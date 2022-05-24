@@ -1070,7 +1070,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			return ajax;
 		}
 
-		String confirmMsg = "";
+		String confirmMsg = etrExchangeTradeCommonValidatorService.isNameSoftControl(dto);
 		if (StringUtils.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
 			Map<String, Object> pageParam = new HashMap<String, Object>();
 			Date sysDate = DateUtil.platDateFromCache();
@@ -1080,7 +1080,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			if (StringUtils.isNotEmpty(price)) {
 				BigDecimal bigPrice = new BigDecimal(price);
 				if (dto.getPrice().compareTo(bigPrice.multiply(new BigDecimal(1.02))) > 0) {
-					confirmMsg = "当前价格超过上一日平均价的2%，是否继续？";
+					confirmMsg += "当前价格超过上一日平均价的2%，是否继续？";
 				}
 			}
 		}

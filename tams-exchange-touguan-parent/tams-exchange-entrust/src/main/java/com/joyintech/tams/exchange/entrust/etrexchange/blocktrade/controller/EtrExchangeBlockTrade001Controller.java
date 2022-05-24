@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -362,6 +363,7 @@ public class EtrExchangeBlockTrade001Controller extends BaseController{
 				ajax=etrExchangeTradeCommon001Service.dbClickCheck(dto);
 			}
 			List<EtrExchangeTradePortfolioRequest> portfolioList=dto.getPortfolioList();
+			String confirmMessage = "";
 			if(!CollectionUtils.isEmpty(portfolioList)) {
 				for (int i = 0; i < portfolioList.size(); i++) {
 					EtrExchangeTradePortfolioRequest item = portfolioList.get(i);
@@ -405,6 +407,7 @@ public class EtrExchangeBlockTrade001Controller extends BaseController{
 					if (null != ajax) {
 						break;
 					}
+					confirmMessage += etrExchangeBlockTrade001ValidatorService.isNameSoftControl(dto);
 				}
 				//DZ校验是否闭市
 				Boolean isNonTradingTime = etrExchangeTrade001Service.isNonTradingTime(dto);
@@ -416,6 +419,11 @@ public class EtrExchangeBlockTrade001Controller extends BaseController{
 				}
 			}
 			if (null != ajax) {
+				return new Message<AjaxResult>().success().setData(ajax);
+			} else if (StringUtil.isNotEmpty(confirmMessage)) {
+				ajax = new AjaxResult();
+				ajax.setMessageType(MessageType.确认消息);
+				ajax.setMessage(confirmMessage);
 				return new Message<AjaxResult>().success().setData(ajax);
 			} else {
 				return new Message<AjaxResult>().success().setMessage("校验通过");

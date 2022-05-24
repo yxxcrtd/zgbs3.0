@@ -763,4 +763,457 @@ public interface EtrExchangeCommonValidator extends BeanValidator {
      * @since 1.0
      */
     List<ValidMessage> bussValid(Object value);
+
+    default String isNameSoftControl(Object value) {
+        StringBuilder confirmMessage = new StringBuilder();
+        boolean isNameSoftControl = Boolean.parseBoolean(CacheUtil.getSysParam("IS_NAME_SOFTCONTROL"));
+        if (!isNameSoftControl) {
+            return confirmMessage.toString();
+        }
+        try {
+            RiskNamListCommonValidatorService riskNamListCommonValidatorService = SpringContextUtil.getBean(
+                    RiskNamListCommonValidatorService.class);
+            TrdProductDeal trdProductDeal = null;
+            String repType = null;
+
+            // 副总裁/总裁助理授权额度检查相关处理
+            String counterId = null;
+            BigDecimal prinAmt = null;
+            String 平安资产类型 = null;
+            String windtypeone = null;
+            String tradeMarket = null;
+            String ps = null;
+            // 资产类型改为授权类型 add by renping 2019-08-06  start
+            String finprodId = null;
+            // 资产类型改为授权类型 add by renping 2019-08-06  end
+            // 资产类型改为授权类型 add by zhangnian 2020-03-04  start
+            String 无标的投管资产类型映射行内资产分类 = null;
+            // 资产类型改为授权类型 add by zhangnian 2019-03-04  end
+            // 无标的投管资产类型映射行内资产分类 inputValue1 inputValue2 inputValue3 add by zhangnian 2020-03-04  start
+            String inputValue1 = null;
+            String inputValue2 = null;
+            String inputValue3 = null;
+            // 无标的投管资产类型映射行内资产分类 inputValue1 inputValue2 inputValue3 add by zhangnian 2019-03-04  end
+            // 债券投资交易
+            if (value instanceof EtrInvestBondInfoDto) {
+                EtrInvestBondInfoDto inputDto = (EtrInvestBondInfoDto) value;
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                // 修改债券获取金额by赵东东 2019.9.4 start
+                prinAmt = inputDto.getEntrustNum();
+                // 修改债券获取金额by赵东东 2019.9.4 end
+                平安资产类型 = DictCodeList.平安资产类型_债券.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                finprodId = inputDto.getFinprodId();
+            }
+            // 拆借投资交易
+            else if (value instanceof EtrLendSpecInfoDto) {
+                EtrLendSpecInfoDto inputDto = (EtrLendSpecInfoDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeList.平安资产类型_拆借.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                inputValue1 = DictCodeList.平安资产类型_拆借.getValue();
+                inputValue2 = ps;
+            }
+            // 存款类资产投资交易
+            else if (value instanceof EtrBrowDepoInfoDto) {
+                EtrBrowDepoInfoDto inputDto = (EtrBrowDepoInfoDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeList.平安资产类型_存款.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                finprodId = inputDto.getFinprodId();
+            }
+            // 基金类投资交易
+            else if (value instanceof EtrFundDto) {
+                EtrFundDto inputDto = (EtrFundDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeList.平安资产类型_基金.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                finprodId = inputDto.getFinprodId();
+            }
+            // 计划类资产（净值型）交易
+            else if (value instanceof EtrPlanAssetNDto) {
+                // 修改强转类型by赵东东2019.9.4 start
+                /* EtrFundDto inputDto = (EtrFundDto)value; */
+                EtrPlanAssetNDto inputDto = (EtrPlanAssetNDto) value;
+                // 修改强转类型by赵东东2019.9.4 start
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeList.平安资产类型_计划类资产_净值型.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                finprodId = inputDto.getFinprodId();
+            }
+            // 计划类资产（利率型）交易
+            else if (value instanceof EtrPlanAssetRDto) {
+                EtrPlanAssetRDto inputDto = (EtrPlanAssetRDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                if (StringUtil.equals(inputDto.getPs(), DictCodeList.交易方向_卖出.getValue())) {
+                    prinAmt = inputDto.getEntrustNum();
+                }
+                平安资产类型 = DictCodeList.平安资产类型_计划类资产_利率型.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                finprodId = inputDto.getFinprodId();
+            }
+            // 回购资产交易
+            else if (value instanceof EtrRepoDto) {
+                EtrRepoDto inputDto = (EtrRepoDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeList.平安资产类型_质押式回购.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                repType = inputDto.getAssetType1();
+                inputValue1 = DictCodeList.平安资产类型_质押式回购.getValue();
+                inputValue2 = repType;
+                inputValue3 = ps;
+            }
+            // 项目类资产交易
+            else if (value instanceof EtrProjectDto) {
+                EtrProjectDto inputDto = (EtrProjectDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeList.平安资产类型_项目类资产.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                finprodId = inputDto.getFinprodId();
+            }
+            //  计划类资产（货币型）交易
+            else if (value instanceof EtrPlanAssetCDto) {
+                EtrPlanAssetCDto inputDto = (EtrPlanAssetCDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeList.平安资产类型_计划类资产_货币型.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                finprodId = inputDto.getFinprodId();
+            }
+            //  买断式回购
+            else if (value instanceof EtrBoutRepoDto) {
+                EtrBoutRepoDto inputDto = (EtrBoutRepoDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeList.平安资产类型_买断式回购.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                inputValue1 = DictCodeList.平安资产类型_买断式回购.getValue();
+                inputValue2 = ps;
+            }
+            // 债券借贷
+            else if (value instanceof EtrSecLendDto) {
+                EtrSecLendDto inputDto = (EtrSecLendDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                // 修改获取金额by赵东东 2019.8.23 start
+                prinAmt = inputDto.getTotalAmt();
+                // 修改获取金额by赵东东 2019.8.23 end
+                平安资产类型 = DictCodeListExt2.平安资产类型_债券借贷.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                // 修改获取借贷方向by赵东东 2019.8.23 start
+                ps = inputDto.getBusiPs();
+                // 修改获取借贷方向by赵东东 2019.8.23 end
+                finprodId = "";//inputDto.getFinprodId();
+                inputValue1 = DictCodeListExt2.平安资产类型_债券借贷.getValue();
+            }
+            // 股票
+            else if (value instanceof EtrStockDto) {
+                EtrStockDto inputDto = (EtrStockDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeListExt2.平安资产类型_股票.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                // 将ps不等于T02的改成T01 赵东东 2019.8.26 start
+                if (!StringUtil.equals(ps, DictCodeList.交易方向_卖出.getValue())) {
+                    // 将代码中的字符串改掉by赵东东 2019.8.26 start
+                    ps = DictCodeList.交易方向_买入.getValue();
+                    // 将代码中的字符串改掉by赵东东 2019.8.26 end
+                }
+                // 将ps不等于T02的改成T01 赵东东 2019.8.26 end
+                finprodId = inputDto.getFinprodId();
+            }
+            // 外汇即期
+            else if (value instanceof EtrWtSpotexDto) {
+                EtrWtSpotexDto inputDto = (EtrWtSpotexDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeListExt2.平安资产类型_外汇即期.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                inputValue1 = DictCodeListExt2.平安资产类型_外汇即期.getValue();
+            }
+            // 外汇远期
+            else if (value instanceof EtrForwexDto) {
+                EtrForwexDto inputDto = (EtrForwexDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                平安资产类型 = DictCodeListExt2.平安资产类型_外汇远期.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                inputValue1 = DictCodeListExt2.平安资产类型_外汇远期.getValue();
+            }
+            // 外汇掉期
+            else if (value instanceof EtrWtFxswapDto) {
+                EtrWtFxswapDto inputDto = (EtrWtFxswapDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                // 修改获取交易金额by赵东东 2019.8.23 start
+                prinAmt = inputDto.getTradeAmt();
+                // 修改获取交易金额by赵东东 2019.8.23 end
+                平安资产类型 = DictCodeListExt2.平安资产类型_外汇掉期.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                // 修改获取交易方向by赵东东 2019.8.23 start
+                ps = inputDto.getTradePs();
+                // 修改获取交易方向by赵东东 2019.8.23 start
+                inputValue1 = DictCodeListExt2.平安资产类型_外汇掉期.getValue();
+            }
+            // 利率互换
+            else if (value instanceof EtrIRSDto) {
+                EtrIRSDto inputDto = (EtrIRSDto) value;
+
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                // 修改金额的大小by赵东东 2019.8.23 start
+                prinAmt = inputDto.getEntrustAmt().multiply(new BigDecimal(10000));
+                // 修改金额的大小by赵东东 2019.8.23 end
+                平安资产类型 = DictCodeListExt2.平安资产类型_利率互换.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                // 修改交易方向by赵东东 2019.8.23 start
+                ps = inputDto.getBusiPs();
+                // 修改交易方向by赵东东 2019.8.23 start
+                inputValue1 = DictCodeListExt2.平安资产类型_利率互换.getValue();
+            }
+            // 可转债 add by gejiaao
+            else if (value instanceof EtrConBondDto) {
+                EtrConBondDto inputDto = (EtrConBondDto) value;
+                EtrConBondService etrConBondService = SpringContextUtil.getBean(EtrConBondService.class);
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getEtrInvestPersonInfo().getCounterId();
+                prinAmt = inputDto.getPurchBondTotal();
+                平安资产类型 = DictCodeList.平安资产类型_债券.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = etrConBondService.getTrdProductDeal(inputDto);
+                ps = inputDto.getPs();
+                finprodId = inputDto.getFinprodId();
+            }
+
+            // 可转债转股 add by gaopeng  20191123
+            else if (value instanceof EtrBondToStockDto) {
+                EtrBondToStockDto inputDto = (EtrBondToStockDto) value;
+                EtrBondToStockService etrBondToStockService = SpringContextUtil.getBean(EtrBondToStockService.class);
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getEtrInvestPersonInfo().getCounterId();
+                prinAmt = inputDto.getStocketrPriceTotal();
+                平安资产类型 = DictCodeListExt2.平安资产类型_股票.getValue();
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = etrBondToStockService.getTrdProductDeal(inputDto);
+                ps = inputDto.getPs();
+                trdProductDeal.setFinprodId(inputDto.getShareFinprodId());
+                finprodId = inputDto.getShareFinprodId();
+            }
+            //场内交易指令 add by yzg 20201214 start
+            else if (value instanceof EtrExchangeTradeSaveRequest) {
+                EtrExchangeTradeSaveRequest inputDto = (EtrExchangeTradeSaveRequest) value;
+                // 副总裁/总裁助理授权额度检查相关处理
+                counterId = inputDto.getCounterId();
+                prinAmt = inputDto.getEntrustAmt();
+                if (StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
+                    平安资产类型 = DictCodeList.平安资产类型_债券.getValue();
+                } else if (StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_基金.getValue())) {
+                    平安资产类型 = DictCodeList.平安资产类型_基金.getValue();
+                } else if (StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_股票.getValue())) {
+                    平安资产类型 = DictCodeListExt2.平安资产类型_股票.getValue();
+                } else {
+                    平安资产类型 = DictCodeList.平安资产类型_质押式回购.getValue();
+                }
+                windtypeone = inputDto.getFinprodType2();
+                tradeMarket = inputDto.getTradeMarket();
+                trdProductDeal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                ps = inputDto.getPs();
+                finprodId = inputDto.getFinprodId();
+            }
+            //场内交易指令 add by yzg 20201214 end
+            //交易所质押式协议回购 add by chendijun 20210311
+            else if (value instanceof EtrExchangeAgreRepTrade001Dto) {
+                EtrExchangeAgreRepTrade001Dto inputDto = (EtrExchangeAgreRepTrade001Dto) value;
+                counterId = inputDto.getCounterId();
+                //prinAmt = inputDto.getPrintAmt();
+                //回购金额和方向判断 add by yzg 20210325 start
+                EtrExchangeAgreRepTrade001Service etrAgreRepTrade001Service = SpringContextUtil.getBean(EtrExchangeAgreRepTrade001Service.class);
+                //逆回购和正回购按正常交易金额和交易方向授权
+                if (StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_正回购.getValue())
+                        || StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
+                    ps = inputDto.getPs();
+                    prinAmt = inputDto.getTradeAmt();
+                }
+                //提前购回、到期购回、中途换券、解除质押根据原始回购的交易方向和回购金额进行授权判断
+                else if (StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_提前购回.getValue())
+                        || StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_到期购回.getValue())
+                        || StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
+                        || StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
+                    //获得初始活够金额和交易方向
+                    Map<String, Object> map = new HashMap<>();
+                    // 上交所、深交所取值来源不一致
+                    map.put("tradeId", (inputDto.getIntiTradeId() == null || inputDto.getIntiTradeId().equals("")) ? inputDto.getTradeId() : inputDto.getIntiTradeId());
+                    EtrExchangeAgreRepTrade001Dto result = etrAgreRepTrade001Service.getEntrustInfoByTradeId(map);
+                    if (StringUtil.isNotEmpty(result)) {
+                        ps = result.getPs();
+                        prinAmt = result.getTradeAmt();
+                    }
+                }
+                //到期续作使用原始的回购金额和续做的回购金额中的较大值进行判断
+                else if (StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue())) {
+                    //获得初始回购金额和交易方向
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("tradeId", (inputDto.getIntiTradeId() == null || inputDto.getIntiTradeId().equals("")) ? inputDto.getTradeId() : inputDto.getIntiTradeId());
+                    EtrExchangeAgreRepTrade001Dto result = etrAgreRepTrade001Service.getEntrustInfoByTradeId(map);
+                    if (StringUtil.isNotEmpty(result)) {
+                        ps = result.getPs();
+                        prinAmt = result.getTradeAmt();
+                        if (inputDto.getTradeAmt().compareTo(prinAmt) > 0) {
+                            prinAmt = inputDto.getTradeAmt();
+                        }
+                    } else {
+                        ps = DictCodeListExt3.交易方向_逆回购.getValue();
+                        prinAmt = inputDto.getTradeAmt();
+                    }
+                }
+                //回购金额和方向判断 add by yzg 20210325 end
+                平安资产类型 = DictCodeList.平安资产类型_质押式回购.getValue();
+                inputValue1 = DictCodeList.平安资产类型_质押式回购.getValue();
+                repType = DictCodeList.回购类型_质押式协议回购.getValue();
+                inputValue2 = repType;
+                if (StringUtil.equals(inputDto.getRepPs(), DictCodeList.回购拆借方向_正回购.getValue())) {
+                    windtypeone = DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue();
+                    inputValue3 = DictCodeListExt3.行内资产三级分类_正回购.getValue();
+                } else {
+                    windtypeone = DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue();
+                    inputValue3 = DictCodeListExt3.行内资产三级分类_逆回购.getValue();
+                }
+                tradeMarket = inputDto.getTradeMarket();
+
+                trdProductDeal = new TrdProductDeal();
+                trdProductDeal.setTradeDate(DateUtil.parse(inputDto.getVdate()));
+                trdProductDeal.setFinprodId(inputDto.getFinprodId());
+            }
+
+            if (trdProductDeal != null) {
+                if (StringUtil.isNotEmpty(trdProductDeal.getFinprodId())) {
+                    Map<String, Object> param = new HashMap<>();
+                    if (StringUtil.isNotEmpty(trdProductDeal.getFinprodId())) {
+                        param.put("finprodId", trdProductDeal.getFinprodId());
+                    } else {
+                        param.put("inputValue1", inputValue1);
+                        param.put("inputValue2", inputValue2);
+                        param.put("inputValue3", inputValue3);
+                    }
+                    param = riskNamListCommonValidatorService.名单是否匹配(param);
+                    if (Boolean.parseBoolean(param.get("isAssetMatch").toString())) {
+                        if (param.containsKey("listTypeAsset")) {
+                            confirmMessage.append("资产在黑名单内，禁止投资!");
+                        }
+                    } else if (!Boolean.parseBoolean(param.get("isAssetMatch").toString()) && Boolean.parseBoolean(param.get("isAssetWhiteList").toString())) {
+                        confirmMessage.append("该资产不在白名单内，禁止投资!");
+                    }
+                    if (!Boolean.parseBoolean(param.get("isOrgBlackMatch").toString())) {
+                        if (param.containsKey("listTypeOrg")) {
+                            confirmMessage.append("资产所属机构（或交易对手）在黑名单内，禁止投资!");
+                        }
+                    } else if (!Boolean.parseBoolean(param.get("isOrgWhiteMatch").toString())) {
+                        confirmMessage.append("该资产所属机构（或交易对手）不在白名单内，禁止投资!");
+                    }
+                }
+            }
+            //add by 张年  2019/08.02 end
+        } catch (Exception e) {
+            logger.info("执行风险相关交易共通check出现异常，异常信息如下：");
+            logger.error(e.getMessage(), e);
+        }
+        return confirmMessage.toString();
+    }
 }
