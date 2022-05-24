@@ -10,16 +10,11 @@ import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-
-import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
 
 @ApiModel(value = "委托报文", description = "委托报文")
 public class EntrustVo extends BaseEntity implements Serializable, EntrustInterface, Cloneable, KeyMethodInterface<String> {
@@ -483,12 +478,6 @@ public class EntrustVo extends BaseEntity implements Serializable, EntrustInterf
     }
 
     public BigDecimal getCancelBalance() {
-        if (投管业务类型_通用式质押回购.getValue().equals(busiTypeTg)) {
-            return BigDecimal.valueOf(cancelVolume * 100);
-        } else if (entrustPrice != null) {
-            return entrustPrice.multiply(BigDecimal.valueOf(cancelVolume));
-        }
-
         return cancelBalance;
     }
 

@@ -56,4 +56,11 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/5/21 17:12
      */
     int updateBidOrderBidPrice(@Param("bidId") String bidId);
+
+    /**
+     * 一级投标确认交易查看
+     * @param pageParam
+     * @return
+     */
+    List<CfetsTrdFirstBidFirmInfoDto> viewPage(Map<String, Object> pageParam);
 }

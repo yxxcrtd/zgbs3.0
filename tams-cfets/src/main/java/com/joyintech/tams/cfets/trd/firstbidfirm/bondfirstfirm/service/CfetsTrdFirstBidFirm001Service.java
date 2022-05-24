@@ -117,12 +117,12 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     /**
      * 页面设置区域id-表格
      */
-    private static final String dtCode = "ETRDETINFOLIST";
+    private static final String DTCODE_ETR = "ETRDETINFOLIST";
 
     /**
      * 页面设置区域id-表单
      */
-    private static final String formDtCode = "ETRDETINFO";
+    private static final String FORMDTCODE_ETR = "ETRDETINFO";
 
     /**
      * 通用设置 默认999999
@@ -407,13 +407,13 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         //查询投标产品列表
         List<CfetsTrdBondFirstBidFirmProductDto> productDtos = cfetsTrdFirstBidFirm001Mapper.getEntrustProductInfo(param);
         List<String> spcdCodeList = new ArrayList<>();
-        result.put("form", getReadonlyForms(spcdCodeList));
+        result.put("form", getReadonlyForms(this.pageCode, DTCODE_ETR, spcdCodeList));
         if (StringUtil.isNotEmpty(formData)) {
             result.put("formData", formData);
         }
 
         // 表格格式
-        result.put("table", getBySpcdCodes(new ArrayList<>()));
+        result.put("table", getBySpcdCodes(this.pageCode, FORMDTCODE_ETR, new ArrayList<>()));
         if (CollectionUtils.isNotEmpty(productDtos)) {
             // 表单数据
             result.put("tableData", productDtos);
@@ -442,7 +442,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         }
         // 表格格式
         List<String> spcdCodeList = new ArrayList<>();
-        result.put("table", getBySpcdCodes(spcdCodeList));
+        result.put("table", getBySpcdCodes(null, null,spcdCodeList));
 
         return result;
     }
@@ -451,11 +451,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      * 查询表单表头 (私有方法 pageCode,dtCode,spcdCodeList仅组装该页面的数据)
      *
      */
-    private List<CfgReadonlyFormShow> getReadonlyForms(List<String> spcdCodeList) {
-        //页面id
-        String pageCode = this.pageCode;
-        //区域id
-        String dtCode = this.formDtCode;
+    private List<CfgReadonlyFormShow> getReadonlyForms(String pageCode, String dtCode, List<String> spcdCodeList) {
         if (CollectionUtils.isEmpty(spcdCodeList)) {
             spcdCodeList = new ArrayList<>();
         }
@@ -468,11 +464,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      * 查询表单表头 (私有方法 pageCode,dtCode,spcdCodeList仅组装该页面的数据)
      *
      */
-    private List<CfgDataTableShow> getBySpcdCodes(List<String> spcdCodeList) {
-        //页面id
-        String pageCode = this.pageCode;
-        //区域id
-        String dtCode = this.dtCode;
+    private List<CfgDataTableShow> getBySpcdCodes(String pageCode, String dtCode, List<String> spcdCodeList) {
         if (spcdCodeList == null) {
             spcdCodeList = new ArrayList<>();
         }
