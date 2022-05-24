@@ -615,11 +615,6 @@ public class EntrustUtils {
 
     // 是否为质押式回购指令
     public static boolean isPledgeRepurchase(Instruction instruction) {
-        return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType());
-    }
-
-    // 是否为质押式竞价回购指令
-    public static boolean isPledgeAuctionRepurchase(Instruction instruction) {
         return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
                 && InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1());
     }

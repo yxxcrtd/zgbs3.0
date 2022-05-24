@@ -331,13 +331,15 @@ public class PositionRequestServiceInstructionRequest {
                 map.put(ETR_SEC_AMOUNT, item.getEtrSecAmount());
                 if (交易方向_质押券入库.getValue().equals(entity.getPs())
                         || 交易方向_质押券出库.getValue().equals(entity.getPs())) {
-                    map.put("cashAmount", null);//出入库时，可以为空
+                    //出入库时，可以为空
+                    map.put("cashAmount", null);
                     Map<String, Object> params = new HashMap<>();
                     params.put("finprodId", entity.getFinprodId());
                     BigDecimal faceValue = etrTradeOtherCommonService.selectFaceValue(params);
                     // 标准券总额=质押券数量*折算率*最新面值
                     BigDecimal standardSecAmount = item.getEntrustAmt().multiply(faceValue).divide(BigDecimal.valueOf(100));
-                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.setScale(0, BigDecimal.ROUND_DOWN).longValue() * 100);//向下取整
+                    //向下取整
+                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.setScale(0, BigDecimal.ROUND_DOWN).longValue() * 100);
                 } else {
                     // 标准券总额=标准券数量*100
                     map.put(STANDARD_SEC_AMOUNT, item.getEntrustNum() * 100);
