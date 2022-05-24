@@ -51,7 +51,7 @@ public interface FinProductSpecial001Mapper {
      * @param iPlatformDate
      * @return
      */
-    Integer countFinprodIdProcessing(@Param("finprodId") String finprodId, @Param("iPlatformDate") Date iPlatformDate);
+    int countFinprodIdProcessing(@Param("finprodId") String finprodId, @Param("iPlatformDate") Date iPlatformDate);
 
     /**
      * 接口表简单数据查询
