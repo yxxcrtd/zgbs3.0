@@ -644,12 +644,14 @@ public class PortfolioManager extends BaseService {
         }
 
         // 委托价格为0的指令（市价指令），将涨跌停价填充到委托价格
-//        for (Instruction ins : tempList) {
-//            if (isZeroPriceMarketInstruction(ins)) {
+        for (Instruction ins : tempList) {
+            if (isZeroPriceMarketInstruction(ins)) {
+                ins.setEntrustPrice(lastPrice);
+                log.debug("将最新价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
 //                ins.setEntrustPrice(this.getMarketPrice(tick, entrustBs));
 //                log.debug("将涨跌停价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
-//            }
-//        }
+            }
+        }
 
         // 系统参数：委托价格不优于指令价格时的处理模式:01-禁止
         if (EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()
@@ -896,8 +898,10 @@ public class PortfolioManager extends BaseService {
 
                 FairPortfolioResponse response = new FairPortfolioResponse();
                 BeanUtils.copyProperties(ins, response);
-
                 response.setInstruction(ins);
+                if (EntrustUtils.isMarketPrice(ins)) {
+                    response.setEntrustPrice(BigDecimal.ZERO);
+                }
                 list.add(response);
                 continue;
             }
@@ -925,6 +929,9 @@ public class PortfolioManager extends BaseService {
                 copyInstruction.setInstruction(ins);
                 copyInstruction.setPortfolioId(detail.getPortfolioId());
                 copyInstruction.setPortfolioName(detail.getPortfolioName());
+                if (EntrustUtils.isMarketPrice(ins)) {
+                    copyInstruction.setEntrustPrice(BigDecimal.ZERO);
+                }
 
                 // - 计算组合委托额度
                 disRate = isVolume ? (detail.getEntrustNum().divide(BigDecimal.valueOf(ins.getEntrustNum()), 8, RoundingMode.HALF_UP)) : (detail.getEntrustAmt().divide(ins.getEntrustAmt(), 8, RoundingMode.HALF_UP));
