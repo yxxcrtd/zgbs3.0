@@ -197,7 +197,7 @@ public class EntrustManagement extends BaseService {
                 entrust.setEntrustBalance(entrust.getEntrustBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
                 entrust.setTradedBalance(entrust.getTradedBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
                 entrust.setFrozenBalance(entrust.getFrozenBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
-                entrust.setCancelBalance(entrust.getCancelBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
+                entrust.setCancelBalance(BigDecimal.valueOf(entrust.getCancelVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
             }
             entrusts.add(entrust);
         });
