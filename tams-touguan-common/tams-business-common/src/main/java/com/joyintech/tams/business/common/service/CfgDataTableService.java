@@ -1,12 +1,13 @@
 package com.joyintech.tams.business.common.service;
 
 import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.business.common.dao.CfgDataTableFlagMapper;
 import com.joyintech.tams.business.common.dao.CfgDataTableMapper;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgDataTableShowFlag;
+import com.joyintech.tams.constant.DictCodeList;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,6 +95,10 @@ public class CfgDataTableService {
             }
         });
         CfgDataTableShowFlag flag = cfgDataTableFlagMapper.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodes, userId);
+        List<CfgDataTableShow> tempList = cfgDataTableMapper.getBySpcdCodesByIsHide(pageCode, dtCode, spcdCodes, EFFERANGE_NO, USER_ID, DictCodeList.是否_是.getValue());
+        if (CollectionUtils.isNotEmpty(tempList)) {
+            dataTableShowList.addAll(tempList);
+        }
         if (null != flag) {
             //删除用户原有自定义设置
             cfgDataTableFlagMapper.deleteDataTables(pageCode, dtCode, spcdCodes, userId);
