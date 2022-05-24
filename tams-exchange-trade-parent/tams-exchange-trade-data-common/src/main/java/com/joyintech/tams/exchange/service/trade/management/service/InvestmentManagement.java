@@ -62,8 +62,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
-import static com.joyintech.tams.exchange.common.constant.InvestmentAssetType.PLEDGE_REPURCHASE;
-import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.BIDDING_REPO;
 import static com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum.*;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -107,6 +105,8 @@ public class InvestmentManagement extends BaseService {
     private MinTrdUnitLimitService minTrdUnitLimitService;
     @Autowired
     private MinPriceService minPriceService;
+    @Autowired
+    private InstrumentManagement instrumentManagement;
     /**
      * 是否单体服务
      */
@@ -511,6 +511,16 @@ public class InvestmentManagement extends BaseService {
 //                instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
             String finprodMarketId = instruction.getFinprodMarketId();
             Instrument instrument = instrumentService.findById(finprodMarketId);
+            if (ObjectUtil.isNull(instrument)) {
+                Map<String, Object> params = new HashMap<String, Object>();
+                if (!Strings.isNullOrEmpty(finprodMarketId)) {
+                    params.put("stock_code", finprodMarketId);
+                }
+                ResultBean resultBean = instrumentManagement.flushInstrumentData(params);
+                if (ErrorCode.SUCCESS.value == resultBean.getErrorCode()) {
+                    instrument = instrumentService.findById(finprodMarketId);
+                }
+            }
             if (ObjectUtil.isNull(instrument)) {
                 logger.warn("获取合约信息失败，无法填充最小价差等交易属性信息 => 【instructionId = {}, finprodMarketId = {}】", instruction.getEntrustId(), finprodMarketId);
                 continue;
