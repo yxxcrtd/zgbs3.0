@@ -68,7 +68,15 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                 resultList.add(new ValidMessage(getMessage("特殊债券标识至少其中一个为是!")));
             }
         }
-
+        if (dto.getOperateType().equals(OperationType.NEW.name())) {
+            WflValidInputParameter parameter = new WflValidInputParameter();
+            parameter.setPageId("CfetsBasicInfo001");
+            parameter.setBusinessDataPk1(dto.getFinprodMarketId());
+            ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
+            if (Objects.nonNull(dataEntityFromProcessMark)) {
+                resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可新建")));
+            }
+        }
         //判断特殊资产维护是否存在流程中数据
         if (dto.getOperateType().equals(OperationType.DELETE.name())) {
             WflValidInputParameter parameter = new WflValidInputParameter();
