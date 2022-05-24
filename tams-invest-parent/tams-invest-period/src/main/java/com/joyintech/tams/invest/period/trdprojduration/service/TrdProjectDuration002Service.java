@@ -63,6 +63,7 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.entity.CommentFunction;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * @author : 强成西
@@ -725,5 +726,15 @@ public class TrdProjectDuration002Service extends BaseService<TrdProjectDuration
         BussinessCodeParameter parameter = new BussinessCodeParameter();
         parameter.setCommonBusinessType(DictCodeList.共通业务类型_资产存续期交易);
         return  baseGetBusinessIdImpl.buildBussinessCode(parameter);
+    }
+
+    /**
+     *  资产是否还本带息，若还本带息，还本日是否等于付息日
+     * @param map
+     * @return
+     */
+    public Boolean isPayIntDate(@RequestBody Map<String,Object> map) {
+        return restTemplate.postForObject(ServiceApplication.PERIOD_SERVICE_NAME + "/TrdProjectDuration/isPayIntDate",
+                map, Boolean.class);
     }
 }
