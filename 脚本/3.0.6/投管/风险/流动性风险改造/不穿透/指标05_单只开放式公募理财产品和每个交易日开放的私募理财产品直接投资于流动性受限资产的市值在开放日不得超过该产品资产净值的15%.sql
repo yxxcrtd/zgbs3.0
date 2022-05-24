@@ -265,6 +265,33 @@ SELECT SUM(TRADE_AMT) RVALUE FROM (
     WHERE m.PORTFOLIO_ID IN ${portfolioCode} AND n.TRADE_DATE = DATE''${valDate}''
     AND n.PS IN (''T01'', ''T02'', ''T03'', ''T04'', ''T19'', ''T07'', ''T08'', ''T09'', ''T11'', ''T46'', ''T47'', ''T48'', ''T52'', ''T22'', ''T23'', ''T39'', ''T38'',''T54'',''T100'')
   UNION ALL
+      SELECT
+          nvl(sum(decode(n.PS, ''T01'', n.TRADE_AMT)), 0)
+        + nvl(sum(decode(n.PS, ''T04'', n.TRADE_AMT)), 0)
+        + nvl(sum(decode(n.PS, ''T46'', n.TRADE_AMT)), 0)
+        + nvl(sum(decode(n.PS, ''T47'', n.TRADE_AMT)), 0)
+        + nvl(sum(decode(n.PS, ''T48'', n.TRADE_AMT)), 0)
+        + nvl(sum(decode(n.PS, ''T52'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T02'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T03'', n.TRADE_AMT)), 0)
+  	    - nvl(sum(decode(n.PS, ''T100'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T19'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T07'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T08'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T09'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T11'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T22'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T23'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T38'', n.TRADE_AMT)), 0)
+        - nvl(sum(decode(n.PS, ''T39'', n.TRADE_AMT)), 0)
+  	    - nvl(sum(decode(n.PS, ''T54'', n.TRADE_AMT)), 0)
+  	    - nvl(sum(decode(n.PS, ''T56'', n.TRADE_AMT)), 0) AS TRADE_AMT
+      FROM TRD_PRODUCT_TEMP_DEAL_ADD m
+      INNER JOIN TRD_PRODUCT_TEMP_DEAL n ON m.TRADE_ID = n.TRADE_ID and (n.TRADE_STATUS = ''01'' OR n.TRADE_STATUS IS NULL) and NVL(n.IS_CANCEL,''N'') =''N''
+      INNER JOIN PROD t2 ON t2.FINPROD_ID = n.FINPROD_ID
+      WHERE m.PORTFOLIO_ID IN ${portfolioCode} AND n.TRADE_DATE = DATE''${valDate}''
+      AND n.PS IN (''T01'', ''T02'', ''T03'', ''T04'', ''T19'', ''T07'', ''T08'', ''T09'', ''T11'', ''T46'', ''T47'', ''T48'', ''T52'', ''T22'', ''T23'', ''T39'', ''T38'',''T54'',''T100'')
+  UNION ALL
     SELECT
         nvl(sum(decode(n.PS, ''T01'', n.TRADE_AMT)), 0)
       + nvl(sum(decode(n.PS, ''T04'', n.TRADE_AMT)), 0)
