@@ -821,8 +821,10 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
                 }
             }
         }
-        return ajax == null || CollectionUtils.isEmpty(ajax.getErrorList()) || !StringUtil.equals(ajax.getMessageType(),MessageType.确认消息.getCode()) ?
-                commonCheck(result, dto.getOperateType()): ajax;
+        if (null != ajax && (!CollectionUtils.isEmpty(ajax.getErrorList()) || StringUtil.equals(ajax.getMessageType(), MessageType.确认消息.getCode()))) {
+            return ajax;
+        }
+        return commonCheck(result, dto.getOperateType());
     }
 
     /**
