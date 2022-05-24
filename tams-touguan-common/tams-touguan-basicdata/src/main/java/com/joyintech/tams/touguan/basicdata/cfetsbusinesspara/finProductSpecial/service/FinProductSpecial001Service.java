@@ -94,7 +94,7 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
      * @return
      */
     public Integer countFinprodIdProcessing(String finprodId) {
-        return finProductSpecial001Mapper.countFinprodIdProcessing(finprodId, iPlatformDate.getSysDate());
+        return finProductSpecial001Mapper.countFinprodIdProcessing(finprodId, iPlatformDate.getSysDateStr());
     }
 
     @Override
