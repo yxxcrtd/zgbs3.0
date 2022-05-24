@@ -887,12 +887,39 @@ public class PortfolioManager extends BaseService {
     private List<FairPortfolioResponse> getFairInstructionList(List<PortfolioInstructionContextDto> fairList, PortfolioAllocationResponse result) {
         List<FairPortfolioResponse> list = new ArrayList<>();
 
+        long sumEntrustVolume = 0;
+
         // 获取多组合
         for (PortfolioInstructionContextDto context : fairList) {
             Instruction ins = context.getInstruction();
             List<InstructionDetail> instructionDetails = instructionDetailService.queryInstructionDetailsByInstructionId(ins.getEntrustId());
 
+            // 订单类型：数量单，指令单
+            boolean isVolume = ins.getEntrustNum() > 0L;
+            // 订单数量
+            BigDecimal orderVolume = BigDecimal.valueOf(context.getEntrustVolume());
+
+            // 最小步长
+            BigDecimal minStep = this.getMinStep(ins);
+            if (EntrustUtils.isPledgeRepurchase(ins)) {
+                minStep = minStep.divide(BigDecimal.valueOf(100L));
+            }
+
             if (Objects.isNull(instructionDetails) || instructionDetails.size() == 0 || instructionDetails.size() == 1) {
+                // 数量
+                if (TradeUtils.bigThanZero(orderVolume)) {
+                    if (TradeUtils.lessThan(orderVolume, minStep)) {
+                        // 小于最小交易单位时的处理，置为0
+                        orderVolume = BigDecimal.ZERO;
+                    } else {
+                        // 大于等于最小交易单位时的处理，最小交易单位整数倍
+                        orderVolume = TradeUtils.subtractMod(orderVolume, minStep);
+                    }
+                }
+                ins.setConNum(orderVolume);
+
+                sumEntrustVolume = sumEntrustVolume + orderVolume.longValue();
+
                 // 处理单组合
                 handleFields(result, ins);
 
@@ -902,23 +929,15 @@ public class PortfolioManager extends BaseService {
                 if (EntrustUtils.isMarketPrice(ins)) {
                     response.setEntrustPrice(BigDecimal.ZERO);
                 }
+
                 list.add(response);
                 continue;
             }
 
-            // 订单类型：数量单，指令单
-            boolean isVolume = ins.getEntrustNum() > 0L;
-            // 订单数量
-            BigDecimal orderVolume = BigDecimal.valueOf(context.getEntrustVolume());
             // 委托数量
             BigDecimal entrustVolume = BigDecimal.ZERO;
             // 分配比例
             BigDecimal disRate = BigDecimal.ONE;
-            // 最小步长
-            BigDecimal minStep = this.getMinStep(ins);
-            if (EntrustUtils.isPledgeRepurchase(ins)) {
-                minStep = minStep.divide(BigDecimal.valueOf(100L));
-            }
 
             // 单指令多组合扩展列表
             List<FairPortfolioResponse> singleList = new ArrayList<>();
@@ -967,6 +986,8 @@ public class PortfolioManager extends BaseService {
                 }
                 copyInstruction.setConNum(entrustVolume);
 
+                sumEntrustVolume = sumEntrustVolume + entrustVolume.longValue();
+
                 singleList.add(copyInstruction);
             }
 
@@ -985,6 +1006,17 @@ public class PortfolioManager extends BaseService {
 
             list.addAll(singleList);
         }
+
+        // 计算总委托数量和总委托金额
+        result.setTotalEntrustVolume(sumEntrustVolume);
+        // 特殊处理 质押式回购交易，委托金额=委托数量*100
+        FairPortfolioResponse response = list.get(0);
+        if (EntrustUtils.isPledgeRepurchase(response.getInstruction())) {
+            result.setTotalEntrustAmt(BigDecimal.valueOf(100L).multiply(BigDecimal.valueOf(sumEntrustVolume)));
+        } else {
+            result.setTotalEntrustAmt(result.getPrice().multiply(BigDecimal.valueOf(sumEntrustVolume)));
+        }
+
         return list;
     }
 
