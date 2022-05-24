@@ -72,6 +72,20 @@ public class BillingDetailsDto {
     @ApiModelProperty(name = "secManageAcctId",value = "证券托管户")
     private String secManageAcctId;
 
+    /**
+     * 证券管理账户/通道代码，无通道无证券管理账户的存999999
+     */
+    @ApiModelProperty(name = "secAcctId",value = "证券管理账户")
+    private String secAcctId;
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
+    }
+
     public String getSecManageAcctId() {
         return secManageAcctId;
     }

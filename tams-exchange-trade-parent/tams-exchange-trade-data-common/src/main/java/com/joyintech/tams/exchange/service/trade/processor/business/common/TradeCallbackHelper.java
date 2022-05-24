@@ -320,6 +320,10 @@ public class TradeCallbackHelper {
                 return;
 //                    }
 //                }
+                //信用证保护凭证买入、卖出推手动交收 申购推成交回报
+            }else if(InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType()) && (DictCodeList.交易方向_买入.getValue().equals(instruction.getPs()) || DictCodeList.交易方向_卖出.getValue().equals(instruction.getPs()))){
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
+                return;
             }
 //            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
             messageSenderManagement.pushTrade(tradeRecord, instruction, entrust, portfolioTradeMessages);

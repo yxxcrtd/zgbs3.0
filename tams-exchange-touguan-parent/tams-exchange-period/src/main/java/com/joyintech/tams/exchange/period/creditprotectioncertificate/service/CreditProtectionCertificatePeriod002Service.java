@@ -4,6 +4,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -12,9 +13,11 @@ import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodMapper;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
+import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -86,6 +89,18 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     @Autowired
     private DateCalService dateCalService;
 
+    @Autowired
+    private EtrSecPositionFlowMapper etrSecPositionFlowMapper;
+
+    @Autowired
+    private PtlSecPositionFlowMapper ptlSecPositionFlowMapper;
+
+    @Autowired
+    private EtrCashPositionFlowMapper etrCashPositionFlowMapper;
+
+    @Autowired
+    private PtlCashPositionFlowMapper ptlCashPositionFlowMapper;
+
 
     @Override
     public void doComplete(CreditProtectionCertificatePeriodSaveDto entity, OperationType operationType) {
@@ -93,6 +108,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         deleteFlow(entity.getWorkflowId());
         insertDate(baseBussinessDto, entity);
         if (!StringUtil.equals("save", entity.getOperateType())) {
+            doOldPositionConfirm(entity, false);
             String decisionAct = 系统动作_新建.getValue();
             String systemAct = 系统动作_新建.getValue();
             positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct);
@@ -105,12 +121,14 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         deleteFlow(entity.getWorkflowId());
         insertFlow(baseBussinessDto, entity);
         if (!StringUtil.equals("save", entity.getOperateType())) {
+
+            doOldPositionSubmit(entity, true);
+
             String decisionAct = 系统动作_新建.getValue();
             String systemAct = 系统动作_新建.getValue();
             positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct);
         }
     }
-
 
     @Override
     public void doUpdate(CreditProtectionCertificatePeriodSaveDto entity) {
@@ -123,20 +141,24 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct);
         }
     }
-
-    @Override
-    public void doDelete(String workflowId) {
-        baseTradeProductDealCommServiceImpl.delete(workflowId);
-    }
+//
+//    @Override
+//    public void doDelete(String workflowId) {
+//        baseTradeProductDealCommServiceImpl.delete(workflowId);
+//    }
 
     @Override
     public void doBack(CreditProtectionCertificatePeriodSaveDto entity) {
+        doOldPositionSubmit(entity, true);
         AllTradeCommonUtil.deletePositionReal(entity.getBusiCode());
     }
 
     @Override
     public void doRevoke(CreditProtectionCertificatePeriodSaveDto entity) {
         AllTradeCommonUtil.deletePositionReal(entity.getBusiCode());
+        CreditProtectionCertificatePeriodSaveDto dto = getBussinessEntityByWorkflowId(entity.getWorkflowId());
+        doOldPositionSubmit(dto, true);
+        doOldPositionConfirm(dto, true);
         positionRequestService.sendRevokeCreditProtectionCertificatePeriod(entity);
     }
 
@@ -578,5 +600,173 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             return dateCalService.calculationTradingDay(tradeDate, 1, holiday, "1");
         }
         return null;
+    }
+
+    /**
+     * 老头寸处理 新建提交
+     *
+     * @param entity
+     * @param isRevoke
+     */
+    private void doOldPositionSubmit(CreditProtectionCertificatePeriodSaveDto entity, boolean isRevoke) {
+        List<BillingDetailsDto> billingDetails = entity.getBillingDetails();
+        //指令持仓流水&指令持仓
+        List<EtrSecPositionFlow> etrSecPositionFlows = new ArrayList<>();
+        //交易持仓流水&交易持仓
+        List<PtlSecPositionFlow> ptlSecPositionFlows = new ArrayList<>();
+
+        if (StringUtil.equals(DictCodeListExt4.结算方式_标的_现金结算.getValue(), entity.getSettleMethod())) {
+            for (BillingDetailsDto billingDetail : billingDetails) {
+                EtrSecPositionFlow etrSecPositionFlow = new EtrSecPositionFlow();
+                etrSecPositionFlow.setSeqno(IDGenerator.generate());
+                etrSecPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
+                etrSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
+                etrSecPositionFlow.setFinprodId(entity.getFinprodMarketId());
+                etrSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
+                etrSecPositionFlow.setInvAim(null);
+                etrSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                etrSecPositionFlow.setCdate(entity.getTradeDate());
+                etrSecPositionFlow.setAmount(billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)));
+                etrSecPositionFlow.setpFinprodId(null);
+                etrSecPositionFlow.setTradeId(entity.getBusiCode());
+                etrSecPositionFlow.setOffsetId(entity.getBusiCode());
+                etrSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
+                etrSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
+                etrSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
+                etrSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
+                etrSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+                etrSecPositionFlow.setUpdateTime(DateUtil.now());
+                etrSecPositionFlows.add(etrSecPositionFlow);
+
+                PtlSecPositionFlow ptlSecPositionFlow = new PtlSecPositionFlow();
+                ptlSecPositionFlow.setSeqno(IDGenerator.generate());
+                ptlSecPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
+                ptlSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
+                ptlSecPositionFlow.setFinprodId(entity.getFinprodMarketId());
+                ptlSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
+                ptlSecPositionFlow.setInvAim(null);
+                ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                ptlSecPositionFlow.setCdate(entity.getTradeDate());
+                ptlSecPositionFlow.setAmount(billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)));
+                ptlSecPositionFlow.setpFinprodId(null);
+                ptlSecPositionFlow.setTradeId(entity.getBusiCode());
+                ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
+                ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
+                ptlSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
+                ptlSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
+                ptlSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
+                ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+                ptlSecPositionFlow.setUpdateTime(DateUtil.now());
+                ptlSecPositionFlows.add(ptlSecPositionFlow);
+            }
+        } else {
+            for (BillingDetailsDto billingDetail : billingDetails) {
+                EtrSecPositionFlow etrSecPositionFlow = new EtrSecPositionFlow();
+                etrSecPositionFlow.setSeqno(IDGenerator.generate());
+                etrSecPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
+                etrSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
+                etrSecPositionFlow.setFinprodId(entity.getFinprodMarketId());
+                etrSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
+                etrSecPositionFlow.setInvAim(null);
+                etrSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                etrSecPositionFlow.setCdate(entity.getTradeDate());
+                etrSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)));
+                etrSecPositionFlow.setpFinprodId(null);
+                etrSecPositionFlow.setTradeId(entity.getBusiCode());
+                etrSecPositionFlow.setOffsetId(entity.getBusiCode());
+                etrSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
+                etrSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
+                etrSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
+                etrSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
+                etrSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+                etrSecPositionFlow.setUpdateTime(DateUtil.now());
+                etrSecPositionFlows.add(etrSecPositionFlow);
+
+                EtrSecPositionFlow etrSecPositionFlow2 = new EtrSecPositionFlow();
+                BeanUtils.copyProperties(etrSecPositionFlow, etrSecPositionFlow2);
+                etrSecPositionFlow2.setAmount(isRevoke ? billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)));
+                etrSecPositionFlows.add(etrSecPositionFlow2);
+
+                PtlSecPositionFlow ptlSecPositionFlow = new PtlSecPositionFlow();
+                ptlSecPositionFlow.setSeqno(IDGenerator.generate());
+                ptlSecPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
+                ptlSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
+                ptlSecPositionFlow.setFinprodId(entity.getFinprodMarketId());
+                ptlSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
+                ptlSecPositionFlow.setInvAim(null);
+                ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                ptlSecPositionFlow.setCdate(entity.getTradeDate());
+                ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)));
+                ptlSecPositionFlow.setpFinprodId(null);
+                ptlSecPositionFlow.setTradeId(entity.getBusiCode());
+                ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
+                ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
+                ptlSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
+                ptlSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
+                ptlSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
+                ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+                ptlSecPositionFlow.setUpdateTime(DateUtil.now());
+                ptlSecPositionFlows.add(ptlSecPositionFlow);
+                PtlSecPositionFlow ptlSecPositionFlow2 = new PtlSecPositionFlow();
+                BeanUtils.copyProperties(ptlSecPositionFlow, ptlSecPositionFlow2);
+                ptlSecPositionFlow2.setAmount(isRevoke ? billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)));
+                ptlSecPositionFlows.add(ptlSecPositionFlow2);
+            }
+        }
+        for (EtrSecPositionFlow etrSecPositionFlow : etrSecPositionFlows) {
+            etrSecPositionFlowMapper.insertSelective(etrSecPositionFlow);
+        }
+        for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
+            ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
+        }
+    }
+
+
+    /**
+     * 老头寸处理 审批提交
+     *
+     * @param entity
+     * @param isRevoke
+     */
+    private void doOldPositionConfirm(CreditProtectionCertificatePeriodSaveDto entity, boolean isRevoke) {
+        List<EtrCashPositionFlow> etrCashPositionFlows = new ArrayList<>();
+        List<PtlCashPositionFlow> ptlCashPositionFlows = new ArrayList<>();
+        List<BillingDetailsDto> billingDetails = entity.getBillingDetails();
+        String calendarId;
+        if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())) {
+            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SHJYS_CALID");
+        } else {
+            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
+        }
+        // 下一个交易日
+        Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
+        for (BillingDetailsDto billingDetail : billingDetails) {
+            EtrCashPositionFlow etrCashPositionFlow = new EtrCashPositionFlow();
+            etrCashPositionFlow.setSeqno(IDGenerator.generate());
+            etrCashPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
+            etrCashPositionFlow.setAcctId(billingDetail.getSecAcctId());
+            etrCashPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
+            etrCashPositionFlow.setCdate(nextWorkDate);
+            etrCashPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            etrCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)));
+            etrCashPositionFlow.setOrderId(entity.getBusiCode());
+            etrCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
+            etrCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());
+            etrCashPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
+            etrCashPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
+            etrCashPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+            etrCashPositionFlow.setUpdateTime(DateUtil.now());
+            etrCashPositionFlows.add(etrCashPositionFlow);
+
+            PtlCashPositionFlow ptlCashPositionFlow = new PtlCashPositionFlow();
+            BeanUtils.copyProperties(etrCashPositionFlow, ptlCashPositionFlow);
+            ptlCashPositionFlows.add(ptlCashPositionFlow);
+        }
+        for (EtrCashPositionFlow etrCashPositionFlow : etrCashPositionFlows) {
+            etrCashPositionFlowMapper.insertSelective(etrCashPositionFlow);
+        }
+        for (PtlCashPositionFlow ptlCashPositionFlow : ptlCashPositionFlows) {
+            ptlCashPositionFlowMapper.insertSelective(ptlCashPositionFlow);
+        }
     }
 }

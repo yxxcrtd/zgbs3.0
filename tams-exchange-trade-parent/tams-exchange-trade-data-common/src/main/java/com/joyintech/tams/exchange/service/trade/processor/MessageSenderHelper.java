@@ -179,6 +179,9 @@ public class MessageSenderHelper {
                 && tradeMessage.getFullPrice() != 0) {
             //成交全价金额
             tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
+        } else if(InvestAssetTypeEnum.isCreditProtectionCertificate(trade.getAssetType())){ //信用保护凭证
+            tradeMessage.setCounterId(((IntegratedEntrust) entrust).getCounterId());//交易对手
+            tradeMessage.setPropAcctNo(((IntegratedEntrust) entrust).getPropAcctNo());//对手资金账户
         }
 
         // 业务类型（手工交收用）
