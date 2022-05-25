@@ -989,7 +989,6 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
         if (CollectionUtils.isNotEmpty(cfetsDto.getBiddingProductList())) {
 
-
             for (CfetsBiddingProductDto bidDto : cfetsDto.getBiddingProductList()) {
                 if (StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())
                         || StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
@@ -1076,6 +1075,11 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     List<BigDecimal> bidPriceList = entry.getValue().stream().map(CfetsBiddingProductDto::getBidPrice).distinct().collect(Collectors.toList());
                     if (bidPriceList.size() != entry.getValue().size()) {
                         messages.add(new ValidMessage("招标发行/簿记建档:同一组合同一标位在列表中只能存在一条数据！"));
+                    }
+
+                    List<String> businessModelList = entry.getValue().stream().map(CfetsBiddingProductDto::getBusinessModel).distinct().collect(Collectors.toList());
+                    if (businessModelList.size() != 1) {
+                        messages.add(new ValidMessage("同一组合业务模式不一致！"));
                     }
                 }
             }
