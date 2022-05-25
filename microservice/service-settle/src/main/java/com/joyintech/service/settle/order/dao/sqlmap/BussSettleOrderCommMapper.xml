@@ -68,221 +68,231 @@
 		AND B.CCY = #{ccy}
 	</select>
 	<select id="selectCounterCapacctInfoList" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
-		SELECT
-		DISTINCT
-		B.ACCT_NO as acctNo,
-		B.ACCT_NAME as acctName
-		FROM
-		MST_COUNTER_ACCT A, STL_CAPACCT_INFO B
-		WHERE
-		A.COUNTER_ID = #{counterId}
-		AND A.ACCT_TYPE = #{acctType}
-		AND A.ACCT_NO = B.ACCT_NO
-		AND A.IS_OPEN = '01'    /**add  by  张年  20190904 交易对手资金账户只能选择启用状态下的账户**/
-		AND A.CCY = B.CCY
-		<if test="ccy != null and !ccy.isEmpty()">
-			AND A.CCY = #{ccy}
-		</if>
-	</select>
-
-	<select id="selectFirstChannelCapacctInfoList" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
 		SELECT DISTINCT
-		C.ACCT_NO as acctNo,
-		C.ACCT_NAME as acctName
+            B.ACCT_NO as acctNo,
+            B.BUSI_ACCT_NO busiAcctNo,
+            B.CCY CCY,
+            A.ACCT_TYPE acctType,
+            B.ACCT_NAME as acctName,
+            B.OWN_DEPT stockExchangeNo,
+            '1' status,
+            B.ACC_PASS acctPwd,
+            B.TRADE_PASS tradePwd
 		FROM
-		FIN_CASH_INFO A, MST_COUNTER_ACCT B, STL_CAPACCT_INFO C
-		WHERE
-		A.FINPROD_ID = #{finprodId}
-		AND A.CHL_FINPROD_ID IS NOT NULL
-		AND
-		A.CHL_LEVEL = 1
-		AND B.COUNTER_ID = A.CHL_FINPROD_ID
-		AND B.ACCT_TYPE =
-		#{acctType}
-		AND B.ACCT_NO = C.ACCT_NO
-		AND B.CCY = C.CCY
-	</select>
-	<select id="selectProfitType" resultType="java.lang.String">
-		SELECT
-		PROFIT_TYPE as
-		profitType
-		FROM FIN_PRODUCT
-		WHERE
-		FINPROD_ID = #{finprodId}
-	</select>
-	<select id="selectIsGuarantee" resultType="java.lang.String">
-		SELECT
-		A.IS_GUARANTEE
-		isGuarantee
-		FROM PA_PTL_PORTFOLIO A
-		WHERE
-		A.PORTFOLIO_ID = #{portfolioId}
-	</select>
-
-	<select id="isNaibuCounter" resultType="boolean">
-		SELECT CASE WHEN PORTFOLIO_ID IS NULL THEN 0 ELSE 1 END FROM PTL_PORTFOLIO WHERE PORTFOLIO_ID=#{counterId}
-	</select>
-
-	<select id="selectAssetProvider" resultType="java.lang.String">
-		SELECT
-		ASSET_PROVIDER as assetProvider
-		FROM PA_FIN_PRODUCT
-		WHERE
-		FINPROD_ID =
-		#{finprodId}
-	</select>
-
-	<select id="selectOrdersByBizCode"
-		resultType="com.joyintech.tams.invest.common.dto.common.BussTrdTransferOrderBase">
-		SELECT DISTINCT case SPO.PS when '${IE_FLAG_02}' then
-		SPO.MY_ACCT_NO else
-		SPO.COUNTER_ACCT_NO end payAcctNo,
-		case SPO.PS when
-		'${IE_FLAG_02}' then SPO.COUNTER_ACCT_NO else
-		SPO.MY_ACCT_NO end
-		recAcctNo,
-		case SPO.PS when '${IE_FLAG_02}' then SCI.ACCT_NAME else
-		SCI1.ACCT_NAME
-		end payAcctName,
-		case SPO.PS when '${IE_FLAG_02}' then
-		SCI1.ACCT_NAME else SCI.ACCT_NAME
-		end recAcctName,
-		SPO.PS,
-		SPO.IS_NEED_SEND,
-		SPO.PAY_TYPE,
-		SPO.SETTLE_DATE,
-		SPO.SETTLE_AMT,
-		SPO.CCY,
-		SPO.PORTFOLIO_ID,
-		pp.PORTFOLIO_NAME,
-		SPO.SETTLE_STATUS,
-		SPO.PURPOSE,
-		SPO.TRADE_ID,
-		SPO.ORDER_ID,
-		SPO.REMARK
-		FROM STL_PAY_ORDERS
-		SPO
-		LEFT JOIN
-		STL_CAPACCT_INFO SCI ON SPO.MY_ACCT_NO = SCI.ACCT_NO
-		LEFT JOIN
-		STL_CAPACCT_INFO SCI1 ON SPO.COUNTER_ACCT_NO = SCI1.ACCT_NO
-		LEFT JOIN
-		PTL_PORTFOLIO PP ON SPO.PORTFOLIO_ID = PP.PORTFOLIO_ID
-		WHERE
-		SPO.TRADE_ID = #{bizCode}
-	</select>
-
-	<select id="selectWflOrdersByBizCode"
-		resultType="com.joyintech.tams.invest.common.dto.common.BussTrdTransferOrderBase">
-		SELECT DISTINCT case SPO.PS when '${IE_FLAG_02}' then
-		SPO.MY_ACCT_NO else
-		SPO.COUNTER_ACCT_NO end payAcctNo,
-		case SPO.PS when
-		'${IE_FLAG_02}' then SPO.COUNTER_ACCT_NO else
-		SPO.MY_ACCT_NO end
-		recAcctNo,
-		case SPO.PS when '${IE_FLAG_02}' then SCI.ACCT_NAME else
-		SCI1.ACCT_NAME
-		end payAcctName,
-		case SPO.PS when '${IE_FLAG_02}' then
-		SCI1.ACCT_NAME else SCI.ACCT_NAME
-		end recAcctName,
-		SPO.PS,
-		SPO.IS_NEED_SEND,
-		SPO.PAY_TYPE,
-		SPO.SETTLE_DATE,
-		SPO.SETTLE_AMT,
-		SPO.CCY,
-		SPO.PORTFOLIO_ID,
-		pp.PORTFOLIO_NAME,
-		SPO.SETTLE_STATUS,
-		SPO.PURPOSE,
-		SPO.TRADE_ID,
-		SPO.ORDER_ID,
-		SPO.REMARK
-		FROM WFL_STL_PAY_ORDERS
-		SPO
-		LEFT JOIN
-		STL_CAPACCT_INFO SCI ON SPO.MY_ACCT_NO = SCI.ACCT_NO
-		LEFT JOIN
-		STL_CAPACCT_INFO SCI1 ON SPO.COUNTER_ACCT_NO = SCI1.ACCT_NO
-		LEFT JOIN
-		PTL_PORTFOLIO PP ON SPO.PORTFOLIO_ID = PP.PORTFOLIO_ID
-		WHERE
-		SPO.TRADE_ID = #{bizCode}
-	</select>
-
-	<select id="queryAcctList" resultType="com.joyintech.framework.select.SelectOptionDto">
-		SELECT
-		ACCT_NO id,
-		ACCT_NAME text
-		,SEQ_NO /* add by songyawei 2020-06-18 */
-		FROM STL_CAPACCT_INFO
+		    MST_COUNTER_ACCT A, STL_CAPACCT_INFO B
 		<where>
-			<if test="search != null and search != ''">
-				(
-				ACCT_NO LIKE CONCAT('%', CONCAT(#{search}, '%'))
-				OR
-				ACCT_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
-				)
+			A.COUNTER_ID = #{counterId}
+			<if test="acctType != null and !acctType.isEmpty()">
+				and A.ACCT_TYPE =#{acctType}
 			</if>
-			<if test="ccy_select != null and !ccy_select.isEmpty()">
-				and CCY = #{ccy_select}
-			</if>
-		</where>
-	</select>
+	        <!-- AND A.ACCT_TYPE = #{acctType}-->
+            AND A.ACCT_NO = B.ACCT_NO
+            AND A.IS_OPEN = '01'    /**add  by  张年  20190904 交易对手资金账户只能选择启用状态下的账户**/
+            AND A.CCY = B.CCY
+            <if test="ccy != null and !ccy.isEmpty()">
+                AND A.CCY = #{ccy}
+            </if>
+        </where>
+    </select>
 
-	<select id="findSubTotalTradeId" resultType="string">
-		SELECT
-		TOTLE_TRADE_ID FROM TRD_FIN_PRODUCT_DEAL_TOTAL WHERE P_TOTLE_TRADE_ID
-		= #{bizCode}
-	</select>
+        <select id="selectFirstChannelCapacctInfoList" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
+            SELECT DISTINCT
+            C.ACCT_NO as acctNo,
+            C.ACCT_NAME as acctName
+            FROM
+            FIN_CASH_INFO A, MST_COUNTER_ACCT B, STL_CAPACCT_INFO C
+            WHERE
+            A.FINPROD_ID = #{finprodId}
+            AND A.CHL_FINPROD_ID IS NOT NULL
+            AND
+            A.CHL_LEVEL = 1
+            AND B.COUNTER_ID = A.CHL_FINPROD_ID
+            AND B.ACCT_TYPE =
+            #{acctType}
+            AND B.ACCT_NO = C.ACCT_NO
+            AND B.CCY = C.CCY
+        </select>
+        <select id="selectProfitType" resultType="java.lang.String">
+            SELECT
+            PROFIT_TYPE as
+            profitType
+            FROM FIN_PRODUCT
+            WHERE
+            FINPROD_ID = #{finprodId}
+        </select>
+        <select id="selectIsGuarantee" resultType="java.lang.String">
+            SELECT
+            A.IS_GUARANTEE
+            isGuarantee
+            FROM PA_PTL_PORTFOLIO A
+            WHERE
+            A.PORTFOLIO_ID = #{portfolioId}
+        </select>
 
-	<select id="findSubWflTotalTradeId" resultType="string">
-		SELECT
-		TOTLE_TRADE_ID FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL WHERE
-		P_TOTLE_TRADE_ID = #{bizCode}
-	</select>
+        <select id="isNaibuCounter" resultType="boolean">
+            SELECT CASE WHEN PORTFOLIO_ID IS NULL THEN 0 ELSE 1 END FROM PTL_PORTFOLIO WHERE PORTFOLIO_ID=#{counterId}
+        </select>
 
-	<select id="findSubTradeId" resultType="string">
-		SELECT TRADE_ID FROM TRD_PRODUCT_DEAL WHERE TOTLE_TRADE_ID = #{bizCode}
-	</select>
+        <select id="selectAssetProvider" resultType="java.lang.String">
+            SELECT
+            ASSET_PROVIDER as assetProvider
+            FROM PA_FIN_PRODUCT
+            WHERE
+            FINPROD_ID =
+            #{finprodId}
+        </select>
 
-	<select id="findSubWflTradeId" resultType="string">
-		SELECT TRADE_ID FROM WFL_TRD_PRODUCT_DEAL WHERE TOTLE_TRADE_ID = #{bizCode}
-	</select>
+        <select id="selectOrdersByBizCode"
+            resultType="com.joyintech.tams.invest.common.dto.common.BussTrdTransferOrderBase">
+            SELECT DISTINCT case SPO.PS when '${IE_FLAG_02}' then
+            SPO.MY_ACCT_NO else
+            SPO.COUNTER_ACCT_NO end payAcctNo,
+            case SPO.PS when
+            '${IE_FLAG_02}' then SPO.COUNTER_ACCT_NO else
+            SPO.MY_ACCT_NO end
+            recAcctNo,
+            case SPO.PS when '${IE_FLAG_02}' then SCI.ACCT_NAME else
+            SCI1.ACCT_NAME
+            end payAcctName,
+            case SPO.PS when '${IE_FLAG_02}' then
+            SCI1.ACCT_NAME else SCI.ACCT_NAME
+            end recAcctName,
+            SPO.PS,
+            SPO.IS_NEED_SEND,
+            SPO.PAY_TYPE,
+            SPO.SETTLE_DATE,
+            SPO.SETTLE_AMT,
+            SPO.CCY,
+            SPO.PORTFOLIO_ID,
+            pp.PORTFOLIO_NAME,
+            SPO.SETTLE_STATUS,
+            SPO.PURPOSE,
+            SPO.TRADE_ID,
+            SPO.ORDER_ID,
+            SPO.REMARK
+            FROM STL_PAY_ORDERS
+            SPO
+            LEFT JOIN
+            STL_CAPACCT_INFO SCI ON SPO.MY_ACCT_NO = SCI.ACCT_NO
+            LEFT JOIN
+            STL_CAPACCT_INFO SCI1 ON SPO.COUNTER_ACCT_NO = SCI1.ACCT_NO
+            LEFT JOIN
+            PTL_PORTFOLIO PP ON SPO.PORTFOLIO_ID = PP.PORTFOLIO_ID
+            WHERE
+            SPO.TRADE_ID = #{bizCode}
+        </select>
 
-	<select id="findCounterType" resultType="string">
-		SELECT COUNTER_TYPE FROM
-		MST_COUNTER_PARTY WHERE COUNTER_ID = #{counterId}
-	</select>
+        <select id="selectWflOrdersByBizCode"
+            resultType="com.joyintech.tams.invest.common.dto.common.BussTrdTransferOrderBase">
+            SELECT DISTINCT case SPO.PS when '${IE_FLAG_02}' then
+            SPO.MY_ACCT_NO else
+            SPO.COUNTER_ACCT_NO end payAcctNo,
+            case SPO.PS when
+            '${IE_FLAG_02}' then SPO.COUNTER_ACCT_NO else
+            SPO.MY_ACCT_NO end
+            recAcctNo,
+            case SPO.PS when '${IE_FLAG_02}' then SCI.ACCT_NAME else
+            SCI1.ACCT_NAME
+            end payAcctName,
+            case SPO.PS when '${IE_FLAG_02}' then
+            SCI1.ACCT_NAME else SCI.ACCT_NAME
+            end recAcctName,
+            SPO.PS,
+            SPO.IS_NEED_SEND,
+            SPO.PAY_TYPE,
+            SPO.SETTLE_DATE,
+            SPO.SETTLE_AMT,
+            SPO.CCY,
+            SPO.PORTFOLIO_ID,
+            pp.PORTFOLIO_NAME,
+            SPO.SETTLE_STATUS,
+            SPO.PURPOSE,
+            SPO.TRADE_ID,
+            SPO.ORDER_ID,
+            SPO.REMARK
+            FROM WFL_STL_PAY_ORDERS
+            SPO
+            LEFT JOIN
+            STL_CAPACCT_INFO SCI ON SPO.MY_ACCT_NO = SCI.ACCT_NO
+            LEFT JOIN
+            STL_CAPACCT_INFO SCI1 ON SPO.COUNTER_ACCT_NO = SCI1.ACCT_NO
+            LEFT JOIN
+            PTL_PORTFOLIO PP ON SPO.PORTFOLIO_ID = PP.PORTFOLIO_ID
+            WHERE
+            SPO.TRADE_ID = #{bizCode}
+        </select>
 
-	<select id="queryStlCapacctInfoByBusiAcctNo"
-		resultMap="com.joyintech.tams.common.base.dao.StlCapacctInfoMapper.BaseResultMap">
-		select
-		<include
-			refid="com.joyintech.tams.common.base.dao.StlCapacctInfoMapper.Base_Column_List" />
-		from STL_CAPACCT_INFO
-		where ACCT_NO = #{busiAcctNo}
-		and CCY = #{ccy}
-	</select>
-	<select id="selectTradeMarket" resultType="java.lang.String">
-		SELECT
-		TRADE_MARKET
-		FROM FIN_PRODUCT
-		WHERE
-		FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 =
-		#{FINPROD_TYPE2_F01}
-	</select>
-	<select id="selectSecAcctSource" resultType="java.lang.String">
-		SELECT
-		SEC_ACCT_SOURCE
-		FROM STL_SEC_ACCT_INFO
-		WHERE
-		SEC_ACCT_ID = #{secAcctId}
-	</select>
+        <select id="queryAcctList" resultType="com.joyintech.framework.select.SelectOptionDto">
+            SELECT
+            ACCT_NO id,
+            ACCT_NAME text
+            ,SEQ_NO /* add by songyawei 2020-06-18 */
+            FROM STL_CAPACCT_INFO
+            <where>
+                <if test="search != null and search != ''">
+                    (
+                    ACCT_NO LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                    OR
+                    ACCT_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                    )
+                </if>
+                <if test="ccy_select != null and !ccy_select.isEmpty()">
+                    and CCY = #{ccy_select}
+                </if>
+            </where>
+        </select>
 
-	<!--ͨ通道交易 新增 强成西 2019/03/26 start-->
+        <select id="findSubTotalTradeId" resultType="string">
+            SELECT
+            TOTLE_TRADE_ID FROM TRD_FIN_PRODUCT_DEAL_TOTAL WHERE P_TOTLE_TRADE_ID
+            = #{bizCode}
+        </select>
+
+        <select id="findSubWflTotalTradeId" resultType="string">
+            SELECT
+            TOTLE_TRADE_ID FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL WHERE
+            P_TOTLE_TRADE_ID = #{bizCode}
+        </select>
+
+        <select id="findSubTradeId" resultType="string">
+            SELECT TRADE_ID FROM TRD_PRODUCT_DEAL WHERE TOTLE_TRADE_ID = #{bizCode}
+        </select>
+
+        <select id="findSubWflTradeId" resultType="string">
+            SELECT TRADE_ID FROM WFL_TRD_PRODUCT_DEAL WHERE TOTLE_TRADE_ID = #{bizCode}
+        </select>
+
+        <select id="findCounterType" resultType="string">
+            SELECT COUNTER_TYPE FROM
+            MST_COUNTER_PARTY WHERE COUNTER_ID = #{counterId}
+        </select>
+
+        <select id="queryStlCapacctInfoByBusiAcctNo"
+            resultMap="com.joyintech.tams.common.base.dao.StlCapacctInfoMapper.BaseResultMap">
+            select
+            <include
+                refid="com.joyintech.tams.common.base.dao.StlCapacctInfoMapper.Base_Column_List" />
+            from STL_CAPACCT_INFO
+            where ACCT_NO = #{busiAcctNo}
+            and CCY = #{ccy}
+        </select>
+        <select id="selectTradeMarket" resultType="java.lang.String">
+            SELECT
+            TRADE_MARKET
+            FROM FIN_PRODUCT
+            WHERE
+            FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 =
+            #{FINPROD_TYPE2_F01}
+        </select>
+        <select id="selectSecAcctSource" resultType="java.lang.String">
+            SELECT
+            SEC_ACCT_SOURCE
+            FROM STL_SEC_ACCT_INFO
+            WHERE
+            SEC_ACCT_ID = #{secAcctId}
+        </select>
+
+        <!--ͨ通道交易 新增 强成西 2019/03/26 start-->
 	<select id="getPayType" resultType="string">
 		SELECT PAY_TYPE FROM FIN_PRODUCT_ADD WHERE FINPROD_ID=#{chlId}
 	</select>

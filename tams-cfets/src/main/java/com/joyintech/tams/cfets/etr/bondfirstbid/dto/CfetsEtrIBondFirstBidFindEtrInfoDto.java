@@ -71,6 +71,12 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     @ApiModelProperty(name = "issueDateStr", value = "投标日/发行日字符串")
     private String issueDateStr;
 
+    @ApiModelProperty(name = "issueDateStart", value = "投标日开始日期,字符串", example = "2021-12-21")
+    private Date issueDateStart;
+
+    @ApiModelProperty(name = "issueDateEnd", value = "投标日结束日期,字符串", example = "2021-12-21")
+    private Date issueDateEnd;
+
     @ApiModelProperty(name = "totalBiddingNum", value = "汇总投标券面总额")
     private BigDecimal totalBiddingNum;
 
@@ -489,5 +495,21 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     public void setPs(String ps) {
         this.ps = ps;
+    }
+
+    public Date getIssueDateStart() {
+        return issueDateStart;
+    }
+
+    public void setIssueDateStart(Date issueDateStart) {
+        this.issueDateStart = issueDateStart;
+    }
+
+    public Date getIssueDateEnd() {
+        return issueDateEnd;
+    }
+
+    public void setIssueDateEnd(Date issueDateEnd) {
+        this.issueDateEnd = issueDateEnd;
     }
 }

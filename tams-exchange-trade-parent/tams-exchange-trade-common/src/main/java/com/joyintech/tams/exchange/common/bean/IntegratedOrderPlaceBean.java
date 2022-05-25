@@ -164,6 +164,9 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
 
     @ApiModelProperty(required = true, name = "propInvestorName", value = "对手方交易主体名称")
     private String propInvestorName;
+
+    @ApiModelProperty(required = true, name = "propOwnerType", value = "对手方报价所有者类型")
+    private String propOwnerType;
     // 协商成交使用 --end
 
     @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号")
@@ -903,5 +906,13 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
 
     public void setPropInvestorName(String propInvestorName) {
         this.propInvestorName = propInvestorName;
+    }
+
+    public String getPropOwnerType() {
+        return propOwnerType;
+    }
+
+    public void setPropOwnerType(String propOwnerType) {
+        this.propOwnerType = propOwnerType;
     }
 }
