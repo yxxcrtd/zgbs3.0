@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 import static com.joyintech.tams.constant.DictCodeList.交易方向_行权_回售;
@@ -137,7 +138,7 @@ public class PositionRequestServiceInstructionRequest {
                 if (交易方向_行权_回售.getValue().equals(entity.getPs())) {
                     price = entity.getEntrustPrice();
                 }
-                bean.setCashAmount(price.multiply(BigDecimal.valueOf(item.getEntrustNum())));
+                bean.setCashAmount(price.multiply(BigDecimal.valueOf(item.getEntrustNum())).setScale(2, RoundingMode.HALF_UP));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
                 // 下单委托编号
@@ -182,7 +183,7 @@ public class PositionRequestServiceInstructionRequest {
                 bean.setPortfolioId(item.getPortfolioId());
                 bean.setFinprodId(null);
                 BigDecimal price = Objects.isNull(entity.getFullPrice()) ? BigDecimal.ZERO : entity.getFullPrice();
-                bean.setCashAmount(price.multiply(BigDecimal.valueOf(item.getEntrustNum())));
+                bean.setCashAmount(price.multiply(BigDecimal.valueOf(item.getEntrustNum())).setScale(2, RoundingMode.HALF_UP));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
                 list.add(map);
@@ -275,7 +276,7 @@ public class PositionRequestServiceInstructionRequest {
             for (PortfolioCalculateResponse item : calculates) {
                 bean = new PositionRequestBaseBean(entity);
                 bean.setPortfolioId(item.getPortfolioId());
-                bean.setCashAmount(item.getEntrustAmt());
+                bean.setCashAmount(item.getEntrustAmt().setScale(2, RoundingMode.HALF_UP));
                 bean.setSecAmount(BigDecimal.valueOf(item.getEntrustNum()));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
@@ -305,7 +306,7 @@ public class PositionRequestServiceInstructionRequest {
 
         // 调用组合计算接口，获取分配信息
         List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
-        if(CollectionUtils.isEmpty(calculates)){
+        if (CollectionUtils.isEmpty(calculates)) {
             calculates = getCalculateList(entity);
         }
         int calculateSize = calculates.size();
@@ -535,7 +536,7 @@ public class PositionRequestServiceInstructionRequest {
 
         // 调用组合计算接口，获取分配信息
         List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
-        if(CollectionUtils.isEmpty(calculates)){
+        if (CollectionUtils.isEmpty(calculates)) {
             calculates = getCalculateList(entity);
         }
         int calculateSize = calculates.size();
@@ -548,7 +549,7 @@ public class PositionRequestServiceInstructionRequest {
             for (PortfolioCalculateResponse item : calculates) {
                 bean = new PositionRequestBaseBean(entity);
                 bean.setPortfolioId(item.getPortfolioId());
-                bean.setCashAmount(item.getEntrustAmt());
+                bean.setCashAmount(item.getEntrustAmt().setScale(2, RoundingMode.HALF_UP));
                 bean.setSecAmount(BigDecimal.valueOf(item.getEntrustNum()));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
