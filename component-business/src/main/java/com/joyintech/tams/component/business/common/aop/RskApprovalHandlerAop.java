@@ -68,6 +68,9 @@ public class RskApprovalHandlerAop {
                 }else {
                     // 适用于老的业务规则（不受新的配置规则控制），依赖风险试算结果
                     String riskList = JsonUtils.object2Json(params.get("riskTrialRetDto"));
+                    if(StringUtil.isEmpty(riskList)){
+                        return;
+                    }
                     List<RiskTrialRetDto> riskTrialRetDtoList = new ArrayList<>();
                     riskTrialRetDtoList = JsonUtils.json2List(riskList, RiskTrialRetDto.class);
                     // 提取风险试算结果，是否需要走风险审批
