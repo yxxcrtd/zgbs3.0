@@ -37,6 +37,12 @@ public class CfetsTrdBondFirsBidFirmDetailDto {
     @ApiModelProperty(required = false, name = "issueDate", value = "投标日")
     private Date issueDate;
 
+    @ApiModelProperty(name = "issueDateStart", value = "投标日开始日期,字符串", example = "2021-12-21")
+    private Date issueDateStart;
+
+    @ApiModelProperty(name = "issueDateEnd", value = "投标日结束日期,字符串", example = "2021-12-21")
+    private Date issueDateEnd;
+
     @ApiModelProperty(required = false, name = "issueDateStr", value = "投标日格式化")
     private String issueDateStr;
 
@@ -114,8 +120,8 @@ public class CfetsTrdBondFirsBidFirmDetailDto {
     }
 
     public String getIssueDateStr() {
-        if (null != this.getIssueDate()) {
-            return DateUtil.format(this.getIssueDate());
+        if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
         }
         return issueDateStr;
     }
@@ -188,6 +194,22 @@ public class CfetsTrdBondFirsBidFirmDetailDto {
 
     public void setCounterName(String counterName) {
         this.counterName = counterName;
+    }
+
+    public Date getIssueDateStart() {
+        return issueDateStart;
+    }
+
+    public void setIssueDateStart(Date issueDateStart) {
+        this.issueDateStart = issueDateStart;
+    }
+
+    public Date getIssueDateEnd() {
+        return issueDateEnd;
+    }
+
+    public void setIssueDateEnd(Date issueDateEnd) {
+        this.issueDateEnd = issueDateEnd;
     }
 }
 

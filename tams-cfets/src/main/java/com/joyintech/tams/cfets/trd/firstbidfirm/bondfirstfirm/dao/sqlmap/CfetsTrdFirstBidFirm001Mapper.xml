@@ -34,7 +34,12 @@
     <!-- 指令查询SQL -->
     <sql id="listEntrustSql">
         select ee.ENTRUST_STATUS                        entrustStatus,
-        NULL                                     firstBidStatus,
+        CASE WHEN (bo.BID_ID IS NOT NULL AND bo.BID_MODLE = '03') OR brt.IS_WIN = 'Y' THEN '04'
+        WHEN bo.BID_ID IS  NULL THEN '01'
+        WHEN brt.IS_WIN = 'N' THEN '03'
+        WHEN (bo.BID_MODLE IN ('01', '02') AND brt.TOTAL_WIN_ID IS NULL) THEN '02'
+        ELSE '05'
+        END AS                                   firstBidStatus,
         nvl(efs.ENT_FINISH_AMT, 0)               finishAmt,
         trunc(nvl(efs.ENT_FINISH_AMT, 0) /
         case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
@@ -47,9 +52,24 @@
         fp.FINPROD_MARKET_ID                     finprodMarketId,
         fp.FINPROD_ABBR                          finprodAbbr,
         fpi.TENDER_TARGET                        tenderTarget,
-        nvl(fpi.ISSUE_DATE,fpi.TENDER_EDATE)     issueDate,
+        CASE
+            WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+            THEN fpi.ISSUE_DATE
+            WHEN (fpi.ISSUE_CLASS = '02' AND
+            (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+            OR fpi.ISSUE_CLASS = '03'
+            THEN fpi.TENDER_SDATE
+            END           AS issueDateStart/*投标日 开始*/,
+            CASE
+            WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+            THEN fpi.ISSUE_DATE
+            WHEN (fpi.ISSUE_CLASS = '02' AND
+            (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+            OR fpi.ISSUE_CLASS = '03'
+            THEN fpi.TENDER_SDATE
+            END           AS issueDateEnd/*投标日 结束*/,
         ee.ENTRUST_NUM*100                       entrustNum,
-        NULL                                     bidPrice,
+        bobp.BID_PRICE                           bidPrice,
         eed.PORTFOLIO_ID                         portfolioId,
         eed.PORTFOLIO_NAME                       portfolioName,
         ee.TRADE_MARKET                          tradeMarket,
@@ -94,6 +114,27 @@
         left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
         left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
         left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+        LEFT JOIN BID_ORDER bo ON bo.FINPROD_ID  = fp.FINPROD_ID AND bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+        LEFT JOIN BID_ORDER_BID_PRICE bobp2 ON bobp2.BID_ID = bo.BID_ID AND bobp2.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN BID_RESULT_TOTAL brt ON brt.FINPROD_ID = fp.FINPROD_ID AND brt.BID_ID  = bo.BID_ID AND brt.STATUS = '01'
+        LEFT JOIN
+        (select listagg(case
+        when t3.TENDER_TARGET = '01'
+        then to_char(t0.BID_PRICE * 100, 'FM99990.9990')
+        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM99990.9990')
+        when t3.TENDER_TARGET = '03'
+        then to_char(t0.BID_PRICE * 10000, 'FM99990.90')
+        end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
+        t0.ENTRUST_ID
+        from ETR_ENTRUST_BID_PRICE t0
+        LEFT JOIN ETR_ENTRUST t1 on t1.ENTRUST_ID = t0.ENTRUST_ID
+        LEFT JOIN FIN_PRODUCT t2
+        ON t2.FINPROD_ID = t1.FINPROD_ID
+        LEFT JOIN
+        FIN_PRODUCT_ISSUE t3
+        ON t3.FINPROD_ID = t2.FINPROD_ID
+        group by t0.ENTRUST_ID) bobp
+        ON bobp.ENTRUST_ID = ee.ENTRUST_ID
         where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
         order by decode(ee.ENTRUST_STATUS, '04', 2, '05', 3, '06', 4, 1) asc,fpi.ISSUE_DATE,ee.ENTRUST_DATE,eea.TRANSMIT_TIME
     </sql>
@@ -112,7 +153,8 @@
         T.finprodMarketId,
         T.finprodAbbr,
         T.tenderTarget,
-        T.issueDate,
+        T.issueDateStart,
+        T.issueDateEnd,
         T.bidPrice,
         T.portfolioId,
         T.portfolioName,
@@ -204,7 +246,22 @@
             fp.FINPROD_ABBR                          finprodAbbr,
             fpi.ISSUE_CLASS                          issueClass,
             fpi.TENDER_TARGET                        tenderTarget,
-            nvl(fpi.ISSUE_DATE,fpi.TENDER_SDATE)     issueDate,
+            CASE
+                WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                    THEN fpi.ISSUE_DATE
+                WHEN (fpi.ISSUE_CLASS = '02' AND
+                      (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                    OR fpi.ISSUE_CLASS = '03'
+                    THEN fpi.TENDER_SDATE
+                END           AS issueDateStart/*投标日 开始*/,
+            CASE
+                WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                    THEN fpi.ISSUE_DATE
+                WHEN (fpi.ISSUE_CLASS = '02' AND
+                      (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                    OR fpi.ISSUE_CLASS = '03'
+                    THEN fpi.TENDER_SDATE
+                END           AS issueDateEnd/*投标日 结束*/,
             fpi.PAY_EDATE                            payEdate,
             ee.ENTRUST_DATE                          entrustDate,
             ee.COUNTER_ID                            counterId,
@@ -1057,4 +1114,18 @@
         </if>
     </sql>
 
+    <select id="queryTotalEtrEntrustRel" resultType="com.joyintech.tams.common.base.entity.TotalEtrEntrustRel">
+        select
+        TOTLE_ID, ENTRUST_ID, TRADER, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER,
+        UPDATE_TIME, SUM_FLAG
+        from TOTAL_ETR_ENTRUST_REL
+        <where>
+            <if test="trader != null and trader != '' ">
+                AND TRADER = #{trader}
+            </if>
+            <if test="sumFlag != null and sumFlag != '' ">
+                AND SUM_FLAG = #{sumFlag}
+            </if>
+        </where>
+    </select>
 </mapper>

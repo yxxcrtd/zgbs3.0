@@ -24,6 +24,11 @@ public class TotalEtrEntrustRel extends BaseEntity {
      */
     private String trader;
 
+    /**
+     * 汇总标识
+     */
+    private String sumFlag;
+
 
 
     /**
@@ -72,5 +77,13 @@ public class TotalEtrEntrustRel extends BaseEntity {
      */
     public void setTrader(String trader) {
         this.trader = trader == null ? null : trader.trim();
+    }
+
+    public String getSumFlag() {
+        return sumFlag;
+    }
+
+    public void setSumFlag(String sumFlag) {
+        this.sumFlag = sumFlag;
     }
 }
