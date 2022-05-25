@@ -80,6 +80,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal marketAmt;
 
+    @ApiModelProperty(name = "issuer", value = "发行人编码")
+    private String issuer;
+
     @ApiModelProperty(name = "issuerName", value = "发行人")
     private String issuerName;
 
@@ -918,5 +921,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setCapiIncomeFeature(String capiIncomeFeature) {
         this.capiIncomeFeature = capiIncomeFeature;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 }
