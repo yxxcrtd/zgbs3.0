@@ -130,6 +130,12 @@ public class CfetsBondPortfolioCashRequest {
         return cashAmount;
     }
 
+    /**
+     * 交易金额
+     * @author jiangpeng
+     * @date 2022/5/24 19:29
+     * @param cashAmount
+     */
     public void setCashAmount(BigDecimal cashAmount) {
         this.cashAmount = cashAmount;
     }

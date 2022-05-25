@@ -26,6 +26,9 @@ public class BondFinProductIssueDto extends BaseEntity {
     @ApiModelProperty(name="finprodId",value="新债代码")
     private String finprodId;
 
+    @ApiModelProperty(name="finprodMarketId",value="新债代码ID",required=true)
+    private String finprodMarketId;
+
     /**
      * 新债简称
      */
@@ -109,12 +112,6 @@ public class BondFinProductIssueDto extends BaseEntity {
     private Date payDate;
 
     /**
-     * 投标日
-     */
-    @ApiModelProperty(name="bidDate",value="投标日")
-    private Date bidDate;
-
-    /**
      * 首次利率确定日
      */
     private Date firstConfirmDate;
@@ -134,11 +131,13 @@ public class BondFinProductIssueDto extends BaseEntity {
     /**
      * 投标起始日
      */
+    @ApiModelProperty(name="tenderSdate",value="投标日开始日")
     private Date tenderSdate;
 
     /**
      * 投标截止日
      */
+    @ApiModelProperty(name="tenderEdate",value="投标日截止日")
     private Date tenderEdate;
 
     /**
@@ -371,14 +370,6 @@ public class BondFinProductIssueDto extends BaseEntity {
         this.finprodAbbr = finprodAbbr;
     }
 
-    public Date getBidDate() {
-        return bidDate;
-    }
-
-    public void setBidDate(Date bidDate) {
-        this.bidDate = bidDate;
-    }
-
     public Date getListingDate() {
         return listingDate;
     }
@@ -529,5 +520,13 @@ public class BondFinProductIssueDto extends BaseEntity {
 
     public void setIntType(String intType) {
         this.intType = intType;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
     }
 }

@@ -526,4 +526,24 @@ public class TrdProjectDurationService extends BaseService {
         return trdProjectDurationMapper.getGroupPayByList(param);
     }
     // add by etliu 20210426 权益类资产相关代码合并 end
+
+    /**
+     * 资产是否还本带息，若还本带息，还本日是否等于付息日
+     * @param map
+     * @return
+     */
+    public boolean isPayIntDate(Map<String, Object> map) {
+        //若针对，还本带息，返回 true，针对还本不带息，若有付息日=还本日，返回true
+        int count=trdProjectDurationMapper.isNoPayInt(map);
+        if(count>0){
+            int countt=trdProjectDurationMapper.isPayIntDate(map);
+            if(countt>0){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return true;
+        }
+    }
 }

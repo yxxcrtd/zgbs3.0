@@ -90,11 +90,12 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         List<FinAssetRateAdjResponse> finAssetRateAdjList = finBondAssetMapper.getfinAssetRateAdjByProductId(paramMap);
         for (FinAssetRateAdjResponse entity : finAssetRateAdjList) {
             String updateFlg = StringUtil.EMPTY;
-            if (commonBusinessService.isTransInAsset(entity.getFinprodId())!=0 &&
-                    DateUtil.compareDate(entity.getEffDate(), iPlatformDate.getSysDate()) == -1) {
+            if (finBondAssetService.isTransInAssetTwo(entity.getFinprodId())!=0 &&
+                    DateUtil.compareDate(entity.getEffDate(), iPlatformDate.getSysDate()) == 0) {
                 updateFlg = "02";
-            }
-            else {
+            }else if ( DateUtil.compareDate(entity.getEffDate(), iPlatformDate.getSysDate()) == -1) {
+                updateFlg = "02";
+            } else {
                 updateFlg = "01";
             }
             entity.setUpdateFlg(updateFlg);

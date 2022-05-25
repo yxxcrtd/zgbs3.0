@@ -1966,6 +1966,7 @@ public enum DictCodeListExt2 implements BaseDictCodeList {
     共通业务类型_基金投向维护(DictCode.共通业务类型,"RSK51","基金投向维护"),
     共通业务类型_股票分红公告(DictCode.共通业务类型,"MST34","股票分红公告"),
     共通业务类型_基金分红公告(DictCode.共通业务类型,"MST35","基金分红公告"),
+    共通业务类型_银行间基础信息(DictCode.共通业务类型,"MST36","银行间基础信息"),
     /**
      * 2021-04-07 新增报表：理财子公司月度统计表
      */

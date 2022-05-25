@@ -1690,7 +1690,7 @@
                   AND ENTRUST_ID NOT IN (SELECT TPDA.ENTRUST_ID FROM TRD_PRODUCT_DEAL TPD
                                                       LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
                                                              ON TPD.TRADE_ID = TPDA.TRADE_ID
-                  WHERE TPD.TOTLE_TRADE_ID IN (SELECT TRADE_ID FROM TRD_BANK_MANUAL_SETTLE_INFO ))
+                  WHERE TPDA.ENTRUST_ID IS NOT NULL AND TPD.TOTLE_TRADE_ID IN (SELECT TRADE_ID FROM TRD_BANK_MANUAL_SETTLE_INFO ))
                 UNION ALL
                 SELECT COUNT(ENTRUST_ID) num
                 FROM WFL_ETR_ENTRUST
@@ -1698,7 +1698,7 @@
                   AND ENTRUST_ID NOT IN (SELECT TPDA.ENTRUST_ID FROM TRD_PRODUCT_DEAL TPD
                                                          LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
                                                                    ON TPD.TRADE_ID = TPDA.TRADE_ID
-                         WHERE TPD.TOTLE_TRADE_ID IN (SELECT TRADE_ID FROM TRD_BANK_MANUAL_SETTLE_INFO ))
+                         WHERE  TPDA.ENTRUST_ID IS NOT NULL AND TPD.TOTLE_TRADE_ID IN (SELECT TRADE_ID FROM TRD_BANK_MANUAL_SETTLE_INFO ))
             )
     </select>
 </mapper>

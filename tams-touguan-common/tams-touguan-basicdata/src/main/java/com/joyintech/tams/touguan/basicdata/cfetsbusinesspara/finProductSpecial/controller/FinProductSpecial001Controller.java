@@ -14,6 +14,7 @@ import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto;
@@ -119,13 +120,13 @@ public class FinProductSpecial001Controller extends BaseController {
         // 页面id
         params.setPageId("CfetsBasicInfo001");
         params.setElementId(dto.getElementId());
-        params.setBusinessType(BussinessDictCodeList.特殊债券信息业务类型.getValue());
+        params.setBusinessType(DictCodeListExt2.共通业务类型_银行间基础信息.getValue());
         params.setBusinessCode(dto.getFinprodMarketId());
         String finalCommentStr =
                 "债券代码:" + dto.getFinprodMarketId()
-                        + "是否资产支持证券：" + dto.getIsAbsStr()
-                        + "是否特殊债：" + dto.getIsSpecialDebtStr()
-                        + "是否到期违约债：" + dto.getIsDefaultBondIndicatorStr();
+                        + "-是否资产支持证券:" + dto.getIsAbsStr()
+                        + "-是否特殊债:" + dto.getIsSpecialDebtStr()
+                        + "-是否到期违约债:" + dto.getIsDefaultBondIndicatorStr();
         params.setComment(entity -> finalCommentStr);
         processParameter.setWorkFlowParameter(params);
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
@@ -182,7 +183,7 @@ public class FinProductSpecial001Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(finProductSpecialDto.getElementId());
         params.setBusinessCode(FinProductSpecialDto::getFinprodMarketId);
-        params.setBusinessType(BussinessDictCodeList.特殊债券信息业务类型.getValue());
+        params.setBusinessType(DictCodeListExt2.共通业务类型_银行间基础信息.getValue());
         finProductSpecialDto.setOperateType(OperationType.DELETE.name());
         processParameter.setOperationType(OperationType.DELETE);
         processParameter.setWorkFlowParameter(params);

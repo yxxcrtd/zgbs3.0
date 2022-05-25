@@ -1,0 +1,1 @@
+UPDATE CFG_READONLY_FORM_SHOW SET COLCODE = 'referenceRateStr' WHERE PAGECODE = 'CfetsTrdQuery' AND DTCODE = 'CfetsTrdQueryRegInfo' AND SPCDCODE = '04,B' AND COLNAME = '参考收益率';

@@ -94,7 +94,7 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
      * @return
      */
     public Integer countFinprodIdProcessing(String finprodId) {
-        return finProductSpecial001Mapper.countFinprodIdProcessing(finprodId, iPlatformDate.getSysDate());
+        return finProductSpecial001Mapper.countFinprodIdProcessing(finprodId, iPlatformDate.getSysDateStr());
     }
 
     @Override
@@ -134,6 +134,7 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
     private void insertData(FinProductSpecialDto entity) {
         FinProductSpecial finProductSpecial = new FinProductSpecial();
         BeanUtil.copyPropertiesIgnoreNull(finProductSpecial, entity);
+        finProductSpecial.setInputType(DictCodeListExt1.录入方式_手工录入.getValue());
         finProductSpecialMapper.insertSelective(finProductSpecial);
     }
 

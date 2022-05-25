@@ -572,7 +572,7 @@ public class CfetsTrdConfirmService extends BaseService{
             tradeFeeDetail.setTradeId(deal.getTradeId());
             tradeFeeDetail.setFeeType(BussinessDictCodeList.费用类型_结算手续费.getValue());
             tradeFeeDetail.setIsPayWithTrade(DictCodeList.是否_否.getValue());
-            tradeFeeDetail.setFeeAmt(dtoReg.getSettleFeeAmt());
+            tradeFeeDetail.setFeeAmt(regDeal.getSettleFeeAmt());
             entity.setFeeAmt(regDeal.getSettleFeeAmt());
             entity.setFeeAmtPay(null);
             entity.setFeeAmtUnpay(regDeal.getSettleFeeAmt());

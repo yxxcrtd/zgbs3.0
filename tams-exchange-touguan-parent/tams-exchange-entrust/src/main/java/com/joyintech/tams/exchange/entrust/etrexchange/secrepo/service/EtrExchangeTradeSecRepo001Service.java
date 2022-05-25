@@ -1550,7 +1550,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                     if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice())+"]之外"));
+                        if(quotation.getLastPrice().compareTo(BigDecimal.ZERO)==0){
+                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+BigDecimal.ZERO+"]之外"));
+                        }else{
+                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice())+"]之外"));
+                        }
                     }
                 }
             }

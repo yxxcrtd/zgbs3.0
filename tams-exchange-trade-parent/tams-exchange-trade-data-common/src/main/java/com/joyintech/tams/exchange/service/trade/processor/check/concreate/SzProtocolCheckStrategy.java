@@ -29,7 +29,7 @@ public class SzProtocolCheckStrategy implements IBusinessCheckStrategy {
     @Override
     public boolean support(Instruction instruction) {
         return TradePlat.SZ_PROTOCOL.codeEquals(instruction.getTradePlat())
-                && EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.FUND, InvestmentAssetType.STOCK);
+                && EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.FUND, InvestmentAssetType.STOCK, InvestmentAssetType.BOND);
     }
 
     @Override
