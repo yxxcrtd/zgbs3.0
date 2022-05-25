@@ -32,6 +32,7 @@ import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
+import com.joyintech.tams.business.common.util.NumericUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
@@ -978,6 +979,13 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         if (StringUtil.isEmpty(cfetsDto.getFinprodId())) {
             messages.add(new ValidMessage("请输入资产代码！"));
         }
+        if (cfetsDto.getTotalBiddingNum() == null) {
+            messages.add(new ValidMessage("汇总投标券面总额不能为空！"));
+        }
+        //校验字符串是否是  数字 小数 不为负数
+        if (!NumericUtil.isNumeric(cfetsDto.getTotalBiddingNum().toString())) {
+            messages.add(new ValidMessage("汇总投标券面总额必须是不为负值的数字！"));
+        }
 
         if (CollectionUtils.isNotEmpty(cfetsDto.getBiddingProductList())) {
 
@@ -998,12 +1006,17 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                         messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],资金账户不能为空！"));
                     }
                     //资金账户对应的证券账户
-
+                    if (StringUtil.isEmpty(bidDto.getSecAcctId())) {
+                        messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],证券账户不能为空！"));
+                    }
                 }
-
 
                 if (bidDto.getBidPrinAmt() == null) {
                     messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],投标券面总额不能为空！"));
+                }
+                //校验字符串是否是  数字 小数 不为负数
+                if (!NumericUtil.isNumeric(bidDto.getBidPrinAmt().toString())) {
+                    messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],投标券面总额必须是不为负值的数字！"));
                 }
                 //大于0.1(万元)
                 if (bidDto.getBidPrinAmt() != null) {
@@ -1036,11 +1049,30 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = cfetsDto.getBiddingProductList().stream()
                         .collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
                 for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : portfolioIdMap.entrySet()) {
-                    entry.getValue().stream().forEach(x -> {
-                        if (x.getBidPrice() == null) {
-                            messages.add(new ValidMessage("标位不能为空！"));
+                    for (CfetsBiddingProductDto productDto : entry.getValue()) {
+                        if (productDto.getBidPrice() == null) {
+                            messages.add(new ValidMessage("投标标位不能为空！"));
+                            break;
                         }
-                    });
+                        if (productDto.getBidPrice().compareTo(BigDecimal.ZERO) < 0) {
+                            messages.add(new ValidMessage("投标标位必须大于0！"));
+                            break;
+                        }
+                        //校验字符串是否是  数字 小数 不为负数
+                        if (!NumericUtil.isNumeric(productDto.getBidPrice().toString())) {
+                            messages.add(new ValidMessage("投标标位必须是不为负值的数字！"));
+                            break;
+                        }
+                        if (productDto.getPortfolioTotalBidPrinAmt().compareTo(BigDecimal.ZERO) < 0) {
+                            messages.add(new ValidMessage("组合汇总投标券面总额必须大于0！"));
+                            break;
+                        }
+                        //校验字符串是否是  数字 小数 不为负数
+                        if (!NumericUtil.isNumeric(productDto.getPortfolioTotalBidPrinAmt().toString())) {
+                            messages.add(new ValidMessage("组合汇总投标券面总额必须是不为负值的数字！"));
+                            break;
+                        }
+                    }
                     List<BigDecimal> bidPriceList = entry.getValue().stream().map(CfetsBiddingProductDto::getBidPrice).distinct().collect(Collectors.toList());
                     if (bidPriceList.size() != entry.getValue().size()) {
                         messages.add(new ValidMessage("招标发行/簿记建档:同一组合同一标位在列表中只能存在一条数据！"));
