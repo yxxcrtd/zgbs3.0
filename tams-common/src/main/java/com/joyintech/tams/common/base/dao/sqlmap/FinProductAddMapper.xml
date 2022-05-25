@@ -103,6 +103,9 @@
         <result column="IS_OPEN_EVERYDAY" property="isOpenEveryDay" jdbcType="VARCHAR" />
         <result column="IS_SEVEN_DAY_CASHABLE" property="isSevenDayCashable" jdbcType="VARCHAR" />
         <result column="OPEN_TYPE" property="openType" jdbcType="VARCHAR" />
+        <result column="IS_SEVEN_DAY_CASHABLE" property="isSevenDayCashable" jdbcType="VARCHAR" />
+        <result column="GUA_TYPE" property="guaType" jdbcType="VARCHAR" />
+        <result column="ORIGINAL_OWNER" property="originalOwner" jdbcType="VARCHAR" />
 
     </resultMap>
     <sql id="Base_Column_List" >
@@ -133,7 +136,8 @@
         IS_ISSUE_ASSET IS_ISSUE_ASSET, APPEAR_MARKET_ID APPEAR_MARKET_ID, WIND_CODE WIND_CODE,CROSS_MARKET CROSS_MARKET,
         CROSS_MARKET_CODE CROSS_MARKET_CODE, IS_NO_GUARD IS_NO_GUARD, CONCEPT_TYPE CONCEPT_TYPE,
         IS_ALLOW_OVERWRITE IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE OLD_DELISTING_DATE,LISTING_DATE_FROM_TRADE LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,IS_SEVEN_DAY_CASHABLE,OPEN_TYPE,
-        PROTECT_OBJECT,REF_ENTITY,REF_SEC,REF_SEC_FEATURES,GRACE_PERIOD,BOOK_BUILDING_DATE,PAY_DATE,NOM_CAPI,SETTLE_METHOD,ISSUERSHORT
+        PROTECT_OBJECT,REF_ENTITY,REF_SEC,REF_SEC_FEATURES,GRACE_PERIOD,BOOK_BUILDING_DATE,PAY_DATE,NOM_CAPI,SETTLE_METHOD,ISSUERSHORT,
+        GUA_TYPE,ORIGINAL_OWNER
     </sql>
     <sql id="Sql_All_Data" >
         select
@@ -191,7 +195,7 @@
                                      LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,
                                      IS_SEVEN_DAY_CASHABLE,OPEN_TYPE,PROTECT_OBJECT,REF_ENTITY,
                                      REF_SEC,REF_SEC_FEATURES,GRACE_PERIOD,BOOK_BUILDING_DATE,PAY_DATE,
-                                     NOM_CAPI,SETTLE_METHOD,ISSUERSHORT)
+                                     NOM_CAPI,SETTLE_METHOD,ISSUERSHORT,GUA_TYPE,ORIGINAL_OWNER)
         values (#{finprodId,jdbcType=VARCHAR}, #{saleDepartment,jdbcType=VARCHAR}, #{saleLayer,jdbcType=VARCHAR},
                 #{salePeriod,jdbcType=DECIMAL}, #{purSpeed,jdbcType=DECIMAL}, #{redSpeed,jdbcType=DECIMAL},
                 #{isSecBond,jdbcType=VARCHAR}, #{windId,jdbcType=VARCHAR}, #{isAutoUpdate,jdbcType=VARCHAR},
@@ -226,10 +230,10 @@
                 #{isNoGuard,jdbcType=VARCHAR},#{conceptType,jdbcType=VARCHAR}
                 ,#{isAllowOverwrite,jdbcType=VARCHAR},#{oldDelistingDate,jdbcType=DATE},
                 #{listingDateFromTrade,jdbcType=VARCHAR},#{directDisclosureRiskFlag,jdbcType=VARCHAR},
-                #{isOpenEveryDay,jdbcType=VARCHAR},#{isSevenDayCashable,jdbcType=VARCHAR},#{openType,jdbcType=VARCHAR}，
+                #{isOpenEveryDay,jdbcType=VARCHAR},#{isSevenDayCashable,jdbcType=VARCHAR},#{openType,jdbcType=VARCHAR},
                 #{protectObject,jdbcType=VARCHAR},#{refEntity,jdbcType=VARCHAR},#{refSec,jdbcType=VARCHAR},#{refSecFeatures,jdbcType=VARCHAR},
                 #{gracePeriod,jdbcType=DECIMAL},#{bookBuildingDate,jdbcType=DATE},#{payDate,jdbcType=DATE},#{nomCapi,jdbcType=DECIMAL},
-                #{settleMethod,jdbcType=VARCHAR},#{issuershort,jdbcType=VARCHAR}
+                #{settleMethod,jdbcType=VARCHAR},#{issuershort,jdbcType=VARCHAR},#{guaType,jdbcType=VARCHAR},#{originalOwner,jdbcType=VARCHAR}
                 )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
@@ -538,6 +542,12 @@
             <if test="openType != null" >
                 OPEN_TYPE,
             </if>
+            <if test="guaType != null" >
+                GUA_TYPE,
+            </if>
+            <if test="originalOwner != null" >
+                ORIGINAL_OWNER,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="finprodId != null" >
@@ -843,6 +853,12 @@
             <if test="openType != null" >
                 #{openType,jdbcType=VARCHAR},
             </if>
+            <if test="guaType != null" >
+                #{guaType,jdbcType=VARCHAR},
+            </if>
+            <if test="originalOwner != null" >
+                #{originalOwner,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
@@ -861,7 +877,8 @@
                                     BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE,
                                     LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET,
                                     APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE, IS_NO_GUARD, CONCEPT_TYPE,
-                                    IS_ALLOW_OVERWRITE, OLD_DELISTING_DATE,LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,IS_SEVEN_DAY_CASHABLE,OPEN_TYPE)
+                                    IS_ALLOW_OVERWRITE, OLD_DELISTING_DATE,LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,
+                                    IS_OPEN_EVERYDAY,IS_SEVEN_DAY_CASHABLE,OPEN_TYPE,GUA_TYPE,ORIGINAL_OWNER)
         select FINPROD_ID, SALE_DEPARTMENT, SALE_LAYER, SALE_PERIOD,
                PUR_SPEED, RED_SPEED, IS_SEC_BOND, WIND_ID, IS_AUTO_UPDATE, PORTFOLIO_ID, PROD_REGIST_CODE,
                IS_CYCLE, IS_LAY, LAY_TYPE, INVEST_NATURE, PROFIT_FLAG, SALE_MODE, CHB_ID, TMPL_ID,
@@ -877,7 +894,8 @@
                BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE,
                LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET,
                APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE,IS_NO_GUARD,CONCEPT_TYPE,
-               IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE,LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,IS_SEVEN_DAY_CASHABLE,OPEN_TYPE
+               IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE,LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,
+               IS_OPEN_EVERYDAY,IS_SEVEN_DAY_CASHABLE,OPEN_TYPE,GUA_TYPE,ORIGINAL_OWNER
         from FIN_PRODUCT_ADD
         where 1 = 1 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </insert>
@@ -1172,6 +1190,12 @@
             <if test="openType != null" >
                 OPEN_TYPE = #{openType,jdbcType=VARCHAR},
             </if>
+            <if test="guaType != null" >
+                GUA_TYPE = #{guaType,jdbcType=VARCHAR},
+            </if>
+            <if test="originalOwner != null" >
+                ORIGINAL_OWNER =#{originalOwner,jdbcType=VARCHAR},
+            </if>
         </set>
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
@@ -1273,6 +1297,8 @@
             ,IS_OPEN_EVERYDAY = #{isOpenEveryDay,jdbcType=VARCHAR}
             ,IS_SEVEN_DAY_CASHABLE = #{isSevenDayCashable,jdbcType=VARCHAR}
             ,OPEN_TYPE = #{openType,jdbcType=VARCHAR}
+            ,GUA_TYPE = #{guaType,jdbcType=VARCHAR}
+            ,ORIGINAL_OWNER =#{originalOwner,jdbcType=VARCHAR}
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
 

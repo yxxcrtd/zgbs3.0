@@ -219,6 +219,9 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     @ApiModelProperty(name = "debRateOrg", value = "债项评级机构")
     private String debRateOrg;
 
+    @ApiModelProperty(name = "addBatch", value = "增发批次")
+    private Integer addBatch;
+
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
@@ -757,5 +760,13 @@ public class FinTenderBondAsset001Dto extends BaseDto {
 
     public void setCirculationCode(String circulationCode) {
         this.circulationCode = circulationCode;
+    }
+
+    public Integer getAddBatch() {
+        return addBatch;
+    }
+
+    public void setAddBatch(Integer addBatch) {
+        this.addBatch = addBatch;
     }
 }
