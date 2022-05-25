@@ -1,8 +1,10 @@
 package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto;
 
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -45,8 +47,17 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     @ApiModelProperty(required = false, name = "issueDate", value = "投标日")
     private Date issueDate;
 
+    @ApiModelProperty(name = "issueDateStart", value = "投标日开始日期,字符串", example = "2021-12-21")
+    private Date issueDateStart;
+
+    @ApiModelProperty(name = "issueDateEnd", value = "投标日结束日期,字符串", example = "2021-12-21")
+    private Date issueDateEnd;
+
     @ApiModelProperty(required = false, name = "issueDateStr", value = "投标日格式化")
     private String issueDateStr;
+
+    @ApiModelProperty(name = "etrBidPriceTotal", value = "指令投标券面总额(万元) 需前端转化", example = "1")
+    private BigDecimal etrBidPriceTotal;
 
     @ApiModelProperty(name = "totalBiddingNum", value = "汇总投标券面总额")
     private BigDecimal totalBiddingNum;
@@ -191,7 +202,10 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getTenderTargetStr() {
-        return tenderTargetStr;
+        if (StringUtil.isEmpty(getTenderTarget())) {
+            return "";
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getTenderTarget());
     }
 
     public void setTenderTargetStr(String tenderTargetStr) {
@@ -207,8 +221,12 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getIssueDateStr() {
+        if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
+        }
         return issueDateStr;
     }
+
 
     public void setIssueDateStr(String issueDateStr) {
         this.issueDateStr = issueDateStr;
@@ -247,7 +265,10 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getBiddingMethodStr() {
-        return biddingMethodStr;
+        if (StringUtil.isEmpty(getBiddingMethod())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, getBiddingMethod());
     }
 
     public void setBiddingMethodStr(String biddingMethodStr) {
@@ -263,7 +284,10 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getPayTypeStr() {
-        return payTypeStr;
+        if (StringUtil.isEmpty(getPayType())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.缴款方式, getPayType());
     }
 
     public void setPayTypeStr(String payTypeStr) {
@@ -319,6 +343,10 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getPayDateStr() {
+
+        if (null != this.getPayDate()) {
+            return DateUtil.format(this.getPayDate());
+        }
         return payDateStr;
     }
 
@@ -335,6 +363,9 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getAssignRegdateStr() {
+        if (null != this.getAssignRegdate()) {
+            return DateUtil.format(this.getAssignRegdate());
+        }
         return assignRegdateStr;
     }
 
@@ -351,6 +382,9 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getListingDateStr() {
+        if (null != this.getListingDate()) {
+            return DateUtil.format(this.getListingDate());
+        }
         return listingDateStr;
     }
 
@@ -359,6 +393,9 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getBidConfirmDateStr() {
+        if (null != this.getBidConfirmDate()) {
+            return DateUtil.format(this.getBidConfirmDate());
+        }
         return bidConfirmDateStr;
     }
 
@@ -375,7 +412,10 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getTradeMarketStr() {
-        return tradeMarketStr;
+        if (StringUtil.isEmpty(getTradeMarket())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易场所, getTradeMarket());
     }
 
     public void setTradeMarketStr(String tradeMarketStr) {
@@ -426,11 +466,38 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getDealDateStr() {
+        if (null != this.getDealDate()) {
+            return DateUtil.format(this.getDealDate());
+        }
         return dealDateStr;
     }
 
     public void setDealDateStr(String dealDateStr) {
         this.dealDateStr = dealDateStr;
+    }
+
+    public BigDecimal getEtrBidPriceTotal() {
+        return etrBidPriceTotal;
+    }
+
+    public void setEtrBidPriceTotal(BigDecimal etrBidPriceTotal) {
+        this.etrBidPriceTotal = etrBidPriceTotal;
+    }
+
+    public Date getIssueDateStart() {
+        return issueDateStart;
+    }
+
+    public void setIssueDateStart(Date issueDateStart) {
+        this.issueDateStart = issueDateStart;
+    }
+
+    public Date getIssueDateEnd() {
+        return issueDateEnd;
+    }
+
+    public void setIssueDateEnd(Date issueDateEnd) {
+        this.issueDateEnd = issueDateEnd;
     }
 }
 

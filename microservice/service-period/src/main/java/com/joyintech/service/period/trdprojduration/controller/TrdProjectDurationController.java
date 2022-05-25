@@ -182,4 +182,17 @@ public class TrdProjectDurationController {
     public List<StlPayOrdersDto> getGroupPayByList(@RequestBody Map<String, Object> params) {
         return trdProjectDurationService.getGroupPayByList(params);
     }
+
+    /**
+     * 是否付息日
+     *
+     * @return 查询结果集
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @PostMapping("isPayIntDate")
+    public boolean isPayIntDate(@RequestBody Map<String,Object> map) {
+        return trdProjectDurationService.isPayIntDate(map);
+    }
 }

@@ -120,6 +120,7 @@ public class TrdProjectDuration002Controller extends BaseController {
                 params.put("bizCode", bizCode + "R");
             }
             entity = trdProjectDuration002Service.findEffectiveData(RequestUtil.getPageParam());
+            entity.setCashType("02");
             if (entity != null) {
                 entity.setStatusValid(statusValid);
                 if (!DictCodeListExt1.画面数据状态_待处理.getValue().equals(statusValid) && entity != null) {
@@ -215,5 +216,14 @@ public class TrdProjectDuration002Controller extends BaseController {
         }
         String msg = trdProjectDuration002Service.start(processParameter, dto);
         return new AjaxResult(msg);
+    }
+    /**
+     *  资产是否还本带息，若还本带息，还本日是否等于付息日
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("isPayIntDate")
+    public Boolean isPayIntDate(@RequestBody Map<String,Object> map) {
+        return trdProjectDuration002Service.isPayIntDate(map);
     }
 }

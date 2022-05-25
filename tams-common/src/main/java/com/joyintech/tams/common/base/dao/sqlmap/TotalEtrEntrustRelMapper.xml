@@ -10,10 +10,11 @@
     <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
     <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
     <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="SUM_FLAG" jdbcType="VARCHAR" property="sumFlag" />
   </resultMap>
   <sql id="Base_Column_List">
     TOTLE_ID, ENTRUST_ID, TRADER, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
-    UPDATE_TIME
+    UPDATE_TIME, SUM_FLAG
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -28,10 +29,10 @@
   <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.TotalEtrEntrustRel">
     insert into TOTAL_ETR_ENTRUST_REL (TOTLE_ID, ENTRUST_ID, TRADER, 
       CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-      UPDATE_USER, UPDATE_TIME)
+      UPDATE_USER, UPDATE_TIME, SUM_FLAG)
     values (#{totleId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{trader,jdbcType=VARCHAR}, 
       #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+      #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP} , #{sumFlag,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.TotalEtrEntrustRel">
     insert into TOTAL_ETR_ENTRUST_REL
@@ -60,6 +61,9 @@
       <if test="updateTime != null">
         UPDATE_TIME,
       </if>
+      <if test="sumFlag != null">
+        SUM_FLAG,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="totleId != null">
@@ -85,6 +89,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sumFlag != null">
+        #{sumFlag,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -112,6 +119,9 @@
       <if test="updateTime != null">
         UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="sumFlag != null">
+        SUM_FLAG = #{sumFlag,jdbcType=VARCHAR},
+      </if>
     </set>
     where TOTLE_ID = #{totleId,jdbcType=VARCHAR}
   </update>
@@ -123,7 +133,8 @@
       CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
       CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
       UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      SUM_FLAG = #{sumFlag,jdbcType=VARCHAR}
     where TOTLE_ID = #{totleId,jdbcType=VARCHAR}
   </update>
 </mapper>

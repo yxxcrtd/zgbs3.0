@@ -7,7 +7,6 @@ import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,7 +50,7 @@ public interface FinProductSpecial001Mapper {
      * @param iPlatformDate
      * @return
      */
-    int countFinprodIdProcessing(@Param("finprodId") String finprodId, @Param("iPlatformDate") Date iPlatformDate);
+    int countFinprodIdProcessing(@Param("finprodId") String finprodId, @Param("iPlatformDate") String iPlatformDate);
 
     /**
      * 接口表简单数据查询

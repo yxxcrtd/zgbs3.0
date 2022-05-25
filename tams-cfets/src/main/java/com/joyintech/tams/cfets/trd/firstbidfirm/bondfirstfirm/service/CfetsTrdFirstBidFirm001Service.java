@@ -112,22 +112,41 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     /**
      * 页面设置pageid
      */
-    private static final String pageCode = "TenderBondFirm";
+    private static final String PAGECODE = "TenderBondFirm";
 
     /**
+     * 指令信息
      * 页面设置区域id-表格
      */
-    private static final String DTCODE_ETR = "ETRDETINFOLIST";
+    private static final String TABLE_DTCODE_ETR = "ETRDETINFOLIST";
 
     /**
+     * 指令信息
      * 页面设置区域id-表单
      */
-    private static final String FORMDTCODE_ETR = "ETRDETINFO";
+    private static final String FORM_DTCODE_ETR = "ETRDETINFO";
+
+    /**
+     * 投标确认执行明细
+     * 页面设置区域id-表格
+     */
+    private static final String TABLE_DTCODE_BID = "BIDORDERTRANSLIST";
+
 
     /**
      * 通用设置 默认999999
      */
     private static final String COMM = "999999";
+
+    /**
+     * 汇总标识 01 取消汇总指令
+     */
+    private static final String SUM_FLAG_01 = "01";
+
+    /**
+     * 汇总标识 02 表示一条有交易对手的指令与所有没有交易对手的指令进行汇总
+     */
+    private static final String SUM_FLAG_02 = "02";
 
     /**
      * 接收指令
@@ -287,11 +306,20 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         this.setParam(param);
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoList = new ArrayList<>();
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmDtos = cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
-       // List<TotalEtrEntrustRel> totalEtrEntrustRelList = cfetsTrdFirstBidFirm001Mapper.query
         bidFirmDtos.stream().forEach(x -> {
             x.setIsSumFlag(DictCodeListExt1.是否_否.getValue());
         });
+
         //查询汇总关系表数据  汇总关系表数据单独汇总
+        Map<String, Object> relParam = new HashMap<>();
+        String loginUserId = LoginUserUtil.getUserName();
+        relParam.put("trader", loginUserId);
+        relParam.put("sumFlag", this.SUM_FLAG_01);
+        List<TotalEtrEntrustRel> relList01 = cfetsTrdFirstBidFirm001Mapper.queryTotalEtrEntrustRel(relParam);
+        relParam.put("sumFlag", this.SUM_FLAG_02);
+        List<TotalEtrEntrustRel> relList02 = cfetsTrdFirstBidFirm001Mapper.queryTotalEtrEntrustRel(relParam);
+
+
 
         //交易对手为空
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmCounterIsNull = bidFirmDtos.stream()
@@ -387,6 +415,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         String uuid = IDGenerator.generate();
         totalEtrEntrustRel.setTotleId(uuid);
         totalEtrEntrustRel.setEntrustId(cfetsDto.getEntrustId());
+        totalEtrEntrustRel.setSumFlag(cfetsDto.getSumFlag());
         String loginUserId = LoginUserUtil.getUserName();
         // param.put("loginUserId", loginUserId);
         totalEtrEntrustRel.setTrader(loginUserId);
@@ -407,13 +436,13 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         //查询投标产品列表
         List<CfetsTrdBondFirstBidFirmProductDto> productDtos = cfetsTrdFirstBidFirm001Mapper.getEntrustProductInfo(param);
         List<String> spcdCodeList = new ArrayList<>();
-        result.put("form", getReadonlyForms(this.pageCode, DTCODE_ETR, spcdCodeList));
+        result.put("form", getReadonlyForms(this.PAGECODE, FORM_DTCODE_ETR, spcdCodeList));
         if (StringUtil.isNotEmpty(formData)) {
             result.put("formData", formData);
         }
 
         // 表格格式
-        result.put("table", getBySpcdCodes(this.pageCode, FORMDTCODE_ETR, new ArrayList<>()));
+        result.put("table", getBySpcdCodes(this.PAGECODE, TABLE_DTCODE_ETR, new ArrayList<>()));
         if (CollectionUtils.isNotEmpty(productDtos)) {
             // 表单数据
             result.put("tableData", productDtos);
@@ -437,12 +466,19 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         //查询投标确认执行明细
         List<CfetsTrdBondFirsBidFirmBidOrderDetailDto> tableData = cfetsTrdFirstBidFirm001Mapper.getBidOrderTransactionDetails(param);
         if (CollectionUtils.isNotEmpty(tableData)) {
+            // 表格格式
+            List<String> spcdCodeList = new ArrayList<>();
+            String biddingMethod = tableData.get(0).getBiddingMethod();
+            if (StringUtil.equals(biddingMethod, DictCodeListExt4.投标方式_分销买入.getValue())) {
+                spcdCodeList.add("03");
+            } else {
+                spcdCodeList.add("01");
+            }
+            result.put("table", getBySpcdCodes(this.PAGECODE, this.TABLE_DTCODE_BID, spcdCodeList));
             // 表单数据
             result.put("tableData", tableData);
         }
-        // 表格格式
-        List<String> spcdCodeList = new ArrayList<>();
-        result.put("table", getBySpcdCodes(null, null,spcdCodeList));
+
 
         return result;
     }
