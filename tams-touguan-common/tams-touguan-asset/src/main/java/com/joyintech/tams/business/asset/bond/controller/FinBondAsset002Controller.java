@@ -645,7 +645,7 @@ public class FinBondAsset002Controller extends BaseController{
      */
     @ApiOperation(value = "附件上传", notes = "附件上传")
     @ResponseBody
-    @PostMapping( "uploadFile")
+    @PostMapping( "/uploadFile")
     public Message<SysUploadFileInfo> uploadFile(MultipartFile file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
