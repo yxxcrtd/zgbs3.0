@@ -210,6 +210,9 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     @ApiModelProperty(name="typeFour",value="资产三级分类",required=true)
     private String typeFour;
 
+    @ApiModelProperty(name="isAddSec",value="是否加券(加券:Y)")
+    private String isAddSec;
+
     /**
      * 选择数据
      */
@@ -2068,5 +2071,13 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setFirstPayDate(Date firstPayDate) {
         this.firstPayDate = firstPayDate;
+    }
+
+    public String getIsAddSec() {
+        return isAddSec;
+    }
+
+    public void setIsAddSec(String isAddSec) {
+        this.isAddSec = isAddSec;
     }
 }

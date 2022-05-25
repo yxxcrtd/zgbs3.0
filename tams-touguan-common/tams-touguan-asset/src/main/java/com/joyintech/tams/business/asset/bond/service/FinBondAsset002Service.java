@@ -9,6 +9,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
+import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.common.base.dao.FinCashCalcRuleMapper;
 import com.joyintech.tams.common.base.dao.FinCashPlanMapper;
 import com.joyintech.tams.common.base.entity.*;
@@ -258,6 +259,21 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         dto.setPaFinCashCalcRuleList(paFinCashCalcRuleList);
         dto.setFinCashCalcRuleList(finCashCalcRuleList);
         return dto;
+    }
+
+    @Override
+    public void doInsert(FinAssetRateAdjResponse entity, OperationType type){
+        finBondAssetService.updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整.getValue());
+    }
+
+    @Override
+    public void doUpdate(FinAssetRateAdjResponse entity) {
+        finBondAssetService.updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整.getValue());
+    }
+
+    @Override
+    public void doBack(FinAssetRateAdjResponse entity) {
+        finBondAssetService.updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整退回.getValue());
     }
 
     /**

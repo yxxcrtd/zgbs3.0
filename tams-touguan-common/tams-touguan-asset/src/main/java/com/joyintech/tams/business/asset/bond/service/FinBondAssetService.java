@@ -99,12 +99,6 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     private AssetCommonService assetCommonService;
 
     /**
-     * 业务--行权计划
-     */
-    @Autowired(required = false)
-    private BusiFinExercisePlanService busiFinExercisePlanService;
-
-    /**
      * 附件
      */
     @Autowired(required = false)
@@ -166,9 +160,6 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     private DateCalService dateCalService;
 
     @Autowired
-    private FinProductIssueMapper finProductIssueMapper;
-
-    @Autowired
     private MstCustomerInfoMapper mstCustomerInfoMapper;
 
     @Autowired
@@ -186,6 +177,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 
     public static final String ENTRUST_RECORD_DELETE = "delete";
 
+    public static final String ENTRUST_RECORD_DOBACK = "doback";
+
+
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @DataSource(DataSourceType.MASERT)
@@ -200,6 +194,25 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 }
             }
         return null;
+    }
+
+    @Override
+    public void doInsert(FinBondAssetSaveRequest entity, OperationType type){
+        if (StringUtil.equals(entity.getIsAddSec(),DictCodeList.是否_是.getValue())) {
+            updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_债券自动加券.getValue());
+        }else{
+            updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT);
+        }
+    }
+
+    @Override
+    public void doUpdate(FinBondAssetSaveRequest entity) {
+        updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE);
+    }
+
+    @Override
+    public void doBack(FinBondAssetSaveRequest entity) {
+        updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_DOBACK);
     }
 
     /**
@@ -234,7 +247,6 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 doCompleteUpdate(entity);
             }
             //处理履历
-            updateCfetsOprHis(entity.getFinprodMarketId(), action);
         }
         try {
             // 推送数据到第三方接口
@@ -497,9 +509,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //发行方式
             List<FinProductIssue> finProductIssues = finBondAssetMapper.selectFinProductIssue(dto.getFinprodMarketId());
             List<BondFinProductIssueDto> finProductIssueList = new ArrayList<>();
-            BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
-            BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
             for (FinProductIssue finProductIssue:finProductIssues){
+                BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
+                BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductIssue.getFinprodId());
                 BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
                 bondFinProductIssueDto.setListingDate(finProduct.getCirculationDate());
@@ -1219,15 +1231,18 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     public void updateCfetsOprHis(String entrustId, String optType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
-        oprHisReq.setOperType(DictCodeListExt3.操作类型_利率调整.getValue());
         if (ENTRUST_RECORD_INSERT.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
         } else if (ENTRUST_RECORD_UPDATE.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
-        } else if (ENTRUST_RECORD_DELETE.equals(optType)) {
+        } else if (ENTRUST_RECORD_DOBACK.equals(optType)) {
+            oprHisReq.setOperType(DictCodeListExt3.操作类型_退回.getValue());
+        }else if (ENTRUST_RECORD_DELETE.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_撤回.getValue());
         } else if ("export".equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_导出.getValue());
+        }else{
+            oprHisReq.setOperType(optType);
         }
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
 
@@ -1630,7 +1645,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         return date;
     }
 
+
+
     public int isTransInAssetTwo(String finprodId) {
         return finBondAssetMapper.isTransInAssetTwo(finprodId);
     }
+
 }

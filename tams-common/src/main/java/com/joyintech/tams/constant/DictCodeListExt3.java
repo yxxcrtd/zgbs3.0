@@ -1876,6 +1876,8 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     操作类型_利率调整(DictCode.操作类型,"21","利率调整"),
     操作类型_中标结果维护(DictCode.操作类型,"22","中标结果维护"),
     操作类型_中标结果撤销(DictCode.操作类型,"23","中标结果撤销"),
+    操作类型_债券自动加券(DictCode.操作类型,"24","债券自动加券"),
+    操作类型_利率调整退回(DictCode.操作类型,"25","利率调整退回"),
     债券性质_债性(DictCode.债券性质, "01", "债性"),
     债券性质_股性(DictCode.债券性质, "02", "股性"),
 

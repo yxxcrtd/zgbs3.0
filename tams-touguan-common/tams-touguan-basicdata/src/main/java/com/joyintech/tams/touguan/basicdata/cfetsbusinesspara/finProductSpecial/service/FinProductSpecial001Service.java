@@ -3,6 +3,7 @@ package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -145,8 +147,11 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
      * @param entity
      */
     private void updateData(FinProductSpecialDto entity) {
+        String loginUserName = LoginUserUtil.getUserName();
         FinProductSpecial finProductSpecial = new FinProductSpecial();
         BeanUtil.copyPropertiesIgnoreNull(finProductSpecial, entity);
+        finProductSpecial.setUpdateTime(new Date());
+        finProductSpecial.setUpdateUser(loginUserName);
         finProductSpecialMapper.updateByPrimaryKey(finProductSpecial);
     }
 
