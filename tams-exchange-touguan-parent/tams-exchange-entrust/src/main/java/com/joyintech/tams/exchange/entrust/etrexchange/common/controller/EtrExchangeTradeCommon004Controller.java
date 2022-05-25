@@ -753,7 +753,10 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
     @ResponseBody
     @RequestMapping("/getFinprodMarketInfo")
     public Page<SelectOptionDto> getFinprodMarketInfo() {
-        return etrExchangeTrade001CommonService.getFinprodMarketInfo(RequestUtil.getPageParam());
+        Map<String, Object> pageParam = RequestUtil.getPageParam();
+        //ZGCPCN-724
+        pageParam.remove("expireSettleDate");
+        return etrExchangeTrade001CommonService.getFinprodMarketInfo(pageParam);
     }
 
     public List<MinPirceDto> getInterfSysMinPriceAll(@RequestBody Map<String, Object> param) {

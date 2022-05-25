@@ -196,6 +196,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
 	@Autowired
     private PositionRequestTradeReportService positionRequestTradeReportService;
 
+    @Autowired
+    private InfContractDetailfileMapper infContractDetailfileMapper;
+
     // add by etliu 20220225 start
     // 质押券入出库没有生成入出库流水问题修复
     /**
@@ -2324,10 +2327,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
 
     /**
      * 处理数据
-     * @param infContractDetailfile
-     * @param trdTempDto
      */
-    private void saveSettleInfo(InfContractDetailfile infContractDetailfile, TrdTempDto trdTempDto) {
+    private void saveSettleInfo(InfContractDetailfile file, TrdTempDto trdTempDto) {
+        InfContractDetailfile infContractDetailfile = infContractDetailfileMapper.selectByPrimaryKey(file.getSeqno());
+
         // 构建手工交收信息
         TrdManualSettleInfo settleInfo = new TrdManualSettleInfo();
         BeanUtil.copyPropertiesIgnoreNull(settleInfo, infContractDetailfile);
@@ -2336,7 +2339,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // SETTLE_STATUS	交收状态数据字典
         settleInfo.setSettleStatus(DictCodeListExt3.交收状态_未交收.getValue());
         // TRADE_ID 交易编号 原业务编号
-        settleInfo.setTradeId(trdTempDto.getTradeId());
+        settleInfo.setTradeId(true == StringUtil.isNotEmpty(trdTempDto.getTotleTradeId()) ? trdTempDto.getTotleTradeId() : trdTempDto.getTradeId());
         //	委托编号
         settleInfo.setEntrustNo(infContractDetailfile.getEntrustId());
         // 指令序号
