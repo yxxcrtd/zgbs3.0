@@ -6,6 +6,7 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondF
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoDto;
+import com.joyintech.tams.common.base.entity.TotalEtrEntrustRel;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -71,4 +72,11 @@ public interface CfetsTrdFirstBidFirm001Mapper {
      * @return
      */
     List<CfetsTrdFirstBidFirmDistributionInfoDto> distributionSearch(Map<String, Object> params);
+
+    /**
+     * 查询汇总指令关系表
+     * @param relParam
+     * @return
+     */
+    List<TotalEtrEntrustRel> queryTotalEtrEntrustRel(Map<String, Object> relParam);
 }

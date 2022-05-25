@@ -6,6 +6,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -71,10 +72,10 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     private Date issueDate;
 
     @ApiModelProperty(name = "issueDateStart", value = "投标日开始日期,字符串", example = "2021-12-21")
-    private String issueDateStart;
+    private Date issueDateStart;
 
     @ApiModelProperty(name = "issueDateEnd", value = "投标日结束日期,字符串", example = "2021-12-21")
-    private String issueDateEnd;
+    private Date issueDateEnd;
 
     @ApiModelProperty(name = "issueDateStr", value = "投标日字符串")
     private String issueDateStr;
@@ -85,6 +86,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     @ApiModelProperty(name = "bidPrice", value = "投标标位", example = "1")
     private String bidPrice;
+
+    @ApiModelProperty(name = "bidPriceStr", value = "投标标位字符串", example = "1")
+    private String bidPriceStr;
 
     @ApiModelProperty(name = "portfolioId", value = "组合代码", example = "A1")
     private String portfolioId;
@@ -296,6 +300,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     }
 
     public String getIssueDateStr() {
+        if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
+        }
         return issueDateStr;
     }
 
@@ -384,6 +391,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     }
 
     public String getLastModifiedDateStr() {
+        if (null != this.getLastModifiedDate()) {
+            return DateUtil.format(this.getLastModifiedDate());
+        }
         return LastModifiedDateStr;
     }
 
@@ -400,6 +410,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     }
 
     public String getLastModifiedTimeStr() {
+        if (null != this.getLastModifiedTime()) {
+            return DateUtil.format(this.getLastModifiedTime());
+        }
         return LastModifiedTimeStr;
     }
 
@@ -461,19 +474,36 @@ public class CfetsTrdFirstBidFirmEntrustDto {
         this.invManagerName = invManagerName;
     }
 
-    public String getIssueDateStart() {
+    public Date getIssueDateStart() {
         return issueDateStart;
     }
 
-    public void setIssueDateStart(String issueDateStart) {
+    public void setIssueDateStart(Date issueDateStart) {
         this.issueDateStart = issueDateStart;
     }
 
-    public String getIssueDateEnd() {
+    public Date getIssueDateEnd() {
         return issueDateEnd;
     }
 
-    public void setIssueDateEnd(String issueDateEnd) {
+    public void setIssueDateEnd(Date issueDateEnd) {
         this.issueDateEnd = issueDateEnd;
+    }
+
+    public String getBidPriceStr() {
+        if (StringUtil.equals(DictCodeListExt4.招标标的_利率.getValue(),this.getTenderTarget())) {
+            return getBidPrice() + " %";
+        }
+        if (StringUtil.equals(DictCodeListExt4.招标标的_价格.getValue(),this.getTenderTarget())) {
+            return getBidPrice() + " 元";
+        }
+        if (StringUtil.equals(DictCodeListExt4.招标标的_利差.getValue(),this.getTenderTarget())) {
+            return getBidPrice() + " BP";
+        }
+        return getBidPrice();
+    }
+
+    public void setBidPriceStr(String bidPriceStr) {
+        this.bidPriceStr = bidPriceStr;
     }
 }

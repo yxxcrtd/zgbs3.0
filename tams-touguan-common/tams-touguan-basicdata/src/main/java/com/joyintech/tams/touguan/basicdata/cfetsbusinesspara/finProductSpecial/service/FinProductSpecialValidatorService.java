@@ -51,21 +51,21 @@ public class FinProductSpecialValidatorService implements BeanValidator {
         FinProductSpecialDto dto = (FinProductSpecialDto) value;
         if (!dto.getOperateType().equals(OperationType.DELETE.name())) {
             if (StringUtil.isBlank(dto.getFinprodMarketId())) {
-                resultList.add(new ValidMessage(getMessage("【债券代码】必填!")));
+                resultList.add(new ValidMessage("【债券代码】必填!"));
             }
             if (StringUtil.isBlank(dto.getIsAbs())) {
-                resultList.add(new ValidMessage(getMessage("【是否资产支持证券】必填!")));
+                resultList.add(new ValidMessage("【是否资产支持证券】必填!"));
             }
             if (StringUtil.isBlank(dto.getIsSpecialDebt())) {
-                resultList.add(new ValidMessage(getMessage("【是否特殊债】必填!")));
+                resultList.add(new ValidMessage("【是否特殊债】必填!"));
             }
             if (StringUtil.isBlank(dto.getIsDefaultBondIndicator())) {
-                resultList.add(new ValidMessage(getMessage("【是否到期违约债】必填!")));
+                resultList.add(new ValidMessage("【是否到期违约债】必填!"));
             }
             if (DictCodeList.是否_否.getValue().equals(dto.getIsDefaultBondIndicator())
                     && DictCodeList.是否_否.getValue().equals(dto.getIsAbs())
                     && DictCodeList.是否_否.getValue().equals(dto.getIsSpecialDebt())) {
-                resultList.add(new ValidMessage(getMessage("特殊债券标识至少其中一个为是!")));
+                resultList.add(new ValidMessage("特殊债券标识至少其中一个为是!"));
             }
         }
         if (dto.getOperateType().equals(OperationType.NEW.name())) {
@@ -74,7 +74,8 @@ public class FinProductSpecialValidatorService implements BeanValidator {
             parameter.setBusinessDataPk1(dto.getFinprodMarketId());
             ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
             if (Objects.nonNull(dataEntityFromProcessMark)) {
-                resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可新建")));
+                resultList.add(new ValidMessage("", "资产存在流程中数据,不可新建"));
+                return resultList;
             }
         }
         //判断特殊资产维护是否存在流程中数据
@@ -86,7 +87,8 @@ public class FinProductSpecialValidatorService implements BeanValidator {
             if (Objects.nonNull(dataEntityFromProcessMark)) {
                 String businessData = dataEntityFromProcessMark.getBusinessData();
                 BaseMap responseMap = JsonUtils.json2Object(businessData, BaseMap.class);
-                resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可删除! 流程编号：【" + responseMap.getString("workflowId") + "】")));
+                resultList.add(new ValidMessage("", "资产存在流程中数据,不可删除! 流程编号：【" + responseMap.getString("workflowId") + "】"));
+                return resultList;
             }
         }
 
@@ -99,7 +101,8 @@ public class FinProductSpecialValidatorService implements BeanValidator {
             //判断是否流程中的数据
             Integer countFinProdIdProcessing = finProductSpecial001Service.countFinprodIdProcessing(finprodMarketId);
             if (countFinProdIdProcessing > 0) {
-                resultList.add(new ValidMessage(getMessage("存在有效或流程中的当日指令及交易数据，不允许修改!")));
+                String message = dto.getOperateType().equals(OperationType.MODIFY.name()) ? "修改" : "删除";
+                resultList.add(new ValidMessage("存在有效或流程中的当日指令及交易数据，不允许"+message));
             }
         }
         return resultList;
