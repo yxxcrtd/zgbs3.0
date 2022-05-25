@@ -2082,6 +2082,10 @@ public class CfetsTrdConfirm001Service extends BaseService{
             posport.setSecAmount(ArithmeticUtil.multiply(dto.getShareAmt() == null ? BigDecimal.ZERO : dto.getShareAmt(), new BigDecimal(100)));
             posport.setOwnSecAmount(ArithmeticUtil.multiply(dto.getShareAmt() == null ? BigDecimal.ZERO : dto.getShareAmt(), new BigDecimal(100)));
             posport.setCashAmount(dto.getTradeAmt() == null ? BigDecimal.ZERO : dto.getTradeAmt());
+            BigDecimal etrSecAmount = BigDecimal.ZERO;
+            etrSecAmount = ArithmeticUtil.doAdd(etrSecAmount, cfetsTrdConfirmMapper.selectEtrNum(dto.getPortfolioId(), dto.getEntrustId()));
+            etrSecAmount = ArithmeticUtil.multiply(etrSecAmount,new BigDecimal(100));
+            posport.setEtrSecAmount(etrSecAmount);
             ptlList.add(posport);
         }
         //调用头寸

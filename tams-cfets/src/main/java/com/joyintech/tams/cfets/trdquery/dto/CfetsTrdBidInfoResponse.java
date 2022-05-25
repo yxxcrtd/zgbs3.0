@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.cfets.trdquery.dto;
 
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -30,6 +31,9 @@ import java.util.Date;
  */
 @ApiModel(value="交收管理成交数据",description="交收管理成交数据")
 public class CfetsTrdBidInfoResponse {
+
+    @ApiModelProperty(name="bidDate",value="投标日",example="A1")
+    private String bidDate;
 
     @ApiModelProperty(name="bidDateStart",value="投标开始日",example="A1")
     private Date bidDateStart;
@@ -55,6 +59,9 @@ public class CfetsTrdBidInfoResponse {
     @ApiModelProperty(name="tenderTarget",value="招标标的",example="ZC1")
     private String tenderTarget;
 
+    @ApiModelProperty(name="tenderTarget",value="招标标的",example="ZC1")
+    private String tenderTargetStr;
+
     @ApiModelProperty(name="ccy",value="币种",example="字符串1")
     private String ccy;
 
@@ -72,6 +79,9 @@ public class CfetsTrdBidInfoResponse {
 
     @ApiModelProperty(name="tradeMarketModeStr",value="交易市场",example="ZC1")
     private String tradeMarketModeStr;
+
+    @ApiModelProperty(name="payEdate",value="缴款截止日")
+    private Date payEdate;
 
     @ApiModelProperty(name="payDate",value="缴款日")
     private Date payDate;
@@ -133,8 +143,11 @@ public class CfetsTrdBidInfoResponse {
     @ApiModelProperty(name="ouPartyId",value="本方")
     private String ouPartyId;
 
-    @ApiModelProperty(name="trader",value="本方交易员")
+    @ApiModelProperty(name="trader",value="本方交易员ID")
     private String trader;
+
+    @ApiModelProperty(name="traderidStr",value="本方交易员")
+    private String traderidStr;
 
     @ApiModelProperty(name="exeId",value="成交编号")
     private String exeId;
@@ -144,6 +157,9 @@ public class CfetsTrdBidInfoResponse {
 
     @ApiModelProperty(name="couponSpecies",value="息票品种")
     private String couponSpecies;
+
+    @ApiModelProperty(name="couponSpecies",value="息票品种")
+    private String couponSpeciesStr;
 
     @ApiModelProperty(name="intType",value="利率类型ID")
     private String intType;
@@ -175,11 +191,23 @@ public class CfetsTrdBidInfoResponse {
     @ApiModelProperty(name="rate",value="参考收益率")
     private BigDecimal rate;
 
+    @ApiModelProperty(name="rate",value="参考收益率")
+    private String rateStr;
+
+    @ApiModelProperty(name="rateYleid",value="票面利率")
+    private BigDecimal rateYleid;
+
+    @ApiModelProperty(name="payableAmount",value="应缴款金额")
+    private BigDecimal payableAmount;
+
+    @ApiModelProperty(name="totalWinPrinAmt",value="汇总投标券面总额")
+    private BigDecimal totalWinPrinAmt;
+
     @ApiModelProperty(name="subAmt",value="认购量")
     private BigDecimal subAmt;
 
     public String getTradeMarketModeStr() {
-        return tradeMarketModeStr;
+        return SysDataUtil.getNameFromDataDict(DictCode.交易市场, getTenderTarget());
     }
 
     public void setTradeMarketModeStr(String tradeMarketModeStr) {
@@ -226,6 +254,13 @@ public class CfetsTrdBidInfoResponse {
         this.tradeMarketStr = tradeMarketStr;
     }
 
+    public String getBidDate() {
+        return DateUtil.format(this.getBidDateStart(),"YYYY-MM-DD")+"-"+DateUtil.format(this.getBidDateEnd(),"YYYY-MM-DD");
+    }
+
+    public void setBidDate(String bidDate) {
+        this.bidDate = bidDate;
+    }
 
     public String getCounterId() {
         return counterId;
@@ -365,7 +400,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getBidModleStr() {
-        return bidModleStr;
+        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, getTenderTarget());
     }
 
     public void setBidModleStr(String bidModleStr) {
@@ -381,7 +416,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getPayTypeStr() {
-        return payTypeStr;
+        return SysDataUtil.getNameFromDataDict(DictCode.缴款方式, getTenderTarget());
     }
 
     public void setPayTypeStr(String payTypeStr) {
@@ -493,7 +528,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getIntTypeStr() {
-        return intTypeStr;
+        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, getIntType());
     }
 
     public void setIntTypeStr(String intTypeStr) {
@@ -509,7 +544,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getPsStr() {
-        return psStr;
+        return SysDataUtil.getNameFromDataDict(DictCode.交易方向, getPs());
     }
 
     public void setPsStr(String psStr) {
@@ -525,7 +560,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getTradePlaStr() {
-        return tradePlaStr;
+         return SysDataUtil.getNameFromDataDict(DictCode.交易平台, getTradePlat());
     }
 
     public void setTradePlaStr(String tradePlaStr) {
@@ -570,5 +605,69 @@ public class CfetsTrdBidInfoResponse {
 
     public void setSubAmt(BigDecimal subAmt) {
         this.subAmt = subAmt;
+    }
+
+    public String getTenderTargetStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getTenderTarget());
+    }
+
+    public void setTenderTargetStr(String tenderTargetStr) {
+        this.tenderTargetStr = tenderTargetStr;
+    }
+
+    public String getCouponSpeciesStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, getTenderTarget());
+    }
+
+    public void setCouponSpeciesStr(String couponSpeciesStr) {
+        this.couponSpeciesStr = couponSpeciesStr;
+    }
+
+    public String getTraderidStr() {
+        return traderidStr;
+    }
+
+    public void setTraderidStr(String traderidStr) {
+        this.traderidStr = traderidStr;
+    }
+
+    public Date getPayEdate() {
+        return payEdate;
+    }
+
+    public void setPayEdate(Date payEdate) {
+        this.payEdate = payEdate;
+    }
+
+    public String getRateStr() {
+        return rateStr;
+    }
+
+    public void setRateStr(String rateStr) {
+        this.rateStr = rateStr;
+    }
+
+    public BigDecimal getRateYleid() {
+        return rateYleid;
+    }
+
+    public void setRateYleid(BigDecimal rateYleid) {
+        this.rateYleid = rateYleid;
+    }
+
+    public BigDecimal getPayableAmount() {
+        return payableAmount;
+    }
+
+    public void setPayableAmount(BigDecimal payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    public BigDecimal getTotalWinPrinAmt() {
+        return totalWinPrinAmt;
+    }
+
+    public void setTotalWinPrinAmt(BigDecimal totalWinPrinAmt) {
+        this.totalWinPrinAmt = totalWinPrinAmt;
     }
 }

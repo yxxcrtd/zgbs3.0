@@ -152,7 +152,7 @@
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
         SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
-        from BID_ORDER_BID_PRICE BOBP ON BO.BID_ID = BOBP.BID_ID
+        from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
@@ -375,15 +375,14 @@
 
     <sql id="keywordsWhere">
         <if test="search != null and search != ''">
-            <where>( ss.struts || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodId || '|'
-                || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|'  sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
+            <where>( ss.status || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodId || '|'
+                || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
                 || '|' || sdl_ept.ITEM_VALUE ||'|' || sdl_bt.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.winPrice
                 || '|' || ss.remark  like '%' || #{search} || '%'
                 or to_char(ss.winPrinamt)=#{search}
                 or to_char(ss.payAmt)=#{search}
                 or to_char(ss.settFeeAmt)=#{search}
                 or to_char(ss.totalBiddingNum)=#{search}
-                or to_char(ss.spreadRate)=#{search}
                 or to_char(ss.bidDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.payDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.creditorDebtDate,'YYYY-MM-DD')=#{search}
