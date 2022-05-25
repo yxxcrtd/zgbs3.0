@@ -497,9 +497,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //发行方式
             List<FinProductIssue> finProductIssues = finBondAssetMapper.selectFinProductIssue(dto.getFinprodMarketId());
             List<BondFinProductIssueDto> finProductIssueList = new ArrayList<>();
-            BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
-            BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
             for (FinProductIssue finProductIssue:finProductIssues){
+                BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
+                BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductIssue.getFinprodId());
                 BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
                 bondFinProductIssueDto.setListingDate(finProduct.getCirculationDate());
