@@ -94,6 +94,8 @@ public class PositionRequestManualSettleService {
             this.bond003(entity, resultMap);
         } else if (INTERF_TYPE_REPO002.equals(interType)) {
             this.repo002(entity, resultMap);
+        } else if (INTERF_TYPE_CERTIFICATE001.equals(interType)) {
+            this.certificate001(entity, resultMap);
         }
         if(StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))){
             PositionHttpRequest.send(resultMap);
