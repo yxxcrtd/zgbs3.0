@@ -152,7 +152,7 @@
             CASE
             WHEN fp.COUPON_SPECIES = '01'
             AND fpi.INT_TYPE = '02' THEN SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 , 'FM9999999999999990.90') || ' BP'
-            ELSE to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9000') || ' %'
+            ELSE to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
             END
             WHEN  fpi.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
             WHEN  fpi.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
@@ -205,10 +205,10 @@
         LEFT JOIN
             (select listagg(case
             when t3.TENDER_TARGET = '01'
-            then to_char(t0.BID_PRICE * 100, 'FM99990.9990') || '%'
-            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM99990.9990') || '元'
+            then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
+            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
             when t3.TENDER_TARGET = '03'
-            then to_char(t0.BID_PRICE * 10000, 'FM99990.90') || 'BP'
+            then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
             end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
             t0.ENTRUST_ID
             from ETR_ENTRUST_BID_PRICE t0
@@ -317,7 +317,7 @@
             CASE
             WHEN fp.COUPON_SPECIES = '01'
             AND fpi.INT_TYPE = '02' THEN SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 , 'FM9999999999999990.90') || ' BP'
-            ELSE to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9000') || ' %'
+            ELSE to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
             END
             WHEN  fpi.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
             WHEN  fpi.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
@@ -370,10 +370,10 @@
         LEFT JOIN
             (select listagg(case
             when t3.TENDER_TARGET = '01'
-            then to_char(t0.BID_PRICE * 100, 'FM99990.9990')
-            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM99990.9990')
+            then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
+            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
             when t3.TENDER_TARGET = '03'
-            then to_char(t0.BID_PRICE * 10000, 'FM99990.90')
+            then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
             end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
             t0.ENTRUST_ID
             from WFL_ETR_ENTRUST_BID_PRICE t0
@@ -649,7 +649,7 @@
             case
                 when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
                     SDLDATA.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
-                else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+                else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9990') || ' %'
                 end as referYieldStr,
             ISSUE.FIRST_CONFIRM_DATE firstConfirmDate,
             nvl(round(ISSUE.MIN_PER_TAMT / 100000000, 2), round(ISSUE.MIN_PAMT / 100000000, 2)) AS minPamt,
