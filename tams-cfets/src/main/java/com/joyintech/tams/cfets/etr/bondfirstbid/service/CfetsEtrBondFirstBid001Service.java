@@ -58,6 +58,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -268,9 +269,11 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
                 param.put("oType", DictCodeList.评级类型_主体评级.getValue());
                 //查询评级类型为主体评级的数据
                 List<BusiFinProductRatingDto> ztList = busiProductRatingService.getZtBestRatingByOrgId(param);
-                if (ztList != null && ztList.size() > 0) {
-                    //只取第一条数据
-                    findIssueInfoDto.setSubRate(ztList.get(0).getGradeResult());
+                //按照时间排序
+                List<BusiFinProductRatingDto> ztListNew = ztList.stream().sorted(Comparator.comparing(BusiFinProductRatingDto::getGradeDate).reversed()).collect(Collectors.toList());
+                if (ztListNew != null && ztListNew.size() > 0) {
+                    //只取时间最新第一条数据
+                    findIssueInfoDto.setSubRate(ztListNew.get(0).getGradeResult());
                 }
                 findIssueInfoDtosTemp.add(findIssueInfoDto);
             }
