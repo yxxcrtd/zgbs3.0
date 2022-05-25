@@ -3,6 +3,7 @@ package com.joyintech.tams.invest.risk.quota.rskspecificassettype.dto;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
 import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.validation.annotation.Length;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -72,8 +73,8 @@ public class RskSpecificAssetTypeDto extends RskSpecificAssetType implements ITa
 
     @Override
     @PrimaryKey(PrimaryKey.Field.PK_1)
-    public String getSpecificId(){
-        return super.getSpecificId();
+    public String getFinprodId() {
+        return super.getFinprodId();
     }
 
     public String getOperateType() {
