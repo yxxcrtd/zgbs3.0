@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/cfets/positionInfo")
@@ -43,8 +44,10 @@ public class PositionInfoController {
     @PostMapping("/queryEtrAvailableCash")
     @ResponseBody
     public Message<List<BaseMap>> queryEtrAvailableCash(@RequestBody PositionCashRequestDto requestDto) {
+        //组合去重
+        List<String> portfolioIdList =  requestDto.getPortfolioIdList().stream().distinct().collect(Collectors.toList());
         BaseMap cashMap = positionInfoService.queryEtrAvailableCash(
-                requestDto.getPortfolioIdList(),
+                portfolioIdList,
                 requestDto.getCdate(),
                 requestDto.getAcctId(),
                 requestDto.getCcy(),
