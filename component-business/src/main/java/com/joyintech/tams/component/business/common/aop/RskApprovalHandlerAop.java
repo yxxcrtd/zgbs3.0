@@ -56,28 +56,27 @@ public class RskApprovalHandlerAop {
         Object[] args = joinPoint.getArgs();
         if (args[0] instanceof ProcessMark && StringUtil.isNotEmpty(args[1])){
             ProcessMark entity = (ProcessMark)args[0];
-            // 获取画面流程对象
-            Map<String,Object> params = JsonUtils.stringToMap(entity.getBusinessData());
-            // 获取是否需要走风险审批参数（适用于新规则）,依赖新风险配置的规则
-            String rskApproval = String.valueOf(params.get("rskApproval"));
-            if (StringUtil.equals(rskApproval, DictCodeList.是否_是.getValue())){
-                variables.put("rskApproval",true);
-            }else if (StringUtil.equals(rskApproval, DictCodeList.是否_否.getValue())){
-                variables.put("rskApproval",false);
-            }else {
-                // 适用于老的业务规则（不受新的配置规则控制），依赖风险试算结果
-                String riskList = JsonUtils.object2Json(params.get("riskTrialRetDto"));
-
-                List<RiskTrialRetDto> riskTrialRetDtoList = new ArrayList<>();
-                try {
+            try {
+                // 获取画面流程对象
+                Map<String,Object> params = JsonUtils.stringToMap(entity.getBusinessData());
+                // 获取是否需要走风险审批参数（适用于新规则）,依赖新风险配置的规则
+                String rskApproval = String.valueOf(params.get("rskApproval"));
+                if (StringUtil.equals(rskApproval, DictCodeList.是否_是.getValue())){
+                    variables.put("rskApproval",true);
+                }else if (StringUtil.equals(rskApproval, DictCodeList.是否_否.getValue())){
+                    variables.put("rskApproval",false);
+                }else {
+                    // 适用于老的业务规则（不受新的配置规则控制），依赖风险试算结果
+                    String riskList = JsonUtils.object2Json(params.get("riskTrialRetDto"));
+                    List<RiskTrialRetDto> riskTrialRetDtoList = new ArrayList<>();
                     riskTrialRetDtoList = JsonUtils.json2List(riskList, RiskTrialRetDto.class);
-                } catch (IOException e) {
-                    logger.error("提取风险试算结果错误:{}",e.getMessage());
+                    // 提取风险试算结果，是否需要走风险审批
+                    setRiskVariables(entity.getWorkflowId(),riskTrialRetDtoList,variables);
+                    boolean approveLineOne = (boolean) variables.get(RiskUtil.APPROVE_LINE_ONE);
+                    variables.put("rskApproval",approveLineOne);
                 }
-                // 提取风险试算结果，是否需要走风险审批
-                setRiskVariables(entity.getWorkflowId(),riskTrialRetDtoList,variables);
-                boolean approveLineOne = (boolean) variables.get(RiskUtil.APPROVE_LINE_ONE);
-                variables.put("rskApproval",approveLineOne);
+            } catch (IOException e) {
+                logger.error("提取风险试算结果错误:{}",e.getMessage());
             }
         }
 
