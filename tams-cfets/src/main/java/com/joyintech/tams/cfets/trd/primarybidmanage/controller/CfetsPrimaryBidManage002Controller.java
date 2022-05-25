@@ -230,6 +230,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
             dto.setTotalWinId(IDGenerator.generate());
         }
+        dto.setIsWin("04");
         WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
@@ -237,16 +238,15 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         params.setBusinessType(DictCodeListExt3.共通业务类型_一级市场债中标结果维护.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {
-            return WorkFlowUtil.concatComment("投标编号"+
-                    GlobalConstant.OPEN_PARENTHESIS+entity.getTotalWinId()+GlobalConstant.CLOSE_PARENTHESIS+
-                    "中标结果编号"+GlobalConstant.OPEN_PARENTHESIS+entity.getTotalWinId()+GlobalConstant.CLOSE_PARENTHESIS);
+            return WorkFlowUtil.concatComment("中标日期"+
+                    GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
+                    "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
+                    +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidTypeStr()+GlobalConstant.CLOSE_PARENTHESIS
+                    +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidPrice()+GlobalConstant.CLOSE_PARENTHESIS
+                    +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+dto.getWinPrinamt()+GlobalConstant.CLOSE_PARENTHESIS);
         });
         ProcessParameter<CfetsPrimaryBidManageSaveRequest> parameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
-        if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
-            parameter.setOperationType(OperationType.NEW);
-        } else if (StringUtil.equals(dto.getOperateStatus(), OperationType.MODIFY.name())) {
-            parameter.setOperationType(OperationType.MODIFY);
-        }
+        parameter.setOperationType(OperationType.NEW);
         parameter.setWorkFlowParameter(params);
         String msg = cfetsPrimaryBidManageService.start(parameter, dto);
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));

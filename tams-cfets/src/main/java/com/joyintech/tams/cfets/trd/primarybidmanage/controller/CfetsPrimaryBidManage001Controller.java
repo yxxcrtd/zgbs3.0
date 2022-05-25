@@ -8,7 +8,9 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
@@ -22,6 +24,8 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -73,6 +77,8 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
     @Autowired
     private CfetsPrimaryBidManageValidatorService cfetsPrimaryBidManageValidatorService;
 
+    @Autowired
+    private IPlatformDate iPlatformDate;
 
     @ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/init")
@@ -349,41 +355,71 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             params.setBusinessCode(item -> item.getTotalWinId());
             params.setBusinessType(DictCodeListExt3.共通业务类型_一级市场债中标结果维护.getValue());
             // 设置流程业务说明, entity即传入的dto
+            //中标日期+资产简称+中标方式+中标标位+中标券面总额
             params.setComment(entity -> {
-                return WorkFlowUtil.concatComment("投标编号"+
-                        GlobalConstant.OPEN_PARENTHESIS+entity.getTotalWinId()+GlobalConstant.CLOSE_PARENTHESIS+
-                        "中标结果编号"+GlobalConstant.OPEN_PARENTHESIS+entity.getTotalWinId()+GlobalConstant.CLOSE_PARENTHESIS);
+                return WorkFlowUtil.concatComment("中标日期"+
+                        GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
+                        "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
+                        +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidTypeStr()+GlobalConstant.CLOSE_PARENTHESIS
+                        +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidPrice()+GlobalConstant.CLOSE_PARENTHESIS
+                        +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+dto.getWinPrinamt()+GlobalConstant.CLOSE_PARENTHESIS);
             });
             processParameter.setOperationType(OperationType.DELETE);
             processParameter.setWorkFlowParameter(params);
             //债券交易自动加券、上市流通交易自动加券，加的券没有在留痕表存值，导致删除报错特殊处理
-            String msg =null;
-            ProcessMark pk = new ProcessMark();
-            pk.setPageId("CfetsPrimaryBidManage002");
-            msg = cfetsPrimaryBidManageService.start(processParameter,
+            String msg = cfetsPrimaryBidManageService.start(processParameter,
                     dto.getSelectedItem().toArray(new CfetsPrimaryBidManageSaveRequest[dto.getSelectedItem().size()]));
             return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
         }
 
-    /**
-     * 未中标
-     * @param dto
-     * @param br
-     * @return
-     * @throws Exception
-     * @see
-     * @since 1.0
-     */
-    @ApiOperation(value = "未中标保存", notes = "未中标保存")
-    @ResponseBody
-    @PostMapping("unbid")
-    public Message<AjaxResult> unbid(@RequestBody CfetsPrimaryBidManageCfmRequest request){
-        try {
-            AjaxResult response = cfetsPrimaryBidManageService.unBidSave(request);
-            return new Message<AjaxResult>().success().setData(response);
-        }catch (Exception e) {
-            logger.error("未中标保存数据异常",e);
-            return new Message<AjaxResult>().fail().setMessage("未中标保存信息异常");
+        @ApiOperation(value = "未中标", notes = "未中标")
+        @ResponseBody
+        @PostMapping("unbid")
+        public Message<AjaxResult> unbid(@RequestBody CfetsPrimaryBidManageSaveRequest dto, BindingResult br) throws WorkFlowException {
+            if (br.hasErrors()) {
+                return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
+            }
+            CfetsPrimaryBidManageCfmRequest request = new CfetsPrimaryBidManageCfmRequest();
+            request.setBidId(dto.getBidId());
+            dto = cfetsPrimaryBidManageService.getBidManageCfmInsert(request);
+            dto.setIsWin("03");
+            dto.setTotalWinId(IDGenerator.generate());
+            ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
+            WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
+            params.setPageId("CfetsPrimaryBidManage002");
+            params.setElementId(dto.getElementId());
+            params.setBusinessCode(item -> item.getTotalWinId());
+            params.setBusinessType(DictCodeListExt3.共通业务类型_一级市场债中标结果维护.getValue());
+            // 设置流程业务说明, entity即传入的dto
+            //未中标日期+资产简称+未中标
+            params.setComment(entity -> {
+                return WorkFlowUtil.concatComment("未中标日期"+
+                        GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
+                        "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS+"未中标");
+            });
+            processParameter.setOperationType(OperationType.NEW);
+            processParameter.setWorkFlowParameter(params);
+            String msg = cfetsPrimaryBidManageService.start(processParameter, dto);
+            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
         }
-    }
+//    /**
+//     * 未中标
+//     * @param request
+//     * @return
+//     * @throws Exception
+//     * @see
+//     * @since 1.0
+//     */
+//    @ApiOperation(value = "未中标保存", notes = "未中标保存")
+//    @ResponseBody
+//    @PostMapping("unbid")
+//    public Message<AjaxResult> unbid(@RequestBody CfetsPrimaryBidManageCfmRequest request){
+//        try {
+//            AjaxResult response = cfetsPrimaryBidManageService.unBidSave(request);
+//            return new Message<AjaxResult>().success().setData(response);
+//        }catch (Exception e) {
+//            logger.error("未中标保存数据异常",e);
+//            return new Message<AjaxResult>().fail().setMessage("未中标保存信息异常");
+//        }
+//    }
   }

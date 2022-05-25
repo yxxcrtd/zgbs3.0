@@ -1,5 +1,7 @@
 package com.joyintech.tams.cfets.trd.primarybidmanage.dto;
 
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,6 +24,8 @@ public class CfetsPrimaryBidManageSaveDetailDto {
     /**中标方式*/
     @ApiModelProperty(name="bidType",value="中标方式")
     private String bidType;
+
+    private String bidTypeStr;
     /**自动分配*/
     /**指令代码*/
     @ApiModelProperty(name="entrustId",value="指令代码")
@@ -242,5 +246,13 @@ public class CfetsPrimaryBidManageSaveDetailDto {
 
     public void setTradeAmt(BigDecimal tradeAmt) {
         this.tradeAmt = tradeAmt;
+    }
+
+    public String getBidTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.中标方式, this.getBidType());
+    }
+
+    public void setBidTypeStr(String bidTypeStr) {
+        this.bidTypeStr = bidTypeStr;
     }
 }

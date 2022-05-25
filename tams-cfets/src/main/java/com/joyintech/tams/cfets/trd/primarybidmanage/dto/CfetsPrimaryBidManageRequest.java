@@ -70,31 +70,31 @@ public class CfetsPrimaryBidManageRequest {
     @ApiModelProperty(name="payType",value="缴款方式")
     private String payType;
 
-    @ApiModelProperty(name="winDate",value="投标确认日")
+    @ApiModelProperty(name="winDate",value="中标日期")
     private List<String> winDate;
 
-    @ApiModelProperty(name="winDateStart",value="投标确认日开始日")
+    @ApiModelProperty(name="winDateStart",value="中标日期开始日")
     private String winDateStart;
 
-    @ApiModelProperty(name="winDateEnd",value="投标确认日结束日")
+    @ApiModelProperty(name="winDateEnd",value="中标日期结束日")
     private String winDateEnd;
 
-    @ApiModelProperty(name="payDate",value="投标确认日")
+    @ApiModelProperty(name="payDate",value="缴款日")
     private List<String> payDate;
 
-    @ApiModelProperty(name="payDateStart",value="投标确认日开始日")
+    @ApiModelProperty(name="payDateStart",value="缴款开始日")
     private String payDateStart;
 
-    @ApiModelProperty(name="payDateEnd",value="投标确认日结束日")
+    @ApiModelProperty(name="payDateEnd",value="缴款结束日")
     private String payDateEnd;
 
-    @ApiModelProperty(name="listingDate",value="投标确认日")
+    @ApiModelProperty(name="listingDate",value="上市日")
     private List<String> listingDate;
 
-    @ApiModelProperty(name="listingDateStart",value="投标确认日开始日")
+    @ApiModelProperty(name="listingDateStart",value="上市开始日")
     private String listingDateStart;
 
-    @ApiModelProperty(name="listingDateEnd",value="投标确认日结束日")
+    @ApiModelProperty(name="listingDateEnd",value="上市结束日")
     private String listingDateEnd;
 
     @ApiModelProperty(name="bidType",value="中标方式")
