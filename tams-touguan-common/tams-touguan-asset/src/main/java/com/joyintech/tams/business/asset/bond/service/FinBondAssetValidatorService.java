@@ -157,7 +157,7 @@ public class FinBondAssetValidatorService implements BeanValidator{
                             break;
                         }
                         if (DateUtil.compareDate(finCashPlanEntity.getPayDate(),iPlatformDate.getSysDate())<0){
-                            resultList.add(new ValidMessage("附息计划支付日不能小于平台日"));
+                            resultList.add(new ValidMessage("付息计划支付日不能小于平台日"));
                             break;
                         }
                     }
