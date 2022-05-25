@@ -682,10 +682,10 @@ public class PortfolioManager extends BaseService {
                     adjustedPrice = min;
                 }
 
-                // 不能比委托价格更高
-//                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) > 0) {
-//                    adjustedPrice = entrustPrice;
-//                }
+                // 调整后价格不能比委托价格更高
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) > 0) {
+                    adjustedPrice = entrustPrice;
+                }
 
             } else {
                 BigDecimal max = tempList.stream()
@@ -704,10 +704,10 @@ public class PortfolioManager extends BaseService {
                     adjustedPrice = max;
                 }
 
-                // 不能比委托价格更低
-//                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) < 0) {
-//                    adjustedPrice = entrustPrice;
-//                }
+                // 调整后价格不能比委托价格更低
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) < 0) {
+                    adjustedPrice = entrustPrice;
+                }
             }
 
             // 提示：“委托价格必须优于所有指令价格”
@@ -717,6 +717,7 @@ public class PortfolioManager extends BaseService {
                     result.setInfoLevel("2");
                     result.setInfoDetails("委托价格必须优于所有指令价格");
                 }
+
                 result.setPrice(adjustedPrice);
             }
         } else if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {

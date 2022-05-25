@@ -49,7 +49,14 @@
                 and ISDEFAULTBONDINDICATOR = #{isDefaultBondIndicator}
             </if>
         </where>
-        ORDER BY FINPRODMARKETID, ISSPECIALDEBT, ISDEFAULTBONDINDICATOR, ISABS
+        <choose>
+            <when test="pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+                order by ${pageMode.sort}  ${pageMode.direction}
+            </when>
+            <otherwise>
+                ORDER BY FINPRODMARKETID, ISSPECIALDEBT, ISDEFAULTBONDINDICATOR, ISABS
+            </otherwise>
+        </choose>
     </select>
 
     <select id="queryByFinprodMarketId"

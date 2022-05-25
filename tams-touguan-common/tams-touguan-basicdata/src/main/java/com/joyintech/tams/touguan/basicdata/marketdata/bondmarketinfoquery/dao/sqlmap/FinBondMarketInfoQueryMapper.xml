@@ -112,7 +112,7 @@
             PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]> to_date ( #{platformDate}, 'YYYY-MM-DD' )
 
             <if test="secId !=null and secId !=''">
-                AND PAYHSRCSECINFO.SEC_ID = #{secId,jdbcType=VARCHAR}
+                AND PAYHSRCSECINFO.SECID = #{secId,jdbcType=VARCHAR}
             </if>
 
             <if test="market !=null and market !=''">
