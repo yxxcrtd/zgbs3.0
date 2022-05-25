@@ -10,6 +10,7 @@ import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodMapper;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.*;
@@ -102,7 +103,6 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     @Autowired
     private InvestPeriodCommonService investPeriodCommonService;
 
-
     @Override
     public void doComplete(CreditProtectionCertificatePeriodSaveDto entity, OperationType operationType) {
         BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
@@ -110,9 +110,13 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         insertDate(baseBussinessDto, entity);
         if (!StringUtil.equals("save", entity.getOperateType())) {
             doOldPositionConfirm(entity, false);
-            String decisionAct = 系统动作_新建.getValue();
-            String systemAct = 系统动作_新建.getValue();
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct);
+            String decisionAct = 系统动作_修改.getValue();
+            String systemAct = 系统动作_修改.getValue();
+            if ("new".equals(entity.getOptType())) {
+                systemAct = 系统动作_新建.getValue();
+                decisionAct = 系统动作_新建.getValue();
+            }
+            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct,DictCodeListExt3.流程节点_审批生效.getValue());
         }
     }
 
@@ -122,14 +126,14 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         deleteFlow(entity.getWorkflowId());
         insertFlow(baseBussinessDto, entity);
         if (!StringUtil.equals("save", entity.getOperateType())) {
-            doOldPositionSubmit(entity, true);
+            doOldPositionSubmit(entity, false);
             String decisionAct = 系统动作_修改.getValue();
             String systemAct = 系统动作_修改.getValue();
             if ("new".equals(entity.getOptType())) {
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct);
+            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
 
@@ -139,13 +143,14 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         deleteFlow(entity.getWorkflowId());
         insertFlow(baseBussinessDto, entity);
         if (!StringUtil.equals("save", entity.getOperateType())) {
+            doOldPositionSubmit(entity, false);
             String decisionAct = 系统动作_修改.getValue();
             String systemAct = 系统动作_修改.getValue();
             if ("new".equals(entity.getOptType())) {
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct);
+            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct,DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
 //
@@ -167,7 +172,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         params.put("workflowId", entity.getWorkflowId());
         params.put("workflowStatus", DictCodeList.数据状态_删除中.getValue());
         params.put("user", entity.getCreateUser());
-        params.put("dept", entity.getCreateDept()==null?"dept":entity.getCreateDept());
+        params.put("dept", entity.getCreateDept() == null ? "dept" : entity.getCreateDept());
         params.put("time", entity.getCreateTime());
         params.put("revokeReason", entity.getRevokeReason());
         investPeriodCommonService.insertWflTable(params);
@@ -642,9 +647,21 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         List<EtrSecPositionFlow> etrSecPositionFlows = new ArrayList<>();
         //交易持仓流水&交易持仓
         List<PtlSecPositionFlow> ptlSecPositionFlows = new ArrayList<>();
+        //指令现金流水&指令现金
+        List<EtrCashPositionFlow> etrCashPositionFlows = new ArrayList<>();
+
+        String calendarId;
+        if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())) {
+            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SHJYS_CALID");
+        } else {
+            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
+        }
+        // 下一个交易日
+        Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
 
         if (StringUtil.equals(DictCodeListExt4.结算方式_标的_现金结算.getValue(), entity.getSettleMethod())) {
             for (BillingDetailsDto billingDetail : billingDetails) {
+                //指令持仓流水
                 EtrSecPositionFlow etrSecPositionFlow = new EtrSecPositionFlow();
                 etrSecPositionFlow.setSeqno(IDGenerator.generate());
                 etrSecPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
@@ -654,7 +671,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setInvAim(null);
                 etrSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 etrSecPositionFlow.setCdate(entity.getTradeDate());
-                etrSecPositionFlow.setAmount(billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)));
+                etrSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)) : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate());
                 etrSecPositionFlow.setpFinprodId(null);
                 etrSecPositionFlow.setTradeId(entity.getBusiCode());
                 etrSecPositionFlow.setOffsetId(entity.getBusiCode());
@@ -666,6 +683,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setUpdateTime(DateUtil.now());
                 etrSecPositionFlows.add(etrSecPositionFlow);
 
+                //交易持仓流水
                 PtlSecPositionFlow ptlSecPositionFlow = new PtlSecPositionFlow();
                 ptlSecPositionFlow.setSeqno(IDGenerator.generate());
                 ptlSecPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
@@ -675,7 +693,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setInvAim(null);
                 ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 ptlSecPositionFlow.setCdate(entity.getTradeDate());
-                ptlSecPositionFlow.setAmount(billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)));
+                ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)) : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate());
                 ptlSecPositionFlow.setpFinprodId(null);
                 ptlSecPositionFlow.setTradeId(entity.getBusiCode());
                 ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
@@ -686,9 +704,29 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
                 ptlSecPositionFlow.setUpdateTime(DateUtil.now());
                 ptlSecPositionFlows.add(ptlSecPositionFlow);
+
+                //指令现金流水
+                EtrCashPositionFlow etrCashPositionFlow = new EtrCashPositionFlow();
+                etrCashPositionFlow.setSeqno(IDGenerator.generate());
+                etrCashPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
+                etrCashPositionFlow.setAcctId(billingDetail.getSecAcctId());
+                etrCashPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令预增.getValue());
+                etrCashPositionFlow.setCdate(nextWorkDate);
+                etrCashPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+                etrCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)));
+                etrCashPositionFlow.setOrderId(entity.getBusiCode());
+                etrCashPositionFlow.setOffsetId(entity.getBusiCode());
+                etrCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
+                etrCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());
+                etrCashPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
+                etrCashPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
+                etrCashPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+                etrCashPositionFlow.setUpdateTime(DateUtil.now());
+                etrCashPositionFlows.add(etrCashPositionFlow);
             }
         } else {
             for (BillingDetailsDto billingDetail : billingDetails) {
+                //指令持仓流水&指令持仓：扣减可用T+0信用保护凭证'名义本金'
                 EtrSecPositionFlow etrSecPositionFlow = new EtrSecPositionFlow();
                 etrSecPositionFlow.setSeqno(IDGenerator.generate());
                 etrSecPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
@@ -698,7 +736,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setInvAim(null);
                 etrSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 etrSecPositionFlow.setCdate(entity.getTradeDate());
-                etrSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)));
+                etrSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)) : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate());
                 etrSecPositionFlow.setpFinprodId(null);
                 etrSecPositionFlow.setTradeId(entity.getBusiCode());
                 etrSecPositionFlow.setOffsetId(entity.getBusiCode());
@@ -710,11 +748,14 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setUpdateTime(DateUtil.now());
                 etrSecPositionFlows.add(etrSecPositionFlow);
 
+                //指令持仓流水&指令持仓：扣减可用T+0交付债券'债券交付数量'
                 EtrSecPositionFlow etrSecPositionFlow2 = new EtrSecPositionFlow();
                 BeanUtils.copyProperties(etrSecPositionFlow, etrSecPositionFlow2);
-                etrSecPositionFlow2.setAmount(isRevoke ? billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)));
+                etrSecPositionFlow2.setSeqno(IDGenerator.generate());
+                etrSecPositionFlow2.setAmount(isRevoke ? billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)) : billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)).negate());
                 etrSecPositionFlows.add(etrSecPositionFlow2);
 
+                //交易持仓流水&交易持仓：扣减可用T+0信用保护凭证'名义本金'
                 PtlSecPositionFlow ptlSecPositionFlow = new PtlSecPositionFlow();
                 ptlSecPositionFlow.setSeqno(IDGenerator.generate());
                 ptlSecPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
@@ -724,7 +765,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setInvAim(null);
                 ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 ptlSecPositionFlow.setCdate(entity.getTradeDate());
-                ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)));
+                ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)) : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate());
                 ptlSecPositionFlow.setpFinprodId(null);
                 ptlSecPositionFlow.setTradeId(entity.getBusiCode());
                 ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
@@ -735,10 +776,32 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
                 ptlSecPositionFlow.setUpdateTime(DateUtil.now());
                 ptlSecPositionFlows.add(ptlSecPositionFlow);
+
+                //交易持仓流水&交易持仓：扣减可用T+0交付债券'债券交付数量'
                 PtlSecPositionFlow ptlSecPositionFlow2 = new PtlSecPositionFlow();
                 BeanUtils.copyProperties(ptlSecPositionFlow, ptlSecPositionFlow2);
-                ptlSecPositionFlow2.setAmount(isRevoke ? billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)));
+                ptlSecPositionFlow2.setSeqno(IDGenerator.generate());
+                ptlSecPositionFlow2.setAmount(isRevoke ? billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)) : billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)).negate());
                 ptlSecPositionFlows.add(ptlSecPositionFlow2);
+
+                //指令现金流水&指令现金：增加预增T+1交付金额
+                EtrCashPositionFlow etrCashPositionFlow = new EtrCashPositionFlow();
+                etrCashPositionFlow.setSeqno(IDGenerator.generate());
+                etrCashPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
+                etrCashPositionFlow.setAcctId(billingDetail.getSecAcctId());
+                etrCashPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令预增.getValue());
+                etrCashPositionFlow.setCdate(nextWorkDate);
+                etrCashPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+                etrCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)));
+                etrCashPositionFlow.setOrderId(entity.getBusiCode());
+                etrCashPositionFlow.setOffsetId(entity.getBusiCode());
+                etrCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
+                etrCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());
+                etrCashPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
+                etrCashPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
+                etrCashPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+                etrCashPositionFlow.setUpdateTime(DateUtil.now());
+                etrCashPositionFlows.add(etrCashPositionFlow);
             }
         }
         for (EtrSecPositionFlow etrSecPositionFlow : etrSecPositionFlows) {
@@ -746,6 +809,9 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         }
         for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
             ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
+        }
+        for (EtrCashPositionFlow etrCashPositionFlow : etrCashPositionFlows) {
+            etrCashPositionFlowMapper.insertSelective(etrCashPositionFlow);
         }
     }
 
@@ -757,8 +823,13 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
      * @param isRevoke
      */
     private void doOldPositionConfirm(CreditProtectionCertificatePeriodSaveDto entity, boolean isRevoke) {
+        //指令现金流水&指令现金
         List<EtrCashPositionFlow> etrCashPositionFlows = new ArrayList<>();
+        //交易现金流水&交易现金
         List<PtlCashPositionFlow> ptlCashPositionFlows = new ArrayList<>();
+        //交易持仓流水&交易持仓
+        List<PtlSecPositionFlow> ptlSecPositionFlows = new ArrayList<>();
+
         List<BillingDetailsDto> billingDetails = entity.getBillingDetails();
         String calendarId;
         if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())) {
@@ -768,16 +839,64 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         }
         // 下一个交易日
         Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
+
         for (BillingDetailsDto billingDetail : billingDetails) {
+            //交易持仓流水&交易持仓：增加可用T+1信用保护凭证'名义本金'
+            PtlSecPositionFlow ptlSecPositionFlow = new PtlSecPositionFlow();
+            ptlSecPositionFlow.setSeqno(IDGenerator.generate());
+            ptlSecPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
+            ptlSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
+            ptlSecPositionFlow.setFinprodId(entity.getFinprodMarketId());
+            ptlSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
+            ptlSecPositionFlow.setInvAim(null);
+            ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
+            ptlSecPositionFlow.setCdate(nextWorkDate);
+            ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)));
+            ptlSecPositionFlow.setpFinprodId(null);
+            ptlSecPositionFlow.setTradeId(entity.getBusiCode());
+            ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
+            ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
+            ptlSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
+            ptlSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
+            ptlSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
+            ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+            ptlSecPositionFlow.setUpdateTime(DateUtil.now());
+            ptlSecPositionFlows.add(ptlSecPositionFlow);
+
+            //交易持仓流水&交易持仓：扣减实际T+1信用保护凭证'名义本金'
+            PtlSecPositionFlow ptlSecPositionFlow2 = new PtlSecPositionFlow();
+            BeanUtils.copyProperties(ptlSecPositionFlow, ptlSecPositionFlow2);
+            ptlSecPositionFlow2.setSeqno(IDGenerator.generate());
+            ptlSecPositionFlow2.setHodingType(DictCodeList.持仓类型_实际.getValue());
+            ptlSecPositionFlow2.setAmount(isRevoke ? billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)) : billingDetail.getRepNomCapi().multiply(BigDecimal.valueOf(10000)).negate());
+            ptlSecPositionFlows.add(ptlSecPositionFlow2);
+
+            if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
+                //交易持仓流水&交易持仓：增加可用T+1交付债券'债券交付数量'
+                PtlSecPositionFlow ptlSecPositionFlow3 = new PtlSecPositionFlow();
+                BeanUtils.copyProperties(ptlSecPositionFlow, ptlSecPositionFlow3);
+                ptlSecPositionFlow3.setSeqno(IDGenerator.generate());
+                ptlSecPositionFlow3.setAmount(isRevoke ? billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)));
+                ptlSecPositionFlows.add(ptlSecPositionFlow3);
+                //交易持仓流水&交易持仓：扣减实际T+1交付债券'债券交付数量'
+                PtlSecPositionFlow ptlSecPositionFlow4 = new PtlSecPositionFlow();
+                BeanUtils.copyProperties(ptlSecPositionFlow2, ptlSecPositionFlow4);
+                ptlSecPositionFlow4.setSeqno(IDGenerator.generate());
+                ptlSecPositionFlow4.setAmount(isRevoke ? billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)) : billingDetail.getDeliverBondAmount().multiply(BigDecimal.valueOf(10000)).negate());
+                ptlSecPositionFlows.add(ptlSecPositionFlow4);
+            }
+
+            //指令现金流水&指令现金：扣减预增T+1交付金额
             EtrCashPositionFlow etrCashPositionFlow = new EtrCashPositionFlow();
             etrCashPositionFlow.setSeqno(IDGenerator.generate());
             etrCashPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
             etrCashPositionFlow.setAcctId(billingDetail.getSecAcctId());
-            etrCashPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
+            etrCashPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令预增.getValue());
             etrCashPositionFlow.setCdate(nextWorkDate);
             etrCashPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
-            etrCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)));
+            etrCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)) : billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)).negate());
             etrCashPositionFlow.setOrderId(entity.getBusiCode());
+            etrCashPositionFlow.setOffsetId(entity.getBusiCode());
             etrCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
             etrCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());
             etrCashPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
@@ -785,9 +904,31 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             etrCashPositionFlow.setCreateTime(iPlatformDate.getSysDate());
             etrCashPositionFlow.setUpdateTime(DateUtil.now());
             etrCashPositionFlows.add(etrCashPositionFlow);
-
+            //指令现金流水&指令现金：增加可用T+1交付金额
+            EtrCashPositionFlow etrCashPositionFlow2 = new EtrCashPositionFlow();
+            BeanUtils.copyProperties(etrCashPositionFlow, etrCashPositionFlow2);
+            etrCashPositionFlow2.setSeqno(IDGenerator.generate());
+            etrCashPositionFlow2.setHodingType(DictCodeList.持仓类型_可用.getValue());
+            etrCashPositionFlow2.setAmount(isRevoke ? billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)));
+            etrCashPositionFlows.add(etrCashPositionFlow2);
+            //交易现金流水&交易现金：增加实际T+1交付金额
             PtlCashPositionFlow ptlCashPositionFlow = new PtlCashPositionFlow();
-            BeanUtils.copyProperties(etrCashPositionFlow, ptlCashPositionFlow);
+            ptlCashPositionFlow.setSeqno(IDGenerator.generate());
+            ptlCashPositionFlow.setPortfolioId(billingDetail.getPortfolioId());
+            ptlCashPositionFlow.setAcctId(billingDetail.getSecAcctId());
+            ptlCashPositionFlow.setHodingType(DictCodeList.持仓类型_实际.getValue());
+            ptlCashPositionFlow.setCdate(nextWorkDate);
+            ptlCashPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            ptlCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)).negate() : billingDetail.getDeliveryAmount().multiply(BigDecimal.valueOf(10000)));
+            ptlCashPositionFlow.setOrderId(entity.getBusiCode());
+            ptlCashPositionFlow.setOffsetId(entity.getBusiCode());
+            ptlCashPositionFlow.setEntrustId(entity.getBusiCode());
+            ptlCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
+            ptlCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());
+            ptlCashPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
+            ptlCashPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
+            ptlCashPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+            ptlCashPositionFlow.setUpdateTime(DateUtil.now());
             ptlCashPositionFlows.add(ptlCashPositionFlow);
         }
         for (EtrCashPositionFlow etrCashPositionFlow : etrCashPositionFlows) {
@@ -795,6 +936,9 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         }
         for (PtlCashPositionFlow ptlCashPositionFlow : ptlCashPositionFlows) {
             ptlCashPositionFlowMapper.insertSelective(ptlCashPositionFlow);
+        }
+        for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
+            ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
         }
     }
 }

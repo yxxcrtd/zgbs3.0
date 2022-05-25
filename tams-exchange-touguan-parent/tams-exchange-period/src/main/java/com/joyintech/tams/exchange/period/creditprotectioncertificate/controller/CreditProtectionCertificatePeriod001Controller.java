@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.period.creditprotectioncertificate.controlle
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
@@ -181,7 +182,11 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
             }
             ProcessParameter<CreditProtectionCertificatePeriodSaveDto> processParameter = new ProcessParameter<>();
             WorkFlowParameter<CreditProtectionCertificatePeriodSaveDto> params = new WorkFlowParameter<>();
-            CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(dto.getBusiCode());
+//            CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(dto.getBusiCode());
+            ProcessMark processMark = new ProcessMark();
+            processMark.setPageId("CreditProtectionCertificatePeriod002");
+            processMark.setBusinessDataPk1(dto.getBusiCode());
+            CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getBussinessEntityByPk(processMark);
             params.setPageId(dto.getPageId());
             params.setElementId(dto.getElementId());
             params.setBusinessCode(dto.getBusiCode());

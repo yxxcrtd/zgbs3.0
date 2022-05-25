@@ -37,11 +37,12 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
      */
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public void sendCreditProtectionCertificatePeriod(CreditProtectionCertificatePeriodSaveDto entity, String decisionAct, String systemAct) {
+    public void sendCreditProtectionCertificatePeriod(CreditProtectionCertificatePeriodSaveDto entity, String decisionAct, String systemAct,String flowStatus) {
         log.info("sendCreditProtectionCertificatePeriod() called with parameters => 【entity = {}】, 【decisionAct = {}】, 【systemAct = {}】", JsonUtils.object2Json(entity), decisionAct, systemAct);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("decisionAct", decisionAct);
         resultMap.put("systemAct", systemAct);
+        resultMap.put("flowStatus", flowStatus);
         period001(entity, resultMap);
         PositionHttpRequest.send(resultMap);
     }
@@ -61,7 +62,6 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
         resultMap.put("userId", LoginUserUtil.getUserName());
 //        resultMap.put("computerId","");
         resultMap.put(TOTAL_TRADE_ID, entity.getBusiCode());
-        resultMap.put("flowStatus", DictCodeListExt3.流程节点_审批生效.getValue());
         resultMap.put("modelType", DictCodeListExt1.子系统代码_交易.getValue());
 
         String balanceCheck = "Y";
