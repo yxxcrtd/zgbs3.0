@@ -424,7 +424,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
                 	map.put("cashAmount", null);//出入库时，可以为空
                 }else {
                     // 标准券总额 = 标准券数量*100
-                    map.put(STANDARD_SEC_AMOUNT, item.getEntrustNum().multiply(BigDecimal.valueOf(100)));
+                    map.put(STANDARD_SEC_AMOUNT, item.getEntrustNum().multiply(BigDecimal.valueOf(100)).setScale(2,RoundingMode.HALF_UP));
                 }
                 ptlList.add(map);
             }
@@ -438,7 +438,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
                     bean = new PositionRequestBaseBean(item);
                     // 券面总额 指令.指令数量*100
                     bean.setCashAmount(null);
-                    BigDecimal secAmount = item.getEntrustNum().multiply(BigDecimal.valueOf(100));
+                    BigDecimal secAmount = item.getEntrustNum().multiply(BigDecimal.valueOf(100).setScale(2,RoundingMode.HALF_UP));
                     bean.setSecAmount(secAmount);
 
                     Map<String, Object> map = BeanUtil.object2Map(bean);
