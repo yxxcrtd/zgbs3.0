@@ -131,7 +131,7 @@
             WHEN fpi.ISSUE_CLASS IN ('02', '03') AND T3.LISTING_DATE IS NOT NULL THEN
             T3.LISTING_DATE
             END ) <![CDATA[>]]> #{platDate,jdbcType=DATE} )
-            AND
+            OR
             ((CASE
             WHEN fpi.ISSUE_CLASS = '01' AND fpi.ISSUE_DATE IS NOT NULL THEN
             fpi.ISSUE_DATE
