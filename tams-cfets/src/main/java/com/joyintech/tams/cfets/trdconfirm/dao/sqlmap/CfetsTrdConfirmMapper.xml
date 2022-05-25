@@ -2627,6 +2627,14 @@
         </if>
     </select>
 
+    <select id="selectEtrNum" resultType="java.math.BigDecimal">
+        select ENTRUST_NUM
+        from ETR_ENTRUST_DETAIL
+        where ENTRUST_ID = #{entrustId}
+          and PORTFOLIO_ID = #{portfolioId}
+          and ROWNUM = 1
+    </select>
+
 </mapper>
 
 
