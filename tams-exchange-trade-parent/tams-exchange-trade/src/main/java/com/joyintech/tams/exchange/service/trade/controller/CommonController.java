@@ -8,6 +8,7 @@ import com.joyintech.tams.exchange.common.ResponseResultBody;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.SysParamBean;
 import com.joyintech.tams.exchange.common.bean.request.*;
+import com.joyintech.tams.exchange.common.bean.response.CounterAcctResponse;
 import com.joyintech.tams.exchange.common.bean.response.ExchangeContextResponse;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
@@ -262,4 +263,11 @@ public class CommonController {
     public Message checkSelfDealerTraderInfo(@RequestBody @Validated CheckTradeInfoRequest dto) {
         return commonManagement.checkSelfDealerTraderInfo(dto);
     }
+
+    @ApiOperation(value = "查询对手方资金账户信息", notes = "查询对手方资金账户信息")
+    @PostMapping("/common/getCounterAcctNoInfo")
+    public List<CounterAcctResponse> selectCounterAcctNoInfo(@RequestBody @Validated CounterAcctRequest dto) {
+        return commonManagement.selectCounterAcctNoInfo(dto);
+    }
+
 }

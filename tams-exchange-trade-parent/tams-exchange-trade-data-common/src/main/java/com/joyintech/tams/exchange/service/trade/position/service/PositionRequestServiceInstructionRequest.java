@@ -2,7 +2,6 @@ package com.joyintech.tams.exchange.service.trade.position.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
@@ -583,9 +582,6 @@ public class PositionRequestServiceInstructionRequest {
 
     /**
      * 信息保护凭证-下单    certificate001
-     *
-     * @param entity
-     * @param resultMap
      */
     private void certificate001(PositionInstructionRequest entity, Map<String, Object> resultMap) {
         resultMap.put(INTERFACE_TYPE, INTERF_TYPE_CERTIFICATE001);
@@ -618,7 +614,7 @@ public class PositionRequestServiceInstructionRequest {
             resultMap.put(PTL_LIST, ptlList);
 
             // 组合附属数据集（交付物债券）	ptlSubList
-            List<Map<String, Object>> ptlSubList = new ArrayList<>(calculateSize);
+//            List<Map<String, Object>> ptlSubList = new ArrayList<>(calculateSize);
 //            for (PortfolioCalculateResponse item : calculates) {
 //                Map<String, Object> map = Maps.newHashMap();
 //                map.put("portfolioId", null);
@@ -628,7 +624,7 @@ public class PositionRequestServiceInstructionRequest {
 //                map.put("secAmount", null);
 //                ptlSubList.add(map);
 //            }
-            resultMap.put("ptlSubList", ptlSubList);
+            resultMap.put("ptlSubList", Lists.newArrayList());
         }
     }
 

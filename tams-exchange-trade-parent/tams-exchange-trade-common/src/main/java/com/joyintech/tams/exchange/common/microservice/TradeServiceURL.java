@@ -166,4 +166,6 @@ public class TradeServiceURL {
     public static String pushTradeForFixedIncome ="/EntrustMsgbyMQ/processManualSettleTrade";
     public static String pushProgress ="/EntrustMsgbyMQ/updateOrderFinishAmt";
 
+    public static String getCounterAcctNoInfo = "/InterfSysTrdConfig/getCounterAcctNoInfo";//对手方资金账户信息查询
+
 }
