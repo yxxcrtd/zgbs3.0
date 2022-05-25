@@ -64,7 +64,7 @@
             SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd')
 
             <if test="secId !=null and secId !=''">
-                AND SEC_INFO.SECID = #{secId,jdbcType=VARCHAR}
+                AND SEC_INFO.SEC_ID = #{secId,jdbcType=VARCHAR}
             </if>
 
             <if test="tradingPlaces !=null and tradingPlaces !=''">
