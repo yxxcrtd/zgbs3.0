@@ -273,4 +273,28 @@ public interface CfetsTrdQueryMapper {
     List<CfetsPledgeInfoResponse> findRepoPledgeInfo(Map<String, Object> pageParam);
 
     List<String> findEtrEntrustIsForcedFinish(Map<String, Object> pageParam);
+
+    CfetsTrdBidInfoResponse findFxmrManualSettleInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findFxmrPortIntFenPeiInfoList(Map<String, Object> pageParam);
+
+    CfetsTrdBidInfoResponse findZztbManualSettleInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findZztbPortIntFenPeiInfoList(Map<String, Object> pageParam);
+
+    CfetsTrdBidInfoResponse findYjsgManualSettleInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findYjsgPortIntFenPeiInfoList(Map<String, Object> pageParam);
+
+    CfetsTrdQueryCstpInfoListResponse selectCstpBidFormDataByKey(Map<String, Object> pageParam);
+
+
+    CfetsTrdBidInfoResponse findYjtbBidTradeDetailInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findYjtbFenPeiInfoList(Map<String, Object> pageParam);
+
+    CfetsTrdBidInfoResponse findYjsgBidTradeDetailInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findYjsgFenPeiInfoList(Map<String, Object> pageParam);
+
 }

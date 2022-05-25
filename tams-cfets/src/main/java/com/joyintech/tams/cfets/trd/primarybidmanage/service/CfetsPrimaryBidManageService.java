@@ -220,30 +220,22 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         return null;
     }
 
-    public AjaxResult unBidSave(CfetsPrimaryBidManageCfmRequest request) {
-        AjaxResult ajax = new AjaxResult();
-        if (StringUtil.isNotEmpty(request.getBidId())) {
-            Map<String, Object> param = BeanUtil.object2Map(request);
-            CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageMapper.selectBidOrderInfo(param);
-            List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBidOrderDtail(param);
-            BidResultTotal bidResultTotal = new BidResultTotal();
-            bidResultTotal.setTotalWinId(IDGenerator.generate());
-            BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,response);
-            bidResultTotalMapper.insertSelective(bidResultTotal);
-            BidOrder record = new BidOrder();
-            record.setBidId(request.getBidId());
-            record.setIsWin(DictCodeList.是否_否.getValue());
-            bidOrderMapper.updateByPrimaryKeySelective(record);
-            for(CfetsPrimaryBidManageSaveDetailDto detailDto: detailDtos){
-                BidResultDetail bidResultDetail = new BidResultDetail();
-                BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,response);
-                BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
-                bidResultDetail.setDetailWinId(IDGenerator.generate());
-                bidResultDetailMapper.insertSelective(bidResultDetail);
-            }
-            ajax.setMessage("未中标信息保存成功！");
+    public void unBidSave(CfetsPrimaryBidManageSaveRequest request) {
+        Map<String, Object> param = BeanUtil.object2Map(request);
+        BidResultTotal bidResultTotal = new BidResultTotal();
+        BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,request);
+        bidResultTotalMapper.insertSelective(bidResultTotal);
+        BidOrder record = new BidOrder();
+        record.setBidId(request.getBidId());
+        record.setIsWin(DictCodeList.是否_否.getValue());
+        bidOrderMapper.updateByPrimaryKeySelective(record);
+        for(CfetsPrimaryBidManageSaveDetailDto detailDto: request.getAllocationDetails()){
+            BidResultDetail bidResultDetail = new BidResultDetail();
+            BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,request);
+            BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
+            bidResultDetail.setDetailWinId(IDGenerator.generate());
+            bidResultDetailMapper.insertSelective(bidResultDetail);
         }
-        return ajax;
     }
 
 
@@ -275,76 +267,82 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultTotal.setTotalWinId(entity.getTotalWinId());
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
             bidResultTotalMapper.updateByPrimaryKey(bidResultTotal);
-            List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
-            for (TrdFinProductDealTotal trdFinProductDealTotal:trdFinProductDealTotalList){
-                TrdFinProductDealTotal trdFinProductDealTotalRevoke = new TrdFinProductDealTotal();
-                trdFinProductDealTotalRevoke.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
-                trdFinProductDealTotalRevoke.setIsCancel(DictCodeList.是否_是.getValue());
-                trdFinProductDealTotalMapper.updateByPrimaryKeySelective(trdFinProductDealTotalRevoke);
-                trdFinProductDealTotal.setpTradeId(trdFinProductDealTotal.getTotleTradeId());
-                trdFinProductDealTotal.setTotleTradeId(
-                        trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                trdFinProductDealTotal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
-                TrdFinProductDealTotal trdFinProductDealTotalR = trdFinProductDealTotalMapper.selectByPrimaryKey(trdFinProductDealTotal.getTotleTradeId());
-                if (StringUtil.isNotEmpty(trdFinProductDealTotalR)) {
-                    trdFinProductDealTotalMapper.updateByPrimaryKey(trdFinProductDealTotal);
-                }else {
-                    trdFinProductDealTotalMapper.insert(trdFinProductDealTotal);
-                }
-                // 根据汇总交易编号查询金融产品交易
-                List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
-                if (!trdProductDealList.isEmpty()) {
-                    for (TrdProductDeal trdProductDeal : trdProductDealList) {
-                        /**金融产品交易表**/
-                        TrdProductDeal trdProductDealRevoke = new TrdProductDeal();
-                        trdProductDealRevoke.setTradeId(trdProductDeal.getTradeId());
-                        trdProductDealRevoke.setIsCancel(DictCodeList.是否_是.getValue());
-                        trdProductDealMapper.updateByPrimaryKeySelective(trdProductDealRevoke);
+            if(StringUtil.equals(entity.getIsWin(),"04")) {
+                List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
+                for (TrdFinProductDealTotal trdFinProductDealTotal : trdFinProductDealTotalList) {
+                    TrdFinProductDealTotal trdFinProductDealTotalRevoke = new TrdFinProductDealTotal();
+                    trdFinProductDealTotalRevoke.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    trdFinProductDealTotalRevoke.setIsCancel(DictCodeList.是否_是.getValue());
+                    trdFinProductDealTotalMapper.updateByPrimaryKeySelective(trdFinProductDealTotalRevoke);
+                    trdFinProductDealTotal.setpTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    trdFinProductDealTotal.setTotleTradeId(
+                            trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                    trdFinProductDealTotal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                    TrdFinProductDealTotal trdFinProductDealTotalR = trdFinProductDealTotalMapper.selectByPrimaryKey(trdFinProductDealTotal.getTotleTradeId());
+                    if (StringUtil.isNotEmpty(trdFinProductDealTotalR)) {
+                        trdFinProductDealTotalMapper.updateByPrimaryKey(trdFinProductDealTotal);
+                    } else {
+                        trdFinProductDealTotalMapper.insert(trdFinProductDealTotal);
+                    }
+                    // 根据汇总交易编号查询金融产品交易
+                    List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    if (!trdProductDealList.isEmpty()) {
+                        for (TrdProductDeal trdProductDeal : trdProductDealList) {
+                            /**金融产品交易表**/
+                            TrdProductDeal trdProductDealRevoke = new TrdProductDeal();
+                            trdProductDealRevoke.setTradeId(trdProductDeal.getTradeId());
+                            trdProductDealRevoke.setIsCancel(DictCodeList.是否_是.getValue());
+                            trdProductDealMapper.updateByPrimaryKeySelective(trdProductDealRevoke);
 
-                        trdProductDeal.setpTradeId(trdProductDeal.getTradeId());
-                        trdProductDeal.setTradeId(trdProductDeal.getTradeId()+BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                        trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
-                        trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
-                        trdProductDealMapper.insert(trdProductDeal);
-                        /**交易附属表 **/
-                        TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getTradeId());
-                        if (trdProductDealAdd != null) {
-                            trdProductDealAdd.setTradeId(trdProductDealAdd.getTradeId()
-                                    + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                            trdProductDealAddMapper.insert(trdProductDealAdd);
-                        }
-                        // 组合交易表
-                        List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDeal.getTradeId());
-                        if (!ptlTradeList.isEmpty()) {
-                            for (PtlTrade ptlTrade : ptlTradeList) {
-                                ptlTrade.setBusiNo(ptlTrade.getBusiNo() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                                ptlTrade.setCreateUser(entity.getCreateUser());
-                                ptlTrade.setCreateTime(new Date());
-                                ptlTrade.setUpdateUser(entity.getCreateUser());
-                                ptlTrade.setUpdateTime(new Date());
-                                ptlTradeMapper.insert(ptlTrade);
+                            trdProductDeal.setpTradeId(trdProductDeal.getTradeId());
+                            trdProductDeal.setTradeId(trdProductDeal.getTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                            trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+                            trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                            trdProductDealMapper.insert(trdProductDeal);
+                            /**交易附属表 **/
+                            TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getTradeId());
+                            if (trdProductDealAdd != null) {
+                                trdProductDealAdd.setTradeId(trdProductDealAdd.getTradeId()
+                                        + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                trdProductDealAddMapper.insert(trdProductDealAdd);
+                            }
+                            // 组合交易表
+                            List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDeal.getTradeId());
+                            if (!ptlTradeList.isEmpty()) {
+                                for (PtlTrade ptlTrade : ptlTradeList) {
+                                    ptlTrade.setBusiNo(ptlTrade.getBusiNo() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                    ptlTrade.setCreateUser(entity.getCreateUser());
+                                    ptlTrade.setCreateTime(new Date());
+                                    ptlTrade.setUpdateUser(entity.getCreateUser());
+                                    ptlTrade.setUpdateTime(new Date());
+                                    ptlTradeMapper.insert(ptlTrade);
+                                }
                             }
                         }
-                    }
 
-                }
-                // 划款指令表
-                List<StlOrders> stlPayOrdersList = cfetsPrimaryBidManageMapper.queryStlPayOrdersByTradeId(trdFinProductDealTotal.getTotleTradeId());
-                if (!stlPayOrdersList.isEmpty()) {
-                    for (StlOrders stlOrders : stlPayOrdersList) {
-                        stlOrders.setOrderId(stlOrders.getOrderId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                        stlOrders.setpOrderId(stlOrders.getOrderId());
-                        stlOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                        stlOrders.setOrderStatus(DictCodeListExt1.指令状态_撤销.getValue());
-                        stlOrdersMapper.insert(stlOrders);
+                    }
+                    // 划款指令表
+                    List<StlOrders> stlPayOrdersList = cfetsPrimaryBidManageMapper.queryStlPayOrdersByTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    if (!stlPayOrdersList.isEmpty()) {
+                        for (StlOrders stlOrders : stlPayOrdersList) {
+                            stlOrders.setOrderId(stlOrders.getOrderId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                            stlOrders.setpOrderId(stlOrders.getOrderId());
+                            stlOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                            stlOrders.setOrderStatus(DictCodeListExt1.指令状态_撤销.getValue());
+                            stlOrdersMapper.insert(stlOrders);
+                        }
                     }
                 }
             }
             updateCfetsOprHis(entity.getTotalWinId(),action);
         } else {
             action = OperationType.NEW.name();
-            entity = cncapBaseBidManageBaseInfoDto(entity);
-            doCompleteInsert(entity);
+            if(StringUtil.equals(entity.getIsWin(),"04")) {
+                entity = cncapBaseBidManageBaseInfoDto(entity);
+                doCompleteInsert(entity);
+            }else{
+                unBidSave(entity);
+            }
             updateCfetsOprHis(entity.getTotalWinId(),action);
         }
     }

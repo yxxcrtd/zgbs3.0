@@ -54,6 +54,9 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
     @ApiModelProperty(name="pageModel",value="分页对象")
     private PageModel pageModel;
 
+     @ApiModelProperty(name="isWin",value="中标状态")
+     private String isWin ;
+
     /**资产代码*/
     @ApiModelProperty(name="finprodId",value="资产代码")
     private String finprodId ;
@@ -453,5 +456,21 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
 
      public void setSeriYN(String seriYN) {
          this.seriYN = seriYN;
+     }
+
+     public String getIsWin() {
+         return isWin;
+     }
+
+     public void setIsWin(String isWin) {
+         this.isWin = isWin;
+     }
+
+     public String getCouponSpecies() {
+         return couponSpecies;
+     }
+
+     public void setCouponSpecies(String couponSpecies) {
+         this.couponSpecies = couponSpecies;
      }
  }
