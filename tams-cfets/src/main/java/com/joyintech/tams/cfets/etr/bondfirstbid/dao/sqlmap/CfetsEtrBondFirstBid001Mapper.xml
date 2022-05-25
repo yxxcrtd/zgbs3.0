@@ -101,13 +101,17 @@
             ELSE fpi.ISSUE_DATE
             END AS issueDate,
             ee.ENTRUST_NUM/100 totalBiddingNum,
-            CASE WHEN  fpi.ISSUE_CLASS = '01' THEN
-                case
-                when fp.COUPON_SPECIES = '01' AND  fpi.INT_TYPE = '02' THEN
-                SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 ,'FM9999999999999990.9000') || ' BP'
-                else to_char(fpi.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
-                end
-            ELSE T1.BID_PRICE
+            CASE
+            WHEN fpi.ISSUE_CLASS = '01' THEN
+            CASE
+            WHEN fp.COUPON_SPECIES = '01'
+            AND fpi.INT_TYPE = '02' THEN SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 , 'FM9999999999999990.90') || ' BP'
+            ELSE to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9000') || ' %'
+            END
+            WHEN  fpi.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
+            WHEN  fpi.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
+            WHEN  fpi.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
+            ELSE bobp.BID_PRICE
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
@@ -154,13 +158,24 @@
         and t1.TRADE_STATUS != '03'
         group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
-        LEFT JOIN (
-                    SELECT
-                        LISTAGG(BID_PRICE, ',') WITHIN GROUP (ORDER BY (BID_PRICE)) BID_PRICE,
-                        ENTRUST_ID
-                    FROM ETR_ENTRUST_BID_PRICE
-                    GROUP BY ENTRUST_ID
-                ) T1 ON T1.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN
+            (select listagg(case
+            when t3.TENDER_TARGET = '01'
+            then to_char(t0.BID_PRICE * 100, 'FM99990.9990') || '%'
+            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM99990.9990') || '元'
+            when t3.TENDER_TARGET = '03'
+            then to_char(t0.BID_PRICE * 10000, 'FM99990.90') || 'BP'
+            end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
+            t0.ENTRUST_ID
+            from ETR_ENTRUST_BID_PRICE t0
+            LEFT JOIN ETR_ENTRUST t1 on t1.ENTRUST_ID = t0.ENTRUST_ID
+            LEFT JOIN FIN_PRODUCT t2
+            ON t2.FINPROD_ID = t1.FINPROD_ID
+            LEFT JOIN
+            FIN_PRODUCT_ISSUE t3
+            ON t3.FINPROD_ID = t2.FINPROD_ID
+            group by t0.ENTRUST_ID) bobp
+        ON bobp.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
                     SELECT
                         LISTAGG(eed.PORTFOLIO_ID, ',') WITHIN GROUP (ORDER BY (eed.PORTFOLIO_ID)) PORTFOLIO_ID,
@@ -247,13 +262,17 @@
             ELSE fpi.ISSUE_DATE
             END AS issueDate,
             ee.ENTRUST_NUM/100 totalBiddingNum,
-            CASE WHEN  fpi.ISSUE_CLASS = '01' THEN
-                case
-                when fp.COUPON_SPECIES = '01' AND  fpi.INT_TYPE = '02' THEN
-                SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 ,'FM9999999999999990.9000') || ' BP'
-                else to_char(fpi.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
-                end
-            ELSE T1.BID_PRICE
+            CASE
+            WHEN fpi.ISSUE_CLASS = '01' THEN
+            CASE
+            WHEN fp.COUPON_SPECIES = '01'
+            AND fpi.INT_TYPE = '02' THEN SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 , 'FM9999999999999990.90') || ' BP'
+            ELSE to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9000') || ' %'
+            END
+            WHEN  fpi.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
+            WHEN  fpi.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
+            WHEN  fpi.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
+            ELSE bobp.BID_PRICE
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
@@ -300,13 +319,24 @@
         and t1.TRADE_STATUS != '03'
         group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
-        LEFT JOIN (
-            SELECT
-                LISTAGG(BID_PRICE, ',') WITHIN GROUP (ORDER BY (BID_PRICE)) BID_PRICE,
-                ENTRUST_ID
-            FROM WFL_ETR_ENTRUST_BID_PRICE
-            GROUP BY ENTRUST_ID
-        ) T1 ON T1.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN
+            (select listagg(case
+            when t3.TENDER_TARGET = '01'
+            then to_char(t0.BID_PRICE * 100, 'FM99990.9990')
+            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM99990.9990')
+            when t3.TENDER_TARGET = '03'
+            then to_char(t0.BID_PRICE * 10000, 'FM99990.90')
+            end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
+            t0.ENTRUST_ID
+            from WFL_ETR_ENTRUST_BID_PRICE t0
+            LEFT JOIN WFL_ETR_ENTRUST t1 on t1.ENTRUST_ID = t0.ENTRUST_ID
+            LEFT JOIN FIN_PRODUCT t2
+            ON t2.FINPROD_ID = t1.FINPROD_ID
+            LEFT JOIN
+            FIN_PRODUCT_ISSUE t3
+            ON t3.FINPROD_ID = t2.FINPROD_ID
+            group by t0.ENTRUST_ID) bobp
+        ON bobp.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
             SELECT
                 LISTAGG(eed.PORTFOLIO_ID, ',') WITHIN GROUP (ORDER BY (eed.PORTFOLIO_ID)) PORTFOLIO_ID,
