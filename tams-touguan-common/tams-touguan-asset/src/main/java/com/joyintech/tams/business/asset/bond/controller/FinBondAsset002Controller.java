@@ -645,7 +645,7 @@ public class FinBondAsset002Controller extends BaseController{
      */
     @ApiOperation(value = "附件上传", notes = "附件上传")
     @ResponseBody
-    @PostMapping(value = "uploadFile")
+    @PostMapping( "/uploadFile")
     public Message<SysUploadFileInfo> uploadFile(MultipartFile file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
@@ -667,7 +667,7 @@ public class FinBondAsset002Controller extends BaseController{
      */
     @ApiOperation(value = "附件删除", notes = "附件删除")
     @ResponseBody
-    @PostMapping(value = "/deleteFile")
+    @PostMapping( "/deleteFile")
     public Message<AjaxResult> UploadFile(SysUploadFileInfo file) {
         try {
             if (StringUtil.isNotEmpty(file)) {

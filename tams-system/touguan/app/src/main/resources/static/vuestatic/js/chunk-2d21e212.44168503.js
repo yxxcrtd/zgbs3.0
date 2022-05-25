@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d21e212"],{d3f3:function(e,n,t){"use strict";t.r(n),t.d(n,"paramsMixin",(function(){return o}));var o={data:function(){return{pageCode:this.$route.query.pageCode}},created:function(){this.pageCode=this.$route.query.pageCode},methods:{}}}}]);
