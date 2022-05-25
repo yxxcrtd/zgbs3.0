@@ -729,12 +729,12 @@ public class PortfolioManager extends BaseService {
                 }
                 if (EntrustBs.isBuy(entrustBs)) {
                     // 买入，过滤价格小于指令价格的指令
-                    if (orderPrice.compareTo(ins.getEntrustPrice()) > 0) {
+                    if (ins.getEntrustPrice().compareTo(orderPrice) < 0) {
                         ins.setEntrustClass(是否_否.getValue());
                     }
                 } else {
                     // 卖出，过滤价格大于指令价格的指令
-                    if (orderPrice.compareTo(ins.getEntrustPrice()) < 0) {
+                    if (ins.getEntrustPrice().compareTo(orderPrice) > 0) {
                         ins.setEntrustClass(是否_否.getValue());
                     }
                 }

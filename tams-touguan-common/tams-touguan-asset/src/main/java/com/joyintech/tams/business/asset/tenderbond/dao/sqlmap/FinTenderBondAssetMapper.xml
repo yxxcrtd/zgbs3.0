@@ -70,6 +70,7 @@
             ISSUE.INT_TYPE as intType,
             ISSUE.PAY_CYCLE as payCycle,
             ISSUE.REFER_YIELD as referYield ,
+            ISSUE.ADD_BATCH as addBatch,
             round(ISSUE.MIN_PER_TAMT/100000000,2) as minPerTamt,
             round(ISSUE.MAX_PER_UTAMT/100000000,2) as maxPerUtamt,
             ZT.RATING as subRate,
@@ -342,7 +343,11 @@
             ri.RELEASE_TYPE as issueStyle,
             ri.ADDITIONAL_BATCHES as addBatch,
             nvl(pri.ISSUE_PX,ri.ISSUE_PX) as issuePrice,
-            nvl(pri.COUPON_RATE,nvl(ri.STIPULATION_VALUE,ri.COUPON_RATE)) as referYield,
+            case when (nvl(pri.ISSUE_METHOD,ri.ISSUING_METHOD)='01' and sec.VARIETY_OF_COUPONS='04')
+            or (nvl(pri.ISSUE_METHOD,ri.ISSUING_METHOD)='01' and sec.VARIETY_OF_COUPONS='04' and nvl(pri.BIDDING_METHOD,ri.BIDDING_METHOD)='02')
+            or (nvl(pri.ISSUE_METHOD,ri.ISSUING_METHOD)='01' and sec.VARIETY_OF_COUPONS='04' and sec.RATE_TYPE='01')
+            then nvl(pri.COUPON_RATE,ri.COUPON_RATE)
+            else nvl(pri.COUPON_RATE,ri.STIPULATION_VALUE) end as referYield,
             nvl(pri.BENCHMARK_CURVE_NAME,ri.BENCHMARK_CURVE_NAME) as intRateId,
             nvl(pri.DECIMAL_PLACES,ri.DECIMAL_PLACES) as rateGrade,
             nvl(pri.SPREAD,ri.SPREAD) as bp,

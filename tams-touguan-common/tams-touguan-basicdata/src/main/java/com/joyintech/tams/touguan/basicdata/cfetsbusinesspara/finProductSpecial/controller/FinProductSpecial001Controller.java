@@ -11,11 +11,8 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
-import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto;
@@ -23,9 +20,6 @@ import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecial001Service;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecialValidatorService;
-import com.joyintech.workflow.engine.constant.OperationType;
-import com.joyintech.workflow.engine.dto.ProcessParameter;
-import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
@@ -107,45 +101,6 @@ public class FinProductSpecial001Controller extends BaseController {
         return Message.success("success", finProductSpecial001Service.querySelectOption(request));
     }
 
-
-    @ApiOperation(value = "特殊债券信息提交(保存)/修改", notes = "特殊债券信息提交(保存)/修改")
-    @ResponseBody
-    @PostMapping("save")
-    public Message save(@RequestBody FinProductSpecialDto dto, BindingResult br) {
-        if (br.hasErrors()) {
-            return new Message<AjaxResult>().success().setData(new AjaxResult(br));
-        }
-        ProcessParameter<FinProductSpecialDto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<FinProductSpecialDto> params = new WorkFlowParameter<>();
-        // 页面id
-        params.setPageId("CfetsBasicInfo001");
-        params.setElementId(dto.getElementId());
-        params.setBusinessType(DictCodeListExt2.共通业务类型_银行间基础信息.getValue());
-        params.setBusinessCode(dto.getFinprodMarketId());
-        String finalCommentStr =
-                "债券代码:" + dto.getFinprodMarketId()
-                        + "-是否资产支持证券:" + dto.getIsAbsStr()
-                        + "-是否特殊债:" + dto.getIsSpecialDebtStr()
-                        + "-是否到期违约债:" + dto.getIsDefaultBondIndicatorStr();
-        params.setComment(entity -> finalCommentStr);
-        processParameter.setWorkFlowParameter(params);
-        if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
-            processParameter.setOperationType(OperationType.NEW);
-        } else if (StringUtil.equals(dto.getOperateType(), OperationType.MODIFY.name())) {
-            processParameter.setOperationType(OperationType.MODIFY);
-        } else {
-            processParameter.setOperationType(OperationType.DELETE);
-        }
-        processParameter.setPageId(params.getPageId());
-        try {
-            String msg = finProductSpecial001Service.start(processParameter, dto);
-            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
-        } catch (Exception e) {
-            logger.error("特殊债券信息提交失败", e);
-            return PositionUtil.ajaxErrorReturn(e);
-        }
-    }
-
     /**
      * 特殊债券信息提交检查
      *
@@ -166,34 +121,6 @@ public class FinProductSpecial001Controller extends BaseController {
         } else {
             return Message.success("校验成功", null);
         }
-    }
-
-    /**
-     * 特殊债券信息删除
-     *
-     * @param finProductSpecialDto
-     * @return
-     */
-    @ApiOperation(value = "特殊债券信息删除", notes = "特殊债券信息删除")
-    @PostMapping("/del")
-    @ResponseBody
-    public Message<AjaxResult> del(@RequestBody FinProductSpecialDto finProductSpecialDto) {
-        ProcessParameter<FinProductSpecialDto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<FinProductSpecialDto> params = new WorkFlowParameter<>();
-        params.setPageId(this.getPageId());
-        params.setElementId(finProductSpecialDto.getElementId());
-        params.setBusinessCode(FinProductSpecialDto::getFinprodMarketId);
-        params.setBusinessType(DictCodeListExt2.共通业务类型_银行间基础信息.getValue());
-        finProductSpecialDto.setOperateType(OperationType.DELETE.name());
-        processParameter.setOperationType(OperationType.DELETE);
-        processParameter.setWorkFlowParameter(params);
-        try {
-            finProductSpecial001Service.start(processParameter, finProductSpecialDto);
-        } catch (Exception e) {
-            logger.error("流程发起失败", e);
-            return Message.fail("流程发起失败");
-        }
-        return Message.success("处理成功", null);
     }
 
 

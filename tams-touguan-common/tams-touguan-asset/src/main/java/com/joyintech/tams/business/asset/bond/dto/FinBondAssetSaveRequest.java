@@ -430,6 +430,23 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 行权日
      */
     private Date firstPayDate;
+
+    /**
+     * 担保方式
+     */
+    private String guaType;
+
+    /**
+     * 原始权益人
+     */
+    private String originalOwner;
+
+    /**
+     * 担保人
+     */
+    private String sponsor;
+
+
     /**
      * 债券评级信息list add by shenchen 2019-04-25
      */
@@ -2079,5 +2096,29 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setIsAddSec(String isAddSec) {
         this.isAddSec = isAddSec;
+    }
+
+    public String getGuaType() {
+        return guaType;
+    }
+
+    public void setGuaType(String guaType) {
+        this.guaType = guaType;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
+    }
+
+    public String getSponsor() {
+        return sponsor;
+    }
+
+    public void setSponsor(String sponsor) {
+        this.sponsor = sponsor;
     }
 }

@@ -9,8 +9,10 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.*;
@@ -81,6 +83,9 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
 
     @Resource
+    private JoyinbusinessCommonService joyinbusinessCommonService;
+
+    @Resource
     private IPlatformDate iPlatformDate;
 
     @Override
@@ -91,6 +96,11 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
 
     @Override
     public void doInsert(FinTenderBondAsset003Dto entity, OperationType type) {
+        if (OperationType.REVOKE == type) {
+            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "上市流通撤销原因：" + entity.getRevokeReason(), DictCodeListExt3.操作类型_上市流通撤销);
+        } else {
+            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "", DictCodeListExt3.操作类型_上市流通);
+        }
         if (type == OperationType.REVOKE) return;
         Map<String, String> param = new HashMap();
         param.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
@@ -99,6 +109,14 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
         if (StringUtil.isEmpty(finproductId)) {//执行加券
             finBondMarketInfoQuery001Service.addCoupons(entity.getAppearMarketId());
         }
+    }
+
+    @Override
+    public void doDelete(String workflowId) {
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setWorkflowId(workflowId);
+        oprHisReq.setBusiDes("作废");
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
     @Override
@@ -137,7 +155,6 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                         throw new PositionException(e);
                     }
                 }
-                finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), product.getRemark(), DictCodeListExt3.操作类型_上市流通撤销);
             }
         } else {
             FinProduct product1 = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
@@ -175,7 +192,6 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             productAdd.setFinprodId(dto.getFinprodId());
             productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
             finProductAddMapper.updateForTenderBound(productAdd);
-            finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_上市流通);
             if (dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日和平台日相等时才发头寸
                 Map<String, String> params = new HashMap();
                 params.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());

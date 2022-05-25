@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -225,7 +226,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         /**--息票品种modify 2019-04-15 end--**/
         finProduct.setFinprodMarketId(secId);
         //发行金额除以万元
-        finProduct.setIssuePrice(finListedBondInfoQuery001Dto.getIssuePx());
+        finProduct.setIssuePrice(new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()));
 
         finProduct.setCcy(finListedBondInfoQuery001Dto.getCurrency());
         //境内外

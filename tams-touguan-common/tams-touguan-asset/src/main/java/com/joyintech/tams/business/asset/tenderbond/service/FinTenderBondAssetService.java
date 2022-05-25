@@ -69,7 +69,24 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
+    @Override
+    public void doInsert(FinTenderBondAsset002Dto dto, OperationType type) {
+        if (OperationType.DELETE == type) {
+            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_放弃);
+        } else if (OperationType.NEW == type) {
+            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_新建);
+        } else if (OperationType.MODIFY == type) {
+            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_修改);
+        }
+    }
 
+    @Override
+    public void doDelete(String workflowId) {
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setWorkflowId(workflowId);
+        oprHisReq.setBusiDes("作废");
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+    }
 
     @Override
     public String generateTitle(FinTenderBondAsset002Dto entity, OperationType operationType) {
@@ -85,13 +102,10 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     public void doComplete(FinTenderBondAsset002Dto dto, OperationType type) {
         if (OperationType.DELETE == type) {
             this.delete(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_放弃);
         } else if (OperationType.NEW == type) {
             this.insert(dto);
-            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_新建);
         } else if (OperationType.MODIFY == type) {
             this.update(dto);
-            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_修改);
         }
     }
 

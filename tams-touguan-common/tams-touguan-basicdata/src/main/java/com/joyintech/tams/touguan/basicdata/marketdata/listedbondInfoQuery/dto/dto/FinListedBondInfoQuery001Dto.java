@@ -140,16 +140,14 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private String currency;
 
     @ApiModelProperty(name = "issuePx", value = "发行价格（元）")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal issuePx;
+    private String issuePx;
 
     @ApiModelProperty(name = "issueAmt", value = "发行金额（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issueAmt;
 
     @ApiModelProperty(name = "stipulationValue", value = "参考收益率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal stipulationValue;
+    private String stipulationValue;
 
     @ApiModelProperty(name = "singleMinSubAmt", value = "单笔最低认购量（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -573,19 +571,19 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.currency = currency;
     }
 
-    public BigDecimal getIssuePx() {
+    public String getIssuePx() {
         return issuePx;
     }
 
-    public void setIssuePx(BigDecimal issuePx) {
+    public void setIssuePx(String issuePx) {
         this.issuePx = issuePx;
     }
 
-    public BigDecimal getStipulationValue() {
+    public String getStipulationValue() {
         return stipulationValue;
     }
 
-    public void setStipulationValue(BigDecimal stipulationValue) {
+    public void setStipulationValue(String stipulationValue) {
         this.stipulationValue = stipulationValue;
     }
 
