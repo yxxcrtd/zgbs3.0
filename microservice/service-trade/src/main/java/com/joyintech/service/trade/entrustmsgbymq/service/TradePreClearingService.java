@@ -338,7 +338,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
                     logger.info("【成交数据预清算处理-信用保护凭证开始】tradePreClearing entrustId: {}, seqno: {}",
                             infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
-                    this.trdCredit(trdTempDto, infContractDetailfile);
+                    this.trdTempCredit(trdTempDto, infContractDetailfile);
 
                     logger.info("【成交数据预清算处理-信用保护凭证结束】tradePreClearing entrustId: {}, seqno: {}",
                             infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
@@ -814,6 +814,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
             TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
             BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdTempDto.getTrdProductTempDeal());
             trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
+
+            TrdDealTotalAdd trdDealTotalAdd = new TrdDealTotalAdd();
+
         }
         // 多组合系列户指令需要登录临时汇总交易表 add by fuyongsheng 20220511 end
 
@@ -919,6 +922,17 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         positionRequestTradeReportService.sendTradeReportPositionRequest(trdTempDto);
         tradePreCommonService.executePosition(finProductTradeDto, infContractDetailfile.getAcctNo());
 //        }
+    }
+
+    /**
+     * 信用保护凭证清算数据
+     * 金融产品交易汇总Entitiy，金融产品交易汇总附属表Entity，金融产品交易Entitiy，
+     *    金融产品交易附属表Entity，划款指令表Entity，交易费用明细表Entity，组合交易Entity保存到数据库中。
+     * @param trdTempDto
+     * @param infContractDetailfile
+     */
+    private void tradePreClearCredit(TrdTempDto trdTempDto, InfContractDetailfile infContractDetailfile){
+
     }
 
     /**
@@ -1954,7 +1968,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
      * @param dto
      * @param infContractDetailfile
      */
-    public void trdCredit(TrdTempDto dto, InfContractDetailfile infContractDetailfile) {
+    public void trdTempCredit(TrdTempDto dto, InfContractDetailfile infContractDetailfile) {
         // 金融产品临时交易Entity
         // 构造开始----------------------------------------------------------
         BeanUtil.copyPropertiesIgnoreNull(dto, infContractDetailfile);
