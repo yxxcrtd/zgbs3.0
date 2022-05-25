@@ -115,7 +115,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
 
     private String genLocalId() {
         int tempOffSet = localOffset.incrementAndGet();
-        if (tempOffSet > 9999) {
+        if (tempOffSet > 8999) {
             tempOffSet = 0;
             localOffset.set(0);
         }
