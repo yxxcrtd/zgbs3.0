@@ -538,6 +538,16 @@ public class FinProductAdd extends BaseEntity {
 
     private String issuershort;
 
+    /**
+     * 担保方式
+     */
+    private String guaType;
+
+    /**
+     * 原始权益人
+     */
+    private String originalOwner;
+
 
     public String getDirectDisclosureRiskFlag() {
         return directDisclosureRiskFlag;
@@ -2127,5 +2137,21 @@ public class FinProductAdd extends BaseEntity {
 
     public void setIssuershort(String issuershort) {
         this.issuershort = issuershort;
+    }
+
+    public String getGuaType() {
+        return guaType;
+    }
+
+    public void setGuaType(String guaType) {
+        this.guaType = guaType;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
     }
 }

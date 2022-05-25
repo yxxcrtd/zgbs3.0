@@ -1,7 +1,7 @@
 prod:
   bussRep: 1
 server:
-  port: 8080
+  port: 8090
   address: 0.0.0.0
   maxHttpHeaderSize: 102400
   context-path: /tams
@@ -358,8 +358,8 @@ spring:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
 #    username: BS303INIT_EXCHANGE0106
-    username: BS304INIT_DEV20220314IB
-    password: BS304INIT_DEV20220314IB
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
@@ -369,8 +369,8 @@ spring:
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS304INIT_DEV20220314IB
-  sqldirpassword: BS304INIT_DEV20220314IB
+  sqldiruserName: BS303INIT_TEST1008_03
+  sqldirpassword: BS303INIT_TEST1008_03
 shiro:
   ssoEnable: false  #是否开启sso验证，可以和joyinsso 统一登录配套使用。如果没有统一登录，但为true的话，就不校验密码
   #  loginUrl: http://127.0.0.1:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
@@ -392,26 +392,26 @@ base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS304INIT_DEV20220314IB
-    password: BS304INIT_DEV20220314IB
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
 interf:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS304INIT_DEV20220314IB
-    password: BS304INIT_DEV20220314IB
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
 stresstest:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS304INIT_DEV20220314IB
-    password: BS304INIT_DEV20220314IB
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
 wind:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS304INIT_DEV20220314IB
-    password: BS304INIT_DEV20220314IB
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
 log:
   path: /home/tams/logs/tams/touguan
   level: debug
