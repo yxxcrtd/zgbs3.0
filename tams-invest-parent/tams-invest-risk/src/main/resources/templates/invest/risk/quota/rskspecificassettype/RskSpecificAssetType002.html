@@ -24,6 +24,10 @@
         .pl{
             padding-left:20%;
         }
+        .form-label-wrap{
+            white-space: normal !important;
+            overflow: visible !important;
+        }
     </style>
         <form class="layui-form joyin-form-wrap"
               id="submitForm">
@@ -34,9 +38,9 @@
                    style="display: none">
                 <div class="layui-form-item pl">
                     <div class="form-inline-wrap">
-                        <label class="layui-form-label form-label-wrap" style="width:15%!important;text-align:left;"
+                        <label class="layui-form-label form-label-wrap" style="width:20%!important;text-align:left;"
                                data-th-text="#{RskSpecificAssetType001.finprodName}">资产简称</label>
-                        <div class="layui-input-inline input-inline" style="width:61%!important;">
+                        <div class="layui-input-inline input-inline" style="width:56%!important;">
                             <select id="finprodMarketId" name="finprodMarketId"
                                     class="layui-input form-input input-select"
                                     data-th-placeholder="#{SysCommon.placeholder}" allowClear="true"
@@ -46,9 +50,9 @@
                         </div>
                     </div>
                     <div class="form-inline-wrap1">
-                        <label class="layui-form-label form-label-wrap" style="width:15%!important;text-align:left;"
+                        <label class="layui-form-label form-label-wrap" style="width:20%!important;text-align:left;"
                                data-th-text="#{RskSpecificAssetType001.finprodId}">资产代码</label>
-                        <div class="layui-input-inline input-inline" style="width:61%!important;">
+                        <div class="layui-input-inline input-inline" style="width:56%!important;">
                             <input type="text" id="assetCode" name="assetCode" disabled="disabled"
                                    class="layui-input form-input" placeholder="请输入内容"
                                    data-th-placeholder="#{SysCommon.placeholder}"
