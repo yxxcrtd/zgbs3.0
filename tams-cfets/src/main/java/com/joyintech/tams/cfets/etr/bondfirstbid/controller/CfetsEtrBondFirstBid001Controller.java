@@ -194,10 +194,11 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     }
 
     @ApiOperation(value = "查询资产是否进行了SPPI测试", notes = "查询资产是否进行了SPPI测试")
-    @PostMapping("/queryAssetIsSppiTest/{finprodId:.+}")
+    @PostMapping("/queryAssetIsSppiTest")
     @ResponseBody
-    public Message<SppiImportData> queryAssetIsSppiTest(@PathVariable String finprodId) {
+    public Message<SppiImportData> queryAssetIsSppiTest(@RequestBody Map<String, Object> param) {
         try {
+            String finprodId = (String) param.get("finprodId");
             SppiImportData data = cfetsEtrBondFirstBid001Service.queryAssetIsSppiTest(finprodId);
             return new Message<SppiImportData>().success().setData(data);
         } catch (Exception e) {
