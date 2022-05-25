@@ -47,6 +47,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.util.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -74,6 +76,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/business/asset/bond/FinBondAsset002")
 @Api(tags = "债券标的信息新建")
 public class FinBondAsset002Controller extends BaseController{
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private FinBondAssetService finBondAssetService;
@@ -647,12 +651,14 @@ public class FinBondAsset002Controller extends BaseController{
     @PostMapping( "/uploadFile")
     public Message<SysUploadFileInfo> uploadFile(MultipartFile file) {
         try {
+            logger.info("文件上传开始");
             if (StringUtil.isNotEmpty(file)) {
                 SysUploadFileInfo fileInfo = finBondAssetService.getUploadFileInfo(file);
                 return new Message<SysUploadFileInfo>().success().setData(fileInfo);
             }
+            logger.info("文件上传结束");
         }catch (Exception e){
-            e.printStackTrace();
+            logger.error("文件上传异常", e);
             return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
         }
         return null;
