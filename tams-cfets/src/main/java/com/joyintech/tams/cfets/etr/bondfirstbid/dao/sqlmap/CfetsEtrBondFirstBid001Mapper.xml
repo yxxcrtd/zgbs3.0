@@ -4,7 +4,43 @@
 
     <!-- 指令管理查询 -->
     <select id="findEtrInfoPage" parameterType="Map" resultType="com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto">
-        select * from (select aaa.* from (
+        select * from (
+            select
+                aaa.effectiveStatusName,
+                aaa.entrustStatus,
+                aaa.execFinishAmt,
+                aaa.execRemainderAmt,
+                aaa.execProcess,
+                aaa.transFinishAmt,
+                aaa.transRemainderAmt,
+                aaa.transProcess,
+                aaa.firstBidStatus,
+                aaa.finprodId,
+                aaa.finprodMarketId,
+                aaa.finprodAbbr,
+                aaa.issueClass,
+                aaa.tradeMarket,
+                aaa.ps,
+                aaa.issueDateStart,
+                aaa.issueDateEnd,
+                aaa.totalBiddingNum,
+                aaa.bidPriceStr,
+                aaa.payEdate,
+                aaa.portfolioId,
+                aaa.portfolioName,
+                aaa.busiModel,
+                aaa.invManagerId,
+                aaa.entrustId,
+                aaa.etrDate,
+                aaa.counterId,
+                aaa.counterName,
+                aaa.approver,
+                aaa.remark,
+                aaa.payEdateStr,
+                aaa.etrDateStr,
+                TO_CHAR(aaa.issueDateStart, 'yyyy-MM-dd')  || '~' || TO_CHAR(aaa.issueDateEnd, 'yyyy-MM-dd')  issueDateStr
+
+        from (
         <choose>
             <when test="search == '有效'">
                 <!-- 有效状态查询 -->
@@ -18,11 +54,14 @@
         </choose>
         ) aaa
         left join SYS_DATADICT_LIST sdl on aaa.entrustStatus=sdl.ITEM_CODE and sdl.DICT_CODE='ENTRUST_STATUS'
+        left join SYS_DATADICT_LIST issueClassSdl on aaa.issueClass = issueClassSdl.ITEM_CODE and issueClassSdl.DICT_CODE='ISSUE_CLASS'
+        left join SYS_DATADICT_LIST bidStatusSdl on aaa.firstBidStatus = bidStatusSdl.ITEM_CODE and bidStatusSdl.DICT_CODE='FIRST_BID_STATUS'
         left join SYS_DATADICT_LIST dictbusiModel on aaa.busiModel=dictbusiModel.ITEM_CODE and dictbusiModel.DICT_CODE='BUSINESS_MODEL'
+        left join SYS_DATADICT_LIST tradeMarketSdl on aaa.tradeMarket=tradeMarketSdl.ITEM_CODE and tradeMarketSdl.DICT_CODE='TRADE_PLACE'
         <where>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
-                AND aaa.issueDate <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
-                AND aaa.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
+                AND aaa.issueDateStart <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
+                AND aaa.issueDateEnd <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
             </if>
             <!-- 组合匹配 -->
             <if test="portfolioIdList != null and portfolioIdList.size()>0">
@@ -50,10 +89,10 @@
     <sql id="keywordsWhereEtr">
         <if test="search != null and search != '' and search !='有效' ">
             AND (
-            aaa.effectiveStatusName || '|' || sdl.ITEM_VALUE || '|' || aaa.portfolioId || '|' || aaa.portfolioName
-            || '|' || aaa.issueClass || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr || '|' || aaa.invManagerId
+            aaa.effectiveStatusName || '|' || sdl.ITEM_VALUE || '|' || bidStatusSdl.ITEM_VALUE || '|' || aaa.portfolioId || '|' || aaa.portfolioName
+            || '|' || issueClassSdl.ITEM_VALUE || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr || '|' || aaa.invManagerId
             || '|' || aaa.entrustId || '|' || approver || '|' || aaa.REMARK || '|' || dictbusiModel.ITEM_VALUE
-            || '|' || aaa.counterId || '|' || aaa.counterName
+            || '|' || aaa.counterId || '|' || aaa.counterName || '|' || tradeMarketSdl.ITEM_VALUE || '|' || TO_CHAR(aaa.issueDateStart, 'yyyy-MM-dd') || '~' || TO_CHAR(aaa.issueDateEnd, 'yyyy-MM-dd')
             like '%' || #{search} || '%'
             or to_char(aaa.execProcess,'FM99990.9990')=#{search} or  aaa.execProcess||'' =#{search}
             or to_char(aaa.transProcess,'FM99990.9990')=#{search} or  aaa.transProcess||'' =#{search}
@@ -61,10 +100,13 @@
             or to_char(aaa.etrDate,'yyyyMMdd')  = #{search}
             or to_char(aaa.etrDate,'yyyy-MM-dd') =#{year}||'-'||#{search}
             or to_char(aaa.etrDate,'yyyyMMdd') =#{year}||''||#{search}
-            or to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search}
-            or to_char(aaa.issueDate,'yyyyMMdd')  = #{search}
-            or aaa.totalBiddingNum ||''= #{search}
-            or aaa.bidPriceStr ||''= #{search}
+            or to_char(aaa.issueDateStart,'yyyy-MM-dd')  = #{search}
+            or to_char(aaa.issueDateStart,'yyyyMMdd')  = #{search}
+            or to_char(aaa.issueDateEnd,'yyyy-MM-dd')  = #{search}
+            or to_char(aaa.issueDateEnd,'yyyyMMdd')  = #{search}
+            or aaa.totalBiddingNum || ''= #{search}
+            or aaa.bidPriceStr = #{search}
+            or TO_CHAR(aaa.issueDateStart, 'yyyy-MM-dd') || '~' || TO_CHAR(aaa.issueDateEnd, 'yyyy-MM-dd') = #{search}
             or to_char(aaa.payEdate,'yyyy-MM-dd')  = #{search}
             or to_char(aaa.payEdate,'yyyyMMdd')  = #{search}
             )
@@ -84,10 +126,11 @@
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
-            CASE
-            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            '01'
-            ELSE null
+            CASE WHEN (bo.BID_ID IS NOT NULL AND bo.BID_MODLE = '03') OR brt.IS_WIN = '04' THEN '04'
+            WHEN bo.BID_ID IS  NULL THEN '01'
+            WHEN brt.IS_WIN = '03' THEN '03'
+            WHEN (bo.BID_MODLE IN ('01', '02') AND brt.TOTAL_WIN_ID IS NULL) THEN '02'
+            ELSE '05'
             END AS firstBidStatus,
             ee.FINPROD_ID finprodId,
             fp.FINPROD_MARKET_ID finprodMarketId,
@@ -96,18 +139,25 @@
             ee.TRADE_MARKET tradeMarket,
             ee.PS ps,
             CASE
-            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            nvl(fpi.ISSUE_DATE,fpi.TENDER_EDATE)
+            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN nvl(fpi.ISSUE_DATE, fpi.TENDER_SDATE)
             ELSE fpi.ISSUE_DATE
-            END AS issueDate,
+            END AS issueDateStart,
+            CASE
+            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN nvl(fpi.ISSUE_DATE, fpi.TENDER_EDATE)
+            ELSE fpi.ISSUE_DATE
+            END AS issueDateEnd,
             ee.ENTRUST_NUM/100 totalBiddingNum,
-            CASE WHEN  fpi.ISSUE_CLASS = '01' THEN
-                case
-                when fp.COUPON_SPECIES = '01' AND  fpi.INT_TYPE = '02' THEN
-                SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 ,'FM9999999999999990.9000') || ' BP'
-                else to_char(fpi.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
-                end
-            ELSE T1.BID_PRICE
+            CASE
+            WHEN fpi.ISSUE_CLASS = '01' THEN
+            CASE
+            WHEN fp.COUPON_SPECIES = '01'
+            AND fpi.INT_TYPE = '02' THEN SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 , 'FM9999999999999990.90') || ' BP'
+            ELSE to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9000') || ' %'
+            END
+            WHEN  fpi.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
+            WHEN  fpi.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
+            WHEN  fpi.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
+            ELSE bobp.BID_PRICE
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
@@ -124,8 +174,6 @@
             mcp.COUNTER_NAME counterName,
             NULL AS approver,
             ee.REMARK remark,
-            case when fpi.ISSUE_DATE is null then to_char(fpi.TENDER_SDATE,'yyyy-mm-dd') || '~' || to_char(fpi.TENDER_EDATE,'yyyy-mm-dd')
-            else to_char(fpi.ISSUE_DATE,'yyyy-mm-dd') end as issueDateStr,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
             TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
@@ -154,13 +202,26 @@
         and t1.TRADE_STATUS != '03'
         group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
-        LEFT JOIN (
-                    SELECT
-                        LISTAGG(BID_PRICE, ',') WITHIN GROUP (ORDER BY (BID_PRICE)) BID_PRICE,
-                        ENTRUST_ID
-                    FROM ETR_ENTRUST_BID_PRICE
-                    GROUP BY ENTRUST_ID
-                ) T1 ON T1.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN
+            (select listagg(case
+            when t3.TENDER_TARGET = '01'
+            then to_char(t0.BID_PRICE * 100, 'FM99990.9990') || '%'
+            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM99990.9990') || '元'
+            when t3.TENDER_TARGET = '03'
+            then to_char(t0.BID_PRICE * 10000, 'FM99990.90') || 'BP'
+            end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
+            t0.ENTRUST_ID
+            from ETR_ENTRUST_BID_PRICE t0
+            LEFT JOIN ETR_ENTRUST t1 on t1.ENTRUST_ID = t0.ENTRUST_ID
+            LEFT JOIN FIN_PRODUCT t2
+            ON t2.FINPROD_ID = t1.FINPROD_ID
+            LEFT JOIN
+            FIN_PRODUCT_ISSUE t3
+            ON t3.FINPROD_ID = t2.FINPROD_ID
+            group by t0.ENTRUST_ID) bobp
+        ON bobp.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN BID_ORDER bo ON bo.FINPROD_ID  = fp.FINPROD_ID AND bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+        LEFT JOIN BID_RESULT_TOTAL brt ON brt.FINPROD_ID = fp.FINPROD_ID AND brt.BID_ID  = bo.BID_ID AND brt.STATUS = '01'
         LEFT JOIN (
                     SELECT
                         LISTAGG(eed.PORTFOLIO_ID, ',') WITHIN GROUP (ORDER BY (eed.PORTFOLIO_ID)) PORTFOLIO_ID,
@@ -230,10 +291,11 @@
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
-            CASE
-            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            '01'
-            ELSE null
+            CASE WHEN (bo.BID_ID IS NOT NULL AND bo.BID_MODLE = '03') OR brt.IS_WIN = '04' THEN '04'
+            WHEN bo.BID_ID IS  NULL THEN '01'
+            WHEN brt.IS_WIN = '03' THEN '03'
+            WHEN (bo.BID_MODLE IN ('01', '02') AND brt.TOTAL_WIN_ID IS NULL) THEN '02'
+            ELSE '05'
             END AS firstBidStatus,
             ee.FINPROD_ID finprodId,
             fp.FINPROD_MARKET_ID finprodMarketId,
@@ -242,18 +304,25 @@
             ee.TRADE_MARKET tradeMarket,
             ee.PS ps,
             CASE
-            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            nvl(fpi.ISSUE_DATE,fpi.TENDER_EDATE)
+            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN nvl(fpi.ISSUE_DATE, fpi.TENDER_SDATE)
             ELSE fpi.ISSUE_DATE
-            END AS issueDate,
+            END AS issueDateStart,
+            CASE
+            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN nvl(fpi.ISSUE_DATE, fpi.TENDER_EDATE)
+            ELSE fpi.ISSUE_DATE
+            END AS issueDateEnd,
             ee.ENTRUST_NUM/100 totalBiddingNum,
-            CASE WHEN  fpi.ISSUE_CLASS = '01' THEN
-                case
-                when fp.COUPON_SPECIES = '01' AND  fpi.INT_TYPE = '02' THEN
-                SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 ,'FM9999999999999990.9000') || ' BP'
-                else to_char(fpi.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
-                end
-            ELSE T1.BID_PRICE
+            CASE
+            WHEN fpi.ISSUE_CLASS = '01' THEN
+            CASE
+            WHEN fp.COUPON_SPECIES = '01'
+            AND fpi.INT_TYPE = '02' THEN SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 , 'FM9999999999999990.90') || ' BP'
+            ELSE to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9000') || ' %'
+            END
+            WHEN  fpi.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
+            WHEN  fpi.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
+            WHEN  fpi.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
+            ELSE bobp.BID_PRICE
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
@@ -270,8 +339,6 @@
             mcp.COUNTER_NAME counterName,
             nextUser.userName AS approver,
             ee.REMARK remark,
-            case when fpi.ISSUE_DATE is null then to_char(fpi.TENDER_SDATE,'yyyy-mm-dd') || '~' || to_char(fpi.TENDER_EDATE,'yyyy-mm-dd')
-            else to_char(fpi.ISSUE_DATE,'yyyy-mm-dd') end as issueDateStr,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
             TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
@@ -300,13 +367,26 @@
         and t1.TRADE_STATUS != '03'
         group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
-        LEFT JOIN (
-            SELECT
-                LISTAGG(BID_PRICE, ',') WITHIN GROUP (ORDER BY (BID_PRICE)) BID_PRICE,
-                ENTRUST_ID
-            FROM WFL_ETR_ENTRUST_BID_PRICE
-            GROUP BY ENTRUST_ID
-        ) T1 ON T1.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN
+            (select listagg(case
+            when t3.TENDER_TARGET = '01'
+            then to_char(t0.BID_PRICE * 100, 'FM99990.9990')
+            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM99990.9990')
+            when t3.TENDER_TARGET = '03'
+            then to_char(t0.BID_PRICE * 10000, 'FM99990.90')
+            end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
+            t0.ENTRUST_ID
+            from WFL_ETR_ENTRUST_BID_PRICE t0
+            LEFT JOIN WFL_ETR_ENTRUST t1 on t1.ENTRUST_ID = t0.ENTRUST_ID
+            LEFT JOIN FIN_PRODUCT t2
+            ON t2.FINPROD_ID = t1.FINPROD_ID
+            LEFT JOIN
+            FIN_PRODUCT_ISSUE t3
+            ON t3.FINPROD_ID = t2.FINPROD_ID
+            group by t0.ENTRUST_ID) bobp
+        ON bobp.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN WFL_BID_ORDER bo ON bo.FINPROD_ID  = fp.FINPROD_ID AND bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+        LEFT JOIN WFL_BID_RESULT_TOTAL brt ON brt.FINPROD_ID = fp.FINPROD_ID AND brt.BID_ID  = bo.BID_ID AND brt.STATUS = '01'
         LEFT JOIN (
             SELECT
                 LISTAGG(eed.PORTFOLIO_ID, ',') WITHIN GROUP (ORDER BY (eed.PORTFOLIO_ID)) PORTFOLIO_ID,
