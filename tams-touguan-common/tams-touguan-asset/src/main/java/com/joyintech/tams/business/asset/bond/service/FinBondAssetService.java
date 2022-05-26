@@ -1577,8 +1577,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             newPathFile.mkdir();
         }
         File folder = new SafelyFile(newPathFile,newfileName);
-        folder.getParentFile().mkdirs();
-        folder.createNewFile();
+        if (!folder.getParentFile().exists())
+            folder.getParentFile().mkdirs();
+        if (!folder.exists())
+            folder.createNewFile();
         FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
         SysUploadFileInfo fileInfo = new SysUploadFileInfo();
         String uuid = UUID.randomUUID().toString().replace("-", "");
