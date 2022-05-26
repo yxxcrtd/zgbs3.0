@@ -295,11 +295,13 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //type8
         finProductType.setType8(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         //取债券资料表系统债券类型
-        finProductType.setType9(finProductTypeConfig.getInputValue2());
-        //取债券资料表系统债券类型2
-        finProductType.setType10(finProductTypeConfig.getInputValue3());
-        finProductType.setType11(finProductTypeConfig.getInputValue4());
-        finProductType.setType12(finProductTypeConfig.getInputValue5());
+        if(Objects.nonNull(finProductTypeConfig)){
+            finProductType.setType9(finProductTypeConfig.getInputValue2());
+            //取债券资料表系统债券类型2
+            finProductType.setType10(finProductTypeConfig.getInputValue3());
+            finProductType.setType11(finProductTypeConfig.getInputValue4());
+            finProductType.setType12(finProductTypeConfig.getInputValue5());
+        }
         baseFinProductBaseInfoDto.setFinProductType(finProductType);
         baseFinProductBaseInfoList.add(baseFinProductBaseInfoDto);
         interfPayhsrcsecinfoDto.setBaseFinProductBaseInfoList(baseFinProductBaseInfoList);
