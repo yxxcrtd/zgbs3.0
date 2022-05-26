@@ -438,7 +438,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
                     bean = new PositionRequestBaseBean(item);
                     // 券面总额 指令.指令数量*100
                     bean.setCashAmount(null);
-                    BigDecimal secAmount = item.getEntrustNum().multiply(BigDecimal.valueOf(100).setScale(2,RoundingMode.HALF_UP));
+                    BigDecimal secAmount = item.getEntrustNum().multiply(BigDecimal.valueOf(100)).setScale(2,RoundingMode.HALF_UP);
                     bean.setSecAmount(secAmount);
 
                     Map<String, Object> map = BeanUtil.object2Map(bean);
