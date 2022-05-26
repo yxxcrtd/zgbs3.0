@@ -1093,7 +1093,7 @@ public class PortfolioManager extends BaseService {
             BigDecimal entrustVolume = portfolioDetailMap.values().stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
             if (TradeUtils.lessThan(entrustVolume, minStep)) {
                 // 小于最小交易单位时的处理，置为1
-                entrustVolume = BigDecimal.ZERO;
+                entrustVolume = BigDecimal.ONE;
             } else {
                 // 大于等于最小交易单位时的处理，最小交易单位整数倍
                 entrustVolume = TradeUtils.subtractMod(entrustVolume, minStep);
