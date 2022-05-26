@@ -2,13 +2,16 @@ package com.joyintech.tams.business.asset.bond.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.background.component.common.pack.common.validation.annotation.NotEmpty;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 债券标的信息DTO
@@ -641,7 +644,12 @@ public class FinBondAssetResponse {
     }
 
     public String getConceptTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.概念标识, this.getConceptType());
+        List<String> conceptTypes = StringUtil.splitToList(null, this.getConceptType());
+        List<String> conceptTypeList = new ArrayList<>();
+        for (String conceptType: conceptTypes) {
+            conceptTypeList.add(SysDataUtil.getNameFromDataDict(DictCode.概念标识, conceptType));
+        }
+        return StringUtil.joinString(conceptTypeList,",");
     }
 
     public void setConceptTypeStr(String conceptTypeStr) {
