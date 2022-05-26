@@ -31,3 +31,6 @@ VALUES ('TenderBondSub', 'TenderBondSub002_btn_save', '01', '01', null, '保存'
 
 INSERT INTO SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID, ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG, PARENT_ELEMENT_ID)
 VALUES ('TenderBondSub', 'TenderBondSub002_btn_submit', '01', '01', null, '提交', 'system', null, sysdate, 'system', sysdate, 'C', 'CfetsTenderBondSubTab');
+
+INSERT INTO SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID, ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG, PARENT_ELEMENT_ID)
+VALUES ('TenderBondSub', 'TenderBondSub001_btn_receiveSingle', '01', '01', null, '接收', 'system', null, sysdate, 'system', sysdate, 'C', 'CfetsTenderBondSubTab');

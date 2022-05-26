@@ -43,6 +43,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -382,7 +384,13 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
         } else {
             param.put("declaTypeList", null);
         }
-        return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.selectEtrExchange(param));
+        //ZGCPCN-798
+        Page<EtrExchangeTradeEtrExchangeCommonResponse> page = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.selectEtrExchange(param));
+        List<EtrExchangeTradeEtrExchangeCommonResponse> root = page.getRoot();
+        List<EtrExchangeTradeEtrExchangeCommonResponse>  root2 = root.stream().filter(response -> !(StringUtil.equals(response.getEntrustStatus(), DictCodeList.委托状态_已关闭.getValue()) &&
+                StringUtil.equals(response.getPs(), DictCodeList.交易方向_行权_回售.getValue()))).collect(Collectors.toList());
+        page.setRoot(root2);
+        return page;
 //		return restTemplate.postForPage(ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/selectEtrExchange",
 //				param, EtrExchangeTrade003Dto.class);
     }

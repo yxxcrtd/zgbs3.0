@@ -343,11 +343,9 @@
             ri.RELEASE_TYPE as issueStyle,
             ri.ADDITIONAL_BATCHES as addBatch,
             nvl(pri.ISSUE_PX,ri.ISSUE_PX) as issuePrice,
-            case when (nvl(pri.ISSUE_METHOD,ri.ISSUING_METHOD)='01' and sec.VARIETY_OF_COUPONS='04')
-            or (nvl(pri.ISSUE_METHOD,ri.ISSUING_METHOD)='01' and sec.VARIETY_OF_COUPONS='04' and nvl(pri.BIDDING_METHOD,ri.BIDDING_METHOD)='02')
-            or (nvl(pri.ISSUE_METHOD,ri.ISSUING_METHOD)='01' and sec.VARIETY_OF_COUPONS='04' and sec.RATE_TYPE='01')
-            then nvl(pri.COUPON_RATE,ri.COUPON_RATE)
-            else nvl(pri.COUPON_RATE,ri.STIPULATION_VALUE) end as referYield,
+            case when (nvl(pri.ISSUE_METHOD,ri.ISSUING_METHOD)='01' and (sec.VARIETY_OF_COUPONS='02' or sec.VARIETY_OF_COUPONS='03'))
+            then nvl(pri.STIPULATION_VALUE,ri.STIPULATION_VALUE)
+            else nvl(pri.COUPON_RATE,ri.COUPON_RATE) end as referYield,
             nvl(pri.BENCHMARK_CURVE_NAME,ri.BENCHMARK_CURVE_NAME) as intRateId,
             nvl(pri.DECIMAL_PLACES,ri.DECIMAL_PLACES) as rateGrade,
             nvl(pri.SPREAD,ri.SPREAD) as bp,

@@ -25,6 +25,8 @@
         <result column="IS_COUNTER" property="isCounter" jdbcType="VARCHAR" />
         <result column="IS_BANK" property="isBank" jdbcType="VARCHAR" />
         <result column="IS_FUTURE_COM" property="isFutureCom" jdbcType="VARCHAR" />
+        <result column="IS_ORIGINAL_OWNER" property="isOriginalOwner" jdbcType="VARCHAR" />
+
     </resultMap>
     <sql id="Base_Column_List" >
         CUSTOMER_ID CUSTOMER_ID, CUSTOMER_NAME CUSTOMER_NAME, CUSTOMER_ABBR CUSTOMER_ABBR, 
@@ -33,7 +35,7 @@
         IS_RATING_AGENCIES IS_RATING_AGENCIES, IS_PLEDGOR IS_PLEDGOR, IS_DEPOSIT_BANK IS_DEPOSIT_BANK, 
         IS_INVEST_ADVISER IS_INVEST_ADVISER, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, 
         CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, IS_BROKER IS_BROKER, 
-        IS_COUNTER IS_COUNTER, IS_BANK IS_BANK, IS_FUTURE_COM IS_FUTURE_COM
+        IS_COUNTER IS_COUNTER, IS_BANK IS_BANK, IS_FUTURE_COM IS_FUTURE_COM,IS_ORIGINAL_OWNER IS_ORIGINAL_OWNER
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -63,7 +65,7 @@
             IS_DEPOSIT_BANK, IS_INVEST_ADVISER, CREATE_USER, 
             CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
             UPDATE_TIME, IS_BROKER, IS_COUNTER, 
-            IS_BANK, IS_FUTURE_COM)
+            IS_BANK, IS_FUTURE_COM,IS_ORIGINAL_OWNER)
         values (#{customerId,jdbcType=VARCHAR}, #{customerName,jdbcType=VARCHAR}, #{customerAbbr,jdbcType=VARCHAR}, 
             #{customerType,jdbcType=VARCHAR}, #{isIssuer,jdbcType=VARCHAR}, #{isAssteManager,jdbcType=VARCHAR}, 
             #{isTruster,jdbcType=VARCHAR}, #{isSaler,jdbcType=VARCHAR}, #{isFinancier,jdbcType=VARCHAR}, 
@@ -71,7 +73,7 @@
             #{isDepositBank,jdbcType=VARCHAR}, #{isInvestAdviser,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
             #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
             #{updateTime,jdbcType=TIMESTAMP}, #{isBroker,jdbcType=VARCHAR}, #{isCounter,jdbcType=VARCHAR}, 
-            #{isBank,jdbcType=VARCHAR}, #{isFutureCom,jdbcType=VARCHAR})
+            #{isBank,jdbcType=VARCHAR}, #{isFutureCom,jdbcType=VARCHAR}, #{isOriginalOwner,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.MstCustomerInfo" >
         insert into MST_CUSTOMER_INFO
@@ -145,6 +147,9 @@
             <if test="isFutureCom != null" >
                 IS_FUTURE_COM,
             </if>
+            <if test="isOriginalOwner != null" >
+                IS_ORIGINAL_OWNER,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="customerId != null" >
@@ -216,17 +221,21 @@
             <if test="isFutureCom != null" >
                 #{isFutureCom,jdbcType=VARCHAR},
             </if>
+            <if test="isOriginalOwner != null" >
+                #{isOriginalOwner,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.MstCustomerInfo" >
         insert into MST_CUSTOMER_INFO(CUSTOMER_ID, CUSTOMER_NAME, CUSTOMER_ABBR, CUSTOMER_TYPE, 
         IS_ISSUER, IS_ASSTE_MANAGER, IS_TRUSTER, IS_SALER, IS_FINANCIER, IS_GUARANTEE, IS_RATING_AGENCIES, 
         IS_PLEDGOR, IS_DEPOSIT_BANK, IS_INVEST_ADVISER, CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-        UPDATE_USER, UPDATE_TIME, IS_BROKER, IS_COUNTER, IS_BANK, IS_FUTURE_COM)
+        UPDATE_USER, UPDATE_TIME, IS_BROKER, IS_COUNTER, IS_BANK, IS_FUTURE_COM,IS_ORIGINAL_OWNER)
         select CUSTOMER_ID, CUSTOMER_NAME, CUSTOMER_ABBR, CUSTOMER_TYPE, 
             IS_ISSUER, IS_ASSTE_MANAGER, IS_TRUSTER, IS_SALER, IS_FINANCIER, IS_GUARANTEE, IS_RATING_AGENCIES, 
             IS_PLEDGOR, IS_DEPOSIT_BANK, IS_INVEST_ADVISER, CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-            #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, IS_BROKER, IS_COUNTER, IS_BANK, IS_FUTURE_COM
+            #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, IS_BROKER,
+            IS_COUNTER, IS_BANK, IS_FUTURE_COM,IS_ORIGINAL_OWNER
              from MST_CUSTOMER_INFO
              where 1 = 1 and CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}
     </insert>
@@ -290,6 +299,9 @@
             <if test="isFutureCom != null" >
                 IS_FUTURE_COM = #{isFutureCom,jdbcType=VARCHAR},
             </if>
+            <if test="isOriginalOwner != null" >
+                IS_ORIGINAL_OWNER = #{isOriginalOwner,jdbcType=VARCHAR},
+            </if>
         </set>
         where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}
     </update>
@@ -313,7 +325,8 @@
             IS_BROKER = #{isBroker,jdbcType=VARCHAR},
             IS_COUNTER = #{isCounter,jdbcType=VARCHAR},
             IS_BANK = #{isBank,jdbcType=VARCHAR},
-            IS_FUTURE_COM = #{isFutureCom,jdbcType=VARCHAR}
+            IS_FUTURE_COM = #{isFutureCom,jdbcType=VARCHAR},
+            IS_ORIGINAL_OWNER = #{isOriginalOwner,jdbcType=VARCHAR}
         where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}
     </update>
 </mapper>

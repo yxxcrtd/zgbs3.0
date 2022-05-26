@@ -1263,8 +1263,6 @@ public class TrdCommonBaseService extends BaseService {
         // 关联交易编号
         String fTradeId = (String) paraMap.get("fTradeId");
 
-        String interfaceType = MapUtils.getString(paraMap, "interfaceType", "");
-
         if(!StringUtil.isEmpty(dealNo)){
             // 查询关联交易编号
             fTradeId = trdCommonBaseMapper.selectFTradeId(dealNo);
@@ -1295,9 +1293,9 @@ public class TrdCommonBaseService extends BaseService {
             return new ArrayList<>();
         }
         if(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(etrEntrust.getEntrustClass())){ // 多组合指令
-            portfolioDtos = this.handleMultiPortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面, interfaceType);
+            portfolioDtos = this.handleMultiPortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
         }else{ // 单组合指令
-            portfolioDtos = this.handleSinglePortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面, interfaceType);
+            portfolioDtos = this.handleSinglePortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
         }
         logger.debug("【组合计算分配结果】portfolioDtos: {}", JSON.toJSONString(portfolioDtos));
         return portfolioDtos;
@@ -1314,8 +1312,7 @@ public class TrdCommonBaseService extends BaseService {
      */
     private List<PortfolioCalculateDto> handleMultiPortfolioEntrust(InfContractDetailfile infContractDetailfile,
                                                                     List<InfContractPortfolioDetail> portfolioDetails,
-                                                                    EtrEntrust etrEntrust, BigDecimal converseRadio, BigDecimal 百元券面,
-                                                                    String interfaceType){
+                                                                    EtrEntrust etrEntrust, BigDecimal converseRadio, BigDecimal 百元券面){
         List<PortfolioCalculateDto> portfolioDtos = new ArrayList<>();
         List<EtrEntrustDetail> etrEntrustDetails = trdCommonBaseMapper.selectEtrEntrustDetailByEntrustId(etrEntrust.getEntrustId());
         Map<String, EtrEntrustDetail> etrPortfolioMap = etrEntrustDetails.stream()
@@ -1333,9 +1330,9 @@ public class TrdCommonBaseService extends BaseService {
             portfolioDto.setOrderId(infContractDetailfile.getOrderId());
             if(DictCodeListExt3.目标类型_数量.getValue().equals(portfolioDetail.getTargetType())){
                 // 指令券面总额
-                if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())){
+                if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())) {
                     portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), new BigDecimal(100)));
-                }else{
+                } else {
                     portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum()));
                 }
             }else{
@@ -1344,22 +1341,18 @@ public class TrdCommonBaseService extends BaseService {
             }
             // 交易金额
             portfolioDto.setCashAmount(portfolioDetail.getTradeAmt());
-            if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())){
+            if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
+                    || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(etrEntrust.getFinprodType2())
+                    || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())) {
+                // 券面总额
+                portfolioDto.setSecAmount(ArithmeticUtil.multiply(portfolioDetail.getShareAmt(), new BigDecimal(100)));
+                // 下单券面总额
+                portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustNum(), new BigDecimal(100)));
+            }else{
                 // 券面总额
                 portfolioDto.setSecAmount(portfolioDetail.getShareAmt());
                 // 下单券面总额
                 portfolioDto.setOrdSecAmount(portfolioDetail.getEntrustNum());
-            }else{
-                // 券面总额
-                portfolioDto.setSecAmount(portfolioDetail.getShareAmt());
-                // ZGCPCN-635 : 质押式通用回购,指令的委托数量应为金额的概念，现在数据库落地的ETR_ENTRUST.entrustNum还是张的概念。修改取值字段。
-                if (interfaceType.equals(INTERF_TYPE_REPO003)) {
-                    // 下单券面总额
-                    portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustAmt()));
-                } else {
-                    // 下单券面总额
-                    portfolioDto.setOrdSecAmount(portfolioDetail.getEntrustNum());
-                }
             }
             // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 start
             // 本方券面总额
@@ -1387,8 +1380,7 @@ public class TrdCommonBaseService extends BaseService {
      */
     private List<PortfolioCalculateDto> handleSinglePortfolioEntrust(InfContractDetailfile infContractDetailfile,
                                                                     List<InfContractPortfolioDetail> portfolioDetails,
-                                                                    EtrEntrust etrEntrust, BigDecimal converseRadio, BigDecimal 百元券面,
-                                                                    String interfaceType){
+                                                                    EtrEntrust etrEntrust, BigDecimal converseRadio, BigDecimal 百元券面){
         List<PortfolioCalculateDto> portfolioDtos = new ArrayList<>();
         InfContractPortfolioDetail portfolioDetail = portfolioDetails.get(0);
         PortfolioCalculateDto portfolioDto = new PortfolioCalculateDto();
@@ -1402,7 +1394,9 @@ public class TrdCommonBaseService extends BaseService {
         portfolioDto.setOrderId(infContractDetailfile.getOrderId());
         // 交易金额
         portfolioDto.setCashAmount(infContractDetailfile.getTradeAmt());
-        if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())){
+        if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
+                || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(etrEntrust.getFinprodType2())
+                || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())){
             // 指令券面总额
             portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), new BigDecimal(100)));
             // 下单券面总额
@@ -1412,18 +1406,10 @@ public class TrdCommonBaseService extends BaseService {
             // 本方券面总额
             portfolioDto.setOwnSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
         }else{
-            // ZGCPCN-635 : 质押式通用回购,指令的委托数量应为金额的概念，现在数据库落地的ETR_ENTRUST.entrustNum还是张的概念。修改取值字段。
-            if (interfaceType.equals(INTERF_TYPE_REPO003)) {
-                // 指令券面总额
-                portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustAmt()));
-                // 下单券面总额
-                portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustAmt()));
-            } else {
-                // 指令券面总额
-                portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum()));
-                // 下单券面总额
-                portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustNum()));
-            }
+            // 指令券面总额
+            portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum()));
+            // 下单券面总额
+            portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustNum()));
             // 券面总额
             portfolioDto.setSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt()));
             // 本方券面总额

@@ -97,9 +97,9 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     @Override
     public void doInsert(FinTenderBondAsset003Dto entity, OperationType type) {
         if (OperationType.REVOKE == type) {
-            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "上市流通撤销原因：" + entity.getRevokeReason(), DictCodeListExt3.操作类型_上市流通撤销);
+            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "上市流通撤销原因：" + entity.getRevokeReason(), DictCodeListExt3.操作类型_上市流通撤销,entity.getWorkflowId());
         } else {
-            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "", DictCodeListExt3.操作类型_上市流通);
+            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "", DictCodeListExt3.操作类型_上市流通,entity.getWorkflowId());
         }
         if (type == OperationType.REVOKE) return;
         Map<String, String> param = new HashMap();
@@ -329,7 +329,10 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 validMessages.add(new ValidMessage("发行阶段不为已发行的不能进行上市流通"));
             }
             if (Objects.nonNull(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(), DictCodeListExt1.发行状态_发行成功.getValue())) {
-                validMessages.add(new ValidMessage("发行状态为发行成功的不能再次进行上市流通"));
+                FinProduct product = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+                if(Objects.nonNull(product) && !StringUtil.isEmpty(product.getCirculationCode())) {
+                    validMessages.add(new ValidMessage("发行状态为发行成功的不能再次进行上市流通"));
+                }
             }
             if (Objects.nonNull(dto.getIssueDate()) && Objects.nonNull(dto.getListingDate()) && dto.getListingDate().compareTo(dto.getIssueDate()) < 0) {
                 validMessages.add(new ValidMessage("上市日需大于等于发行日"));
