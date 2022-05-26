@@ -281,7 +281,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //金融产品分类
         FinProductType finProductType = new FinProductType();
         finProductType.setFinprodId(finProdId);
-        finProductType.setBranch(0L);
+        finProductType.setBranch(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalBatches()) ? finListedBondInfoQuery001Dto.getAdditionalBatches().longValue() : 0L);
         //取债券资料表系统债券类型
         finProductType.setType4(finListedBondInfoQuery001Dto.getPrimaryClassification());
         //取债券资料表系统债券类型2
