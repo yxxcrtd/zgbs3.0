@@ -12,24 +12,7 @@ package com.joyintech.tams.component.business.common.dto;
 
 import java.util.List;
 
-import com.joyintech.tams.common.base.entity.FinCashCalcRule;
-import com.joyintech.tams.common.base.entity.FinCashInfo;
-import com.joyintech.tams.common.base.entity.FinCashPayRule;
-import com.joyintech.tams.common.base.entity.FinCashPlan;
-import com.joyintech.tams.common.base.entity.FinExercisePlan;
-import com.joyintech.tams.common.base.entity.FinExerciseRule;
-import com.joyintech.tams.common.base.entity.FinOpenPlan;
-import com.joyintech.tams.common.base.entity.FinOpenRule;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.FinProductAdd;
-import com.joyintech.tams.common.base.entity.FinProductType;
-import com.joyintech.tams.common.base.entity.FinRateInfo;
-import com.joyintech.tams.common.base.entity.JxsIssueInfo;
-import com.joyintech.tams.common.base.entity.MstBondCreditRating;
-import com.joyintech.tams.common.base.entity.RepAssetBond;
-import com.joyintech.tams.common.base.entity.RepAssetDept;
-import com.joyintech.tams.common.base.entity.RepAssetEquity;
-import com.joyintech.tams.common.base.entity.RepFund;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.report.dto.BaseRepAssetEquityInfoDto;
 
 /**
@@ -50,6 +33,11 @@ public class BaseFinProductBaseInfoDto {
      * 金融产品附属表entity
      */
     private FinProductAdd finProductAdd;
+    /**
+     * 金融产品发行信息
+     */
+    private FinProductIssue finProductIssue;
+
     /**
      * 金融产品分类表entity
      */
@@ -393,4 +381,12 @@ public class BaseFinProductBaseInfoDto {
 	public void setRepAssetEquity(RepAssetEquity repAssetEquity) {
 		this.repAssetEquity = repAssetEquity;
 	}
+
+    public FinProductIssue getFinProductIssue() {
+        return finProductIssue;
+    }
+
+    public void setFinProductIssue(FinProductIssue finProductIssue) {
+        this.finProductIssue = finProductIssue;
+    }
 }

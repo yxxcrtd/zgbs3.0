@@ -44,6 +44,7 @@ import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecRequest;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecSingleResp;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -392,7 +393,7 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setPriceMode(instruction.getPriceMode());
             calculateResponse.setAcctNo(instruction.getAcctName());
 
-            calculateResponse.setEtrSecAmount(instruction.getEntrustAmt());
+            calculateResponse.setEtrSecAmount(detail.getEntrustAmt());
 
             PortfolioDetail portfolioDetail = portfolioDetailMap.get(portfolioId);
             if (ObjectUtil.isNotNull(portfolioDetail)) {
@@ -710,6 +711,12 @@ public class PortfolioManager extends BaseService {
                 }
             }
 
+            //市价模式取传入价格
+            if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.bigThanZero(entrustPrice)) {
+                adjustedPrice = entrustPrice;
+                result.setPrice(adjustedPrice);
+            }
+
             // 提示：“委托价格必须优于所有指令价格”
             if (adjustedPrice.compareTo(entrustPrice) != 0) {
                 // 首次调用，特殊处理
@@ -723,18 +730,23 @@ public class PortfolioManager extends BaseService {
         } else if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
             // 02时，剔除该指令并继续时
             BigDecimal orderPrice = adjustedPrice;
+            BigDecimal filterPrice = null;
             for (Instruction ins : tempList) {
                 if (EntrustUtils.isMarketPrice(ins)) {
                     continue;
                 }
+                filterPrice = ins.getEntrustPrice();
+                if (StringUtil.isNotEmpty(ins.getIsNetPrice()) && StringUtil.equals(ins.getIsNetPrice(), "N")) {
+                    filterPrice = ins.getFullPrice();
+                }
                 if (EntrustBs.isBuy(entrustBs)) {
                     // 买入，过滤价格小于指令价格的指令
-                    if (ins.getEntrustPrice().compareTo(orderPrice) < 0) {
+                    if (filterPrice.compareTo(orderPrice) < 0) {
                         ins.setEntrustClass(是否_否.getValue());
                     }
                 } else {
                     // 卖出，过滤价格大于指令价格的指令
-                    if (ins.getEntrustPrice().compareTo(orderPrice) > 0) {
+                    if (filterPrice.compareTo(orderPrice) > 0) {
                         ins.setEntrustClass(是否_否.getValue());
                     }
                 }
@@ -1041,7 +1053,7 @@ public class PortfolioManager extends BaseService {
             }
 
             //单组合
-            if (Objects.isNull(instructionDetails) || instructionDetails.size() == 0 || instructionDetails.size() == 1) {
+            if (CollectionUtils.isEmpty(instructionDetails) || instructionDetails.size() == 1) {
                 // 数量
                 if (TradeUtils.bigThanZero(orderVolume)) {
                     if (TradeUtils.lessThan(orderVolume, minStep)) {
@@ -1079,6 +1091,13 @@ public class PortfolioManager extends BaseService {
             Map<String, PortfolioDetail> portfolioDetailMap = (Map<String, PortfolioDetail>) assignResult.getData();
             //组合分配总数量
             BigDecimal entrustVolume = portfolioDetailMap.values().stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (TradeUtils.lessThan(entrustVolume, minStep)) {
+                // 小于最小交易单位时的处理，置为1
+                entrustVolume = BigDecimal.ONE;
+            } else {
+                // 大于等于最小交易单位时的处理，最小交易单位整数倍
+                entrustVolume = TradeUtils.subtractMod(entrustVolume, minStep);
+            }
 
             // 单指令多组合扩展列表
             List<FairPortfolioResponse> singleList = new ArrayList<>();
@@ -1093,15 +1112,18 @@ public class PortfolioManager extends BaseService {
                 if (TradeUtils.bigThanZero(orderVolume)) {
                     PortfolioDetail portfolioDetail = portfolioDetailMap.get(detail.getPortfolioId());
                     if (ObjectUtil.isNotNull(portfolioDetail)) {
-//                    copyInstruction.setEntrustNum(portfolioDetail.getTargetNum().longValue());
-//                    copyInstruction.setEntrustAmt(portfolioDetail.getTargetAmt());
-//                    if (!isVolume) {
-//                        copyInstruction.setEntrustPrice(result.getPrice());
-//                    } else {
-//                        copyInstruction.setEntrustPrice(NumberUtil.div(copyInstruction.getEntrustAmt(), copyInstruction.getEntrustNum()));
-//                    }
-
-                        copyInstruction.setConNum(portfolioDetail.getTargetNum());
+                        BigDecimal targetNum = portfolioDetail.getTargetNum();
+                        // 数量
+                        if (TradeUtils.bigThanZero(targetNum)) {
+                            if (TradeUtils.lessThan(targetNum, minStep)) {
+                                // 小于最小交易单位时的处理，置为0
+                                targetNum = BigDecimal.ZERO;
+                            } else {
+                                // 大于等于最小交易单位时的处理，最小交易单位整数倍
+                                targetNum = TradeUtils.subtractMod(targetNum, minStep);
+                            }
+                        }
+                        copyInstruction.setConNum(targetNum);
                     } else {
                         copyInstruction.setConNum(BigDecimal.ZERO);
                         log.error(">>>>>>公平交易组合分配不存在：instructionId={},portfolioId={}", detail.getEntrustId(), detail.getPortfolioId());
@@ -1124,6 +1146,10 @@ public class PortfolioManager extends BaseService {
                 singleList.add(copyInstruction);
             }
 
+            for (FairPortfolioResponse item : singleList) {
+                handleFields(result, item);
+            }
+
             list.addAll(singleList);
         }
 
@@ -1136,11 +1162,13 @@ public class PortfolioManager extends BaseService {
         }
 
         // 特殊处理 质押式回购交易，委托金额=委托数量*100
-        FairPortfolioResponse response = list.get(0);
-        if (EntrustUtils.isPledgeRepurchase(response.getInstruction())) {
-            result.setTotalEntrustAmt(BigDecimal.valueOf(100L).multiply(BigDecimal.valueOf(sumEntrustVolume)));
-        } else {
-            result.setTotalEntrustAmt(result.getPrice().multiply(BigDecimal.valueOf(sumEntrustVolume)));
+        if (CollectionUtils.isNotEmpty(list)) {
+            FairPortfolioResponse response = list.get(0);
+            if (EntrustUtils.isPledgeRepurchase(response.getInstruction())) {
+                result.setTotalEntrustAmt(BigDecimal.valueOf(100L).multiply(BigDecimal.valueOf(sumEntrustVolume)));
+            } else {
+                result.setTotalEntrustAmt(result.getPrice().multiply(BigDecimal.valueOf(sumEntrustVolume)));
+            }
         }
 
         return list;

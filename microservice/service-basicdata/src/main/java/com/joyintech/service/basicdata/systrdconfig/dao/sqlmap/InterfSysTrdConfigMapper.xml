@@ -620,7 +620,7 @@
         from FIN_EXERCISE_PLAN
         where
             FINPROD_ID = #{finprodId}
-            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE}
+            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE} and EXERCISE_TYPE in ('01','02')
     </select>
 
 

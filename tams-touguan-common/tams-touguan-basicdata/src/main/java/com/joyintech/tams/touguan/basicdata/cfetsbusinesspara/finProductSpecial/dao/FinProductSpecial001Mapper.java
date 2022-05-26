@@ -44,13 +44,21 @@ public interface FinProductSpecial001Mapper {
 
 
     /**
-     * 判断金融产品代码是否使用过
+     * 判断金融产品代码当日是否使用过
      *
      * @param finprodId
      * @param iPlatformDate
      * @return
      */
-    int countFinprodIdProcessing(@Param("finprodId") String finprodId, @Param("iPlatformDate") String iPlatformDate);
+    int countFinprodIdProcessingAndDate(@Param("finprodId") String finprodId, @Param("iPlatformDate") String iPlatformDate);
+
+    /**
+     * 判断金融产品代码是否使用过
+     *
+     * @param finprodId
+     * @return
+     */
+    int countFinprodIdProcessing(@Param("finprodId") String finprodId);
 
     /**
      * 接口表简单数据查询

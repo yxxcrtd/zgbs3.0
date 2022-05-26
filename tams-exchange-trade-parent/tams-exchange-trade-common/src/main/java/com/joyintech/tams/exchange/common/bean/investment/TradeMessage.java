@@ -282,7 +282,7 @@ public class TradeMessage extends BasicMessage {
             tradeMessage.setOrderId(trade.getEntrustId());
             tradeMessage.setEntrustNo(trade.getBrokerEntrustId());
             tradeMessage.setDealNo(trade.getBrokerTradeId());
-            tradeMessage.setAcctNo(trade.getFinanceAccount());
+            tradeMessage.setAcctNo(entrust.getAccountId());
             tradeMessage.setFinprodMarketId(trade.getStockCode());
             tradeMessage.setDealVolume((double) trade.getTradedVolume());
             tradeMessage.setDealPrice(trade.getTradedPrice());

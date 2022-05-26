@@ -1,12 +1,10 @@
 package com.joyintech.tams.business.asset.bond.service;
 
-import com.github.pagehelper.PageInfo;
 import com.joyintech.calculation.bonds.constant.Variety;
 import com.joyintech.calculation.shell.PriceByYieldCalculator;
 import com.joyintech.calculation.shell.YieldByPriceCalculator;
 import com.joyintech.calculation.shell.param.*;
 import com.joyintech.framework.ajax.AjaxResult;
-import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.file.SafelyFile;
@@ -15,13 +13,11 @@ import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
-import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -29,7 +25,6 @@ import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
 import com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto;
 import com.joyintech.tams.component.business.basicdata.dto.BusiFinProductRatingDto;
 import com.joyintech.tams.component.business.basicdata.service.BusiProductRatingService;
-import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
 import com.joyintech.tams.component.business.bond.dto.BusiFinExercisePlanDto;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
@@ -57,6 +52,8 @@ import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -79,6 +76,8 @@ import java.util.*;
  */
 @Service
 public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> implements BaseProcessService<FinBondAssetSaveRequest>{
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private CommonAutoCouponService commonAutoService;
@@ -201,7 +200,11 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (StringUtil.equals(entity.getIsAddSec(),DictCodeList.是否_是.getValue())) {
             updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_债券自动加券.getValue());
         }else{
-            updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT);
+            if (OperationType.NEW.equals(type)) {
+                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT);
+            }else{
+                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE);
+            }
         }
     }
 
@@ -211,8 +214,11 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     }
 
     @Override
-    public void doBack(FinBondAssetSaveRequest entity) {
-        updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_DOBACK);
+    public void doDelete(String workflowId){
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setWorkflowId(workflowId);
+        oprHisReq.setBusiDes("作废");
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
     /**
@@ -516,6 +522,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
                 bondFinProductIssueDto.setListingDate(finProduct.getCirculationDate());
                 bondFinProductIssueDto.setFinprodMarketId(finProduct.getFinprodMarketId());
+                bondFinProductIssueDto.setFinprodAbbr(finProduct.getFinprodAbbr());
                 finProductIssueList.add(bondFinProductIssueDto);
             }
             dto.setFinProductIssueList(finProductIssueList);
@@ -1576,8 +1583,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (!newPathFile.exists()){
             newPathFile.mkdir();
         }
+        logger.info("创建文件路径："+newPath+",文件名称："+newfileName);
         File folder = new SafelyFile(newPathFile,newfileName);
-        folder.createNewFile();
+        if (!folder.getParentFile().exists())
+            folder.getParentFile().mkdirs();
+        if (!folder.exists())
+            folder.createNewFile();
         FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
         SysUploadFileInfo fileInfo = new SysUploadFileInfo();
         String uuid = UUID.randomUUID().toString().replace("-", "");

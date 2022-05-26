@@ -1,13 +1,13 @@
 package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
@@ -20,6 +20,7 @@ import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecial001Service;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecialValidatorService;
+import com.joyintech.workflow.engine.constant.OperationType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
@@ -65,7 +66,6 @@ public class FinProductSpecial001Controller extends BaseController {
         Map<String, Object> model = new HashMap<>(1);
         model.put("pageId", this.getPageId());
         model.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
-        model.put("EXCEL_TEMPLATE_URL", "");
 
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
         FinProductSpecialDto entity = new FinProductSpecialDto();
@@ -115,9 +115,14 @@ public class FinProductSpecial001Controller extends BaseController {
         if (result != null && result.hasErrors()) {
             return new Message<AjaxResult>().success().setData(new AjaxResult(result));
         }
-        List<ValidMessage> valid = finProductSpecialValidatorService.valid(dto);
-        if (CollectionUtils.isNotEmpty(valid)) {
-            return Message.fail(ValidUtils.getValidMessage(valid));
+        AjaxResult ajaxResult = finProductSpecialValidatorService.validCustom(dto);
+
+        if (CollectionUtils.isNotEmpty(ajaxResult.getErrorList())) {
+            if (MessageType.错误消息.getCode().equals(ajaxResult.getMessageType())) {
+                return Message.fail(ValidUtils.getValidMessage(ajaxResult.getErrorList()));
+            } else {
+                return Message.success("校验失败", ajaxResult);
+            }
         } else {
             return Message.success("校验成功", null);
         }

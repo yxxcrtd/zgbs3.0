@@ -1,5 +1,6 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
@@ -587,6 +588,7 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.schecalRule = schecalRule;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getFirstConfirmDate() {
         return firstConfirmDate;
     }
@@ -668,6 +670,7 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.optionType = optionType;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getTheOryOptionPayDay() {
         return theOryOptionPayDay;
     }

@@ -254,7 +254,12 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
         /*if ((DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue()).equals(resultMap.get(DELIVERY_TYPE))&&(DictCodeListExt1.交易场所_深圳证券交易所.getValue()).equals(resultMap.get(TRADE_PLACE))) {//头寸引擎深交所RTGS都是大宗交易
             resultMap.put(SHARES_TRADE_PLATFORM, DictCodeList.交易平台_大宗交易平台.getValue());
         }*/
-        resultMap.put(SHARES_TRADE_PLATFORM, entity.getTradePlat());
+        //头寸交易系统无03 枚举，仅有02，04数据字典。（02：竞价交易，04：大宗交易）
+        if(StringUtil.isNotEmpty(entity.getTradePlat())&&(StringUtil.equals(交易平台_竞价撮合平台.getValue(),entity.getTradePlat())||StringUtil.equals(交易平台_大宗交易平台.getValue(),entity.getTradePlat()))){
+            resultMap.put(SHARES_TRADE_PLATFORM, entity.getTradePlat());
+        }else{
+            resultMap.put(SHARES_TRADE_PLATFORM, null);
+        }
         resultMap.put(SETTLE_SPEED, commonPositionEngineService.parseSettleSpreed((String) resultMap.get(DELIVERY_TYPE)));
 
         String ps = entity.getPs();
@@ -438,7 +443,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
                     bean = new PositionRequestBaseBean(item);
                     // 券面总额 指令.指令数量*100
                     bean.setCashAmount(null);
-                    BigDecimal secAmount = item.getEntrustNum().multiply(BigDecimal.valueOf(100).setScale(2,RoundingMode.HALF_UP));
+                    BigDecimal secAmount = item.getEntrustNum().multiply(BigDecimal.valueOf(100)).setScale(2,RoundingMode.HALF_UP);
                     bean.setSecAmount(secAmount);
 
                     Map<String, Object> map = BeanUtil.object2Map(bean);

@@ -90,13 +90,23 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
 
 
     /**
-     * 判断金融产品代码是否使用过
+     * 判断金融产品代码当日是否使用过
+     *
+     * @param finprodId
+     * @return
+     */
+    public Integer countFinprodIdProcessingAndDate(String finprodId) {
+        return finProductSpecial001Mapper.countFinprodIdProcessingAndDate(finprodId, iPlatformDate.getSysDateStr());
+    }
+
+    /**
+     * 判断金融产品代码当日是否使用过
      *
      * @param finprodId
      * @return
      */
     public Integer countFinprodIdProcessing(String finprodId) {
-        return finProductSpecial001Mapper.countFinprodIdProcessing(finprodId, iPlatformDate.getSysDateStr());
+        return finProductSpecial001Mapper.countFinprodIdProcessing(finprodId);
     }
 
     @Override

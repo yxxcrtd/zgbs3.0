@@ -17,7 +17,7 @@ insert into cfg_datatable_show (PAGECODE, DTCODE,SPCDCODE, COLCODE, COLNAME, DIC
 
 delete from SYS_PAGE where PAGE_ID IN （'CfetsBasicInfo001','CfetsBasicInfo002');
 INSERT INTO SYS_PAGE ("PAGE_ID", "SYSTEM_CODE", "PAGE_URL", "PAGE_FILE", "MENU_ID", "HEIGHT", "WIDTH", "IS_HP_SELECT", "IS_NEED_WORKFLOW", "REMARK", "CREATE_USER", "CREATE_DEPT",  "CREATE_TIME", "UPDATE_USER", "UPDATE_TIME") VALUES ('CfetsBasicInfo001', 'ETR', '/home.html#/interbank/basic-info?a=a', 'vue', 'BUSINESS_PARA_MANAGEMENT_001_001_005', NULL, NULL, '02', '01', '银行间基础信息-特殊债券信息', 'system', NULL, SYSDATE, 'system', SYSDATE);
-INSERT INTO SYS_PAGE ("PAGE_ID", "SYSTEM_CODE", "PAGE_URL", "PAGE_FILE", "MENU_ID", "HEIGHT", "WIDTH", "IS_HP_SELECT", "IS_NEED_WORKFLOW", "REMARK", "CREATE_USER", "CREATE_DEPT",  "CREATE_TIME", "UPDATE_USER", "UPDATE_TIME") VALUES ('CfetsBasicInfo002', 'ETR', '/home.html#/approve/interbank/basic-info?a=a', 'vue', 'BUSINESS_PARA_MANAGEMENT_001_001_005', NULL, NULL, '02', '01', '银行间基础信息-特殊债券信息', 'system', NULL, SYSDATE, 'system', SYSDATE);
+INSERT INTO SYS_PAGE ("PAGE_ID", "SYSTEM_CODE", "PAGE_URL", "PAGE_FILE", "MENU_ID", "HEIGHT", "WIDTH", "IS_HP_SELECT", "IS_NEED_WORKFLOW", "REMARK", "CREATE_USER", "CREATE_DEPT",  "CREATE_TIME", "UPDATE_USER", "UPDATE_TIME") VALUES ('CfetsBasicInfo002', 'ETR', '/home.html?a=a#/approve/interbank/basic-info?a=a', 'vue', 'BUSINESS_PARA_MANAGEMENT_001_001_005', NULL, NULL, '02', '01', '银行间基础信息-特殊债券信息', 'system', NULL, SYSDATE, 'system', SYSDATE);
 
 --SYS_PAGE_ELEMENT配置
 DELETE FROM SYS_PAGE_ELEMENT WHERE PAGE_ID= 'CfetsBasicInfo001';

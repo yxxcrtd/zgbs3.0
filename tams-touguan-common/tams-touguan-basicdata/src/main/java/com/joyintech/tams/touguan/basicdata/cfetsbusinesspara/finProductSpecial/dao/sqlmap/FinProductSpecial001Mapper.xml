@@ -131,7 +131,7 @@
         </where>
     </select>
 
-    <select id="countFinprodIdProcessing" resultType="java.lang.Integer">
+    <select id="countFinprodIdProcessingAndDate" resultType="java.lang.Integer">
         select sum(qty) qty
         from (
                  select count(1) as qty
@@ -143,6 +143,20 @@
                  from WFL_ETR_ENTRUST
                  where FINPROD_ID = #{finprodId}
                    AND ENTRUST_DATE = to_date(#{iPlatformDate}, 'yyyy-MM-dd')
+             )
+    </select>
+
+
+    <select id="countFinprodIdProcessing" resultType="java.lang.Integer">
+        select sum(qty) qty
+        from (
+                 select count(1) as qty
+                 from ETR_ENTRUST
+                 where FINPROD_ID = #{finprodId}
+                 union all
+                 select count(1) as qty
+                 from WFL_ETR_ENTRUST
+                 where FINPROD_ID = #{finprodId}
              )
     </select>
 
