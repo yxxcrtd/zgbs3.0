@@ -413,6 +413,21 @@ public class MstSecuritiesAccountController {
         return asas;
     }
 
+
+    /**
+     * 获取证券代码(债券 质押式回购)
+     *
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("getFinprodMarketInfoCds/{page}/{length}")
+    public Page<SelectOptionDto> getFinprodMarketInfoCds(@RequestBody Map<String, Object> map,
+                                                             @PathVariable("page") int page, @PathVariable("length") int length) throws Exception {
+        Page<SelectOptionDto> asas=mstSecuritiesAccountService.getFinprodMarketInfoCds(page, length, map);
+        return asas;
+    }
+
     /**
      * 现券列表查询获取资产代码
      * @param map
