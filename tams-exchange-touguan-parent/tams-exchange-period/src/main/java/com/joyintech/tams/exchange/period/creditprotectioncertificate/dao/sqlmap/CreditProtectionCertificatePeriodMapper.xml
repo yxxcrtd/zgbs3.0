@@ -5,7 +5,7 @@
 
     <select id="findPage"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Response">
-        select *
+        select * from
         (select
         case when tfpdl.TRADE_STATUS = '01' then '01'
         else '03' end validStatus,
