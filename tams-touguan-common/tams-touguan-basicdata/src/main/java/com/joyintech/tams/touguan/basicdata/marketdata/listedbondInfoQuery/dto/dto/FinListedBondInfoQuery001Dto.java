@@ -164,7 +164,8 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal couponRate;
 
     @ApiModelProperty(name = "benchmarkCurveName", value = "基准利率")
-    private String benchmarkCurveName;
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal benchmarkCurveName;
 
     @ApiModelProperty(name = "decimalPlaces", value = "基准利率精度")
     private String decimalPlaces;
@@ -616,11 +617,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.couponRate = couponRate;
     }
 
-    public String getBenchmarkCurveName() {
+    public BigDecimal getBenchmarkCurveName() {
         return benchmarkCurveName;
     }
 
-    public void setBenchmarkCurveName(String benchmarkCurveName) {
+    public void setBenchmarkCurveName(BigDecimal benchmarkCurveName) {
         this.benchmarkCurveName = benchmarkCurveName;
     }
 
