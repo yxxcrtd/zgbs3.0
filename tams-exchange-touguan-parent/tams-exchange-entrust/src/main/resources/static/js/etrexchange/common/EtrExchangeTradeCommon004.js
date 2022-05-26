@@ -1654,6 +1654,10 @@
             $("#acctNo_div_" + currentTab).hide()
         }
 
+        if(ps == PS_T97){
+            $("#businessModelDiv_"+ currentTab).hide();
+        }
+
     };
 
     var formatMoney = function (s, n) {
@@ -3285,6 +3289,7 @@
                 $("#acctNo_div_" + currentTab).show();
                 $("#dateTableDiv").hide();
                 $("#ps_" + currentTab).attr('disabled', 'disabled');
+                $("#businessModelDiv_"+ currentTab).hide();
             }
             if(ps == PS_T49){
                 $("#entrustAmtUnit_div_" + currentTab).hide();
@@ -3389,6 +3394,7 @@
 
             if(ps == PS_T97){
                 $("#invAim_div_" + currentTab).hide();
+                $("#businessModelDiv_"+ currentTab).hide();
             }
         }
     var addMinPriceStep = function (type, num, input) {
