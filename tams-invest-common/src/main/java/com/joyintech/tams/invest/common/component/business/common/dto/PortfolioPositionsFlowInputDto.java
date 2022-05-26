@@ -32,6 +32,11 @@ public class PortfolioPositionsFlowInputDto {
     private String assetType2;
 
     /**
+     * 业务阶段 01 登记 02 成交 03 交收 04 交收失败
+     */
+    private String stage;
+
+    /**
      * 买断式回购特殊处理(债券数量)
      */
     private BigDecimal secAmount;
@@ -175,5 +180,13 @@ public class PortfolioPositionsFlowInputDto {
 
     public void setNotWorkflow(boolean notWorkflow) {
         isNotWorkflow = notWorkflow;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
     }
 }

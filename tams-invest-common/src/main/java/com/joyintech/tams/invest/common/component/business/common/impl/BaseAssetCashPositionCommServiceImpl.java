@@ -120,7 +120,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
         String assetType2 = StringUtil.isNotEmpty(
             inputDto.getAssetType2()) ? inputDto.getAssetType2() : baseAssetCashPositionCommMapper.selectFundType(
                 inputDto.getTrdProductDeal().getFinprodId());
-
+        String stage = inputDto.getStage();
         List<PtlSecPositionFlowDto> result = new ArrayList<>();
         PtlSecPositionFlowDto resultDto = new PtlSecPositionFlowDto();
         resultDto.setPortfolioId(inputDto.getPortfolioId());
@@ -588,6 +588,32 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             else if (StringUtils.equals(deal.getPs(), DictCodeList.交易方向_份额强增.getValue())) {
                 resultDto.setCdate(deal.getSettleDate());
                 resultDto.setAmount(deal.getShareAmt());
+                result.add(resultDto);
+                return result;
+            }
+        }
+
+        if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
+                && "ISSUE_CLASS_01".equals(assetType2)// 发行方式 报价发行
+                && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
+            // 成交 增加在途持仓
+            if ("02".equals(stage)) {
+                resultDto.setCdate(deal.getSettleDate());
+                resultDto.setAmount(deal.getShareAmt());
+                resultDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
+                result.add(resultDto);
+                return result;
+            }
+            // 交收 减少在途持仓 增加实际持仓
+            if ("03".equals(stage)) {
+                resultDto.setCdate(deal.getSettleDate());
+                resultDto.setAmount(deal.getShareAmt().negate());
+                resultDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
+                result.add(resultDto);
+                PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
+                BeanUtil.copyPropertiesIgnoreNull(resultDto, flowDto);
+                resultDto.setAmount(deal.getShareAmt());
+                resultDto.setHodingType(DictCodeList.持仓类型_实际.getValue());
                 result.add(resultDto);
                 return result;
             }
@@ -1140,6 +1166,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             String assetType2 = StringUtil.isNotEmpty(
                 inputDto.getAssetType2()) ? inputDto.getAssetType2() : baseAssetCashPositionCommMapper.selectFundType(
                     inputDto.getTrdProductDeal().getFinprodId());
+            String stage = inputDto.getStage();
             PtlCashPositionFlowDto resultDto = new PtlCashPositionFlowDto();
             // 输入参数.组合代码
             resultDto.setPortfolioId(portfolioId);
@@ -1154,8 +1181,8 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             // 流程id
             resultDto.setWorkflowId(stlPayOrder.getWorkflowId());
             // 指令代码
-            if(StringUtil.isNotEmpty(dealAdd)){
-            resultDto.setEntrustId(dealAdd.getEntrustId());
+            if (StringUtil.isNotEmpty(dealAdd)) {
+                resultDto.setEntrustId(dealAdd.getEntrustId());
             }
             // 金融产品交易Entity.金融产品代码
             String chlId = null;
@@ -1679,13 +1706,18 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             }
             //add by  liutf 20200108 end
             // add by jiangpeng on 20220428 新增一级申购业务处理 start
-            else if (DictCodeList.持仓类型_可用.getValue().equals(inputDto.getPositionType())
-                    && DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
+            else if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
                     && "ISSUE_CLASS_01".equals(assetType2)// 发行方式 报价发行
                     && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
                 resultDto.setCdate(stlPayOrder.getSettleDate());
-                // 扣减现金 应缴款金额
-                resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
+                resultDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                // 交收 增加可用金额
+                if ("03".equals(stage)) {
+                    resultDto.setAmount(stlPayOrder.getSettleAmt());
+                } else {
+                    // 登记/成交 扣减可用金额
+                    resultDto.setAmount(stlPayOrder.getSettleAmt().negate());
+                }
                 result.add(resultDto);
                 return result;
             }

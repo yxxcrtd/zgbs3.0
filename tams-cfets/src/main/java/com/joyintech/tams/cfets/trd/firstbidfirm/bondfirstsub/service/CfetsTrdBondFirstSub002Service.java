@@ -49,6 +49,7 @@ import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -143,6 +144,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
 
     @Autowired
     private PositionInfoService positionInfoService;
+
+    @Autowired
+    private FinProductMapper finProductMapper;
 
     /**
      * 认购量最小变动单位
@@ -1624,7 +1628,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     }
 
     /**
-     * TODO 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
+     * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
      * @param entity   页面元素
      * @param flowType 交易流程状态 参数字典 TRADE_FLOW_STATUS
@@ -1649,6 +1653,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
                     BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
                     baseTradeProductDealDto.setEntrustId(deal.getEntrustId());
+                    baseTradeProductDealDto.setStage("01");
                     TrdProductDeal trdProductDeal = new TrdProductDeal();
                     BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, deal);
                     trdProductDeal.setFinprodId(entity.getFinprodId());
@@ -1658,6 +1663,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     trdProductDeal.setPrinAmt(deal.getSubscriptionAmount());
                     trdProductDeal.setTradeDate(entity.getTradeDate());
                     trdProductDeal.setSettleDate(entity.getTradeDate());
+                    trdProductDeal.setSecManageAcctId(deal.getSecManageAcctId());
                     baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
                     TrdProductDealAdd add = new TrdProductDealAdd();
                     add.setPortfolioId(deal.getPortfolioId());
@@ -1668,9 +1674,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     //处理指令完成情况
                     List<StlPayOrdersDto> stlPayOrders = new ArrayList<>();
                     StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
-                    stlPayOrder.setMyAcctNo(deal.getSecManageAcctId());
+                    FinProduct finProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
+                    String acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), finProduct.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+                    stlPayOrder.setMyAcctNo(acctId);
                     stlPayOrder.setOrderId(entity.getBidId());
-                    stlPayOrder.setCcy("CNY");
+                    stlPayOrder.setCcy(finProduct.getCcy());
                     stlPayOrder.setSettleAmt(deal.getPayableAmount());
                     stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
                     stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
