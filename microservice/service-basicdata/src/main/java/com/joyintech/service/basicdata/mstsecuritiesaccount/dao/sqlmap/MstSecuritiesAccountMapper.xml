@@ -534,7 +534,8 @@
         t.TYPE_7,
         t.IS_NET_SETT,
         t.FACE_VALUE,
-        t.IS_NETPRICE
+        t.IS_NETPRICE,
+        t.IS_NO_GUARD
         from (
         <if test="tradePlat != null and tradePlat != '' and tradePlat.equals('02') or tradePlat == null or tradePlat == ''">
             select t.oth_code  as finprod_market_id,
@@ -550,7 +551,8 @@
             null AS IS_NET_SETT,
             v.mdate,
             va.FACE_VALUE FACE_VALUE,
-            va.IS_NETPRICE IS_NETPRICE
+            va.IS_NETPRICE IS_NETPRICE,
+            va.IS_NO_GUARD
             from fin_product_oth_code t
             left join fin_product v
             on t.finprod_id = v.finprod_id
@@ -583,7 +585,8 @@
         b.IS_NET_SETT,
         a.mdate,
         b.FACE_VALUE FACE_VALUE,
-        b.IS_NETPRICE IS_NETPRICE
+        b.IS_NETPRICE IS_NETPRICE,
+        b.IS_NO_GUARD
         from fin_product a
         left join fin_product_add b
         on b.FINPROD_ID = a.FINPROD_ID

@@ -7,6 +7,7 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import io.swagger.annotations.ApiModel;
@@ -16,6 +17,7 @@ import org.apache.commons.compress.utils.Lists;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 债券市场列表信息查看DTO
@@ -140,16 +142,14 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private String currency;
 
     @ApiModelProperty(name = "issuePx", value = "发行价格（元）")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal issuePx;
+    private String issuePx;
 
     @ApiModelProperty(name = "issueAmt", value = "发行金额（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issueAmt;
 
     @ApiModelProperty(name = "stipulationValue", value = "参考收益率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal stipulationValue;
+    private String stipulationValue;
 
     @ApiModelProperty(name = "singleMinSubAmt", value = "单笔最低认购量（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -573,19 +573,22 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.currency = currency;
     }
 
-    public BigDecimal getIssuePx() {
+    public String getIssuePx() {
+        if(Objects.nonNull(getCouponSpecies()) && (getCouponSpecies().equals(BussinessDictCodeList.息票品种_附息.getValue()) || getCouponSpecies().equals(BussinessDictCodeList.息票品种_利随本清.getValue())) ){
+            return "100.0000";
+        }
         return issuePx;
     }
 
-    public void setIssuePx(BigDecimal issuePx) {
+    public void setIssuePx(String issuePx) {
         this.issuePx = issuePx;
     }
 
-    public BigDecimal getStipulationValue() {
+    public String getStipulationValue() {
         return stipulationValue;
     }
 
-    public void setStipulationValue(BigDecimal stipulationValue) {
+    public void setStipulationValue(String stipulationValue) {
         this.stipulationValue = stipulationValue;
     }
 

@@ -3267,8 +3267,8 @@
         //初始化时，是否隐藏左上角内容
     var initPage = function () {
             $("#businessModelDiv_jj").hide();
-            //$("#businessModelDiv_gd").hide();
-            //$("#businessModelDiv_dz").hide();
+            $("#businessModelDiv_gd").hide();
+            $("#businessModelDiv_dz").hide();
             var finprodType2 = $("#finprodType2_" + currentTab).val();
             var ps = $("#ps_" + currentTab).val();
             if(ps){
@@ -4590,6 +4590,8 @@
                         }else if(result.data=="4"){
                             Joyin.error("当前资产未进行SPPI测试，无法进行指令提交/保存。");
                             $("#secId_" + currentTab).val("").trigger('change');
+                        }else if(result.data=='1'){
+                            $("#businessModelDiv_"+ currentTab).hide();
                         }
                     });
             }

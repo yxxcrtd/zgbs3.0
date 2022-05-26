@@ -74,7 +74,12 @@
             SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
             else to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
             END
-        WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F17' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02','03')  THEN  TO_CHAR(BIDT.BID_PRICE)
+        WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F17' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02','03')  THEN
+            CASE  WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
+            WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
+            WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
+            ELSE bobp.BID_PRICE
+            END
         WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN ('F05', 'F04', 'F03', 'F09', 'F06', 'F02') THEN TO_CHAR(round( 0, 4 ))
         WHEN ETR_ENTRUST.PS IN ('T68', 'T69') THEN TO_CHAR(ETR_ENTRUST.PRICE * 100)
         WHEN ETR_ENTRUST.PS IN ('T56', 'T93', 'T94', 'T95', 'T96') THEN TO_CHAR(ETR_ENTRUST.PRICE * 100)
@@ -348,13 +353,24 @@
                 PTL_PORTFOLIO
                 ON ETR_ENTRUST_DETAIL.portfolio_id = PTL_PORTFOLIO.portfolio_id
             GROUP BY ENTRUST_ID ) det on det.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
-        LEFT JOIN (
-            SELECT
-            LISTAGG(TO_CHAR(BID_PRICE,'FM9999999999999990.9000') , ',') WITHIN GROUP (ORDER BY (BID_PRICE)) BID_PRICE,
-            ENTRUST_ID
-            FROM ETR_ENTRUST_BID_PRICE
-            GROUP BY ENTRUST_ID
-        ) BIDT ON BIDT.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
+        LEFT JOIN
+            (select listagg(case
+            when t3.TENDER_TARGET = '01'
+            then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
+            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
+            when t3.TENDER_TARGET = '03'
+            then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
+            end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
+            t0.ENTRUST_ID
+            from ETR_ENTRUST_BID_PRICE t0
+            LEFT JOIN ETR_ENTRUST t1 on t1.ENTRUST_ID = t0.ENTRUST_ID
+            LEFT JOIN FIN_PRODUCT t2
+            ON t2.FINPROD_ID = t1.FINPROD_ID
+            LEFT JOIN
+            FIN_PRODUCT_ISSUE t3
+            ON t3.FINPROD_ID = t2.FINPROD_ID
+            group by t0.ENTRUST_ID) bobp
+        ON bobp.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
         LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on FIN_PRODUCT_ISSUE.INT_RATE_ID = SDLDATA.ITEM_CODE
             LEFT JOIN (
             SELECT

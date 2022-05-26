@@ -136,7 +136,9 @@ public class FinBondAsset002Controller extends BaseController{
        initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
        initPageParams.put("SECRATE_DATA", this.getSelectDataFromDataDic(DictCode.利率行情, null));
        initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
-       String finprodId = getParam("finprodId");
+       initPageParams.put("GUARANTEE_MODE",this.getSelectDataFromDataDic(DictCode.新债_担保方式, null));
+
+        String finprodId = getParam("finprodId");
        String finprodType = getParam("finprodType");
        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
        initPageParams.put("YES",DictCodeList.是否_是.getValue());

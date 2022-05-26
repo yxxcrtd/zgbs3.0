@@ -92,6 +92,8 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
         params.put("SVR_BASIS_TYPE_ACCURACY", this.getSelectDataFromDataDic(DictCode.基准利率精度, null));
         params.put("AMT_INCOME_TYPE",this.getSelectDataFromDataDic(DictCode.本金收益特征, null));
+        params.put("GUARANTEE_MODE",this.getSelectDataFromDataDic(DictCode.新债_担保方式, null));
+
 
         params.put(GlobalConstant.ENTITY, entity);
         //pageId

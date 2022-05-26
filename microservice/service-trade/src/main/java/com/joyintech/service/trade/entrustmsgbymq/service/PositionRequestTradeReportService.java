@@ -20,6 +20,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.trade.dto.PortfolioCalculateDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeList.是否_否;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
@@ -61,11 +63,14 @@ public class PositionRequestTradeReportService {
 
     /**
      * 发送成交回报头寸请求
-     * @param trdTempDto
      */
-    public void sendTradeReportPositionRequest(TrdTempDto trdTempDto) {
-        logger.debug("【发送成交回报头寸请求】trdTempDto: {}", JSON.toJSONString(trdTempDto));
+    public void sendTradeReportPositionRequest(List<TrdTempDto> trdTempDtoList) {
+        logger.debug("【发送成交回报头寸请求】trdTempDtoList: {}", JSON.toJSONString(trdTempDtoList));
         Map<String, Object> resultMap = new HashMap<>();
+        /**
+         * 多组合，除了tradeId，其他字段一样。设置共同字段的时候随机取一条
+         */
+        TrdTempDto trdTempDto =trdTempDtoList.get(0);
         // 设置公共字段
         this.setCommonField(trdTempDto, resultMap);
         String finprodType = trdTempDto.getFinprodType2();
@@ -86,17 +91,17 @@ public class PositionRequestTradeReportService {
         String interType = commonPositionEngineService.getPositionInterType(POSITION_TYPE_TRD, TRADE_PLAT, finprodType, ps, DictCodeListExt3.业务动作_成交回报.getValue(), trdTempDto.getClass().getName());
         logger.debug("【成交回报查询头寸接口结果】interType:{}", interType);
         if (INTERF_TYPE_BOND002.equals(interType)) {
-            this.bond002(trdTempDto, resultMap);
+            this.bond002(trdTempDtoList, resultMap);
         } else if (INTERF_TYPE_BOND003.equals(interType)) {
-            this.bond003(trdTempDto, resultMap);
+            this.bond003(trdTempDtoList, resultMap);
         } else if (INTERF_TYPE_REPO003.equals(interType)) {
-            this.repo003(trdTempDto, resultMap);
+            this.repo003(trdTempDtoList, resultMap);
         } else if (INTERF_TYPE_REPO002.equals(interType)) {
-            this.repo002(trdTempDto, resultMap);
+            this.repo002(trdTempDtoList, resultMap);
         } else if (INTERF_TYPE_FUND002.equals(interType)) {
-            this.fund002(trdTempDto, resultMap);
+            this.fund002(trdTempDtoList, resultMap);
         } else if (INTERF_TYPE_STOCK001.equals(interType)) {
-            this.stock001(trdTempDto, resultMap);
+            this.stock001(trdTempDtoList, resultMap);
         }
         if(StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))){
             PositionHttpRequest.send(resultMap);
@@ -107,11 +112,9 @@ public class PositionRequestTradeReportService {
 
     /**
      * 场内现券-指令
-     *
-     * @param entity
-     * @param resultMap
      */
-    private void bond002(TrdTempDto entity, Map<String, Object> resultMap) {
+    private void bond002(List<TrdTempDto> trdTempDtoList, Map<String, Object> resultMap) {
+        TrdTempDto entity = trdTempDtoList.get(0);
         resultMap.put("interfaceType", INTERF_TYPE_BOND002);
         // 交易平台
         resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, INTERF_TYPE_BOND002));
@@ -132,11 +135,14 @@ public class PositionRequestTradeReportService {
         paraMap.put("fTradeId", entity.getfTradeId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
 
+        Map<String ,TrdTempDto> trdTempDtoMap = trdTempDtoList.stream().collect(Collectors.toMap(TrdTempDto::getPortfolioId, TrdTempDto -> TrdTempDto, (k1, k2) -> k1));
         List<Map<String, Object>> ptlList = new ArrayList<>();
-        for (PortfolioCalculateDto dto:list) {
+        for (PortfolioCalculateDto dto : list) {
             Map<String, Object> pltMap = new HashMap<>();
+            TrdTempDto trdTempDto = trdTempDtoMap.get(dto.getPortfolioId());
+
             pltMap.put("portfolioId", dto.getPortfolioId());
-            pltMap.put("tradeId", entity.getTradeId());
+            pltMap.put("tradeId", trdTempDto.getTradeId());
             pltMap.put("etrId", entity.getEntrustId());
             pltMap.put("ordEntrustId", null);
             pltMap.put("etrSecAmount", dto.getEtrSecAmount());
@@ -159,11 +165,9 @@ public class PositionRequestTradeReportService {
 
     /**
      * 可转债-指令
-     *
-     * @param entity
-     * @param resultMap
      */
-    private void bond003(TrdTempDto entity, Map<String, Object> resultMap) {
+    private void bond003(List<TrdTempDto> trdTempDtoList, Map<String, Object> resultMap) {
+        TrdTempDto entity = trdTempDtoList.get(0);
         resultMap.put("interfaceType", INTERF_TYPE_BOND003);
         // 交易平台
         resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, INTERF_TYPE_BOND003));
@@ -183,11 +187,14 @@ public class PositionRequestTradeReportService {
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlCashList = new ArrayList<>(4);
         List<Map<String, Object>> bondSecList = new ArrayList<>(4);
+        Map<String ,TrdTempDto> trdTempDtoMap = trdTempDtoList.stream().collect(Collectors.toMap(TrdTempDto::getPortfolioId, TrdTempDto -> TrdTempDto, (k1, k2) -> k1));
+
         for (PortfolioCalculateDto dto : list){
             Map<String, Object> ptlCash = new HashMap<>(8);
+            TrdTempDto trdTempDto = trdTempDtoMap.get(dto.getPortfolioId());
             ptlCash.put("portfolioId", dto.getPortfolioId());
             ptlCash.put("cashAcctId", dto.getCashAcctId());
-            ptlCash.put("tradeId", entity.getTradeId());
+            ptlCash.put("tradeId", trdTempDto.getTradeId());
             ptlCash.put("etrId", entity.getEntrustId());
             ptlCash.put("cashAmount", dto.getCashAmount());
             ptlCash.put("etrSecAmount", dto.getEtrSecAmount());
@@ -216,11 +223,9 @@ public class PositionRequestTradeReportService {
 
     /**
      * 质押式通用回购-指令
-     *
-     * @param entity
-     * @param resultMap
      */
-    private void repo003(TrdTempDto entity, Map<String, Object> resultMap) {
+    private void repo003(List<TrdTempDto> trdTempDtoList, Map<String, Object> resultMap) {
+        TrdTempDto entity = trdTempDtoList.get(0);
         resultMap.put("interfaceType", INTERF_TYPE_REPO003);
         resultMap.put("ps", entity.getPs());
         resultMap.put("tradePlace", entity.getTradeMarket());
@@ -239,12 +244,15 @@ public class PositionRequestTradeReportService {
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlList = new ArrayList<>(4);
         List<Map<String, Object>> ptlSecList = new ArrayList<>(4);
+        Map<String ,TrdTempDto> trdTempDtoMap = trdTempDtoList.stream().collect(Collectors.toMap(TrdTempDto::getPortfolioId, TrdTempDto -> TrdTempDto, (k1, k2) -> k1));
+
         for (PortfolioCalculateDto dto : list){
             Map<String, Object> plt = new HashMap<>(8);
+            TrdTempDto trdTempDto = trdTempDtoMap.get(dto.getPortfolioId());
             plt.put("portfolioId", dto.getPortfolioId());
             plt.put("cashAcctId", dto.getCashAcctId());
             plt.put("secAcctId", dto.getSecAcctId());
-            plt.put("tradeId", entity.getTradeId());
+            plt.put("tradeId", trdTempDto.getTradeId());
             plt.put("etrId", entity.getEntrustId());
             // ZGTFCP-1250:新增字段赋值 modify by fuyongsheng 20220318 start
             plt.put("etrSecAmount", dto.getEtrSecAmount());
@@ -275,7 +283,7 @@ public class PositionRequestTradeReportService {
                 ptlSec.put("portfolioId", dto.getPortfolioId());
                 ptlSec.put("finprodId", entity.getFinprodId());
                 ptlSec.put("secAcctId", dto.getSecAcctId());
-                ptlSec.put("tradeId", entity.getTradeId());
+                ptlSec.put("tradeId", trdTempDto.getTradeId());
                 ptlSec.put("etrId", entity.getEntrustId());
                 ptlSec.put("integrateSecAmount", dto.getIntegrateSecAmount());
                 ptlSec.put("ownSecAmount", dto.getOwnSecAmount());
@@ -290,11 +298,9 @@ public class PositionRequestTradeReportService {
     // ZGTFCP-1041:新增成交回报协议回购 add by fuyongsheng 20220317 start
     /**
      * 质押式协议回购
-     *
-     * @param entity
-     * @param resultMap
      */
-    private void repo002(TrdTempDto entity, Map<String, Object> resultMap) {
+    private void repo002(List<TrdTempDto> trdTempDtoList, Map<String, Object> resultMap) {
+        TrdTempDto entity = trdTempDtoList.get(0);
         resultMap.put("interfaceType", INTERF_TYPE_REPO002);
         EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
         // ZGTFCP-1644:协议回购新头寸交易方向通过资产类型判断 modify by fuyongsheng 20220323 start
@@ -331,7 +337,10 @@ public class PositionRequestTradeReportService {
         List<Map<String, Object>> ptlSecList = new ArrayList<>();
         // 解除质押券数据集
         List<Map<String, Object>> ptlRelieveSecList = new ArrayList<>();
+        Map<String ,TrdTempDto> trdTempDtoMap = trdTempDtoList.stream().collect(Collectors.toMap(TrdTempDto::getPortfolioId, TrdTempDto -> TrdTempDto, (k1, k2) -> k1));
+
         for (PortfolioCalculateDto dto : list){
+            TrdTempDto trdTempDto = trdTempDtoMap.get(dto.getPortfolioId());
             if(DictCodeListExt3.交易方向_正回购.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_逆回购.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_提前购回.getValue().equals(entity.getPs())
@@ -354,7 +363,7 @@ public class PositionRequestTradeReportService {
                     ptlCash.put("cashAcctId", dto.getCashAcctId());
                     ptlCash.put("cashAmount", dto.getCashAmount());
                 }
-                ptlCash.put("tradeId", entity.getTradeId());
+                ptlCash.put("tradeId", trdTempDto.getTradeId());
                 ptlCash.put("etrId", entity.getEntrustId());
                 ptlCashList.add(ptlCash);
             }
@@ -362,7 +371,7 @@ public class PositionRequestTradeReportService {
                 Map<String, Object> ptlOffsetCash = new HashMap<>();
                 ptlOffsetCash.put("portfolioId", dto.getPortfolioId());
                 ptlOffsetCash.put("cashAcctId", dto.getCashAcctId());
-                ptlOffsetCash.put("tradeId", entity.getTradeId());
+                ptlOffsetCash.put("tradeId", trdTempDto.getTradeId());
                 ptlOffsetCash.put("etrId", entity.getEntrustId());
                 // ZGTFCP-2022:赋值交易金额 modify by fuyongsheng 20220325 start
                 // 到期的本金-首期的到期结算金额
@@ -379,7 +388,7 @@ public class PositionRequestTradeReportService {
                 Map<String, Object> ptlSec = new HashMap<>();
                 ptlSec.put("portfolioId", dto.getPortfolioId());
                 ptlSec.put("secAcctId", dto.getSecAcctId());
-                ptlSec.put("tradeId", entity.getTradeId());
+                ptlSec.put("tradeId", trdTempDto.getTradeId());
                 ptlSec.put("etrId", entity.getEntrustId());
                 // 融入券券面总额
                 ptlSec.put("integrateSecAmount", dto.getIntegrateSecAmount());
@@ -421,7 +430,7 @@ public class PositionRequestTradeReportService {
                 Map<String, Object> ptlRelieveSec = new HashMap<>();
                 ptlRelieveSec.put("portfolioId", dto.getPortfolioId());
                 ptlRelieveSec.put("secAcctId", dto.getSecAcctId());
-                ptlRelieveSec.put("tradeId", entity.getTradeId());
+                ptlRelieveSec.put("tradeId", trdTempDto.getTradeId());
                 ptlRelieveSec.put("etrId", entity.getEntrustId());
                 // 融入券券面总额
                 ptlRelieveSec.put("integrateSecAmount", dto.getIntegrateSecAmount());
@@ -466,11 +475,9 @@ public class PositionRequestTradeReportService {
 
     /**
      * 基金-指令
-     *
-     * @param entity
-     * @param resultMap
      */
-    private void fund002(TrdTempDto entity, Map<String, Object> resultMap) {
+    private void fund002(List<TrdTempDto> trdTempDtoList, Map<String, Object> resultMap) {
+        TrdTempDto entity = trdTempDtoList.get(0);
         resultMap.put("interfaceType", INTERF_TYPE_FUND002);
         // 交易平台
         resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, INTERF_TYPE_FUND002));
@@ -489,10 +496,13 @@ public class PositionRequestTradeReportService {
         paraMap.put("fTradeId", entity.getfTradeId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlList = new ArrayList<>(4);
+        Map<String ,TrdTempDto> trdTempDtoMap = trdTempDtoList.stream().collect(Collectors.toMap(TrdTempDto::getPortfolioId, TrdTempDto -> TrdTempDto, (k1, k2) -> k1));
+
         for (PortfolioCalculateDto dto : list){
             Map<String, Object> plt = new HashMap<>(8);
+            TrdTempDto trdTempDto = trdTempDtoMap.get(dto.getPortfolioId());
             plt.put("portfolioId", dto.getPortfolioId());
-            plt.put("tradeId", entity.getTradeId());
+            plt.put("tradeId", trdTempDto.getTradeId());
             plt.put("etrId", entity.getEntrustId());
             plt.put("finprodId", entity.getFinprodId());
             plt.put("cashAcctId", dto.getCashAcctId());
@@ -510,11 +520,9 @@ public class PositionRequestTradeReportService {
 
     /**
      * 股票指令
-     *
-     * @param entity
-     * @param resultMap
      */
-    private void stock001(TrdTempDto entity, Map<String, Object> resultMap) {
+    private void stock001(List<TrdTempDto> trdTempDtoList, Map<String, Object> resultMap) {
+        TrdTempDto entity = trdTempDtoList.get(0);
         resultMap.put("interfaceType", INTERF_TYPE_STOCK001);
         // 交易平台
         resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, INTERF_TYPE_STOCK001));
@@ -531,11 +539,14 @@ public class PositionRequestTradeReportService {
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlList = new ArrayList<>(4);
         List<Map<String, Object>> ptlRoList = new ArrayList<>(4);
+        Map<String ,TrdTempDto> trdTempDtoMap = trdTempDtoList.stream().collect(Collectors.toMap(TrdTempDto::getPortfolioId, TrdTempDto -> TrdTempDto, (k1, k2) -> k1));
+
         for (PortfolioCalculateDto dto : list){
             Map<String, Object> plt = new HashMap<>(8);
+            TrdTempDto trdTempDto = trdTempDtoMap.get(dto.getPortfolioId());
             plt.put("portfolioId", dto.getPortfolioId());
             plt.put("finprodId", entity.getFinprodId());
-            plt.put("tradeId", entity.getTradeId());
+            plt.put("tradeId", trdTempDto.getTradeId());
             plt.put("etrId", entity.getEntrustId());
             plt.put("etrSecAmount", dto.getEtrSecAmount());
             plt.put("ordId", dto.getOrderId());
@@ -626,7 +637,7 @@ public class PositionRequestTradeReportService {
      */
     private void setCommonField(TrdTempDto entity, Map<String, Object> resultMap) {
         resultMap.put("userId", LoginUserUtil.getUserName());
-        resultMap.put("totalTradeId", entity.getTradeId());
+        resultMap.put("totalTradeId", true == StringUtil.isNotEmpty(entity.getTotleTradeId()) ? entity.getTotleTradeId() : entity.getTradeId());
         // resultMap.put("balanceCheck", "Y");
         resultMap.put("balanceCheck", "N");
         resultMap.put("flowStatus", DictCodeListExt3.流程节点_审批生效.getValue());

@@ -39,6 +39,8 @@ import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.common.base.entity.EtrEntrustDetail;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.common.base.entity.SppiImportData;
+import com.joyintech.tams.component.business.basicdata.dto.BusiFinProductRatingDto;
+import com.joyintech.tams.component.business.basicdata.service.BusiProductRatingService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -56,6 +58,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -116,6 +119,12 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
 
     @Autowired
     private FinProductMapper finProductMapper;
+
+    /**
+     * 产品评级共通
+     */
+    @Autowired(required = false)
+    private BusiProductRatingService busiProductRatingService;
 
 
 
@@ -231,9 +240,6 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         }
 
         Map<String, Object> pageParam = BeanUtil.object2Map(search);
-//        pageParam.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
-//        pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
-
 
         List<String> statusList = search.getIssueStage();
         if (!StringUtil.isEmptyList(statusList) && statusList.contains("all")) {
@@ -251,8 +257,30 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
             pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA, finprodId));
         }
 
-        return super.queryForPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize(), () -> cfetsEtrBondFirstBid001Mapper.findIssueInfoPage(pageParam));
+        Page<CfetsEtrIBondFirstBidFindIssueInfoDto> page = super.queryForPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize(), () -> cfetsEtrBondFirstBid001Mapper.findIssueInfoPage(pageParam));
 
+        List<CfetsEtrIBondFirstBidFindIssueInfoDto> findIssueInfoDtos = page.getRoot();
+        List<CfetsEtrIBondFirstBidFindIssueInfoDto> findIssueInfoDtosTemp = new ArrayList<>();
+        for (CfetsEtrIBondFirstBidFindIssueInfoDto findIssueInfoDto : findIssueInfoDtos) {
+
+            if (StringUtil.isEmpty(findIssueInfoDto.getSubRate())) {
+                Map<String, Object> param = new HashMap<String, Object>();
+                param.put("oCode", findIssueInfoDto.getIssuer());
+                param.put("oType", DictCodeList.评级类型_主体评级.getValue());
+                //查询评级类型为主体评级的数据
+                List<BusiFinProductRatingDto> ztList = busiProductRatingService.getZtBestRatingByOrgId(param);
+                //按照时间排序
+                List<BusiFinProductRatingDto> ztListNew = ztList.stream().sorted(Comparator.comparing(BusiFinProductRatingDto::getGradeDate).reversed()).collect(Collectors.toList());
+                if (ztListNew != null && ztListNew.size() > 0) {
+                    //只取时间最新第一条数据
+                    findIssueInfoDto.setSubRate(ztListNew.get(0).getGradeResult());
+                }
+                findIssueInfoDtosTemp.add(findIssueInfoDto);
+            }
+        }
+
+        page.setRoot(findIssueInfoDtosTemp);
+        return page;
     }
 
     /**

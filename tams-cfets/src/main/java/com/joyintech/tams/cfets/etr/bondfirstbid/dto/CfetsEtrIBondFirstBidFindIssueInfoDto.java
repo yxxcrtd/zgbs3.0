@@ -338,7 +338,7 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
     }
 
     public String getSubRate() {
-        return subRate;
+        return SysDataUtil.getNameFromDataDict(DictCode.评级结果, this.subRate);
     }
 
     public void setSubRate(String subRate) {

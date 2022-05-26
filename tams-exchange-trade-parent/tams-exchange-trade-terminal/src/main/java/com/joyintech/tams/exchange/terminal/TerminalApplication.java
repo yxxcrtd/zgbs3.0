@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
@@ -15,7 +16,16 @@ public class TerminalApplication {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    public RestTemplate restTemplate(SimpleClientHttpRequestFactory requestFactory) {
+        return new RestTemplate(requestFactory);
+    }
+
+    @Bean
+    public SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(500);
+        requestFactory.setReadTimeout(500);
+
+        return requestFactory;
     }
 }

@@ -388,8 +388,6 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 		trdTempDto.setSettleDate(infContractDetailfile.getTradeDate());
 		trdTempDto.setTrdProductTempDeal(trdProductTempDeal);
 		trdTempDto.setTrdProductTempDealAdd(trdProductTempDealAdd);
-		// 调用新头寸接口 add by fuyongsheng 20220307 end
-		positionRequestTradeReportService.sendTradeReportPositionRequest(trdTempDto);
 
 		// 处理头寸
 		tradePreCommonService.executePosition(finProductTradeDto, infContractDetailfile.getAcctNo());
