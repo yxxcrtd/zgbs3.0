@@ -359,6 +359,21 @@ public class CommonSelectController {
     }
 
     /**
+     * 原始权益人下拉
+     *
+     * @param param 过滤参数
+     * @return 下拉框列表
+     * @throws Exception
+     */
+    @RequestMapping("getOriginalOwner/{page}/{length}")
+    public Page<SelectOptionDto> getOriginalOwner(@RequestBody Map<String, Object> param,
+                                           @PathVariable("page") int page,
+                                           @PathVariable("length") int length) {
+        param.put("IS_ORIGINAL_OWNER", DictCodeList.是否_是.getValue());
+        return commonSelectService.getCustomer(page, length, param);
+    }
+
+    /**
      * 实际管理人
      *
      * @param param 过滤参数

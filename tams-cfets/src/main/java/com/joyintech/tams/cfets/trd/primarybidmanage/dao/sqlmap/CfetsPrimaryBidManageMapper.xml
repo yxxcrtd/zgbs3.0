@@ -7,12 +7,13 @@
         SELECT ss.* FROM (
         SELECT s.* FROM (
         SELECT
-        ${otherEffectFlag_01} otherEffectFlag,
+        '${otherEffectFlag_01}' otherEffectFlag,
         CASE WHEN BO.IS_WIN = 'Y' THEN '03'
         WHEN BO.IS_WIN = 'N' THEN '04'
         ELSE '02' END isWin,
         BO.BID_ID bidId,
         BO.FINPROD_ID finprodId,
+        FP.FINPROD_MARKET_ID finprodMarketId,
         FP.FINPROD_ABBR finprodAbbr,
         FPI.TENDER_TARGET tenderTarget,
         BO.BID_DATE bidDate,
@@ -36,10 +37,11 @@
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
-        WHERE
-        BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE ='01' and
-        TRADE_STATUS='03' and IS_CANCEL='Y')
-        <if test="finprodIdList != null and finprodIdList.size() > 0">AND BO.FINPROD_ID IN
+        WHERE BO.IS_CANCEL = 'N' AND
+        BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE =#{COMMON_BUSINESS_TYPE_TRD97} and
+        TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL='N')
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND FP.FINPROD_MARKET_ID IN
             <foreach
                     collection="finprodIdList" item="item" open="(" close=")" separator=",">
                     #{item}
@@ -88,7 +90,7 @@
                 </foreach>
             </if>
             <if test="bidId != null and bidId != ''">
-                AND BO.BID_ID = #{bidId}
+                AND BO.BID_ID like '%' || #{bidId} || '%'
             </if>
             ) s  WHERE 1=1
             <if test="isWinList != null and isWinList.size() > 0">
@@ -99,6 +101,7 @@
             </if>
         ) ss
         left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
+        left join SYS_DATADICT_LIST sdl_otherEffectFlag on ss.otherEffectFlag=sdl_otherEffectFlag.ITEM_CODE and sdl_otherEffectFlag.DICT_CODE='STATUS_VALID'
         left join SYS_DATADICT_LIST sdl_tt on ss.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
         left join SYS_DATADICT_LIST sdl_wt on ss.winType=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
         left join SYS_DATADICT_LIST sdl_ept on ss.payType=sdl_ept.ITEM_CODE and sdl_ept.DICT_CODE='ETR_PAY_TYPE'
@@ -111,7 +114,7 @@
     </select>
     <sql id="keywordsCfmWhere">
         <if test="search != null and search != ''">
-            <where>( ss.otherEffectFlag || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodId || '|'
+            <where>( sdl_otherEffectFlag.ITEM_VALUE || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
                 || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
                 || '|' || sdl_ept.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.counterName
                 || '|' || ss.remark
@@ -131,6 +134,7 @@
              ELSE '02' END isWin,
         BO.BID_ID  bidId,
         BO.FINPROD_ID  finprodId,
+        FP.FINPROD_MARKET_ID finprodMarketId,
         FP.FINPROD_ABBR finprodAbbr,
         FPI.TENDER_TARGET tenderTarget,
         BO.BID_DATE       bidDate,
@@ -142,7 +146,7 @@
         BO.BID_DATE      bidCfmDate,
         FP.TRADE_MARKET  tradeMarket,
         BO.PAY_DATE      payDate,
-        FP.TRADE_MARKET  trader,
+        BO.OUR_TRADER   trader,
         BO.REMARK        remark,
         BO.COUNTER_ID    counterId,
         MCP.COUNTER_NAME   counterName,
@@ -243,11 +247,10 @@
         SELECT ss.* FROM (
         SELECT
             BRT.STATUS  status,
-            CASE WHEN BRT.IS_WIN = 'Y' THEN '03'
-            WHEN BRT.IS_WIN = 'N' THEN '04'
-            ELSE '02' END isWin,
+            BRT.IS_WIN  isWin,
             BO.BID_ID   bidId,
             BRT.FINPROD_ID  finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR  finprodAbbr,
             FPI.TENDER_TARGET  tenderTarget,
             BO.BID_DATE        bidDate,
@@ -269,7 +272,7 @@
             BRT.COUNTER_ID          counterId,
             BRT.REMARK              remark
         FROM BID_ORDER BO
-        LEFT JOIN (SELECT * FROM (SELECT BRT.*
+        INNER JOIN (SELECT * FROM (SELECT BRT.*
             ,ROW_NUMBER() OVER(PARTITION BY BRT.BID_ID ORDER BY BRT.WIN_DATE DESC) RANK
             FROM BID_RESULT_TOTAL BRT
             ) WHERE RANK=1
@@ -294,7 +297,7 @@
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
          <if test="finprodIdList != null and finprodIdList.size() > 0">
-            AND BO.FINPROD_ID IN
+            AND FP.FINPROD_MARKET_ID IN
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
@@ -360,6 +363,7 @@
             AND BO.IS_WIN = #{isWin}
         </if>
         ) ss
+        left join SYS_DATADICT_LIST sdl_status on ss.status=sdl_status.ITEM_CODE and sdl_status.DICT_CODE='STATUS_VALID'
         left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
         left join SYS_DATADICT_LIST sdl_tt on ss.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
         left join SYS_DATADICT_LIST sdl_wt on ss.winType=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
@@ -375,7 +379,7 @@
 
     <sql id="keywordsWhere">
         <if test="search != null and search != ''">
-            <where>( ss.status || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodId || '|'
+            <where>( sdl_status.ITEM_VALUE || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
                 || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
                 || '|' || sdl_ept.ITEM_VALUE ||'|' || sdl_bt.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.winPrice
                 || '|' || ss.remark  like '%' || #{search} || '%'
@@ -400,6 +404,7 @@
             BRT.IS_WIN  isWin,
             BO.BID_ID   bidId,
             BRT.FINPROD_ID  finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR  finprodAbbr,
             FPI.TENDER_TARGET  tenderTarget,
             BO.BID_DATE        bidDate,
@@ -449,6 +454,7 @@
             BRT.IS_WIN       isWin,
             BO.BID_ID        bidId,
             BRT.FINPROD_ID   finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR  finprodAbbr,
             FPI.TENDER_TARGET  tenderTarget,
             BO.BID_DATE        bidDate,
@@ -497,14 +503,15 @@
     <select id="selectBidOrderInfo" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest" parameterType="Map">
         SELECT
             BO.FINPROD_ID finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR finprodAbbr,
             BO.OUR_TRADER   ouTraderId,
             BO.COUNTER_ID     counterId,
             FPI.TENDER_TARGET tenderTarget,
             FP.CCY            ccy,
             FPI.PAY_DATE      payDate,
-            FPI.ISSUE_SDATE   bidDateStart,
-            FPI.ISSUE_EDATE   bidDateEnd,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
             BO.PAY_DATE   creditorDebtDate,
             FPA.LISTING_DATE listingDate,
             BO.WIN_TYPE   winType,
@@ -512,7 +519,9 @@
             BO.WIN_PRIN_AMT   winPrinAmt,
             FP.CIRCULATION_CODE circulationCode,
             FPI.SERI_Y_N seriYN,
-            FP.COUPON_SPECIES  couponSpecies
+            FP.COUPON_SPECIES  couponSpecies,
+            BO.WIN_PRIN_AMT totalBiddingNum,
+            BO.WIN_PRICE winPrice
         FROM BID_ORDER	BO
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
@@ -540,6 +549,7 @@
         SELECT
             BRT.TOTAL_WIN_ID totalWinId,
             BRT.FINPROD_ID finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR finprodAbbr,
             BO.OUR_TRADER   ouTraderId,
             BO.COUNTER_ID   counterId,

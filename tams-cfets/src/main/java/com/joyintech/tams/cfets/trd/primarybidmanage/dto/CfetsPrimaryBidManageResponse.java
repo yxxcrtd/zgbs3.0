@@ -24,6 +24,9 @@ public class CfetsPrimaryBidManageResponse {
     @ApiModelProperty(name="status",value="有效状态")
     private String status;
 
+    @ApiModelProperty(name="statusStr",value="有效状态")
+    private String statusStr;
+
     @ApiModelProperty(name="isWin",value="中标状态Str")
     private String isWin;
 
@@ -35,6 +38,9 @@ public class CfetsPrimaryBidManageResponse {
 
     @ApiModelProperty(name="finprodId",value="资产代码")
     private String finprodId ;
+
+    @ApiModelProperty(name="finprodMarketId",value="资产市场代码")
+    private String finprodMarketId ;
 
     @ApiModelProperty(name="finprodAbbr",value="资产简称")
     private String finprodAbbr;
@@ -150,7 +156,7 @@ public class CfetsPrimaryBidManageResponse {
     }
 
     public String getTenderTargetStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.招标方式, this.getTenderTarget());
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, this.getTenderTarget());
     }
 
     public void setTenderTargetStr(String tenderTargetStr) {
@@ -244,6 +250,14 @@ public class CfetsPrimaryBidManageResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getStatusStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.有效状态, this.getStatus());
+    }
+
+    public void setStatusStr(String statusStr) {
+        this.statusStr = statusStr;
     }
 
     public String getBidType() {
@@ -340,5 +354,13 @@ public class CfetsPrimaryBidManageResponse {
 
     public void setIsWinStr(String isWinStr) {
         this.isWinStr = isWinStr;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
     }
 }
