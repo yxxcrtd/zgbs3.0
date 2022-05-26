@@ -214,9 +214,15 @@ public class CommonPositionEngineService {
      */
     public String getExchangeTradePlatform(String entrustId, String tradePlat, String ps, String finprodId, String interfaceType){
         // 债券接口调用头寸引擎对应场景的交易平台
-        if(INTERF_TYPE_BOND002.equals(interfaceType) || INTERF_TYPE_BOND003.equals(interfaceType)){
+        if (INTERF_TYPE_BOND003.equals(interfaceType)) {
+            if (DictCodeList.交易平台_大宗交易平台.getValue().equals(tradePlat)
+                    || DictCodeList.交易平台_竞价撮合平台.getValue().equals(tradePlat)) {
+                return tradePlat;
+            }
+            return null;
+        } else if(INTERF_TYPE_BOND002.equals(interfaceType)) {
             return tradePlat;
-        }else{
+        } else {
             if(StringUtil.isEmpty(entrustId)){ // 存续期无指令
                 return tradePlat;
             }else{
