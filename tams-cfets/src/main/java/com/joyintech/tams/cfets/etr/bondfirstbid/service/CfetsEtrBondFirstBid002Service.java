@@ -1146,6 +1146,18 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                             //连续投标限制
                             if (StringUtil.isNotEmpty(finProductInfo.getSeriYN()) && DictCodeList.是否_是.getValue().equals(finProductInfo.getSeriYN())) {
 
+                                if (finProductInfo.getTenderUnit() != null) {
+                                    List<BigDecimal> bidPriceSortnew = new ArrayList<>();
+                                    for (int i = 0; i < bidPriceSort.size() - 1; i++) {
+                                        bidPriceSortnew.add(bidPriceSort.get(i + 1).subtract(bidPriceSort.get(i)));
+                                    }
+                                    if (CollectionUtils.isNotEmpty(bidPriceSortnew)) {
+                                        if (bidPriceSortnew.contains(finProductInfo.getTenderUnit())) {
+                                            errorMessageList.add("连续投标限制");
+                                        }
+                                    }
+                                }
+
                             }
                         }
                     }
