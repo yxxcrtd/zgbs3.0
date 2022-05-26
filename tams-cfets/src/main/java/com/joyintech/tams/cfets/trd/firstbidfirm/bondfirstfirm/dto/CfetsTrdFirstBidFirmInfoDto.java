@@ -503,6 +503,13 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
         this.bidPriceTotal = bidPriceTotal;
     }
 
+    /**
+     * 中标标位
+     *
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/5/25 9:34
+     */
     public BigDecimal getWinPrice() {
         return winPrice;
     }

@@ -126,11 +126,13 @@
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
-            CASE WHEN (bo.BID_ID IS NOT NULL AND bo.BID_MODLE = '03') OR brt.IS_WIN = '04' THEN '04'
-            WHEN bo.BID_ID IS  NULL THEN '01'
-            WHEN brt.IS_WIN = '03' THEN '03'
-            WHEN (bo.BID_MODLE IN ('01', '02') AND brt.TOTAL_WIN_ID IS NULL) THEN '02'
-            ELSE '05'
+            CASE
+                WHEN fpi.ISSUE_CLASS = '01' THEN NULL
+                WHEN (bo.BID_ID IS NOT NULL AND bo.BID_MODLE = '03') OR brt.IS_WIN = '04' THEN '04'
+                WHEN bo.BID_ID IS  NULL THEN '01'
+                WHEN brt.IS_WIN = '03' THEN '03'
+                WHEN (bo.BID_MODLE IN ('01', '02') AND brt.TOTAL_WIN_ID IS NULL) THEN '02'
+                ELSE '05'
             END AS firstBidStatus,
             ee.FINPROD_ID finprodId,
             fp.FINPROD_MARKET_ID finprodMarketId,
@@ -291,11 +293,13 @@
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
-            CASE WHEN (bo.BID_ID IS NOT NULL AND bo.BID_MODLE = '03') OR brt.IS_WIN = '04' THEN '04'
-            WHEN bo.BID_ID IS  NULL THEN '01'
-            WHEN brt.IS_WIN = '03' THEN '03'
-            WHEN (bo.BID_MODLE IN ('01', '02') AND brt.TOTAL_WIN_ID IS NULL) THEN '02'
-            ELSE '05'
+            CASE
+                WHEN fpi.ISSUE_CLASS = '01' THEN NULL
+                WHEN (bo.BID_ID IS NOT NULL AND bo.BID_MODLE = '03') OR brt.IS_WIN = '04' THEN '04'
+                WHEN bo.BID_ID IS  NULL THEN '01'
+                WHEN brt.IS_WIN = '03' THEN '03'
+                WHEN (bo.BID_MODLE IN ('01', '02') AND brt.TOTAL_WIN_ID IS NULL) THEN '02'
+                ELSE '05'
             END AS firstBidStatus,
             ee.FINPROD_ID finprodId,
             fp.FINPROD_MARKET_ID finprodMarketId,
@@ -494,19 +498,87 @@
 
     <select id="findIssueInfoPage"  parameterType="Map"
             resultType="com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto">
-        select * from (select aaa.* from (
-            <include refid="finProductInfo"></include>
+        select * from (
+            select
+                aaa.issueStage,
+                aaa.finprodMarketId,
+                aaa.finprodAbbr,
+                aaa.finprodId,
+                aaa.issueClass,
+                aaa.planIssueAmt,
+                aaa.issueDateStart,
+                aaa.issueDateEnd,
+                aaa.payEdate,
+                aaa.couponSpecies,
+                aaa.intType,
+                aaa.issuePrice,
+                aaa.referYieldStr,
+                aaa.firstConfirmDate,
+                aaa.minPamt,
+                aaa.maxPamt,
+                aaa.tradeMarket,
+                aaa.issuer,
+                aaa.ccy,
+                aaa.type9,
+                aaa.type10,
+                aaa.type11,
+                aaa.remark,
+                aaa.tenderType,
+                aaa.issueStyle,
+                aaa.issueDateStr,
+                aaa.payEdateStr,
+                aaa.firstConfirmDateStr
+        from (
+                <include refid="finProductInfo"></include>
+                UNION
+                <include refid="interfFinProductInfo"></include>
 
-        ) aaa
+            ) aaa
         left join SYS_DATADICT_LIST sdl on aaa.issueClass = sdl.ITEM_CODE and sdl.DICT_CODE = 'ISSUE_CLASS'
-        left join SYS_DATADICT_LIST sdl2 on aaa.couponSpecies = sdl.ITEM_CODE and sdl.DICT_CODE = 'COUPON_SPECIES'
-        left join SYS_DATADICT_LIST sdl3 on aaa.intType = sdl.ITEM_CODE and sdl.DICT_CODE = 'INT_TYPE'
-        left join SYS_DATADICT_LIST sdl4 on aaa.type9 = sdl.ITEM_CODE and sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO'
-        left join SYS_DATADICT_LIST sdl5 on aaa.type10 = sdl.ITEM_CODE and sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_THREE'
-        left join SYS_DATADICT_LIST sdl6 on aaa.type11 = sdl.ITEM_CODE and sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_FOUR'
-        left join SYS_DATADICT_LIST sdl7 on aaa.ccy = sdl.ITEM_CODE and sdl.DICT_CODE = 'CCY'
+        left join SYS_DATADICT_LIST sdl2 on aaa.couponSpecies = sdl2.ITEM_CODE and sdl2.DICT_CODE = 'COUPON_SPECIES'
+        left join SYS_DATADICT_LIST sdl3 on aaa.intType = sdl3.ITEM_CODE and sdl3.DICT_CODE = 'INT_TYPE'
+        left join SYS_DATADICT_LIST sdl4 on aaa.type9 = sdl4.ITEM_CODE and sdl4.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO'
+        left join SYS_DATADICT_LIST sdl5 on aaa.type10 = sdl5.ITEM_CODE and sdl5.DICT_CODE = 'CUSTOM_ASSET_TYPE_THREE'
+        left join SYS_DATADICT_LIST sdl6 on aaa.type11 = sdl6.ITEM_CODE and sdl6.DICT_CODE = 'CUSTOM_ASSET_TYPE_FOUR'
+        left join SYS_DATADICT_LIST sdl7 on aaa.ccy = sdl7.ITEM_CODE and sdl7.DICT_CODE = 'CCY'
+        LEFT JOIN SYS_DATADICT_LIST sdl8 ON aaa.tradeMarket = sdl8.ITEM_CODE AND sdl8.DICT_CODE = 'TRADE_PLACE'
         <where>
-            aaa.filterDate  <![CDATA[>=]]> to_date(#{platformDate}, 'yyyy-MM-dd')
+            <if test="finprodMarketId !=null and finprodMarketId !=''">
+                AND aaa.finprodMarketId=#{finprodMarketId,jdbcType=VARCHAR}
+            </if>
+            <if test="issueClass !=null and issueClass !=''">
+                AND aaa.issueClass=#{issueClass,jdbcType=VARCHAR}
+            </if>
+            <if test="couponSpecies !=null and couponSpecies !=''">
+                AND aaa.couponSpecies=#{couponSpecies,jdbcType=VARCHAR}
+            </if>
+            <if test="intType !=null and intType !=''">
+                AND aaa.intType=#{intType,jdbcType=VARCHAR}
+            </if>
+            <if test="type9List != null and type9List.size() > 0">
+                AND aaa.type9 in
+                <foreach collection="type9List" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="type10List != null and type10List.size() > 0">
+                AND aaa.type10 in
+                <foreach collection="type10List" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="type11List != null and type11List.size() > 0">
+                AND aaa.type11 in
+                <foreach collection="type11List" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="ccy !=null and ccy !=''">
+                AND aaa.ccy=#{ccy,jdbcType=VARCHAR}
+            </if>
+            <if test="tradeMarket !=null and tradeMarket !=''">
+                AND aaa.tradeMarket=#{tradeMarket,jdbcType=VARCHAR}
+            </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND aaa.finprodId in
                 <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -514,8 +586,8 @@
                 </foreach>
             </if>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
-                AND aaa.issueDate <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
-                AND aaa.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
+                AND aaa.issueDateStart <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
+                AND aaa.issueDateEnd <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
             </if>
             <if test="issueStage != null and issueStage.size() > 0">
                 AND aaa.issueStage in
@@ -542,23 +614,23 @@
             sdl5.ITEM_VALUE like '%' || #{search} || '%' OR
             sdl6.ITEM_VALUE like '%' || #{search} || '%' OR
             sdl7.ITEM_VALUE like '%' || #{search} || '%' OR
+            sdl8.ITEM_VALUE like '%' || #{search} || '%' OR
             aaa.finprodMarketId like '%' || #{search} || '%' OR
             aaa.finprodAbbr like '%' || #{search} || '%' OR
             aaa.planIssueAmt ||''= #{search} OR
-            to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search} OR
+            to_char(aaa.planIssueAmt , 'FM9999999999999990.9990') || '' = #{search} OR
             to_char(aaa.payEdate,'yyyy-MM-dd')  = #{search} OR
-            to_char(aaa.issueDate,'yyyyMMdd')  = #{search} OR
             to_char(aaa.payEdate,'yyyyMMdd')  = #{search} OR
             aaa.issuePrice ||''= #{search} OR
+            to_char(aaa.issuePrice , 'FM9999999999999990.9990') || '' = #{search} OR
             aaa.referYieldStr ||''= #{search} OR
             to_char(aaa.firstConfirmDate,'yyyy-MM-dd')  = #{search} OR
             to_char(aaa.firstConfirmDate,'yyyyMMdd')  = #{search} OR
             aaa.minPamt ||''= #{search} OR
+            to_char(aaa.minPamt , 'FM9999999999999990.9990') || '' = #{search} OR
             aaa.maxPamt ||''= #{search} OR
-            aaa.subRate like '%' || #{search} || '%' OR
-            aaa.subRateOrg like '%' || #{search} || '%' OR
-            aaa.debRate like '%' || #{search} || '%' OR
-            aaa.debRateOrg like '%' || #{search} || '%' OR
+            to_char(aaa.maxPamt , 'FM9999999999999990.9990') || '' = #{search} OR
+            aaa.issueDateStr ||''= #{search} OR
             aaa.remark like '%' || #{search} || '%'
             )
         </if>
@@ -568,58 +640,49 @@
             '02' AS issueStage,
             SEC_INFO.SEC_ID finprodMarketId,
             SEC_INFO.BOND_ABBREVIATION finprodAbbr,
-            null as finprodId,
-            nvl(RDI_RELEASE_INFO.ISSUE_METHOD ,RELEASE_INFO.ISSUING_METHOD) as issueClass,
-            nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 10000 , ROUND(RELEASE_INFO.ISSUE_SIZE / 10000, 2)) as planIssueAmt,
-            nvl(RDI_RELEASE_INFO.ISSUE_DATE, RELEASE_INFO.ISSUE_DATE) AS issueDate,
-            nvl(RDI_RELEASE_INFO.EVENT_DATE, RELEASE_INFO.PAYMENT_DEADLINE) AS payEdate,
+            NULL AS finprodId,
+            nvl(RDI_RELEASE_INFO.ISSUE_METHOD , RELEASE_INFO.ISSUING_METHOD) AS issueClass,
+            trunc(nvl(RDI_RELEASE_INFO.ISSUE_SIZE, RELEASE_INFO.ISSUE_SIZE), 2) AS planIssueAmt,
+            nvl(to_date(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyyMMdd') , RELEASE_INFO.ISSUE_DATE) AS issueDateStart,
+            nvl(to_date(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyyMMdd'), RELEASE_INFO.ISSUE_DATE)  AS issueDateEnd,
+            nvl(to_date(RDI_RELEASE_INFO.EVENT_DATE, 'yyyyMMdd'), RELEASE_INFO.EVENT_DATE)  AS payEdate,
             SEC_INFO.VARIETY_OF_COUPONS couponSpecies,
             SEC_INFO.RATE_TYPE intType,
-            nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) as issuePrice,
-            nvl(RDI_RELEASE_INFO_CP.COUPON_RATE, RELEASE_INFO.COUPON_RATE) as referYield,
-            nvl(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, RELEASE_INFO.INTEREST_ACCRUAL_DATE) AS firstConfirmDate,
-            nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as minPamt,
-            nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as maxPamt,
+            nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) AS issuePrice,
+            nvl(to_char(RDI_RELEASE_INFO.COUPON_RATE * 100 , 'FM9999999999999990.9990') , to_char(RELEASE_INFO.COUPON_RATE * 100 , 'FM9999999999999990.9990')) || ' %' AS referYieldStr,
+            nvl(to_date(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyyMMdd'), RELEASE_INFO.INTEREST_ACCRUAL_DATE)  AS firstConfirmDate,
+            nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 100000000, 2)) AS minPamt,
+            nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 100000000, 2)) AS maxPamt,
             SEC_INFO.TRADING_PLACES tradeMarket,
-            SEC_INFO.ISSUER as issuer,
+            SEC_INFO.ISSUER AS issuer,
             SEC_INFO.CURRENCY ccy,
             SEC_INFO.PRIMARY_CLASSIFICATION type9,
             SEC_INFO.SECONDARY_CLASSIFICATION type10,
-            null as type11,
-            ZT.RATING as subRate,
-            MCI.CUSTOMER_NAME as subRateOrg,
-            ZX.RATING as debRate,
-            MCIT.CUSTOMER_NAME as debRateOrg,
-            RDI_RELEASE_INFO.REMARK as remark,
-            RELEASE_INFO.BIDDING_METHOD as tenderType,
-            RELEASE_INFO.RELEASE_TYPE as issueStyle,
-            nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE,'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.ISSUE_DATE,'yyyy-MM-dd'))  AS issueDateStr,
-            nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE,'yyyy-MM-dd'), TO_CHAR( RELEASE_INFO.PAYMENT_DEADLINE,'yyyy-MM-dd'))  AS payEdateStr,
-            nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE,'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,'yyyy-MM-dd'))  AS firstConfirmDateStr
+            NULL AS type11,
+            RDI_RELEASE_INFO.REMARK AS remark,
+            RELEASE_INFO.BIDDING_METHOD AS tenderType,
+            RELEASE_INFO.RELEASE_TYPE AS issueStyle,
+            nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) AS issueDateStr,
+            nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_CHAR( RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) AS payEdateStr,
+            nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')) AS firstConfirmDateStr
 
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
-        LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
-        LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
-        LEFT JOIN (SELECT * FROM INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in('CD','14')) RDI_RELEASE_INFO_CP ON
-            RDI_RELEASE_INFO_CP.SECURITY_ID = SEC_INFO.SEC_ID
-        LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
-                                                                      SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
-                        ,BRATING.GRADE_RESULT DESC) RANK,BRATING.O_CODE AS ASSET_CODE,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
-                                                                      FROM MST_BOND_CREDIT_RATING BRATING
-                                                                      WHERE BRATING.O_TYPE = '01' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
-                                                                  ) WHERE RANK=1
-        ) ZT on PRODUCT.FINPROD_MARKET_ID = ZT.ASSET_CODE
-        LEFT JOIN MST_CUSTOMER_INFO MCI ON MCI.CUSTOMER_ID=ZT.GRADE_ORG_ID
-        LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
-                                                                      SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
-                            ,BRATING.GRADE_RESULT DESC ) RANK ,BRATING.O_CODE AS ASSET_CODE ,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
-                                                                      FROM MST_BOND_CREDIT_RATING BRATING
-                                                                      WHERE BRATING.O_TYPE = '02' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
-                                                                  ) WHERE RANK=1
-        ) ZX ON PRODUCT.FINPROD_MARKET_ID = ZX.ASSET_CODE
-        LEFT JOIN MST_CUSTOMER_INFO MCIT ON MCIT.CUSTOMER_ID=ZX.GRADE_ORG_ID
+                 LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
+                 LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
+                 LEFT JOIN MST_CUSTOMER_INFO_ADD CUSTOMER_INFO_ADD on SEC_INFO.ISSUER = CUSTOMER_INFO_ADD.INSITITUTE_CODE
+                 LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO on CUSTOMER_INFO_ADD.CUSTOMER_ID = CUSTOMER_INFO.CUSTOMER_ID
+                 LEFT JOIN FIN_PRODUCT PRODUCT on SEC_INFO.SEC_ID = PRODUCT.FINPROD_MARKET_ID
+        <where>
+            SEC_INFO.TRADING_PLACES in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
+            AND (
+                CASE
+                WHEN RELEASE_INFO.LISTING_DATE IS NOT NULL THEN RELEASE_INFO.LISTING_DATE -1
+                WHEN RELEASE_INFO.ISSUE_DATE IS NOT NULL THEN RELEASE_INFO.ISSUE_DATE
+                END <![CDATA[>=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+            )
+        </where>
     </sql>
-    <sql id="finProductInfo">
+        <sql id="finProductInfo">
         SELECT
             CASE WHEN <![CDATA[
                 ISSUE.ISSUE_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') or
@@ -627,21 +690,19 @@
                      WHEN PRODUCT_ADD.LISTING_DATE > TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '02'
                 ]]>
             ELSE NULL END AS issueStage,
-            CASE
-                WHEN PRODUCT_ADD.LISTING_DATE IS NOT NULL THEN PRODUCT_ADD.LISTING_DATE
-                WHEN ISSUE.ISSUE_DATE IS NOT NULL THEN ISSUE.ISSUE_DATE
-                ELSE ISSUE.TENDER_EDATE
-                END AS filterDate,
             PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
             PRODUCT.FINPROD_ABBR as finprodAbbr,
             PRODUCT.FINPROD_ID as finprodId,
             ISSUE.ISSUE_CLASS as issueClass,
             round(ISSUE.PLAN_ISSUE_AMT/100000000,2) as planIssueAmt,
             case
-            when ISSUE.ISSUE_CLASS IN ('01')  THEN
-            ISSUE.ISSUE_DATE
+            when ISSUE.ISSUE_CLASS ='01' THEN ISSUE.ISSUE_DATE
+            else nvl(ISSUE.ISSUE_DATE,ISSUE.TENDER_SDATE)
+            end as issueDateStart,
+            case
+            when ISSUE.ISSUE_CLASS ='01' THEN ISSUE.ISSUE_DATE
             else nvl(ISSUE.ISSUE_DATE,ISSUE.TENDER_EDATE)
-            end as issueDate,
+            end as issueDateEnd,
             nvl(ISSUE.PAY_EDATE, ISSUE.PAY_DATE) AS payEdate,
             PRODUCT.COUPON_SPECIES as couponSpecies,
             ISSUE.INT_TYPE as intType,
@@ -660,15 +721,14 @@
             PRODUCT_TYPE.TYPE_9 as type9,
             PRODUCT_TYPE.TYPE_10 as type10,
             PRODUCT_TYPE.TYPE_11 as type11,
-            ZT.RATING as subRate,
-            MCI.CUSTOMER_NAME as subRateOrg,
-            ZX.RATING as debRate,
-            MCIT.CUSTOMER_NAME as debRateOrg,
             PRODUCT.REMARK as remark,
             ISSUE.TENDER_TYPE as tenderType,
             ISSUE.ISSUE_STYLE as issueStyle,
-            case when ISSUE.ISSUE_DATE is null then to_char(ISSUE.TENDER_SDATE,'yyyy-mm-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-mm-dd')
-            else to_char(ISSUE.ISSUE_DATE,'yyyy-mm-dd') end as issueDateStr,
+            case
+            when ISSUE.ISSUE_CLASS ='01' THEN to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+            when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+            else to_char(ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+            end as issueDateStr,
             nvl(TO_CHAR(ISSUE.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(ISSUE.PAY_DATE, 'yyyy-MM-dd')) AS payEdateStr,
             TO_CHAR(ISSUE.FIRST_CONFIRM_DATE, 'yyyy-MM-dd')  as firstConfirmDateStr
 
@@ -677,66 +737,18 @@
         LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID
         LEFT JOIN MST_INT_RATE_INFO miri ON miri.INT_RATE_ID  = ISSUE.INT_RATE_ID AND miri.EFF_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')
-        LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
-                    SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
-                        ,BRATING.GRADE_RESULT DESC) RANK,BRATING.O_CODE AS ASSET_CODE,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
-                    FROM MST_BOND_CREDIT_RATING BRATING
-                    WHERE BRATING.O_TYPE = '01' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
-                    ) WHERE RANK=1
-        ) ZT on PRODUCT.FINPROD_MARKET_ID = ZT.ASSET_CODE
-        LEFT JOIN MST_CUSTOMER_INFO MCI ON MCI.CUSTOMER_ID=ZT.GRADE_ORG_ID
-        LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
-                        SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
-                            ,BRATING.GRADE_RESULT DESC ) RANK ,BRATING.O_CODE AS ASSET_CODE ,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
-                        FROM MST_BOND_CREDIT_RATING BRATING
-                        WHERE BRATING.O_TYPE = '02' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
-                        ) WHERE RANK=1
-        ) ZX ON PRODUCT.FINPROD_MARKET_ID = ZX.ASSET_CODE
-        LEFT JOIN MST_CUSTOMER_INFO MCIT ON MCIT.CUSTOMER_ID=ZX.GRADE_ORG_ID
         LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on ISSUE.INT_RATE_ID = SDLDATA.ITEM_CODE
         <where>
             PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
             AND PRODUCT.TRADE_MARKET in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
             AND (PRODUCT_ADD.ISSUE_STATUS != '02' OR PRODUCT_ADD.ISSUE_STATUS IS NULL ) <!-- 限制为发行状态不为发行失败-->
-            <if test="finprodMarketId !=null and finprodMarketId !=''">
-                AND PRODUCT.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
-            </if>
-            <if test="issueClass !=null and issueClass !=''">
-                AND ISSUE.ISSUE_CLASS=#{issueClass,jdbcType=VARCHAR}
-            </if>
-            <if test="couponSpecies !=null and couponSpecies !=''">
-                AND PRODUCT.COUPON_SPECIES=#{couponSpecies,jdbcType=VARCHAR}
-            </if>
-            <if test="intType !=null and intType !=''">
-                AND ISSUE.INT_TYPE=#{intType,jdbcType=VARCHAR}
-            </if>
-            <if test="customAssetType !=null and customAssetType !=''">
-                AND PRODUCT_TYPE.TYPE_11=#{customAssetType,jdbcType=VARCHAR}
-            </if>
-            <if test="type9List != null and type9List.size() > 0">
-                AND PRODUCT_TYPE.type_9 in
-                <foreach collection="type9List" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="type10List != null and type10List.size() > 0">
-                AND PRODUCT_TYPE.type_10 in
-                <foreach collection="type10List" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="type11List != null and type11List.size() > 0">
-                AND PRODUCT_TYPE.type_11 in
-                <foreach collection="type11List" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="ccy !=null and ccy !=''">
-                AND PRODUCT.CCY=#{ccy,jdbcType=VARCHAR}
-            </if>
-            <if test="tradeMarket !=null and tradeMarket !=''">
-                AND PRODUCT.TRADE_MARKET=#{tradeMarket,jdbcType=VARCHAR}
-            </if>
+            AND (
+                CASE
+                WHEN PRODUCT_ADD.LISTING_DATE IS NOT NULL THEN PRODUCT_ADD.LISTING_DATE -1
+                WHEN ISSUE.ISSUE_DATE IS NOT NULL THEN ISSUE.ISSUE_DATE
+                WHEN ISSUE.TENDER_EDATE IS NOT NULL THEN ISSUE.TENDER_EDATE
+                END <![CDATA[>=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+            )
         </where>
 
     </sql>

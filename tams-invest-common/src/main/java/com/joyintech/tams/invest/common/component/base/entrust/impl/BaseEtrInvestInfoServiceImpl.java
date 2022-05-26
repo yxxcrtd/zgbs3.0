@@ -582,7 +582,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 保存List<委托投标标位表>
             if (dto.getBidPriceList() != null && !dto.getBidPriceList().isEmpty()) {
                 for (EtrEntrustBidPrice etrEntrustBidPrice : dto.getBidPriceList()) {
-                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice().divide(BigDecimal.valueOf(100)));
+                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice());
                     etrEntrustBidPriceMapper.insertSelective(etrEntrustBidPrice);
                 }
             }
@@ -643,7 +643,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 保存List<委托投标标位表>
             if (dto.getBidPriceList() != null && !dto.getBidPriceList().isEmpty()) {
                 for (EtrEntrustBidPrice etrEntrustBidPrice : dto.getBidPriceList()) {
-                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice().divide(BigDecimal.valueOf(100)));
+                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice());
                     etrEntrustBidPriceMapper.insertSelective(etrEntrustBidPrice);
                 }
             }
@@ -1294,7 +1294,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 保存List<委托投标标位表>
             if (dto.getBidPriceList() != null && !dto.getBidPriceList().isEmpty()) {
                 for (EtrEntrustBidPrice etrEntrustBidPrice : dto.getBidPriceList()) {
-                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice().divide(BigDecimal.valueOf(100)));
+                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice());
                     WflEtrEntrustBidPrice wflEtrEntrustBidPrice = new WflEtrEntrustBidPrice();
                     BeanUtil.copyPropertiesIgnoreNull(wflEtrEntrustBidPrice,etrEntrustBidPrice);
                     wflEtrEntrustBidPrice.setWorkflowId(dto.getWorkFlowId());
@@ -1354,7 +1354,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 保存List<委托投标标位表>
             if (dto.getBidPriceList() != null && !dto.getBidPriceList().isEmpty()) {
                 for (EtrEntrustBidPrice etrEntrustBidPrice : dto.getBidPriceList()) {
-                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice().divide(BigDecimal.valueOf(100)));
+                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice());
                     WflEtrEntrustBidPrice wflEtrEntrustBidPrice = new WflEtrEntrustBidPrice();
                     BeanUtil.copyPropertiesIgnoreNull(wflEtrEntrustBidPrice,etrEntrustBidPrice);
                     wflEtrEntrustBidPrice.setWorkflowId(dto.getWorkFlowId());
