@@ -13,7 +13,9 @@ import com.joyintech.background.component.order.exchange.common.service.impl.Etr
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.common.service.WFlowCommonService;
@@ -374,6 +376,18 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
                 ServiceApplication.ENTRUST_SERVICE_NAME + "/common/entrustcommonbase/doDeleteEtrFlow", param,
                 Boolean.class);
     }
+
+    /**
+     * 查询证券代码
+     *
+     * @return
+     */
+    public Page<SelectOptionDto> getFinprodMarketInfo(Map<String, Object> map) {
+        return restTemplate.postForPage(
+                ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getFinprodMarketInfoCds", map,
+                SelectOptionDto.class);
+    }
+
     /**
      * 插入和修改时，指令持仓流水 、现金流水处理,支持多组合
      * add by zhangpei
