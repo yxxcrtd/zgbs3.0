@@ -2503,7 +2503,11 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         if (StringUtil.equals(targetType, DictCodeListExt3.目标类型_数量.getValue())) {
 //            entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
            if(StringUtils.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),finprodType2)){
-                entrustAmt = ArithmeticUtil.multiply(entrustNum, fprice);
+               if(fprice.compareTo(BigDecimal.ZERO)==0){
+                   entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
+               }else{
+                   entrustAmt = ArithmeticUtil.multiply(entrustNum, fprice);
+               }
             } else {
                 entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
             }
