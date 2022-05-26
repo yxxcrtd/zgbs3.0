@@ -18,6 +18,7 @@ import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
@@ -240,6 +241,7 @@ public class CommonCheckKit extends BaseCheckKit {
         }
 
         if (InvestmentAssetType.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
                 && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
             minStep = minStep / 100;
         }
@@ -307,6 +309,7 @@ public class CommonCheckKit extends BaseCheckKit {
         }
 
         if (InvestmentAssetType.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
                 && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
             minNum = minNum / 100;
         }
