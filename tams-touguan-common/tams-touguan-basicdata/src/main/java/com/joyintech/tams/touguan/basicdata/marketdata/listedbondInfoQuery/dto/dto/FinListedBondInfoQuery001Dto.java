@@ -7,6 +7,7 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import io.swagger.annotations.ApiModel;
@@ -16,6 +17,7 @@ import org.apache.commons.compress.utils.Lists;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 债券市场列表信息查看DTO
@@ -572,6 +574,9 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     }
 
     public String getIssuePx() {
+        if(Objects.nonNull(getCouponSpecies()) && (getCouponSpecies().equals(BussinessDictCodeList.息票品种_附息.getValue()) || getCouponSpecies().equals(BussinessDictCodeList.息票品种_利随本清.getValue())) ){
+            return "100.0000";
+        }
         return issuePx;
     }
 
