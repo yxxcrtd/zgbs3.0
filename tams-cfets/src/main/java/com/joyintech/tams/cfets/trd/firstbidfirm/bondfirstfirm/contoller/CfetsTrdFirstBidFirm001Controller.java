@@ -40,10 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 一级投标确认 初始化页面
@@ -86,6 +83,12 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         initPageParams.put("FIRST_BID_STATUS", this.getSelectDataFromDataDic(DictCode.一级投标中标状态, null));
         initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
+        // 招标标的_利率
+        initPageParams.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
+        // 招标标的_利差
+        initPageParams.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_利差.getValue());
+        // 招标标的_价格
+        initPageParams.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_价格.getValue());
         // 缴款方式
         initPageParams.put("PAY_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.缴款方式, null));
         initPageParams.put("PAY_TYPE_01", BussinessDictCodeList.缴款方式_一级分销.getValue());
@@ -112,7 +115,7 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         //当前用户
         initPageParams.put("userId", SecurityUtil.getLoginUser().getUserName());
         //pageId
-        initPageParams.put("pageId", this.getPageId());
+        initPageParams.put("pageId", "CfetsTrdFirstBidFirm002");
         return new Message<Map<String, Object>>(initPageParams).success();
 
     }

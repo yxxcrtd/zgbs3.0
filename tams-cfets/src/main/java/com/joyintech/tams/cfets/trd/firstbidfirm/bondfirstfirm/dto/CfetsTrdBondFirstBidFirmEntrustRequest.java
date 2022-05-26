@@ -60,6 +60,9 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
     @ApiModelProperty(name="counterName",value="交易对手名称",example="A1")
     private String counterName;
 
+    @ApiModelProperty(name = "existEntrustIds", value = "etrAddSearch接口,已存在的指令代码,用于过滤申购产品列表中已添加的指令", example = "[WTBOND2022041801,WTBOND2022041802]")
+    private List<String> existEntrustIds;
+
     public PageMode getPageMode() {
         return pageMode;
     }
@@ -197,5 +200,13 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     public void setCounterName(String counterName) {
         this.counterName = counterName;
+    }
+
+    public List<String> getExistEntrustIds() {
+        return existEntrustIds;
+    }
+
+    public void setExistEntrustIds(List<String> existEntrustIds) {
+        this.existEntrustIds = existEntrustIds;
     }
 }

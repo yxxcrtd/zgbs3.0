@@ -71,4 +71,25 @@ public class BigDecimalUtil {
         return false;
     }
 
+    /**
+     * 获取 a 是否是b的整数倍,即a除b是否为整数
+     *
+     * @param a
+     * @param b
+     * @return boolean 是 true 否 false
+     * @author jiangpeng
+     * @date 2022/5/25 11:05
+     */
+    public static boolean divideResultIsInteger(BigDecimal a, BigDecimal b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        if (BigDecimal.ZERO.compareTo(b) == 0) {
+            return false;
+        }
+        BigDecimal integerResult = a.divide(b, RoundingMode.HALF_DOWN);
+        BigDecimal result = a.divide(b, 12, RoundingMode.HALF_UP);
+        return result.compareTo(integerResult) == 0;
+    }
+
 }

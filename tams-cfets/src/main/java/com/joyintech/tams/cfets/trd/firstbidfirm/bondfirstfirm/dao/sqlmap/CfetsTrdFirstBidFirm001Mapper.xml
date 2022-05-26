@@ -17,14 +17,12 @@
     <sql id="keywordsWhere">
         <if test="search != null and search != ''">
             ( T.entrustStatus || '|' || sdl_es.item_value || '|' || T.finprodId || '|' || T.finprodMarketId || '|'
-            || '|' || T.finprodAbbr || '|' || T.portfolioName || '|' || T.portfolioId || '|' || T.secManageAcctId
-            || '|' || T.secAcctName || '|' || T.invManagerName || '|' || T.entrustId || '|' || T.remark
+            || '|' || T.finprodAbbr || '|' || T.portfolioName || '|' || T.portfolioId  || '|' || T.invManagerName || '|' || T.entrustId || '|' || T.remark
             like '%' || #{search} || '%'
             or decode(T.transactioncom,0,'0.00',to_char(T.transactioncom,'FM90.90'))=#{search} or to_char(T.transactioncom)=#{search}
             or decode(T.tradeFinishPercent,0,'0.00',to_char(T.tradeFinishPercent,'FM90.90'))=#{search} or to_char(T.tradeFinishPercent)=#{search}
             or decode(T.entrustNum,0,'0.00',to_char(T.entrustNum/10000,'FM999999999990.90'))=#{search} or to_char(T.entrustNum)=#{search}
             or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{search}
-            or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.entrustDate,'yyyy-MM-dd'),'-','/')=#{search}
             or T.transmitTime=#{search}
             )
@@ -230,6 +228,13 @@
             <if test="entrustIdList != null and entrustIdList.size()>0">
                 AND
                 <foreach collection="entrustIdList" open=" T.entrustId in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+                /*指令代码查询*/
+            </if>
+            <if test="existEntrustIds != null and existEntrustIds.size()>0">
+                AND
+                <foreach collection="existEntrustIds" open=" T.entrustId not in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
                 /*指令代码查询*/
@@ -524,7 +529,7 @@
            T.remark
     from (SELECT CASE
                      WHEN bo.IS_CANCEL = 'Y' THEN '03'
-                     ELSE '01' END AS validStatus/*有效状态*/,
+                     ELSE '02' END AS validStatus/*有效状态*/,
                  CASE
                      WHEN brt.IS_WIN = 'Y' THEN '04'
                      WHEN brt.IS_WIN = 'N' THEN '03'
@@ -582,7 +587,7 @@
                FIN_PRODUCT fp
                ON fp.FINPROD_ID = bo.FINPROD_ID
                    LEFT JOIN
-               (select distinct ENTRUST_ID,BID_ID from BID_ORDER_BID_PRICE)
+               (select distinct ENTRUST_ID,BID_ID from BID_ORDER_BID_PRICE) bobp1
                ON bobp1.BID_ID = bo.BID_ID
                    LEFT JOIN
                FIN_PRODUCT_ISSUE fpi
@@ -632,7 +637,7 @@
                 AND bo.BID_ID LIKE CONCAT('%',CONCAT(#{bidId},'%'))
             </if>
           union all
-          SELECT '04' AS validStatus/*有效状态*/,
+          SELECT '01' AS validStatus/*有效状态*/,
                  CASE
                      WHEN brt.IS_WIN = 'Y' THEN '04'
                      WHEN brt.IS_WIN = 'N' THEN '03'
@@ -755,10 +760,10 @@
              </foreach>
          </if>
          <if test="bidDateStart != null">
-             AND T.bidDateStart = TO_DATE(#{bidDateStart},'yyyy-MM-dd')
+             AND T.bidDateStart = #{bidDateStart}
          </if>
          <if test="bidDateEnd != null">
-             AND T.bidDateEnd = TO_DATE(#{bidDateEnd},'yyyy-MM-dd')
+             AND T.bidDateEnd = #{bidDateEnd}
          </if>
          <if test="validStatus != null and validStatus.size()>0">
              AND
@@ -814,13 +819,15 @@
            T.listingDate,
            T.bidDate,
            T.counterId,
+           T.tradeMarket,
+           T.tenderTarget,
            T.counterName,
            T.remark,
            T.dealDate
     from (
              SELECT CASE
                         WHEN bo.IS_CANCEL = 'Y' THEN '03'
-                        ELSE '01' END AS validStatus/*有效状态*/,
+                        ELSE '02' END AS validStatus/*有效状态*/,
                     CASE
                         WHEN brt.IS_WIN = 'Y' THEN '04'
                         WHEN brt.IS_WIN = 'N' THEN '03'
@@ -830,6 +837,7 @@
                      fp.FINPROD_ID finprodId,
                      fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
                      fp.FINPROD_ABBR      finprodAbbr/*资产简称*/,
+                     fpi.TENDER_TARGET    tenderTarget/*招标标的*/,
                     CASE
                         WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
                             THEN fpi.ISSUE_DATE
@@ -866,6 +874,7 @@
                     bo.COUNTER_ID counterId/*交易对手*/,
                     mci.CUSTOMER_NAME AS counterName/*交易对手*/,
                     bo.REMARK         AS remark/*备注*/,
+                    fp.TRADE_MARKET      tradeMarket/*交易场所*/,
                     null                 dealDate/*成交日期*/
              FROM BID_ORDER bo
                       LEFT JOIN
@@ -941,7 +950,7 @@
                     AND bo.BID_ID LIKE CONCAT('%',CONCAT(#{bidId},'%'))
                 </if>
              union all
-             SELECT '04'            AS validStatus/*有效状态*/,
+             SELECT '01'            AS validStatus/*有效状态*/,
                     CASE
                         WHEN brt.IS_WIN = 'Y' THEN '04'
                         WHEN brt.IS_WIN = 'N' THEN '03'
@@ -951,6 +960,7 @@
                      fp.FINPROD_ID finprodId,
                      fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
                      fp.FINPROD_ABBR      finprodAbbr/*资产简称*/,
+                     fpi.TENDER_TARGET    tenderTarget/*招标标的*/,
                     CASE
                         WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
                             THEN fpi.ISSUE_DATE
@@ -987,6 +997,7 @@
                     bo.COUNTER_ID counterId/*交易对手*/,
                     mci.CUSTOMER_NAME AS counterName/*交易对手*/,
                     bo.REMARK       AS remark/*备注*/,
+                    fp.TRADE_MARKET      tradeMarket/*交易场所*/,
                     null               dealDate/*成交日期*/
              FROM WFL_BID_ORDER bo
                       LEFT JOIN
@@ -1077,10 +1088,10 @@
                 </foreach>
             </if>
             <if test="bidDateStart != null">
-                AND T.bidDateStart = TO_DATE(#{bidDateStart},'yyyy-MM-dd')
+                AND T.bidDateStart = #{bidDateStart}
             </if>
             <if test="bidDateEnd != null">
-                AND T.bidDateEnd = TO_DATE(#{bidDateEnd},'yyyy-MM-dd')
+                AND T.bidDateEnd = #{bidDateEnd}
             </if>
             <if test="validStatus != null and validStatus.size()>0">
                 AND
@@ -1092,7 +1103,7 @@
     group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId,
              T.finprodAbbr, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice, T.biddingMethod,
              T.payType, T.winPrice, T.price, T.payableAmount, T.settFeeAmt, T.payDate, T.assignRegdate, T.listingDate,
-             T.bidDate, T.counterName,T.remark, T.dealDate
+             T.bidDate, T.counterName,T.remark, T.dealDate,T.tradeMarket,T.tenderTarget,T.counterId
     </select>
 
     <!-- 分销买入 关键字 -->
@@ -1105,7 +1116,7 @@
             || '|' || T.finprodAbbr || '|' || T.counterId || '|' || T.counterName || '|' || T.remark
             like '%' || #{search} || '%'
             or decode(T.etrBidPriceTotal,0,'0.00',to_char(T.etrBidPriceTotal/10000,'FM99999999999990.90'))=#{search} or to_char(T.etrBidPriceTotal)=#{search}
-            or decode(T.totalBiddingNum,0,'0.00',to_char(T.totalBiddingNum/10000,'FM9999999999990.90'))=#{search} or to_char(T.totalBiddingNum)=#{search}
+            or decode(T.bidPriceTotal,0,'0.00',to_char(T.bidPriceTotal/10000,'FM9999999999990.90'))=#{search} or to_char(T.bidPriceTotal)=#{search}
             or decode(T.bidprice,0,'0.00',to_char(T.bidprice,'FM999999999990.9990'))=#{search} or to_char(T.bidprice)=#{search}
             or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{search}
