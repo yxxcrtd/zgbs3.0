@@ -57,6 +57,8 @@ import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -79,6 +81,8 @@ import java.util.*;
  */
 @Service
 public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> implements BaseProcessService<FinBondAssetSaveRequest>{
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private CommonAutoCouponService commonAutoService;
@@ -1576,8 +1580,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (!newPathFile.exists()){
             newPathFile.mkdir();
         }
+        logger.info("创建文件路径："+newPath+",文件名称："+newfileName);
         File folder = new SafelyFile(newPathFile,newfileName);
-        folder.createNewFile();
+        if (!folder.getParentFile().exists())
+            folder.getParentFile().mkdirs();
+        if (!folder.exists())
+            folder.createNewFile();
         FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
         SysUploadFileInfo fileInfo = new SysUploadFileInfo();
         String uuid = UUID.randomUUID().toString().replace("-", "");

@@ -583,10 +583,10 @@
         r.TYPE_6,
         r.TYPE_7,
         b.IS_NET_SETT,
-        b.IS_NO_GUARD,
         a.mdate,
         b.FACE_VALUE FACE_VALUE,
-        b.IS_NETPRICE IS_NETPRICE
+        b.IS_NETPRICE IS_NETPRICE,
+        b.IS_NO_GUARD
         from fin_product a
         left join fin_product_add b
         on b.FINPROD_ID = a.FINPROD_ID
