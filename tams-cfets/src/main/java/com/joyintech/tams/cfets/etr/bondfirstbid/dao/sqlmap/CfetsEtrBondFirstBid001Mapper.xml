@@ -128,10 +128,10 @@
             100                                      transProcess,
             CASE
                 WHEN fpi.ISSUE_CLASS = '01' THEN NULL
-                WHEN (bo.BID_ID IS NOT NULL AND bo.BID_MODLE = '03') OR brt.IS_WIN = '04' THEN '04'
-                WHEN bo.BID_ID IS  NULL THEN '01'
-                WHEN brt.IS_WIN = '03' THEN '03'
-                WHEN (bo.BID_MODLE IN ('01', '02') AND brt.TOTAL_WIN_ID IS NULL) THEN '02'
+                WHEN (bobrt.BID_MODLE IS NOT NULL AND bobrt.BID_MODLE = '03') OR bobrt.IS_WIN = '04' THEN '04'
+                WHEN bobrt.BID_MODLE IS NULL THEN '01'
+                WHEN bobrt.IS_WIN = '03' THEN '03'
+                WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
                 ELSE '05'
             END AS firstBidStatus,
             ee.FINPROD_ID finprodId,
@@ -222,8 +222,13 @@
             ON t3.FINPROD_ID = t2.FINPROD_ID
             group by t0.ENTRUST_ID) bobp
         ON bobp.ENTRUST_ID = ee.ENTRUST_ID
-        LEFT JOIN BID_ORDER bo ON bo.FINPROD_ID  = fp.FINPROD_ID AND bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
-        LEFT JOIN BID_RESULT_TOTAL brt ON brt.FINPROD_ID = fp.FINPROD_ID AND brt.BID_ID  = bo.BID_ID AND brt.STATUS = '01'
+        LEFT JOIN (
+            SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID   FROM  BID_ORDER bo
+            LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+            AND brt.FINPROD_ID = bo.FINPROD_ID
+            WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+            GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID
+        ) bobrt ON 	bobrt.FINPROD_ID = fp.FINPROD_ID
         LEFT JOIN (
                     SELECT
                         LISTAGG(eed.PORTFOLIO_ID, ',') WITHIN GROUP (ORDER BY (eed.PORTFOLIO_ID)) PORTFOLIO_ID,
@@ -295,10 +300,10 @@
             100                                      transProcess,
             CASE
                 WHEN fpi.ISSUE_CLASS = '01' THEN NULL
-                WHEN (bo.BID_ID IS NOT NULL AND bo.BID_MODLE = '03') OR brt.IS_WIN = '04' THEN '04'
-                WHEN bo.BID_ID IS  NULL THEN '01'
-                WHEN brt.IS_WIN = '03' THEN '03'
-                WHEN (bo.BID_MODLE IN ('01', '02') AND brt.TOTAL_WIN_ID IS NULL) THEN '02'
+                WHEN (bobrt.BID_MODLE IS NOT NULL AND bobrt.BID_MODLE = '03') OR bobrt.IS_WIN = '04' THEN '04'
+                WHEN bobrt.BID_MODLE IS NULL THEN '01'
+                WHEN bobrt.IS_WIN = '03' THEN '03'
+                WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
                 ELSE '05'
             END AS firstBidStatus,
             ee.FINPROD_ID finprodId,
@@ -389,8 +394,13 @@
             ON t3.FINPROD_ID = t2.FINPROD_ID
             group by t0.ENTRUST_ID) bobp
         ON bobp.ENTRUST_ID = ee.ENTRUST_ID
-        LEFT JOIN WFL_BID_ORDER bo ON bo.FINPROD_ID  = fp.FINPROD_ID AND bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
-        LEFT JOIN WFL_BID_RESULT_TOTAL brt ON brt.FINPROD_ID = fp.FINPROD_ID AND brt.BID_ID  = bo.BID_ID AND brt.STATUS = '01'
+        LEFT JOIN (
+            SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID   FROM  WFL_BID_ORDER bo
+            LEFT JOIN WFL_BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+            AND brt.FINPROD_ID = bo.FINPROD_ID
+            WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+            GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID
+        ) bobrt ON 	bobrt.FINPROD_ID = fp.FINPROD_ID
         LEFT JOIN (
             SELECT
                 LISTAGG(eed.PORTFOLIO_ID, ',') WITHIN GROUP (ORDER BY (eed.PORTFOLIO_ID)) PORTFOLIO_ID,
