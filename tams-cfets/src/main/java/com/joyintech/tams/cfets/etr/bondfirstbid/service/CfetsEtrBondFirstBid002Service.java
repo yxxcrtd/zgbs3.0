@@ -537,7 +537,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 etrEntrustAdd.setSecAcctId(dto.getSecAcctId());
             }
             etrEntrustAdd.setEntrustId(dto.getEntrustId());
-            etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
+            etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             entity.setEtrEntrustAdd(etrEntrustAdd);
 
             //委托投标标位表
@@ -631,7 +631,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 etrEntrustAdd.setSecAcctId(dto.getSecAcctId());
             }
             etrEntrustAdd.setEntrustId(dto.getEntrustId());
-            etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
+            etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             entity.setEtrEntrustAdd(etrEntrustAdd);
             //指令下达时间
             if (StringUtil.isNotEmpty(dto.getTransmitTime())) {
