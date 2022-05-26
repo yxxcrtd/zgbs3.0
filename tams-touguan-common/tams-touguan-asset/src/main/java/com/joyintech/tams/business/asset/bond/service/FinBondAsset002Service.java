@@ -10,6 +10,8 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
 import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.FinCashCalcRuleMapper;
 import com.joyintech.tams.common.base.dao.FinCashPlanMapper;
 import com.joyintech.tams.common.base.entity.*;
@@ -78,6 +80,8 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
     @Autowired
     private CommonBusinessService commonBusinessService;
 
+    @Autowired
+    private JoyinbusinessCommonService joyinbusinessCommonService;
     /**
      * 初始化信息--前台分页 <功能详细描述>
      *
@@ -272,8 +276,11 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
     }
 
     @Override
-    public void doBack(FinAssetRateAdjResponse entity) {
-        finBondAssetService.updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整退回.getValue());
+    public void doDelete(String workflowId){
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setWorkflowId(workflowId);
+        oprHisReq.setBusiDes("作废");
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
     /**
