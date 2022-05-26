@@ -4,6 +4,7 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirst
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,16 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/5/17 15:12
      */
     List<CfetsTrdFirstBidFirmInfoDto> selectProductsInit(Map<String, Object> param);
+
+    /**
+     * 查询是否存在分销买入数据
+     *
+     * @param param
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2022/5/25 19:19
+     */
+    String selectBidModelInData(Map<String, Object> param);
 
     /**
      * 查询指令流程中及生效的自主投标和代投代缴的投标确认数据
@@ -63,4 +74,14 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @return
      */
     List<CfetsTrdFirstBidFirmInfoDto> viewPage(Map<String, Object> pageParam);
+
+    /**
+     * 获取利率
+     *
+     * @param pageParam
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/5/25 14:05
+     */
+    BigDecimal getRate(Map<String, Object> pageParam);
 }

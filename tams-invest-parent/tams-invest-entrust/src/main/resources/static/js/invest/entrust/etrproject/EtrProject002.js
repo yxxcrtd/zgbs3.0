@@ -2,6 +2,8 @@
  * 项目类委托新建
  */
 (function() {
+
+    var  initFlag = true;
     var getriskdata = function () {
         var obj = {tradeDirection:$('#ps').val(),timePoint:MY_SUP_TIME_TYPE_02,valDate:sysDate,portfolioCode:$('#portfolioId').val(),tradeAmount:$('#entrustAmt').val(),assetType:fintype,isEnabled:'01',assetCode:$('#finprodIdhid').val()}
         //---add by 裴家俊  2019/03/20  添加资产类型条件---start-----
@@ -130,6 +132,9 @@
 
 
      var changeBussnissModelByFinprodId = function(){
+        if(initFlag){
+            return;
+        }
          var finprodId = $('#finprodId').val();
          if(finprodId){
               var data = {finprodId:finprodId }
@@ -379,5 +384,6 @@
         	$('#assetType11Div').hide();
         }
         init();
+        initFlag=false;
     });
 }());

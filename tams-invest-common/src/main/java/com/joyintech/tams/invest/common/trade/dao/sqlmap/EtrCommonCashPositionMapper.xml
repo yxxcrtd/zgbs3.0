@@ -1109,7 +1109,6 @@
             and t1.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
             )
         </if>
-        and (t.is_exist_new is null or  t.is_exist_new!='Y')
     </select>
 
 

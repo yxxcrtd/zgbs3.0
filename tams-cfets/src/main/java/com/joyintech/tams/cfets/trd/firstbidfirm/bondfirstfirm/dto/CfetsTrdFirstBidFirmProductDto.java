@@ -3,11 +3,11 @@ package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author jiangpeng
@@ -97,6 +97,20 @@ public class CfetsTrdFirstBidFirmProductDto {
 
     @ApiModelProperty(name = "counterName", value = "交易对手名", example = "广发银行")
     private String counterName;
+
+    @ApiModelProperty(name = "cashT", value = "T+1日可用现金(元)")
+    private BigDecimal cashT;
+
+    @ApiModelProperty(name = "cashT1", value = "T日可用现金(元)")
+    private BigDecimal cashT1;
+
+    @ApiModelProperty(name = "realCash", value = "托管户账户现金(元)")
+    private BigDecimal realCash;
+
+    @ApiModelProperty(name = "secDesirableCash", value = "券商户可取现金(元)")
+    private BigDecimal secDesirableCash;
+
+    List<CfetsTrdFirstBidFirmProductDto> list;
 
     public String getEntrustId() {
         return entrustId;
@@ -349,5 +363,45 @@ public class CfetsTrdFirstBidFirmProductDto {
 
     public void setCounterName(String counterName) {
         this.counterName = counterName;
+    }
+
+    public BigDecimal getCashT() {
+        return cashT;
+    }
+
+    public void setCashT(BigDecimal cashT) {
+        this.cashT = cashT;
+    }
+
+    public BigDecimal getCashT1() {
+        return cashT1;
+    }
+
+    public void setCashT1(BigDecimal cashT1) {
+        this.cashT1 = cashT1;
+    }
+
+    public BigDecimal getRealCash() {
+        return realCash;
+    }
+
+    public void setRealCash(BigDecimal realCash) {
+        this.realCash = realCash;
+    }
+
+    public BigDecimal getSecDesirableCash() {
+        return secDesirableCash;
+    }
+
+    public void setSecDesirableCash(BigDecimal secDesirableCash) {
+        this.secDesirableCash = secDesirableCash;
+    }
+
+    public List<CfetsTrdFirstBidFirmProductDto> getList() {
+        return list;
+    }
+
+    public void setList(List<CfetsTrdFirstBidFirmProductDto> list) {
+        this.list = list;
     }
 }
