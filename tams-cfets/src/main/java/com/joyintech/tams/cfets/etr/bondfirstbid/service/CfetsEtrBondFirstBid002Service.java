@@ -237,15 +237,15 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
                 if (StringUtil.isNotEmpty(productDto.getAcctNo())) {
                     posport.setCashAcctId(productDto.getAcctNo());
-                   // posport.setSecAcctId("lh004"); // 证券户
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("acctNo",productDto.getAcctNo());
-                    map.put("portfolioId",productDto.getPortfolioId());
-                    map.put("tradeMarket",entity.getTradeMarket());
-                    List<SelectOptionDto> tempList= cfetsEtrBondFirstBid001Service.getPtlSecAcctInfo(map);
-                    SelectOptionDto temp = tempList.stream().filter(x -> Objects.equals(x.getId(),productDto.getAcctNo())).findFirst().orElse(null);
-                    ArrayList secMap = (ArrayList) temp.getObject();
-                    posport.setSecAcctId(((HashMap) secMap.get(0)).get("secAcctId").toString()); // 证券户
+                    posport.setSecAcctId(productDto.getSecAcctId()); // 证券户
+//                    Map<String, Object> map = new HashMap<>();
+//                    map.put("acctNo",productDto.getAcctNo());
+//                    map.put("portfolioId",productDto.getPortfolioId());
+//                    map.put("tradeMarket",entity.getTradeMarket());
+//                    List<SelectOptionDto> tempList= cfetsEtrBondFirstBid001Service.getPtlSecAcctInfo(map);
+//                    SelectOptionDto temp = tempList.stream().filter(x -> Objects.equals(x.getId(),productDto.getAcctNo())).findFirst().orElse(null);
+//                    ArrayList secMap = (ArrayList) temp.getObject();
+//                    posport.setSecAcctId(((HashMap) secMap.get(0)).get("secAcctId").toString()); // 证券户
                 } else {
                     if (StringUtil.isNotEmpty(productDto.getPortfolioId())) {
                         Map<String, Object> map = new HashMap<String, Object>();
@@ -574,8 +574,6 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                         SelectOptionDto temp = tempList.stream().filter(x -> Objects.equals(x.getId(), entrustDetail.getAcctNo())).findFirst().orElse(null);
                         ArrayList secMap = (ArrayList) temp.getObject();
                         entrustDetail.setSecAcctId(((HashMap) secMap.get(0)).get("secAcctId").toString()); // 证券户
-                    } else {
-                        entrustDetail.setSecAcctId(entry.getValue().get(0).getSecAcctId());
                     }
 
                 }
