@@ -304,7 +304,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         FinProductType finProductType = new FinProductType();
         BeanUtil.copyPropertiesIgnoreNull(finProductType, dto);
         finProductType.setBranch(0l);
-        finProductType.setType8(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        finProductType.setType8(DictCodeListExt2.平安资产类型_债券.getValue());
         FinProductTypeConfig config = new FinProductTypeConfig();
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
         config.setInputValue2(dto.getType9());

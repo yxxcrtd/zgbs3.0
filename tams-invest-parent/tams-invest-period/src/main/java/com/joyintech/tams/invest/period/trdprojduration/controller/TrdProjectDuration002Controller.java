@@ -120,7 +120,6 @@ public class TrdProjectDuration002Controller extends BaseController {
                 params.put("bizCode", bizCode + "R");
             }
             entity = trdProjectDuration002Service.findEffectiveData(RequestUtil.getPageParam());
-            entity.setCashType("02");
             if (entity != null) {
                 entity.setStatusValid(statusValid);
                 if (!DictCodeListExt1.画面数据状态_待处理.getValue().equals(statusValid) && entity != null) {
