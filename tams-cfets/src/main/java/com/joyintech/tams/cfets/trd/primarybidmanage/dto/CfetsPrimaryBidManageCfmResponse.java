@@ -3,6 +3,7 @@ package com.joyintech.tams.cfets.trd.primarybidmanage.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -21,8 +22,11 @@ import java.util.List;
 @ApiModel(value="投标确认列表查询返回参数",description="投标确认列表查询返回参数")
 public class CfetsPrimaryBidManageCfmResponse {
 
-    @ApiModelProperty(name="otherEffectFlag",value="有效状态")
+    @ApiModelProperty(name="otherEffectFlag",value="有效状态ID")
     private String otherEffectFlag;
+
+    @ApiModelProperty(name="otherEffectFlagStr",value="有效状态")
+    private String otherEffectFlagStr;
 
     @ApiModelProperty(name="isWin",value="中标状态")
     private String isWin;
@@ -35,6 +39,9 @@ public class CfetsPrimaryBidManageCfmResponse {
 
     @ApiModelProperty(name="finprodId",value="资产代码")
     private String finprodId ;
+
+    @ApiModelProperty(name="finprodMarketId",value="资产市场代码")
+    private String finprodMarketId ;
 
     @ApiModelProperty(name="finprodAbbr",value="资产简称")
     private String finprodAbbr;
@@ -116,6 +123,14 @@ public class CfetsPrimaryBidManageCfmResponse {
         this.otherEffectFlag = otherEffectFlag;
     }
 
+    public String getOtherEffectFlagStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.有效状态, this.getOtherEffectFlag());
+    }
+
+    public void setOtherEffectFlagStr(String otherEffectFlagStr) {
+        this.otherEffectFlagStr = otherEffectFlagStr;
+    }
+
     public String getIsWin() {
         return isWin;
     }
@@ -157,7 +172,7 @@ public class CfetsPrimaryBidManageCfmResponse {
     }
 
     public String getTenderTargetStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.招标方式, this.getTenderTarget());
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, this.getTenderTarget());
     }
 
     public void setTenderTargetStr(String tenderTargetStr) {
@@ -339,5 +354,13 @@ public class CfetsPrimaryBidManageCfmResponse {
 
     public void setTraderStr(String traderStr) {
         this.traderStr = traderStr;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
     }
 }

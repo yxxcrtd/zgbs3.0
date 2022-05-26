@@ -72,11 +72,11 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     @Override
     public void doInsert(FinTenderBondAsset002Dto dto, OperationType type) {
         if (OperationType.DELETE == type) {
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_放弃);
+            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_删除,dto.getWorkflowId());
         } else if (OperationType.NEW == type) {
-            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_新建);
+            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_新建,dto.getWorkflowId());
         } else if (OperationType.MODIFY == type) {
-            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_修改);
+            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_修改,dto.getWorkflowId());
         }
     }
 
@@ -328,6 +328,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         FinProduct product = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
         if(Objects.nonNull(product)) {
             dto.setRemark(product.getRemark());
+            dto.setCreateTime(product.getCreateTime());
+            dto.setCreateUser(product.getCreateUser());
+            dto.setCreateDept(product.getCreateDept());
         }
         this.delete(dto);
         this.insert(dto);
@@ -359,11 +362,12 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @param remark
      * @param operType
      */
-    public void saveOperate(String tradeId, String remark, DictCodeListExt3 operType) {
+    public void saveOperate(String tradeId, String remark, DictCodeListExt3 operType,String workFlowId) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
+        oprHisReq.setWorkflowId(workFlowId);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 

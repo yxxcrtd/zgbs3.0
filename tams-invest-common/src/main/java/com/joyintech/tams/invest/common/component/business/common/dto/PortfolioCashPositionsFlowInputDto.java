@@ -60,6 +60,11 @@ public class PortfolioCashPositionsFlowInputDto {
     private String ieFlag;
 
     /**
+     * 业务阶段 01 登记 02 成交 03 交收 04 交收失败
+     */
+    private String stage;
+
+    /**
      * 获取 ieFlag
      *
      * @return ieFlag
@@ -228,4 +233,11 @@ public class PortfolioCashPositionsFlowInputDto {
         this.isNotWorkflow = isNotWorkflow;
     }
 
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
+    }
 }

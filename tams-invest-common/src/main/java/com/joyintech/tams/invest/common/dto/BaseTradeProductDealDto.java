@@ -199,6 +199,11 @@ public class BaseTradeProductDealDto {
      */
     private String isExistNew;
 
+    /**
+     * 业务阶段 01 登记 02 成交 03 交收 04 交收失败
+     */
+    private String stage;
+
     public Date getExRightsDate() {
         return exRightsDate;
     }
@@ -685,5 +690,13 @@ public class BaseTradeProductDealDto {
 
     public void setIsExistNew(String isExistNew) {
         this.isExistNew = isExistNew;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
     }
 }

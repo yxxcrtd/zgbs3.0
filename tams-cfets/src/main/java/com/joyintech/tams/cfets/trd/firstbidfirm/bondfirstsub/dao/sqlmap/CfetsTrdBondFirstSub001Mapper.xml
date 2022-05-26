@@ -82,6 +82,15 @@
                 or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{search}
                 or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{search}
                 or replace(to_char(T.entrustDate,'yyyy-MM-dd'),'-','/')=#{search}
+                or to_char(T.issueDate,'yyyy-MM-dd')=#{search}
+                or to_char(T.payDate,'yyyy-MM-dd')=#{search}
+                or to_char(T.entrustDate,'yyyy-MM-dd')=#{search}
+                or to_char(T.issueDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+                or to_char(T.payDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+                or to_char(T.entrustDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+                or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+                or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+                or replace(to_char(T.entrustDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
                 or T.transmitTime=#{search}
                 )
         </if>
@@ -382,6 +391,12 @@
             or to_char(T.rate)=#{search}
             or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{search}
+            or to_char(T.issueDate,'yyyy-MM-dd')=#{search}
+            or to_char(T.payDate,'yyyy-MM-dd')=#{search}
+            or to_char(T.issueDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or to_char(T.payDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+            or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
             )
         </if>
     </sql>

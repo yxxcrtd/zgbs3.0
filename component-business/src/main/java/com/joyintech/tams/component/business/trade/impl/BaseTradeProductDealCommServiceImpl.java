@@ -756,6 +756,8 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
             	inputDto.setAssetType2(baseTradeProductDealDto.getAssetType2());
             }
 			inputDto.setTrdProductDealAdd(baseTradeProductDealDto.getTrdProductDealAdd());
+            // 针对新UI添加 用于区分登记/成交/交收/交收失败
+            inputDto.setStage(baseTradeProductDealDto.getStage());
 
             if (是否处理持仓) {
                 List<PtlSecPositionFlowDto> ptlSecPositionFlowDtoss = assetPositionsCashCommServiceImpl.positionDeal(inputDto);//组合持仓
@@ -832,6 +834,8 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
                 cashInputDto.setNotWorkflow(finProductTradeDto.isNotWorkflow());
                 // GNS-949:增加是否工作流数据标识 modify by fuyongsheng 20220227 end
                 cashInputDto.setTrdProductDealAdd(baseTradeProductDealDto.getTrdProductDealAdd());
+                // 针对新UI添加 用于区分登记/成交/交收/交收失败
+                cashInputDto.setStage(baseTradeProductDealDto.getStage());
                 if (是否处理持仓) {
                     List<PtlCashPositionFlowDto> resultList = assetPositionsCashCommServiceImpl.cashDeal(cashInputDto);//现金处理详细
 //                    if (持仓类型 == DictCodeList.持仓类型_可用

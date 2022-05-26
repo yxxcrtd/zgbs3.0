@@ -726,7 +726,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
          */
         if (DictCodeList.交易平台_大宗交易平台.getValue().equals(etrSinglePortfolioDto.getTradePlat())
                 && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dto.getTradeMarket())) {
-            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_综合协议交易平台.getValue());
+            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_大宗交易平台.getValue());
 
         } else if (DictCodeList.交易平台_大宗交易平台.getValue().equals(etrSinglePortfolioDto.getTradePlat())
                 && DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dto.getTradeMarket())) {
