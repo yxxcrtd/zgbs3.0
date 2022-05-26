@@ -97,6 +97,11 @@ $(function() {
             "customerCharaterStr":typeName_12,
             "customerCharater":typeValue_12
         }
+        ,
+        {
+            "customerCharaterStr":typeName_13,
+            "customerCharater":typeValue_13
+        }
        ];
     var customerCharaterTable=$("#customerCharaterTable").joyintable({
     /*
@@ -266,7 +271,7 @@ $(function() {
         table.load();
         var data = customerCharaterData.map(a => Object.assign({}, a));
         if(customerType == CUSTOMER_TYPE_02){
-            var idx = data.indexOf(data.find(function(element){ return element.customerCharater === typeValue_12;}));
+            var idx = data.indexOf(data.find(function(element){ return element.customerCharater === typeValue_13;}));
             if(idx != -1){
                 data.splice(idx, 1);
             }
