@@ -4352,8 +4352,9 @@
                 saveOrSubmit('submit');
             });
         }
-
-        saveOrSubmit('submit');
+        if(($('#riskTrialSpan').text() && $('#riskTrialSpan').text().trim() == '试算通过') || (ps == PS_T68 || ps == PS_T69) ){
+            saveOrSubmit('submit');
+        }
     }
 
     /**
@@ -4378,6 +4379,9 @@
         //         return;
         //     }
         // }
+        if(entity_RiskTrialRetList){
+            object.riskTrialRetDto = entity_RiskTrialRetList;
+        }
         if(object.finprodType2 == FINPROD_TYPE_TG_F01 && (object.ps == PS_T68 || object.ps == PS_T69)){
             if(object.entrustNum){
                 object.entrustNum = object.entrustNum * 100;
@@ -4810,6 +4814,7 @@
             Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTradeCommonRiskcal/doRiskcal', param, function (data) {
                 $("#riskTrialSpan").html("&nbsp;&nbsp;" + data.data.data.riskTrialSpan);
                 entity_RiskTrialRetList = data.data.data.riskcalReturnList;
+                riskResultdata =  data.data.data.riskcalReturnList;
                 $.each(entity_RiskTrialRetList, function (index, item) {
                     item.conclusion = data.data.data.riskTrialSpan;
                 })
