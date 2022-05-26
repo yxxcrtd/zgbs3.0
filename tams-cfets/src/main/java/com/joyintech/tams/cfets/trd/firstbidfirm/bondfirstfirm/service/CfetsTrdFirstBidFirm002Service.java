@@ -1288,15 +1288,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                         || BigDecimalUtil.ACompareToB(maxBidPrice, item.getBidPrice(), 6) < 0) {
                     maxBidPrice = item.getBidPrice();
                 }
-                if (dto.getBidTotalList().size() > 0) {
-                    CheckMassgeInfo checkMassgeInfo = new CheckMassgeInfo();
-                    checkMassgeInfo.setPrimaryKey(item.getBidPrice().toPlainString());
-                    checkMassgeInfo.setFeild("bidPrice");
-                    checkMassgeInfo.setMessage("应大于等于标的的最低标位!");
-                    checkMassgeInfos.add(checkMassgeInfo);
-                    flag1 = true;
-                    flag = true;
-                }
                 // 标的类金融产品发行信息.投标步长 IS NOT NULL AND 投标标位不是标的类金融产品发行信息.投标步长的整数倍
                 if (!flag1 && StringUtil.isNotEmpty(finProductIssue.getTenderUnit())
                         && !BigDecimalUtil.divideResultIsInteger(item.getBidPrice(), finProductIssue.getTenderUnit())) {
