@@ -189,7 +189,8 @@ public class EtrExchangeTradeSecRepo002Controller extends BaseController{
                     || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_企业债务融资工具.getValue())
                     || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_资产支持证券.getValue())
                     || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_外国债券.getValue())
-                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_理财直接融资工具.getValue());
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_金融债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_可交换债.getValue());
         }).collect(Collectors.toList());
         selectDto.setOptions(assetType);
         initPageParams.put("ASSET_TYPE", selectDto);
