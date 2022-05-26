@@ -708,7 +708,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		AjaxResult ajaxResult = new AjaxResult();
 		if (StringUtil.isNotEmpty(ajax) && StringUtil.isNotEmpty(ajax.getMessageType())
 				&& StringUtil.isNotEmpty(ajax.getData())) {
-			if (ajax.getMessageType().equals("错误消息")){
+			if (ajax.getMessageType().equals("错误消息") || ajax.getMessageType().equals("error")){
 				ajaxResult.setMessageType(MessageType.错误消息);
 			}
 			ajaxResult.setData(ajax.getData());

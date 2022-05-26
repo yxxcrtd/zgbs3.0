@@ -419,12 +419,12 @@
         insert into ETR_ENTRUST_OPER_HIS (SEQ_NO, ENTRUST_ID, OPER_TYPE,
         OPER_DATE, OPER_TIME, BUSI_DES,
         USER_ID, CREATE_USER, CREATE_DEPT,
-        CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        CREATE_TIME, UPDATE_USER, UPDATE_TIME,WORKFLOW_ID
         )
         values (#{seqNo,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{operType,jdbcType=VARCHAR},
         #{operDate,jdbcType=DATE}, sysdate, #{busiDes,jdbcType=VARCHAR},
         #{userId,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR},
-        sysdate, #{updateUser,jdbcType=VARCHAR},sysdate
+        sysdate, #{updateUser,jdbcType=VARCHAR},sysdate, #{workflowId,jdbcType=VARCHAR}
         )
     </insert>
 

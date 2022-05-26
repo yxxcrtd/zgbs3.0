@@ -166,7 +166,7 @@ public class JoyinbusinessCommonService extends BaseService {
      */
     public Boolean updateCfetsOprHis(CfetsOprHisInfoRequest dto) {
         dto.setSeqNo(IDGenerator.generate(32));
-        dto.setOperDate(DateUtil.platDateFromCache());
+        dto.setOperDate(new Date());
         dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
         dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
         dto.setCreateDept(CommonUtil.getDeptCode());

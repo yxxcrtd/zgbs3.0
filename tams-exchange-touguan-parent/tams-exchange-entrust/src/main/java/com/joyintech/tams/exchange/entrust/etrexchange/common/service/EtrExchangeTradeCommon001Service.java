@@ -726,7 +726,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
          */
         if (DictCodeList.交易平台_大宗交易平台.getValue().equals(etrSinglePortfolioDto.getTradePlat())
                 && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dto.getTradeMarket())) {
-            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_综合协议交易平台.getValue());
+            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_大宗交易平台.getValue());
 
         } else if (DictCodeList.交易平台_大宗交易平台.getValue().equals(etrSinglePortfolioDto.getTradePlat())
                 && DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dto.getTradeMarket())) {
@@ -5391,6 +5391,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         etrExchangeTrade001Dto.setEntrustNum(multiPtl001Dto.getEntrustNum());
         etrExchangeTrade001Dto.setAccAvailableCash(multiPtl001Dto.getAccAvailableCash());
         etrExchangeTrade001Dto.setAccAvailablePos(multiPtl001Dto.getAccAvailablePos());
+        etrExchangeTrade001Dto.setStandardBondVolume(multiPtl001Dto.getStandardBondVolume());
         //etrExchangeTrade001Dto.setEntrustPrice(multiPtl001Dto.getEntrustPrice());
         etrExchangeTrade001Dto.setTargetType(dto.getTargetType());
         etrExchangeTrade001Dto.setMdate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));

@@ -29,7 +29,7 @@
     </sql>
     <sql id="selectHisInfo" >
         select his.ENTRUST_ID,
-               listagg(su.REAL_NAME || '(' || to_char(his.OPER_TIME, 'yyyy/MM/dd HH:MM:SS') || ')【' || sdl.ITEM_VALUE || '】:' ||
+               listagg(su.REAL_NAME || '(' || to_char(his.OPER_TIME, 'yyyy/MM/dd HH24:MM:SS') || ')【' || sdl.ITEM_VALUE || '】:' ||
                        his.BUSI_DES, ';')
                        within group (order by his.OPER_TIME desc) AS remark
         from ETR_ENTRUST_OPER_HIS his

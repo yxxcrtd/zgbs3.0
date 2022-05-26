@@ -4,6 +4,7 @@ import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.cfets.common.servive.CfetsCommonOprHisHandlerAopService;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -82,9 +83,9 @@ public class CfetsCommonOprHisHandlerAop {
     public void updateCfetsOprHisForGiveUpEntrust(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         String entrustId = (String) args[0];
-        String busiDes = "指令放弃";
+        String busiDes = null;
         String type = DictCodeListExt3.操作类型_放弃.getValue();
-        if (StringUtil.isNotEmpty(entrustId) && StringUtil.isNotEmpty(busiDes) && StringUtil.isNotEmpty(type)) {
+        if (StringUtil.isNotEmpty(entrustId) && StringUtil.isNotEmpty(type)) {
             this.updateCfetsOprHis(busiDes, entrustId, type, null);
         }
     }
@@ -97,9 +98,9 @@ public class CfetsCommonOprHisHandlerAop {
         Object[] args = joinPoint.getArgs();
         Map param = (Map) args[0];
         List<String> entrustIds = StringUtil.splitToList(GlobalConstant.COMMA, (String) param.get("entrustIds"));
-        String busiDes = "指令接受";
+        String busiDes = (String)param.get("remark");
         String type = DictCodeListExt3.操作类型_接收.getValue();
-        if (StringUtil.isNotEmpty(busiDes) && StringUtil.isNotEmpty(type)) {
+        if (StringUtil.isNotEmpty(type)) {
             entrustIds.forEach(entrustId -> this.updateCfetsOprHis(busiDes, entrustId, type, null));
         }
     }
@@ -107,11 +108,14 @@ public class CfetsCommonOprHisHandlerAop {
     /**
      * 退回指令时更新细操作履历表
      */
-    @AfterReturning(value = "entrustRefucePoint()")
-    public void updateCfetsOprHisForRntrustRefucePoint(JoinPoint joinPoint) throws BusinessException {
+    @AfterReturning(value = "entrustRefucePoint()",returning = "result")
+    public void updateCfetsOprHisForRntrustRefucePoint(JoinPoint joinPoint, Object result) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         Map param = (Map) args[0];
-        List<String> entrustIdList = com.joyintech.framework.util.StringUtil.splitToList(",", (String) param.get("entrustId"));
+        if(result instanceof Message){
+            return;
+        }
+        List<String> entrustIdList = StringUtil.splitToList(",", (String) param.get("entrustId"));
         String busiDes = (String) param.get("rekReason");
         String type = DictCodeListExt3.操作类型_退回.getValue();
         //更新操作记录日志

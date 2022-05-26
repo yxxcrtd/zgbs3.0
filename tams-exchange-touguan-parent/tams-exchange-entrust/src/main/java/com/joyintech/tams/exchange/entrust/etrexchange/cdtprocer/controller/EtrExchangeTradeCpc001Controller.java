@@ -5,6 +5,7 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -18,6 +19,7 @@ import com.joyintech.tams.constant.*;
 import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAop;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateApplyRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.service.EtrExchangeTradeCpc001Service;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.FinprodMarketInfoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.controller.EtrExchangeTradeSec001Controller;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -216,6 +218,23 @@ public class EtrExchangeTradeCpc001Controller extends BaseController {
             return new Message<EtrCreditProtectionCertificateApplyRequest>().fail().setMessage("查询异常");
         }
 
+    }
+
+
+    @ResponseBody
+    @PostMapping("/getFinprodMarketInfo")
+    @ApiOperation(value = "查询现券资产列表", notes = "查询现券资产列表")
+    public Message<Page<SelectOptionDto>> getFinprodMarketInfo(@RequestBody FinprodMarketInfoRequest dto){
+        logger.debug("getFinprodMarketInfo() called with parameters => 【dto = {}】",JsonUtils.object2Json(dto));
+        try {
+            Map<String, Object> map = BeanUtil.object2Map(dto);
+            map.put("acctTradeMarket", dto.getTradeMarket());
+            Page<SelectOptionDto> tempList = etrExchangeTradeCpc001Service.getFinprodMarketInfo(map);
+            return new Message<Page<SelectOptionDto>>().success().setData(tempList);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
+        }
     }
 
 

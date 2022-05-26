@@ -214,9 +214,9 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         List<MstCalendarInfo> mstCalendarInfoList = getMstCalendarInfo();
         //new标的类金融产品
         FinProduct finProduct = new FinProduct();
-        String finProdId = commonBusinessService.getFinProdId(secId, BussinessDictCodeList.金融产品类型_投管用_债券.getValue(), StringUtil.EMPTY);
+        String finProdId = commonBusinessService.getFinProdId(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), StringUtil.EMPTY);
         finProduct.setFinprodId(finProdId);
-        finProduct.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        finProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         finProduct.setFinprodAbbr(finListedBondInfoQuery001Dto.getBondAbbreviation());
         finProduct.setFinprodName(finListedBondInfoQuery001Dto.getBondName());
         finProduct.setProfitType(DictCodeList.收益类型_收益型.getValue());
@@ -224,7 +224,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         /**--息票品种modify 2019-04-15 end--**/
         finProduct.setFinprodMarketId(secId);
         //发行金额除以万元
-        finProduct.setIssuePrice(new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()));
+        finProduct.setIssuePrice(Objects.nonNull(finListedBondInfoQuery001Dto.getIssuePx()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()) : null);
 
         finProduct.setCcy(finListedBondInfoQuery001Dto.getCurrency());
         //境内外
@@ -281,7 +281,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //金融产品分类
         FinProductType finProductType = new FinProductType();
         finProductType.setFinprodId(finProdId);
-        finProductType.setBranch(0L);
+        finProductType.setBranch(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalBatches()) ? finListedBondInfoQuery001Dto.getAdditionalBatches().longValue() : 0L);
         //取债券资料表系统债券类型
         finProductType.setType4(finListedBondInfoQuery001Dto.getPrimaryClassification());
         //取债券资料表系统债券类型2
@@ -308,10 +308,10 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setTenderType(finListedBondInfoQuery001Dto.getBiddingMethod());
         finProductIssue.setTenderTarget(finListedBondInfoQuery001Dto.getTenderTarget());
         //计划发行量
-        finProductIssue.setPlanIssueAmt(new BigDecimal(finListedBondInfoQuery001Dto.getIssueSize()));
+        finProductIssue.setPlanIssueAmt(Objects.nonNull(finListedBondInfoQuery001Dto.getIssueSize()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssueSize()) : null);
         finProductIssue.setIssueStyle(finListedBondInfoQuery001Dto.getReleaseType());
         finProductIssue.setAddBatch(0L);
-        finProductIssue.setIssuePrice(new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()));
+        finProductIssue.setIssuePrice(Objects.nonNull(finListedBondInfoQuery001Dto.getIssuePx()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()) : null);
         finProductIssue.setReferYield(finListedBondInfoQuery001Dto.getCouponRate());
         finProductIssue.setRateGrade(finListedBondInfoQuery001Dto.getDecimalPlaces());
         finProductIssue.setBp(finListedBondInfoQuery001Dto.getSpread());
@@ -336,8 +336,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setMinTamt(finListedBondInfoQuery001Dto.getMinTenderPxForPlan());
         finProductIssue.setMaxTamt(finListedBondInfoQuery001Dto.getMaxTenderPxForPlan());
         finProductIssue.setTenderUnit(finListedBondInfoQuery001Dto.getTenderStep());
-        finProductIssue.setMaxTenderUnit(new BigDecimal(finListedBondInfoQuery001Dto.getMedianMaxBidMarked()));
-        finProductIssue.setMaxTenderPlus(new BigDecimal(finListedBondInfoQuery001Dto.getMaxTenderPxDiffer()));
+        finProductIssue.setMaxTenderUnit(Objects.nonNull(finListedBondInfoQuery001Dto.getMedianMaxBidMarked()) ? new BigDecimal(finListedBondInfoQuery001Dto.getMedianMaxBidMarked()) : null);
+        finProductIssue.setMaxTenderPlus(Objects.nonNull(finListedBondInfoQuery001Dto.getMaxTenderPxDiffer()) ? new BigDecimal(finListedBondInfoQuery001Dto.getMaxTenderPxDiffer()) : null);
         finProductIssue.setSeriYN(finListedBondInfoQuery001Dto.getContinuousTenderLimit());
         finProductIssue.setMaxTotalTender(finListedBondInfoQuery001Dto.getMaxTotalTenderAmt());
         finProductIssue.setPayCycle(finListedBondInfoQuery001Dto.getInterestPaymentFrequency());

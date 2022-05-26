@@ -61,6 +61,9 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
     @ApiModelProperty(name="finprodId",value="资产代码")
     private String finprodId ;
 
+     @ApiModelProperty(name="finprodMarketId",value="市场代码")
+     private String finprodMarketId ;
+
     /**资产简称*/
     @ApiModelProperty(name="finprodAbbr",value="资产简称")
     private String finprodAbbr;
@@ -472,5 +475,13 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
 
      public void setCouponSpecies(String couponSpecies) {
          this.couponSpecies = couponSpecies;
+     }
+
+     public String getFinprodMarketId() {
+         return finprodMarketId;
+     }
+
+     public void setFinprodMarketId(String finprodMarketId) {
+         this.finprodMarketId = finprodMarketId;
      }
  }

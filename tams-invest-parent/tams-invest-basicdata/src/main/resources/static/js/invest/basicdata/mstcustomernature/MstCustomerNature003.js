@@ -56,8 +56,12 @@ $(function() {
             if(v.customerCharater==CUSTOMER_NATURE_12){
                 object.isCounter="Y";
             }
+            if(v.customerCharater==CUSTOMER_NATURE_13){
+                object.isOriginalOwner="Y";
+            }
             selectedItem[idx].customerId = $("#customerId").val();
         });
+
         object.pageModel = pageModel;
         object.operateType = operateType;
         object.selectedItem = selectedItem;
@@ -77,7 +81,7 @@ $(function() {
 		if (entityData.customerType == CUSTOMER_TYPE_02) {// 自然人
 			if(typeof CUSTOMER_NATURE == "string"){
 				CUSTOMER_NATURE = JSON.parse(CUSTOMER_NATURE); 
-			var idx = CUSTOMER_NATURE.indexOf(CUSTOMER_NATURE.find(function(element){ return element.id === CUSTOMER_NATURE_12;}));
+			var idx = CUSTOMER_NATURE.indexOf(CUSTOMER_NATURE.find(function(element){ return element.id === CUSTOMER_NATURE_13;}));
         	if(idx != -1){
         		CUSTOMER_NATURE.splice(idx, 1);
 			}
@@ -136,6 +140,9 @@ $(function() {
     }
     if(entityData.isCounter=='Y'){
         options.data.push({"customerCharater": CUSTOMER_NATURE_12});
+    }
+    if(entityData.isOriginalOwner=='Y'){
+        options.data.push({"customerCharater": CUSTOMER_NATURE_13});
     }
     /*
      * 初始化表格

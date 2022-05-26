@@ -1094,7 +1094,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
 
     客户性质_券商(DictCode.客户性质,"10","券商"),
     客户性质_交易对手(DictCode.客户性质,"12","交易对手"),
-
+    客户性质_原始权益人(DictCode.客户性质,"13","原始权益人"),
     金融产品其他代码类型_回售代码(DictCode.金融产品其他代码类型,"01","回售"),
     金融产品其他代码类型_质押代码(DictCode.金融产品其他代码类型,"02","标准券出入库"),
     金融产品其他代码类型_可转债信用申购代码(DictCode.金融产品其他代码类型,"03","可转债信用申购"),
@@ -1878,6 +1878,8 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     操作类型_中标结果撤销(DictCode.操作类型,"23","中标结果撤销"),
     操作类型_债券自动加券(DictCode.操作类型,"24","债券自动加券"),
     操作类型_利率调整退回(DictCode.操作类型,"25","利率调整退回"),
+    操作类型_删除(DictCode.操作类型,"26","删除"),
+
     债券性质_债性(DictCode.债券性质, "01", "债性"),
     债券性质_股性(DictCode.债券性质, "02", "股性"),
 
