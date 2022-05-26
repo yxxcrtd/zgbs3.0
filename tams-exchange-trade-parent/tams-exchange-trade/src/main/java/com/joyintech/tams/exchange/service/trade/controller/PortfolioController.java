@@ -1,7 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.controller;
 
 import com.joyintech.tams.business.common.pojo.BaseMap;
-import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.ResponseResultBody;
 import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
 import com.joyintech.tams.exchange.common.domain.Message;
@@ -18,6 +17,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hibernate.validator.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,7 @@ import java.util.Map;
 @ResponseResultBody
 @Api(tags = "场内交易-组合查询接口")
 public class PortfolioController {
+    private static final Logger logger = LoggerFactory.getLogger(PortfolioController.class);
 
     @Autowired
     private PortfolioManager portfolioManager;
@@ -89,6 +91,7 @@ public class PortfolioController {
         try {
             return new Message<>(portfolioManager.queryPortfolioCalculate(bean));
         } catch (Exception e) {
+            logger.error("查询组合计算信息：{}", e.getMessage(), e);
             return new Message<List<PortfolioCalculateResponse>>().fail().setMessage(e.getMessage());
         }
     }
@@ -102,6 +105,7 @@ public class PortfolioController {
         try {
             return new Message<>(portfolioManager.queryPortfolioCalculateWithFair(bean));
         } catch (Exception e) {
+            logger.error("查询公平指令信息异常：{}", e.getMessage(), e);
             return new Message<PortfolioAllocationResponse>().fail().setMessage(e.getMessage());
         }
     }
