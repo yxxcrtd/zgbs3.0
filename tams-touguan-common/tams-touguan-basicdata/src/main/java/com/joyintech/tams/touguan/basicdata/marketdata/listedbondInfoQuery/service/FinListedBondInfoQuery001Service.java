@@ -224,7 +224,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         /**--息票品种modify 2019-04-15 end--**/
         finProduct.setFinprodMarketId(secId);
         //发行金额除以万元
-        finProduct.setIssuePrice(new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()));
+        finProduct.setIssuePrice(Objects.nonNull(finListedBondInfoQuery001Dto.getIssuePx()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()) : null);
 
         finProduct.setCcy(finListedBondInfoQuery001Dto.getCurrency());
         //境内外
