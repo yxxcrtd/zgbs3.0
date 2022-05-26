@@ -244,8 +244,7 @@ public class CommonCheckKit extends BaseCheckKit {
             minStep = minStep / 100;
         }
 
-        if (EntrustBs.isBuy(entrustBs)
-                && entrustVolume % minStep != 0) {
+        if (EntrustBs.isBuy(entrustBs) && entrustVolume % minStep != 0) {
             String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep);
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
@@ -307,16 +306,19 @@ public class CommonCheckKit extends BaseCheckKit {
             minNum = minTrdUnitLimit.getMinNum();
         }
 
+        if (InvestmentAssetType.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+            minNum = minNum / 100;
+        }
+
         BigDecimal minAmt = minTrdUnitLimit.getMinAmt();
         if (entrustVolume < minNum) {
-            String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}]",
-                    entrustVolume, minNum);
+            String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}]", entrustVolume, minNum);
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
         if (entrustBalance.compareTo(minAmt) < 0) {
-            String errorMsg = StrUtil.format("委托金额[{}]不符合最小买入金额限制[{}]",
-                     entrustBalance, minAmt);
+            String errorMsg = StrUtil.format("委托金额[{}]不符合最小买入金额限制[{}]", entrustBalance, minAmt);
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
