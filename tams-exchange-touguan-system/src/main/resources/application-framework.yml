@@ -1,7 +1,7 @@
 prod:
   bussRep: 1
 server:
-  port: 8080
+  port: 8090
   address: 0.0.0.0
   maxHttpHeaderSize: 102400
   context-path: /tams
@@ -161,7 +161,7 @@ jixu:
 shiro:
   sessionId: JSESSIONID
   casClientName: tams
-  allowUrl: /core/selectRule,/common/ptlposition/insertPosition,/BussSettleOrderComm/generateSettleOrder,
+  allowUrl: /core/selectRule,/common/ptlposition/insertPosition,/BussSettleOrderComm/generateSettleOrder,/trade/joyin/**,
     /common/trdcommonbase/insertTradeInfo,/TrdFxswapInvestTrade001/doComplete,/TrdBondInvestTrade/**,/BussRepoSec/**,/common/trdcommonbase/selectParam/COM/is_auto_generate_negate_deal,/CstpAutoSelect/**,
     /TrdBondDuration/findAllData,/TrdDepoDuration/selectAllData,/TrdRepoDuration/selectAllData,/TrdProjectDuration/selectAllData,
     /TrdRepoDuration/findEffectiveData,/TrdProjectDuration/findEffectiveData,/TrdPlanInterestDuration/findEffectiveData,
@@ -171,8 +171,8 @@ shiro:
     /invest/trade/bond/TrdBondInvestTrade002/secAutoTrade,/invest/trade/trdrepotrade/TrdRepoTrade002/repoAutoTrade,/cstp/match/*,/CfetsQuotedCommon/**,
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,
-    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/FinProjectTargetAsset/insert,
-    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/BussSettleOrderComm/**,/etrexchange/hqjj/jjetrExchangeTrade001/*,/MstSecuritiesAccountInfo/*,invest/asset/**
+    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/FinProjectTargetAsset/insert,/component/**,/FinProductRating/**,
+    /common/joyinbusinessCommon/**,/svreport/interf/file/CreateZHXPFile/createFile,/asset/tenderBondAsset003/*,/core/*,/AssetCommon/*,/MstCustomerNature/*
 specialsyspara:
   parakey: AUTHORIZE_LIMIT||PRICE_CAL_TYPE||portfolio_handle_userid||settle_acct_name||settle_acct_no||prod_tru_acct_no||prod_tru_acct_name||lending_acct_no||lending_acct_name
 #页面特殊参数取值
@@ -326,25 +326,38 @@ application:
 #交易压力测试性能优化开关
 flag: false
 
+#头寸引擎地址
+positionUrl: http://192.168.70.146:2667/dsp
+#监听头寸余额地址
+webSocketUrl: ws://192.168.70.146:2667/dsp/positionTopic
+#监听键值
+webSocketKey: "[{\"table\":\"ETR_CASH_POSITION\",\"hodingTypes\":[]}, {\"table\":\"PTL_CASH_POSITION\",\"hodingTypes\":[]}, {\"table\":\"ETR_SEC_POSITION\",\"hodingTypes\":[]}, {\"table\":\"PTL_SEC_POSITION\",\"hodingTypes\":[]}]"
+#监听市场行情最新净价
+cmdsWebSocketUrl: ws://192.168.90.244:18888/dsp/cmds
+#监听债券行情键值
+bondWebSocketKey: Subscriber
+#分页插件超过最后一页返回不返回数据
+pagehelper:
+  reasonable: false
 ---
 spring:
   profiles: allinone
   thymeleaf:
     cache: false
+  #  redis:   ##单节点配置
+  #    database: 0
+  #    host: 192.168.90.47
+  #    port: 6379
+  #    timeout: 20000
   redis:
-    database: 1
-    password: joyin!234
-    host: 192.168.90.165
-    port: 6379
-    timeout: 20000
-  #  redis:
-  #    cluster:
-  #      nodes: 192.168.70.246:6379,192.168.70.246:6380,192.168.70.246:6381,192.168.70.246:6382,192.168.70.246:6383,192.168.70.246:6384
-  #  redislock:
-  #    redissonEnabled: false
+    cluster:
+      nodes: 192.168.90.243:6379,192.168.90.243:6380,192.168.90.243:6381,192.168.90.243:6382,192.168.90.243:6383,192.168.90.243:6384
+  redislock:
+    redissonEnabled: false
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
+    #    username: BS303INIT_EXCHANGE0106
     username: BS303INIT_EXCHANGE0106
     password: BS303INIT_EXCHANGE0106
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
@@ -360,7 +373,7 @@ application:
   sqldirpassword: BS303INIT_EXCHANGE0106
 shiro:
   ssoEnable: false  #是否开启sso验证，可以和joyinsso 统一登录配套使用。如果没有统一登录，但为true的话，就不校验密码
-  #loginUrl: http://192.168.60.111:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
+  #  loginUrl: http://127.0.0.1:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
   allowUrl: /core/selectRule,/common/ptlposition/insertPosition,/BussSettleOrderComm/generateSettleOrder,
     /common/trdcommonbase/insertTradeInfo,/TrdFxswapInvestTrade001/doComplete,/TrdBondInvestTrade/**,/BussRepoSec/**,/common/trdcommonbase/selectParam/COM/is_auto_generate_negate_deal,/CstpAutoSelect/**,
     /TrdBondDuration/findAllData,/TrdDepoDuration/selectAllData,/TrdRepoDuration/selectAllData,/TrdProjectDuration/selectAllData,
@@ -371,12 +384,10 @@ shiro:
     /invest/trade/bond/TrdBondInvestTrade002/secAutoTrade,/invest/trade/trdrepotrade/TrdRepoTrade002/repoAutoTrade,/cstp/match/*,/CfetsQuotedCommon/**,
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
-    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,
+    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,/trade/joyin/**,
     /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/interf/xp,/interf/xp/**,/interf/zg,/interf/zg/**,/FinProjectTargetAsset/insert,/FinAssetRateAdj/getFinAssetRateAdjByCashId,
-    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/common/joyinbusinessCommon/**,/cfets/bankuplink/bond/IbuQuoteBond/**,/cfets/bond/IbuQuoteBond004/**,/BussSettleOrderComm/**,
-    /etrexchange/hqjj/jjetrExchangeTrade001/**,/MstSecuritiesAccountInfo/**,/etrexchange/common/**,/TrdBondInvestTrade/**,/etrexchange/hqjj/etrExchangeTradeJj001/*,/service/joyin/*,/common/entrustcommonbase/*,
-    /etrexchange/agreementrep/**
-
+    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile,
+    /EtrAgreRepTrade/getEntrustInfoByTradeId,/trade/joyin/**,/EntrustMsgbyMQ/**,/asset/tenderBondAsset003/*,/core/*,/AssetCommon/*,/MstCustomerNature/*
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
@@ -461,13 +472,39 @@ trade:
     risk:
       alive: 5000
       capacity: 128
-#分页插件超过最后一页返回空数据
-pagehelper:
-  reasonable: false
+
+quote:
+  flag: false #是否使用接口平台行情，true 是，false 否
+  ws:
+    host: ws://192.168.90.208:16667/dsp
+    url: /exchange
+  http:
+    host: http://192.168.90.208:1668/dsp
+    url: /datarouter/http/json/callTrigger
+    gpCode: GZYH
+    triggerCode: GZ_HQ_SH
+agent:
+  active: false #是否对接接口平台，true-是，false-否
+  terminal:
+    host: http://192.168.90.208:1668/dsp
+    url: /datarouter/http/json/callTrigger
+  query:
+    interval: 10000
+    count: 2
+  keep:
+    fixRate: 30000
+  cache:
+    path: cache
+    clean: 0 0 16 ? * MON-FRI
 
 position:
   flag: false #是否控制账户持仓，true控制，false不控制
+#清除 批处理 缓存的配置，添加此配置后可登录批处理地址http://ip:8084进行批处理缓存更新
+url:
+  batch: http://192.168.90.243:8084/main/about/refreshCache
 
+#消息推送方式:1-MQ；2-接口(开发使用)
+trd-info-push-mode: 1
 
 ---
 spring:
@@ -514,7 +551,7 @@ shiro:
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,
-    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/cfets/**,/common/workflow/**,/common/config/**,/component/**,/etrexchange/hqjj/jjetrExchangeTrade001/*,/MstSecuritiesAccountInfo/*
+    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
@@ -650,7 +687,7 @@ shiro:
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,
-    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/cfets/**,/common/workflow/**,/common/config/**,/component/**,/etrexchange/hqjj/jjetrExchangeTrade001/*,/MstSecuritiesAccountInfo/*
+    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
