@@ -69,6 +69,8 @@ public class PortfolioDetail implements Serializable, KeyMethodInterface<String>
     @ApiModelProperty(value = "目标类型：01 数量；02 金额")
     private String targetType;
 
+    public BigDecimal etrSecAmount;
+
     public String getId() {
         return id;
     }
@@ -147,6 +149,14 @@ public class PortfolioDetail implements Serializable, KeyMethodInterface<String>
 
     public void setTargetType(String targetType) {
         this.targetType = targetType == null ? null : targetType.trim();
+    }
+
+    public BigDecimal getEtrSecAmount() {
+        return etrSecAmount;
+    }
+
+    public void setEtrSecAmount(BigDecimal etrSecAmount) {
+        this.etrSecAmount = etrSecAmount;
     }
 
     @Override

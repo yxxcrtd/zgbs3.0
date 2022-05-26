@@ -392,7 +392,7 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setPriceMode(instruction.getPriceMode());
             calculateResponse.setAcctNo(instruction.getAcctName());
 
-            calculateResponse.setEtrSecAmount(instruction.getEntrustAmt());
+            calculateResponse.setEtrSecAmount(detail.getEntrustAmt());
 
             PortfolioDetail portfolioDetail = portfolioDetailMap.get(portfolioId);
             if (ObjectUtil.isNotNull(portfolioDetail)) {
@@ -1122,6 +1122,10 @@ public class PortfolioManager extends BaseService {
                 sumEntrustVolume = sumEntrustVolume + copyInstruction.getConNum().longValue();
 
                 singleList.add(copyInstruction);
+            }
+
+            for (FairPortfolioResponse item : singleList) {
+                handleFields(result, item);
             }
 
             list.addAll(singleList);

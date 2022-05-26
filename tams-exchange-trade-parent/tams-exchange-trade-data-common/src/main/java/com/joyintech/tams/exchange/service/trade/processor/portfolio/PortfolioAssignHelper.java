@@ -190,6 +190,8 @@ public class PortfolioAssignHelper {
             portfolioDetail.setTargetType(detail.getTargetType());
             portfolioDetail.setBusiStatus(PortfolioDetailBusiStatusEnum.CONFIRM.getCode());
             portfolioDetail.setBusiType(busiType.getCode());
+
+            portfolioDetail.setEtrSecAmount(detail.getEntrustAmt());
             list.add(portfolioDetail);
 
             if (i == len - 1) {
