@@ -1760,14 +1760,20 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             item.setEntrustNum(BigDecimal.ZERO);
             item.setEntrustAmt(BigDecimal.ZERO);
         });
+
         boolean flag=true;
         //目标类型是数量安装步长分配
         List<EtrExchangeProtfolioDetailRequest> portfolioList = dto.getPortfolioList();
         int sumSize = dto.getPortfolioList().size();
+        String ps=portfolioList.get(0).getPs();
+        if(StringUtil.equals(DictCodeListExt3.交易方向_质押券出库.getValue(),ps)||StringUtil.equals(DictCodeListExt3.交易方向_质押券入库.getValue(),ps)){
+            entrustPrice=ArithmeticUtil.divide(entrustPrice,new BigDecimal(100),2);
+        }
         if (StringUtil.equals(DictCodeListExt3.目标类型_数量.getValue(), dto.getTargetType())) {
             while (flag) {
                 for (int i = 0; i < sumSize; i++) {
                     EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
+
                         if (leftEntrustNum.compareTo(minStep) > 0) {
                             item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), minStep));
                             item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));

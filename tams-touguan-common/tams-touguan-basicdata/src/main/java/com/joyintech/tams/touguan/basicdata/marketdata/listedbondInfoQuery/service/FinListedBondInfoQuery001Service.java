@@ -214,9 +214,9 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         List<MstCalendarInfo> mstCalendarInfoList = getMstCalendarInfo();
         //new标的类金融产品
         FinProduct finProduct = new FinProduct();
-        String finProdId = commonBusinessService.getFinProdId(secId, BussinessDictCodeList.金融产品类型_投管用_债券.getValue(), StringUtil.EMPTY);
+        String finProdId = commonBusinessService.getFinProdId(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), StringUtil.EMPTY);
         finProduct.setFinprodId(finProdId);
-        finProduct.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        finProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         finProduct.setFinprodAbbr(finListedBondInfoQuery001Dto.getBondAbbreviation());
         finProduct.setFinprodName(finListedBondInfoQuery001Dto.getBondName());
         finProduct.setProfitType(DictCodeList.收益类型_收益型.getValue());

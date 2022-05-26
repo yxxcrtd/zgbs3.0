@@ -5,10 +5,7 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
@@ -518,6 +515,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
         param.put("entrustIdList",param.get("entrustIds"));
         String loginUserId = LoginUserUtil.getUserName();
+        param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
         param.put("loginUserId", loginUserId);
     }
 
