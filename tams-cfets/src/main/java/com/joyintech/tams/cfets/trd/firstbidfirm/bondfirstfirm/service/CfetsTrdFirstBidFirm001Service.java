@@ -53,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -290,8 +291,8 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
         String loginUserId = LoginUserUtil.getUserName();
-        // param.put("loginUserId", loginUserId);
-        param.put("loginUserId", "li02");
+        param.put("loginUserId", loginUserId);
+        //param.put("loginUserId", "jp");
     }
 
 
@@ -304,7 +305,10 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     public List<CfetsTrdFirstBidFirmEntrustDto> pageSumEntrust(CfetsTrdBondFirstBidFirmEntrustRequest dto) {
         Map<String, Object> param = BeanUtil.object2Map(dto);
         this.setParam(param);
+        //指令汇总数据
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoList = new ArrayList<>();
+        //手动汇总
+        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoListHand = new ArrayList<>();
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmDtos = cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
         bidFirmDtos.stream().forEach(x -> {
             x.setIsSumFlag(DictCodeListExt1.是否_否.getValue());
@@ -315,10 +319,34 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         String loginUserId = LoginUserUtil.getUserName();
         relParam.put("trader", loginUserId);
         relParam.put("sumFlag", this.SUM_FLAG_01);
+        //单独汇总数据
         List<TotalEtrEntrustRel> relList01 = cfetsTrdFirstBidFirm001Mapper.queryTotalEtrEntrustRel(relParam);
+        List<String> entrustId01 = relList01.stream().map(TotalEtrEntrustRel::getEntrustId).collect(Collectors.toList());
         relParam.put("sumFlag", this.SUM_FLAG_02);
         List<TotalEtrEntrustRel> relList02 = cfetsTrdFirstBidFirm001Mapper.queryTotalEtrEntrustRel(relParam);
+        List<String> entrustId02 = relList02.stream().map(TotalEtrEntrustRel::getEntrustId).collect(Collectors.toList());
 
+        Iterator<CfetsTrdFirstBidFirmEntrustDto> iterator = bidFirmDtos.iterator();
+        while (iterator.hasNext()) {
+            CfetsTrdFirstBidFirmEntrustDto bidFirm = iterator.next();
+            //匹配出取消汇总（单独进行汇总）的数据放入-指令汇总数据
+            if (entrustId01.contains(bidFirm.getEntrustId())) {
+                bidFirm.setIsSumFlag(DictCodeListExt1.是否_是.getValue());
+                bidFirmSumDtoList.add(bidFirm);
+                iterator.remove();
+            }
+            //匹配出手动汇总的数据
+            if (entrustId02.contains(bidFirm.getEntrustId())) {
+                bidFirm.setIsSumFlag(DictCodeListExt1.是否_是.getValue());
+                bidFirmSumDtoListHand.add(bidFirm);
+                iterator.remove();
+            }
+        }
+        Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> handSumMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(bidFirmSumDtoListHand)) {
+            handSumMap = bidFirmSumDtoListHand.stream()
+                    .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getEntrustStatus()));
+        }
 
 
         //交易对手为空
@@ -330,16 +358,34 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
                 .filter(x -> StringUtil.isNotEmpty(x.getCounterId())).collect(Collectors.toList());
 
         //汇总数据维度（新债标的OR投标日OR交易对手or指令状态）
+        Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMapSel = new HashMap<>();
         Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMap = bidFirmCounterIsNull.stream()
                 .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getEntrustStatus()));
+
+        for (Map.Entry<String, List<CfetsTrdFirstBidFirmEntrustDto>> entry : counterIsNullMap.entrySet()) {
+            if (CollectionUtils.isNotEmpty(handSumMap.get(entry.getKey()))) {
+                List <CfetsTrdFirstBidFirmEntrustDto> handList = new ArrayList<>();
+                CfetsTrdFirstBidFirmEntrustDto entrustDto = handSumMap.get(entry.getKey()).get(0);
+                if (entrustDto != null) {
+                    handList.add(entrustDto);
+                    handList.addAll(entry.getValue());
+                    handSumMap.put(entry.getKey(), handList);
+                }
+            } else {
+                counterIsNullMapSel.put(entry.getKey(), entry.getValue());
+            }
+
+        }
 
         Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNotNullMap = bidFirmCounterIsNotNull.stream()
                 .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getCounterId() + "_" + o.getEntrustStatus()));
 
-        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumIsNullList = getSumListInfo(counterIsNullMap);
+        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumIsNullList = getSumListInfo(counterIsNullMapSel);
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumIsNotNullList = getSumListInfo(counterIsNotNullMap);
+        List<CfetsTrdFirstBidFirmEntrustDto> handSumList = getSumListInfo(handSumMap);
         bidFirmSumDtoList.addAll(bidFirmSumIsNullList);
         bidFirmSumDtoList.addAll(bidFirmSumIsNotNullList);
+        bidFirmSumDtoList.addAll(handSumList);
 
         return bidFirmSumDtoList;
     }
@@ -351,6 +397,9 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      * @return
      */
     private List<CfetsTrdFirstBidFirmEntrustDto> getSumListInfo(Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMap) {
+        if (counterIsNullMap.isEmpty()) {
+            return null ;
+        }
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoList = new ArrayList<>();
         for (Map.Entry<String, List<CfetsTrdFirstBidFirmEntrustDto>> entry : counterIsNullMap.entrySet()) {
             CfetsTrdFirstBidFirmEntrustDto bidFirmSum = new CfetsTrdFirstBidFirmEntrustDto();
@@ -383,19 +432,31 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
             bidFirmSum.setEntrustNum(sumEntrustNum);
             //投标标位去重
-            List<String> bidPriceList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getBidPrice).collect(Collectors.toList());
-            bidFirmSum.setBidPrice(bidPriceList.toString());
-            List<String> portfolioIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioId).collect(Collectors.toList());
-            List<String> portfolioNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioName).collect(Collectors.toList());
+            List<String> bidPriceList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getBidPrice)
+                    .distinct().sorted().collect(Collectors.toList());
+            bidFirmSum.setBidPrice(StringUtil.join(bidPriceList, ","));
+            List<String> portfolioIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioId)
+                    .distinct().sorted().collect(Collectors.toList());
+            List<String> portfolioNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioName)
+                    .distinct().sorted().collect(Collectors.toList());
             bidFirmSum.setPortfolioId(StringUtil.join(portfolioIdList, ","));
             bidFirmSum.setPortfolioName(StringUtil.join(portfolioNameList, ","));
             bidFirmSum.setTradeMarket(bidFirmDetail.get(0).getTradeMarket());
             bidFirmSum.setTradeMarketStr(bidFirmDetail.get(0).getTradeMarketStr());
 
-            List<String> invManagerIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerId).collect(Collectors.toList());
-            List<String> invManagerNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerName).collect(Collectors.toList());
+            List<String> invManagerIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerId)
+                    .distinct().sorted().collect(Collectors.toList());
+            List<String> invManagerNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerName)
+                    .distinct().sorted().collect(Collectors.toList());
             bidFirmSum.setInvManagerId(StringUtil.join(invManagerIdList, ","));
             bidFirmSum.setInvManagerName(StringUtil.join(invManagerNameList, ","));
+
+            List<String> counterIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getCounterId)
+                    .distinct().sorted().collect(Collectors.toList());
+            List<String> counterNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getCounterName)
+                    .distinct().sorted().collect(Collectors.toList());
+            bidFirmSum.setCounterId(StringUtil.join(counterIdList, ","));
+            bidFirmSum.setCounterName(StringUtil.join(counterNameList, ","));
 
             bidFirmSum.setIsSumFlag(DictCodeListExt1.是否_是.getValue());
 
@@ -407,6 +468,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     /**
      * 指令取消汇总保存
+     *
      * @param cfetsDto
      * @return
      */
@@ -419,11 +481,14 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         String loginUserId = LoginUserUtil.getUserName();
         // param.put("loginUserId", loginUserId);
         totalEtrEntrustRel.setTrader(loginUserId);
+        //先删除后插入
+        cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(cfetsDto.getEntrustId(), loginUserId);
         return totalEtrEntrustRelMapper.insertSelective(totalEtrEntrustRel);
     }
 
     /**
      * 获取指令详细信息
+     *
      * @param entrustId
      * @return
      */
@@ -456,6 +521,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     /**
      * 查询投标确认执行明细
+     *
      * @param entrustId
      * @return
      */
@@ -485,7 +551,6 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     /**
      * 查询表单表头 (私有方法 pageCode,dtCode,spcdCodeList仅组装该页面的数据)
-     *
      */
     private List<CfgReadonlyFormShow> getReadonlyForms(String pageCode, String dtCode, List<String> spcdCodeList) {
         if (CollectionUtils.isEmpty(spcdCodeList)) {
@@ -498,7 +563,6 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     /**
      * 查询表单表头 (私有方法 pageCode,dtCode,spcdCodeList仅组装该页面的数据)
-     *
      */
     private List<CfgDataTableShow> getBySpcdCodes(String pageCode, String dtCode, List<String> spcdCodeList) {
         if (spcdCodeList == null) {

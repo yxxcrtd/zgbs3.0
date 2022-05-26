@@ -16,8 +16,9 @@
 
     <sql id="keywordsWhere">
         <if test="search != null and search != ''">
-            ( T.entrustStatus || '|' || sdl_es.item_value || '|' || T.finprodId || '|' || T.finprodMarketId || '|'
+            ( T.entrustStatus || '|' || sdl_es.ITEM_VALUE || '|' || T.finprodId || '|' || T.finprodMarketId || '|'
             || '|' || T.finprodAbbr || '|' || T.portfolioName || '|' || T.portfolioId  || '|' || T.invManagerName || '|' || T.entrustId || '|' || T.remark
+            || '|' || sdl2.ITEM_VALUE || '|' || sdl3.ITEM_VALUE || '|' || sdl4.ITEM_VALUE
             like '%' || #{search} || '%'
             or decode(T.transactioncom,0,'0.00',to_char(T.transactioncom,'FM90.90'))=#{search} or to_char(T.transactioncom)=#{search}
             or decode(T.tradeFinishPercent,0,'0.00',to_char(T.tradeFinishPercent,'FM90.90'))=#{search} or to_char(T.tradeFinishPercent)=#{search}
@@ -67,7 +68,12 @@
             THEN fpi.TENDER_SDATE
             END           AS issueDateEnd/*投标日 结束*/,
         ee.ENTRUST_NUM*100                       entrustNum,
-        bobp.BID_PRICE                           bidPrice,
+        CASE
+            WHEN  fpi.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
+            WHEN  fpi.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
+            WHEN  fpi.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
+            ELSE bobp.BID_PRICE
+        END AS bidPrice,
         eed.PORTFOLIO_ID                         portfolioId,
         eed.PORTFOLIO_NAME                       portfolioName,
         ee.TRADE_MARKET                          tradeMarket,
@@ -122,10 +128,10 @@
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM99990.9990')
-        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM99990.9990')
+        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
+        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM99990.90')
+        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.ENTRUST_ID
         from ETR_ENTRUST_BID_PRICE t0
@@ -175,12 +181,18 @@
         from
         (<include refid="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper.listEntrustSql" />) T
         left join SYS_DATADICT_LIST sdl_es on T.entrustStatus=sdl_es.ITEM_CODE and sdl_es.DICT_CODE='ENTRUST_STATUS'
+        left join SYS_DATADICT_LIST sdl2 on T.firstBidStatus=sdl2.ITEM_CODE and sdl2.DICT_CODE='FIRST_BID_STATUS'
+        left join SYS_DATADICT_LIST sdl3 on T.tradeMarket=sdl3.ITEM_CODE and sdl3.DICT_CODE='TRADE_PLACE'
+        left join SYS_DATADICT_LIST sdl4 on T.tenderTarget=sdl4.ITEM_CODE and sdl4.DICT_CODE='TENDER_TARGET'
         LEFT JOIN ETR_DISTRIBUTE ed ON ed.ENTRUST_ID = T.entrustId
         <where>
             <!-- 关键字模糊查询 -->
             <include refid="keywordsWhere"></include>
             <if test="loginUserId != null and loginUserId != '' ">
                 AND ed.TRADER = #{loginUserId}
+            </if>
+            <if test="tradeMarket != null and tradeMarket != '' ">
+                AND T.tradeMarket = #{tradeMarket}
             </if>
             <if test="entrustStatus == null">
                 AND T.entrustStatus in ('02','03','04','05','06')
@@ -189,6 +201,12 @@
                 AND
                 <foreach collection="entrustStatus" open=" T.entrustStatus in(" close=")" separator="," item="item">
                     #{item}
+                </foreach>
+            </if>
+            <if test="portfolioIds != null and portfolioIds.size()>0">
+                AND
+                <foreach collection="portfolioIds" index="index" item="item" open=""  separator="or" close="">
+                    T.portfolioId like  '%'||#{item}||'%'
                 </foreach>
             </if>
             <if test="finprodIds != null and finprodIds.size()>0">
@@ -232,13 +250,6 @@
             <if test="entrustIdList != null and entrustIdList.size()>0">
                 AND
                 <foreach collection="entrustIdList" open=" T.entrustId in(" close=")" separator="," item="item">
-                    #{item}
-                </foreach>
-                /*指令代码查询*/
-            </if>
-            <if test="existEntrustIds != null and existEntrustIds.size()>0">
-                AND
-                <foreach collection="existEntrustIds" open=" T.entrustId not in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
                 /*指令代码查询*/
@@ -287,13 +298,18 @@
         SELECT
             eebp.PORTFOLIO_ID portfolioId,
             pp.PORTFOLIO_NAME  portfolioName,
-            eebp.BID_PRICE bidPrice,
-            eebp.BID_PRIN_AMT  bidPrinAmt,
+            CASE
+                WHEN  fpi.TENDER_TARGET = '01' THEN to_char(eebp.BID_PRICE * 100, 'FM9999999999999990.9990') || ' %'
+                WHEN  fpi.TENDER_TARGET = '02' THEN to_char(eebp.BID_PRICE, 'FM9999999999999990.9990') || ' 元'
+                WHEN  fpi.TENDER_TARGET = '03' THEN to_char(eebp.BID_PRICE * 10000, 'FM9999999999999990.90') || ' BP'
+            END AS bidPrice,
+            eebp.BID_PRIN_AMT*100  bidPrinAmt,
             eed.INV_AIM  businessModel,
-            eed.ENTRUST_NUM/100 portfolioTotalBidPrinAmt
+            eed.ENTRUST_NUM*100 portfolioTotalBidPrinAmt
         FROM ETR_ENTRUST ee
                  left join ETR_ENTRUST_BID_PRICE eebp ON eebp.ENTRUST_ID  = ee.ENTRUST_ID
                  LEFT JOIN ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID  = eebp.ENTRUST_ID AND eed.PORTFOLIO_ID  = eebp.PORTFOLIO_ID
+                 LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = ee.FINPROD_ID
                  left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eebp.PORTFOLIO_ID
 
         WHERE ee.ENTRUST_ID = #{entrustId}
@@ -1143,4 +1159,10 @@
             </if>
         </where>
     </select>
+
+    <delete id="deleteEtrEntrustRel" parameterType="java.lang.String">
+        delete from TOTAL_ETR_ENTRUST_REL
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+              and  TRADER = #{loginUserId,jdbcType=VARCHAR}
+    </delete>
 </mapper>
