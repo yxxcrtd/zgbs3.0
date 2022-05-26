@@ -52,6 +52,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -723,18 +724,23 @@ public class PortfolioManager extends BaseService {
         } else if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
             // 02时，剔除该指令并继续时
             BigDecimal orderPrice = adjustedPrice;
+            BigDecimal filterPrice = null;
             for (Instruction ins : tempList) {
                 if (EntrustUtils.isMarketPrice(ins)) {
                     continue;
                 }
+                filterPrice = ins.getEntrustPrice();
+                if (StringUtil.isNotEmpty(ins.getIsNetPrice()) && StringUtil.equals(ins.getIsNetPrice(), "N")) {
+                    filterPrice = ins.getFullPrice();
+                }
                 if (EntrustBs.isBuy(entrustBs)) {
                     // 买入，过滤价格小于指令价格的指令
-                    if (ins.getEntrustPrice().compareTo(orderPrice) < 0) {
+                    if (filterPrice.compareTo(orderPrice) < 0) {
                         ins.setEntrustClass(是否_否.getValue());
                     }
                 } else {
                     // 卖出，过滤价格大于指令价格的指令
-                    if (ins.getEntrustPrice().compareTo(orderPrice) > 0) {
+                    if (filterPrice.compareTo(orderPrice) > 0) {
                         ins.setEntrustClass(是否_否.getValue());
                     }
                 }
