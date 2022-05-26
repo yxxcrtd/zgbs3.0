@@ -211,6 +211,7 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
                         riskTrialFlag = false;
                     }
                 }
+                entity.setRiskTrialRetDto(riskTrialRetList);
                 model.addAttribute("riskTrialSpan", riskTrialFlag ? "试算通过" : "试算不通过");
                 model.addAttribute("entity_RiskTrialRetList", riskTrialRetList);
             }
