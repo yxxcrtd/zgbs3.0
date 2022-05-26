@@ -1308,7 +1308,7 @@
                 //$("#invAim_div_" + currentTab).show();
                 $("#businessModelDiv_"+ currentTab).show();
                 if(ps == PS_T02){
-                    $("#businessModel_" + currentTab).val("").trigger('change');
+                    // $("#businessModel_" + currentTab).val("").trigger('change');
                     $("#businessModel_" + currentTab).prop("disabled", true);
                 }
             }
