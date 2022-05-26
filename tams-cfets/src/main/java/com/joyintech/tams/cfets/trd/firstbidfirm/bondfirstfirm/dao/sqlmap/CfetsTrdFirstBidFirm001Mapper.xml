@@ -355,9 +355,9 @@
                         bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                         bo.PAY_TYPE       AS payType/*缴款方式*/,
                         case
-                            when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM99990.9990') || '%'
-                            when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM99990.9990') || '元'
-                            when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM99990.90') || 'BP'
+                            when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                            when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+                            when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
                             end              winPrice/*中标标位*/,
                         bo.UNIT_CPRICE       price/*净价*/,
                         bo.PAYABLE_AMOUNT    payableAmount/*缴款金额*/,
@@ -374,11 +374,11 @@
                           LEFT JOIN
                       (select listagg(case
                                           when t3.TENDER_TARGET = '01'
-                                              then to_char(t0.BID_PRICE * 100, 'FM99990.9990') || '%'
+                                              then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
                                           when t3.TENDER_TARGET = '02'
-                                              then to_char(t0.BID_PRICE, 'FM99990.9990') || '元'
+                                              then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
                                           when t3.TENDER_TARGET = '03'
-                                              then to_char(t0.BID_PRICE * 10000, 'FM99990.90') || 'BP'
+                                              then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
                                           end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
                           t0.BID_ID
                        from BID_ORDER_BID_PRICE t0
@@ -445,9 +445,9 @@
                         bo.BID_MODLE    AS biddingMethod/*投标方式*/,
                         bo.PAY_TYPE     AS payType/*缴款方式*/,
                         case
-                            when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM99990.9990') || '%'
-                            when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM99990.9990') || '元'
-                            when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM99990.90') || 'BP'
+                            when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                            when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+                            when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
                             end            winPrice/*中标标位*/,
                         bo.UNIT_CPRICE     price/*净价*/,
                         bo.PAYABLE_AMOUNT  payableAmount/*缴款金额*/,
@@ -464,11 +464,11 @@
                           LEFT JOIN
                       (select listagg(case
                                           when t3.TENDER_TARGET = '01'
-                                              then to_char(t0.BID_PRICE * 100, 'FM99990.9990') || '%'
+                                              then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
                                           when t3.TENDER_TARGET = '02'
-                                              then to_char(t0.BID_PRICE, 'FM99990.9990') || '元'
+                                              then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
                                           when t3.TENDER_TARGET = '03'
-                                              then to_char(t0.BID_PRICE * 10000, 'FM99990.90') || 'BP'
+                                              then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
                                           end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
                           t0.BID_ID
                        from WFL_BID_ORDER_BID_PRICE t0
