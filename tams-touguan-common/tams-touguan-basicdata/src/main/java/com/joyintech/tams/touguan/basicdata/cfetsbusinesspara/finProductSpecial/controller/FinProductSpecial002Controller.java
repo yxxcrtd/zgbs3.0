@@ -54,7 +54,6 @@ public class FinProductSpecial002Controller extends BaseController {
         Map<String, Object> model = new HashMap<>(1);
         model.put("pageId", this.getPageId());
         model.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
-        model.put("EXCEL_TEMPLATE_URL", "");
 
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
         FinProductSpecialDto entity = new FinProductSpecialDto();
