@@ -1577,6 +1577,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             newPathFile.mkdir();
         }
         File folder = new SafelyFile(newPathFile,newfileName);
+        folder.getParentFile().mkdirs();
         folder.createNewFile();
         FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
         SysUploadFileInfo fileInfo = new SysUploadFileInfo();
