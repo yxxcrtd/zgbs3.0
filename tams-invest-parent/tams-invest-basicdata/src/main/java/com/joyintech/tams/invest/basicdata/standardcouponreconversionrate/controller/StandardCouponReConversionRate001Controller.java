@@ -153,17 +153,16 @@ public class StandardCouponReConversionRate001Controller extends BaseController 
         WorkFlowParameter<StandardCouponReConversionRateDto> params = new WorkFlowParameter<StandardCouponReConversionRateDto>();
         params.setPageId("StandardCouponReConversionRate002");
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(entity-> entity.getFinprodId ()+"-"+entity.getBrokerId ());
         params.setBusinessType(DictCodeListExt3.共通业务类型_标准券再折算率.getValue());
         // 设置流程业务说明, entity即传入的dto
-        // 设置流程业务说明, entity即传入的dto
-        if(org.codehaus.plexus.util.StringUtils.isNotEmpty(dto.getFinprodId())&& org.codehaus.plexus.util.StringUtils.isEmpty(dto.getAccountType())){
-            params.setBusinessCode(dto.getFinprodId ()+"-"+dto.getBrokerId ());
-            params.setComment(entity -> SpringContextUtil.getTextValue("资产代码") + "("+ entity.getFinprodId () + ")");
-        } else {
-            params.setBusinessCode(dto.getAccountType ()+"-"+dto.getBrokerId ());
-            params.setComment(entity -> SpringContextUtil.getTextValue("资金账户") + "("+ entity.getAccountType () + ")");
-        }
+        params.setBusinessCode(item ->
+                        StringUtils.isNotEmpty( item.getFinprodId ()) ? item.getFinprodId ()+"-"+item.getBrokerId ()
+                                :item.getAccountType ()+"-"+item.getBrokerId ()
+                );
+        params.setComment(entity->
+            StringUtils.isNotEmpty( entity.getFinprodId ()) ? SpringContextUtil.getTextValue("资产代码") + "("+ entity.getFinprodId () + ")"
+            :SpringContextUtil.getTextValue("资金账户") + "("+ entity.getAccountType () + ")"
+        );
         processParameter.setWorkFlowParameter(params);
         String msg = standardCouponReConversionRateService.start(processParameter,
                 dto.getSelectedItem().toArray(new StandardCouponReConversionRateDto[dto.getSelectedItem().size()]));

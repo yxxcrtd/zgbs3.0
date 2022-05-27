@@ -1,8 +1,16 @@
 package com.joyintech.tams.invest.basicdata.mstmarketmanagement.dto;
 
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.basicdata.mstmarketinstitutions.validator.MstMarketInstitutionsValidator;
+import com.joyintech.tams.invest.basicdata.mstmarketmanagement.validator.MstMarketManagementValidator;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 /**
  * 
@@ -12,11 +20,30 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
  * @see MstMarketManagementDto
  * @since 1.0
  */
+@PageId("MstMarketManagement002")
+@ValidLogic(targetClass = MstMarketManagementValidator.class, groups = {ValidateGroupEdit.class,
+        ValidateGroupDelete.class})
 public class MstMarketManagementDto  extends BaseEntity implements ProcessEntity{
     /**
      * <意义，目的和功能，以及可能被用到的地方>
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 操作类型
+     */
+    private String operateType;
+
+    /**
+     * 画面打开模式
+     */
+    private String pageModel;
+
+    /**
+     * <意义，目的和功能，以及可能被用到的地方>
+     */
+    private String elementId;
+
     /**
      * 市场代码
      */
@@ -164,8 +191,43 @@ public class MstMarketManagementDto  extends BaseEntity implements ProcessEntity
      * sql排序标识
      */
     private String sqlSortString;
-    
-    
+
+    /**
+     * 评级日期，修改时记录修改前的评级日期
+     */
+    private String oldGradeDate;
+
+    /**
+     * 评级机构，修改时记录修改前的评级机构
+     */
+    private String oldGradeOrgId;
+
+    private String oldGradeResult;
+
+    public String getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(String operateType) {
+        this.operateType = operateType;
+    }
+
+    public String getPageModel() {
+        return pageModel;
+    }
+
+    public void setPageModel(String pageModel) {
+        this.pageModel = pageModel;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
     /**
      * 获取 previousgradeDate
      * @return previousgradeDate.
@@ -407,6 +469,7 @@ public class MstMarketManagementDto  extends BaseEntity implements ProcessEntity
      * 
      * @return 债券代码（市场代码）
      */
+    @PrimaryKey(value= PrimaryKey.Field.PK_2)
     public String getoCode() {
         return oCode;
     }
@@ -434,6 +497,7 @@ public class MstMarketManagementDto  extends BaseEntity implements ProcessEntity
      * 
      * @return 评级机构
      */
+    @PrimaryKey(value= PrimaryKey.Field.PK_3)
     public String getGradeOrgId() {
         return gradeOrgId;
     }
@@ -453,6 +517,7 @@ public class MstMarketManagementDto  extends BaseEntity implements ProcessEntity
      * 
      * @return 评级日期
      */
+    @PrimaryKey(value= PrimaryKey.Field.PK_4)
     public String getGradeDate() {
         return gradeDate;
     }
@@ -472,6 +537,7 @@ public class MstMarketManagementDto  extends BaseEntity implements ProcessEntity
      * 
      * @return 评级类型，主体评级、债项评级
      */
+    @PrimaryKey(value= PrimaryKey.Field.PK_1)
     public String getoType() {
         return oType;
     }
@@ -664,8 +730,20 @@ public class MstMarketManagementDto  extends BaseEntity implements ProcessEntity
         this.gradeDateEnd = gradeDateEnd;
     }
 
+    public String getGradeSourceTypeStr() {
+        if (StringUtil.equals(getGradeSourceType(),"02")){
+            return "内部评级";
+        }else {
+            return "外部评级";
+        }
+    }
+
     public String getGradeSourceType() {
-        return gradeSourceType;
+        if (StringUtil.equals("98",getGradeOrgId()) || StringUtil.equals("99",getGradeOrgId())){
+            return "02";
+        }else {
+            return "01";
+        }
     }
 
     public void setGradeSourceType(String gradeSourceType) {
@@ -686,6 +764,30 @@ public class MstMarketManagementDto  extends BaseEntity implements ProcessEntity
 
     public void setSqlSortString(String sqlSortString) {
         this.sqlSortString = sqlSortString;
+    }
+
+    public String getOldGradeDate() {
+        return oldGradeDate;
+    }
+
+    public void setOldGradeDate(String oldGradeDate) {
+        this.oldGradeDate = oldGradeDate;
+    }
+
+    public String getOldGradeOrgId() {
+        return oldGradeOrgId;
+    }
+
+    public void setOldGradeOrgId(String oldGradeOrgId) {
+        this.oldGradeOrgId = oldGradeOrgId;
+    }
+
+    public String getOldGradeResult() {
+        return oldGradeResult;
+    }
+
+    public void setOldGradeResult(String oldGradeResult) {
+        this.oldGradeResult = oldGradeResult;
     }
 }
 

@@ -81,6 +81,17 @@ public class StandardCouponReConversionRateController {
      * @param dto
      * @return
      */
+    @PostMapping("/getBokerList")
+    public List<StandardCouponReConversionRateDto> getBokerList(@RequestBody StandardCouponReConversionRateDto dto){
+        return standardCouponReConversionRateService.getBokerList(dto);
+    }
+
+    /**
+     * 详情、修改、查看、唯一性验证
+     *
+     * @param dto
+     * @return
+     */
     @PostMapping("/getBusinessData")
     public List<WflValidInputParameter> getBusinessData(@RequestBody WflValidInputParameter dto){
         return standardCouponReConversionRateService.getBusinessData(dto);

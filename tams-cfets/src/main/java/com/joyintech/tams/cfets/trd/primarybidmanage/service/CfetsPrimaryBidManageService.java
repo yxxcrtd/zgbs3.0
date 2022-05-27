@@ -196,6 +196,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 }
                 summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
                 summaryBidDto.setWinPrinAmt(winPrinAmt);
+                summaryBidDto.setWinPrice(winPrice);
+                summaryBidList.add(summaryBidDto);
             }
 //            response.setSummaryBidList(summaryBidList);
             resultData.put(dtCode + "_form", infoForm);

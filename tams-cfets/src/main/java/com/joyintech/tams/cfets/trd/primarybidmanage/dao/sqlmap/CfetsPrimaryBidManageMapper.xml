@@ -168,11 +168,14 @@
             BOBP.BID_ID       bidId,
             BOBP.ENTRUST_ID   entrustId,
             BOBP.PORTFOLIO_ID   portfolioId,
+            pp.PORTFOLIO_NAME portfolioName,
             NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000   totalBidPrinamt,
             BOBP.WIN_PRIN_AMT     winPrinAmt,
-            BOBP.WIN_PRICE        winPrice
+            BOBP.WIN_PRICE        winPrice,
+            BOBP.INV_AIM   invAim
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN PTL_PORTFOLIO pp on BOBP.PORTFOLIO_ID = pp.PORTFOLIO_ID
         WHERE BOBP.BID_ID = #{bidId}
     </select>
 
@@ -533,7 +536,7 @@
         SELECT
             BOBP.ENTRUST_ID  entrustId,
             BOBP.PORTFOLIO_ID portfolioId,
-            BOBP.THE_WIN_PRIN_AMT theWinPrinAmt,
+            BOBP.THE_WIN_PRIN_AMT totalBidPrinamt,
             BOBP.BID_PRICE   bidPrice,
             BOBP.INV_AIM   invAim,
             BOBP.SEC_ACCT_ID secAcctId,

@@ -87,6 +87,10 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
         return basicStandardCouponReConversionRateMapper.getList(dto);
     }
 
+    public List<StandardCouponReConversionRateDto> getBokerList(StandardCouponReConversionRateDto dto){
+        return basicStandardCouponReConversionRateMapper.getBokerList(dto);
+    }
+
     public List<WflValidInputParameter> getBusinessData(WflValidInputParameter dto){
         List<String> list = basicStandardCouponReConversionRateMapper.getBusinessData(dto);
         if (CollectionUtils.isNotEmpty(list)) {
