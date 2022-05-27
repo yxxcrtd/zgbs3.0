@@ -97,6 +97,13 @@
         where FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectByFinprodMarketIdAndType2" resultMap="BaseResultMap"  parameterType="java.lang.String" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.FinProductMapper.Base_Column_List" />
+        from FIN_PRODUCT
+        where FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR} and FINPROD_TYPE2 =  #{finprodType2,jdbcType=VARCHAR}
+    </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
         delete from FIN_PRODUCT
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
