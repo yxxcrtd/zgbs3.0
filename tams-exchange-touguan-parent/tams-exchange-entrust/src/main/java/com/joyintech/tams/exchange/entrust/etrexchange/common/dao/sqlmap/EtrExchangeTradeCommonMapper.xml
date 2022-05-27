@@ -1048,9 +1048,10 @@
             <if test="secAcctId != null and secAcctId != ''">
                 and SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
             </if>
-            <if test="portfolioId != null and portfolioId != ''">
-                and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
-            </if>
+            <!--交易所品种额度 表数据 无组合维度-->
+<!--            <if test="portfolioId != null and portfolioId != ''">-->
+<!--                and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}-->
+<!--            </if>-->
             <if test="finprodId != null and finprodId != ''">
                 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
             </if>
