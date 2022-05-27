@@ -6101,6 +6101,9 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         ProcessMark processMark = new ProcessMark();
         processMark.setBusinessDataPk1(tradeId);
         String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
+        if(StringUtil.isEmpty(workflowId)){
+            return new ArrayList<>();
+        }
         EtrExchangeTradeSaveRequest  entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
         List<EtrExchangeTradePortfolioRequest> portlist=entity.getPortfolioList();
         List portfolioIdList=new ArrayList();
