@@ -1130,6 +1130,17 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 return result;
             }
             // 活期存放 交易方向为卖出 end
+            else if (DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(deal.getFinprodType2())) {
+                resultDto.setCdate(deal.getTradeDate());
+                if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())) {
+                    resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
+                }
+                if (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())) {
+                    resultDto.setAmount(deal.getShareAmt());
+                }
+                result.add(resultDto);
+                return result;
+            }
         }
         return result;
     }
@@ -2464,6 +2475,17 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                     return result;
                 }
                 // 活期存放 交易方向为卖出 end
+                else if (DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(deal.getFinprodType2())) {
+                    resultDto.setCdate(deal.getTradeDate());
+                    if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())) {
+                        resultDto.setAmount(stlPayOrder.getSettleAmt());
+                    }
+                    if (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())) {
+                        resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
+                    }
+                    result.add(resultDto);
+                    return result;
+                }
             }
         }
         return result;

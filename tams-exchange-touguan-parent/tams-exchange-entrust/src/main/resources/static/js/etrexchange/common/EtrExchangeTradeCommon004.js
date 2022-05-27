@@ -1308,7 +1308,7 @@
                 //$("#invAim_div_" + currentTab).show();
                 $("#businessModelDiv_"+ currentTab).show();
                 if(ps == PS_T02){
-                    $("#businessModel_" + currentTab).val("").trigger('change');
+                    // $("#businessModel_" + currentTab).val("").trigger('change');
                     $("#businessModel_" + currentTab).prop("disabled", true);
                 }
             }
@@ -1652,6 +1652,10 @@
 
         if (currentTab == 'gd') {
             $("#acctNo_div_" + currentTab).hide()
+        }
+
+        if(ps == PS_T97){
+            $("#businessModelDiv_"+ currentTab).hide();
         }
 
     };
@@ -3285,6 +3289,7 @@
                 $("#acctNo_div_" + currentTab).show();
                 $("#dateTableDiv").hide();
                 $("#ps_" + currentTab).attr('disabled', 'disabled');
+                $("#businessModelDiv_"+ currentTab).hide();
             }
             if(ps == PS_T49){
                 $("#entrustAmtUnit_div_" + currentTab).hide();
@@ -3389,6 +3394,7 @@
 
             if(ps == PS_T97){
                 $("#invAim_div_" + currentTab).hide();
+                $("#businessModelDiv_"+ currentTab).hide();
             }
         }
     var addMinPriceStep = function (type, num, input) {
@@ -4352,8 +4358,9 @@
                 saveOrSubmit('submit');
             });
         }
-
-        saveOrSubmit('submit');
+        if(($('#riskTrialSpan').text() && $('#riskTrialSpan').text().trim() == '试算通过') || (ps == PS_T68 || ps == PS_T69) ){
+            saveOrSubmit('submit');
+        }
     }
 
     /**
@@ -4378,6 +4385,9 @@
         //         return;
         //     }
         // }
+        if(entity_RiskTrialRetList){
+            object.riskTrialRetDto = entity_RiskTrialRetList;
+        }
         if(object.finprodType2 == FINPROD_TYPE_TG_F01 && (object.ps == PS_T68 || object.ps == PS_T69)){
             if(object.entrustNum){
                 object.entrustNum = object.entrustNum * 100;
@@ -4810,6 +4820,7 @@
             Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTradeCommonRiskcal/doRiskcal', param, function (data) {
                 $("#riskTrialSpan").html("&nbsp;&nbsp;" + data.data.data.riskTrialSpan);
                 entity_RiskTrialRetList = data.data.data.riskcalReturnList;
+                riskResultdata =  data.data.data.riskcalReturnList;
                 $.each(entity_RiskTrialRetList, function (index, item) {
                     item.conclusion = data.data.data.riskTrialSpan;
                 })

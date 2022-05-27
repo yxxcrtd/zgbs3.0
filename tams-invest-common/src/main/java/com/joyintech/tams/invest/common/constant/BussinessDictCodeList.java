@@ -5184,6 +5184,8 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
     行内资产三级分类_掉期(BussinessDictCode.行内资产三级分类, "68", "掉期"),
     指令业务类型_银证转账(BussinessDictCode.指令业务类型, "49", "银证转账"),
     指令业务类型_证银转账(BussinessDictCode.指令业务类型, "50", "证银转账"),
+    行内资产三级分类_金融债(BussinessDictCode.行内资产三级分类, "69", "金融债"),
+    行内资产三级分类_可交换债(BussinessDictCode.行内资产三级分类, "71", "可交换债"),
 
     /**
      * 行权方式_回售
