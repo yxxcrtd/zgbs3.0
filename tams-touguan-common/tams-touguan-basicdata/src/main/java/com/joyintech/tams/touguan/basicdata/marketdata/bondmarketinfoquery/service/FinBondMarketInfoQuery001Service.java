@@ -12,7 +12,6 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.FinProductIssue;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -193,52 +192,32 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
             param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
             param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
-            param.put("finprodType",DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            param.put("finprodType", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             detailQueryDto = finBondMarketInfoQueryMapper.queryFinProductForCoupons(param);
-            if(Objects.nonNull(detailQueryDto)){
-                //付息信息
-//                BondFinPayInterestStdInfoDto finPayInterestStdInfoDto = new BondFinPayInterestStdInfoDto();
-//                BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,dto);
-//                if(StringUtil.isNotEmpty(finPayInterestStdInfoDto)) {
-//                    finPayInterestStdInfoDto.setMaxTradeDate(this.getMaxTradeDate(dto.getFinprodId()));
-//                }
-//                map.put("cashId",dto.getInterestCashId());
-//                if (StringUtil.isNotEmpty(dto.getInterestCashId())) {
-//                    List<BondFinCashPlanDto> invScheduleList = finBondAssetMapper.selectInvScheduleList(map);
-//                    for (BondFinCashPlanDto invRepay: invScheduleList) {
-//                        if (StringUtil.equals(invRepay.getBasis(), DictCodeList.计息基础_A_A_平均分配.getValue())
-//                                || StringUtil.equals(invRepay.getBasis(), DictCodeList.计息基础_A_A_按实际天数分配.getValue())) {
-//                            invRepay.setBasis(DictCodeList.计息基础_A_A.getValue());
-//                        }
-//                    }
-//                    finPayInterestStdInfoDto.setInvScheduleList(invScheduleList);
-//                    dto.setFinPayInterestStdInfoDto(finPayInterestStdInfoDto);
-//                }
-//                //付息信息
-//                map.put("cashId",dto.getPrincipalCashId());
-//                if (StringUtil.isNotEmpty(dto.getPrincipalCashId())) {
-//                    List<BondFinCashPlanDto> invRepayList = finBondAssetMapper.selectInvScheduleList(map);
-//                    dto.setInvRepayList(invRepayList);
-//                }
-//                //行权计划
-//                map.put("cashId",dto.getPrincipalCashId());
-//                if (StringUtil.isNotEmpty(dto.getPrincipalCashId())) {
-//                    List<BondFinExercisePlanDto> finExercisePlanList = finBondAssetMapper.selectFinExercisePlanList(map);
-//                    dto.setFinExercisePlanList(finExercisePlanList);
-//                }
-//                //发行方式
-//                List<FinProductIssue> finProductIssues = finBondAssetMapper.selectFinProductIssue(dto.getFinprodMarketId());
-//                List<BondFinProductIssueDto> finProductIssueList = new ArrayList<>();
-//                for (FinProductIssue finProductIssue:finProductIssues){
-//                    BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
-//                    BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
-//                    FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductIssue.getFinprodId());
-//                    BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
-//                    bondFinProductIssueDto.setListingDate(finProduct.getCirculationDate());
-//                    bondFinProductIssueDto.setFinprodMarketId(finProduct.getFinprodMarketId());
-//                    finProductIssueList.add(bondFinProductIssueDto);
-//                }
-//                dto.setFinProductIssueList(finProductIssueList);
+            if (Objects.nonNull(detailQueryDto)) {
+                Map<String, Object> map = new HashMap<>();
+                //付息计划
+                map.put("cashId", detailQueryDto.getBasisStyle());
+                map.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                if (StringUtil.isNotEmpty(detailQueryDto.getBasisStyle())) {
+                    List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.selectInvScheduleList(map);
+                    detailQueryDto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
+                }
+                //还本信息
+                map.put("cashId",detailQueryDto.getPrincipalCashId());
+                map.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                if (StringUtil.isNotEmpty(detailQueryDto.getPrincipalCashId())) {
+                    List<FinBondMarketCashPlanDto> invRepayList = finBondMarketInfoQueryMapper.selectInvScheduleList(map);
+                    detailQueryDto.setBondMarketInvRepayDtos(invRepayList);
+                }
+
+                //行权计划
+                map.put("cashId", detailQueryDto.getPrincipalCashId());
+                map.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                if (StringUtil.isNotEmpty(detailQueryDto.getPrincipalCashId())) {
+                    List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.selectFinExercisePlanList(map);
+                    detailQueryDto.setBondPayHSrcSecOptionDtos(bondPayHSrcSecOptionDtos);
+                }
             }
         }
         return detailQueryDto;

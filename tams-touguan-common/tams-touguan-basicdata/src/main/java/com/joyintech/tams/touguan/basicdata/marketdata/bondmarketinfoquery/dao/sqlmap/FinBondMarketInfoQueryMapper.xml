@@ -217,6 +217,9 @@
             <if test="search !=null and search !=''">
                 AND (
                 PAYHSRCSECINFO.SECID like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.SECNAME like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.SECFULLNAME like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.SECCODE like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.MARKET like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.institution like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.ISSUERSHORT like '%' || #{search} || '%' OR
@@ -589,5 +592,40 @@
                 )
             </if>
         </where>
+    </select>
+
+
+    <select id="selectInvScheduleList" resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto">
+        SELECT VDATE intereststartday,
+               MDATE interestendday,
+               PAY_DATE interestpayday,
+               RANGE_YIELD couponrate,
+               INT_PRIN_AMT prinamt,
+               INT_AMT accrueintamt,
+               BASIS basis,
+               PRIN_AMT prinAmt,
+               CASH_AMT cashAmt
+        from  FIN_CASH_PLAN fcp
+        WHERE  fcp.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+          AND  fcp.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+          AND  fcp.BRANCH = 0
+          AND  fcp.CASH_ID = #{cashId}
+    </select>
+
+
+    <select id="selectFinExercisePlanList" resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto">
+        SELECT EXERCISE_STATUS optionStatus,
+               VDATE optionStartDay,
+               MDATE optionEndDay,
+               EXERCISE_TYPE optionType,
+               EXERCISE_DATE theOryOptionPayDay,
+               ACT_EXERCISE_DATE optionPayDay,
+               EXERCISE_PRICE optionPrice,
+               EXERCISE_REMARK optionClause
+        from FIN_EXERCISE_PLAN fep
+        WHERE  fep.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+          AND  fep.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+          AND  fep.BRANCH = 0
+          AND  fep.CASH_ID = #{cashId}
     </select>
 </mapper>
