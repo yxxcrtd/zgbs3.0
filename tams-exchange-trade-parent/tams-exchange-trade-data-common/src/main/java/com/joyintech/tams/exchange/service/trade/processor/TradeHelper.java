@@ -673,7 +673,6 @@ public class TradeHelper {
         logger.info("开始创建订单 {}", JsonUtils.getJsonFromObject(dto));
         Order order = Order.createOrder(dto);
         Instrument instrument = instrumentService.queryByInnerCode(order.getStockCode());
-//        order.setIsFullPrice(instrument.getIsFullPrice());
         FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(order.getStockCode());
         if (!createOrderByInstrument(order, instrument, futuresInstrument)) {
             return order;
@@ -705,13 +704,13 @@ public class TradeHelper {
         }
 
         // 指令检查(包括状态,日期,接收人) 价格限定
-        ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, order, orderPrice, tradingDay);
-        if (!ErrorCode.isSuccess(errorCode.value)) {
-            logger.info("内部指令信息检查未通过：instructionId [{}] error:{}-{}", dto.getInstructionId(), errorCode.value, errorCode.errorMsg);
-            order.setErrorCode(errorCode.value);
-            order.setErrorMsg(errorCode.errorMsg);
-            return order;
-        }
+//        ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, order, orderPrice, tradingDay);
+//        if (!ErrorCode.isSuccess(errorCode.value)) {
+//            logger.info("内部指令信息检查未通过：instructionId [{}] error:{}-{}", dto.getInstructionId(), errorCode.value, errorCode.errorMsg);
+//            order.setErrorCode(errorCode.value);
+//            order.setErrorMsg(errorCode.errorMsg);
+//            return order;
+//        }
         if (!checkOthCode(dto, order, instruction)) {
             return order;
         }
@@ -724,8 +723,7 @@ public class TradeHelper {
         order.setBusinessFlag(BusinessFlag.NORMAL.value);
         order.setBsFlag(EntrustUtils.getBsFlagForNormal(order.getEntrustProp(), order.getEntrustBs(), order.getAssetType(), instrument, instruction.getDeliveryMethod()));
         order.setEntrustType(EntrustUtils.getEntrustType(order.getBsFlag()));
-        //order.setOrderBalance(TradeUtils.calculateBalance(order.getOrderPrice(), order.getOrderVolume(), order.getAssetType(), order, futuresInstrument));
-
+        order.setOrderBalance(TradeUtils.calculateBalance(order.getOrderPrice(), order.getOrderVolume(), order.getAssetType(), order, futuresInstrument));
         order.setPortfolioName(instruction.getPortfolioName());
         order.setSecAcctId(instruction.getSecAcctId());
         order.setSecAcctName(instruction.getSecAcctName());
@@ -741,9 +739,18 @@ public class TradeHelper {
 
         //1.公平下单
         if (fairOrderHelper.createFairOrder(order)) {
-            order.setOrderBalance(TradeUtils.calculateBalance(order.getOrderPrice(), order.getOrderVolume(), order.getAssetType(), order, futuresInstrument));
             return order;
         }
+
+        // 指令检查(包括状态,日期,接收人) 价格限定
+        ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, order, orderPrice, tradingDay);
+        if (!ErrorCode.isSuccess(errorCode.value)) {
+            logger.info("内部指令信息检查未通过：instructionId [{}] error:{}-{}", dto.getInstructionId(), errorCode.value, errorCode.errorMsg);
+            order.setErrorCode(errorCode.value);
+            order.setErrorMsg(errorCode.errorMsg);
+            return order;
+        }
+
         //2.批量下单
         BatchInfo batchInfo = dto.getBatchInfo();
         if (Objects.nonNull(batchInfo)) {
@@ -772,7 +779,6 @@ public class TradeHelper {
             orderService.asyncUpdate(order);
         }
         //3.普通下单
-        order.setOrderBalance(TradeUtils.calculateBalance(order.getOrderPrice(), order.getOrderVolume(), order.getAssetType(), order, futuresInstrument));
         return order;
     }
 
