@@ -160,7 +160,10 @@ public class FinPlanProfitAsset002Controller extends BaseController{
                 FinPlanProfitAssetDto finPlanAssetRInfo = finPlanProfitAssetService.getBasicInfoByFinprodId(finprodId);
                 //finPlanAssetRInfo.setReferRate(finPlanAssetRInfo.getInvestRate().subtract(finPlanAssetRInfo.getBuyOutRate()));
                 if(null!=finPlanAssetRInfo){
-                    finPlanAssetRInfo.setFjId(finPlanAssetRInfo.getFinprodId());
+                    // 快录时，不默认带出附件信息
+                    if (!isQuickInput){
+                        finPlanAssetRInfo.setFjId(finPlanAssetRInfo.getFinprodId());
+                    }
                     //finPlanAssetRInfo.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
                     if(finPlanAssetRInfo.getBuyOutRate() !=null){
                     	finPlanAssetRInfo.setBuyOutRate(finPlanAssetRInfo.getBuyOutRate().multiply(new BigDecimal(100)));

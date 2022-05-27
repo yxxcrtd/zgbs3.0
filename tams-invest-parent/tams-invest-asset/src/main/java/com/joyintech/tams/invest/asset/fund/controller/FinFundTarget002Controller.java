@@ -119,7 +119,8 @@ public class FinFundTarget002Controller extends BaseController{
                     }
                 }
             }
-            if(null != dto){
+            // 快录时，不默认带出附件信息
+            if(null != dto && !isQuickInput){
                 model.addAttribute("businessId", dto.getFinprodId());
                 //commonBusinessService.setTradeMarketId(dto,model);
             }

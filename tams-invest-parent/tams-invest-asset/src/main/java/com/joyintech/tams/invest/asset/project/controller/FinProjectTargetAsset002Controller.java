@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.invest.asset.project.controller;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -180,6 +181,10 @@ public class FinProjectTargetAsset002Controller extends BaseController{
                     }
                 }
             }*/
+            if(isQuickInput){
+                // 快录时，不默认带出附件信息
+                finProjectTargetAssetDto.setFinprodId("");
+            }
             model.addAttribute("entity", finProjectTargetAssetDto);
         }//来自于代办
         else if(!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)){

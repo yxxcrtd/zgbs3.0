@@ -284,7 +284,7 @@ var QueryFunc=function(){
             Joyin.ajax(basePath + 'invest/asset/plan/planNet/FinPlanNetAsset002/init', {
                 'finprodMarketId': $('#finprodMarketId').val(),
 //                'status':'quickinput'
-                'pageModel': pageModel
+                'pageModel': pageModel,'isQuickInput':true
             }, function (data) {
                 // update by caiqun 20200721 资产代码为本机构不存在的，快录时不直接删除填的的资产，做成提醒；  start
                 if($(data).find('#finprodMarketId').val()!=""){

@@ -769,9 +769,10 @@ implements BaseProcessService<FinBondTargetAssetDto>{
             bondTargetDto, FinBondTargetAssetDto.class);
 
         if (null != fileAttachmentProcess && StringUtil.isNotEmpty(bondTargetDto.getFinprodId())) {
-            List<UploadFile> files = fileAttachmentProcess.fetchByBusinessCode(
-                bondTargetDto.getFinprodId());
-            bondTargetDto.setFileArray(files);
+            // 快录时，不默认带出附件信息
+//            List<UploadFile> files = fileAttachmentProcess.fetchByBusinessCode(
+//                bondTargetDto.getFinprodId());
+//            bondTargetDto.setFileArray(files);
         }
         //查询债项
         Map<String, Object> zxmap = new HashMap<>();

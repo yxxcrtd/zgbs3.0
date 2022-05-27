@@ -141,6 +141,8 @@ public class FinProjectNetTargetAsset002Controller extends BaseController{
             //快录原标的可能有占用额度
             if(isQuickInput){
                 finProjectTargetAssetDto.setHapCreditAmt(BigDecimal.ZERO);
+                // 快录时，不默认带出附件信息
+                finProjectTargetAssetDto.setFinprodId("");
             }
             model.addAttribute("entity", finProjectTargetAssetDto);
         }//来自于代办
@@ -170,6 +172,10 @@ public class FinProjectNetTargetAsset002Controller extends BaseController{
                         DictCodeListExt1.是或否_是.getValue(): CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE));
         //add by lizhi 是否显示中债信息开关 2020年2月28日  end
         model.addAttribute("CUSTOM_ASSET_TYPE_TWO_P03", "P03");
+        // 快录时，不默认带出附件信息
+        if (isQuickInput){
+            model.addAttribute("businessId", "");
+        }
         return super.init(model);
     }
     

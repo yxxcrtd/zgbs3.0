@@ -97,6 +97,7 @@ public class FinPlanAssetC002Controller extends BaseController{
         String finprodId = getParam("finprodId");
 //        add by zhuyongkang 20191012 start
         String finprodMarketId=getParam("finprodMarketId");
+        boolean isQuickInput = Boolean.parseBoolean(getParam("isQuickInput"));
         if(StringUtil.isNotEmpty(finprodMarketId)&&StringUtil.isEmpty(finprodId)){
             finprodId=finPlanAssetCService.getFinprodId(finprodMarketId);
         }
@@ -114,7 +115,10 @@ public class FinPlanAssetC002Controller extends BaseController{
             FinPlanAssetCDto finPlanAssetCDto = finPlanAssetCService.getBasicInfoByFinprodId(finprodId);
             if(null!=finPlanAssetCDto){
                 finPlanAssetCDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
-                finPlanAssetCDto.setFjId(finPlanAssetCDto.getFinprodId());
+                // 快录时，不默认带出附件信息
+                if (!isQuickInput){
+                    finPlanAssetCDto.setFjId(finPlanAssetCDto.getFinprodId());
+                }
             }
             model.addAttribute("entity",finPlanAssetCDto);
         }
