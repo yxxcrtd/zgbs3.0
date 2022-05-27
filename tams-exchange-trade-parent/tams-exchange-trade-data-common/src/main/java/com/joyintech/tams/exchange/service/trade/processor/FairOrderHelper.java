@@ -176,7 +176,8 @@ public class FairOrderHelper {
         }
 
         List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
-        if (instructions.size() <= 1) {
+        Map<String, List<Instruction>> instructionMap = instructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
+        if (instructionMap.size() <= 1) {
             // 走普通委托
             return false;
         }

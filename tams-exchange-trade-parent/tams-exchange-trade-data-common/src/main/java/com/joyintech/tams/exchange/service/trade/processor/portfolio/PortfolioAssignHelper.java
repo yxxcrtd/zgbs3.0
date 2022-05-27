@@ -89,7 +89,9 @@ public class PortfolioAssignHelper {
         // 待分配数量
         if (TradeUtils.lessThanZero(orginVolume)) {
             log.warn("待分配数量 => 【orginVolume = {}】", orginVolume);
-            return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
+            ResultBean error = ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
+            error.setErrorMsg("请求参数错误：待分配数量为0");
+            return error;
         }
 
         // 获取指令
