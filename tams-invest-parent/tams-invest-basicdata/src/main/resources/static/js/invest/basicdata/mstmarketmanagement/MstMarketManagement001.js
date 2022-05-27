@@ -42,9 +42,10 @@ $(function() {
             ,{field:'gradeExpectationStr',sortable:false, title: 'MstMarketManagement001.gradeExpectation'}//评级展望
             ,{field:'directionChangeStr', sortable:false,title: 'MstMarketManagement001.directionChange'}//变动方向
             ,{field:'gradeOrgStr', sortable:false,title: 'MstMarketManagement001.gradeOrgId'}//当前评级机构
+            ,{field:'gradeSourceTypeStr', sortable:false,title: '内评/外评'}//内评/外评
             ,{field:'previousgradeOrgName', visible:false}//前次评级机构(不显示)
             // 移除右侧修改及删除按钮  modified by qufangxu at 2019-10-30
-            // ,{field:'operation',  title: 'SysCommon.operation',sortable:false, type:'action', buttons: ['edit', 'delt']}
+            ,{field:'operation',  title: 'SysCommon.operation',sortable:false, type:'action', buttons: ['edit']}
         ],
         searchOnInit :REM_TYPE && REM_TYPE == 'R7S1',
         checkbox : false
@@ -67,6 +68,13 @@ $(function() {
         $(conditionArea).find("input").val("");
         $(conditionArea).find("select").val("").trigger("change");// select清空
     }
+
+    table.bind('click', '.edit', function(data, index) {
+        data.pageModel = PAGE_MODEL_EDIT;
+        Joyin.dialog(JoyinUtil.getLabel("MstMarketManagement002"), basePath
+            + "invest/basicdata/mstmarketmanagement/MstMarketManagement002/init",
+            "80%", "80%", data,function(){table.reload();});
+    });
     /**
      * 画面加载完成
      */
@@ -97,6 +105,12 @@ $(function() {
         /** 事件绑定: 置空按钮 */
         $("#MstMarketManagement001_btn_reset").click(function(event){
             reset( '#selectArea',table);
+        });
+        /** 事件绑定: 置空按钮 */
+        $("#MstMarketManagement001_btn_add").click(function(){
+            Joyin.dialog(JoyinUtil.getLabel("MstMarketManagement002"), basePath
+                + "invest/basicdata/mstmarketmanagement/MstMarketManagement002/init",
+                "80%", "80%", {pageModel : PAGE_MODEL_NEW},function(){table.reload();});
         });
     });
 }());

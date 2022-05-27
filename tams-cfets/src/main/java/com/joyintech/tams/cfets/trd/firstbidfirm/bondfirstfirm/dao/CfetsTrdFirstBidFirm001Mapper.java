@@ -7,6 +7,7 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirst
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoDto;
 import com.joyintech.tams.common.base.entity.TotalEtrEntrustRel;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -79,4 +80,12 @@ public interface CfetsTrdFirstBidFirm001Mapper {
      * @return
      */
     List<TotalEtrEntrustRel> queryTotalEtrEntrustRel(Map<String, Object> relParam);
+
+    /**
+     * 删除汇总指令关系
+     * @param entrustId
+     * @param loginUserId
+     * @return
+     */
+    int deleteEtrEntrustRel(@Param("entrustId") String entrustId, @Param("loginUserId") String loginUserId);
 }

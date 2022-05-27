@@ -94,6 +94,11 @@ public class MstCustomerInfo extends BaseEntity {
     private String isFutureCom;
 
     /**
+     * 是否原始权益人
+     */
+    private String isOriginalOwner;
+
+    /**
      * 取得 客户代码
      * @return 客户代码
      */
@@ -379,5 +384,21 @@ public class MstCustomerInfo extends BaseEntity {
      */
     public void setIsFutureCom(String isFutureCom) {
         this.isFutureCom = isFutureCom == null ? null : isFutureCom.trim();
+    }
+
+    /**
+     * 取得 是否原始权益人
+     * @return 是否原始权益人
+     */
+    public String getIsOriginalOwner() {
+        return isOriginalOwner;
+    }
+
+    /**
+     * 设置 是否原始权益人
+     * @param isOriginalOwner 是否原始权益人
+     */
+    public void setIsOriginalOwner(String isOriginalOwner) {
+        this.isOriginalOwner = isOriginalOwner;
     }
 }

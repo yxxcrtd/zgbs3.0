@@ -11,6 +11,8 @@ import com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMa
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -74,6 +76,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
                 pageParam.put("bidCfmDateEnd",bidCfmDateEnd);
             }
         }
+
         pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodId()));
         pageParam.put("tradeMarketList", StringUtil.splitToList(null, request.getTradeMarket()));
         pageParam.put("tenderTargetList", StringUtil.splitToList(null, request.getTenderTarget()));
@@ -82,6 +85,8 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         pageParam.put("counterIdList", StringUtil.splitToList(null, request.getCounterId()));
         pageParam.put("platDate", DateUtil.format(DateUtil.platDateFromCache()));
         pageParam.put("otherEffectFlag_01", DictCodeListExt1.有效状态_有效.getValue());
+        pageParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+        pageParam.put("COMMON_BUSINESS_TYPE_TRD97", BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
         List<String> isWinList = StringUtil.splitToList(null, request.getIsWin());
         pageParam.put("isWinList", isWinList);
         pageParam.put("sort",request.getPageMode().getSort());

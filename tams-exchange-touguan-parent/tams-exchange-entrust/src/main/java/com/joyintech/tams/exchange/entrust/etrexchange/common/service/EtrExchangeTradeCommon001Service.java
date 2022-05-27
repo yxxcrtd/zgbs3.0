@@ -726,7 +726,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
          */
         if (DictCodeList.交易平台_大宗交易平台.getValue().equals(etrSinglePortfolioDto.getTradePlat())
                 && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dto.getTradeMarket())) {
-            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_综合协议交易平台.getValue());
+            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_大宗交易平台.getValue());
 
         } else if (DictCodeList.交易平台_大宗交易平台.getValue().equals(etrSinglePortfolioDto.getTradePlat())
                 && DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dto.getTradeMarket())) {
@@ -2503,7 +2503,11 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         if (StringUtil.equals(targetType, DictCodeListExt3.目标类型_数量.getValue())) {
 //            entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
            if(StringUtils.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),finprodType2)){
-                entrustAmt = ArithmeticUtil.multiply(entrustNum, fprice);
+               if(fprice.compareTo(BigDecimal.ZERO)==0){
+                   entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
+               }else{
+                   entrustAmt = ArithmeticUtil.multiply(entrustNum, fprice);
+               }
             } else {
                 entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
             }
@@ -5290,6 +5294,9 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             if (StringUtil.isNotEmpty(pt.getFinprodId())) {
                 pt.setFinprodId(null);
             }
+            if (StringUtil.equals(dto.getFinprodType2(),"ZYSHG")) {
+                pt.setEntrustAmt(ArithmeticUtil.multiply(pt.getRepoAmt(),new BigDecimal(10000)));
+            }
             if (StringUtil.isNotEmpty(pt.getPs()) && (pt.getPs().equals(DictCodeListExt2.交易方向_配股.getValue())
                     || pt.getPs().equals(DictCodeListExt3.交易方向_配债.getValue()))) {
                 pt.setFinprodId(dto.getFinprodId());
@@ -5316,6 +5323,9 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         d.setTradeMarketMode(DictCodeListExt1.交易市场_二级市场.getValue());
         if (StringUtil.isNotEmpty(dto.getYield())){
             d.setMatureYield(dto.getYield().toString());
+        }
+        if (StringUtil.equals(dto.getFinprodType2(),"ZYSHG")) {
+            d.setEntrustAmt(ArithmeticUtil.multiply(dto.getRepoAmt(),new BigDecimal(10000)));
         }
         Map<String, Object> dataMap = BeanUtil.object2Map(d);
         return dataMap;
@@ -5391,6 +5401,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         etrExchangeTrade001Dto.setEntrustNum(multiPtl001Dto.getEntrustNum());
         etrExchangeTrade001Dto.setAccAvailableCash(multiPtl001Dto.getAccAvailableCash());
         etrExchangeTrade001Dto.setAccAvailablePos(multiPtl001Dto.getAccAvailablePos());
+        etrExchangeTrade001Dto.setStandardBondVolume(multiPtl001Dto.getStandardBondVolume());
         //etrExchangeTrade001Dto.setEntrustPrice(multiPtl001Dto.getEntrustPrice());
         etrExchangeTrade001Dto.setTargetType(dto.getTargetType());
         etrExchangeTrade001Dto.setMdate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));

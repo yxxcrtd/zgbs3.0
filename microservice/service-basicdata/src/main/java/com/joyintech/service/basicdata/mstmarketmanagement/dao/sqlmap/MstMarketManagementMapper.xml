@@ -150,5 +150,60 @@
         OR  MBCR.O_CODE LIKE concat(concat('%',#{param,jdbcType=VARCHAR}),'%') )
 			   
 	</select>
-	
+	<select id="getCodeName" resultType="com.joyintech.framework.select.SelectOptionDto">
+		<choose>
+			<when test="oType != null and oType.equals('01')">
+				SELECT DISTINCT
+					i.CUSTOMER_ID id,
+					i.CUSTOMER_NAME text
+				FROM MST_CUSTOMER_INFO i
+				LEFT JOIN MST_CUSTOMER_INFO_ADD a on i.CUSTOMER_ID=a.CUSTOMER_ID
+				<where>
+					<if test="search != null and search != ''">
+						(
+						i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+						OR
+						i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
+						OR
+						i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+						OR
+						a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{search}, '%'))
+						)
+					</if>
+					<if test="initValue != null and initValue != ''">
+						(
+						i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+						OR
+						i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+						OR
+						i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+						OR
+						a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{initValue,jdbcType=VARCHAR}, '%'))
+						)
+					</if>
+					AND (i.IS_TRUSTER = 'Y' OR i.IS_FINANCIER = 'Y' OR i.IS_ASSTE_MANAGER = 'Y' OR i.IS_GUARANTEE = 'Y'
+					OR i.IS_PLEDGOR = 'Y' OR i.IS_DEPOSIT_BANK = 'Y')
+				</where>
+			</when>
+			<otherwise>
+				SELECT
+					FINPROD_MARKET_ID id,
+					FINPROD_ABBR text
+				FROM FIN_PRODUCT
+				<where>
+					<if test="search != null and search != ''">
+						(FINPROD_MARKET_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+						OR
+						FINPROD_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+						OR
+						FINPROD_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%')))
+					</if>
+					<if test="initValue != null and initValue != ''">
+						AND FINPROD_MARKET_ID = #{initValue}
+					</if>
+					AND FINPROD_TYPE2 = 'F01'
+				</where>
+			</otherwise>
+		</choose>
+	</select>
 </mapper> 

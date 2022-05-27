@@ -782,6 +782,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 trdFinProductDealTotal.setBusiType("busiType");
             }
             // ZGCPCN-652: busiType不能为null   2022/5/20 end
+            InfContractDetailfile infContractDetailfileTemp = infContractDetailfileMapper.selectByPrimaryKey(infContractDetailfile.getSeqno());
+            trdFinProductDealTotal.setShareAmt(infContractDetailfileTemp.getShareAmt());
+            trdFinProductDealTotal.setTradeAmt(infContractDetailfileTemp.getTradeAmt());
             trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
         }
         // 多组合系列户指令需要登录临时汇总交易表 add by fuyongsheng 20220511 end
@@ -1304,7 +1307,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // 交易类金融产品Entity
         // 构造开始----------------------------------------------------------
         FinTradeProduct finTradeProduct = new FinTradeProduct();
-        finTradeProduct.setFinprodId(dto.getFinprodId());
+        // ZGCPCN-859: 【场内交易】债券买卖和质押式回购多组合下单成交回报缺失，成交回报已推送，头寸未处理。多组合导致主键冲突
+        finTradeProduct.setFinprodId(dto.getTradeId());
         finTradeProduct.setFinprodType2(dto.getFinprodType2());
 //        String branch = CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE);
 //        Long branchLong = Long.parseLong(branch);

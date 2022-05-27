@@ -103,7 +103,7 @@ public class EtrExchangeTradePortfolioRequest extends EtrEntrust {
     private String businessTypeName;
 
     @ApiModelProperty(name="standardBondVolume",value="标准券数量",example="")
-    private Integer standardBondVolume;
+    private BigDecimal standardBondVolume;
 
     @ApiModelProperty(name="repoAmt",value="回购金额",example="12")
     private BigDecimal repoAmt;
@@ -518,11 +518,11 @@ public class EtrExchangeTradePortfolioRequest extends EtrEntrust {
         this.priceModel = priceModel;
     }
 
-    public Integer getStandardBondVolume() {
+    public BigDecimal getStandardBondVolume() {
         return standardBondVolume;
     }
 
-    public void setStandardBondVolume(Integer standardBondVolume) {
+    public void setStandardBondVolume(BigDecimal standardBondVolume) {
         this.standardBondVolume = standardBondVolume;
     }
 

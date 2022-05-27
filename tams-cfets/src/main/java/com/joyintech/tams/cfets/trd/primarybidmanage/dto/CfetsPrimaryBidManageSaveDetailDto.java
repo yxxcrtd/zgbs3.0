@@ -72,15 +72,15 @@ public class CfetsPrimaryBidManageSaveDetailDto {
     private BigDecimal settFeeAmt;
 
     /**业务模式*/
-    @ApiModelProperty(name="invAim",value="结算服务费（元）")
+    @ApiModelProperty(name="invAim",value="业务模式")
     private String invAim;
 
     /**证券账户*/
-    @ApiModelProperty(name="secAcctId",value="结算服务费（元）")
+    @ApiModelProperty(name="secAcctId",value="证券账户")
     private String secAcctId;
 
     /**投资经理*/
-    @ApiModelProperty(name="invManagerId",value="结算服务费（元）")
+    @ApiModelProperty(name="invManagerId",value="投资经理")
     private String invManagerId;
 
     /**资金账户*/

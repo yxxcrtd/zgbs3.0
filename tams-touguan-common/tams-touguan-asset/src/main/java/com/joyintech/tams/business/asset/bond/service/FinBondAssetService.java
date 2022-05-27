@@ -464,6 +464,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //转债信息
             BondFinProductConvertibleDto finProductConvertible = new BondFinProductConvertibleDto();
             BeanUtil.copyPropertiesIgnoreNull(finProductConvertible,dto);
+            if (StringUtil.isNotEmpty(finProductConvertible.getConFinprodId())){
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductConvertible.getConFinprodId());
+                finProductConvertible.setConFinprodId(finProduct.getFinprodMarketId());
+            }
             dto.setFinProductConvertible(finProductConvertible);
             //计息要素
             BondFinInterestFactorDto finInterestFactorDto = new BondFinInterestFactorDto();
@@ -634,6 +638,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             FinProductConvertible finProductConvertible = new FinProductConvertible();
             finProductConvertible.setFinprodId(dto.getFinprodId());
             BeanUtil.copyPropertiesIgnoreNull(finProductConvertible, dto.getFinProductConvertible());
+            finProductConvertible.setConFinprodId(
+                    commonBusinessService.getFinProdId(finProductConvertible.getConFinprodId(),DictCodeListExt1.金融产品类型_投管用_股票.getValue(),null));
             dto.setProductConvertible(finProductConvertible);
         }
         //现金流信息Entity-本金
