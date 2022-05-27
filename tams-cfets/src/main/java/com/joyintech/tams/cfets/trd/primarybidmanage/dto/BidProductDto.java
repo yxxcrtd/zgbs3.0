@@ -1,5 +1,7 @@
 package com.joyintech.tams.cfets.trd.primarybidmanage.dto;
 
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,8 +24,11 @@ public class BidProductDto {
     @ApiModelProperty(name="entrustId",value="指令代码")
     private String entrustId;
 
-    @ApiModelProperty(name="portfolioId",value="投标编号")
+    @ApiModelProperty(name="portfolioId",value="组合代码")
     private String portfolioId;
+
+    @ApiModelProperty(name="portfolioName",value="组合名称")
+    private String portfolioName;
 
     @ApiModelProperty(name="totalBidPrinamt",value="汇总投标券面总额")
     private BigDecimal totalBidPrinamt;
@@ -34,8 +39,11 @@ public class BidProductDto {
     @ApiModelProperty(name="winPrice",value="投标标位")
     private BigDecimal winPrice;
 
-    @ApiModelProperty(name="businessModel",value="业务模式")
-    private BigDecimal businessModel;
+    @ApiModelProperty(name="invAim",value="业务模式Id")
+    private String invAim;
+
+    @ApiModelProperty(name="invAimStr",value="业务模式")
+    private String invAimStr;
 
     public String getBidId() {
         return bidId;
@@ -85,11 +93,27 @@ public class BidProductDto {
         this.winPrice = winPrice;
     }
 
-    public BigDecimal getBusinessModel() {
-        return businessModel;
+    public String getInvAim() {
+        return invAim;
     }
 
-    public void setBusinessModel(BigDecimal businessModel) {
-        this.businessModel = businessModel;
+    public void setInvAim(String invAim) {
+        this.invAim = invAim;
+    }
+
+    public String getInvAimStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, this.getInvAim());
+    }
+
+    public void setInvAimStr(String invAimStr) {
+        this.invAimStr = invAimStr;
+    }
+
+    public String getPortfolioName() {
+        return portfolioName;
+    }
+
+    public void setPortfolioName(String portfolioName) {
+        this.portfolioName = portfolioName;
     }
 }
