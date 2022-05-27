@@ -217,6 +217,9 @@
             <if test="search !=null and search !=''">
                 AND (
                 PAYHSRCSECINFO.SECID like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.SECNAME like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.SECFULLNAME like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.SECCODE like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.MARKET like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.institution like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.ISSUERSHORT like '%' || #{search} || '%' OR
