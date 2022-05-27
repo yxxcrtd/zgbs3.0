@@ -18,6 +18,7 @@ import java.util.Map;
 public abstract class StlDataGatherBondBaseReader extends StlDataGatherReader {
     @Override
     protected void setSearchParam(Map<String, Object> searchParam) {
+        searchParam.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         // 业务类型
         searchParam.put("busiType", DictCodeList.业务类型_银行间债券交易.getValue());
         // 交易方向列表

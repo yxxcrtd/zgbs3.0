@@ -104,7 +104,28 @@ public class BaseTradeProductDealDto {
      * 交易费用明细表
      */
     private List<TrdTradeFeeDetail> trdTradeFeeDetailList;
-    
+
+    // TrdBankManualSettleInfo
+    private TrdBankManualSettleInfo trdBankManualSettleInfo;
+    // TrdBankManualSettleFlow
+    private TrdBankManualSettleFlow trdBankManualSettleFlow;
+
+    public TrdBankManualSettleInfo getTrdBankManualSettleInfo() {
+        return trdBankManualSettleInfo;
+    }
+
+    public void setTrdBankManualSettleInfo(TrdBankManualSettleInfo trdBankManualSettleInfo) {
+        this.trdBankManualSettleInfo = trdBankManualSettleInfo;
+    }
+
+    public TrdBankManualSettleFlow getTrdBankManualSettleFlow() {
+        return trdBankManualSettleFlow;
+    }
+
+    public void setTrdBankManualSettleFlow(TrdBankManualSettleFlow trdBankManualSettleFlow) {
+        this.trdBankManualSettleFlow = trdBankManualSettleFlow;
+    }
+
     /**
      * 交易费用表(通道费）
      */

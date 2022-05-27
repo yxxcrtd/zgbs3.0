@@ -106,6 +106,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                 this.repo002(entity, resultMap);
             } else if (PositionConstant.INTERF_TYPE_STOCK001.equals(interType)) {
                 this.stock001(entity, resultMap);
+            } else if (PositionConstant.INTERF_TYPE_CREDIT001.equals(interType)) {
+                this.credit001(entity, resultMap);
             }
             if(StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))){
                 PositionHttpRequest.send(resultMap);
@@ -387,6 +389,50 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         map.put("ordSecAmount", null);
         ptlList.add(map);
         resultMap.put("ptlList", ptlList);
+    }
+
+    /**
+     * 信用保护凭证交易-指令
+     */
+    private void credit001(BaseTradeProductDealDto entity, Map<String, Object> resultMap) {
+        TrdProductDeal trdProductDeal = entity.getTrdProductDeal();
+        resultMap.put(INTERFACE_TYPE, PositionConstant.INTERF_TYPE_CREDIT001);
+        resultMap.put(BUSI_ACT, getBusiAct(trdProductDeal));
+        resultMap.put(PS, trdProductDeal.getPs());
+        resultMap.put(TRADE_PLACE, trdProductDeal.getTradeMarket());
+        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建);
+        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建);
+        resultMap.put(WORK_FLOW_ID, trdProductDeal.getWorkflowId());
+        resultMap.put("ceSettleType", null);
+        resultMap.put("cdate", DateUtil.format(trdProductDeal.getTradeDate()));
+        resultMap.put(CCY, trdProductDeal.getCcy());
+        resultMap.put("bTotalTradeId", null);
+
+        TrdProductDealAdd trdProductDealAdd = entity.getTrdProductDealAdd();
+
+        List<Map<String, Object>> ptlList = new ArrayList<>();
+        Map<String, Object> pltMap = new HashMap<>();
+        pltMap.put("portfolioId", trdProductDealAdd.getPortfolioId());
+        pltMap.put(FINPROD_ID, trdProductDeal.getFinprodId());
+        pltMap.put("tradeId", trdProductDeal.getTradeId());
+        pltMap.put("etrId", trdProductDealAdd.getEntrustId());
+        pltMap.put("etrSecAmount", null);
+        pltMap.put("cashAcctId", exchangeTransMatchCommonMapper.queryAccountNo(trdProductDeal.getSecManageAcctId()));
+        pltMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
+        pltMap.put("secAmount", ArithmeticUtil.multiply(trdProductDeal.getShareAmt(), new BigDecimal(100)));
+        pltMap.put("cashAmount", trdProductDeal.getTradeAmt());
+        ptlList.add(pltMap);
+
+        List<Map<String, Object>> ptlSubList = new ArrayList<>();
+        Map<String, Object> ptlSubMap = new HashMap<>();
+        ptlSubMap.put("portfolioId", null);
+        ptlSubMap.put(FINPROD_ID, null);
+        ptlSubMap.put("tradeId", null);
+        ptlSubMap.put("secAcctId", null);
+        ptlSubMap.put("secAmount", null);
+
+        resultMap.put("ptlList", ptlList);
+        resultMap.put("ptlSubList", ptlSubList);
     }
 
     /**

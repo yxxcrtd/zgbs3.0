@@ -48,73 +48,8 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
         // 根据InvestTradeReaderDto中的成交数据明细数据列表，构建一个InvestTradeWriteDto
         List<SettleTransDataDto> settleTransDataDtos = item.getSettleTransDataList();
         if(CollectionUtils.isNotEmpty(settleTransDataDtos)) {
-            /*if(item.isCreateTrade()){
-                //存续期
-                InvestTradeWriteDto investTradeWriteDto = new InvestTradeWriteDto();
-                // 金融产品交易明细
-                List<TrdProductDealDto> dealList = generateProductDeal(settleTransDataDtos);
-                // 金融产品交易汇总信息
-                List<TotalTrdProductDealDto> dealTotalList = generateDealTotal(dealList);
-                // 生成汇总交易
-                investTradeWriteDto.setFinProductDealTotalList(dealTotalList);
-                // 金融产品交易汇总附属信息
-                List<TrdDealTotalAdd> totalAddList = generateDealTotalAdd(dealTotalList);
-                // 金融产品交易实物汇总信息
-                List<TrdFinProductBarterTotal> trdBarterTotalList = generateDealBarterTotal(dealTotalList);
-                // 金融产品交易实物信息
-                List<TrdFinProductBarter> trdBarterList = generateDealBarterList(dealList);
-                // 组合交易
-                List<PtlTrade> ptlTradeList = generatePtlTrade(dealList);
-                // 金融产品交易费用明细
-                List<TrdTradeFeeDetail> tradeFeeDetailList = generateTradeFeeDetail(dealList);
-                // 划款指令明细
-                List<StlPayOrders> stlPayOrdersList = generateStlPayOrdersList(dealTotalList, dealList, settleTransDataDtos);
-                // 交易类金融信息
-                List<FinTradeProductDto> tradeProductList = generateFinTradeProductList(dealList, settleTransDataDtos);
-                // 回购质押品
-                List<FinDealPledge> dealPledgeList = new ArrayList<FinDealPledge>();
-                if (item.getSettleTransDataPledgeList() != null && item.getSettleTransDataPledgeList().size() > 0) {
-                    dealPledgeList = generateFinDealPledgeList(dealList, item.getSettleTransDataPledgeList(), settleTransDataDtos);
-                }
-                // 委托完成度
-                List<EtrFinishStatus> etrFinishStatusList = generateEtrFinishStatusList(dealTotalList, dealList);
-
-                if(null != totalAddList) {
-                    investTradeWriteDto.setTrdDealTotalAddList(totalAddList);
-                }
-                if(null != trdBarterTotalList) {
-                    investTradeWriteDto.setTrdBarterTotalList(trdBarterTotalList);
-                }
-                if(null != trdBarterList) {
-                    investTradeWriteDto.setTrdBarterList(trdBarterList);
-                }
-                if(null != dealList) {
-                    investTradeWriteDto.setProductDealList(dealList);
-                }
-                if (null != ptlTradeList) {
-                    investTradeWriteDto.setPtlTradeList(ptlTradeList);
-                }
-                if(null != tradeFeeDetailList) {
-                    investTradeWriteDto.setTradeFeeDetailList(tradeFeeDetailList);
-                }
-                if(null != stlPayOrdersList) {
-                    investTradeWriteDto.setStlPayOrdersList(stlPayOrdersList);
-                }
-                if(null != tradeProductList) {
-                    investTradeWriteDto.setTradeProductList(tradeProductList);
-                }
-                if(null != dealPledgeList && !dealPledgeList.isEmpty()) {
-                    investTradeWriteDto.setDealPledgeList(dealPledgeList);
-                }
-                if(null != etrFinishStatusList) {
-                    investTradeWriteDto.setEtrFinishStatusList(etrFinishStatusList);
-                }
-                investTradeWriteDto.setSecType(getSecType());
-                return investTradeWriteDto;
-            }else{*/
-                //交易数据  调用共通
-                generateSettleTransData(settleTransDataDtos);
-            /*}*/
+            //交易数据  调用共通
+            generateSettleTransData(settleTransDataDtos);
         }
         return null;
     }
