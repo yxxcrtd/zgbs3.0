@@ -75,6 +75,10 @@ public class PositionCommonConstant {
      */
     public static final String INTERF_TYPE_STOCK001 = "Stock001";
     /**
+     * 信用保护凭证
+     */
+    public static final String INTERF_TYPE_CPC001 = "CPC001";
+    /**
      * 业务类型
      */
     public static final String BUSI_TYPE = "busiType";
@@ -123,6 +127,10 @@ public class PositionCommonConstant {
      * 组合数据集
      */
     public static final String PTL_LIST = "ptlList";
+    /**
+     *组合数附属据集
+     */
+    public static final String PTL_SUB_LIST = "ptlSubList";
     /**
      * 组合现金数据集
      */
