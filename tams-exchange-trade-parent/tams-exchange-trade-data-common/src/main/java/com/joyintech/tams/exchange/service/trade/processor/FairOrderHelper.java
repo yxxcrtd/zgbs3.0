@@ -10,11 +10,10 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
@@ -26,14 +25,14 @@ import com.joyintech.tams.exchange.common.bean.WorkflowBean;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskTrigger;
 import com.joyintech.tams.exchange.common.bean.investment.RiskOccupyBean;
 import com.joyintech.tams.exchange.common.constant.*;
-import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.dto.PortfolioInstructionContextDto;
 import com.joyintech.tams.exchange.common.exception.PositionExchangeException;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.FairPortfolioResponse;
 import com.joyintech.tams.exchange.common.response.PortfolioAllocationResponse;
-import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.management.service.*;
 import com.joyintech.tams.exchange.service.trade.position.service.PositionRequestServiceInstructionRequest;
@@ -302,7 +301,11 @@ public class FairOrderHelper {
         entrust.setPortfolioName(instruction.getPortfolioName());
         entrust.setSecAcctId(instruction.getSecAcctId());
         entrust.setSecAcctName(instruction.getSecAcctName());
-        entrust.setIsFullPrice(instruction.getIsNetPrice());
+        if (StringUtil.equals(instruction.getIsNetPrice(), "N")) {
+            entrust.setIsFullPrice("Y");
+        } else {
+            entrust.setIsFullPrice("N");
+        }
     }
 
     public Entrust convertOrderToEntrust(Order order) {

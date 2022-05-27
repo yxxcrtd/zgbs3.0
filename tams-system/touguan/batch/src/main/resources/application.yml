@@ -158,15 +158,15 @@ spring:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS304inv_release_cq
-    password: BS304inv_release_cq
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
 #应用配置
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS304inv_release_cq
-  sqldirpassword: BS304inv_release_cq
+  sqldiruserName: BS303INIT_TEST1008_03
+  sqldirpassword: BS303INIT_TEST1008_03
   #以下根据实际ip和端口进行修改
   loadbalance: false
   micorservice:
@@ -201,15 +201,15 @@ base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS304inv_release_cq
-    password: BS304inv_release_cq
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
 #interf数据源配置
 interf:
    datasource:
      url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
      driverClassName: oracle.jdbc.driver.OracleDriver
-     username: BS304inv_release_cq
-     password: BS304inv_release_cq
+     username: BS303INIT_TEST1008_03
+     password: BS303INIT_TEST1008_03
 #日志路径配置
 log:
   path: /home/tams/logs/touguan/batch

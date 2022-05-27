@@ -320,6 +320,9 @@ public class CommonPositionEngineService {
         if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(finprodType2)) {
             busiType = DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
         }
+        if (DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(finprodType2)) {
+            busiType = DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue();
+        }
         if (DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(finprodType2)) {
             if (DictCodeList.交易方向_申购.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_网上申购.getValue();

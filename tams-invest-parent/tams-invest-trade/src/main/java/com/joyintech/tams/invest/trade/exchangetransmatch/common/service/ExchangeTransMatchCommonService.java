@@ -13,6 +13,8 @@ import com.alibaba.fastjson.JSON;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.trade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
+import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.bidding.ExchangeTransMatchBidding1Service;
+import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.credit.ExchangeTransMatchCredit1Service;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,6 +132,12 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
     @Autowired
     private ExchangeTransMatchBondCommonService exchangeTransMatchBondCommonService;
+
+    @Autowired
+    private ExchangeTransMatchBidding1Service exchangeTransMatchBidding1Service;
+
+    @Autowired
+    private ExchangeTransMatchCredit1Service exchangeTransMatchCredit1Service;
 
     @Autowired
     private ExchangeTransMatchBond1Service exchangeTransMatchBond1Service;
@@ -703,6 +711,15 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 List<ExchangeTransMatchBaseTradeDto> baseTradeProductDealDtList = exchangeTransMatchBond6Service.genFinProductTradeDto(dto,commonEntrustDto);
                 exchangeTransMatchBaseTradeDtos.addAll(baseTradeProductDealDtList);
             }
+        }
+        if (StringUtil.equals(commonEntrustDto.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())) {
+            List<ExchangeTransMatchBaseTradeDto> baseTradeProductDealDtList = exchangeTransMatchBidding1Service.genFinProductTradeDto(dto,commonEntrustDto);
+            exchangeTransMatchBaseTradeDtos.addAll(baseTradeProductDealDtList);
+        }
+        if (StringUtil.equals(commonEntrustDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())) {
+
+            List<ExchangeTransMatchBaseTradeDto> baseTradeProductDealDtList = exchangeTransMatchCredit1Service.genFinProductTradeDto(dto,commonEntrustDto);
+            exchangeTransMatchBaseTradeDtos.addAll(baseTradeProductDealDtList);
         }
         else if(StringUtil.equals(commonEntrustDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
         || StringUtil.equals(commonEntrustDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())){

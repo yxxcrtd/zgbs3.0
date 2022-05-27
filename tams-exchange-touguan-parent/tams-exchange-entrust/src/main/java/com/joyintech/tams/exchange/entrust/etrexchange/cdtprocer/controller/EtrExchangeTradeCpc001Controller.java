@@ -313,7 +313,7 @@ public class EtrExchangeTradeCpc001Controller extends BaseController {
         initPageParams.put("SEC_CALC_MODE_02", DictCodeListExt3.债券计算模式_单位全价.getValue());
         initPageParams.put("SEC_CALC_MODE_03", DictCodeListExt3.债券计算模式_到期收益率.getValue());
         // 指令业务类型
-        initPageParams.put("ENTRUST_BUSS_TYPE_28", DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue());
+        initPageParams.put("ENTRUST_BUSS_TYPE_30", DictCodeListExt3.上农商_指令业务类型_信用保护凭证指令.getValue());
         // 目标类型
         initPageParams.put("TARGET_CLASS_01", DictCodeListExt3.目标类型_数量.getValue());
         initPageParams.put("TARGET_CLASS_02", DictCodeListExt3.目标类型_金额.getValue());

@@ -77,5 +77,9 @@ public final class PositionConstant {
      */
     public static final String INTERF_TYPE_STOCK001 = "Stock001";
 
+    /**
+     * 信用保护凭证交易
+     */
+    public static final String INTERF_TYPE_CREDIT001 = "CPC001";
 
 }

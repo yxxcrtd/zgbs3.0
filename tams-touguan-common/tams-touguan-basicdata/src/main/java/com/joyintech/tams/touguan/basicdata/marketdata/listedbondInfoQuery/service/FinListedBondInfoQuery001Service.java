@@ -3,6 +3,8 @@ package com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.serv
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -167,14 +169,17 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @param secId
      * @return
      */
-    public List<ValidMessage> addCoupons(String secId) {
+    public AjaxResult addCoupons(String secId) {
+        AjaxResult ajaxResult = new AjaxResult();
         logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]", secId);
         List<ValidMessage> validMessages = new ArrayList<>();
-        FinProduct finProduct = finProductMapper.selectByFinprodMarketId(secId);
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         //该债券信息在系统中已存在，无法加券！
         if (finProduct != null) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
-            return validMessages;
+            ajaxResult.setErrorList(validMessages);
+            ajaxResult.setMessageType(MessageType.错误消息);
+            return ajaxResult;
         }
         //债券信息查询
         FinListedBondInfoQueryRequest request = new FinListedBondInfoQueryRequest();
@@ -182,7 +187,9 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = queryFinWindMarketForCoupons(request);
         if (Objects.isNull(finListedBondInfoQuery001Dto)) {
             validMessages.add(new ValidMessage("未查询到该待上市债券信息，无法加券，请手工维护"));
-            return validMessages;
+            ajaxResult.setErrorList(validMessages);
+            ajaxResult.setMessageType(MessageType.错误消息);
+            return ajaxResult;
         }
 
         //接口数据转换
@@ -190,7 +197,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //公共加券操作
         commonAutoCouponService.autoBondCouponSave(interfPayhsrcsecinfoDto);
         //发行人处理
-        return validMessages;
+        return ajaxResult;
     }
 
     /**

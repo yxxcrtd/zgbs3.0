@@ -8,12 +8,14 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
@@ -179,7 +181,44 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(param);
             detailQueryDto.setBondMarketInvRepayDtos(bondMarketInvRepayDtos);
         } else {
-            detailQueryDto = finBondMarketInfoQueryMapper.queryFinProductForCoupons(secId);
+            param.put("FINPROD_TYPE2_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+            param.put("FIN_CASH_BUSINESS_TYPE_01", DictCodeListExt1.现金流业务类型_金融产品.getValue());
+            param.put("CASH_TYPE_1_02", DictCodeListExt1.现金流一级类型_利息.getValue());
+            param.put("CASH_TYPE_1_01", DictCodeListExt1.现金流一级类型_本金.getValue());
+            param.put("CASH_TYPE_2_C02", DictCodeListExt1.现金流二级类型_利息.getValue());
+            param.put("CASH_TYPE_2_C01", DictCodeListExt1.现金流二级类型_本金.getValue());
+            param.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
+            param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+            param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+            param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            param.put("finprodType", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            detailQueryDto = finBondMarketInfoQueryMapper.queryFinProductForCoupons(param);
+            if (Objects.nonNull(detailQueryDto)) {
+                Map<String, Object> map = new HashMap<>();
+                //付息计划
+                map.put("cashId", detailQueryDto.getBasisStyle());
+                map.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                if (StringUtil.isNotEmpty(detailQueryDto.getBasisStyle())) {
+                    List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.selectInvScheduleList(map);
+                    detailQueryDto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
+                }
+                //还本信息
+                map.put("cashId",detailQueryDto.getPrincipalCashId());
+                map.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                if (StringUtil.isNotEmpty(detailQueryDto.getPrincipalCashId())) {
+                    List<FinBondMarketCashPlanDto> invRepayList = finBondMarketInfoQueryMapper.selectInvScheduleList(map);
+                    detailQueryDto.setBondMarketInvRepayDtos(invRepayList);
+                }
+
+                //行权计划
+                map.put("cashId", detailQueryDto.getPrincipalCashId());
+                map.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                if (StringUtil.isNotEmpty(detailQueryDto.getPrincipalCashId())) {
+                    List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.selectFinExercisePlanList(map);
+                    detailQueryDto.setBondPayHSrcSecOptionDtos(bondPayHSrcSecOptionDtos);
+                }
+            }
         }
         return detailQueryDto;
     }
@@ -201,5 +240,9 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
                 request.getPageMode().getPageSize(),
                 () -> finBondMarketInfoQueryMapper.getAssetId(param));
         return page;
+    }
+
+    private void queryFinProductForCoupons() {
+
     }
 }

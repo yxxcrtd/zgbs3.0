@@ -1854,7 +1854,7 @@
         from FIN_EXERCISE_PLAN
         where
             FINPROD_ID = #{finprodId}
-            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE}
+            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE} and EXERCISE_TYPE in ('01','02')
     </select>
 
     <!--组合持有资产业务模式查询 -->

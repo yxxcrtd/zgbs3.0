@@ -189,6 +189,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "ratebasic", value = "计息基础")
     private String ratebasic;
 
+    @ApiModelProperty(name = "marketBasis", value = "交易市场计息基础")
+    private String marketBasis;
+
     @ApiModelProperty(name = "workDayRule", value = "营业日准则")
     private String workDayRule;
 
@@ -238,8 +241,17 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "isNetprice", value = "是否净价交易")
     private String isNetprice;
 
+    @ApiModelProperty(name="isNoGuard",value="是否非担保(条件必填)")
+    private String isNoGuard;
+
     @ApiModelProperty(name = "conFinprodId", value = "正股代码")
     private String conFinprodId;
+
+    @ApiModelProperty(name = "conFinprodName", value = "转股名称")
+    private String conFinprodName;
+
+    @ApiModelProperty(name = "conProportion", value = "转股比例")
+    private BigDecimal conProportion;
 
     @ApiModelProperty(name = "conShareId", value = "转股代码")
     private String conShareId;
@@ -267,6 +279,11 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
     private String capiIncomeFeature;
+
+    @ApiModelProperty(name="listingDate",value="上市日")
+    private Date listingDate;
+
+    private String principalCashId;
 
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
@@ -929,5 +946,53 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getConFinprodName() {
+        return conFinprodName;
+    }
+
+    public void setConFinprodName(String conFinprodName) {
+        this.conFinprodName = conFinprodName;
+    }
+
+    public String getMarketBasis() {
+        return marketBasis;
+    }
+
+    public void setMarketBasis(String marketBasis) {
+        this.marketBasis = marketBasis;
+    }
+
+    public BigDecimal getConProportion() {
+        return conProportion;
+    }
+
+    public void setConProportion(BigDecimal conProportion) {
+        this.conProportion = conProportion;
+    }
+
+    public Date getListingDate() {
+        return listingDate;
+    }
+
+    public void setListingDate(Date listingDate) {
+        this.listingDate = listingDate;
+    }
+
+    public String getPrincipalCashId() {
+        return principalCashId;
+    }
+
+    public void setPrincipalCashId(String principalCashId) {
+        this.principalCashId = principalCashId;
     }
 }

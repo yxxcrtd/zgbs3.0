@@ -135,6 +135,40 @@
             </if>
         </where>
     </select>
+
+    <select id ="getBokerList" resultType="com.joyintech.service.basicdata.standardcouponreconversionrate.dto.StandardCouponReConversionRateDto">
+        select
+        sbmci.SEQ_NO seqNo,
+        sbmci.BROKER_ID brokerId, /*券商代码*/
+        mci.CUSTOMER_NAME brokerName, /*券商名称*/
+        sbmci.ACCT_NO accountType,
+        R.ACCT_NAME accountTypeStr,
+        sbmci.FINPROD_ID finprodId, /*资产代码*/
+        fin.FINPROD_MARKET_ID finprodMarketId,
+        fin.FINPROD_ABBR finprodAbbr, /*资产名称*/
+        sbmci.MORE_CONVRATE * 100 moreConvrate,/*标准券折算率%*/
+        sbmci.START_DATE startDate,/*开始日期*/
+        sbmci.END_DATE endDate/*结束日期*/
+        from STD_BOND_MORE_CONVRATE_INFO sbmci
+        left join MST_CUSTOMER_INFO mci on sbmci.BROKER_ID = mci.CUSTOMER_ID
+        left join FIN_PRODUCT fin on sbmci.FINPROD_ID = fin.FINPROD_ID
+        left join PTL_CAPACCT_INFO t on sbmci.ACCT_NO = t.ACCT_NO
+        LEFT JOIN STL_CAPACCT_INFO R ON T.ACCT_NO = R.ACCT_NO AND T.CCY = R.CCY
+        <where>
+            <if test="brokerId !=null and brokerId != ''">
+                and sbmci.BROKER_ID = #{brokerId,jdbcType=VARCHAR}
+            </if>
+            <if test="acctNoStr !=null and acctNoStr != ''">
+                and (sbmci.ACCT_NO = 'BROKER'
+                or sbmci.FINPROD_ID is not null)
+            </if>
+            <if test="finprodIdStr != null and finprodIdStr != ''">
+                and (sbmci.FINPROD_ID = 'BROKER'
+                or sbmci.ACCT_NO is not null)
+            </if>
+        </where>
+    </select>
+
     <insert id="insertSelective" parameterType="com.joyintech.service.basicdata.standardcouponreconversionrate.dto.StandardCouponReConversionRateDto">
         insert into STD_BOND_MORE_CONVRATE_INFO
         <trim prefix="(" suffix=")" suffixOverrides=",">
