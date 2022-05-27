@@ -676,7 +676,7 @@ public class PortfolioManager extends BaseService {
                             }
                         })
                         .min(Comparator.naturalOrder())
-                        .orElse(lastPrice);
+                        .orElse(upperLimitPrice);
                 if (min.compareTo(upperLimitPrice) > 0) {
                     adjustedPrice = upperLimitPrice;
                 } else {
@@ -698,7 +698,7 @@ public class PortfolioManager extends BaseService {
                             }
                         })
                         .max(Comparator.naturalOrder())
-                        .orElse(lastPrice);
+                        .orElse(lowerLimitPrice);
                 if (max.compareTo(lowerLimitPrice) < 0) {
                     adjustedPrice = lowerLimitPrice;
                 } else {
@@ -709,12 +709,6 @@ public class PortfolioManager extends BaseService {
                 if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) < 0) {
                     adjustedPrice = entrustPrice;
                 }
-            }
-
-            //市价模式取传入价格
-            if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.bigThanZero(entrustPrice)) {
-                adjustedPrice = entrustPrice;
-                result.setPrice(adjustedPrice);
             }
 
             // 提示：“委托价格必须优于所有指令价格”
