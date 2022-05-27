@@ -736,7 +736,7 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     private String entrustBsStr;
 
     @ApiModelProperty(value = "成交数量")
-    private long tradedVolume;
+    private BigDecimal tradedVolume;
 
     
     @ApiModelProperty(value = "成交价格")
@@ -963,11 +963,11 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
         this.entrustBsStr = entrustBsStr;
     }
 
-    public long getTradedVolume() {
+    public BigDecimal getTradedVolume() {
         return tradedVolume;
     }
 
-    public void setTradedVolume(long tradedVolume) {
+    public void setTradedVolume(BigDecimal tradedVolume) {
         this.tradedVolume = tradedVolume;
     }
 

@@ -48,6 +48,7 @@ import com.joyintech.tams.common.base.entity.FinProductType;
 import com.joyintech.tams.common.base.entity.FinProductTypeKey;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
+import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -67,6 +68,7 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -162,6 +164,9 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
 
     @Autowired
     private EtrExchangeTradeSecRepo001Service etrExchangeTradeSecRepo001Service;
+
+    @Autowired
+    private BasRiskMathCommService basRiskMathCommService;
 
     /**
      * {@inheritDoc}
@@ -320,6 +325,8 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         }
         //处理履历
         etrExchangeTradeSecRepo001Service.updateCfetsOprHis(dto.getEntrustId(), dto.getOptType());
+        basRiskMathCommService.insert(dto.getRiskTrialRetDto(), dto.getEntrustId());
+        dto.setConfirmOk(null);
     }
 
     @Override
@@ -330,12 +337,13 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         //产品化_所有投资指令预占需求_场内交易  add by zhangpei 20201128 start
         AllTradeCommonUtil.deletePosition(null, entity.getEntrustId());
         //产品化_所有投资指令预占需求_场内交易  add by zhangpei 20201128 end
+        entity.setConfirmOk(null);
     }
 
     @Override
     public void doUpdate(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
 
-        if(StringUtil.isEmpty(entity.getPortfolioId()) && !CollectionUtils.isEmpty(entity.getPortfolioList())){
+        if(!CollectionUtils.isEmpty(entity.getPortfolioList())){
             entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
             entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
         }
@@ -385,7 +393,10 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
                 // 工作流ID
                 newEntity.setWorkflowId(entity.getWorkflowId());
                 newEntity.setStatus(entity.getStatus());
-                newEntity.setBusinessData(JsonUtils.object2Json(entity));
+                EtrExchangeTradeSecRepoSaveRepoRequest entityInsert = new EtrExchangeTradeSecRepoSaveRepoRequest();
+                BeanUtils.copyProperties(entity,entityInsert);
+                entityInsert.setConfirmOk(null);
+                newEntity.setBusinessData(JsonUtils.object2Json(entityInsert));
                 // 更新业务表数据
                 // 操作留痕表
                 WorkflowContext.getProcessMarkService().insertIntoProcessMark(newEntity);
@@ -410,6 +421,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
                         decisionAct = 系统动作_新建.getValue();
                     }
                 }
+                entity.setSoftSkipMode("N");
                 if (StringUtil.equals("1", entity.getConfirmOk())) {
                     entity.setSoftSkipMode("Y");
                 }
@@ -431,6 +443,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
                 //增加调用头寸引擎代码end
             }
         }
+        entity.setConfirmOk(null);
     }
 
     public void calcAmt(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
@@ -493,6 +506,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         }
         positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct);
         //增加调用头寸引擎代码end
+        entity.setConfirmOk(null);
     }
 
     @Override
@@ -503,7 +517,9 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             EtrExchangeTradeSecRepoSaveRepoRequest entity = getBussinessEntityByWorkflowId(workflowId);
+            etrExchangeTradeSecRepo001Service.backReRoll(entity.getEntrustId());
             positionRequestService.sendDelete(entity);
+            entity.setConfirmOk(null);
         }
         //增加调用头寸引擎代码end
     }

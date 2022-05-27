@@ -621,4 +621,96 @@ public class ExchangeEntrustRdsCommonAop {
             }
         }
     }
+
+    public  void revokeBackRiskCommonInteface(Map<String, Object> mapTrd,  String simpleName) {
+        // 接口代码
+        String infCode = BussinessDictCodeListRds.接口系统ID_预占释放接口.getValue();
+        // 是否是需要批量执行的交易方向
+        if (listInfPs.contains(CommonUtil.findValue(mapTrd, PageFieldToInterfFactory.INF_PS))) {
+            logger.info(BATCH_INFO_LOG, infCode);
+            infCode = BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue();
+        }
+
+        // add by etliu 20210902 start
+        // 债券多组合指令，走预占释放批量接口
+        // ZGZGST-2517:质押式回购多组合走预占释放批量接口 fuyongsheng 20210917 edit start
+        if (mapTrd.containsKey("etrInvestBondInfoDtos") || mapTrd.containsKey("etrInvestRepoInfoDtos")) {
+            infCode = BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue();
+        }
+        // ZGZGST-2517:质押式回购多组合走预占释放批量接口 fuyongsheng 20210917 edit end
+        // add by etliu 20210902 end
+        // 设置投管分类等
+        setEachAstTypeBySimpleName(mapTrd, simpleName);
+        String assetType = StringUtil.EMPTY;
+        Object finprodId = mapTrd.get(InterfUtil.finprodId);
+        Object finprodType2 = mapTrd.get(InterfUtil.finprodType2);
+        // 取得资产类型
+        if (StringUtil.isNotEmpty(finprodId)) {
+            IAssetInfo assetInfo = assetInfoSrc.getInfoFromRedis(RedisKeyEnum.资产基本信息.key(),
+                    finprodId.toString());
+            assetType = assetInfo == null ? assetType : assetInfo.getAssetType();
+        }
+        else if (null != mapTrd.get("assetType")) {
+            assetType = (String)mapTrd.get("assetType");
+        }
+        if (CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷)
+                || CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷融入)
+                || CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷融出)
+                //债券一级指令不进行预占
+                || CommonUtil.isType(assetType, DictCodeListExt2.平安资产类型_一级市场债)) {
+            return;
+        }
+        InterfRiskRdsDto interfRiskRdsDto = new InterfRiskRdsDto();
+        // 事件类型 预占
+        interfRiskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());
+        // 接口代码
+        interfRiskRdsDto.setInfCode(infCode);
+        // 资产类型
+        interfRiskRdsDto.setAssetType(initRepoLendCommon((String)finprodType2, assetType));
+        // 金融产品类型
+        interfRiskRdsDto.setFinType(
+                finprodType2 != null ? finprodType2.toString() : StringUtil.EMPTY);
+        try {
+            ClientData result = getInterfRiskRdsService().sendRiskRdsData(mapTrd,
+                    interfRiskRdsDto);
+            // 调用接口返回错误信息时抛出异常
+            if (result != null
+                    && StringUtil.equals(result.getHeadField(InterfUtil.std400msgt), InterfUtil.E)
+                    && StringUtil.isNotEmpty(result.getHeadField(InterfUtil.stdrtninfo))) {
+                throw new BusinessException(
+                        InterfUtil.MSG + result.getHeadField(InterfUtil.stdrtninfo));
+            }
+        } catch (Exception e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    /**
+     * 设置每个交易品种过来的类型
+     * @param mapTrd
+     * @param joinPoint
+     */
+    private void setEachAstTypeBySimpleName(Map<String, Object> mapTrd, String simpleName) {
+        //String simpleName = joinPoint.getTarget().getClass().getSimpleName();
+        Object ps = mapTrd.get(InterfUtil.ps);
+        if (!StringUtil.isNotEmpty(mapTrd.get(InterfUtil.finprodType2))) {
+            mapTrd.put(InterfUtil.finprodType2, getFinprodType2(simpleName, ps));
+        }
+        //债转股
+        if (simpleName.contains("EtrBondToStockService")) {
+            mapTrd.put(InterfUtil.ps, DictCodeListExt1.交易方向_债转股.getValue());
+        }
+        // 拆借
+        if (simpleName.contains("EtrLendSpecInfoService")) {
+            if (StringUtil.equals(mapTrd.get("assetType1"),
+                    BussinessDictCodeList.拆借类型_特殊目的载体.getValue())) {
+                mapTrd.put(InterfUtil.finprodType2,
+                        BussinessDictCodeList.金融产品类型_投管用_特拆拆入.getValue());
+            }
+        }
+        // 债券借贷
+        if (simpleName.contains("EtrSecLendService")) {
+            mapTrd.put(InterfUtil.finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷.getValue());
+        }
+    }
 }

@@ -177,4 +177,11 @@ public interface ExchangeTransMatchCommonMapper {
      * @return
      */
     FinTradeProduct getFinTradeProduct(@Param("finprodId") String finprodId);
+
+    /**
+     * 根据指令编号查询交易
+     * @param entrustId
+     * @return
+     */
+    List<TrdProductDeal> getTrdProductDealsByEntrustId(@Param("entrustId") String entrustId);
 }

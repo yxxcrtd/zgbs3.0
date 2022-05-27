@@ -125,6 +125,16 @@ public class ImplAsset extends FinProduct implements IAssetInfo {
      */
     private String isCorOrg;
 
+    /**
+     * 债券风险五级分类
+     */
+    private String bondRiskType;
+
+    /**
+     * 债券是否存在应收款
+     */
+    private String isExistRecAst;
+
     @Override
     public String getAssetType() {
         return this.type6;
@@ -637,5 +647,23 @@ public class ImplAsset extends FinProduct implements IAssetInfo {
 
     public void setIsBadAsset(String isBadAsset) {
         this.isBadAsset = isBadAsset;
+    }
+
+    @Override
+    public String getBondRiskType() {
+        return bondRiskType;
+    }
+
+    public void setBondRiskType(String bondRiskType) {
+        this.bondRiskType = bondRiskType;
+    }
+
+    @Override
+    public String getIsExistRecAst() {
+        return isExistRecAst;
+    }
+
+    public void setIsExistRecAst(String isExistRecAst) {
+        this.isExistRecAst = isExistRecAst;
     }
 }

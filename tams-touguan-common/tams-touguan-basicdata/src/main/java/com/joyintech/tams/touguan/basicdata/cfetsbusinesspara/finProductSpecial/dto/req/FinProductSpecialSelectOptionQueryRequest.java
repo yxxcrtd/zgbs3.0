@@ -1,6 +1,5 @@
 package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req;
 
-import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -10,8 +9,11 @@ public class FinProductSpecialSelectOptionQueryRequest {
     @ApiModelProperty(name = "search", value = "关键词")
     private String search;
 
-    @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
-    private PageMode pageMode;
+    @ApiModelProperty(required = true, name = "pageSize", value = "每页记录数", example = "20")
+    private int pageSize;
+
+    @ApiModelProperty(required = true, name = "pageNo", value = "页码", example = "1")
+    private int pageNo;
 
     public String getSearch() {
         return search;
@@ -21,11 +23,19 @@ public class FinProductSpecialSelectOptionQueryRequest {
         this.search = search;
     }
 
-    public PageMode getPageMode() {
-        return pageMode;
+    public int getPageSize() {
+        return pageSize;
     }
 
-    public void setPageMode(PageMode pageMode) {
-        this.pageMode = pageMode;
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public int getPageNo() {
+        return pageNo;
+    }
+
+    public void setPageNo(int pageNo) {
+        this.pageNo = pageNo;
     }
 }

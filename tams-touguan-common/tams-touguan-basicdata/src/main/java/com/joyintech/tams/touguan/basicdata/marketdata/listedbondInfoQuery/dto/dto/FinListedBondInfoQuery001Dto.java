@@ -1,16 +1,23 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.compress.utils.Lists;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 债券市场列表信息查看DTO
@@ -25,6 +32,9 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
+
+    @ApiModelProperty(name = "finprodId", value = "金融产品代码")
+    private String finprodId;
 
     @ApiModelProperty(name = "bondName", value = "债券名称")
     private String bondName;
@@ -81,8 +91,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private String issueMethod;
 
     @ApiModelProperty(name = "issueSize", value = "计划发行量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal issueSize;
+    private String issueSize;
 
     @ApiModelProperty(name = "issueDate", value = "发行日")
     private Date issueDate;
@@ -133,16 +142,14 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private String currency;
 
     @ApiModelProperty(name = "issuePx", value = "发行价格（元）")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal issuePx;
+    private String issuePx;
 
     @ApiModelProperty(name = "issueAmt", value = "发行金额（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issueAmt;
 
     @ApiModelProperty(name = "stipulationValue", value = "参考收益率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal stipulationValue;
+    private String stipulationValue;
 
     @ApiModelProperty(name = "singleMinSubAmt", value = "单笔最低认购量（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -157,7 +164,8 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal couponRate;
 
     @ApiModelProperty(name = "benchmarkCurveName", value = "基准利率")
-    private String benchmarkCurveName;
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal benchmarkCurveName;
 
     @ApiModelProperty(name = "decimalPlaces", value = "基准利率精度")
     private String decimalPlaces;
@@ -172,11 +180,20 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "issueEndTime", value = "发行结束时间")
     private Date issueEndTime;
 
-    @ApiModelProperty(name = "bidDate", value = "投标日")
-    private Date bidDate;
+    @ApiModelProperty(name = "bidBeginDate", value = "投标日开始时间")
+    private String bidBeginDate;
+
+    @ApiModelProperty(name = "bidEndDate", value = "投标日结束时间")
+    private String bidEndDate;
+
+    @ApiModelProperty(name = "additionalTenderBeginDate", value = "增发投标日开始时间")
+    private String additionalTenderBeginDate;
+
+    @ApiModelProperty(name = "additionalTenderEndDate", value = "增发投标日结束时间")
+    private String additionalTenderEndDate;
 
     @ApiModelProperty(name = "additionalTenderDate", value = "增发投标日")
-    private Date additionalTenderDate;
+    private String additionalTenderDate;
 
     @ApiModelProperty(name = "maxSubAmt", value = "最高认购总量（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -236,7 +253,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "bondMarketCashPlanDtos", value = "付息计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos;
-    
+
     public String getSecId() {
         return secId;
     }
@@ -265,12 +282,22 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         return tradingPlaces;
     }
 
+
+    public String getTradingPlacesStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, this.getTradingPlaces());
+    }
+
     public void setTradingPlaces(String tradingPlaces) {
         this.tradingPlaces = tradingPlaces;
     }
 
     public String getRegisteredCustodian() {
         return registeredCustodian;
+    }
+
+
+    public String getRegisteredCustodianStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.登记托管机构, this.getRegisteredCustodian());
     }
 
     public void setRegisteredCustodian(String registeredCustodian) {
@@ -281,12 +308,20 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         return biddingMethod;
     }
 
+    public String getBiddingMethodStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.招标方式, this.getBiddingMethod());
+    }
+
     public void setBiddingMethod(String biddingMethod) {
         this.biddingMethod = biddingMethod;
     }
 
     public String getTenderTarget() {
         return tenderTarget;
+    }
+
+    public String getTenderTargetStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, this.getBiddingMethod());
     }
 
     public void setTenderTarget(String tenderTarget) {
@@ -337,12 +372,22 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         return raiseMode;
     }
 
+
+    public String getRaiseModeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.getRaiseMode());
+    }
+
     public void setRaiseMode(String raiseMode) {
         this.raiseMode = raiseMode;
     }
 
     public String getDomesticAndForeign() {
         return domesticAndForeign;
+    }
+
+
+    public String getDomesticAndForeignStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.境内外, this.getDomesticAndForeign());
     }
 
     public void setDomesticAndForeign(String domesticAndForeign) {
@@ -385,18 +430,23 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         return issueMethod;
     }
 
+    public String getIssueMethodStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, this.getIssueMethod());
+    }
+
     public void setIssueMethod(String issueMethod) {
         this.issueMethod = issueMethod;
     }
 
-    public BigDecimal getIssueSize() {
+    public String getIssueSize() {
         return issueSize;
     }
 
-    public void setIssueSize(BigDecimal issueSize) {
+    public void setIssueSize(String issueSize) {
         this.issueSize = issueSize;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getIssueDate() {
         return issueDate;
     }
@@ -405,6 +455,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueDate = issueDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getEventDate() {
         return eventDate;
     }
@@ -413,6 +464,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.eventDate = eventDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getDebtRegistrationDate() {
         return debtRegistrationDate;
     }
@@ -421,6 +473,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.debtRegistrationDate = debtRegistrationDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getListingDate() {
         return listingDate;
     }
@@ -437,6 +490,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.listingCode = listingCode;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getInterestAccrualDate() {
         return interestAccrualDate;
     }
@@ -445,6 +499,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.interestAccrualDate = interestAccrualDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getValueDate() {
         return valueDate;
     }
@@ -453,6 +508,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.valueDate = valueDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getExpiryDate() {
         return expiryDate;
     }
@@ -469,6 +525,14 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.primaryClassification = primaryClassification;
     }
 
+    public String getPrimaryClassificationStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.WIND一级分类_含债券一级分类等, this.getPrimaryClassification());
+    }
+
+    public String getSecondaryClassificationStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.WIND二级分类_含债券二级分类等, this.getSecondaryClassification());
+    }
+
     public String getSecondaryClassification() {
         return secondaryClassification;
     }
@@ -476,8 +540,14 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     public void setSecondaryClassification(String secondaryClassification) {
         this.secondaryClassification = secondaryClassification;
     }
+
     public String getInterestPaymentFrequency() {
         return interestPaymentFrequency;
+    }
+
+
+    public String getInterestPaymentFrequencyStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.频率, this.getInterestPaymentFrequency());
     }
 
     public void setInterestPaymentFrequency(String interestPaymentFrequency) {
@@ -496,23 +566,30 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         return currency;
     }
 
+    public String getCurrencyStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.币种, this.getCurrency());
+    }
+
     public void setCurrency(String currency) {
         this.currency = currency;
     }
 
-    public BigDecimal getIssuePx() {
+    public String getIssuePx() {
+        if(Objects.nonNull(getCouponSpecies()) && (getCouponSpecies().equals(BussinessDictCodeList.息票品种_附息.getValue()) || getCouponSpecies().equals(BussinessDictCodeList.息票品种_利随本清.getValue())) ){
+            return "100.0000";
+        }
         return issuePx;
     }
 
-    public void setIssuePx(BigDecimal issuePx) {
+    public void setIssuePx(String issuePx) {
         this.issuePx = issuePx;
     }
 
-    public BigDecimal getStipulationValue() {
+    public String getStipulationValue() {
         return stipulationValue;
     }
 
-    public void setStipulationValue(BigDecimal stipulationValue) {
+    public void setStipulationValue(String stipulationValue) {
         this.stipulationValue = stipulationValue;
     }
 
@@ -540,11 +617,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.couponRate = couponRate;
     }
 
-    public String getBenchmarkCurveName() {
+    public BigDecimal getBenchmarkCurveName() {
         return benchmarkCurveName;
     }
 
-    public void setBenchmarkCurveName(String benchmarkCurveName) {
+    public void setBenchmarkCurveName(BigDecimal benchmarkCurveName) {
         this.benchmarkCurveName = benchmarkCurveName;
     }
 
@@ -564,6 +641,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.spread = spread;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getIssueStartTime() {
         return issueStartTime;
     }
@@ -572,6 +650,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueStartTime = issueStartTime;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getIssueEndTime() {
         return issueEndTime;
     }
@@ -580,19 +659,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueEndTime = issueEndTime;
     }
 
-    public Date getBidDate() {
-        return bidDate;
-    }
-
-    public void setBidDate(Date bidDate) {
-        this.bidDate = bidDate;
-    }
-
-    public Date getAdditionalTenderDate() {
+    public String getAdditionalTenderDate() {
         return additionalTenderDate;
     }
 
-    public void setAdditionalTenderDate(Date additionalTenderDate) {
+    public void setAdditionalTenderDate(String additionalTenderDate) {
         this.additionalTenderDate = additionalTenderDate;
     }
 
@@ -762,5 +833,71 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public void setCouponSpecies(String couponSpecies) {
         this.couponSpecies = couponSpecies;
+    }
+
+    public String getCouponSpeciesStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, this.getCouponSpecies());
+    }
+
+    public String getRateTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, this.getRateType());
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
+    }
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public String getBidBeginDate() {
+        return bidBeginDate;
+    }
+
+    public void setBidBeginDate(String bidBeginDate) {
+        this.bidBeginDate = bidBeginDate;
+    }
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public String getBidEndDate() {
+        return bidEndDate;
+    }
+
+    public List<String> getBidDates() {
+        List<String> bidDates = Lists.newArrayList();
+        bidDates.add(StringUtil.isBlank(getBidBeginDate()) ? "" : getBidBeginDate());
+        bidDates.add(StringUtil.isBlank(getBidEndDate()) ? "" : getBidEndDate());
+        return bidDates;
+    }
+
+    public void setBidEndDate(String bidEndDate) {
+        this.bidEndDate = bidEndDate;
+    }
+
+    public List<String> getAdditionalTenderDates() {
+        List<String> additionalTenderDates = Lists.newArrayList();
+        additionalTenderDates.add(StringUtil.isBlank(getAdditionalTenderBeginDate()) ? "" : getAdditionalTenderBeginDate());
+        additionalTenderDates.add(StringUtil.isBlank(getAdditionalTenderEndDate()) ? "" : getAdditionalTenderEndDate());
+        return additionalTenderDates;
+    }
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public String getAdditionalTenderBeginDate() {
+        return additionalTenderBeginDate;
+    }
+
+    public void setAdditionalTenderBeginDate(String additionalTenderBeginDate) {
+        this.additionalTenderBeginDate = additionalTenderBeginDate;
+    }
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public String getAdditionalTenderEndDate() {
+        return additionalTenderEndDate;
+    }
+
+    public void setAdditionalTenderEndDate(String additionalTenderEndDate) {
+        this.additionalTenderEndDate = additionalTenderEndDate;
     }
 }

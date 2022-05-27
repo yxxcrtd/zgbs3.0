@@ -2,25 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.invest.batch.riskparamcalc.dao.RskParamReCalcMapper" >
     <select id="queryOcpInfo" resultType="com.joyintech.tams.invest.batch.riskparamcalc.dto.RskInterfDataDto" >
-         WITH YZ AS (
+        WITH YZ AS (
             SELECT t1.EVENT_ID,t1.OCCUPY_CODE FROM RSK_OCCUPY_INFO t1
             INNER JOIN RSK_PRE_OCCUPY_INFO t2 ON t1.OCCUPY_CODE = t2.EVENT_ID 
-            LEFT JOIN (select ENTRUST_ID,ENTRUST_STATUS FROM ETR_ENTRUST
-              UNION ALL
-            select  B.ENTRUST_ID||B.PORTFOLIO_ID ENTRUST_ID,A.ENTRUST_STATUS FROM
-             ETR_ENTRUST_WW A, ETR_ENTRUST_WW_DETAIL B
-             WHERE A.ENTRUST_ID=B.ENTRUST_ID
-            ) etr ON t2.EVENT_ID = etr.ENTRUST_ID 
+            LEFT JOIN (
+                select ENTRUST_ID,ENTRUST_STATUS FROM ETR_ENTRUST
+                UNION ALL
+                select  B.ENTRUST_ID||B.PORTFOLIO_ID ENTRUST_ID,A.ENTRUST_STATUS FROM
+                ETR_ENTRUST_WW A, ETR_ENTRUST_WW_DETAIL B
+                WHERE A.ENTRUST_ID=B.ENTRUST_ID
+            ) etr ON t2.EVENT_ID = etr.ENTRUST_ID
             OR SUBSTR(t2.EVENT_ID,0,LENGTH(t2.EVENT_ID)-3) = etr.ENTRUST_ID 
             WHERE t2.OCCUPY_DATE &gt;= #{sysDate,jdbcType=DATE}
             AND etr.ENTRUST_STATUS NOT IN ('04', '06', '07') 
-        ), SF AS (
+        ),
+        SF AS (
             SELECT rpoi.EVENT_ID FROM RSK_PRE_OCCUPY_INFO rpoi
-            LEFT JOIN (select ENTRUST_ID,ENTRUST_STATUS FROM ETR_ENTRUST
-              UNION ALL
-            select  B.ENTRUST_ID||B.PORTFOLIO_ID ENTRUST_ID,A.ENTRUST_STATUS FROM
-             ETR_ENTRUST_WW A, ETR_ENTRUST_WW_DETAIL B
-             WHERE A.ENTRUST_ID=B.ENTRUST_ID
+            LEFT JOIN (
+                select ENTRUST_ID,ENTRUST_STATUS FROM ETR_ENTRUST
+                UNION ALL
+                select  B.ENTRUST_ID||B.PORTFOLIO_ID ENTRUST_ID,A.ENTRUST_STATUS FROM
+                ETR_ENTRUST_WW A, ETR_ENTRUST_WW_DETAIL B
+                WHERE A.ENTRUST_ID=B.ENTRUST_ID
             ) etr ON etr.ENTRUST_ID = rpoi.EVENT_ID 
             OR SUBSTR(rpoi.EVENT_ID,0,LENGTH(rpoi.EVENT_ID)-3) = etr.ENTRUST_ID 
             WHERE rpoi.OCCUPY_DATE &gt;= #{sysDate,jdbcType=DATE}
@@ -37,6 +40,7 @@
         FROM RSK_PRE_OCCUPY_INFO rpoi
         LEFT JOIN INTERF_RISK_LOG irl ON irl.SEQ_NO = rpoi.SEQ_NO 
         WHERE irl.RESPONSE_DATA IS NULL AND irl.SEQ_NO IS NOT NULL
+        AND rpoi.EVENT_DATE &lt; #{sysDate,jdbcType=DATE}
         AND EXISTS (SELECT 1 FROM SF WHERE SF.EVENT_ID = rpoi.EVENT_ID )
         <if test="infoList != null and infoList.size() > 0">
             AND rpoi.PROD_ID IN
@@ -44,7 +48,7 @@
                 #{item}
             </foreach>
         </if>
-      UNION ALL
+        UNION ALL
         -- 实占部分
         SELECT 
             rpoi.UUID orderNo,              -- 序号
@@ -57,6 +61,7 @@
         LEFT JOIN INTERF_RISK_LOG irl ON irl.SEQ_NO = rpoi.SEQ_NO 
         LEFT JOIN YZ t1 ON t1.EVENT_ID = rpoi.EVENT_ID 
         WHERE irl.RESPONSE_DATA IS NULL AND irl.SEQ_NO IS NOT NULL
+        AND rpoi.EVENT_DATE &lt; #{sysDate,jdbcType=DATE}
         AND EXISTS (SELECT 1 FROM YZ WHERE YZ.EVENT_ID = rpoi.EVENT_ID )
         <if test="infoList != null and infoList.size() > 0">
             AND rpoi.PROD_ID IN
@@ -65,7 +70,45 @@
             </foreach>
         </if>
     </select>
-
+    <select id="getOcpInfoListToday" resultType="com.joyintech.tams.invest.batch.riskparamcalc.dto.RskInterfDataDto">
+        -- 预占部分
+        SELECT
+            rpoi.UUID orderNo,              -- 序号
+            rpoi.EVENT_ID eventId,          -- 事件编号
+            null preOccupyCode,             -- 实占对应的预占编号
+            irl.REQUEST_DATA requestData,   -- 报文
+            irl.INF_ID infCode,             -- 接口代码
+            irl.SEQ_NO seqNo                -- 报文流水号
+        FROM RSK_PRE_OCCUPY_INFO rpoi
+        LEFT JOIN INTERF_RISK_LOG irl ON irl.SEQ_NO = rpoi.SEQ_NO
+        WHERE irl.RESPONSE_DATA IS NULL AND irl.SEQ_NO IS NOT NULL
+        AND rpoi.EVENT_DATE = #{sysDate,jdbcType=DATE}
+        <if test="infoList != null and infoList.size() > 0">
+            AND rpoi.PROD_ID IN
+            <foreach collection="infoList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        -- 实占部分
+        SELECT
+            rpoi.UUID orderNo,              -- 序号
+            rpoi.EVENT_ID eventId,          -- 事件编号
+            rpoi.OCCUPY_CODE preOccupyCode,   -- 实占对应的预占编号
+            irl.REQUEST_DATA requestData,   -- 报文
+            irl.INF_ID infCode,             -- 接口代码
+            irl.SEQ_NO seqNo                -- 报文流水号
+        FROM RSK_OCCUPY_INFO rpoi
+        LEFT JOIN INTERF_RISK_LOG irl ON irl.SEQ_NO = rpoi.SEQ_NO
+        WHERE irl.RESPONSE_DATA IS NULL AND irl.SEQ_NO IS NOT NULL
+        AND rpoi.EVENT_DATE = #{sysDate,jdbcType=DATE}
+        <if test="infoList != null and infoList.size() > 0">
+            AND rpoi.PROD_ID IN
+            <foreach collection="infoList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
     <delete id="deleteRskIndParaDtl" parameterType="java.util.List" >
         delete from RSK_INDICATOR_PARA_CALCDETAIL
         <where>
@@ -77,12 +120,4 @@
         </if>
         </where>
     </delete>
-    
-    <select id="getTradeAmtByEventId" parameterType="java.lang.String" resultType="java.lang.String">
-    	SELECT TO_CHAR(CHANGE_VALUE) FROM (
-			select CHANGE_VALUE  from RSK_INDICATOR_PARA_CALCDETAIL
-			where para_code = 'XJGM' AND TRADE_ID = #{eventId,jdbcType=VARCHAR}
-			ORDER BY DOTIMESTAMP DESC
-		)WHERE ROWNUM=1
-    </select>
 </mapper>

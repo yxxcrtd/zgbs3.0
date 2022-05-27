@@ -3,7 +3,7 @@ package com.joyintech.tams.exchange.service.trade.processor.check.concreate;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
-import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
@@ -29,7 +29,7 @@ public class ShBulkCheckStrategy implements IBusinessCheckStrategy {
     @Override
     public boolean support(Instruction instruction) {
         return TradePlat.SH_SCALE.codeEquals(instruction.getTradePlat())
-                && EnumUtil.in(instruction.getAssetType(), InvestAssetTypeEnum.FUND, InvestAssetTypeEnum.STOCK);
+                && EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.FUND, InvestmentAssetType.STOCK, InvestmentAssetType.BOND);
     }
 
     @Override

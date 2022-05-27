@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @PageId("FinTenderBondAsset002")
@@ -64,6 +65,10 @@ public class FinTenderBondAsset002Controller extends BaseController {
             String finprodId = getParam("finprodId");
             if (StringUtil.isNotEmpty(finprodId)) {//修改
                 entity = finTenderBoundAssetService.getById(finprodId);
+                if(Objects.nonNull(entity.getCirculationCode())) {
+                    entity.getProductAddDto().setAppearMarketId(entity.getCirculationCode());
+                    entity.getProductAddDto().setListingDate(entity.getCirculationDate());
+                }
                 params.put("businessId", entity.getFinprodMarketId());
             }
         }
@@ -87,6 +92,8 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
         params.put("SVR_BASIS_TYPE_ACCURACY", this.getSelectDataFromDataDic(DictCode.基准利率精度, null));
         params.put("AMT_INCOME_TYPE",this.getSelectDataFromDataDic(DictCode.本金收益特征, null));
+        params.put("GUARANTEE_MODE",this.getSelectDataFromDataDic(DictCode.新债_担保方式, null));
+
 
         params.put(GlobalConstant.ENTITY, entity);
         //pageId
@@ -147,7 +154,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
         params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
             processParameter.setOperationType(OperationType.NEW);
         } else if (StringUtil.equals(dto.getOperateType(), OperationType.MODIFY.name())) {
@@ -174,7 +181,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(asset004Dto.getElementId());
         params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         FinTenderBondAsset002Dto dto = finTenderBoundAssetService.getById(asset004Dto.getFinprodId());
         dto.setRemark(asset004Dto.getRemark());
         dto.setOperateType(OperationType.DELETE.name());

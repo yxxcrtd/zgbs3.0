@@ -1,7 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.processor.portfolio;
 
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
@@ -52,6 +51,7 @@ public class PortfolioTradeMessageHelper {
         List<PortfolioTradeMessage> portfolioTradeMessages = Lists.newArrayList();
 
         //1、调用通用分配接口，构建成交组合分配
+        logger.info("调用通用分配接口，构建成交组合分配");
         Map<String, PortfolioDetail> portfolioDetailMap = Maps.newHashMap();
         ResultBean resultBean = portfolioAssignHelper.queryPortfolioAssign(instruction.getEntrustId(), PortfolioDetailBusiTypeEnum.TRADE,
                 BigDecimal.valueOf(trade.getTradedVolume()), trade.getTradedPrice(), trade.getEntrustProp());
@@ -64,11 +64,15 @@ public class PortfolioTradeMessageHelper {
         }
 
         //2、保存 成交组合分配
+        logger.info("保存成交组合分配");
         for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
-            portfolioDetailMapper.insert(entry.getValue());
+            PortfolioDetail value = entry.getValue();
+            value.setBusiId(trade.getId());
+            portfolioDetailMapper.insert(value);
         }
 
         //3、查询成交对应委托下单的组合分配
+        logger.info("查询成交对应委托下单的组合分配");
         List<PortfolioDetail> portfolioDetails = portfolioDetailByManualMapper.selectListByBusiIdAndBusiType(entrust.getId(), PortfolioDetailBusiTypeEnum.ORDER.getCode());
         Map<String, PortfolioDetail> detailMap = portfolioDetails.stream().collect(Collectors.toMap(PortfolioDetail::getPortfolioId, o -> o));
 
@@ -118,12 +122,14 @@ public class PortfolioTradeMessageHelper {
             return calculateResponses;
         }
 
-        //2、保存 成交组合分配
+        //2、保存 委托组合分配
         for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
+            PortfolioDetail value = entry.getValue();
+            value.setBusiId(entrust.getId());
             portfolioDetailMapper.insert(entry.getValue());
         }
 
-        //3、组装成交组合分配
+        //3、组装委托组合分配
         PortfolioCalculateResponse calculateResponse = null;
         for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
             calculateResponse = new PortfolioCalculateResponse();
@@ -143,6 +149,8 @@ public class PortfolioTradeMessageHelper {
             calculateResponse.setEntrustNum(portfolioDetail.getTargetNum().longValue());
             calculateResponse.setEntrustAmt(portfolioDetail.getTargetAmt());
             calculateResponse.setEntrustPrice(NumberUtil.div(calculateResponse.getEntrustAmt(), calculateResponse.getEntrustNum()));
+
+            calculateResponse.setEtrSecAmount(portfolioDetail.getEtrSecAmount());
 
             calculateResponses.add(calculateResponse);
         }

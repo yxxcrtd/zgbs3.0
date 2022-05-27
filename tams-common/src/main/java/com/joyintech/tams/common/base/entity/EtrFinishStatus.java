@@ -36,6 +36,13 @@ public class EtrFinishStatus extends EtrFinishStatusKey {
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal orderFinishAmt;
 
+
+    /**
+     * 转二级交易额度
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal tranFinishAmt;
+
     /**
      * 取得 完成日期
      * @return 完成日期
@@ -115,5 +122,24 @@ public class EtrFinishStatus extends EtrFinishStatusKey {
      */
     public void setOrderFinishAmt(BigDecimal orderFinishAmt) {
         this.orderFinishAmt = orderFinishAmt;
+    }
+
+
+    /**
+     * 获取 转二级交易额度
+     *
+     * @return tranFinishAmt 转二级交易额度
+     */
+    public BigDecimal getTranFinishAmt() {
+        return this.tranFinishAmt;
+    }
+
+    /**
+     * 设置 转二级交易额度
+     *
+     * @param tranFinishAmt 转二级交易额度
+     */
+    public void setTranFinishAmt(BigDecimal tranFinishAmt) {
+        this.tranFinishAmt = tranFinishAmt;
     }
 }

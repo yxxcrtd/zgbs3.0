@@ -1,0 +1,2 @@
+UPDATE SYS_PAGE SET PAGE_URL = '/home.html#/interbank/biddingTransaction?a=a' WHERE PAGE_ID = 'TenderBondSub001';
+UPDATE SYS_PAGE SET PAGE_URL = '/home.html#/interbank/biddingTransaction?a=a' WHERE PAGE_ID = 'TenderBondSub';

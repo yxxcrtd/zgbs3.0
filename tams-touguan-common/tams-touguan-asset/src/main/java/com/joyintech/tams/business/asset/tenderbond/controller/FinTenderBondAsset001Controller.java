@@ -16,7 +16,6 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.invest.asset.plan.plancur.service.FinPlanAssetCService;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -96,6 +95,15 @@ public class FinTenderBondAsset001Controller extends BaseController {
     @ApiOperation(value = "上市代码下拉列表", notes = "上市代码下拉列表,参数:{search,initValue,pageNo,pageSize,includeInterface}")
     public Page<SelectOptionDto> appearMarketIdForSelect(@RequestBody Map<String, Object> search) {
         return finTenderBondAssetService.getAppearMarketIdForSelect(search);
+    }
+
+
+    @ResponseBody
+    @PostMapping("/appearMarketIdForSelectV2")
+    @ApiOperation(value = "上市代码下拉列表V2", notes = "上市代码下拉列表V2,参数:{search,initValue,pageNo,pageSize,includeInterface}")
+    public Message<Page<SelectOptionDto>> appearMarketIdForSelectV2(@RequestBody Map<String, Object> search) {
+        return Message.success("success", finTenderBondAssetService.getAppearMarketIdForSelect(search));
+
     }
 
     @ResponseBody

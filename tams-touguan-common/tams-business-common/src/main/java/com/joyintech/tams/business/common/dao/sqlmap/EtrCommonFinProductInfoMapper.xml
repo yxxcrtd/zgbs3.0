@@ -24,7 +24,7 @@
         PRODUCT_TYPE.TYPE_11 assetTypeThree,
         PRODUCT_TYPE.TYPE_11 bondType,
         PRODUCT.COUPON_SPECIES couponSpecies,
-        PRODUCT.CCY cyy,
+        PRODUCT.CCY ccy,
         PRODUCT.CAPI_INCOME_FEATURE capiIncomeFeature,
         PRODUCT_ADD.IS_AUTO_UPDATE isAutoUpdate,
         ISSUE.ISSUE_PRICE issuePrice,
@@ -32,9 +32,11 @@
         ISSUE.INT_TYPE intType,
         ISSUE.PAY_CYCLE payCycle,
 
-        case when (PRODUCT.COUPON_SPECIES='"01"'  or ISSUE.INT_TYPE='02' )
-        then SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.9000') || 'BP'
-        else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') end as referYield,
+        case
+        when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
+        SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
+        else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+        end as referYield,
 
         RATE_INFO.INT_RATE basicRate,
         ISSUE.RATE_GRADE rateGrade,
@@ -53,7 +55,7 @@
         ISSUE.TENDER_SDATE tenderSdate,
         ISSUE.TENDER_EDATE tenderEdate,
         ISSUE.ISSUE_STYLE issueStyle,
-        ISSUE.PLAN_ISSUE_AMT/100000000 planIssueAmt,
+        TO_CHAR(ROUND(ISSUE.PLAN_ISSUE_AMT/100000000,2),'fm999999999999999999999990.00') || '亿元' planIssueAmt,
         ISSUE.ADD_BATCH addBatch,
         ISSUE.PAY_DATE payDate,
         ISSUE.PAY_EDATE payEdate,

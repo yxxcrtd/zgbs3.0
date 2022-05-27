@@ -34,7 +34,7 @@
             T1.TRADE_PLAT tradePlat,
             sdl5.item_value tradePlatStr,
             T7.SEC_ACCT_NAME secAcctId,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME) counterName,
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)) counterName,
             T1.TRADE_MARKET_MODE tradeMarketMode,
             sdl6.item_value tradeMarketModeStr,
             NULL AS cleanStlStatus,
@@ -54,6 +54,7 @@
         LEFT JOIN PTL_PORTFOLIO T5 ON T4.PORTFOLIO_ID = T5.PORTFOLIO_ID
         LEFT JOIN MST_COUNTER_PARTY T6 ON T1.COUNTER_ID = T6.COUNTER_ID
         LEFT JOIN MST_COUNTER_PARTY T61 ON T2.ISSUER = T61.LINK_ID AND T61.P_TYPE_ONE IS NOT NULL
+        LEFT JOIN MST_CUSTOMER_INFO T611 ON T2.ISSUER = T611.CUSTOMER_ID
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON T1.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
@@ -110,6 +111,9 @@
         <if test="finprodType2 != null and finprodType2!='' ">
             AND FIN_PRODUCT_TYPE.TYPE_8= #{finprodType2}
         </if>
+        <if test="assetType != null and assetType!='' ">
+            AND FIN_PRODUCT_TYPE.TYPE_9= #{assetType}
+        </if>
         <if test="tgBusiType != null and tgBusiType!='' ">
             AND btm.busi_type = #{tgBusiType}
         </if>
@@ -143,7 +147,7 @@
             sdl4.item_value,
             T1.TRADE_PLAT,
             sdl5.item_value,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME),
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)),
             T1.FINPROD_ID,
             T1.CCY,
             T7.SEC_ACCT_NAME,
@@ -181,7 +185,7 @@
             T1.TRADE_PLAT tradePlat,
             sdl5.item_value tradePlatStr,
             T7.SEC_ACCT_NAME secAcctId,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME) counterName,
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)) counterName,
             T1.TRADE_MARKET_MODE tradeMarketMode,
             sdl6.item_value tradeMarketModeStr,
             NULL AS cleanStlStatus,
@@ -201,6 +205,7 @@
         LEFT JOIN PTL_PORTFOLIO T5 ON T4.PORTFOLIO_ID = T5.PORTFOLIO_ID
         LEFT JOIN MST_COUNTER_PARTY T6 ON T1.COUNTER_ID = T6.COUNTER_ID
         LEFT JOIN MST_COUNTER_PARTY T61 ON T2.ISSUER = T61.LINK_ID AND T61.P_TYPE_ONE IS NOT NULL
+        LEFT JOIN MST_CUSTOMER_INFO T611 ON T2.ISSUER = T611.CUSTOMER_ID
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON T1.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
@@ -257,6 +262,9 @@
         <if test="finprodType2 != null and finprodType2!='' ">
             AND FIN_PRODUCT_TYPE.TYPE_8= #{finprodType2}
         </if>
+        <if test="assetType != null and assetType!='' ">
+            AND FIN_PRODUCT_TYPE.TYPE_9= #{assetType}
+        </if>
         <if test="tgBusiType != null and tgBusiType!='' ">
             AND btm.busi_type = #{tgBusiType}
         </if>
@@ -290,7 +298,7 @@
         sdl4.item_value,
         T1.TRADE_PLAT,
         sdl5.item_value,
-        nvl(T6.COUNTER_NAME,T61.COUNTER_NAME),
+        nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)),
         T1.FINPROD_ID,
         T1.CCY,
         T7.SEC_ACCT_NAME,
@@ -329,7 +337,7 @@
             T1.TRADE_PLAT tradePlat,
             sdl5.item_value tradePlatStr,
             T7.SEC_ACCT_NAME secAcctId,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME) counterName,
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)) counterName,
             T1.TRADE_MARKET_MODE tradeMarketMode,
             sdl6.item_value tradeMarketModeStr,
             NULL AS cleanStlStatus,
@@ -350,6 +358,7 @@
         LEFT JOIN PTL_PORTFOLIO T5 ON T4.PORTFOLIO_ID = T5.PORTFOLIO_ID
         LEFT JOIN MST_COUNTER_PARTY T6 ON T1.COUNTER_ID = T6.COUNTER_ID
         LEFT JOIN MST_COUNTER_PARTY T61 ON T2.ISSUER = T61.LINK_ID AND T61.P_TYPE_ONE IS NOT NULL
+        LEFT JOIN MST_CUSTOMER_INFO T611 ON T2.ISSUER = T611.CUSTOMER_ID
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON T1.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
         LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
         LEFT JOIN INF_PAY_ORDERS_STATUS T10 ON T9.ORDER_ID = T10.ORDER_ID
@@ -404,6 +413,9 @@
         <if test="finprodType2 != null and finprodType2!='' ">
             AND FIN_PRODUCT_TYPE.TYPE_8= #{finprodType2}
         </if>
+        <if test="assetType != null and assetType!='' ">
+            AND FIN_PRODUCT_TYPE.TYPE_9= #{assetType}
+        </if>
         <if test="tgBusiType != null and tgBusiType!='' ">
             AND btm.busi_type= #{tgBusiType}
         </if>
@@ -438,7 +450,7 @@
             sdl4.item_value,
             T1.TRADE_PLAT,
             sdl5.item_value,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME),
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)),
             T0.SETTLE_SEQ_NO,
             T0.FINPROD_ID,
             T1.CCY,
@@ -609,15 +621,15 @@
         SELECT ROWNUM             rowNums,
                TPDA.Entrust_Id    entrustId,
                pp.PORTFOLIO_NAME  portfolioName,
-               TPD.SHARE_AMT      qtyd,
-               ttft1.fee_amt      jsFeeAmt,
-               EE.BUSINESS_MODEL  busiTypePosition,
+               TPD.SHARE_AMT*100      qtyd,
+               TPD.fee_amt      jsFeeAmt,
+               eed.INV_AIM  busiTypePosition,
                ssai.sec_acct_name secAcctId
         FROM TRD_PRODUCT_DEAL TPD
                  INNER JOIN TRD_PRODUCT_DEAL_ADD TPDA on TPD.TRADE_ID = TPDA.TRADE_ID
                  LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
                  LEFT JOIN TRD_TRADE_FEE_DETAIL ttft1 ON tpd.trade_id = ttft1.trade_id AND ttft1.fee_type = #{feeType08}
-                 LEFT JOIN ETR_ENTRUST ee ON TPDA.Entrust_Id = ee.entrust_id
+                 LEFT JOIN ETR_ENTRUST_DETAIL eed ON TPDA.Entrust_Id = eed.entrust_id and TPDA.PORTFOLIO_ID = eed.PORTFOLIO_ID
                  LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
         where TPD.TOTLE_TRADE_ID = #{tradeId}
           and TPD.Trade_Status = '01'

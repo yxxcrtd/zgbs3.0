@@ -73,6 +73,9 @@ public class CfetsTrdQueryRegInfoListRequest {
     @ApiModelProperty(name="endDate",value="查询结束日期",example="12")
     private Date endDate;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型")
+    private String busiTypePosition;
+
     public String getRegStatus() {
         return regStatus;
     }
@@ -215,6 +218,14 @@ public class CfetsTrdQueryRegInfoListRequest {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 }
 

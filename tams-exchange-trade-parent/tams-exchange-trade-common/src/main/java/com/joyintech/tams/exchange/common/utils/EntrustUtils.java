@@ -545,12 +545,12 @@ public class EntrustUtils {
 
     // 判断是否可以做公平交易
     public static boolean allowFairOrder(Instruction instruction) {
-        return TradePlat.NORMAL.value.equals(instruction.getTradePlat())
-                && (
-                DictCodeListExt2.交易方向_买入.getValue().equals(instruction.getPs())
-                        || DictCodeListExt2.交易方向_卖出.getValue().equals(instruction.getPs())
-                        || DictCodeListExt2.交易方向_正回购.getValue().equals(instruction.getPs())
-                        || DictCodeListExt2.交易方向_逆回购.getValue().equals(instruction.getPs())
+        return (TradePlat.NORMAL.value.equals(instruction.getTradePlat())
+                || TradePlat.NEW_BOND.value.equals(instruction.getTradePlat()))
+                && (DictCodeListExt2.交易方向_买入.getValue().equals(instruction.getPs())
+                || DictCodeListExt2.交易方向_卖出.getValue().equals(instruction.getPs())
+                || DictCodeListExt2.交易方向_正回购.getValue().equals(instruction.getPs())
+                || DictCodeListExt2.交易方向_逆回购.getValue().equals(instruction.getPs())
         );
     }
 
@@ -967,16 +967,16 @@ public class EntrustUtils {
     }
 
     /**
-     * 判断是否非交易业务
+     * 判断是否非交易业务: 新股申购、配股 是竞价交易不是非交易
      */
     public static boolean isNotTrade(String busiTypeTg) {
         return StringUtil.equals(DictCodeListExt3.投管业务类型_行权.getValue(), busiTypeTg)
                 || StringUtil.equals(DictCodeListExt3.投管业务类型_债转股.getValue(), busiTypeTg)
                 || StringUtil.equals(DictCodeListExt3.投管业务类型_质押券出入库.getValue(), busiTypeTg)
                 || StringUtil.equals(DictCodeListExt3.投管业务类型_配债.getValue(), busiTypeTg)
-                || StringUtil.equals(DictCodeListExt3.投管业务类型_可转债申购.getValue(), busiTypeTg)
-                || StringUtil.equals(DictCodeListExt3.投管业务类型_配股.getValue(), busiTypeTg)
-                || StringUtil.equals(DictCodeListExt3.投管业务类型_新股申购.getValue(), busiTypeTg);
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_可转债申购.getValue(), busiTypeTg);
+//                || StringUtil.equals(DictCodeListExt3.投管业务类型_配股.getValue(), busiTypeTg)
+//                || StringUtil.equals(DictCodeListExt3.投管业务类型_新股申购.getValue(), busiTypeTg);
     }
 
     /**

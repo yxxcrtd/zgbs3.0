@@ -1301,7 +1301,9 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
             return null;
         }
         List<MinTrdUnitLimit> minTrdUnitLimitList = minPriceAndMinTrdUnitLimitBean.getMinTrdUnitLimitList();
-
+        if (ObjectUtil.isEmpty(minTrdUnitLimitList)) {
+            return null;
+        }
         if (minTrdUnitLimitList.size() == 1) {
             return minTrdUnitLimitList.get(0);
         } else {
@@ -1319,6 +1321,9 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
             return null;
         }
         List<MinPrice> minPriceList = minPriceAndMinTrdUnitLimitBean.getMinPriceList();
+        if (ObjectUtil.isEmpty(minPriceList)) {
+            return null;
+        }
         if (minPriceList.size() == 1) {
             return minPriceList.get(0).getMinPrice();
         } else {

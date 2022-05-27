@@ -398,7 +398,7 @@
         }
         Joyin.dialog(JoyinUtil.getLabel("RskSupervisionIndividuation002.edit"),
             basePath + "invest/riskredis/quota/supervisionindividuation/RskSupervisionIndividuation002/init",
-            "80%", "80%",data,function(result) {
+            "85%", "85%",data,function(result) {
         					if(result){
         						var row = {conditionItemStr:result.conditionItemStr,controlTypeStr:result.controlTypeStr,conditionId:result.conditionId,
 										valueStr:result.valueStr,valueEnd:result.valueEnd,conditionItem:result.conditionItem,controlType:result.controlType,
@@ -817,7 +817,7 @@
     	$("#RskSupervisionIndividuation001_btn_tjsz_add").click(function() {
     		Joyin.dialog(JoyinUtil.getLabel("RskSupervisionIndividuation002"),
     	            basePath + "invest/riskredis/quota/supervisionindividuation/RskSupervisionIndividuation002/init",
-    	            "80%", "80%", {pageModel: PAGE_MODEL_NEW,indId: $('#indId').val(),prtBagId: $('#prtBagId').val(),VDATE:VDATE}, function (result) {
+    	            "85%", "85%", {pageModel: PAGE_MODEL_NEW,indId: $('#indId').val(),prtBagId: $('#prtBagId').val(),VDATE:VDATE}, function (result) {
     	            	flag = true;
     	            	if(result){
     	            		var row = {conditionItemStr:result.conditionItemStr,controlTypeStr:result.controlTypeStr,conditionId:result.conditionId,

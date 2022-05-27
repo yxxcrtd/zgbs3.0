@@ -54,5 +54,6 @@ public interface RskParamReCalcMapper {
      * @return
      */
     String getTradeAmtByEventId(String eventId);
-    
+
+    List<RskInterfDataDto> getOcpInfoListToday(Map<String, Object> param);
 }

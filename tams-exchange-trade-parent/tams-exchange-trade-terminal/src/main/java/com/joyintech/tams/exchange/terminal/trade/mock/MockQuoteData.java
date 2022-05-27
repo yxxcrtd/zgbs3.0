@@ -266,7 +266,7 @@ public class MockQuoteData {
             buy.setRequestStatus(1);
             buy.setStockCode(stockCode);
             buy.setStockName("债券" + StockCodeUtils.getStockCode(stockCode));
-            buy.setAmount(50000);
+            buy.setAmount(5088);
             buy.setFullPrice(BigDecimal.valueOf(101.2345));
             buy.setEntrustPrice(BigDecimal.valueOf(100.1024));
             buy.setEntrustBalance(BigDecimal.valueOf(5061725.00));

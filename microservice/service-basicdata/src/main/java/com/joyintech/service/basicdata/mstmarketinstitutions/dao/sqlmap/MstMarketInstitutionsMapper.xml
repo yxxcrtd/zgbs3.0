@@ -346,7 +346,7 @@
     </select>
 
 	<select id="getByInsitituteCode" resultType="com.joyintech.service.basicdata.mstmarketinstitutions.dto.MstMarketInstitutionsDto">
-		select * from MST_CUSTOMER_INFO_ADD where INSITITUTE_CODE=#{insitituteCode} and ROWNUM=1
+		select * from MST_CUSTOMER_INFO_ADD where (INSITITUTE_CODE=#{insitituteCode} or CUSTOMER_ID=#{insitituteCode}) and ROWNUM=1
 	</select>
 
 	<select id="getInterfCustomerInfo" resultType="com.joyintech.service.basicdata.mstmarketinstitutions.dto.MstMarketInstitutionsDto">
@@ -381,7 +381,7 @@
 			   COMPANY_NATURE as companyNature,
 			   REMARK as remark,
 			   HS_TYPE as hsType
-		FROM INTERF_CUSTOMER_INFO where INSITITUTE_CODE=#{insitituteCode} and ROWNUM=1
+		FROM INTERF_CUSTOMER_INFO where (INSITITUTE_CODE=#{insitituteCode} or CUSTOMER_ID=#{insitituteCode} or CUSTOMER_NAME=#{insitituteCode}) and ROWNUM=1
 	</select>
 
 </mapper>

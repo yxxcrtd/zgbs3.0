@@ -1,6 +1,7 @@
 package com.joyintech.tams.business.asset.bond.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.dto.UploadFile;
@@ -28,10 +29,7 @@ import com.joyintech.tams.component.business.asset.dto.FinInterestFactorDto;
 import com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto;
 import com.joyintech.tams.component.business.bond.BusiFinBondRatingInfoService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDetailDto;
@@ -49,6 +47,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.util.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -76,6 +76,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/business/asset/bond/FinBondAsset002")
 @Api(tags = "债券标的信息新建")
 public class FinBondAsset002Controller extends BaseController{
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private FinBondAssetService finBondAssetService;
@@ -134,7 +136,9 @@ public class FinBondAsset002Controller extends BaseController{
        initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
        initPageParams.put("SECRATE_DATA", this.getSelectDataFromDataDic(DictCode.利率行情, null));
        initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
-       String finprodId = getParam("finprodId");
+       initPageParams.put("GUARANTEE_MODE",this.getSelectDataFromDataDic(DictCode.新债_担保方式, null));
+
+        String finprodId = getParam("finprodId");
        String finprodType = getParam("finprodType");
        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
        initPageParams.put("YES",DictCodeList.是否_是.getValue());
@@ -270,6 +274,16 @@ public class FinBondAsset002Controller extends BaseController{
         ValidUtils.valid(dto.getFinInterestFactorDto(),validList);
         List<ValidMessage> valids = finBondAssetValidatorService.valid(dto);
         validList.addAll(valids);
+        if (!StringUtil.equals(dto.getOperateStatus(), "MODIFY")) {
+            String finProdId = commonBusinessService.getFinProdId(dto.getFinprodMarketId() + dto.getTradeMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
+            if (finBondAssetService.selectCountByfinprodId(finProdId) > 0) {
+                validList.add(new ValidMessage("",
+                        getMessage("资产代码不能重复!")));
+                ajax.setErrorList(validList);
+                ajax.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().success().setData(ajax);
+            }
+        }
         if (CollectionUtils.isNotEmpty(validList)){
             ajax.setErrorList(validList);
             return new Message<AjaxResult>().success().setData(ajax);
@@ -407,26 +421,26 @@ public class FinBondAsset002Controller extends BaseController{
             //是否属于139000-139999代码段债券
             if(pattern.matcher(secid).matches()) {
                 Long l = Long.parseLong(secid);
-                if ((l > 139000 && l < 139999) || (l > 123000 && l < 123499)) {
+                if ((l >= 139000 && l <= 139999) || (l >= 123000 && l <= 123499)) {
                     settleFlag = true;
                 }
             }
             //全额结算 : 私募债 || 139000-139999代码段债券、123000-123499代码段债券 || 资产支持证券
-            if(StringUtil.equals(isPpb, "Y") || settleFlag || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
-                isNetSett="N";
+            if(StringUtil.equals(isPpb, "Y") || settleFlag || StringUtil.equals(DictCodeListExt3.行内资产三级分类_资产支持证券.getValue(), type9)){
+                isNetSett="Y";
 //                tradePlat=DictCodeList.交易平台_固定收益平台.getValue();
             }else{
                 //以上情况都不符合则为纳入净额结算标准范围的债券
-                isNetSett="Y";
+                isNetSett="N";
 //                tradePlat=DictCodeList.交易平台_固定收益平台.getValue()+","+DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_大宗交易平台.getValue();
             }
         }else if(StringUtil.equals(DictCodeListExt1.交易场所_深圳证券交易所.getValue(), tradeMarket)){
             //全额结算: 私募债 || 资产支持证券
-            if(StringUtil.equals(isPpb, "Y") || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
-                isNetSett="N";
+            if(StringUtil.equals(isPpb, "Y") || StringUtil.equals(DictCodeListExt3.行内资产三级分类_资产支持证券.getValue(), type9)){
+                isNetSett="Y";
 //                tradePlat=DictCodeList.交易平台_综合协议交易平台.getValue();
             }else{
-                isNetSett="Y";
+                isNetSett="N";
 //                tradePlat=DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_综合协议交易平台.getValue();
             }
         }
@@ -636,15 +650,17 @@ public class FinBondAsset002Controller extends BaseController{
      */
     @ApiOperation(value = "附件上传", notes = "附件上传")
     @ResponseBody
-    @PostMapping(value = "/UploadFile")
-    public Message<SysUploadFileInfo> UploadFile(MultipartFile file) {
+    @PostMapping( "/uploadFile")
+    public Message<SysUploadFileInfo> uploadFile(MultipartFile file) {
         try {
+            logger.info("文件上传开始");
             if (StringUtil.isNotEmpty(file)) {
                 SysUploadFileInfo fileInfo = finBondAssetService.getUploadFileInfo(file);
                 return new Message<SysUploadFileInfo>().success().setData(fileInfo);
             }
+            logger.info("文件上传结束");
         }catch (Exception e){
-            e.printStackTrace();
+            logger.error("文件上传异常", e);
             return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
         }
         return null;
@@ -658,7 +674,7 @@ public class FinBondAsset002Controller extends BaseController{
      */
     @ApiOperation(value = "附件删除", notes = "附件删除")
     @ResponseBody
-    @PostMapping(value = "/deleteFile")
+    @PostMapping( "/deleteFile")
     public Message<AjaxResult> UploadFile(SysUploadFileInfo file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
@@ -683,5 +699,92 @@ public class FinBondAsset002Controller extends BaseController{
         }catch (Exception e) {
             return new Message<Page<SelectOptionDto>>().fail().setMessage("正股代码的联想下拉框异常");
         }
+    }
+
+    @ApiOperation(value="节假日自动向后推算日期(参数：)",notes = "节假日自动向后推算日期")
+    @ResponseBody
+    @PostMapping("getDealCalendarHoliday")
+    public Message<Date> getDealCalendarHoliday(@RequestBody SelectOptionCommonRequest request){
+        try {
+            Date date = finBondAssetService.getDealCalendarHoliday(request);
+            return new Message<Date>().success().setData(date);
+        }catch (Exception e) {
+            return new Message<Date>().fail().setMessage("正股代码的联想下拉框异常");
+        }
+    }
+
+    /**
+     * 查看区间付息计划
+     * <功能详细描述>
+     * @param dto
+     * @return
+     * @throws ParseException
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value="查看区间付息计划",notes = "查看区间付息计划")
+    @ResponseBody
+    @PostMapping("generationSubPlan")
+    public Message<List<BondFinCashPlanDto>> generationSubPlan(@RequestBody BondFinPayInterestStdInfoRequest dto) {
+        try {
+            String finprodId = dto.getFinprodId();
+            if(!StringUtil.isNotEmpty(finprodId) && StringUtil.isNotEmpty(dto.getFinprodMarketId())) {
+                finprodId = commonBusinessService.getFinProdId(dto.getFinprodMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
+            }
+            if (StringUtil.isNotEmpty(dto.getFinInterestFactorDto()) &&
+                    StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getYield()) ){
+                dto.getFinInterestFactorDto().setYield(ArithmeticUtil.multiply(dto.getFinInterestFactorDto().getYield(),BigDecimal.valueOf(100)));
+            }
+            // 付息计划
+            List<BondFinCashPlanDto> invList = new ArrayList<>();
+            Date maxTradeDate = null;
+            if(StringUtil.isNotEmpty(finprodId)) {
+                maxTradeDate = finBondAssetService.getMaxTradeDate(finprodId);
+                // 生付息成计划
+                dto.setMaxTradeDate(maxTradeDate);
+            }
+            dto.setCalendarId(finBondAssetService.getCalendarId(dto.getTradeMarket()));
+            dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            if(StringUtil.equals(dto.getAdjPlanFlag(), DictCodeList.共通业务类型_付息计划调整.getValue())){
+                dto.setFinprodType2(dto.getAdjPlanFlag());
+            }
+            FinPayInterestStdInfoDto finPayInterestStdInfoDto= new FinPayInterestStdInfoDto();
+            BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,dto);
+            BondFinInterestFactorDto bondFinInterestFactorDto = dto.getFinInterestFactorDto();
+            FinInterestFactorDto finInterestFactorDto = new FinInterestFactorDto();
+            finInterestFactorDto.setRate(bondFinInterestFactorDto.getYield());
+            BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto,bondFinInterestFactorDto);
+            finPayInterestStdInfoDto.setFinInterestFactorDto(finInterestFactorDto);
+            if (CollectionUtils.isNotEmpty(dto.getInvScheduleList())) {
+                List<FinCashPlanDto> invScheduleList = new ArrayList<>();
+                dto.getInvScheduleList().forEach(bondInvSchedule -> {
+                    FinCashPlanDto finCashPlanDto = new FinCashPlanDto();
+                    BeanUtil.copyPropertiesIgnoreNull(finCashPlanDto, bondInvSchedule);
+                    invScheduleList.add(finCashPlanDto);
+                });
+                finPayInterestStdInfoDto.setInvScheduleList(invScheduleList);
+            }
+            if (CollectionUtils.isNotEmpty(dto.getInvRepayList())) {
+                List<FinCashPlanDto> invRepayList = new ArrayList<>();
+                dto.getInvRepayList().forEach(item -> {
+                    FinCashPlanDto finCashPlanDto = new FinCashPlanDto();
+                    BeanUtil.copyPropertiesIgnoreNull(finCashPlanDto, item);
+                    invRepayList.add(finCashPlanDto);
+                });
+                finPayInterestStdInfoDto.setInvRepayList(invRepayList);
+            }
+            List<FinCashPlanDto> finCashPlanList = finPayInterestStdInfoService.createAssetPayInteresPlan(finPayInterestStdInfoDto);
+            for (FinCashPlanDto finCashPlan:finCashPlanList){
+                BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
+                BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto,finCashPlan);
+                bondFinCashPlanDto.setRangeYield(ArithmeticUtil.divide(bondFinCashPlanDto.getRangeYield(),BigDecimal.valueOf(100),4));
+                bondFinCashPlanDto.setLirs(null);
+                invList.add(bondFinCashPlanDto);
+            }
+            return new Message<List<BondFinCashPlanDto>>().success().setData(invList);
+        }catch (Exception e) {
+            return new Message<List<BondFinCashPlanDto>>().fail().setMessage("查看区间付息计划异常");
+        }
+
     }
 }

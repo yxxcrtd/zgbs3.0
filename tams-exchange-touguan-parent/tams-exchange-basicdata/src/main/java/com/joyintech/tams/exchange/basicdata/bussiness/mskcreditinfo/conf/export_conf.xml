@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook filePath="mskcreditinfo/valmskcreditinfo/ValMskCreditInfo001.xlsx" name="信用保护凭证行情信息">
+    <Worksheet javaBean="com.joyintech.tams.exchange.basicdata.business.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+        <Row>
+            <Cell order="1" name="资产代码">secid</Cell>
+            <Cell order="2" name="资产简称">finprodAbbr</Cell>
+            <Cell order="3" name="估值来源">valueSourceStr</Cell>
+            <Cell order="4" name="估值日期">cdateStr</Cell>
+            <Cell order="5" name="估值全价">mdprice</Cell>
+            <Cell order="6" name="应计利息">mint</Cell>
+            <Cell order="7" name="估值净价">mcprice</Cell>
+            <Cell order="8" name="估价收益率(%)">myield</Cell>
+            <Cell order="9" name="估价修正久期">mMduration</Cell>
+            <Cell order="10" name="估价凸性">mcnvxty</Cell>
+            <Cell order="11" name="发行市场数">issueMarketNum</Cell>
+            <Cell order="12" name="信用类型">creditType</Cell>
+        </Row>
+    </Worksheet>
+</Workbook>

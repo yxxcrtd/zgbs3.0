@@ -172,6 +172,8 @@ public class EntrustQueryBean implements Serializable {
     private String propInvestorName;
     @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
     private String tradeId;
+    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员")
+    private String tradeName;
     @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
     private String dealerId;
     @ApiModelProperty(required = true, name = "dealerName", value = "本方交易商名称")
@@ -180,6 +182,8 @@ public class EntrustQueryBean implements Serializable {
     private String counterId;
     @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
     private String propTradeId;
+    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员")
+    private String propTradeName;
     @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
     private String propDealerId;
     @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
@@ -324,6 +328,9 @@ public class EntrustQueryBean implements Serializable {
 
     @ApiModelProperty(name = "operateUser", value = "操作人员ID 执行撤销异常委托操作人员ID", hidden = true)
     private String operateUser;
+
+    @ApiModelProperty(name = "entrustPriceView", value = "委托价格(展示)")
+    private BigDecimal entrustPriceView;
 
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
@@ -1180,27 +1187,31 @@ public class EntrustQueryBean implements Serializable {
         this.propOwnerType = propOwnerType;
     }
 
-    public String getCounterName() {
-        return counterName;
+    public String getTradeName() {
+        return tradeName;
     }
 
-    public void setCounterName(String counterName) {
-        this.counterName = counterName;
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
     }
 
-    public String getPropAcctNo() {
-        return propAcctNo;
+    public String getPropTradeName() {
+        return propTradeName;
     }
 
-    public void setPropAcctNo(String propAcctNo) {
-        this.propAcctNo = propAcctNo;
+    public void setPropTradeName(String propTradeName) {
+        this.propTradeName = propTradeName;
     }
 
-    public String getPropAcctName() {
-        return propAcctName;
+    public BigDecimal getEntrustPriceView() {
+        if (StringUtil.isNotEmpty(isFullPrice) && StringUtil.equals(isFullPrice, "Y")) {
+            return fullPrice;
+        } else {
+            return entrustPrice;
+        }
     }
 
-    public void setPropAcctName(String propAcctName) {
-        this.propAcctName = propAcctName;
+    public void setEntrustPriceView(BigDecimal entrustPriceView) {
+        this.entrustPriceView = entrustPriceView;
     }
 }

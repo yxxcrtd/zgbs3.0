@@ -44,6 +44,18 @@ public class CfetsTrdQueryRegInfoListResponse {
     @ApiModelProperty(name="finprodType2Str",value="资产类型",example="A1")
     private String  finprodType2Str;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型",example="A1")
+    private String  busiTypePosition;
+
+    @ApiModelProperty(name="busiTypePositionStr",value="业务类型",example="A1")
+    private String  busiTypePositionStr;
+
+    @ApiModelProperty(name="issueType",value="发行状态",example="A1")
+    private String  issueType;
+
+    @ApiModelProperty(name="issueTypeStr",value="发行状态",example="A1")
+    private String  issueTypeStr;
+
     @ApiModelProperty(name="finprodId",value="资产代码Id",example="ZC1")
     private String finprodId;
 
@@ -817,5 +829,37 @@ public class CfetsTrdQueryRegInfoListResponse {
 
     public void setCalMode(String calMode) {
         this.calMode = calMode;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
+    public String getIssueType() {
+        return issueType;
+    }
+
+    public void setIssueType(String issueType) {
+        this.issueType = issueType;
+    }
+
+    public String getBusiTypePositionStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
+    }
+
+    public void setBusiTypePositionStr(String busiTypePositionStr) {
+        this.busiTypePositionStr = busiTypePositionStr;
+    }
+
+    public String getIssueTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.发行状态, this.getIssueType());
+    }
+
+    public void setIssueTypeStr(String issueTypeStr) {
+        this.issueTypeStr = issueTypeStr;
     }
 }

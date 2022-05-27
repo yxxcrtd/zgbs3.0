@@ -1,0 +1,5 @@
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"4"}' WHERE PAGECODE = 'CfetsTrdQuery' AND DTCODE = 'CfetsTrdQueryRegInfo' AND SPCDCODE = '04,B' AND COLCODE = 'issuePrice';
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"2"}' WHERE PAGECODE = 'CfetsTrdQuery' AND DTCODE = 'CfetsTrdQueryRegInfo' AND SPCDCODE = '04,B' AND COLCODE = 'payableAmount';
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"2"}' WHERE PAGECODE = 'CfetsTrdQuery' AND DTCODE = 'CfetsTrdQueryRegInfo' AND SPCDCODE = '04,B' AND COLCODE = 'settFeeAmt';
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"2"}' WHERE PAGECODE = 'CfetsTrdQuery' AND DTCODE = 'CfetsTrdQueryRegInfo' AND SPCDCODE = '04,B' AND COLCODE = 'subscriptionAmount';
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "left"}',COLCODE = 'rateStr' WHERE PAGECODE = 'CfetsTrdQuery' AND DTCODE = 'CfetsTrdQueryRegInfo' AND SPCDCODE = '04,B' AND COLNAME = '票面利率';

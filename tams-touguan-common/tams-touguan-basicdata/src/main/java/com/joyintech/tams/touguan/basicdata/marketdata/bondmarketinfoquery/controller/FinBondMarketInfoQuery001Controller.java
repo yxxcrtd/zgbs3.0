@@ -10,6 +10,7 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
@@ -38,6 +39,8 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
 
     @Autowired
     private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
+    @Autowired
+    private IPlatformDate iPlatformDate;
 
 
     @ApiOperation(value = "初始化参数", notes = "初始化参数")
@@ -69,7 +72,7 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
         initPageParams.put("SVR_BASIS_TYPE", this.getSelectDataFromDataDic(DictCode.基准利率, null));
         initPageParams.put("SVR_GUA_TYPE", this.getSelectDataFromDataDic(DictCode.担保方式, null));
         initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
-
+        initPageParams.put("iPlatformDate", iPlatformDate.getSysDateStr());
         //导出
         initPageParams.put("EXPORT_SHOW", CacheUtil.getSysParam("EXPORT_SHOW"));
         //刷新时间
@@ -114,7 +117,7 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
         if (StringUtil.isNotEmpty(dto)) {
             return Message.success("success", dto);
         } else {
-            return Message.fail("资产代码不存在.");
+            return Message.fail("未查询到该债券信息，无法加券，请手工维护");
         }
     }
 

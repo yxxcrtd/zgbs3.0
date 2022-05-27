@@ -40,7 +40,7 @@ public enum ErrorCode implements IEnum<Integer> {
 
     INSTRUCTION_APPLY_NOT_UNIQUE(25, "只能进行一次该申报"),
 
-    MIN_TRD_UNIT_LIMIT_ERROR(26, "交易属性错误"),
+    MIN_TRD_UNIT_LIMIT_ERROR(26, "未找到最小交易单元"),
 
     DB_ERROR(100, "数据库返回错误"),
 
@@ -166,7 +166,7 @@ public enum ErrorCode implements IEnum<Integer> {
 
     INSTRUCTION_END_DATE_ERROR(4013, "指令的结束日小于平台日"),
 
-    INSTRUCTIONS_PRICE_ERROR(4014, "指令委托价格超限"),
+    INSTRUCTIONS_PRICE_ERROR(4014, "委托价格超限"),
 
     REQ_PARAMETER_INSTRUCTION_ID_ERROR(4015, "指令ID错误"),
 
@@ -187,6 +187,14 @@ public enum ErrorCode implements IEnum<Integer> {
     INSTRUCTIONS_RETURN_FORBID(4051, "当前指令不可退回"),
 
     QUOTATION_NOT_EXIST(4052, "未获取到当前资产行情信息"),
+
+    INSTRUCTIONS_BUY_PRICE_ERROR(4053, "买入委托价格不得超过指令价格"),
+
+    INSTRUCTIONS_SELL_PRICE_ERROR(4054, "卖出委托价格不得低于指令价格"),
+
+    INSTRUCTIONS_POSITIVEREPO_PRICE_ERROR(4055, "正回购委托价格不得超过指令价格"),
+
+    INSTRUCTIONS_REVERSEDREPO_PRICE_ERROR(4056, "逆回购委托价格不得低于指令价格"),
 
     APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR(4997, "分发指令数据存在不合法"),
 

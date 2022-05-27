@@ -260,6 +260,20 @@ public class FinPlanAssetCService extends CommonExportService<FinPlanAssetCDto>
      * @see
      * @since 1.0
      */
+    public Page<SelectOptionDto> getOriginalOwner(Map<String, Object> map) {
+        return restTemplate.postForPage(ServiceApplication.COMMON_SERVICE_NAME
+                        + "/CommonSelect/getOriginalOwner", map,
+                SelectOptionDto.class);
+    }
+
+    /**
+     * <一句话功能简述>
+     * <功能详细描述>
+     * @param map
+     * @return
+     * @see
+     * @since 1.0
+     */
     public Page<SelectOptionDto> getManagerId(Map<String, Object> map) {
         return restTemplate.postForPage(ServiceApplication.COMMON_SERVICE_NAME
             + "/CommonSelect/getManager", map,

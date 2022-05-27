@@ -214,9 +214,15 @@ public class CommonPositionEngineService {
      */
     public String getExchangeTradePlatform(String entrustId, String tradePlat, String ps, String finprodId, String interfaceType){
         // 债券接口调用头寸引擎对应场景的交易平台
-        if(INTERF_TYPE_BOND002.equals(interfaceType) || INTERF_TYPE_BOND003.equals(interfaceType)){
+        if (INTERF_TYPE_BOND003.equals(interfaceType)) {
+            if (DictCodeList.交易平台_大宗交易平台.getValue().equals(tradePlat)
+                    || DictCodeList.交易平台_竞价撮合平台.getValue().equals(tradePlat)) {
+                return tradePlat;
+            }
+            return null;
+        } else if(INTERF_TYPE_BOND002.equals(interfaceType)) {
             return tradePlat;
-        }else{
+        } else {
             if(StringUtil.isEmpty(entrustId)){ // 存续期无指令
                 return tradePlat;
             }else{
@@ -314,6 +320,9 @@ public class CommonPositionEngineService {
         if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(finprodType2)) {
             busiType = DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
         }
+        if (DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(finprodType2)) {
+            busiType = DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue();
+        }
         if (DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(finprodType2)) {
             if (DictCodeList.交易方向_申购.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_网上申购.getValue();
@@ -347,6 +356,9 @@ public class CommonPositionEngineService {
             } else if (DictCodeListExt3.交易方向_中途换券.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_协议回购中途换券.getValue();
             }
+        }
+        if (DictCodeListExt1.金融产品类型_信用保护凭证.getValue().equals(finprodType2)) {
+            busiType = DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue();
         }
         return busiType;
     }

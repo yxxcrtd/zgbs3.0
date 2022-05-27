@@ -4,6 +4,8 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
@@ -15,7 +17,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class TradeUtils {
-    
+
     private TradeUtils() {
         throw new IllegalStateException("Utility class");
     }
@@ -118,8 +120,19 @@ public class TradeUtils {
         return false;
     }
 
+    public static boolean lessThanOrEquals(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) <= 0;
+        }
+        return false;
+    }
+
     public static boolean lessThanZero(BigDecimal value) {
         return lessThan(value, BigDecimal.ZERO);
+    }
+
+    public static boolean lessThanOrEqualsZero(BigDecimal value) {
+        return lessThanOrEquals(value, BigDecimal.ZERO);
     }
 
     public static BigDecimal subtractMod(BigDecimal value, BigDecimal dividend) {
@@ -239,6 +252,19 @@ public class TradeUtils {
         if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
         }
+        return multiply(entrustPrice, entrustVolume, 2);
+    }
+
+    public static BigDecimal calculateBalanceForRisk(BigDecimal fullPrice, BigDecimal entrustPrice, long entrustVolume, String assetType, String ps) {
+        // 质押式竞价回购，金额计算
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType)) {
+            return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
+        }
+        if (InvestAssetTypeEnum.BOND.value.equals(assetType)
+                && EnumUtil.in(ps, InstructionPs.BUY, InstructionPs.SELL)) {
+            return multiply(fullPrice, entrustVolume, 2);
+        }
+
         return multiply(entrustPrice, entrustVolume, 2);
     }
 

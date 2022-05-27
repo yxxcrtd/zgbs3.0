@@ -18,6 +18,26 @@ public class StandardCouponReConversionRateDto extends StdBondMoreConvrateInfo {
 
     private String tandardRate;//标准券再折算率
 
+    private String acctNoStr;
+
+    private String finprodIdStr;
+
+    public String getFinprodIdStr() {
+        return finprodIdStr;
+    }
+
+    public void setFinprodIdStr(String finprodIdStr) {
+        this.finprodIdStr = finprodIdStr;
+    }
+
+    public String getAcctNoStr() {
+        return acctNoStr;
+    }
+
+    public void setAcctNoStr(String acctNoStr) {
+        this.acctNoStr = acctNoStr;
+    }
+
     public String getBrokerName() {
         return brokerName;
     }

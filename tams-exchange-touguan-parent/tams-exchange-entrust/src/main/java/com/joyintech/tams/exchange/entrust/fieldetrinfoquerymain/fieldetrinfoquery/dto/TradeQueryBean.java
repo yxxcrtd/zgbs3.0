@@ -71,7 +71,7 @@ public class TradeQueryBean implements Serializable {
     private String entrustBsStr;
 
     @ApiModelProperty(value = "成交数量")
-    private long tradedVolume;
+    private BigDecimal tradedVolume;
 
     @JsonSerialize(using = DoubleSerializerUtils.class)
     @ApiModelProperty(value = "成交价格")
@@ -344,14 +344,15 @@ public class TradeQueryBean implements Serializable {
         this.tradedBalance = tradedBalance;
     }
 
-    public long getTradedVolume() {
+    public BigDecimal getTradedVolume() {
         // 质押券出入库 ZGCPCN-404
         if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
-            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(tradedVolume)),new BigDecimal("100"),2).longValue();
+            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(tradedVolume)),new BigDecimal("100"),2);
         }
         return tradedVolume;
     }
-    public void setTradedVolume(long tradedVolume) {
+
+    public void setTradedVolume(BigDecimal tradedVolume) {
         this.tradedVolume = tradedVolume;
     }
 
@@ -619,5 +620,36 @@ public class TradeQueryBean implements Serializable {
 
     public void setDeliverySchedule(String deliverySchedule) {
         this.deliverySchedule = deliverySchedule;
+    }
+
+    /**
+     * 页面悬浮窗提示使用字段
+     */
+    private String tradedVolumeStr;
+    private String tradedPriceStr;
+    private String tradedBalanceStr;
+
+    public String getTradedVolumeStr() {
+        return tradedVolumeStr;
+    }
+
+    public void setTradedVolumeStr(String tradedVolumeStr) {
+        this.tradedVolumeStr = tradedVolumeStr;
+    }
+
+    public String getTradedPriceStr() {
+        return tradedPriceStr;
+    }
+
+    public void setTradedPriceStr(String tradedPriceStr) {
+        this.tradedPriceStr = tradedPriceStr;
+    }
+
+    public String getTradedBalanceStr() {
+        return tradedBalanceStr;
+    }
+
+    public void setTradedBalanceStr(String tradedBalanceStr) {
+        this.tradedBalanceStr = tradedBalanceStr;
     }
 }

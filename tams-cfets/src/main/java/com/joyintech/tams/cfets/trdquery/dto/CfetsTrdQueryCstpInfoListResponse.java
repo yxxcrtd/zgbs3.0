@@ -76,8 +76,12 @@ public class CfetsTrdQueryCstpInfoListResponse {
 
     @ApiModelProperty(name="faceValue",value="券面总额",example="1")
     private BigDecimal faceValue;
+
     @ApiModelProperty(name="tradeYield",value="成交价/回购利率",example="1")
     private BigDecimal tradeYield;
+
+    @ApiModelProperty(name="tenderTarget",value="招标标的",example="1")
+    private String tenderTarget;
 
     @ApiModelProperty(name="termDays",value="期限（天）",example="1")
     private BigDecimal termDays;
@@ -243,8 +247,6 @@ public class CfetsTrdQueryCstpInfoListResponse {
     @ApiModelProperty(name="mdeliveryType",value="到期结算方式",example="字符串1")
     private String mdeliveryType;
 
-
-
     public String getMatchStatus() {
         return matchStatus;
     }
@@ -272,7 +274,7 @@ public class CfetsTrdQueryCstpInfoListResponse {
     public String getBusinesstypeStr() {
         if(StringUtil.equals("BOND",getBusinesstype())){
             return "现券买卖";
-        }else{
+        }else {
             return "质押式回购";
         }
         //return SysDataUtil.getNameFromDataDict(DictCode.CSTP资产类型, getBusinesstype());
@@ -824,5 +826,13 @@ public class CfetsTrdQueryCstpInfoListResponse {
 
     public void setRepoTypeStr(String repoTypeStr) {
         this.repoTypeStr = repoTypeStr;
+    }
+
+    public String getTenderTarget() {
+        return tenderTarget;
+    }
+
+    public void setTenderTarget(String tenderTarget) {
+        this.tenderTarget = tenderTarget;
     }
 }

@@ -337,4 +337,16 @@ public interface IAssetInfo extends IBusiness {
      */
     String getCustomerObjType();
     // add by zhangrui1 增加资产属性:机构主体类型 end
+
+    /**
+     * 取得 债券风险五级分类
+     * @return 债券风险五级分类
+     */
+    String getBondRiskType();
+
+    /**
+     * 债券是否存在应收款
+     * @return
+     */
+    public String getIsExistRecAst();
 }

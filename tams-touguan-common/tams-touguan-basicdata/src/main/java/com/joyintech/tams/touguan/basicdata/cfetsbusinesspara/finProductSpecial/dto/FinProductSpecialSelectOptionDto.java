@@ -1,7 +1,11 @@
 package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto;
 
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.Objects;
 
 /**
  * 特殊债券下拉框信息
@@ -12,25 +16,43 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "特殊债券信息", description = "特殊债券信息")
 public class FinProductSpecialSelectOptionDto {
 
-    @ApiModelProperty(name = "finprodMarketId", value = "债券代码")
-    private String finprodMarketId;
+    @ApiModelProperty(name = "id", value = "债券代码")
+    private String id;
 
-    @ApiModelProperty(name = "finprodAbbr", value = "债券简称")
-    private String finprodAbbr;
+    @ApiModelProperty(name = "text", value = "债券简称")
+    private String text;
 
-    public String getFinprodMarketId() {
-        return finprodMarketId;
+    @ApiModelProperty(name = "type", value = "资产二级分类")
+    private String type;
+
+    public String getId() {
+        return id;
     }
 
-    public void setFinprodMarketId(String finprodMarketId) {
-        this.finprodMarketId = finprodMarketId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getFinprodAbbr() {
-        return finprodAbbr;
+    public String getText() {
+        return text;
     }
 
-    public void setFinprodAbbr(String finprodAbbr) {
-        this.finprodAbbr = finprodAbbr;
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getIsAbs() {
+        if (Objects.nonNull(this.getType()) && this.getType().equals(DictCodeListExt3.行内资产三级分类_资产支持证券.getValue())) {
+            return DictCodeList.是否_是.getValue();
+        }
+        return DictCodeList.是否_否.getValue();
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

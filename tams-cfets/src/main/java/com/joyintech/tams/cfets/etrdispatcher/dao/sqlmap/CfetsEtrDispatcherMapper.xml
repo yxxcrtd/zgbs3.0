@@ -16,7 +16,7 @@
         case
         when FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01'  THEN
         FIN_PRODUCT_ISSUE.ISSUE_DATE
-        else FIN_PRODUCT_ISSUE.TENDER_SDATE
+        else nvl(FIN_PRODUCT_ISSUE.ISSUE_DATE,FIN_PRODUCT_ISSUE.TENDER_EDATE)
         end as issueDate,
         CASE WHEN FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02', '03') THEN '01'
         ELSE NULL
@@ -74,10 +74,16 @@
             SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
             else to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
             END
-        WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F17' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02','03')  THEN  TO_CHAR(BIDT.BID_PRICE)
+        WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F17' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02','03')  THEN
+            CASE  WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
+            WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
+            WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
+            ELSE bobp.BID_PRICE
+            END
         WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN ('F05', 'F04', 'F03', 'F09', 'F06', 'F02') THEN TO_CHAR(round( 0, 4 ))
         WHEN ETR_ENTRUST.PS IN ('T68', 'T69') THEN TO_CHAR(ETR_ENTRUST.PRICE * 100)
         WHEN ETR_ENTRUST.PS IN ('T56', 'T93', 'T94', 'T95', 'T96') THEN TO_CHAR(ETR_ENTRUST.PRICE * 100)
+        WHEN ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' THEN TO_CHAR(decode(ETR_ENTRUST_ADD.PRICE_TYPE,'01',ROUND(ETR_ENTRUST.PRICE,4),'02',ROUND(ETR_ENTRUST_ADD.FULL_PRICE,4)))
         ELSE TO_CHAR(nvl(round(decode(btm.busi_type, '02', decode(ETR_ENTRUST_ADD.CALCULATE_FIELD, 'price', ETR_ENTRUST.PRICE, 'exerYield', ETR_ENTRUST_ADD.EXER_YIELD * 100, 'matureYield', ETR_ENTRUST_ADD.MATURE_YIELD * 100), '03', ETR_ENTRUST.PRICE, '05', ETR_ENTRUST.PRICE * 100, nvl(ETR_ENTRUST.PRICE , 0)), 4), round(nvl(ETR_ENTRUST.PRICE , 0), 4)))
         END AS etrPrice,
         CASE
@@ -245,7 +251,8 @@
         END AS transRemainderAmt,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi') transmitTimeSer,
-        ETR_ENTRUST_ADD.CALCULATE_FIELD
+        ETR_ENTRUST_ADD.CALCULATE_FIELD,
+        ETR_ENTRUST.TRADE_PLAT tradePlat
         FROM (SELECT * FROM ETR_ENTRUST  ORDER BY ENTRUST_DATE DESC) ETR_ENTRUST
         LEFT JOIN PTL_PORTFOLIO ON PTL_PORTFOLIO.PORTFOLIO_ID = ETR_ENTRUST.PORTFOLIO_ID
         LEFT JOIN FIN_PRODUCT ON FIN_PRODUCT.FINPROD_ID = ETR_ENTRUST.FINPROD_ID
@@ -346,13 +353,24 @@
                 PTL_PORTFOLIO
                 ON ETR_ENTRUST_DETAIL.portfolio_id = PTL_PORTFOLIO.portfolio_id
             GROUP BY ENTRUST_ID ) det on det.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
-        LEFT JOIN (
-            SELECT
-            LISTAGG(TO_CHAR(BID_PRICE,'FM9999999999999990.9000') , ',') WITHIN GROUP (ORDER BY (BID_PRICE)) BID_PRICE,
-            ENTRUST_ID
-            FROM ETR_ENTRUST_BID_PRICE
-            GROUP BY ENTRUST_ID
-        ) BIDT ON BIDT.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
+        LEFT JOIN
+            (select listagg(case
+            when t3.TENDER_TARGET = '01'
+            then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
+            when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
+            when t3.TENDER_TARGET = '03'
+            then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
+            end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
+            t0.ENTRUST_ID
+            from ETR_ENTRUST_BID_PRICE t0
+            LEFT JOIN ETR_ENTRUST t1 on t1.ENTRUST_ID = t0.ENTRUST_ID
+            LEFT JOIN FIN_PRODUCT t2
+            ON t2.FINPROD_ID = t1.FINPROD_ID
+            LEFT JOIN
+            FIN_PRODUCT_ISSUE t3
+            ON t3.FINPROD_ID = t2.FINPROD_ID
+            group by t0.ENTRUST_ID) bobp
+        ON bobp.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
         LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on FIN_PRODUCT_ISSUE.INT_RATE_ID = SDLDATA.ITEM_CODE
             LEFT JOIN (
             SELECT
@@ -382,7 +400,7 @@
                 OR ETR_ENTRUST.PORTFOLIO_ID IS NULL)
             </if>
             <if test="ps != null and ps!='' ">
-                AND (case
+                <!--AND (case
                 <if test="IRSType_01.equals(IRSps) or IRSType_02.equals(IRSps) or PS_T01.equals(ps)">
                     when  ETR_ENTRUST_ADD.ASSET_TYPE IN (#{ASSET_TYPE_16})
                     then  ETR_ENTRUST_ADD.BUSI_PS
@@ -392,7 +410,18 @@
                     then  ETR_ENTRUST_ADD.BUSI_PS
                 </if>
                 else  ETR_ENTRUST.PS
-                end) =#{ps}
+                end) =#{ps}-->
+                AND (
+                case
+                WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN (#{ASSET_TYPE_16})
+                THEN ETR_ENTRUST_ADD.BUSI_PS
+                WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN (#{ASSET_TYPE_07}, #{ASSET_TYPE_10}, #{ASSET_TYPE_12},#{ASSET_TYPE_16})
+                THEN ETR_ENTRUST_ADD.BUSI_PS
+                WHEN ETR_ENTRUST.PS IN ('T56', 'T92', 'T93','T94','T95','T96')
+                THEN ETR_ENTRUST_ADD.BUSI_PS
+                ELSE  ETR_ENTRUST.PS
+                END
+                ) = #{ps}
             </if>
             <if test="finprodType2 != null and finprodType2!='' ">
                 AND ETR_ENTRUST_ADD.ASSET_TYPE  = #{finprodType2}
@@ -480,40 +509,47 @@
     <sql id="vagueQueryWhere">
         <if test="search != null and search != '' and search !='有效' ">
             <where>
-                (sdl.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl1.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl2.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl3.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl4.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl5.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl6.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl7.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl8.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl9.ITEM_VALUE like '%' || #{search} || '%'
-                OR t.entrustId like '%' || #{search} || '%'
-                OR t.invManagerId like '%' || #{search} || '%'
-                OR t.invManagerName like '%' || #{search} || '%'
-                OR t.realName like '%' || #{search} || '%'
-                OR t.trader like '%' || #{search} || '%'
-                OR t.portfolioId like '%' || #{search} || '%'
-                OR t.portfolioName like '%' || #{search} || '%'
-                OR t.finprodMarketId like '%' || #{search} || '%'
-                OR t.finprodAbbr like '%' || #{search} || '%'
-                OR t.remark like '%' || #{search} || '%'
-                OR t.secAcctId like '%' || #{search} || '%'
-                OR t.entrustAmt||'' = #{search}
-                OR t.etrPrice||'' = #{search}
-                OR t.termDays||'' = #{search}
-                OR t.exeProgress||'' = #{search}
-                OR t.dealProgress||'' = #{search}
-                OR TO_CHAR(t.issueDate,'yyyy-MM-dd') ||''= #{search}
-                OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{search}
-                OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{year}||'-'||#{search}
-                OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{search}
-                OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
-                OR t.transmitTime = #{search}
-                OR t.transmitTimeSer = #{search}
-                )
+            <choose>
+                <when test="search.length() > 10">
+                    t.entrustId like '%' || #{search} || '%'
+                </when>
+                <otherwise>
+                    (sdl.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl1.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl2.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl3.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl4.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl5.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl6.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl7.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl8.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl9.ITEM_VALUE like '%' || #{search} || '%'
+                    OR t.entrustId like '%' || #{search} || '%'
+                    OR t.invManagerId like '%' || #{search} || '%'
+                    OR t.invManagerName like '%' || #{search} || '%'
+                    OR t.realName like '%' || #{search} || '%'
+                    OR t.trader like '%' || #{search} || '%'
+                    OR t.portfolioId like '%' || #{search} || '%'
+                    OR t.portfolioName like '%' || #{search} || '%'
+                    OR t.finprodMarketId like '%' || #{search} || '%'
+                    OR t.finprodAbbr like '%' || #{search} || '%'
+                    OR t.remark like '%' || #{search} || '%'
+                    OR t.secAcctId like '%' || #{search} || '%'
+                    OR t.entrustAmt||'' = #{search}
+                    OR t.etrPrice||'' = #{search}
+                    OR t.termDays||'' = #{search}
+                    OR t.exeProgress||'' = #{search}
+                    OR t.dealProgress||'' = #{search}
+                    OR TO_CHAR(t.issueDate,'yyyy-MM-dd') ||''= #{search}
+                    OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{search}
+                    OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{year}||'-'||#{search}
+                    OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{search}
+                    OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+                    OR t.transmitTime = #{search}
+                    OR t.transmitTimeSer = #{search}
+                    )
+                </otherwise>
+            </choose>
             </where>
         </if>
     </sql>
@@ -1454,6 +1490,31 @@
         LEFT JOIN BID_ORDER_BID_PRICE T10  ON T10.ENTRUST_ID = T9.ENTRUST_ID AND T10.BID_PRICE = T9.BID_PRICE
         where T9.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
         GROUP BY T9.ENTRUST_ID, T10.BID_ID, T10.IS_WIN,T10.TRADE_ID
+    </select>
+
+    <select id="getEtrFirstBidInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListResponse">
+        SELECT ee.ENTRUST_ID entrustId,
+               trunc(nvl(efs.ENT_FINISH_AMT, 0), 2)               execFinishAmt,
+               trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0)),2) execRemainderAmt,
+               trunc(nvl(efs.ENT_FINISH_AMT, 0) /
+                     case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+               100                                      exeProgress,
+               trunc(nvl(tpd.SHARE_AMT * 100, 0),2)                   transFinishAmt,
+               trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0)),2) transRemainderAmt,
+               trunc(nvl(tpd.SHARE_AMT * 100, 0) /
+                     case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+               100                                      dealProgress
+        FROM ETR_ENTRUST ee
+        left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
+                   from ETR_FINISH_STATUS
+                   group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
+        left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
+                   from TRD_PRODUCT_DEAL t1
+                            left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+                            where t1.IS_CANCEL = 'N'
+                              and t1.TRADE_STATUS != '03'
+                            group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
+        where ee.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
     </select>
 
     <select id="getEtrDealInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListResponse">

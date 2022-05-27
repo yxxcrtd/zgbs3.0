@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm002Mapper">
+
+    <resultMap type="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto"
+               id="BaseResultMap">
+        <result property="finprodId" column="finprodId" jdbcType="VARCHAR"/>
+        <result property="finprodMarketId" column="finprodMarketId" jdbcType="VARCHAR"/>
+        <result property="finprodAbbr" column="finprodAbbr" jdbcType="VARCHAR"/>
+        <result property="couponSpecies" column="couponSpecies" jdbcType="VARCHAR"/>
+        <result property="ourTrader" column="ourTrader" jdbcType="VARCHAR"/>
+        <result property="ourTraderName" column="ourTraderName" jdbcType="VARCHAR"/>
+        <result property="tenderTarget" column="tenderTarget" jdbcType="VARCHAR"/>
+        <result property="ccy" column="ccy" jdbcType="VARCHAR"/>
+        <result property="bidDateStart" column="bidDateStart" jdbcType="DATE"/>
+        <result property="bidDateEnd" column="bidDateEnd" jdbcType="DATE"/>
+        <result property="payEdate" column="payEdate" jdbcType="DATE"/>
+        <result property="payDate" column="payDate" jdbcType="DATE"/>
+        <result property="assignRegdate" column="assignRegdate" jdbcType="DATE"/>
+        <result property="listingDate" column="listingDate" jdbcType="DATE"/>
+        <result property="circulationDate" column="circulationDate" jdbcType="DATE"/>
+        <result property="biddingMethod" column="biddingMethod" jdbcType="VARCHAR"/>
+        <result property="payType" column="payType" jdbcType="VARCHAR"/>
+        <result property="etrBidPriceTotal" column="etrBidPriceTotal" jdbcType="DECIMAL"/>
+        <result property="totalBiddingNum" column="totalBiddingNum" jdbcType="DECIMAL"/>
+        <result property="bidPriceTotal" column="bidPriceTotal" jdbcType="DECIMAL"/>
+        <result property="payType" column="payType" jdbcType="VARCHAR"/>
+        <result property="winPrice" column="winPrice" jdbcType="DECIMAL"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="intAmt" column="intAmt" jdbcType="DECIMAL"/>
+        <result property="settFeeAmt" column="settFeeAmt" jdbcType="DECIMAL"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="adjustStrategy" column="adjustStrategy" jdbcType="VARCHAR"/>
+        <result property="dipType" column="dipType" jdbcType="VARCHAR"/>
+        <result property="bidId" column="bidId" jdbcType="VARCHAR"/>
+        <result property="adjustStrategy" column="adjustStrategy" jdbcType="VARCHAR"/>
+        <result property="tradeMarket" column="tradeMarket" jdbcType="VARCHAR"/>
+        <result property="registOrg" column="registOrg" jdbcType="VARCHAR"/>
+        <result property="counterId" column="counterId" jdbcType="VARCHAR"/>
+        <result property="counterName" column="counterName" jdbcType="VARCHAR"/>
+        <collection property="productDtos" ofType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmProductDto"
+                    javaType="java.util.ArrayList" >
+            <result property="entrustId" column="ENTRUST_ID" jdbcType="VARCHAR"/>
+            <result property="portfolioId" column="PORTFOLIO_ID" jdbcType="VARCHAR"/>
+            <result property="portfolioName" column="PORTFOLIO_NAME" jdbcType="VARCHAR"/>
+            <result property="totalBiddingNum" column="THE_WIN_PRIN_AMT" jdbcType="DECIMAL"/>
+            <result property="etrBidPriceTotal" column="ENTRUST_NUM" jdbcType="DECIMAL"/>
+            <result property="avaNum" column="avaNum" jdbcType="DECIMAL"/>
+            <result property="entrustNum" column="ENTRUST_NUM" jdbcType="DECIMAL"/>
+            <result property="bidPrinAmt" column="BID_PRIN_AMT" jdbcType="DECIMAL"/>
+            <result property="bidPriceTotal" column="TRADE_AMT" jdbcType="DECIMAL"/>
+            <result property="settFeeAmt" column="SETT_FEE_AMT" jdbcType="DECIMAL"/>
+            <result property="tradeAmt" column="TRADE_AMT" jdbcType="DECIMAL"/>
+            <result property="intAmt" column="UNIT_INT" jdbcType="DECIMAL"/>
+            <result property="payAmt" column="PAYABLE_AMOUNT" jdbcType="DECIMAL"/>
+            <result property="bidPrice" column="BID_PRICE" jdbcType="DECIMAL"/>
+            <result property="businessModel" column="INV_AIM" jdbcType="VARCHAR"/>
+            <result property="secManageAcctId" column="SEC_ACCT_ID" jdbcType="VARCHAR"/>
+            <result property="secManageAcctIdName" column="SEC_ACCT_NAME" jdbcType="VARCHAR"/>
+            <result property="invManagerId" column="INV_MANAGER_ID" jdbcType="VARCHAR"/>
+            <result property="invManagerName" column="INV_MANAGER_NAME" jdbcType="VARCHAR"/>
+            <result property="bidId" column="bidId" jdbcType="VARCHAR"/>
+            <result property="counterId" column="COUNTER_ID" jdbcType="VARCHAR"/>
+            <result property="counterName" column="COUNTER_NAME" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectProductsInit" resultMap="BaseResultMap">
+        select distinct ee.FINPROD_ID                    finprodId,
+                fp.FINPROD_MARKET_ID             finprodMarketId/*资产代码*/,
+                fp.FINPROD_ABBR                  finprodAbbr/*资产简称*/,
+                fp.COUPON_SPECIES                couponSpecies/*息票品种*/,
+                fp.TRADE_MARKET                  tradeMarket/*交易场所*/,
+                fp.REGIST_ORG                    registOrg,
+                #{loginUserId} ourTrader/*本方交易员*/,
+                ee.COUNTER_ID counterId/*交易对手*/,
+                MCP.COUNTER_NAME counterName/*交易对手*/,
+                fpi.TENDER_TARGET tenderTarget/*招标标的*/,
+                fp.CCY ccy /*币种*/,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND fpi.TENDER_TYPE IN (#{TENDER_TYPE_01}, #{TENDER_TYPE_02})
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN (#{TENDER_TYPE_03}, #{TENDER_TYPE_04})))
+                       OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
+                       THEN fpi.TENDER_SDATE
+                   END                       AS bidDateStart/*投标日 开始*/,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND fpi.TENDER_TYPE IN (#{TENDER_TYPE_01}, #{TENDER_TYPE_02})
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN (#{TENDER_TYPE_03}, #{TENDER_TYPE_04})))
+                       OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
+                       THEN fpi.TENDER_SDATE
+                   END                       AS bidDateEnd/*投标日 结束*/,
+                fpi.PAY_EDATE payEdate/*缴款截止日*/,
+                fpi.PAY_DATE payDate/*缴款日*/,
+                fpi.ASSIGN_REGDATE assignRegdate/*债权债务登记日*/,
+               CASE
+                   WHEN fp.CIRCULATION_DATE IS NOT NULL THEN fp.CIRCULATION_DATE
+                   ELSE fpa.LISTING_DATE end AS listingDate/*上市日*/,
+               fp.CIRCULATION_DATE circulationDate /*上市流通日*/,
+               CASE
+                   WHEN
+                           (
+                                   fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND
+                                   fpi.TENDER_TYPE IN (#{TENDER_TYPE_01}, #{TENDER_TYPE_02}) AND
+                                   fpi.ISSUE_DATE <![CDATA[<]]> TO_DATE(#{sysDate,jdbcType=VARCHAR},'YYYY-MM-DD')
+                               )
+                           OR
+                           (((fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND
+                              (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN (#{TENDER_TYPE_03}, #{TENDER_TYPE_04}))
+                                 ) OR
+                             fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
+                                ) AND
+                            fpi.TENDER_EDATE <![CDATA[<]]> TO_DATE(#{sysDate,jdbcType=VARCHAR},'YYYY-MM-DD')
+                               ) THEN #{WIN_TYPE_03}
+                   ELSE #{WIN_TYPE_01} END           AS biddingMethod/*投标方式*/,
+                    ee.ENTRUST_ID/*指令代码*/,
+                    eed.PORTFOLIO_ID,
+                    pp.PORTFOLIO_NAME/*组合名称*/,
+                    eed.ACCT_NO/*资金账户*/,
+                    eebp.BID_PRICE/*投标标位*/,
+                    eed.INV_AIM/*业务模式*/,
+                    eed.SEC_ACCT_ID/*证券账户*/,
+                    ssai.SEC_ACCT_NAME/*证券账户*/,
+                    ee.INV_MANAGER_ID/*投资经理ID*/,
+                    SU.REAL_NAME INV_MANAGER_NAME/*投资经理*/,
+                    eed.ENTRUST_NUM*100 ENTRUST_NUM /*委托券面总额*/,
+                    eed.ENTRUST_NUM*100 avaNum /*剩余券面总额*/,
+                    eebp.BID_PRIN_AMT*100 BID_PRIN_AMT /*委托投标券面*/
+        from ETR_ENTRUST ee
+                 left join ETR_ENTRUST_DETAIL eed on ee.ENTRUST_ID = eed.ENTRUST_ID
+                 left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                 left join ETR_ENTRUST_BID_PRICE eebp on eebp.ENTRUST_ID = ee.ENTRUST_ID and eed.PORTFOLIO_ID = eebp.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = ee.FINPROD_ID
+                 left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = ee.FINPROD_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
+                 LEFT JOIN SYS_USER SU ON ee.INV_MANAGER_ID = SU.USER_NAME
+                 LEFT JOIN STL_SEC_ACCT_INFO ssai ON eed.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+                 LEFT JOIN MST_COUNTER_PARTY MCP ON ee.COUNTER_ID = MCP.COUNTER_ID
+        <where>
+            <if test="entrustIdList != null and entrustIdList.size()>0">
+                ee.ENTRUST_ID in
+                <foreach collection="entrustIdList" open=" (" close=") " separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+
+    </select>
+    <select id="selectBidModelInData" resultType="java.lang.String">
+        select BID_MODLE
+        from (
+                 select distinct t1.BID_MODLE, t2.ENTRUST_ID
+                 from BID_ORDER t1
+                          left join BID_ORDER_BID_PRICE t2 on t1.BID_ID = t2.BID_ID
+                 where t1.IS_CANCEL = 'N'
+                   and t1.TRADE_STATUS = '01'
+                 union all
+                 select distinct t1.BID_MODLE, t2.ENTRUST_ID
+                 from WFL_BID_ORDER t1
+                          left join WFL_BID_ORDER_BID_PRICE t2 on t1.BID_ID = t2.BID_ID
+             )
+        where BID_MODLE = '03'
+        <if test="entrustIdList != null and entrustIdList.size()>0">
+            and ENTRUST_ID in
+            <foreach collection="entrustIdList" open=" (" close=") " separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        and ROWNUM = 1
+    </select>
+
+    <select id="selectBidFirmCountByEntrustId" resultType="java.lang.Integer">
+        select count(*)
+        from (
+        select distinct bo.BID_ID
+        from BID_ORDER bo
+        left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+        where bo.IS_CANCEL = 'N'
+        and bo.TRADE_STATUS = '01'
+        <if test="bidModles != null and bidModles.size()>0">
+            and bo.BID_MODLE in
+            <foreach collection="bidModles" open=" (" close=") " separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustIdList != null and entrustIdList.size()>0">
+            and bobp.ENTRUST_ID in
+            <foreach collection="entrustIdList" open=" (" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        union all
+        select distinct bo.BID_ID
+        from Wfl_BID_ORDER bo
+        left join Wfl_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+        where
+        <if test="bidModles != null and bidModles.size()>0">
+            and bo.BID_MODLE in
+            <foreach collection="bidModles" open=" (" close=") " separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustIdList != null and entrustIdList.size()>0">
+            and bobp.ENTRUST_ID in
+            <foreach collection="entrustIdList" open=" (" close=") " separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        )
+    </select>
+
+    <update id="updateBidOrder">
+        UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark} WHERE BID_ID = #{bidId}
+    </update>
+
+    <update id="updateBidOrderBidPrice">
+        UPDATE BID_ORDER_BID_PRICE SET IS_CANCEL  = 'Y' WHERE BID_ID  = #{bidId}
+    </update>
+    <!--根据投标编号查看一级投标确认交易信息-->
+    <select id="viewPage" resultMap="BaseResultMap">
+        select bo.FINPROD_ID           finprodId,
+               fp.FINPROD_MARKET_ID    finprodMarketId,
+               fp.FINPROD_ABBR         finprodAbbr,
+               bo.OUR_TRADER           ourTrader,
+               mcct.TRADER_NAME        ourTraderName,
+               fpi.TENDER_TARGET       tenderTarget/*招标标的*/,
+               fp.CCY  ccy,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                       OR fpi.ISSUE_CLASS = '03'
+                       THEN fpi.TENDER_SDATE
+                   END           AS bidDateStart/*投标日 开始*/,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                       OR fpi.ISSUE_CLASS = '03'
+                       THEN fpi.TENDER_SDATE
+                   END           AS bidDateEnd/*投标日 结束*/,
+               bo.PAY_DATE          payDate/*缴款日*/,
+               fpi.PAY_EDATE          payEdate/*缴款截止日*/,
+               bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
+               bo.ONMARKET_DATE     listingDate/*上市日*/,
+               bo.BID_MODLE      AS biddingMethod/*投标方式*/,
+               bo.PAY_TYPE       AS payType/*缴款方式*/,
+               ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+               bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
+               bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
+               case
+                   when fpi.TENDER_TARGET = '01' then bo.WIN_PRICE * 100
+                   when fpi.TENDER_TARGET = '02' then bo.WIN_PRICE
+                   when fpi.TENDER_TARGET = '03' then bo.WIN_PRICE * 10000
+                   end              winPrice/*中标标位*/,
+               bo.UNIT_INT   /*应计利息*/,
+               bo.SETT_FEE_AMT    settFeeAmt/*结算服务费*/,
+               bo.REMARK       AS remark/*备注*/,
+               bobp.ENTRUST_ID,
+               bobp.PORTFOLIO_ID,
+               pp.PORTFOLIO_NAME,
+               bobp.THE_WIN_PRIN_AMT /*汇总投标券面总额*/,
+               bobp.SETT_FEE_AMT/*结算服务费*/,
+               bobp.TRADE_AMT/*交易金额*/,
+               bobp.INT_AMT/*应计利息总额*/,
+               bobp.PAYABLE_AMOUNT/*缴款金额*/,
+               bobp.BID_PRICE/*标位*/,
+               eed.INV_AIM/*业务模式*/,
+               eed.SEC_ACCT_ID,
+               ssai.SEC_ACCT_NAME,
+               bo.dip_Type dipType/*分配方式*/,
+               bo.dip_Type adjustStrategy/*调整策略*/,
+               ee.INV_MANAGER_ID invManagerId,
+               su.REAL_NAME     invManagerName,
+               ROWNUM rn
+        from BID_ORDER bo
+                 left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                 left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID  = bobp.ENTRUST_ID
+                 left join ETR_ENTRUST_DETAIL eed on bobp.ENTRUST_ID = eed.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
+                 left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
+                 left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                 left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+                 left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+        where bo.BID_ID = #{bidId}
+        union all
+        select bo.FINPROD_ID           finprodId,
+               fp.FINPROD_MARKET_ID    finprodMarketId,
+               fp.FINPROD_ABBR         finprodAbbr,
+               bo.OUR_TRADER           ourTrader,
+               mcct.TRADER_NAME        ourTraderName,
+               fpi.TENDER_TARGET       tenderTarget/*招标标的*/,
+               fp.CCY  ccy,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                       OR fpi.ISSUE_CLASS = '03'
+                       THEN fpi.TENDER_SDATE
+                   END           AS bidDateStart/*投标日 开始*/,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                       OR fpi.ISSUE_CLASS = '03'
+                       THEN fpi.TENDER_SDATE
+                   END           AS bidDateEnd/*投标日 结束*/,
+               bo.PAY_DATE          payDate/*缴款日*/,
+               fpi.PAY_EDATE          payEdate/*缴款截止日*/,
+               bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
+               bo.ONMARKET_DATE     listingDate/*上市日*/,
+               bo.BID_MODLE      AS biddingMethod/*投标方式*/,
+               bo.PAY_TYPE       AS payType/*缴款方式*/,
+               ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+               bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
+               bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
+               case
+                   when fpi.TENDER_TARGET = '01' then bo.WIN_PRICE * 100
+                   when fpi.TENDER_TARGET = '02' then bo.WIN_PRICE
+                   when fpi.TENDER_TARGET = '03' then bo.WIN_PRICE * 10000
+                   end              winPrice/*中标标位*/,
+               bo.UNIT_INT   /*应计利息*/,
+               bo.SETT_FEE_AMT    settFeeAmt/*结算服务费*/,
+               bo.REMARK       AS remark/*备注*/,
+               bobp.ENTRUST_ID,
+               bobp.PORTFOLIO_ID,
+               pp.PORTFOLIO_NAME,
+               bobp.THE_WIN_PRIN_AMT /*汇总投标券面总额*/,
+               bobp.SETT_FEE_AMT/*结算服务费*/,
+               bobp.TRADE_AMT/*交易金额*/,
+               bobp.INT_AMT/*应计利息总额*/,
+               bobp.PAYABLE_AMOUNT/*缴款金额*/,
+               bobp.BID_PRICE/*标位*/,
+               eed.INV_AIM/*业务模式*/,
+               eed.SEC_ACCT_ID,
+               ssai.SEC_ACCT_NAME,
+               bo.dip_Type dipType/*分配方式*/,
+               bo.dip_Type adjustStrategy/*调整策略*/,
+               ee.INV_MANAGER_ID invManagerId,
+               su.REAL_NAME     invManagerName,
+               ROWNUM rn
+        from WFL_BID_ORDER bo
+                 left join WFL_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                 left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID  = bobp.ENTRUST_ID
+                 left join ETR_ENTRUST_DETAIL eed on bobp.ENTRUST_ID = eed.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
+                 left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
+                 left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                 left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+                 left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+        where bo.BID_ID = #{bidId}
+    </select>
+
+    <select id="getRate" resultType="java.math.BigDecimal">
+        select NVl(fri.BENCHMARK_ID_ACCURACY, 1) * nvl(fri.COEFFICIENT, 1)*nvl(miri.INT_RATE,0) + NVl(fri.SPREAD_RATE, 0)
+        from FIN_RATE_INFO fri
+        left join MST_INT_RATE_INFO miri on fri.BENCHMARK_ID = miri.INT_RATE_ID
+        where fri.EFF_DATE <![CDATA[<=]]> to_date('yyyy-MM-dd',#{sysDate})
+            and miri.EFF_DATE <![CDATA[<=]]> to_date('yyyy-MM-dd',#{sysDate})
+            and fri.FINPROD_ID = #{finprodId}
+            and ROWNUM = 1
+        order by fri.EFF_DATE desc ,miri.EFF_DATE desc
+    </select>
+</mapper>

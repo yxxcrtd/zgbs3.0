@@ -10,16 +10,11 @@ import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-
-import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
 
 @ApiModel(value = "委托报文", description = "委托报文")
 public class EntrustVo extends BaseEntity implements Serializable, EntrustInterface, Cloneable, KeyMethodInterface<String> {
@@ -241,6 +236,10 @@ public class EntrustVo extends BaseEntity implements Serializable, EntrustInterf
     @ApiModelProperty(name = "bondVolume", value = "折合标准券(展示)")
     @Digits(integer = 20, fraction = 4)
     private BigDecimal bondVolume;
+
+    @ApiModelProperty(name = "entrustPirceView", value = "委托价格(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal entrustPriceView;
 
     @Override
     public boolean isNoCancelEntrust() {
@@ -479,12 +478,6 @@ public class EntrustVo extends BaseEntity implements Serializable, EntrustInterf
     }
 
     public BigDecimal getCancelBalance() {
-        if (投管业务类型_通用式质押回购.getValue().equals(busiTypeTg)) {
-            return BigDecimal.valueOf(cancelVolume * 100);
-        } else if (entrustPrice != null) {
-            return entrustPrice.multiply(BigDecimal.valueOf(cancelVolume));
-        }
-
         return cancelBalance;
     }
 
@@ -810,6 +803,14 @@ public class EntrustVo extends BaseEntity implements Serializable, EntrustInterf
 
     public void setBondVolume(BigDecimal bondVolume) {
         this.bondVolume = bondVolume;
+    }
+
+    public BigDecimal getEntrustPriceView() {
+        return entrustPriceView;
+    }
+
+    public void setEntrustPriceView(BigDecimal entrustPriceView) {
+        this.entrustPriceView = entrustPriceView;
     }
 
     public static EntrustVo getTemplateEntrust() {

@@ -210,7 +210,7 @@ public class InvestRiskManagement extends BaseService {
         long entrustVolume = entrust.getEntrustVolume();
 
         List<PortfolioCalculateResponse> calculateList = portfolioManager.getCalculateList(
-                instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume);
+                instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume,entrust.getEntrustProp());
 
         List<ReqRiskTrigger> list = Lists.newArrayList();
         int portfolioNum = calculateList.size();
@@ -408,7 +408,7 @@ public class InvestRiskManagement extends BaseService {
 
         }
         List<PortfolioCalculateResponse> calculateList = portfolioManager.getCalculateList(
-                instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume);
+                instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume,entrust.getEntrustProp());
 
         List<ReqRiskOccupy> list = Lists.newArrayList();
         int portfolioNum = calculateList.size();

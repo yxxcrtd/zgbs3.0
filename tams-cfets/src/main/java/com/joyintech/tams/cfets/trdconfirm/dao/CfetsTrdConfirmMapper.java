@@ -3,12 +3,14 @@ package com.joyintech.tams.cfets.trdconfirm.dao;
 
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
+import com.joyintech.tams.common.base.entity.BidOrder;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.FinProductAdd;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -278,4 +280,7 @@ public interface CfetsTrdConfirmMapper {
      * @return int
      */
     List<EtrEntrust> selectEtrEntrustEByFinprodId(@Param("finprodIds") List<String> finprodIds);
+
+
+    BigDecimal selectEtrNum(@Param("portfolioId") String finprodId,@Param("entrustId") String entrustId);
 }

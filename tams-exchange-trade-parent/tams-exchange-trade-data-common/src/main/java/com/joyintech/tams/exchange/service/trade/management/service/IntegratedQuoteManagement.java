@@ -148,18 +148,21 @@ public class IntegratedQuoteManagement {
         negotiateQuoteSendBean.setFullPrice(integratedEntrust.getFullPrice());
         negotiateQuoteSendBean.setEntrustPrice(integratedEntrust.getEntrustPrice());
         negotiateQuoteSendBean.setEntrustBalance(integratedEntrust.getEntrustBalance());
-        negotiateQuoteSendBean.setMemberId(integratedEntrust.getDealerId());
-        negotiateQuoteSendBean.setTraderCode(integratedEntrust.getTradeId());
-        negotiateQuoteSendBean.setInvestorId(integratedEntrust.getInvestorId());
+        negotiateQuoteSendBean.setMemberId(integratedEntrust.getDealerName());
+        negotiateQuoteSendBean.setTraderCode(integratedEntrust.getTradeName());
+        negotiateQuoteSendBean.setInvestorId(integratedEntrust.getInvestorName());
         negotiateQuoteSendBean.setInvestorType(integratedEntrust.getOwnerType());
-        negotiateQuoteSendBean.setCpMemberId(integratedEntrust.getPropDealerId());
-        negotiateQuoteSendBean.setCpTraderCode(integratedEntrust.getPropTradeId());
-        negotiateQuoteSendBean.setCpInvestorId(integratedEntrust.getPropInvestorId());
+        negotiateQuoteSendBean.setCpMemberId(integratedEntrust.getPropDealerName());
+        negotiateQuoteSendBean.setCpTraderCode(integratedEntrust.getPropTradeName());
+        negotiateQuoteSendBean.setCpInvestorId(integratedEntrust.getPropInvestorName());
         negotiateQuoteSendBean.setCpInvestorType(integratedEntrust.getPropOwnerType());
         negotiateQuoteSendBean.setConfirmId(integratedEntrust.getContractId());
         negotiateQuoteSendBean.setPositionStr(integratedEntrust.getPositionStr());
         negotiateQuoteSendBean.setRemark(integratedEntrust.getRemark());
         String requestStatusName = EnumUtil.getDescriptionByCode(RequestStatus.class, negotiateQuoteSendBean.getRequestStatus());
+        if (RequestStatus.WAIT_CONFIRM.getCode() == negotiateQuoteSendBean.getRequestStatus()) {
+            requestStatusName = "待对手方确认";
+        }
         negotiateQuoteSendBean.setRequestStatusStr(requestStatusName);
         negotiateQuoteSendBean.setBsStr(EntrustBs.isBuy(negotiateQuoteSendBean.getBs()) ? EntrustBs.BUY.name : EntrustBs.SELL.name);
         String investorTypeName = EnumUtil.getDescriptionByCode(InvestorType.class, negotiateQuoteSendBean.getInvestorType());

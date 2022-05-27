@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.common.utils.SpringContextUtils;
 import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
+import com.joyintech.tams.exchange.service.trade.server.agent.ufx.UfxTradeAgent;
 import com.joyintech.tams.exchange.service.trade.util.http.HttpClientUtil;
 import com.joyintech.tams.exchange.service.trade.util.http.HttpParameter;
 import com.joyintech.tams.exchange.service.trade.util.http.HttpResult;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -50,6 +53,10 @@ public class TradeAgentHelper {
         ResultBean resultBean;
         String accountId = agentInfo.getAccountId();
         boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
+        if (loginStatus && message instanceof Map && "ufx".equals(agentInfo.getAgentType())) {
+            Map map = (Map) message;
+            map.put("password", ((UfxTradeAgent) SpringContextUtils.getBean("ufx")).getAccount(accountId).getTradePwd());
+        }
         if (!loginStatus && agentInfo.getFunctionCode() != 4) {
             return new ResultBean(ErrorCode.ACCOUNT_NOT_LOGIN);
         }
@@ -66,10 +73,17 @@ public class TradeAgentHelper {
                 String data = JsonUtils.getJsonFromObject(jsonObject.get("data"));
                 resultBean = JsonUtils.getObjectFromJson(data, ResultBean.class);
             }
-
+            JSONObject jData = null;
+            // xiazelei 20220402 error_info判断登录过期时使用；
+            // "error_info": "[330030][登录已过期，请重新登录]\r\n[client_id=030800006116,fund_account=21506238,error_no_t=-17]\n",
+            if (resultBean.getData() != null && resultBean.getData() instanceof JSONObject) {
+                jData = (JSONObject) resultBean.getData();
+            }
             int errorCode = resultBean.getErrorCode();
-            if (errorCode == ErrorCode.ACCOUNT_NOT_LOGIN.value ||
-                    StringUtils.contains(resultBean.getErrorMsg(), "证书已经过期")) {
+            if (errorCode == ErrorCode.ACCOUNT_NOT_LOGIN.value
+                    || StringUtils.contains(resultBean.getErrorMsg(), "证书已经过期")
+                    || (jData != null && StringUtils.contains(jData.getString("error_info"), "登录已过期"))
+            ) {
                 tradeAgentManager.addAgentLoginStatus(accountId, false);
                 logger.error("{}终端登录状态异常：{}，{}", agentInfo.getAgentType(), accountId, JsonUtils.getJsonFromObject(resultBean));
             }

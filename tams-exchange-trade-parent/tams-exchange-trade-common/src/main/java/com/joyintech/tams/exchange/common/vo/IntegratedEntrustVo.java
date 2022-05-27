@@ -132,6 +132,9 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
     private String tradeId;
 
+    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员")
+    private String tradeName;
+
     @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
     private String dealerId;
 
@@ -146,6 +149,9 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
 
     @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
     private String propTradeId;
+
+    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员")
+    private String propTradeName;
 
     @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
     private String propDealerId;
@@ -315,6 +321,10 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     @ApiModelProperty(name = "cancelVolumeView", value = "撤单数量(展示)")
     @Digits(integer = 20, fraction = 2)
     private BigDecimal cancelVolumeView;
+
+    @ApiModelProperty(name = "entrustPriceView", value = "委托价格(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal entrustPriceView;
 
     public String getSoftSkipMode() {
         return softSkipMode;
@@ -1125,5 +1135,29 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
 
     public void setCancelVolumeView(BigDecimal cancelVolumeView) {
         this.cancelVolumeView = cancelVolumeView;
+    }
+
+    public String getTradeName() {
+        return tradeName;
+    }
+
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
+    public String getPropTradeName() {
+        return propTradeName;
+    }
+
+    public void setPropTradeName(String propTradeName) {
+        this.propTradeName = propTradeName;
+    }
+
+    public BigDecimal getEntrustPriceView() {
+        return entrustPriceView;
+    }
+
+    public void setEntrustPriceView(BigDecimal entrustPriceView) {
+        this.entrustPriceView = entrustPriceView;
     }
 }

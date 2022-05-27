@@ -526,6 +526,18 @@ public class WflEtrEntrustAdd extends WflEtrEntrustAddKey {
      * 投管业务类型
      */
     private String busiTypePosition;
+    /**
+     * 计价模式
+     */
+    private String priceType;
+
+    public String getPriceType() {
+        return priceType;
+    }
+
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
+    }
 
     /**
      * 取得 清算速度

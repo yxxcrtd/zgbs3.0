@@ -6,10 +6,7 @@ import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
@@ -72,24 +69,43 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
+    @Override
+    public void doInsert(FinTenderBondAsset002Dto dto, OperationType type) {
+        if (OperationType.DELETE == type) {
+            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_删除,dto.getWorkflowId());
+        } else if (OperationType.NEW == type) {
+            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_新建,dto.getWorkflowId());
+        } else if (OperationType.MODIFY == type) {
+            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_修改,dto.getWorkflowId());
+        }
+    }
+
+    @Override
+    public void doDelete(String workflowId) {
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setWorkflowId(workflowId);
+        oprHisReq.setBusiDes("作废");
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+    }
 
     @Override
     public String generateTitle(FinTenderBondAsset002Dto entity, OperationType operationType) {
-        return String.format("资产代码(%s) 资产简称(%s)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
-                StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr());
+        String isssueClass = "";
+        if(Objects.nonNull(entity.getIssueDto()) && StringUtil.isNotEmpty(entity.getIssueDto().getIssueClass())) {
+            isssueClass = SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式,entity.getIssueDto().getIssueClass());
+        }
+        return String.format("资产代码(%s) 资产简称(%s) 发行方式(%s)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
+                StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr(),isssueClass);
     }
 
     @Override
     public void doComplete(FinTenderBondAsset002Dto dto, OperationType type) {
         if (OperationType.DELETE == type) {
             this.delete(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_放弃);
         } else if (OperationType.NEW == type) {
             this.insert(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_新建);
         } else if (OperationType.MODIFY == type) {
             this.update(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_修改);
         }
     }
 
@@ -191,6 +207,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        param.put("platformDate",iPlatformDate.getSysDateStr());
         param.put("finprodMarketId", finprodMarketId);
         String finprodId = finTenderBondAssetMapper.selectFinprodId(param);
         if (StringUtil.isNotEmpty(finprodId)) {
@@ -207,13 +224,14 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @return
      */
     public FinTenderBondAsset002Dto getFromInterface(Map<String, String> param) {
-        FinTenderBondAsset002Dto dto = finTenderBondAssetMapper.getProductFromInterface(param);
-        if(dto == null) return dto;
+        List<FinTenderBondAsset002Dto> list = finTenderBondAssetMapper.getProductFromInterface(param);
+        if(CollectionUtils.isEmpty(list)) return null;
+        FinTenderBondAsset002Dto dto = list.get(0);
         dto.setCalModel("price");//默认计算价格
         FinProductTypeConfig config = new FinProductTypeConfig();
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
-        config.setOutputValue1(dto.getType9());
-        config.setOutputValue2(dto.getType10());
+        config.setInputValue2(dto.getType9());
+        config.setInputValue3(dto.getType10());
         List<FinProductTypeConfig> resultTypeList = assetCommonMapper.getAssetThreeType(config);
         if(CollectionUtils.isNotEmpty(resultTypeList)) {
             dto.setType9(resultTypeList.get(0).getInputValue2());
@@ -228,7 +246,10 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             }
             dto.setProductAddDto(addDto);
         }
-        dto.setCapiIncomeFeature(DictCodeList.是否_否.getValue());
+        //dto.setCapiIncomeFeature(DictCodeList.是否_否.getValue());
+        if(list.size() > 1 ) {
+            param.put("flag","Y");
+        }
         dto.setIssueDto(finTenderBondAssetMapper.getProductIssueFromInterface(param));
         return dto;
     }
@@ -283,7 +304,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         FinProductType finProductType = new FinProductType();
         BeanUtil.copyPropertiesIgnoreNull(finProductType, dto);
         finProductType.setBranch(0l);
-        finProductType.setType8(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        finProductType.setType8(DictCodeListExt2.平安资产类型_债券.getValue());
         FinProductTypeConfig config = new FinProductTypeConfig();
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
         config.setInputValue2(dto.getType9());
@@ -304,6 +325,13 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      */
     public void update(FinTenderBondAsset002Dto dto) {
         //采用先删除在插入的方式处理
+        FinProduct product = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+        if(Objects.nonNull(product)) {
+            dto.setRemark(product.getRemark());
+            dto.setCreateTime(product.getCreateTime());
+            dto.setCreateUser(product.getCreateUser());
+            dto.setCreateDept(product.getCreateDept());
+        }
         this.delete(dto);
         this.insert(dto);
     }
@@ -334,11 +362,12 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @param remark
      * @param operType
      */
-    public void saveOperate(String tradeId, String remark, DictCodeListExt3 operType) {
+    public void saveOperate(String tradeId, String remark, DictCodeListExt3 operType,String workFlowId) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
+        oprHisReq.setWorkflowId(workFlowId);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
@@ -429,7 +458,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     public Boolean editCheck(String finprodId) {
         // 同时需要判断该资产是否存在有效上市流通数据，如存在，则不允许修改上市日、上市代码
         Integer qty = finTenderBondAssetMapper.countListing(finprodId);
-        return qty == null ? true : qty > 1 ? false : true;
+        return qty == null ? true : qty > 0 ? false : true;
     }
 
 

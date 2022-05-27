@@ -15,6 +15,8 @@ import com.joyintech.tams.invest.common.prodinfo.dto.IPtlRule;
 
 import java.util.List;
 import com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig;
+import com.joyintech.tams.invest.common.riskinfrds.info.entity.IProdInfo;
+
 import java.util.function.Supplier;
 
 /**
@@ -29,10 +31,10 @@ public interface BussRuleService<V extends IPtlRule>{
 
     /**
      * 匹配规则的组合
-     * @param ruleList
+     * @param rule
      * @return
      */
-    List<String> matchRulePort(V ruleList);
+    List<String> matchRulePort(V rule);
 
     /**
      * 匹配规则的组合
@@ -40,6 +42,13 @@ public interface BussRuleService<V extends IPtlRule>{
      * @return
      */
    <T extends IRskRulePoolConfig> List<String> matchRulePortForPage(List<T> ruleList);
+
+    /**
+     * 匹配组合的规则
+     * @param portEntity
+     * @return
+     */
+    <T extends IProdInfo> void matchRulePortByPort(T portEntity);
 
     /**
      * 查询规则关联指标
