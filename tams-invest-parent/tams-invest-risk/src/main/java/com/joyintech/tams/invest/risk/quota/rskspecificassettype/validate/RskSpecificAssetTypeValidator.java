@@ -39,6 +39,12 @@ public class RskSpecificAssetTypeValidator implements BeanValidator {
 					resultList.add(new ValidMessage("资产代码重复，无法提交!"));
 					return resultList;
 				}
+				// 资产代码作为主键
+				dto.setSpecificId(dto.getFinprodId());
+				if (rskSpecificAssetTypeService.checkBusinessDataInFlow(dto)){
+					resultList.add(new ValidMessage("该资产代码存在流程中数据，无法提交!"));
+					return resultList;
+				}
 			}
 			else{
 				repeatMap.put("repeatCondition","02");
