@@ -946,6 +946,13 @@ public class EntrustUtils {
     }
 
     /**
+     * 判断是否信用保护凭证
+     */
+    public static boolean isCreditProtectionCertificate(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), busiTypeTg);
+    }
+
+    /**
      * 判断是否新债业务
      */
     public static boolean isNewBond(String busiTypeTg) {
