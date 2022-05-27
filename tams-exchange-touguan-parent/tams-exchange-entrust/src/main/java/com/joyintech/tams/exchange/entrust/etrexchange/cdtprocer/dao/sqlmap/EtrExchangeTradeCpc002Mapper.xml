@@ -115,7 +115,7 @@
         left join MST_REPO_PRODUCT T8 on T1.FINPROD_ID = T8.TERM_TYPE
         where T1.TRADE_MARKET in ('03','04')
         AND T2.ASSET_TYPE NOT IN ('F17')
-        AND T1.ENTRUST_TYPE IN (#{ENTRUST_BUSS_TYPE_37})
+        AND T1.ENTRUST_TYPE IN (#{ENTRUST_BUSS_TYPE_30})
         AND T1.CREATE_USER=#{userId}
         <if test="sysDate !=null and !sysDate.equals('')">
             AND T1.ENTRUST_DATE = to_date(#{sysDate},'yyyy-MM-dd')
@@ -255,7 +255,7 @@
         left join MST_REPO_PRODUCT T8 on T1.FINPROD_ID = T8.TERM_TYPE
         where T1.TRADE_MARKET in ('03','04')
         AND T2.ASSET_TYPE NOT IN ('F17')
-        AND T1.ENTRUST_TYPE in (#{ENTRUST_BUSS_TYPE_37})
+        AND T1.ENTRUST_TYPE in (#{ENTRUST_BUSS_TYPE_30})
         AND T1.CREATE_USER=#{userId}
         <if test="sysDate !=null and !sysDate.equals('')">
             AND T1.ENTRUST_DATE = to_date(#{sysDate},'yyyy-MM-dd')
@@ -646,7 +646,7 @@
         LEFT JOIN FIN_PRODUCT b ON a.FINPROD_ID =b.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE c ON a.FINPROD_ID =c.FINPROD_ID
         WHERE   (( b.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37})
-        AND b.TRADE_MARKETin(#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37}) )
+        AND b.TRADE_MARKET in(#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37}) )
         or (b.TRADE_MARKET in (#{SVR_TRADE_MARKET_03} ,#{SVR_TRADE_MARKET_04})))
         AND a.CDATE =#{cdate}
         <if test="portfolioIdList != null">

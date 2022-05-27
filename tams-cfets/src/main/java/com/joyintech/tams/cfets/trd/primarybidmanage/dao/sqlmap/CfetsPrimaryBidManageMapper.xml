@@ -508,6 +508,7 @@
             BO.FINPROD_ID finprodId,
             FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR finprodAbbr,
+            FP.TRADE_MARKET tradeMarket,
             BO.OUR_TRADER   ouTraderId,
             BO.COUNTER_ID     counterId,
             FPI.TENDER_TARGET tenderTarget,

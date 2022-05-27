@@ -373,6 +373,8 @@ public class PortfolioManager extends BaseService {
 
         // 计算结果列表
         List<PortfolioCalculateResponse> list = new ArrayList<>(8);
+     // 订单类型：数量单，指令单
+        boolean isVolume = instruction.volumeInstruction();
         // 计算结果
         PortfolioCalculateResponse calculateResponse = null;
         for (InstructionDetail detail : instructionDetails) {
@@ -394,6 +396,7 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setAcctNo(instruction.getAcctName());
 
             calculateResponse.setEtrSecAmount(detail.getEntrustAmt());
+            calculateResponse.setInstructionLeftNum(isVolume ? instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue() : 0L);
 
             PortfolioDetail portfolioDetail = portfolioDetailMap.get(portfolioId);
             if (ObjectUtil.isNotNull(portfolioDetail)) {
@@ -408,9 +411,7 @@ public class PortfolioManager extends BaseService {
 
             list.add(calculateResponse);
         }
-
-        // 订单类型：数量单，指令单
-        boolean isVolume = instruction.volumeInstruction();
+        
         // 订单数量
         BigDecimal orderVolume = BigDecimal.valueOf(order.getEntrustVolume());
         // 订单金额
@@ -418,6 +419,7 @@ public class PortfolioManager extends BaseService {
 
         if (isVolume && DictCodeListExt3.交易方向_债转股.getValue().equals(instruction.getPs())) {
             long bondPaperValue = 100L;
+//            long totalConNum = list.get(0).getInstructionLeftNum() * bondPaperValue / list.get(0).getEntrustPrice().longValue();
             long totalConNum = list.get(0).getInstructionLeftNum() * bondPaperValue / list.get(0).getEntrustPrice().longValue();
             for (PortfolioCalculateResponse response : list) {
                 response.setConNum(totalConNum * response.getEntrustNum() / instruction.getEntrustNum());

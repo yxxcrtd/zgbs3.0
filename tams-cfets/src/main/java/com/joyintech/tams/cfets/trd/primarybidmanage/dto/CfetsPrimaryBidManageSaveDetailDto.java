@@ -95,6 +95,8 @@ public class CfetsPrimaryBidManageSaveDetailDto {
     @ApiModelProperty(name="tradeAmt",value="交易金额（元）")
     private BigDecimal tradeAmt;
 
+    @ApiModelProperty(name="bobpId",value="组合+指令代码")
+    private String bobpId;
 
     public String getTotalWinId() {
         return totalWinId;
@@ -254,5 +256,13 @@ public class CfetsPrimaryBidManageSaveDetailDto {
 
     public void setBidTypeStr(String bidTypeStr) {
         this.bidTypeStr = bidTypeStr;
+    }
+
+    public String getBobpId() {
+        return this.getPortfolioId()+"_"+this.getEntrustId();
+    }
+
+    public void setBobpId(String bobpId) {
+        this.bobpId = bobpId;
     }
 }

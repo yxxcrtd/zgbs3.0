@@ -1374,6 +1374,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 return request.getWinPrice();
             }
         }
-        return null;
+        return request.getWinPrice();
     }
 }
