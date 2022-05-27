@@ -2,7 +2,6 @@ package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -1220,7 +1219,7 @@ public class TradeHelper {
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
 
         BigDecimal entrustPrice = integratedEntrust.getEntrustPrice();
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
                 integratedEntrust.setIsFullPrice(FullPriceConst.NET_PRICE.value);

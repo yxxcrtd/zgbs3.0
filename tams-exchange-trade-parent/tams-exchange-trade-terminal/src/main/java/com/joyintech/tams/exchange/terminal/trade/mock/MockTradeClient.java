@@ -739,7 +739,7 @@ public class MockTradeClient implements ITradeRequest {
     public void onTrade(Trade trade) {
         if (!(IntegratedEntrustUtils.isProtocolBack_SH(trade.getEntrustProp())
                 || IntegratedEntrustUtils.isProtocolBack_SZ(trade.getEntrustProp())) && !InvestAssetTypeEnum.FUTURES.value.equals(trade.getAssetType())) {
-            trade.setTradedBalance(TradeUtils.calculateBalanceForRisk(trade.getEntrustBs(), trade.getTradedPrice(), trade.getTradedVolume(), trade.getAssetType(), trade.getPs()));
+            trade.setTradedBalance(TradeUtils.calculateBalanceForRisk(trade.getFullPrice(), trade.getTradedPrice(), trade.getTradedVolume(), trade.getAssetType(), trade.getPs()));
         }
         if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
             trade.setBrokerTradeId(trade.getEntrustId());
