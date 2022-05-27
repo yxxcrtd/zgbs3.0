@@ -1,0 +1,187 @@
+<!DOCTYPE html><html class=html><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1"><meta name=renderer content=webkit><meta name=google content=notranslate><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><link rel=icon href=./static/layui/css/layui.css><script src=./static/layui/layui.js></script><link rel=icon href=/tams/favicon.ico><script src=/tams/config.js></script><script src=/tams/plugins/echarts-4.2.1/echarts.min.js></script><title>理财产品管理系统</title><style>html,
+    body,
+    #app {
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .chromeframe {
+      margin: 4px 0;
+      background: #ccc;
+      color: #000;
+      padding: 4px 0;
+    }
+
+    #loader-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 999999;
+    }
+
+    #loader {
+      display: block;
+      position: relative;
+      left: 50%;
+      top: 50%;
+      width: 150px;
+      height: 150px;
+      margin: -75px 0 0 -75px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: #FFF;
+      -webkit-animation: spin 2s linear infinite;
+      -ms-animation: spin 2s linear infinite;
+      -moz-animation: spin 2s linear infinite;
+      -o-animation: spin 2s linear infinite;
+      animation: spin 2s linear infinite;
+      z-index: 1001;
+    }
+
+    #loader:before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      bottom: 5px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: #FFF;
+      -webkit-animation: spin 3s linear infinite;
+      -moz-animation: spin 3s linear infinite;
+      -o-animation: spin 3s linear infinite;
+      -ms-animation: spin 3s linear infinite;
+      animation: spin 3s linear infinite;
+    }
+
+    #loader:after {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      right: 15px;
+      bottom: 15px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: #FFF;
+      -moz-animation: spin 1.5s linear infinite;
+      -o-animation: spin 1.5s linear infinite;
+      -ms-animation: spin 1.5s linear infinite;
+      -webkit-animation: spin 1.5s linear infinite;
+      animation: spin 1.5s linear infinite;
+    }
+
+
+    @-webkit-keyframes spin {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+
+      100% {
+        -webkit-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes spin {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+
+      100% {
+        -webkit-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+
+
+    #loader-wrapper .loader-section {
+      position: fixed;
+      top: 0;
+      width: 51%;
+      height: 100%;
+      background: #1890ff;
+      z-index: 1000;
+      -webkit-transform: translateX(0);
+      -ms-transform: translateX(0);
+      transform: translateX(0);
+    }
+
+    #loader-wrapper .loader-section.section-left {
+      left: 0;
+    }
+
+    #loader-wrapper .loader-section.section-right {
+      right: 0;
+    }
+
+
+    .loaded #loader-wrapper .loader-section.section-left {
+      -webkit-transform: translateX(-100%);
+      -ms-transform: translateX(-100%);
+      transform: translateX(-100%);
+      -webkit-transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+      transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+    }
+
+    .loaded #loader-wrapper .loader-section.section-right {
+      -webkit-transform: translateX(100%);
+      -ms-transform: translateX(100%);
+      transform: translateX(100%);
+      -webkit-transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+      transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+    }
+
+    .loaded #loader {
+      opacity: 0;
+      -webkit-transition: all 0.3s ease-out;
+      transition: all 0.3s ease-out;
+    }
+
+    .loaded #loader-wrapper {
+      visibility: hidden;
+      -webkit-transform: translateY(-100%);
+      -ms-transform: translateY(-100%);
+      transform: translateY(-100%);
+      -webkit-transition: all 0.3s 1s ease-out;
+      transition: all 0.3s 1s ease-out;
+    }
+
+    .no-js #loader-wrapper {
+      display: none;
+    }
+
+    .no-js h1 {
+      color: #222222;
+    }
+
+    #loader-wrapper .load_title {
+      font-family: 'Open Sans';
+      color: #FFF;
+      font-size: 19px;
+      width: 100%;
+      text-align: center;
+      z-index: 9999999999999;
+      position: absolute;
+      top: 60%;
+      opacity: 1;
+      line-height: 30px;
+    }
+
+    #loader-wrapper .load_title span {
+      font-weight: normal;
+      font-style: italic;
+      font-size: 13px;
+      color: #FFF;
+      opacity: 0.5;
+    }</style><script>window.__getServiceUrl=function(url){if(window.S_CONFIG.MODE==="single"&&url){url=url.replace(/^\/?(upms|config|platform|job)\//, "/")}return window.S_CONFIG.BASE_URL+url};</script><link href=/tams/vuestatic/css/vendor.9a78d090.css rel=stylesheet><link href=/tams/vuestatic/css/styles.a05eccff.css rel=stylesheet><link href=/tams/vuestatic/css/app.cfb65853.css rel=stylesheet></head><body><div id=app><div id=loader-wrapper><div id=loader></div><div class="loader-section section-left"></div><div class="loader-section section-right"></div><div class=load_title>正在加载系统资源，请耐心等待</div></div></div><script>(function(c){function e(e){for(var u,a,d=e[0],k=e[1],b=e[2],t=0,r=[];t<d.length;t++)a=d[t],Object.prototype.hasOwnProperty.call(h,a)&&h[a]&&r.push(h[a][0]),h[a]=0;for(u in k)Object.prototype.hasOwnProperty.call(k,u)&&(c[u]=k[u]);o&&o(e);while(r.length)r.shift()();return f.push.apply(f,b||[]),n()}function n(){for(var c,e=0;e<f.length;e++){for(var n=f[e],u=!0,a=1;a<n.length;a++){var d=n[a];0!==h[d]&&(u=!1)}u&&(f.splice(e--,1),c=k(k.s=n[0]))}return c}var u={},a={runtime:0},h={runtime:0},f=[];function d(c){return k.p+"vuestatic/js/"+({}[c]||c)+"."+{"chunk-0214a68c":"1f8c784a","chunk-03632443":"04d93dfa","chunk-2d0b8df8":"b4324589","chunk-2d0e6289":"2bce0785","chunk-6ec96be3":"7c118ecf","chunk-cfa98d2a":"c321275b","chunk-2de8013e":"7da9eae2","chunk-5364c581":"ad1af199","chunk-3daa63ba":"c33f3757","chunk-56334428":"6fdf4ff9","chunk-77cd59d2":"e8955615","chunk-c125f3fc":"22c928cd","chunk-c471fedc":"bc767f17","chunk-33944d79":"47812586","chunk-3917bcab":"c99008bd","chunk-3faacdc9":"e0e6ce5f","chunk-979eea96":"bebba288","chunk-1a60f72c":"85589ff5","chunk-2611b0e2":"0ea4ce5b","chunk-02283054":"e398085d","chunk-0a037b16":"bd90625f","chunk-21ab6408":"f68456f7","chunk-3096a0cf":"7dca9601","chunk-3ea07d90":"0cbf0fd7","chunk-41607e6d":"0138755c","chunk-4ab56312":"ab4890bf","chunk-4ac880d4":"379180ac","chunk-4ad50f56":"5f420fef","chunk-4f79546c":"def4ae51","chunk-5f7d9452":"a2810c27","chunk-61edc91a":"dd46879e","chunk-6cf5b198":"b253d50f","chunk-6e402d02":"3cb94c67","chunk-740a9b5a":"c95b2e86","chunk-7e4998b7":"795e7bb6","chunk-81f98660":"71fc6cdc","chunk-82abbe1c":"ba1a4d66","chunk-9f2433ca":"7ae7da77","chunk-f0ccbbdc":"43c520b0","chunk-f5f79692":"45212ba7","chunk-71655f22":"56c950fe","chunk-7552d1b4":"3e874b97","chunk-7e0007fc":"e9d5d3a5","chunk-95df4076":"4423cfba","chunk-b3c65900":"a1329e9b","chunk-c2251aba":"e8624688","chunk-c6536dac":"e2142afa","chunk-04acb519":"8328ef08","chunk-283306bf":"bf28e748","chunk-e2bcd112":"2f65bb02","chunk-e7f9de6c":"22d943bc","chunk-ca5b5802":"f3c8b65f","chunk-fe356fac":"1d78ff02","chunk-547a4543":"77288fdd","chunk-00fdc37d":"b1a71050","chunk-38bf6540":"27e84299","chunk-6e5c7089":"7bbe9a82","chunk-79a7df9a":"89756883","chunk-dcb598d2":"162e212a"}[c]+".js"}function k(e){if(u[e])return u[e].exports;var n=u[e]={i:e,l:!1,exports:{}};return c[e].call(n.exports,n,n.exports,k),n.l=!0,n.exports}k.e=function(c){var e=[],n={"chunk-0214a68c":1,"chunk-03632443":1,"chunk-6ec96be3":1,"chunk-cfa98d2a":1,"chunk-2de8013e":1,"chunk-5364c581":1,"chunk-3daa63ba":1,"chunk-56334428":1,"chunk-77cd59d2":1,"chunk-c471fedc":1,"chunk-33944d79":1,"chunk-3917bcab":1,"chunk-3faacdc9":1,"chunk-979eea96":1,"chunk-1a60f72c":1,"chunk-2611b0e2":1,"chunk-02283054":1,"chunk-0a037b16":1,"chunk-21ab6408":1,"chunk-3096a0cf":1,"chunk-3ea07d90":1,"chunk-41607e6d":1,"chunk-4ab56312":1,"chunk-4ac880d4":1,"chunk-4ad50f56":1,"chunk-4f79546c":1,"chunk-5f7d9452":1,"chunk-61edc91a":1,"chunk-6cf5b198":1,"chunk-6e402d02":1,"chunk-740a9b5a":1,"chunk-7e4998b7":1,"chunk-81f98660":1,"chunk-82abbe1c":1,"chunk-9f2433ca":1,"chunk-f0ccbbdc":1,"chunk-f5f79692":1,"chunk-71655f22":1,"chunk-7552d1b4":1,"chunk-7e0007fc":1,"chunk-95df4076":1,"chunk-b3c65900":1,"chunk-c2251aba":1,"chunk-c6536dac":1,"chunk-04acb519":1,"chunk-283306bf":1,"chunk-e2bcd112":1,"chunk-e7f9de6c":1,"chunk-ca5b5802":1,"chunk-fe356fac":1,"chunk-547a4543":1,"chunk-00fdc37d":1,"chunk-38bf6540":1,"chunk-6e5c7089":1,"chunk-79a7df9a":1,"chunk-dcb598d2":1};a[c]?e.push(a[c]):0!==a[c]&&n[c]&&e.push(a[c]=new Promise((function(e,n){for(var u="vuestatic/css/"+({}[c]||c)+"."+{"chunk-0214a68c":"4bc7a747","chunk-03632443":"8d1dc540","chunk-2d0b8df8":"31d6cfe0","chunk-2d0e6289":"31d6cfe0","chunk-6ec96be3":"d2467487","chunk-cfa98d2a":"79cddf31","chunk-2de8013e":"e4bb9cb3","chunk-5364c581":"ace798a2","chunk-3daa63ba":"61a18779","chunk-56334428":"573c2f8a","chunk-77cd59d2":"d38c0ea9","chunk-c125f3fc":"31d6cfe0","chunk-c471fedc":"1ebd847b","chunk-33944d79":"b7be19ea","chunk-3917bcab":"fc3db9fd","chunk-3faacdc9":"e9c5fed3","chunk-979eea96":"88ba0b1e","chunk-1a60f72c":"28dca6dd","chunk-2611b0e2":"5018e478","chunk-02283054":"72cd7f2c","chunk-0a037b16":"b791c416","chunk-21ab6408":"c01f73b5","chunk-3096a0cf":"4d1e6b37","chunk-3ea07d90":"165d8ef3","chunk-41607e6d":"b76c38c9","chunk-4ab56312":"25cdb107","chunk-4ac880d4":"4bc8a5fa","chunk-4ad50f56":"b1c2dcea","chunk-4f79546c":"3ced6331","chunk-5f7d9452":"0df1df33","chunk-61edc91a":"6ad608f8","chunk-6cf5b198":"b54cbfc0","chunk-6e402d02":"9275e116","chunk-740a9b5a":"0905434b","chunk-7e4998b7":"00d9c291","chunk-81f98660":"52599854","chunk-82abbe1c":"a41c9804","chunk-9f2433ca":"7dbf0b18","chunk-f0ccbbdc":"50618678","chunk-f5f79692":"ab02ed86","chunk-71655f22":"73124340","chunk-7552d1b4":"41abbc88","chunk-7e0007fc":"74e385db","chunk-95df4076":"9bc8ca9c","chunk-b3c65900":"beac8d58","chunk-c2251aba":"297608bf","chunk-c6536dac":"c50a61e8","chunk-04acb519":"10e207bb","chunk-283306bf":"f63bcf85","chunk-e2bcd112":"43751ce3","chunk-e7f9de6c":"7de42795","chunk-ca5b5802":"34f81b04","chunk-fe356fac":"1dfe7773","chunk-547a4543":"8b2bcf70","chunk-00fdc37d":"abec80c4","chunk-38bf6540":"6c713f87","chunk-6e5c7089":"93f044b8","chunk-79a7df9a":"21498a63","chunk-dcb598d2":"e3f84147"}[c]+".css",h=k.p+u,f=document.getElementsByTagName("link"),d=0;d<f.length;d++){var b=f[d],t=b.getAttribute("data-href")||b.getAttribute("href");if("stylesheet"===b.rel&&(t===u||t===h))return e()}var r=document.getElementsByTagName("style");for(d=0;d<r.length;d++){b=r[d],t=b.getAttribute("data-href");if(t===u||t===h)return e()}var o=document.createElement("link");o.rel="stylesheet",o.type="text/css",o.onload=e,o.onerror=function(e){var u=e&&e.target&&e.target.src||h,f=new Error("Loading CSS chunk "+c+" failed.\n("+u+")");f.code="CSS_CHUNK_LOAD_FAILED",f.request=u,delete a[c],o.parentNode.removeChild(o),n(f)},o.href=h;var i=document.getElementsByTagName("head")[0];i.appendChild(o)})).then((function(){a[c]=0})));var u=h[c];if(0!==u)if(u)e.push(u[2]);else{var f=new Promise((function(e,n){u=h[c]=[e,n]}));e.push(u[2]=f);var b,t=document.createElement("script");t.charset="utf-8",t.timeout=120,k.nc&&t.setAttribute("nonce",k.nc),t.src=d(c);var r=new Error;b=function(e){t.onerror=t.onload=null,clearTimeout(o);var n=h[c];if(0!==n){if(n){var u=e&&("load"===e.type?"missing":e.type),a=e&&e.target&&e.target.src;r.message="Loading chunk "+c+" failed.\n("+u+": "+a+")",r.name="ChunkLoadError",r.type=u,r.request=a,n[1](r)}h[c]=void 0}};var o=setTimeout((function(){b({type:"timeout",target:t})}),12e4);t.onerror=t.onload=b,document.head.appendChild(t)}return Promise.all(e)},k.m=c,k.c=u,k.d=function(c,e,n){k.o(c,e)||Object.defineProperty(c,e,{enumerable:!0,get:n})},k.r=function(c){"undefined"!==typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(c,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(c,"__esModule",{value:!0})},k.t=function(c,e){if(1&e&&(c=k(c)),8&e)return c;if(4&e&&"object"===typeof c&&c&&c.__esModule)return c;var n=Object.create(null);if(k.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:c}),2&e&&"string"!=typeof c)for(var u in c)k.d(n,u,function(e){return c[e]}.bind(null,u));return n},k.n=function(c){var e=c&&c.__esModule?function(){return c["default"]}:function(){return c};return k.d(e,"a",e),e},k.o=function(c,e){return Object.prototype.hasOwnProperty.call(c,e)},k.p="/tams/",k.oe=function(c){throw console.error(c),c};var b=window["webpackJsonp"]=window["webpackJsonp"]||[],t=b.push.bind(b);b.push=e,b=b.slice();for(var r=0;r<b.length;r++)e(b[r]);var o=t;n()})([]);</script><script src=/tams/vuestatic/js/vendor.f3a77e8a.js></script><script src=/tams/vuestatic/js/styles.86fcfc61.js></script><script src=/tams/vuestatic/js/app.af9168a1.js></script></body></html>
