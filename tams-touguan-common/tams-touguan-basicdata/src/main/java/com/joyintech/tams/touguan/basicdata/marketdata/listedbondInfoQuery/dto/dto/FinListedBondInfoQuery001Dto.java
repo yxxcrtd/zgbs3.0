@@ -149,7 +149,8 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal issueAmt;
 
     @ApiModelProperty(name = "stipulationValue", value = "参考收益率")
-    private String stipulationValue;
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal stipulationValue;
 
     @ApiModelProperty(name = "singleMinSubAmt", value = "单笔最低认购量（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -321,7 +322,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     }
 
     public String getTenderTargetStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, this.getBiddingMethod());
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, this.getTenderTarget());
     }
 
     public void setTenderTarget(String tenderTarget) {
@@ -585,11 +586,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issuePx = issuePx;
     }
 
-    public String getStipulationValue() {
+    public BigDecimal getStipulationValue() {
         return stipulationValue;
     }
 
-    public void setStipulationValue(String stipulationValue) {
+    public void setStipulationValue(BigDecimal stipulationValue) {
         this.stipulationValue = stipulationValue;
     }
 

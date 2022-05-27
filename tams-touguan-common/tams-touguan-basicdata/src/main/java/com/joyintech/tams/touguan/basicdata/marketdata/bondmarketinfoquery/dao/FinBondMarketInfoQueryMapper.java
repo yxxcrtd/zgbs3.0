@@ -62,4 +62,21 @@ public interface FinBondMarketInfoQueryMapper {
      * @return
      */
     List<SelectOptionDto> getAssetId(Map<String, Object> param);
+
+    /**
+     * 查询付息计划信息
+     *
+     * @param map
+     * @return
+     */
+    List<FinBondMarketCashPlanDto> selectInvScheduleList(Map<String, Object> map);
+
+    /**
+     * 行权计划信息
+     *
+     * @param map
+     * @return
+     */
+    List<FinBondPayHSrcSecOptionDto> selectFinExercisePlanList(Map<String, Object> map);
+
 }

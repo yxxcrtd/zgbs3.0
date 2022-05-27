@@ -283,6 +283,8 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name="listingDate",value="上市日")
     private Date listingDate;
 
+    private String principalCashId;
+
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
@@ -984,5 +986,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setListingDate(Date listingDate) {
         this.listingDate = listingDate;
+    }
+
+    public String getPrincipalCashId() {
+        return principalCashId;
+    }
+
+    public void setPrincipalCashId(String principalCashId) {
+        this.principalCashId = principalCashId;
     }
 }
