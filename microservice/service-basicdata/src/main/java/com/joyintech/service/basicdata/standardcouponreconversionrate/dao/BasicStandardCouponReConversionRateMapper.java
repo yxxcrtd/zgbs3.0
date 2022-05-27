@@ -34,6 +34,8 @@ public interface BasicStandardCouponReConversionRateMapper {
 
     List<StandardCouponReConversionRateDto> getList(StandardCouponReConversionRateDto dto);
 
+    List<StandardCouponReConversionRateDto> getBokerList(StandardCouponReConversionRateDto dto);
+
     List<String> getBusinessData(WflValidInputParameter dto);
 
     int deleteByPrimaryKey(StandardCouponReConversionRateDto dto);

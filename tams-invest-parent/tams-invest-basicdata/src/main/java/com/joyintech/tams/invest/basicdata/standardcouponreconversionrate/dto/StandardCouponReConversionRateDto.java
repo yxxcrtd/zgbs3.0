@@ -41,6 +41,16 @@ public class StandardCouponReConversionRateDto extends StdBondMoreConvrateInfo i
 
     private String tandardRate;//标准券再折算率
 
+    private String acctNoStr;
+
+    public String getAcctNoStr() {
+        return acctNoStr;
+    }
+
+    public void setAcctNoStr(String acctNoStr) {
+        this.acctNoStr = acctNoStr;
+    }
+
     public String getOperateType() {
         return operateType;
     }
@@ -74,7 +84,11 @@ public class StandardCouponReConversionRateDto extends StdBondMoreConvrateInfo i
     }
 
     public String getAccountTypeStr() {
-        return accountTypeStr;
+        if(StringUtil.equals(this.accountType,"BROKER")){
+            return "所有";
+        }else{
+            return this.accountTypeStr;
+        }
     }
 
     public void setAccountTypeStr(String accountTypeStr) {

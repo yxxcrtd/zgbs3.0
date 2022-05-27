@@ -36,7 +36,15 @@ public class StandardCouponReConversionRateValidator implements BeanValidator {
                 resultList.add(new ValidMessage(this.getMessage("存在流程中的数据，请维护相同模式的数据", dto.getTandardRate ())));
                 return resultList;
             }
-            if(StringUtils.isNotEmpty(dto.getFinprodId())&&StringUtils.isEmpty(dto.getAccountType())){
+            if(StringUtils.equals(dto.getFinprodId(), "BROKER")){
+                vo.setFinprodId("system");
+                dto.setFinprodIdStr("BROKER");
+                List<StandardCouponReConversionRateDto> list = standardCouponReConversionRateService.getBokerList(dto);
+                if(!list.isEmpty()&&list.size()>0){
+                    resultList.add(new ValidMessage(this.getMessage("已存在数据，请维护相同模式的数据", dto.getTandardRate ())));
+                    return resultList;
+                }
+            } else if(StringUtils.isNotEmpty(dto.getFinprodId())&&StringUtils.isEmpty(dto.getAccountType())&&!StringUtils.equals(dto.getFinprodId(), "BROKER")){
                 vo.setFinprodId("system");
                 List<StandardCouponReConversionRateDto> list = standardCouponReConversionRateService.getList(dto);
                 if(!list.isEmpty()&&list.size()>0){
@@ -44,7 +52,15 @@ public class StandardCouponReConversionRateValidator implements BeanValidator {
                     return resultList;
                 }
             }
-            if(StringUtils.isEmpty(dto.getFinprodId())&&StringUtils.isNotEmpty(dto.getAccountType())){
+            if(StringUtils.equals(dto.getAccountType(), "BROKER")){
+                vo.setFinprodId("system");
+                dto.setAcctNoStr("BROKER");
+                List<StandardCouponReConversionRateDto> list = standardCouponReConversionRateService.getBokerList(dto);
+                if(!list.isEmpty()&&list.size()>0){
+                    resultList.add(new ValidMessage(this.getMessage("已存在数据，请维护相同模式的数据", dto.getTandardRate ())));
+                    return resultList;
+                }
+            } else if(StringUtils.isEmpty(dto.getFinprodId())&&StringUtils.isNotEmpty(dto.getAccountType())&&!StringUtils.equals(dto.getAccountType(), "BROKER")){
                 vo.setAccountType("system");
                 List<StandardCouponReConversionRateDto> list = standardCouponReConversionRateService.getList(dto);
                 if(!list.isEmpty()&&list.size()>0){
