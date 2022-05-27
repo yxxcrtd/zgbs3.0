@@ -286,7 +286,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         }
     }
 
-    @ApiOperation(value = "标的校验", notes = "自主投标 修改 基本信息中【汇总投标券面总额】和汇总投标列表中【投标标位】 调用")
+    @ApiOperation(value = "标的校验", notes = "自主投标 修改 基本信息中【汇总投标券面总额】和<投标产品列表>中信息 调用")
     @PostMapping("/checkFinInfo")
     @ResponseBody
     public Message<AjaxResult> checkFinInfo(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {

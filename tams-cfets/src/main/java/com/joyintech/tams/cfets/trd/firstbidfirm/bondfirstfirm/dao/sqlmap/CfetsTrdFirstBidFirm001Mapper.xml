@@ -542,7 +542,7 @@
            T.bidprice,
            T.biddingMethod,
            T.payType,
-           T.bidDate,
+           T.bidCfmDate,
            T.tradeMarket,
            T.counterId,
            T.counterName,
@@ -576,13 +576,13 @@
                      END           AS bidDateEnd/*投标日 结束*/,
                  ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
-                 bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+                 bobp.BID_PRICE    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
                  bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                  bo.PAY_TYPE       AS payType/*缴款方式*/,
-                 bo.BID_DATE       AS bidDate/*投标确认日*/,
+                 bo.BID_DATE       AS bidCfmDate/*投标确认日*/,
                  fp.TRADE_MARKET      tradeMarket/*交易场所*/,
                  bo.COUNTER_ID counterId/*交易对手*/,
-                 mci.CUSTOMER_NAME AS counterName/*交易对手*/,
+                 mcp.COUNTER_NAME AS counterName/*交易对手*/,
                  bo.REMARK         AS remark/*备注*/
           FROM BID_ORDER bo
                    LEFT JOIN
@@ -619,8 +619,8 @@
                    LEFT JOIN
                ETR_ENTRUST ee
                ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-                   LEFT JOIN MST_CUSTOMER_INFO mci
-                             ON mci.CUSTOMER_ID = bo.COUNTER_ID
+                   LEFT JOIN MST_COUNTER_PARTY mcp
+                             ON mcp.COUNTER_ID = bo.COUNTER_ID
           WHERE bo.BID_MODLE IN ('01', '02')
             AND bo.TRADE_STATUS = '01'
             <if test="tradeMarkets != null and tradeMarkets.size()>0">
@@ -684,13 +684,13 @@
                      END           AS bidDateEnd/*投标日 结束*/,
                  ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
-                 bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+                 bobp.BID_PRICE    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
                  bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                  bo.PAY_TYPE       AS payType/*缴款方式*/,
-                 bo.BID_DATE       AS bidDate/*投标确认日*/,
+                 bo.BID_DATE       AS bidCfmDate/*投标确认日*/,
                  fp.TRADE_MARKET      tradeMarket/*交易场所*/,
                  bo.COUNTER_ID counterId/*交易对手*/,
-                 mci.CUSTOMER_NAME AS counterName/*交易对手*/,
+                 mcp.COUNTER_NAME AS counterName/*交易对手*/,
                  bo.REMARK         AS remark/*备注*/
           FROM WFL_BID_ORDER bo
                    LEFT JOIN
@@ -727,8 +727,8 @@
                    LEFT JOIN
                ETR_ENTRUST ee
                ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-                   LEFT JOIN MST_CUSTOMER_INFO mci
-                             ON mci.CUSTOMER_ID = bo.COUNTER_ID
+                   LEFT JOIN MST_COUNTER_PARTY mcp
+                             ON mcp.COUNTER_ID = bo.COUNTER_ID
           WHERE bo.BID_MODLE IN ('01', '02')
             <if test="tradeMarkets != null and tradeMarkets.size()>0">
                 AND
@@ -793,7 +793,7 @@
          </if>
      </where>
     group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId, T.finprodAbbr, T.tenderTarget, T.bidDateStart,
-             T.bidDateEnd, T.etrBidPriceTotal, T.totalBiddingNum, T.bidprice, T.biddingMethod, T.payType, T.bidDate, T.tradeMarket,
+             T.bidDateEnd, T.etrBidPriceTotal, T.totalBiddingNum, T.bidprice, T.biddingMethod, T.payType, T.bidCfmDate, T.tradeMarket,
              T.counterId, T.counterName, T.remark
     </select>
 
@@ -811,7 +811,16 @@
             or decode(T.bidprice,0,'0.00',to_char(T.bidprice,'FM999999999990.9990'))=#{search} or to_char(T.bidprice)=#{search}
             or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{search}
-            or replace(to_char(T.bidDate,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.bidCfmDate,'yyyy-MM-dd'),'-','/')=#{search}
+            or to_char(T.bidDateStart,'yyyy-MM-dd')=#{search}
+            or to_char(T.bidDateEnd,'yyyy-MM-dd')=#{search}
+            or to_char(T.bidCfmDate,'yyyy-MM-dd')=#{search}
+            or to_char(T.bidDateStart,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or to_char(T.bidDateEnd,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or to_char(T.bidCfmDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+            or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+            or replace(to_char(T.bidCfmDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
             )
         </if>
     </sql>
@@ -837,7 +846,7 @@
            T.payDate,
            T.assignRegdate,
            T.listingDate,
-           T.bidDate,
+           T.bidCfmDate,
            T.counterId,
            T.tradeMarket,
            T.tenderTarget,
@@ -890,9 +899,9 @@
                     bo.PAY_DATE          payDate/*缴款日*/,
                     bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
                     bo.ONMARKET_DATE     listingDate/*上市日*/,
-                    bo.BID_DATE       AS bidDate/*投标确认日*/,
+                    bo.BID_DATE       AS bidCfmDate/*投标确认日*/,
                     bo.COUNTER_ID counterId/*交易对手*/,
-                    mci.CUSTOMER_NAME AS counterName/*交易对手*/,
+                    mcp.COUNTER_NAME AS counterName/*交易对手*/,
                     bo.REMARK         AS remark/*备注*/,
                     fp.TRADE_MARKET      tradeMarket/*交易场所*/,
                     null                 dealDate/*成交日期*/
@@ -932,8 +941,8 @@
                       LEFT JOIN
                   ETR_ENTRUST ee
                   ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-                   LEFT JOIN MST_CUSTOMER_INFO mci
-                             ON mci.CUSTOMER_ID = bo.COUNTER_ID
+                   LEFT JOIN MST_COUNTER_PARTY mcp
+                             ON mcp.COUNTER_ID = bo.COUNTER_ID
              WHERE bo.BID_MODLE IN ('03')
                AND bo.TRADE_STATUS = '01'
                 <if test="tradeMarkets != null and tradeMarkets.size()>0">
@@ -1013,9 +1022,9 @@
                     bo.PAY_DATE        payDate/*缴款日*/,
                     bo.ASSIGN_REGDATE  assignRegdate/*债权债务登记日*/,
                     bo.ONMARKET_DATE   listingDate/*上市日*/,
-                    bo.BID_DATE     AS bidDate/*投标确认日*/,
+                    bo.BID_DATE     AS bidCfmDate/*投标确认日*/,
                     bo.COUNTER_ID counterId/*交易对手*/,
-                    mci.CUSTOMER_NAME AS counterName/*交易对手*/,
+                    mcp.COUNTER_NAME AS counterName/*交易对手*/,
                     bo.REMARK       AS remark/*备注*/,
                     fp.TRADE_MARKET      tradeMarket/*交易场所*/,
                     null               dealDate/*成交日期*/
@@ -1055,8 +1064,8 @@
                       LEFT JOIN
                   ETR_ENTRUST ee
                   ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-                   LEFT JOIN MST_CUSTOMER_INFO mci
-                             ON mci.CUSTOMER_ID = bo.COUNTER_ID
+                   LEFT JOIN MST_COUNTER_PARTY mcp
+                             ON mcp.COUNTER_ID = bo.COUNTER_ID
              WHERE bo.BID_MODLE IN ('03')
                 <if test="tradeMarkets != null and tradeMarkets.size()>0">
                     AND
@@ -1123,7 +1132,7 @@
     group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId,
              T.finprodAbbr, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice, T.biddingMethod,
              T.payType, T.winPrice, T.price, T.payableAmount, T.settFeeAmt, T.payDate, T.assignRegdate, T.listingDate,
-             T.bidDate, T.counterName,T.remark, T.dealDate,T.tradeMarket,T.tenderTarget,T.counterId
+             T.bidCfmDate, T.counterName,T.remark, T.dealDate,T.tradeMarket,T.tenderTarget,T.counterId
     </select>
 
     <!-- 分销买入 关键字 -->
@@ -1140,7 +1149,16 @@
             or decode(T.bidprice,0,'0.00',to_char(T.bidprice,'FM999999999990.9990'))=#{search} or to_char(T.bidprice)=#{search}
             or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{search}
-            or replace(to_char(T.bidDate,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.bidCfmDate,'yyyy-MM-dd'),'-','/')=#{search}
+            or to_char(T.bidDateStart,'yyyy-MM-dd')=#{search}
+            or to_char(T.bidDateEnd,'yyyy-MM-dd')=#{search}
+            or to_char(T.bidCfmDate,'yyyy-MM-dd')=#{search}
+            or to_char(T.bidDateStart,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or to_char(T.bidDateEnd,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or to_char(T.bidCfmDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+            or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+            or replace(to_char(T.bidCfmDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
             )
         </if>
     </sql>
