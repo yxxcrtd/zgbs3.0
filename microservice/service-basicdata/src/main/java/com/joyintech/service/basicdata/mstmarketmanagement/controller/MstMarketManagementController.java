@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.annotation.DTXTransaction;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.basicdata.mstmarketinstitutions.dto.MstMarketInstitutionsDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,27 +67,53 @@ public class MstMarketManagementController {
              return info;
          }
          /**
-          * 联想文本框service层实现
+        * 联想文本框service层实现
           * 
           * @param param 检索参数
           * @return SuggestDto
-          */
-         @PostMapping("/selectFinprodName")
-         public List<SuggestDto> selectForCode(@RequestBody Map<String, Object> param) {
-             return mstMarketManagementService.selectFinprodName(param);
-         }
-        
-      /*   *//**
-          * 画面查询方法-交易编号
-          *
-          * @return 查询结果集
-          * @throws Exception 异常
-          *//*
-         @PostMapping("/getGradeResult/{page}/{length}")
-         public Page<SelectOptionDto> getGradeResult(@RequestBody Map<String, Object> param, @PathVariable("page") int page,
-                                                  @PathVariable("length") int length) {
-             return mstMarketManagementService.getGradeResult(page, length, param);
-         }*/
-        
-           
+        */
+        @PostMapping("/selectFinprodName")
+        public List<SuggestDto> selectForCode(@RequestBody Map<String, Object> param) {
+            return mstMarketManagementService.selectFinprodName(param);
+        }
+
+    /**
+     * 客户性质设置为“发行人、融资人、管理人、担保人、出质人、存放行、原始权益人”的全部市场机构名称
+     *
+     * @param param 过滤参数
+     * @return 下拉框列表
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping("getCodeName/{page}/{length}")
+    public Page<SelectOptionDto> getFinancier(@RequestBody Map<String, Object> param,
+                                              @PathVariable("page") int page,
+                                              @PathVariable("length") int length) {
+        return mstMarketManagementService.getCodeName(page, length, param);
+    }
+
+    /**
+     *
+     * 工作流完成
+     * <功能详细描述>
+     * @param entity
+     * @see
+     * @since 1.0
+     */
+    @Transactional
+    @DTXTransaction
+    @PostMapping("doComplete")
+    public void doComplete(@RequestBody MstMarketManageDto entity){
+        mstMarketManagementService.doComplete(entity);
+    }
+    /**
+     * 查询评级明细信息
+     *
+     * @param entity 检索参数
+     * @return MstMarketManageDto
+     */
+    @PostMapping("/selectDetail")
+    public MstMarketManageDto selectDetail(@RequestBody MstMarketManageDto entity) {
+        return mstMarketManagementService.selectDetail(entity);
+    }
 }
