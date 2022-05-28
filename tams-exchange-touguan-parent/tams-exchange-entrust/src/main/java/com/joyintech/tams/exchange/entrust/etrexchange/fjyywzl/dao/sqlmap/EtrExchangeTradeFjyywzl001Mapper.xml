@@ -469,8 +469,8 @@
             </foreach>
         </if>
         ) a
-        left join SYS_DATADICT_LIST sdl1 on a.tradeMarket=sdl1.ITEM_CODE and sdl1.DICT_CODE='TRADE_PLACE'
-        where 1=1
+--         left join SYS_DATADICT_LIST sdl1 on a.tradeMarket=sdl1.ITEM_CODE and sdl1.DICT_CODE='TRADE_PLACE'
+--         where 1=1
         <!-- 关键字模糊查询 -->
 <!--        <include refid="etrExchangeQueryAnd1"/>-->
 <!--        <if test="sort != null and sort != '' and direction != null and direction != ''">-->
