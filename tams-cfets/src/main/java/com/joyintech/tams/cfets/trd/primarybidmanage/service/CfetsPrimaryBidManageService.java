@@ -262,6 +262,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,response);
                 BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
                 bidResultDetail.setDetailWinId(IDGenerator.generate());
+                bidResultDetail.setTotalWinId(bidResultTotal.getTotalWinId());
                 bidResultDetailMapper.insertSelective(bidResultDetail);
             }
             ajax.setMessage("未中标信息保存成功！");
