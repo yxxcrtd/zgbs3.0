@@ -36,6 +36,10 @@ public class FinProductSpecialValidatorService implements BeanValidator {
 
     private static final String NO_INFO_SHOW_OUT = "noInfoShowOut";
 
+    private static final String CHANGE_LINE_MARK = "<br/>";
+
+    private static final String PAGE_ID = "CfetsBasicInfo002";
+
     private static final Integer IMPORT_MAXIMUM_SIZE = 100;
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
@@ -84,7 +88,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
         }
         //校验流程中数据
         WflValidInputParameter parameter = new WflValidInputParameter();
-        parameter.setPageId("CfetsBasicInfo002");
+        parameter.setPageId(PAGE_ID);
         parameter.setBusinessDataPk1(dto.getFinprodMarketId());
         ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
         if (Objects.nonNull(dataEntityFromProcessMark)) {
@@ -166,45 +170,47 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                     if (DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsDefaultBondIndicator())
                             && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsAbs())
                             && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsSpecialDebt())) {
-                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_IS", String.valueOf(j))).append("\n\r");
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_IS", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isBlank(finProductSpecialImportDto.getIsSpecialDebt())) {
-                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否特殊债", String.valueOf(j))).append("\n\r");
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否特殊债", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isBlank(finProductSpecialImportDto.getIsAbs())) {
-                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否资产支持证券", String.valueOf(j))).append("\n\r");
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否资产支持证券", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isBlank(finProductSpecialImportDto.getIsDefaultBondIndicator())) {
-                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否到期违约债", String.valueOf(j))).append("\n\r");
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否到期违约债", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isBlank(finProductSpecialImportDto.getFinprodMarketId()) && StringUtil.isBlank(finProductSpecialImportDto.getFinprodAbbr())) {
-                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "债券代码/债券代码", String.valueOf(j))).append("\n\r");
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "债券代码/债券代码", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isNotBlank(finProductSpecialImportDto.getIsSpecialDebt())
                             && finProductSpecialImportDto.getIsSpecialDebt().equals(DictCodeList.是否_否.getCodeName())
                             && finProductSpecialImportDto.getIsSpecialDebt().equals(DictCodeList.是否_是.getCodeName())) {
-                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否特殊债", String.valueOf(j))).append("\n\r");
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否特殊债", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isNotBlank(finProductSpecialImportDto.getIsAbs())
                             && finProductSpecialImportDto.getIsAbs().equals(DictCodeList.是否_否.getCodeName())
                             && finProductSpecialImportDto.getIsAbs().equals(DictCodeList.是否_是.getCodeName())) {
-                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否资产支持证券", String.valueOf(j))).append("\n\r");
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否资产支持证券", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isNotBlank(finProductSpecialImportDto.getIsDefaultBondIndicator())
                             && finProductSpecialImportDto.getIsDefaultBondIndicator().equals(DictCodeList.是否_否.getCodeName())
                             && finProductSpecialImportDto.getIsDefaultBondIndicator().equals(DictCodeList.是否_是.getCodeName())) {
-                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否到期违约债", String.valueOf(j))).append("\n\r");
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否到期违约债", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     String search = finProductSpecialImportDto.getFinprodMarketId();
                     if (StringUtil.isBlank(search)) {
                         search = finProductSpecialImportDto.getFinprodAbbr();
                     }
-                    if (finProductSpecial001Mapper.countFinprodIdInProduct(search) == 0) {
-                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_BOND_NON_EXISTENT", String.valueOf(j))).append("\n\r");
+                    if (StringUtil.isNotBlank(search)) {
+                        if (finProductSpecial001Mapper.countFinprodIdInProduct(search) == 0) {
+                            errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_BOND_NON_EXISTENT", String.valueOf(j))).append(CHANGE_LINE_MARK);
+                        }
                     }
 
                     if (finProductSpecial001Mapper.countFinprodIdForSpecial(finProductSpecialImportDto.getFinprodMarketId()) > 0) {
-                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_BOND_ALREADY_EXISTS", String.valueOf(j))).append("\n\r");
+                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_BOND_ALREADY_EXISTS", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     //校验流程中数据
                     String finprodMarketId = finProductSpecialImportDto.getFinprodMarketId();
@@ -215,11 +221,11 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                         }
                     }
                     WflValidInputParameter parameter = new WflValidInputParameter();
-                    parameter.setPageId("CfetsBasicInfo002");
+                    parameter.setPageId(PAGE_ID);
                     parameter.setBusinessDataPk1(finprodMarketId);
                     ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
                     if (Objects.nonNull(dataEntityFromProcessMark)) {
-                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_IN_PROCESS", String.valueOf(j))).append("\n\r");
+                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_IN_PROCESS", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
 
                     if (StringUtil.isNotBlank(errorMsg)) {
