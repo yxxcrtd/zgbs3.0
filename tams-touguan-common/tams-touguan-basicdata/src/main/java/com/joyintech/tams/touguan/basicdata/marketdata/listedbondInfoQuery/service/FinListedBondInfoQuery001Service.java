@@ -319,9 +319,9 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setIssueStyle(finListedBondInfoQuery001Dto.getReleaseType());
         finProductIssue.setAddBatch(0L);
         finProductIssue.setIssuePrice(Objects.nonNull(finListedBondInfoQuery001Dto.getIssuePx()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()) : null);
-        finProductIssue.setReferYield(finListedBondInfoQuery001Dto.getCouponRate());
+        finProductIssue.setReferYield(Objects.nonNull(finListedBondInfoQuery001Dto.getCouponRate()) ? new BigDecimal(finListedBondInfoQuery001Dto.getCouponRate()) : null);
         finProductIssue.setRateGrade(finListedBondInfoQuery001Dto.getDecimalPlaces());
-        finProductIssue.setBp(finListedBondInfoQuery001Dto.getSpread());
+        finProductIssue.setBp(Objects.nonNull(finListedBondInfoQuery001Dto.getSpread()) ? new BigDecimal(finListedBondInfoQuery001Dto.getSpread()) : null);
         finProductIssue.setIssueDate(finListedBondInfoQuery001Dto.getIssueDate());
         finProductIssue.setPayDate(finListedBondInfoQuery001Dto.getPayDate());
         finProductIssue.setFirstConfirmDate(finListedBondInfoQuery001Dto.getInterestAccrualDate());
