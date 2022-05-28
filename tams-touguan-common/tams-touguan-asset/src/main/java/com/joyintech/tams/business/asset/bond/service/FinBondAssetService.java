@@ -519,19 +519,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 dto.setFinExercisePlanList(finExercisePlanList);
             }
             //发行方式
-            List<FinProductIssue> finProductIssues = finBondAssetMapper.selectFinProductIssue(dto.getFinprodMarketId());
-            List<BondFinProductIssueDto> finProductIssueList = new ArrayList<>();
-            for (FinProductIssue finProductIssue:finProductIssues){
-                BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
-                BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
-                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductIssue.getFinprodId());
-                BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
-                bondFinProductIssueDto.setListingDate(finProduct.getCirculationDate());
-                bondFinProductIssueDto.setFinprodMarketId(finProduct.getFinprodMarketId());
-                bondFinProductIssueDto.setFinprodAbbr(finProduct.getFinprodAbbr());
-                finProductIssueList.add(bondFinProductIssueDto);
-            }
-            dto.setFinProductIssueList(finProductIssueList);
+            getIssues(dto);
             List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(dto.getFinprodId());
             MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
             mstFileInputParameter.setFileList(uploadInfo);
@@ -551,6 +539,22 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             return new FinBondAssetSaveRequest();
         }
         return dto;
+    }
+
+    public void getIssues(FinBondAssetSaveRequest dto) {
+        List<FinProductIssue> finProductIssues = finBondAssetMapper.selectFinProductIssue(dto.getFinprodMarketId());
+        List<BondFinProductIssueDto> finProductIssueList = new ArrayList<>();
+        for (FinProductIssue finProductIssue:finProductIssues){
+            BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
+            BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, dto);
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductIssue.getFinprodId());
+            BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
+            bondFinProductIssueDto.setListingDate(finProduct.getCirculationDate());
+            bondFinProductIssueDto.setFinprodMarketId(finProduct.getFinprodMarketId());
+            bondFinProductIssueDto.setFinprodAbbr(finProduct.getFinprodAbbr());
+            finProductIssueList.add(bondFinProductIssueDto);
+        }
+        dto.setFinProductIssueList(finProductIssueList);
     }
 
     /**
