@@ -107,8 +107,7 @@
         left join SYS_DATADICT_LIST sdl_ba on PAYHSRCSECINFO.BLNAREA = sdl_ba.ITEM_CODE and sdl_ba.DICT_CODE='BLN_AREA'
         left join SYS_DATADICT_LIST sdl_sgt on PAYHSRCSECINFO.GUARTYPE = sdl_sgt.ITEM_CODE and
         sdl_sgt.DICT_CODE='SVR_GUA_TYPE'
-        -- left join SYS_DATADICT_LIST sdl_tc on PAYHSRCSECINFO.CALENDARID = sdl_tc.ITEM_CODE and
-        sdl_tc.DICT_CODE='TRANSACTION_CALENDAR'
+        -- left join SYS_DATADICT_LIST sdl_tc on PAYHSRCSECINFO.CALENDARID = sdl_tc.ITEM_CODE and sdl_tc.DICT_CODE='TRANSACTION_CALENDAR'
 
         <where>
             PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]> to_date ( #{platformDate}, 'YYYY-MM-DD' )
