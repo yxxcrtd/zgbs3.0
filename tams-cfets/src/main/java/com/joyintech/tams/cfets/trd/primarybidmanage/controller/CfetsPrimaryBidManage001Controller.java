@@ -415,7 +415,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
     @PostMapping("unbid")
     public Message<AjaxResult> unbid(@RequestBody CfetsPrimaryBidManageCfmRequest request){
         try {
-            AjaxResult response = cfetsPrimaryBidManageService.unBidSave(request);
+            AjaxResult response  = cfetsPrimaryBidManageService.unBidSave(request);
             return new Message<AjaxResult>().success().setData(response);
         }catch (Exception e) {
             logger.error("未中标保存数据异常",e);

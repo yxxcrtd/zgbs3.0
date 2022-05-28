@@ -242,14 +242,38 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
     }
 
-
+    public AjaxResult unBidSave(CfetsPrimaryBidManageCfmRequest request) {
+        AjaxResult ajax = new AjaxResult();
+        if (StringUtil.isNotEmpty(request.getBidId())) {
+            Map<String, Object> param = BeanUtil.object2Map(request);
+            CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageMapper.selectBidOrderInfo(param);
+            response.setIsWin(DictCodeList.是否_否.getValue());
+            List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBidOrderDtail(param);
+            BidResultTotal bidResultTotal = new BidResultTotal();
+            bidResultTotal.setTotalWinId(IDGenerator.generate());
+            BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,response);
+            bidResultTotalMapper.insertSelective(bidResultTotal);
+            BidOrder record = new BidOrder();
+            record.setBidId(request.getBidId());
+            record.setIsWin(DictCodeList.是否_否.getValue());
+            bidOrderMapper.updateByPrimaryKeySelective(record);
+            for(CfetsPrimaryBidManageSaveDetailDto detailDto: detailDtos){
+                BidResultDetail bidResultDetail = new BidResultDetail();
+                BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,response);
+                BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
+                bidResultDetail.setDetailWinId(IDGenerator.generate());
+                bidResultDetailMapper.insertSelective(bidResultDetail);
+            }
+            ajax.setMessage("未中标信息保存成功！");
+        }
+        return ajax;
+    }
     public CfetsPrimaryBidManageSaveRequest selectBasicInfo(CfetsPrimaryBidManageSaveRequest request) {
         if (StringUtil.isNotEmpty(request.getTotalWinId())) {
             Map<String, Object> param = BeanUtil.object2Map(request);
             CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageMapper.selectBasicInfo(param);
             List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBasicDtail(param);
             response.setAllocationDetails(detailDtos);
-            return response;
         }
         return null;
     }
@@ -360,7 +384,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         BidOrder record = new BidOrder();
         record.setBidId(bidResultTotal.getBidId());
         record.setIsWin(bidResultTotal.getIsWin());
-        bidOrderMapper.updateByPrimaryKey(record);
+        bidOrderMapper.updateByPrimaryKeySelective(record);
         bidResultTotalMapper.insertSelective(bidResultTotal);
         //中标结果明细表
         for(BidResultDetail bidResultDetail: dto.getBidResultDetailList()) {
