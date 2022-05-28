@@ -444,7 +444,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("10000"),2,RoundingMode.HALF_UP));
                     }
                 }
-                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.平安资产类型_一级投标债券.getValue())){
+                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.平安资产类型_债券.getValue())){
 
                     CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
                     if(dto2 != null) {
