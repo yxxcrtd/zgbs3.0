@@ -444,7 +444,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             secAcctIdTotleTradeId.put(secAcctId,trdFinProductDealTotal.getTotleTradeId());
             trdFinProductDealTotal.setFinprodId(dto.getFinprodId());
             trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
-            trdFinProductDealTotal.setBusiType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
+            trdFinProductDealTotal.setBusiType(BussinessDictCodeList.共同业务类型_中标结果维护.getValue());
             trdFinProductDealTotal.setBranch(branch);
             trdFinProductDealTotal.setTradeDate(iplatformDate.getSysDate());
             trdFinProductDealTotal.setSettleDate(dto.getCreditorDebtDate());
@@ -734,6 +734,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     BeanUtil.copyPropertiesIgnoreNull(wflBidResultDetail, detail);
                     wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
                     wflBidResultDetail.setWorkflowId(request.getWorkflowId());
+                    wflBidResultDetail.setDetailWinId(IDGenerator.generate());
+                    wflBidResultDetail.setTotalWinId(request.getTotalWinId());
                     wflBidResultDetailMapper.insertSelective(wflBidResultDetail);
                 }
             }
