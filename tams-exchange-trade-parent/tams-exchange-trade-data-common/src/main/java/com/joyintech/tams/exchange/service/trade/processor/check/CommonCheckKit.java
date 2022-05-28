@@ -5,6 +5,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.validation.BeanValidationResult;
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -320,7 +321,7 @@ public class CommonCheckKit extends BaseCheckKit {
             String busiTypeTg = instruction.getBusiTypeTg();
             String errorMsg = "";
             if(DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg) || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)){
-                errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入数量限制[{}]万元", entrustVolume/100, minNum/100);
+                errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入数量限制[{}]万元",(ArithmeticUtil.divide(BigDecimal.valueOf(entrustVolume), new BigDecimal(100),2)),ArithmeticUtil.divide(BigDecimal.valueOf(minNum), new BigDecimal(100),2));
             }else{
                 errorMsg = StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}]", entrustVolume, minNum);
             }
