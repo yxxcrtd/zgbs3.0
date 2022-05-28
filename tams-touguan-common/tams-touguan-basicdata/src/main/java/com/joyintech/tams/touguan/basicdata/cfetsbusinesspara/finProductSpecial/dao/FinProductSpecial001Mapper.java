@@ -53,6 +53,14 @@ public interface FinProductSpecial001Mapper {
     int countFinprodIdProcessingAndDate(@Param("finprodId") String finprodId, @Param("iPlatformDate") String iPlatformDate);
 
     /**
+     * 查询业务表是否存在
+     *
+     * @param search
+     * @return
+     */
+    int countFinprodIdInProduct(@Param("search") String search);
+
+    /**
      * 判断金融产品代码是否使用过
      *
      * @param finprodId
@@ -75,6 +83,14 @@ public interface FinProductSpecial001Mapper {
      * @return
      */
     FinProductSpecialSelectOptionDto querySampleFinProduct(FinProductSpecialSelectOptionQueryRequest request);
+
+    /**
+     * 查询特殊债券信息数量
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    int countFinprodIdForSpecial(@Param("finprodMarketId") String finprodMarketId);
 
 
 }
