@@ -202,8 +202,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         }else{
             if (OperationType.NEW.equals(type)) {
                 updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT,entity.getWorkflowId());
-            }else{
+            }else if (OperationType.MODIFY.equals(type)) {
                 updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE,entity.getWorkflowId());
+            }else if (OperationType.DELETE.equals(type)) {
+                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_DELETE,entity.getWorkflowId());
             }
         }
     }
