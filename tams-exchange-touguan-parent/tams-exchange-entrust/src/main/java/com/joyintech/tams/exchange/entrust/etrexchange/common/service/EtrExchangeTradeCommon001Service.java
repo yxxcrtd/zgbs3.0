@@ -5377,12 +5377,17 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         ProcessMark processMark = new ProcessMark();
         processMark.setBusinessDataPk1(dto.getEntrustId());
         String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
+        //EtrEntrust etrEntrust=etrEntrustMapper.selectByPrimaryKey(dto.getEntrustId());
         EtrExchangeTradeSaveRequest entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
-        List<EtrExchangeTradePortfolioRequest> portlist = entity.getPortfolioList();
-        for (EtrExchangeTradePortfolioRequest port : portlist) {
-            EtrExchangeTradeSaveRequest etrExchangeTrade001Dto = new EtrExchangeTradeSaveRequest();
-            BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, port);
-            tradeList.add(etrExchangeTrade001Dto);
+        if("modify".equals(entity.getOptType()) && "07".equals(entity.getEntrustStatus())){
+            tradeList = etrExchangeTradeCommonMapper.selectEntrustDetail(dto);
+        }else{
+            List<EtrExchangeTradePortfolioRequest> portlist = entity.getPortfolioList();
+            for (EtrExchangeTradePortfolioRequest port : portlist) {
+                EtrExchangeTradeSaveRequest etrExchangeTrade001Dto = new EtrExchangeTradeSaveRequest();
+                BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, port);
+                tradeList.add(etrExchangeTrade001Dto);
+            }
         }
         if (CollectionUtils.isEmpty(tradeList)) {
             tradeList = etrExchangeTradeCommonMapper.selectEntrustDetail(dto);
