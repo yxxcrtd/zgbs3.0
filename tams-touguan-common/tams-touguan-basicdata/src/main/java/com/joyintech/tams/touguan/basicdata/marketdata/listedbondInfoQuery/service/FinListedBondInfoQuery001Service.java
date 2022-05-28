@@ -13,7 +13,9 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.MstCustomerInfoAddMapper;
 import com.joyintech.tams.common.base.dao.MstCustomerInfoMapper;
@@ -26,6 +28,7 @@ import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -39,6 +42,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -78,6 +82,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     private FinProductMapper finProductMapper;
     @Resource
     private IPlatformDate iPlatformDate;
+    @Resource
+    private JoyinbusinessCommonService joyinbusinessCommonService;
 
     /**
      * 待上市债券市场信息分页查询
@@ -169,6 +175,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @param secId
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public AjaxResult addCoupons(String secId) {
         AjaxResult ajaxResult = new AjaxResult();
         logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]", secId);
@@ -196,6 +203,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto);
         //公共加券操作
         commonAutoCouponService.autoBondCouponSave(interfPayhsrcsecinfoDto);
+        //保存操作记录
+        this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
         //发行人处理
         return ajaxResult;
     }
@@ -417,6 +426,23 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         config.setOutputValue2(secondaryClassification);
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
         return finListedBondInfoQueryMapper.getWindType(config);
+    }
+
+
+    /**
+     * 保存操作记录
+     *
+     * @param tradeId
+     * @param remark
+     * @param operType
+     */
+    public void saveOperate(String tradeId, String remark, DictCodeListExt3 operType, String workFlowId) {
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setEntrustId(tradeId);
+        oprHisReq.setOperType(operType.getValue());
+        oprHisReq.setBusiDes(remark);
+        oprHisReq.setWorkflowId(workFlowId);
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
 }
