@@ -269,7 +269,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultTotal.setTotalWinId(entity.getTotalWinId());
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
             bidResultTotalMapper.updateByPrimaryKey(bidResultTotal);
-            if(StringUtil.equals(entity.getIsWin(),"04")) {
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                 List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
                 for (TrdFinProductDealTotal trdFinProductDealTotal : trdFinProductDealTotalList) {
                     TrdFinProductDealTotal trdFinProductDealTotalRevoke = new TrdFinProductDealTotal();
@@ -354,8 +354,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //中标结果汇总表
         BidResultTotal bidResultTotal = dto.getBidResultTotal();
         wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
-//        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
-
+        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
+        BidOrder record = new BidOrder();
+        record.setBidId(bidResultTotal.getBidId());
+        record.setIsWin(bidResultTotal.getIsWin());
+        bidOrderMapper.updateByPrimaryKey(record);
         bidResultTotalMapper.insertSelective(bidResultTotal);
         //中标结果明细表
         for(BidResultDetail bidResultDetail: dto.getBidResultDetailList()) {
@@ -415,6 +418,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //中标结果汇总
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,dto);
+        bidResultTotal.setWinDate(iplatformDate.getSysDate());
         //中标结果明细表
         List<BidResultDetail> bidResultDetailList = new ArrayList<>();
         for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()) {
