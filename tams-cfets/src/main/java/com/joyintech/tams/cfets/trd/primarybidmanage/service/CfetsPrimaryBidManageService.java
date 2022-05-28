@@ -226,6 +226,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         Map<String, Object> param = BeanUtil.object2Map(request);
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,request);
+        bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
         bidResultTotalMapper.insertSelective(bidResultTotal);
         BidOrder record = new BidOrder();
         record.setBidId(request.getBidId());
@@ -236,6 +237,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,request);
             BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
             bidResultDetail.setDetailWinId(IDGenerator.generate());
+            bidResultDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
             bidResultDetailMapper.insertSelective(bidResultDetail);
         }
     }
@@ -419,6 +421,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,dto);
         bidResultTotal.setWinDate(iplatformDate.getSysDate());
+        bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
         //中标结果明细表
         List<BidResultDetail> bidResultDetailList = new ArrayList<>();
         for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()) {
@@ -426,6 +429,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
             bidResultDetail.setDetailWinId(IDGenerator.generate());
             bidResultDetail.setTotalWinId(dto.getTotalWinId());
+            bidResultDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
             bidResultDetailList.add(bidResultDetail);
         }
         Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> allocationListMap = dto.getAllocationDetails().stream().collect(JoyinCollectors.groupingBy(item -> item.getSecAcctId()));
@@ -704,8 +708,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             for (CfetsPrimaryBidManageSaveRequest dto : selectedItem) {
                 WflBidResultTotal wflBidResultTotal = new WflBidResultTotal();
                 BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, dto);
+                wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
                 wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
                 wflBidResultTotal.setWorkflowId(dto.getWorkflowId());
+                wflBidResultTotal.setWinDate(iplatformDate.getSysDate());
 //                wflBidResultTotal.setpTotalWinId(wflBidResultTotal.getTotalWinId());
                 wflBidResultTotal.setTotalWinId(wflBidResultTotal.getTotalWinId() + "R");
                 wflBidResultTotalMapper.insertSelective(wflBidResultTotal);
@@ -717,6 +723,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         wflBidResultDetail.setWorkflowId(dto.getWorkflowId());
                         wflBidResultDetail.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
                         wflBidResultDetail.setTotalWinId(dto.getTotalWinId() + "R");
+                        wflBidResultDetail.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
                         wflBidResultDetailMapper.insertSelective(wflBidResultDetail);
                     }
                 }
@@ -727,6 +734,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, request);
             wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
             wflBidResultTotal.setWorkflowId(request.getWorkflowId());
+            wflBidResultTotal.setWinDate(iplatformDate.getSysDate());
+            wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_流程中.getValue());
             wflBidResultTotalMapper.insertSelective(wflBidResultTotal);
             if (request.getAllocationDetails() != null && request.getAllocationDetails().size() > 0) {
                 for (CfetsPrimaryBidManageSaveDetailDto detail : request.getAllocationDetails()) {
@@ -736,6 +745,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     wflBidResultDetail.setWorkflowId(request.getWorkflowId());
                     wflBidResultDetail.setDetailWinId(IDGenerator.generate());
                     wflBidResultDetail.setTotalWinId(request.getTotalWinId());
+                    wflBidResultDetail.setStatus(DictCodeListExt1.有效状态_流程中.getValue());
                     wflBidResultDetailMapper.insertSelective(wflBidResultDetail);
                 }
             }
