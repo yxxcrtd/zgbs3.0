@@ -289,7 +289,7 @@ public class TradeInfoPro001Controller extends BaseController {
                 }
             }
             if(StringUtil.equals(dto.getTradeMarket(),"04")) {
-                if (tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto)>0){
+                if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto))){
                     return new Message().fail().setMessage("一条交易商信息下，不同交易主体类型之间，交易主体代码不允许重复!");
                 }else if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoTraderNo(dto))){
                     return new Message().fail().setMessage("一条交易商信息下，交易主体代码+交易员代码应是唯一的!");
@@ -393,7 +393,7 @@ public class TradeInfoPro001Controller extends BaseController {
             if (dto.getDealerPartyName().getBytes().length>50){
                 return new Message().fail().setMessage("交易主体名称输入的字符过长，请重新输入!");
             }
-            if (tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto)>0){
+            if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto))&&!StringUtil.equals(tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto),dto.getSeqNo())){
                 return new Message().fail().setMessage("一条交易商信息下，不同交易主体类型之间，交易主体代码不允许重复!");
             }else if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoTraderNo(dto))&&!StringUtil.equals(tradeInfoPro001Service.hasSameDealerPartyNoTraderNo(dto),dto.getSeqNo())){
                 return new Message().fail().setMessage("一条交易商信息下，交易主体代码+交易员代码应是唯一的!");
