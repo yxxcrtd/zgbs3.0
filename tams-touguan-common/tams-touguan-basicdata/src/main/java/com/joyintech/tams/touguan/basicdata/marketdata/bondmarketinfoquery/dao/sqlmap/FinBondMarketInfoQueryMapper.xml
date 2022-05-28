@@ -20,11 +20,7 @@
         CUSTOMER_INFO1.CUSTOMER_NAME issuerName,
         PAYHSRCSECINFO.SECTYPE,
         PAYHSRCSECINFO.SECTYPE2,
-        CASE
-        PAYHSRCSECINFO.ISSUETYPE
-        WHEN '01' THEN
-        '1' ELSE '2'
-        END AS ISSUETYPE,
+        CASE PAYHSRCSECINFO.ISSUETYPE WHEN '01' THEN '1' ELSE '2' END AS ISSUETYPE,
         PAYHSRCSECINFO.BLNAREA,
         PAYHSRCSECINFO.ISSUS,
         PAYHSRCSECINFO.ISSECBOND,
@@ -33,11 +29,7 @@
         PAYHSRCSECINFO.FACEVALUE,
         PAYHSRCSECINFO.GUARANTOR,
         PAYHSRCSECINFO.GUARTYPE,
-        CASE
-
-        WHEN ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y' ) THEN
-        'Y' ELSE 'N'
-        END AS IS_RIGHT,
+        CASE WHEN ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y' ) THEN 'Y' ELSE 'N' END AS IS_RIGHT,
         PAYHSRCSECINFO.REMARK,
         PAYHSRCSECINFO.COUPONSPECIES,
         PAYHSRCSECINFO.INTERESTRATE,
@@ -50,18 +42,9 @@
         PAYHSRCSECINFO.RESETTYPE,
         PAYHSRCSECINFO.OBSERVEBEFDAY,
         PAYHSRCSECINFO.OBSERVEBEFUNIT,
-        CASE
-
-        WHEN ( PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' OR PAYHSRCSECINFO.PUTOPTION = 'A_B_DAY' ) THEN
-        'A/A' ELSE PAYHSRCSECINFO.RATEBASIC
-        END AS RATEBASIC,
-        CASE
-
-        WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' THEN
-        '02'
-        WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN
-        '01'
-        END AS BASISSTYLE,
+        CASE WHEN ( PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' OR PAYHSRCSECINFO.PUTOPTION = 'A_B_DAY' ) THEN
+        'A/A' ELSE PAYHSRCSECINFO.RATEBASIC END AS RATEBASIC,
+        CASE WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' THEN '02' WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN '01' END AS BASISSTYLE,
         PAYHSRCSECINFO.WORKDAYRULE,
         PAYHSRCSECINFO.PAYCYCLE,
         PAYHSRCSECINFO.SCHECALRULE,
@@ -81,34 +64,30 @@
         INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
         LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO1 ON PAYHSRCSECINFO.ISSUERSHORT = CUSTOMER_INFO1.CUSTOMER_ID
         LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO2 ON CUSTOMER_INFO1.CUSTOMER_ID = PAYHSRCSECINFO.GUARANTOR
-        LEFT JOIN (
-        SELECT
-        SECID,
-        OPTIONTYPE,
-        THEORYOPTIONPAYDAY
-        FROM
-        (
-        SELECT
-        ROW_NUMBER ( ) OVER ( PARTITION BY PAYHSRCSECOPTION.SECID ORDER BY PAYHSRCSECOPTION.THEORYOPTIONPAYDAY DESC )
-        NUM,
-        SECID,
-        OPTIONTYPE,
-        THEORYOPTIONPAYDAY
-        FROM
-        INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION
-        WHERE
-        PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ > ]]> to_date( #{platformDate}, 'YYYY-MM-DD' )
-        )
-        WHERE
-        NUM = 1
-        ) PAYHSRCSECOPTION ON PAYHSRCSECOPTION.SECID = PAYHSRCSECINFO.SECID
-        <!--接口债券评级信息表 -->
-        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM
-        INTERF_PAYHSRCSECRATING WHERE ratingtype='C') PAYHSRCSECRATING ON PAYHSRCSECRATING.SECID = PAYHSRCSECINFO.SECID
-        AND PAYHSRCSECRATING.NUM = 1
-        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM
-        INTERF_PAYHSRCSECRATING WHERE ratingtype='I') PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID =
-        PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING2.NUM = 1
+        LEFT JOIN (  SELECT SECID, OPTIONTYPE, THEORYOPTIONPAYDAY FROM ( SELECT  ROW_NUMBER ( ) OVER ( PARTITION BY PAYHSRCSECOPTION.SECID ORDER BY PAYHSRCSECOPTION.THEORYOPTIONPAYDAY DESC )
+        NUM, SECID, OPTIONTYPE, THEORYOPTIONPAYDAY  FROM INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION  WHERE PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ > ]]> to_date( #{platformDate}, 'YYYY-MM-DD' )
+        ) WHERE NUM = 1 ) PAYHSRCSECOPTION ON PAYHSRCSECOPTION.SECID = PAYHSRCSECINFO.SECID
+        ---接口债券评级信息表
+        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM INTERF_PAYHSRCSECRATING WHERE ratingtype='C') PAYHSRCSECRATING ON PAYHSRCSECRATING.SECID = PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING.NUM = 1
+        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM INTERF_PAYHSRCSECRATING WHERE ratingtype='I') PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID = PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING2.NUM = 1
+        left join SYS_DATADICT_LIST sdl_tp on PAYHSRCSECINFO.MARKET = sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
+        left join SYS_DATADICT_LIST sdl_ro on PAYHSRCSECINFO.ISSUEPRICE = sdl_ro.ITEM_CODE and sdl_ro.DICT_CODE='REGIST_ORG'
+        left join SYS_DATADICT_LIST sdl_catt on PAYHSRCSECINFO.SECTYPE = sdl_catt.ITEM_CODE and sdl_catt.DICT_CODE='WINDTYPEONE'
+        left join SYS_DATADICT_LIST sdl_catth on PAYHSRCSECINFO.SECTYPE2 = sdl_catth.ITEM_CODE and  sdl_catth.DICT_CODE='WINDTYPETWO'
+        left join SYS_DATADICT_LIST sdl_cs on PAYHSRCSECINFO.COUPONSPECIES = sdl_cs.ITEM_CODE and sdl_cs.DICT_CODE='COUPON_SPECIES'
+        left join SYS_DATADICT_LIST sdl_it on PAYHSRCSECINFO.INTERESTRATE = sdl_it.ITEM_CODE and sdl_it.DICT_CODE='INT_TYPE'
+        left join SYS_DATADICT_LIST sdl_fu on PAYHSRCSECINFO.payCycle = sdl_fu.ITEM_CODE and sdl_fu.DICT_CODE='FREQUENCY_UNIT'
+        left join SYS_DATADICT_LIST sdl_sd on PAYHSRCSECINFO.RATECODE = sdl_sd.ITEM_CODE and sdl_sd.DICT_CODE='SECRATE_DATA'
+        left join SYS_DATADICT_LIST sdl_em on PAYHSRCSECOPTION.OPTIONTYPE = sdl_em.ITEM_CODE and sdl_em.DICT_CODE='EXEC_MODE'
+        left join SYS_DATADICT_LIST sdl_is on PAYHSRCSECINFO.ISSUS = sdl_is.ITEM_CODE and sdl_is.DICT_CODE='YES_OR_NO'
+        left join SYS_DATADICT_LIST sdl_isb on PAYHSRCSECINFO.ISSECBOND=sdl_isb.ITEM_CODE and sdl_isb.DICT_CODE='YES_OR_NO'
+        left join SYS_DATADICT_LIST sdl_yo on PAYHSRCSECINFO.CITY_INVEST_SEC_CHB = sdl_yo.ITEM_CODE and sdl_yo.DICT_CODE='YES_OR_NO'
+        left join SYS_DATADICT_LIST sdl_ccy on PAYHSRCSECINFO.ccy=sdl_ccy.ITEM_CODE and sdl_ccy.DICT_CODE='CCY'
+        left join SYS_DATADICT_LIST sdl_rt on PAYHSRCSECINFO.ISSUETYPE = sdl_rt.ITEM_CODE and sdl_rt.DICT_CODE='RAISE_TYPE'
+        left join SYS_DATADICT_LIST sdl_ba on PAYHSRCSECINFO.BLNAREA = sdl_ba.ITEM_CODE and sdl_ba.DICT_CODE='BLN_AREA'
+        left join SYS_DATADICT_LIST sdl_sgt on PAYHSRCSECINFO.GUARTYPE = sdl_sgt.ITEM_CODE and sdl_sgt.DICT_CODE='SVR_GUA_TYPE'
+--         left join SYS_DATADICT_LIST sdl_tc on PAYHSRCSECINFO.CALENDARID = sdl_tc.ITEM_CODE and sdl_tc.DICT_CODE='TRANSACTION_CALENDAR'
+
         <where>
             PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]> to_date ( #{platformDate}, 'YYYY-MM-DD' )
 
@@ -219,6 +198,7 @@
                 PAYHSRCSECINFO.SECID like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.SECNAME like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.SECFULLNAME like '%' || #{search} || '%' OR
+                CUSTOMER_INFO1.CUSTOMER_NAME like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.SECCODE like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.MARKET like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.institution like '%' || #{search} || '%' OR
@@ -234,7 +214,25 @@
                 PAYHSRCSECINFO.ISSUS like '%' || #{search} || '%' OR
                 PAYHSRCSECOPTION.OPTIONTYPE like '%' || #{search} || '%' OR
                 PAYHSRCSECRATING2.RATING like '%' || #{search} || '%' OR
-                PAYHSRCSECRATING.RATING like '%' || #{search} || '%'
+                PAYHSRCSECRATING.RATING like '%' || #{search} || '%' OR
+
+                sdl_tp.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_ro.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_catt.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_catth.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_cs.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_it.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_fu.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_sd.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_em.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_is.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_isb.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_yo.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_ccy.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_rt.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_ba.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_sgt.ITEM_VALUE like '%' || #{search} || '%'
+
                 )
             </if>
         </where>
