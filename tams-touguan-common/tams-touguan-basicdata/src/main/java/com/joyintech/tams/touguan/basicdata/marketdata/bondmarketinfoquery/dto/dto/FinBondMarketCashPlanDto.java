@@ -101,7 +101,7 @@ public class FinBondMarketCashPlanDto extends BaseDto {
     /**
      * 计息本金
      */
-    @ApiModelProperty(name = "prinamt", value = "计息本金")
+    @ApiModelProperty(name = "prinamt", value = "计息本金（还本面值）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal prinamt;
 
