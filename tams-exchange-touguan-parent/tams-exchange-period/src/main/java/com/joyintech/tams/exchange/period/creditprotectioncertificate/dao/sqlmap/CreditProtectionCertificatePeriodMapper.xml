@@ -137,17 +137,13 @@
     <select id="findFinprodId" resultType="com.joyintech.framework.select.SelectOptionDto">
         select FINPROD_MARKET_ID id, NVL(FINPROD_ABBR, FINPROD_NAME) text
         from FIN_PRODUCT
-        <where>
-            <if test="finprodType2 != null and finprodType2 != ''">
-                and FINPROD_TYPE2 = #{finprodType2}
-            </if>
-            <if test="search != null and search != ''">
-                and (instr(FINPROD_MARKET_ID, #{search}) > 0
-                or instr(FINPROD_ID, #{search}) > 0
-                or instr(FINPROD_NAME, #{search}) > 0
-                or instr(FINPROD_ABBR, #{search}) > 0)
-            </if>
-        </where>
+        where FINPROD_TYPE2 = 'F37'
+        <if test="search != null and search != ''">
+            and (instr(FINPROD_MARKET_ID, #{search}) > 0
+            or instr(FINPROD_ID, #{search}) > 0
+            or instr(FINPROD_NAME, #{search}) > 0
+            or instr(FINPROD_ABBR, #{search}) > 0)
+        </if>
     </select>
     <select id="findFinprodDetail"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.FinprodLinkDto">

@@ -11,6 +11,9 @@ public class CreditProtectionCertificatePeriod001Request {
     @ApiModelProperty(name="busiTypePosition",value="业务类型",example="206")
     private String businessType;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型数组",example="206")
+    private String businessTypeList;
+
     @ApiModelProperty(name="businessCode",value="业务编号",example="206")
     private String businessCode;
 
@@ -106,6 +109,14 @@ public class CreditProtectionCertificatePeriod001Request {
 
     public void setFinprodName(String finprodName) {
         this.finprodName = finprodName;
+    }
+
+    public String getBusinessTypeList() {
+        return businessTypeList;
+    }
+
+    public void setBusinessTypeList(String businessTypeList) {
+        this.businessTypeList = businessTypeList;
     }
 }
 

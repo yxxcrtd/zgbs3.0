@@ -112,6 +112,29 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
         }
     }
 
+    @ApiOperation(value = "点击查看", notes = "点击查看")
+    @PostMapping("getEntity")
+    @ResponseBody
+    public Message<CreditProtectionCertificatePeriodSaveDto> getEntity()
+            throws Exception {
+        CreditProtectionCertificatePeriodSaveDto res = null;
+        String businessCode = "null".equals(getParam("businessCode")) ? null : getParam("businessCode");
+        if(businessCode == null){
+            return new Message<CreditProtectionCertificatePeriodSaveDto>().fail().setMessage("请输入参数 businessCode ");
+        }
+        if (StringUtil.isNotEmpty(businessCode)) {
+//            ProcessMark processMark = new ProcessMark();
+//            processMark.setPageId(this.getPageId());
+//            processMark.setBusinessDataPk1(businessCode);
+//            CreditProtectionCertificatePeriodSaveDto dto = creditProtectionCertificatePeriod002Service.getBussinessEntityByPk(processMark);
+            res = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(businessCode);
+        }
+        if (null == res) {
+            res = new CreditProtectionCertificatePeriodSaveDto();
+        }
+        return new Message<CreditProtectionCertificatePeriodSaveDto>().success().setData(res);
+    }
+
     @ApiOperation(value = "业务编号下拉框", notes = "业务编号下拉框")
     @ResponseBody
     @PostMapping("findBusiCode")
