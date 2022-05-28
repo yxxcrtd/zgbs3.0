@@ -39,6 +39,7 @@ import com.joyintech.tams.exchange.service.trade.position.service.PositionReques
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
 import com.joyintech.tams.exchange.service.trade.processor.msg.TradeMsgReceiver;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -176,7 +177,8 @@ public class FairOrderHelper {
         }
 
         List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
-        if (instructions.size() <= 1) {
+        Map<String, List<Instruction>> instructionMap = instructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
+        if (instructionMap.size() <= 1) {
             // 走普通委托
             return false;
         }
@@ -184,6 +186,17 @@ public class FairOrderHelper {
         order.setBusinessFlag(BusinessFlag.FAIR.value);
         orderService.asyncUpdate(order);
         return true;
+    }
+
+    public boolean isFairOrder(OrderPlaceBean orderPlaceBean) {
+        ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
+
+        PortfolioAllocationResponse portfolioAllocationResponse = Convert.convert(PortfolioAllocationResponse.class, resultBean.getData());
+        if (StrUtil.isNotEmpty(portfolioAllocationResponse.getInfoLevel())) {
+            return false;
+        }
+
+        return CollectionUtils.isNotEmpty(portfolioAllocationResponse.getList());
     }
 
     private List<FairPortfolioResponse> getFairInstructions(Order order) {

@@ -117,8 +117,7 @@ public class OrderManagement extends BaseService {
     private ResultBean checkSPPI(OrderPlaceBean orderPlaceBean) {
 
         Instruction instruction = instructionService.findById(orderPlaceBean.getInstructionId());
-        if (InvestmentAssetType.isBond(instruction.getAssetType()) && InstructionPs.BUY.codeEquals(instruction.getPs()))
-        {
+        if (InvestmentAssetType.isBond(instruction.getAssetType()) && InstructionPs.BUY.codeEquals(instruction.getPs())) {
             BidPriceConInfoRequest request = new BidPriceConInfoRequest();
             request.setPs(InstructionPs.BUY.getCode());
             request.setFinprodId(instruction.getFinprodId());
@@ -133,10 +132,13 @@ public class OrderManagement extends BaseService {
     //头寸引擎余额检查
     private void checkPosition(OrderPlaceBean orderPlaceBean) {
         Instruction instruction = instructionService.findById(orderPlaceBean.getInstructionId());
-//        	PositionInstructionRequest instructionClone = (PositionInstructionRequest)instruction.cloneInstruction();
         PositionInstructionRequest instructionClone = new PositionInstructionRequest();
         BeanUtil.copyProperties(instruction, instructionClone);
         instructionClone.setSoftSkipMode(orderPlaceBean.getSoftSkipMode());
+        //公平交易
+        if (tradeHelper.isFairTransaction(orderPlaceBean, instructionClone)) {
+            return;
+        }
         //普通下单
         if (tradeHelper.isOrdinaryTransaction(orderPlaceBean, instruction)) {
             logger.info("普通交易头寸检查...");
@@ -144,8 +146,6 @@ public class OrderManagement extends BaseService {
             instructionClone.setEntrustNum(orderPlaceBean.getEntrustVolume());
             instructionClone.setEntrustPrice(orderPlaceBean.getEntrustPrice());
             instructionClone.setFullPrice(orderPlaceBean.getFullPrice());
-        } else if (tradeHelper.isFairTransaction(orderPlaceBean, instructionClone)) { //公平交易
-            return;
         } else {
             tradeHelper.fillEntrustPriceAndAmt(orderPlaceBean, instructionClone, instruction);
         }

@@ -607,14 +607,16 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             // 交收 减少在途持仓 增加实际持仓
             if ("03".equals(stage)) {
                 resultDto.setCdate(deal.getSettleDate());
-                resultDto.setAmount(deal.getShareAmt().negate());
-                resultDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
-                result.add(resultDto);
                 PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
-                BeanUtil.copyPropertiesIgnoreNull(resultDto, flowDto);
-                resultDto.setAmount(deal.getShareAmt());
-                resultDto.setHodingType(DictCodeList.持仓类型_实际.getValue());
-                result.add(resultDto);
+                BeanUtil.copyPropertiesIgnoreNull(flowDto, resultDto);
+                flowDto.setAmount(deal.getShareAmt().negate());
+                flowDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
+                result.add(flowDto);
+                PtlSecPositionFlowDto flowDto1 = new PtlSecPositionFlowDto();
+                BeanUtil.copyPropertiesIgnoreNull(flowDto1, resultDto);
+                flowDto1.setAmount(deal.getShareAmt());
+                flowDto1.setHodingType(DictCodeList.持仓类型_实际.getValue());
+                result.add(flowDto1);
                 return result;
             }
         }
@@ -1722,14 +1724,24 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                     && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
                 resultDto.setCdate(stlPayOrder.getSettleDate());
                 resultDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
-                // 交收 增加可用金额
+                // 交收 增加可用金额 减少实际
                 if ("03".equals(stage)) {
-                    resultDto.setAmount(stlPayOrder.getSettleAmt());
+                    PtlCashPositionFlowDto flowDto1 = new PtlCashPositionFlowDto();
+                    BeanUtil.copyPropertiesIgnoreNull(flowDto1, resultDto);
+                    flowDto1.setAmount(stlPayOrder.getSettleAmt());
+                    flowDto1.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                    result.add(flowDto1);
+                    PtlCashPositionFlowDto flowDto2 = new PtlCashPositionFlowDto();
+                    BeanUtil.copyPropertiesIgnoreNull(flowDto2, resultDto);
+                    flowDto2.setAmount(stlPayOrder.getSettleAmt().negate());
+                    flowDto2.setHodingType(DictCodeList.持仓类型_实际.getValue());
+                    flowDto2.setIsDeleteAble(DictCodeList.是否_否.getValue());
+                    result.add(flowDto2);
                 } else {
                     // 登记/成交 扣减可用金额
                     resultDto.setAmount(stlPayOrder.getSettleAmt().negate());
+                    result.add(resultDto);
                 }
-                result.add(resultDto);
                 return result;
             }
             // add by jiangpeng on 20220428 新增一级申购业务处理 end

@@ -149,8 +149,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal issueAmt;
 
     @ApiModelProperty(name = "stipulationValue", value = "参考收益率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal stipulationValue;
+    private String stipulationValue;
 
     @ApiModelProperty(name = "singleMinSubAmt", value = "单笔最低认购量（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -165,8 +164,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal couponRate;
 
     @ApiModelProperty(name = "benchmarkCurveName", value = "基准利率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal benchmarkCurveName;
+    private String benchmarkCurveName;
 
     @ApiModelProperty(name = "decimalPlaces", value = "基准利率精度")
     private String decimalPlaces;
@@ -586,11 +584,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issuePx = issuePx;
     }
 
-    public BigDecimal getStipulationValue() {
+    public String getStipulationValue() {
         return stipulationValue;
     }
 
-    public void setStipulationValue(BigDecimal stipulationValue) {
+    public void setStipulationValue(String stipulationValue) {
         this.stipulationValue = stipulationValue;
     }
 
@@ -618,11 +616,15 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.couponRate = couponRate;
     }
 
-    public BigDecimal getBenchmarkCurveName() {
+    public String getBenchmarkCurveName() {
         return benchmarkCurveName;
     }
 
-    public void setBenchmarkCurveName(BigDecimal benchmarkCurveName) {
+    public String getBenchmarkCurveNameStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.利率行情, this.getBenchmarkCurveName());
+    }
+
+    public void setBenchmarkCurveName(String benchmarkCurveName) {
         this.benchmarkCurveName = benchmarkCurveName;
     }
 

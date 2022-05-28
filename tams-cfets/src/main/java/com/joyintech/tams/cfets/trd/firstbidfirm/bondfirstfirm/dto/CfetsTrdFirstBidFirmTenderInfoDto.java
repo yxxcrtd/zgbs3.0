@@ -64,6 +64,9 @@ public class CfetsTrdFirstBidFirmTenderInfoDto extends BaseEntity implements Pro
     @ApiModelProperty(name = "bidDateEndStr", value = "投标日结束格式化,展示用")
     private String bidDateEndStr;
 
+    @ApiModelProperty(name = "bidDateStr", value = "投标日 拼接,展示用")
+    private String bidDateStr;
+
     @ApiModelProperty(name = "etrBidPriceTotal", value = "指令投标券面总额(万元) 需前端转化", example = "10000.00")
     private BigDecimal etrBidPriceTotal;
 
@@ -99,6 +102,24 @@ public class CfetsTrdFirstBidFirmTenderInfoDto extends BaseEntity implements Pro
 
     @ApiModelProperty(name = "remark", value = "备注", example = "XXX")
     private String remark;
+
+    @ApiModelProperty(name = "bidCfmDateStart", value = "投标确认日开始日")
+    private Date bidCfmDateStart;
+
+    @ApiModelProperty(name = "bidCfmDateStartStr", value = "投标确认日开始 格式化")
+    private String bidCfmDateStartStr;
+
+    @ApiModelProperty(name = "bidCfmDateEnd", value = "投标确认日结束日")
+    private Date bidCfmDateEnd;
+
+    @ApiModelProperty(name = "bidCfmDateEndStr", value = "投标确认日结束日 格式化")
+    private String bidCfmDateEndStr;
+
+    @ApiModelProperty(name = "bidCfmDate", value = "投标确认日")
+    private Date bidCfmDate;
+
+    @ApiModelProperty(name = "bidCfmDateStr", value = "投标确认日 拼接,展示用")
+    private String bidCfmDateStr;
 
     public String getValidStatus() {
         return validStatus;
@@ -199,6 +220,14 @@ public class CfetsTrdFirstBidFirmTenderInfoDto extends BaseEntity implements Pro
 
     public void setBidDateEndStr(String bidDateEndStr) {
         this.bidDateEndStr = bidDateEndStr;
+    }
+
+    public void setBidDateStr(String bidDateStr) {
+        this.bidDateStr = bidDateStr;
+    }
+
+    public String getBidDateStr() {
+        return this.getBidDateStartStr() + "~" + this.getBidDateEndStr();
     }
 
     public String getTenderTarget() {
@@ -334,6 +363,72 @@ public class CfetsTrdFirstBidFirmTenderInfoDto extends BaseEntity implements Pro
 
     public void setCounterName(String counterName) {
         this.counterName = counterName;
+    }
+
+    public Date getBidCfmDateStart() {
+        return bidCfmDateStart;
+    }
+
+    public void setBidCfmDateStart(Date bidCfmDateStart) {
+        this.bidCfmDateStart = bidCfmDateStart;
+    }
+
+    public String getBidCfmDateStartStr() {
+        if (null != this.getBidCfmDateStart()) {
+            return DateUtil.format(this.getBidCfmDateStart());
+        }
+        return bidCfmDateStartStr;
+    }
+
+    public void setBidCfmDateStartStr(String bidCfmDateStartStr) {
+        this.bidCfmDateStartStr = bidCfmDateStartStr;
+    }
+
+    public Date getBidCfmDateEnd() {
+        return bidCfmDateEnd;
+    }
+
+    public void setBidCfmDateEnd(Date bidCfmDateEnd) {
+        this.bidCfmDateEnd = bidCfmDateEnd;
+    }
+
+    public String getBidCfmDateEndStr() {
+        if (null != this.getBidCfmDateEnd()) {
+            return DateUtil.format(this.getBidCfmDateEnd());
+        }
+        return bidCfmDateEndStr;
+    }
+
+    public void setBidCfmDateEndStr(String bidCfmDateEndStr) {
+        this.bidCfmDateEndStr = bidCfmDateEndStr;
+    }
+
+    public String getBidPrice() {
+        return bidPrice;
+    }
+
+    public void setBidPrice(String bidPrice) {
+        this.bidPrice = bidPrice;
+    }
+
+    public Date getBidCfmDate() {
+        return bidCfmDate;
+    }
+
+    public void setBidCfmDate(Date bidCfmDate) {
+        this.bidCfmDate = bidCfmDate;
+    }
+
+    public String getBidCfmDateStr() {
+        if (null != this.getBidCfmDate()) {
+            return DateUtil.format(this.getBidCfmDate());
+        }
+        return bidCfmDateStr;
+//        return this.getBidCfmDateStartStr() + "-" + this.getBidCfmDateEndStr();
+    }
+
+    public void setBidCfmDateStr(String bidCfmDateStr) {
+        this.bidCfmDateStr = bidCfmDateStr;
     }
 
 }
