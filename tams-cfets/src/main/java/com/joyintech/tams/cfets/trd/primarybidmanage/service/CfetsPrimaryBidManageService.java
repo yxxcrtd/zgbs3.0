@@ -385,9 +385,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         record.setBidId(bidResultTotal.getBidId());
         record.setIsWin(bidResultTotal.getIsWin());
         bidOrderMapper.updateByPrimaryKeySelective(record);
+        bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
         bidResultTotalMapper.insertSelective(bidResultTotal);
         //中标结果明细表
         for(BidResultDetail bidResultDetail: dto.getBidResultDetailList()) {
+            bidResultDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
             bidResultDetailMapper.insertSelective(bidResultDetail);
         }
         //金融产品交易汇总表
