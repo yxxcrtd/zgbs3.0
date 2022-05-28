@@ -1260,7 +1260,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         } else if (ENTRUST_RECORD_DOBACK.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_退回.getValue());
         }else if (ENTRUST_RECORD_DELETE.equals(optType)) {
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_撤回.getValue());
+            oprHisReq.setOperType(DictCodeListExt3.操作类型_删除.getValue());
         } else if ("export".equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_导出.getValue());
         }else{
