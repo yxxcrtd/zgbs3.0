@@ -703,6 +703,8 @@ public class TradeHelper {
             }
         }
 
+
+
         // 指令检查(包括状态,日期,接收人) 价格限定
 //        ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, order, orderPrice, tradingDay);
 //        if (!ErrorCode.isSuccess(errorCode.value)) {
@@ -738,7 +740,7 @@ public class TradeHelper {
         order.setIsNoGuard(instruction.getIsNoGuard());
 
         //1.公平下单
-        if (fairOrderHelper.createFairOrder(order)) {
+        if (fairOrderHelper.createFairOrder(order,instruction)) {
             return order;
         }
 

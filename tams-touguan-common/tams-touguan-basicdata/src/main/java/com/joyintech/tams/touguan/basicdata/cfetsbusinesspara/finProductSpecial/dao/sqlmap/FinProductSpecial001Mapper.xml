@@ -102,7 +102,7 @@
         LEFT JOIN
         FIN_PRODUCT_TYPE type on p.FINPROD_ID = type.FINPROD_ID
         WHERE
-        P.FINPROD_MARKET_ID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL )
+        P.FINPROD_MARKET_ID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL WHERE FINPROD_MARKET_ID is NOT NULL)
         AND P.FINPROD_TYPE2 = 'F01'
         AND P.TRADE_MARKET = '01'
         UNION
@@ -112,12 +112,11 @@
         null type
         FROM
         INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
-        LEFT JOIN FIN_PRODUCT_SPECIAL SPECIAL ON PAYHSRCSECINFO.SECID = SPECIAL.FINPROD_MARKET_ID
         WHERE
         PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND
         TRADE_MARKET = '01' )
         AND PAYHSRCSECINFO.MARKET = '01'
-        AND PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL )
+        AND PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL WHERE FINPROD_MARKET_ID is NOT NULL)
         )
         <where>
             <if test="search !=null and search !=''">
@@ -129,6 +128,46 @@
                 )
             </if>
         </where>
+    </select>
+
+    <select id="countFinprodIdInProduct" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1) qst
+        FROM
+            (
+                SELECT
+                    P.FINPROD_MARKET_ID id,
+                    P.FINPROD_ABBR text,
+                    type.type_10 type
+                FROM
+                    FIN_PRODUCT P
+                        LEFT JOIN
+                    FIN_PRODUCT_TYPE type on p.FINPROD_ID = type.FINPROD_ID
+                WHERE
+                        P.FINPROD_MARKET_ID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL WHERE FINPROD_MARKET_ID is NOT NULL)
+                  AND P.FINPROD_TYPE2 = 'F01'
+                  AND P.TRADE_MARKET = '01'
+                  AND ( P.FINPROD_MARKET_ID = #{search} or P.FINPROD_ABBR = #{search}
+                      )
+                UNION
+                SELECT
+                    SECID id,
+                    SECNAME text,
+                    null type
+                FROM
+                    INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+                WHERE
+                        PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND
+                        TRADE_MARKET = '01' )
+                  AND PAYHSRCSECINFO.MARKET = '01'
+                  AND PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL WHERE FINPROD_MARKET_ID is NOT NULL)
+                  AND (PAYHSRCSECINFO.SECID = #{search} or PAYHSRCSECINFO.SECNAME = #{search}
+                )
+            )
+    </select>
+
+    <select id="countFinprodIdForSpecial" resultType="java.lang.Integer">
+        SELECT COUNT(1) num FROM FIN_PRODUCT_SPECIAL where FINPROD_MARKET_ID = #{finprodMarketId}
     </select>
 
     <select id="countFinprodIdProcessingAndDate" resultType="java.lang.Integer">
