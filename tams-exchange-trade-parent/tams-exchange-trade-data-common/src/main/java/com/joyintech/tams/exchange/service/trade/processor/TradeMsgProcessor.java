@@ -837,14 +837,15 @@ public class TradeMsgProcessor {
             //组装撤单组合分配
             List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildPortfolioCalculateResponse(entrust, instructionClone, PortfolioDetailBusiTypeEnum.CANCEL);
             if (CollectionUtils.isEmpty(portfolioCalculateResponses)) {
-                logger.error("【未组装撤单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】",
-                        instruction.getEntrustId(), entrust.getId());
+                logger.error("【未组装撤单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
                 return;
             }
             instructionClone.setPortfolioCalculateResponses(portfolioCalculateResponses);
 
+            logger.error("【委托撤单】发送头寸开始：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
             positionRequestServiceInstructionRequest.sendRequest(instructionClone,
                     业务动作_撤委托.getValue(), 系统动作_新建.getValue(), 系统动作_新建.getValue());
+            logger.error("【委托撤单】发送头寸成功：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
             return;
         }
         //撤销委托，调用头寸引擎---end
@@ -855,14 +856,15 @@ public class TradeMsgProcessor {
             //组装成交组合分配
             List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildPortfolioCalculateResponse(entrust, instructionClone, PortfolioDetailBusiTypeEnum.ORDER);
             if (CollectionUtils.isEmpty(portfolioCalculateResponses)) {
-                logger.error("【未组装下单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】",
-                        instruction.getEntrustId(), entrust.getId());
+                logger.error("【未组装下单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
                 return;
             }
             instructionClone.setPortfolioCalculateResponses(portfolioCalculateResponses);
 
+            logger.error("【委托下单】发送头寸开始：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
             positionRequestServiceInstructionRequest.sendRequest(instructionClone,
                     业务动作_交易下单.getValue(), 系统动作_新建.getValue(), 系统动作_新建.getValue());
+            logger.error("【委托下单】发送头寸成功：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
         }
         //下单生成委托，调用头寸引擎---end
     }
