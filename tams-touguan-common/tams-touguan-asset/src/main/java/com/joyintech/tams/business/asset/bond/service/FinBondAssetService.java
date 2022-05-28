@@ -198,19 +198,19 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     @Override
     public void doInsert(FinBondAssetSaveRequest entity, OperationType type){
         if (StringUtil.equals(entity.getIsAddSec(),DictCodeList.是否_是.getValue())) {
-            updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_债券自动加券.getValue());
+            updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_债券自动加券.getValue(),entity.getWorkflowId());
         }else{
             if (OperationType.NEW.equals(type)) {
-                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT);
+                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT,entity.getWorkflowId());
             }else{
-                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE);
+                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE,entity.getWorkflowId());
             }
         }
     }
 
     @Override
     public void doUpdate(FinBondAssetSaveRequest entity) {
-        updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE);
+        updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE,entity.getWorkflowId());
     }
 
     @Override
@@ -1243,9 +1243,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     /**
      * 处理履历
      */
-    public void updateCfetsOprHis(String entrustId, String optType) {
+    public void updateCfetsOprHis(String entrustId, String optType, String workflowId) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
+        oprHisReq.setWorkflowId(workflowId);
         if (ENTRUST_RECORD_INSERT.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
         } else if (ENTRUST_RECORD_UPDATE.equals(optType)) {
