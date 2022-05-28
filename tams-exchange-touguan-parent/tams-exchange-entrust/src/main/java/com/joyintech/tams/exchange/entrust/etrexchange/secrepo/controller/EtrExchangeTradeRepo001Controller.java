@@ -891,7 +891,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 						etrExchangeTrade001Dto.setCreateDept(LoginUserUtil.getDeptCode());// 用户部门
 						etrExchangeTrade001Dto.setCreateTime(new Date());// 创建时间
 						etrExchangeTrade001Dto.setBusinessTypeName(businessType);//此处存的是类型
-						etrExchangeTrade001Dto.setIsMulti(DictCodeList.是否_否.getValue());
+						etrExchangeTrade001Dto.setIsMulti(DictCodeList.是否_是.getValue());
 						etrExchangeTrade001Dto.setFromEtrExchange("Y");
 						etrExchangeTrade001Dto.setDisRate(item2.getDisRate());
 
@@ -904,6 +904,9 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 						etrExchangeTrade001DtoList.add(etrExchangeTrade001Dto);
 						EtrExchangeTradeSecRepoSaveRepoRequest preRiskEtrExchangeTrade001Dto=new EtrExchangeTradeSecRepoSaveRepoRequest();
 						BeanUtil.copyPropertiesIgnoreNull(preRiskEtrExchangeTrade001Dto,etrExchangeTrade001Dto);
+						// 系列户的 占用编号需要拼接组合代码
+						preRiskEtrExchangeTrade001Dto.setEntrustId(preRiskEtrExchangeTrade001Dto.getEntrustId()
+																+ "-"+preRiskEtrExchangeTrade001Dto.getPortfolioId());
 						riskPreEtrExchangeTrade001DtoList.add(preRiskEtrExchangeTrade001Dto);
 					}
 					riskEtrExchangeTrade001DtoList=riskPreEtrExchangeTrade001DtoList;
@@ -912,8 +915,10 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 					String infCode;
 					infCode = BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue();
 					dto.setFromEtrExchange("Y");//场内指令
-					AjaxResult ar = ExchangeEntrustRdsCommonAop.doListPreOccupy("EtrExchangeTradeMulti001", riskPreEtrExchangeTrade001DtoList,
-							infCode);
+					AjaxResult ar = ExchangeEntrustRdsCommonAop.doListPreOccupy(riskPreEtrExchangeTrade001DtoList,
+							DictCodeList.平安资产类型_质押式回购.getValue(),
+							BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue(),
+							false, null);
 					if (StringUtil.isNotEmpty(ar)) {
 						return new Message<AjaxResult>().success().setData(ar);
 					}
@@ -987,8 +992,10 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 					String infCode = BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue();
 					riskEtrExchangeTrade001DtoList=riskPreEtrExchangeTrade001DtoList;
 					// add by zhangrui1 start
-					AjaxResult ar = ExchangeEntrustRdsCommonAop.doListPreOccupy("EtrExchangeTradeMulti001", riskPreEtrExchangeTrade001DtoList,
-							infCode);
+					AjaxResult ar = ExchangeEntrustRdsCommonAop.doListPreOccupy(riskPreEtrExchangeTrade001DtoList,
+							DictCodeList.平安资产类型_质押式回购.getValue(),
+							BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue(),
+							false, null);
 					ExchangeEntrustRdsCommonAop.riskListToChildren(dto.getRiskTrialRetDto(), riskPreEtrExchangeTrade001DtoList,
 							(etrExchangeTrade001Dto, list) -> etrExchangeTrade001Dto.setRiskTrialRetDto(list));
 				}
