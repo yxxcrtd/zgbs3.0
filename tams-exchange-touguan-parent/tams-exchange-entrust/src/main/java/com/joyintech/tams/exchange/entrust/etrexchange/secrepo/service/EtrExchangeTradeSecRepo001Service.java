@@ -19,11 +19,13 @@ import com.joyintech.background.component.order.exchange.common.dto.EtrParameter
 import com.joyintech.background.component.order.exchange.common.dto.EtrSinglePortfolioDto;
 import com.joyintech.background.component.order.exchange.common.service.EtrComponentCommService;
 import com.joyintech.background.component.order.exchange.common.service.impl.EtrComponentFactory;
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
 import com.joyintech.calculation.bonds.SecIntSchedule;
 import com.joyintech.calculation.bonds.SecPrinSchedule;
 import com.joyintech.calculation.bonds.constant.*;
+import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.shell.AccurIntCalculator;
 import com.joyintech.calculation.shell.AccurIntForSecheduleCalculator;
 import com.joyintech.calculation.shell.PriceByYieldCalculator;
@@ -1553,7 +1555,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         if(quotation.getLastPrice().compareTo(BigDecimal.ZERO)==0){
                             validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+BigDecimal.ZERO+"]之外"));
                         }else{
-                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice())+"]之外"));
+                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ ArithmeticUtil.round(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()), NumberEnum.MONEY)+","+ArithmeticUtil.round(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()),NumberEnum.MONEY)+"]之外"));
                         }
                     }
                 }
