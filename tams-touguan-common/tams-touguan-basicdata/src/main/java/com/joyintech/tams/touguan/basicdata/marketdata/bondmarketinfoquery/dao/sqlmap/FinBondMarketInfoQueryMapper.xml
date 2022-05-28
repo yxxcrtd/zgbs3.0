@@ -71,7 +71,6 @@
         NUM, SECID, OPTIONTYPE, THEORYOPTIONPAYDAY FROM INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION WHERE
         PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ > ]]> to_date( #{platformDate}, 'YYYY-MM-DD' )
         ) WHERE NUM = 1 ) PAYHSRCSECOPTION ON PAYHSRCSECOPTION.SECID = PAYHSRCSECINFO.SECID
-        ---接口债券评级信息表
         LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM
         INTERF_PAYHSRCSECRATING WHERE ratingtype='C') PAYHSRCSECRATING ON PAYHSRCSECRATING.SECID = PAYHSRCSECINFO.SECID
         AND PAYHSRCSECRATING.NUM = 1
@@ -107,7 +106,6 @@
         left join SYS_DATADICT_LIST sdl_ba on PAYHSRCSECINFO.BLNAREA = sdl_ba.ITEM_CODE and sdl_ba.DICT_CODE='BLN_AREA'
         left join SYS_DATADICT_LIST sdl_sgt on PAYHSRCSECINFO.GUARTYPE = sdl_sgt.ITEM_CODE and
         sdl_sgt.DICT_CODE='SVR_GUA_TYPE'
-        -- left join SYS_DATADICT_LIST sdl_tc on PAYHSRCSECINFO.CALENDARID = sdl_tc.ITEM_CODE and sdl_tc.DICT_CODE='TRANSACTION_CALENDAR'
 
         <where>
             PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]> to_date ( #{platformDate}, 'YYYY-MM-DD' )
@@ -239,11 +237,11 @@
                 PAYHSRCSECINFO.RATEBASIC like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.GUARANTOR like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.GUARTYPE like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.ISSUEPRICE = #{search} OR
-                PAYHSRCSECINFO.ISSUEAMT = #{search} OR
-                PAYHSRCSECINFO.PAPERIR = #{search} OR
-                PAYHSRCSECINFO.FACEVALUE = #{search} OR
-                PAYHSRCSECINFO.SPREADRATE_8 = #{search} OR
+                PAYHSRCSECINFO.ISSUEPRICE ||''= #{search} OR
+                PAYHSRCSECINFO.ISSUEAMT ||''= #{search} OR
+                PAYHSRCSECINFO.PAPERIR ||''= #{search} OR
+                PAYHSRCSECINFO.FACEVALUE ||''= #{search} OR
+                PAYHSRCSECINFO.SPREADRATE_8 ||''= #{search} OR
                 sdl_tp.ITEM_VALUE like '%' || #{search} || '%' OR
                 sdl_ro.ITEM_VALUE like '%' || #{search} || '%' OR
                 sdl_catt.ITEM_VALUE like '%' || #{search} || '%' OR
