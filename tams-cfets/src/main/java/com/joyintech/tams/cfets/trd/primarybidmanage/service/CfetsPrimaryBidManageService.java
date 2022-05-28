@@ -269,7 +269,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultTotal.setTotalWinId(entity.getTotalWinId());
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
             bidResultTotalMapper.updateByPrimaryKey(bidResultTotal);
-            if(StringUtil.equals(entity.getIsWin(),"04")) {
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                 List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
                 for (TrdFinProductDealTotal trdFinProductDealTotal : trdFinProductDealTotalList) {
                     TrdFinProductDealTotal trdFinProductDealTotalRevoke = new TrdFinProductDealTotal();
@@ -339,7 +339,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             updateCfetsOprHis(entity.getTotalWinId(),action);
         } else {
             action = OperationType.NEW.name();
-            if(StringUtil.equals(entity.getIsWin(),"04")) {
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                 entity = cncapBaseBidManageBaseInfoDto(entity);
                 doCompleteInsert(entity);
             }else{
@@ -354,8 +354,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //中标结果汇总表
         BidResultTotal bidResultTotal = dto.getBidResultTotal();
         wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
-//        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
-
+        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
+        BidOrder record = new BidOrder();
+        record.setBidId(bidResultTotal.getBidId());
+        record.setIsWin(bidResultTotal.getIsWin());
+        bidOrderMapper.updateByPrimaryKey(record);
         bidResultTotalMapper.insertSelective(bidResultTotal);
         //中标结果明细表
         for(BidResultDetail bidResultDetail: dto.getBidResultDetailList()) {
@@ -415,16 +418,16 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //中标结果汇总
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,dto);
-        baseBidManageBaseInfoDto.setBidResultTotal(bidResultTotal);
+        bidResultTotal.setWinDate(iplatformDate.getSysDate());
         //中标结果明细表
         List<BidResultDetail> bidResultDetailList = new ArrayList<>();
         for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()) {
             BidResultDetail bidResultDetail = new BidResultDetail();
             BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
             bidResultDetail.setDetailWinId(IDGenerator.generate());
+            bidResultDetail.setTotalWinId(dto.getTotalWinId());
             bidResultDetailList.add(bidResultDetail);
         }
-        baseBidManageBaseInfoDto.setBidResultDetailList(bidResultDetailList);
         Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> allocationListMap = dto.getAllocationDetails().stream().collect(JoyinCollectors.groupingBy(item -> item.getSecAcctId()));
         //金融产品交易汇总表
         List<TrdFinProductDealTotal> trdFinProductDealTotalList = new ArrayList<>();
@@ -441,6 +444,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             secAcctIdTotleTradeId.put(secAcctId,trdFinProductDealTotal.getTotleTradeId());
             trdFinProductDealTotal.setFinprodId(dto.getFinprodId());
             trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            trdFinProductDealTotal.setBusiType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
             trdFinProductDealTotal.setBranch(branch);
             trdFinProductDealTotal.setTradeDate(iplatformDate.getSysDate());
             trdFinProductDealTotal.setSettleDate(dto.getCreditorDebtDate());
@@ -491,7 +495,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdFinProductDealTotal.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
             trdFinProductDealTotal.setTrader(dto.getOuTraderId());
 //            参数字典.平安业务类型.中标结果维护
-//            trdFinProductDealTotal.setTgBusiType();
+            trdFinProductDealTotal.setTgBusiType("151");
             trdFinProductDealTotal.setbTradeId(dto.getTotalWinId());
             trdFinProductDealTotal.setCounterId(dto.getCounterId());
             trdFinProductDealTotal.setRemark(dto.getRemark());
@@ -501,6 +505,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdTradeFeeTotal.setFeeType(BussinessDictCodeList.费用类型_结算费.getValue());
             trdTradeFeeTotal.setIsPayWithTrade(DictCodeList.是否_否.getValue());
             trdTradeFeeTotal.setFeeAmt(settFeeAmt);
+            trdTradeFeeTotal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
             trdTradeFeeTotalList.add(trdTradeFeeTotal);
             //结算指令表
             StlOrders stlOrders = new StlOrders();
@@ -536,18 +541,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         List<EtrFinishStatus> etrFinishStatusList = new ArrayList<>();
         //组合交易表
         List<PtlTrade> ptlTradeList = new ArrayList<>();
-        for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()){
-            //中标结果明细表
-            BidResultDetail bidResultDetail= new BidResultDetail();
-            BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
-            bidResultDetail.setTotalWinId(dto.getTotalWinId());
-            bidResultDetailList.add(bidResultDetail);
-
-        }
         Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> allocationListTwoMap = dto.getAllocationDetails().stream()
                 .collect(JoyinCollectors.groupingBy(item -> item.getSecAcctId() + GlobalConstant.COMMA + item.getEntrustId() + GlobalConstant.COMMA + item.getPortfolioId()));
-        for (String allocation:allocationListMap.keySet()) {
-            List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = allocationListMap.get(allocation);
+        for (String allocation:allocationListTwoMap.keySet()) {
+            List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = allocationListTwoMap.get(allocation);
             List<String> allocationList = StringUtil.splitToList(GlobalConstant.COMMA, allocation);
             String secAcctId = allocationList.get(0);
             String entrustId = allocationList.get(1);
@@ -600,7 +597,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             trdProductDeal.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
 //            参数字典.平安业务类型.中标结果维护
-//            trdFinProductDealTotal.setTgBusiType();
+            trdProductDeal.setTgBusiType("151");
             trdProductDeal.setbTradeId(dto.getTotalWinId());
             trdProductDeal.setCounterId(dto.getCounterId());
             trdProductDeal.setRemark(dto.getRemark());
@@ -1374,6 +1371,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 return request.getWinPrice();
             }
         }
-        return null;
+        return request.getWinPrice();
     }
 }

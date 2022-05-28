@@ -936,21 +936,6 @@ public class TradeHelper {
                 logger.info("batch {} entrust price {} less than lowlimit {}, cover to lowlimit", batchInfo.getOrderId(), entrust.getEntrustPrice(), tick.getLowerLimitPrice());
                 entrust.setEntrustPrice(TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), round));
             }
-
-            //资产类型是债券，处理净价、全价
-            if (InvestmentAssetType.isBond(order.getAssetType())) {
-                EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
-                dto.setPrice(entrust.getEntrustPrice());
-                dto.setEntrustVolume(entrust.getEntrustVolume());
-                dto.setRound(round);
-
-                //判断是否全价交易
-                boolean isFullPrice = FullPriceConst.FULL_PRICE.value.equals(order.getIsFullPrice());
-                investmentManagement.getAllPriceAndYield(instruction, dto, isFullPrice);
-                entrust.setEntrustPrice(dto.getNetPrice());
-                entrust.setFullPrice(dto.getFullPrice());
-                entrust.setExpireYearRate(dto.getYield());
-            }
         }
     }
 
@@ -1005,17 +990,20 @@ public class TradeHelper {
         int round = bondHelper.getPriceRoundByPriceStep(instrument);
         setBatchEntrustPrice(order, batchInfo, entrust, instruction, round);
 
-//        // 处理债券
-//        if (InvestmentAssetType.isBond(order.getAssetType())) {
-//            // 根据字段区分“起始净价”或者“起始全价”
-//            if (EntrustUtils.isFullPrice(instrument, order.getAssetType(), order.getEntrustProp(), order.getIsFullPrice())) {
-//                investmentManagement.setYeildAndNetPriceFromAllPrice(instruction, entrust, round);
-//                order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
-//            } else {
-//                investmentManagement.setYieldAndAllPriceFromNetPrice(instruction, entrust, round);
-//                order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
-//            }
-//        }
+        //资产类型是债券，处理净价、全价
+        if (InvestmentAssetType.isBond(order.getAssetType())) {
+            EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
+            dto.setPrice(entrust.getEntrustPrice());
+            dto.setEntrustVolume(entrust.getEntrustVolume());
+            dto.setRound(round);
+
+            //判断是否全价交易
+            boolean isFullPrice = FullPriceConst.FULL_PRICE.value.equals(order.getIsFullPrice());
+            investmentManagement.getAllPriceAndYield(instruction, dto, isFullPrice);
+            entrust.setEntrustPrice(dto.getNetPrice());
+            entrust.setFullPrice(dto.getFullPrice());
+            entrust.setExpireYearRate(dto.getYield());
+        }
 
         batchInfo.setOrderVolume(batchInfo.getOrderVolume() + (int) entrust.getEntrustVolume());
         batchInfo.setCompleteTimes(batchInfo.getCompleteTimes() + 1);
@@ -1066,16 +1054,31 @@ public class TradeHelper {
                 Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
                 int round = bondHelper.getPriceRoundByPriceStep(instrument);
                 setBatchEntrustPrice(order, batchInfo, entrust, instruction, round);
-                // 处理债券
+//                // 处理债券
+//                if (InvestmentAssetType.isBond(order.getAssetType())) {
+//                    // 根据字段区分“起始净价”或者“起始全价”
+//                    if (EntrustUtils.isFullPrice(instrument, order.getAssetType(), order.getEntrustProp(), order.getIsFullPrice())) {
+//                        investmentManagement.setYeildAndNetPriceFromAllPrice(instruction, entrust, round);
+//                        order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
+//                    } else {
+//                        investmentManagement.setYieldAndAllPriceFromNetPrice(instruction, entrust, round);
+//                        order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
+//                    }
+//                }
+
+                //资产类型是债券，处理净价、全价
                 if (InvestmentAssetType.isBond(order.getAssetType())) {
-                    // 根据字段区分“起始净价”或者“起始全价”
-                    if (EntrustUtils.isFullPrice(instrument, order.getAssetType(), order.getEntrustProp(), order.getIsFullPrice())) {
-                        investmentManagement.setYeildAndNetPriceFromAllPrice(instruction, entrust, round);
-                        order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
-                    } else {
-                        investmentManagement.setYieldAndAllPriceFromNetPrice(instruction, entrust, round);
-                        order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
-                    }
+                    EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
+                    dto.setPrice(entrust.getEntrustPrice());
+                    dto.setEntrustVolume(entrust.getEntrustVolume());
+                    dto.setRound(round);
+
+                    //判断是否全价交易
+                    boolean isFullPrice = FullPriceConst.FULL_PRICE.value.equals(order.getIsFullPrice());
+                    investmentManagement.getAllPriceAndYield(instruction, dto, isFullPrice);
+                    entrust.setEntrustPrice(dto.getNetPrice());
+                    entrust.setFullPrice(dto.getFullPrice());
+                    entrust.setExpireYearRate(dto.getYield());
                 }
                 batchInfo.setOrderVolume(batchInfo.getOrderVolume() + (int) entrust.getEntrustVolume());
                 batchInfo.setCompleteTimes(batchInfo.getCompleteTimes() + 1);
@@ -1374,9 +1377,7 @@ public class TradeHelper {
      * 判断是否普通交易
      */
     public boolean isOrdinaryTransaction(OrderPlaceBean orderPlaceBean, Instruction instruction) {
-        if (isFairTransaction(orderPlaceBean, instruction)) {
-            return false;
-        } else if (isBatchTransaction(orderPlaceBean)) {
+        if (isBatchTransaction(orderPlaceBean)) {
             return false;
         } else if (EntrustProp.isMarketPrice(orderPlaceBean.getEntrustProp())) {
             return false;
@@ -1394,14 +1395,8 @@ public class TradeHelper {
                 || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
             return false;
         }
-        Order order = new Order();
-        order.setEntrustProp(orderPlaceBean.getEntrustProp());
-        order.setStockCode(orderPlaceBean.getStockCode());
-        order.setEntrustBs(orderPlaceBean.getEntrustBs());
-        order.setUserId(orderPlaceBean.getUserId());
-        order.setAssetType(instruction.getAssetType());
-        Map<String, Instruction> instructionBeanMap = getInstructionBeans(order);
-        return MapUtils.isNotEmpty(instructionBeanMap) && instructionBeanMap.size() > 1;
+
+        return fairOrderHelper.isFairOrder(orderPlaceBean);
     }
 
     /**
@@ -1479,23 +1474,17 @@ public class TradeHelper {
         }
 
         //资产类型是债券
-//                if (InvestmentAssetType.isBond(instructionClone.getAssetType())) {
-//                    EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
-//                    dto.setPrice(averagePrice);
-//                    dto.setEntrustVolume(instructionClone.getEntrustNum());
-//                    dto.setRound(round);
-//
-//                    //判断是否全价交易
-//                    boolean isFullPrice = FullPriceConst.FULL_PRICE.value.equals(instrument.getIsFullPrice());
-//                    investmentManagement.getAllPriceAndYield(instruction, dto, isFullPrice);
-//                    instructionClone.setEntrustPrice(dto.getNetPrice());
-//                    instructionClone.setFullPrice(dto.getFullPrice());
-//                }
+        if (InvestmentAssetType.isBond(instructionClone.getAssetType())) {
+            EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
+            dto.setPrice(instructionClone.getEntrustPrice());
+            dto.setEntrustVolume(instructionClone.getEntrustNum());
+            dto.setRound(round);
 
-        if (InvestmentAssetType.isBond(instructionClone.getAssetType()) && instructionClone.getEntrustPrice() != null) {
-            //获取全价
-            BigDecimal fullPrice = expireIncomeRateHelper.calculateFullPrice(instructionClone);
-            instructionClone.setFullPrice(fullPrice);
+            //判断是否全价交易
+            boolean isFullPrice = FullPriceConst.NET_PRICE.value.equals(instruction.getIsNetPrice());
+            investmentManagement.getAllPriceAndYield(instruction, dto, isFullPrice);
+            instructionClone.setEntrustPrice(dto.getNetPrice());
+            instructionClone.setFullPrice(dto.getFullPrice());
         }
 
     }

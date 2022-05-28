@@ -81,7 +81,7 @@
 		  nvl(A.PRICE,FTP.INT_RATE) as entrustPrice,/**委托单价*/
 		  nvl(A.BUSINESS_MODEL,A.INV_AIM) invAim,/**投资目的*/
 		  F.FULL_PRICE fullPrice,/**全价*/
-		  DECODE(F.BUSI_TYPE_POSITION,'EX009','PRM01',A.PRICE_MODEL) priceMode,/**限价模式 */
+		  NVL(A.PRICE_MODEL,'PRM01') priceMode,/**限价模式 */
 		  FS.finishamt entrustLeftAmt,/*已完成数量*/
 		  F.SETTLE_SPREED settleSpeed,/**清算速度*/
 		  F.VDATE valueDate,/**起息日*/

@@ -508,6 +508,7 @@
             BO.FINPROD_ID finprodId,
             FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR finprodAbbr,
+            FP.TRADE_MARKET tradeMarket,
             BO.OUR_TRADER   ouTraderId,
             BO.COUNTER_ID     counterId,
             FPI.TENDER_TARGET tenderTarget,
@@ -524,7 +525,8 @@
             FPI.SERI_Y_N seriYN,
             FP.COUPON_SPECIES  couponSpecies,
             BO.WIN_PRIN_AMT totalBiddingNum,
-            BO.WIN_PRICE winPrice
+            BO.WIN_PRICE winPrice,
+            BO.BID_ID  bidId
         FROM BID_ORDER	BO
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
@@ -569,7 +571,8 @@
             BRT.WIN_PRICE       winPrice,
             BRT.SETT_FEE_AMT     settFeeAmt,
             BRT.REMARK  remark,
-            FP.TRADE_MARKET  tradeMarket
+            FP.TRADE_MARKET  tradeMarket,
+            BO.BID_ID  bidId
         FROM BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID

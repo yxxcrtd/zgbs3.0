@@ -86,7 +86,7 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
 
     /**投标日*/
     @ApiModelProperty(name="bidDate",value="投标日")
-    private Date bidDate;
+    private List<Date> bidDate;
 
      @ApiModelProperty(name="bidDateStart",value="投标开始日")
      private Date bidDateStart;
@@ -256,11 +256,11 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
          this.ccy = ccy;
      }
 
-     public Date getBidDate() {
+     public List<Date> getBidDate() {
          return bidDate;
      }
 
-     public void setBidDate(Date bidDate) {
+     public void setBidDate(List<Date> bidDate) {
          this.bidDate = bidDate;
      }
 

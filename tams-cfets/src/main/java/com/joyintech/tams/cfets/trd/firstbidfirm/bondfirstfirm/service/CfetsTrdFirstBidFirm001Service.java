@@ -5,11 +5,7 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
@@ -43,6 +39,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +106,9 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      */
     @Autowired
     private CfgDataTableService cfgDataTableService;
+
+    @Autowired(required=false)
+    private IPlatformDate iPlatformDate;
 
     /**
      * 页面设置pageid
@@ -301,8 +301,9 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
         String loginUserId = LoginUserUtil.getUserName();
-        //param.put("loginUserId", loginUserId);
-        param.put("loginUserId", "jp");
+        param.put("loginUserId", loginUserId);
+        param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
+        //param.put("loginUserId", "jp");
     }
 
 

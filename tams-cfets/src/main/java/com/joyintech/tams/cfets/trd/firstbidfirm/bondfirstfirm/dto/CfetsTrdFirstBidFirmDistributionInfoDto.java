@@ -145,6 +145,9 @@ public class CfetsTrdFirstBidFirmDistributionInfoDto extends BaseEntity implemen
     @ApiModelProperty(name = "bidCfmDateEndStr", value = "投标确认日结束日 格式化")
     private String bidCfmDateEndStr;
 
+    @ApiModelProperty(name = "bidCfmDate", value = "投标确认日")
+    private Date bidCfmDate;
+
     @ApiModelProperty(name = "bidCfmDateStr", value = "投标确认日 拼接,展示用")
     private String bidCfmDateStr;
 
@@ -553,15 +556,27 @@ public class CfetsTrdFirstBidFirmDistributionInfoDto extends BaseEntity implemen
     }
 
     public String getBidDateStr() {
-        return this.getBidDateStartStr() + "-" + this.getBidDateEndStr();
+        return this.getBidDateStartStr() + "~" + this.getBidDateEndStr();
     }
 
     public void setBidDateStr(String bidDateStr) {
         this.bidDateStr = bidDateStr;
     }
 
+    public Date getBidCfmDate() {
+        return bidCfmDate;
+    }
+
+    public void setBidCfmDate(Date bidCfmDate) {
+        this.bidCfmDate = bidCfmDate;
+    }
+
     public String getBidCfmDateStr() {
-        return this.getBidCfmDateStartStr() + "-" + this.getBidCfmDateEndStr();
+        if (null != this.getBidCfmDate()) {
+            return DateUtil.format(this.getBidCfmDate());
+        }
+        return bidCfmDateStr;
+//        return this.getBidCfmDateStartStr() + "-" + this.getBidCfmDateEndStr();
     }
 
     public void setBidCfmDateStr(String bidCfmDateStr) {

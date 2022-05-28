@@ -67,7 +67,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
         Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("userId", SecurityUtil.getLoginUser().getUserName());
         param.put("sysDate", iPlatformDate.getSysDateStr());
-        param.put("ENTRUST_BUSS_TYPE_37",DictCodeListExt3.上农商_指令业务类型_信用保护凭证指令.getValue());
+        param.put("ENTRUST_BUSS_TYPE_30",DictCodeListExt3.上农商_指令业务类型_信用保护凭证指令.getValue());
         param.put("PRICE_MODEL_PRM02", DictCodeListExt2.价格模式_限价指令.getValue());
         String portfolioId = (String) param.get("portfolioId");
         if (StringUtil.isNotEmpty(portfolioId)) {
