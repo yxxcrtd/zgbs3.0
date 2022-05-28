@@ -976,8 +976,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                 List<String> traders = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_已接收.getValue())
                         .stream().distinct().collect(Collectors.toList());
                 if (CollectionUtils.isNotEmpty(traders)) {
-                    traders.stream().sorted();
-                    tradersList.stream().sorted();
+                    Collections.sort(traders);
+                    Collections.sort(tradersList);
                     if (!traders.toString().equals(tradersList.toString())) {
                         errorList.add(new ValidMessage("同一投标日的债券[" + finprodId + "]一级投标已有交易员接收，必须分给交易员" + traders.toString()));
                     }
@@ -1063,8 +1063,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                         .stream().distinct().collect(Collectors.toList());
                 List<String> entrustIdListYet = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, Arrays.asList(DictCodeList.委托状态_待接收.getValue()))
                         .stream().distinct().collect(Collectors.toList());
-                traderList.stream().sorted();
-                newTraders.stream().sorted();
+                Collections.sort(traderList);
+                Collections.sort(newTraders);
 
                 if (CollectionUtils.isNotEmpty(traderList) && !StringUtil.equals(traderList.toString(),newTraders.toString())) {
                     newTraderList.addAll(traderList);
