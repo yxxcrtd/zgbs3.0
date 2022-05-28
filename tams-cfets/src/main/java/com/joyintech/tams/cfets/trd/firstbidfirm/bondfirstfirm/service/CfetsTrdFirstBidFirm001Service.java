@@ -150,6 +150,16 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     private static final String SUM_FLAG_02 = "02";
 
     /**
+     * 指令拖出 取消汇总
+     */
+    private static final String OPERATE_SIDE_OUT = "01";
+
+    /**
+     * 指令拖入
+     */
+    private static final String OPERATE_SIDE_IN = "02";
+
+    /**
      * 接收指令
      *
      * @param param
@@ -291,8 +301,8 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
         String loginUserId = LoginUserUtil.getUserName();
-        param.put("loginUserId", loginUserId);
-        //param.put("loginUserId", "jp");
+        //param.put("loginUserId", loginUserId);
+        param.put("loginUserId", "jp");
     }
 
 
@@ -311,7 +321,8 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoListHand = new ArrayList<>();
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmDtos = cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
         bidFirmDtos.stream().forEach(x -> {
-            x.setIsSumFlag(DictCodeListExt1.是否_否.getValue());
+            x.setSumFlag(Boolean.FALSE);
+            x.setEntrustIdKey(x.getEntrustId());
         });
 
         //查询汇总关系表数据  汇总关系表数据单独汇总
@@ -331,13 +342,12 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             CfetsTrdFirstBidFirmEntrustDto bidFirm = iterator.next();
             //匹配出取消汇总（单独进行汇总）的数据放入-指令汇总数据
             if (entrustId01.contains(bidFirm.getEntrustId())) {
-                bidFirm.setIsSumFlag(DictCodeListExt1.是否_是.getValue());
+                bidFirm.setSumFlag(Boolean.TRUE);
                 bidFirmSumDtoList.add(bidFirm);
                 iterator.remove();
             }
             //匹配出手动汇总的数据
             if (entrustId02.contains(bidFirm.getEntrustId())) {
-                bidFirm.setIsSumFlag(DictCodeListExt1.是否_是.getValue());
                 bidFirmSumDtoListHand.add(bidFirm);
                 iterator.remove();
             }
@@ -383,9 +393,15 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumIsNullList = getSumListInfo(counterIsNullMapSel);
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumIsNotNullList = getSumListInfo(counterIsNotNullMap);
         List<CfetsTrdFirstBidFirmEntrustDto> handSumList = getSumListInfo(handSumMap);
-        bidFirmSumDtoList.addAll(bidFirmSumIsNullList);
-        bidFirmSumDtoList.addAll(bidFirmSumIsNotNullList);
-        bidFirmSumDtoList.addAll(handSumList);
+        if (CollectionUtils.isNotEmpty(bidFirmSumIsNullList)) {
+            bidFirmSumDtoList.addAll(bidFirmSumIsNullList);
+        }
+        if (CollectionUtils.isNotEmpty(bidFirmSumIsNotNullList)) {
+            bidFirmSumDtoList.addAll(bidFirmSumIsNotNullList);
+        }
+        if (CollectionUtils.isNotEmpty(handSumList)) {
+            bidFirmSumDtoList.addAll(handSumList);
+        }
 
         return bidFirmSumDtoList;
     }
@@ -407,6 +423,8 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             bidFirmSum.setCfetsTrdFirstBidFirmEntrustDtos(bidFirmDetail);
             bidFirmSum.setEntrustStatus(bidFirmDetail.get(0).getEntrustStatus());
             bidFirmSum.setFirstBidStatus(bidFirmDetail.get(0).getFirstBidStatus());
+            //唯一标识 前端用
+            bidFirmSum.setEntrustIdKey(bidFirmDetail.get(0).getEntrustId()+"KEY");
             //重新计算执行进度和成交进度
             //已完成额度
             BigDecimal sumFinishAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getFinishAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -458,7 +476,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             bidFirmSum.setCounterId(StringUtil.join(counterIdList, ","));
             bidFirmSum.setCounterName(StringUtil.join(counterNameList, ","));
 
-            bidFirmSum.setIsSumFlag(DictCodeListExt1.是否_是.getValue());
+            bidFirmSum.setSumFlag(Boolean.TRUE);
 
             bidFirmSumDtoList.add(bidFirmSum);
 
@@ -599,5 +617,88 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         Map<String, Object> param = BeanUtil.object2Map(request);
         this.setParam(param);
         return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.distributionSearch(param));
+    }
+
+    /**
+     * 指令汇总操作
+     *
+     * @param entrustDtoList
+     * @return
+     */
+    public List<ValidMessage> etrSumOperate(List<CfetsTrdFirstBidFirmEntrustDto> entrustDtoList) {
+        List<ValidMessage> errorList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(entrustDtoList)) {
+            errorList.add(new ValidMessage("指令信息不能为空!"));
+            return errorList;
+        }
+
+        List<CfetsTrdFirstBidFirmEntrustDto> outList = entrustDtoList.stream().filter(dto -> OPERATE_SIDE_OUT.equals(dto.getOperateSide()))
+                .collect(Collectors.toList());
+        List<CfetsTrdFirstBidFirmEntrustDto> inList = entrustDtoList.stream().filter(dto -> OPERATE_SIDE_IN.equals(dto.getOperateSide()))
+                .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(outList) && CollectionUtils.isNotEmpty(inList)) {
+            errorList.add(new ValidMessage("指令信息同时存在手动汇总和取消汇总数据!"));
+            return errorList;
+        }
+        if (CollectionUtils.isNotEmpty(outList) && outList.size() >1) {
+            errorList.add(new ValidMessage("不允许同时取消汇总多条指令信息!"));
+            return errorList;
+        }
+        //拖出：取消汇总
+        if (CollectionUtils.isNotEmpty(outList)) {
+            CfetsTrdFirstBidFirmEntrustDto cfetsDto = outList.get(0);
+            undoSumSave(cfetsDto, this.SUM_FLAG_01);
+        }
+
+        if (CollectionUtils.isNotEmpty(inList)) {
+
+            //汇总数据维度（新债标的OR投标日OR指令状态）
+            Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMap = inList.stream()
+                    .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getEntrustStatus()));
+            if (!counterIsNullMap.isEmpty() && counterIsNullMap.size() > 1) {
+                errorList.add(new ValidMessage("所选指令不满足汇总条件：【新债标的OR投标日OR交易对手OR指令状态】不同"));
+                return errorList;
+            }
+
+            List<CfetsTrdFirstBidFirmEntrustDto> counterIdList = inList.stream().filter(x -> StringUtil.isNotEmpty(x.getCounterId()))
+                    .collect(Collectors.toList());
+
+            //拖入：没有交易对手方 删除汇总关系 （指令信息自动汇总）
+            if (CollectionUtils.isEmpty(counterIdList)) {
+                for (CfetsTrdFirstBidFirmEntrustDto dto :counterIdList) {
+                    undoSumSave(dto, this.SUM_FLAG_01);
+                }
+            }
+            if (CollectionUtils.isNotEmpty(counterIdList) && counterIdList.size() >1) {
+                errorList.add(new ValidMessage("所选指令不满足汇总条件：手动汇总时指令中有多个交易对手!"));
+                return errorList;
+            }
+            if (CollectionUtils.isNotEmpty(counterIdList)) {
+                CfetsTrdFirstBidFirmEntrustDto cfetsDto = outList.get(0);
+                undoSumSave(cfetsDto, this.SUM_FLAG_02);
+            }
+        }
+
+        return errorList;
+    }
+
+    /**
+     * 指令取消汇总保存
+     *
+     * @param cfetsDto
+     * @return
+     */
+    public int undoSumSave(CfetsTrdFirstBidFirmEntrustDto cfetsDto, String sumFlag) {
+        TotalEtrEntrustRel totalEtrEntrustRel = new TotalEtrEntrustRel();
+        String uuid = IDGenerator.generate();
+        totalEtrEntrustRel.setTotleId(uuid);
+        totalEtrEntrustRel.setEntrustId(cfetsDto.getEntrustId());
+        totalEtrEntrustRel.setSumFlag(sumFlag);
+        String loginUserId = LoginUserUtil.getUserName();
+        // param.put("loginUserId", loginUserId);
+        totalEtrEntrustRel.setTrader(loginUserId);
+        //先删除后插入
+        cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(cfetsDto.getEntrustId(), loginUserId);
+        return totalEtrEntrustRelMapper.insertSelective(totalEtrEntrustRel);
     }
 }

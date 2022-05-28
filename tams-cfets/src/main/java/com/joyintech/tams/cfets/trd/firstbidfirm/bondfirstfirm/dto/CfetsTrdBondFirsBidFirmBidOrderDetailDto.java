@@ -146,7 +146,10 @@ public class CfetsTrdBondFirsBidFirmBidOrderDetailDto {
     }
 
     public String getEffectiveStatusName() {
-        return effectiveStatusName;
+        if (StringUtil.isEmpty(getEffectiveStatus())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.交易流程状态, getEffectiveStatus());
     }
 
     public void setEffectiveStatusName(String effectiveStatusName) {
