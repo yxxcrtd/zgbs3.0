@@ -674,7 +674,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         dto.setPrice(price);
         // 【结算服务费】，根据银行间债券交易费用规则计算
-        List<TrdTradeFeeDetail> trdTradeFeeDetails = this.calFee(calRequest, dto.getRegistOrg(), dto.getTradeMarket(), null);
+        List<TrdTradeFeeDetail> trdTradeFeeDetails = this.calFee(calRequest, dto.getRegistOrg(), dto.getTradeMarket(), DictCodeList.平安资产类型_债券.getValue());
         if (CollectionUtils.isNotEmpty(trdTradeFeeDetails)) {
             trdTradeFeeDetails.forEach(item -> {
                 if (StringUtil.equals(item.getFeeType(), BussinessDictCodeList.费用类型_结算手续费.getValue())) {
@@ -769,7 +769,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      */
     public List<TrdTradeFeeDetail> calFee(CalRequest calRequest, String registOrg, String tradeMarket, String finprodType2) {
         if (StringUtil.isEmpty(finprodType2)) {
-            finprodType2 = BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue();
+            finprodType2 = DictCodeList.平安资产类型_债券.getValue();
         }
         if (StringUtil.isEmpty(tradeMarket)) {
             tradeMarket = BussinessDictCodeList.交易场所_银行间.getValue();
@@ -1200,7 +1200,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      */
     public List<CfetsTrdFirstBidFirmProductDto> otherDistribution(CfetsTrdFirstBidFirmInfoDto dto) {
         // 根据投标产品列表中指令条数平均分配结算服务费
-        BigDecimal settFeeAmt = StringUtil.isNotEmpty(dto.getSettFeeAmt()) ? dto.getIntAmt() : BigDecimal.ZERO;
+        BigDecimal settFeeAmt = StringUtil.isNotEmpty(dto.getSettFeeAmt()) ? dto.getSettFeeAmt() : BigDecimal.ZERO;
         // 交易金额
         BigDecimal tradeAmt = StringUtil.isNotEmpty(dto.getTradeAmt()) ? dto.getTradeAmt() : BigDecimal.ZERO;
         // 应计利息总额
