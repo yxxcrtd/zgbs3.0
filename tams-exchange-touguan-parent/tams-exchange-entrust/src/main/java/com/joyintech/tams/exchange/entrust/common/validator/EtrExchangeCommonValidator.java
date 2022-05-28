@@ -546,6 +546,9 @@ public interface EtrExchangeCommonValidator extends BeanValidator {
                     finprodId = inputDto.getShareFinprodId();
                 } else if (value instanceof EtrExchangeTradeSaveSecRepoRequest) {
                     EtrExchangeTradeSaveSecRepoRequest inputDto = (EtrExchangeTradeSaveSecRepoRequest) value;
+                    counterId = inputDto.getCounterId();
+                    prinAmt = inputDto.getEntrustAmt();
+                    平安资产类型 = inputDto.getFinprodType2();
                     windtypeone = inputDto.getFinprodType2();
                     tradeMarket = inputDto.getTradeMarket();
                     trdProductDeal = new TrdProductDeal();
@@ -671,7 +674,8 @@ public interface EtrExchangeCommonValidator extends BeanValidator {
                 }
                 //add by gaopeng 20191126 end
                 // 授权额度检查（当本金金额高于副总裁/总裁助理相应资产的授权额度时，提示消息） 且不等于赎回
-                if (StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH), "01") && StringUtil.isEmptyList(validMessageList) && prinAmt != null
+                boolean etrlimitSwitch = StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH), "01");
+                if (etrlimitSwitch && StringUtil.isEmptyList(validMessageList) && prinAmt != null
                         && (!StringUtil.equals(ps == null ? "" : ps, DictCodeList.交易方向_赎回.getValue()))) {
                     if (!isAuthorizationSoftcontrol) {
                         CommonBusinessService commonBusinessService = SpringContextUtil.getBean(CommonBusinessService.class);
