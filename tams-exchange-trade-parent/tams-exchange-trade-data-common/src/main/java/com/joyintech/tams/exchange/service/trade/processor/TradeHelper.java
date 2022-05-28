@@ -1377,9 +1377,7 @@ public class TradeHelper {
      * 判断是否普通交易
      */
     public boolean isOrdinaryTransaction(OrderPlaceBean orderPlaceBean, Instruction instruction) {
-        if (isFairTransaction(orderPlaceBean, instruction)) {
-            return false;
-        } else if (isBatchTransaction(orderPlaceBean)) {
+        if (isBatchTransaction(orderPlaceBean)) {
             return false;
         } else if (EntrustProp.isMarketPrice(orderPlaceBean.getEntrustProp())) {
             return false;
@@ -1397,14 +1395,8 @@ public class TradeHelper {
                 || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
             return false;
         }
-        Order order = new Order();
-        order.setEntrustProp(orderPlaceBean.getEntrustProp());
-        order.setStockCode(orderPlaceBean.getStockCode());
-        order.setEntrustBs(orderPlaceBean.getEntrustBs());
-        order.setUserId(orderPlaceBean.getUserId());
-        order.setAssetType(instruction.getAssetType());
-        Map<String, Instruction> instructionBeanMap = getInstructionBeans(order);
-        return MapUtils.isNotEmpty(instructionBeanMap) && instructionBeanMap.size() > 1;
+
+        return fairOrderHelper.isFairOrder(orderPlaceBean);
     }
 
     /**
