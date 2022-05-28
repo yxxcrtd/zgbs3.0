@@ -230,16 +230,17 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                         failNum++;
                     }
                 }
-                if (StringUtil.isNotBlank(allConfirmErrorMsg)) {
-                    allConfirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_FAIL", String.valueOf(failNum)));
-                    result.setMessage(allConfirmErrorMsg.toString(), MessageType.确认消息);
-                    return result;
-                }
 
                 if (StringUtil.isNotBlank(allErrorMsg)) {
                     result.setMessage(allErrorMsg.toString(), MessageType.错误消息);
                     return result;
                 }
+
+                if (StringUtil.isNotBlank(allConfirmErrorMsg)) {
+                    result.setMessage(allConfirmErrorMsg.toString(), MessageType.警告消息);
+                    return result;
+                }
+
             } else {
                 result.setData(NO_INFO_SHOW_OUT);
             }
