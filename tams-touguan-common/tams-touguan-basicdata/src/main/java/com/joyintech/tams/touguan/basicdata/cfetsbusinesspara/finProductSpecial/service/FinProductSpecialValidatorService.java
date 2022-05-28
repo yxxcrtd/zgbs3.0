@@ -1,9 +1,9 @@
 package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service;
 
-import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
@@ -12,6 +12,7 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dao.FinProductSpecial001Mapper;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialImportDto;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -40,6 +41,8 @@ public class FinProductSpecialValidatorService implements BeanValidator {
     private MstWorkflowCommonService mstWorkflowCommonService;
     @Autowired
     private FinProductSpecial001Service finProductSpecial001Service;
+    @Autowired
+    private FinProductSpecial001Mapper finProductSpecial001Mapper;
     @Resource
     private FinProductMapper finProductMapper;
 
@@ -155,43 +158,93 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                 StringBuilder allConfirmErrorMsg = new StringBuilder();
                 for (int i = 0; i < finProductSpecialImportDtos.size(); i++) {
                     int j = i + 2;
-                    FinProductSpecialImportDto finProductSpecialImportDto = finProductSpecialImportDtos.get(i);
-                    if (DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsDefaultBondIndicator()) && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsAbs()) && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsSpecialDebt())) {
-                        result.setMessage(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MAXIMUM_SIZE", String.valueOf(j)), MessageType.错误消息);
-                        return result;
-                    }
-
                     //确认消息
                     StringBuilder confirmErrorMsg = new StringBuilder();
                     //错误消息
                     StringBuilder errorMsg = new StringBuilder();
-                    if (com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getIsSpecialDebt())) {
-                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否特殊债", String.valueOf(j))).append("\n");
+                    FinProductSpecialImportDto finProductSpecialImportDto = finProductSpecialImportDtos.get(i);
+                    if (DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsDefaultBondIndicator())
+                            && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsAbs())
+                            && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsSpecialDebt())) {
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_IS", String.valueOf(j))).append("\n\r");
                     }
-                    if (com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getIsAbs())) {
-                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否资产支持证券", String.valueOf(j))).append("\n");
+                    if (StringUtil.isBlank(finProductSpecialImportDto.getIsSpecialDebt())) {
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否特殊债", String.valueOf(j))).append("\n\r");
                     }
-                    if (com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getIsDefaultBondIndicator())) {
-                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否到期违约债", String.valueOf(j))).append("\n");
+                    if (StringUtil.isBlank(finProductSpecialImportDto.getIsAbs())) {
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否资产支持证券", String.valueOf(j))).append("\n\r");
                     }
-                    if (com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getFinprodMarketId()) && com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getFinprodAbbr())) {
-                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "债券代码/债券代码", String.valueOf(j))).append("\n");
+                    if (StringUtil.isBlank(finProductSpecialImportDto.getIsDefaultBondIndicator())) {
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否到期违约债", String.valueOf(j))).append("\n\r");
                     }
-                    if (com.joyintech.framework.util.StringUtil.isNotBlank(confirmErrorMsg)) {
+                    if (StringUtil.isBlank(finProductSpecialImportDto.getFinprodMarketId()) && StringUtil.isBlank(finProductSpecialImportDto.getFinprodAbbr())) {
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "债券代码/债券代码", String.valueOf(j))).append("\n\r");
+                    }
+                    if (StringUtil.isNotBlank(finProductSpecialImportDto.getIsSpecialDebt())
+                            && finProductSpecialImportDto.getIsSpecialDebt().equals(DictCodeList.是否_否.getCodeName())
+                            && finProductSpecialImportDto.getIsSpecialDebt().equals(DictCodeList.是否_是.getCodeName())) {
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否特殊债", String.valueOf(j))).append("\n\r");
+                    }
+                    if (StringUtil.isNotBlank(finProductSpecialImportDto.getIsAbs())
+                            && finProductSpecialImportDto.getIsAbs().equals(DictCodeList.是否_否.getCodeName())
+                            && finProductSpecialImportDto.getIsAbs().equals(DictCodeList.是否_是.getCodeName())) {
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否资产支持证券", String.valueOf(j))).append("\n\r");
+                    }
+                    if (StringUtil.isNotBlank(finProductSpecialImportDto.getIsDefaultBondIndicator())
+                            && finProductSpecialImportDto.getIsDefaultBondIndicator().equals(DictCodeList.是否_否.getCodeName())
+                            && finProductSpecialImportDto.getIsDefaultBondIndicator().equals(DictCodeList.是否_是.getCodeName())) {
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否到期违约债", String.valueOf(j))).append("\n\r");
+                    }
+                    String search = finProductSpecialImportDto.getFinprodMarketId();
+                    if (StringUtil.isBlank(search)) {
+                        search = finProductSpecialImportDto.getFinprodAbbr();
+                    }
+                    if (finProductSpecial001Mapper.countFinprodIdInProduct(search) == 0) {
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_BOND_NON_EXISTENT", String.valueOf(j))).append("\n\r");
+                    }
+
+                    if (finProductSpecial001Mapper.countFinprodIdForSpecial(finProductSpecialImportDto.getFinprodMarketId()) > 0) {
+                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_BOND_ALREADY_EXISTS", String.valueOf(j))).append("\n\r");
+                    }
+                    //校验流程中数据
+                    String finprodMarketId = finProductSpecialImportDto.getFinprodMarketId();
+                    if (StringUtil.isBlank(finprodMarketId)) {
+                        FinProduct finProduct = finProductMapper.selectByFinprodMarketId(finprodMarketId);
+                        if (Objects.nonNull(finProduct) && Objects.nonNull(finProduct.getFinprodId())) {
+                            finprodMarketId = finProduct.getFinprodId();
+                        }
+                    }
+                    WflValidInputParameter parameter = new WflValidInputParameter();
+                    parameter.setPageId("CfetsBasicInfo002");
+                    parameter.setBusinessDataPk1(finprodMarketId);
+                    ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
+                    if (Objects.nonNull(dataEntityFromProcessMark)) {
+                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_IN_PROCESS", String.valueOf(j))).append("\n\r");
+                    }
+
+                    if (StringUtil.isNotBlank(errorMsg)) {
+                        allErrorMsg.append(errorMsg);
+                    }
+                    if (StringUtil.isNotBlank(confirmErrorMsg)) {
                         allConfirmErrorMsg.append(confirmErrorMsg);
                         failNum++;
                     }
                 }
-                if (com.joyintech.framework.util.StringUtil.isNotBlank(allConfirmErrorMsg)) {
+                if (StringUtil.isNotBlank(allConfirmErrorMsg)) {
                     allConfirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_FAIL", String.valueOf(failNum)));
                     result.setMessage(allConfirmErrorMsg.toString(), MessageType.确认消息);
+                    return result;
+                }
+
+                if (StringUtil.isNotBlank(allErrorMsg)) {
+                    result.setMessage(allErrorMsg.toString(), MessageType.错误消息);
                     return result;
                 }
             } else {
                 result.setData(NO_INFO_SHOW_OUT);
             }
         } else {
-            result.setMessage("文件内容无有效数据！", MessageType.错误消息);
+            result.setMessage("导入文件为空！", MessageType.错误消息);
         }
         return result;
     }

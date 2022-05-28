@@ -52,6 +52,9 @@ import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.joyintech.tams.exchange.common.constant.ErrorCode.INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR;
+import static com.joyintech.tams.exchange.common.constant.ErrorCode.INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR;
+
 @Component
 public class FairOrderHelper {
     private static final Logger logger = LoggerFactory.getLogger(FairOrderHelper.class);
@@ -164,7 +167,7 @@ public class FairOrderHelper {
         return true;
     }
 
-    public boolean createFairOrder(Order order) {
+    public boolean createFairOrder(Order order, Instruction instruction) {
         OrderPlaceBean orderPlaceBean = convertOrder2OrderPlaceBean(order);
         ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
 
@@ -181,6 +184,20 @@ public class FairOrderHelper {
         if (instructionMap.size() <= 1) {
             // 走普通委托
             return false;
+        }
+
+        //卖出价格不得小于最优价，买入不得高于最优价
+        BigDecimal price = portfolioAllocationResponse.getPrice();
+        if (order.getEntrustBs().equals(EntrustBs.SELL.value)
+                && TradeUtils.lessThan(order.getOrderPrice(), price)) {
+            order.setErrorCode(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.value);
+            order.setErrorMsg(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.errorMsg);
+            return true;
+        } else if (order.getEntrustBs().equals(EntrustBs.BUY.value)
+                && TradeUtils.bigThan(order.getOrderPrice(), price)) {
+            order.setErrorCode(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.value);
+            order.setErrorMsg(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.errorMsg);
+            return true;
         }
 
         order.setBusinessFlag(BusinessFlag.FAIR.value);

@@ -57,7 +57,7 @@ insert into cfg_datatable_show (PAGECODE, DTCODE,SPCDCODE, COLCODE, COLNAME, DIC
 values('CfetsTrdFirstBidFirm001', 'DistributionInfo','999999', 'firstBidStatusStr', '中标状态', 'firstBidStatus','2', '1', '0', '1','120','{"colAlign": "left","supportSearch":"模糊"}','0','COMM','1','0','','','0');
 
 insert into cfg_datatable_show (PAGECODE, DTCODE,SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3,ISKEY) 
-values('CfetsTrdFirstBidFirm001', 'DistributionInfo','999999', 'bidId', '投标编号', '','3', '1', '0', '0','120','{"colAlign": "left","supportSearch":"模糊"}','0','COMM','1','0','','','0');
+values('CfetsTrdFirstBidFirm001', 'DistributionInfo','999999', 'bidId', '投标编号', '','3', '1', '0', '0','120','{"colAlign": "left","supportSearch":"模糊"}','0','COMM','1','0','','','1');
 
 insert into cfg_datatable_show (PAGECODE, DTCODE,SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3,ISKEY) 
 values('CfetsTrdFirstBidFirm001', 'DistributionInfo','999999', 'finprodMarketId', '资产代码', '','4', '1', '0', '1','120','{"colAlign": "left","supportSearch":"模糊"}','0','COMM','1','0','','','0');

@@ -105,6 +105,10 @@ public class FinBondMarketCashPlanDto extends BaseDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal prinamt;
 
+    @ApiModelProperty(name = "cashAmt", value = "本息和")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal cashAmt;
+
     @ApiModelProperty(name = "basis", value = "计息基础")
     private String basis;
 
@@ -219,5 +223,13 @@ public class FinBondMarketCashPlanDto extends BaseDto {
 
     public void setBasis(String basis) {
         this.basis = basis;
+    }
+
+    public BigDecimal getCashAmt() {
+        return cashAmt;
+    }
+
+    public void setCashAmt(BigDecimal cashAmt) {
+        this.cashAmt = cashAmt;
     }
 }

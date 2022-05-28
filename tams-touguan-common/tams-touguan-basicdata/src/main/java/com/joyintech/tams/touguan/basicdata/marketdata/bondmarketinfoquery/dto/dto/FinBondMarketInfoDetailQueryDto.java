@@ -288,6 +288,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     private String principalCashId;
 
+    @ApiModelProperty(name="yield",value="初始利率")
+    private BigDecimal yield;
+
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
@@ -1005,5 +1008,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setCalcRule(String calcRule) {
         this.calcRule = calcRule;
+    }
+
+    public BigDecimal getYield() {
+        return yield;
+    }
+
+    public void setYield(BigDecimal yield) {
+        this.yield = yield;
     }
 }
