@@ -84,7 +84,7 @@ public class PortfolioAssignHelper {
      * @return 分配列表
      */
     public ResultBean queryPortfolioAssign(String instructionId, PortfolioDetailBusiTypeEnum busiType, final BigDecimal orginVolume, final BigDecimal orginPrice, final String orginProp) {
-        log.info("queryPortfolioAssign() called with parameters => 【instructionId = {}】, 【busiType = {}】, 【orginVolume = {}】, 【orginPrice = {}】, 【orginProp = {}】", instructionId, busiType, orginVolume, orginPrice, orginProp);
+        log.info("【queryPortfolioAssign()】 called with parameters => 【instructionId = {}】, 【busiType = {}】, 【orginVolume = {}】, 【orginPrice = {}】, 【orginProp = {}】", instructionId, busiType, orginVolume, orginPrice, orginProp);
 
         // 待分配数量
         if (TradeUtils.lessThanZero(orginVolume)) {
@@ -269,7 +269,7 @@ public class PortfolioAssignHelper {
         }
 
         Map<String, PortfolioDetail> portfolioDetailMap = list.stream().collect(Collectors.toMap(PortfolioDetail::getPortfolioId, item -> item, (o1, o2) -> o1));
-        log.debug("queryPortfolioAssign() called with result => 【portfolioDetailMap = {}】", portfolioDetailMap);
+        log.debug("【queryPortfolioAssign()】 called with result => 【portfolioDetailMap = {}】", portfolioDetailMap);
         return ResultBean.success(portfolioDetailMap);
     }
 }
