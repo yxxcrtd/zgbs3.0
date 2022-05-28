@@ -21,6 +21,7 @@ import com.joyintech.tams.constant.*;
 import com.joyintech.tams.business.asset.tenderbond.dao.FinTenderBondAssetMapper;
 import com.joyintech.tams.business.asset.tenderbond.dto.*;
 import com.joyintech.tams.invest.common.asset.dao.AssetCommon002Mapper;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -368,6 +369,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
         oprHisReq.setWorkflowId(workFlowId);
+        oprHisReq.setBusiType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 

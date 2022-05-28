@@ -19,6 +19,7 @@ import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto
 import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.invest.batch.valbatchimport.common.service.CommonAutoCouponService;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter;
 import org.apache.commons.collections.CollectionUtils;
@@ -247,7 +248,7 @@ public class FinTenderBondAssetBatchService {
         productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
         finProductAddMapper.updateForTenderBound(productAdd);
         //记录操作日志
-        saveOperate(dto.getFinprodMarketId(), dto.getRemark());
+        saveOperate(dto.getFinprodMarketId(), "");
         //发送头寸
         dto.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
         this.sendPosition(dto, plateDate, seqList);
@@ -330,6 +331,7 @@ public class FinTenderBondAssetBatchService {
         oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(DictCodeListExt3.操作类型_上市流通.getValue());
         oprHisReq.setBusiDes(remark);
+        oprHisReq.setBusiType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
