@@ -10,12 +10,15 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
@@ -31,6 +34,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -59,6 +63,8 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     private FinProductMapper finProductMapper;
     @Resource
     private IPlatformDate iPlatformDate;
+    @Resource
+    private JoyinbusinessCommonService joyinbusinessCommonService;
 
     /**
      * 债券市场信息分页查询
@@ -124,6 +130,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      * @param secId
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public List<ValidMessage> addCoupons(String secId) {
         logger.info("addCoupons >> 债券市场加券参数：secId：【{}】", secId);
         FinProduct finProduct = finProductMapper.selectByFinprodMarketId(secId);
@@ -146,6 +153,9 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         /****************自动加券****end****************/
         if (CollectionUtils.isNotEmpty(errorInfoList)) {
             validMessages = errorInfoList.stream().map(errorInfo -> new ValidMessage(errorInfo)).collect(Collectors.toList());
+        } else {
+            //操作记录
+            this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
         }
         return validMessages;
     }
@@ -204,7 +214,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
                     detailQueryDto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
                 }
                 //还本信息
-                map.put("cashId",detailQueryDto.getPrincipalCashId());
+                map.put("cashId", detailQueryDto.getPrincipalCashId());
                 map.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                 if (StringUtil.isNotEmpty(detailQueryDto.getPrincipalCashId())) {
                     List<FinBondMarketCashPlanDto> invRepayList = finBondMarketInfoQueryMapper.selectInvScheduleList(map);
@@ -242,7 +252,19 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         return page;
     }
 
-    private void queryFinProductForCoupons() {
-
+    /**
+     * 保存操作记录
+     *
+     * @param tradeId
+     * @param remark
+     * @param operType
+     */
+    private void saveOperate(String tradeId, String remark, DictCodeListExt3 operType, String workFlowId) {
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setEntrustId(tradeId);
+        oprHisReq.setOperType(operType.getValue());
+        oprHisReq.setBusiDes(remark);
+        oprHisReq.setWorkflowId(workFlowId);
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 }

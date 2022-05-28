@@ -267,6 +267,9 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getIssueStatusValue() {
+        if(this.issueStatus != null && this.issueStatus.equals("00")) {
+            return null;
+        }
         return SysDataUtil.getNameFromDataDict(DictCode.发行状态, this.issueStatus);
     }
 
