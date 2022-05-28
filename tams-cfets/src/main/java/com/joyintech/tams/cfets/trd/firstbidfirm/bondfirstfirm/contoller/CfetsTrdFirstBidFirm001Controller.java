@@ -146,6 +146,17 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         }
     }
 
+    @PostMapping(value = "/exportEtrSumInfo")
+    @ResponseBody
+    @ApiOperation(value = "一级投标确认指令管理汇总导出", notes = "一级投标确认指令管理汇总导出")
+    public void exportEtrSumInfo(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
+        // 导出
+        ExcelUitl.doExport(req, response, "一级投标确认指令管理汇总导出", () -> {
+            List dataList = cfetsTrdFirstBidFirm001Service.pageSumEntrust(req.getDto(CfetsTrdBondFirstBidFirmEntrustRequest.class));
+            return dataList;
+        });
+    }
+
     @PostMapping(value = "/exportEtrInfo")
     @ResponseBody
     @ApiOperation(value = "一级投标确认指令管理导出", notes = "一级投标确认指令管理导出")
@@ -171,6 +182,21 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         } catch (Exception e) {
             logger.error("指令取消汇总保存异常", e);
             return new Message<AjaxResult>().fail().setMessage("指令取消汇总保存失败");
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/etrSumOperate")
+    @ApiOperation(value = "指令汇总操作", notes = "指令汇总操作")
+    public Message<AjaxResult> etrSumOperate(@RequestBody List<CfetsTrdFirstBidFirmEntrustDto> entrustDtoList) {
+        try {
+            AjaxResult result = new AjaxResult();
+            List<ValidMessage> validMessages = cfetsTrdFirstBidFirm001Service.etrSumOperate(entrustDtoList);
+            result.setErrorList(validMessages);
+            return new Message<AjaxResult>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("指令汇总操作异常", e);
+            return new Message<AjaxResult>().fail().setMessage("指令汇总操作失败");
         }
     }
 

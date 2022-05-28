@@ -160,8 +160,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal singleMaxSubAmt;
 
     @ApiModelProperty(name = "couponRate", value = "票面利率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal couponRate;
+    private String couponRate;
 
     @ApiModelProperty(name = "benchmarkCurveName", value = "基准利率")
     private String benchmarkCurveName;
@@ -170,8 +169,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private String decimalPlaces;
 
     @ApiModelProperty(name = "spread", value = "利差")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal spread;
+    private String spread;
 
     @ApiModelProperty(name = "issueStartTime", value = "发行开始时间")
     private Date issueStartTime;
@@ -574,7 +572,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     }
 
     public String getIssuePx() {
-        if(Objects.nonNull(getCouponSpecies()) && (getCouponSpecies().equals(BussinessDictCodeList.息票品种_附息.getValue()) || getCouponSpecies().equals(BussinessDictCodeList.息票品种_利随本清.getValue())) ){
+        if (Objects.nonNull(getCouponSpecies()) && (getCouponSpecies().equals(BussinessDictCodeList.息票品种_附息.getValue()) || getCouponSpecies().equals(BussinessDictCodeList.息票品种_利随本清.getValue()))) {
             return "100.0000";
         }
         return issuePx;
@@ -585,6 +583,20 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     }
 
     public String getStipulationValue() {
+        return stipulationValue;
+    }
+
+
+    public String getStipulationValueStr() {
+        String couponSpecies = getCouponSpecies();
+        String rateType = this.getRateType();
+        if (Objects.isNull(couponSpecies) || BussinessDictCodeList.息票品种_零息.getValue().equals(couponSpecies) || BussinessDictCodeList.息票品种_贴现.getValue().equals(couponSpecies)) {
+            return Objects.nonNull(getStipulationValue()) ? getStipulationValue() + "%" : getStipulationValue();
+        } else if (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_固定利率.getValue().equals(rateType)) {
+            return Objects.nonNull(getCouponRate()) ? getCouponRate() + "%" : getCouponRate();
+        } else if (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_浮动利率.getValue().equals(rateType)) {
+            return getBenchmarkCurveNameStr() + "+" + getSpread();
+        }
         return stipulationValue;
     }
 
@@ -608,11 +620,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.singleMaxSubAmt = singleMaxSubAmt;
     }
 
-    public BigDecimal getCouponRate() {
+    public String getCouponRate() {
         return couponRate;
     }
 
-    public void setCouponRate(BigDecimal couponRate) {
+    public void setCouponRate(String couponRate) {
         this.couponRate = couponRate;
     }
 
@@ -636,11 +648,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.decimalPlaces = decimalPlaces;
     }
 
-    public BigDecimal getSpread() {
+    public String getSpread() {
         return spread;
     }
 
-    public void setSpread(BigDecimal spread) {
+    public void setSpread(String spread) {
         this.spread = spread;
     }
 

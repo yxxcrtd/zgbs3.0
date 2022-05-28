@@ -259,6 +259,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "conVdate", value = "转股起始日")
     private Date conVdate;
 
+    @ApiModelProperty(name = "calcRule", value = "推算方式")
+    private String calcRule;
+
     @ApiModelProperty(name = "conPrice", value = "转股价格")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal conPrice;
@@ -994,5 +997,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setPrincipalCashId(String principalCashId) {
         this.principalCashId = principalCashId;
+    }
+
+    public String getCalcRule() {
+        return calcRule;
+    }
+
+    public void setCalcRule(String calcRule) {
+        this.calcRule = calcRule;
     }
 }
