@@ -663,20 +663,29 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
             List<CfetsTrdFirstBidFirmEntrustDto> counterIdList = inList.stream().filter(x -> StringUtil.isNotEmpty(x.getCounterId()))
                     .collect(Collectors.toList());
-
-            //拖入：没有交易对手方 删除汇总关系 （指令信息自动汇总）
-            if (CollectionUtils.isEmpty(counterIdList)) {
-                for (CfetsTrdFirstBidFirmEntrustDto dto :counterIdList) {
-                    undoSumSave(dto, this.SUM_FLAG_01);
-                }
-            }
+            List<CfetsTrdFirstBidFirmEntrustDto> counterIdIsNullList = inList.stream().filter(x -> StringUtil.isEmpty(x.getCounterId()))
+                    .collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(counterIdList) && counterIdList.size() >1) {
                 errorList.add(new ValidMessage("所选指令不满足汇总条件：手动汇总时指令中有多个交易对手!"));
                 return errorList;
             }
+            //拖入：没有交易对手方 删除汇总关系 （指令信息自动汇总）
+            if (CollectionUtils.isEmpty(counterIdList)) {
+                if (CollectionUtils.isNotEmpty(counterIdIsNullList)) {
+                    for (CfetsTrdFirstBidFirmEntrustDto dto :counterIdIsNullList) {
+                        undoSumSave(dto, null);
+                    }
+                }
+            }
+
             if (CollectionUtils.isNotEmpty(counterIdList)) {
-                CfetsTrdFirstBidFirmEntrustDto cfetsDto = outList.get(0);
+                CfetsTrdFirstBidFirmEntrustDto cfetsDto = counterIdList.get(0);
                 undoSumSave(cfetsDto, this.SUM_FLAG_02);
+                if (CollectionUtils.isNotEmpty(counterIdIsNullList)) {
+                    for (CfetsTrdFirstBidFirmEntrustDto dto :counterIdIsNullList) {
+                        undoSumSave(dto, null);
+                    }
+                }
             }
         }
 
@@ -698,8 +707,13 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         String loginUserId = LoginUserUtil.getUserName();
         // param.put("loginUserId", loginUserId);
         totalEtrEntrustRel.setTrader(loginUserId);
-        //先删除后插入
-        cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(cfetsDto.getEntrustId(), loginUserId);
-        return totalEtrEntrustRelMapper.insertSelective(totalEtrEntrustRel);
+        if (StringUtil.isEmpty(sumFlag)) {
+            return cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(cfetsDto.getEntrustId(), loginUserId);
+        } else {
+            //先删除后插入
+            cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(cfetsDto.getEntrustId(), loginUserId);
+            return totalEtrEntrustRelMapper.insertSelective(totalEtrEntrustRel);
+        }
+
     }
 }
