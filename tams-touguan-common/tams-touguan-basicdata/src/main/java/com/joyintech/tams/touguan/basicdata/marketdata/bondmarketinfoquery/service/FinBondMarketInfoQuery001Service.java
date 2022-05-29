@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -131,33 +133,53 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public List<ValidMessage> addCoupons(String secId) {
+    public AjaxResult addCoupons(String secId) {
         logger.info("addCoupons >> 债券市场加券参数：secId：【{}】", secId);
+        AjaxResult ajaxResult = new AjaxResult();
         FinProduct finProduct = finProductMapper.selectByFinprodMarketId(secId);
         List<ValidMessage> validMessages = new ArrayList<>();
-        if (finProduct != null) {
+        if (Objects.isNull(finProduct)) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
-            return validMessages;
+            ajaxResult.setErrorList(validMessages);
+            ajaxResult.setMessageType(MessageType.错误消息);
+            return ajaxResult;
+        }
+        //校验
+        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.selectWindBondAssetBySecId(secId);
+        if (Objects.isNull(interfPayhsrcsecinfoDto)) {
+            validMessages.add(new ValidMessage("未查询到该待上市债券信息，无法加券，请手工维护"));
+            ajaxResult.setErrorList(validMessages);
+            ajaxResult.setMessageType(MessageType.错误消息);
+            return ajaxResult;
+        }
+        //校验必填项
+        addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
+        if (CollectionUtils.isNotEmpty(validMessages)) {
+            ajaxResult.setErrorList(validMessages);
+            ajaxResult.setMessageType(MessageType.警告消息);
+            return ajaxResult;
         }
         /****************自动加券****start****************/
         //自动加券错误信息
         List<String> errorInfoList = new ArrayList<>();
         //调用债券自动加券方法
-        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = new InterfPayhsrcsecinfoDto();
-        interfPayhsrcsecinfoDto.setSecidList(Lists.newArrayList(secId));
+        InterfPayhsrcsecinfoDto params = new InterfPayhsrcsecinfoDto();
+        params.setSecidList(Lists.newArrayList(secId));
         //加券
-        InterfPayhsrcsecinfoDto result = commonAutoCouponService.autoBondCoupon(interfPayhsrcsecinfoDto);
+        InterfPayhsrcsecinfoDto result = commonAutoCouponService.autoBondCoupon(params);
         if (null != result && null != result.getErrorBondList()) {
             errorInfoList.addAll(result.getErrorBondList());
         }
         /****************自动加券****end****************/
         if (CollectionUtils.isNotEmpty(errorInfoList)) {
             validMessages = errorInfoList.stream().map(errorInfo -> new ValidMessage(errorInfo)).collect(Collectors.toList());
+            ajaxResult.setErrorList(validMessages);
+            ajaxResult.setMessageType(MessageType.错误消息);
         } else {
             //操作记录
             this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
         }
-        return validMessages;
+        return ajaxResult;
     }
 
     /**
@@ -246,9 +268,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      */
     public Page<SelectOptionDto> getAssetId(SelectOptionCommonRequest request) {
         Map<String, Object> param = BeanUtil.object2Map(request);
-        Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
-                request.getPageMode().getPageSize(),
-                () -> finBondMarketInfoQueryMapper.getAssetId(param));
+        Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> finBondMarketInfoQueryMapper.getAssetId(param));
         return page;
     }
 
@@ -266,5 +286,66 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         oprHisReq.setBusiDes(remark);
         oprHisReq.setWorkflowId(workFlowId);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+    }
+
+    /**
+     * 加券参数校验
+     *
+     * @param validMessages
+     * @param interfPayhsrcsecinfoDto
+     */
+    private void addCouponsCheck(List<ValidMessage> validMessages, InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto) {
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getSecid())) {
+            getValidMessages("资产代码", validMessages);
+        }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getSecfullname())) {
+            getValidMessages("资产名称", validMessages);
+        }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getSecname())) {
+            getValidMessages("资产名称", validMessages);
+        }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getMarket())) {
+            getValidMessages("交易场所", validMessages);
+        }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getInstitution())) {
+            getValidMessages("登记托管机构", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getIssueprice())) {
+            getValidMessages("发行价格", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getPubenddate())) {
+            getValidMessages("发行日", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getVdate())) {
+            getValidMessages("起息日", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getMdate())) {
+            getValidMessages("到期日", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getIssueamt())) {
+            getValidMessages("发行金额", validMessages);
+        }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getIssuershort())) {
+            getValidMessages("发行人", validMessages);
+        }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getIssuetype())) {
+            getValidMessages("发行方式", validMessages);
+        }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getCcy())) {
+            getValidMessages("币种", validMessages);
+        }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getCouponspecies())) {
+            getValidMessages("息票品种", validMessages);
+        }
+    }
+
+    /**
+     * 封装校验
+     *
+     * @param field
+     * @param validMessages
+     */
+    private void getValidMessages(String field, List<ValidMessage> validMessages) {
+        validMessages.add(new ValidMessage(String.format("%s%s", field, "不能为空")));
     }
 }
