@@ -1,11 +1,17 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.bean.TerminalId;
+import com.joyintech.tams.exchange.common.bean.TrdExchangeEntrustDto;
+import com.joyintech.tams.exchange.common.bean.TrdExchangeIntegratedEntrustDto;
+import com.joyintech.tams.exchange.common.bean.WorkflowBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
@@ -44,6 +50,10 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -106,14 +116,14 @@ public class TradeMsgProcessor {
     private boolean yaliFlag;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-    
+
     private AtomicInteger brokerTradeId = new AtomicInteger(0);
     private AtomicInteger localOffset = new AtomicInteger(9000);
     private static int timeZoneOffset = 0;
     static {
         timeZoneOffset = TimeZone.getDefault().getRawOffset();
     }
-    
+
     public boolean handleFrozenPendingApprovalEntrust(Entrust entrust) {
         logger.info("handleFrozenPendingApprovalEntrust {}", entrust.getId());
         FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(entrust.getStockCode());
@@ -322,13 +332,13 @@ public class TradeMsgProcessor {
 
     public void handIntegratedEntrust(IntegratedEntrust integratedEntrust, TradeAgent agent, int processType) {
         logger.info("handle IntegratedEntrust attribute value {}", integratedEntrust.getId());
-        
+
         //信用保护凭证不走交易直接，走交易登记逻辑
         if(StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), integratedEntrust.getBusiTypeTg())) {
         	this.integratedEntrustNonAgent(integratedEntrust);
         	return;
         }
-        
+
         transactionHelper.addIntegratedEntrust(integratedEntrust);
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
         transactionHelper.setInstructionBean(instruction);
@@ -355,7 +365,7 @@ public class TradeMsgProcessor {
             orderInterface.setFrozenVolume(orderInterface.getEntrustVolume());
         }
     }
-    
+
     private void integratedEntrustNonAgent(IntegratedEntrust integratedEntrust) {
     	integratedEntrust.setLocalEntrustId(genLocalId());
     	integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
@@ -374,7 +384,7 @@ public class TradeMsgProcessor {
     	this.onTrade(trade);
     	return;
     }
-    
+
     private Trade getTrade(EntrustInterface entrust, Calendar now, int tradeType) {
         Trade trade = new Trade();
         trade.setTradedVolume(entrust.getEntrustVolume());
@@ -407,7 +417,7 @@ public class TradeMsgProcessor {
         trade.setBrokerTradeId(trade.getTradeTime() + brokerTradeId.incrementAndGet());
         return trade;
     }
-    
+
     private String genLocalId() {
         int tempOffSet = localOffset.incrementAndGet();
         if (tempOffSet > 9999) {
@@ -463,9 +473,17 @@ public class TradeMsgProcessor {
             }
             // 可用数量
             if (instruction.volumeInstruction()) {
-                if (instruction.getEntrustNum() < instruction.getEntrustLeftAmt().longValue() + instruction.getFrozenQuantity().longValue() + entrustVolume) {
+                long leftNum = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
+                if (leftNum < entrustVolume) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.value);
-                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+//                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+                    String errorMsg;
+                    if (EntrustProp.isConsultingTrade(orderInterface.getEntrustProp())) {
+                        errorMsg = StrUtil.format("委托数量{}万元>指令剩余数量{}万元", NumberUtil.div(BigDecimal.valueOf(entrustVolume), 100, 2), NumberUtil.div(BigDecimal.valueOf(leftNum), 100, 2));
+                    } else {
+                        errorMsg = StrUtil.format("委托数量{}>指令剩余数量{}", entrustVolume, leftNum);
+                    }
+                    orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
                 instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
@@ -491,9 +509,17 @@ public class TradeMsgProcessor {
             }
         } else if (!Strings.isNullOrEmpty(ServiceApplication.INSTRUCTION_SERVICE) && EntrustUtils.isIntentionEntrust(orderInterface.getEntrustProp())) {
             if (instruction.volumeInstruction()) {
-                if (instruction.getEntrustNum() < instruction.getEntrustLeftAmt().longValue() + instruction.getFrozenQuantity().longValue() + entrustVolume) {
+                long leftNum = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
+                if (leftNum < entrustVolume) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.value);
-                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+//                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+                    String errorMsg;
+                    if (EntrustProp.isConsultingTrade(orderInterface.getEntrustProp())) {
+                        errorMsg = StrUtil.format("委托数量{}万元>指令剩余数量{}万元", NumberUtil.div(BigDecimal.valueOf(entrustVolume), 100, 2), NumberUtil.div(BigDecimal.valueOf(leftNum), 100, 2));
+                    } else {
+                        errorMsg = StrUtil.format("委托数量{}>指令剩余数量{}", entrustVolume, leftNum);
+                    }
+                    orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
                 instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));

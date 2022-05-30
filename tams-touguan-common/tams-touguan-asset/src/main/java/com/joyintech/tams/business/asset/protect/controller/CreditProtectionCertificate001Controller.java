@@ -1,17 +1,23 @@
 package com.joyintech.tams.business.asset.protect.controller;
 
+import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
+import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateInsertRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateRequest;
 import com.joyintech.tams.business.asset.protect.service.CreditProtectionCertificate001Service;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,13 +25,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -107,22 +116,68 @@ public class CreditProtectionCertificate001Controller extends BaseController {
             return new Message<Page<CreditProtectionCertificateDto>>().success().setData(page);
         }catch (Exception e) {
             logger.error("查询债券标的信息分页数据异常",e);
-            return new Message<Page<CreditProtectionCertificateDto>>().fail().setMessage("查询信用保护凭证标的信息");
+            return new Message<Page<CreditProtectionCertificateDto>>().fail().setMessage("查询信用保护凭证标的信息数据异常");
         }
     }
 
     @ResponseBody
     @PostMapping("/finprodIdForSelect")
-    @ApiOperation(value = "资产代码下拉列表", notes = "资产代码列表,参数:{search,initValue,pageNo,pageSize}")
-    public Page<SelectOptionDto> finprodIdForSelect(@RequestBody Map<String, Object> search) {
-        return creditProtectionCertificate001Service.getFinprodIdForSelect(search);
+    @ApiOperation(value = "资产代码下拉列表", notes = "资产代码列表")
+    public Message<Page<SelectOptionDto>> finprodIdForSelect(@RequestBody CreditProtectionCertificateRequest request) {
+        try {
+
+            Page<SelectOptionDto> page = creditProtectionCertificate001Service.getFinprodIdForSelect(request);
+            return new Message<Page<SelectOptionDto>>().success().setData(page);
+        }catch (Exception e) {
+            logger.error("债券简称下拉框数据异常",e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("资产代码下拉列表");
+        }
     }
 
     @ResponseBody
     @PostMapping("/findForSelect")
-    @ApiOperation(value = "参考债券下拉列表", notes = "参考债券下拉列表,参数:{search,initValue,pageNo,pageSize}")
-    public Page<SelectOptionDto> findForSelect(@RequestBody Map<String, Object> search) {
-        return creditProtectionCertificate001Service.findForSelect(search);
+    @ApiOperation(value = "参考债券下拉列表", notes = "参考债券下拉列表")
+    public Message<Page<SelectOptionDto>> findForSelect(@RequestBody CreditProtectionCertificateRequest request) {
+        try {
+
+            Page<SelectOptionDto> page = creditProtectionCertificate001Service.findForSelect(request);
+            return new Message<Page<SelectOptionDto>>().success().setData(page);
+        }catch (Exception e) {
+            logger.error("债券简称下拉框数据异常",e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("参考债券下拉列表");
+        }
+    }
+
+    /**
+     * 删除按钮点击时的check
+     *
+     * @param dto dto
+     * @param result BindingResult
+     * @return check结果
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value = "删除按钮点击时的check", notes = "删除按钮点击时的check")
+    @ResponseBody
+    @PostMapping("check")
+    public Message<AjaxResult> check(@RequestBody CreditProtectionCertificateRequest dto, BindingResult result) {
+        AjaxResult res= new AjaxResult();
+        List<ValidMessage> errorList = new ArrayList<>();
+        if(null!=dto.getSelectedItem()&&!dto.getSelectedItem().isEmpty()) {
+            for (CreditProtectionCertificateInsertRequest entity : dto.getSelectedItem()) {
+                WflValidInputParameter parameter = new WflValidInputParameter();
+                parameter.setPageId("CreditProtectionCertificate002");
+                parameter.setBusinessDataPk1(entity.getFinprodMarketId());
+                if (creditProtectionCertificate001Service.isInWflProcess(parameter)) {
+                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可删除!")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
+            }
+        }
+        AjaxResult ajaxResult = commonCheck(result, "revoke");
+        return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
     @ResponseBody

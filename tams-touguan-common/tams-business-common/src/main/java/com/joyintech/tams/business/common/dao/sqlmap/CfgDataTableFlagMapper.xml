@@ -29,6 +29,7 @@
             </if>
           and RANGEID = #{rangeId}
           and EFFERANGE = 1
+          and ROWNUM = 1
     </select>
 
     <insert id="insertCfgDataTableFlag" parameterType="com.joyintech.tams.business.common.entity.CfgDataTableShowFlag">

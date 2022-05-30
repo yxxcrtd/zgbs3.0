@@ -14,6 +14,7 @@
             <Cell order="10" name="评级展望">gradeExpectationStr</Cell>
             <Cell order="11" name="评级变动">directionChangeStr</Cell>
             <Cell order="12" name="评级机构">gradeOrgStr</Cell>
+            <Cell order="13" name="内评/外评">gradeSourceTypeStr</Cell>
         </Row>
     </Worksheet>
 </Workbook>

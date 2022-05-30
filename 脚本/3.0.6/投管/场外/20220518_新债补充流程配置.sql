@@ -1,0 +1,3 @@
+delete from SYS_WFL_BUSINESS_MODULE where PAGE_ID in ('FinTenderBondAsset003') and ELEMENT_ID='FinTenderBondAsset003_btn_revoke';
+INSERT INTO SYS_WFL_BUSINESS_MODULE (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, IS_SEND_UORG)
+VALUES ('FinTenderBondAsset003', 'FinTenderBondAsset003_btn_revoke', 'noneApproval', 'system', '0001', sysdate, 'system', sysdate, 'ALL', '02');

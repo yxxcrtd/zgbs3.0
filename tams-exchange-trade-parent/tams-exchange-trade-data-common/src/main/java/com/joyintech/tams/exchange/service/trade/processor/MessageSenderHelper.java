@@ -105,7 +105,7 @@ public class MessageSenderHelper {
         tradeMessage.setOrderId(trade.getEntrustId());
         tradeMessage.setEntrustNo(trade.getBrokerEntrustId());
         tradeMessage.setDealNo(trade.getBrokerTradeId());
-        tradeMessage.setAcctNo(trade.getFinanceAccount());
+        tradeMessage.setAcctNo(instruction.getAcctNo());
         tradeMessage.setFinprodMarketId(trade.getStockCode());
         tradeMessage.setDealVolume((double) trade.getTradedVolume());
         tradeMessage.setDealPrice(trade.getTradedPrice());

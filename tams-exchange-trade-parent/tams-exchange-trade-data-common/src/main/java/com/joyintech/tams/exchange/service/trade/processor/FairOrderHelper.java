@@ -13,6 +13,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
@@ -28,8 +29,11 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.exception.PositionExchangeException;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
+import com.joyintech.tams.exchange.common.response.FairPortfolioResponse;
 import com.joyintech.tams.exchange.common.response.PortfolioAllocationResponse;
-import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.management.service.*;
 import com.joyintech.tams.exchange.service.trade.position.service.PositionRequestServiceInstructionRequest;
@@ -172,7 +176,7 @@ public class FairOrderHelper {
             return true;
         }
 
-        List<Instruction> instructions = portfolioAllocationResponse.getList();
+        List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
         if (instructions.size() <= 1) {
             // 走普通委托
             return false;
@@ -183,7 +187,7 @@ public class FairOrderHelper {
         return true;
     }
 
-    private List<Instruction> getFairInstructions(Order order) {
+    private List<FairPortfolioResponse> getFairInstructions(Order order) {
         OrderPlaceBean orderPlaceBean = convertOrder2OrderPlaceBean(order);
         ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
 
@@ -219,7 +223,7 @@ public class FairOrderHelper {
     //下委托及风险审批
     public void handleFairOrder(Order order, WorkflowBean workflow) {
 
-        List<Instruction> fairInstructions = getFairInstructions(order);
+        List<FairPortfolioResponse> fairInstructions = getFairInstructions(order);
         // fairInstructions是根据组合维度的生成的，需要根据指令代码重新聚合，注意字段借用
         Map<String, List<Instruction>> instructionMap = fairInstructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
 
@@ -298,7 +302,11 @@ public class FairOrderHelper {
         entrust.setPortfolioName(instruction.getPortfolioName());
         entrust.setSecAcctId(instruction.getSecAcctId());
         entrust.setSecAcctName(instruction.getSecAcctName());
-        entrust.setIsFullPrice(instruction.getIsNetPrice());
+        if (StringUtil.equals(instruction.getIsNetPrice(), "N")) {
+            entrust.setIsFullPrice("Y");
+        } else {
+            entrust.setIsFullPrice("N");
+        }
     }
 
     public Entrust convertOrderToEntrust(Order order) {

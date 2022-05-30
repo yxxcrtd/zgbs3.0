@@ -20,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 批处理-指标重新计算-Service
@@ -72,5 +69,12 @@ public class RskParamReCalcService {
         mapper.deleteRskIndParaDtl(details);
         detailsService.setBatchListMapper(detailsMapper);
         detailsService.insertBatchList(details);
+    }
+
+    public List<RskInterfDataDto> getOcpInfoListToday(List<String> prodIdList, Date sysDate) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("sysDate", sysDate);
+        param.put("infoList", prodIdList);
+        return mapper.getOcpInfoListToday(param);
     }
 }

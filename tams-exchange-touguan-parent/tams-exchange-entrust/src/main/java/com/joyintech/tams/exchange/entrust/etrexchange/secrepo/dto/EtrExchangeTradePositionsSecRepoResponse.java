@@ -110,6 +110,8 @@ public class EtrExchangeTradePositionsSecRepoResponse {
 
     private String dealCurAcctName;
 
+    private String tradePlat;
+
     public String getDealCurAcctName() {
         return dealCurAcctName;
     }
@@ -385,5 +387,13 @@ public class EtrExchangeTradePositionsSecRepoResponse {
 
     public void setPositionUnitCost(BigDecimal positionUnitCost) {
         this.positionUnitCost = positionUnitCost;
+    }
+
+    public String getTradePlat() {
+        return tradePlat;
+    }
+
+    public void setTradePlat(String tradePlat) {
+        this.tradePlat = tradePlat;
     }
 }

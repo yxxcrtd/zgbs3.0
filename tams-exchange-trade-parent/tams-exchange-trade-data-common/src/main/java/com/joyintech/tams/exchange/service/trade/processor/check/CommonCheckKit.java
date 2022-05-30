@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.validation.BeanValidationResult;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
@@ -17,6 +18,7 @@ import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
@@ -37,6 +39,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.util.List;
+
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
 
 /**
  * 报单通用检查
@@ -198,6 +202,10 @@ public class CommonCheckKit extends BaseCheckKit {
         if (EntrustUtils.isNoTrade(entrustProp)) {
             return;
         }
+        //质押券出入库不需要check折算率
+        if (StringUtil.equals(instruction.getBusiTypeTg(), 投管业务类型_质押券出入库.getValue())) {
+            return;
+        }
         checkLimitPrice(order, instruction, instrument, tickBean);
     }
 
@@ -234,12 +242,12 @@ public class CommonCheckKit extends BaseCheckKit {
         }
 
         if (InvestAssetTypeEnum.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
                 && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
             minStep = minStep / 100;
         }
 
-        if (EntrustBs.isBuy(entrustBs)
-                && entrustVolume % minStep != 0) {
+        if (EntrustBs.isBuy(entrustBs) && entrustVolume % minStep != 0) {
             String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep);
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
@@ -301,10 +309,26 @@ public class CommonCheckKit extends BaseCheckKit {
             minNum = minTrdUnitLimit.getMinNum();
         }
 
+        if (InvestAssetTypeEnum.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
+                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+            minNum = minNum / 100;
+        }
+
         BigDecimal minAmt = minTrdUnitLimit.getMinAmt();
-        if (entrustVolume < minNum && entrustBalance.compareTo(minAmt) < 0) {
-            String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}],委托金额[{}]不符合最小买入金额限制[{}]",
-                    entrustVolume, minNum, entrustBalance, minAmt);
+        if (entrustVolume < minNum) {
+            String busiTypeTg = instruction.getBusiTypeTg();
+            String errorMsg = "";
+            if(DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg) || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)){
+                errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入数量限制[{}]万元", entrustVolume/100, minNum/100);
+            }else{
+                errorMsg = StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}]", entrustVolume, minNum);
+            }
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
+        }
+        if (entrustBalance.compareTo(minAmt) < 0) {
+            String errorMsg = StrUtil.format("委托金额[{}]不符合最小买入金额限制[{}]", entrustBalance, minAmt);
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }

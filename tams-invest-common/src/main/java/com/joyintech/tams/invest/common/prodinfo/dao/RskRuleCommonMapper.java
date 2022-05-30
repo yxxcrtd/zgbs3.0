@@ -23,7 +23,13 @@ public interface RskRuleCommonMapper extends BatchListMapper<RskPortfolioIndicat
 
 	List<IRskRulePoolConfig> getRulePoolConfig(@Param("code") String code);
 
-	List<String> getMatchPortData(@Param("sqlWhere") String sqlWhere, @Param("isHas") String isHas, @Param("valDate") String valDate);
+	/**
+	 * 查询所有的规则包
+	 * @return
+	 */
+	List<IRskRulePoolConfig> selectPtlRuleAll();
+
+	List<String> getMatchPortData(@Param("sqlWhere") String sqlWhere,@Param("portfolioId") String portfolioId, @Param("valDate") String valDate);
 
 	/**
 	 * 获取规则关联指标

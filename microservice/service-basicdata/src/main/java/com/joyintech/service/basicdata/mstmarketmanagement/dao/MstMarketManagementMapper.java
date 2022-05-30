@@ -19,14 +19,7 @@ public interface MstMarketManagementMapper {
 
  
     List<SelectOptionDto> getGradeResult(Map<String, Object> param);
-	 
-
-	 
 
 
-	 
-
-
-	 
-
+    List<SelectOptionDto> getCodeName(Map<String, Object> param);
 }

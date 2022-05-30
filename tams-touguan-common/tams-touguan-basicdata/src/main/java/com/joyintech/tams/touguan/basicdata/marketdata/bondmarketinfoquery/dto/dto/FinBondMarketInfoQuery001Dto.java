@@ -1,15 +1,20 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 债券市场列表信息查看DTO
@@ -81,8 +86,17 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "isSecBond", value = "是否次级债,Y是N否")
     private String isSecBond;
 
+    @ApiModelProperty(name = "cityInvestSecChb", value = "是否城投债（中债）")
+    private String cityInvestSecChb;
+
     @ApiModelProperty(name = "cityInvestSecWind", value = "是否城投债（WIND）")
     private String cityInvestSecWind;
+
+    @ApiModelProperty(name = "calloption", value = "是否可赎回,Y是N否")
+    private String calloption;
+
+    @ApiModelProperty(name = "putoption", value = "是否可回售,Y是N否")
+    private String putoption;
 
     @ApiModelProperty(name = "isRight", value = "是否含权债")
     private String isRight;
@@ -195,6 +209,12 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "delistingDate", value = "摘牌日")
     private String delistingDate;
+
+    @ApiModelProperty(name = "conceptType", value = "概念板块Code")
+    private List<String> conceptType;
+
+    @ApiModelProperty(name = "conceptTypeStr", value = "概念板块")
+    private String conceptTypeStr;
 
     @ApiModelProperty(name = "finProductConvertibleDto", value = "债项市场转股信息")
     private FinProductConvertibleDto finProductConvertibleDto;
@@ -412,10 +432,6 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     }
 
 
-    public String getGuarTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.担保方式, this.getGuarType());
-    }
-
     public String getGuarType() {
         return guarType;
     }
@@ -572,6 +588,7 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.schecalRule = schecalRule;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getFirstConfirmDate() {
         return firstConfirmDate;
     }
@@ -653,6 +670,7 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.optionType = optionType;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getTheOryOptionPayDay() {
         return theOryOptionPayDay;
     }
@@ -725,5 +743,67 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public void setDelistingDate(String delistingDate) {
         this.delistingDate = delistingDate;
+    }
+
+    public List<String> getConceptType() {
+        List<String> conceptType = new ArrayList<>();
+        if (DictCodeList.是否_是.getValue().equals(this.getCityInvestSecChb())) {
+            conceptType.add("01");
+        }
+        if (DictCodeList.是否_是.getValue().equals(this.getIsGreenBond())) {
+            conceptType.add("02");
+        }
+        if (DictCodeList.是否_是.getValue().equals(this.getIsSecBond())) {
+            conceptType.add("04");
+        }
+        if (DictCodeList.是否_是.getValue().equals(this.getIssus())) {
+            conceptType.add("05");
+        }
+        if (DictCodeList.是否_是.getValue().equals(this.getCalloption()) || DictCodeList.是否_是.getValue().equals(this.getPutoption())) {
+            conceptType.add("06");
+        }
+        return conceptType;
+    }
+
+    public void setConceptType(List<String> conceptType) {
+        this.conceptType = conceptType;
+    }
+
+    public String getConceptTypeStr() {
+        List<String> conceptTypes = getConceptType();
+        if (CollectionUtils.isEmpty(conceptTypes)) {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder();
+        conceptTypes.stream().forEach(conceptType -> builder.append(SysDataUtil.getNameFromDataDict(DictCode.概念标识, conceptType)).append(","));
+        return builder.toString();
+    }
+
+    public void setConceptTypeStr(String conceptTypeStr) {
+        this.conceptTypeStr = conceptTypeStr;
+    }
+
+    public String getCityInvestSecChb() {
+        return cityInvestSecChb;
+    }
+
+    public void setCityInvestSecChb(String cityInvestSecChb) {
+        this.cityInvestSecChb = cityInvestSecChb;
+    }
+
+    public String getCalloption() {
+        return calloption;
+    }
+
+    public void setCalloption(String calloption) {
+        this.calloption = calloption;
+    }
+
+    public String getPutoption() {
+        return putoption;
+    }
+
+    public void setPutoption(String putoption) {
+        this.putoption = putoption;
     }
 }

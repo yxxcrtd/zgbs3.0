@@ -153,6 +153,10 @@ public class CfetsTrdConfirmService extends BaseService{
 
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
+
+    @Autowired
+    private FinProductAddMapper finProductAddMapper;
+
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
     String PAGE_FROM_TrdRepoTrade003 = "TrdRepoTrade003";
@@ -277,6 +281,8 @@ public class CfetsTrdConfirmService extends BaseService{
     /**
      * 交易执行-成交确认
      */
+    @Transactional(rollbackFor = Exception.class)
+    @DTXTransaction
     public AjaxResult trdConfirmSaveMethod(CfetsTrdConfirmRegInfoListResponse dto){
         List<CfetsTrdConfirmRegInfoListResponse> selectedItem = dto.getSelectedItem();
         List<ValidMessage> messages = new ArrayList<>();
@@ -295,6 +301,10 @@ public class CfetsTrdConfirmService extends BaseService{
                                 || StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.CSTP资产类型_一级申购.getValue())) {
                             CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(item.getTotleTradeId(), DictCodeListExt1.生成方式_画面录入.getValue());
                             cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW);
+                            FinProductAdd finProductAdd = new FinProductAdd();
+                            finProductAdd.setFinprodId(item.getFinprodId());
+                            finProductAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
+                            finProductAddMapper.updateByPrimaryKeySelective(finProductAdd);
                         } else {
                             CfetsTrdRepoTrade003Dto entity = packageRepoEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
                             //成交确认提交方法
@@ -404,7 +414,7 @@ public class CfetsTrdConfirmService extends BaseService{
             entity.setTotleTradeId(IDGenerator.generate());
         }
         // 业务类型
-        entity.setBusiType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
+        entity.setBusiType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
         // 金融产品类型（估值核算）
         // 分支序号
         String branch = CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE);
@@ -477,7 +487,7 @@ public class CfetsTrdConfirmService extends BaseService{
 
         TrdTradeFeeTotal ttfd = new TrdTradeFeeTotal();
         ttfd.setTotleTradeId(totleTradeId);
-        ttfd.setFeeType(DictCodeListExt1.一次性费用类型_结算费.getValue());
+        ttfd.setFeeType(BussinessDictCodeList.费用类型_结算手续费.getValue());
         ttfd.setIsPayWithTrade(DictCodeList.是否_否.getValue());
         ttfd.setFeeAmt(dtoReg.getSettleFeeAmt());
 
@@ -529,6 +539,7 @@ public class CfetsTrdConfirmService extends BaseService{
             deal.setCounterId(entity.getCounterId());
             deal.setCounterTrader(entity.getCounterTrader());
             deal.setShareAmt(ArithmeticUtil.divide(regDeal.getFaceValue(), new BigDecimal(100), decimalPlaces_4, RoundingMode.HALF_UP));
+            deal.setEntrustId(regDeal.getEntrustId());
             deals.add(deal);
 
             // 金融产品交易附属表Entity 构造开始----------------------------------------------------------
@@ -559,9 +570,9 @@ public class CfetsTrdConfirmService extends BaseService{
 
             TrdTradeFeeDetail tradeFeeDetail = new TrdTradeFeeDetail();
             tradeFeeDetail.setTradeId(deal.getTradeId());
-            tradeFeeDetail.setFeeType(DictCodeListExt1.一次性费用类型_结算费.getValue());
+            tradeFeeDetail.setFeeType(BussinessDictCodeList.费用类型_结算手续费.getValue());
             tradeFeeDetail.setIsPayWithTrade(DictCodeList.是否_否.getValue());
-            tradeFeeDetail.setFeeAmt(dtoReg.getSettleFeeAmt());
+            tradeFeeDetail.setFeeAmt(regDeal.getSettleFeeAmt());
             entity.setFeeAmt(regDeal.getSettleFeeAmt());
             entity.setFeeAmtPay(null);
             entity.setFeeAmtUnpay(regDeal.getSettleFeeAmt());
@@ -2517,7 +2528,7 @@ public class CfetsTrdConfirmService extends BaseService{
         //分品种区别是否支持CSTP下行接口
         pageParam.put("bondSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BOND"));
         pageParam.put("repoSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO"));
-        pageParam.put("repoSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
+        pageParam.put("bidSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdConfirmMapper.findAllCstpInfoList(pageParam));
     }
     /**
@@ -2747,8 +2758,8 @@ public class CfetsTrdConfirmService extends BaseService{
                         }
                         str.append("本方");
                     }
-                    if (StringUtil.isNotEmpty(regInfo.getTradeAmt()) && StringUtil.isNotEmpty(cstpInfo.getTradeAmt())
-                            && regInfo.getTradeAmt().compareTo(cstpInfo.getTradeAmt()) != 0) {
+                    if (StringUtil.isNotEmpty(regInfo.getFaceValue()) && StringUtil.isNotEmpty(cstpInfo.getLastqty())
+                            && regInfo.getFaceValue().compareTo(cstpInfo.getLastqty()) != 0) {
                         if (str != null) {
                             str.append(",");
                         }
@@ -2886,14 +2897,15 @@ public class CfetsTrdConfirmService extends BaseService{
             pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA,finprodId));
         }
 
+        pageParam.put("assetType", pageParam.get("finprodType2"));
         String regAssetType= (String)pageParam.get("regAssetType");
         if(StringUtil.isNotEmpty(regAssetType)) {
             if (StringUtil.equals(regAssetType, "01")) {
-                pageParam.put("regAssetType", "BOND");
+                pageParam.put("finprodType2", "BOND");
             } else if (StringUtil.equals(regAssetType, "02")) {
-                pageParam.put("regAssetType", "REPO");
+                pageParam.put("finprodType2", "REPO");
             } else if (StringUtil.equals(regAssetType, "03")) {
-                pageParam.put("regAssetType", "BID");
+                pageParam.put("finprodType2", "BID");
             }
         }
         if (StringUtil.equals(dto.getSettleSpeed(),
@@ -3050,15 +3062,21 @@ public class CfetsTrdConfirmService extends BaseService{
         CfetsTrdConfirmMatchDto matchDto=new CfetsTrdConfirmMatchDto();
         //是否支持CSTP下行接口_现券买卖
         String support_cstp_flag_bond=CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BOND");
+        logger.info("是否支持CSTP下行接口_现券买卖:" + support_cstp_flag_bond);
         //是否支持CSTP下行接口_质押式回购
-        String support_cstp_flag_repo=CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO");
+        String support_cstp_flag_repo = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO");
+        logger.info("是否支持CSTP下行接口_质押式回购:" + support_cstp_flag_repo);
         //是否支持CSTP下行接口_一级申购
         String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
+        logger.info("是否支持CSTP下行接口_一级申购:" + isSupportCstpFlagBondfirst);
         if (StringUtil.isNotEmpty(interfTradSecdeal) && StringUtil.equals(support_cstp_flag_bond, DictCodeList.是否_是.getValue())) {
+            logger.info("银行间CSTP成交回报-现券买卖匹配报文:" + JsonUtils.object2Json(interfTradSecdeal));
             matchDto = cstpSecTradeAutoMatch(interfTradSecdeal, iCstpTrade);
         } else if (StringUtil.isNotEmpty(interfOpicsTradRepo) && StringUtil.equals(support_cstp_flag_repo, DictCodeList.是否_是.getValue())) {
+            logger.info("银行间CSTP成交回报-质押式回购匹配报文:" + JsonUtils.object2Json(interfOpicsTradRepo));
             matchDto = cstpRepoTradeAutoMatch(interfOpicsTradRepo, iCstpTrade);
         } else if (StringUtil.isNotEmpty(interfCstpBjfxjg) && StringUtil.equals(isSupportCstpFlagBondfirst, DictCodeList.是否_是.getValue())) {
+            logger.info("银行间CSTP成交回报-一级申购匹配报文:" + JsonUtils.object2Json(interfCstpBjfxjg));
             matchDto = cstpBidTradeAutoMatch(interfCstpBjfxjg);
         }
         if(!StringUtil.isNotEmpty(matchDto)){
@@ -3101,7 +3119,7 @@ public class CfetsTrdConfirmService extends BaseService{
                     entity.setOprType(DictCodeListExt3.操作类型_自动匹配确认.getValue());
                     //成交确认提交方法
                     cfetsTrdConfirm001Service.doCompleteRepoMethod(entity,OperationType.NEW,false);
-                } else {
+                } else if(StringUtil.isNotEmpty(regInfo.getTotleTradeId())){
                     //对dto进行封装
                     CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(regInfo.getTotleTradeId(), DictCodeListExt1.生成方式_接口接入.getValue());
                     CfetsTrdConfirmMatchDto oldMatchDto = entity.getCfetsTrdConfirmMatchDto();

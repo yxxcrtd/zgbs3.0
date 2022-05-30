@@ -64,6 +64,9 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "rate", value = "票面利率", example = "99.0000")
     private BigDecimal rate;
 
+    @ApiModelProperty(name = "rateStr", value = "票面利率", example = "99.0000")
+    private String rateStr;
+
     @ApiModelProperty(name = "subscriptionAmount", value = "认购量", example = "1000.00")
     private BigDecimal subscriptionAmount;
 
@@ -106,6 +109,9 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     @ApiModelProperty(name = "systemAct", value = "头寸_系统动作,编辑页面/提交用", example = "Y")
     private String systemAct;
+
+    @ApiModelProperty(name = "confirmOk", value = "是否忽略头寸软控", example = "Y")
+    private String confirmOk;
 
     @ApiModelProperty(name = "riskcalResponse", value = "风险实体类")
     private CfetsEtribdoRiskcalResponse riskcalResponse;
@@ -215,6 +221,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setRate(BigDecimal rate) {
         this.rate = rate;
+    }
+
+    public String getRateStr() {
+        return rateStr;
+    }
+
+    public void setRateStr(String rateStr) {
+        this.rateStr = rateStr;
     }
 
     public BigDecimal getSubscriptionAmount() {
@@ -338,6 +352,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setRiskcalResponse(CfetsEtribdoRiskcalResponse riskcalResponse) {
         this.riskcalResponse = riskcalResponse;
+    }
+
+    public String getConfirmOk() {
+        return confirmOk;
+    }
+
+    public void setConfirmOk(String confirmOk) {
+        this.confirmOk = confirmOk;
     }
 }
 

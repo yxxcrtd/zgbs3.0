@@ -14,12 +14,13 @@
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
         <result column="ENT_FINISH_AMT" property="entFinishAmt" jdbcType="DECIMAL" />
         <result column="ORDER_FINISH_AMT" property="orderFinishAmt" jdbcType="DECIMAL" />
+        <result column="TRAN_FINISH_AMT" property="tranFinishAmt" jdbcType="DECIMAL" />
     </resultMap>
     <sql id="Base_Column_List" >
         ENTRUST_ID ENTRUST_ID, TRADE_ID TRADE_ID, FINISH_DATE FINISH_DATE, FINISH_AMT FINISH_AMT, 
         TRADER TRADER, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
         UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, ENT_FINISH_AMT ENT_FINISH_AMT, 
-        ORDER_FINISH_AMT ORDER_FINISH_AMT
+        ORDER_FINISH_AMT ORDER_FINISH_AMT,TRAN_FINISH_AMT TRAN_FINISH_AMT
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -47,12 +48,13 @@
         insert into ETR_FINISH_STATUS (ENTRUST_ID, TRADE_ID, FINISH_DATE, 
             FINISH_AMT, TRADER, CREATE_USER, 
             CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
-            UPDATE_TIME, ENT_FINISH_AMT, ORDER_FINISH_AMT
+            UPDATE_TIME, ENT_FINISH_AMT, ORDER_FINISH_AMT,TRAN_FINISH_AMT
             )
         values (#{entrustId,jdbcType=VARCHAR}, #{tradeId,jdbcType=VARCHAR}, #{finishDate,jdbcType=DATE}, 
             #{finishAmt,jdbcType=DECIMAL}, #{trader,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
             #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
-            #{updateTime,jdbcType=TIMESTAMP}, #{entFinishAmt,jdbcType=DECIMAL}, #{orderFinishAmt,jdbcType=DECIMAL}
+            #{updateTime,jdbcType=TIMESTAMP}, #{entFinishAmt,jdbcType=DECIMAL}, #{orderFinishAmt,jdbcType=DECIMAL},
+            #{tranFinishAmt,jdbcType=DECIMAL}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.EtrFinishStatus" >
@@ -94,6 +96,9 @@
             <if test="orderFinishAmt != null" >
                 ORDER_FINISH_AMT,
             </if>
+            <if test="tranFinishAmt != null" >
+                TRAN_FINISH_AMT,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -132,15 +137,18 @@
             <if test="orderFinishAmt != null" >
                 #{orderFinishAmt,jdbcType=DECIMAL},
             </if>
+            <if test="tranFinishAmt != null" >
+                #{tranFinishAmt,jdbcType=DECIMAL},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.EtrFinishStatus" >
         insert into ETR_FINISH_STATUS(ENTRUST_ID, TRADE_ID, FINISH_DATE, FINISH_AMT, TRADER, 
         CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ENT_FINISH_AMT, 
-        ORDER_FINISH_AMT)
+        ORDER_FINISH_AMT,TRAN_FINISH_AMTs)
         select ENTRUST_ID, TRADE_ID, FINISH_DATE, FINISH_AMT, TRADER, 
             CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, ENT_FINISH_AMT, 
-            ORDER_FINISH_AMT
+            ORDER_FINISH_AMT,TRAN_FINISH_AMT
              from ETR_FINISH_STATUS
              where 1 = 1 and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR} and TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </insert>
@@ -168,6 +176,9 @@
             <if test="orderFinishAmt != null" >
                 ORDER_FINISH_AMT = #{orderFinishAmt,jdbcType=DECIMAL},
             </if>
+            <if test="tranFinishAmt != null" >
+                TRAN_FINISH_AMT =  #{tranFinishAmt,jdbcType=DECIMAL},
+            </if>
         </set>
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
           and TRADE_ID = #{tradeId,jdbcType=VARCHAR}
@@ -180,7 +191,8 @@
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             ENT_FINISH_AMT = #{entFinishAmt,jdbcType=DECIMAL},
-            ORDER_FINISH_AMT = #{orderFinishAmt,jdbcType=DECIMAL}
+            ORDER_FINISH_AMT = #{orderFinishAmt,jdbcType=DECIMAL},
+            TRAN_FINISH_AMT =  #{tranFinishAmt,jdbcType=DECIMAL}
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
           and TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>

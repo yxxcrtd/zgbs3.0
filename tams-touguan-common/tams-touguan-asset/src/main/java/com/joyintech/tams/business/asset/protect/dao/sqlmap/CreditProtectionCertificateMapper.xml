@@ -27,13 +27,15 @@
             fp.FINPROD_NAME finprodName,					<!-- 资产名称 -->
             fp.TRADE_MARKET tradeMarket,
             sdl3.item_value tradeMarketStr,				<!-- 交易场所-->
-            fpa.ISSUERSHORT issueRshortStr,				<!-- 创立机构-->
+            fpa.ISSUERSHORT issueRshort,
+            ci1.CUSTOMER_NAME issueRshortStr,       <!-- 创立机构-->
             fpa.NOM_CAPI issueAmt,								<!-- 名义本金总额-->
             fpa.PROTECT_OBJECT protectObject,			<!-- 保护对象-->
             sdl4.item_value protectObjectStr,
             fpa.REF_SEC_FEATURES refSecFeatures,  <!-- 参考债项特征-->
             fpa.REF_SEC refSec,										<!-- 参考债项-->
-            fpa.REF_ENTITY refEntity,							<!-- 参考实体-->
+            fpa.REF_ENTITY refEntityId,
+            ci2.CUSTOMER_NAME refEntity,							<!-- 参考实体-->
             fp.MDATE mDate,												<!-- 到期日-->
             fp.VDATE vDate,												<!-- 起始日-->
             fpa.GRACE_PERIOD gracePeriod,					<!-- 宽限期（天）	-->
@@ -46,11 +48,14 @@
             fpa.SETTLE_METHOD settleMethod,			<!-- 结算方式		-->
             sdl2.item_value settleMethodStr,
             fpa.IS_ALLOW_OVERWRITE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
-            sdl1.item_value isOrNoStr
+            sdl1.item_value isOrNoStr,
+            fp.REMARK
         FROM
             FIN_PRODUCT fp
             LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID
             LEFT JOIN FIN_CASH_INFO fci ON fci.FINPROD_ID = fp.FINPROD_ID
+            LEFT JOIN MST_CUSTOMER_INFO ci1 ON fpa.ISSUERSHORT = ci1.CUSTOMER_ID
+            LEFT JOIN MST_CUSTOMER_INFO ci2 ON fpa.REF_ENTITY = ci2.CUSTOMER_ID
             LEFT JOIN FIN_CASH_CALC_RULE fccr ON fccr.FINPROD_ID = fp.FINPROD_ID AND fccr.CASH_ID = fci.CASH_ID
             LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='YES_OR_NO' and sdl1.item_code = fpa.IS_ALLOW_OVERWRITE
             LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='SETTLE_METHOD' and sdl2.item_code = fpa.SETTLE_METHOD
@@ -67,8 +72,12 @@
                 </foreach>
                 )
             </if>
-            <if test="refEntity != null and refEntity != ''">
-                AND fpa.REF_ENTITY = #{refEntity}
+            <if test="refEntity != null and refEntity.size() > 0">
+                AND (fpa.REF_ENTITY IN
+                <foreach collection="refEntity" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
             </if>
             <if test="refSec != null and refSec.size() > 0">
                 AND (fpa.REF_SEC IN
@@ -77,8 +86,12 @@
                 </foreach>
                 )
             </if>
-            <if test="issueRshortStr != null and issueRshortStr != ''">
-                AND fpa.ISSUERSHORT = #{issueRshortStr}
+            <if test="issueRshortStr != null and issueRshortStr.size() > 0">
+                AND (fpa.ISSUERSHORT IN
+                <foreach collection="issueRshortStr" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
             </if>
             <if test="vdateStart != null and vdateStart != ''">
                 <![CDATA[AND  fp.vdate >= TO_DATE(#{vdateStart},'YYYY-MM-DD') ]]>
@@ -96,6 +109,72 @@
         </where>
         ORDER BY
             fp.FINPROD_ID
+    </select>
+
+    <select id ='getByFinProdId' resultType="com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate002Dto" parameterType="Map">
+        SELECT
+        fp.FINPROD_ID finprodId,
+        fp.FINPROD_MARKET_ID finprodMarketId, <!-- 资产代码-->
+        fp.FINPROD_ABBR finprodAbbr,          <!-- 资产简称-->
+        fp.FINPROD_NAME finprodName,					<!-- 资产名称 -->
+        fp.TRADE_MARKET tradeMarket,
+        sdl3.item_value tradeMarketStr,				<!-- 交易场所-->
+        fpa.ISSUERSHORT issuershort,
+        ci1.CUSTOMER_NAME issuershortStr,       <!-- 创立机构-->
+        fpa.NOM_CAPI nomCapi,								<!-- 名义本金总额-->
+        fpa.PROTECT_OBJECT protectObject,			<!-- 保护对象-->
+        sdl4.item_value protectObjectStr,
+        fpa.REF_SEC_FEATURES refSecFeatures,  <!-- 参考债项特征-->
+        fpa.REF_SEC refSec,										<!-- 参考债项-->
+        fpa.REF_ENTITY refEntity,
+        ci2.CUSTOMER_NAME refEntityStr,							<!-- 参考实体-->
+        fp.MDATE mDate,												<!-- 到期日-->
+        fp.VDATE vDate,												<!-- 起始日-->
+        fpa.GRACE_PERIOD gracePeriod,					<!-- 宽限期（天）	-->
+        fpa.BOOK_BUILDING_DATE bookBuildingDate,<!-- 簿记建档日	-->
+        fpa.PAY_DATE payDate,									<!-- 缴款日	-->
+        fpa.LISTING_DATE listingDate,					<!-- 上市流通日	-->
+        fp.CALENDAR_ID calendarId,						<!-- 交易日历		-->
+        fp.ISSUE_PRICE issuePrice,						<!-- 创设价格（元）-->
+        fccr.BASIS basis,									<!-- 计费年度天数	-->
+        fpa.SETTLE_METHOD settleMethod,			<!-- 结算方式		-->
+        sdl2.item_value settleMethodStr,
+        fpa.IS_ALLOW_OVERWRITE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
+        sdl1.item_value isOrNoStr,
+        fp.REMARK
+        FROM
+        FIN_PRODUCT fp
+        LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID
+        LEFT JOIN FIN_CASH_INFO fci ON fci.FINPROD_ID = fp.FINPROD_ID
+        LEFT JOIN MST_CUSTOMER_INFO ci1 ON fpa.ISSUERSHORT = ci1.CUSTOMER_ID
+        LEFT JOIN MST_CUSTOMER_INFO ci2 ON fpa.REF_ENTITY = ci2.CUSTOMER_ID
+        LEFT JOIN FIN_CASH_CALC_RULE fccr ON fccr.FINPROD_ID = fp.FINPROD_ID AND fccr.CASH_ID = fci.CASH_ID
+        LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='YES_OR_NO' and sdl1.item_code = fpa.IS_ALLOW_OVERWRITE
+        LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='SETTLE_METHOD' and sdl2.item_code = fpa.SETTLE_METHOD
+        LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='TRADE_PLACE' and sdl3.item_code = fp.TRADE_MARKET
+        LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='PROTECT_OBJECT' and sdl4.item_code = fpa.PROTECT_OBJECT
+        <where>
+            <if test="finprodMarketId != null and finprodMarketId != ''">
+                fp.FINPROD_ID = #{finprodMarketId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getRefList" resultType="java.lang.String">
+        SELECT
+        T1.FINPROD_ABBR text
+        FROM FIN_PRODUCT T1
+        <where>
+            AND T1.FINPROD_TYPE2 = #{finprodType2}
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+            <if test="refList != null and refList.size() > 0">
+                AND (T1.FINPROD_MARKET_ID IN
+                <foreach collection="refList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+        </where>
     </select>
 
     <select id="getFinprodIdForSelect" resultMap="finprodIdMap">
@@ -212,6 +291,84 @@
         </if> and ROWNUM=1
     </select>
 
+    <insert id="insertFileSelective" parameterType="com.joyintech.tams.common.base.entity.SysUploadFileInfo" >
+        insert into SYS_UPLOAD_FILE_INFO
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="seqNo != null" >
+                SEQ_NO,
+            </if>
+            <if test="fileName != null" >
+                FILE_NAME,
+            </if>
+            <if test="path != null" >
+                PATH,
+            </if>
+            <if test="businessId != null" >
+                BUSINESS_ID,
+            </if>
+            <if test="createUser != null" >
+                CREATE_USER,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="seqNo != null" >
+                #{seqNo,jdbcType=VARCHAR},
+            </if>
+            <if test="fileName != null" >
+                #{fileName,jdbcType=VARCHAR},
+            </if>
+            <if test="path != null" >
+                #{path,jdbcType=VARCHAR},
+            </if>
+            <if test="businessId != null" >
+                #{businessId,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateFileByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.SysUploadFileInfo" >
+        update SYS_UPLOAD_FILE_INFO
+        <set >
+            <if test="fileName != null" >
+                FILE_NAME = #{fileName,jdbcType=VARCHAR},
+            </if>
+            <if test="path != null" >
+                PATH = #{path,jdbcType=VARCHAR},
+            </if>
+            <if test="businessId != null" >
+                BUSINESS_ID = #{businessId,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </update>
+
     <sql id="vagueQueryWhere">
         <if test="search != null and search != '' and search !='有效' ">
               AND  (
@@ -227,10 +384,10 @@
                 OR fpa.REF_SEC_FEATURES like '%' || #{search} || '%'
                 OR fpa.REF_SEC like '%' || #{search} || '%'
                 OR fpa.REF_ENTITY like '%' || #{search} || '%'
-                OR fpa.GRACE_PERIOD like '%' || #{search} || '%'
+                OR fpa.GRACE_PERIOD||'' = #{search}
                 OR fp.CALENDAR_ID||'' like '%' || #{search} || '%'
                 OR fp.ISSUE_PRICE||'' like '%' || #{search} || '%'
-                OR fccr.BASIS||'' like '%' || #{search} || '%'
+                OR fccr.BASIS||'' =|| #{search}
                 OR sdl2.item_value||'' like '%' || #{search} || '%'
                 OR TO_CHAR(fp.MDATE,'yyyy-MM-dd') ||''= #{search}
                 OR TO_CHAR(fp.VDATE,'yyyy-MM-dd') ||''= #{search}

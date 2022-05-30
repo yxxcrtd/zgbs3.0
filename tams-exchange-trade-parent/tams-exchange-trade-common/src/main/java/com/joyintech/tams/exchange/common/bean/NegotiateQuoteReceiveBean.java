@@ -67,7 +67,17 @@ public class NegotiateQuoteReceiveBean {
     @ApiModelProperty(name = "amountView", value = "数量(展示)")
     private BigDecimal amountView;
 
+    @ApiModelProperty(name = "memberName", value = "本方交易商名称")
+    private String memberName;
+    @ApiModelProperty(name = "investorName", value = "本方交易主体名称")
+    private String investorName;
+    @ApiModelProperty(name = "traderName", value = "本方交易员名称")
+    private String traderName;
+
     public String getRequestStatusStr() {
+        if (RequestStatus.WAIT_CONFIRM.getCode() == requestStatus) {
+            return "待本方确认";
+        }
         return RequestStatus.getRequestStatusName(requestStatus);
     }
 
@@ -260,10 +270,34 @@ public class NegotiateQuoteReceiveBean {
     }
 
     public BigDecimal getAmountView() {
-        return BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(100),2, RoundingMode.HALF_UP);
+        return BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
     }
 
     public void setAmountView(BigDecimal amountView) {
         this.amountView = amountView;
+    }
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getTraderName() {
+        return traderName;
+    }
+
+    public void setTraderName(String traderName) {
+        this.traderName = traderName;
     }
 }

@@ -13,6 +13,8 @@ package com.joyintech.tams.invest.asset.project.controller;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.asset.depo.dto.FinDepositTargetDto;
@@ -294,6 +296,14 @@ public class FinProjectTargetAsset002Controller extends BaseController{
         Map<String,Object>map = RequestUtil.getPageParam();
         return finProjectTargetAssetService.getGuarantee(map);
     }
+
+    @ResponseBody
+    @RequestMapping("/getGuarantee2")
+    public Message<Page<SelectOptionDto>> getGuarantee2(){
+        Map<String,Object>map = RequestUtil.getPageParam();
+        return Message.success("查询成功",finProjectTargetAssetService.getGuarantee(map));
+    }
+
     /**
      * 
      * 保存

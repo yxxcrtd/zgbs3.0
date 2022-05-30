@@ -108,6 +108,30 @@ public class FinBondAsset003Controller extends BaseController{
     }
 
     /**
+     *  获取流程中信息
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+    @ResponseBody
+    @PostMapping("/getApproveRateAdjEntity")
+    public Message<FinAssetRateAdjResponse> getApproveEntity(@RequestBody FinAssetRateAdjResponse request)
+    {
+        try{
+            String workflowId = request.getWorkflowId();
+            FinAssetRateAdjResponse entity = new FinAssetRateAdjResponse();
+            if (StringUtil.isNotEmpty(workflowId)) {
+                //流程代办checkImportData
+                entity = finBondAsset002Service.getBussinessEntityByWorkflowId(workflowId);
+            }
+            return new Message<FinAssetRateAdjResponse>().success().setData(entity);
+        } catch(Exception e){
+            e.printStackTrace();
+            return new Message<FinAssetRateAdjResponse>().fail().setMessage("查询异常");
+        }
+    }
+
+    /**
      * 初始化
      * <功能详细描述>
      * @param request
@@ -204,12 +228,12 @@ public class FinBondAsset003Controller extends BaseController{
         WorkFlowParameter<FinAssetRateAdjResponse> params = new WorkFlowParameter<FinAssetRateAdjResponse>();
         params.setPageId("FinBondAsset003");
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(FinAssetRateAdjResponse::getFinprodId);
+        params.setBusinessCode(FinAssetRateAdjResponse::getFinprodMarketId);
         params.setBusinessType(DictCodeList.共通业务类型_债券类资产利率调整.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {
             return WorkFlowUtil.concatComment("利率调整，债券代码"+
-                GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodId()+GlobalConstant.CLOSE_PARENTHESIS,
+                GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId()+GlobalConstant.CLOSE_PARENTHESIS,
                 "债券简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
         });
         // 给参数变成ProcessParameter而非WorkFlowParameter

@@ -61,6 +61,16 @@ public class WflBidOrderBidPrice extends WflBidOrderBidPriceKey {
     private BigDecimal subscriptionAmount;
 
     /**
+     * 应缴款金额
+     */
+    private BigDecimal payableAmount;
+
+    /**
+     * 结算服务费
+     */
+    private BigDecimal settFeeAmt;
+
+    /**
      * 前置投标编
      */
     private String pBidId;
@@ -84,6 +94,28 @@ public class WflBidOrderBidPrice extends WflBidOrderBidPriceKey {
      * 数据状态
      */
     private String workflowStatus;
+    /**
+     * 投资目的
+     **/
+    private String invAim;
+    /**
+     * 证券账户
+     **/
+    private String secAcctId;
+    /**
+     * 资金账户
+     **/
+    private String acctNo;
+
+    /**
+     * 交易金额
+     */
+    private BigDecimal tradeAmt;
+
+    /**
+     * 应计利息总额
+     */
+    private BigDecimal intAmt;
 
     /**
      * 是否中标
@@ -267,6 +299,43 @@ public class WflBidOrderBidPrice extends WflBidOrderBidPriceKey {
     }
 
     /**
+     * 应缴款金额
+     *
+     * @return PAYABLE_AMOUNT 应缴款金额
+     */
+    public BigDecimal getPayableAmount() {
+        return payableAmount;
+    }
+
+
+    /**
+     * 应缴款金额
+     *
+     * @param payableAmount 应缴款金额
+     */
+    public void setPayableAmount(BigDecimal payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    /**
+     * 结算服务费
+     *
+     * @return SETT_FEE_AMT 结算服务费
+     */
+    public BigDecimal getSettFeeAmt() {
+        return settFeeAmt;
+    }
+
+    /**
+     * 结算服务费
+     *
+     * @param settFeeAmt 结算服务费
+     */
+    public void setSettFeeAmt(BigDecimal settFeeAmt) {
+        this.settFeeAmt = settFeeAmt;
+    }
+
+    /**
      * 前置投标编
      *
      * @return P_BID_ID 前置投标编
@@ -354,5 +423,45 @@ public class WflBidOrderBidPrice extends WflBidOrderBidPriceKey {
      */
     public void setWorkflowStatus(String workflowStatus) {
         this.workflowStatus = workflowStatus == null ? null : workflowStatus.trim();
+    }
+
+    public String getInvAim() {
+        return invAim;
+    }
+
+    public void setInvAim(String invAim) {
+        this.invAim = invAim;
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
+    }
+
+    public BigDecimal getIntAmt() {
+        return intAmt;
+    }
+
+    public void setIntAmt(BigDecimal intAmt) {
+        this.intAmt = intAmt;
     }
 }

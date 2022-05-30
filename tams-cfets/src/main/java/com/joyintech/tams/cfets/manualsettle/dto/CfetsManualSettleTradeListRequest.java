@@ -28,8 +28,8 @@ public class CfetsManualSettleTradeListRequest {
     @ApiModelProperty(name="portfolioId",value="组合名称集合",example="字符串1,字符串2,...")
     private String portfolioId;
 
-    @ApiModelProperty(name="finprodType2",value="资产类型",example="A1")
-    private String finprodType2;
+    @ApiModelProperty(name="assetType",value="资产类型",example="A1")
+    private String assetType;
 
     @ApiModelProperty(name="tgBusiType",value="业务类型",example="A1")
     private String tgBusiType;
@@ -90,12 +90,12 @@ public class CfetsManualSettleTradeListRequest {
         this.portfolioId = portfolioId;
     }
 
-    public String getFinprodType2() {
-        return finprodType2;
+    public String getAssetType() {
+        return assetType;
     }
 
-    public void setFinprodType2(String finprodType2) {
-        this.finprodType2 = finprodType2;
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 
     public String getTgBusiType() {

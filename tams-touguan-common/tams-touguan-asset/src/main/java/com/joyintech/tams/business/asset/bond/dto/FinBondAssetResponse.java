@@ -2,13 +2,16 @@ package com.joyintech.tams.business.asset.bond.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.background.component.common.pack.common.validation.annotation.NotEmpty;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 债券标的信息DTO
@@ -107,6 +110,9 @@ public class FinBondAssetResponse {
 
     @ApiModelProperty(name="basisRate",value="基准利率")
     private String basisRate;
+
+    @ApiModelProperty(name="basisRateStr",value="基准利率")
+    private String basisRateStr;
 
     @ApiModelProperty(name="basisRateRatio",value="基准利率系数")
     private BigDecimal basisRateRatio;
@@ -396,7 +402,6 @@ public class FinBondAssetResponse {
     public String getBasisRate() {
         return basisRate;
     }
-
     public void setBasisRate(String basisRate) {
         this.basisRate = basisRate;
     }
@@ -417,6 +422,7 @@ public class FinBondAssetResponse {
         this.spreadRate = spreadRate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getFirstRateFixDate() {
         return firstRateFixDate;
     }
@@ -638,10 +644,23 @@ public class FinBondAssetResponse {
     }
 
     public String getConceptTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.概念标识, this.getConceptType());
+        List<String> conceptTypes = StringUtil.splitToList(null, this.getConceptType());
+        List<String> conceptTypeList = new ArrayList<>();
+        for (String conceptType: conceptTypes) {
+            conceptTypeList.add(SysDataUtil.getNameFromDataDict(DictCode.概念标识, conceptType));
+        }
+        return StringUtil.joinString(conceptTypeList,",");
     }
 
     public void setConceptTypeStr(String conceptTypeStr) {
         this.conceptTypeStr = conceptTypeStr;
+    }
+
+    public void setBasisRateStr(String basisRateStr) {
+        this.basisRateStr = basisRateStr;
+    }
+
+    public String getBasisRateStr() {
+       return SysDataUtil.getNameFromDataDict(DictCode.利率行情, this.getBasisRate());
     }
 }

@@ -503,7 +503,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         if (CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_预占接口)
             || CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_预占批量接口)) {
             map.put(PageFieldToInterfFactory.INF_OCCUPYDATE,
-                map.get(PageFieldToInterfFactory.INF_EVENTDATE));
+//                map.get(PageFieldToInterfFactory.INF_EVENTDATE));
+                StringUtil.isNotEmpty(map.get(PageFieldToInterfFactory.INF_MDATE))?map.get(PageFieldToInterfFactory.INF_MDATE):map.get(PageFieldToInterfFactory.INF_EVENTDATE));//update zhangweiqi 2021-1-6 支持跨日指令
         }
         else if ((CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占接口)
                   || CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占批量接口))
@@ -1722,7 +1723,15 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             Object repoTerm=CommonUtil.findValue(dataMap, "repoTerm");
             if(StringUtil.isNotEmpty(repoTerm)) {
                 infRiskRdsDto.setRepoTerm(new BigDecimal(repoTerm.toString()));
-                infRiskRdsDto.setMdate(DateUtil.parse(DateUtil.addDay(StringUtil.isNotEmpty(CommonUtil.findValue(dataMap, "vdate"))?CommonUtil.findValue(dataMap, "vdate").toString():infRiskRdsDto.getEventDate(),Integer.valueOf(repoTerm.toString()))));
+                Date vdate = null;
+                if(Objects.nonNull(CommonUtil.findValue(dataMap, "vdate"))) {
+                    if (dataMap.get("vdate") instanceof Long){
+                        vdate = new Date(Long.parseLong(dataMap.get("vdate").toString()));
+                    }else{
+                        vdate = DateUtil.parse(dataMap.get("vdate").toString());
+                    }
+                }
+                infRiskRdsDto.setMdate(DateUtil.parse(DateUtil.addDay(Objects.nonNull(vdate)?DateUtil.format(vdate):infRiskRdsDto.getEventDate(),Integer.valueOf(repoTerm.toString()))));
             }
             //----add by 裴家俊 组合资产剩余期限 20201125 end-----
 
@@ -1769,7 +1778,15 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     CommonUtil.findValue(dataMap, "repoTerm2"):CommonUtil.findValue(dataMap, "repoTerm");//从严控制
             if(StringUtil.isNotEmpty(repoTerm)) {
                 infRiskRdsDto.setRepoTerm(new BigDecimal(repoTerm.toString()));
-                infRiskRdsDto.setMdate(DateUtil.parse(DateUtil.addDay(StringUtil.isNotEmpty(CommonUtil.findValue(dataMap, "vdate"))?CommonUtil.findValue(dataMap, "vdate").toString():infRiskRdsDto.getEventDate(),Integer.valueOf(repoTerm.toString()))));
+                Date vdate = null;
+                if(Objects.nonNull(CommonUtil.findValue(dataMap, "vdate"))) {
+                    if (dataMap.get("vdate") instanceof Long){
+                        vdate = new Date(Long.parseLong(dataMap.get("vdate").toString()));
+                    }else{
+                        vdate = DateUtil.parse(dataMap.get("vdate").toString());
+                    }
+                }
+                infRiskRdsDto.setMdate(DateUtil.parse(DateUtil.addDay(Objects.nonNull(vdate)?DateUtil.format(vdate):infRiskRdsDto.getEventDate(),Integer.valueOf(repoTerm.toString()))));
             }
             //----add by 裴家俊 组合资产剩余期限 20201125 end-----
 
@@ -2678,7 +2695,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             }
             // add by zhangrui1 增加券面总额（元） end
         }
-        if(StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(),finDto.getFinprodType2())
+        if((StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(),finDto.getFinprodType2())||
+                StringUtil.equals(DictCodeList.平安资产类型_存款.getValue(),v.getAssetType()))
                 &&StringUtil.equals(finDto.getPs(),DictCodeList.交易方向_中间付息.getValue())){
             infRiskRdsDto.setEventDate(DateUtil.format(finDto.getTradeDate()));
             String intSettType  = (String)dataMap.get("intSettType");
@@ -2691,7 +2709,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 }
             }
         }
-        if(StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(),finDto.getFinprodType2())
+        if((StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(),finDto.getFinprodType2())||
+                StringUtil.equals(DictCodeList.平安资产类型_存款.getValue(),v.getAssetType()))
                 &&StringUtil.equals(finDto.getPs(),DictCodeList.交易方向_提前支取.getValue())){
             infRiskRdsDto.setEventDate(DateUtil.format(finDto.getTradeDate()));
             // add by zhangrui1 提前支取金额当作数量 start

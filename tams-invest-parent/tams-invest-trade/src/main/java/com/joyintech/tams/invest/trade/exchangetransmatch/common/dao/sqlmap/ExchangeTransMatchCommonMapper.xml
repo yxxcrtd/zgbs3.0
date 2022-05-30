@@ -6,6 +6,7 @@
             select
             T2.TARGET_TYPE targetType,
             T2.TRADER trader,
+            T2.DEAL_MODE,
             CASE
                 WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93},#{PS_T94})) THEN
                     NVL(T3.PLEDGE_NUMBER,0) - NVL(S.MARCH_QTY_EN,0)
@@ -424,6 +425,19 @@
         <where>
             FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
             AND BRANCH = 0
+        </where>
+    </select>
+
+    <select id="getTrdProductDealsByEntrustId" resultType = "com.joyintech.tams.common.base.entity.TrdProductDeal">
+        SELECT
+        tpda.PORTFOLIO_ID,
+        tpd.SHARE_AMT
+        FROM
+        TRD_PRODUCT_DEAL tpd
+        LEFT JOIN
+        TRD_PRODUCT_DEAL_ADD tpda
+        <where>
+            tpda.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
         </where>
     </select>
 </mapper>

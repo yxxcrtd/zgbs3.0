@@ -6,6 +6,8 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.joyintech.exchange.service.quote.service.QuoteService;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
@@ -29,11 +31,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
 
 /**
  * 组合分配
@@ -104,16 +110,36 @@ public class PortfolioAssignHelper {
 
         // 获取委托属性
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, orginProp);
-        if (StrUtil.isEmpty(entrustProp)) {
-            log.warn("未找到委托属性: instructionId [{}], entrustProp = [{}]", instructionId, orginProp);
-            return ResultBean.error(ErrorCode.REQ_PARAMETER_ENTRUST_PROP_ERROR);
+        //新债交易委托属性
+        if (StringUtil.equals(投管业务类型_现券交易.getValue(), instruction.getBusiTypeTg())) {
+            if (StrUtil.isEmpty(entrustProp)) {
+                log.warn("未找到委托属性: instructionId [{}], entrustProp = [{}]", instructionId, orginProp);
+                return ResultBean.error(ErrorCode.REQ_PARAMETER_ENTRUST_PROP_ERROR);
+            }
+            if (EntrustProp.isConsultingTrade(entrustProp)) {
+                entrustProp = EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value;
+            }
+//            entrustProp = EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value;
+        } else if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
+            entrustProp = EntrustProp.NORMAL.value;
+        }
+
+        MinTrdUnitLimit minTrdUnitLimit = instruction.queryMinTrdUnitLimit(entrustProp);
+        if (Objects.isNull(minTrdUnitLimit)) {
+            log.warn("未找到最小交易单元: instructionId [{}], entrustProp = [{}]", instructionId, entrustProp);
+            return ResultBean.error(ErrorCode.MIN_TRD_UNIT_LIMIT_ERROR);
         }
 
         // 最小交易单元：整数倍
-        BigDecimal minStep = BigDecimal.valueOf(instruction.queryMinTrdUnitLimit(entrustProp).getMinStep());
+        BigDecimal minStep = BigDecimal.valueOf(minTrdUnitLimit.getMinStep());
         if (ObjectUtil.isNull(minStep) || minStep.intValue() <= 0) {
-            log.warn("未找到交易属性: instructionId [{}], entrustProp = [{}]", instructionId, entrustProp);
+            log.warn("未找到最小交易单元: instructionId [{}], entrustProp = [{}]", instructionId, entrustProp);
             return ResultBean.error(ErrorCode.MIN_TRD_UNIT_LIMIT_ERROR);
+        }
+
+        //质押式回购的步长是对金额控制的，因此要转换成数量
+        if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
+            minStep = minStep.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
         }
 
         // 价格
@@ -164,6 +190,8 @@ public class PortfolioAssignHelper {
             portfolioDetail.setTargetType(detail.getTargetType());
             portfolioDetail.setBusiStatus(PortfolioDetailBusiStatusEnum.CONFIRM.getCode());
             portfolioDetail.setBusiType(busiType.getCode());
+
+            portfolioDetail.setEtrSecAmount(detail.getEntrustAmt());
             list.add(portfolioDetail);
 
             if (i == len - 1) {

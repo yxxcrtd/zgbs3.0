@@ -4,6 +4,8 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.Date;
+
 /**
  * 下拉框请求requesyt
  * @author wangyang1
@@ -45,6 +47,15 @@ public class SelectOptionCommonRequest {
 
     @ApiModelProperty(name="finprodMarketId",value="资产代码",example="A1")
     private String finprodMarketId;
+
+    @ApiModelProperty(name="searchDate",value="查询日期",example="A1")
+    private Date searchDate;
+
+    @ApiModelProperty(name="vdate",value="起息日",example="A1")
+    private Date vdate;
+
+    @ApiModelProperty(name="mdate",value="到期日",example="A1")
+    private Date mdate;
 
     public String getSearch() {
         return search;
@@ -132,5 +143,29 @@ public class SelectOptionCommonRequest {
 
     public void setFinprodMarketId(String finprodMarketId) {
         this.finprodMarketId = finprodMarketId;
+    }
+
+    public Date getSearchDate() {
+        return searchDate;
+    }
+
+    public void setSearchDate(Date searchDate) {
+        this.searchDate = searchDate;
+    }
+
+    public Date getVdate() {
+        return vdate;
+    }
+
+    public void setVdate(Date vdate) {
+        this.vdate = vdate;
+    }
+
+    public Date getMdate() {
+        return mdate;
+    }
+
+    public void setMdate(Date mdate) {
+        this.mdate = mdate;
     }
 }

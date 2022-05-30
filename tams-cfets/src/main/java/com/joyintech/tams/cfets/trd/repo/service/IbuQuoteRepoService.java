@@ -720,6 +720,9 @@ public class IbuQuoteRepoService extends BaseService {
         if (StringUtil.equals(request.getSettleSpreedCode(), BussinessDictCodeList.清算速度_T加2.getValue())) {
             cfetsRepoDealQuoteCommonDto.setSettlementStartDate(dateCalService.calculationTradingDay(tradeDate, 2, holidayList, "1"));
         }
+        if(Objects.isNull(cfetsRepoDealQuoteCommonDto.getSettlementStartDate())) {//到这里还为空这设置默认T+0
+            cfetsRepoDealQuoteCommonDto.setSettlementStartDate(tradeDate);
+        }
         // 到期结算日=首次结算日+回购期限，遇银行间节假日调整到下一工作日
         if (StringUtil.isNotEmpty(cfetsRepoDealQuoteCommonDto.getSettlementStartDate())) {
             cfetsRepoDealQuoteCommonDto.setSettlementEndDate(DateUtil.addDay(cfetsRepoDealQuoteCommonDto.getSettlementStartDate(), repoTerm - 1));
@@ -2568,9 +2571,6 @@ public class IbuQuoteRepoService extends BaseService {
     public List<ValidMessage> receiveEntrust(Map<String, Object> param) {
         List<ValidMessage> errorList = new ArrayList<ValidMessage>();
         String trader = LoginUserUtil.getUserName();
-        if ("admin".equals(trader)) {
-//            trader = "jp";//TODO 测试写死登录用户 提交代码时修改
-        }
         param.put("trader", trader);
         List<EtrDistribute> list = getDistributeTrader(param);
         List<String> traderList = new ArrayList<String>();
@@ -2581,14 +2581,15 @@ public class IbuQuoteRepoService extends BaseService {
         //无错误时，进行接收操作
         if (errorList.size() == 0) {
             etrInvesInfo.receptionDelegate(list);
-            List<String> entrustIds = StringUtil.splitToList(",", (String) param.get("entrustIds"));
-            for (String entrustId : entrustIds) {
-                //更新操作记录日志
-                CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-                oprHisReq.setEntrustId(entrustId);
-                oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
-                joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-            }
+            // AOP处理
+//            List<String> entrustIds = StringUtil.splitToList(",", (String) param.get("entrustIds"));
+//            for (String entrustId : entrustIds) {
+//                //更新操作记录日志
+//                CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+//                oprHisReq.setEntrustId(entrustId);
+//                oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
+//                joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+//            }
         }
         return errorList;
     }
@@ -2662,11 +2663,6 @@ public class IbuQuoteRepoService extends BaseService {
         } else {
             boolean status = etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeListExt3.委托状态_待分发.getValue());
         }
-        //更新操作记录日志
-        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(entrustId);
-        oprHisReq.setOperType(DictCodeListExt3.操作类型_放弃.getValue());
-        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
         return null;
     }
 

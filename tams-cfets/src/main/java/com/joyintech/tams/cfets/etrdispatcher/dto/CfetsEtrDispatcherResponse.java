@@ -1,5 +1,6 @@
 package com.joyintech.tams.cfets.etrdispatcher.dto;
 
+import com.joyintech.framework.validation.ValidMessage;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -23,6 +24,12 @@ public class CfetsEtrDispatcherResponse {
 
     @ApiModelProperty(name="readOnlyField",value="交易员字段是否可修改",example="Y/N")
     private String readOnlyField;
+
+    @ApiModelProperty(name="bidCode",value="条件code",example="01 已分发不通过；02 首次分发 03 直接分发 04 更新已分发")
+    private String bidCode;
+
+    private List<ValidMessage> errorList;
+
 
     public String getFinprodId() {
         return finprodId;
@@ -54,5 +61,21 @@ public class CfetsEtrDispatcherResponse {
 
     public void setReadOnlyField(String readOnlyField) {
         this.readOnlyField = readOnlyField;
+    }
+
+    public String getBidCode() {
+        return bidCode;
+    }
+
+    public void setBidCode(String bidCode) {
+        this.bidCode = bidCode;
+    }
+
+    public List<ValidMessage> getErrorList() {
+        return errorList;
+    }
+
+    public void setErrorList(List<ValidMessage> errorList) {
+        this.errorList = errorList;
     }
 }

@@ -110,6 +110,7 @@
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
+        <result column="BUSI_TYPE_TG_STR" property="busiTypeTgStr" jdbcType="VARCHAR"/>
         <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
         <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
         <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
@@ -277,7 +278,7 @@
         STD.TRADE_MARKET MARKET_STR,
         FP.FINPROD_MARKET_ID STOCK_CODE,
         FP.FINPROD_ABBR STOCK_NAME,
-        EE.ENTRUST_CLASS BUSI_TYPE_TGSTR,
+        EEA.BUSI_TYPE_POSITION BUSI_TYPE_TG_STR,
         DECODE(TT.PS, NULL, A.PS) ENTRUST_BSSTR,
         DECODE(TT.TRADED_VOLUME, NULL, A.TRADED_VOLUME) TRADED_VOLUME,
         DECODE(TT.TRADED_PRICE, NULL, A.TRADED_PRICE) TRADED_PRICE,
@@ -304,6 +305,7 @@
         LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN STL_CAPACCT_INFO SCI ON STD.ACCT_NO = SCI.ACCT_NO
         LEFT JOIN ETR_ENTRUST EE ON TT.INSTRUCTION_ID = EE.ENTRUST_ID
+        LEFT JOIN ETR_ENTRUST_ADD EEA ON EE.ENTRUST_ID = EEA.ENTRUST_ID
         LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
         LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID
         WHERE STD.DELIVERY_RESULT IN ('01', '02', '03')

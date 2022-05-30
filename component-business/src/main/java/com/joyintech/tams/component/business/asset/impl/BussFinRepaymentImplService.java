@@ -162,8 +162,10 @@ public class BussFinRepaymentImplService extends BaseService<BussFinRepaymentDto
             invRepayList = dto.getInvRepayList();
             //计算支付日
             for(FinCashPlanDto finCashPlanDto : scheList){
-                String payDate = AdjustedTradeDayCal.getAdjustedTradeDay(DateUtil.format(finCashPlanDto.getMdate()), is.getPayTdayRule(), holidayList);
-                finCashPlanDto.setPayDate(DateUtil.parse(payDate));
+                if (!StringUtil.isNotEmpty(finCashPlanDto.getPayDate())) {
+                    String payDate = AdjustedTradeDayCal.getAdjustedTradeDay(DateUtil.format(finCashPlanDto.getMdate()), is.getPayTdayRule(), holidayList);
+                    finCashPlanDto.setPayDate(DateUtil.parse(payDate));
+                }
             }
             for(FinCashPlanDto finCashPlanDto2:invRepayList){
                 if(dto.getIsPayIntFlag().equals(DictCodeList.是否_是.getValue())){//是还本不带息的场景
@@ -171,8 +173,10 @@ public class BussFinRepaymentImplService extends BaseService<BussFinRepaymentDto
                 }else {
                     finCashPlanDto2.setIsPayInt(DictCodeList.是否_是.getValue());//还本带息
                 }
-                String payDate = AdjustedTradeDayCal.getAdjustedTradeDay(DateUtil.format(finCashPlanDto2.getMdate()), is.getPayTdayRule(), holidayList);
-                finCashPlanDto2.setPayDate(DateUtil.parse(payDate));
+                if (!StringUtil.isNotEmpty(finCashPlanDto2.getPayDate())) {
+                    String payDate = AdjustedTradeDayCal.getAdjustedTradeDay(DateUtil.format(finCashPlanDto2.getMdate()), is.getPayTdayRule(), holidayList);
+                    finCashPlanDto2.setPayDate(DateUtil.parse(payDate));
+                }
                 for(FinCashPlanDto finCashPlanDto3:scheList){
                     if(DateUtil.compareDate(finCashPlanDto2.getMdate(), finCashPlanDto3.getVdate())==1
                         &&DateUtil.compareDate(finCashPlanDto2.getMdate(), finCashPlanDto3.getMdate())==-1){

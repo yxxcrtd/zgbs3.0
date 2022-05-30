@@ -1,15 +1,18 @@
 package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto;
@@ -18,10 +21,9 @@ import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecial001Service;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecialValidatorService;
 import com.joyintech.workflow.engine.constant.OperationType;
-import com.joyintech.workflow.engine.dto.ProcessParameter;
-import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +46,7 @@ import java.util.Map;
  * @date 2022-05-06
  */
 @Controller
-@PageId("FinProductSpecial001")
+@PageId("CfetsBasicInfo001")
 @RequestMapping("/business/param/FinProductSpecial001")
 @Api(tags = "银行间基础信息-特殊债券信息")
 public class FinProductSpecial001Controller extends BaseController {
@@ -61,7 +64,23 @@ public class FinProductSpecial001Controller extends BaseController {
     @ResponseBody
     public Message<Map<String, Object>> init() {
         Map<String, Object> model = new HashMap<>(1);
+        model.put("pageId", this.getPageId());
         model.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
+
+        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        FinProductSpecialDto entity = new FinProductSpecialDto();
+        if (StringUtil.isNotEmpty(workflowId)) {
+            entity = finProductSpecial001Service.getBussinessEntityByWorkflowId(workflowId);
+            model.put("businessId", entity.getFinprodMarketId());
+        } else {
+            String finprodId = getParam("finprodMarketId");
+            if (StringUtil.isNotEmpty(finprodId)) {
+                //修改
+                entity = finProductSpecial001Service.queryByFinprodMarketId(finprodId);
+                model.put("businessId", entity.getFinprodMarketId());
+            }
+        }
+        model.put(GlobalConstant.ENTITY, entity);
         return new Message<>(model).success();
     }
 
@@ -82,35 +101,6 @@ public class FinProductSpecial001Controller extends BaseController {
         return Message.success("success", finProductSpecial001Service.querySelectOption(request));
     }
 
-
-    @ApiOperation(value = "特殊债券信息提交(保存)", notes = "特殊债券信息提交(保存)")
-    @ResponseBody
-    @PostMapping("save")
-    public Message save(@RequestBody FinProductSpecialDto dto, BindingResult br) {
-        if (br.hasErrors()) {
-            return new Message<AjaxResult>().success().setData(new AjaxResult(br));
-        }
-        ProcessParameter<FinProductSpecialDto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<FinProductSpecialDto> params = new WorkFlowParameter<>();
-        // 页面id
-        params.setPageId("CfetsBasicInfo001");
-        params.setElementId(dto.getElementId());
-        params.setBusinessType(BussinessDictCodeList.特殊债券信息业务类型.getValue());
-        params.setBusinessCode(dto.getFinprodMarketId());
-        String finalCommentStr = "债券代码:" + dto.getFinprodMarketId() + "是否资产支持证券：" + dto.getIsAbs() + "是否特殊债：" + dto.getIsSpecialDebt() + "是否到期违约债：" + dto.getIsDefaultBondIndicator();
-        params.setComment(entity -> finalCommentStr);
-        processParameter.setWorkFlowParameter(params);
-        processParameter.setOperationType(OperationType.NEW);
-        processParameter.setPageId(params.getPageId());
-        try {
-            String msg = finProductSpecial001Service.start(processParameter, dto);
-            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
-        } catch (Exception e) {
-            logger.error("特殊债券信息提交失败", e);
-            return PositionUtil.ajaxErrorReturn(e);
-        }
-    }
-
     /**
      * 特殊债券信息提交检查
      *
@@ -125,11 +115,35 @@ public class FinProductSpecial001Controller extends BaseController {
         if (result != null && result.hasErrors()) {
             return new Message<AjaxResult>().success().setData(new AjaxResult(result));
         }
-        AjaxResult ajax = new AjaxResult();
-        List<ValidMessage> valid = finProductSpecialValidatorService.valid(dto);
-        ajax.setErrorList(valid);
-        return new Message<AjaxResult>().success().setData(ajax);
+        AjaxResult ajaxResult = finProductSpecialValidatorService.validCustom(dto);
+
+        if (CollectionUtils.isNotEmpty(ajaxResult.getErrorList())) {
+            if (MessageType.错误消息.getCode().equals(ajaxResult.getMessageType())) {
+                return Message.fail(ValidUtils.getValidMessage(ajaxResult.getErrorList()));
+            } else {
+                return Message.success("校验失败", ajaxResult);
+            }
+        } else {
+            return Message.success("校验成功", null);
+        }
     }
+
+
+    /**
+     * 特殊债券信息
+     *
+     * @param req
+     * @param response
+     */
+    @ResponseBody
+    @PostMapping(value = "/export")
+    @ApiOperation(value = "特殊债券信息列表导出", notes = "特殊债券信息列表导出")
+    public void export(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
+        ExcelUitl.doExport(req, response, "特殊债券信息", () ->
+                finProductSpecial001Service.queryForPage(req.getDto(FinProductSpecialQueryRequest.class)).getRoot()
+        );
+    }
+
 
     /**
      * 导入数据文件之前检查数据
@@ -138,9 +152,10 @@ public class FinProductSpecial001Controller extends BaseController {
      * @return 处理结果
      */
     @ResponseBody
-    @RequestMapping(value = "checkConfirmMsgForImportData")
-    public AjaxResult checkConfirmMsgForImportData(String fileName) {
-        return finProductSpecialValidatorService.checkConfirmMsgForImportData(fileName);
+    @PostMapping(value = "checkConfirmMsgForImportData")
+    @ApiOperation(value = "导入数据文件之前检查数据", notes = "导入数据文件之前检查数据")
+    public Message<AjaxResult> checkConfirmMsgForImportData(String fileName) {
+        return Message.success("处理成功", finProductSpecialValidatorService.checkConfirmMsgForImportData(fileName));
     }
 
     /**
@@ -150,9 +165,10 @@ public class FinProductSpecial001Controller extends BaseController {
      * @return 导入结果，包含验证内容，如果验证失败，返回message
      */
     @ResponseBody
-    @RequestMapping("/importFile")
-    public List<ExcelValidDto> importData(String fileName) {
-        return finProductSpecial001Service.importData(fileName);
+    @PostMapping("/importFile")
+    @ApiOperation(value = "导入数据文件", notes = "导入数据文件")
+    public Message<List<ExcelValidDto>> importData(String fileName) {
+        return Message.success("处理成功", finProductSpecial001Service.importData(fileName));
     }
 
 }

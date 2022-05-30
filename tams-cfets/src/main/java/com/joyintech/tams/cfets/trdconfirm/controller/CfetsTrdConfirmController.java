@@ -22,6 +22,7 @@ import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -49,6 +50,9 @@ public class CfetsTrdConfirmController extends BaseController {
     @Autowired
     private CfetsTrdConfirmService cfetsTrdConfirmService;
 
+    @Autowired
+    private IPlatformDate iPlatformDate;
+
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
     @ResponseBody
@@ -57,10 +61,13 @@ public class CfetsTrdConfirmController extends BaseController {
         //是否支持CSTP下行接口
         initPageParams.put("IS_SUPPORT_CSTP_FLAG_BOND", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BOND"));
         initPageParams.put("IS_SUPPORT_CSTP_FLAG_REPO", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO"));
+        initPageParams.put("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
         //银行间债券交易执行是否可手工确认
         initPageParams.put("IS_CFETSSECTRD_MANUALCONFIRM_FLAG", CacheUtil.getSysParam("IS_CFETSSECTRD_MANUALCONFIRM_FLAG"));
         //银行间回购交易执行是否可手工确认
         initPageParams.put("IS_CFETSREPOTRD_MANUALCONFIRM_FLAG", CacheUtil.getSysParam("IS_CFETSREPOTRD_MANUALCONFIRM_FLAG"));
+        // 银行间一级申购交易执行是否可手工确认
+        initPageParams.put("IS_CFETSFIRSTSECTRD_MANUALCONFIRM_FLAG", CacheUtil.getSysParam("IS_CFETSFIRSTSECTRD_MANUALCONFIRM_FLAG"));
         //交易员是否可查看全部CSTP下行成交数据
         initPageParams.put("IS_QUERYALLCSTP_FLAG", CacheUtil.getSysParam("IS_QUERYALLCSTP_FLAG"));
         //自动刷新时间
@@ -77,6 +84,8 @@ public class CfetsTrdConfirmController extends BaseController {
         initPageParams.put("CSTP_BUSINESS_TYPE", this.getSelectDataFromDataDic(DictCode.CSTP资产类型, null));
         initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式_登记, null));
         initPageParams.put("CUSTOM_ASSET_TYPE_TWO", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
+        // 系统日期
+        initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         //pageId
         initPageParams.put("pageId", "CfetsTrdConfirm");
         return new Message<Map<String, Object>>(initPageParams).success();

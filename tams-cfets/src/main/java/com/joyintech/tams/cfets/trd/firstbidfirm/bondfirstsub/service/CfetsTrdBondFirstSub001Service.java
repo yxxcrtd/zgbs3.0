@@ -5,10 +5,7 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
@@ -289,11 +286,11 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
                 }
             }
         }
-        //是否存在流程中或者有效且数据状态不为 已撤回 已终止
-        int i = cfetsTrdBondFirstSub001Mapper.checkDataStatus(params);
-        if (i > 0) {
-            return "存在流程中的申购，不可放弃！";
-        }
+//        //是否存在流程中或者有效且数据状态不为 已撤回 已终止
+//        int i = cfetsTrdBondFirstSub001Mapper.checkDataStatus(params);
+//        if (i > 0) {
+//            return "存在流程中的申购，不可放弃！";
+//        }
         //2.查询指令分发的临时表数据  插入  指令分发表，并将状态改为  待接收。
         List<EtrDistributeInterfTmp> distmpList = cfetsIbuQuoteBondEtrMapper.listEtrDistributeInterfTmp(params);
         if (!StringUtil.isEmptyList(distmpList)) {
@@ -336,7 +333,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         if (CollectionUtils.isNotEmpty(cfetsTrdBondFirstSubEntrustDtos)) {
             cfetsTrdBondFirstSubEntrustDtos.forEach(item -> {
                 if (/*StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_待接收.getValue())
-                        ||*/ !(StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue()) && item.getTransactioncom().compareTo(BigDecimal.ZERO) != 0)) {
+                        ||*/ !(StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue()) && item.getTransactioncom().compareTo(BigDecimal.ZERO) == 0)) {
                     errorList.add(new ValidMessage("只可对已接收执行进度为0的指令执行退回操作!"));
                 }
                 param.put("entrustId", item.getEntrustId());
@@ -518,6 +515,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
         param.put("entrustIdList",param.get("entrustIds"));
         String loginUserId = LoginUserUtil.getUserName();
+        param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
         param.put("loginUserId", loginUserId);
     }
 

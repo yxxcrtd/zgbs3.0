@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -74,7 +75,7 @@ public class RepoEntrustForcedFinishController extends BaseController {
 
     @ApiOperation(value = "强制完成检查", notes = "强制完成检查")
     @ResponseBody
-    @RequestMapping("/doForcedFinishCheck")
+    @PostMapping("/doForcedFinishCheck")
     public Message<AjaxResult> doForcedFinishCheck(@RequestBody Map<String, Object> param) {
         BondQuoteInfoDto bondQuoteInfoDto = new BondQuoteInfoDto();
         AjaxResult ar = null;
@@ -84,7 +85,7 @@ public class RepoEntrustForcedFinishController extends BaseController {
     }
 
     @ApiOperation(value = "登记提交(保存)", notes = "登记提交(保存)")
-    @RequestMapping("save")
+    @PostMapping("save")
     @ResponseBody
     public Message<AjaxResult> save(@RequestBody RepoEntrustForcedFinishDto dto, BindingResult br) throws Exception {
         if (br.hasErrors()) {

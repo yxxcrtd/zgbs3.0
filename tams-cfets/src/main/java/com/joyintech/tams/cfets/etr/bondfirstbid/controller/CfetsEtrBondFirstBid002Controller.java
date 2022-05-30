@@ -22,8 +22,8 @@ import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
@@ -86,15 +86,18 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @ResponseBody
     @PostMapping("/initParam")
     @ApiOperation(value = "新建/修改/查看页面初始化", notes = "新建/修改/查看页面初始化")
-    public Message<Map<String, Object>> init() {
+    public Message<Map<String, Object>> init(@RequestBody Map<String, Object> map) {
         Map<String, Object> params = new HashMap<>();
-        //String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
-        String workflowId = "00000000000000000000000000044663";
+       // String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        //String workflowId = "00000000000000000000000000059700";
+        String workflowId = "null".equals(map.get(GlobalConstant.WORKFLOW_ID)) ? null : (String) map.get(GlobalConstant.WORKFLOW_ID);
         boolean todoList = false;
         CfetsEtrBondFirstBid002Dto entity = new CfetsEtrBondFirstBid002Dto();
         // 待办中过来
         if (StringUtil.isNotEmpty(workflowId)) {
             todoList = true;
+//            ProcessMark processMark = cfetsEtrBondFirstBid002Service.getFirstBidBusinessInfo(workflowId);
+//            entity = cfetsEtrBondFirstBid002Service.getBussinessEntity(processMark);
             entity = cfetsEtrBondFirstBid002Service.getBussinessEntityByWorkflowId(workflowId);
             if (CollectionUtils.isNotEmpty(entity.getBiddingProductList())) {
                 for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {
@@ -120,8 +123,10 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
         }
         //数据字典初始化数据
         params.put("BUSINESS_MODEL", this.getSelectDataFromDataDic(DictCode.业务模式, null));
+        params.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         // 加券按钮
         params.put("IS_ADDBOND_SHOW", CacheUtil.getSysParam("IS_ADDBOND_SHOW"));
+
 
         params.put(GlobalConstant.ENTITY, entity);
         //pageId
@@ -185,7 +190,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
         for (CfetsEtrBondFirstBid002Dto dto : allDto.getEtrInvestBondFirstBidDtos()) {
             if (!StringUtil.isNotEmpty(dto.getEntrustId())) {
                 BussinessCodeParameter param = new BussinessCodeParameter();
-                param.setCommonBusinessType(DictCodeList.共同业务类型_债券一级投标委托);
+                param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
                 String code = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
                 dto.setEntrustId(code);
             }
@@ -215,10 +220,14 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
                 (dto, list) -> dto.setRiskTrialRetDto(list));
 
         // 临时主键
-        BussinessCodeParameter param = new BussinessCodeParameter();
-        param.setCommonBusinessType(DictCodeList.共同业务类型_债券一级投标委托);
-        String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
-        allDto.setTotalEtrustId(generatedId);
+        if(StringUtil.isNotEmpty(cfetsDto.getEntrustId())){
+            allDto.setTotalEtrustId(cfetsDto.getEntrustId());
+        }else{
+            BussinessCodeParameter param = new BussinessCodeParameter();
+            param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
+            String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
+            allDto.setTotalEtrustId(generatedId);
+        }
 
         ProcessParameter<CfetsEtrBondFirstBid002Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CfetsEtrBondFirstBid002Dto> params = new WorkFlowParameter<>();
@@ -226,7 +235,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(cfetsDto.getElementId());
         params.setBusinessCode(CfetsEtrBondFirstBid002Dto::getTotalEtrustId);
-        params.setBusinessType(DictCodeList.共同业务类型_债券一级投标委托.getValue());
+        params.setBusinessType(DictCodeListExt3.共通业务类型_一级投标指令.getValue());
         processParameter.setOperationType(OperationType.NEW);
         processParameter.setWorkFlowParameter(params);
 

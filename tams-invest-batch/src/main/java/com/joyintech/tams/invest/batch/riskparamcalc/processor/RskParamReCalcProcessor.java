@@ -95,10 +95,10 @@ public class RskParamReCalcProcessor extends BaseProcessor<NeedOperateEntity, Rs
             temp.put("uuid", data.getOrderNo());
             // 事件编号
             String eventId = data.getEventId();
-            // 处理预占实占
+            // 处理预占实占：预占占用多少，实占最终占用多少（交易生效的占用-交易撤销的释放）
             if (CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_预占接口)
                 || CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占接口)) {
-                // 执行生成预占实占信息
+                // 执行生成预占实占信息（生效交易）
                 ocpMap.put(eventId, calcService.doOccupy(eventId, temp));
                 // 记录实占索引
                 if (CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占接口)) {
@@ -109,7 +109,7 @@ public class RskParamReCalcProcessor extends BaseProcessor<NeedOperateEntity, Rs
                     mapData.putAll(temp);
                 }
             }
-            // 处理释放
+            // 处理释放：有撤销交易的记录，处理上方【执行生成预占实占信息】，做扣减
             else {
                 calcService.releaseOccupy(ocpMap.get(eventId), temp);
             }

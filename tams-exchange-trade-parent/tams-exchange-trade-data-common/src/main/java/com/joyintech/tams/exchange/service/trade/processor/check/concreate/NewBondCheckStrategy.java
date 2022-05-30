@@ -11,6 +11,7 @@ import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
@@ -60,7 +61,7 @@ public class NewBondCheckStrategy implements IBusinessCheckStrategy {
      */
     private ResultBean checkCounterDealerTraderInfo(IntegratedEntrust entrust, Instruction instruction) {
         TradeInfoProRequest dto = new TradeInfoProRequest();
-        dto.setTradePlace(instruction.getTradeMarket());
+        dto.setTradePlace(Market.getInvestValue(instruction.getTradeMarket()));
         dto.setDealerNo(entrust.getPropDealerId());
         List<TradeInfoProResponse> list = commonManagement.getCounterDealerTraderInfo(dto);
         String errorMsg = "";
@@ -68,7 +69,7 @@ public class NewBondCheckStrategy implements IBusinessCheckStrategy {
             errorMsg += StrUtil.format("对手方交易商[{}]未维护<br/>", entrust.getPropDealerId());
         } else {
             if (StringUtil.isNotEmpty(entrust.getPropInvestorId())) {
-                Optional<TradeInfoProResponse> first = list.stream().filter(o -> StringUtil.equals(o.getTraderNo(), entrust.getPropInvestorId())).findFirst();
+                Optional<TradeInfoProResponse> first = list.stream().filter(o -> StringUtil.equals(o.getDealerPartyNo(), entrust.getPropInvestorId())).findFirst();
                 if (!first.isPresent()) {
                     errorMsg += StrUtil.format("对手方交易主体[{}]未维护<br/>", entrust.getPropInvestorId());
                 }

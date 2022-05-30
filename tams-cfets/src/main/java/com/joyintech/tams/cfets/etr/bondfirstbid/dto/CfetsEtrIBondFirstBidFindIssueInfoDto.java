@@ -1,7 +1,5 @@
 package com.joyintech.tams.cfets.etr.bondfirstbid.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -41,11 +39,16 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
     private String issueStyle;
 
     @ApiModelProperty(name = "planIssueAmt", value = "计划发行量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal planIssueAmt;
 
     @ApiModelProperty(name = "issueDate", value = "投标日/发行日")
     private Date issueDate;
+
+    @ApiModelProperty(name = "issueDateStart", value = "投标日开始日期,字符串", example = "2021-12-21")
+    private Date issueDateStart;
+
+    @ApiModelProperty(name = "issueDateEnd", value = "投标日结束日期,字符串", example = "2021-12-21")
+    private Date issueDateEnd;
 
     @ApiModelProperty(name = "issueDateStr", value = "投标日/发行日字符串")
     private String issueDateStr;
@@ -338,7 +341,7 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
     }
 
     public String getSubRate() {
-        return subRate;
+        return SysDataUtil.getNameFromDataDict(DictCode.评级结果, this.subRate);
     }
 
     public void setSubRate(String subRate) {
@@ -459,5 +462,21 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
 
     public void setTradeMarketStr(String tradeMarketStr) {
         this.tradeMarketStr = tradeMarketStr;
+    }
+
+    public Date getIssueDateStart() {
+        return issueDateStart;
+    }
+
+    public void setIssueDateStart(Date issueDateStart) {
+        this.issueDateStart = issueDateStart;
+    }
+
+    public Date getIssueDateEnd() {
+        return issueDateEnd;
+    }
+
+    public void setIssueDateEnd(Date issueDateEnd) {
+        this.issueDateEnd = issueDateEnd;
     }
 }

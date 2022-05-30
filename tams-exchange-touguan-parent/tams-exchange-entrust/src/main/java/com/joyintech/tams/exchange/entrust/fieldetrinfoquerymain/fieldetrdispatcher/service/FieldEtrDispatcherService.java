@@ -369,6 +369,10 @@ public class FieldEtrDispatcherService extends BaseService{
                     }
 
                 }
+                if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), dto.getBusiTypePosition()) &&
+                        StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), fieldResponseDto.getPriceModel())){
+                    fieldResponseDto.setUnitPrice(null);
+                }
             }
             return fieldResponseDto;
         }

@@ -115,8 +115,9 @@ public class IndicatorParamValService {
      */
     private Map<String, Map<String, IValue<Object>>> checkBatchKey(Map<String, Map<String, IValue<Object>>> paraValList,
                                                                    Function< Map<String, Map<String, IValue<Object>>>, Map<String, Map<String, IValue<Object>>>> function) {
-        Map<String, Map<String, IValue<Object>>> paramList = new HashMap<>();
+        Map<String, Map<String, IValue<Object>>> paramTotalList = new HashMap<>();
         paraValList.entrySet().forEach(en -> {
+            Map<String, Map<String, IValue<Object>>> paramList = new HashMap<>();
             String key = en.getKey();
             Map<String, IValue<Object>> val = en.getValue();
             for(String k:val.keySet()){
@@ -139,12 +140,12 @@ public class IndicatorParamValService {
                         IValue<Object> rValue = new Value<>(str->str);
                         rValue.value(sb.toString());
                         valTotal.put(k, rValue);
-                        paramList.put(key,valTotal);
+                        paramTotalList.put(key,valTotal);
                     }
                 }
             };
         });
-        return paramList;
+        return paramTotalList;
     }
 
     private Map<String, Map<String, IValue<Object>>> changeKey(Map<String, Map<String, IValue<Object>>> paraValList,

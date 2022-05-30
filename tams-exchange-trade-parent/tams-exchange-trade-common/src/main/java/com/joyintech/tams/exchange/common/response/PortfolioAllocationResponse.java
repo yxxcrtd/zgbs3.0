@@ -1,6 +1,5 @@
 package com.joyintech.tams.exchange.common.response;
 
-import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -11,7 +10,7 @@ import java.util.List;
 public class PortfolioAllocationResponse {
 
     @ApiModelProperty(value = "指令列表")
-    private List<Instruction> list;
+    private List<FairPortfolioResponse> list;
 
     @ApiModelProperty(value = "委托价格")
     private BigDecimal price;
@@ -31,11 +30,11 @@ public class PortfolioAllocationResponse {
     @ApiModelProperty(value = "警告信息类别：1 错误；2 警告")
     private String infoLevel;
 
-    public List<Instruction> getList() {
+    public List<FairPortfolioResponse> getList() {
         return list;
     }
 
-    public void setList(List<Instruction> list) {
+    public void setList(List<FairPortfolioResponse> list) {
         this.list = list;
     }
 

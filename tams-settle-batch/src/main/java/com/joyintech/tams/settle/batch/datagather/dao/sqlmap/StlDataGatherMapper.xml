@@ -67,7 +67,8 @@
 			std.TRADE_AMT_RAW TRADE_AMT_RAW,
 			std.TRADE_ID_RAW TRADE_ID_RAW,
 			std.SEQ_NO SEQ_NO,
-			std.IS_PURCH_TYPE_YX IS_PURCH_TYPE_YX
+			std.IS_PURCH_TYPE_YX IS_PURCH_TYPE_YX,
+			std.DELIVERY_RESULT
 			FROM SETTLE_TRANS_DATA_TOTAL std
 	</sql>
 
@@ -449,6 +450,15 @@
 			(stdts.MATCH_STATUS != '2' OR stdts.MATCH_STATUS IS NULL)
 			<if test="dealDate != null">
 				AND std.DEAL_DATE = #{dealDate,jdbcType=DATE}
+			</if>
+			<if test="finprodType2 != null and finprodType2 != 'F32'">
+				AND STD.FINPROD_TYPE2 = #{finprodType2, jdbcType=VARCHAR}
+			</if>
+			<if test="finprodType2 != null and finprodType2 == 'F32'">
+				AND STD.FINPROD_TYPE2 = #{finprodType2, jdbcType=VARCHAR}
+				AND (STD.DELIVERY_RESULT = #{deliveryResult05, jdbcType=VARCHAR}
+				OR STD.SETTLE_MODE = #{settleMode01, jdbcType=VARCHAR}
+				OR (STD.SETTLE_MODE = #{settleMode02, jdbcType=VARCHAR} AND STD.SETTLE_SPEED = #{accountSpeed0, jdbcType=NUMERIC}))
 			</if>
 			<if test="finprodIdList != null and finprodIdList.size() > 0">
 				<foreach collection="finprodIdList" item="finprodId" open="AND std.FINPROD_ID IN (" close=")" separator=",">

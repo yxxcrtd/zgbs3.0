@@ -143,7 +143,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         PositionCashSecDto secDto = new PositionCashSecDto();
                         BeanUtil.copyPropertiesIgnoreNull(secDto, entity);
                         BigDecimal sellNum = etrTradeCommonervice.selectAvailableNum(secDto);
-                        entity.setSellNum(sellNum);
+                        entity.setSellNum(ArithmeticUtil.divide(sellNum,new BigDecimal("100"),2));
                         //过滤掉实际持仓和可用持仓都等于0
                         if (entity.getPositionsNum().compareTo(BigDecimal.ZERO) == 0 && sellNum.compareTo(BigDecimal.ZERO) == 0) {
                             continue;
@@ -245,6 +245,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         param.put("PS_04", DictCodeListExt3.交易方向_逆回购.getValue());
         param.put("ENTRUST_BUSS_TYPE_28",DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue());
         param.put("ENTRUST_BUSS_TYPE_29",DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue());
+        param.put("PRICE_MODEL_PRM03",DictCodeListExt2.价格模式_市价指令.getValue());
         String portfolioId = (String) param.get("portfolioId");
         if (StringUtil.isNotEmpty(portfolioId)) {
             param.put("portfolioIdList",
@@ -431,10 +432,12 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                     r.setPositionUnitCost(dto.getUnitCost());
                 }
                 // 最新净价*组合持仓.数量 - 持仓成本 as 浮动盈亏
-                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
+                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(),
+                                    ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(),
+                                ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100"))), 2);
                 r.setFloatingPL(floatPL);
 
             });

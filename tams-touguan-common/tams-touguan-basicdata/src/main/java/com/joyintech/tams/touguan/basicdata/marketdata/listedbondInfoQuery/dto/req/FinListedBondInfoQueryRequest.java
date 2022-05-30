@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 待上市债券市场信息查询条件
@@ -26,8 +27,17 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "secName", value = "资产简称")
     private String secName;
 
-    @ApiModelProperty(name = "market", value = "市场")
-    private String market;
+    @ApiModelProperty(name = "primaryClassifications", value = "一级分类")
+    private List<String> primaryClassifications;
+
+    @ApiModelProperty(name = "secondaryClassifications", value = "二级分类")
+    private List<String> secondaryClassifications;
+
+    @ApiModelProperty(name = "customAssetType", value = "资产分类")
+    private List<List<String>> customAssetType;
+
+    @ApiModelProperty(name = "tradingPlaces", value = "交易场所/市场")
+    private String tradingPlaces;
 
     @ApiModelProperty(name = "biddingMethod", value = "招标方式")
     private String biddingMethod;
@@ -56,11 +66,8 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "listingCode", value = "上市代码")
     private String listingCode;
 
-    @ApiModelProperty(name = "secType", value = "债券分类")
-    private String secType;
-
-    @ApiModelProperty(name = "institution", value = "登记托管机构")
-    private String institution;
+    @ApiModelProperty(name = "registeredCustodian", value = "登记托管机构")
+    private String registeredCustodian;
 
     @ApiModelProperty(name = "issuer", value = "发行人")
     private String issuer;
@@ -89,26 +96,11 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "rateType", value = "利率类型")
     private String rateType;
 
-    @ApiModelProperty(name = "payCycle", value = "付息频率")
-    private String payCycle;
+    @ApiModelProperty(name = "interestPaymentFrequency", value = "付息频率")
+    private String interestPaymentFrequency;
 
     @ApiModelProperty(name = "currency", value = "币种")
     private String currency;
-
-    @ApiModelProperty(name = "isRight", value = "是否含权债", example = "Y/N")
-    private String isRight;
-
-    @ApiModelProperty(name = "optionType", value = "行权方式")
-    private String optionType;
-
-    @ApiModelProperty(name = "theOryOptionPayDayStart", value = "理论行权日开始")
-    private Date theOryOptionPayDayStart;
-
-    @ApiModelProperty(name = "theOryOptionPayDayEnd", value = "理论行权日结束")
-    private Date theOryOptionPayDayEnd;
-
-    @ApiModelProperty(name = "isSus", value = "是否永续")
-    private String isSus;
 
     @ApiModelProperty(name = "zxGrade", value = "债项评级")
     private String zxGrade;
@@ -143,22 +135,6 @@ public class FinListedBondInfoQueryRequest {
 
     public void setSecId(String secId) {
         this.secId = secId;
-    }
-
-    public String getMarket() {
-        return market;
-    }
-
-    public void setMarket(String market) {
-        this.market = market;
-    }
-
-    public String getInstitution() {
-        return institution;
-    }
-
-    public void setInstitution(String institution) {
-        this.institution = institution;
     }
 
     public String getIssuer() {
@@ -223,54 +199,6 @@ public class FinListedBondInfoQueryRequest {
 
     public void setCouponSpecies(String couponSpecies) {
         this.couponSpecies = couponSpecies;
-    }
-
-    public String getPayCycle() {
-        return payCycle;
-    }
-
-    public void setPayCycle(String payCycle) {
-        this.payCycle = payCycle;
-    }
-
-    public String getIsRight() {
-        return isRight;
-    }
-
-    public void setIsRight(String isRight) {
-        this.isRight = isRight;
-    }
-
-    public String getOptionType() {
-        return optionType;
-    }
-
-    public void setOptionType(String optionType) {
-        this.optionType = optionType;
-    }
-
-    public Date getTheOryOptionPayDayStart() {
-        return theOryOptionPayDayStart;
-    }
-
-    public void setTheOryOptionPayDayStart(Date theOryOptionPayDayStart) {
-        this.theOryOptionPayDayStart = theOryOptionPayDayStart;
-    }
-
-    public Date getTheOryOptionPayDayEnd() {
-        return theOryOptionPayDayEnd;
-    }
-
-    public void setTheOryOptionPayDayEnd(Date theOryOptionPayDayEnd) {
-        this.theOryOptionPayDayEnd = theOryOptionPayDayEnd;
-    }
-
-    public String getIsSus() {
-        return isSus;
-    }
-
-    public void setIsSus(String isSus) {
-        this.isSus = isSus;
     }
 
     public String getZxGrade() {
@@ -377,14 +305,6 @@ public class FinListedBondInfoQueryRequest {
         this.listingCode = listingCode;
     }
 
-    public String getSecType() {
-        return secType;
-    }
-
-    public void setSecType(String secType) {
-        this.secType = secType;
-    }
-
     public String getIssueMethod() {
         return issueMethod;
     }
@@ -423,5 +343,53 @@ public class FinListedBondInfoQueryRequest {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public String getTradingPlaces() {
+        return tradingPlaces;
+    }
+
+    public void setTradingPlaces(String tradingPlaces) {
+        this.tradingPlaces = tradingPlaces;
+    }
+
+    public String getInterestPaymentFrequency() {
+        return interestPaymentFrequency;
+    }
+
+    public void setInterestPaymentFrequency(String interestPaymentFrequency) {
+        this.interestPaymentFrequency = interestPaymentFrequency;
+    }
+
+    public String getRegisteredCustodian() {
+        return registeredCustodian;
+    }
+
+    public void setRegisteredCustodian(String registeredCustodian) {
+        this.registeredCustodian = registeredCustodian;
+    }
+
+    public List<List<String>> getCustomAssetType() {
+        return customAssetType;
+    }
+
+    public void setCustomAssetType(List<List<String>> customAssetType) {
+        this.customAssetType = customAssetType;
+    }
+
+    public List<String> getPrimaryClassifications() {
+        return primaryClassifications;
+    }
+
+    public void setPrimaryClassifications(List<String> primaryClassifications) {
+        this.primaryClassifications = primaryClassifications;
+    }
+
+    public List<String> getSecondaryClassifications() {
+        return secondaryClassifications;
+    }
+
+    public void setSecondaryClassifications(List<String> secondaryClassifications) {
+        this.secondaryClassifications = secondaryClassifications;
     }
 }

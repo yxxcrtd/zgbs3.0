@@ -112,7 +112,7 @@ public interface FinTenderBondAssetMapper {
      * @param param
      * @return
      */
-    FinTenderBondAsset002Dto getProductFromInterface(Map<String, String> param);
+    List<FinTenderBondAsset002Dto> getProductFromInterface(Map<String, String> param);
 
     /**
      * 获取接口表标的附属表数据

@@ -51,8 +51,6 @@ public class EtrCommonFinProductInfoService extends BaseService {
     public CfetsEtrFinProductInfoResponse findFinProductInfo(String pageCode, String dtCode, CfetsEtrFinProductInfoRequest request) {
         CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoMapper.findFinProductInfo(request);
         if (Objects.nonNull(finProductInfo)) {
-            //标题
-            finProductInfo.setTitle(finProductInfo.getFinprodId() + finProductInfo.getFinprodAbbr());
             //评级信息
             if (Objects.nonNull(pageCode) && Objects.nonNull(dtCode)) {
                 //查询对于业务场景展示表头
@@ -69,10 +67,18 @@ public class EtrCommonFinProductInfoService extends BaseService {
                     } else {
                         if (DictCodeList.息票品种_零息.getValue().equals(couponSpecies) || DictCodeList.息票品种_贴现.getValue().equals(couponSpecies)
                                 || (DictCodeList.息票品种_附息.getValue().equals(couponSpecies) && DictCodeList.利率类型_浮动利率.getValue().equals(intType))) {
-                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> getColName(cfgDataTableShow.getColName(), Boolean.TRUE));
+                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> {
+                                if ("referYield".equals(cfgDataTableShow.getColCode())) {
+                                    cfgDataTableShow.setColName("参考收益率");
+                                }
+                            });
                         } else if (DictCodeList.息票品种_利随本清.getValue().equals(couponSpecies)
                                 || (DictCodeList.息票品种_附息.getValue().equals(couponSpecies) && DictCodeList.利率类型_固定利率.getValue().equals(intType))) {
-                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> getColName(cfgDataTableShow.getColName(), Boolean.FALSE));
+                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> {
+                                if ("referYield".equals(cfgDataTableShow.getColCode())) {
+                                    cfgDataTableShow.setColName("票面利率");
+                                }
+                            });
                         }
                     }
                     finProductInfo.setTableShows(byPageCodeAndDtCodes);

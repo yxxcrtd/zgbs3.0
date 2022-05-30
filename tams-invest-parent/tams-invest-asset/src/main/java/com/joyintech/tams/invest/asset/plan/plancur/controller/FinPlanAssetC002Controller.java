@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
@@ -161,6 +162,39 @@ public class FinPlanAssetC002Controller extends BaseController{
         map.put("param", map.get("search"));
         Page<SelectOptionDto> temp = finPlanAssetCService.getIssuerId(map);
         return temp;
+    }
+
+    /**
+     * 原始权益人的联想下拉框事件
+     *
+     * @return 查询结果
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getOriginalOwner")
+    public Page<SelectOptionDto> getOriginalOwner(){
+        Map<String,Object> map = RequestUtil.getPageParam();
+        //sql中参数不是search，页面控件传回是search，做转换 yjm 20190731
+        map.put("param", map.get("search"));
+        return finPlanAssetCService.getOriginalOwner(map);
+    }
+
+    /**
+     * 原始权益人的联想下拉框事件
+     *
+     * @return 查询结果
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getOriginalOwner2")
+    public Message<Page<SelectOptionDto>> getOriginalOwner2(){
+        Map<String,Object> map = RequestUtil.getPageParam();
+        //sql中参数不是search，页面控件传回是search，做转换 yjm 20190731
+        map.put("param", map.get("search"));
+        Page<SelectOptionDto> temp = finPlanAssetCService.getOriginalOwner(map);
+        return Message.success("",temp);
     }
     
     /**

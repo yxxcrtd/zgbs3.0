@@ -1820,15 +1820,32 @@
 
     <!--查询资产是否进行了SPPI测试-->
     <select id="queryAssetIsSppiTest"  resultType="com.joyintech.tams.common.base.entity.SppiImportData">
-        select * from (
-        select x.test_status isSppiPass
-        from sppi_test x
-        where x.finprod_id=#{finprodId,jdbcType=VARCHAR}
-        union
-        select t.is_sppi_pass
-        from SPPI_IMPORT_DATA t
-        where t.bond_id=#{finprodId,jdbcType=VARCHAR}
-        ) where rownum=1
+       	select
+	TMP1.bondId   				AS bondId,
+	TMP1.isSppiPass				AS isSppiPass
+ from
+	(
+		select
+				TMP.bondId   				AS bondId,
+				TMP.isSppiPass				AS isSppiPass,
+				ROW_NUMBER() OVER (PARTITION BY TMP.bondId ORDER BY TMP.updateTime DESC) AS RN
+		from
+				(
+						select
+						x.finprod_id bondId,
+						x.test_status isSppiPass,
+						x.UPDATE_TIME updateTime
+					from sppi_test x
+					where x.finprod_id=#{finprodId,jdbcType=VARCHAR}
+						UNION ALL
+						select
+						t.bond_id  bondId,
+						t.is_sppi_pass isSppiPass,
+					  t.UPDATE_TIME updateTime
+              from SPPI_IMPORT_DATA t
+              where t.bond_id=#{finprodId,jdbcType=VARCHAR}
+					)TMP
+	)TMP1	where TMP1.RN=1
     </select>
 
     <!--未来是否有行权-->
@@ -1837,7 +1854,7 @@
         from FIN_EXERCISE_PLAN
         where
             FINPROD_ID = #{finprodId}
-            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE}
+            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE} and EXERCISE_TYPE in ('01','02')
     </select>
 
     <!--组合持有资产业务模式查询 -->

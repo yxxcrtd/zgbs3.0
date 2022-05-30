@@ -87,4 +87,14 @@ public interface CfetsTrdBondFirstSub002Mapper {
      * @date 2022/4/28 17:26
      */
     int deleteByPreTradeId(@Param("preTradeId") String preTradeId);
+
+    /**
+     * 获取发行人名称
+     *
+     * @param finprodId
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2022/5/18 19:36
+     */
+    String getIssuer(@Param("finprodId") String finprodId);
 }

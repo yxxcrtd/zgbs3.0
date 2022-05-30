@@ -279,6 +279,17 @@ public class EtrExchangeTradeEtrExchangeSecRepoResponse {
      */
     private String dealMode;
 
+    @ApiModelProperty(name="priceType",value="价格模式")
+    private String priceType;
+
+    public String getPriceType() {
+        return priceType;
+    }
+
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
+    }
+
     public String getFinprodId() {
         return finprodId;
     }
