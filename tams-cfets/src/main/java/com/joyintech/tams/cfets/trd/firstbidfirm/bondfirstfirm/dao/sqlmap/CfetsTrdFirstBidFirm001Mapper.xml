@@ -33,9 +33,9 @@
     <sql id="listEntrustSql">
         select ee.ENTRUST_STATUS                        entrustStatus,
         CASE
-            WHEN (bobrt.BID_MODLE IS NOT NULL AND bobrt.BID_MODLE = '03') OR bobrt.IS_WIN = '04' THEN '04'
+            WHEN (bobrt.BID_MODLE IS NOT NULL AND bobrt.BID_MODLE = '03') OR bobrt.IS_WIN = 'Y' THEN '04'
             WHEN bobrt.BID_MODLE IS NULL THEN '01'
-            WHEN bobrt.IS_WIN = '03' THEN '03'
+            WHEN bobrt.IS_WIN = 'N' THEN '03'
             WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
             ELSE '05'
         END AS firstBidStatus,
@@ -119,12 +119,13 @@
         left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
         left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
         LEFT JOIN (
-            SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID   FROM  BID_ORDER bo
+            SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
+            LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
             LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
             AND brt.FINPROD_ID = bo.FINPROD_ID
             WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
-            GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID
-        ) bobrt ON 	bobrt.FINPROD_ID = fp.FINPROD_ID
+            GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
+        ) bobrt ON 	bobrt.FINPROD_ID = fp.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
