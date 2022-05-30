@@ -124,10 +124,10 @@ public class FinBondAssetValidatorService implements BeanValidator{
                 }else{
                     if (StringUtil.equals(dto.getOperateStatus(),"MODIFY")) {
                         for (BondFinCashPlanDto bondFinCashPlanDto : dto.getInvRepayList()) {
-                            if (DateUtil.compareDate(bondFinCashPlanDto.getPayDate(), iPlatformDate.getSysDate()) < 0) {
-                                resultList.add(new ValidMessage("还本计划支付日不能小于平台日"));
-                                break;
-                            }
+//                            if (DateUtil.compareDate(bondFinCashPlanDto.getPayDate(), iPlatformDate.getSysDate()) < 0) {
+//                                resultList.add(new ValidMessage("还本计划支付日不能小于平台日"));
+//                                break;
+//                            }
                         }
                     }
                 }
@@ -159,10 +159,10 @@ public class FinBondAssetValidatorService implements BeanValidator{
                             break;
                         }
                         if (StringUtil.equals(dto.getOperateStatus(),"MODIFY")) {
-                            if (DateUtil.compareDate(finCashPlanEntity.getPayDate(), iPlatformDate.getSysDate()) < 0) {
-                                resultList.add(new ValidMessage("付息计划支付日不能小于平台日"));
-                                break;
-                            }
+//                            if (DateUtil.compareDate(finCashPlanEntity.getPayDate(), iPlatformDate.getSysDate()) < 0) {
+//                                resultList.add(new ValidMessage("付息计划支付日不能小于平台日"));
+//                                break;
+//                            }
                         }
                     }
                 }
