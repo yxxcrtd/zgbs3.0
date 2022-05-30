@@ -1322,10 +1322,13 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         //产品化_债券二级指令 如果entrustCommonDto为空，则赋值为流程中的数据  add by zhangpei 20201119 start
         if(StringUtil.isNotEmpty(entrustCommonDto)){
         	 if(!StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrust())||!StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrustAdd())){
-             	if(StringUtil.isNotEmpty(entrustCommonDto)){
-             		BeanUtil.copyPropertiesIgnoreNull(entrustCommonDto, entrustCommons);
-             	}
+                 if (null != entrustCommons) {
+                     BeanUtil.copyPropertiesIgnoreNull(entrustCommonDto, entrustCommons);
+                 }
              }
+        }
+        if (!StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrust()) || !StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrustAdd())) {
+            return new BigDecimal(0);
         }
         //产品化_债券二级指令 如果entrustCommonDto为空，则赋值为流程中的数据  add by zhangpei 20201119 end
         
