@@ -10,6 +10,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.util.DateUtil;
@@ -124,7 +125,9 @@ public class FairOrderHelper {
                 if (EntrustUtils.isFullPrice(instrument, order.getAssetType(), order.getEntrustProp(), order.getIsFullPrice())) {
                     Instruction instruction = instructionService.findById(order.getStockCode());
                     if (Objects.nonNull(instruction)) {
-                        price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(price, order.getEntrustVolume(), instruction, bondHelper.getPriceRoundByPriceStep(instrumentService.queryByInnerCode(order.getStockCode())));
+                        BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+                        int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
+                        price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(price, order.getEntrustVolume(), instruction, round);
                     }
                 }
             } else {
@@ -168,6 +171,13 @@ public class FairOrderHelper {
     }
 
     public boolean createFairOrder(Order order, Instruction instruction) {
+        // 判断order是否要做公平交易
+        if (!Strings.isNullOrEmpty(order.getAlgorithmId())
+                || !EntrustUtils.isFairOrder(order.getEntrustProp())
+                || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
+            return false;
+        }
+
         OrderPlaceBean orderPlaceBean = convertOrder2OrderPlaceBean(order);
         ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
 

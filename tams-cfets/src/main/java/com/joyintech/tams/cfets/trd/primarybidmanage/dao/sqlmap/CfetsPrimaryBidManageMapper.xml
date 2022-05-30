@@ -8,8 +8,8 @@
         SELECT s.* FROM (
         SELECT
         '${otherEffectFlag_01}' otherEffectFlag,
-        CASE WHEN BO.IS_WIN = 'Y' THEN '03'
-        WHEN BO.IS_WIN = 'N' THEN '04'
+        CASE WHEN BO.IS_WIN = 'Y' THEN '04'
+        WHEN BO.IS_WIN = 'N' THEN '03'
         ELSE '02' END isWin,
         BO.BID_ID bidId,
         BO.FINPROD_ID finprodId,
@@ -37,7 +37,7 @@
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
-        WHERE BO.IS_CANCEL = 'N' AND
+        WHERE FPI.ISSUE_CLASS = '02'  AND BO.IS_CANCEL = 'N' AND
         BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE =#{COMMON_BUSINESS_TYPE_TRD97} and
         TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL='N')
         <if test="finprodIdList != null and finprodIdList.size() > 0">
@@ -143,6 +143,7 @@
         BOBP.BID_PRICE    bidPrice,
         BO.WIN_TYPE      winType,
         BO.PAY_TYPE      payType,
+        BO.BID_MODLE     bidModle,
         BO.BID_DATE      bidCfmDate,
         FP.TRADE_MARKET  tradeMarket,
         BO.PAY_DATE      payDate,
@@ -528,6 +529,7 @@
             BO.PAY_DATE   creditorDebtDate,
             FPA.LISTING_DATE listingDate,
             BO.WIN_TYPE   winType,
+            BO.BID_MODLE     bidModle,
             BO.PAY_TYPE   payType,
             BO.WIN_PRIN_AMT   winPrinAmt,
             FP.CIRCULATION_CODE circulationCode,
@@ -574,6 +576,7 @@
             BRT.CREDITOR_DEBT_DATE   creditorDebtDate,
             FPA.LISTING_DATE listingDate,
             BRT.WIN_TYPE   winType,
+            BO.BID_MODLE     bidModle,
             BO.WIN_PRIN_AMT/10000 totalBiddingNum,
             BRT.WIN_PRINAMT   winPrinAmt,
             BRT.WIN_PRICE       winPrice,

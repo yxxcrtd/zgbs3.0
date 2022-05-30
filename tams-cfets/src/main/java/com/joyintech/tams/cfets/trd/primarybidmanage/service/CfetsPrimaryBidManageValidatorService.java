@@ -76,23 +76,25 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                         return o1.getWinPrice().compareTo(o2.getWinPrice());
                     }
                 });
-                if (dto.getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0
-                        || dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMinTamt()) < 0) {
+                if ((finProductIssue.getMinTamt() != null) && (dto.getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0
+                        || dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMinTamt()) < 0)) {
                     checkFlag = true;
                 }
-                if (dto.getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0
-                        || dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinCprice().compareTo(finProductIssue.getMaxTamt()) > 0) {
+                if ((finProductIssue.getMaxTamt() != null) &&(dto.getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0
+                        || dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinCprice().compareTo(finProductIssue.getMaxTamt()) > 0)) {
                     checkFlag = true;
                 }
-                if (dto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0) {
+                if ((finProductIssue.getTenderUnit() != null) &&(dto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0)) {
                     checkFlag = true;
                 }
-                for (CfetsPrimaryBidManageSaveDetailDto detailDto : dto.getAllocationDetails()) {
-                    if (detailDto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0) {
-                        checkFlag = true;
+                if ((finProductIssue.getTenderUnit() != null)) {
+                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : dto.getAllocationDetails()) {
+                        if (detailDto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0) {
+                            checkFlag = true;
+                        }
                     }
                 }
-                if (BigDecimal.valueOf(dto.getAllocationDetails().size()).compareTo(finProductIssue.getMaxTenderUnit()) < 0) {
+                if ((finProductIssue.getMaxTenderUnit() != null) && (BigDecimal.valueOf(dto.getAllocationDetails().size()).compareTo(finProductIssue.getMaxTenderUnit()) < 0)) {
                     checkFlag = true;
                 }
                 if (dto.getAllocationDetails().size() > 1) {
@@ -101,7 +103,7 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                         checkFlag = true;
                     }
                 } else {
-                    if (dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMaxTenderPlus()) < 0) {
+                    if ((finProductIssue.getMaxTenderPlus() != null) && (dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMaxTenderPlus()) < 0)) {
                         checkFlag = true;
                     }
                 }
@@ -122,7 +124,7 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
             }
  //            分配明细中缴款金额 汇总金额<>基本信息中的缴款金额
             BigDecimal sumPatAmt = dto.getAllocationDetails().stream().map(item -> item.getPayAmt()).reduce(BigDecimal.ZERO, BigDecimal::add);
-            if (sumPatAmt.compareTo(dto.getPayAmt())!=0){
+            if (StringUtil.isNotEmpty(dto.getPayAmt()) && sumPatAmt.compareTo(dto.getPayAmt())!=0){
                 resultList.add(new ValidMessage(getMessage("明细汇总缴款金额不等于基本信息中的缴款金额！")));
             }
 //            分配明细中结算服务费 汇总金额<>基本信息中的结算服务费
