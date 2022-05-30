@@ -204,7 +204,7 @@
             parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest">
         SELECT SECID finprodMarketId, SECNAME finprodAbbr
         from INTERF_PAYHSRCSECINFO
-        WHERE SECNAME = #{search};
+        WHERE SECNAME = #{search}
     </select>
 
     <select id="querySampleFinProduct"
@@ -212,7 +212,7 @@
             parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest">
         SELECT FINPROD_ID finprodMarketId, FINPROD_ABBR finprodAbbr
         from FIN_PRODUCT
-        where FINPROD_ABBR = #{search};
+        where FINPROD_ABBR = #{search}
     </select>
 
 </mapper>
