@@ -30,6 +30,10 @@ public class TradeUtils {
         return BigDecimal.valueOf(d).setScale(scale, RoundingMode.HALF_UP);
     }
 
+    public static BigDecimal getBigDecimal(Double d, int scale, RoundingMode roundingMode) {
+        return BigDecimal.valueOf(d).setScale(scale, roundingMode);
+    }
+
     public static double formatDouble(Double d, int scale) {
         return BigDecimal.valueOf(d).setScale(scale, RoundingMode.HALF_UP).doubleValue();
     }

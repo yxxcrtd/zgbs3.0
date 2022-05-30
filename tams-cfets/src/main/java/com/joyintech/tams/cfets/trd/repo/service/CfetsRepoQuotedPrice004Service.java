@@ -220,6 +220,9 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
      */
     @Autowired
     private BasePtlCashPositionInfoService basePtlCashPositionInfoServiceImpl;
+
+    @Autowired
+    private com.joyintech.tams.cfets.trd.bond.service.CfetsQuotedCommonService cfetsQuotedCommonServicevue;
     /**
      * 利率保留位数
      */
@@ -273,6 +276,11 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                 if (validMessageList != null && !validMessageList.isEmpty()) {
                     errorList.addAll(validMessageList);
 //                    break;
+                }
+                AjaxResult ajaxResultPartyId = cfetsQuotedCommonServicevue.checkpartyId(ptlAllocatio.getEntrustId(),
+                        ptlAllocatio.getPortfolioId(), DictCodeListExt3.报价系统区分类型_质押式回购登记报价.getValue());
+                if(StringUtil.isNotEmpty(ajaxResultPartyId.getMessage())){
+                    errorList.add(new ValidMessage(ajaxResultPartyId.getMessage()));
                 }
                 if (this.ACompareToB(ptlAllocatio.getTradeAmt(), ptlAllocatio.getConvertAmt(), 6) > 0
                         && StringUtil.equals(ps, DictCodeListExt3.交易方向_正回购.getValue())) {

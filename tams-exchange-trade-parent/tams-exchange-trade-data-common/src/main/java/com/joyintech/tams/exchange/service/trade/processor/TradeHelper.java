@@ -42,7 +42,6 @@ import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeOtherCommonService;
-import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -704,7 +703,6 @@ public class TradeHelper {
         }
 
 
-
         // 指令检查(包括状态,日期,接收人) 价格限定
 //        ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, order, orderPrice, tradingDay);
 //        if (!ErrorCode.isSuccess(errorCode.value)) {
@@ -740,7 +738,7 @@ public class TradeHelper {
         order.setIsNoGuard(instruction.getIsNoGuard());
 
         //1.公平下单
-        if (fairOrderHelper.createFairOrder(order,instruction)) {
+        if (fairOrderHelper.createFairOrder(order, instruction)) {
             return order;
         }
 
@@ -771,7 +769,8 @@ public class TradeHelper {
             }
             order.setId(orderService.genDbId());
 
-            int round = bondHelper.getPriceRoundByPriceStep(instrument);
+            BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+            int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
             setBatchOrderPrice(order, batchInfo, instruction, round);
             order.setOrderBalance(TradeUtils.calculateBalance(order.getOrderPrice(), order.getOrderVolume(), order.getAssetType(), order, futuresInstrument));
 
@@ -856,9 +855,6 @@ public class TradeHelper {
         ResultBean tickBean = quoteService.getTick(order.getStockCode());
         if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
             TickBean tick = (TickBean) tickBean.getData();
-//        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(order.getStockCode());
-//        if (Objects.nonNull(tick)) {
-
             if (batchInfo.getPriceMode() == BatchPriceMode.BID_OFFSET.value) {
                 if (tick.getBidPrice().get(0) > 0) {
                     order.setOrderPrice(TradeUtils.add(tick.getBidPrice().get(0), batchInfo.getPriceOffset(), round));
@@ -1003,8 +999,8 @@ public class TradeHelper {
         entrust.setEntrustVolume(entrustVolume);
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
-        Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
-        int round = bondHelper.getPriceRoundByPriceStep(instrument);
+        BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+        int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
         setBatchEntrustPrice(order, batchInfo, entrust, instruction, round);
 
         //资产类型是债券，处理净价、全价
@@ -1068,8 +1064,8 @@ public class TradeHelper {
             Instruction instruction = instructionService.findById(order.getInstructionId());
             if (Objects.nonNull(batchInfo)) {
                 entrust.setEntrustVolume(batchInfo.getBeginVolume() + batchInfo.getVolumeOffset() * batchInfo.getCompleteTimes());
-                Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
-                int round = bondHelper.getPriceRoundByPriceStep(instrument);
+                BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+                int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
                 setBatchEntrustPrice(order, batchInfo, entrust, instruction, round);
 //                // 处理债券
 //                if (InvestmentAssetType.isBond(order.getAssetType())) {
@@ -1574,5 +1570,55 @@ public class TradeHelper {
         logger.debug("公平委托相关指令: {}", JsonUtils.getJsonFromObject(instructionMap));
         return instructionMap;
     }
+
+    public void marketPriceCheck(OrderPlaceBean order, Instruction instruction) {
+        // 科创板 盘后定价 填写保护价格 不需要反向填充涨跌停价格
+        if (EntrustProp.NORMAL_AFTER_SET_PRICE.getValue().equals(order.getEntrustProp())) {
+            return;
+        }
+
+        //市价委托填充反向涨跌停价
+        if (EntrustProp.isMarketPrice(order.getEntrustProp())) {
+            ResultBean tickBean = quoteService.getTick(order.getStockCode());
+            if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+                TickBean tick = (TickBean) tickBean.getData();
+                BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+                int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
+                BigDecimal price;
+                if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {
+                    price = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), round, RoundingMode.UP);
+                } else {
+                    price = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), round, RoundingMode.DOWN);
+                }
+                order.setEntrustPrice(price);
+            }
+        }
+    }
+
+    public void fillFullPrice(OrderPlaceBean order, Instruction instruction) {
+        if (Objects.nonNull(order.getFullPrice()) && order.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
+            return;
+        }
+
+        BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+        int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
+
+        //资产类型是债券
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+            EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
+            dto.setPrice(order.getEntrustPrice());
+            dto.setEntrustVolume(order.getEntrustVolume());
+            dto.setRound(round);
+
+            //判断是否全价交易
+            boolean isFullPrice = FullPriceConst.NET_PRICE.value.equals(instruction.getIsNetPrice());
+            investmentManagement.getAllPriceAndYield(instruction, dto, isFullPrice);
+            order.setEntrustPrice(dto.getNetPrice());
+            order.setFullPrice(dto.getFullPrice());
+            order.setYield(dto.getYield());
+        }
+    }
+
 
 }

@@ -107,7 +107,7 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
     private Date listingDate;
 
     /**投标方式*/
-    @ApiModelProperty(name="winType",value="投标方式")
+    @ApiModelProperty(name="winType",value="中标方式")
     private String winType;
 
     /**缴款方式*/
@@ -164,6 +164,9 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
 
      @ApiModelProperty(name="couponSpecies",value="息票品种")
      private String couponSpecies;
+
+     @ApiModelProperty(name="bidModle",value="投标方式")
+     private String bidModle;
 
 
      private BaseBidManageBaseInfoDto baseBidManageBaseInfoDto;
@@ -483,5 +486,13 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
 
      public void setFinprodMarketId(String finprodMarketId) {
          this.finprodMarketId = finprodMarketId;
+     }
+
+     public String getBidModle() {
+         return bidModle;
+     }
+
+     public void setBidModle(String bidModle) {
+         this.bidModle = bidModle;
      }
  }

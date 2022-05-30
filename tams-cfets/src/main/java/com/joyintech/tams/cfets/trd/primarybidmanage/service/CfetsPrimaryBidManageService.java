@@ -252,6 +252,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BidResultTotal bidResultTotal = new BidResultTotal();
             bidResultTotal.setTotalWinId(IDGenerator.generate());
             BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,response);
+            bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
             bidResultTotalMapper.insertSelective(bidResultTotal);
             BidOrder record = new BidOrder();
             record.setBidId(request.getBidId());
@@ -262,6 +263,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,response);
                 BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
                 bidResultDetail.setDetailWinId(IDGenerator.generate());
+                bidResultDetail.setTotalWinId(bidResultTotal.getTotalWinId());
+                bidResultDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
                 bidResultDetailMapper.insertSelective(bidResultDetail);
             }
             ajax.setMessage("未中标信息保存成功！");
