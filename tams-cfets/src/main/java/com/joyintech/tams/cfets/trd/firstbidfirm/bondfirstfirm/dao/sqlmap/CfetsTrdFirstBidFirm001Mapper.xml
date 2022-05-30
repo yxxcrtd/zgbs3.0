@@ -65,7 +65,7 @@
             WHEN (fpi.ISSUE_CLASS = '02' AND
             (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
             OR fpi.ISSUE_CLASS = '03'
-            THEN fpi.TENDER_SDATE
+            THEN fpi.TENDER_EDATE
             END           AS issueDateEnd/*投标日 结束*/,
         ee.ENTRUST_NUM*100                       entrustNum,
         CASE
