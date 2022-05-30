@@ -179,9 +179,9 @@
     </delete>
 
     <select id="hasSameDealerPartyNoDiffType" resultType="java.lang.Integer">
-        select count(DEALER_PARTY_NO) from  MST_DEALER_DETAIL_INFO MDDI
+        select SEQ_NO from  MST_DEALER_DETAIL_INFO MDDI
         where MDDI.CUSTOMER_ID = #{customerId} and MDDI.TRADE_MARKET = #{tradeMarket}
-           and MDDI.DEALER_PARTY_TYPE != #{dealerPartyType} and MDDI.DEALER_PARTY_NO != #{dealerPartyNo}
+           and MDDI.DEALER_PARTY_TYPE != #{dealerPartyType} and MDDI.DEALER_PARTY_NO = #{dealerPartyNo}
     </select>
 
     <select id="hasSameDealerPartyNoTraderNo" resultType="java.lang.String">

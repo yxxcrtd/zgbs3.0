@@ -33,6 +33,9 @@ public class CfetsPrimaryBidManageResponse {
     @ApiModelProperty(name="isWinStr",value="中标状态")
     private String isWinStr;
 
+    @ApiModelProperty(name="totalWinId",value="中标编号")
+    private String totalWinId;
+
     @ApiModelProperty(name="bidId",value="投标编号")
     private String bidId;
 
@@ -362,5 +365,13 @@ public class CfetsPrimaryBidManageResponse {
 
     public void setFinprodMarketId(String finprodMarketId) {
         this.finprodMarketId = finprodMarketId;
+    }
+
+    public String getTotalWinId() {
+        return totalWinId;
+    }
+
+    public void setTotalWinId(String totalWinId) {
+        this.totalWinId = totalWinId;
     }
 }

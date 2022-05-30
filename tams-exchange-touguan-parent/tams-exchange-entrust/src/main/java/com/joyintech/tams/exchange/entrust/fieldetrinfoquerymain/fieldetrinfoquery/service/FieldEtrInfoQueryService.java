@@ -266,12 +266,12 @@ public class FieldEtrInfoQueryService extends BaseService {
         if (busiTypePosition.equals(DictCodeListExt3.投管业务类型_现券交易.getValue())) {
             response.setTradedVolumeStr(response.getTradedVolume() + "(万元)");
             response.setTradedPriceStr(response.getTradedPrice() + "(元)");
-            response.setTradedBalanceStr(response.getTradedBalance() + "(元)");
+            response.setTradedBalanceStr(response.getClearBalance() + "(元)");
         }
         if (busiTypePosition.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue())) {
             response.setTradedVolumeStr("");
             response.setTradedPriceStr(response.getTradedPrice() + "%");
-            response.setTradedBalanceStr(ArithmeticUtil.divide(response.getTradedPrice(), new BigDecimal(100), 2) + "(万元)");
+            response.setTradedBalanceStr(ArithmeticUtil.divide(response.getClearBalance(), new BigDecimal(100), 2) + "(万元)");
         }
     }
 }

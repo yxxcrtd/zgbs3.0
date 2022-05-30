@@ -1,5 +1,6 @@
 package com.joyintech.tams.business.asset.tenderbond.service;
 
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
@@ -247,7 +248,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      * @param dto
      * @return
      */
-    public List<ValidMessage> addCoupons(FinTenderBondAsset003Dto dto) {
+    public AjaxResult addCoupons(FinTenderBondAsset003Dto dto) {
         return finBondMarketInfoQuery001Service.addCoupons(dto.getAppearMarketId());
     }
 
