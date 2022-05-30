@@ -12,6 +12,12 @@ public enum BusinessType {
     INTEGRATED_PROTOCOL_BUY("深交所综合协议平台债券买入", "03"),
     INTEGRATED_PROTOCOL_SELL("深交所综合协议平台债券卖出", "04"),
 
+    // add by etliu 20220531 start
+    // 3.0.6场内 ZGCPCN-973:【手工交收管理】债券是否非担保为“是”时，成交回报后，手工交收管理查询不到数据
+    BOND_BUY("场内现券买入", "25"),
+    BOND_SELL("场内现券卖出", "26"),
+    // add by etliu 20220531 end
+
     SH_SELL_PROTOCOL_BACK_BEGIN("上交所协议正回购初始交易", "05"),
     SH_SELL_PROTOCOL_BACK_EXCHANGE("上交所协议正回购中途换券", "06"),
     SH_SELL_PROTOCOL_BACK_TERMINATE("上交所协议正回购提前购回", "07"),
