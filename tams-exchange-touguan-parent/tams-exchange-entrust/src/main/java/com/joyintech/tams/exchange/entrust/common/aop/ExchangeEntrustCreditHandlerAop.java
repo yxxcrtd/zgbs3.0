@@ -9,6 +9,7 @@ import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.exchange.entrust.common.service.EtrExchangeCommonService;
+import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
 import com.joyintech.tams.invest.entrust.etrautomanagementaccount.dto.EtrAutoManagementAccountDto;
@@ -115,7 +116,7 @@ public class ExchangeEntrustCreditHandlerAop {
                     ajaxResult.setMessageType(MessageType.错误消息);
                 }
                 if (ar != null && StringUtil.isNotEmpty(ar.getData())){
-                      ajaxResult.setData(ar.getData());
+                      ajaxResult.setData(StringUtil.replaceAll(ar.getData().toString(), BussinessConstant.MSG_SPLIT,""));
                       ajaxResult.setMessageType(MessageType.确认消息);
 //                    if (StringUtil.equals(ajaxResult.getData().toString(),"请确认是否要提交?")
 //                            || StringUtil.equals(ajaxResult.getData().toString(),"请确认是否要保存?")){
