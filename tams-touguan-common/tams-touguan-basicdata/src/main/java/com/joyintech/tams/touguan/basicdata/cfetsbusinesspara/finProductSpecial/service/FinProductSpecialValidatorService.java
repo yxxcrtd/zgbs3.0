@@ -17,6 +17,7 @@ import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialImportDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -235,6 +236,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
 
                 if (StringUtil.isNotBlank(allConfirmErrorMsg)) {
                     result.setMessage(allConfirmErrorMsg.toString(), MessageType.警告消息);
+                    result.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
                     return result;
                 }
 

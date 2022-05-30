@@ -155,8 +155,7 @@ public class FinProductSpecial001Controller extends BaseController {
     public Message<AjaxResult> checkConfirmMsgForImportData(String fileName) {
         AjaxResult ajaxResult = finProductSpecialValidatorService.checkConfirmMsgForImportData(fileName);
         if (Objects.nonNull(ajaxResult.getMessageType()) &&
-                (ajaxResult.getMessageType().equals(MessageType.错误消息.getCode())
-                        || ajaxResult.getMessageType().equals(MessageType.警告消息.getCode()))) {
+                (ajaxResult.getMessageType().equals(MessageType.错误消息.getCode()))) {
             String validMessage = ValidUtils.getValidMessage(ajaxResult.getErrorList());
             if (StringUtil.isBlank(validMessage)) {
                 validMessage = ajaxResult.getMessage();
