@@ -13,6 +13,7 @@ package com.joyintech.tams.exchange.entrust.etrexchange.common.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Strings;
 import com.joyintech.background.component.common.pack.common.security.User;
 import com.joyintech.background.component.order.exchange.business.dto.*;
 import com.joyintech.background.component.order.exchange.common.constant.UnitEnum;
@@ -5377,9 +5378,8 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         ProcessMark processMark = new ProcessMark();
         processMark.setBusinessDataPk1(dto.getEntrustId());
         String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
-        //EtrEntrust etrEntrust=etrEntrustMapper.selectByPrimaryKey(dto.getEntrustId());
         EtrExchangeTradeSaveRequest entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
-        if("modify".equals(entity.getOptType()) && "07".equals(entity.getEntrustStatus())){
+        if("modify".equals(entity.getOptType()) && "07".equals(entity.getEntrustStatus()) &&  Strings.isNullOrEmpty(dto.getOperateType())){
             tradeList = etrExchangeTradeCommonMapper.selectEntrustDetail(dto);
         }else{
             List<EtrExchangeTradePortfolioRequest> portlist = entity.getPortfolioList();
