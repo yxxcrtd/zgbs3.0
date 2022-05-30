@@ -226,6 +226,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         Map<String, Object> param = BeanUtil.object2Map(request);
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,request);
+        bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
         bidResultTotalMapper.insertSelective(bidResultTotal);
         BidOrder record = new BidOrder();
         record.setBidId(request.getBidId());
@@ -236,18 +237,43 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,request);
             BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
             bidResultDetail.setDetailWinId(IDGenerator.generate());
+            bidResultDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
             bidResultDetailMapper.insertSelective(bidResultDetail);
         }
     }
 
-
+    public AjaxResult unBidSave(CfetsPrimaryBidManageCfmRequest request) {
+        AjaxResult ajax = new AjaxResult();
+        if (StringUtil.isNotEmpty(request.getBidId())) {
+            Map<String, Object> param = BeanUtil.object2Map(request);
+            CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageMapper.selectBidOrderInfo(param);
+            response.setIsWin(DictCodeList.是否_否.getValue());
+            List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBidOrderDtail(param);
+            BidResultTotal bidResultTotal = new BidResultTotal();
+            bidResultTotal.setTotalWinId(IDGenerator.generate());
+            BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,response);
+            bidResultTotalMapper.insertSelective(bidResultTotal);
+            BidOrder record = new BidOrder();
+            record.setBidId(request.getBidId());
+            record.setIsWin(DictCodeList.是否_否.getValue());
+            bidOrderMapper.updateByPrimaryKeySelective(record);
+            for(CfetsPrimaryBidManageSaveDetailDto detailDto: detailDtos){
+                BidResultDetail bidResultDetail = new BidResultDetail();
+                BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,response);
+                BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
+                bidResultDetail.setDetailWinId(IDGenerator.generate());
+                bidResultDetailMapper.insertSelective(bidResultDetail);
+            }
+            ajax.setMessage("未中标信息保存成功！");
+        }
+        return ajax;
+    }
     public CfetsPrimaryBidManageSaveRequest selectBasicInfo(CfetsPrimaryBidManageSaveRequest request) {
         if (StringUtil.isNotEmpty(request.getTotalWinId())) {
             Map<String, Object> param = BeanUtil.object2Map(request);
             CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageMapper.selectBasicInfo(param);
             List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBasicDtail(param);
             response.setAllocationDetails(detailDtos);
-            return response;
         }
         return null;
     }
@@ -269,7 +295,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultTotal.setTotalWinId(entity.getTotalWinId());
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
             bidResultTotalMapper.updateByPrimaryKey(bidResultTotal);
-            if(StringUtil.equals(entity.getIsWin(),"04")) {
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                 List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
                 for (TrdFinProductDealTotal trdFinProductDealTotal : trdFinProductDealTotalList) {
                     TrdFinProductDealTotal trdFinProductDealTotalRevoke = new TrdFinProductDealTotal();
@@ -339,7 +365,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             updateCfetsOprHis(entity.getTotalWinId(),action);
         } else {
             action = OperationType.NEW.name();
-            if(StringUtil.equals(entity.getIsWin(),"04")) {
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                 entity = cncapBaseBidManageBaseInfoDto(entity);
                 doCompleteInsert(entity);
             }else{
@@ -354,11 +380,16 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //中标结果汇总表
         BidResultTotal bidResultTotal = dto.getBidResultTotal();
         wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
-//        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
-
+        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
+        BidOrder record = new BidOrder();
+        record.setBidId(bidResultTotal.getBidId());
+        record.setIsWin(bidResultTotal.getIsWin());
+        bidOrderMapper.updateByPrimaryKeySelective(record);
+        bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
         bidResultTotalMapper.insertSelective(bidResultTotal);
         //中标结果明细表
         for(BidResultDetail bidResultDetail: dto.getBidResultDetailList()) {
+            bidResultDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
             bidResultDetailMapper.insertSelective(bidResultDetail);
         }
         //金融产品交易汇总表
@@ -415,16 +446,18 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //中标结果汇总
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,dto);
-        baseBidManageBaseInfoDto.setBidResultTotal(bidResultTotal);
+        bidResultTotal.setWinDate(iplatformDate.getSysDate());
+        bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
         //中标结果明细表
         List<BidResultDetail> bidResultDetailList = new ArrayList<>();
         for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()) {
             BidResultDetail bidResultDetail = new BidResultDetail();
             BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
             bidResultDetail.setDetailWinId(IDGenerator.generate());
+            bidResultDetail.setTotalWinId(dto.getTotalWinId());
+            bidResultDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
             bidResultDetailList.add(bidResultDetail);
         }
-        baseBidManageBaseInfoDto.setBidResultDetailList(bidResultDetailList);
         Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> allocationListMap = dto.getAllocationDetails().stream().collect(JoyinCollectors.groupingBy(item -> item.getSecAcctId()));
         //金融产品交易汇总表
         List<TrdFinProductDealTotal> trdFinProductDealTotalList = new ArrayList<>();
@@ -441,6 +474,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             secAcctIdTotleTradeId.put(secAcctId,trdFinProductDealTotal.getTotleTradeId());
             trdFinProductDealTotal.setFinprodId(dto.getFinprodId());
             trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            trdFinProductDealTotal.setBusiType(BussinessDictCodeList.共同业务类型_中标结果维护.getValue());
             trdFinProductDealTotal.setBranch(branch);
             trdFinProductDealTotal.setTradeDate(iplatformDate.getSysDate());
             trdFinProductDealTotal.setSettleDate(dto.getCreditorDebtDate());
@@ -491,7 +525,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdFinProductDealTotal.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
             trdFinProductDealTotal.setTrader(dto.getOuTraderId());
 //            参数字典.平安业务类型.中标结果维护
-//            trdFinProductDealTotal.setTgBusiType();
+            trdFinProductDealTotal.setTgBusiType("151");
             trdFinProductDealTotal.setbTradeId(dto.getTotalWinId());
             trdFinProductDealTotal.setCounterId(dto.getCounterId());
             trdFinProductDealTotal.setRemark(dto.getRemark());
@@ -501,6 +535,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdTradeFeeTotal.setFeeType(BussinessDictCodeList.费用类型_结算费.getValue());
             trdTradeFeeTotal.setIsPayWithTrade(DictCodeList.是否_否.getValue());
             trdTradeFeeTotal.setFeeAmt(settFeeAmt);
+            trdTradeFeeTotal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
             trdTradeFeeTotalList.add(trdTradeFeeTotal);
             //结算指令表
             StlOrders stlOrders = new StlOrders();
@@ -536,18 +571,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         List<EtrFinishStatus> etrFinishStatusList = new ArrayList<>();
         //组合交易表
         List<PtlTrade> ptlTradeList = new ArrayList<>();
-        for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()){
-            //中标结果明细表
-            BidResultDetail bidResultDetail= new BidResultDetail();
-            BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
-            bidResultDetail.setTotalWinId(dto.getTotalWinId());
-            bidResultDetailList.add(bidResultDetail);
-
-        }
         Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> allocationListTwoMap = dto.getAllocationDetails().stream()
                 .collect(JoyinCollectors.groupingBy(item -> item.getSecAcctId() + GlobalConstant.COMMA + item.getEntrustId() + GlobalConstant.COMMA + item.getPortfolioId()));
-        for (String allocation:allocationListMap.keySet()) {
-            List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = allocationListMap.get(allocation);
+        for (String allocation:allocationListTwoMap.keySet()) {
+            List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = allocationListTwoMap.get(allocation);
             List<String> allocationList = StringUtil.splitToList(GlobalConstant.COMMA, allocation);
             String secAcctId = allocationList.get(0);
             String entrustId = allocationList.get(1);
@@ -600,7 +627,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             trdProductDeal.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
 //            参数字典.平安业务类型.中标结果维护
-//            trdFinProductDealTotal.setTgBusiType();
+            trdProductDeal.setTgBusiType("151");
             trdProductDeal.setbTradeId(dto.getTotalWinId());
             trdProductDeal.setCounterId(dto.getCounterId());
             trdProductDeal.setRemark(dto.getRemark());
@@ -707,8 +734,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             for (CfetsPrimaryBidManageSaveRequest dto : selectedItem) {
                 WflBidResultTotal wflBidResultTotal = new WflBidResultTotal();
                 BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, dto);
+                wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
                 wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
                 wflBidResultTotal.setWorkflowId(dto.getWorkflowId());
+                wflBidResultTotal.setWinDate(iplatformDate.getSysDate());
 //                wflBidResultTotal.setpTotalWinId(wflBidResultTotal.getTotalWinId());
                 wflBidResultTotal.setTotalWinId(wflBidResultTotal.getTotalWinId() + "R");
                 wflBidResultTotalMapper.insertSelective(wflBidResultTotal);
@@ -720,6 +749,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         wflBidResultDetail.setWorkflowId(dto.getWorkflowId());
                         wflBidResultDetail.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
                         wflBidResultDetail.setTotalWinId(dto.getTotalWinId() + "R");
+                        wflBidResultDetail.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
                         wflBidResultDetailMapper.insertSelective(wflBidResultDetail);
                     }
                 }
@@ -730,6 +760,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, request);
             wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
             wflBidResultTotal.setWorkflowId(request.getWorkflowId());
+            wflBidResultTotal.setWinDate(iplatformDate.getSysDate());
+            wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_流程中.getValue());
             wflBidResultTotalMapper.insertSelective(wflBidResultTotal);
             if (request.getAllocationDetails() != null && request.getAllocationDetails().size() > 0) {
                 for (CfetsPrimaryBidManageSaveDetailDto detail : request.getAllocationDetails()) {
@@ -737,6 +769,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     BeanUtil.copyPropertiesIgnoreNull(wflBidResultDetail, detail);
                     wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
                     wflBidResultDetail.setWorkflowId(request.getWorkflowId());
+                    wflBidResultDetail.setDetailWinId(IDGenerator.generate());
+                    wflBidResultDetail.setTotalWinId(request.getTotalWinId());
+                    wflBidResultDetail.setStatus(DictCodeListExt1.有效状态_流程中.getValue());
                     wflBidResultDetailMapper.insertSelective(wflBidResultDetail);
                 }
             }
@@ -1374,6 +1409,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 return request.getWinPrice();
             }
         }
-        return null;
+        return request.getWinPrice();
     }
 }

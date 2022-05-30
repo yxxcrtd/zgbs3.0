@@ -54,14 +54,14 @@
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.BidResultDetail" >
         insert into BID_RESULT_DETAIL (DETAIL_WIN_ID,TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
             TOTAL_BID_PRINAMT, THE_WIN_PRINAMT, ACT_WIN_PRINAMT, BID_PRICE, WIN_PRICE, WIN_CPRICE,
-            INT_AMT, PAY_AMT, SETT_FEE_AMT, INV_AIM, SEC_ACCT_ID, WORKFLOW_ID, WORKFLOW_STATUS,
+            INT_AMT, PAY_AMT, SETT_FEE_AMT, INV_AIM, SEC_ACCT_ID,
             CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
             )
         values (#{detailWinId,jdbcType=VARCHAR}, #{totalWinId,jdbcType=VARCHAR}, #{winId,jdbcType=VARCHAR}, #{bidId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR},
             #{portfolioId,jdbcType=VARCHAR}, #{totalBidPrinamt,jdbcType=DECIMAL}, #{theWinPrinamt,jdbcType=DECIMAL},
             #{actWinPrinamt,jdbcType=DECIMAL}, #{bidPrice,jdbcType=DECIMAL}, #{winPrice,jdbcType=DECIMAL}, #{winCprice,jdbcType=DECIMAL},
             #{intAmt,jdbcType=DECIMAL}, #{payAmt,jdbcType=DECIMAL}, #{settFeeAmt,jdbcType=DECIMAL}, #{invAim,jdbcType=VARCHAR},
-            #{secAcctId,jdbcType=VARCHAR}, #{workflowId,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR},
+            #{secAcctId,jdbcType=VARCHAR},
             #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
             #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
             )
@@ -119,12 +119,6 @@
             </if>
             <if test="secAcctId != null" >
                 SEC_ACCT_ID,
-            </if>
-            <if test="workflowId != null" >
-                WORKFLOW_ID,
-            </if>
-            <if test="workflowStatus != null" >
-                WORKFLOW_STATUS ,
             </if>
             <if test="createUser != null" >
                 CREATE_USER,
@@ -194,12 +188,6 @@
             <if test="secAcctId != null" >
                 #{secAcctId,jdbcType=VARCHAR},
             </if>
-            <if test="workflowId != null" >
-                #{workflowId,jdbcType=VARCHAR},
-            </if>
-            <if test="workflowStatus != null" >
-                #{workflowStatus,jdbcType=VARCHAR},
-            </if>
             <if test="createUser != null" >
                 #{createUser,jdbcType=VARCHAR},
             </if>
@@ -220,11 +208,11 @@
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.BidResultDetail" >
         insert into BID_RESULT_DETAIL(DETAIL_WIN_ID,TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
         TOTAL_BID_PRINAMT, THE_WIN_PRINAMT, ACT_WIN_PRINAMT, BID_PRICE, WIN_PRICE, WIN_CPRICE,
-        INT_AMT, PAY_AMT, SETT_FEE_AMT, INV_AIM, SEC_ACCT_ID, WORKFLOW_ID, WORKFLOW_STATUS,
+        INT_AMT, PAY_AMT, SETT_FEE_AMT, INV_AIM, SEC_ACCT_ID,
         CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
         select DETAIL_WIN_ID,TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
                TOTAL_BID_PRINAMT, THE_WIN_PRINAMT, ACT_WIN_PRINAMT, BID_PRICE, WIN_PRICE, WIN_CPRICE,
-               INT_AMT, PAY_AMT, SETT_FEE_AMT, INV_AIM, SEC_ACCT_ID, WORKFLOW_ID, WORKFLOW_STATUS,
+               INT_AMT, PAY_AMT, SETT_FEE_AMT, INV_AIM, SEC_ACCT_ID,
                CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
              from BID_RESULT_DETAIL
              where DETAIL_WIN_ID = #{detailWinId,jdbcType=VARCHAR}
@@ -280,12 +268,6 @@
             <if test="secAcctId != null" >
                 SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR},
             </if>
-            <if test="workflowId != null" >
-                WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR},
-            </if>
-            <if test="workflowStatus != null" >
-                WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
-            </if>
             <if test="updateUser != null" >
                 UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             </if>
@@ -313,8 +295,6 @@
             SETT_FEE_AMT = #{settFeeAmt,jdbcType=DECIMAL},
             INV_AIM = #{invAim,jdbcType=VARCHAR},
             SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR},
-            WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR},
-            WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
         where DETAIL_WIN_ID= #{detailWinId,jdbcType=VARCHAR}

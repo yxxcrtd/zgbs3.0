@@ -54,6 +54,9 @@ public class CfetsOprHisInfoRequest {
     @ApiModelProperty(name="workflowId",value="工作流代码")
     private String workflowId;
 
+    @ApiModelProperty(name="busiType",value="共通业务类型")
+    private String busiType;
+
     public String getSeqNo() {
         return seqNo;
     }
@@ -164,5 +167,13 @@ public class CfetsOprHisInfoRequest {
 
     public void setWorkflowId(String workflowId) {
         this.workflowId = workflowId;
+    }
+
+    public String getBusiType() {
+        return busiType;
+    }
+
+    public void setBusiType(String busiType) {
+        this.busiType = busiType;
     }
 }

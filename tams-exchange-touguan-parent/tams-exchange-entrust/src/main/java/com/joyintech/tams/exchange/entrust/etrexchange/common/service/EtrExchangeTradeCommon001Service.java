@@ -62,6 +62,7 @@ import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceM
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
 import com.joyintech.tams.component.business.common.dto.FinStockInfoDto;
+import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
@@ -258,6 +259,9 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
 
     @Autowired
     private EtrExchangeTradeCommon001Service etrExchangeTrade001CommonService;
+
+    @Autowired
+    private BasRiskMathCommService basRiskMathCommService;
 
 
     /**
@@ -679,6 +683,8 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         }
         //处理履历
         updateCfetsOprHis(dto.getEntrustId(), dto.getOptType());
+        //插入风险试算
+        basRiskMathCommService.insert(dto.getRiskTrialRetDto(),dto.getEntrustId());
     }
 
     /**
@@ -5371,12 +5377,17 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         ProcessMark processMark = new ProcessMark();
         processMark.setBusinessDataPk1(dto.getEntrustId());
         String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
+        //EtrEntrust etrEntrust=etrEntrustMapper.selectByPrimaryKey(dto.getEntrustId());
         EtrExchangeTradeSaveRequest entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
-        List<EtrExchangeTradePortfolioRequest> portlist = entity.getPortfolioList();
-        for (EtrExchangeTradePortfolioRequest port : portlist) {
-            EtrExchangeTradeSaveRequest etrExchangeTrade001Dto = new EtrExchangeTradeSaveRequest();
-            BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, port);
-            tradeList.add(etrExchangeTrade001Dto);
+        if("modify".equals(entity.getOptType()) && "07".equals(entity.getEntrustStatus())){
+            tradeList = etrExchangeTradeCommonMapper.selectEntrustDetail(dto);
+        }else{
+            List<EtrExchangeTradePortfolioRequest> portlist = entity.getPortfolioList();
+            for (EtrExchangeTradePortfolioRequest port : portlist) {
+                EtrExchangeTradeSaveRequest etrExchangeTrade001Dto = new EtrExchangeTradeSaveRequest();
+                BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, port);
+                tradeList.add(etrExchangeTrade001Dto);
+            }
         }
         if (CollectionUtils.isEmpty(tradeList)) {
             tradeList = etrExchangeTradeCommonMapper.selectEntrustDetail(dto);
@@ -6095,6 +6106,9 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         ProcessMark processMark = new ProcessMark();
         processMark.setBusinessDataPk1(tradeId);
         String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
+        if(StringUtil.isEmpty(workflowId)){
+            return new ArrayList<>();
+        }
         EtrExchangeTradeSaveRequest  entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
         List<EtrExchangeTradePortfolioRequest> portlist=entity.getPortfolioList();
         List portfolioIdList=new ArrayList();

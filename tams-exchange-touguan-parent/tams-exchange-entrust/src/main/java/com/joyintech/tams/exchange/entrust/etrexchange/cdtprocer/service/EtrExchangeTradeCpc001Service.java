@@ -12,6 +12,7 @@ import com.joyintech.background.component.order.exchange.common.service.EtrCompo
 import com.joyintech.background.component.order.exchange.common.service.impl.EtrComponentFactory;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -19,12 +20,19 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.common.service.WFlowCommonService;
+import com.joyintech.system.base.dao.SysWflBusinessListMapper;
+import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
 import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
+import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -32,9 +40,11 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dao.EtrExchangeTradeCpc002Mapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateApplyRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.position.service.PositionRequestServiceTradSaveCpcRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeOperateSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeQuotationHqSecRepoResponse;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo002Service;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
@@ -48,6 +58,7 @@ import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommSer
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinPirceDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -64,6 +75,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
+
 /**
  * 交易所指令交易（现券+通用质押式回购）
  *
@@ -79,9 +93,16 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
     public static String queryIntegratedTick = "/joyin/quote/tick";
     @Autowired
     private EtrComponentCommService<EtrBlockTradeStockDto> componentService;
+    @Autowired
+    private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
     /**
-     * 委托指令共通
+     * 指令废弃表
      */
+    @Autowired
+    private EtrEntrustBackupMapper etrEntrustBackupMapper;
+    @Autowired
+    private SysWflBusinessListMapper sysWflBusinessListMapper;
+
     @Autowired(required = false)
     private BaseEtrCashPositionCommService baseEtrCashPositionCommService;
     @Autowired
@@ -101,6 +122,10 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
     private FinProductTypeMapper finProductTypeMapper;
     @Autowired
     private JoyinbusinessCommonService joyinbusinessCommonService;
+
+    @Autowired
+    private PositionRequestServiceTradSaveCpcRequest positionRequestService;
+
 
     public static final String ENTRUST_RECORD_MODIFY = "modify";
     public static final String ENTRUST_RECORD_NEW = "new";
@@ -174,7 +199,32 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         //退回的移到备份表
         doInsertBackupQuery(entity);
         doInsertFlow(entity);
+        //插入和修改时，指令持仓流水 、现金流水处理,支持多组合
+//        doInsetOrUpdateForEtrPositionHoldMulti(entity);
+        //增加调用头寸引擎代码start
+        String decisionAct = 系统动作_修改.getValue();
+        String systemAct = 系统动作_修改.getValue();
+        if (ENTRUST_RECORD_NEW.equals(entity.getOptType())) {
+            systemAct = 系统动作_新建.getValue();
+            decisionAct = 系统动作_新建.getValue();
+        }
+        positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct );
+
     }
+
+    @Override
+    public void doDelete(String workflowId) {
+        doDeleteFlow(workflowId);
+        //增加调用头寸引擎代码start
+        ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
+        if (StringUtil.isNotEmpty(processMark)
+                && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
+            EtrCreditProtectionCertificateApplyRequest entity = getBussinessEntityByWorkflowId(workflowId);
+            positionRequestService.sendDelete(entity);
+        }
+        //增加调用头寸引擎代码end
+    }
+
     @Override
     public void doUpdate(EtrCreditProtectionCertificateApplyRequest entity) {
         // nothing to do just for aspect
@@ -185,6 +235,64 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             doDeleteFlow(entity.getWorkflowId());
             // 重新insert
             doInsertFlow(entity);
+            if (!StringUtil.equals(entity.getOperateType(), "save")) {
+                //产品化_所有投资指令预占需求_场内交易  add by zhangpei 20201128 start
+                doInsetOrUpdateForEtrPositionHoldMulti(entity);
+                //产品化_所有投资指令预占需求_场内交易  add by zhangpei 20201128 end
+            }
+            //add by zznn 20210824 start
+            ProcessMark newEntity;
+            try {
+                newEntity = WorkFlowUtil.getBusinessObjectFromRequest(EtrExchangeTradeSaveSecRepoRequest.class, true);
+                // 工作流ID
+                newEntity.setWorkflowId(entity.getWorkflowId());
+                newEntity.setStatus(entity.getStatus());
+                newEntity.setBusinessData(JsonUtils.object2Json(entity));
+                // 更新业务表数据
+                // 操作留痕表
+                WorkflowContext.getProcessMarkService().insertIntoProcessMark(newEntity);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //保存不需要处理头寸
+            if (!StringUtil.equals(entity.getOperateType(), "save")) {
+                //增加调用头寸引擎代码start
+                String decisionAct = 系统动作_修改.getValue();
+                String systemAct = 系统动作_修改.getValue();
+                EtrEntrust etrEntrust = etrEntrustBackupMapper.selectByPrimaryKey(entity.getEntrustId());
+                SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
+                if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+                    if (etrEntrust == null) {
+                        systemAct = 系统动作_新建.getValue();
+                        decisionAct = 系统动作_修改.getValue();
+                    }
+                } else {
+                    if (etrEntrust == null) {
+                        systemAct = 系统动作_新建.getValue();
+                        decisionAct = 系统动作_新建.getValue();
+                    }
+                }
+                String confirmOk = RequestUtil.getParam("confirmOk");
+                if (StringUtil.equals("1", confirmOk) || StringUtil.equals("1",entity.getConfirmOk())) {
+                    entity.setSoftSkipMode("Y");
+                }
+                try {
+                    entity.setPositionSeqno(null);
+                    positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct);
+                } catch (PositionException e) {
+                    Message message = PositionUtil.ajaxErrorReturn(e);
+                    if (StringUtil.isNotBlank(message.getMessage())) {
+                        WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+                    } else {
+                        if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                            BaseMap bm = (BaseMap) message.getData();
+                            StringBuffer messageStr = (StringBuffer) bm.get("message");
+                            WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                        }
+                    }
+                }
+                //增加调用头寸引擎代码end
+            }
         }
     }
 
@@ -433,15 +541,12 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         EtrSecPositionFlowDto etrSecPositionFlowDtoUnit = new EtrSecPositionFlowDto();// 组合持仓流水DTO
         EtrCashPositionFlowDto etrCashPositionFlowDtoUnit = new EtrCashPositionFlowDto();// 组合现金流水DTO
         if (DictCodeList.交易方向_卖出.getValue().equals(etrSinglePortfolioDto.getPs())
-                || DictCodeListExt3.交易方向_正回购.getValue().equals(etrSinglePortfolioDto.getPs())) {
+                || DictCodeList.交易方向_申购.getValue().equals(etrSinglePortfolioDto.getPs())) {
             /********************** 持仓流水DTO构造 *************************************/
             etrSecPositionFlowDtoUnit.setSeqno(getSeqNo());
             etrSecPositionFlowDtoUnit.setPortfolioId(etrSinglePortfolioDto.getPortfolioId());// 组合代码
             etrSecPositionFlowDtoUnit.setSecAcctId(etrSinglePortfolioDto.getSecAcctId());// 证券账户
             etrSecPositionFlowDtoUnit.setFinprodId(etrSinglePortfolioDto.getFinprodId());// 金融产品代码
-            if (DictCodeListExt3.交易方向_正回购.getValue().equals(etrSinglePortfolioDto.getPs())) {
-                etrSecPositionFlowDtoUnit.setFinprodId("XN_PRODID999");
-            }
             etrSecPositionFlowDtoUnit.setBranch(new Long(0));// 分支序号
             etrSecPositionFlowDtoUnit.setInvAim(StringUtils.isNotEmpty(etrSinglePortfolioDto.getInvAim()) ? etrSinglePortfolioDto.getInvAim() : "999999");
             etrSecPositionFlowDtoUnit.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());// 持仓类型
@@ -452,8 +557,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrSecPositionFlowDtoUnit.setTradeId(etrSinglePortfolioDto.getEntrustId());// 指令编号
             etrSecPositionFlows.add(etrSecPositionFlowDtoUnit);
             /*************************************************************************/
-        } else if (DictCodeList.交易方向_买入.getValue().equals(etrSinglePortfolioDto.getPs())
-                || DictCodeListExt3.交易方向_逆回购.getValue().equals(etrSinglePortfolioDto.getPs())) {
+        } else if (DictCodeList.交易方向_买入.getValue().equals(etrSinglePortfolioDto.getPs())) {
             /********************** 持仓流水DTO构造 *************************************/
             etrCashPositionFlowDtoUnit.setSeqno(getSeqNo());
             etrCashPositionFlowDtoUnit.setPortfolioId(etrSinglePortfolioDto.getPortfolioId());// 组合代码
@@ -463,7 +567,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrCashPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
             // if 画面.全价不为空，则数量 = 画面.全价*画面.数量 else 投资指令DTO.指令金额
             if (null != dto.getFprice()) {
-                etrCashPositionFlowDtoUnit.setAmount(dto.getEntrustNum().multiply(dto.getFprice()).multiply(new BigDecimal(-1)));
+                etrCashPositionFlowDtoUnit.setAmount(dto.getEntrustNum().multiply(dto.getPrice()).multiply(new BigDecimal(-1)));
             } else {
                 if (StringUtil.isNotEmpty(etrSinglePortfolioDto.getEntrustAmt())) {
                     etrCashPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustAmt().multiply(new BigDecimal(-1)));// 数量
@@ -823,7 +927,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         }
         //处理履历
         updateCfetsOprHis(entity.getEntrustId(), "close");
-//        positionRequestService.sendClose(entity);
+        positionRequestService.sendClose(entity);
     }
 
     /**

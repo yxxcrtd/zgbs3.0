@@ -1779,28 +1779,20 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         if (StringUtil.equals(DictCodeList.是否_否.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             return;
         }
+        Set<String> totleTradeIds = new HashSet<>();
         //设置登记时的成交编号
         List<CfetsManualSettleDealInfo> listTemp = cfetsManualSettleMapper.getDealDetailsByTradeId(cfetsManualSettleRequest.getTradeId(),null);
         for (CfetsManualSettleDealInfo deal : listTemp) {
             if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())) {
-                // 一级申购成交时可用现金 交收失败时需要冲销
-                baseAssetCashPositionCommMapper.deleteCashPositionByOrderId(deal.getTotleTradeId());
-                // 一级申购成交时可用持仓 交收失败时需要冲销
-                baseAssetCashPositionCommMapper.deletePositionByTradeId(deal.getTotleTradeId());
-                List<PtlSecPositionFlow> list = baseAssetCashPositionCommMapper.selectAllPosition(deal.getTotleTradeId());
-                list.forEach(flow -> {
-                    PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
-                    BeanUtil.copyPropertiesIgnoreNull(flowDto,flow);
-                    flowDto.setAmount(flow.getAmount().negate());
-                    flowDto.setOffsetId(flow.getTradeId());
-                    flowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
-                    flowDto.setTradeId(deal.getTotleTradeId());
-                    basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
-                });
+                totleTradeIds.add(deal.getTradeId());
             } else {
                 AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
                 FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
-                finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
+                if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue())) {
+                    finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
+                }else{
+                    finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
+                }
                 finProductTradeDto.setAssetType2("ISSUE_CLASS_01");
                 finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
                 BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
@@ -1814,12 +1806,12 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 trdProductDeal.setSettleDate(deal.getTradeDate());
                 trdProductDeal.setPrinAmt(deal.getShareAmt());
                 trdProductDeal.setTradeDate(deal.getTradeDate());
-                trdProductDeal.setSettleDate(deal.getTradeDate());
+                trdProductDeal.setSettleDate(deal.getSettleDate());
                 trdProductDeal.setSecManageAcctId(deal.getSecManageAcctId());
                 baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
                 TrdProductDealAdd add = new TrdProductDealAdd();
                 add.setPortfolioId(deal.getPortfolioId());
-                add.setTradeId(deal.getTotleTradeId());
+                add.setTradeId(deal.getTradeId());
                 add.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
                 add.setEntrustId(deal.getEntrustId());
                 baseTradeProductDealDto.setTrdProductDealAdd(add);
@@ -1842,5 +1834,24 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 baseTradeProductDealCommService.insertPosition(finProductTradeDto);
             }
         }
+        if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())) {
+            // 一级申购成交时可用现金 交收失败时需要冲销
+            baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(new ArrayList<String>(totleTradeIds));
+            // 一级申购成交时可用持仓 交收失败时需要冲销
+            for (String totleTradeId : totleTradeIds) {
+                baseAssetCashPositionCommMapper.deletePositionByTradeId(totleTradeId);
+                List<PtlSecPositionFlow> list = baseAssetCashPositionCommMapper.selectAllPosition(totleTradeId);
+                list.forEach(flow -> {
+                    PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
+                    BeanUtil.copyPropertiesIgnoreNull(flowDto, flow);
+                    flowDto.setAmount(flow.getAmount().negate());
+                    flowDto.setOffsetId(flow.getTradeId());
+                    flowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                    flowDto.setTradeId(totleTradeId + "R");
+                    basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
+                });
+            }
+        }
+
     }
 }

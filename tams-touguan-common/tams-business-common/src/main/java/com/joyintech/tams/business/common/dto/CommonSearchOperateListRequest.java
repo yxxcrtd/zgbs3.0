@@ -17,6 +17,9 @@ public class CommonSearchOperateListRequest {
     @ApiModelProperty(name="entrustId",value="指令代码",example="A1",required = true)
     private String entrustId;
 
+    @ApiModelProperty(name="busiType",value="业务类型",example="A1",required = true)
+    private String busiType;
+
     @ApiModelProperty(name="pageMode",value="分页对象")
     private PageMode pageMode;
 
@@ -34,6 +37,14 @@ public class CommonSearchOperateListRequest {
 
     public void setPageMode(PageMode pageMode) {
         this.pageMode = pageMode;
+    }
+
+    public String getBusiType() {
+        return busiType;
+    }
+
+    public void setBusiType(String busiType) {
+        this.busiType = busiType;
     }
 }
 

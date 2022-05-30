@@ -398,7 +398,7 @@ public class FinBondAsset001Controller extends BaseController{
             FinBondAssetRequest dto = requestDto.getDto(FinBondAssetRequest.class);
             List<FinBondAssetResponse> dataList = finBondAsset001Service.selectForPage(dto).getRoot();
             for(FinBondAssetResponse data:dataList){
-                finBondAssetService.updateCfetsOprHis(data.getFinprodId(),"export");
+                finBondAssetService.updateCfetsOprHis(data.getFinprodId(),"export","");
             }
             return dataList;
         });

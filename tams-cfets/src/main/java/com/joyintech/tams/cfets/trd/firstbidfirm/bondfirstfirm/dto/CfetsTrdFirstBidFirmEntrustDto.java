@@ -31,6 +31,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     @ApiModelProperty(name = "entrustId", value = "指令代码", example = "WTBOND202204191858")
     private String entrustId;
 
+    @ApiModelProperty(name = "entrustIdKey", value = "指令代码唯一标识：前端区分", example = "WTBOND202204191858")
+    private String entrustIdKey;
+
     @ApiModelProperty(name = "finprodId", value = "资产代码,系统内代码一般不用于显示", example = "F01_aa.IB")
     private String finprodId;
 
@@ -144,8 +147,11 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     @ApiModelProperty(name = "firstBidStatusStr", value = "中标状态名称", example = "A1")
     private String firstBidStatusStr;
 
-    @ApiModelProperty(name = "isSumFlag", value = "汇总标识", example = "Y/N")
-    private String isSumFlag;
+    @ApiModelProperty(name = "sumFlag", value = "汇总标识", example = "true/fasle")
+    private Boolean sumFlag;
+
+    @ApiModelProperty(name = "operateSide", value = "操作方向：01 拖出 02 拖入", example = "01")
+    private String operateSide;
 
     @ApiModelProperty(name = "cfetsTrdFirstBidFirmEntrustDtos", value = "指令明细信息")
     private List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtos;
@@ -450,12 +456,12 @@ public class CfetsTrdFirstBidFirmEntrustDto {
         this.tenderTargetStr = tenderTargetStr;
     }
 
-    public String getIsSumFlag() {
-        return isSumFlag;
+    public Boolean getSumFlag() {
+        return sumFlag;
     }
 
-    public void setIsSumFlag(String isSumFlag) {
-        this.isSumFlag = isSumFlag;
+    public void setSumFlag(Boolean sumFlag) {
+        this.sumFlag = sumFlag;
     }
 
     public List<CfetsTrdFirstBidFirmEntrustDto> getCfetsTrdFirstBidFirmEntrustDtos() {
@@ -505,5 +511,21 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     public void setBidPriceStr(String bidPriceStr) {
         this.bidPriceStr = bidPriceStr;
+    }
+
+    public String getEntrustIdKey() {
+        return entrustIdKey;
+    }
+
+    public void setEntrustIdKey(String entrustIdKey) {
+        this.entrustIdKey = entrustIdKey;
+    }
+
+    public String getOperateSide() {
+        return operateSide;
+    }
+
+    public void setOperateSide(String operateSide) {
+        this.operateSide = operateSide;
     }
 }

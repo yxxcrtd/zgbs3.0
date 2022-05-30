@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +21,6 @@ import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.portfolio.actualtimeasset.dao.ActualTimeAssetMapper;
 import com.joyintech.service.portfolio.actualtimeasset.dto.ActualTimeAssetDto;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -106,7 +105,8 @@ public class ActualTimeAssetService extends BaseService<ActualTimeAssetDto> {
         pageParam.put("etrHodingTypeList", etrHodingTypeList);
         //资产类型特殊处理分类
         List<String> type8List = Arrays.asList(DictCodeList.平安资产类型_质押式回购.getValue(), DictCodeList.平安资产类型_买断式回购.getValue(), 
-            DictCodeList.平安资产类型_拆借.getValue(), DictCodeListExt2.平安资产类型_利率互换.getValue(), DictCodeListExt2.平安资产类型_期权.getValue());
+            DictCodeList.平安资产类型_拆借.getValue(), DictCodeListExt2.平安资产类型_利率互换.getValue(), DictCodeListExt2.平安资产类型_期权.getValue(),
+                BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         pageParam.put("type8List", type8List);
         //不显示的资产类型
         List<String> noShowType8List = Arrays.asList(DictCodeListExt2.平安资产类型_外汇即期.getValue(), DictCodeListExt2.平安资产类型_外汇掉期.getValue(), 
@@ -119,6 +119,7 @@ public class ActualTimeAssetService extends BaseService<ActualTimeAssetDto> {
         pageParam.put("finprodType2_F07", DictCodeList.平安资产类型_质押式回购.getValue());
         pageParam.put("finprodType2_F10", DictCodeList.平安资产类型_买断式回购.getValue());
         pageParam.put("finprodType2_F20", DictCodeList.平安资产类型_现金资产.getValue());
+        pageParam.put("finprodType2_F32", BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         //update zhangweiqi SNSTZJY-2370 按照实际持仓最大的优先扣减指令持仓  2020-12-15 begin
         Page<ActualTimeAssetDto> pageList = super.queryForPage(page, length, () -> actualTimeAssetMapper.findPage(pageParam));
 		for (ActualTimeAssetDto dto : pageList.getRoot()) {

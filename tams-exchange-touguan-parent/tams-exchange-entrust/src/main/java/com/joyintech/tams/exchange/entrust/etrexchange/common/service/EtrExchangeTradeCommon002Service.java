@@ -387,7 +387,7 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
         //ZGCPCN-798
         Page<EtrExchangeTradeEtrExchangeCommonResponse> page = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.selectEtrExchange(param));
         List<EtrExchangeTradeEtrExchangeCommonResponse> root = page.getRoot();
-        List<EtrExchangeTradeEtrExchangeCommonResponse>  root2 = root.stream().filter(response -> !(StringUtil.equals(response.getEntrustStatus(), DictCodeList.委托状态_已关闭.getValue()) &&
+        List<EtrExchangeTradeEtrExchangeCommonResponse>  root2 = root.stream().filter(response -> !(StringUtil.equals(request.getTradePlat(), "02") &&
                 StringUtil.equals(response.getPs(), DictCodeList.交易方向_行权_回售.getValue()))).collect(Collectors.toList());
         page.setRoot(root2);
         return page;
