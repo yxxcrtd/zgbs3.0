@@ -257,7 +257,7 @@ SELECT SUM(TRADE_AMT) RVALUE FROM (
       - nvl(sum(decode(n.PS, ''T19'', n.TRADE_AMT)), 0) AS TRADE_AMT
     FROM TRD_PRODUCT_TEMP_DEAL_ADD m
     INNER JOIN TRD_PRODUCT_TEMP_DEAL n ON m.TRADE_ID = n.TRADE_ID and n.TRADE_STATUS = ''01'' and NVL(n.IS_CANCEL,''N'') =''N''
-    INNER JOIN PROD t2 ON t2.FINPROD_ID = n.TRADE_ID
+    INNER JOIN PROD t2 ON (t2.FINPROD_ID = n.FINPROD_ID OR t2.FINPROD_ID = n.TRADE_ID)
     WHERE m.PORTFOLIO_ID IN ${portfolioCode} AND n.TRADE_DATE = DATE''${valDate}''
     AND n.PS IN (''04'',''T01'', ''T02'', ''T03'', ''T04'', ''T19'', ''T46'', ''T47'', ''T48'', ''T52'')
     UNION ALL
