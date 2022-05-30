@@ -2824,6 +2824,9 @@
             <if test="ps != null and ps!='' ">
                 AND T1.PS= #{ps}
             </if>
+            <if test="bidId != null and bidId!='' ">
+                AND  1 !=1
+            </if>
             <if test="cleanStatus != null and cleanStatus!='' ">
                 AND (case when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus01} THEN #{cleanStatus01}
                 when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus02} THEN #{cleanStatus02}
@@ -2960,6 +2963,9 @@
             <if test="ps != null and ps!='' ">
                 AND T1.PS= #{ps}
             </if>
+            <if test="bidId != null and bidId!='' ">
+                AND  1 !=1
+            </if>
             <if test="cleanStatus != null and cleanStatus!='' ">
                 AND (case when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus01} THEN #{cleanStatus01}
                         when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus02} THEN #{cleanStatus02}
@@ -3095,6 +3101,9 @@
             <if test="ps != null and ps!='' ">
                 AND T1.PS= #{ps}
             </if>
+            <if test="bidId != null and bidId!='' ">
+                AND  1 !=1
+            </if>
             <if test="cleanStatus != null and cleanStatus!='' ">
                 AND (case when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus01} THEN #{cleanStatus01}
                         when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus02} THEN #{cleanStatus02}
@@ -3224,6 +3233,10 @@
             </if>
             <if test="ps != null and ps!='' ">
                 AND TFPDT.PS= #{ps}
+            </if>
+            <if test="bidId != null and bidId!='' ">
+                AND (CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.BID_ID
+                WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN '' END) like '%'|| #{bidId}||'%'
             </if>
             <if test="cleanStatus != null and cleanStatus!='' ">
                 AND SO.SETTLE_STATUS = #{cleanStatus}
