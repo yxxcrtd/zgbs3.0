@@ -160,6 +160,12 @@
                 #{item}
             </foreach>
         </if>
+        <if test="busiTypePositionList != null and busiTypePositionList.size() > 0">
+            AND btm.busi_type in
+            <foreach collection="busiTypePositionList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
         <if test="tradeMarket != null and !tradeMarket.equals('')">
             AND reg.trade_market=#{tradeMarket,jdbcType=VARCHAR}
         </if>
@@ -310,6 +316,13 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="busiTypePositionList != null and busiTypePositionList.size() > 0">
+                AND (  CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN 	#{BUSI_TYPE_POSITION_01}
+                WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END ) IN
+                <foreach collection="busiTypePositionList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="tradeMarket != null and !tradeMarket.equals('')">
                 AND FP.TRADE_MARKET=#{tradeMarket,jdbcType=VARCHAR}
             </if>
@@ -433,6 +446,13 @@
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND WBO.FINPROD_ID IN
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="busiTypePositionList != null and busiTypePositionList.size() > 0">
+            AND (CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
+            WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34} END) in
+            <foreach collection="busiTypePositionList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>
@@ -562,6 +582,12 @@
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND nvl(reg.finprod_id,reg.term_type) in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="busiTypePositionList != null and busiTypePositionList.size() > 0">
+            AND btm.busi_type in
+            <foreach collection="busiTypePositionList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>

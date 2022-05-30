@@ -1692,6 +1692,7 @@
                 SELECT COUNT(ENTRUST_ID) num
                 FROM ETR_ENTRUST
                 WHERE FINPROD_ID = #{finprodId}
+                  AND ENTRUST_STATUS != '06'
                   AND ENTRUST_ID NOT IN (SELECT TPDA.ENTRUST_ID FROM TRD_PRODUCT_DEAL TPD
                                                       LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
                                                              ON TPD.TRADE_ID = TPDA.TRADE_ID
@@ -1700,6 +1701,7 @@
                 SELECT COUNT(ENTRUST_ID) num
                 FROM WFL_ETR_ENTRUST
                 WHERE FINPROD_ID = #{finprodId}
+                  AND ENTRUST_STATUS != '06'
                   AND ENTRUST_ID NOT IN (SELECT TPDA.ENTRUST_ID FROM TRD_PRODUCT_DEAL TPD
                                                          LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
                                                                    ON TPD.TRADE_ID = TPDA.TRADE_ID

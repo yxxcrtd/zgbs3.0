@@ -162,6 +162,7 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         BeanUtil.copyPropertiesIgnoreNull(finProductSpecial, entity);
         finProductSpecial.setUpdateTime(new Date());
         finProductSpecial.setUpdateUser(loginUserName);
+        finProductSpecial.setInputType(DictCodeListExt1.录入方式_手工录入.getValue());
         finProductSpecialMapper.updateByPrimaryKey(finProductSpecial);
     }
 
