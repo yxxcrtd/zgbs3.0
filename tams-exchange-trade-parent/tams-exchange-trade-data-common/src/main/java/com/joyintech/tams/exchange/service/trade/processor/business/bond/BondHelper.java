@@ -177,7 +177,9 @@ public class BondHelper {
         if (InvestmentAssetType.isBond(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)
                 && !EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
-            BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
+            BigDecimal minPrice = instruction.queryMinPrice(trade.getEntrustProp());
+            int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
+            BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, round);
             logger.info("handleTradePriceByFullPrice  trade fullPrice {}", price);
             return TradeUtils.multiply(price, trade.getTradedVolume(), 2);
         }

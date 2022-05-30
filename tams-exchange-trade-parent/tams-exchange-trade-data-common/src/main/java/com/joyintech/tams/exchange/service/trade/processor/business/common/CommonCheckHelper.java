@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Objects;
@@ -308,8 +309,7 @@ public class CommonCheckHelper {
      */
     private boolean checkOrderPrice(Instruction instruction, OrderInterface order, BigDecimal orderPrice) {
         //债券买卖
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
-                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             String priceMode = instruction.getPriceMode();
             String isFullPrice = order.getIsFullPrice();
             if (StringUtil.equals(priceMode, InstructionPriceMode.SPECIFIED.value)) {
@@ -328,8 +328,7 @@ public class CommonCheckHelper {
         }
 
         //其他交易
-        if (instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(orderPrice, instruction.getEntrustPrice())
-                || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice))) {
+        if (instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(orderPrice, instruction.getEntrustPrice()) || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice))) {
             return true;
         }
 
@@ -338,16 +337,12 @@ public class CommonCheckHelper {
 
     //超限返回true
     private boolean checkPriceFixed(OrderInterface order, BigDecimal fixedPrice, BigDecimal orderPrice) {
-        return order.getEntrustBs().equals(EntrustBs.SELL.value) && TradeUtils.bigThan(fixedPrice, orderPrice)
-                || order.getEntrustBs().equals(EntrustBs.BUY.value) && TradeUtils.lessThan(fixedPrice, orderPrice);
+        return order.getEntrustBs().equals(EntrustBs.SELL.value) && TradeUtils.bigThan(fixedPrice, orderPrice) || order.getEntrustBs().equals(EntrustBs.BUY.value) && TradeUtils.lessThan(fixedPrice, orderPrice);
     }
 
     public void marketPriceCheck(Order order, Instrument instrument, Instruction instruction) {
         // 科创板 盘后定价 填写保护价格 不需要反向填充涨跌停价格
-        if (EntrustProp.NORMAL_AFTER_SET_PRICE.getValue().equals(order.getEntrustProp())
-                && Objects.nonNull(instrument)
-                && SubStockType.KCB.value.equals(instrument.getSubStockType())
-                && order.getOrderPrice().compareTo(BigDecimal.ZERO) > 0) {
+        if (EntrustProp.NORMAL_AFTER_SET_PRICE.getValue().equals(order.getEntrustProp()) && Objects.nonNull(instrument) && SubStockType.KCB.value.equals(instrument.getSubStockType()) && order.getOrderPrice().compareTo(BigDecimal.ZERO) > 0) {
             return;
         }
 
@@ -356,20 +351,21 @@ public class CommonCheckHelper {
             ResultBean tickBean = quoteService.getTick(order.getStockCode());
             if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
                 TickBean tick = (TickBean) tickBean.getData();
+                BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+                int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
 //            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
 //            if (Objects.nonNull(tick)) {
                 BigDecimal price;
                 if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {
-                    price = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
+                    price = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), round, RoundingMode.UP);
                 } else {
-                    price = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
+                    price = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), round, RoundingMode.DOWN);
                 }
                 order.setOrderPrice(price);
 
                 //资产类型是债券
-                if (InvestmentAssetType.isBond(order.getAssetType())
-                        && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
-                    int round = bondHelper.getPriceRoundByPriceStep(instrument);
+                if (InvestmentAssetType.isBond(order.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+
                     EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
                     dto.setPrice(price);
                     dto.setEntrustVolume(order.getOrderVolume());
