@@ -89,6 +89,12 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="counterIdList != null and counterIdList.size() > 0">
+                AND BO.COUNTER_ID in
+                <foreach collection="counterIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="bidId != null and bidId != ''">
                 AND BO.BID_ID like '%' || #{bidId} || '%'
             </if>
