@@ -120,6 +120,7 @@ SELECT SUM(TRADE_AMT) RVALUE FROM (
   UNION ALL
       SELECT
           nvl(sum(decode(n.PS, ''T01'', n.TRADE_AMT)), 0)
+        + nvl(sum(decode(n.PS, ''04'', n.TRADE_AMT)), 0)
         + nvl(sum(decode(n.PS, ''T04'', n.TRADE_AMT)), 0)
         + nvl(sum(decode(n.PS, ''T46'', n.TRADE_AMT)), 0)
         + nvl(sum(decode(n.PS, ''T47'', n.TRADE_AMT)), 0)
@@ -143,7 +144,7 @@ SELECT SUM(TRADE_AMT) RVALUE FROM (
       INNER JOIN TRD_PRODUCT_TEMP_DEAL n ON m.TRADE_ID = n.TRADE_ID and (n.TRADE_STATUS = ''01'' OR n.TRADE_STATUS IS NULL) and NVL(n.IS_CANCEL,''N'') =''N''
       INNER JOIN PROD t2 ON t2.FINPROD_ID = n.FINPROD_ID
       WHERE m.PORTFOLIO_ID IN ${portfolioCode} AND n.TRADE_DATE = DATE''${valDate}''
-      AND n.PS IN (''T01'', ''T02'', ''T03'', ''T04'', ''T19'', ''T07'', ''T08'', ''T09'', ''T11'', ''T46'', ''T47'', ''T48'', ''T52'', ''T22'', ''T23'', ''T39'', ''T38'',''T54'',''T100'')
+      AND n.PS IN (''04'',''T01'', ''T02'', ''T03'', ''T04'', ''T19'', ''T07'', ''T08'', ''T09'', ''T11'', ''T46'', ''T47'', ''T48'', ''T52'', ''T22'', ''T23'', ''T39'', ''T38'',''T54'',''T100'')
   UNION ALL
     SELECT
         nvl(sum(decode(n.PS, ''T01'', n.TRADE_AMT)), 0)

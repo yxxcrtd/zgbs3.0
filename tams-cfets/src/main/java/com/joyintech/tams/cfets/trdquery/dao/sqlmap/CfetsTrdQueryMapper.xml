@@ -45,7 +45,6 @@
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>
       <!--  <include refid="vagueQueryCommWhere"></include>-->
-
         order by aaa.finprodType2, aaa.regStatus,aaa.ps DESC)
         <!--前端传入排序字段-->
         <if test="sort != null and sort != '' and direction != null and direction != ''">
@@ -222,7 +221,7 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END
                 AS	faceValue,
-            CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN TO_CHAR(ROUND(BRBP.BID_PRICE,4),'FM990.0000')
+            CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BRBP.BID_PRICE
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD,4),'FM990.0000')  END AS tradeYield,
             null									AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
@@ -252,7 +251,7 @@
                                   wm_concat(STLINFO.SEC_ACCT_NAME) SEC_ACCT_NAME,
                                   wm_concat(BRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                                   wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                                  wm_concat(BRBP.BID_PRICE) BID_PRICE
+                                  wm_concat(TO_CHAR(ROUND(BRBP.BID_PRICE,4),'FM990.0000')) BID_PRICE
                    FROM BID_ORDER_BID_PRICE BRBP
                    LEFT JOIN PTL_PORTFOLIO PP
                           ON PP.PORTFOLIO_ID = BRBP.PORTFOLIO_ID
@@ -360,7 +359,7 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN WBO.WIN_PRIN_AMT/10000
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN WBO.SUBSCRIPTION_AMOUNT/10000
                 END AS	faceValue,
-                CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN TO_CHAR(ROUND(WBRBP.BID_PRICE,4),'FM990.0000')
+                CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN WBRBP.BID_PRICE
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD,4),'FM990.0000') END AS	tradeYield,
             null	AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
@@ -371,7 +370,7 @@
             to_char(WBO.BID_DATE,'yyyy-MM-dd')	AS	confirmTradeDate,
             WBO.COUNTER_ID		AS	counterId,
             MCCI.COUNTER_NAME AS counterIdStr,
-            WBRBP.PORTFOLIO_ID	AS counterIdStr,
+            WBRBP.PORTFOLIO_ID	AS portfolioIds,
             WBRBP.PORTFOLIO_NAME AS	portfolioNames,
             ''	    AS	quoteType,
             ''		AS	matchStatus,
@@ -386,7 +385,7 @@
                     wm_concat(STLINFO.SEC_ACCT_NAME) SEC_ACCT_NAME,
                     wm_concat(WBRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                     wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                    wm_concat(WBRBP.BID_PRICE) BID_PRICE
+                    wm_concat(TO_CHAR(ROUND(WBRBP.BID_PRICE,4),'FM990.0000')) BID_PRICE
                 FROM WFL_BID_ORDER_BID_PRICE WBRBP
                 LEFT JOIN PTL_PORTFOLIO PP
                 ON PP.PORTFOLIO_ID = WBRBP.PORTFOLIO_ID

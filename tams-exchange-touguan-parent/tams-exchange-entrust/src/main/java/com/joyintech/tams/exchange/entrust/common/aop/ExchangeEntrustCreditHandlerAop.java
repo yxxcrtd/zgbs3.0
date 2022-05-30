@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.entrust.common.aop;
 
 import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.JsonUtils;
@@ -111,9 +112,11 @@ public class ExchangeEntrustCreditHandlerAop {
                 }
                 if (ar != null && !StringUtil.isEmptyList(ar.getErrorList())){
                     ajaxResult.setErrorList(ar.getErrorList());
+                    ajaxResult.setMessageType(MessageType.错误消息);
                 }
                 if (ar != null && StringUtil.isNotEmpty(ar.getData())){
                       ajaxResult.setData(ar.getData());
+                      ajaxResult.setMessageType(MessageType.确认消息);
 //                    if (StringUtil.equals(ajaxResult.getData().toString(),"请确认是否要提交?")
 //                            || StringUtil.equals(ajaxResult.getData().toString(),"请确认是否要保存?")){
 //                        ajaxResult.setData(ar.getData());

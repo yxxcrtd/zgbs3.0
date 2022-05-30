@@ -1,7 +1,7 @@
 
 update SYS_MENU set page_id= 'TenderBondSub' where MENU_ID = 'DEAL_MANAGEMENT_001_001_007';
 
-delete from SYS_PAGE WHERE PAGE_ID in( 'TenderBondSub','CfetsTrdFirstBidFirm001','CfetsTrdFirstBidFirm002')
+delete from SYS_PAGE WHERE PAGE_ID in( 'TenderBondSub','CfetsTrdFirstBidFirm001','CfetsTrdFirstBidFirm002');
 
 INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 VALUES ('TenderBondSub', 'TRD', '/home.html#/interbank/biddingTransaction?a=a', 'vue', 'DEAL_MANAGEMENT_001_001_007', null, null, '02', '01', '一级投标确认', 'system', null, sysdate, 'system', sysdate);

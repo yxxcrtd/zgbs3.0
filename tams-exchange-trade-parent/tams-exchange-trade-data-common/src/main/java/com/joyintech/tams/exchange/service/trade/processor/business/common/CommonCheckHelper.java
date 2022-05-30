@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Objects;
@@ -357,20 +358,21 @@ public class CommonCheckHelper {
             ResultBean tickBean = quoteService.getTick(order.getStockCode());
             if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
                 TickBean tick = (TickBean) tickBean.getData();
+                BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+                int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
 //            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
 //            if (Objects.nonNull(tick)) {
                 BigDecimal price;
                 if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {
-                    price = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
+                    price = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), round, RoundingMode.UP);
                 } else {
-                    price = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
+                    price = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), round, RoundingMode.DOWN);
                 }
                 order.setOrderPrice(price);
 
                 //资产类型是债券
                 if (InvestAssetTypeEnum.isBond(order.getAssetType())
                         && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
-                    int round = bondHelper.getPriceRoundByPriceStep(instrument);
                     EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
                     dto.setPrice(price);
                     dto.setEntrustVolume(order.getOrderVolume());
