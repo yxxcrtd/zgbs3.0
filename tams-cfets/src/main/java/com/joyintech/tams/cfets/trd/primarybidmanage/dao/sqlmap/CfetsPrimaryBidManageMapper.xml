@@ -37,7 +37,7 @@
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
-        WHERE BO.IS_CANCEL = 'N' AND
+        WHERE FPI.ISSUE_CLASS = '02'  AND BO.IS_CANCEL = 'N' AND
         BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE =#{COMMON_BUSINESS_TYPE_TRD97} and
         TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL='N')
         <if test="finprodIdList != null and finprodIdList.size() > 0">
