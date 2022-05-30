@@ -64,11 +64,18 @@ public class CfetsPrimaryBidManageCfmResponse {
     @ApiModelProperty(name="bidPrice",value="投标标位")
     private String bidPrice;
 
-    @ApiModelProperty(name="winType",value="投标方式")
+    @ApiModelProperty(name="winType",value="中标方式")
     private String winType;
 
-    @ApiModelProperty(name="winType",value="投标方式")
+    @ApiModelProperty(name="winType",value="中标方式")
     private String winTypeStr;
+
+
+    @ApiModelProperty(name="bidModle",value="投标方式")
+    private String bidModle;
+
+    @ApiModelProperty(name="bidModleStr",value="投标方式")
+    private String bidModleStr;
 
     @ApiModelProperty(name="payType",value="缴款方式")
     private String payType;
@@ -220,7 +227,7 @@ public class CfetsPrimaryBidManageCfmResponse {
     }
 
     public String getWinTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, this.getWinType());
+        return SysDataUtil.getNameFromDataDict(DictCode.中标方式, this.getWinType());
     }
 
     public void setWinTypeStr(String winTypeStr) {
@@ -362,5 +369,21 @@ public class CfetsPrimaryBidManageCfmResponse {
 
     public void setFinprodMarketId(String finprodMarketId) {
         this.finprodMarketId = finprodMarketId;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
+    public String getBidModleStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, this.getBidModle());
+    }
+
+    public void setBidModleStr(String bidModleStr) {
+        this.bidModleStr = bidModleStr;
     }
 }
