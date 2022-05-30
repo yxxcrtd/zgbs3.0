@@ -171,6 +171,14 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         //是否是股票的分红送转 add by chendijun 20200523
         boolean isStockFHSZ = (StringUtil.equals((String) dataMap.get(InterfUtil.ps), DictCodeList.股票分红类型_分红送转.getValue()) 
             &&StringUtil.equals((String) dataMap.get("finprodType2"), DictCodeListExt1.金融产品类型_投管用_股票.getValue()));
+
+        //场内交易指令暂不处理的交易方向
+        if(StringUtil.equals(dataMap.get("fromEtrExchange"), DictCodeList.是否_是.getValue())
+                && StringUtil.isNotEmpty(dataMap.get("ps"))
+                && 场内指令_质押券入库_质押券出库.contains(dataMap.get("ps").toString())){
+            return null;
+        }
+
         // 批量接口或者转仓或者是股票分红送转
         if(CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占批量接口)
             || CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占释放批量接口)
