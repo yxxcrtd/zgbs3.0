@@ -185,18 +185,18 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                         errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "债券代码/债券代码", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isNotBlank(finProductSpecialImportDto.getIsSpecialDebt())
-                            && finProductSpecialImportDto.getIsSpecialDebt().equals(DictCodeList.是否_否.getCodeName())
-                            && finProductSpecialImportDto.getIsSpecialDebt().equals(DictCodeList.是否_是.getCodeName())) {
+                            && (!finProductSpecialImportDto.getIsSpecialDebt().equals(DictCodeList.是否_否.getCodeName())
+                            && !finProductSpecialImportDto.getIsSpecialDebt().equals(DictCodeList.是否_是.getCodeName()))) {
                         errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否特殊债", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isNotBlank(finProductSpecialImportDto.getIsAbs())
-                            && finProductSpecialImportDto.getIsAbs().equals(DictCodeList.是否_否.getCodeName())
-                            && finProductSpecialImportDto.getIsAbs().equals(DictCodeList.是否_是.getCodeName())) {
+                            && (!finProductSpecialImportDto.getIsAbs().equals(DictCodeList.是否_否.getCodeName())
+                            && !finProductSpecialImportDto.getIsAbs().equals(DictCodeList.是否_是.getCodeName()))) {
                         errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否资产支持证券", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     if (StringUtil.isNotBlank(finProductSpecialImportDto.getIsDefaultBondIndicator())
-                            && finProductSpecialImportDto.getIsDefaultBondIndicator().equals(DictCodeList.是否_否.getCodeName())
-                            && finProductSpecialImportDto.getIsDefaultBondIndicator().equals(DictCodeList.是否_是.getCodeName())) {
+                            && (!finProductSpecialImportDto.getIsDefaultBondIndicator().equals(DictCodeList.是否_否.getCodeName())
+                            && !finProductSpecialImportDto.getIsDefaultBondIndicator().equals(DictCodeList.是否_是.getCodeName()))) {
                         errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MEET_THE_REQUIREMENTS", "是否到期违约债", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
                     String search = finProductSpecialImportDto.getFinprodMarketId();
