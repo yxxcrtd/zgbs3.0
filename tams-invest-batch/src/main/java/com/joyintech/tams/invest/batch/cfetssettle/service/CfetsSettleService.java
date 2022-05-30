@@ -25,10 +25,7 @@ import com.joyintech.tams.common.base.entity.TrdBankManualSetDetail;
 import com.joyintech.tams.common.base.entity.TrdBankManualSettleFlow;
 import com.joyintech.tams.common.base.entity.TrdBankManualSettleInfo;
 import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.batch.cfetssettle.dao.CfetsSettleMapper;
 import com.joyintech.tams.invest.batch.cfetssettle.dto.*;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
@@ -419,6 +416,7 @@ public class CfetsSettleService extends BaseService{
         param.put("PINAN_BUSINESS_TYPE_106", DictCodeListExt2.平安业务类型_债券借贷融出.getValue());
         param.put("PINAN_BUSINESS_TYPE_107", DictCodeListExt2.平安业务类型_债券借贷融入到期.getValue());
         param.put("PINAN_BUSINESS_TYPE_108", DictCodeListExt2.平安业务类型_债券借贷融出到期.getValue());
+        param.put("PINAN_BUSINESS_TYPE_180", DictCodeListExt4.平安业务类型_一级申购.getValue());
         //收付方向
         param.put("feePs02", DictCodeListExt1.收付方向_支出.getValue());
         //结算状态
