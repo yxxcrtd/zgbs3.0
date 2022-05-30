@@ -17,6 +17,7 @@ import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.management.service.OrderManagement;
+import com.joyintech.tams.exchange.service.trade.processor.TradeHelper;
 import com.joyintech.tams.exchange.service.trade.processor.check.BusinessCheckKit;
 import com.joyintech.tams.exchange.service.trade.processor.check.CommonCheckKit;
 import com.joyintech.tams.exchange.util.MasterUtil;
@@ -50,6 +51,8 @@ public class OrderController {
     private CommonCheckKit commonCheckKit;
     @Autowired
     private BusinessCheckKit businessCheckKit;
+    @Autowired
+    private TradeHelper tradeHelper;
 
 //    /**
 //     * 查询订单信息
@@ -79,6 +82,26 @@ public class OrderController {
             return MasterUtil.postForObject(order);
         }
 
+        Instruction instruction = instructionService.findById(order.getInstructionId());
+
+        if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
+            order.setEntrustPrice(NumberUtil.div(order.getEntrustPrice(), 100));
+        }
+
+        String entrustBs = EntrustBsProp.getEntrustBs(instruction.getPs());
+        logger.debug("普通下单（竞价下单）买卖方向（entrustBs）转换：{} ==> {}, ", order.getEntrustBs(), entrustBs);
+        order.setEntrustBs(entrustBs);
+
+        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
+        logger.debug("普通下单（竞价下单）委托属性（entrustProp）转换：{} ==> {}, ", order.getEntrustProp(), entrustProp);
+        order.setEntrustProp(entrustProp);
+
+        //填充市价
+        tradeHelper.marketPriceCheck(order, instruction);
+
+        //批量委托填充全价
+        tradeHelper.fillFullPrice(order, instruction);
+
         try {
             ResultBean commonCheckResult = commonCheckKit.check(order);
             if (ErrorCode.TRIGGER_SOFT_CONTROL.codeEquals(commonCheckResult.getErrorCode())) {
@@ -94,20 +117,6 @@ public class OrderController {
         } catch (BusinessResultException e) {
             return e.toMessage();
         }
-
-        Instruction instruction = instructionService.findById(order.getInstructionId());
-
-        if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
-            order.setEntrustPrice(NumberUtil.div(order.getEntrustPrice(), 100));
-        }
-
-        String entrustBs = EntrustBsProp.getEntrustBs(instruction.getPs());
-        logger.debug("普通下单（竞价下单）买卖方向（entrustBs）转换：{} ==> {}, ", order.getEntrustBs(), entrustBs);
-        order.setEntrustBs(entrustBs);
-
-        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
-        logger.debug("普通下单（竞价下单）委托属性（entrustProp）转换：{} ==> {}, ", order.getEntrustProp(), entrustProp);
-        order.setEntrustProp(entrustProp);
 
         try {
             return new Message<>(orderManagement.sendOrder(order.getUserId(), order));

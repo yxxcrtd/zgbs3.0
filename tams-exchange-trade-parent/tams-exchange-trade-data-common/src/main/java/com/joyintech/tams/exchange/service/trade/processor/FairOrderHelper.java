@@ -124,7 +124,9 @@ public class FairOrderHelper {
                 if (EntrustUtils.isFullPrice(instrument, order.getAssetType(), order.getEntrustProp(), order.getIsFullPrice())) {
                     Instruction instruction = instructionService.findById(order.getStockCode());
                     if (Objects.nonNull(instruction)) {
-                        price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(price, order.getEntrustVolume(), instruction, bondHelper.getPriceRoundByPriceStep(instrumentService.queryByInnerCode(order.getStockCode())));
+                        BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+                        int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
+                        price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(price, order.getEntrustVolume(), instruction, round);
                     }
                 }
             } else {
