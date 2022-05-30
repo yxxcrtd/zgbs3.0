@@ -1015,10 +1015,13 @@ public class CfetsQuotedCommonService extends BaseService {
         String exportShow = CacheUtil.getSysParam("EXPORT_SHOW");
         //防止用户不刷新页面  去绑定账户   查一次数据库
         String partyId = cfetsIbuQuoteBondMapper.getPartyIdByPtl(portfolioId);
-        if(((StringUtil.equals(exportShow,"01")&&StringUtil.equals(quoteType,DictCodeListExt3.报价系统区分类型_现券登记报价.getValue()))
-                ||(StringUtil.equals(exportShow,"02")&&(StringUtil.equals(quoteType,DictCodeListExt3.报价系统区分类型_现券对话报价.getValue())||StringUtil.equals(quoteType,DictCodeListExt3.报价系统区分类型_现券请求报价.getValue()))))
-        &&StringUtil.isEmpty(partyId)){
-            ajaxResult.setMessage(StringUtil.join("指令",entrustId,"下组合未关联交易账户，请至[银行间业务参数管理-CFETS关联账户]中维护"));
+        if (((StringUtil.equals(exportShow, "01") && StringUtil.equals(quoteType, DictCodeListExt3.报价系统区分类型_现券登记报价.getValue()))
+                || (StringUtil.equals(exportShow, "01") && StringUtil.equals(quoteType, DictCodeListExt3.报价系统区分类型_质押式回购登记报价.getValue()))
+                || (StringUtil.equals(exportShow, "02") && (StringUtil.equals(quoteType, DictCodeListExt3.报价系统区分类型_现券对话报价.getValue())
+                || StringUtil.equals(quoteType, DictCodeListExt3.报价系统区分类型_现券请求报价.getValue())
+                || StringUtil.equals(quoteType, DictCodeListExt3.报价系统区分类型_质押式回购对话报价.getValue()))))
+                && StringUtil.isEmpty(partyId)) {
+            ajaxResult.setMessage(StringUtil.join("指令", entrustId, "下组合未关联交易账户，请至[银行间业务参数管理-CFETS关联账户]中维护"));
         }
         return ajaxResult;
     }
