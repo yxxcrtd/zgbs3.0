@@ -676,7 +676,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 
 		//SPPI测试
 		if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.isNotEmpty(dto.getFinprodId())
-				&& StringUtil.equals(dto.getPs(),DictCodeList.交易方向_买入.getValue())) {
+				&& StringUtil.equals(dto.getPs(),DictCodeList.交易方向_买入.getValue()) && !StringUtil.equals(dto.getPriceModel(), DictCodeListExt2.价格模式_市价指令.getValue()) ) {
 			//判断是否进行了SPPI测试
 			Map<String, Object> paramsppi = new HashMap<>();
 			paramsppi.put("finprodId", dto.getFinprodId());
