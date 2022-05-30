@@ -207,7 +207,7 @@
     <sql id="onlyRegBidInfo">
         SELECT
             distinct decode(BO.IS_CANCEL,'Y','撤销','N','有效')	effectiveStatusStr,
-            FPT.TYPE_8  AS	finprodType2,
+            FPT.TYPE_9  AS	finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN 	#{BUSI_TYPE_POSITION_01}
              WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END AS	busiTypePosition,
             FP.finprod_id as finprodId,
@@ -299,7 +299,7 @@
                 AND #{PS_T01} =#{ps}
             </if>
             <if test="finprodType2List != null and finprodType2List.size() > 0">
-                AND FPT.TYPE_8 in
+                AND FPT.TYPE_9 in
                 <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -345,7 +345,7 @@
     <sql id="onlyWflRegBidInfo">
         SELECT
             '流程中'	effectiveStatusStr,
-             FPT.TYPE_8 AS finprodType2,
+             FPT.TYPE_9 AS finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34} END AS	busiTypePosition,
             FP.FINPROD_ID as finprodId,
@@ -425,7 +425,7 @@
             AND #{PS_T01} =#{ps}
         </if>
         <if test="finprodType2List != null and finprodType2List.size() > 0">
-            AND FPT.TYPE_8 in
+            AND FPT.TYPE_9 in
             <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
@@ -3090,7 +3090,7 @@
                 SO.SETTLE_STATUS   cleanStatus,
                 TMSI.SETTLE_STATUS	 settleStatus,
                 TFPDT.TOTLE_TRADE_ID	totleTradeId,
-                FPT.TYPE_8	 finprodType2,
+                TFPDT.FINPROD_TYPE2	 finprodType2,
                 sdl1.item_value finprodType2Str,
                 CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END tgBusiType,
