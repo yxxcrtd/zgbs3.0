@@ -246,7 +246,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 etrCashPositionFlowDtoUnit.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());// 持仓类型
                 etrCashPositionFlowDtoUnit.setCdate(iPlatformDate.getSysDate());// 日期
                 etrCashPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
-                etrCashPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustAmt());
+                etrCashPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustAmt().negate());
                 etrCashPositionFlowDtoUnit.setOrderId(etrSinglePortfolioDto.getEntrustId());// 业务编号
                 etrCashPositionFlowDtoUnit.setChlFinprodId(null);// 通道金融产品代码
                 etrCashPositionFlowDtoUnit.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());// 冲正标识
