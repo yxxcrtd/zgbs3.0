@@ -423,7 +423,7 @@
                PAYHSRCSECINFO.PUTOPTION,
                MARKET_INFO.MARKET_AMT,
                MARKET_INFO.VALUE_DATE,
-               PAYHSRCSECINFO.ISSUEAMT                      ISSUEAMT,
+               PAYHSRCSECINFO.ISSUEAMT/100000000            ISSUEAMT,
                PAYHSRCSECINFO.ISSUERSHORT                   issuer,
                CUSTOMER_INFO1.CUSTOMER_NAME                 issuerName,
                PAYHSRCSECINFO.SECTYPE                       primaryClassification,
