@@ -124,11 +124,11 @@ public class FinTenderBondAsset003Controller extends BaseController {
     @PostMapping("/addCoupons")
     @ApiOperation(value = "上市流通自动加券", notes = "上市流通自动加券")
     public Message addCoupons(@RequestBody FinTenderBondAsset003Dto dto) {
-        List<ValidMessage> messageList = finTenderBoundAsset003Service.addCoupons(dto);
-        if (CollectionUtils.isEmpty(messageList)) {
+        AjaxResult ajaxResult = finTenderBoundAsset003Service.addCoupons(dto);
+        if (CollectionUtils.isEmpty(ajaxResult.getErrorList())) {
             return Message.success("加券成功", null);
         } else {
-            return Message.fail("加券失败", messageList);
+            return Message.fail("加券失败", ajaxResult.getErrorList());
         }
     }
 

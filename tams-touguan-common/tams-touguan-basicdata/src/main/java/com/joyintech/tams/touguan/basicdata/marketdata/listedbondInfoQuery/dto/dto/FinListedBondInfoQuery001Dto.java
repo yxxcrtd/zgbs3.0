@@ -30,22 +30,22 @@ import java.util.Objects;
 @ApiModel(value = "债券市场列表详情信息查看", description = "债券市场列表详情信息查看")
 public class FinListedBondInfoQuery001Dto extends BaseDto {
 
-    @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
+    @ApiModelProperty(name = "secId", value = "债券ID/资产代码", required = true)
     private String secId;
 
     @ApiModelProperty(name = "finprodId", value = "金融产品代码")
     private String finprodId;
 
-    @ApiModelProperty(name = "bondName", value = "债券名称")
+    @ApiModelProperty(name = "bondName", value = "债券名称", required = true)
     private String bondName;
 
-    @ApiModelProperty(name = "bondAbbreviation", value = "债券简称")
+    @ApiModelProperty(name = "bondAbbreviation", value = "债券简称", required = true)
     private String bondAbbreviation;
 
-    @ApiModelProperty(name = "tradingPlaces", value = "交易场所")
+    @ApiModelProperty(name = "tradingPlaces", value = "交易场所", required = true)
     private String tradingPlaces;
 
-    @ApiModelProperty(name = "registeredCustodian", value = "登记托管机构")
+    @ApiModelProperty(name = "registeredCustodian", value = "登记托管机构", required = true)
     private String registeredCustodian;
 
     @ApiModelProperty(name = "biddingMethod", value = "招标方式")
@@ -57,7 +57,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "additionalBatches", value = "增发批次")
     private Integer additionalBatches;
 
-    @ApiModelProperty(name = "issuer", value = "发行人")
+    @ApiModelProperty(name = "issuer", value = "发行人", required = true)
     private String issuer;
 
     @ApiModelProperty(name = "issuerName", value = "发行人")
@@ -69,7 +69,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
     private String crossMarketCode;
 
-    @ApiModelProperty(name = "raiseMode", value = "募集方式")
+    @ApiModelProperty(name = "raiseMode", value = "募集方式", required = true)
     private String raiseMode;
 
     @ApiModelProperty(name = "domesticAndForeign", value = "境内外")
@@ -87,7 +87,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "releaseType", value = "发行类型")
     private String releaseType;
 
-    @ApiModelProperty(name = "issueMethod", value = "发行方式")
+    @ApiModelProperty(name = "issueMethod", value = "发行方式", required = true)
     private String issueMethod;
 
     @ApiModelProperty(name = "issueSize", value = "计划发行量")
@@ -114,10 +114,10 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "interestAccrualDate", value = "首次利率确定日")
     private Date interestAccrualDate;
 
-    @ApiModelProperty(name = "valueDate", value = "起息日")
+    @ApiModelProperty(name = "valueDate", value = "起息日", required = true)
     private Date valueDate;
 
-    @ApiModelProperty(name = "expiryDate", value = "到期日")
+    @ApiModelProperty(name = "expiryDate", value = "到期日", required = true)
     private Date expiryDate;
 
     @ApiModelProperty(name = "primaryClassification", value = "一级分类")
@@ -129,16 +129,16 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "threearyClassification", value = "三级分类")
     private String threearyClassification;
 
-    @ApiModelProperty(name = "couponSpecies", value = "息票品种")
+    @ApiModelProperty(name = "couponSpecies", value = "息票品种", required = true)
     private String couponSpecies;
 
     @ApiModelProperty(name = "interestPaymentFrequency", value = "付息频率")
     private String interestPaymentFrequency;
 
-    @ApiModelProperty(name = "rateType", value = "利率类型")
+    @ApiModelProperty(name = "rateType", value = "利率类型", required = true)
     private String rateType;
 
-    @ApiModelProperty(name = "currency", value = "币种")
+    @ApiModelProperty(name = "currency", value = "币种", required = true)
     private String currency;
 
     @ApiModelProperty(name = "issuePx", value = "发行价格（元）")
@@ -236,7 +236,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "dayCount", value = "计息基准")
     private String dayCount;
 
-    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖")
+    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖", required = true)
     private String isAutoUpdate;
 
     @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
