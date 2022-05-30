@@ -208,7 +208,7 @@
     <select id="querySampleFinProduct"
             resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto"
             parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest">
-        SELECT FINPROD_ID id, FINPROD_ABBR text
+        SELECT FINPROD_MARKET_ID id, FINPROD_ABBR text
         from FIN_PRODUCT
         where FINPROD_ABBR = #{search}
     </select>
