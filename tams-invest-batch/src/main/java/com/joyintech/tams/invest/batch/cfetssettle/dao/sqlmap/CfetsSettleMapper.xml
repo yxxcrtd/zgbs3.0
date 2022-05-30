@@ -72,7 +72,7 @@
 			where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
 			ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
 			AND ((T2.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpi.ISSUE_CLASS) or
-			T2.FINPROD_TYPE2 != 'F32')
+			T2.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
 		LEFT JOIN (select pm.STATUS status, pm.BUSINESS_DATA_PK1 pk1 from SYS_DATA_PROCESS_MARK pm
 		           inner join (select max(HIS_NO) HIS_NO, WORKFLOW_ID from SYS_DATA_PROCESS_MARK
 								where 1=1
@@ -86,11 +86,13 @@
 					order by pm.create_time desc) sdpm
 		ON sdpm.pk1 = T1.Totle_Trade_Id
 		WHERE (T8.SETTLE_SEQ_NO IS NULL OR T8.SETTLE_STATUS = #{DELIVERY_STATUS_01})
-		AND T1.TG_BUSI_TYPE IN (#{PINAN_BUSINESS_TYPE_09},#{PINAN_BUSINESS_TYPE_10},#{PINAN_BUSINESS_TYPE_11},
-		#{PINAN_BUSINESS_TYPE_35},#{PINAN_BUSINESS_TYPE_36},#{PINAN_BUSINESS_TYPE_37},
-		#{PINAN_BUSINESS_TYPE_20},#{PINAN_BUSINESS_TYPE_51},#{PINAN_BUSINESS_TYPE_52},
-		#{PINAN_BUSINESS_TYPE_74},#{PINAN_BUSINESS_TYPE_75},#{PINAN_BUSINESS_TYPE_76},#{PINAN_BUSINESS_TYPE_77},
-		#{PINAN_BUSINESS_TYPE_105},#{PINAN_BUSINESS_TYPE_106},#{PINAN_BUSINESS_TYPE_107},#{PINAN_BUSINESS_TYPE_108})
+		<if test="tgBusiTypes != null and tgBusiTypes.size() > 0">
+			AND T1.TG_BUSI_TYPE IN(
+			<foreach item="item" index="index" collection="tgBusiTypes" separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
 		AND	T1.TRADE_STATUS =#{TRADE_STATUS_01}
 		AND T1.Is_Cancel =#{isCalcN}
 		AND T1.SETTLE_DATE = #{batchDate}
@@ -139,7 +141,7 @@
 			where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
 			ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
 			AND ((T2.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpi.ISSUE_CLASS) or
-			T2.FINPROD_TYPE2 != 'F32')
+			T2.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
 		LEFT JOIN (select pm.STATUS status, pm.BUSINESS_DATA_PK1 pk1 from SYS_DATA_PROCESS_MARK pm
 		inner join (select max(HIS_NO) HIS_NO, WORKFLOW_ID from SYS_DATA_PROCESS_MARK
 		where 1=1
@@ -153,11 +155,13 @@
 		order by pm.create_time desc) sdpm
 		ON sdpm.pk1 = T1.Totle_Trade_Id
 		WHERE (T8.SETTLE_SEQ_NO IS NULL OR T8.SETTLE_STATUS = #{DELIVERY_STATUS_01})
-		AND T1.TG_BUSI_TYPE IN (#{PINAN_BUSINESS_TYPE_09},#{PINAN_BUSINESS_TYPE_10},#{PINAN_BUSINESS_TYPE_11},
-		#{PINAN_BUSINESS_TYPE_35},#{PINAN_BUSINESS_TYPE_36},#{PINAN_BUSINESS_TYPE_37},
-		#{PINAN_BUSINESS_TYPE_20},#{PINAN_BUSINESS_TYPE_51},#{PINAN_BUSINESS_TYPE_52},
-		#{PINAN_BUSINESS_TYPE_74},#{PINAN_BUSINESS_TYPE_75},#{PINAN_BUSINESS_TYPE_76},#{PINAN_BUSINESS_TYPE_77},
-		#{PINAN_BUSINESS_TYPE_105},#{PINAN_BUSINESS_TYPE_106},#{PINAN_BUSINESS_TYPE_107},#{PINAN_BUSINESS_TYPE_108})
+		<if test="tgBusiTypes != null and tgBusiTypes.size() > 0">
+			AND T1.TG_BUSI_TYPE IN(
+			<foreach item="item" index="index" collection="tgBusiTypes" separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
 		AND	T1.TRADE_STATUS =#{TRADE_STATUS_01}
 		AND T1.Is_Cancel =#{isCalcN}
 		AND T1.SETTLE_DATE = #{batchDate}
