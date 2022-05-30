@@ -5977,7 +5977,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             } else if (StringUtils.equals(dto.getPs(), DictCodeList.交易方向_申购.getValue())) {
                 busiTypePosition=DictCodeListExt3.投管业务类型_可转债申购.getValue();
             } else if (StringUtils.equals(dto.getPs(), DictCodeListExt1.交易方向_债转股.getValue())) {
-                busiTypePosition=DictCodeListExt3.投管业务类型_新股申购.getValue();
+                busiTypePosition=DictCodeListExt3.投管业务类型_债转股.getValue();
             } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue()) || StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
                 busiTypePosition=DictCodeListExt3.投管业务类型_质押券出入库.getValue();
             }
