@@ -198,19 +198,21 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     @Override
     public void doInsert(FinBondAssetSaveRequest entity, OperationType type){
         if (StringUtil.equals(entity.getIsAddSec(),DictCodeList.是否_是.getValue())) {
-            updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_债券自动加券.getValue());
+            updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_债券自动加券.getValue(),entity.getWorkflowId());
         }else{
             if (OperationType.NEW.equals(type)) {
-                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT);
-            }else{
-                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE);
+                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT,entity.getWorkflowId());
+            }else if (OperationType.MODIFY.equals(type)) {
+                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE,entity.getWorkflowId());
+            }else if (OperationType.DELETE.equals(type)) {
+                updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_DELETE,entity.getWorkflowId());
             }
         }
     }
 
     @Override
     public void doUpdate(FinBondAssetSaveRequest entity) {
-        updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE);
+        updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE,entity.getWorkflowId());
     }
 
     @Override
@@ -466,7 +468,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             BeanUtil.copyPropertiesIgnoreNull(finProductConvertible,dto);
             if (StringUtil.isNotEmpty(finProductConvertible.getConFinprodId())){
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductConvertible.getConFinprodId());
-                finProductConvertible.setConFinprodId(finProduct.getFinprodMarketId());
+                if (StringUtil.isNotEmpty(finProduct)) {
+                    finProductConvertible.setConFinprodId(finProduct.getFinprodMarketId());
+                }
             }
             dto.setFinProductConvertible(finProductConvertible);
             //计息要素
@@ -517,19 +521,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 dto.setFinExercisePlanList(finExercisePlanList);
             }
             //发行方式
-            List<FinProductIssue> finProductIssues = finBondAssetMapper.selectFinProductIssue(dto.getFinprodMarketId());
-            List<BondFinProductIssueDto> finProductIssueList = new ArrayList<>();
-            for (FinProductIssue finProductIssue:finProductIssues){
-                BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
-                BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
-                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductIssue.getFinprodId());
-                BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
-                bondFinProductIssueDto.setListingDate(finProduct.getCirculationDate());
-                bondFinProductIssueDto.setFinprodMarketId(finProduct.getFinprodMarketId());
-                bondFinProductIssueDto.setFinprodAbbr(finProduct.getFinprodAbbr());
-                finProductIssueList.add(bondFinProductIssueDto);
-            }
-            dto.setFinProductIssueList(finProductIssueList);
+            getIssues(dto);
             List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(dto.getFinprodId());
             MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
             mstFileInputParameter.setFileList(uploadInfo);
@@ -549,6 +541,22 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             return new FinBondAssetSaveRequest();
         }
         return dto;
+    }
+
+    public void getIssues(FinBondAssetSaveRequest dto) {
+        List<FinProductIssue> finProductIssues = finBondAssetMapper.selectFinProductIssue(dto.getFinprodMarketId());
+        List<BondFinProductIssueDto> finProductIssueList = new ArrayList<>();
+        for (FinProductIssue finProductIssue:finProductIssues){
+            BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
+            BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, dto);
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductIssue.getFinprodId());
+            BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
+            bondFinProductIssueDto.setListingDate(finProduct.getCirculationDate());
+            bondFinProductIssueDto.setFinprodMarketId(finProduct.getFinprodMarketId());
+            bondFinProductIssueDto.setFinprodAbbr(finProduct.getFinprodAbbr());
+            finProductIssueList.add(bondFinProductIssueDto);
+        }
+        dto.setFinProductIssueList(finProductIssueList);
     }
 
     /**
@@ -1241,9 +1249,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     /**
      * 处理履历
      */
-    public void updateCfetsOprHis(String entrustId, String optType) {
+    public void updateCfetsOprHis(String entrustId, String optType, String workflowId) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
+        oprHisReq.setWorkflowId(workflowId);
         if (ENTRUST_RECORD_INSERT.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
         } else if (ENTRUST_RECORD_UPDATE.equals(optType)) {
@@ -1251,7 +1260,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         } else if (ENTRUST_RECORD_DOBACK.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_退回.getValue());
         }else if (ENTRUST_RECORD_DELETE.equals(optType)) {
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_撤回.getValue());
+            oprHisReq.setOperType(DictCodeListExt3.操作类型_删除.getValue());
         } else if ("export".equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_导出.getValue());
         }else{

@@ -1636,9 +1636,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @date 2022/4/28 10:37
      */
     public void dealOldPosition(CfetsTrdBondFirstSubInfoDto entity, boolean isRevokeOrBack) {
-//        if (StringUtil.isNotEmpty(entity)) {
-//            return;
-//        }
         if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             // 撤销或退回
             entity.setTradeDate(iPlatformDate.getSysDate());

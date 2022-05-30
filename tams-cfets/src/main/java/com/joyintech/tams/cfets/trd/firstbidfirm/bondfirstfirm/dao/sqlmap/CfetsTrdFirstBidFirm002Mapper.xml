@@ -55,6 +55,7 @@
             <result property="payAmt" column="PAYABLE_AMOUNT" jdbcType="DECIMAL"/>
             <result property="bidPrice" column="BID_PRICE" jdbcType="DECIMAL"/>
             <result property="businessModel" column="INV_AIM" jdbcType="VARCHAR"/>
+            <result property="acctNo" column="ACCT_NO" jdbcType="VARCHAR"/>
             <result property="secManageAcctId" column="SEC_ACCT_ID" jdbcType="VARCHAR"/>
             <result property="secManageAcctIdName" column="SEC_ACCT_NAME" jdbcType="VARCHAR"/>
             <result property="invManagerId" column="INV_MANAGER_ID" jdbcType="VARCHAR"/>
@@ -91,8 +92,8 @@
                        OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
                        THEN fpi.TENDER_SDATE
                    END                       AS bidDateEnd/*投标日 结束*/,
-                fpi.PAY_EDATE payEdate/*缴款截止日*/,
-                fpi.PAY_DATE payDate/*缴款日*/,
+                case when fpi.PAY_EDATE is not null then fpi.PAY_EDATE else fpi.PAY_DATE end payEdate/*缴款截止日*/,
+                case when fpi.PAY_DATE is not null then fpi.PAY_DATE else fpi.PAY_EDATE end payDate/*缴款日*/,
                 fpi.ASSIGN_REGDATE assignRegdate/*债权债务登记日*/,
                CASE
                    WHEN fp.CIRCULATION_DATE IS NOT NULL THEN fp.CIRCULATION_DATE
@@ -118,7 +119,11 @@
                     eed.PORTFOLIO_ID,
                     pp.PORTFOLIO_NAME/*组合名称*/,
                     eed.ACCT_NO/*资金账户*/,
-                    eebp.BID_PRICE/*投标标位*/,
+                    case
+                        when fpi.TENDER_TARGET = '01' then eebp.BID_PRICE * 100
+                        when fpi.TENDER_TARGET = '02' then eebp.BID_PRICE
+                        when fpi.TENDER_TARGET = '03' then eebp.BID_PRICE * 10000
+                    end              BID_PRICE/*投标标位*/,
                     eed.INV_AIM/*业务模式*/,
                     eed.SEC_ACCT_ID/*证券账户*/,
                     ssai.SEC_ACCT_NAME/*证券账户*/,
@@ -271,8 +276,9 @@
                ssai.SEC_ACCT_NAME,
                bo.dip_Type dipType/*分配方式*/,
                bo.dip_Type adjustStrategy/*调整策略*/,
-               ee.INV_MANAGER_ID invManagerId,
-               su.REAL_NAME     invManagerName,
+               ee.INV_MANAGER_ID ,
+               su.REAL_NAME     INV_MANAGER_NAME,
+               bo.COUNTER_ID counterId,
                ROWNUM rn
         from BID_ORDER bo
                  left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
@@ -342,6 +348,7 @@
                bo.dip_Type adjustStrategy/*调整策略*/,
                ee.INV_MANAGER_ID invManagerId,
                su.REAL_NAME     invManagerName,
+               bo.COUNTER_ID counterId,
                ROWNUM rn
         from WFL_BID_ORDER bo
                  left join WFL_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
@@ -367,5 +374,15 @@
             and fri.FINPROD_ID = #{finprodId}
             and ROWNUM = 1
         order by fri.EFF_DATE desc ,miri.EFF_DATE desc
+    </select>
+
+    <select id="findTotalByPTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper.BaseResultMap">
+        <include refid="com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper.Sql_All_Data" />
+        WHERE P_TOTLE_TRADE_ID = #{PTotleTradeId}
+    </select>
+
+    <select id="findDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.BaseResultMap">
+        <include refid="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.Sql_All_Data" />
+        WHERE TOTLE_TRADE_ID = #{totleTradeId}
     </select>
 </mapper>

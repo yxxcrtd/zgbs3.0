@@ -1117,6 +1117,14 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 				AjaxResult ajaxResultEnt = new AjaxResult();
 				ajaxResultEnt.setErrorList(validListEnt);
 				return ajaxResultEnt;
+			}else{
+				if(dto.getEntrustNum().compareTo(qutos.get(0).getQuto())==1){
+					List<ValidMessage> validListEnt = new ArrayList<>();
+					validListEnt.add(new ValidMessage("ps", "指令数量超过申购额度"));
+					AjaxResult ajaxResultEnt = new AjaxResult();
+					ajaxResultEnt.setErrorList(validListEnt);
+					return ajaxResultEnt;
+				}
 			}
 		}
 

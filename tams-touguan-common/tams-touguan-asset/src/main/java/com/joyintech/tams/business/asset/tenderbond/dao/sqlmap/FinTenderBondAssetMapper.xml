@@ -325,6 +325,7 @@
     <select id="getProductAddFromInterface" resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinProductAddDto">
         SELECT
             sec.CROSS_MARKET_CODE as crossMarketCode,
+            case when sec.CROSS_MARKET_CODE is null then 'N' else 'Y' end as crossMarket,
             ri.LISTING_DATE as listingDate,
             ri.LISTING_CODE as appearMarketId
         FROM INTERF_WIND_UNRELEASE_SEC_INFO sec
@@ -344,11 +345,11 @@
             ri.ADDITIONAL_BATCHES as addBatch,
             nvl(pri.ISSUE_PX,ri.ISSUE_PX) as issuePrice,
             case when (nvl(pri.ISSUE_METHOD,ri.ISSUING_METHOD)='01' and (sec.VARIETY_OF_COUPONS='02' or sec.VARIETY_OF_COUPONS='03'))
-            then nvl(pri.STIPULATION_VALUE,ri.STIPULATION_VALUE)
-            else nvl(pri.COUPON_RATE,ri.COUPON_RATE) end as referYield,
+            then nvl(pri.STIPULATION_VALUE,ri.STIPULATION_VALUE) /100
+            else nvl(pri.COUPON_RATE,ri.COUPON_RATE) /100 end as referYield,
             nvl(pri.BENCHMARK_CURVE_NAME,ri.BENCHMARK_CURVE_NAME) as intRateId,
             nvl(pri.DECIMAL_PLACES,ri.DECIMAL_PLACES) as rateGrade,
-            nvl(pri.SPREAD,ri.SPREAD) as bp,
+            nvl(pri.SPREAD,ri.SPREAD) / 10000 as bp,
             nvl(to_date(pri.ISSUE_DATE,'yyyy-mm-dd'),ri.ISSUE_DATE) as issueDate,
             nvl(to_date(pri.EVENT_DATE,'yyyy-mm-dd'),ri.EVENT_DATE) as payDate,
             nvl(to_date(pri.INTEREST_ACCRUAL_DATE,'yyyy-mm-dd'),ri.INTEREST_ACCRUAL_DATE) as firstConfirmDate,
