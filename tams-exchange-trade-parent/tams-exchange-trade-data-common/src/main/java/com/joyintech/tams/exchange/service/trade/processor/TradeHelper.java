@@ -1599,12 +1599,12 @@ public class TradeHelper {
         if (Objects.nonNull(order.getFullPrice()) && order.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
             return;
         }
-        
+
         BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
         int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
 
         //资产类型是债券
-        if (InvestmentAssetType.isBond(instruction.getAssetType())
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
             dto.setPrice(order.getEntrustPrice());
