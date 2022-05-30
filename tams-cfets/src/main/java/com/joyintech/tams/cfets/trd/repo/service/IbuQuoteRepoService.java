@@ -1660,8 +1660,8 @@ public class IbuQuoteRepoService extends BaseService {
             }
             // 交易账户校验
             // 当参数：本币交易导出按钮配置为显示 OR (系统是否支持报价业务设置为支持时 and 本币交易导出按钮配置为不显示时)
-            if (StringUtil.isEmpty(item.getPartyId()) && (StringUtil.equals(exportShow, "01") ||
-                    (!isReg && StringUtil.equals(exportShow, "02")))) {
+            if (StringUtil.isEmpty(item.getPartyId())
+                    && (StringUtil.equals(exportShow, "01") || !isReg)) {
                 message = "指令【" + item.getEntrustId() + "】下组合未关联交易账户，请至[银行间业务参数管理-CFETS关联账户]中维护";
                 ajaxResult.setMessage(message);
                 return ajaxResult;

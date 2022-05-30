@@ -1957,6 +1957,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 交易编号
         trdFinProductDealTotal.setpTotleTradeId(dto.getBidId());
         trdFinProductDealTotal.setWorkflowId(dto.getWorkflowId());
+        trdFinProductDealTotal.setBusiType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
 //        现金流代码，金融产品代码+金融产品类型+现金流二级类型，还本、付息、付费等时存对应计划的现金流代码
 //        前置交易编号，记录该交易的前置交易编号。比如申购确认时存申购申请交易编号							投标确认.投标编号
         for (CfetsTrdFirstBidFirmProductDto item : secIdProducts) {
@@ -2105,6 +2106,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             stlPayOrders.setCcy(total.getCcy());
             stlPayOrders.setSettleStatus(DictCodeList.结算状态_已结算.getValue());
             stlPayOrders.setStatus(DictCodeListExt1.交易状态_初始.getValue());
+            stlPayOrders.setOrderStatus(DictCodeListExt1.交易状态_初始.getValue());
+            stlPayOrders.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
             tradeDto.setStlPayOrders(stlPayOrders);
             // 数据库取值
             List<WflTrdProductDeal> wflDeals = cfetsTrdFirstBidFirm002Mapper.findDealByTotleTradeId(total.getTotleTradeId());
@@ -2116,13 +2119,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             for (WflTrdProductDeal wflDeal : wflDeals) {
                 TrdProductDeal deal = new TrdProductDeal();
                 BeanUtil.copyPropertiesIgnoreNull(deal, wflDeal);
-                deals.add(deal);
                 WflTrdProductDealAdd wflDealAdd = new WflTrdProductDealAdd();
                 wflDealAdd.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
                 wflDealAdd.setTradeId(wflDeal.getTradeId());
                 wflDealAdd = wflTrdProductDealAddMapper.selectByPrimaryKey(wflDealAdd);
                 TrdProductDealAdd dealAdd = new TrdProductDealAdd();
                 BeanUtil.copyPropertiesIgnoreNull(dealAdd, wflDealAdd);
+                deal.setPortfolioId(wflDealAdd.getPortfolioId());
+                deals.add(deal);
                 dealAdds.add(dealAdd);
                 // 费用
                 TrdTradeFeeDetail feeDetail = new TrdTradeFeeDetail();
@@ -2183,6 +2187,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 productDto.setSettFeeAmt(ArithmeticUtil.doAdd(productDto.getSettFeeAmt(), item.getSettFeeAmt()));
                 productDto.getList().add(item);
             }
+            productDtos.add(productDto);
         });
         return productDtos;
     }
@@ -2349,10 +2354,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
 
             entity.getTrdProductDealAdds().forEach(trdProductDealAdd -> {
                 trdProductDealAddMapper.insertSelective(trdProductDealAdd);
-            });
-
-            entity.getTrdProductDeals().forEach(trdProductDealAdd -> {
-                trdProductDealMapper.insertSelective(trdProductDealAdd);
             });
 
             for (TrdProductDeal trdProductDeal : entity.getTrdProductDeals()) {
