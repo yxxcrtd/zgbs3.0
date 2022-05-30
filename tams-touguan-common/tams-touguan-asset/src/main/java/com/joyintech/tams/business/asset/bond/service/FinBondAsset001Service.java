@@ -273,6 +273,7 @@ public class FinBondAsset001Service extends BaseService{
         //dto转成map
         Map<String,Object> pageParam = BeanUtil.object2Map(dto);
         List<String> entrustIdList = StringUtil.splitToList(",",(String)pageParam.get("entrustId"));
+        pageParam.put("busiType",DictCodeList.共通业务类型_债券类资产信息.getValue());
         if(StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1){
             return new Page<SearchInfoOperateListResponse>();
         }else{

@@ -1079,6 +1079,7 @@
                     LEFT JOIN SYS_USER SUR ON reg.CREATE_USER = SUR.user_name
                     LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
            WHERE his.entrust_id = #{entrustId}
+             AND his.BUSINESS_TYPE = #{busiType}
            order by his.OPER_TIME desc) t
     </select>
 
