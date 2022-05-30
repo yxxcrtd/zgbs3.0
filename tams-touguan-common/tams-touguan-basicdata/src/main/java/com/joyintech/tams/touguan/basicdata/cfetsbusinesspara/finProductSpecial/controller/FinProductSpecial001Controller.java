@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 特殊债券信息
@@ -153,7 +154,7 @@ public class FinProductSpecial001Controller extends BaseController {
     @ApiOperation(value = "导入数据文件之前检查数据", notes = "导入数据文件之前检查数据")
     public Message<AjaxResult> checkConfirmMsgForImportData(String fileName) {
         AjaxResult ajaxResult = finProductSpecialValidatorService.checkConfirmMsgForImportData(fileName);
-        if (ajaxResult.getMessageType().equals(MessageType.错误消息.getCode())) {
+        if (Objects.nonNull(ajaxResult.getMessageType()) && ajaxResult.getMessageType().equals(MessageType.错误消息.getCode())) {
             String validMessage = ValidUtils.getValidMessage(ajaxResult.getErrorList());
             if (StringUtil.isBlank(validMessage)) {
                 validMessage = ajaxResult.getMessage();
