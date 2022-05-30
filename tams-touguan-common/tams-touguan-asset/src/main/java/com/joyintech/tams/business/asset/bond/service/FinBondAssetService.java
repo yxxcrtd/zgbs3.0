@@ -1266,6 +1266,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         }else{
             oprHisReq.setOperType(optType);
         }
+        oprHisReq.setBusiType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
 
     }
