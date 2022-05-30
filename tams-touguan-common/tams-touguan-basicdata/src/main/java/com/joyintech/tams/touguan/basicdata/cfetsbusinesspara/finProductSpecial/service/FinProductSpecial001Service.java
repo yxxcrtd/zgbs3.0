@@ -235,14 +235,17 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
             FinProductSpecialDto entity = new FinProductSpecialDto();
             String id = list.get(1);
             String text = list.get(2);
+            String isAbs = list.get(3);
+            String isSpecialDebt = list.get(4);
+            String isDefaultBondIndicator = list.get(5);
             if (StringUtil.isBlank(id)) {
                 id = queryFinprodIdByAbbr(text);
             }
             entity.setFinprodMarketId(id);
             entity.setFinprodAbbr(text);
-            entity.setIsAbs(list.get(3));
-            entity.setIsSpecialDebt(list.get(4));
-            entity.setIsDefaultBondIndicator(list.get(5));
+            entity.setIsAbs(getIsByDict(isAbs));
+            entity.setIsSpecialDebt(getIsByDict(isSpecialDebt));
+            entity.setIsDefaultBondIndicator(getIsByDict(isDefaultBondIndicator));
             entities.add(entity);
         }
         return entities;
@@ -286,5 +289,23 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         return validList;
     }
 
+
+    /**
+     * 字典转换
+     *
+     * @param value
+     * @return
+     */
+    private String getIsByDict(String value) {
+        String value1 = DictCodeList.是否_是.getCodeName();
+        String value2 = DictCodeList.是否_否.getCodeName();
+        if (value.equals(value1)) {
+            return DictCodeList.是否_是.getValue();
+        } else if (value.equals(value2)) {
+            return DictCodeList.是否_否.getValue();
+        }
+        return null;
+
+    }
 
 }
