@@ -620,7 +620,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
             trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
             trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
-            trdProductDeal.setpTradeId(secAcctIdTotleTradeId.get(secAcctId));
+            trdProductDeal.setTotleTradeId(secAcctIdTotleTradeId.get(secAcctId));
             trdProductDeal.setTradeMarket(dto.getTradeMarket());
             if(StringUtil.equals(dto.getTradeMarket(),DictCodeListExt3.交易场所_银行间.getValue())
                     || StringUtil.equals(dto.getTradeMarket(),DictCodeListExt3.交易场所_商业银行柜台.getValue())){

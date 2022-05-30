@@ -447,6 +447,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
         oprHisReq.setWorkflowId(workFlowId);
+        oprHisReq.setBusiType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 

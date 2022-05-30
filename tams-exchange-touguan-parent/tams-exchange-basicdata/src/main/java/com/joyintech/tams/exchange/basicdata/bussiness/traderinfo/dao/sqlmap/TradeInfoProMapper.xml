@@ -178,7 +178,7 @@
             delete from MST_DEALER_DETAIL_INFO where  SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </delete>
 
-    <select id="hasSameDealerPartyNoDiffType" resultType="java.lang.Integer">
+    <select id="hasSameDealerPartyNoDiffType" resultType="java.lang.String">
         select SEQ_NO from  MST_DEALER_DETAIL_INFO MDDI
         where MDDI.CUSTOMER_ID = #{customerId} and MDDI.TRADE_MARKET = #{tradeMarket}
            and MDDI.DEALER_PARTY_TYPE != #{dealerPartyType} and MDDI.DEALER_PARTY_NO = #{dealerPartyNo}

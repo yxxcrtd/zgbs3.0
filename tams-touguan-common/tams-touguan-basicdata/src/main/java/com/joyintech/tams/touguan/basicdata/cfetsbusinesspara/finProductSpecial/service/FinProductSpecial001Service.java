@@ -162,6 +162,7 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         BeanUtil.copyPropertiesIgnoreNull(finProductSpecial, entity);
         finProductSpecial.setUpdateTime(new Date());
         finProductSpecial.setUpdateUser(loginUserName);
+        finProductSpecial.setInputType(DictCodeListExt1.录入方式_手工录入.getValue());
         finProductSpecialMapper.updateByPrimaryKey(finProductSpecial);
     }
 
@@ -232,14 +233,38 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         for (int i = 0; i < dataList.size(); i++) {
             List<String> list = dataList.get(i);
             FinProductSpecialDto entity = new FinProductSpecialDto();
-            entity.setFinprodMarketId(list.get(1));
-            entity.setFinprodAbbr(list.get(2));
+            String id = list.get(1);
+            String text = list.get(2);
+            if (StringUtil.isBlank(id)) {
+                id = queryFinprodIdByAbbr(text);
+            }
+            entity.setFinprodMarketId(id);
+            entity.setFinprodAbbr(text);
             entity.setIsAbs(list.get(3));
             entity.setIsSpecialDebt(list.get(4));
             entity.setIsDefaultBondIndicator(list.get(5));
             entities.add(entity);
         }
         return entities;
+    }
+
+    /**
+     * 查询债券ID
+     *
+     * @param abbr
+     * @return
+     */
+    public String queryFinprodIdByAbbr(String abbr) {
+        FinProductSpecialSelectOptionQueryRequest request = new FinProductSpecialSelectOptionQueryRequest();
+        request.setSearch(abbr);
+        FinProductSpecialSelectOptionDto finProductSpecialSelectOptionDto = finProductSpecial001Mapper.querySampleInterf(request);
+        if (Objects.isNull(finProductSpecialSelectOptionDto)) {
+            finProductSpecialSelectOptionDto = finProductSpecial001Mapper.querySampleFinProduct(request);
+        }
+        if (Objects.nonNull(finProductSpecialSelectOptionDto)) {
+            return finProductSpecialSelectOptionDto.getId();
+        }
+        return "";
     }
 
     /**
