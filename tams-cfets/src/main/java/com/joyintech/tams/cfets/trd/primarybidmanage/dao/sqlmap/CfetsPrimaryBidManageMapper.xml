@@ -8,8 +8,8 @@
         SELECT s.* FROM (
         SELECT
         '${otherEffectFlag_01}' otherEffectFlag,
-        CASE WHEN BO.IS_WIN = 'Y' THEN '03'
-        WHEN BO.IS_WIN = 'N' THEN '04'
+        CASE WHEN BO.IS_WIN = 'Y' THEN '04'
+        WHEN BO.IS_WIN = 'N' THEN '03'
         ELSE '02' END isWin,
         BO.BID_ID bidId,
         BO.FINPROD_ID finprodId,
