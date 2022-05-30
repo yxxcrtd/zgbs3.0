@@ -92,7 +92,7 @@ public class FinTenderBondPreService {
         param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
         param.put("ISSUE_STATUS_02", DictCodeListExt1.发行状态_发行失败.getValue());
-        List<SysPrebatchResultDetail> details1 = finTenderBoundPreMapper.selectPreList(param);
+        List<SysPrebatchResultDetail> details1 = finTenderBoundPreMapper.selectPreList2(param);
         if (!StringUtil.isEmptyList(details1)) {
             details.addAll(details1);
         }
