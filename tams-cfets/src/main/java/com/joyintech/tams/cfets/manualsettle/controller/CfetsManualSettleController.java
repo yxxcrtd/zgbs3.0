@@ -88,8 +88,7 @@ public class CfetsManualSettleController extends BaseController {
     @ResponseBody
     @ApiOperation(value = "交收", notes = "交收")
     @PostMapping("doManualSettle")
-    public Message<AjaxResult> doManualSettle(@RequestBody CfetsManualSettleRequest cfetsRequest, BindingResult br)
-            throws Exception {
+    public Message<AjaxResult> doManualSettle(@RequestBody CfetsManualSettleRequest cfetsRequest, BindingResult br) {
 
         List<CfetsManualSettleDto> dtoList = cfetsRequest.getSelectedItem();
         //保存

@@ -154,4 +154,7 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
     public String hasSameDealerPartyNoTraderNo(TradeInfoProSaveRequest dto) {
         return tradeInfoProMapper.hasSameDealerPartyNoTraderNo(dto);
     }
+    public String hasSameTraderSeqNo(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.hasSameTraderSeqNo(dto);
+    }
 }
