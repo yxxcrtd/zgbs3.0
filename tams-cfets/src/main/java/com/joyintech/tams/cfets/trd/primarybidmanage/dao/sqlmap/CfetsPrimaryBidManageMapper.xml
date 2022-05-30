@@ -529,6 +529,7 @@
             BO.PAY_DATE   creditorDebtDate,
             FPA.LISTING_DATE listingDate,
             BO.WIN_TYPE   winType,
+            BO.BID_MODLE     bidModle,
             BO.PAY_TYPE   payType,
             BO.WIN_PRIN_AMT   winPrinAmt,
             FP.CIRCULATION_CODE circulationCode,
