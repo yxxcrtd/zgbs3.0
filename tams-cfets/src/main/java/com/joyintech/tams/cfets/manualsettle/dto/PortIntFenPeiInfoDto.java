@@ -9,86 +9,106 @@ import java.math.BigDecimal;
 //组合分配信息共通DTO
 public class PortIntFenPeiInfoDto {
 
-    @ApiModelProperty(name="portfolioId",value="组合代码",example="A1")
+    @ApiModelProperty(name = "portfolioId", value = "组合代码", example = "A1")
     private String portfolioId;
 
-    @ApiModelProperty(name="portfolioName",value="组合名称",example="A1")
+    @ApiModelProperty(name = "portfolioName", value = "组合名称", example = "A1")
     private String portfolioName;
 
-    @ApiModelProperty(name="qtyd",value="券面总额（万元）",example="A1")
+    @ApiModelProperty(name = "qtyd", value = "券面总额（万元）", example = "A1")
     private BigDecimal qtyd;
 
-    @ApiModelProperty(name="prinAmtTheoryd",value="还本金额（元）",example="A1")
+    @ApiModelProperty(name = "prinAmtTheoryd", value = "还本金额（元）", example = "A1")
     private BigDecimal prinAmtTheoryd;
 
-    @ApiModelProperty(name="intAmtTheoryd",value="理论应收利息（元）",example="A1")
+    @ApiModelProperty(name = "intAmtTheoryd", value = "理论应收利息（元）", example = "A1")
     private BigDecimal intAmtTheoryd;
 
-    @ApiModelProperty(name="cpriceAmt",value="净价总额",example="100")
+    @ApiModelProperty(name = "cpriceAmt", value = "净价总额", example = "100")
     private BigDecimal cpriceAmt;
 
-    @ApiModelProperty(name="intAmt",value="应计利息总额（元）",example="100")
+    @ApiModelProperty(name = "intAmt", value = "应计利息总额（元）", example = "100")
     private BigDecimal intAmt;
 
-    @ApiModelProperty(name="fpriceAmt",value="全价总额",example="1000000")
+    @ApiModelProperty(name = "fpriceAmt", value = "全价总额", example = "1000000")
     private BigDecimal fpriceAmt;
 
-    @ApiModelProperty(name="jyFeeAmt",value="交易手续费",example="1000000")
+    @ApiModelProperty(name = "jyFeeAmt", value = "交易手续费", example = "1000000")
     private BigDecimal jyFeeAmt;
 
-    @ApiModelProperty(name="jsFeeAmt",value="结算手续费",example="1000000")
+    @ApiModelProperty(name = "jsFeeAmt", value = "结算手续费", example = "1000000")
     private BigDecimal jsFeeAmt;
 
-    @ApiModelProperty(name="tradeAmt",value="交易金额",example="1000000")
+    @ApiModelProperty(name = "tradeAmt", value = "交易金额", example = "1000000")
     private BigDecimal tradeAmt;
 
-    @ApiModelProperty(name="entrustId",value="委托代码",example="A1")
+    @ApiModelProperty(name = "entrustId", value = "委托代码", example = "A1")
     private String entrustId;
 
-    @ApiModelProperty(name="rowNums",value="序号",example="A1")
+    @ApiModelProperty(name = "rowNums", value = "序号", example = "A1")
     private Integer rowNums;
 
-    @ApiModelProperty(name="unFinshAmt",value="剩余指令额度（万元）",example="1000000")
+    @ApiModelProperty(name = "unFinshAmt", value = "剩余指令额度（万元）", example = "1000000")
     private BigDecimal unFinshAmt;
 
-    @ApiModelProperty(name="secAcctId",value="证券账户",example="A1")
+    @ApiModelProperty(name = "secAcctId", value = "证券账户", example = "A1")
     private String secAcctId;
 
-    @ApiModelProperty(name="priceModel",value="价格模式",example="01")
+    @ApiModelProperty(name = "priceModel", value = "价格模式", example = "01")
     private String priceModel;
 
-    @ApiModelProperty(name="matureYield",value="到期收益率",example="1000000")
+    @ApiModelProperty(name = "matureYield", value = "到期收益率", example = "1000000")
     private BigDecimal matureYield;
 
-    @ApiModelProperty(name="exeYield",value="行权收益率",example="1000000")
+    @ApiModelProperty(name = "exeYield", value = "行权收益率", example = "1000000")
     private BigDecimal exeYield;
 
-    @ApiModelProperty(name="busiTypePosition",value="业务模式",example="01")
+    @ApiModelProperty(name = "busiTypePosition", value = "业务模式", example = "01")
     private String busiTypePosition;
 
-    @ApiModelProperty(name="unitPrice",value="净价",example="1000000")
+    @ApiModelProperty(name = "unitPrice", value = "净价", example = "1000000")
     private BigDecimal unitPrice;
 
-    @ApiModelProperty(name="qtydq",value="持有面额（元）",example="A1")
+    @ApiModelProperty(name = "qtydq", value = "持有面额（元）", example = "A1")
     private BigDecimal qtydq;
 
-    @ApiModelProperty(name="mintAmt",value="回购利息（元）",example="100")
+    @ApiModelProperty(name = "mintAmt", value = "回购利息（元）", example = "100")
     private BigDecimal mintAmt;
 
-    @ApiModelProperty(name="mtradeAmt",value="到期结算金额（元）",example="100")
+    @ApiModelProperty(name = "mtradeAmt", value = "到期结算金额（元）", example = "100")
     private BigDecimal mtradeAmt;
 
-    @ApiModelProperty(name="disFaceValue",value="质押券折算总额（元）",example="100")
+    @ApiModelProperty(name = "disFaceValue", value = "质押券折算总额（元）", example = "100")
     private BigDecimal disFaceValue;
 
-    @ApiModelProperty(name="rate",value="回购利率",example="100")
+    @ApiModelProperty(name = "rate", value = "回购利率", example = "100")
     private BigDecimal rate;
 
     private BigDecimal tradeYield;
 
-    @ApiModelProperty(name="totalAmtTheory",value="理论交收金额",example="A1")
+    @ApiModelProperty(name = "totalAmtTheory", value = "理论交收金额", example = "A1")
     private BigDecimal totalAmtTheory;
 
+    @ApiModelProperty(name = "payAmt", value = "缴款金额（元）")
+    private BigDecimal payAmt;
+
+    @ApiModelProperty(name = "bidPrice", value = "投标标位")
+    private String bidPrice;
+
+    @ApiModelProperty(name = "winPrice", value = "中标标位")
+    private String winPrice;
+
+    @ApiModelProperty(name = "invManagerName", value = "投资经理名称", example = "字符串1")
+    private String invManagerName;
+
+    @ApiModelProperty(name = "totalBiddingNum", value = "汇总投标券面总额(万元)")
+    private BigDecimal totalBiddingNum;
+
+    @ApiModelProperty(name = "theWinPrinamt", value = "理论中标券面总额 (万元)")
+    private BigDecimal theWinPrinamt;
+
+    @ApiModelProperty(name = "actWinPrinamt", value = "实际中标券面总额（万元）")
+    private BigDecimal actWinPrinamt;
 
 
     public String getPriceModelStr() {
@@ -313,5 +333,61 @@ public class PortIntFenPeiInfoDto {
 
     public void setTotalAmtTheory(BigDecimal totalAmtTheory) {
         this.totalAmtTheory = totalAmtTheory;
+    }
+
+    public BigDecimal getPayAmt() {
+        return payAmt;
+    }
+
+    public void setPayAmt(BigDecimal payAmt) {
+        this.payAmt = payAmt;
+    }
+
+    public String getBidPrice() {
+        return bidPrice;
+    }
+
+    public void setBidPrice(String bidPrice) {
+        this.bidPrice = bidPrice;
+    }
+
+    public String getWinPrice() {
+        return winPrice;
+    }
+
+    public void setWinPrice(String winPrice) {
+        this.winPrice = winPrice;
+    }
+
+    public String getInvManagerName() {
+        return invManagerName;
+    }
+
+    public void setInvManagerName(String invManagerName) {
+        this.invManagerName = invManagerName;
+    }
+
+    public BigDecimal getTotalBiddingNum() {
+        return totalBiddingNum;
+    }
+
+    public void setTotalBiddingNum(BigDecimal totalBiddingNum) {
+        this.totalBiddingNum = totalBiddingNum;
+    }
+
+    public BigDecimal getTheWinPrinamt() {
+        return theWinPrinamt;
+    }
+
+    public void setTheWinPrinamt(BigDecimal theWinPrinamt) {
+        this.theWinPrinamt = theWinPrinamt;
+    }
+
+    public BigDecimal getActWinPrinamt() {
+        return actWinPrinamt;
+    }
+
+    public void setActWinPrinamt(BigDecimal actWinPrinamt) {
+        this.actWinPrinamt = actWinPrinamt;
     }
 }
