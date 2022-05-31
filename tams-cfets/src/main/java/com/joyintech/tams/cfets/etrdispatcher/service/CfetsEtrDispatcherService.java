@@ -384,6 +384,7 @@ public class CfetsEtrDispatcherService extends BaseService {
         pageLimit.setRoot(list);
         if (!list.isEmpty()) {
             for (CfetsEtrDispatcherTradeListResponse response : list) {
+                response.setTraderId(response.getTrader());
                 if (StringUtil.isNotEmpty(response.getTrader())) {
                     String[] traders = response.getTrader().split(",");
                     StringBuffer buffer = new StringBuffer();
