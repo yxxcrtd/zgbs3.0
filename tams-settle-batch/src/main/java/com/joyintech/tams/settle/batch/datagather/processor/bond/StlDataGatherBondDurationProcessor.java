@@ -479,10 +479,15 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
         trdProductDeal.setfTradeId(null);
         // 现金流代码
         trdProductDeal.setCashId(null);
+        if(StringUtil.equals(trdProductDeal.getPs(), DictCodeList.交易方向_还本到账.getValue())){
+            trdProductDeal.setCashId(settleTransData.getPrinCashId());
+        }else if(StringUtil.equals(trdProductDeal.getPs(), DictCodeList.交易方向_收息到账.getValue())){
+            trdProductDeal.setCashId(settleTransData.getIntPayCashId());
+        }
         // 登记托管机构
         trdProductDeal.setRegistOrg(DictCodeList.登记托管机构_中债_中国证券登记结算有限责任公司.getValue());
         // 备注
-        trdProductDeal.setRemark(null);
+        trdProductDeal.setRemark(StlDataGatherConstant.STL_DATA_GATHER_REMARK);
         // 撤销说明
         trdProductDeal.setCancelRemark(null);
         // 销售代码
@@ -532,7 +537,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
         // ZGZGST-4219:交易方向已在外层处理 fuyongsheng 20211216 modify end
         // 结算方式 券款兑付
         trdProductDeal.setSettMode("03");
-        if(StringUtil.equals(settleTransData.getPs(), DictCodeList.交易方向_收息到账.getValue())){
+        if(StringUtil.equals(trdProductDeal.getPs(), DictCodeList.交易方向_收息到账.getValue())){
             trdProductDeal.setTgBusiType( DictCodeListExt1.平安业务类型_债券中间收息.getValue());
         }else{
             trdProductDeal.setTgBusiType( DictCodeListExt1.平安业务类型_债券中间还本.getValue());
@@ -572,7 +577,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
         // 投资组合代码
         stlPayOrders.setPortfolioId(total.getPortfolioId());
         // 备注
-        stlPayOrders.setRemark("数据清算自动处理");
+        stlPayOrders.setRemark(StlDataGatherConstant.STL_DATA_GATHER_REMARK);
         // 划款类型
         stlPayOrders.setPayType(DictCodeListExt1.平安划款类型_清算划款.getValue());
         return stlPayOrders;

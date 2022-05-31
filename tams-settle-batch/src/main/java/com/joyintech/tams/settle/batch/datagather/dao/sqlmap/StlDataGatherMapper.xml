@@ -146,7 +146,8 @@
 	<select id="listBondSettleTransData" parameterType="java.util.Map"
 			resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
 		SELECT
-			TMIN.CASH_ID CASH_ID,
+			TMIN.CASH_ID intPayCashId,
+			TMINPRIN.CASH_ID prinCashId,
 			TMAX.MDATE VDATE,
 			TMIN.MDATE MDATE2,
 			fp.MDATE MDATE,
@@ -217,6 +218,38 @@
 						AND T2.MDATE = T1.MDATE
 			    )
 		) TMAX ON TMAX.FINPROD_ID = std.FINPROD_ID
+		LEFT JOIN (
+			SELECT
+				T1.CASH_ID,
+				T1.MDATE ,
+				T1.FINPROD_ID
+			FROM
+				FIN_CASH_PLAN T1
+			WHERE
+				EXISTS(
+					SELECT
+						1
+					FROM
+						(
+							SELECT
+								CASH_ID,
+								FINPROD_ID ,
+								MIN(MDATE) MDATE
+							FROM
+								FIN_CASH_PLAN fcp2
+							WHERE
+								fcp2.CASH_TYPE IN('02','03')
+								AND  <![CDATA[fcp2.MDATE > #{dealDate,jdbcType=DATE}]]>
+							GROUP BY
+								CASH_ID,
+								FINPROD_ID
+						)T2
+					WHERE
+						T2.CASH_ID = T1.CASH_ID
+						AND T2.FINPROD_ID = T1.FINPROD_ID
+						AND T2.MDATE = T1.MDATE
+				)
+		) TMINPRIN ON TMINPRIN.FINPROD_ID = std.FINPROD_ID
 		<where>
 			std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			<if test="dealDate != null">
