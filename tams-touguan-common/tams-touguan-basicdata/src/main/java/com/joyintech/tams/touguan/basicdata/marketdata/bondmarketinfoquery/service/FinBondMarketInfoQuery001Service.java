@@ -195,6 +195,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         param.put("platformDate", iPlatformDate.getSysDateStr());
         FinBondMarketInfoDetailQueryDto detailQueryDto = finBondMarketInfoQueryMapper.queryFinBondMarketForCoupons(param);
         if (Objects.nonNull(detailQueryDto)) {
+            detailQueryDto.setMarketBasis(detailQueryDto.getRatebasic());
             //行权计划信息
             List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(secId);
             detailQueryDto.setBondPayHSrcSecOptionDtos(finBondPayHSrcSecOptionDtos);
