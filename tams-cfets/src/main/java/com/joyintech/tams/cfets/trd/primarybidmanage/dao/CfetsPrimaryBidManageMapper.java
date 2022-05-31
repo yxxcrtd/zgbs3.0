@@ -79,4 +79,10 @@ public interface CfetsPrimaryBidManageMapper {
 	List<SelectOptionDto>  selectTrader(Map<String, Object> map);
 
 	FinRateInfo getFinRateInfoByFinprodId(@Param("finprodId") String finprodId);
+	/**
+	 * 检索账户来源
+	 * @param param
+	 * @return
+	 */
+	String selectSecAcctSource(Map<String, Object> param);
 }
