@@ -182,6 +182,12 @@ public class FairOrderHelper {
         ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
 
         PortfolioAllocationResponse portfolioAllocationResponse = Convert.convert(PortfolioAllocationResponse.class, resultBean.getData());
+        List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
+        Map<String, List<Instruction>> instructionMap = instructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
+        if (instructionMap.size() <= 1) {
+        	// 走普通委托
+        	return false;
+        }
 
         if (StrUtil.isNotEmpty(portfolioAllocationResponse.getInfoLevel())) {
             logger.info("fair order failed");
@@ -189,12 +195,6 @@ public class FairOrderHelper {
             return true;
         }
 
-        List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
-        Map<String, List<Instruction>> instructionMap = instructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
-        if (instructionMap.size() <= 1) {
-            // 走普通委托
-            return false;
-        }
 
         //卖出价格不得小于最优价，买入不得高于最优价
         BigDecimal price = portfolioAllocationResponse.getPrice();
