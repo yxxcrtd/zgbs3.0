@@ -303,7 +303,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
         resultMap.put("systemAct", 系统动作_新建.getValue());
         resultMap.put("flowStatus", DictCodeListExt3.流程节点_审批生效.getValue());
 
-        resultMap.put(INTERFACE_TYPE, "T100");
+        resultMap.put(INTERFACE_TYPE, "Certificate001");
         resultMap.put("userId", "SYSTEM");
 //        resultMap.put("computerId","");
         resultMap.put(TOTAL_TRADE_ID, writerDto.getBussinessCode());

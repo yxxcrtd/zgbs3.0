@@ -294,9 +294,12 @@
     <select id="getRefSecsByRefEntity" resultType="java.lang.String">
         select distinct fa.REF_SEC
         from FIN_PRODUCT f
-                 left join FIN_PRODUCT_ADD fa on fa.FINPROD_ID = f.FINPROD_ID
-        where f.ISSUER = #{refEntity,jdbcType=VARCHAR}
-          and fa.REF_SEC is not null
+        left join FIN_PRODUCT_ADD fa on fa.FINPROD_ID = f.FINPROD_ID
+        where f.ISSUER in
+        <foreach collection="refEntityArray" item="refEntity" open="(" close=")" separator=",">
+            #{refEntity,jdbcType=VARCHAR}
+        </foreach>
+        and fa.REF_SEC is not null
     </select>
     <select id="getAmountByPortfolioId" resultType="java.math.BigDecimal">
         select nvl(p.AMOUNT, 0) / 10000
