@@ -376,7 +376,7 @@ public class EtrTradeCommonervice extends BaseService {
         String tradePlat = requestDto.getPtlList().get(0).getTradePlat();
         if(StringUtil.equals(tradePlat, TempConstant.NO_TRADE_BUSINESS_ETR)
                 ||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
-                ||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                ||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
                 ||StringUtil.equals(finprodType2, "ZYSHG")
                 || StringUtil.equals(tradePlat, DictCodeList.交易平台_新债平台.getValue())) {
             canSec=canSec==null?BigDecimal.ZERO:ArithmeticUtil.divide(canSec,new BigDecimal(100),2);

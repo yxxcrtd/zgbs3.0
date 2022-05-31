@@ -62,6 +62,9 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     @ApiModelProperty(name="trader",value="交易员",example="admin")
     private String trader;
 
+    @ApiModelProperty(name="traderId",value="交易员ID",example="admin")
+    private String traderId;
+
     @ApiModelProperty(name="secAcctId",value="证券账户",example="XXX证券账户")
     private String secAcctId;
 
@@ -492,5 +495,13 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
 
     public void setIssueDateStr(String issueDateStr) {
         this.issueDateStr = issueDateStr;
+    }
+
+    public String getTraderId() {
+        return traderId;
+    }
+
+    public void setTraderId(String traderId) {
+        this.traderId = traderId;
     }
 }
