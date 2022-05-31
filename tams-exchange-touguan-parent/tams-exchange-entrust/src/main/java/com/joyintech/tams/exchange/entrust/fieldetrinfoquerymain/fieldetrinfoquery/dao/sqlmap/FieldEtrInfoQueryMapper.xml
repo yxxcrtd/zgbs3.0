@@ -914,7 +914,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         order by t.TRADING_DAY desc,t.TRADE_TIME desc
     </select>-->
     <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
-	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, PP.PORTFOLIO_NAME, SCI.ACCT_NAME   FINANCE_ACCOUNT
+	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, PP.PORTFOLIO_NAME, SCI.ACCT_NAME  ACCOUNT_NAME
 	  FROM (
 	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
 			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
