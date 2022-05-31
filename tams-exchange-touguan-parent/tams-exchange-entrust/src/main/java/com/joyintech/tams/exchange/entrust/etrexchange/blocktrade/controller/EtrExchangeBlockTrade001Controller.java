@@ -452,7 +452,7 @@ public class EtrExchangeBlockTrade001Controller extends BaseController{
 			} else if (StringUtil.isNotEmpty(confirmMessage)) {
 				ajax = new AjaxResult();
 				ajax.setMessageType(MessageType.确认消息);
-				ajax.setMessage(confirmMessage);
+				ajax.setData(confirmMessage);
 				return new Message<AjaxResult>().success().setData(ajax);
 			}else {
 				return new Message<AjaxResult>().success().setMessage("校验通过");
