@@ -548,7 +548,7 @@ public class EtrTradeCommonervice extends BaseService {
         if(ptList!=null&&ptList.size()>0
                 &&StringUtil.isNotEmpty(ptList.get(0).getFinprodType2())
                 &&(StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),ptList.get(0).getFinprodType2())||ptList.get(0).getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
-                ||ptList.get(0).getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                ||ptList.get(0).getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
                 ||ptList.get(0).getFinprodType2().equals("ZYSHG"))
                 &&(StringUtil.equals(flowType,"02")||StringUtil.equals(flowType,"04"))){
             sumAmount=ArithmeticUtil.divide(sumAmount,100,0);
