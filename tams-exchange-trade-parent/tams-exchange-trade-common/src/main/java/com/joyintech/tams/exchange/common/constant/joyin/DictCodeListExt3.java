@@ -61,7 +61,6 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     投管业务类型_现券交易(DictCode.投管业务类型,"EX017","现券交易"),
     投管业务类型_通用式质押回购(DictCode.投管业务类型,"EX018","通用式质押回购"),
     投管业务类型_信用保护凭证(DictCode.投管业务类型,"EX019","信用保护凭证"),
-
     /***add by liepeng 20191106 start**/
     基准日_巨额赎回调整日(DictCode.基准日, "12", "分红确认日"),
     基准日_募集上线调整日(DictCode.基准日, "13", "分红确认日"),
