@@ -435,8 +435,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                     if (StringUtil.equals(response.getTargetType(), DictCodeListExt3.目标类型_数量.getValue())) {
                         DecimalFormat df = new DecimalFormat("0.##");
                         response.setDealProgress(ArithmeticUtil.divide(response.getFinishAmt(), response.getEntrustAmt(), 4).multiply(new BigDecimal("100")));
-                        response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(ArithmeticUtil.subtract(response.getEntrustAmt(), response.getFinishAmt()), new BigDecimal("10000"), 4))));
-                        response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("10000"), 4))));
+                        response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getTransRemainderAmt(), new BigDecimal("100"), 4))));
+                        response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("100"), 4))));
                         response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                         response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     }
@@ -1376,6 +1376,13 @@ public class CfetsEtrDispatcherService extends BaseService {
         List<String> counterIdList = new ArrayList<>();
         Map<String, String> counterIdMap = splitParams("counterIds",
                 str -> counterIdList.add(str));
+        if ( counterIdMap.size()==0 ) {
+            enTrustIds.forEach(id -> {
+                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(id);
+                counterIdList.add(etrEntrust.getCounterId());
+                counterIdMap.put(id,etrEntrust.getCounterId());
+            });
+        }
         Map<String, PtlPortfolio> innerIds = AllTradeCommonUtil.selectPortfolioIds(
                 counterIdList);
         Map<String, String> psMap = splitParams("psList", null);
@@ -1394,6 +1401,10 @@ public class CfetsEtrDispatcherService extends BaseService {
                 list.add(finDto);
                 // 生成方向指令
                 if (innerIds.containsKey(counterIdMap.get(id))) {
+                    list.clear();
+                    finDto.put(PageFieldToInterfFactory.INF_EVENTID, id+ BussinessDictCodeList.交易方向_卖出.getValue());
+                    finDto.put(PageFieldToInterfFactory.INF_PS, BussinessDictCodeList.交易方向_卖出.getValue());
+                    list.add(finDto);
                     finDto = new HashMap<>();
                     finDto.put(PageFieldToInterfFactory.INF_EVENTID, id + ps);
                     finDto.put(PageFieldToInterfFactory.INF_EVENTDATE, DateUtil.format(

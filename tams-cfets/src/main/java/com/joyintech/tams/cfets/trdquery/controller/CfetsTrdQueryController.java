@@ -177,9 +177,9 @@ public class CfetsTrdQueryController extends BaseController {
                                                             @RequestBody CfetsTrdQueryRegInfoListResponse dto) throws Exception {
         try {
             Map<String,Object> resultData = null;
-            if (StringUtil.equals(spcdCode, DictCodeListExt3.头寸业务类型_债券一级申购.getValue())
-            || StringUtil.equals(spcdCode, DictCodeListExt3.头寸业务类型_债券一级投标.getValue())){
-                resultData = cfetsTrdQueryService.findRegBidInfo(pageCode,dtCode,spcdCode,dto);
+            if (StringUtil.equals(dto.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())
+            || StringUtil.equals(dto.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())){
+                resultData = cfetsTrdQueryService.findRegBidInfo(pageCode,dtCode,dto.getBusiTypePosition(),dto);
             }else {
                 resultData = cfetsTrdQueryService.findRegInfo(pageCode, dtCode, spcdCode, dto);
             }

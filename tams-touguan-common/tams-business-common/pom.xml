@@ -60,11 +60,5 @@
             <artifactId>joyintech-system</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.joyintech</groupId>
-            <artifactId>component-business</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-
     </dependencies>
 </project>

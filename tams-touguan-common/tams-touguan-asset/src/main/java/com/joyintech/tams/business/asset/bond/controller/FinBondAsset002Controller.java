@@ -334,7 +334,7 @@ public class FinBondAsset002Controller extends BaseController{
         params.setComment(entity -> {
             return WorkFlowUtil.concatComment("债券代码"+
                 GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId(), GlobalConstant.CLOSE_PARENTHESIS+
-                "债券名称"+GlobalConstant.OPEN_PARENTHESIS+
+                "债券简称"+GlobalConstant.OPEN_PARENTHESIS+
                 entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
         });
         // 给参数变成ProcessParameter而非WorkFlowParameter
