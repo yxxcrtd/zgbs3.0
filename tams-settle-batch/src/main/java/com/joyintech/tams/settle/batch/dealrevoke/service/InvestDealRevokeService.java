@@ -424,6 +424,9 @@ public class InvestDealRevokeService {
                 // 日间下单撤销数据
                 Map<String, Object> orderData = new HashMap<>();
 
+                if (null == deal.getfTradeId()) {
+                    continue;
+                }
                 // 查询下单明细数据
                 InfContractDetailfile infContractDetailfile = trdCommonBaseMapper.selectInfContractDetailfile(deal.getfTradeId());
                 if(null == infContractDetailfile){

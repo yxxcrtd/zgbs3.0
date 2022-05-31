@@ -2825,9 +2825,9 @@
     //根据是否纳入金额结算 设置清算速度
     var setSettleSpeed = function (isNetSett) {
         if (isNetSett == YES_OR_NO_Y) {
-            $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_01).trigger('change');
-        } else {
             $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_02).trigger('change');
+        } else {
+            $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_01).trigger('change');
         }
         $("#settleSpeed_" + currentTab).attr("disabled", true);
     }

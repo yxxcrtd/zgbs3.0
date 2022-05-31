@@ -20,7 +20,7 @@
         BOBP.ENTRUST_NUM/100 bidPrinAmt,
         BO.WIN_PRIN_AMT/10000 totalBiddingNum,
         BOBP.BID_PRICE bidPrice,
-        BO.WIN_TYPE winType,
+        BO.BID_MODLE bidModle,
         BO.PAY_TYPE payType,
         BO.BID_DATE bidCfmDate,
         FP.TRADE_MARKET tradeMarket,
@@ -31,7 +31,7 @@
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
@@ -89,6 +89,12 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="counterIdList != null and counterIdList.size() > 0">
+                AND BO.COUNTER_ID in
+                <foreach collection="counterIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="bidId != null and bidId != ''">
                 AND BO.BID_ID like '%' || #{bidId} || '%'
             </if>
@@ -103,7 +109,7 @@
         left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
         left join SYS_DATADICT_LIST sdl_otherEffectFlag on ss.otherEffectFlag=sdl_otherEffectFlag.ITEM_CODE and sdl_otherEffectFlag.DICT_CODE='STATUS_VALID'
         left join SYS_DATADICT_LIST sdl_tt on ss.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
-        left join SYS_DATADICT_LIST sdl_wt on ss.winType=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
+        left join SYS_DATADICT_LIST sdl_wt on ss.bidModle=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
         left join SYS_DATADICT_LIST sdl_ept on ss.payType=sdl_ept.ITEM_CODE and sdl_ept.DICT_CODE='ETR_PAY_TYPE'
         <!-- 关键字模糊查询 -->
         <include refid="keywordsCfmWhere"></include>)
@@ -156,7 +162,7 @@
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
@@ -288,7 +294,7 @@
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
@@ -441,7 +447,7 @@
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
@@ -494,7 +500,7 @@
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
@@ -523,10 +529,10 @@
             BO.COUNTER_ID     counterId,
             FPI.TENDER_TARGET tenderTarget,
             FP.CCY            ccy,
-            FPI.PAY_DATE      payDate,
+            NVL(FPI.PAY_DATE,FPI.PAY_EDATE)      payDate,
             FPI.TENDER_SDATE   bidDateStart,
             FPI.TENDER_EDATE   bidDateEnd,
-            BO.PAY_DATE   creditorDebtDate,
+            NVL(FPI.PAY_DATE,FPI.PAY_EDATE)   creditorDebtDate,
             FPA.LISTING_DATE listingDate,
             BO.WIN_TYPE   winType,
             BO.BID_MODLE     bidModle,
@@ -859,5 +865,13 @@
         FROM FIN_RATE_INFO
         WHERE FINPROD_ID = #{finprodId}
          AND ROWNUM = 1
+    </select>
+
+    <select id="selectSecAcctSource" resultType="java.lang.String">
+        SELECT
+            SEC_ACCT_SOURCE
+        FROM STL_SEC_ACCT_INFO
+        WHERE
+            SEC_ACCT_ID = #{secAcctId}
     </select>
 </mapper>

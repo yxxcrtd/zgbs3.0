@@ -144,8 +144,7 @@
                         LEFT JOIN
                     FIN_PRODUCT_TYPE type on p.FINPROD_ID = type.FINPROD_ID
                 WHERE
-                        P.FINPROD_MARKET_ID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL WHERE FINPROD_MARKET_ID is NOT NULL)
-                  AND P.FINPROD_TYPE2 = 'F01'
+                 P.FINPROD_TYPE2 = 'F01'
                   AND P.TRADE_MARKET = '01'
                   AND ( P.FINPROD_MARKET_ID = #{search} or P.FINPROD_ABBR = #{search}
                       )
@@ -160,7 +159,6 @@
                         PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND
                         TRADE_MARKET = '01' )
                   AND PAYHSRCSECINFO.MARKET = '01'
-                  AND PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL WHERE FINPROD_MARKET_ID is NOT NULL)
                   AND (PAYHSRCSECINFO.SECID = #{search} or PAYHSRCSECINFO.SECNAME = #{search}
                 )
             )
@@ -202,17 +200,17 @@
     <select id="querySampleInterf"
             resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto"
             parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest">
-        SELECT SECID finprodMarketId, SECNAME finprodAbbr
+        SELECT SECID id, SECNAME text
         from INTERF_PAYHSRCSECINFO
-        WHERE SECNAME = #{search};
+        WHERE SECNAME = #{search}
     </select>
 
     <select id="querySampleFinProduct"
             resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto"
             parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest">
-        SELECT FINPROD_ID finprodMarketId, FINPROD_ABBR finprodAbbr
+        SELECT FINPROD_MARKET_ID id, FINPROD_ABBR text
         from FIN_PRODUCT
-        where FINPROD_ABBR = #{search};
+        where FINPROD_ABBR = #{search}
     </select>
 
 </mapper>

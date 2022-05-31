@@ -237,11 +237,11 @@
                 PAYHSRCSECINFO.RATEBASIC like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.GUARANTOR like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.GUARTYPE like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.ISSUEPRICE ||''= #{search} OR
-                PAYHSRCSECINFO.ISSUEAMT ||''= #{search} OR
-                PAYHSRCSECINFO.PAPERIR ||''= #{search} OR
-                PAYHSRCSECINFO.FACEVALUE ||''= #{search} OR
-                PAYHSRCSECINFO.SPREADRATE_8 ||''= #{search} OR
+                TO_CHAR(PAYHSRCSECINFO.ISSUEPRICE, 'fm99999999999990.0000') ||''= #{search} OR
+                TO_CHAR(PAYHSRCSECINFO.ISSUEAMT/100000000, 'fm99999999999990.00') ||''= #{search} OR
+                TO_CHAR(PAYHSRCSECINFO.PAPERIR, 'fm99999999999990.0000') ||''= #{search} OR
+                TO_CHAR(PAYHSRCSECINFO.FACEVALUE, 'fm99999999999990.0000') ||''= #{search} OR
+                TO_CHAR(PAYHSRCSECINFO.SPREADRATE_8, 'fm99999999999990.00') ||''= #{search} OR
                 sdl_tp.ITEM_VALUE like '%' || #{search} || '%' OR
                 sdl_ro.ITEM_VALUE like '%' || #{search} || '%' OR
                 sdl_catt.ITEM_VALUE like '%' || #{search} || '%' OR
@@ -505,7 +505,8 @@
                PAYHSRCSECINFO.SCHECALRULE,
                PAYHSRCSECINFO.PAYCYCLE,
                PAYHSRCSECINFO.WORKDAYRULE,
-               PAYHSRCSECINFO.REMARK
+               PAYHSRCSECINFO.REMARK,
+               PAYHSRCSECINFO.PAPERIR yield
         FROM INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
                  LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO1
                            ON PAYHSRCSECINFO.ISSUERSHORT = CUSTOMER_INFO1.CUSTOMER_ID

@@ -18,10 +18,16 @@ public interface FinTenderBondPreMapper {
 	
 	/**
 	 * 发行阶段为已发行、发行状态不为发行失败且上市日为当日但未进行上市流通的新债标的，批前检查提示并卡批
-	 * 发行阶段为已发行、发行状态不为发行失败且上市日为空但未进行上市流通的新债标的，批前检查提示不卡批
 	 * @param map
 	 * @return
 	 */
 	List<SysPrebatchResultDetail> selectPreList(Map<String,Object> map);
 
+
+	/**
+	 * 发行阶段为已发行、发行状态不为发行失败且上市日为空但未进行上市流通的新债标的，批前检查提示不卡批
+	 * @param map
+	 * @return
+	 */
+	List<SysPrebatchResultDetail> selectPreList2(Map<String,Object> map);
 }

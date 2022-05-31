@@ -147,7 +147,16 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         FinProductSpecial finProductSpecial = new FinProductSpecial();
         BeanUtil.copyPropertiesIgnoreNull(finProductSpecial, entity);
         finProductSpecial.setInputType(DictCodeListExt1.录入方式_手工录入.getValue());
-        finProductSpecialMapper.insertSelective(finProductSpecial);
+        int i = finProductSpecial001Mapper.countFinprodIdForSpecial(entity.getFinprodMarketId());
+        if (i > 0) {
+            String loginUserName = LoginUserUtil.getUserName();
+            finProductSpecial.setUpdateTime(new Date());
+            finProductSpecial.setUpdateUser(loginUserName);
+            finProductSpecialMapper.updateByPrimaryKey(finProductSpecial);
+        } else {
+            finProductSpecialMapper.insertSelective(finProductSpecial);
+        }
+
     }
 
 
@@ -162,6 +171,7 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         BeanUtil.copyPropertiesIgnoreNull(finProductSpecial, entity);
         finProductSpecial.setUpdateTime(new Date());
         finProductSpecial.setUpdateUser(loginUserName);
+        finProductSpecial.setInputType(DictCodeListExt1.录入方式_手工录入.getValue());
         finProductSpecialMapper.updateByPrimaryKey(finProductSpecial);
     }
 
@@ -232,14 +242,41 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         for (int i = 0; i < dataList.size(); i++) {
             List<String> list = dataList.get(i);
             FinProductSpecialDto entity = new FinProductSpecialDto();
-            entity.setFinprodMarketId(list.get(1));
-            entity.setFinprodAbbr(list.get(2));
-            entity.setIsAbs(list.get(3));
-            entity.setIsSpecialDebt(list.get(4));
-            entity.setIsDefaultBondIndicator(list.get(5));
+            String id = list.get(1);
+            String text = list.get(2);
+            String isAbs = list.get(3);
+            String isSpecialDebt = list.get(4);
+            String isDefaultBondIndicator = list.get(5);
+            if (StringUtil.isBlank(id)) {
+                id = queryFinprodIdByAbbr(text);
+            }
+            entity.setFinprodMarketId(id);
+            entity.setFinprodAbbr(text);
+            entity.setIsAbs(getIsByDict(isAbs));
+            entity.setIsSpecialDebt(getIsByDict(isSpecialDebt));
+            entity.setIsDefaultBondIndicator(getIsByDict(isDefaultBondIndicator));
             entities.add(entity);
         }
         return entities;
+    }
+
+    /**
+     * 查询债券ID
+     *
+     * @param abbr
+     * @return
+     */
+    public String queryFinprodIdByAbbr(String abbr) {
+        FinProductSpecialSelectOptionQueryRequest request = new FinProductSpecialSelectOptionQueryRequest();
+        request.setSearch(abbr);
+        FinProductSpecialSelectOptionDto finProductSpecialSelectOptionDto = finProductSpecial001Mapper.querySampleInterf(request);
+        if (Objects.isNull(finProductSpecialSelectOptionDto)) {
+            finProductSpecialSelectOptionDto = finProductSpecial001Mapper.querySampleFinProduct(request);
+        }
+        if (Objects.nonNull(finProductSpecialSelectOptionDto)) {
+            return finProductSpecialSelectOptionDto.getId();
+        }
+        return "";
     }
 
     /**
@@ -261,5 +298,23 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         return validList;
     }
 
+
+    /**
+     * 字典转换
+     *
+     * @param value
+     * @return
+     */
+    private String getIsByDict(String value) {
+        String value1 = DictCodeList.是否_是.getCodeName();
+        String value2 = DictCodeList.是否_否.getCodeName();
+        if (value.equals(value1)) {
+            return DictCodeList.是否_是.getValue();
+        } else if (value.equals(value2)) {
+            return DictCodeList.是否_否.getValue();
+        }
+        return null;
+
+    }
 
 }

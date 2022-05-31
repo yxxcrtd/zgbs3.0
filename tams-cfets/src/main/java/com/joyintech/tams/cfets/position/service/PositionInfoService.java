@@ -152,16 +152,27 @@ public class PositionInfoService {
                 Map<String, String> secIdMap = new HashMap<String, String>();
                 secIdMap.put("portfolioId", portfolioId);
                 secIdMap.put("finprodId", finprodId);
-                String secAcctId = qryPortfolioSecAcctId(secIdMap);// 证券账户
-                if (StringUtil.isNotEmpty(secAcctId)) {
+                List<String> secAcctIds = this.qryPortfolioSecAcctIdAll(map);// 证券账户
+                String finalCcy = ccy;
+                String finalCdate = cdate;
+                secAcctIds.forEach(secAcctId -> {
                     PositionCashSecDto positionCashSecDto = new PositionCashSecDto();
-                    positionCashSecDto.setCcy(ccy);
+                    positionCashSecDto.setCcy(finalCcy);
                     positionCashSecDto.setPortfolioId(portfolioId);
-                    positionCashSecDto.setCdate(cdate);
-                    positionCashSecDto.setSecAcctId(secAcctId);
-
+                    positionCashSecDto.setCdate(finalCdate);
+                    positionCashSecDto.setAcctId(secAcctId);
                     sumAcctNoList.add(positionCashSecDto);
-                }
+                });
+//                String secAcctId = qryPortfolioSecAcctId(secIdMap);// 证券账户
+//                if (StringUtil.isNotEmpty(secAcctId)) {
+//                    PositionCashSecDto positionCashSecDto = new PositionCashSecDto();
+//                    positionCashSecDto.setCcy(ccy);
+//                    positionCashSecDto.setPortfolioId(portfolioId);
+//                    positionCashSecDto.setCdate(cdate);
+//                    positionCashSecDto.setSecAcctId(secAcctId);
+//
+//                    sumAcctNoList.add(positionCashSecDto);
+//                }
             }
 
             //资金可用金额

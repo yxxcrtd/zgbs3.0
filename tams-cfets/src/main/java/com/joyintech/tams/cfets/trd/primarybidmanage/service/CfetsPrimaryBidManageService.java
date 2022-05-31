@@ -31,11 +31,14 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
+import com.joyintech.tams.component.business.settle.dto.BussSettleOrderParameterDto;
+import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.trade.dto.SecInfoModelDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
@@ -135,6 +138,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
     @Autowired(required=false)
     private CfgDataTableMapper cfgDataTableMapper;
+
+    @Autowired(required=false)
+    private BussTrdTransferOrderService bussTrdTransferOrderService;
+
+    @Autowired(required=false)
+    private StlPayOrdersMapper stlPayOrdersMapper;
 
     /**
      * 默认设置
@@ -427,6 +436,16 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         for(StlOrders stlOrders: dto.getStlOrdersList()) {
             stlOrdersMapper.insertSelective(stlOrders);
         }
+
+        if (CollectionUtils.isNotEmpty(dto.getBussTrdTransferOrderList())){
+            bussTrdTransferOrderService.save(dto.getBussTrdTransferOrderList());
+            StlPayOrders stlPayOrders = new StlPayOrders();
+            for (BussTrdTransferOrderDto ferOrder : dto.getBussTrdTransferOrderList()) {
+                BeanUtil.copyPropertiesIgnoreNull(stlPayOrders, ferOrder);
+                stlPayOrders.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
+                stlPayOrdersMapper.insertSelective(stlPayOrders);
+            }
+        }
     }
 
     /**
@@ -574,6 +593,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         List<EtrFinishStatus> etrFinishStatusList = new ArrayList<>();
         //组合交易表
         List<PtlTrade> ptlTradeList = new ArrayList<>();
+
+        List<BussTrdTransferOrderDto> bussTrdTransferOrderList = new ArrayList<>();
+
         Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> allocationListTwoMap = dto.getAllocationDetails().stream()
                 .collect(JoyinCollectors.groupingBy(item -> item.getSecAcctId() + GlobalConstant.COMMA + item.getEntrustId() + GlobalConstant.COMMA + item.getPortfolioId()));
         for (String allocation:allocationListTwoMap.keySet()) {
@@ -620,7 +642,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
             trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
             trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
-            trdProductDeal.setpTradeId(secAcctIdTotleTradeId.get(secAcctId));
+            trdProductDeal.setTotleTradeId(secAcctIdTotleTradeId.get(secAcctId));
             trdProductDeal.setTradeMarket(dto.getTradeMarket());
             if(StringUtil.equals(dto.getTradeMarket(),DictCodeListExt3.交易场所_银行间.getValue())
                     || StringUtil.equals(dto.getTradeMarket(),DictCodeListExt3.交易场所_商业银行柜台.getValue())){
@@ -666,6 +688,32 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             etrFinishStatus.setTrader(dto.getOuTraderId());
             etrFinishStatus.setTranFinishAmt(trdProductDeal.getPrinAmt());
             etrFinishStatusList.add(etrFinishStatus);
+            BussSettleOrderParameterDto bussSettleOrderParameterDto = new BussSettleOrderParameterDto();
+            bussSettleOrderParameterDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+            bussSettleOrderParameterDto.setBankLendingType(null);
+            //多组合时，必须同托管账户
+            TrdProductDeal deal = new TrdProductDeal();
+            BeanUtil.copyPropertiesIgnoreNull(deal,trdProductDeal);
+            deal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            bussSettleOrderParameterDto.setPortfolioId(portfolioId);//暂存，后面删除，目的是为了查询出账户
+            bussSettleOrderParameterDto.setDeal(deal);
+            BussTrdTransferOrderDto bussTrdTransferOrderDto = bussTrdTransferOrderService.generateOrder(bussSettleOrderParameterDto);
+            bussTrdTransferOrderDto.setPayAcctNoList(null);
+            bussTrdTransferOrderDto.setRecAcctNoList(null);
+            bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+            if (StringUtil.isNotEmpty(secAcctId)) {
+                Map<String, Object> param = new HashMap<String, Object>();
+                param.put("secAcctId", secAcctId);
+                String secAcctSource = cfetsPrimaryBidManageMapper.selectSecAcctSource(param);
+                if (StringUtil.equals(BussinessDictCodeList.账户来源_自营.getValue(), secAcctSource)) {
+                    bussTrdTransferOrderDto.setIsNeedSend(BussinessDictCodeList.是否_否.getValue());
+                }
+            }
+            bussTrdTransferOrderDto.setTradeId(secAcctIdTotleTradeId.get(secAcctId));
+            bussTrdTransferOrderDto.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
+            bussTrdTransferOrderDto.setPortfolioId(portfolioId);//可能是多组合，此时该字段为空
+            bussTrdTransferOrderDto.setPortfolioName(null);
+            bussTrdTransferOrderList.add(bussTrdTransferOrderDto);
         }
         baseBidManageBaseInfoDto.setBidResultTotal(bidResultTotal);
         baseBidManageBaseInfoDto.setBidResultDetailList(bidResultDetailList);
@@ -677,6 +725,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         baseBidManageBaseInfoDto.setPtlTradeList(ptlTradeList);
         baseBidManageBaseInfoDto.setEtrFinishStatusList(etrFinishStatusList);
         baseBidManageBaseInfoDto.setStlOrdersList(stlOrdersList);
+        baseBidManageBaseInfoDto.setBussTrdTransferOrderList(bussTrdTransferOrderList);
         dto.setBaseBidManageBaseInfoDto(baseBidManageBaseInfoDto);
         return dto;
     }

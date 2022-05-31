@@ -2619,11 +2619,9 @@ public class StlDataDealSzdJsmxProcessService {
 		finProductTypeKey.setBranch(0L);
 		finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
 
-		FinProductType finProductType = new FinProductType();
-		try {
-			finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
-		} catch (Exception e) {
-			logger.error("根据金融产品代码查询投管一级类型出错信息：" + e);
+		FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+		if (null == finProductType) {
+			return "";
 		}
 		return finProductType.getType6();
 	}

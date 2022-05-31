@@ -1,6 +1,7 @@
 package com.joyintech.tams.cfets.trd.primarybidmanage.dto;
 
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 
 import java.util.List;
 
@@ -66,6 +67,7 @@ public class BaseBidManageBaseInfoDto {
      */
     private List<StlOrders> stlOrdersList;
 
+    private List<BussTrdTransferOrderDto> bussTrdTransferOrderList;
 
     /**
      * 获取 中标结果汇总表entity
@@ -247,5 +249,13 @@ public class BaseBidManageBaseInfoDto {
      */
     public void setBidResultDetailList(List<BidResultDetail> bidResultDetailList) {
         this.bidResultDetailList = bidResultDetailList;
+    }
+
+    public List<BussTrdTransferOrderDto> getBussTrdTransferOrderList() {
+        return bussTrdTransferOrderList;
+    }
+
+    public void setBussTrdTransferOrderList(List<BussTrdTransferOrderDto> bussTrdTransferOrderList) {
+        this.bussTrdTransferOrderList = bussTrdTransferOrderList;
     }
 }

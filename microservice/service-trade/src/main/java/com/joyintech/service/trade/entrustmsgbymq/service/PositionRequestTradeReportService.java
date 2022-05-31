@@ -210,7 +210,9 @@ public class PositionRequestTradeReportService {
             bondSec.put("portfolioId", dto.getPortfolioId());
             bondSec.put("finprodId", entity.getFinprodId());
             bondSec.put("secAcctId", dto.getSecAcctId());
-            bondSec.put("tradeId", entity.getTradeId());
+            // ZGCPCN-899:修改组合维度交易编号 modify by fuyongsheng 20220530 start
+            bondSec.put("tradeId", trdTempDto.getTradeId());
+            // ZGCPCN-899:修改组合维度交易编号 modify by fuyongsheng 20220530 end
             bondSec.put("etrId", entity.getEntrustId());
             bondSec.put("integrateSecAmount", dto.getIntegrateSecAmount());
             bondSec.put("ownSecAmount", dto.getOwnSecAmount());
