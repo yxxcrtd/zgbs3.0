@@ -55,7 +55,9 @@
         RDI_RELEASE_INFO.REMARK as REMARK,
         PRODUCT.FINPROD_ID FINPRODID,
         nvl(to_char(RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd'), to_char(RELEASE_INFO.BID_BEGIN_DATE,'yyyy-mm-dd') ||' - '|| to_char(RELEASE_INFO.BID_END_DATE,'yyyy-mm-dd'))
-        as additionalTenderDate
+        as additionalTenderDate,
+
+        nvl(to_char(RDI_RELEASE_INFO.COUPON_RATE, 'fm99999999999990.0000'), to_char(RELEASE_INFO.COUPON_RATE, 'fm99999999999990.0000')) as couponRate
 
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
