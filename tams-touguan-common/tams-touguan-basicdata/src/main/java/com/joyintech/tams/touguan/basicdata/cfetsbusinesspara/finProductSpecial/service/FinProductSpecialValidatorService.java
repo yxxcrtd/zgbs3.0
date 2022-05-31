@@ -239,6 +239,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                             Integer index = finProductSpecialImportDto.getIndex();
                             stringBuilder.append(index).append(",");
                         });
+                        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
                         allErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_EXCEL_ALREADY_EXISTS", stringBuilder.toString())).append(CHANGE_LINE_MARK);
                     }
                 }
