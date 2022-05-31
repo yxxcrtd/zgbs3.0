@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.json.CustomDateDeserialize;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class InterfPayhsrcsecinfo extends InterfPayhsrcsecinfoKey {
+
     /**
      * 债券简称
      */
@@ -19,7 +21,7 @@ public class InterfPayhsrcsecinfo extends InterfPayhsrcsecinfoKey {
     private String seccode;
 
     /**
-     * 市场 
+     * 市场
      */
     private String market;
 
@@ -61,19 +63,19 @@ public class InterfPayhsrcsecinfo extends InterfPayhsrcsecinfoKey {
     /**
      * 面额 默认100
      */
-    @JsonSerialize(using=BigDecimalSerializer.class)
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal facevalue;
 
     /**
      * 发行价
      */
-    @JsonSerialize(using=BigDecimalSerializer.class)
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issueprice;
 
     /**
      * 票面利率
      */
-    @JsonSerialize(using=BigDecimalSerializer.class)
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal paperir;
 
     /**
@@ -114,19 +116,19 @@ public class InterfPayhsrcsecinfo extends InterfPayhsrcsecinfoKey {
     /**
      * 利率上限
      */
-    @JsonSerialize(using=BigDecimalSerializer.class)
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal toprate;
 
     /**
      * 利率下限
      */
-    @JsonSerialize(using=BigDecimalSerializer.class)
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal bottomrate;
 
     /**
      * 发行总额
      */
-    @JsonSerialize(using=BigDecimalSerializer.class)
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issueamt;
 
     /**
@@ -137,13 +139,13 @@ public class InterfPayhsrcsecinfo extends InterfPayhsrcsecinfoKey {
     /**
      * 浮动利差
      */
-    @JsonSerialize(using=BigDecimalSerializer.class)
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal spreadrate8;
 
     /**
      * 浮动系数
      */
-    @JsonSerialize(using=BigDecimalSerializer.class)
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal coefficient;
 
     /**
@@ -223,7 +225,7 @@ public class InterfPayhsrcsecinfo extends InterfPayhsrcsecinfoKey {
 
     /**
      * "币种
-CNY 人民币、HKD 港币、JPY 日元、USD 美元"
+     * CNY 人民币、HKD 港币、JPY 日元、USD 美元"
      */
     private String ccy;
 
@@ -328,8 +330,8 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
      */
     private String issuerinstitutionssecond;
     // 20200819 龙江银行修改-查询债券接口信息表增加查询字段 wangwei end
-	/**
-     *是否私募债
+    /**
+     * 是否私募债
      */
     private String isPpb;
     /**
@@ -337,32 +339,61 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
      */
     private String isNetprice;
     /**
-     *正股代码
+     * 正股代码
      */
     private String conFinprodId;
     /**
-     *转股代码
+     * 转股代码
      */
     private String conShareId;
     /**
-     *转股起始日
+     * 转股起始日
      */
     private Date conVdate;
+
     /**
-     *转股价格
+     * 转股价格
      */
     private BigDecimal conPrice;
+
     /**
-     *回售触发价
+     * 回售触发价
      */
     private BigDecimal resalePrice;
+
     /**
-     *赎回触发价
+     * 赎回触发价
      */
     private BigDecimal redeemPrice;
 
     /**
+     * 摘牌日
+     */
+    private Date delistingDate;
+
+    /**
+     * 是否绿色债
+     */
+    private String isGreenBond;
+
+    /**
+     * 跨市场代码
+     */
+    private String crossMarketCode;
+
+    /**
+     * 基准利率精度
+     */
+    private BigDecimal baseRateAccuracy;
+
+    /**
+     * 首次利率确定日
+     */
+    private Date firstRateDeterminationDate;
+
+    /**
      * 取得 债券简称
+     *
      * @return 债券简称
      */
     public String getSecname() {
@@ -371,6 +402,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 债券简称
+     *
      * @param secname 债券简称
      */
     public void setSecname(String secname) {
@@ -379,6 +411,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 债券code
+     *
      * @return 债券code
      */
     public String getSeccode() {
@@ -387,6 +420,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 债券code
+     *
      * @param seccode 债券code
      */
     public void setSeccode(String seccode) {
@@ -394,16 +428,18 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
     }
 
     /**
-     * 取得 市场 
-     * @return 市场 
+     * 取得 市场
+     *
+     * @return 市场
      */
     public String getMarket() {
         return market;
     }
 
     /**
-     * 设置 市场 
-     * @param market 市场 
+     * 设置 市场
+     *
+     * @param market 市场
      */
     public void setMarket(String market) {
         this.market = market == null ? null : market.trim();
@@ -411,6 +447,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 债券全称
+     *
      * @return 债券全称
      */
     public String getSecfullname() {
@@ -419,6 +456,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 债券全称
+     *
      * @param secfullname 债券全称
      */
     public void setSecfullname(String secfullname) {
@@ -427,6 +465,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 计息基准：参考右边明细
+     *
      * @return 计息基准：参考右边明细
      */
     public String getRatebasic() {
@@ -435,6 +474,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 计息基准：参考右边明细
+     *
      * @param ratebasic 计息基准：参考右边明细
      */
     public void setRatebasic(String ratebasic) {
@@ -443,6 +483,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 息票品种 NPV付息 DIS贴现 IAM利随本清 ZCO零息
+     *
      * @return 息票品种 NPV付息 DIS贴现 IAM利随本清 ZCO零息
      */
     public String getCouponspecies() {
@@ -451,6 +492,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 息票品种 NPV付息 DIS贴现 IAM利随本清 ZCO零息
+     *
      * @param couponspecies 息票品种 NPV付息 DIS贴现 IAM利随本清 ZCO零息
      */
     public void setCouponspecies(String couponspecies) {
@@ -459,6 +501,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 利率类型 FI固定，FL浮动
+     *
      * @return 利率类型 FI固定，FL浮动
      */
     public String getInterestrate() {
@@ -467,6 +510,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 利率类型 FI固定，FL浮动
+     *
      * @param interestrate 利率类型 FI固定，FL浮动
      */
     public void setInterestrate(String interestrate) {
@@ -475,6 +519,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 起息日
+     *
      * @return 起息日
      */
     public Date getVdate() {
@@ -483,6 +528,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 起息日
+     *
      * @param vdate 起息日
      */
     @JsonDeserialize(using = CustomDateDeserialize.class)
@@ -492,6 +538,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 到期日
+     *
      * @return 到期日
      */
     public Date getMdate() {
@@ -500,6 +547,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 到期日
+     *
      * @param mdate 到期日
      */
     @JsonDeserialize(using = CustomDateDeserialize.class)
@@ -509,6 +557,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 付息频率
+     *
      * @return 付息频率
      */
     public String getPaycycle() {
@@ -517,6 +566,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 付息频率
+     *
      * @param paycycle 付息频率
      */
     public void setPaycycle(String paycycle) {
@@ -525,6 +575,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 面额 默认100
+     *
      * @return 面额 默认100
      */
     public BigDecimal getFacevalue() {
@@ -533,6 +584,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 面额 默认100
+     *
      * @param facevalue 面额 默认100
      */
     public void setFacevalue(BigDecimal facevalue) {
@@ -541,6 +593,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行价
+     *
      * @return 发行价
      */
     public BigDecimal getIssueprice() {
@@ -549,6 +602,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行价
+     *
      * @param issueprice 发行价
      */
     public void setIssueprice(BigDecimal issueprice) {
@@ -557,6 +611,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 票面利率
+     *
      * @return 票面利率
      */
     public BigDecimal getPaperir() {
@@ -565,6 +620,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 票面利率
+     *
      * @param paperir 票面利率
      */
     public void setPaperir(BigDecimal paperir) {
@@ -573,6 +629,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 付息区间推算方法 VF起息日向后，MB到期日向前，FD首次付息日
+     *
      * @return 付息区间推算方法 VF起息日向后，MB到期日向前，FD首次付息日
      */
     public String getSchecalrule() {
@@ -581,6 +638,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 付息区间推算方法 VF起息日向后，MB到期日向前，FD首次付息日
+     *
      * @param schecalrule 付息区间推算方法 VF起息日向后，MB到期日向前，FD首次付息日
      */
     public void setSchecalrule(String schecalrule) {
@@ -589,6 +647,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 首次付息日
+     *
      * @return 首次付息日
      */
     public Date getFirstrateday() {
@@ -597,6 +656,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 首次付息日
+     *
      * @param firstrateday 首次付息日
      */
     @JsonDeserialize(using = CustomDateDeserialize.class)
@@ -606,6 +666,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 营业日准则 P向前调整 S向后调整 M调整的向后 N不调整
+     *
      * @return 营业日准则 P向前调整 S向后调整 M调整的向后 N不调整
      */
     public String getWorkdayrule() {
@@ -614,6 +675,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 营业日准则 P向前调整 S向后调整 M调整的向后 N不调整
+     *
      * @param workdayrule 营业日准则 P向前调整 S向后调整 M调整的向后 N不调整
      */
     public void setWorkdayrule(String workdayrule) {
@@ -622,6 +684,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行人
+     *
      * @return 发行人
      */
     public String getIssuershort() {
@@ -630,6 +693,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行人
+     *
      * @param issuershort 发行人
      */
     public void setIssuershort(String issuershort) {
@@ -638,6 +702,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 利率调整规则
+     *
      * @return 利率调整规则
      */
     public String getResettype() {
@@ -646,6 +711,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 利率调整规则
+     *
      * @param resettype 利率调整规则
      */
     public void setResettype(String resettype) {
@@ -654,6 +720,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 延后时间
+     *
      * @return 延后时间
      */
     public Long getObservebefday() {
@@ -662,6 +729,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 延后时间
+     *
      * @param observebefday 延后时间
      */
     public void setObservebefday(Long observebefday) {
@@ -670,6 +738,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 延后时间单位
+     *
      * @return 延后时间单位
      */
     public String getObservebefunit() {
@@ -678,6 +747,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 延后时间单位
+     *
      * @param observebefunit 延后时间单位
      */
     public void setObservebefunit(String observebefunit) {
@@ -686,6 +756,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 利率上限
+     *
      * @return 利率上限
      */
     public BigDecimal getToprate() {
@@ -694,6 +765,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 利率上限
+     *
      * @param toprate 利率上限
      */
     public void setToprate(BigDecimal toprate) {
@@ -702,6 +774,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 利率下限
+     *
      * @return 利率下限
      */
     public BigDecimal getBottomrate() {
@@ -710,6 +783,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 利率下限
+     *
      * @param bottomrate 利率下限
      */
     public void setBottomrate(BigDecimal bottomrate) {
@@ -718,6 +792,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行总额
+     *
      * @return 发行总额
      */
     public BigDecimal getIssueamt() {
@@ -726,6 +801,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行总额
+     *
      * @param issueamt 发行总额
      */
     public void setIssueamt(BigDecimal issueamt) {
@@ -734,6 +810,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 浮动利率code
+     *
      * @return 浮动利率code
      */
     public String getRatecode() {
@@ -742,6 +819,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 浮动利率code
+     *
      * @param ratecode 浮动利率code
      */
     public void setRatecode(String ratecode) {
@@ -750,6 +828,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 浮动利差
+     *
      * @return 浮动利差
      */
     public BigDecimal getSpreadrate8() {
@@ -758,6 +837,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 浮动利差
+     *
      * @param spreadrate8 浮动利差
      */
     public void setSpreadrate8(BigDecimal spreadrate8) {
@@ -766,6 +846,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 浮动系数
+     *
      * @return 浮动系数
      */
     public BigDecimal getCoefficient() {
@@ -774,6 +855,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 浮动系数
+     *
      * @param coefficient 浮动系数
      */
     public void setCoefficient(BigDecimal coefficient) {
@@ -782,6 +864,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 系统债券类型：
+     *
      * @return 系统债券类型：
      */
     public String getSectype() {
@@ -790,6 +873,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 系统债券类型：
+     *
      * @param sectype 系统债券类型：
      */
     public void setSectype(String sectype) {
@@ -798,6 +882,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 系统债券类型：
+     *
      * @return 系统债券类型：
      */
     public String getSectype2() {
@@ -806,6 +891,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 系统债券类型：
+     *
      * @param sectype2 系统债券类型：
      */
     public void setSectype2(String sectype2) {
@@ -814,6 +900,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 中债债券类型：
+     *
      * @return 中债债券类型：
      */
     public String getChbsectype() {
@@ -822,6 +909,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 中债债券类型：
+     *
      * @param chbsectype 中债债券类型：
      */
     public void setChbsectype(String chbsectype) {
@@ -830,6 +918,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 中债债券类型：
+     *
      * @return 中债债券类型：
      */
     public String getChbsectype2() {
@@ -838,6 +927,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 中债债券类型：
+     *
      * @param chbsectype2 中债债券类型：
      */
     public void setChbsectype2(String chbsectype2) {
@@ -846,6 +936,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 人行债券类型：
+     *
      * @return 人行债券类型：
      */
     public String getPbocsectype() {
@@ -854,6 +945,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 人行债券类型：
+     *
      * @param pbocsectype 人行债券类型：
      */
     public void setPbocsectype(String pbocsectype) {
@@ -862,6 +954,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 人行债券类型：
+     *
      * @return 人行债券类型：
      */
     public String getPbocsectype2() {
@@ -870,6 +963,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 人行债券类型：
+     *
      * @param pbocsectype2 人行债券类型：
      */
     public void setPbocsectype2(String pbocsectype2) {
@@ -878,6 +972,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 备注
+     *
      * @return 备注
      */
     public String getRemark() {
@@ -886,6 +981,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 备注
+     *
      * @param remark 备注
      */
     public void setRemark(String remark) {
@@ -894,7 +990,8 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 是否次级债,Y是N否
-     * @return 是否次级债,Y是N否
+     *
+     * @return 是否次级债, Y是N否
      */
     public String getIssecbond() {
         return issecbond;
@@ -902,6 +999,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 是否次级债,Y是N否
+     *
      * @param issecbond 是否次级债,Y是N否
      */
     public void setIssecbond(String issecbond) {
@@ -910,7 +1008,8 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 是否永续债,Y是N否
-     * @return 是否永续债,Y是N否
+     *
+     * @return 是否永续债, Y是N否
      */
     public String getIssus() {
         return issus;
@@ -918,6 +1017,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 是否永续债,Y是N否
+     *
      * @param issus 是否永续债,Y是N否
      */
     public void setIssus(String issus) {
@@ -926,7 +1026,8 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 是否可赎回,Y是N否
-     * @return 是否可赎回,Y是N否
+     *
+     * @return 是否可赎回, Y是N否
      */
     public String getCalloption() {
         return calloption;
@@ -934,6 +1035,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 是否可赎回,Y是N否
+     *
      * @param calloption 是否可赎回,Y是N否
      */
     public void setCalloption(String calloption) {
@@ -942,7 +1044,8 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 是否可回售,Y是N否
-     * @return 是否可回售,Y是N否
+     *
+     * @return 是否可回售, Y是N否
      */
     public String getPutoption() {
         return putoption;
@@ -950,6 +1053,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 是否可回售,Y是N否
+     *
      * @param putoption 是否可回售,Y是N否
      */
     public void setPutoption(String putoption) {
@@ -958,6 +1062,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 登记托管机构
+     *
      * @return 登记托管机构
      */
     public String getInstitution() {
@@ -966,6 +1071,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 登记托管机构
+     *
      * @param institution 登记托管机构
      */
     public void setInstitution(String institution) {
@@ -974,6 +1080,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 登记托管机构说明
+     *
      * @return 登记托管机构说明
      */
     public String getInstitutiontext() {
@@ -982,6 +1089,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 登记托管机构说明
+     *
      * @param institutiontext 登记托管机构说明
      */
     public void setInstitutiontext(String institutiontext) {
@@ -990,6 +1098,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 交易场所说明
+     *
      * @return 交易场所说明
      */
     public String getMarkettext() {
@@ -998,6 +1107,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 交易场所说明
+     *
      * @param markettext 交易场所说明
      */
     public void setMarkettext(String markettext) {
@@ -1006,6 +1116,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 交易流通场所：01 银行间市场、02 商业银行柜台市场、03 上海交易所、04 深圳交易所、99 其它
+     *
      * @return 交易流通场所：01 银行间市场、02 商业银行柜台市场、03 上海交易所、04 深圳交易所、99 其它
      */
     public String getMarket2() {
@@ -1014,6 +1125,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 交易流通场所：01 银行间市场、02 商业银行柜台市场、03 上海交易所、04 深圳交易所、99 其它
+     *
      * @param market2 交易流通场所：01 银行间市场、02 商业银行柜台市场、03 上海交易所、04 深圳交易所、99 其它
      */
     public void setMarket2(String market2) {
@@ -1022,9 +1134,10 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 "币种
-CNY 人民币、HKD 港币、JPY 日元、USD 美元"
+     * CNY 人民币、HKD 港币、JPY 日元、USD 美元"
+     *
      * @return "币种
-CNY 人民币、HKD 港币、JPY 日元、USD 美元"
+     * CNY 人民币、HKD 港币、JPY 日元、USD 美元"
      */
     public String getCcy() {
         return ccy;
@@ -1032,9 +1145,10 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 "币种
-CNY 人民币、HKD 港币、JPY 日元、USD 美元"
+     * CNY 人民币、HKD 港币、JPY 日元、USD 美元"
+     *
      * @param ccy "币种
-CNY 人民币、HKD 港币、JPY 日元、USD 美元"
+     *            CNY 人民币、HKD 港币、JPY 日元、USD 美元"
      */
     public void setCcy(String ccy) {
         this.ccy = ccy == null ? null : ccy.trim();
@@ -1042,6 +1156,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行方式
+     *
      * @return 发行方式
      */
     public String getIssuetype() {
@@ -1050,6 +1165,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行方式
+     *
      * @param issuetype 发行方式
      */
     public void setIssuetype(String issuetype) {
@@ -1058,6 +1174,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 境内外
+     *
      * @return 境内外
      */
     public String getBlnarea() {
@@ -1066,6 +1183,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 境内外
+     *
      * @param blnarea 境内外
      */
     public void setBlnarea(String blnarea) {
@@ -1074,6 +1192,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 担保人
+     *
      * @return 担保人
      */
     public String getGuarantor() {
@@ -1082,6 +1201,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 担保人
+     *
      * @param guarantor 担保人
      */
     public void setGuarantor(String guarantor) {
@@ -1090,6 +1210,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 担保方式
+     *
      * @return 担保方式
      */
     public String getGuartype() {
@@ -1098,6 +1219,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 担保方式
+     *
      * @param guartype 担保方式
      */
     public void setGuartype(String guartype) {
@@ -1106,6 +1228,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行截止日
+     *
      * @return 发行截止日
      */
     public Date getPubenddate() {
@@ -1114,6 +1237,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行截止日
+     *
      * @param pubenddate 发行截止日
      */
     @JsonDeserialize(using = CustomDateDeserialize.class)
@@ -1123,6 +1247,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 是否城投债（中债）
+     *
      * @return 是否城投债（中债）
      */
     public String getCityInvestSecChb() {
@@ -1131,6 +1256,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 是否城投债（中债）
+     *
      * @param cityInvestSecChb 是否城投债（中债）
      */
     public void setCityInvestSecChb(String cityInvestSecChb) {
@@ -1139,6 +1265,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 城投债省及省会（单列市）
+     *
      * @return 城投债省及省会（单列市）
      */
     public String getCityInvestSecProvinces() {
@@ -1147,6 +1274,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 城投债省及省会（单列市）
+     *
      * @param cityInvestSecProvinces 城投债省及省会（单列市）
      */
     public void setCityInvestSecProvinces(String cityInvestSecProvinces) {
@@ -1155,6 +1283,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 城投债地级市
+     *
      * @return 城投债地级市
      */
     public String getCityInvestSecCities() {
@@ -1163,6 +1292,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 城投债地级市
+     *
      * @param cityInvestSecCities 城投债地级市
      */
     public void setCityInvestSecCities(String cityInvestSecCities) {
@@ -1171,6 +1301,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 城投债县及县级市
+     *
      * @return 城投债县及县级市
      */
     public String getCityInvestSecCounty() {
@@ -1179,6 +1310,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 城投债县及县级市
+     *
      * @param cityInvestSecCounty 城投债县及县级市
      */
     public void setCityInvestSecCounty(String cityInvestSecCounty) {
@@ -1187,6 +1319,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 是否城投债（WIND）
+     *
      * @return 是否城投债（WIND）
      */
     public String getCityInvestSecWind() {
@@ -1195,6 +1328,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 是否城投债（WIND）
+     *
      * @param cityInvestSecWind 是否城投债（WIND）
      */
     public void setCityInvestSecWind(String cityInvestSecWind) {
@@ -1203,6 +1337,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 是否城投债（银监）
+     *
      * @return 是否城投债（银监）
      */
     public String getCityInvestSecCbrc() {
@@ -1211,6 +1346,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 是否城投债（银监）
+     *
      * @param cityInvestSecCbrc 是否城投债（银监）
      */
     public void setCityInvestSecCbrc(String cityInvestSecCbrc) {
@@ -1219,6 +1355,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 资产/负债类别
+     *
      * @return 资产/负债类别
      */
     public String getAssetClass() {
@@ -1227,6 +1364,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 资产/负债类别
+     *
      * @param assetClass 资产/负债类别
      */
     public void setAssetClass(String assetClass) {
@@ -1235,6 +1373,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 具体类别
+     *
      * @return 具体类别
      */
     public String getConcreteClass() {
@@ -1243,6 +1382,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 具体类别
+     *
      * @param concreteClass 具体类别
      */
     public void setConcreteClass(String concreteClass) {
@@ -1251,6 +1391,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 具体类别说明
+     *
      * @return 具体类别说明
      */
     public String getConcreteClassSm() {
@@ -1259,6 +1400,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 具体类别说明
+     *
      * @param concreteClassSm 具体类别说明
      */
     public void setConcreteClassSm(String concreteClassSm) {
@@ -1267,6 +1409,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行机构类型（按规模划分）
+     *
      * @return 发行机构类型（按规模划分）
      */
     public String getIssuerScaleType() {
@@ -1275,6 +1418,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行机构类型（按规模划分）
+     *
      * @param issuerScaleType 发行机构类型（按规模划分）
      */
     public void setIssuerScaleType(String issuerScaleType) {
@@ -1283,6 +1427,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行机构类型（按技术领域划分）
+     *
      * @return 发行机构类型（按技术领域划分）
      */
     public String getIssuerTechnologyType() {
@@ -1291,6 +1436,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行机构类型（按技术领域划分）
+     *
      * @param issuerTechnologyType 发行机构类型（按技术领域划分）
      */
     public void setIssuerTechnologyType(String issuerTechnologyType) {
@@ -1299,6 +1445,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行机构类型（按经济领域划分）
+     *
      * @return 发行机构类型（按经济领域划分）
      */
     public String getIssuerEconomicType() {
@@ -1307,6 +1454,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行机构类型（按经济领域划分）
+     *
      * @param issuerEconomicType 发行机构类型（按经济领域划分）
      */
     public void setIssuerEconomicType(String issuerEconomicType) {
@@ -1315,6 +1463,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行机构类型说明
+     *
      * @return 发行机构类型说明
      */
     public String getIssuerDesc() {
@@ -1323,6 +1472,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行机构类型说明
+     *
      * @param issuerDesc 发行机构类型说明
      */
     public void setIssuerDesc(String issuerDesc) {
@@ -1331,6 +1481,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行机构所属行业
+     *
      * @return 发行机构所属行业
      */
     public String getIssuerInstitutions() {
@@ -1339,6 +1490,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行机构所属行业
+     *
      * @param issuerInstitutions 发行机构所属行业
      */
     public void setIssuerInstitutions(String issuerInstitutions) {
@@ -1349,6 +1501,7 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 取得 发行机构所属行业二级分类
+     *
      * @return 发行机构所属行业二级分类
      */
     public String getIssuerinstitutionssecond() {
@@ -1357,73 +1510,115 @@ CNY 人民币、HKD 港币、JPY 日元、USD 美元"
 
     /**
      * 设置 发行机构所属行业二级分类
+     *
      * @param issuerinstitutionssecond 发行机构所属行业二级分类
      */
     public void setIssuerinstitutionssecond(String issuerinstitutionssecond) {
         this.issuerinstitutionssecond = issuerinstitutionssecond;
     }
+
     // 20200819 龙江银行修改-查询债券接口信息表增加查询字段 wangwei end
-	public String getIsPpb() {
-		return isPpb;
-	}
+    public String getIsPpb() {
+        return isPpb;
+    }
 
-	public void setIsPpb(String isPpb) {
-		this.isPpb = isPpb;
-	}
+    public void setIsPpb(String isPpb) {
+        this.isPpb = isPpb;
+    }
 
-	public String getIsNetprice() {
-		return isNetprice;
-	}
+    public String getIsNetprice() {
+        return isNetprice;
+    }
 
-	public void setIsNetprice(String isNetprice) {
-		this.isNetprice = isNetprice;
-	}
+    public void setIsNetprice(String isNetprice) {
+        this.isNetprice = isNetprice;
+    }
 
-	public String getConFinprodId() {
-		return conFinprodId;
-	}
+    public String getConFinprodId() {
+        return conFinprodId;
+    }
 
-	public void setConFinprodId(String conFinprodId) {
-		this.conFinprodId = conFinprodId;
-	}
+    public void setConFinprodId(String conFinprodId) {
+        this.conFinprodId = conFinprodId;
+    }
 
-	public String getConShareId() {
-		return conShareId;
-	}
+    public String getConShareId() {
+        return conShareId;
+    }
 
-	public void setConShareId(String conShareId) {
-		this.conShareId = conShareId;
-	}
+    public void setConShareId(String conShareId) {
+        this.conShareId = conShareId;
+    }
 
-	public Date getConVdate() {
-		return conVdate;
-	}
+    public Date getConVdate() {
+        return conVdate;
+    }
 
-	public void setConVdate(Date conVdate) {
-		this.conVdate = conVdate;
-	}
+    public void setConVdate(Date conVdate) {
+        this.conVdate = conVdate;
+    }
 
-	public BigDecimal getConPrice() {
-		return conPrice;
-	}
+    public BigDecimal getConPrice() {
+        return conPrice;
+    }
 
-	public void setConPrice(BigDecimal conPrice) {
-		this.conPrice = conPrice;
-	}
+    public void setConPrice(BigDecimal conPrice) {
+        this.conPrice = conPrice;
+    }
 
-	public BigDecimal getResalePrice() {
-		return resalePrice;
-	}
+    public BigDecimal getResalePrice() {
+        return resalePrice;
+    }
 
-	public void setResalePrice(BigDecimal resalePrice) {
-		this.resalePrice = resalePrice;
-	}
+    public void setResalePrice(BigDecimal resalePrice) {
+        this.resalePrice = resalePrice;
+    }
 
-	public BigDecimal getRedeemPrice() {
-		return redeemPrice;
-	}
+    public BigDecimal getRedeemPrice() {
+        return redeemPrice;
+    }
 
-	public void setRedeemPrice(BigDecimal redeemPrice) {
-		this.redeemPrice = redeemPrice;
-	}
+    public void setRedeemPrice(BigDecimal redeemPrice) {
+        this.redeemPrice = redeemPrice;
+    }
+
+    public Date getDelistingDate() {
+        return delistingDate;
+    }
+
+    public void setDelistingDate(Date delistingDate) {
+        this.delistingDate = delistingDate;
+    }
+
+    public String getIsGreenBond() {
+        return isGreenBond;
+    }
+
+    public void setIsGreenBond(String isGreenBond) {
+        this.isGreenBond = isGreenBond;
+    }
+
+    public String getCrossMarketCode() {
+        return crossMarketCode;
+    }
+
+    public void setCrossMarketCode(String crossMarketCode) {
+        this.crossMarketCode = crossMarketCode;
+    }
+
+    public BigDecimal getBaseRateAccuracy() {
+        return baseRateAccuracy;
+    }
+
+    public void setBaseRateAccuracy(BigDecimal baseRateAccuracy) {
+        this.baseRateAccuracy = baseRateAccuracy;
+    }
+
+    public Date getFirstRateDeterminationDate() {
+        return firstRateDeterminationDate;
+    }
+
+    public void setFirstRateDeterminationDate(Date firstRateDeterminationDate) {
+        this.firstRateDeterminationDate = firstRateDeterminationDate;
+    }
 }

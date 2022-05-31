@@ -1975,7 +1975,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
 	结算方式_头寸引擎_RTGS(DictCode.结算方式_头寸引擎, "02", "RTGS"),
 	结算方式_头寸引擎_逐笔全额结算(DictCode.结算方式_头寸引擎, "03", "逐笔全额结算"),
 
-    共通业务类型_场内债券现券指令(DictCode.共通业务类型, "ETR54", "场内债券现券指令"),
+    共通业务类型_场内债券现券指令(DictCode.共通业务类型, "ETR54", "场内债券指令"),
     共通业务类型_信用保护凭证指令(DictCode.共通业务类型, "ETR56", "信用保护凭证指令"),
     共通业务类型_场内通用质押式回购指令(DictCode.共通业务类型, "ETR55", "场内通用质押式回购指令"),
     计价方式_净价(DictCode.计价方式, "01", "净价"),

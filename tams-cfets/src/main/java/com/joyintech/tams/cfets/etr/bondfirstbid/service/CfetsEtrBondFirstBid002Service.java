@@ -303,9 +303,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      */
     private void sendPositionMethod(CfetsEtrBondFirstBid002Dto dto, boolean isSubmit, String confirmOk) {
 
-        List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
-
         for (CfetsEtrBondFirstBid002Dto entity : dto.getEtrInvestBondFirstBidDtos()) {
+            List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
             for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {
                 //调用头寸
                 CfetsBondPortfolioCashRequest posport = new CfetsBondPortfolioCashRequest();

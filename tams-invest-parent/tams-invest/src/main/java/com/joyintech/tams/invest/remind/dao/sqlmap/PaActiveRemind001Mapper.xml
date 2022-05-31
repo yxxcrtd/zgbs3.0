@@ -3631,7 +3631,7 @@ select #{R7S1} as remType,
 			WHERE
 			    PTL_SEC_POSITION_RULE.CDATE =  #{quaryDate}
 			AND STL_SEC_ACCT_INFO.TRADE_PLACE = #{tradePlace}
-			and ptl_sec_position_rule.hoding_type = 'A_001'
+			and ptl_sec_position_rule.hoding_type = 'A_064'
 			and ptl_sec_position_rule.date_type = '0'
 			and PTL_SEC_POSITION_RULE.PORTFOLIO_ID = #{portfolioId}
 			AND FIN_STDSEC_CONVERSE_RADIO.MDATE >= #{quaryDate}

@@ -447,6 +447,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         //缴款方式
         dto.setPayType(this.getPayType(dto.getBiddingMethod()));
         BigDecimal bidPriceTotal = BigDecimal.ZERO;
+        BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
         BigDecimal maxBidPrice = null;
         BigDecimal minBidPrice = null;
         String tenderTarget = dto.getTenderTarget();
@@ -454,6 +455,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 【券面总额】根据剩余指令额度默认带出，可修改
             productDto.setBidPriceTotal(productDto.getAvaNum());
             bidPriceTotal = ArithmeticUtil.doAdd(bidPriceTotal, productDto.getBidPriceTotal());
+            if (!StringUtil.isNotEmpty(productDto.getEtrBidPriceTotal())) {
+                productDto.setEtrBidPriceTotal(productDto.getAvaNum());
+            }
+            etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, productDto.getEtrBidPriceTotal());
             if (!StringUtil.isNotEmpty(maxBidPrice)) {
                 maxBidPrice = productDto.getBidPrice();
             }
@@ -479,6 +484,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         //券面总额
         dto.setBidPriceTotal(bidPriceTotal);
+        dto.setEtrBidPriceTotal(etrBidPriceTotal);
         // 净价
         dto.setPrice(this.calPrice(dto));
         dto.setProductDtos(list);
