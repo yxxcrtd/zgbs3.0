@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper
-        namespace="com.joyintech.service.trade.entrustmsgbymq.dao.EntrustMsgbyMQMapper">
-    
-     <select id="queryById" resultType="java.lang.String">
-		select 
+		namespace="com.joyintech.service.trade.entrustmsgbymq.dao.EntrustMsgbyMQMapper">
+
+	<select id="queryById" resultType="java.lang.String">
+		select
 			t.TYPE_8 as type8 /* 投管资产大类 */
 		from FIN_PRODUCT_TYPE t
 		where t.FINPROD_ID = #{finprodId}
-			and t.BRANCH = #{branch}
-    </select>
+		  and t.BRANCH = #{branch}
+	</select>
 
-     <!-- 根据金融产品代码和分支查询二级资产类型 -->
-     <select id="queryType6ById" resultType="java.lang.String">
-		select 
+	<!-- 根据金融产品代码和分支查询二级资产类型 -->
+	<select id="queryType6ById" resultType="java.lang.String">
+		select
 			t.TYPE_6 as type6 /* 投管资产二级类型 */
 		from FIN_PRODUCT_TYPE t
 		where t.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
-			and t.BRANCH = #{branch,jdbcType=VARCHAR}
-    </select>
-    <!-- 根据资金账户账号查询证券账户账号 -->
-     <select id="querySecAcctIdByAcctId" resultType="java.lang.String">
-		select t.sec_acct_id as secAcctId 
-		from STL_SEC_ACCT_INFO t 
+		  and t.BRANCH = #{branch,jdbcType=VARCHAR}
+	</select>
+	<!-- 根据资金账户账号查询证券账户账号 -->
+	<select id="querySecAcctIdByAcctId" resultType="java.lang.String">
+		select t.sec_acct_id as secAcctId
+		from STL_SEC_ACCT_INFO t
 		where t.trd_acct_id = #{acctNo,jdbcType=VARCHAR}
-    </select>
-    
-     <select id="queryByAcctNo" resultType="java.lang.String">
-	  SELECT v.SEC_ACCT_ID AS secAcctId
-        FROM PTL_CAPACCT_INFO t
-        LEFT JOIN STL_SEC_ACCT_INFO v ON t.ACCT_NO = v.TRD_ACCT_ID 
-	    LEFT JOIN STL_CAPACCT_INFO R ON T.ACCT_NO = R.ACCT_NO
-        AND T.CCY = R.CCY 
-        LEFT JOIN PTL_SEC_ACCT PSA
-        ON v.SEC_ACCT_ID = PSA.ACCT_NO
-        WHERE t.PORTFOLIO_ID = #{portfolioId}
-	    AND v.TRADE_PLACE = #{tradeMarket}
-	    AND t.ACCT_NO = #{acctNo}
-	    AND PSA.PORTFOLIO_ID = #{portfolioId}
-      ORDER BY t.ACCT_NO
-    </select>
-    
-     <select id="queryAssetType1" resultType="java.lang.String">
-		select 
+	</select>
+
+	<select id="queryByAcctNo" resultType="java.lang.String">
+		SELECT v.SEC_ACCT_ID AS secAcctId
+		FROM PTL_CAPACCT_INFO t
+				 LEFT JOIN STL_SEC_ACCT_INFO v ON t.ACCT_NO = v.TRD_ACCT_ID
+				 LEFT JOIN STL_CAPACCT_INFO R ON T.ACCT_NO = R.ACCT_NO
+			AND T.CCY = R.CCY
+				 LEFT JOIN PTL_SEC_ACCT PSA
+						   ON v.SEC_ACCT_ID = PSA.ACCT_NO
+		WHERE t.PORTFOLIO_ID = #{portfolioId}
+		  AND v.TRADE_PLACE = #{tradeMarket}
+		  AND t.ACCT_NO = #{acctNo}
+		  AND PSA.PORTFOLIO_ID = #{portfolioId}
+		ORDER BY t.ACCT_NO
+	</select>
+
+	<select id="queryAssetType1" resultType="java.lang.String">
+		select
 			eea.ASSET_TYPE1 as assetType1   /*回购类型*/
 		from ETR_ENTRUST_ADD eea
 		where eea.ENTRUST_ID = #{entrustId}
-    </select>
-    
-     <select id="queryTradeId" resultType="java.lang.String">
-		select 
+	</select>
+
+	<select id="queryTradeId" resultType="java.lang.String">
+		select
 			ed.TRADER as tradeId   /*交易员*/
 		from ETR_DISTRIBUTE ed
 		where ed.ENTRUST_ID = #{entrustId}
-    </select>
-    
-   <select id="queryEtrEntrust" resultType="com.joyintech.tams.common.base.entity.EtrEntrust">
-   		SELECT 
-	        A.ENTRUST_ID as entrustId,   /*委托代码*/
-	        A.FINPROD_ID as finprodId,   /*金融产品代码*/
-	        A.INV_AIM as invAim,   /*投资目的*/
+	</select>
+
+	<select id="queryEtrEntrust" resultType="com.joyintech.tams.common.base.entity.EtrEntrust">
+		SELECT
+			A.ENTRUST_ID as entrustId,   /*委托代码*/
+			A.FINPROD_ID as finprodId,   /*金融产品代码*/
+			A.INV_AIM as invAim,   /*投资目的*/
 			A.BUSINESS_MODEL as businessModel,   /*业务模式*/
-	        A.COUNTER_ID as counterId,   /*交易对手*/
-	        A.ENTRUST_NUM * 100  entrustNum   /*券面总额*/
-	    FROM  ETR_ENTRUST A
-	    WHERE A.ENTRUST_ID = #{entrustId}
-   </select>
+			A.COUNTER_ID as counterId,   /*交易对手*/
+			A.ENTRUST_NUM * 100  entrustNum   /*券面总额*/
+		FROM  ETR_ENTRUST A
+		WHERE A.ENTRUST_ID = #{entrustId}
+	</select>
 
 	<select id="queryEtrEntrustAdd" resultType="com.joyintech.tams.common.base.entity.EtrEntrustAdd">
 		select
@@ -74,26 +74,26 @@
 		WHERE ENTRUST_ID = #{entrustId}
 	</select>
 
-     <select id="queryTargetType" resultType="java.lang.String">
+	<select id="queryTargetType" resultType="java.lang.String">
 		select eea.target_type as targetType /*目标类型*/
-          from ETR_ENTRUST_ADD eea
-         where eea.ENTRUST_ID = #{entrustId}
-    </select>
+		from ETR_ENTRUST_ADD eea
+		where eea.ENTRUST_ID = #{entrustId}
+	</select>
 
 	<select id="queryEntrustNumAndAmt" resultType="com.joyintech.tams.common.base.entity.EtrEntrust">
-   		SELECT
-	        A.ENTRUST_ID as entrustId,   /*委托代码*/
-	        A.FINPROD_ID as finprodId,   /*金融产品代码*/
-	        A.ENTRUST_NUM as entrustNum , /*券面总额*/
-            A.ENTRUST_AMT as entrustAmt,/*委托额度，交易金额*/
-            A.PS as ps /**交易方向*/
-	    FROM  ETR_ENTRUST A
-	    WHERE A.ENTRUST_ID = #{entrustId}
-   </select>
+		SELECT
+			A.ENTRUST_ID as entrustId,   /*委托代码*/
+			A.FINPROD_ID as finprodId,   /*金融产品代码*/
+			A.ENTRUST_NUM as entrustNum , /*券面总额*/
+			A.ENTRUST_AMT as entrustAmt,/*委托额度，交易金额*/
+			A.PS as ps /**交易方向*/
+		FROM  ETR_ENTRUST A
+		WHERE A.ENTRUST_ID = #{entrustId}
+	</select>
 
 	<update id="updateEntrustStatu" parameterType="com.joyintech.tams.common.base.entity.EtrEntrust" >
 		update ETR_ENTRUST set ENTRUST_STATUS = #{entrustStatus,jdbcType=VARCHAR}
-		      where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+		where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
 	</update>
 
 	<select id="queryConverseRadio" parameterType="map" resultType="BigDecimal">
@@ -101,49 +101,49 @@
 			NVL(FSCR.SCALE, 0)
 		from FIN_STDSEC_CONVERSE_RADIO FSCR
 		where FSCR.FINPROD_ID = #{finprodId, jdbcType=VARCHAR}
-		AND FSCR.BRANCH = '0'
-		AND FSCR.VDATE  &lt;= #{vdate, jdbcType=DATE}
-		AND NOT EXISTS (SELECT 1
-			FROM FIN_STDSEC_CONVERSE_RADIO FSCRINNER
-			WHERE FSCRINNER.FINPROD_ID = FSCR.FINPROD_ID
-			AND FSCRINNER.BRANCH ='0'
-			AND FSCRINNER.VDATE &lt;= #{vdate, jdbcType=DATE}
-			AND FSCRINNER.VDATE > FSCR.VDATE
-		)
-    </select>
+		  AND FSCR.BRANCH = '0'
+		  AND FSCR.VDATE  &lt;= #{vdate, jdbcType=DATE}
+		  AND NOT EXISTS (SELECT 1
+						  FROM FIN_STDSEC_CONVERSE_RADIO FSCRINNER
+						  WHERE FSCRINNER.FINPROD_ID = FSCR.FINPROD_ID
+							AND FSCRINNER.BRANCH ='0'
+							AND FSCRINNER.VDATE &lt;= #{vdate, jdbcType=DATE}
+							AND FSCRINNER.VDATE > FSCR.VDATE
+			)
+	</select>
 
-    
- <!-- 组合资产当日开平仓 -->
-   <select id="getOpenClosePosition" resultType="map">	
-	select tptd.unit_cprice as unitCprice, tptd.share_amt as shareAmt
-  from TRD_PRODUCT_TEMP_DEAL tptd
- inner join TRD_PRODUCT_TEMP_DEAL_ADD tptda
-    on tptd.trade_id = tptda.trade_id
- where tptda.portfolio_id = #{portfolioId}
-   and tptd.finprod_id = #{finprodId}
-   and tptd.ps = #{ps}
-   and tptd.trade_date = #{tradeDate,jdbcType=DATE}
-   order by tptd.create_time
-   </select>  
-   
+
+	<!-- 组合资产当日开平仓 -->
+	<select id="getOpenClosePosition" resultType="map">
+		select tptd.unit_cprice as unitCprice, tptd.share_amt as shareAmt
+		from TRD_PRODUCT_TEMP_DEAL tptd
+				 inner join TRD_PRODUCT_TEMP_DEAL_ADD tptda
+							on tptd.trade_id = tptda.trade_id
+		where tptda.portfolio_id = #{portfolioId}
+		  and tptd.finprod_id = #{finprodId}
+		  and tptd.ps = #{ps}
+		  and tptd.trade_date = #{tradeDate,jdbcType=DATE}
+		order by tptd.create_time
+	</select>
+
 	<select id="queryContractMultiplier" resultType="java.math.BigDecimal">
-	select fpa.contract_multiplier
-	  from FIN_PRODUCT_ADD fpa
-	 where fpa.finprod_id = #{finprodId}
-	 </select>
+		select fpa.contract_multiplier
+		from FIN_PRODUCT_ADD fpa
+		where fpa.finprod_id = #{finprodId}
+	</select>
 
 	<select id="getFinDealPledgeList" resultType="com.joyintech.tams.common.base.entity.FinDealPledge">
-    select
+		select
 		<include refid="com.joyintech.tams.common.base.dao.FinDealPledgeMapper.Base_Column_List" />
-      from fin_deal_pledge t1
-     where t1.finprod_id = #{vTradeId}
-       and t1.branch = #{branch}
- 	</select>
+		from fin_deal_pledge t1
+		where t1.finprod_id = #{vTradeId}
+		and t1.branch = #{branch}
+	</select>
 
 	<delete id="deleteFinDealPledge" parameterType="java.util.Map">
 		delete from fin_deal_pledge t1
-		 where t1.finprod_id = #{finprodId}
-		   and t1.branch = #{branch}
+		where t1.finprod_id = #{finprodId}
+		  and t1.branch = #{branch}
 	</delete>
 	<update id="updateTrdProductTempDeal">
 		UPDATE TRD_PRODUCT_TEMP_DEAL T SET T.MDATE = #{mdate,jdbcType=DATE},T.UNIT_CPRICE = #{unitCprice} WHERE T.FINPROD_ID = #{finprodId} AND T.TRADE_MARKET = '04' AND T.PS IN ('03','04')
@@ -151,28 +151,28 @@
 	<update id="updateTrdProductDeal">
 		UPDATE TRD_PRODUCT_DEAL T SET T.MDATE = #{mdate,jdbcType=DATE},T.UNIT_CPRICE = #{unitCprice} WHERE T.FINPROD_ID = #{finprodId} AND T.TRADE_MARKET = '04' AND T.PS IN ('03','04')
 	</update>
-	
+
 	<resultMap id="FinDealPledgeBaseResultMap" type="com.joyintech.tams.common.base.entity.FinDealPledge" >
-        <id column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
-        <id column="BRANCH" property="branch" jdbcType="DECIMAL" />
-        <id column="PLEDGE_FINPROD_ID" property="pledgeFinprodId" jdbcType="VARCHAR" />
-        <result column="PLEDGE_FACE_VALUE" property="pledgeFaceValue" jdbcType="DECIMAL" />
-        <result column="PLEDGE_NUMBER" property="pledgeNumber" jdbcType="DECIMAL" />
-        <result column="PLEDGE_RATIO" property="pledgeRatio" jdbcType="DECIMAL" />
-        <result column="PLEDGE_AMT" property="pledgeAmt" jdbcType="DECIMAL" />
-        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
-        <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
-        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
-        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
-        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
-    </resultMap>
+		<id column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+		<id column="BRANCH" property="branch" jdbcType="DECIMAL" />
+		<id column="PLEDGE_FINPROD_ID" property="pledgeFinprodId" jdbcType="VARCHAR" />
+		<result column="PLEDGE_FACE_VALUE" property="pledgeFaceValue" jdbcType="DECIMAL" />
+		<result column="PLEDGE_NUMBER" property="pledgeNumber" jdbcType="DECIMAL" />
+		<result column="PLEDGE_RATIO" property="pledgeRatio" jdbcType="DECIMAL" />
+		<result column="PLEDGE_AMT" property="pledgeAmt" jdbcType="DECIMAL" />
+		<result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
+		<result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
 	<select id="selectFinDealPledgeByPrimaryKey" resultMap="FinDealPledgeBaseResultMap" parameterType="com.joyintech.tams.common.base.entity.FinDealPledgeKey" >
-        select 
-        <include refid="com.joyintech.tams.common.base.dao.FinDealPledgeMapper.Base_Column_List" />
-        from FIN_DEAL_PLEDGE
-        where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
-          and BRANCH = #{branch,jdbcType=DECIMAL}
-    </select>
+		select
+		<include refid="com.joyintech.tams.common.base.dao.FinDealPledgeMapper.Base_Column_List" />
+		from FIN_DEAL_PLEDGE
+		where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+		and BRANCH = #{branch,jdbcType=DECIMAL}
+	</select>
 
 	<select id="selectFinProductOthCode" resultType="com.joyintech.tams.common.base.entity.FinProductOthCode">
 		SELECT
@@ -191,12 +191,33 @@
 	<select id="selectPledgeId" resultType="string">
 		select FINPROD_ID from INF_CONTRACT_DETAILFILE where DEAL_NO=#{getvTradeId}
 	</select>
+	<select id="queryCounterTradeId" resultType="java.lang.String">
+		select COUNTER_TRADER
+		from ETR_ENTRUST
+		where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+	</select>
+	<select id="getOriFinDealPledgeList" resultType="com.joyintech.tams.common.base.pojo.OriPledgeInfo">
+		SELECT F2.PLEDGE_FINPROD_ID                    pledgeFinprodId,
+			   F2.PLEDGE_NUMBER                        pledgeNumber,
+			   F2.PLEDGE_NUMBER * 100                  pledgeTradeAmt,
+			   F2.PLEDGE_RATIO                         pledgeRatio,
+			   F2.PLEDGE_NUMBER * F2.PLEDGE_FACE_VALUE pledgeFaceValue,
+			   F.PRIN                                  prin,
+			   F.FINPROD_ID                            finprodId
+		FROM FIN_TRADE_PRODUCT F
+				 LEFT JOIN FIN_DEAL_PLEDGE F2 ON F.FINPROD_ID = F2.FINPROD_ID AND F2.BRANCH = F.BRANCH
+				 LEFT JOIN FIN_PRODUCT_TYPE F3
+						   ON F3.FINPROD_ID = F.FINPROD_ID AND F3.BRANCH = F.BRANCH AND F3.TYPE_6 = 'H01' AND
+							  F3.TYPE_7 = '03'
+		WHERE F.FINPROD_ID = #{tradeId,jdbcType=VARCHAR}
+		  AND F.BRANCH = 0
+	</select>
 
-<!--	<select id="getTrdProductDealByFTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">-->
-<!--		select-->
-<!--		<include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Base_Column_List" />-->
-<!--		from TRD_PRODUCT_DEAL-->
-<!--		where F_TRADE_ID = #{fTradeId,jdbcType=VARCHAR}-->
-<!--	</select>-->
+	<!--	<select id="getTrdProductDealByFTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">-->
+	<!--		select-->
+	<!--		<include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Base_Column_List" />-->
+	<!--		from TRD_PRODUCT_DEAL-->
+	<!--		where F_TRADE_ID = #{fTradeId,jdbcType=VARCHAR}-->
+	<!--	</select>-->
 
 </mapper>

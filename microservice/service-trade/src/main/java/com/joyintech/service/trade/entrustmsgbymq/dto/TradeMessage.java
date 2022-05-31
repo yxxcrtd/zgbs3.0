@@ -1,5 +1,7 @@
 package com.joyintech.service.trade.entrustmsgbymq.dto;
 
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,7 +27,7 @@ public class TradeMessage implements Cloneable, Serializable {
     private String tradingDay;      // 交易日
     private String valueDate;       // 首期结算日
     private String maturityDate;    // 到期结算日
-	private String ccy;             //币种
+    private String ccy;             //币种
     private String settleDay; //交收日
     private String busiType; //业务类别
     private BigDecimal dealMargin;      //交易保证金
@@ -36,6 +38,19 @@ public class TradeMessage implements Cloneable, Serializable {
      * 下单组合明细数据消息
      */
     private List<PortfolioTradeMessage> portfolioTradeMessages;
+
+    /**
+     * 质押券列表
+     */
+    private List<PledgeListDto> pledgeList;
+
+    public List<PledgeListDto> getPledgeList() {
+        return pledgeList;
+    }
+
+    public void setPledgeList(List<PledgeListDto> pledgeList) {
+        this.pledgeList = pledgeList;
+    }
 
     public List<PortfolioTradeMessage> getPortfolioTradeMessages() {
         return portfolioTradeMessages;
@@ -204,7 +219,7 @@ public class TradeMessage implements Cloneable, Serializable {
     public void setMaturityDate(String maturityDate) {
         this.maturityDate = maturityDate;
     }
-	
+
     public String getCcy() {
         return ccy;
     }
@@ -228,14 +243,14 @@ public class TradeMessage implements Cloneable, Serializable {
     public void setBusiType(String busiType) {
         this.busiType = busiType;
     }
-    
-    public BigDecimal getDealMargin() {
-		return dealMargin;
-	}
 
-	public void setDealMargin(BigDecimal dealMargin) {
-		this.dealMargin = dealMargin;
-	}
+    public BigDecimal getDealMargin() {
+        return dealMargin;
+    }
+
+    public void setDealMargin(BigDecimal dealMargin) {
+        this.dealMargin = dealMargin;
+    }
 
     public BigDecimal getPledgeRatio() {
         return pledgeRatio;

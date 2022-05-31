@@ -9,13 +9,11 @@ import com.joyintech.service.trade.entrustmsgbymq.dao.EntrustMsgbyMQMapper;
 import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.pojo.OriPledgeInfo;
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
 import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPositionInfoService;
@@ -34,14 +32,13 @@ import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.position.dto.EtrEntrustAddDto;
 import com.joyintech.tams.invest.common.position.dto.FinTradeProductDto;
 import com.joyintech.tams.invest.common.position.dto.PositionBaseData;
-import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +59,7 @@ import java.util.*;
  */
 @Service
 public class TradePreClearingService extends BaseService<InfContractDetailfile>{
-    
+
     private static final Logger logger = LoggerFactory.getLogger(TradePreClearingService.class);
 
     /**
@@ -173,14 +170,14 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
      */
     @Autowired(required = false)
     private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
-    
+
     /**
      * 组合可用持仓和实际持仓查询更新
      */
     @Autowired(required = false)
     private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
 
-    
+
     @Autowired(required = false)
     private BaseEtrInvestInfoService baseEtrInvestInfoService;
 
@@ -193,7 +190,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
     @Autowired
     private FinPledgeDispDetailTempMapper finPledgeDispDetailTempMapper;
 
-	@Autowired
+    @Autowired
     private PositionRequestTradeReportService positionRequestTradeReportService;
 
     @Autowired
@@ -263,10 +260,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 || DictCodeListExt3.交易方向_质押券出库.getValue().equals(infContractDetailfile.getPs())) {
             //标准券入出库成交数据接入：
             logger.info("【成交数据预清算-标准券入出库开始】tradePreClearing entrustId: {}, seqno: {}",
-                infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                    infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
             trdStaSec(trdTempDto, infContractDetailfile);
             logger.info("【成交数据预清算-标准券入出库结束】tradePreClearing entrustId: {}, seqno: {}",
-                infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                    infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
         } else {
             String type8 = "";
             if (infContractDetailfile.getFinprodId() != null) {
@@ -274,41 +271,45 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             }
 
             logger.info("【成交数据预清算】tradePreClearing entrustId: {}, seqno: {}, type8: {}",
-                infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno(), type8);
+                    infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno(), type8);
 
             if (DictCodeList.平安资产类型_基金.getValue().equals(type8)) {
                 logger.info("【成交数据预清算-基金开始】tradePreClearing entrustId: {}, seqno: {}",
-                    infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                 fundTradePreClearingService.trdFund(trdTempDto, infContractDetailfile);
                 logger.info("【成交数据预清算-基金结束】tradePreClearing entrustId: {}, seqno: {}",
-                    infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
             } else {
+                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infContractDetailfile.getEntrustId());
                 // TrdTempDto trdTempDto = null;
                 if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())
                         || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {
                     logger.info("【成交数据预清算dto拼装-回购开始】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
                     // 指令信息处理
                     this.buildPositionBaseData(trdTempDto, infContractDetailfile);
                     // 临时交易及其他数据处理
                     this.trdRepo(trdTempDto, infContractDetailfile,infContractDetailfile.getPs());
                     logger.info("【成交数据预清算dto拼装-回购结束】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                 }
                 else if (DictCodeListExt3.交易方向_提前购回.getValue().equals(infContractDetailfile.getPs())
                         || DictCodeListExt3.交易方向_到期购回.getValue().equals(infContractDetailfile.getPs())
                         || DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())
-                        || DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())) {
+                        || (DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())
+                        && DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrEntrust.getEntrustType()))
+                        || (DictCodeListStl.交易方向_换券.getValue().equals(infContractDetailfile.getPs())
+                        && DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrEntrust.getEntrustType()))) {
                     logger.info("【成交数据预清算dto拼装-协议回购开始】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
-
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                    //todo 1
                     // 首期信息、指令信息处理
                     this.buildPositionBaseData(trdTempDto, infContractDetailfile);
                     // 临时交易及其他数据处理
                     this.trdRepoPeriod(trdTempDto, infContractDetailfile);
                     logger.info("【成交数据预清算dto拼装-协议回购结束】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                 }
                 else if (DictCodeListExt3.交易方向_到期续做.getValue().equals(infContractDetailfile.getPs())){
                     logger.info("【成交数据预清算dto拼装-协议回购-到期续作开始】tradePreClearing entrustId: {}, seqno: {}",
@@ -323,28 +324,28 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 }
                 else if (DictCodeListExt2.平安资产类型_股票.getValue().equals(type8)) {
                     logger.info("【成交数据预清算dto拼装-股票开始】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
                     this.trdStock(trdTempDto, infContractDetailfile);
 
                     logger.info("【成交数据预清算dto拼装-股票结束】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                 } else if (DictCodeList.平安资产类型_债券.getValue().equals(type8)) {
                     logger.info("【成交数据预清算dto拼装-债券开始】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
                     this.trdBond(trdTempDto, infContractDetailfile);
 
                     logger.info("【成交数据预清算dto拼装-债券结束】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                 }else if (DictCodeListExt3.平安资产类型_期货.getValue().equals(type8)) {
                     logger.info("【成交数据预清算处理-期货开始】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
                     this.trdFuture(trdTempDto, infContractDetailfile);
 
                     logger.info("【成交数据预清算处理-期货结束】tradePreClearing entrustId: {}, seqno: {}",
-                        infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                 }
                 if (trdTempDto != null) {
                     logger.debug("【成交数据预清算数据】trdTempDto: {}, infContractDetailfile: {}", JSON.toJSONString(trdTempDto),
@@ -353,23 +354,23 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                     if(StringUtil.isNotEmpty(infContractDetailfile.getSettleDay())
                             && StringUtil.isNotEmpty(infContractDetailfile.getBusiType())){
                         logger.info("【成交数据预清算手工交收处理-开始】tradePreClearing entrustId: {}, seqno: {}",
-                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                                infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
                         trdTempDto.setIsManualSettle("Y");
                         this.saveSettleInfo(infContractDetailfile,trdTempDto);
 
                         logger.info("【成交数据预清算手工交收处理-结束】tradePreClearing entrustId: {}, seqno: {}",
-                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                                infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                     }
                     // 手工交收判断 add by yufei 20201022 end
                     if(!DictCodeListExt3.平安资产类型_期货.getValue().equals(type8)){
                         logger.info("【成交数据预清算入库处理-开始】tradePreClearing entrustId: {}, seqno: {}",
-                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                                infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
-                    	this.tradePreClear(trdTempDto, infContractDetailfile);
+                        this.tradePreClear(trdTempDto, infContractDetailfile);
 
-                    	logger.info("【成交数据预清算入库处理-结束】tradePreClearing entrustId: {}, seqno: {}",
-                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                        logger.info("【成交数据预清算入库处理-结束】tradePreClearing entrustId: {}, seqno: {}",
+                                infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                     }
                 }
             }
@@ -809,24 +810,30 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         }
         // 质押式回购
         if ((DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(trdTempDto.getFinprodType2())
-            || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(trdTempDto.getFinprodType2()))
-            && trdTempDto.getFinTradeProduct() != null&& trdTempDto.getFinTradeProduct().getFinprodId() != null) {
+                || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(trdTempDto.getFinprodType2()))
+                && trdTempDto.getFinTradeProduct() != null&& trdTempDto.getFinTradeProduct().getFinprodId() != null) {
             // 写入交易类金融产品表
             finTradeProductMapper.insertSelective(trdTempDto.getFinTradeProduct());
             // 写入金融产品分类
             finProductTypeMapper.insertSelective(trdTempDto.getFinProductType());
             // 写入回购质押品表
-            if (DictCodeList.回购类型_质押式协议回购.getValue().equals(trdTempDto.getFinProductType().getType6())
-                && trdTempDto.getFinDealPledge().getPledgeFinprodId() != null) {
-                finDealPledgeMapper.insertSelective(trdTempDto.getFinDealPledge());
+            if (DictCodeList.回购类型_质押式协议回购.getValue().equals(trdTempDto.getFinProductType().getType6())) {
+                if(trdTempDto.getFinDealPledge().getPledgeFinprodId() != null) {
+                    finDealPledgeMapper.insertSelective(trdTempDto.getFinDealPledge());
+                }
+            }
+            if(!CollectionUtils.isEmpty(trdTempDto.getFinDealPledgeList())){
+                for (FinDealPledge finDealPledge : trdTempDto.getFinDealPledgeList()) {
+                    finDealPledgeMapper.insertSelective(finDealPledge);
+                }
             }
         }
-
 
         //协议回购中途换券/解除质押
         if((DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(trdTempDto.getFinprodType2()) || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(trdTempDto.getFinprodType2()))
                 && (StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())
-                || StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue()))) {
+//                || StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
+                || DictCodeListStl.交易方向_换券.getValue().equals(infContractDetailfile.getPs()))) {
             //写入质押券置换临时表
             if(StringUtil.isNotEmpty(trdTempDto.getFinPledgeDispTemp())) {
                 finPledgeDispTempMapper.insertSelective(trdTempDto.getFinPledgeDispTemp());
@@ -899,31 +906,31 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         secMap.put("acctNo", infContractDetailfile.getAcctNo());
         secMap.put("portfolioId", infContractDetailfile.getPortfolioId());
         secMap.put("tradeMarket", infContractDetailfile.getTradeMarket());
-    	String secAcctId = entrustMsgbyMQMapper.queryByAcctNo(secMap);
-    	dto.setSecManageAcctId(secAcctId);
-    	// 随交易支付费用（本次不计算，为0）
-    	dto.setFeeAmtPay(BigDecimal.ZERO);
-    	// 总交易费用（本次不计算，为0）
-    	dto.setFeeAmt(BigDecimal.ZERO);
-    	// 交易金额（如果是买入：成交明细DTO.成交金额+随交易支付费用 如果是卖出：成交明细DTO.成交金额-随交易支付费用）
-    	if(DictCodeList.交易方向_买入.getValue().equals(infContractDetailfile.getPs())){
-    		dto.setTradeAmt(ArithmeticUtil.doAdd(infContractDetailfile.getTradeAmt(), dto.getFeeAmtPay()));
-    	}else if(DictCodeList.交易方向_卖出.getValue().equals(infContractDetailfile.getPs())){
-    		dto.setTradeAmt(ArithmeticUtil.subtract(infContractDetailfile.getTradeAmt(), dto.getFeeAmtPay()));
-    	}
-    	// add by etliu 20201212 SNSTZJY-2333 【金融产品交易临时交易表】交易所日间成交数据，股票、基金的全价总额没有登录
-    	dto.setFpriceAmt(dto.getTradeAmt());
+        String secAcctId = entrustMsgbyMQMapper.queryByAcctNo(secMap);
+        dto.setSecManageAcctId(secAcctId);
+        // 随交易支付费用（本次不计算，为0）
+        dto.setFeeAmtPay(BigDecimal.ZERO);
+        // 总交易费用（本次不计算，为0）
+        dto.setFeeAmt(BigDecimal.ZERO);
+        // 交易金额（如果是买入：成交明细DTO.成交金额+随交易支付费用 如果是卖出：成交明细DTO.成交金额-随交易支付费用）
+        if(DictCodeList.交易方向_买入.getValue().equals(infContractDetailfile.getPs())){
+            dto.setTradeAmt(ArithmeticUtil.doAdd(infContractDetailfile.getTradeAmt(), dto.getFeeAmtPay()));
+        }else if(DictCodeList.交易方向_卖出.getValue().equals(infContractDetailfile.getPs())){
+            dto.setTradeAmt(ArithmeticUtil.subtract(infContractDetailfile.getTradeAmt(), dto.getFeeAmtPay()));
+        }
+        // add by etliu 20201212 SNSTZJY-2333 【金融产品交易临时交易表】交易所日间成交数据，股票、基金的全价总额没有登录
+        dto.setFpriceAmt(dto.getTradeAmt());
 
-    	// 交易方式（根据成交明细DTO.交易平台判断，如果是竞价撮合平台，则为竞价交易。如果是上交所大宗交易平台、深交所大宗平台，则为大宗交易。）
-    	if(DictCodeList.交易平台_竞价撮合平台.getValue().equals(infContractDetailfile.getTradePlat())){
-    		dto.setDealMode(DictCodeListExt2.外汇交易模式_竞价交易.getValue());
-    	}else if(DictCodeList.交易平台_大宗交易平台.getValue().equals(infContractDetailfile.getTradePlat())){
-    		dto.setDealMode(DictCodeListExt2.外汇交易模式_大宗交易.getValue());
-    	}
-    	// 是否锁定 默认否
-    	dto.setWithLockPeriod(DictCodeListExt2.是否有锁定期_否.getValue());
-    	// 交易编号
-    	BussinessCodeParameter param = new BussinessCodeParameter();
+        // 交易方式（根据成交明细DTO.交易平台判断，如果是竞价撮合平台，则为竞价交易。如果是上交所大宗交易平台、深交所大宗平台，则为大宗交易。）
+        if(DictCodeList.交易平台_竞价撮合平台.getValue().equals(infContractDetailfile.getTradePlat())){
+            dto.setDealMode(DictCodeListExt2.外汇交易模式_竞价交易.getValue());
+        }else if(DictCodeList.交易平台_大宗交易平台.getValue().equals(infContractDetailfile.getTradePlat())){
+            dto.setDealMode(DictCodeListExt2.外汇交易模式_大宗交易.getValue());
+        }
+        // 是否锁定 默认否
+        dto.setWithLockPeriod(DictCodeListExt2.是否有锁定期_否.getValue());
+        // 交易编号
+        BussinessCodeParameter param = new BussinessCodeParameter();
         param.setCommonBusinessExtType(DictCodeListExt2.fromDictCodeList(DictCodeListExt2.共通业务类型_股票投资交易));
         dto.setTradeId(autoPeriodCommonService.buildBussinessCode(param));
 
@@ -1241,12 +1248,12 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         }
         logger.debug("[到期续作成交数据特殊处理开始],finProductId:{}, ps:{}", dto.getFinprodId(), ps);
         if(
-                // ZGTFCP-1143:修改判空逻辑 modify by fuyongsheng 20220317 start
-                // dto.getFinprodId() == null
+            // ZGTFCP-1143:修改判空逻辑 modify by fuyongsheng 20220317 start
+            // dto.getFinprodId() == null
                 StringUtil.isEmpty(dto.getFinprodId())
-                // ZGTFCP-1143:修改判空逻辑 modify by fuyongsheng 20220317 end
-                // GNS-955:到期续作登录finProdId有误 modify by fuyongsheng 20220224 start
-                || DictCodeListExt3.交易方向_到期续做.getValue().equals(ps)
+                        // ZGTFCP-1143:修改判空逻辑 modify by fuyongsheng 20220317 end
+                        // GNS-955:到期续作登录finProdId有误 modify by fuyongsheng 20220224 start
+                        || DictCodeListExt3.交易方向_到期续做.getValue().equals(ps)
             // GNS-955:到期续作登录finProdId有误 modify by fuyongsheng 20220224 end
         ){
             dto.setFinprodId(infContractDetailfile.getDealNo());
@@ -1438,32 +1445,52 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // 回购质押品Entity
         // 构造开始----------------------------------------------------------
         if(DictCodeList.回购类型_质押式协议回购.getValue().equals(assetType1)){
-            FinDealPledge finDealPledge = new FinDealPledge();
-
-//            EtrPledge etrPledge = new EtrPledge();
-//        	etrPledge.setEntrustId(infContractDetailfile.getEntrustId());
-//        	// 金融产品代码 = 交易类金融产品.金融产品代码
-//        	etrPledge.setFinprodId(infContractDetailfile.getFinprodId());
-//        	etrPledge = etrPledgeMapper.selectByPrimaryKey(etrPledge);
-//        	if(etrPledge != null){
-//        		BeanUtil.copyPropertiesIgnoreNull(finDealPledge, etrPledge);
-//        	}
-            finDealPledge.setFinprodId(finTradeProduct.getFinprodId());
-            // 分支序号
-            finDealPledge.setBranch(finTradeProduct.getBranch());
-            finDealPledge.setPledgeFinprodId(infContractDetailfile.getFinprodId());
-            BigDecimal faceValue = trdCommonBaseService.getFaceValue(infContractDetailfile.getFinprodId(), infContractDetailfile.getTradeDate());
-            finDealPledge.setPledgeFaceValue(faceValue);
-            finDealPledge.setPledgeNumber(infContractDetailfile.getShareAmt());
-            finDealPledge.setPledgeAmt(infContractDetailfile.getTradeAmt());
-            //如果成交信息中存在折算比例取成交信息中的，如果不存在就计算
-            if(StringUtil.isNotEmpty(infContractDetailfile.getScale())) {
-                finDealPledge.setPledgeRatio(infContractDetailfile.getScale());
+            //todo 2
+            if(DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(infContractDetailfile.getTradeMarket())){
+                FinDealPledge finDealPledge = new FinDealPledge();
+                finDealPledge.setFinprodId(finTradeProduct.getFinprodId());
+                // 分支序号
+                finDealPledge.setBranch(finTradeProduct.getBranch());
+                finDealPledge.setPledgeFinprodId(infContractDetailfile.getFinprodId());
+                BigDecimal faceValue = trdCommonBaseService.getFaceValue(infContractDetailfile.getFinprodId(), infContractDetailfile.getTradeDate());
+                finDealPledge.setPledgeFaceValue(faceValue);
+                finDealPledge.setPledgeNumber(infContractDetailfile.getShareAmt());
+                finDealPledge.setPledgeAmt(infContractDetailfile.getTradeAmt());
+                //如果成交信息中存在折算比例取成交信息中的，如果不存在就计算
+                if(StringUtil.isNotEmpty(infContractDetailfile.getScale())) {
+                    finDealPledge.setPledgeRatio(infContractDetailfile.getScale());
+                }
+                else if(infContractDetailfile.getShareAmt()!=null && faceValue!=null && infContractDetailfile.getTradeAmt()!=null){
+                    finDealPledge.setPledgeRatio(ArithmeticUtil.divide(infContractDetailfile.getTradeAmt(),ArithmeticUtil.multiply(faceValue,infContractDetailfile.getShareAmt()),4));
+                }
+                dto.setFinDealPledge(finDealPledge);
+            }else if(DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(infContractDetailfile.getTradeMarket())){
+                // todo2 IF 交易场所 = 深交所（协议回购，多条数据）
+                List<PledgeListDto> pledgeInfoList = infContractDetailfile.getPledgeList();
+                List<FinDealPledge> finDealPledgeList = new ArrayList<>();
+                dto.setFinDealPledgeList(finDealPledgeList);
+                if(!CollectionUtils.isEmpty(pledgeInfoList)){
+                    for (PledgeListDto pledgeInfo : pledgeInfoList) {
+                        FinDealPledge finDealPledge = new FinDealPledge();
+                        finDealPledge.setFinprodId(finTradeProduct.getFinprodId());
+                        // 分支序号
+                        finDealPledge.setBranch(finTradeProduct.getBranch());
+                        finDealPledge.setPledgeFinprodId(pledgeInfo.getFinprodMarketId());
+                        BigDecimal faceValue = trdCommonBaseService.getFaceValue(infContractDetailfile.getFinprodId(), infContractDetailfile.getTradeDate());
+                        finDealPledge.setPledgeFaceValue(faceValue);
+                        finDealPledge.setPledgeNumber(pledgeInfo.getPledgeNumber());
+                        finDealPledge.setPledgeAmt(infContractDetailfile.getTradeAmt());
+                        //如果成交信息中存在折算比例取成交信息中的，如果不存在就计算
+                        if(StringUtil.isNotEmpty(infContractDetailfile.getScale())) {
+                            finDealPledge.setPledgeRatio(infContractDetailfile.getScale());
+                        }
+                        else if(infContractDetailfile.getShareAmt()!=null && faceValue!=null && infContractDetailfile.getTradeAmt()!=null){
+                            finDealPledge.setPledgeRatio(ArithmeticUtil.divide(infContractDetailfile.getTradeAmt(),ArithmeticUtil.multiply(faceValue,infContractDetailfile.getShareAmt()),4));
+                        }
+                        finDealPledgeList.add(finDealPledge);
+                    }
+                }
             }
-            else if(infContractDetailfile.getShareAmt()!=null && faceValue!=null && infContractDetailfile.getTradeAmt()!=null){
-                finDealPledge.setPledgeRatio(ArithmeticUtil.divide(infContractDetailfile.getTradeAmt(),ArithmeticUtil.multiply(faceValue,infContractDetailfile.getShareAmt()),4));
-            }
-            dto.setFinDealPledge(finDealPledge);
         }else  if(finTradeProduct.getFinprodId() != null && infContractDetailfile.getFinprodMarketId() != null){
             FinDealPledge finDealPledge = new FinDealPledge();
             EtrPledge etrPledge = new EtrPledge();
@@ -1740,6 +1767,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
         BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, dto);
         trdProductTempDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
+        // 对手方交易员
+        String counterTrader = entrustMsgbyMQMapper.queryCounterTradeId(infContractDetailfile.getEntrustId());
+        trdProductTempDeal.setCounterTrader(counterTrader);
 
         dto.setTrdProductTempDeal(trdProductTempDeal);
         // 金融产品临时交易Entity
@@ -1788,16 +1818,21 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // 划款指令表Entity
         // 构造结束----------------------------------------------------------
         //交易方向为中途换券或者解除质押
+        // todo 3
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infContractDetailfile.getEntrustId());
         if(StringUtil.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())
-                || StringUtil.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())) {
+//                || StringUtil.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
+                || (DictCodeListStl.交易方向_换券.getValue().equals(infContractDetailfile.getPs())
+                && DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrEntrust.getEntrustType()))) {
             //生成质押券置换业务编号
             BussinessCodeParameter parameter = new BussinessCodeParameter();
             parameter.setCommonBusinessExtType(DictCodeListExt3.fromDictCodeList(DictCodeListExt3.共通业务类型_质押券置换));
             String bussinessCode = baseGetBusinessIdImpl.buildBussinessCode(parameter);
             //构造质押券置换DTO
             FinPledgeDispTemp finPledgeDispTemp = new FinPledgeDispTemp();
+            TrdProductDeal firstRepoTrade = trdCommonBaseService.getFirstRepoTrade(infContractDetailfile.getvTradeId(), null, secAcctId, infContractDetailfile.getVdate());
             finPledgeDispTemp.setTradeId(bussinessCode);
-            finPledgeDispTemp.setfTradeId(infContractDetailfile.getvTradeId());
+            finPledgeDispTemp.setfTradeId(firstRepoTrade == null ? "" : firstRepoTrade.getFinprodId());
             finPledgeDispTemp.setTradeDate(infContractDetailfile.getTradeDate());
             dto.setFinPledgeDispTemp(finPledgeDispTemp);
 
@@ -1827,23 +1862,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             // ZGTFCP-1882: 质押品表的tradeId有时登录的是交易编号 modify by fuyongsheng 20220325 end
             List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = new ArrayList<>();
             dto.setFinPledgeDispDetailTempList(finPledgeDispDetailTempList);
-            //换出券或者解除质押券
-            if(!StringUtil.isEmptyList(finDealPledgeList)) {
-                for(FinDealPledge pledge:finDealPledgeList ) {
-                    FinPledgeDispDetailTemp outputFinPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
-                    outputFinPledgeDispDetailTemp.setSeqNo(IDGenerator.generate());
-                    outputFinPledgeDispDetailTemp.setTradeId(finPledgeDispTemp.getTradeId());
-                    outputFinPledgeDispDetailTemp.setBranch(new BigDecimal(pledge.getBranch()));
-                    outputFinPledgeDispDetailTemp.setFinprodId(pledge.getPledgeFinprodId());
-                    outputFinPledgeDispDetailTemp.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
-                    outputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(pledge.getPledgeNumber());
-                    outputFinPledgeDispDetailTemp.setScale(pledge.getPledgeRatio());
-                    finPledgeDispDetailTempList.add(outputFinPledgeDispDetailTemp);
-                }
-            }
 
             //如果是中途换券，需要设置换入券
-            if(StringUtil.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())) {
+            if(StringUtil.equals(infContractDetailfile.getPs(), DictCodeListStl.交易方向_换券.getValue())) {
                 BigDecimal faceValue = trdCommonBaseService.getFaceValue(infContractDetailfile.getFinprodId(), infContractDetailfile.getTradeDate());
                 //如果成交信息中存在折算比例取成交信息中的，如果不存在就计算
                 BigDecimal scale = infContractDetailfile.getScale();
@@ -1852,33 +1873,98 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 }
 
 
-                FinPledgeDispDetailTemp inputFinPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
-                inputFinPledgeDispDetailTemp.setSeqNo(IDGenerator.generate());
-                inputFinPledgeDispDetailTemp.setTradeId(finPledgeDispTemp.getTradeId());
-                inputFinPledgeDispDetailTemp.setFinprodId(infContractDetailfile.getFinprodId());
-                inputFinPledgeDispDetailTemp.setBranch(BigDecimal.ZERO);
-                inputFinPledgeDispDetailTemp.setTradeType(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
-                inputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(infContractDetailfile.getShareAmt());
-                inputFinPledgeDispDetailTemp.setScale(scale);
-                finPledgeDispDetailTempList.add(inputFinPledgeDispDetailTemp);
+                if(!CollectionUtils.isEmpty(infContractDetailfile.getPledgeList())) {
+                    //首期质押品列表
+                    List<OriPledgeInfo> oriFinDealPledgeList = entrustMsgbyMQMapper.getOriFinDealPledgeList(finPledgeDispTemp.getfTradeId());
+                    //将首期质押品信息和当前换出券按照质押金融产品代码进行汇总，置换后质押品list
+                    List<OriPledgeInfo> replacePledgeList = new ArrayList<>();
+                    for (PledgeListDto pledgeListDto : infContractDetailfile.getPledgeList()) {
+                        FinPledgeDispDetailTemp inputFinPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
+                        inputFinPledgeDispDetailTemp.setSeqNo(IDGenerator.generate());
+                        inputFinPledgeDispDetailTemp.setTradeId(finPledgeDispTemp.getTradeId());
+                        inputFinPledgeDispDetailTemp.setFinprodId(infContractDetailfile.getFinprodId());
+                        inputFinPledgeDispDetailTemp.setBranch(BigDecimal.ZERO);
+                        inputFinPledgeDispDetailTemp.setTradeType(pledgeListDto.getDisplaceDir());
+                        inputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(pledgeListDto.getPledgeNumber());
+                        finPledgeDispDetailTempList.add(inputFinPledgeDispDetailTemp);
+
+                        for (OriPledgeInfo oriPledgeInfo : oriFinDealPledgeList) {
+                            if(StringUtil.equals(oriPledgeInfo.getPledgeFinprodId(),pledgeListDto.getFinprodMarketId())){
+                                OriPledgeInfo oriPledgeInfo1 = new OriPledgeInfo();
+                                BeanUtils.copyProperties(oriPledgeInfo,oriPledgeInfo1);
+                                oriPledgeInfo1.setPledgeNumber(oriPledgeInfo1.getPledgeNumber().add(StringUtil.equals(pledgeListDto.getDisplaceDir(),"01") ? pledgeListDto.getPledgeNumber() : pledgeListDto.getPledgeNumber().negate()));
+                                replacePledgeList.add(oriPledgeInfo1);
+                            }
+                        }
+                    }
+
+                    BigDecimal pledgeFaceAmt = BigDecimal.ZERO;
+
+                    List<FinDealPledge> finDealPledgeList2 = new ArrayList<>();
+                    dto.setFinDealPledgeList(finDealPledgeList2);
+
+                    for (OriPledgeInfo oriPledgeInfo : replacePledgeList) {
+                        BigDecimal faceValue1 = trdCommonBaseService.getFaceValue(oriPledgeInfo.getPledgeFinprodId(), infContractDetailfile.getTradeDate());
+                        pledgeFaceAmt = pledgeFaceAmt.add(oriPledgeInfo.getPledgeNumber());
+                        //构造回购质押品dto
+                        FinDealPledge finDealPledge = new FinDealPledge();
+                        finDealPledge.setFinprodId(infContractDetailfile.getvTradeId());
+                        finDealPledge.setBranch(0L);
+                        finDealPledge.setPledgeFinprodId(oriPledgeInfo.getPledgeFinprodId());
+                        finDealPledge.setPledgeNumber(oriPledgeInfo.getPledgeNumber());
+                        finDealPledge.setPledgeFaceValue(faceValue1);
+                        finDealPledgeList2.add(finDealPledge);
+                    }
+
+                    BigDecimal pledgeRatio = ArithmeticUtil.divide(oriFinDealPledgeList.get(0).getPrin(),pledgeFaceAmt,4);
+                    finDealPledgeList2.forEach(finDealPledge -> finDealPledge.setPledgeRatio(pledgeRatio));
+                }
 
                 //构造回购质押品dto
-                FinDealPledge finDealPledge = new FinDealPledge();
-                finDealPledge.setFinprodId(infContractDetailfile.getvTradeId());
-                finDealPledge.setBranch(0L);
-                finDealPledge.setPledgeFinprodId(infContractDetailfile.getFinprodId());
-                finDealPledge.setPledgeNumber(infContractDetailfile.getShareAmt());
-                finDealPledge.setPledgeRatio(scale);
-                finDealPledge.setPledgeFaceValue(faceValue);
-                finDealPledge.setPledgeAmt(infContractDetailfile.getTradeAmt());
-
-                dto.setFinDealPledge(finDealPledge);
+//                FinDealPledge finDealPledge = new FinDealPledge();
+//                finDealPledge.setFinprodId(infContractDetailfile.getvTradeId());
+//                finDealPledge.setBranch(0L);
+//                finDealPledge.setPledgeFinprodId(infContractDetailfile.getFinprodId());
+//                finDealPledge.setPledgeNumber(infContractDetailfile.getShareAmt());
+//                finDealPledge.setPledgeRatio(scale);
+//                finDealPledge.setPledgeFaceValue(faceValue);
+//                finDealPledge.setPledgeAmt(infContractDetailfile.getTradeAmt());
+//
+//                dto.setFinDealPledge(finDealPledge);
             }
 
-
+            //解除质押券
+            if(StringUtil.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
+//                if (!StringUtil.isEmptyList(finDealPledgeList)) {
+//                    for (FinDealPledge pledge : finDealPledgeList) {
+//                        FinPledgeDispDetailTemp outputFinPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
+//                        outputFinPledgeDispDetailTemp.setSeqNo(IDGenerator.generate());
+//                        outputFinPledgeDispDetailTemp.setTradeId(finPledgeDispTemp.getTradeId());
+//                        outputFinPledgeDispDetailTemp.setBranch(new BigDecimal(pledge.getBranch()));
+//                        outputFinPledgeDispDetailTemp.setFinprodId(pledge.getPledgeFinprodId());
+//                        outputFinPledgeDispDetailTemp.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+//                        outputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(pledge.getPledgeNumber());
+//                        outputFinPledgeDispDetailTemp.setScale(pledge.getPledgeRatio());
+//                        finPledgeDispDetailTempList.add(outputFinPledgeDispDetailTemp);
+//                    }
+//                }
+                //首期质押品列表
+                List<OriPledgeInfo> oriFinDealPledgeList = entrustMsgbyMQMapper.getOriFinDealPledgeList(finPledgeDispTemp.getfTradeId());
+                for (OriPledgeInfo oriPledgeInfo : oriFinDealPledgeList) {
+                    FinPledgeDispDetailTemp inputFinPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
+                    inputFinPledgeDispDetailTemp.setSeqNo(IDGenerator.generate());
+                    inputFinPledgeDispDetailTemp.setTradeId(finPledgeDispTemp.getTradeId());
+                    inputFinPledgeDispDetailTemp.setFinprodId(oriPledgeInfo.getPledgeFinprodId());
+                    inputFinPledgeDispDetailTemp.setBranch(BigDecimal.ZERO);
+                    inputFinPledgeDispDetailTemp.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+                    inputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(oriPledgeInfo.getPledgeTradeAmt());
+                    inputFinPledgeDispDetailTemp.setScale(oriPledgeInfo.getPledgeRatio());
+                    finPledgeDispDetailTempList.add(inputFinPledgeDispDetailTemp);
+                }
+            }
         }
     }
-    
+
     /**
      * 根据成交明细Dto，构筑期货需要反映到数据库的实体(协议回购存续期)
      *
@@ -1933,7 +2019,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         dto.setTrdProductTempDeal(trdProductTempDeal);
         // 金融产品临时交易Entity
         // 构造结束----------------------------------------------------------
-        
+
         // 金融产品临时交易附属表Entity
         // 构造开始----------------------------------------------------------
         TrdProductTempDealAdd trdProductTempDealAdd = new TrdProductTempDealAdd();
@@ -1947,8 +2033,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // 金融产品临时交易附属表Entity
         // 构造结束----------------------------------------------------------
         // 平仓盈亏（盯市）
-		BigDecimal profit = calClosingInvestProfit(dto);
-		
+        BigDecimal profit = calClosingInvestProfit(dto);
+
         // 临时划款指令表Entity
         // 构造开始----------------------------------------------------------
         String orderId = null;
@@ -1973,133 +2059,133 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         bussTrdTransferOrderDto.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue()); // 指令状态
         // 划款指令表Entity
         // 构造结束----------------------------------------------------------
-        
+
         //金融产品临时交易表
         trdProductTempDealMapper.insertSelective(trdProductTempDeal);
         //金融产品临时交易附属表
         trdProductTempDealAddMapper.insertSelective(trdProductTempDealAdd);
         // 写入临时划款指令表
-		StlPayTempOrders stlPayTempOrders = new StlPayTempOrders();
-		BeanUtil.copyPropertiesIgnoreNull(stlPayTempOrders, bussTrdTransferOrderDto);
-		stlPayTempOrdersMapper.insertSelective(stlPayTempOrders);
+        StlPayTempOrders stlPayTempOrders = new StlPayTempOrders();
+        BeanUtil.copyPropertiesIgnoreNull(stlPayTempOrders, bussTrdTransferOrderDto);
+        stlPayTempOrdersMapper.insertSelective(stlPayTempOrders);
 
-		//1.指令持仓流水（期货）：正流水
-		if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入开仓.getValue())
-				|| StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出开仓.getValue())) {
-			EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
-			List<EtrSecPositionFlowDto> etrSecPositionFlows = new ArrayList<>();// 持仓流水
-			EtrSecPositionFlowDto etrSecPositionFlowDtoUnit = new EtrSecPositionFlowDto();// 组合持仓流水DTO
-			/********************** 持仓流水DTO构造 *************************************/
-			etrSecPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
-			etrSecPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
-			etrSecPositionFlowDtoUnit.setSecAcctId(secAcctId);// 证券账户
-			etrSecPositionFlowDtoUnit.setFinprodId(infContractDetailfile.getFinprodId());// 金融产品代码
-			etrSecPositionFlowDtoUnit.setBranch(new Long(0));// 分支序号
-			if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入开仓.getValue())) {
-				etrSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_多头.getValue());
-			} else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出开仓.getValue())) {
-				etrSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_空头.getValue());
-			}
-			etrSecPositionFlowDtoUnit.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());// 持仓类型
-			etrSecPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
-			etrSecPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
-			etrSecPositionFlowDtoUnit.setAmount(infContractDetailfile.getShareAmt());// 交易数量
-			etrSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
-			etrSecPositionFlowDtoUnit.setTradeId(dto.getTradeId());// 指令编号
+        //1.指令持仓流水（期货）：正流水
+        if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入开仓.getValue())
+                || StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出开仓.getValue())) {
+            EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
+            List<EtrSecPositionFlowDto> etrSecPositionFlows = new ArrayList<>();// 持仓流水
+            EtrSecPositionFlowDto etrSecPositionFlowDtoUnit = new EtrSecPositionFlowDto();// 组合持仓流水DTO
+            /********************** 持仓流水DTO构造 *************************************/
+            etrSecPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
+            etrSecPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
+            etrSecPositionFlowDtoUnit.setSecAcctId(secAcctId);// 证券账户
+            etrSecPositionFlowDtoUnit.setFinprodId(infContractDetailfile.getFinprodId());// 金融产品代码
+            etrSecPositionFlowDtoUnit.setBranch(new Long(0));// 分支序号
+            if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入开仓.getValue())) {
+                etrSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_多头.getValue());
+            } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出开仓.getValue())) {
+                etrSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_空头.getValue());
+            }
+            etrSecPositionFlowDtoUnit.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());// 持仓类型
+            etrSecPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
+            etrSecPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
+            etrSecPositionFlowDtoUnit.setAmount(infContractDetailfile.getShareAmt());// 交易数量
+            etrSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
+            etrSecPositionFlowDtoUnit.setTradeId(dto.getTradeId());// 指令编号
 
-			etrSecPositionFlows.add(etrSecPositionFlowDtoUnit);
-			etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlows);
-			etrPositionHoldDto.setDealEtr(true);
-			EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
-			
-			// 2.交易持仓流水（期货）：正流水
-			List<PtlSecPositionFlowDto> ptlSecPositionFlows = new ArrayList<>();
-			PtlSecPositionFlowDto ptlSecPositionFlowDtoUnit = new PtlSecPositionFlowDto();// 组合持仓流水DTO
-			/********************** 持仓流水DTO构造 *************************************/
-			ptlSecPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
-			ptlSecPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
-			ptlSecPositionFlowDtoUnit.setSecAcctId(secAcctId);// 证券账户
-			ptlSecPositionFlowDtoUnit.setFinprodId(dto.getFinprodId());// 金融产品代码
-			ptlSecPositionFlowDtoUnit.setBranch(new Long(0));// 分支序号
-			if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入开仓.getValue())) {
-				ptlSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_多头.getValue());
-			} else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出开仓.getValue())) {
-				ptlSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_空头.getValue());
-			}
-			ptlSecPositionFlowDtoUnit.setHodingType(DictCodeList.持仓类型_实际.getValue());// 持仓类型
-			ptlSecPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
-			ptlSecPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
-			ptlSecPositionFlowDtoUnit.setAmount(dto.getShareAmt());// 数量
-			ptlSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
-			ptlSecPositionFlowDtoUnit.setTradeId(dto.getTradeId());// 指令编号
-			ptlSecPositionFlows.add(ptlSecPositionFlowDtoUnit);
-			// 插入持仓流水
-			for (PtlSecPositionFlowDto ptlSecPositionFlow : ptlSecPositionFlows) {
-				basePtlSecPositionInfoService.inertSecPositionFlow(ptlSecPositionFlow);
-			}
-		} else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())
-				|| StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
-			EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
-			// 3.指令现金流水：正流水
-			List<EtrCashPositionFlowDto> etrCashPositionFlows = new ArrayList<>();
-			EtrCashPositionFlowDto etrCashPositionFlowDtoUnit = new EtrCashPositionFlowDto();// 组合持仓流水DTO
-			/********************** 持仓流水DTO构造 *************************************/
-			etrCashPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
-			etrCashPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
-			etrCashPositionFlowDtoUnit.setAcctId(infContractDetailfile.getAcctNo());// 资金账户
+            etrSecPositionFlows.add(etrSecPositionFlowDtoUnit);
+            etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlows);
+            etrPositionHoldDto.setDealEtr(true);
+            EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
 
-			etrCashPositionFlowDtoUnit.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());// 持仓类型
-			etrCashPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
-			etrCashPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
-			etrCashPositionFlowDtoUnit.setAmount(trdProductTempDealAdd.getDepositAmt().add(profit));// 保证金金额 + 平仓盈亏（盯市）
-			etrCashPositionFlowDtoUnit.setChlFinprodId(null);// 母金融产品代码
-			etrCashPositionFlowDtoUnit.setOrderId(bussTrdTransferOrderDto.getOrderId());// 指令编号
-			etrCashPositionFlowDtoUnit.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());// 冲正标识
-			etrCashPositionFlowDtoUnit.setOffsetId(dto.getEntrustId());// 冲销业务编号
-			etrCashPositionFlows.add(etrCashPositionFlowDtoUnit);
-			etrPositionHoldDto.setPtlCashPositionFlows(etrCashPositionFlows);
-			etrPositionHoldDto.setDealEtr(true);
-			EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
+            // 2.交易持仓流水（期货）：正流水
+            List<PtlSecPositionFlowDto> ptlSecPositionFlows = new ArrayList<>();
+            PtlSecPositionFlowDto ptlSecPositionFlowDtoUnit = new PtlSecPositionFlowDto();// 组合持仓流水DTO
+            /********************** 持仓流水DTO构造 *************************************/
+            ptlSecPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
+            ptlSecPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
+            ptlSecPositionFlowDtoUnit.setSecAcctId(secAcctId);// 证券账户
+            ptlSecPositionFlowDtoUnit.setFinprodId(dto.getFinprodId());// 金融产品代码
+            ptlSecPositionFlowDtoUnit.setBranch(new Long(0));// 分支序号
+            if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入开仓.getValue())) {
+                ptlSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_多头.getValue());
+            } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出开仓.getValue())) {
+                ptlSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_空头.getValue());
+            }
+            ptlSecPositionFlowDtoUnit.setHodingType(DictCodeList.持仓类型_实际.getValue());// 持仓类型
+            ptlSecPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
+            ptlSecPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
+            ptlSecPositionFlowDtoUnit.setAmount(dto.getShareAmt());// 数量
+            ptlSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
+            ptlSecPositionFlowDtoUnit.setTradeId(dto.getTradeId());// 指令编号
+            ptlSecPositionFlows.add(ptlSecPositionFlowDtoUnit);
+            // 插入持仓流水
+            for (PtlSecPositionFlowDto ptlSecPositionFlow : ptlSecPositionFlows) {
+                basePtlSecPositionInfoService.inertSecPositionFlow(ptlSecPositionFlow);
+            }
+        } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())
+                || StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
+            EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
+            // 3.指令现金流水：正流水
+            List<EtrCashPositionFlowDto> etrCashPositionFlows = new ArrayList<>();
+            EtrCashPositionFlowDto etrCashPositionFlowDtoUnit = new EtrCashPositionFlowDto();// 组合持仓流水DTO
+            /********************** 持仓流水DTO构造 *************************************/
+            etrCashPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
+            etrCashPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
+            etrCashPositionFlowDtoUnit.setAcctId(infContractDetailfile.getAcctNo());// 资金账户
 
-			// 4.交易现金流水（期货）：正流水
-			PtlCashPositionFlowDto ptlCashPositionFlowDtoUnit = new PtlCashPositionFlowDto();
-			ptlCashPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
-			ptlCashPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
-			ptlCashPositionFlowDtoUnit.setAcctId(infContractDetailfile.getAcctNo());// 资金账户
-			ptlCashPositionFlowDtoUnit.setHodingType(DictCodeList.持仓类型_实际.getValue());// 持仓类型
-			ptlCashPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
-			ptlCashPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
-			ptlCashPositionFlowDtoUnit.setOrderId(bussTrdTransferOrderDto.getOrderId());// 指令编号
-			//*************************************待定***************
-			ptlCashPositionFlowDtoUnit.setAmount(profit);// 平仓盈亏（盯市）
-			//*************************************待定***************
-			ptlCashPositionFlowDtoUnit.setChlFinprodId(null);// 母金融产品代码
-			basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlowDtoUnit);
-			
-			// 5.交易持仓流水（期货）：负流水
-			PtlSecPositionFlowDto ptlSecPositionFlowDtoUnit = new PtlSecPositionFlowDto();// 组合持仓流水DTO
-			/********************** 持仓流水DTO构造 *************************************/
-			ptlSecPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
-			ptlSecPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
-			ptlSecPositionFlowDtoUnit.setSecAcctId(secAcctId);// 证券账户
-			ptlSecPositionFlowDtoUnit.setFinprodId(dto.getFinprodId());// 金融产品代码
-			ptlSecPositionFlowDtoUnit.setBranch(new Long(0));// 分支序号
-			if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
-				ptlSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_多头.getValue());
-			} else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
-				ptlSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_空头.getValue());
-			}
-			ptlSecPositionFlowDtoUnit.setHodingType(DictCodeList.持仓类型_实际.getValue());// 持仓类型
-			ptlSecPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
-			ptlSecPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
-			ptlSecPositionFlowDtoUnit.setAmount(dto.getShareAmt().multiply(new BigDecimal(-1)));// 数量
-			ptlSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
-			ptlSecPositionFlowDtoUnit.setTradeId(dto.getTradeId());// 指令编号
-			// 插入持仓流水
-			basePtlSecPositionInfoService.inertSecPositionFlow(ptlSecPositionFlowDtoUnit);
-		}
-		
-		 //更新指令完成度
+            etrCashPositionFlowDtoUnit.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());// 持仓类型
+            etrCashPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
+            etrCashPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
+            etrCashPositionFlowDtoUnit.setAmount(trdProductTempDealAdd.getDepositAmt().add(profit));// 保证金金额 + 平仓盈亏（盯市）
+            etrCashPositionFlowDtoUnit.setChlFinprodId(null);// 母金融产品代码
+            etrCashPositionFlowDtoUnit.setOrderId(bussTrdTransferOrderDto.getOrderId());// 指令编号
+            etrCashPositionFlowDtoUnit.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());// 冲正标识
+            etrCashPositionFlowDtoUnit.setOffsetId(dto.getEntrustId());// 冲销业务编号
+            etrCashPositionFlows.add(etrCashPositionFlowDtoUnit);
+            etrPositionHoldDto.setPtlCashPositionFlows(etrCashPositionFlows);
+            etrPositionHoldDto.setDealEtr(true);
+            EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
+
+            // 4.交易现金流水（期货）：正流水
+            PtlCashPositionFlowDto ptlCashPositionFlowDtoUnit = new PtlCashPositionFlowDto();
+            ptlCashPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
+            ptlCashPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
+            ptlCashPositionFlowDtoUnit.setAcctId(infContractDetailfile.getAcctNo());// 资金账户
+            ptlCashPositionFlowDtoUnit.setHodingType(DictCodeList.持仓类型_实际.getValue());// 持仓类型
+            ptlCashPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
+            ptlCashPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
+            ptlCashPositionFlowDtoUnit.setOrderId(bussTrdTransferOrderDto.getOrderId());// 指令编号
+            //*************************************待定***************
+            ptlCashPositionFlowDtoUnit.setAmount(profit);// 平仓盈亏（盯市）
+            //*************************************待定***************
+            ptlCashPositionFlowDtoUnit.setChlFinprodId(null);// 母金融产品代码
+            basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlowDtoUnit);
+
+            // 5.交易持仓流水（期货）：负流水
+            PtlSecPositionFlowDto ptlSecPositionFlowDtoUnit = new PtlSecPositionFlowDto();// 组合持仓流水DTO
+            /********************** 持仓流水DTO构造 *************************************/
+            ptlSecPositionFlowDtoUnit.setSeqno(IDGenerator.generate());
+            ptlSecPositionFlowDtoUnit.setPortfolioId(infContractDetailfile.getPortfolioId());// 组合代码
+            ptlSecPositionFlowDtoUnit.setSecAcctId(secAcctId);// 证券账户
+            ptlSecPositionFlowDtoUnit.setFinprodId(dto.getFinprodId());// 金融产品代码
+            ptlSecPositionFlowDtoUnit.setBranch(new Long(0));// 分支序号
+            if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
+                ptlSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_多头.getValue());
+            } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
+                ptlSecPositionFlowDtoUnit.setInvAim(DictCodeListExt3.投资目的_空头.getValue());
+            }
+            ptlSecPositionFlowDtoUnit.setHodingType(DictCodeList.持仓类型_实际.getValue());// 持仓类型
+            ptlSecPositionFlowDtoUnit.setCdate(infContractDetailfile.getTradeDate());// 日期
+            ptlSecPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
+            ptlSecPositionFlowDtoUnit.setAmount(dto.getShareAmt().multiply(new BigDecimal(-1)));// 数量
+            ptlSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
+            ptlSecPositionFlowDtoUnit.setTradeId(dto.getTradeId());// 指令编号
+            // 插入持仓流水
+            basePtlSecPositionInfoService.inertSecPositionFlow(ptlSecPositionFlowDtoUnit);
+        }
+
+        //更新指令完成度
         List<EtrFinishStatusDto> baseEtrInvestInfoDtos = new ArrayList<>();
         EtrFinishStatusDto status = new EtrFinishStatusDto();
         status.setEntrustId(infContractDetailfile.getEntrustId());
@@ -2108,24 +2194,24 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         status.setFinishAmt(dto.getShareAmt());
         baseEtrInvestInfoDtos.add(status);
         baseEtrInvestInfoService.completeDelegate(baseEtrInvestInfoDtos);
-	}
-    
+    }
+
     /**
      * 保证金计算
      * @param dto
      * @return
      */
     public BigDecimal getDealMargin(TrdTempDto dto,InfContractDetailfile infContractDetailfile) {
-    	BigDecimal entrustAmt = BigDecimal.ZERO;
-    	Map<String, Object> param = new HashMap<>();
-    	param.put("date", DateUtil.format(infContractDetailfile.getTradeDate()));
-    	param.put("psStr", infContractDetailfile.getPs());
-    	param.put("finprodId", infContractDetailfile.getFinprodId());
-    	param.put("portfolioId", infContractDetailfile.getPortfolioId());
-    	param.put("acctNo", infContractDetailfile.getAcctNo());
-    	param.put("tradeMarket", infContractDetailfile.getTradeMarket());
-    	param.put("entrustNum", infContractDetailfile.getShareAmt());
-    	//证券账户
+        BigDecimal entrustAmt = BigDecimal.ZERO;
+        Map<String, Object> param = new HashMap<>();
+        param.put("date", DateUtil.format(infContractDetailfile.getTradeDate()));
+        param.put("psStr", infContractDetailfile.getPs());
+        param.put("finprodId", infContractDetailfile.getFinprodId());
+        param.put("portfolioId", infContractDetailfile.getPortfolioId());
+        param.put("acctNo", infContractDetailfile.getAcctNo());
+        param.put("tradeMarket", infContractDetailfile.getTradeMarket());
+        param.put("entrustNum", infContractDetailfile.getShareAmt());
+        //证券账户
     	/*Map<String, Object> map = new HashMap<>();
     	map.put("portfolioId", infContractDetailfile.getPortfolioId());
     	map.put("acctNo", infContractDetailfile.getAcctNo());
@@ -2140,66 +2226,66 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
     			}
     		}
     	}*/
-    	param.put("secAcctId", infContractDetailfile.getBondId());
-    	//昨结算价
-    	String secId = infContractDetailfile.getFinprodMarketId();
-		//String param = "?stock_code=" + secId;
-		String queryIntegratedTick = "/joyin/quote/tick?stock_code="+ secId;
-		Map quoteMap = restTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + queryIntegratedTick, Map.class);
-		//Map quoteMap = simpleRestTemplate.getForObject("http://192.168.90.105:8080/tams/" + queryIntegratedTick, Map.class);
-		if (quoteMap != null && quoteMap.get("data") != null) {
-			Map<String, Object> quoteList = (Map<String, Object>) quoteMap.get("data");
-			if (null != quoteList) {
-				param.put("preClosePrice", quoteList.get("preClosePrice"));
-			}
-		}
-    	if (StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_买入开仓.getValue())
-				|| StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_卖出开仓.getValue())) {
-			BigDecimal entrustPrice = infContractDetailfile.getUnitCprice();
-			entrustAmt = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), entrustPrice);
-			if (StringUtils.isNotEmpty(infContractDetailfile.getFinprodId())) {
-				BigDecimal faceValue = getCurSecAmt(param);
-				if (null != faceValue) {
-					entrustAmt = entrustAmt.multiply(faceValue);
-				} else {
-					entrustAmt = null;
-				}
-			}
-		} else if (StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())
-				|| StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
-			String ps = "";
-			if (StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
-				ps = DictCodeListExt3.交易方向_卖出开仓.getValue();
-			} else {
-				ps = DictCodeListExt3.交易方向_买入开仓.getValue();
-			}
-			param.put("ps", ps);
-			entrustAmt = getDepositAmt(param);
-		}
-    	return entrustAmt;
+        param.put("secAcctId", infContractDetailfile.getBondId());
+        //昨结算价
+        String secId = infContractDetailfile.getFinprodMarketId();
+        //String param = "?stock_code=" + secId;
+        String queryIntegratedTick = "/joyin/quote/tick?stock_code="+ secId;
+        Map quoteMap = restTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + queryIntegratedTick, Map.class);
+        //Map quoteMap = simpleRestTemplate.getForObject("http://192.168.90.105:8080/tams/" + queryIntegratedTick, Map.class);
+        if (quoteMap != null && quoteMap.get("data") != null) {
+            Map<String, Object> quoteList = (Map<String, Object>) quoteMap.get("data");
+            if (null != quoteList) {
+                param.put("preClosePrice", quoteList.get("preClosePrice"));
+            }
+        }
+        if (StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_买入开仓.getValue())
+                || StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_卖出开仓.getValue())) {
+            BigDecimal entrustPrice = infContractDetailfile.getUnitCprice();
+            entrustAmt = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), entrustPrice);
+            if (StringUtils.isNotEmpty(infContractDetailfile.getFinprodId())) {
+                BigDecimal faceValue = getCurSecAmt(param);
+                if (null != faceValue) {
+                    entrustAmt = entrustAmt.multiply(faceValue);
+                } else {
+                    entrustAmt = null;
+                }
+            }
+        } else if (StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())
+                || StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
+            String ps = "";
+            if (StringUtils.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
+                ps = DictCodeListExt3.交易方向_卖出开仓.getValue();
+            } else {
+                ps = DictCodeListExt3.交易方向_买入开仓.getValue();
+            }
+            param.put("ps", ps);
+            entrustAmt = getDepositAmt(param);
+        }
+        return entrustAmt;
     }
-    
+
     /**
-	 * 面值
-	 * 
-	 * @param param
-	 * @return
-	 */
-	public BigDecimal getCurSecAmt(Map<String, Object> param) {
-		return restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrFutureTrade/getCurSecAmt",
-				param, BigDecimal.class);
-	}
-	
-	/**
-	 * 面值
-	 * 
-	 * @param param
-	 * @return
-	 */
-	public BigDecimal getDepositAmt(Map<String, Object> param) {
-		return restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrFutureTrade/getDepositAmt",
-				param, BigDecimal.class);
-	}
+     * 面值
+     *
+     * @param param
+     * @return
+     */
+    public BigDecimal getCurSecAmt(Map<String, Object> param) {
+        return restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrFutureTrade/getCurSecAmt",
+                param, BigDecimal.class);
+    }
+
+    /**
+     * 面值
+     *
+     * @param param
+     * @return
+     */
+    public BigDecimal getDepositAmt(Map<String, Object> param) {
+        return restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrFutureTrade/getDepositAmt",
+                param, BigDecimal.class);
+    }
 
     /**
      * 获取下一个工作日
@@ -2401,159 +2487,159 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // modify by etliu 20220114 end
         trdManualSettleInfoMapper.insertSelective(settleInfo);
     }
-    
+
     /**
-	 * 计算平仓投资收益（平仓盈亏（盯市））
-	 * 
-	 * @param trdTempDto
-	 * @return
-	 */
-	private BigDecimal calClosingInvestProfit(TrdTempDto trdTempDto) {
-		TrdTempDto temp = new TrdTempDto();
-		BeanUtil.copyPropertiesIgnoreNull(temp, trdTempDto);
-		BigDecimal closingProfit = BigDecimal.ZERO;
-		if (StringUtils.equals(temp.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())
-				|| StringUtils.equals(temp.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
-			if (StringUtils.equals(temp.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
-				temp.setPs(DictCodeListExt3.交易方向_卖出开仓.getValue());
-			} else {
-				temp.setPs(DictCodeListExt3.交易方向_买入开仓.getValue());
-			}
-		}
-		// 查询当前开仓
-		List<Map<String, Object>> curOpenPosition = entrustMsgbyMQMapper.getOpenClosePosition(temp);
-		//交易平仓数量
-		BigDecimal curAmount = toBigDecimal(trdTempDto.getShareAmt());
-		//交易平仓价格
-		BigDecimal curPrice = toBigDecimal(trdTempDto.getUnitCprice());
-		// 前一日结算价
-		BigDecimal preClosingPrice = findPreClosePrice(trdTempDto.getFinprodId().substring(4,trdTempDto.getFinprodId().length()));// 要接口取值
-		// 合约乘数
-		BigDecimal contractMultiplier = entrustMsgbyMQMapper.queryContractMultiplier(trdTempDto.getFinprodId());
-		// 多空系数
-		BigDecimal flag = new BigDecimal(1);
-		if (StringUtils.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
-			flag = new BigDecimal(-1);
-		}
-		contractMultiplier = contractMultiplier.multiply(flag);
-		if (null == curOpenPosition || curOpenPosition.size() == 0) {
-			// 当前开仓不存在
-			closingProfit = curPrice.subtract(preClosingPrice).multiply(curAmount).multiply(contractMultiplier);
-		} else {
-			PtlSecPositionFlowDto ptlSecPositionFlowDto = new PtlSecPositionFlowDto();
-			ptlSecPositionFlowDto.setPortfolioId(trdTempDto.getPortfolioId());
-			ptlSecPositionFlowDto.setSecAcctId(trdTempDto.getSecAcctId());
-			ptlSecPositionFlowDto.setFinprodId(trdTempDto.getFinprodId());
-			ptlSecPositionFlowDto.setPs(trdTempDto.getPs());
-			ptlSecPositionFlowDto.setCdate(trdTempDto.getTradeDate());
-			ptlSecPositionFlowDto.setSecAcctId(trdTempDto.getSecManageAcctId());
-			ptlSecPositionFlowDto.setHodingType(DictCodeList.持仓类型_实际.getValue());
-			if (StringUtils.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
-				ptlSecPositionFlowDto.setInvAim(DictCodeListExt3.投资目的_多头.getValue());
-			} else if (StringUtils.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
-				ptlSecPositionFlowDto.setInvAim(DictCodeListExt3.投资目的_空头.getValue());
-			}
-			basePtlSecPositionInfoService.queryOtherSecPosition(ptlSecPositionFlowDto);
-			try {
-				Calendar cd = Calendar.getInstance();
-				cd.setTime(trdTempDto.getTradeDate());
-				cd.add(Calendar.DATE, -1);// 减一天
-				ptlSecPositionFlowDto.setCdate(cd.getTime());
-			} catch (Exception e) {
-				ptlSecPositionFlowDto.setCdate(null);
-			}
-			// 昨日持仓
-			BigDecimal preDatePosition = basePtlSecPositionInfoService.queryOtherSecPosition(ptlSecPositionFlowDto);
-			List<Map<String, Object>> curClosingPosition = entrustMsgbyMQMapper.getOpenClosePosition(trdTempDto);
-			//if (null != curClosingPosition && curClosingPosition.size() > 0) {
-				//当日交易总平仓量
-				BigDecimal TotalPosition = BigDecimal.ZERO;
-				if (null != curClosingPosition && curClosingPosition.size() > 0) {
-					for (Map<String, Object> res : curClosingPosition) {
-						BigDecimal shareAmt = toBigDecimal(res.get("SHAREAMT"));
-						if (null != shareAmt) {
-							TotalPosition = TotalPosition.add(shareAmt);
-						}
-					}
-				}
-				//昨仓剩余量
-				BigDecimal lastNum = preDatePosition.subtract(TotalPosition);
-				if (lastNum.compareTo(BigDecimal.ZERO) < 0) {
-					lastNum = BigDecimal.ZERO;
-				}
-				if (curAmount.compareTo(lastNum) < 0) {
-					closingProfit = curPrice.subtract(preClosingPrice).multiply(curAmount).multiply(contractMultiplier);
-				} else {
-					closingProfit = curPrice.subtract(preClosingPrice).multiply(lastNum).multiply(contractMultiplier);
-					BigDecimal curClosingSum = lastNum;// 当笔平仓数量累计值
-					BigDecimal curOpenSum = BigDecimal.ZERO;// 当日平仓当日开仓部分累计值
-					BigDecimal curOpenTotal = TotalPosition.subtract(preDatePosition);// 当日平仓当日开仓部分总量
-					if (curOpenTotal.compareTo(BigDecimal.ZERO) < 0) {
-						curOpenTotal = BigDecimal.ZERO;
-					}
-					Boolean isValidTrade = false;
-					/*
-					 * 变量.当日平仓当日开仓部分累计值 += 当笔交易.开仓数量； if 变量.当日平仓当日开仓部分累计值 >
-					 * 变量.当日平仓当日开仓部分总量 变量.当笔交易记入部分 = 当笔交易.开仓数量； if
-					 * 变量.是否已找到第一笔有效交易 == false； 变量.当笔交易记入部分 = 变量.当日平仓当日开仓部分累计值
-					 * - 变量.当日平仓当日开仓部分总量； endif if 变量.当笔平仓数量累计值 + 变量.当笔交易记入部分 <
-					 * 当日平仓交易.平仓数量（C） 平仓投资收益 += (P-当笔交易.开仓价格
-					 * )*变量.当笔交易记入部分*合约乘数*多空标志 else 平仓投资收益 += (P-当笔交易.开仓价格
-					 * )*（当日平仓交易.平仓数量(C) - 变量.当笔平仓数量累计值）*合约乘数*多空标志 计算结束，返回结果
-					 * endif 变量.当笔平仓数量累计值 += 变量.当笔交易记入部分 变量.是否已找到第一笔有效交易 = true；
-					 * endif
-					 */
-					for (Map<String, Object> result : curOpenPosition) {
-						BigDecimal shartAmt = toBigDecimal(result.get("SHAREAMT"));
-						BigDecimal unitCprice = toBigDecimal(result.get("UNITCPRICE"));
-						curOpenSum = curOpenSum.add(shartAmt);
-						if (curOpenSum.compareTo(curOpenTotal) > 0) {
-							BigDecimal curPart = shartAmt;// 当笔交易记入部分
-							if (isValidTrade == false) {
-								curPart = curOpenSum.subtract(curOpenTotal);
-							}
-							if (curClosingSum.add(curPart).compareTo(curAmount) < 0) {
-								closingProfit = closingProfit.add((curPrice.subtract(unitCprice)).multiply(curPart).multiply(contractMultiplier));
-							} else {
-								closingProfit = closingProfit.add((curPrice.subtract(unitCprice)).multiply(curAmount.subtract(curClosingSum)).multiply(contractMultiplier));
-								return closingProfit;
-							}
-							curClosingSum = curClosingSum.add(curPart);
-							isValidTrade = true;
-						}
-					}
-				}
-			//}
-		}
-		return closingProfit;
-	}
-	
-	/** 查询交易行情信息 **/
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public BigDecimal findPreClosePrice(String secId) {
-		BigDecimal preClosePrice = BigDecimal.ZERO;
-		String param = "?stock_code=" + secId;
-		Map quoteMap = restTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + "/joyin/quote/tick" + param, Map.class);
-		//Map quoteMap = simpleRestTemplate.getForObject("http://192.168.90.105:8080/tams/" + "/joyin/quote/tick" + param, Map.class);
-		if (quoteMap != null && quoteMap.get("data") != null) {
-			Map<String, Object> quoteList = (Map<String, Object>) quoteMap.get("data");
-			if (null != quoteList) {
-				preClosePrice = toBigDecimal(quoteList.get("preClosePrice"));
-			}
-		}
-		return preClosePrice;
-	}
-	
-	/**
-	 * 
-	 * @param object
-	 * @return
-	 */
-	public BigDecimal toBigDecimal(Object object) {
-		if (null != object && "" != object) {
-			return new BigDecimal(object.toString());
-		}
-		return null;
-	}
+     * 计算平仓投资收益（平仓盈亏（盯市））
+     *
+     * @param trdTempDto
+     * @return
+     */
+    private BigDecimal calClosingInvestProfit(TrdTempDto trdTempDto) {
+        TrdTempDto temp = new TrdTempDto();
+        BeanUtil.copyPropertiesIgnoreNull(temp, trdTempDto);
+        BigDecimal closingProfit = BigDecimal.ZERO;
+        if (StringUtils.equals(temp.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())
+                || StringUtils.equals(temp.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
+            if (StringUtils.equals(temp.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
+                temp.setPs(DictCodeListExt3.交易方向_卖出开仓.getValue());
+            } else {
+                temp.setPs(DictCodeListExt3.交易方向_买入开仓.getValue());
+            }
+        }
+        // 查询当前开仓
+        List<Map<String, Object>> curOpenPosition = entrustMsgbyMQMapper.getOpenClosePosition(temp);
+        //交易平仓数量
+        BigDecimal curAmount = toBigDecimal(trdTempDto.getShareAmt());
+        //交易平仓价格
+        BigDecimal curPrice = toBigDecimal(trdTempDto.getUnitCprice());
+        // 前一日结算价
+        BigDecimal preClosingPrice = findPreClosePrice(trdTempDto.getFinprodId().substring(4,trdTempDto.getFinprodId().length()));// 要接口取值
+        // 合约乘数
+        BigDecimal contractMultiplier = entrustMsgbyMQMapper.queryContractMultiplier(trdTempDto.getFinprodId());
+        // 多空系数
+        BigDecimal flag = new BigDecimal(1);
+        if (StringUtils.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
+            flag = new BigDecimal(-1);
+        }
+        contractMultiplier = contractMultiplier.multiply(flag);
+        if (null == curOpenPosition || curOpenPosition.size() == 0) {
+            // 当前开仓不存在
+            closingProfit = curPrice.subtract(preClosingPrice).multiply(curAmount).multiply(contractMultiplier);
+        } else {
+            PtlSecPositionFlowDto ptlSecPositionFlowDto = new PtlSecPositionFlowDto();
+            ptlSecPositionFlowDto.setPortfolioId(trdTempDto.getPortfolioId());
+            ptlSecPositionFlowDto.setSecAcctId(trdTempDto.getSecAcctId());
+            ptlSecPositionFlowDto.setFinprodId(trdTempDto.getFinprodId());
+            ptlSecPositionFlowDto.setPs(trdTempDto.getPs());
+            ptlSecPositionFlowDto.setCdate(trdTempDto.getTradeDate());
+            ptlSecPositionFlowDto.setSecAcctId(trdTempDto.getSecManageAcctId());
+            ptlSecPositionFlowDto.setHodingType(DictCodeList.持仓类型_实际.getValue());
+            if (StringUtils.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_卖出平仓.getValue())) {
+                ptlSecPositionFlowDto.setInvAim(DictCodeListExt3.投资目的_多头.getValue());
+            } else if (StringUtils.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_买入平仓.getValue())) {
+                ptlSecPositionFlowDto.setInvAim(DictCodeListExt3.投资目的_空头.getValue());
+            }
+            basePtlSecPositionInfoService.queryOtherSecPosition(ptlSecPositionFlowDto);
+            try {
+                Calendar cd = Calendar.getInstance();
+                cd.setTime(trdTempDto.getTradeDate());
+                cd.add(Calendar.DATE, -1);// 减一天
+                ptlSecPositionFlowDto.setCdate(cd.getTime());
+            } catch (Exception e) {
+                ptlSecPositionFlowDto.setCdate(null);
+            }
+            // 昨日持仓
+            BigDecimal preDatePosition = basePtlSecPositionInfoService.queryOtherSecPosition(ptlSecPositionFlowDto);
+            List<Map<String, Object>> curClosingPosition = entrustMsgbyMQMapper.getOpenClosePosition(trdTempDto);
+            //if (null != curClosingPosition && curClosingPosition.size() > 0) {
+            //当日交易总平仓量
+            BigDecimal TotalPosition = BigDecimal.ZERO;
+            if (null != curClosingPosition && curClosingPosition.size() > 0) {
+                for (Map<String, Object> res : curClosingPosition) {
+                    BigDecimal shareAmt = toBigDecimal(res.get("SHAREAMT"));
+                    if (null != shareAmt) {
+                        TotalPosition = TotalPosition.add(shareAmt);
+                    }
+                }
+            }
+            //昨仓剩余量
+            BigDecimal lastNum = preDatePosition.subtract(TotalPosition);
+            if (lastNum.compareTo(BigDecimal.ZERO) < 0) {
+                lastNum = BigDecimal.ZERO;
+            }
+            if (curAmount.compareTo(lastNum) < 0) {
+                closingProfit = curPrice.subtract(preClosingPrice).multiply(curAmount).multiply(contractMultiplier);
+            } else {
+                closingProfit = curPrice.subtract(preClosingPrice).multiply(lastNum).multiply(contractMultiplier);
+                BigDecimal curClosingSum = lastNum;// 当笔平仓数量累计值
+                BigDecimal curOpenSum = BigDecimal.ZERO;// 当日平仓当日开仓部分累计值
+                BigDecimal curOpenTotal = TotalPosition.subtract(preDatePosition);// 当日平仓当日开仓部分总量
+                if (curOpenTotal.compareTo(BigDecimal.ZERO) < 0) {
+                    curOpenTotal = BigDecimal.ZERO;
+                }
+                Boolean isValidTrade = false;
+                /*
+                 * 变量.当日平仓当日开仓部分累计值 += 当笔交易.开仓数量； if 变量.当日平仓当日开仓部分累计值 >
+                 * 变量.当日平仓当日开仓部分总量 变量.当笔交易记入部分 = 当笔交易.开仓数量； if
+                 * 变量.是否已找到第一笔有效交易 == false； 变量.当笔交易记入部分 = 变量.当日平仓当日开仓部分累计值
+                 * - 变量.当日平仓当日开仓部分总量； endif if 变量.当笔平仓数量累计值 + 变量.当笔交易记入部分 <
+                 * 当日平仓交易.平仓数量（C） 平仓投资收益 += (P-当笔交易.开仓价格
+                 * )*变量.当笔交易记入部分*合约乘数*多空标志 else 平仓投资收益 += (P-当笔交易.开仓价格
+                 * )*（当日平仓交易.平仓数量(C) - 变量.当笔平仓数量累计值）*合约乘数*多空标志 计算结束，返回结果
+                 * endif 变量.当笔平仓数量累计值 += 变量.当笔交易记入部分 变量.是否已找到第一笔有效交易 = true；
+                 * endif
+                 */
+                for (Map<String, Object> result : curOpenPosition) {
+                    BigDecimal shartAmt = toBigDecimal(result.get("SHAREAMT"));
+                    BigDecimal unitCprice = toBigDecimal(result.get("UNITCPRICE"));
+                    curOpenSum = curOpenSum.add(shartAmt);
+                    if (curOpenSum.compareTo(curOpenTotal) > 0) {
+                        BigDecimal curPart = shartAmt;// 当笔交易记入部分
+                        if (isValidTrade == false) {
+                            curPart = curOpenSum.subtract(curOpenTotal);
+                        }
+                        if (curClosingSum.add(curPart).compareTo(curAmount) < 0) {
+                            closingProfit = closingProfit.add((curPrice.subtract(unitCprice)).multiply(curPart).multiply(contractMultiplier));
+                        } else {
+                            closingProfit = closingProfit.add((curPrice.subtract(unitCprice)).multiply(curAmount.subtract(curClosingSum)).multiply(contractMultiplier));
+                            return closingProfit;
+                        }
+                        curClosingSum = curClosingSum.add(curPart);
+                        isValidTrade = true;
+                    }
+                }
+            }
+            //}
+        }
+        return closingProfit;
+    }
+
+    /** 查询交易行情信息 **/
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public BigDecimal findPreClosePrice(String secId) {
+        BigDecimal preClosePrice = BigDecimal.ZERO;
+        String param = "?stock_code=" + secId;
+        Map quoteMap = restTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + "/joyin/quote/tick" + param, Map.class);
+        //Map quoteMap = simpleRestTemplate.getForObject("http://192.168.90.105:8080/tams/" + "/joyin/quote/tick" + param, Map.class);
+        if (quoteMap != null && quoteMap.get("data") != null) {
+            Map<String, Object> quoteList = (Map<String, Object>) quoteMap.get("data");
+            if (null != quoteList) {
+                preClosePrice = toBigDecimal(quoteList.get("preClosePrice"));
+            }
+        }
+        return preClosePrice;
+    }
+
+    /**
+     *
+     * @param object
+     * @return
+     */
+    public BigDecimal toBigDecimal(Object object) {
+        if (null != object && "" != object) {
+            return new BigDecimal(object.toString());
+        }
+        return null;
+    }
 }
 

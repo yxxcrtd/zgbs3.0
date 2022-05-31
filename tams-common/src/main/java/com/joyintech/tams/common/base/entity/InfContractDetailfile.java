@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.json.CustomDateDeserialize;
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
+
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class InfContractDetailfile extends BaseEntity {
     /**
@@ -143,6 +146,19 @@ public class InfContractDetailfile extends BaseEntity {
      * 业务类别,数据字典DELIVERY_BUS_TYPE;01 上交所固定收益平台债券买入;02 上交所固定收益平台债券卖出
      */
     private String busiType;
+
+    /**
+     * 质押券列表
+     */
+    private List<PledgeListDto> pledgeList;
+
+    public List<PledgeListDto> getPledgeList() {
+        return pledgeList;
+    }
+
+    public void setPledgeList(List<PledgeListDto> pledgeList) {
+        this.pledgeList = pledgeList;
+    }
 
     /**
      * 取得 流水号
