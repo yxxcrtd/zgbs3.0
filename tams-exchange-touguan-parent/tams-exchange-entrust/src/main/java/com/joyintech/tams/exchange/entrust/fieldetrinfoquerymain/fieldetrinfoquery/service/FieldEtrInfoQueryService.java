@@ -26,6 +26,7 @@ import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoque
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.TradeQueryBean;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,8 @@ public class FieldEtrInfoQueryService extends BaseService {
 
     @Autowired
     private FieldEtrInfoQueryMapper fieldEtrInfoQueryMapper;
+    @Autowired
+    private IPlatformDate iPlatformDate;
 
     /**
      * 指令列表分页查询
@@ -239,6 +242,7 @@ public class FieldEtrInfoQueryService extends BaseService {
         String busiTypePosition = dto.getBusiTypePosition();
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         pageParam.put("instructionId", dto.getEntrustId());
+        pageParam.put("sysDate", iPlatformDate.getSysDateStr());
         Page<TradeQueryBean> page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
                 () -> fieldEtrInfoQueryMapper.queryTrade2Touguan(pageParam));
         if (!CollectionUtils.isEmpty(page.getRoot())) {

@@ -583,8 +583,10 @@
                 </foreach>
             </if>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
-                AND aaa.issueDateStart <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
-                AND aaa.issueDateEnd <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
+                AND  (
+                    (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd') and to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd)
+                OR (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')  and to_date(#{issueDateEnd}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd )
+                    )
             </if>
             <if test="issueStage != null and issueStage.size() > 0">
                 AND aaa.issueStage in

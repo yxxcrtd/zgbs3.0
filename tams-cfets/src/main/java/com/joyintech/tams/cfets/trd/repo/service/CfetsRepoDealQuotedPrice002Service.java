@@ -551,6 +551,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
      * @return 校验返回信息
      */
     public AjaxResult checkSave(CfetsRepoDealQuoteCommonDto entity) {
+        logger.debug("回购报价提交保存检查,入参:" + JsonUtils.object2Json(entity));
         AjaxResult ajaxResult = new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
         //模式

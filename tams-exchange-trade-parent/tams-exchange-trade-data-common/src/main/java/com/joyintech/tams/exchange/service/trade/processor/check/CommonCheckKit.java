@@ -319,6 +319,11 @@ public class CommonCheckKit extends BaseCheckKit {
         }
 
         BigDecimal minAmt = minTrdUnitLimit.getMinAmt();
+        
+        if (!(entrustVolume < minNum) || !(entrustBalance.compareTo(minAmt) < 0)) {
+        	return ;
+        }
+        
         if (entrustVolume < minNum) {
             String busiTypeTg = instruction.getBusiTypeTg();
             String errorMsg = "";

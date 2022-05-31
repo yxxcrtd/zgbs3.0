@@ -546,7 +546,7 @@
                 )
             </if>
             AND t.tradeMarket in ('03','04','12')
-            AND t.assetType in ('F01','F02','F07','F11')
+            AND t.assetType in ('F01','F02','F07','F11','F37')
         </where>
     </sql>
 
@@ -914,7 +914,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         order by t.TRADING_DAY desc,t.TRADE_TIME desc
     </select>-->
     <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
-	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, PP.PORTFOLIO_NAME, SCI.ACCT_NAME   FINANCE_ACCOUNT
+	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, PP.PORTFOLIO_NAME, SCI.ACCT_NAME  ACCOUNT_NAME
 	  FROM (
 	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
 			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
@@ -988,12 +988,139 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 		 AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD')
 		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
                 OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
-	) A 
+        <!-- 信用保护凭证新家逻辑-->
+        AND ( STD.SETTLE_SPEED = '0' OR STD.SETTLE_SPEED IS NULL ) UNION
+        SELECT
+            tpda.ENTRUST_ID INSTRUCTION_ID,
+            NULL ENTRUST_ID,
+            tpd.TOTLE_TRADE_ID BROKER_TRADE_ID,
+            CASE
+
+            WHEN tpd.TRADE_MARKET = '03' THEN
+            '上海证券交易所'
+            WHEN tpd.TRADE_MARKET = '04' THEN
+            '深圳证券交易所' ELSE NULL
+            END MARKET,
+            fp.FINPROD_MARKET_ID STOCK_CODE,
+            fp.FINPROD_ABBR STOCK_NAME,
+            tpd.PS ENTRUST_BS,
+            tpd.SHARE_AMT TRADED_VOLUME,
+            tpd.CPRICE_AMT TRADED_PRICE,
+            tpd.FPRICE_AMT TRADED_BALANCE,
+            TO_CHAR( tpd.TRADE_DATE, 'YYYY-MM-DD' ) TRADING_DAY,
+            TO_CHAR( tpd.CREATE_TIME, 'HH24:Mi:ss' ) TRADE_TIME,
+            '正常交收' DELIVERY_RESULT,
+            '100' DELIVERY_SCHEDULE,
+            ssai.SEC_ACCT_ID ACCT_ACCOUNT
+        FROM
+            TRD_FIN_PRODUCT_DEAL_TOTAL tpd
+            LEFT JOIN TRD_DEAL_TOTAL_ADD tpda ON tpd.TOTLE_TRADE_ID = tpda.TOTLE_TRADE_ID
+            LEFT JOIN FIN_PRODUCT fp ON tpd.FINPROD_ID = fp.FINPROD_ID
+            LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.SEC_MANAGE_ACCT_ID = ssai.SEC_ACCT_ID
+        WHERE
+            tpd.IS_CANCEL = 'N'
+            AND tpd.TRADE_STATUS = '01'
+            AND tpd.FINPROD_TYPE2 = 'F37'
+            AND tpd.PS = 'T04'
+            AND tpd.TRADE_DATE &lt; to_date(#{sysDate},'yyyy-mm-dd')
+        ) A
 	  LEFT JOIN STL_CAPACCT_INFO SCI ON A.ACCT_ACCOUNT = SCI.ACCT_NO
 	  LEFT JOIN ETR_ENTRUST EE ON A.INSTRUCTION_ID = EE.ENTRUST_ID
 	  LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
 	  LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID
     WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+        <!-- union
+        SELECT
+            tdta.ENTRUST_ID INSTRUCTION_ID,
+            B.* ,
+            EE.ENTRUST_TYPE,
+            PP.PORTFOLIO_NAME,
+            SCI.ACCT_NAME FINANCE_ACCOUNT
+        FROM
+            (
+            SELECT
+                std1.TRADE_ID ENTRUST_ID,
+                std1.CJBH BROKER_TRADE_ID,
+                CASE
+
+                WHEN std1.TRADE_MARKET = '03' THEN
+                '上海证券交易所'
+                WHEN std1.TRADE_MARKET = '04' THEN
+                '深圳证券交易所' ELSE NULL
+                END MARKET,
+                fp.FINPROD_ID STOCK_CODE,
+                fp.FINPROD_ABBR STOCK_NAME,
+                std1.PS ENTRUST_BS,
+                std1.SHARE_AMT TRADED_VOLUME,
+                std1.UNIT_FPRICE TRADED_PRICE,
+                std1.FPRICE_AMT TRADED_BALANCE,
+                std1.DEAL_DATE TRADING_DAY,
+                TO_CHAR( std1.CREATE_TIME, 'HH24:Mi:ss' ) TRADE_TIME,
+                CASE
+
+                WHEN std1.DELIVERY_RESULT = '05'
+                AND std2.DELIVERY_RESULT IS NULL THEN
+                '未交收'
+                WHEN std1.DELIVERY_RESULT = '05'
+                AND std2.DELIVERY_RESULT IS NOT NULL THEN
+                (
+                CASE
+
+                WHEN std2.DELIVERY_RESULT IS NULL THEN
+                '未交收'
+                WHEN std2.DELIVERY_RESULT = '01' THEN
+                '正常交收'
+                WHEN std2.DELIVERY_RESULT = '02' THEN
+                '部分交收'
+                WHEN std2.DELIVERY_RESULT = '03' THEN
+                '交收失败'
+                WHEN std2.DELIVERY_RESULT = '04' THEN
+                '未交收'
+                WHEN std2.DELIVERY_RESULT = '05' THEN
+                '交收通知'
+                END
+                ) ELSE (
+                CASE
+
+                WHEN std1.DELIVERY_RESULT IS NULL THEN
+                '未交收'
+                WHEN std1.DELIVERY_RESULT = '01' THEN
+                '正常交收'
+                WHEN std1.DELIVERY_RESULT = '02' THEN
+                '部分交收'
+                WHEN std1.DELIVERY_RESULT = '03' THEN
+                '交收失败'
+                WHEN std1.DELIVERY_RESULT = '04' THEN
+                '未交收'
+                WHEN std1.DELIVERY_RESULT = '05' THEN
+                '交收通知'
+                END
+                )
+                END DELIVERY_RESULT,
+                CASE
+
+                WHEN std1.DELIVERY_RESULT != '05' THEN
+                100 || '%' ELSE DECODE( std1.SHARE_AMT, std2.SHARE_AMT, 0 ) / DECODE( std1.SHARE_AMT, std1.SHARE_AMT, 1 ) * 100 || '%'
+                END DELIVERY_SCHEDULE
+            FROM
+                SETTLE_TRANS_DATA std1
+                LEFT JOIN SETTLE_TRANS_DATA std2 ON std1.TRADE_ID = std2.TRADE_ID
+                    AND std1.CJBH = std2.CJBH
+                    AND std1.SEC_ACCT_ID = std2.SEC_ACCT_ID
+                    AND std1.SETTLE_DATE = std2.SETTLE_DATE
+                    AND std1.SEAT_NUMBER = std2.SEAT_NUMBER
+                LEFT JOIN FIN_PRODUCT fp ON std1.FINPROD_ID = fp.FINPROD_ID
+                WHERE
+                    std1.DELIVERY_RESULT = '05'
+                    AND std2.DELIVERY_RESULT != '05'
+            ) B
+            LEFT JOIN SETTLE_TRANS_TG_MAPPING sttm ON B.ENTRUST_ID = sttm.TRADE_ID
+            LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON sttm.TRADE_ID_TG = tfpdt.TOTLE_TRADE_ID
+            LEFT JOIN TRD_DEAL_TOTAL_ADD tdta ON tfpdt.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
+            LEFT JOIN STL_CAPACCT_INFO sci ON B.STOCK_CODE = sci.ACCT_NO
+            LEFT JOIN PTL_PORTFOLIO pp ON pp.PORTFOLIO_ID = tfpdt.PORTFOLIO_ID
+            LEFT JOIN ETR_ENTRUST EE ON tdta.ENTRUST_ID = EE.ENTRUST_ID
+        WHERE tdta.ENTRUST_ID = #{instructionId,jdbcType=VARCHAR} -->
     </select>
 
     <select id="getEtrDispatcherExeListInfo"
