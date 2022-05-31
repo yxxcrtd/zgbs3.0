@@ -212,6 +212,17 @@ public class MessageSenderHelper {
             return handleProtocolBakBusiType(trade, instruction, entrust);
         }
 
+        // add by etliu 20220531 start
+        // 3.0.6场内 ZGCPCN-973:【手工交收管理】债券是否非担保为“是”时，成交回报后，手工交收管理查询不到数据
+        if (DictCodeList.交易平台_现券交易平台.getValue().equals(tradePlat) && InvestmentAssetType.isBond(assetType)) {
+            if (EntrustBs.BUY.value.equals(entrustBs)) {
+                return BusinessType.BOND_BUY.value;
+            } else if (EntrustBs.SELL.value.equals(entrustBs)) {
+                return BusinessType.BOND_SELL.value;
+            }
+        }
+        // add by etliu 20220531 end
+
         // 深交所综合协议平台债券
         if (DictCodeList.交易平台_综合协议交易平台.getValue().equals(tradePlat) && InvestAssetTypeEnum.isBond(assetType)) {
             if (EntrustBs.BUY.value.equals(entrustBs)) {

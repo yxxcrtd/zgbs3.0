@@ -205,7 +205,7 @@ public class StlDownDataDealReaderService {
 
     				//清算数据List中以<交收编号,成交编号，业务单元1>为key分组
 					Map<String,List<SzdJsmx>> szdJsmxGroupMap =  szdJsmxList.stream().collect(Collectors.groupingBy(ele ->
-							new StringBuffer(ele.getJsbh()).append("#").append(ele.getCjbh()).append("#").append(ele.getXwh1()).toString()));
+							new StringBuffer(null == ele.getJsbh() ? "" : ele.getJsbh()).append("#").append(ele.getCjbh()).append("#").append(ele.getXwh1()).toString()));
     				if(MapUtils.isNotEmpty(szdJsmxGroupMap)){
 						szdJsmxList.clear();
     					for(Map.Entry<String,List<SzdJsmx>> entry : szdJsmxGroupMap.entrySet()){

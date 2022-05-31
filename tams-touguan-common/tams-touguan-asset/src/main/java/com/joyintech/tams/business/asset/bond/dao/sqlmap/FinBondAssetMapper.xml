@@ -1079,6 +1079,7 @@
                     LEFT JOIN SYS_USER SUR ON reg.CREATE_USER = SUR.user_name
                     LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
            WHERE his.entrust_id = #{entrustId}
+             AND his.BUSINESS_TYPE = #{busiType}
            order by his.OPER_TIME desc) t
     </select>
 
@@ -1691,6 +1692,7 @@
                 SELECT COUNT(ENTRUST_ID) num
                 FROM ETR_ENTRUST
                 WHERE FINPROD_ID = #{finprodId}
+                  AND ENTRUST_STATUS != '06'
                   AND ENTRUST_ID NOT IN (SELECT TPDA.ENTRUST_ID FROM TRD_PRODUCT_DEAL TPD
                                                       LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
                                                              ON TPD.TRADE_ID = TPDA.TRADE_ID
@@ -1699,6 +1701,7 @@
                 SELECT COUNT(ENTRUST_ID) num
                 FROM WFL_ETR_ENTRUST
                 WHERE FINPROD_ID = #{finprodId}
+                  AND ENTRUST_STATUS != '06'
                   AND ENTRUST_ID NOT IN (SELECT TPDA.ENTRUST_ID FROM TRD_PRODUCT_DEAL TPD
                                                          LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
                                                                    ON TPD.TRADE_ID = TPDA.TRADE_ID

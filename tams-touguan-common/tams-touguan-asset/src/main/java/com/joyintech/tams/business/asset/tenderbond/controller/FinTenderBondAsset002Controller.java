@@ -63,10 +63,10 @@ public class FinTenderBondAsset002Controller extends BaseController {
             if (StringUtil.isNotEmpty(finprodId)) {
                 //修改
                 entity = finTenderBoundAssetService.getById(finprodId);
-                if (Objects.nonNull(entity.getCirculationCode())) {
+                if (Objects.nonNull(entity) && Objects.nonNull(entity.getCirculationCode())) {
                     entity.getProductAddDto().setAppearMarketId(entity.getCirculationCode());
                     entity.getProductAddDto().setListingDate(entity.getCirculationDate());
-                } else {
+                } else if(Objects.isNull(entity)){
                     entity = finTenderBoundAssetService.addCoupons(finprodId);
                 }
                 params.put("businessId", entity.getFinprodMarketId());

@@ -136,9 +136,9 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     public AjaxResult addCoupons(String secId) {
         logger.info("addCoupons >> 债券市场加券参数：secId：【{}】", secId);
         AjaxResult ajaxResult = new AjaxResult();
-        FinProduct finProduct = finProductMapper.selectByFinprodMarketId(secId);
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2(secId, DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         List<ValidMessage> validMessages = new ArrayList<>();
-        if (Objects.isNull(finProduct)) {
+        if (Objects.nonNull(finProduct)) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
             ajaxResult.setErrorList(validMessages);
             ajaxResult.setMessageType(MessageType.错误消息);

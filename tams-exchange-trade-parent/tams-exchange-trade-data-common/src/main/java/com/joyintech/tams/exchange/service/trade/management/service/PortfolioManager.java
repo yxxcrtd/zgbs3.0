@@ -374,7 +374,7 @@ public class PortfolioManager extends BaseService {
 
         // 计算结果列表
         List<PortfolioCalculateResponse> list = new ArrayList<>(8);
-     // 订单类型：数量单，指令单
+        // 订单类型：数量单，指令单
         boolean isVolume = instruction.volumeInstruction();
         // 计算结果
         PortfolioCalculateResponse calculateResponse = null;
@@ -412,7 +412,7 @@ public class PortfolioManager extends BaseService {
 
             list.add(calculateResponse);
         }
-        
+
         // 订单数量
         BigDecimal orderVolume = BigDecimal.valueOf(order.getEntrustVolume());
         // 订单金额
@@ -804,28 +804,39 @@ public class PortfolioManager extends BaseService {
             bean.setEntrustVolume(totalLeftVolume);
         }
 
+
         // 计算指令的委托数量
         for (PortfolioInstructionContextDto context : resultList) {
+            Instruction ins = context.getInstruction();
+            // 最小步长
+            BigDecimal minStep = this.getMinStep(ins);
+            if (EntrustUtils.isPledgeRepurchase(ins)) {
+                minStep = minStep.divide(BigDecimal.valueOf(100L));
+            }
             Long realVolume = 0L;
             if (bean.getEntrustVolume() != 0L) {
-                if (EntrustUtils.isBond(context.getInstruction())) {
+                if (EntrustUtils.isBond(ins)) {
                     realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 1);
-                } else if (EntrustUtils.isPledgeRepurchase(context.getInstruction())) {
+                } else if (EntrustUtils.isPledgeRepurchase(ins)) {
                     //通用质押式回购最小交易单元：深交所-1，上交所-10
-                    if (Market.SZSE.investValue.equals(context.getInstruction().getTradeMarket())) {
+                    if (Market.SZSE.investValue.equals(ins.getTradeMarket())) {
                         realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 0);
                     } else {
                         realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 1);
                     }
-                } else if (EntrustUtils.isFutures(context.getInstruction())) {
+                } else if (EntrustUtils.isFutures(ins)) {
                     realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 0);
                 } else {
                     realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 2);
                 }
             }
+
+            //指令数量分配：按照步长处理，四舍五入
+            realVolume = getRealVolume(minStep, realVolume);
+
             context.setEntrustVolume(Math.min(context.getLeftVolume(), realVolume));
             // 分配到指令的委托数量，借用转股数量字段
-            context.getInstruction().setConNum(BigDecimal.valueOf(Math.min(context.getLeftVolume(), realVolume)));
+            ins.setConNum(BigDecimal.valueOf(Math.min(context.getLeftVolume(), realVolume)));
         }
 
         // 计算总委托数量和总委托金额
@@ -854,6 +865,12 @@ public class PortfolioManager extends BaseService {
         log.debug("公平委托相关指令: {}", JsonUtils.getJsonFromObject(resultList));
 
         return resultList;
+    }
+
+
+    private Long getRealVolume(BigDecimal minStep, Long realVolume) {
+        BigDecimal divide =  BigDecimal.valueOf(realVolume).divide(minStep, 0, RoundingMode.HALF_UP);
+        return divide.multiply(minStep).longValue();
     }
 
     private boolean isZeroPriceMarketInstruction(Instruction instruction) {
