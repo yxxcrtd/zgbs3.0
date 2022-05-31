@@ -337,6 +337,48 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getCouponspecies())) {
             getValidMessages("息票品种", validMessages);
         }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getInterestrate())) {
+            getValidMessages("利率类型", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getPaperir())) {
+            getValidMessages("票面利率", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getToprate())) {
+            getValidMessages("利率上限", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getBottomrate())) {
+            getValidMessages("利率下限", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getResettype())) {
+            getValidMessages("基准利率调整规则", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getObservebefday())) {
+            getValidMessages("延后时间", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getObservebefunit())) {
+            getValidMessages("延后时间单位", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getWorkdayrule())) {
+            getValidMessages("营业日准则", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getPaycycle())) {
+            getValidMessages("付息频率", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getCoefficient())) {
+            getValidMessages("系数", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getSpreadrate8())) {
+            getValidMessages("利差", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getCalloption())) {
+            getValidMessages("是否可赎回", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getPutoption())) {
+            getValidMessages("是否可回售", validMessages);
+        }
+        if (Objects.isNull(interfPayhsrcsecinfoDto.getRatebasic())) {
+            getValidMessages("计息基础", validMessages);
+        }
     }
 
     /**

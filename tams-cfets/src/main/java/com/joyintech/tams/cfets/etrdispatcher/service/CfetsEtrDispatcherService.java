@@ -461,6 +461,17 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setTransFinishAmt(dto2.getTransFinishAmt());
                         response.setTransRemainderAmt(dto2.getTransRemainderAmt());
                         response.setDealProgress(dto2.getDealProgress());
+                        //ZGCPCN-995
+                        if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
+                            if (StringUtil.equals(response.getTargetType(), DictCodeListExt3.目标类型_数量.getValue())) {
+                                DecimalFormat df = new DecimalFormat("0.##");
+                                response.setDealProgress(dto2.getDealProgress());
+                                response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(dto2.getTransRemainderAmt(), new BigDecimal("10000"), 4))));
+                                response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(dto2.getTransFinishAmt(), new BigDecimal("10000"), 4))));
+                                response.setExecFinishAmt(ArithmeticUtil.divide(dto2.getExecFinishAmt(), new BigDecimal("10000"), 2, RoundingMode.HALF_UP));
+                                response.setExecRemainderAmt(ArithmeticUtil.divide(dto2.getExecRemainderAmt(), new BigDecimal("10000"), 2, RoundingMode.HALF_UP));
+                            }
+                        }
                     }
                 }
 
