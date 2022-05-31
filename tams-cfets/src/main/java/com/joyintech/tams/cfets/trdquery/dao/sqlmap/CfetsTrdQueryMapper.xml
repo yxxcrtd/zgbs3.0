@@ -36,6 +36,7 @@
         </choose>
         ) aaa
         left join SYS_DATADICT_LIST sdl on aaa.finprodType2=sdl.ITEM_CODE and sdl.DICT_CODE='REG_ASSET_TYPE'
+        left join SYS_DATADICT_LIST sdlbusiTypePosition on aaa.busiTypePosition=sdlbusiTypePosition.ITEM_CODE and sdlbusiTypePosition.DICT_CODE='BUSI_TYPE_POSITION'
         left join SYS_DATADICT_LIST dictps on aaa.PS=dictps.ITEM_CODE and dictps.DICT_CODE='PS'
         left join SYS_DATADICT_LIST dicttradeMarket on aaa.tradeMarket=dicttradeMarket.ITEM_CODE and dicttradeMarket.DICT_CODE='TRADE_PLACE'
         left join SYS_DATADICT_LIST dictsp on aaa.settleSpeed=dictsp.ITEM_CODE and dictsp.DICT_CODE='ACCOUNT_SPEED'
@@ -228,7 +229,7 @@
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END
                 AS	faceValue,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BRBP.BID_PRICE
-            WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD,4),'FM990.0000')  END AS tradeYield,
+            WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD,4),'FM99999990.0000')  END AS tradeYield,
             null									AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.PAYABLE_AMOUNT END AS	tradeAmt,
@@ -257,7 +258,7 @@
                                   wm_concat(STLINFO.SEC_ACCT_NAME) SEC_ACCT_NAME,
                                   wm_concat(BRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                                   wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                                  wm_concat(TO_CHAR(ROUND(BRBP.BID_PRICE,4),'FM990.0000')) BID_PRICE
+                                  wm_concat(TO_CHAR(ROUND(BRBP.BID_PRICE,4),'FM9999990.0000')) BID_PRICE
                    FROM BID_ORDER_BID_PRICE BRBP
                    LEFT JOIN PTL_PORTFOLIO PP
                           ON PP.PORTFOLIO_ID = BRBP.PORTFOLIO_ID
@@ -637,7 +638,7 @@
                 and aaa.effectiveStatus=#{effectiveStatus}
             </if>
             <if test="search != null and search != '' and search !='有效' ">
-                and ((aaa.effectiveStatusStr || '|' || sdl.ITEM_VALUE || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr
+                and ((aaa.effectiveStatusStr || '|' || sdl.ITEM_VALUE || '|' || '|' || sdlbusiTypePosition.ITEM_VALUE || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr
                 || '|' || dictps.ITEM_VALUE || '|' || dicttradeMarket.ITEM_VALUE || '|' || dictsp.ITEM_VALUE
                 || '|' || aaa.secManageAcctIdStr || '|' || aaa.busiCode || '|' || aaa.trader
                 || '|' || aaa.counterId  || '|' || aaa.counterIdStr || '|' || aaa.portfolioIds  || '|' || aaa.portfolioNames
@@ -5102,10 +5103,10 @@
         SELECT  EE.FINPROD_ID as finprodId,
                 FP.FINPROD_MARKET_ID   AS	finprodMarketId,
                 FP.FINPROD_ABBR	  AS	finprodAbbr,
-                bo.OU_PARTY_ID AS	trader,
+                bo.OUR_TRADER  AS	trader,
                 mcci.PARTY_ABBR as traderidStr,
-                bo.OUR_TRADER  AS	counterId,
-                MCCI.TRADER_NAME AS counterIdStr,
+                bo.COUNTER_ID  AS	counterId,
+                mcp.COUNTER_NAME AS counterIdStr,
                 FPI.ISSUE_PRICE issuePrice,
                 case
                     when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
@@ -5122,15 +5123,15 @@
          left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
          left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
          left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
-         left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
-         left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+         LEFT JOIN MST_CFETS_CUSTOMER_INFO mcci on BO.OUR_TRADER=mcci.PARTY_ID
+         LEFT JOIN MST_COUNTER_PARTY mcp ON BO.COUNTER_ID= mcp.COUNTER_ID
         where bo.BID_ID = #{bidId}
         UNION ALL
         SELECT  EE.FINPROD_ID as finprodId,
                 FP.FINPROD_MARKET_ID   AS	finprodMarketId,
                 FP.FINPROD_ABBR	  AS	finprodAbbr,
-                wbo.OU_PARTY_ID AS	trader,
-                mcci.PARTY_ABBR as traderidStr,
+                wbo.OUR_TRADER AS	trader,
+                m1.PARTY_ABBR as traderidStr,
                 wbo.OUR_TRADER  AS	counterId,
                 MCCI.TRADER_NAME AS counterIdStr,
                 FPI.ISSUE_PRICE issuePrice,
@@ -5144,14 +5145,13 @@
                         then fpi.REFER_YIELD end rateYleid,
                 wbo.SUBSCRIPTION_AMOUNT subAmt,
                 wbo.PAYABLE_AMOUNT  payableAmount,
-                wbo.SETT_FEE_AMT  settleFeeAmt,
-                wbo.
-        from WFL_BID_ORDER wbo
+                wbo.SETT_FEE_AMT  settleFeeAmt
+         from WFL_BID_ORDER wbo
          left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
          left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
          left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
-         left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
-         left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+         LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on wbo.OUR_TRADER=m1.PARTY_ID
+         LEFT JOIN MST_COUNTER_PARTY mcci ON wbo.COUNTER_ID= mcci.COUNTER_ID
          left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
         where bo.BID_ID = #{bidId}
     </select>

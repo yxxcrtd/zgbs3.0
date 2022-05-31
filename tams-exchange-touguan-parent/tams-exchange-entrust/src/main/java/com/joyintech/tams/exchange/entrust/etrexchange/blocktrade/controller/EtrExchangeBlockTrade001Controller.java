@@ -18,6 +18,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.util.*;
+import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
+import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +40,6 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
@@ -96,6 +95,9 @@ public class EtrExchangeBlockTrade001Controller extends BaseController{
 
 	@Autowired
 	private EtrExchangeTradeCommonMapper etrExchangeTradeCommonMapper;
+
+	@Autowired
+	private SppiImportDataMapper sppiImportDataMapper;
 
 	@ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
 	@PostMapping("/init")
@@ -417,13 +419,40 @@ public class EtrExchangeBlockTrade001Controller extends BaseController{
 						validList.add(new ValidMessage("当日已闭市，不允许下指令!"));
 						ajax.setErrorList(validList);
 				}
+				//SPPI测试
+				if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.isNotEmpty(dto.getFinprodId())
+						&& StringUtil.equals(dto.getPs(),DictCodeList.交易方向_买入.getValue()) && !StringUtil.equals(dto.getPriceModel(), DictCodeListExt2.价格模式_市价指令.getValue()) ) {
+					//判断是否进行了SPPI测试
+					Map<String, Object> paramsppi = new HashMap<>();
+					paramsppi.put("finprodId", dto.getFinprodId());
+					SppiImportData sppiDto = etrExchangeTradeCommonMapper.queryAssetIsSppiTest(paramsppi);
+					if (StringUtil.isNotEmpty(sppiDto)) {
+						if (StringUtil.isNotEmpty(sppiDto.getIsSppiPass()) && StringUtil.equals(sppiDto.getIsSppiPass(), "2")) {
+							//判断该资产未来是否有行权计划
+							Map<String, Object> param = new HashMap<>();
+							param.put("finprodId", dto.getFinprodId());
+							param.put("sysDate", DateUtil.platDateFromCache());
+							if (etrExchangeTradeCommonMapper.countBondHasEexrPlan(param) > 0) {
+								if (StringUtil.isNotEmpty(dto.getBusinessModel()) && StringUtil.equals(dto.getBusinessModel(), DictCodeListExt3.业务模式_收取合同约定的现金流.getValue())) {
+									SppiImportData sppiImportData = sppiImportDataMapper.selectByPrimaryKey(dto.getFinprodId());
+									if (null != sppiImportData && StringUtil.isNotEmpty(sppiImportData.getBidPriceCon())) {
+										String[] split = sppiImportData.getBidPriceCon().split(",");
+										if (dto.getPrice().compareTo(new BigDecimal(split[1])) <= 0){
+											confirmMessage="净价不满足使权不重大购入价条件，若继续提交，业务模式会发生变更";
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 			if (null != ajax) {
 				return new Message<AjaxResult>().success().setData(ajax);
 			} else if (StringUtil.isNotEmpty(confirmMessage)) {
 				ajax = new AjaxResult();
 				ajax.setMessageType(MessageType.确认消息);
-				ajax.setMessage(confirmMessage);
+				ajax.setData(confirmMessage);
 				return new Message<AjaxResult>().success().setData(ajax);
 			}else {
 				return new Message<AjaxResult>().success().setMessage("校验通过");

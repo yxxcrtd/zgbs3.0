@@ -303,9 +303,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      */
     private void sendPositionMethod(CfetsEtrBondFirstBid002Dto dto, boolean isSubmit, String confirmOk) {
 
-        List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
-
         for (CfetsEtrBondFirstBid002Dto entity : dto.getEtrInvestBondFirstBidDtos()) {
+            List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
             for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {
                 //调用头寸
                 CfetsBondPortfolioCashRequest posport = new CfetsBondPortfolioCashRequest();
@@ -471,7 +470,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                 dto.setIssueDate(finProductInfo.getIssueDate());
                 dto.setPayDate(finProductInfo.getPayDate());
-                dto.setIssuePrice(finProductInfo.getIssuePrice());
+                dto.setIssuePrice(new BigDecimal(finProductInfo.getIssuePrice()));
                 dto.setReferYield(finProductInfo.getReferYield());
 
             } else {
@@ -1000,7 +999,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                 dto.setIssueDate(finProductInfo.getIssueDate());
                 dto.setPayDate(finProductInfo.getPayDate());
-                dto.setIssuePrice(finProductInfo.getIssuePrice());
+                dto.setIssuePrice(new BigDecimal(finProductInfo.getIssuePrice()));
                 dto.setReferYield(finProductInfo.getReferYield());
 
             } else {

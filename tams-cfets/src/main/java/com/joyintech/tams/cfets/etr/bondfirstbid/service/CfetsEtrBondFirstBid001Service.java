@@ -381,7 +381,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
             dto.setIssueDate(finProductInfo.getIssueDate());
             dto.setPayDate(finProductInfo.getPayDate());
-            dto.setIssuePrice(finProductInfo.getIssuePrice());
+            dto.setIssuePrice(new BigDecimal(finProductInfo.getIssuePrice()));
             dto.setReferYield(finProductInfo.getReferYield());
 
         }else {

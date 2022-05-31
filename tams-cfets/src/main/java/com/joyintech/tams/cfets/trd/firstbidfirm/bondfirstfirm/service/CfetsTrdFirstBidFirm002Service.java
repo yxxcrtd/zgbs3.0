@@ -234,11 +234,23 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         Date systemDate = iPlatformDate.getSysDate();
         List<String> entrustIdList = new ArrayList<>();
         logger.debug("自动分配,入参:" + JsonUtils.object2Json(request));
-        if (StringUtil.isNotEmpty(request) && StringUtil.isNotEmpty(request.getEntrustDtos())) {
+        List<CfetsTrdFirstBidFirmEntrustDto> list = request.getEntrustDtos();
+        if (StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"))) {
+            List<CfetsTrdFirstBidFirmEntrustDto> listTemp = new ArrayList<>();
+            request.getEntrustDtos().forEach(entrustDto -> {
+                if(CollectionUtils.isEmpty(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos())){
+                    listTemp.add(entrustDto);
+                }else {
+                    listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
+                }
+            });
+            list = listTemp;
+        }
+        if (StringUtil.isNotEmpty(request) && StringUtil.isNotEmpty(list)) {
             String finprodId = null;
             String counterId = null;
             Date issueDate = null;
-            for (CfetsTrdFirstBidFirmEntrustDto entrustDto : request.getEntrustDtos()) {
+            for (CfetsTrdFirstBidFirmEntrustDto entrustDto : list) {
                 ValidMessage error = new ValidMessage();
                 // 资产代码+证券账户必须一致提示信息
                 String msg = "";
@@ -319,8 +331,20 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         CfetsTrdFirstBidFirmInfoDto cfetsTrdFirstBidFirmInfoDto = new CfetsTrdFirstBidFirmInfoDto();
         Map<String, Object> param = new HashMap<>();
         List<String> entrustIdList = new ArrayList<>();
+        List<CfetsTrdFirstBidFirmEntrustDto> list = request.getEntrustDtos();
+        if (StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"))) {
+            List<CfetsTrdFirstBidFirmEntrustDto> listTemp = new ArrayList<>();
+            request.getEntrustDtos().forEach(entrustDto -> {
+                if(CollectionUtils.isEmpty(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos())){
+                    listTemp.add(entrustDto);
+                }else {
+                    listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
+                }
+            });
+            list = listTemp;
+        }
         // 共通业务规则
-        request.getEntrustDtos().forEach(item -> {
+        list.forEach(item -> {
             entrustIdList.add(item.getEntrustId());
         });
         param.put("entrustIdList", entrustIdList);
@@ -447,6 +471,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         //缴款方式
         dto.setPayType(this.getPayType(dto.getBiddingMethod()));
         BigDecimal bidPriceTotal = BigDecimal.ZERO;
+        BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
         BigDecimal maxBidPrice = null;
         BigDecimal minBidPrice = null;
         String tenderTarget = dto.getTenderTarget();
@@ -454,6 +479,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 【券面总额】根据剩余指令额度默认带出，可修改
             productDto.setBidPriceTotal(productDto.getAvaNum());
             bidPriceTotal = ArithmeticUtil.doAdd(bidPriceTotal, productDto.getBidPriceTotal());
+            if (!StringUtil.isNotEmpty(productDto.getEtrBidPriceTotal())) {
+                productDto.setEtrBidPriceTotal(productDto.getAvaNum());
+            }
+            etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, productDto.getEtrBidPriceTotal());
             if (!StringUtil.isNotEmpty(maxBidPrice)) {
                 maxBidPrice = productDto.getBidPrice();
             }
@@ -479,6 +508,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         //券面总额
         dto.setBidPriceTotal(bidPriceTotal);
+        dto.setEtrBidPriceTotal(etrBidPriceTotal);
         // 净价
         dto.setPrice(this.calPrice(dto));
         dto.setProductDtos(list);
@@ -595,8 +625,20 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         Map<String, Object> param = new HashMap<>();
         List<String> entrustIdList = new ArrayList<>();
         // 共通业务规则
+        List<CfetsTrdFirstBidFirmEntrustDto> entrustDtolist = request.getEntrustDtos();
+        if (StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"))) {
+            List<CfetsTrdFirstBidFirmEntrustDto> listTemp = new ArrayList<>();
+            request.getEntrustDtos().forEach(entrustDto -> {
+                if(CollectionUtils.isEmpty(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos())){
+                    listTemp.add(entrustDto);
+                }else {
+                    listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
+                }
+            });
+            entrustDtolist = listTemp;
+        }
         //1.查询申购产品列表(获取资产信息,及剩余指令额度)
-        request.getEntrustDtos().forEach(item -> {
+        entrustDtolist.forEach(item -> {
             entrustIdList.add(item.getEntrustId());
         });
         param.put("entrustIdList", entrustIdList);

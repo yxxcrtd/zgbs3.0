@@ -384,6 +384,7 @@ public class CfetsEtrDispatcherService extends BaseService {
         pageLimit.setRoot(list);
         if (!list.isEmpty()) {
             for (CfetsEtrDispatcherTradeListResponse response : list) {
+                response.setTraderId(response.getTrader());
                 if (StringUtil.isNotEmpty(response.getTrader())) {
                     String[] traders = response.getTrader().split(",");
                     StringBuffer buffer = new StringBuffer();
@@ -434,8 +435,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                     if (StringUtil.equals(response.getTargetType(), DictCodeListExt3.目标类型_数量.getValue())) {
                         DecimalFormat df = new DecimalFormat("0.##");
                         response.setDealProgress(ArithmeticUtil.divide(response.getFinishAmt(), response.getEntrustAmt(), 4).multiply(new BigDecimal("100")));
-                        response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(ArithmeticUtil.subtract(response.getEntrustAmt(), response.getFinishAmt()), new BigDecimal("10000"), 4))));
-                        response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("10000"), 4))));
+                        response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getTransRemainderAmt(), new BigDecimal("100"), 4))));
+                        response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("100"), 4))));
                         response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                         response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     }
@@ -449,7 +450,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("10000"),2,RoundingMode.HALF_UP));
                     }
                 }
-                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.平安资产类型_债券.getValue())){
+                if(StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
+                        StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
 
                     CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
                     if(dto2 != null) {
@@ -459,6 +461,17 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setTransFinishAmt(dto2.getTransFinishAmt());
                         response.setTransRemainderAmt(dto2.getTransRemainderAmt());
                         response.setDealProgress(dto2.getDealProgress());
+                        //ZGCPCN-995
+                        if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
+                            if (StringUtil.equals(response.getTargetType(), DictCodeListExt3.目标类型_数量.getValue())) {
+                                DecimalFormat df = new DecimalFormat("0.##");
+                                response.setDealProgress(dto2.getDealProgress());
+                                response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(dto2.getTransRemainderAmt(), new BigDecimal("10000"), 4))));
+                                response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(dto2.getTransFinishAmt(), new BigDecimal("10000"), 4))));
+                                response.setExecFinishAmt(ArithmeticUtil.divide(dto2.getExecFinishAmt(), new BigDecimal("10000"), 2, RoundingMode.HALF_UP));
+                                response.setExecRemainderAmt(ArithmeticUtil.divide(dto2.getExecRemainderAmt(), new BigDecimal("10000"), 2, RoundingMode.HALF_UP));
+                            }
+                        }
                     }
                 }
 
@@ -1363,6 +1376,13 @@ public class CfetsEtrDispatcherService extends BaseService {
         List<String> counterIdList = new ArrayList<>();
         Map<String, String> counterIdMap = splitParams("counterIds",
                 str -> counterIdList.add(str));
+        if ( counterIdMap.size()==0 ) {
+            enTrustIds.forEach(id -> {
+                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(id);
+                counterIdList.add(etrEntrust.getCounterId());
+                counterIdMap.put(id,etrEntrust.getCounterId());
+            });
+        }
         Map<String, PtlPortfolio> innerIds = AllTradeCommonUtil.selectPortfolioIds(
                 counterIdList);
         Map<String, String> psMap = splitParams("psList", null);
@@ -1381,6 +1401,10 @@ public class CfetsEtrDispatcherService extends BaseService {
                 list.add(finDto);
                 // 生成方向指令
                 if (innerIds.containsKey(counterIdMap.get(id))) {
+                    list.clear();
+                    finDto.put(PageFieldToInterfFactory.INF_EVENTID, id+ BussinessDictCodeList.交易方向_卖出.getValue());
+                    finDto.put(PageFieldToInterfFactory.INF_PS, BussinessDictCodeList.交易方向_卖出.getValue());
+                    list.add(finDto);
                     finDto = new HashMap<>();
                     finDto.put(PageFieldToInterfFactory.INF_EVENTID, id + ps);
                     finDto.put(PageFieldToInterfFactory.INF_EVENTDATE, DateUtil.format(

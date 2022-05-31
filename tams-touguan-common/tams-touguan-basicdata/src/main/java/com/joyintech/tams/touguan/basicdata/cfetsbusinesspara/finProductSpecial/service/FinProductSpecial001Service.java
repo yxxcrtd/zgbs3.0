@@ -147,7 +147,16 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         FinProductSpecial finProductSpecial = new FinProductSpecial();
         BeanUtil.copyPropertiesIgnoreNull(finProductSpecial, entity);
         finProductSpecial.setInputType(DictCodeListExt1.录入方式_手工录入.getValue());
-        finProductSpecialMapper.insertSelective(finProductSpecial);
+        int i = finProductSpecial001Mapper.countFinprodIdForSpecial(entity.getFinprodMarketId());
+        if (i > 0) {
+            String loginUserName = LoginUserUtil.getUserName();
+            finProductSpecial.setUpdateTime(new Date());
+            finProductSpecial.setUpdateUser(loginUserName);
+            finProductSpecialMapper.updateByPrimaryKey(finProductSpecial);
+        } else {
+            finProductSpecialMapper.insertSelective(finProductSpecial);
+        }
+
     }
 
 

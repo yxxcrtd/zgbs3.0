@@ -212,7 +212,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 
     @Override
     public void doUpdate(FinBondAssetSaveRequest entity) {
-        updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_UPDATE,entity.getWorkflowId());
+        entity.setFinprodMarketId(entity.getFinprodMarketId()+entity.getTradeMarketId());
+        updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT,entity.getWorkflowId());
     }
 
     @Override

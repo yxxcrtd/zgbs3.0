@@ -62,6 +62,9 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     @ApiModelProperty(name="trader",value="交易员",example="admin")
     private String trader;
 
+    @ApiModelProperty(name="traderId",value="交易员ID",example="admin")
+    private String traderId;
+
     @ApiModelProperty(name="secAcctId",value="证券账户",example="XXX证券账户")
     private String secAcctId;
 
@@ -351,9 +354,9 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     }
 
     public String getOtherBusiTypePosition() {
-        if(this.getBusiTypePosition() == null) return null;
-        return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition()) == null ?
-                SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition()) : 
+        if (this.getBusiTypePosition() == null) return null;
+        return StringUtil.equals(SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition()), this.getBusiTypePosition()) ?
+                SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition()) :
                 SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
     }
 
@@ -492,5 +495,13 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
 
     public void setIssueDateStr(String issueDateStr) {
         this.issueDateStr = issueDateStr;
+    }
+
+    public String getTraderId() {
+        return traderId;
+    }
+
+    public void setTraderId(String traderId) {
+        this.traderId = traderId;
     }
 }

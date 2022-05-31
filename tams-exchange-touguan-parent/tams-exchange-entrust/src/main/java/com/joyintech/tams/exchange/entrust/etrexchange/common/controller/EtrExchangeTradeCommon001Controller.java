@@ -27,6 +27,7 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
 import com.joyintech.tams.common.base.entity.FinExercisePlan;
 import com.joyintech.tams.common.base.entity.FinProductQuto;
 import com.joyintech.tams.common.base.entity.SppiImportData;
@@ -138,6 +139,9 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 
 	@Autowired
 	ExchangeEntrustRdsCommonAop exchangeEntrustRdsCommonAop;
+
+	@Autowired
+	private SppiImportDataMapper sppiImportDataMapper;
 
 	/**
 	 * 由于交易平台不同，设置不同交易平台对应的委托方向
@@ -1089,6 +1093,36 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 				BigDecimal bigPrice = new BigDecimal(price);
 				if (dto.getPrice().compareTo(bigPrice.multiply(new BigDecimal(1.02))) > 0) {
 					confirmMsg += "当前价格超过上一日平均价的2%，是否继续？";
+				}
+			}
+		}
+		//SPPI测试
+		if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.isNotEmpty(dto.getFinprodId())
+				&& StringUtil.equals(dto.getPs(),DictCodeList.交易方向_买入.getValue()) && !StringUtil.equals(dto.getPriceModel(), DictCodeListExt2.价格模式_市价指令.getValue()) ) {
+			//判断是否进行了SPPI测试
+			Map<String, Object> paramsppi = new HashMap<>();
+			paramsppi.put("finprodId", dto.getFinprodId());
+			SppiImportData sppiDto = etrExchangeTradeCommonMapper.queryAssetIsSppiTest(paramsppi);
+			if (StringUtil.isNotEmpty(sppiDto)) {
+				if (StringUtil.isNotEmpty(sppiDto.getIsSppiPass()) && StringUtil.equals(sppiDto.getIsSppiPass(), "2")) {
+					//判断该资产未来是否有行权计划
+					Map<String, Object> param = new HashMap<>();
+					param.put("finprodId", dto.getFinprodId());
+					param.put("sysDate", DateUtil.platDateFromCache());
+					if (etrExchangeTradeCommonMapper.countBondHasEexrPlan(param) > 0) {
+						if (StringUtil.isNotEmpty(dto.getBusinessModel()) && StringUtil.equals(dto.getBusinessModel(), DictCodeListExt3.业务模式_收取合同约定的现金流.getValue())) {
+							SppiImportData sppiImportData = sppiImportDataMapper.selectByPrimaryKey(dto.getFinprodId());
+							if (null != sppiImportData && StringUtil.isNotEmpty(sppiImportData.getBidPriceCon())) {
+								String[] split = sppiImportData.getBidPriceCon().split(",");
+//								if ((!(dto.getPrice().compareTo(new BigDecimal(split[0]))==0))&&(dto.getPrice().compareTo(new BigDecimal(split[1])) <= 0)) {
+								// modify by fxmei 2022-05-23 需求变更 start
+								if (dto.getPrice().compareTo(new BigDecimal(split[1])) <= 0){
+									// modify by fxmei 2022-05-23 需求变更 end
+									confirmMsg="净价不满足使权不重大购入价条件，若继续提交，业务模式会发生变更";
+								}
+							}
+						}
+					}
 				}
 			}
 		}

@@ -141,6 +141,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
     @Autowired(required=false)
     private BussTrdTransferOrderService bussTrdTransferOrderService;
+
+    @Autowired(required=false)
+    private StlPayOrdersMapper stlPayOrdersMapper;
+
     /**
      * 默认设置
      */
@@ -435,6 +439,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
         if (CollectionUtils.isNotEmpty(dto.getBussTrdTransferOrderList())){
             bussTrdTransferOrderService.save(dto.getBussTrdTransferOrderList());
+            StlPayOrders stlPayOrders = new StlPayOrders();
+            for (BussTrdTransferOrderDto ferOrder : dto.getBussTrdTransferOrderList()) {
+                BeanUtil.copyPropertiesIgnoreNull(stlPayOrders, ferOrder);
+                stlPayOrders.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
+                stlPayOrdersMapper.insertSelective(stlPayOrders);
+            }
         }
     }
 

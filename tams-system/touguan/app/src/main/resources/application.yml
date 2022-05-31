@@ -1,7 +1,7 @@
 prod:
   bussRep: 1
 server:
-  port: 8090
+  port: 8080
   address: 0.0.0.0
   maxHttpHeaderSize: 102400
   context-path: /tams
@@ -351,7 +351,7 @@ spring:
   #    timeout: 20000
   redis:
     cluster:
-      nodes: 192.168.90.243:6379,192.168.90.243:6380,192.168.90.243:6381,192.168.90.243:6382,192.168.90.243:6383,192.168.90.243:6384
+      nodes: 192.168.70.247:6379,192.168.70.247:6380,192.168.70.247:6381,192.168.70.247:6382,192.168.70.247:6383,192.168.70.247:6384
   redislock:
     redissonEnabled: false
   datasource:
