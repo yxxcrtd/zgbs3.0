@@ -772,7 +772,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             if(StringUtil.isNotEmpty(agreRepHwayChgSecDto.getFinprodId())) {
             	BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepHwayChgSecDto);
                 etrPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getNewRepSecNum(),entity.getNewpledgeFaceValue()));
-                etrPledge.setDisplaceDir("01");//暂时用字段串
+                etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
                 list.add(etrPledge);
                 //换出券
                 if(entity.getOutRepSecNum()!=null){
@@ -787,7 +787,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     outPledge.setPledgeNumber(entity.getOutRepSecNum());
                     // 质押金额
                     outPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getOutRepSecNum(),entity.getOutPledgeFaceValue()));
-                    outPledge.setDisplaceDir("02");
+                    outPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
                     list.add(outPledge);
                 }
             }
@@ -2176,7 +2176,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
           	systemAct = DictCodeListExt3.系统动作_新建.getValue();
           	decisionAct = DictCodeListExt3.系统动作_新建.getValue();
         }
-  		positionRequestService.send(entity,decisionAct,systemAct);
+  		//positionRequestService.send(entity,decisionAct,systemAct);
   		//增加调用头寸引擎代码end
 
     }
