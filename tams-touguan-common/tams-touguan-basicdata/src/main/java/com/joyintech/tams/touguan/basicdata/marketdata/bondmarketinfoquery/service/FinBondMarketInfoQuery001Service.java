@@ -298,6 +298,9 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getSecid())) {
             getValidMessages("资产代码", validMessages);
         }
+        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getSectype())) {
+            getValidMessages("系统债券类型", validMessages);
+        }
         if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getSecfullname())) {
             getValidMessages("资产名称", validMessages);
         }
