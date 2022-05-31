@@ -5,7 +5,12 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
@@ -262,6 +267,20 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         if (!StringUtil.isNotEmpty(param.get("remark"))) {
             errorList.add(new ValidMessage("请输入退回原因!"));
         }
+        // 2.查询指令状态及执行进度
+        this.setParam(param);
+        List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtos = cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
+        if (CollectionUtils.isNotEmpty(cfetsTrdFirstBidFirmEntrustDtos)) {
+            cfetsTrdFirstBidFirmEntrustDtos.forEach(item -> {
+                if (!(StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue()) && item.getTransactioncom().compareTo(BigDecimal.ZERO) == 0)) {
+                    errorList.add(new ValidMessage("只可对已接收或者执行进度为0的指令执行退回操作!"));
+                }
+                param.put("entrustId", item.getEntrustId());
+                if (cfetsTrdFirstBidFirm001Mapper.checkDataStatus(param) > 0) {
+                    errorList.add(new ValidMessage("存在流程中的交易数据，不可退回!"));
+                }
+            });
+        }
         ajaxResult.setErrorList(errorList);
         return ajaxResult;
     }
@@ -470,12 +489,25 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             bidFirmSum.setInvManagerId(StringUtil.join(invManagerIdList, ","));
             bidFirmSum.setInvManagerName(StringUtil.join(invManagerNameList, ","));
 
-            List<String> counterIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getCounterId)
-                    .distinct().sorted().collect(Collectors.toList());
-            List<String> counterNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getCounterName)
-                    .distinct().sorted().collect(Collectors.toList());
-            bidFirmSum.setCounterId(StringUtil.join(counterIdList, ","));
-            bidFirmSum.setCounterName(StringUtil.join(counterNameList, ","));
+            List<String> counterIdList = new ArrayList<>();
+            List<String> counterNameList = new ArrayList<>();
+            for (CfetsTrdFirstBidFirmEntrustDto bidFirmDto : bidFirmDetail) {
+
+                if (StringUtil.isNotEmpty(bidFirmDto.getCounterId())) {
+                    counterIdList.add(bidFirmDto.getCounterId());
+                }
+                if (StringUtil.isNotEmpty(bidFirmDto.getCounterName())) {
+                    counterNameList.add(bidFirmDto.getCounterName());
+                }
+            }
+
+            if (CollectionUtils.isNotEmpty(counterIdList)) {
+                bidFirmSum.setCounterId(StringUtil.join(counterIdList, ","));
+            }
+            if (CollectionUtils.isNotEmpty(counterNameList)) {
+                bidFirmSum.setCounterName(StringUtil.join(counterNameList, ","));
+            }
+
 
             bidFirmSum.setSumFlag(Boolean.TRUE);
 
