@@ -14,6 +14,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class MessageSenderHelper {
         tradeMessage.setSecAcctId(instruction.getSecAcctId());
         tradeMessage.setPortfolioId(instruction.getPortfolioId());
         tradeMessage.setTradeMarket(instruction.getTradeMarket());
-        tradeMessage.setTradePlat(instruction.getTradePlat());
+        tradeMessage.setTradePlat(TradePlatUtils.trd2EtrTradePlat(instruction));
         tradeMessage.setPS(instruction.getPs());
         tradeMessage.setCcy(instruction.getCcy());
         tradeMessage.setTradingDay(trade.getTradingDay());
@@ -114,7 +115,7 @@ public class MessageSenderHelper {
         tradeMessage.setSecAcctId(instruction.getSecAcctId());
         tradeMessage.setPortfolioId(instruction.getPortfolioId());
         tradeMessage.setTradeMarket(instruction.getTradeMarket());
-        tradeMessage.setTradePlat(instruction.getTradePlat());
+        tradeMessage.setTradePlat(TradePlatUtils.trd2EtrTradePlat(instruction));
         tradeMessage.setPS(instruction.getPs());
         tradeMessage.setCcy(instruction.getCcy());
         tradeMessage.setFinprodId(instruction.getFinprodId());
