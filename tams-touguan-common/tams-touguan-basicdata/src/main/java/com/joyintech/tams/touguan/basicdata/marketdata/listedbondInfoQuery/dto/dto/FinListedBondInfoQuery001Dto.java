@@ -595,7 +595,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         if (Objects.isNull(couponSpecies) || BussinessDictCodeList.息票品种_零息.getValue().equals(couponSpecies)
                 || BussinessDictCodeList.息票品种_贴现.getValue().equals(couponSpecies)) {
             return Objects.nonNull(getStipulationValue()) ? getStipulationValue() + "%" : "";
-        } else if (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_固定利率.getValue().equals(rateType)) {
+        } else if ((couponSpecies.equals(BussinessDictCodeList.息票品种_利随本清.getValue())) || (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_固定利率.getValue().equals(rateType))) {
             return Objects.nonNull(getCouponRate()) ? getCouponRate() + "%" : "";
         } else if (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_浮动利率.getValue().equals(rateType)) {
             return (StringUtil.isNotBlank(benchmarkCurveNameStr) ? benchmarkCurveNameStr : "") + "+" + (StringUtil.isNotBlank(spread) ? spread : "");
