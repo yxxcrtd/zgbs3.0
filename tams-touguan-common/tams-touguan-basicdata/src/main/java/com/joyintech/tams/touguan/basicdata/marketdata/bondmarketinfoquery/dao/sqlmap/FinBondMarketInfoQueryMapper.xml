@@ -576,8 +576,6 @@
         T16.OBSERVE_BEF_DAY observeBefDay,
         T16.OBSERVE_BEF_UNIT observeBefUnit,
         T16.FIRST_CONFIRM_DATE firstConfirmDate,
-        T12.BASIS ratebasic,
-        T12.MARKET_BASIS marketBasis,
         T1.REMARK REMARK,
         NVL(T4.CIRCULATION_DATE,T7.LISTING_DATE) listingDate,
         T10.CASH_ID basisStyle,
@@ -589,7 +587,13 @@
         T2.IS_SEC_BOND isSecBond,
         T2.GUA_TYPE guarType,
         T2.ORIGINAL_OWNER originalOwner,
-        T1.SPONSOR guarantor
+        T1.SPONSOR guarantor,
+        Case when T12.BASIS = 'A/A_B_COUP' THEN 'A/A'
+        when T12.BASIS = 'A/A_B_DAY' THEN 'A/A'
+        else T12.BASIS END  basis,
+        Case when T12.MARKET_BASIS = 'A/A_B_COUP' THEN 'A/A'
+        when T12.MARKET_BASIS = 'A/A_B_DAY' THEN 'A/A'
+        else T12.MARKET_BASIS END  marketBasis
         FROM FIN_PRODUCT T1
         LEFT JOIN FIN_PRODUCT_ADD T2 ON T2.FINPROD_ID = T1.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE T3 ON T3.FINPROD_ID = T1.FINPROD_ID
