@@ -155,7 +155,8 @@
                f.MDATE             mdate,
                fa.REF_ENTITY       refEntity,
                f.TRADE_MARKET      tradeMarket,
-               fa.REF_SEC          refSec
+               fa.REF_SEC          refSec,
+               fa.SETTLE_METHOD    settleMethod
         from FIN_PRODUCT f
                  left join FIN_PRODUCT_ADD fa on fa.FINPROD_ID = f.FINPROD_ID
         where f.FINPROD_ID = #{finprodId}

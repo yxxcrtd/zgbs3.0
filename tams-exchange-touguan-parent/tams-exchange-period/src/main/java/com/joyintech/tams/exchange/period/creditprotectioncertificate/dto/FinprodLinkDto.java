@@ -91,6 +91,17 @@ public class FinprodLinkDto {
     @ApiModelProperty(name = "refSecs", value = "参考债项选择列表")
     private List<String> refSecs;
 
+    @ApiModelProperty(name = "settleMethod", value = "结算方式")
+    private String settleMethod;
+
+    public String getSettleMethod() {
+        return settleMethod;
+    }
+
+    public void setSettleMethod(String settleMethod) {
+        this.settleMethod = settleMethod;
+    }
+
     public List<String> getRefSecs() {
         return refSecs;
     }

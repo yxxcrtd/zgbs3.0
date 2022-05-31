@@ -4,6 +4,7 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 public class CreditProtectionCertificatePeriod001Request {
 
@@ -12,7 +13,7 @@ public class CreditProtectionCertificatePeriod001Request {
     private String businessType;
 
     @ApiModelProperty(name="busiTypePosition",value="业务类型数组",example="206")
-    private String businessTypeList;
+    private List<String> businessTypeList;
 
     @ApiModelProperty(name="businessCode",value="业务编号",example="206")
     private String businessCode;
@@ -111,11 +112,11 @@ public class CreditProtectionCertificatePeriod001Request {
         this.finprodName = finprodName;
     }
 
-    public String getBusinessTypeList() {
+    public List<String> getBusinessTypeList() {
         return businessTypeList;
     }
 
-    public void setBusinessTypeList(String businessTypeList) {
+    public void setBusinessTypeList(List<String> businessTypeList) {
         this.businessTypeList = businessTypeList;
     }
 }
