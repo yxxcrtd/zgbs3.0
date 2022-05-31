@@ -1376,6 +1376,13 @@ public class CfetsEtrDispatcherService extends BaseService {
         List<String> counterIdList = new ArrayList<>();
         Map<String, String> counterIdMap = splitParams("counterIds",
                 str -> counterIdList.add(str));
+        if ( counterIdMap.size()==0 ) {
+            enTrustIds.forEach(id -> {
+                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(id);
+                counterIdList.add(etrEntrust.getCounterId());
+                counterIdMap.put(id,etrEntrust.getCounterId());
+            });
+        }
         Map<String, PtlPortfolio> innerIds = AllTradeCommonUtil.selectPortfolioIds(
                 counterIdList);
         Map<String, String> psMap = splitParams("psList", null);
@@ -1394,6 +1401,10 @@ public class CfetsEtrDispatcherService extends BaseService {
                 list.add(finDto);
                 // 生成方向指令
                 if (innerIds.containsKey(counterIdMap.get(id))) {
+                    list.clear();
+                    finDto.put(PageFieldToInterfFactory.INF_EVENTID, id+ BussinessDictCodeList.交易方向_卖出.getValue());
+                    finDto.put(PageFieldToInterfFactory.INF_PS, BussinessDictCodeList.交易方向_卖出.getValue());
+                    list.add(finDto);
                     finDto = new HashMap<>();
                     finDto.put(PageFieldToInterfFactory.INF_EVENTID, id + ps);
                     finDto.put(PageFieldToInterfFactory.INF_EVENTDATE, DateUtil.format(
