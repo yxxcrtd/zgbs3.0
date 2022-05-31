@@ -72,6 +72,13 @@ public interface CfetsManualSettleMapper {
      */
     List<PortIntFenPeiInfoDto> findPortIntFenPeiInfoList(Map<String, Object> pageParam);
     /**
+     * 一级投标分销买入组合分配信息List
+     *
+     * @param pageParam 参数
+     * @return List<PortIntFenPeiInfoDto>
+     */
+    List<PortIntFenPeiInfoDto> findBidFirmPortIntFenPeiInfoList(Map<String, Object> pageParam);
+    /**
      * 一级申购组合分配信息List
      *
      * @param pageParam 参数
@@ -240,6 +247,14 @@ public interface CfetsManualSettleMapper {
      * @return CfetsManualSettleInfoF32Respond
      */
     CfetsManualSettleInfoOtherListRespond findManualSettleInfoBid(Map<String, Object> pageParam);
+
+    /**
+     * 一级投标确认成交信息查询
+     *
+     * @param pageParam 参数
+     * @return CfetsManualSettleInfoF32Respond
+     */
+    CfetsManualSettleInfoOtherListRespond findManualSettleInfoBidFirm(Map<String, Object> pageParam);
 
     /**
      * 一级市场投标交收流水列表分页查询
