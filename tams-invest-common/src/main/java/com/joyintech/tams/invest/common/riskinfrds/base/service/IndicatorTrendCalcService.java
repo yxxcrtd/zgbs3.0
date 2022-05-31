@@ -715,6 +715,10 @@ public class IndicatorTrendCalcService {
         Set<String> ocpCodeList = ocpInfo.getOcpCodeList();
         // 若不存在实占信息
         if (CollectionUtils.isEmpty(ocpCodeList)) {
+            if (ocpItems == null) {
+                return result;
+            }
+
             ocpItems.entrySet().forEach(en -> {
                 if (null == en.getValue()) {
                     return;

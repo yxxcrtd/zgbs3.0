@@ -46,6 +46,11 @@ public class FinProductSpecialImportDto extends BaseEntity {
      */
     private String inputType;
 
+    /**
+     * 下标
+     */
+    private Integer index;
+
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -100,5 +105,13 @@ public class FinProductSpecialImportDto extends BaseEntity {
 
     public void setFinprodAbbr(String finprodAbbr) {
         this.finprodAbbr = finprodAbbr;
+    }
+
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 }
