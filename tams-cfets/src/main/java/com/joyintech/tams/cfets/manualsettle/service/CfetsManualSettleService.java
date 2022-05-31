@@ -267,7 +267,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         && StringUtil.equals(cfetsDto.getCleanStatus(), DictCodeListExt3.清算状态_清算成功.getValue())){
                     FinProduct finProduct = finProductMapper.selectByPrimaryKey(cfetsDto.getFinprodId());
                     // 上市流通日不为空,则已经做过了上市流通 此时存在后续交易 交收回溯不可进行
-                    if(!StringUtil.isNotEmpty(finProduct.getCirculationDate())){
+                    if(StringUtil.isNotEmpty(finProduct.getCirculationDate())){
                         ajaxResult.setErrorList(Arrays.asList(new ValidMessage("存在后续交易，不允许进行交收回溯，请重新选择!")));
                         return ajaxResult;
                     }
