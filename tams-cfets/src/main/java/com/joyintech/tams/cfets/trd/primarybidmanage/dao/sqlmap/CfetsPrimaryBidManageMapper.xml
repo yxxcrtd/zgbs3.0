@@ -866,4 +866,12 @@
         WHERE FINPROD_ID = #{finprodId}
          AND ROWNUM = 1
     </select>
+
+    <select id="selectSecAcctSource" resultType="java.lang.String">
+        SELECT
+            SEC_ACCT_SOURCE
+        FROM STL_SEC_ACCT_INFO
+        WHERE
+            SEC_ACCT_ID = #{secAcctId}
+    </select>
 </mapper>
