@@ -5972,11 +5972,14 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             if (StringUtils.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue())) {
                 busiTypePosition=DictCodeListExt3.投管业务类型_行权.getValue();
             } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_配债.getValue())) {
+                dto.setBusinessModel(DictCodeListExt3.业务模式_出售.getValue());
                 dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_配债指令.getValue());
                 busiTypePosition=DictCodeListExt3.投管业务类型_配债.getValue();
             } else if (StringUtils.equals(dto.getPs(), DictCodeList.交易方向_申购.getValue())) {
+                dto.setBusinessModel(DictCodeListExt3.业务模式_出售.getValue());
                 busiTypePosition=DictCodeListExt3.投管业务类型_可转债申购.getValue();
             } else if (StringUtils.equals(dto.getPs(), DictCodeListExt1.交易方向_债转股.getValue())) {
+                dto.setBusinessModel(DictCodeListExt3.业务模式_出售.getValue());
                 busiTypePosition=DictCodeListExt3.投管业务类型_债转股.getValue();
             } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue()) || StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
                 busiTypePosition=DictCodeListExt3.投管业务类型_质押券出入库.getValue();
