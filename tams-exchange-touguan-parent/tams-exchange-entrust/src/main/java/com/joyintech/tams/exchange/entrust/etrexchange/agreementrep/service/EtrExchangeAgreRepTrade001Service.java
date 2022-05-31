@@ -771,7 +771,25 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepHwayChgSecDto);
             if(StringUtil.isNotEmpty(agreRepHwayChgSecDto.getFinprodId())) {
             	BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepHwayChgSecDto);
-            	list.add(etrPledge);
+                etrPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getNewRepSecNum(),entity.getNewpledgeFaceValue()));
+                etrPledge.setDisplaceDir("01");//暂时用字段串
+                list.add(etrPledge);
+                //换出券
+                if(entity.getOutRepSecNum()!=null){
+                    EtrPledge outPledge=new EtrPledge();
+                    outPledge.setEntrustId(entity.getEntrustId());
+                    outPledge.setFinprodId(entity.getOutFinprodId());
+                    // 质押面值
+                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    //质押率
+                    outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(),new BigDecimal(100),2));
+                    // 质押数量
+                    outPledge.setPledgeNumber(entity.getOutRepSecNum());
+                    // 质押金额
+                    outPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getOutRepSecNum(),entity.getOutPledgeFaceValue()));
+                    outPledge.setDisplaceDir("02");
+                    list.add(outPledge);
+                }
             }
         }else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
         	

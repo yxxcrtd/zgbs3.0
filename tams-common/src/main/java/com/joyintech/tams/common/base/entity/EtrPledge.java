@@ -28,6 +28,11 @@ public class EtrPledge extends EtrPledgeKey {
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal pledgeAmt;
+    /**
+     * 置换方向
+     */
+    private String displaceDir;
+
 
     /**
      * 取得 质押面值
@@ -91,5 +96,13 @@ public class EtrPledge extends EtrPledgeKey {
      */
     public void setPledgeAmt(BigDecimal pledgeAmt) {
         this.pledgeAmt = pledgeAmt;
+    }
+
+    public String getDisplaceDir() {
+        return displaceDir;
+    }
+
+    public void setDisplaceDir(String displaceDir) {
+        this.displaceDir = displaceDir;
     }
 }
