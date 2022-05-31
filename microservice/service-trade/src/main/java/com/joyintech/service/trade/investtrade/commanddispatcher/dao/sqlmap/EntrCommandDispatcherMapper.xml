@@ -195,7 +195,8 @@
             A1.PLEDGE_FACE_VALUE  oldPledgeFaceValue,/*质押面值*/
             A1.Pledge_Number oldPledgeNumber,/*质押数量*/
             A1.PLEDGE_RATIO  oldPledgeRatio,/*质押率*/
-            A1.PLEDGE_AMT oldPledgeAmt/*质押金额*/
+            A1.PLEDGE_AMT oldPledgeAmt,/*质押金额*/
+			A.DISPLACE_DIR displaceDir/*置换方向*/
 	    FROM
 	    ETR_PLEDGE A
 	    LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
