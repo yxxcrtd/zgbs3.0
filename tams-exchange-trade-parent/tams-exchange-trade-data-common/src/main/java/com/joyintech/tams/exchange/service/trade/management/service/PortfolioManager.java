@@ -24,6 +24,7 @@ import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
+import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
@@ -621,7 +622,8 @@ public class PortfolioManager extends BaseService {
         BigDecimal adjustedPrice = entrustPrice;
         // 市价订单
         // 如果是市价指令+限价订单时，委托价格不为0
-        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)) {
+        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)
+                && !EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
 //            adjustedPrice = this.getMarketPrice(tick, entrustBs);
             adjustedPrice = lastPrice;
         }
@@ -647,14 +649,14 @@ public class PortfolioManager extends BaseService {
         }
 
         // 委托价格为0的指令（市价指令），将涨跌停价填充到委托价格
-        for (Instruction ins : tempList) {
-            if (isZeroPriceMarketInstruction(ins)) {
-                ins.setEntrustPrice(lastPrice);
-                log.debug("将最新价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
-//                ins.setEntrustPrice(this.getMarketPrice(tick, entrustBs));
-//                log.debug("将涨跌停价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
-            }
-        }
+//        for (Instruction ins : tempList) {
+//            if (isZeroPriceMarketInstruction(ins)) {
+//                ins.setEntrustPrice(lastPrice);
+//                log.debug("将最新价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
+////                ins.setEntrustPrice(this.getMarketPrice(tick, entrustBs));
+////                log.debug("将涨跌停价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
+//            }
+//        }
 
         // 系统参数：委托价格不优于指令价格时的处理模式:01-禁止
         if (EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()
@@ -670,6 +672,7 @@ public class PortfolioManager extends BaseService {
             //注意：买入价格向上调/卖出价格向下调     给出提示“委托价格必须优于所有指令价格”且自动调回
             if (EntrustBs.isBuy(entrustBs)) {
                 BigDecimal min = tempList.stream()
+                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
                         .map(o -> {
                             if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
                                 return o.getFullPrice();
@@ -678,7 +681,7 @@ public class PortfolioManager extends BaseService {
                             }
                         })
                         .min(Comparator.naturalOrder())
-                        .orElse(upperLimitPrice);
+                        .orElse(BigDecimal.ZERO);
                 if (min.compareTo(upperLimitPrice) > 0) {
                     adjustedPrice = upperLimitPrice;
                 } else {
@@ -689,9 +692,9 @@ public class PortfolioManager extends BaseService {
                 if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) > 0) {
                     adjustedPrice = entrustPrice;
                 }
-
             } else {
                 BigDecimal max = tempList.stream()
+                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
                         .map(o -> {
                             if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
                                 return o.getFullPrice();
@@ -700,7 +703,7 @@ public class PortfolioManager extends BaseService {
                             }
                         })
                         .max(Comparator.naturalOrder())
-                        .orElse(lowerLimitPrice);
+                        .orElse(BigDecimal.ZERO);
                 if (max.compareTo(lowerLimitPrice) < 0) {
                     adjustedPrice = lowerLimitPrice;
                 } else {
@@ -728,6 +731,7 @@ public class PortfolioManager extends BaseService {
             BigDecimal orderPrice = adjustedPrice;
             BigDecimal filterPrice = null;
             for (Instruction ins : tempList) {
+                // 市价指令不参与剔除
                 if (EntrustUtils.isMarketPrice(ins)) {
                     continue;
                 }
@@ -736,12 +740,12 @@ public class PortfolioManager extends BaseService {
                     filterPrice = ins.getFullPrice();
                 }
                 if (EntrustBs.isBuy(entrustBs)) {
-                    // 买入，过滤价格小于指令价格的指令
+                    // 买入，过滤价格小于调整价
                     if (filterPrice.compareTo(orderPrice) < 0) {
                         ins.setEntrustClass(是否_否.getValue());
                     }
                 } else {
-                    // 卖出，过滤价格大于指令价格的指令
+                    // 卖出，过滤价格大于调整价
                     if (filterPrice.compareTo(orderPrice) > 0) {
                         ins.setEntrustClass(是否_否.getValue());
                     }
@@ -868,7 +872,7 @@ public class PortfolioManager extends BaseService {
 
 
     private Long getRealVolume(BigDecimal minStep, Long realVolume) {
-        BigDecimal divide =  BigDecimal.valueOf(realVolume).divide(minStep, 0, RoundingMode.HALF_UP);
+        BigDecimal divide = BigDecimal.valueOf(realVolume).divide(minStep, 0, RoundingMode.HALF_UP);
         return divide.multiply(minStep).longValue();
     }
 

@@ -3,6 +3,7 @@ package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -12,6 +13,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -241,7 +243,7 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "isNetprice", value = "是否净价交易")
     private String isNetprice;
 
-    @ApiModelProperty(name="isNoGuard",value="是否非担保(条件必填)")
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保(条件必填)")
     private String isNoGuard;
 
     @ApiModelProperty(name = "conFinprodId", value = "正股代码")
@@ -280,15 +282,19 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "conceptTypeStr", value = "概念板块")
     private String conceptTypeStr;
 
+    private String conceptTypes;
+
+    private String isWind;
+
     @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
     private String capiIncomeFeature;
 
-    @ApiModelProperty(name="listingDate",value="上市日")
+    @ApiModelProperty(name = "listingDate", value = "上市日")
     private Date listingDate;
 
     private String principalCashId;
 
-    @ApiModelProperty(name="yield",value="初始利率")
+    @ApiModelProperty(name = "yield", value = "初始利率")
     private BigDecimal yield;
 
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
@@ -902,20 +908,27 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public List<String> getConceptType() {
         List<String> conceptType = new ArrayList<>();
-        if (DictCodeList.是否_是.getValue().equals(this.getCityInvestSecChb())) {
-            conceptType.add("01");
-        }
-        if (DictCodeList.是否_是.getValue().equals(this.getIsGreenBond())) {
-            conceptType.add("02");
-        }
-        if (DictCodeList.是否_是.getValue().equals(this.getIsSecBond())) {
-            conceptType.add("04");
-        }
-        if (DictCodeList.是否_是.getValue().equals(this.getIssus())) {
-            conceptType.add("05");
-        }
-        if (DictCodeList.是否_是.getValue().equals(this.getCalloption()) || DictCodeList.是否_是.getValue().equals(this.getPutoption())) {
-            conceptType.add("06");
+        if (StringUtil.isNotBlank(getIsWind()) && getIsWind().equals(DictCodeList.是否_是.getValue())) {
+            String conceptTypes = getConceptTypes();
+            if (StringUtil.isNotBlank(conceptTypes)) {
+                return Arrays.asList(conceptTypes.split(","));
+            }
+        } else {
+            if (DictCodeList.是否_是.getValue().equals(this.getCityInvestSecChb())) {
+                conceptType.add("01");
+            }
+            if (DictCodeList.是否_是.getValue().equals(this.getIsGreenBond())) {
+                conceptType.add("02");
+            }
+            if (DictCodeList.是否_是.getValue().equals(this.getIsSecBond())) {
+                conceptType.add("04");
+            }
+            if (DictCodeList.是否_是.getValue().equals(this.getIssus())) {
+                conceptType.add("05");
+            }
+            if (DictCodeList.是否_是.getValue().equals(this.getCalloption()) || DictCodeList.是否_是.getValue().equals(this.getPutoption())) {
+                conceptType.add("06");
+            }
         }
         return conceptType;
     }
@@ -1016,5 +1029,21 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setYield(BigDecimal yield) {
         this.yield = yield;
+    }
+
+    public String getConceptTypes() {
+        return conceptTypes;
+    }
+
+    public void setConceptTypes(String conceptTypes) {
+        this.conceptTypes = conceptTypes;
+    }
+
+    public String getIsWind() {
+        return isWind;
+    }
+
+    public void setIsWind(String isWind) {
+        this.isWind = isWind;
     }
 }

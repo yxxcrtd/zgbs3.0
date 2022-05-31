@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.component.business.riskrds.core.BaseRiskRdsService;
-import com.joyintech.tams.component.business.trade.dto.BussEtrInvestPersonInfoDto;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
