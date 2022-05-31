@@ -3,6 +3,7 @@ package com.joyintech.tams.business.common.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.constant.DictCode;
@@ -511,12 +512,21 @@ public class CfetsEtrFinProductInfoResponse {
         return minPamt;
     }
 
+    public String getMinPamtStr() {
+        return StringUtil.isNotBlank(getMinPamt()) ? getMinPamt() + "亿元" : "";
+    }
+
+
     public void setMinPamt(String minPamt) {
         this.minPamt = minPamt;
     }
 
     public String getMaxPamt() {
         return maxPamt;
+    }
+
+    public String getMaxPamtStr() {
+        return StringUtil.isNotBlank(getMaxPamt()) ? getMaxPamt() + "亿元" : "";
     }
 
     public void setMaxPamt(String maxPamt) {
@@ -543,6 +553,10 @@ public class CfetsEtrFinProductInfoResponse {
 
     public String getIssuePrice() {
         return issuePrice;
+    }
+
+    public String getIssuePriceStr() {
+        return StringUtil.isNotBlank(getIssuePrice()) ? getIssuePrice() + "元" : "";
     }
 
     public void setIssuePrice(String issuePrice) {
