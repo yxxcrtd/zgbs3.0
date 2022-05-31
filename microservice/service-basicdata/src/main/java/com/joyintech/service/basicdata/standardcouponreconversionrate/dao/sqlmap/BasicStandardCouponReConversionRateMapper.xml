@@ -133,6 +133,12 @@
             <if test="accountType != null and accountType != ''">
                 AND (sbmci.FINPROD_ID is not null or sbmci.ACCT_NO is not null)
             </if>
+            <if test="startDate != null and startDate != ''">
+                AND (
+                (<![CDATA[ sbmci.END_DATE >= #{startDate}]]>)
+                 or (sbmci.END_DATE is null and <![CDATA[ sbmci.START_DATE >= #{startDate}]]>)
+                )
+            </if>
         </where>
     </select>
 
@@ -165,6 +171,12 @@
             <if test="finprodIdStr != null and finprodIdStr != ''">
                 and (sbmci.FINPROD_ID = 'BROKER'
                 or sbmci.ACCT_NO is not null)
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND (
+                (<![CDATA[ sbmci.END_DATE >= #{startDate}]]>)
+                or (sbmci.END_DATE is null and <![CDATA[ sbmci.START_DATE >= #{startDate}]]>)
+                )
             </if>
         </where>
     </select>

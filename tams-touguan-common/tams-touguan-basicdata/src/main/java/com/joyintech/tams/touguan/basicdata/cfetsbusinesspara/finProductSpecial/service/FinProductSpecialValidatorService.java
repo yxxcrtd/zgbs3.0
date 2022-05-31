@@ -24,7 +24,9 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 债券特殊信息 check service
@@ -158,7 +160,6 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                 }
                 //对象转换
                 List<FinProductSpecialImportDto> finProductSpecialImportDtos = convertToBean(dataList);
-                Integer failNum = 0;
                 StringBuilder allErrorMsg = new StringBuilder();
                 StringBuilder allConfirmErrorMsg = new StringBuilder();
                 for (int i = 0; i < finProductSpecialImportDtos.size(); i++) {
@@ -217,7 +218,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                     parameter.setBusinessDataPk1(finprodMarketId);
                     ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
                     if (Objects.nonNull(dataEntityFromProcessMark)) {
-                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_IN_PROCESS", String.valueOf(j))).append(CHANGE_LINE_MARK);
+                        errorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_IN_PROCESS", String.valueOf(j))).append(CHANGE_LINE_MARK);
                     }
 
                     if (StringUtil.isNotBlank(errorMsg)) {
@@ -225,10 +226,22 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                     }
                     if (StringUtil.isNotBlank(confirmErrorMsg)) {
                         allConfirmErrorMsg.append(confirmErrorMsg);
-                        failNum++;
+                    }
+                    finProductSpecialImportDtos.get(i).setIndex(j);
+                }
+                //校验Excel中重复数据
+                Map<String, List<FinProductSpecialImportDto>> collect = finProductSpecialImportDtos.stream().collect(Collectors.groupingBy(FinProductSpecialImportDto::getFinprodMarketId));
+                for (Map.Entry<String, List<FinProductSpecialImportDto>> entry : collect.entrySet()) {
+                    List<FinProductSpecialImportDto> value = entry.getValue();
+                    if (!CollectionUtils.isEmpty(value) && value.size() > 1) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        value.stream().forEach(finProductSpecialImportDto -> {
+                            Integer index = finProductSpecialImportDto.getIndex();
+                            stringBuilder.append(index).append(",");
+                        });
+                        allErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_EXCEL_ALREADY_EXISTS", stringBuilder.toString())).append(CHANGE_LINE_MARK);
                     }
                 }
-
                 if (StringUtil.isNotBlank(allErrorMsg)) {
                     result.setMessage(allErrorMsg.toString(), MessageType.错误消息);
                     return result;
@@ -260,9 +273,14 @@ public class FinProductSpecialValidatorService implements BeanValidator {
         for (int i = 0; i < dataList.size(); i++) {
             List<String> list = dataList.get(i);
             FinProductSpecialImportDto entity = new FinProductSpecialImportDto();
+            String id = list.get(1);
+            String text = list.get(2);
+            if (StringUtil.isBlank(id)) {
+                id = finProductSpecial001Service.queryFinprodIdByAbbr(text);
+            }
             entity.setSerialNumber(list.get(0));
-            entity.setFinprodMarketId(list.get(1));
-            entity.setFinprodAbbr(list.get(2));
+            entity.setFinprodMarketId(id);
+            entity.setFinprodAbbr(text);
             entity.setIsAbs(list.get(3));
             entity.setIsSpecialDebt(list.get(4));
             entity.setIsDefaultBondIndicator(list.get(5));
