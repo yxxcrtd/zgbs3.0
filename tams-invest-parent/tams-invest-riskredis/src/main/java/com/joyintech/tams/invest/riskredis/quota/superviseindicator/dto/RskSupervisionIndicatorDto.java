@@ -43,7 +43,7 @@ public class RskSupervisionIndicatorDto  extends RskIsupIndicator {
    	}
    	
     @Override
-	@Length(fieldName = "RskSupervisionIndicator002.indName", max = 60,groups={ValidateGroupEdit.class})
+	@Length(fieldName = "RskSupervisionIndicator002.indName", max = 200,groups={ValidateGroupEdit.class})
 	@NotEmpty(fieldName = "RskSupervisionIndicator002.indName",groups={ValidateGroupEdit.class})
 	public String getIndName() {
 		return super.getIndName();
