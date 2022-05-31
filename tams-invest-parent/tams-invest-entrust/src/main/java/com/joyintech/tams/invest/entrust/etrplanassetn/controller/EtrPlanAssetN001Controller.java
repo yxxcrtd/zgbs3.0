@@ -70,9 +70,6 @@ public class EtrPlanAssetN001Controller extends BaseController{
     @Autowired
     private EtrEntrustMapper etrEntrustMapper;
 
-
-    @Autowired
-    private  BaseRiskRdsService baseRiskRdsService;
     /**
      * 页面初始化
      */
