@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -26,16 +27,14 @@ import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.datacommon.db.service.OrderService;
 import com.joyintech.tams.exchange.service.trade.position.service.PositionRequestServiceInstructionRequest;
-import com.joyintech.tams.exchange.service.trade.processor.invest.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.processor.TradeHelper;
 import com.joyintech.tams.exchange.service.trade.processor.algorithm.AlgorithmHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.common.CommonCheckHelper;
+import com.joyintech.tams.exchange.service.trade.processor.invest.InvestInterfaceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.joyintech.tams.business.common.exception.PositionException;
-
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -117,8 +116,7 @@ public class OrderManagement extends BaseService {
     private ResultBean checkSPPI(OrderPlaceBean orderPlaceBean) {
 
         Instruction instruction = instructionService.findById(orderPlaceBean.getInstructionId());
-        if (InvestmentAssetType.isBond(instruction.getAssetType()) && InstructionPs.BUY.codeEquals(instruction.getPs()))
-        {
+        if (InvestmentAssetType.isBond(instruction.getAssetType()) && InstructionPs.BUY.codeEquals(instruction.getPs())) {
             BidPriceConInfoRequest request = new BidPriceConInfoRequest();
             request.setPs(InstructionPs.BUY.getCode());
             request.setFinprodId(instruction.getFinprodId());
@@ -133,10 +131,13 @@ public class OrderManagement extends BaseService {
     //头寸引擎余额检查
     private void checkPosition(OrderPlaceBean orderPlaceBean) {
         Instruction instruction = instructionService.findById(orderPlaceBean.getInstructionId());
-//        	PositionInstructionRequest instructionClone = (PositionInstructionRequest)instruction.cloneInstruction();
         PositionInstructionRequest instructionClone = new PositionInstructionRequest();
         BeanUtil.copyProperties(instruction, instructionClone);
         instructionClone.setSoftSkipMode(orderPlaceBean.getSoftSkipMode());
+        //公平交易
+        if (tradeHelper.isFairTransaction(orderPlaceBean, instructionClone)) {
+            return;
+        }
         //普通下单
         if (tradeHelper.isOrdinaryTransaction(orderPlaceBean, instruction)) {
             logger.info("普通交易头寸检查...");
@@ -144,8 +145,6 @@ public class OrderManagement extends BaseService {
             instructionClone.setEntrustNum(orderPlaceBean.getEntrustVolume());
             instructionClone.setEntrustPrice(orderPlaceBean.getEntrustPrice());
             instructionClone.setFullPrice(orderPlaceBean.getFullPrice());
-        } else if (tradeHelper.isFairTransaction(orderPlaceBean, instructionClone)) { //公平交易
-            return;
         } else {
             tradeHelper.fillEntrustPriceAndAmt(orderPlaceBean, instructionClone, instruction);
         }
@@ -177,9 +176,24 @@ public class OrderManagement extends BaseService {
         String uniqueCheck = commonCheckHelper.checkApplyEntrust(integratedEntrust.getEntrustProp(), integratedEntrust.getAccountId(), integratedEntrust.getStockCode(), integratedEntrust.getInstructionId());
         if (Objects.nonNull(uniqueCheck))
             return new ResultBean(ErrorCode.INSTRUCTION_APPLY_NOT_UNIQUE.value, ErrorCode.INSTRUCTION_APPLY_NOT_UNIQUE.errorMsg + ":" + uniqueCheck, integratedEntrust);
+
+        String instructionId = integratedEntrust.getInstructionId();
+        // SPPI检查
+        OrderPlaceBean orderPlaceBean = new OrderPlaceBean();
+        orderPlaceBean.setInstructionId(instructionId);
+        orderPlaceBean.setEntrustPrice(integratedEntrust.getEntrustPrice());
+        ResultBean sppiResult = checkSPPI(orderPlaceBean);
+        if (sppiResult.isFail()) {
+            return sppiResult;
+        } else {
+            BidPriceConInfoResponse response = (BidPriceConInfoResponse) sppiResult.getData();
+            if (ObjectUtil.isNotNull(response) && response.getStatus() != 0) {
+                return ResultBean.error(ErrorCode.CHECK_ERROR.value, "SPPI 校验失败：" + response.getMessage(), orderPlaceBean);
+            }
+        }
+
         //头寸引擎余额检查---start
         try {
-            String instructionId = integratedEntrust.getInstructionId();
             Instruction instruction = instructionService.findById(instructionId);
             PositionInstructionRequest instructionClone = new PositionInstructionRequest();
             BeanUtil.copyProperties(instruction, instructionClone);

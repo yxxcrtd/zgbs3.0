@@ -555,7 +555,7 @@
 		</where>
 	</select>
 
-	<select id="getValue" resultType="java.lang.Double">
+	<select id="getValue" resultType="java.util.HashMap">
 		select
 			NVL(C.VALUATION,0)   value
 		from

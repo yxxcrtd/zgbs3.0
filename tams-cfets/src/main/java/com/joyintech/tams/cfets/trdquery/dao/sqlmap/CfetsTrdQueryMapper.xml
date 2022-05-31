@@ -45,7 +45,6 @@
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>
       <!--  <include refid="vagueQueryCommWhere"></include>-->
-
         order by aaa.finprodType2, aaa.regStatus,aaa.ps DESC)
         <!--前端传入排序字段-->
         <if test="sort != null and sort != '' and direction != null and direction != ''">
@@ -161,6 +160,12 @@
                 #{item}
             </foreach>
         </if>
+        <if test="busiTypePositionList != null and busiTypePositionList.size() > 0">
+            AND btm.busi_type in
+            <foreach collection="busiTypePositionList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
         <if test="tradeMarket != null and !tradeMarket.equals('')">
             AND reg.trade_market=#{tradeMarket,jdbcType=VARCHAR}
         </if>
@@ -208,7 +213,7 @@
     <sql id="onlyRegBidInfo">
         SELECT
             distinct decode(BO.IS_CANCEL,'Y','撤销','N','有效')	effectiveStatusStr,
-            FPT.TYPE_8  AS	finprodType2,
+            FPT.TYPE_9  AS	finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN 	#{BUSI_TYPE_POSITION_01}
              WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END AS	busiTypePosition,
             FP.finprod_id as finprodId,
@@ -222,7 +227,7 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END
                 AS	faceValue,
-            CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN TO_CHAR(ROUND(BRBP.BID_PRICE,4),'FM990.0000')
+            CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BRBP.BID_PRICE
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD,4),'FM990.0000')  END AS tradeYield,
             null									AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
@@ -252,7 +257,7 @@
                                   wm_concat(STLINFO.SEC_ACCT_NAME) SEC_ACCT_NAME,
                                   wm_concat(BRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                                   wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                                  wm_concat(BRBP.BID_PRICE) BID_PRICE
+                                  wm_concat(TO_CHAR(ROUND(BRBP.BID_PRICE,4),'FM990.0000')) BID_PRICE
                    FROM BID_ORDER_BID_PRICE BRBP
                    LEFT JOIN PTL_PORTFOLIO PP
                           ON PP.PORTFOLIO_ID = BRBP.PORTFOLIO_ID
@@ -300,7 +305,7 @@
                 AND #{PS_T01} =#{ps}
             </if>
             <if test="finprodType2List != null and finprodType2List.size() > 0">
-                AND FPT.TYPE_8 in
+                AND FPT.TYPE_9 in
                 <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -308,6 +313,13 @@
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND BO.FINPROD_ID IN
                 <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiTypePositionList != null and busiTypePositionList.size() > 0">
+                AND (  CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN 	#{BUSI_TYPE_POSITION_01}
+                WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END ) IN
+                <foreach collection="busiTypePositionList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
@@ -346,7 +358,7 @@
     <sql id="onlyWflRegBidInfo">
         SELECT
             '流程中'	effectiveStatusStr,
-             FPT.TYPE_8 AS finprodType2,
+             FPT.TYPE_9 AS finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34} END AS	busiTypePosition,
             FP.FINPROD_ID as finprodId,
@@ -360,7 +372,7 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN WBO.WIN_PRIN_AMT/10000
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN WBO.SUBSCRIPTION_AMOUNT/10000
                 END AS	faceValue,
-                CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN TO_CHAR(ROUND(WBRBP.BID_PRICE,4),'FM990.0000')
+                CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN WBRBP.BID_PRICE
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD,4),'FM990.0000') END AS	tradeYield,
             null	AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
@@ -371,7 +383,7 @@
             to_char(WBO.BID_DATE,'yyyy-MM-dd')	AS	confirmTradeDate,
             WBO.COUNTER_ID		AS	counterId,
             MCCI.COUNTER_NAME AS counterIdStr,
-            WBRBP.PORTFOLIO_ID	AS counterIdStr,
+            WBRBP.PORTFOLIO_ID	AS portfolioIds,
             WBRBP.PORTFOLIO_NAME AS	portfolioNames,
             ''	    AS	quoteType,
             ''		AS	matchStatus,
@@ -386,7 +398,7 @@
                     wm_concat(STLINFO.SEC_ACCT_NAME) SEC_ACCT_NAME,
                     wm_concat(WBRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                     wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                    wm_concat(WBRBP.BID_PRICE) BID_PRICE
+                    wm_concat(TO_CHAR(ROUND(WBRBP.BID_PRICE,4),'FM990.0000')) BID_PRICE
                 FROM WFL_BID_ORDER_BID_PRICE WBRBP
                 LEFT JOIN PTL_PORTFOLIO PP
                 ON PP.PORTFOLIO_ID = WBRBP.PORTFOLIO_ID
@@ -426,7 +438,7 @@
             AND #{PS_T01} =#{ps}
         </if>
         <if test="finprodType2List != null and finprodType2List.size() > 0">
-            AND FPT.TYPE_8 in
+            AND FPT.TYPE_9 in
             <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
@@ -434,6 +446,13 @@
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND WBO.FINPROD_ID IN
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="busiTypePositionList != null and busiTypePositionList.size() > 0">
+            AND (CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
+            WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34} END) in
+            <foreach collection="busiTypePositionList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>
@@ -563,6 +582,12 @@
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND nvl(reg.finprod_id,reg.term_type) in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="busiTypePositionList != null and busiTypePositionList.size() > 0">
+            AND btm.busi_type in
+            <foreach collection="busiTypePositionList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>
@@ -2799,6 +2824,9 @@
             <if test="ps != null and ps!='' ">
                 AND T1.PS= #{ps}
             </if>
+            <if test="bidId != null and bidId!='' ">
+                AND  1 !=1
+            </if>
             <if test="cleanStatus != null and cleanStatus!='' ">
                 AND (case when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus01} THEN #{cleanStatus01}
                 when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus02} THEN #{cleanStatus02}
@@ -2935,6 +2963,9 @@
             <if test="ps != null and ps!='' ">
                 AND T1.PS= #{ps}
             </if>
+            <if test="bidId != null and bidId!='' ">
+                AND  1 !=1
+            </if>
             <if test="cleanStatus != null and cleanStatus!='' ">
                 AND (case when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus01} THEN #{cleanStatus01}
                         when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus02} THEN #{cleanStatus02}
@@ -3070,6 +3101,9 @@
             <if test="ps != null and ps!='' ">
                 AND T1.PS= #{ps}
             </if>
+            <if test="bidId != null and bidId!='' ">
+                AND  1 !=1
+            </if>
             <if test="cleanStatus != null and cleanStatus!='' ">
                 AND (case when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus01} THEN #{cleanStatus01}
                         when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus02} THEN #{cleanStatus02}
@@ -3091,7 +3125,7 @@
                 SO.SETTLE_STATUS   cleanStatus,
                 TMSI.SETTLE_STATUS	 settleStatus,
                 TFPDT.TOTLE_TRADE_ID	totleTradeId,
-                FPT.TYPE_8	 finprodType2,
+                TFPDT.FINPROD_TYPE2	 finprodType2,
                 sdl1.item_value finprodType2Str,
                 CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END tgBusiType,
@@ -3199,6 +3233,10 @@
             </if>
             <if test="ps != null and ps!='' ">
                 AND TFPDT.PS= #{ps}
+            </if>
+            <if test="bidId != null and bidId!='' ">
+                AND (CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.BID_ID
+                WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN '' END) like '%'|| #{bidId}||'%'
             </if>
             <if test="cleanStatus != null and cleanStatus!='' ">
                 AND SO.SETTLE_STATUS = #{cleanStatus}

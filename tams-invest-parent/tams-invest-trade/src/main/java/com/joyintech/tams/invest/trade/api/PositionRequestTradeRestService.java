@@ -113,6 +113,9 @@ public class PositionRequestTradeRestService {
             if(StringUtil.isNotEmpty(dealAdd.getEntrustId())){
                 EtrEntrust entrust = etrEntrustMapper.selectByPrimaryKey(dealAdd.getEntrustId());
                 EtrEntrustAdd entrustAdd = etrEntrustAddMapper.selectByPrimaryKey(dealAdd.getEntrustId());
+                if(null == entrust || null == entrustAdd){
+                    continue;
+                }
                 assetType2 = entrustAdd.getAssetType1();
                 ps = entrust.getPs();
                 finprodType2 = entrust.getFinprodType2();

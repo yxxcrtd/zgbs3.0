@@ -46,6 +46,8 @@ import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid001Service;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsPledgeBondInfoDto;
 import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoinfoService;
@@ -118,7 +120,17 @@ import org.springframework.validation.BindingResult;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -238,6 +250,9 @@ public class CfetsEtrDispatcherService extends BaseService {
 
     @Autowired
     private EtrCommonFinProductInfoService etrCommonFinProductInfoService;
+
+    @Autowired
+    private CfetsEtrBondFirstBid001Service cfetsEtrBondFirstBid001Service;
 
     /**
      * 指令列表分页查询
@@ -434,7 +449,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("10000"),2,RoundingMode.HALF_UP));
                     }
                 }
-                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.平安资产类型_一级投标债券.getValue())){
+                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.平安资产类型_债券.getValue())){
 
                     CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
                     if(dto2 != null) {
@@ -966,8 +981,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                 List<String> traders = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_已接收.getValue())
                         .stream().distinct().collect(Collectors.toList());
                 if (CollectionUtils.isNotEmpty(traders)) {
-                    traders.stream().sorted();
-                    tradersList.stream().sorted();
+                    Collections.sort(traders);
+                    Collections.sort(tradersList);
                     if (!traders.toString().equals(tradersList.toString())) {
                         errorList.add(new ValidMessage("同一投标日的债券[" + finprodId + "]一级投标已有交易员接收，必须分给交易员" + traders.toString()));
                     }
@@ -1053,25 +1068,26 @@ public class CfetsEtrDispatcherService extends BaseService {
                         .stream().distinct().collect(Collectors.toList());
                 List<String> entrustIdListYet = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, Arrays.asList(DictCodeList.委托状态_待接收.getValue()))
                         .stream().distinct().collect(Collectors.toList());
-                traderList.stream().sorted();
-                newTraders.stream().sorted();
+                Collections.sort(traderList);
+                Collections.sort(newTraders);
 
                 if (CollectionUtils.isNotEmpty(traderList) && !StringUtil.equals(traderList.toString(),newTraders.toString())) {
                     newTraderList.addAll(traderList);
                     errorList.clear();
                     errorList.add(new ValidMessage("同一投标日的债券一级投标已有分发记录，是否将已分发记录的交易员也调整为交易员"+newTraders.toString()));
-                }
-                if (CollectionUtils.isNotEmpty(entrustIdListYet)) {
-                    CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
-                    newEntrustIdList.addAll(entrustIdListYet);
-                    etrDispatcherDto.setBidCode("04");
-                    etrDispatcherDto.setErrorList(errorList);
-                    etrDispatcherDto.setTraderList(newTraderList.stream().distinct().collect(Collectors.toList()));
-                    newEntrustIdList.addAll(entrustIdList);
-                    etrDispatcherDto.setEntrustIdList(newEntrustIdList.stream().distinct().collect(Collectors.toList()));
-                    etrDispatcherList.add(etrDispatcherDto);
+                    if (CollectionUtils.isNotEmpty(entrustIdListYet)) {
+                        CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
+                        newEntrustIdList.addAll(entrustIdListYet);
+                        etrDispatcherDto.setBidCode("04");
+                        etrDispatcherDto.setErrorList(errorList);
+                        etrDispatcherDto.setTraderList(newTraderList.stream().distinct().collect(Collectors.toList()));
+                        newEntrustIdList.addAll(entrustIdList);
+                        etrDispatcherDto.setEntrustIdList(newEntrustIdList.stream().distinct().collect(Collectors.toList()));
+                        etrDispatcherList.add(etrDispatcherDto);
 
+                    }
                 }
+
             }
 
         }
@@ -1522,7 +1538,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                     spcdCode = spcdCode + ",02";
                     infoForm.addAll(cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode));
                 }
-            }else if(StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), dto.getBusiTypePosition())) {
+            }else if(StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), dto.getBusiTypePosition()) ||
+                    StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), dto.getBusiTypePosition())) {
                 //一级投标
                 return bondFirstLBidding(pageCode, dtCode, spcdCode,dto);
             }else {
@@ -1700,6 +1717,38 @@ public class CfetsEtrDispatcherService extends BaseService {
         List<UploadFile> files = fileAttachmentProcess.fetchByBusinessCode(dto.getEntrustId());
         resultData.put(dtCode + "_fileTable",fileTable);
         resultData.put(dtCode + "_fileTableData",files);
+        return resultData;
+    }
+
+    /**
+     * 一级投标&一级申购 指令信息
+     * @param pageCode
+     * @param dtCode
+     * @param spcdCode
+     * @param dto
+     * @return
+     */
+    private Map<String, Object> bondFirstLBidding2(String pageCode, String dtCode, String spcdCode, CommonSearchInfoRequest dto) {
+        Map<String, Object> resultData = new HashMap<>();
+        //基本信息
+        List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+        CfetsEtrBondFirstBid002Dto infoData = cfetsEtrBondFirstBid001Service.getEtrEntrustInfo(dto.getEntrustId());
+
+        resultData.put(dtCode + "_infoForm",infoForm);
+        resultData.put(dtCode + "_infoFormData",infoData);
+        //备注
+        List<CfgReadonlyFormShow> rFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",R"));
+        resultData.put(dtCode + "_rFrom",rFrom);
+        resultData.put(dtCode + "_rFromData",infoData);
+        //投标券面总额汇总
+        List<CfgReadonlyFormShow> aFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",A"));
+        resultData.put(dtCode + "_aFrom",aFrom);
+        resultData.put(dtCode + "_aFromData",infoData);
+        //投标标位
+        List<CfgDataTableShow> infoTable =  cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, null, null);
+        resultData.put(dtCode + "_infoTable",infoTable);
+        resultData.put(dtCode + "_infoTableData",infoData.getBiddingProductList());
+
         return resultData;
     }
 

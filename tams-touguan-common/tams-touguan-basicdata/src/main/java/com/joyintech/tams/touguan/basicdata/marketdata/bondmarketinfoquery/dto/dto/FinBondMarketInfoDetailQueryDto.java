@@ -259,6 +259,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "conVdate", value = "转股起始日")
     private Date conVdate;
 
+    @ApiModelProperty(name = "calcRule", value = "推算方式")
+    private String calcRule;
+
     @ApiModelProperty(name = "conPrice", value = "转股价格")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal conPrice;
@@ -284,6 +287,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     private Date listingDate;
 
     private String principalCashId;
+
+    @ApiModelProperty(name="yield",value="初始利率")
+    private BigDecimal yield;
 
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
@@ -994,5 +1000,21 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setPrincipalCashId(String principalCashId) {
         this.principalCashId = principalCashId;
+    }
+
+    public String getCalcRule() {
+        return calcRule;
+    }
+
+    public void setCalcRule(String calcRule) {
+        this.calcRule = calcRule;
+    }
+
+    public BigDecimal getYield() {
+        return yield;
+    }
+
+    public void setYield(BigDecimal yield) {
+        this.yield = yield;
     }
 }

@@ -1640,6 +1640,11 @@ public class InvestmentManagement extends BaseService {
                 || DEBT_TO_EQUITY.value.equals(entrustBussType)) {
             instruction.setTradePlat(TradePlat.NORMAL.value);
         }
+        //深圳大宗交易，设置交易平台为 深圳综合协议平台
+        if (投管业务类型_大宗交易.getValue().equals(instruction.getBusiTypeTg())
+                && StringUtil.equals(Market.SZSE.investValue, instruction.getTradeMarket())) {
+            instruction.setTradePlat(TradePlat.SZ_PROTOCOL.value);
+        }
     }
 
     private void handleInstructionSetTradersInfo(Instruction instruction, List<Instruction> instructions) {

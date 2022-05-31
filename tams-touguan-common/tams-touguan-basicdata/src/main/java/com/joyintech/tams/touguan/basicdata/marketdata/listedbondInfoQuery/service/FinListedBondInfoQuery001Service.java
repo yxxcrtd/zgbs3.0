@@ -13,7 +13,10 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.MstCustomerInfoAddMapper;
 import com.joyintech.tams.common.base.dao.MstCustomerInfoMapper;
@@ -23,9 +26,7 @@ import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -39,6 +40,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -61,7 +63,6 @@ public class FinListedBondInfoQuery001Service extends BaseService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     @Resource
     private BaseGetBusinessId bussGetBussinessIdService;
     @Resource
@@ -78,6 +79,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     private FinProductMapper finProductMapper;
     @Resource
     private IPlatformDate iPlatformDate;
+    @Resource
+    private JoyinbusinessCommonService joyinbusinessCommonService;
 
     /**
      * 待上市债券市场信息分页查询
@@ -169,6 +172,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @param secId
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public AjaxResult addCoupons(String secId) {
         AjaxResult ajaxResult = new AjaxResult();
         logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]", secId);
@@ -191,11 +195,20 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             ajaxResult.setMessageType(MessageType.错误消息);
             return ajaxResult;
         }
-
+        finListedBondInfoQuery001Dto.setIsAutoUpdate(DictCodeList.是否_否.getValue());
+        //非空校验
+        emptyCheck(finListedBondInfoQuery001Dto, validMessages);
+        if (CollectionUtils.isNotEmpty(validMessages)) {
+            ajaxResult.setErrorList(validMessages);
+            ajaxResult.setMessageType(MessageType.警告消息);
+            return ajaxResult;
+        }
         //接口数据转换
         InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto);
         //公共加券操作
         commonAutoCouponService.autoBondCouponSave(interfPayhsrcsecinfoDto);
+        //保存操作记录
+        this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
         //发行人处理
         return ajaxResult;
     }
@@ -276,7 +289,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         FinProductAdd finProductAdd = new FinProductAdd();
         finProductAdd.setFinprodId(finProdId);
         finProductAdd.setWindId(secId);
-        finProductAdd.setIsAutoUpdate(DictCodeList.是否_是.getValue());
+        finProductAdd.setIsAutoUpdate(DictCodeList.是否_否.getValue());
+        finProductAdd.setCrossMarket(DictCodeList.是否_否.getValue());
         //面值
         finProductAdd.setFaceValue(finListedBondInfoQuery001Dto.getFaceValue());
         // 20200819 债券自动加券优化-判断城投债级别 wangwei end
@@ -319,9 +333,9 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setIssueStyle(finListedBondInfoQuery001Dto.getReleaseType());
         finProductIssue.setAddBatch(0L);
         finProductIssue.setIssuePrice(Objects.nonNull(finListedBondInfoQuery001Dto.getIssuePx()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()) : null);
-        finProductIssue.setReferYield(finListedBondInfoQuery001Dto.getCouponRate());
+        finProductIssue.setReferYield(Objects.nonNull(finListedBondInfoQuery001Dto.getCouponRate()) ? new BigDecimal(finListedBondInfoQuery001Dto.getCouponRate()) : null);
         finProductIssue.setRateGrade(finListedBondInfoQuery001Dto.getDecimalPlaces());
-        finProductIssue.setBp(finListedBondInfoQuery001Dto.getSpread());
+        finProductIssue.setBp(Objects.nonNull(finListedBondInfoQuery001Dto.getSpread()) ? new BigDecimal(finListedBondInfoQuery001Dto.getSpread()) : null);
         finProductIssue.setIssueDate(finListedBondInfoQuery001Dto.getIssueDate());
         finProductIssue.setPayDate(finListedBondInfoQuery001Dto.getPayDate());
         finProductIssue.setFirstConfirmDate(finListedBondInfoQuery001Dto.getInterestAccrualDate());
@@ -417,6 +431,93 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         config.setOutputValue2(secondaryClassification);
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
         return finListedBondInfoQueryMapper.getWindType(config);
+    }
+
+
+    /**
+     * 保存操作记录
+     *
+     * @param tradeId
+     * @param remark
+     * @param operType
+     */
+    private void saveOperate(String tradeId, String remark, DictCodeListExt3 operType, String workFlowId) {
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setEntrustId(tradeId);
+        oprHisReq.setOperType(operType.getValue());
+        oprHisReq.setBusiDes(remark);
+        oprHisReq.setWorkflowId(workFlowId);
+        oprHisReq.setBusiType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+    }
+
+    /**
+     * 空检查
+     *
+     * @param dto
+     * @param validList
+     */
+    private void emptyCheck(FinListedBondInfoQuery001Dto dto, List<ValidMessage> validList) {
+        ValidUtils.valid(dto, validList);
+        if (Objects.nonNull(dto.getValueDate()) && Objects.nonNull(dto.getExpiryDate()) && dto.getValueDate().compareTo(dto.getExpiryDate()) >= 0) {
+            validList.add(new ValidMessage("起息日不能大于到期日"));
+        }
+        if (StringUtil.isNotEmpty(dto.getIssueMethod()) && (StringUtil.equals(dto.getIssueMethod(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
+                StringUtil.equals(dto.getIssueMethod(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
+            if (StringUtil.isEmpty(dto.getTenderTarget())) {
+                validList.add(new ValidMessage("招标标的不能为空"));
+            }
+        }
+        if (StringUtil.isNotEmpty(dto.getReleaseType()) && StringUtil.equals(dto.getReleaseType(), DictCodeListExt4.发行类型_增发.getValue())) {
+            if (Objects.isNull(dto.getAdditionalBatches())) {
+                validList.add(new ValidMessage("增发批次不能为空"));
+            }
+        }
+        if (StringUtil.isNotEmpty(dto.getIssueMethod()) && (StringUtil.equals(dto.getIssueMethod(), DictCodeListExt4.新债_发行方式_报价发行.getValue()) || (
+                StringUtil.equals(dto.getIssueMethod(), DictCodeListExt4.新债_发行方式_报价发行.getValue()) && StringUtil.isNotEmpty(dto.getBiddingMethod()) &&
+                        (StringUtil.equals(dto.getBiddingMethod(), DictCodeListExt4.招标方式_单一价格招标) || StringUtil.equals(dto.getBiddingMethod(), DictCodeListExt4.招标方式_数量招标))
+        ))) {
+            if (Objects.isNull(dto.getIssueDate())) {
+                validList.add(new ValidMessage("发行日不能为空"));
+            } else if (DateUtil.compareDate(dto.getIssueDate(), iPlatformDate.getSysDate()) < 0) {
+                validList.add(new ValidMessage("发行日需大于等于平台日"));
+            }
+            if (Objects.isNull(dto.getPayDate())) {
+                validList.add(new ValidMessage("缴款日不能为空"));
+            }
+            if (Objects.isNull(dto.getIssuePx())) {
+                validList.add(new ValidMessage("发行价格不能为空"));
+            }
+        }
+        if (StringUtil.isNotEmpty(dto.getIssueMethod()) && StringUtil.equals(dto.getIssueMethod(), DictCodeListExt4.新债_发行方式_报价发行.getValue()) &&
+                StringUtil.equals(dto.getIssueMethod(), DictCodeListExt4.招标方式_数量招标)) {
+            if (Objects.isNull(dto.getIssuePx())) {
+                validList.add(new ValidMessage("发行价格不能为空"));
+            }
+        }
+        if (StringUtil.isNotEmpty(dto.getIssueMethod()) && StringUtil.equals(dto.getIssueMethod(), DictCodeListExt4.新债_发行方式_报价发行.getValue()) &&
+                (StringUtil.isNotEmpty(dto.getCouponSpecies()) && (StringUtil.equals(dto.getCouponSpecies(), DictCodeList.息票品种_贴现.getValue()) || StringUtil.equals(dto.getCouponSpecies(), DictCodeList.息票品种_零息.getValue())))) {
+            if (Objects.isNull(dto.getStipulationValue())) {
+                validList.add(new ValidMessage("参考收益率不能为空"));
+            }
+        }
+        if (StringUtil.isNotEmpty(dto.getReleaseType()) && StringUtil.equals(dto.getReleaseType(), DictCodeListExt4.发行类型_增发.getValue())) {
+//            if (StringUtil.isNotEmpty(dto.getProductAddDto().getCrossMarket()) && StringUtil.equals(dto.getProductAddDto().getCrossMarket(), DictCodeList.是否_是.getValue())) {
+//                if (StringUtil.isEmpty(dto.getProductAddDto().getCrossMarketCode())) {
+//                    validList.add(new ValidMessage("跨市场代码不能为空"));
+//                }
+//            }
+            if (StringUtil.isEmpty(dto.getListingCode())) {
+                validList.add(new ValidMessage("上市代码不能为空"));
+            }
+            if (StringUtil.isNotEmpty(dto.getAdditionalTenderBeginDate()) && DateUtil.compareDate(DateUtil.parse(dto.getAdditionalTenderBeginDate()), iPlatformDate.getSysDate()) < 0) {
+                validList.add(new ValidMessage("增发投标日截止日需大于等于平台日"));
+            }
+        } else {
+            if (StringUtil.isNotEmpty(dto.getBidEndDate()) && DateUtil.compareDate(DateUtil.parse(dto.getBidEndDate()), iPlatformDate.getSysDate()) < 0) {
+                validList.add(new ValidMessage("投标日截止日需大于等于平台日"));
+            }
+        }
     }
 
 }

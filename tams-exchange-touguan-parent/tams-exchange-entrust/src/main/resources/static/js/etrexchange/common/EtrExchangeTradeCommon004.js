@@ -2825,9 +2825,9 @@
     //根据是否纳入金额结算 设置清算速度
     var setSettleSpeed = function (isNetSett) {
         if (isNetSett == YES_OR_NO_Y) {
-            $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_01).trigger('change');
-        } else {
             $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_02).trigger('change');
+        } else {
+            $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_01).trigger('change');
         }
         $("#settleSpeed_" + currentTab).attr("disabled", true);
     }
@@ -3518,10 +3518,10 @@
     };
 
     function getBussCombDistribtTableParams() {
+        var ps = $("#ps_" + currentTab).val();
         var ebcd = entity_BussCombDistribtList || [];
         if(ebcd.length > 0) {
-            var item = ebcd[0];
-            var isPs68OrPs69 = item.ps == PS_T68 || item.ps == PS_T69;
+            var isPs68OrPs69 = (ps == PS_T68 || ps == PS_T69);
             if (isPs68OrPs69) {
             for (var i = 0; i < ebcd.length; i++) {
                     var ebcdKey = ebcd[i];

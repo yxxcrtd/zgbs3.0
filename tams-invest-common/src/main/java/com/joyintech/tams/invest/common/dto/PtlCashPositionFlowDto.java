@@ -36,6 +36,10 @@ public class PtlCashPositionFlowDto extends PtlCashPositionFlow {
      *数据已入新头寸，Y：已入
      */
     private String isExistNew;
+    /**
+     * 是否删除可用 : N 不删除
+     */
+    private String isDeleteAble;
 
 
     public String getSplitType() {
@@ -127,5 +131,13 @@ public class PtlCashPositionFlowDto extends PtlCashPositionFlow {
 
     public void setIsExistNew(String isExistNew) {
         this.isExistNew = isExistNew;
+    }
+
+    public String getIsDeleteAble() {
+        return isDeleteAble;
+    }
+
+    public void setIsDeleteAble(String isDeleteAble) {
+        this.isDeleteAble = isDeleteAble;
     }
 }

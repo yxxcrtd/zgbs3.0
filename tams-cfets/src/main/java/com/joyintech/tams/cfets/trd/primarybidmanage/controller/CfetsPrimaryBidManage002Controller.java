@@ -17,10 +17,9 @@ import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageValidatorService;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -74,6 +73,8 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
     @Autowired
     private CfetsPrimaryBidManageValidatorService CfetsPrimaryBidManageValidatorService;
 
+    @Autowired
+    private FinProductMapper finProductMapper;
 
     @ApiOperation(value="新建页面初始化参数", notes = "新建页面初始化参数")
     @PostMapping("/getInitPageParams")
@@ -230,7 +231,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
             dto.setTotalWinId(IDGenerator.generate());
         }
-        dto.setIsWin("04");
+        dto.setIsWin(DictCodeList.是否_是.getValue());
         WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
@@ -307,6 +308,14 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
     @PostMapping("/calcPriceAndYield")
     public Message<CalcPriceAndYieldResponse> calcPriceAndYield(@RequestBody CalcPriceAndYieldRequest dto ){
         try{
+            dto.setPs(DictCodeList.交易方向_买入.getValue());
+            dto.setCalculateField("03");
+            if (StringUtil.isNotEmpty(dto.getFinprodId())){
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+               if (StringUtil.equals( finProduct.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+                  dto.setFinprodId("F01_"+finProduct.getCirculationCode());
+               }
+            }
             Map<String, Object> param = BeanUtil.object2Map(dto);
             Map<String, BigDecimal> returnMap=cfetsPrimaryBidManageService.calcPriceAndYield(param);
             Map<String, Object> returnObjMap=new HashMap<>();

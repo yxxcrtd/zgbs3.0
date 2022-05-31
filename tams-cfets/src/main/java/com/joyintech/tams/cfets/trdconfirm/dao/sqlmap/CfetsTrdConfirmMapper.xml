@@ -1784,10 +1784,15 @@
                 deal.SEC_ACCT_ID                as secManageAcctId,
                 stlinfo.sec_acct_name           as secManageAcctIdName,
                 bo.SUBSCRIPTION_AMOUNT/10000    as printAmt,
-                case
+                /*case
                     when icb.ISSUE_PRICE is not null then TO_CHAR(icb.ISSUE_PRICE,'FM99990.9990') || '元'
                     when icb.SPREAD is not null then TO_CHAR(icb.SPREAD,'FM99990.90') || 'BP'
-                    when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYield,
+                    when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYield,*/
+                case
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then SDL_SD.ITEM_VALUE || '+' || to_char(nvl(fpi.BP*10000, 0),'FM999990.90')||'BP'
+                    when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD*100,'FM99990.9990') || '%'
+                    when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                    then to_char(fpi.REFER_YIELD*100,'FM99990.9990') || '%' end                tradeYield,
                 null                            as termDays,
                 bo.PAYABLE_AMOUNT               as tradeAmt,
                 bo.BID_DATE                     as tradeDate,
@@ -1806,6 +1811,8 @@
              inner join BID_ORDER bo on m.pre_trade_id = bo.BID_ID
              left join fin_product fp on bo.finprod_id = fp.finprod_id
              left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
+             left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+             LEFT JOIN SYS_DATADICT_LIST SDL_SD on fpi.INT_RATE_ID = SDL_SD.ITEM_CODE and SDL_SD.DICT_CODE='SECRATE_DATA'
              left join SYS_DATADICT_LIST sdl on sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO' and sdl.ITEM_CODE = fpt.TYPE_9
              inner join(select bobp.BID_ID,
                                eed.SEC_ACCT_ID,

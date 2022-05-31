@@ -3533,6 +3533,8 @@ select #{R7S1} as remType,
 		PSPR.cdate as cdate,
 		SSAI.Trade_Place as tradePlace
 		from ptl_sec_position_rule 	PSPR
+		left join (select * from ptl_sec_position_rule where hoding_type='A_071' and date_type='0' and cdate = TO_DATE(#{quaryDateStr}, 'YYYY-MM-DD')) T
+		on PSPR.sec_acct_id = T.sec_acct_id
 		left join ptl_portfolio 	PP
 		on PSPR.portfolio_id = PP.portfolio_id
 		left join PTL_PORTFOLIO_AUTHORITY 	PPAU
@@ -3541,7 +3543,7 @@ select #{R7S1} as remType,
 		on PSPR.sec_acct_id = SSAI.sec_Acct_Id
 		LEFT JOIN SYS_ACTIVEREMINDER_SET REMINDER_SET
 		ON REMINDER_SET.REM_TYPE=#{R12S1}
-		where PSPR.hoding_type = 'A_001'
+		where PSPR.hoding_type = 'A_159'
 		<if test="finprodId != null and !finprodId.equals('')">
 			AND PSPR.finprod_id = #{finprodId}
 		</if>
@@ -3550,7 +3552,7 @@ select #{R7S1} as remType,
 		</if>
 		and PSPR.cdate = TO_DATE(#{quaryDateStr}, 'YYYY-MM-DD')
 		and PSPR.date_type = '0'
-		and <![CDATA[PSPR.amount < 0]]>
+		and <![CDATA[(PSPR.amount-NVL(T.amount,0)) < 0]]>
 		AND NOT EXISTS
 		(select 1
 		from SYS_ACTIVEREMINDER_INFO  SAI
@@ -4073,13 +4075,15 @@ select #{R7S1} as remType,
 		PSPR.cdate as 结果日期,
 		SSAI.Trade_Place as 交易场所
 		from ptl_sec_position_rule 	PSPR
+		left join (select * from ptl_sec_position_rule where hoding_type='A_071' and date_type='0' and cdate=TO_DATE(#{quaryDateStr}, 'YYYY-MM-DD')) T
+		on PSPR.sec_acct_id = T.sec_acct_id
 		left join ptl_portfolio 	PP
 		on PSPR.portfolio_id = PP.portfolio_id
 		left join PTL_PORTFOLIO_AUTHORITY 	PPAU
 		on PSPR.portfolio_id = PPAU.Portfolio_Id
 		left join STL_SEC_ACCT_INFO 	SSAI
 		on PSPR.sec_acct_id = SSAI.sec_Acct_Id
-		where PSPR.hoding_type = 'A_001'
+		where PSPR.hoding_type = 'A_159'
 		<if test="finprodId != null and !finprodId.equals('')">
 			AND PSPR.finprod_id = #{finprodId}
 		</if>
@@ -4088,7 +4092,7 @@ select #{R7S1} as remType,
 		</if>
 		and PSPR.cdate = TO_DATE(#{quaryDateStr}, 'YYYY-MM-DD')
 		and PSPR.date_type = '0'
-		and <![CDATA[PSPR.amount < 0]]>
+		and <![CDATA[(PSPR.amount-NVL(T.amount,0)) < 0]]>
 		AND NOT EXISTS
 		(select 1
 		from SYS_ACTIVEREMINDER_INFO  SAI

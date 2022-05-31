@@ -8,8 +8,8 @@
         SELECT s.* FROM (
         SELECT
         '${otherEffectFlag_01}' otherEffectFlag,
-        CASE WHEN BO.IS_WIN = 'Y' THEN '03'
-        WHEN BO.IS_WIN = 'N' THEN '04'
+        CASE WHEN BO.IS_WIN = 'Y' THEN '04'
+        WHEN BO.IS_WIN = 'N' THEN '03'
         ELSE '02' END isWin,
         BO.BID_ID bidId,
         BO.FINPROD_ID finprodId,
@@ -20,7 +20,7 @@
         BOBP.ENTRUST_NUM/100 bidPrinAmt,
         BO.WIN_PRIN_AMT/10000 totalBiddingNum,
         BOBP.BID_PRICE bidPrice,
-        BO.WIN_TYPE winType,
+        BO.BID_MODLE bidModle,
         BO.PAY_TYPE payType,
         BO.BID_DATE bidCfmDate,
         FP.TRADE_MARKET tradeMarket,
@@ -31,13 +31,13 @@
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
-        WHERE BO.IS_CANCEL = 'N' AND
+        WHERE FPI.ISSUE_CLASS = '02'  AND BO.IS_CANCEL = 'N' AND
         BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE =#{COMMON_BUSINESS_TYPE_TRD97} and
         TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL='N')
         <if test="finprodIdList != null and finprodIdList.size() > 0">
@@ -89,6 +89,12 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="counterIdList != null and counterIdList.size() > 0">
+                AND BO.COUNTER_ID in
+                <foreach collection="counterIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="bidId != null and bidId != ''">
                 AND BO.BID_ID like '%' || #{bidId} || '%'
             </if>
@@ -103,7 +109,7 @@
         left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
         left join SYS_DATADICT_LIST sdl_otherEffectFlag on ss.otherEffectFlag=sdl_otherEffectFlag.ITEM_CODE and sdl_otherEffectFlag.DICT_CODE='STATUS_VALID'
         left join SYS_DATADICT_LIST sdl_tt on ss.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
-        left join SYS_DATADICT_LIST sdl_wt on ss.winType=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
+        left join SYS_DATADICT_LIST sdl_wt on ss.bidModle=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
         left join SYS_DATADICT_LIST sdl_ept on ss.payType=sdl_ept.ITEM_CODE and sdl_ept.DICT_CODE='ETR_PAY_TYPE'
         <!-- 关键字模糊查询 -->
         <include refid="keywordsCfmWhere"></include>)
@@ -129,8 +135,8 @@
     </sql>
     <select id="getBidManageCfmInfo" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageCfmResponse" parameterType="Map">
     SELECT
-        CASE WHEN BO.IS_WIN = 'Y' THEN '03'
-             WHEN BO.IS_WIN = 'N' THEN '04'
+        CASE WHEN BO.IS_WIN = 'N' THEN '03'
+             WHEN BO.IS_WIN = 'Y' THEN '04'
              ELSE '02' END isWin,
         BO.BID_ID  bidId,
         BO.FINPROD_ID  finprodId,
@@ -143,6 +149,7 @@
         BOBP.BID_PRICE    bidPrice,
         BO.WIN_TYPE      winType,
         BO.PAY_TYPE      payType,
+        BO.BID_MODLE     bidModle,
         BO.BID_DATE      bidCfmDate,
         FP.TRADE_MARKET  tradeMarket,
         BO.PAY_DATE      payDate,
@@ -155,7 +162,7 @@
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
@@ -249,8 +256,11 @@
         SELECT * FROM (
         SELECT ss.* FROM (
         SELECT
+            BRT.TOTAL_WIN_ID  totalWinId,
             BRT.STATUS  status,
-            BRT.IS_WIN  isWin,
+            CASE WHEN BRT.IS_WIN = 'N' THEN '03'
+            WHEN BRT.IS_WIN = 'Y' THEN '04'
+            ELSE '02' END isWin,
             BO.BID_ID   bidId,
             BRT.FINPROD_ID  finprodId,
             FP.FINPROD_MARKET_ID finprodMarketId,
@@ -284,7 +294,7 @@
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
@@ -403,8 +413,11 @@
 
     <select id="selectDetailForPage" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageResponse" parameterType="Map">
         SELECT
+            BRT.TOTAL_WIN_ID  totalWinId,
             BRT.STATUS  status,
-            BRT.IS_WIN  isWin,
+            CASE WHEN BRT.IS_WIN = 'N' THEN '03'
+            WHEN BRT.IS_WIN = 'Y' THEN '04'
+            ELSE '02' END isWin,
             BO.BID_ID   bidId,
             BRT.FINPROD_ID  finprodId,
             FP.FINPROD_MARKET_ID finprodMarketId,
@@ -434,7 +447,7 @@
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
@@ -453,8 +466,11 @@
         </if>
         UNION ALL
         SELECT
+            BRT.TOTAL_WIN_ID  totalWinId,
             BRT.STATUS       status,
-            BRT.IS_WIN       isWin,
+            CASE WHEN BRT.IS_WIN = 'N' THEN '03'
+            WHEN BRT.IS_WIN = 'Y' THEN '04'
+            ELSE '02' END isWin,
             BO.BID_ID        bidId,
             BRT.FINPROD_ID   finprodId,
             FP.FINPROD_MARKET_ID finprodMarketId,
@@ -484,7 +500,7 @@
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         group by BID_ID
@@ -508,23 +524,26 @@
             BO.FINPROD_ID finprodId,
             FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR finprodAbbr,
+            FP.TRADE_MARKET tradeMarket,
             BO.OUR_TRADER   ouTraderId,
             BO.COUNTER_ID     counterId,
             FPI.TENDER_TARGET tenderTarget,
             FP.CCY            ccy,
-            FPI.PAY_DATE      payDate,
+            NVL(FPI.PAY_DATE,FPI.PAY_EDATE)      payDate,
             FPI.TENDER_SDATE   bidDateStart,
             FPI.TENDER_EDATE   bidDateEnd,
-            BO.PAY_DATE   creditorDebtDate,
+            NVL(FPI.PAY_DATE,FPI.PAY_EDATE)   creditorDebtDate,
             FPA.LISTING_DATE listingDate,
             BO.WIN_TYPE   winType,
+            BO.BID_MODLE     bidModle,
             BO.PAY_TYPE   payType,
             BO.WIN_PRIN_AMT   winPrinAmt,
             FP.CIRCULATION_CODE circulationCode,
             FPI.SERI_Y_N seriYN,
             FP.COUPON_SPECIES  couponSpecies,
             BO.WIN_PRIN_AMT totalBiddingNum,
-            BO.WIN_PRICE winPrice
+            BO.WIN_PRICE winPrice,
+            BO.BID_ID  bidId
         FROM BID_ORDER	BO
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
@@ -558,19 +577,52 @@
             BO.COUNTER_ID   counterId,
             FPI.TENDER_TARGET tenderTarget,
             FP.CCY                   ccy,
-            BRT.BID_DATE             bidDate,
-            BRT.PAY_DATE             payDate,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
             BRT.CREDITOR_DEBT_DATE   creditorDebtDate,
             FPA.LISTING_DATE listingDate,
             BRT.WIN_TYPE   winType,
-            BRT.PAY_TYPE   payType,
+            BO.BID_MODLE     bidModle,
             BO.WIN_PRIN_AMT/10000 totalBiddingNum,
-            BRT.WIN_PRIN_AMT   winPrinAmt,
+            BRT.WIN_PRINAMT   winPrinAmt,
             BRT.WIN_PRICE       winPrice,
             BRT.SETT_FEE_AMT     settFeeAmt,
             BRT.REMARK  remark,
-            FP.TRADE_MARKET  tradeMarket
+            FP.TRADE_MARKET  tradeMarket,
+            BO.BID_ID  bidId,
+            BRT.PAY_DATE  payDate,
+            BO.PAY_TYPE  payType
         FROM BID_RESULT_TOTAL BRT
+        LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+        LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+        UNION ALL
+        SELECT
+            BRT.TOTAL_WIN_ID totalWinId,
+            BRT.FINPROD_ID finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
+            FP.FINPROD_ABBR finprodAbbr,
+            BO.OUR_TRADER   ouTraderId,
+            BO.COUNTER_ID   counterId,
+            FPI.TENDER_TARGET tenderTarget,
+            FP.CCY                   ccy,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
+            BRT.CREDITOR_DEBT_DATE   creditorDebtDate,
+            FPA.LISTING_DATE listingDate,
+            BRT.WIN_TYPE   winType,
+            BO.WIN_PRIN_AMT/10000 totalBiddingNum,
+            BRT.WIN_PRINAMT   winPrinAmt,
+            BRT.WIN_PRICE       winPrice,
+            BRT.SETT_FEE_AMT     settFeeAmt,
+            BRT.REMARK  remark,
+            FP.TRADE_MARKET  tradeMarket,
+            BO.BID_ID  bidId,
+            BRT.PAY_DATE  payDate,
+            BO.PAY_TYPE  payType
+        FROM WFL_BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
@@ -581,12 +633,11 @@
     <select id="selectBasicDtail" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto" parameterType="Map">
         SELECT
             BRD.TOTAL_WIN_ID totalWinId,
-            BRT.BID_TYPE      bidType,
             BRD.ENTRUST_ID  entrustId,
             BRD.PORTFOLIO_ID portfolioId,
             BRD.TOTAL_BID_PRINAMT totalBidPrinamt,
-            BRD.THE_WIN_PRIN_AMT theWinPrinAmt,
-            BRD.ACT_WIN_PRIN_AMT actWinPrinamt,
+            BRD.THE_WIN_PRINAMT theWinPrinAmt,
+            BRD.ACT_WIN_PRINAMT actWinPrinamt,
             BRD.BID_PRICE   bidPrice,
             BRD.WIN_PRICE   winPrice,
             BRD.WIN_CPRICE   winCprice,
@@ -596,12 +647,40 @@
             BRD.INV_AIM   invAim,
             BRD.SEC_ACCT_ID secAcctId,
             EE.INV_MANAGER_ID invManagerId,
-            BRD.ACCT_NO  acctNo,
-            EE.UNIT_CPRICE unitCprice,
-            EE.TRADE_AMT  tradeAmt
+            BOBR.ACCT_NO   acctNo
         FROM BID_RESULT_DETAIL BRD
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN BID_ORDER_BID_PRICE BOBR ON BOBR.BID_ID = BRT.BID_ID
+                                          AND BOBR.ENTRUST_ID = BRD.ENTRUST_ID
+                                          AND BOBR.PORTFOLIO_ID = BRD.PORTFOLIO_ID
+                                          AND BOBR.BID_PRICE = BRD.BID_PRICE
         LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRD.ENTRUST_ID
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+        UNION ALL
+        SELECT
+            BRD.TOTAL_WIN_ID totalWinId,
+            BRD.ENTRUST_ID  entrustId,
+            BRD.PORTFOLIO_ID portfolioId,
+            BRD.TOTAL_BID_PRINAMT totalBidPrinamt,
+            BRD.THE_WIN_PRINAMT theWinPrinAmt,
+            BRD.ACT_WIN_PRINAMT actWinPrinamt,
+            BRD.BID_PRICE   bidPrice,
+            BRD.WIN_PRICE   winPrice,
+            BRD.WIN_CPRICE   winCprice,
+            BRD.INT_AMT   intAmt,
+            BRD.PAY_AMT   payAmt,
+            BRD.SETT_FEE_AMT     settFeeAmt,
+            BRD.INV_AIM   invAim,
+            BRD.SEC_ACCT_ID secAcctId,
+            EE.INV_MANAGER_ID invManagerId,
+            BOBR.ACCT_NO   acctNo
+        FROM WFL_BID_RESULT_DETAIL BRD
+        LEFT JOIN WFL_BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRD.ENTRUST_ID
+        LEFT JOIN BID_ORDER_BID_PRICE BOBR ON BOBR.BID_ID = BRT.BID_ID
+                                          AND BOBR.ENTRUST_ID = BRD.ENTRUST_ID
+                                          AND BOBR.PORTFOLIO_ID = BRD.PORTFOLIO_ID
+                                          AND BOBR.BID_PRICE = BRD.BID_PRICE
         WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
     </select>
 
@@ -786,5 +865,13 @@
         FROM FIN_RATE_INFO
         WHERE FINPROD_ID = #{finprodId}
          AND ROWNUM = 1
+    </select>
+
+    <select id="selectSecAcctSource" resultType="java.lang.String">
+        SELECT
+            SEC_ACCT_SOURCE
+        FROM STL_SEC_ACCT_INFO
+        WHERE
+            SEC_ACCT_ID = #{secAcctId}
     </select>
 </mapper>

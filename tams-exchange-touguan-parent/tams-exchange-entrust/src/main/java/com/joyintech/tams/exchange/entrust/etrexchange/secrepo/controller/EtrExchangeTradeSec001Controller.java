@@ -676,7 +676,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 
 		//SPPI测试
 		if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.isNotEmpty(dto.getFinprodId())
-				&& StringUtil.equals(dto.getPs(),DictCodeList.交易方向_买入.getValue())) {
+				&& StringUtil.equals(dto.getPs(),DictCodeList.交易方向_买入.getValue()) && !StringUtil.equals(dto.getPriceModel(), DictCodeListExt2.价格模式_市价指令.getValue()) ) {
 			//判断是否进行了SPPI测试
 			Map<String, Object> paramsppi = new HashMap<>();
 			paramsppi.put("finprodId", dto.getFinprodId());
@@ -694,7 +694,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 								String[] split = sppiImportData.getBidPriceCon().split(",");
 //								if ((!(dto.getPrice().compareTo(new BigDecimal(split[0]))==0))&&(dto.getPrice().compareTo(new BigDecimal(split[1])) <= 0)) {
 								// modify by fxmei 2022-05-23 需求变更 start
-								if (dto.getPrice().compareTo(new BigDecimal(split[1])) < 0){
+								if (dto.getPrice().compareTo(new BigDecimal(split[1])) <= 0){
 									// modify by fxmei 2022-05-23 需求变更 end
 									confirmMsg="净价不满足使权不重大购入价条件，若继续提交，业务模式会发生变更";
 								}
@@ -708,6 +708,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		AjaxResult ajaxResult = new AjaxResult();
 		if (StringUtil.isNotEmpty(ajax) && StringUtil.isNotEmpty(ajax.getMessageType())
 				&& StringUtil.isNotEmpty(ajax.getData())) {
+			ajaxResult.setMessageType(MessageType.确认消息);
 			if (ajax.getMessageType().equals("错误消息") || ajax.getMessageType().equals("error")){
 				ajaxResult.setMessageType(MessageType.错误消息);
 			}

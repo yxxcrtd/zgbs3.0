@@ -231,7 +231,8 @@ public class BasePtlCashPositionInfoServiceImpl implements BasePtlCashPositionIn
                 basePtlCashPositionInfoMapper.updatePosition(params);
             }
             // 2.2.4 if 输入参数.持仓类型 = 数据字典缓存.持仓类型.实际
-            if (DictCodeList.持仓类型_实际.getValue().equals(positionFlowDto.getHodingType())) {
+            if (DictCodeList.持仓类型_实际.getValue().equals(positionFlowDto.getHodingType())
+                    && !DictCodeList.是否_否.getValue().equals(positionFlowDto.getIsDeleteAble())) {
                 positionFlowDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 deleteCashPosition(positionFlowDto);
             }

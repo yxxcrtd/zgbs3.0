@@ -148,10 +148,13 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
     public int hasSameTrader(TradeInfoProSaveRequest dto) {
         return tradeInfoProMapper.hasSameTrader(dto);
     }
-    public int hasSameDealerPartyNoDiffType(TradeInfoProSaveRequest dto) {
+    public String hasSameDealerPartyNoDiffType(TradeInfoProSaveRequest dto) {
         return tradeInfoProMapper.hasSameDealerPartyNoDiffType(dto);
     }
     public String hasSameDealerPartyNoTraderNo(TradeInfoProSaveRequest dto) {
         return tradeInfoProMapper.hasSameDealerPartyNoTraderNo(dto);
+    }
+    public String hasSameTraderSeqNo(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.hasSameTraderSeqNo(dto);
     }
 }

@@ -20,7 +20,6 @@ import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecial001Service;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecialValidatorService;
-import com.joyintech.workflow.engine.constant.OperationType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
@@ -38,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 特殊债券信息
@@ -139,9 +139,7 @@ public class FinProductSpecial001Controller extends BaseController {
     @PostMapping(value = "/export")
     @ApiOperation(value = "特殊债券信息列表导出", notes = "特殊债券信息列表导出")
     public void export(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
-        ExcelUitl.doExport(req, response, "特殊债券信息", () ->
-                finProductSpecial001Service.queryForPage(req.getDto(FinProductSpecialQueryRequest.class)).getRoot()
-        );
+        ExcelUitl.doExport(req, response, "特殊债券信息", () -> finProductSpecial001Service.queryForPage(req.getDto(FinProductSpecialQueryRequest.class)).getRoot());
     }
 
 
@@ -155,7 +153,18 @@ public class FinProductSpecial001Controller extends BaseController {
     @PostMapping(value = "checkConfirmMsgForImportData")
     @ApiOperation(value = "导入数据文件之前检查数据", notes = "导入数据文件之前检查数据")
     public Message<AjaxResult> checkConfirmMsgForImportData(String fileName) {
-        return Message.success("处理成功", finProductSpecialValidatorService.checkConfirmMsgForImportData(fileName));
+        AjaxResult ajaxResult = finProductSpecialValidatorService.checkConfirmMsgForImportData(fileName);
+        if (Objects.nonNull(ajaxResult.getMessageType()) &&
+                (ajaxResult.getMessageType().equals(MessageType.错误消息.getCode()))) {
+            String validMessage = ValidUtils.getValidMessage(ajaxResult.getErrorList());
+            if (StringUtil.isBlank(validMessage)) {
+                validMessage = ajaxResult.getMessage();
+            }
+            return Message.fail(validMessage);
+        } else {
+            return Message.success("处理成功", ajaxResult);
+        }
+
     }
 
     /**

@@ -30,22 +30,22 @@ import java.util.Objects;
 @ApiModel(value = "债券市场列表详情信息查看", description = "债券市场列表详情信息查看")
 public class FinListedBondInfoQuery001Dto extends BaseDto {
 
-    @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
+    @ApiModelProperty(name = "secId", value = "债券ID/资产代码", required = true)
     private String secId;
 
     @ApiModelProperty(name = "finprodId", value = "金融产品代码")
     private String finprodId;
 
-    @ApiModelProperty(name = "bondName", value = "债券名称")
+    @ApiModelProperty(name = "bondName", value = "债券名称", required = true)
     private String bondName;
 
-    @ApiModelProperty(name = "bondAbbreviation", value = "债券简称")
+    @ApiModelProperty(name = "bondAbbreviation", value = "债券简称", required = true)
     private String bondAbbreviation;
 
-    @ApiModelProperty(name = "tradingPlaces", value = "交易场所")
+    @ApiModelProperty(name = "tradingPlaces", value = "交易场所", required = true)
     private String tradingPlaces;
 
-    @ApiModelProperty(name = "registeredCustodian", value = "登记托管机构")
+    @ApiModelProperty(name = "registeredCustodian", value = "登记托管机构", required = true)
     private String registeredCustodian;
 
     @ApiModelProperty(name = "biddingMethod", value = "招标方式")
@@ -57,7 +57,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "additionalBatches", value = "增发批次")
     private Integer additionalBatches;
 
-    @ApiModelProperty(name = "issuer", value = "发行人")
+    @ApiModelProperty(name = "issuer", value = "发行人", required = true)
     private String issuer;
 
     @ApiModelProperty(name = "issuerName", value = "发行人")
@@ -69,7 +69,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
     private String crossMarketCode;
 
-    @ApiModelProperty(name = "raiseMode", value = "募集方式")
+    @ApiModelProperty(name = "raiseMode", value = "募集方式", required = true)
     private String raiseMode;
 
     @ApiModelProperty(name = "domesticAndForeign", value = "境内外")
@@ -87,7 +87,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "releaseType", value = "发行类型")
     private String releaseType;
 
-    @ApiModelProperty(name = "issueMethod", value = "发行方式")
+    @ApiModelProperty(name = "issueMethod", value = "发行方式", required = true)
     private String issueMethod;
 
     @ApiModelProperty(name = "issueSize", value = "计划发行量")
@@ -114,10 +114,10 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "interestAccrualDate", value = "首次利率确定日")
     private Date interestAccrualDate;
 
-    @ApiModelProperty(name = "valueDate", value = "起息日")
+    @ApiModelProperty(name = "valueDate", value = "起息日", required = true)
     private Date valueDate;
 
-    @ApiModelProperty(name = "expiryDate", value = "到期日")
+    @ApiModelProperty(name = "expiryDate", value = "到期日", required = true)
     private Date expiryDate;
 
     @ApiModelProperty(name = "primaryClassification", value = "一级分类")
@@ -129,16 +129,16 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "threearyClassification", value = "三级分类")
     private String threearyClassification;
 
-    @ApiModelProperty(name = "couponSpecies", value = "息票品种")
+    @ApiModelProperty(name = "couponSpecies", value = "息票品种", required = true)
     private String couponSpecies;
 
     @ApiModelProperty(name = "interestPaymentFrequency", value = "付息频率")
     private String interestPaymentFrequency;
 
-    @ApiModelProperty(name = "rateType", value = "利率类型")
+    @ApiModelProperty(name = "rateType", value = "利率类型", required = true)
     private String rateType;
 
-    @ApiModelProperty(name = "currency", value = "币种")
+    @ApiModelProperty(name = "currency", value = "币种", required = true)
     private String currency;
 
     @ApiModelProperty(name = "issuePx", value = "发行价格（元）")
@@ -149,8 +149,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal issueAmt;
 
     @ApiModelProperty(name = "stipulationValue", value = "参考收益率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal stipulationValue;
+    private String stipulationValue;
 
     @ApiModelProperty(name = "singleMinSubAmt", value = "单笔最低认购量（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -161,19 +160,16 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal singleMaxSubAmt;
 
     @ApiModelProperty(name = "couponRate", value = "票面利率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal couponRate;
+    private String couponRate;
 
     @ApiModelProperty(name = "benchmarkCurveName", value = "基准利率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal benchmarkCurveName;
+    private String benchmarkCurveName;
 
     @ApiModelProperty(name = "decimalPlaces", value = "基准利率精度")
     private String decimalPlaces;
 
     @ApiModelProperty(name = "spread", value = "利差")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal spread;
+    private String spread;
 
     @ApiModelProperty(name = "issueStartTime", value = "发行开始时间")
     private Date issueStartTime;
@@ -240,7 +236,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "dayCount", value = "计息基准")
     private String dayCount;
 
-    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖")
+    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖", required = true)
     private String isAutoUpdate;
 
     @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
@@ -576,7 +572,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     }
 
     public String getIssuePx() {
-        if(Objects.nonNull(getCouponSpecies()) && (getCouponSpecies().equals(BussinessDictCodeList.息票品种_附息.getValue()) || getCouponSpecies().equals(BussinessDictCodeList.息票品种_利随本清.getValue())) ){
+        if (Objects.nonNull(getCouponSpecies()) && (getCouponSpecies().equals(BussinessDictCodeList.息票品种_附息.getValue()) || getCouponSpecies().equals(BussinessDictCodeList.息票品种_利随本清.getValue()))) {
             return "100.0000";
         }
         return issuePx;
@@ -586,11 +582,28 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issuePx = issuePx;
     }
 
-    public BigDecimal getStipulationValue() {
+    public String getStipulationValue() {
         return stipulationValue;
     }
 
-    public void setStipulationValue(BigDecimal stipulationValue) {
+
+    public String getStipulationValueStr() {
+        String couponSpecies = getCouponSpecies();
+        String rateType = this.getRateType();
+        String spread = getSpread();
+        String benchmarkCurveNameStr = getBenchmarkCurveNameStr();
+        if (Objects.isNull(couponSpecies) || BussinessDictCodeList.息票品种_零息.getValue().equals(couponSpecies)
+                || BussinessDictCodeList.息票品种_贴现.getValue().equals(couponSpecies)) {
+            return Objects.nonNull(getStipulationValue()) ? getStipulationValue() + "%" : "";
+        } else if (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_固定利率.getValue().equals(rateType)) {
+            return Objects.nonNull(getCouponRate()) ? getCouponRate() + "%" : "";
+        } else if (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_浮动利率.getValue().equals(rateType)) {
+            return (StringUtil.isNotBlank(benchmarkCurveNameStr) ? benchmarkCurveNameStr : "") + "+" + (StringUtil.isNotBlank(spread) ? spread : "");
+        }
+        return stipulationValue;
+    }
+
+    public void setStipulationValue(String stipulationValue) {
         this.stipulationValue = stipulationValue;
     }
 
@@ -610,19 +623,23 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.singleMaxSubAmt = singleMaxSubAmt;
     }
 
-    public BigDecimal getCouponRate() {
+    public String getCouponRate() {
         return couponRate;
     }
 
-    public void setCouponRate(BigDecimal couponRate) {
+    public void setCouponRate(String couponRate) {
         this.couponRate = couponRate;
     }
 
-    public BigDecimal getBenchmarkCurveName() {
+    public String getBenchmarkCurveName() {
         return benchmarkCurveName;
     }
 
-    public void setBenchmarkCurveName(BigDecimal benchmarkCurveName) {
+    public String getBenchmarkCurveNameStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.利率行情, this.getBenchmarkCurveName());
+    }
+
+    public void setBenchmarkCurveName(String benchmarkCurveName) {
         this.benchmarkCurveName = benchmarkCurveName;
     }
 
@@ -634,11 +651,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.decimalPlaces = decimalPlaces;
     }
 
-    public BigDecimal getSpread() {
+    public String getSpread() {
         return spread;
     }
 
-    public void setSpread(BigDecimal spread) {
+    public void setSpread(String spread) {
         this.spread = spread;
     }
 

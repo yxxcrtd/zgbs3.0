@@ -2162,13 +2162,13 @@ public class CfetsTrdConfirm001Service extends BaseService{
             trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
             trdProductDeal.setSettleDate(entity.getTradeDate());
             trdProductDeal.setPrinAmt(deal.getShareAmt());
-            trdProductDeal.setTradeDate(entity.getTradeDate());
-            trdProductDeal.setSettleDate(entity.getTradeDate());
+            trdProductDeal.setTradeDate(deal.getTradeDate());
+            trdProductDeal.setSettleDate(deal.getTradeDate());
             trdProductDeal.setSecManageAcctId(deal.getSecManageAcctId());
             baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
             TrdProductDealAdd add = new TrdProductDealAdd();
             add.setPortfolioId(deal.getPortfolioId());
-            add.setTradeId(entity.getTotleTradeId());
+            add.setTradeId(deal.getTradeId());
             add.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
             add.setEntrustId(deal.getEntrustId());
             baseTradeProductDealDto.setTrdProductDealAdd(add);

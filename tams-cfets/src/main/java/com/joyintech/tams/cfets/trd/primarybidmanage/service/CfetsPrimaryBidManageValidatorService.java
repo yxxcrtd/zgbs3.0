@@ -28,6 +28,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.service.InvDataCheckService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +63,10 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
 //        4、分配明细中【中标标位】个数小于等于标的资产的【最大投标标位数】；
 //        5、分配明细中【中标标位】最高标位减去最低标位的差的绝对值小于等于标的资产的【最大投标标位差】；
 //        以上必须同时满足
+            if (!CollectionUtils.isNotEmpty(dto.getAllocationDetails())){
+                resultList.add(new ValidMessage(getMessage("中标结果明细为空")));
+                return resultList;
+            }
             FinProductIssue finProductIssue = cfetsPrimaryBidManageService.getFinProductIssueDto(dto.getFinprodId());
             if (StringUtil.isNotEmpty(finProductIssue)) {
                 boolean checkFlag = false;
@@ -71,23 +76,25 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                         return o1.getWinPrice().compareTo(o2.getWinPrice());
                     }
                 });
-                if (dto.getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0
-                        || dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMinTamt()) < 0) {
+                if ((finProductIssue.getMinTamt() != null) && (dto.getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0
+                        || dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMinTamt()) < 0)) {
                     checkFlag = true;
                 }
-                if (dto.getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0
-                        || dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinCprice().compareTo(finProductIssue.getMaxTamt()) > 0) {
+                if ((finProductIssue.getMaxTamt() != null) &&(dto.getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0
+                        || dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinCprice().compareTo(finProductIssue.getMaxTamt()) > 0)) {
                     checkFlag = true;
                 }
-                if (dto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0) {
+                if ((finProductIssue.getTenderUnit() != null) &&(dto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0)) {
                     checkFlag = true;
                 }
-                for (CfetsPrimaryBidManageSaveDetailDto detailDto : dto.getAllocationDetails()) {
-                    if (detailDto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0) {
-                        checkFlag = true;
+                if ((finProductIssue.getTenderUnit() != null)) {
+                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : dto.getAllocationDetails()) {
+                        if (detailDto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0) {
+                            checkFlag = true;
+                        }
                     }
                 }
-                if (BigDecimal.valueOf(dto.getAllocationDetails().size()).compareTo(finProductIssue.getMaxTenderUnit()) < 0) {
+                if ((finProductIssue.getMaxTenderUnit() != null) && (BigDecimal.valueOf(dto.getAllocationDetails().size()).compareTo(finProductIssue.getMaxTenderUnit()) < 0)) {
                     checkFlag = true;
                 }
                 if (dto.getAllocationDetails().size() > 1) {
@@ -96,7 +103,7 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                         checkFlag = true;
                     }
                 } else {
-                    if (dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMaxTenderPlus()) < 0) {
+                    if ((finProductIssue.getMaxTenderPlus() != null) && (dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMaxTenderPlus()) < 0)) {
                         checkFlag = true;
                     }
                 }
@@ -111,17 +118,18 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                 for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()){
                     if (sumActWinPrinamt.compareTo(detailDto.getTotalBidPrinamt())>0){
                         resultList.add(new ValidMessage(getMessage("中标券面总额不能大于汇总投标券面总额！")));
+                        break;
                     }
                 }
             }
  //            分配明细中缴款金额 汇总金额<>基本信息中的缴款金额
-//            BigDecimal sumPatAmt = dto.getAllocationDetails().stream().map(item -> item.getPayAmt()).reduce(BigDecimal.ZERO, BigDecimal::add);
-//            if (sumPatAmt.compareTo(dto.getPay)>0){
-//
-//            }
+            BigDecimal sumPatAmt = dto.getAllocationDetails().stream().map(item -> item.getPayAmt()).reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (StringUtil.isNotEmpty(dto.getPayAmt()) && sumPatAmt.compareTo(dto.getPayAmt())!=0){
+                resultList.add(new ValidMessage(getMessage("明细汇总缴款金额不等于基本信息中的缴款金额！")));
+            }
 //            分配明细中结算服务费 汇总金额<>基本信息中的结算服务费
             BigDecimal sumSettFeeAmt = dto.getAllocationDetails().stream().map(item -> item.getSettFeeAmt()).reduce(BigDecimal.ZERO, BigDecimal::add);
-            if (sumSettFeeAmt.compareTo(dto.getSettFeeAmt())>0){
+            if (sumSettFeeAmt.compareTo(dto.getSettFeeAmt())!=0){
                 resultList.add(new ValidMessage(getMessage("明细汇总结算服务费不等于基本信息中的结算服务费！")));
             }
 //            分配明细中【中标标位】是否存在连续投标标位，即标位1和标位2之间仅差1个投标步长
