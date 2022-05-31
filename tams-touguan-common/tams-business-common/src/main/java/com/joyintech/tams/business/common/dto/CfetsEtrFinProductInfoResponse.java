@@ -3,6 +3,7 @@ package com.joyintech.tams.business.common.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.constant.DictCode;
@@ -175,15 +176,13 @@ public class CfetsEtrFinProductInfoResponse {
      * 单笔最低认购量
      */
     @ApiModelProperty(name = "minPamt", value = "单笔最低认购量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal minPamt;
+    private String minPamt;
 
     /**
      * 单笔最高认购量
      */
     @ApiModelProperty(name = "maxPamt", value = "单笔最高认购量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal maxPamt;
+    private String maxPamt;
 
     /**
      * 最高认购总量
@@ -280,8 +279,7 @@ public class CfetsEtrFinProductInfoResponse {
      * 发行价格
      */
     @ApiModelProperty(name = "issuePrice", value = "发行价格")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal issuePrice;
+    private String issuePrice;
 
     /**
      * 发行类型
@@ -398,6 +396,17 @@ public class CfetsEtrFinProductInfoResponse {
     private String ztGrade;
 
     /**
+     * 主体评级机构
+     */
+    @ApiModelProperty(name = "ztGradeOrgId", value = "主体评级机构")
+    private String ztGradeOrgId;
+    /**
+     * 债项评级机构
+     */
+    @ApiModelProperty(name = "zxGradeOrgId", value = "债项评级机构")
+    private String zxGradeOrgId;
+
+    /**
      * 发行方式
      */
     @ApiModelProperty(name = "issueType", value = "发行方式/募集方式")
@@ -499,19 +508,28 @@ public class CfetsEtrFinProductInfoResponse {
         this.maxPerUtamt = maxPerUtamt;
     }
 
-    public BigDecimal getMinPamt() {
+    public String getMinPamt() {
         return minPamt;
     }
 
-    public void setMinPamt(BigDecimal minPamt) {
+    public String getMinPamtStr() {
+        return StringUtil.isNotBlank(getMinPamt()) ? getMinPamt() + "亿元" : "";
+    }
+
+
+    public void setMinPamt(String minPamt) {
         this.minPamt = minPamt;
     }
 
-    public BigDecimal getMaxPamt() {
+    public String getMaxPamt() {
         return maxPamt;
     }
 
-    public void setMaxPamt(BigDecimal maxPamt) {
+    public String getMaxPamtStr() {
+        return StringUtil.isNotBlank(getMaxPamt()) ? getMaxPamt() + "亿元" : "";
+    }
+
+    public void setMaxPamt(String maxPamt) {
         this.maxPamt = maxPamt;
     }
 
@@ -533,11 +551,15 @@ public class CfetsEtrFinProductInfoResponse {
         this.payEdate = payEdate;
     }
 
-    public BigDecimal getIssuePrice() {
+    public String getIssuePrice() {
         return issuePrice;
     }
 
-    public void setIssuePrice(BigDecimal issuePrice) {
+    public String getIssuePriceStr() {
+        return StringUtil.isNotBlank(getIssuePrice()) ? getIssuePrice() + "元" : "";
+    }
+
+    public void setIssuePrice(String issuePrice) {
         this.issuePrice = issuePrice;
     }
 
@@ -975,5 +997,21 @@ public class CfetsEtrFinProductInfoResponse {
 
     public void setIssueClass(String issueClass) {
         this.issueClass = issueClass;
+    }
+
+    public String getZtGradeOrgId() {
+        return ztGradeOrgId;
+    }
+
+    public void setZtGradeOrgId(String ztGradeOrgId) {
+        this.ztGradeOrgId = ztGradeOrgId;
+    }
+
+    public String getZxGradeOrgId() {
+        return zxGradeOrgId;
+    }
+
+    public void setZxGradeOrgId(String zxGradeOrgId) {
+        this.zxGradeOrgId = zxGradeOrgId;
     }
 }
