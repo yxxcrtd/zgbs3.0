@@ -238,7 +238,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"))) {
             List<CfetsTrdFirstBidFirmEntrustDto> listTemp = new ArrayList<>();
             request.getEntrustDtos().forEach(entrustDto -> {
-                listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
+                if(CollectionUtils.isEmpty(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos())){
+                    listTemp.add(entrustDto);
+                }else {
+                    listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
+                }
             });
             list = listTemp;
         }
@@ -331,7 +335,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"))) {
             List<CfetsTrdFirstBidFirmEntrustDto> listTemp = new ArrayList<>();
             request.getEntrustDtos().forEach(entrustDto -> {
-                listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
+                if(CollectionUtils.isEmpty(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos())){
+                    listTemp.add(entrustDto);
+                }else {
+                    listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
+                }
             });
             list = listTemp;
         }
@@ -621,7 +629,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"))) {
             List<CfetsTrdFirstBidFirmEntrustDto> listTemp = new ArrayList<>();
             request.getEntrustDtos().forEach(entrustDto -> {
-                listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
+                if(CollectionUtils.isEmpty(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos())){
+                    listTemp.add(entrustDto);
+                }else {
+                    listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
+                }
             });
             entrustDtolist = listTemp;
         }
