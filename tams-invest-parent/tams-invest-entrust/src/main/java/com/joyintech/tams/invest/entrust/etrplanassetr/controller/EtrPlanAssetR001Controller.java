@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
