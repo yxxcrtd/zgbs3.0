@@ -128,6 +128,84 @@ public class SettleTransDataDto extends SettleTransData {
         this.intPayCashId = intPayCashId;
     }
 
+    /**
+     * 本方交易员
+     */
+    private String traderId;
+
+    /**
+     * 对手方交易员
+     */
+    private String propTraderId;
+
+    /**
+     * 本方交易商Id
+     */
+    private String dealerId;
+
+    /**
+     * 对手方交易商Id
+     */
+    private String propDealerId;
+
+    /**
+     * 本方交易主体Id
+     */
+    private String investorId;
+
+    /**
+     * 对手方交易主体
+     */
+    private String propInvestorId;
+
+    public String getTraderId() {
+        return traderId;
+    }
+
+    public void setTraderId(String traderId) {
+        this.traderId = traderId;
+    }
+
+    public String getPropTraderId() {
+        return propTraderId;
+    }
+
+    public void setPropTraderId(String propTraderId) {
+        this.propTraderId = propTraderId;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getPropInvestorId() {
+        return propInvestorId;
+    }
+
+    public void setPropInvestorId(String propInvestorId) {
+        this.propInvestorId = propInvestorId;
+    }
+
     public BigDecimal getShareAmtSg() {
         return shareAmtSg;
     }
