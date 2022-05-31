@@ -469,7 +469,7 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
         // 现券市价指令模式时，净价取得前端隐藏传值
         if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(getEntrustBussType())
                 && StringUtil.equals(getPriceModel(), DictCodeListExt2.价格模式_市价指令.getValue())){
-            return getPriceClone();
+            return getYieldClone();
         }
         return yield;
     }

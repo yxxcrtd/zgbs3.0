@@ -642,6 +642,64 @@
         where TPD.TOTLE_TRADE_ID = #{tradeId} and TPD.Trade_Status='01'
     </select>
 
+    <select id="findBidFirmPortIntFenPeiInfoList" resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
+        select tpda.ENTRUST_ID                           entrustId,
+               pp.PORTFOLIO_NAME                         portfolioName,
+               tpd.SHARE_AMT                             qtyd,
+               tpd.FEE_AMT_UNPAY                         jsFeeAmt,
+               tpd.CPRICE_AMT                            tradeAmt,
+               tpd.INT_AMT                               intAmt,
+               tpd.TRADE_AMT                             payAmt,
+               bobp.BID_PRICE                            bidPrice,
+               bobp.INV_AIM                              busiTypePosition,
+               nvl(ssai.SEC_ACCT_NAME, bobp.SEC_ACCT_ID) secAcctId,
+               nvl(su.REAL_NAME, ee.INV_MANAGER_ID)      invManagerName,
+               null                    totalBiddingNum,
+               null                      theWinPrinamt,
+               null                     actWinPrinamt,
+               null                           winPrice,
+               null                          unitPrice
+        from TRD_PRODUCT_DEAL tpd
+                 left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
+                 left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tpd.TOTLE_TRADE_ID = tfpdt.TOTLE_TRADE_ID
+                 left join BID_ORDER_BID_PRICE bobp
+                           on bobp.PORTFOLIO_ID = tpda.PORTFOLIO_ID and bobp.BID_ID = tfpdt.P_TOTLE_TRADE_ID and
+                              bobp.ENTRUST_ID = tpda.ENTRUST_ID
+                 left join PTL_PORTFOLIO pp on tpda.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp.SEC_ACCT_ID
+                 left join ETR_ENTRUST ee on ee.ENTRUST_ID = tpda.ENTRUST_ID
+                 left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+        where tpd.TOTLE_TRADE_ID = #{tradeId} and TPD.Trade_Status='01' and tfpdt.BUSI_TYPE = 'TRD97'
+        union all
+        select tpda.ENTRUST_ID                          entrustId,
+               pp.PORTFOLIO_NAME                        portfolioName,
+               tpd.SHARE_AMT                            qtyd,
+               tpd.FEE_AMT_UNPAY                        jsFeeAmt,
+               tpd.CPRICE_AMT                           tradeAmt,
+               tpd.INT_AMT                              intAmt,
+               tpd.TRADE_AMT                            payAmt,
+               brd.BID_PRICE                            bidPrice,
+               brd.INV_AIM                              busiTypePosition,
+               nvl(ssai.SEC_ACCT_NAME, brd.SEC_ACCT_ID) secAcctId,
+               nvl(su.REAL_NAME, ee.INV_MANAGER_ID)     invManagerName,
+               brd.TOTAL_BID_PRINAMT                    totalBiddingNum,
+               brd.THE_WIN_PRINAMT                      theWinPrinamt,
+               brd.ACT_WIN_PRINAMT                      actWinPrinamt,
+               brd.WIN_PRICE                            winPrice,
+               brd.WIN_CPRICE                           unitPrice
+        from TRD_PRODUCT_DEAL tpd
+                 left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
+                 left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tpd.TOTLE_TRADE_ID = tfpdt.TOTLE_TRADE_ID
+                 left join BID_RESULT_TOTAL brt on brt.TOTAL_WIN_ID = tfpdt.B_TRADE_ID
+                 left join BID_RESULT_DETAIL brd on brd.ENTRUST_ID = tpda.ENTRUST_ID and
+                                                    brd.PORTFOLIO_ID = tpda.PORTFOLIO_ID
+                 left join PTL_PORTFOLIO pp on tpda.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = brd.SEC_ACCT_ID
+                 left join ETR_ENTRUST ee on ee.ENTRUST_ID = tpda.ENTRUST_ID
+                 left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+        where tpd.TOTLE_TRADE_ID = #{tradeId} and TPD.Trade_Status='01' and tfpdt.BUSI_TYPE = 'TRD61'
+    </select>
+
     <select id="findBidPortIntFenPeiInfoList" resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
         SELECT ROWNUM             rowNums,
                TPDA.Entrust_Id    entrustId,
@@ -1451,6 +1509,67 @@
                                ON sdl.dict_code = 'DISTRIBUTION' and sdl.item_code = bo.DIP_TYPE
             WHERE T1.TOTLE_TRADE_ID = #{tradeId}
               AND T1.TRADE_STATUS = #{TRADE_STATUS01}
+    </select>
+
+    <select id="findManualSettleInfoBidFirm" resultType="com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond">
+        select fp.FINPROD_MARKET_ID                    finprodMarketId,
+                fp.FINPROD_ABBR                         finprodAbbr,
+                nvl(su.REAL_NAME, tfpdt.TRADER)         ouTraderId,
+                nvl(mcp.COUNTER_NAME, tfpdt.COUNTER_ID) counterId,
+                fpi.TENDER_TARGET tenderTarget,
+                fp.CCY ccy,
+                tfpdt.TRADE_MARKET tradeMarket,
+                tfpdt.TRADE_MARKET_MODE tradeMarketMode,
+                CASE
+                    WHEN fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND fpi.TENDER_TYPE IN (#{TENDER_TYPE_01}, #{TENDER_TYPE_02})
+                    THEN fpi.ISSUE_DATE
+                    WHEN (fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN (#{TENDER_TYPE_03}, #{TENDER_TYPE_04})))
+                    OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
+                    THEN fpi.TENDER_SDATE
+                END                       AS bidDateStart/*投标日 开始*/,
+                CASE
+                    WHEN fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND fpi.TENDER_TYPE IN (#{TENDER_TYPE_01}, #{TENDER_TYPE_02})
+                    THEN fpi.ISSUE_DATE
+                    WHEN (fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN (#{TENDER_TYPE_03}, #{TENDER_TYPE_04})))
+                    OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
+                    THEN fpi.TENDER_SDATE
+                END                       AS bidDateEnd/*投标日 结束*/,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then brt.PAY_DATE else bo.PAY_DATE end                 payDate,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then brt.CREDITOR_DEBT_DATE else bo.ASSIGN_REGDATE end assignRegdate,
+                bo.ONMARKET_DATE                                                                     listingDate,
+                bo.BID_MODLE                                                                         bidModle,
+                bo.PAY_TYPE                                                                          payType,
+                null                                                                                 etrBidPriceTotal,
+                bo.WIN_PRIN_AMT                                                                      qty,
+                bo.WIN_PRICE                                                                         winPrice,
+                null                                                                                 price,
+                tfpdt.UNIT_INT                                                                       unitInt,
+                tfpdt.FEE_AMT_UNPAY                                                                  jsFeeAmt,
+                bo.BID_ID                                                                            tradeId,
+                tfpdt.UNIT_FPRICE                                                                    allPrice,
+                tfpdt.FPRICE_AMT                                                                     tradeAmt,
+                tfpdt.INT_AMT                                                                        intAmt,
+                tfpdt.TRADE_AMT                                                                      payAmt,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then brt.WIN_TYPE else bo.DIP_TYPE end                 spanTextOne,
+                tfpdt.REMARK                                                                         remark,
+                null totalBidPrinamt,
+                brt.WIN_PRINAMT winPrinamt,
+                brt.WIN_PRICE winPrice,
+                tfpdt.BUSI_TYPE busiType
+        from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
+        left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdt.FINPROD_ID
+        left join SYS_USER su on su.USER_NAME = tfpdt.TRADER
+        left join MST_COUNTER_PARTY mcp on mcp.COUNTER_ID = tfpdt.COUNTER_ID
+        left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = tfpdt.FINPROD_ID
+        left join BID_RESULT_TOTAL brt on brt.TOTAL_WIN_ID = tfpdt.B_TRADE_ID
+        left join BID_ORDER bo on tfpdt.P_TOTLE_TRADE_ID = bo.BID_ID or brt.BID_ID = bo.BID_ID
+        where tfpdt.IS_CANCEL = 'N' and tfpdt.TRADE_STATUS = #{TRADE_STATUS01} AND tfpdt.TOTLE_TRADE_ID = #{tradeId}
+        <if test="busiTypes != null and busiTypes.size()>0">
+            AND tfpdt.BUSI_TYPE in
+            <foreach collection="busiTypes" open=" (" close=") " separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
     </select>
 
     <select id="findTempManualSettleInfoOther" resultType="com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond">
