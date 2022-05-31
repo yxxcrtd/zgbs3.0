@@ -1198,7 +1198,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                     pltMap.put("cashAcctId", cfetsIbuQuoteBondMapper.getACCTNO(portfolioId, BussinessDictCodeList.资金账户类型_托管账户.getValue()));
                     pltMap.put("secAcctId", cfetsIbuQuoteBondMapper.getSecAcctId(portfolioId, regFinProductDeal.getFinprodId(), regFinProductDeal.getTradeMarket()));
                     pltMap.put("secAmount", ArithmeticUtil.multiply(regFinProductDeal.getShareAmt(), new BigDecimal(100))); //券面总额
-                    pltMap.put("cashAmount", regFinProductDeal.getTradeAmt().setScale(4, RoundingMode.DOWN));
+                    pltMap.put("cashAmount", regFinProductDeal.getTradeAmt().setScale(2, RoundingMode.DOWN));
                     RegFinProductDealAdd regFinProductDealAdd = regFinProductDealAddMap.get(regFinProductDeal.getTradeId()).get(0);
                     if (StringUtil.equals(ps, BussinessDictCodeList.交易方向_卖出.getValue()) || StringUtil.equals(ps, BussinessDictCodeList.交易方向_行权回售.getValue())) {
                         pltMap.put("ownSecAmount", ArithmeticUtil.multiply(regFinProductDealAdd.getOurShareAmt(), new BigDecimal(100)));
