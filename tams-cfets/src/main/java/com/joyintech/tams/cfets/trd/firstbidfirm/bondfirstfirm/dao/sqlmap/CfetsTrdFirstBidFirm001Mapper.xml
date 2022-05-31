@@ -11,6 +11,13 @@
                 /*指令代码查询*/
             </if>
         </where>
+        union all
+        select ENTRUST_ID from BID_ORDER_BID_PRICE
+        where IS_CANCEL ='N' and TRADE_STATUS != '03'
+        <if test="entrustId != null and entrustId != '' ">
+            AND ENTRUST_ID = #{entrustId}
+            /*指令代码查询*/
+        </if>
         )
     </select>
 
