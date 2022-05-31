@@ -183,7 +183,15 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
             });
 
             //质押式回购 持仓流水
-            if(!dto.getBusiType().equals("01")&&!dto.getBusiType().equals("02")&&!dto.getBusiType().equals("03")&&!dto.getBusiType().equals("04")){
+            if(!dto.getBusiType().equals("01") // 上交所固定收益平台债券买入
+                    &&!dto.getBusiType().equals("02") // 上交所固定收益平台债券卖出
+                    &&!dto.getBusiType().equals("03") // 深交所综合协议平台债券买入
+                    &&!dto.getBusiType().equals("04") // 深交所综合协议平台债券卖出
+                    // ZGCPCN-1001:新增场内现券买入卖出 modify by fuyongsheng 20220531 start
+                    &&!dto.getBusiType().equals("25") // 场内现券买入
+                    &&!dto.getBusiType().equals("26") // 场内现券卖出
+                    // ZGCPCN-1001:新增场内现券买入卖出 modify by fuyongsheng 20220531 end
+            ){
                 if(StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_交收.getValue())) {
                     InfContractDetailfile infContractDetailfile = manualSettleMapper.selectInfContractDetailfile(dto.getEntrustNo(), dto.getDealNo());
                     TrdTempDto trdTempDto = new TrdTempDto();
