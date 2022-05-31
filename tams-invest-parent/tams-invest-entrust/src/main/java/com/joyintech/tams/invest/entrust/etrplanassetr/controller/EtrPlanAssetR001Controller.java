@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
@@ -55,7 +57,10 @@ public class EtrPlanAssetR001Controller extends BaseController  {
     
     @Autowired
     private EtrPlanAssetRService etrPlanAssetService;
-    
+
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
     /**
      * 页面初始化
      */
@@ -148,6 +153,8 @@ public class EtrPlanAssetR001Controller extends BaseController  {
         if(dtolist != null && dtolist.size()>0){
             for(EtrPlanAssetRDto entity : dtolist){
                 etrPlanAssetService.recallDelegate(entity);
+                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
+                entity.setCounterId(etrEntrust.getCounterId());
             }
             // add by yushilong 批量撤销预占 start
             EntrustRdsCommonAop.doListPreOccupy(dtolist, DictCodeList.平安资产类型_计划类资产_利率型.getValue(),

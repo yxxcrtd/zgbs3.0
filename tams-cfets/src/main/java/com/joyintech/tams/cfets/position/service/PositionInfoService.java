@@ -291,6 +291,10 @@ public class PositionInfoService {
         BigDecimal cashT = BigDecimal.ZERO; // 指令t日可用
         BigDecimal cashT1 = BigDecimal.ZERO; // 指令t1日可用
         BigDecimal secDesirableCash = BigDecimal.ZERO; // 证券户可取现金
+        List<String> filtered = acctTypes.stream().filter(string -> !string.isEmpty()).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(filtered)) {
+            acctTypes.add("A01");
+        }
         if (StringUtil.isEmpty(ccy)) {
             ccy = DictCodeList.币种_人民币_CNY.getValue();
         }
