@@ -96,11 +96,8 @@ public class OrderController {
         logger.debug("普通下单（竞价下单）委托属性（entrustProp）转换：{} ==> {}, ", order.getEntrustProp(), entrustProp);
         order.setEntrustProp(entrustProp);
 
-        //填充市价
-        tradeHelper.marketPriceCheck(order, instruction);
-
-        //批量委托填充全价
-        tradeHelper.fillFullPrice(order, instruction);
+        //填充订单价格
+        tradeHelper.fillOrderPrice(order, instruction);
 
         try {
             ResultBean commonCheckResult = commonCheckKit.check(order);

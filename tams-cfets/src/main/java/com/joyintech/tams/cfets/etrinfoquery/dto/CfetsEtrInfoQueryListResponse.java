@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 场外指令分发
@@ -66,7 +67,7 @@ public class CfetsEtrInfoQueryListResponse extends EtrEntrust {
     private String effectFlag;
 
     @ApiModelProperty(name="etrPrice",value="指令价格",example="99")
-    private BigDecimal etrPrice;
+    private String etrPrice;
 
     @ApiModelProperty(name="exeProgress",value="执行进度%",example="50%")
     private BigDecimal exeProgress;
@@ -97,6 +98,18 @@ public class CfetsEtrInfoQueryListResponse extends EtrEntrust {
 
     @ApiModelProperty(name="calculateField",value="计算方式",example="计算方式供前台判断使用")
     private String calculateField;
+
+    @ApiModelProperty(name = "issueDate", value = "投标日/发行日")
+    private Date issueDate;
+
+    @ApiModelProperty(name = "issueDateStr", value = "投标日/发行日字符串")
+    private String issueDateStr;
+
+    @ApiModelProperty(name = "bidModle", value = "投标方式")
+    private String bidModle;
+
+    @ApiModelProperty(name = "isWin", value = "中标结果")
+    private String isWin;
 
     /**
      * 获取 otherEntrustStatus
@@ -269,11 +282,11 @@ public class CfetsEtrInfoQueryListResponse extends EtrEntrust {
         return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
     }
 
-    public BigDecimal getEtrPrice() {
+    public String getEtrPrice() {
         return etrPrice;
     }
 
-    public void setEtrPrice(BigDecimal etrPrice) {
+    public void setEtrPrice(String etrPrice) {
         this.etrPrice = etrPrice;
     }
 
@@ -331,5 +344,37 @@ public class CfetsEtrInfoQueryListResponse extends EtrEntrust {
 
     public void setCalculateField(String calculateField) {
         this.calculateField = calculateField;
+    }
+
+    public Date getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public String getIssueDateStr() {
+        return DateUtil.format(this.getIssueDate());
+    }
+
+    public void setIssueDateStr(String issueDateStr) {
+        this.issueDateStr = issueDateStr;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
+    public String getIsWin() {
+        return isWin;
+    }
+
+    public void setIsWin(String isWin) {
+        this.isWin = isWin;
     }
 }

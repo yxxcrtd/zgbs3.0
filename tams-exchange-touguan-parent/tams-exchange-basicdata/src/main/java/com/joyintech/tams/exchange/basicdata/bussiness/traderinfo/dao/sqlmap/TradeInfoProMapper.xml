@@ -179,7 +179,7 @@
     </delete>
 
     <select id="hasSameDealerPartyNoDiffType" resultType="java.lang.String">
-        select SEQ_NO from  MST_DEALER_DETAIL_INFO MDDI
+        select wm_concat(SEQ_NO) from  MST_DEALER_DETAIL_INFO MDDI
         where MDDI.CUSTOMER_ID = #{customerId} and MDDI.TRADE_MARKET = #{tradeMarket}
            and MDDI.DEALER_PARTY_TYPE != #{dealerPartyType} and MDDI.DEALER_PARTY_NO = #{dealerPartyNo}
     </select>
@@ -188,6 +188,13 @@
         select SEQ_NO from  MST_DEALER_DETAIL_INFO MDDI
         where MDDI.CUSTOMER_ID = #{customerId} and MDDI.TRADE_MARKET = #{tradeMarket}
           and MDDI.DEALER_PARTY_NO = #{dealerPartyNo}  and MDDI.TRADER_NO = #{traderNo}
+    </select>
+
+    <select id="hasSameTraderSeqNo" resultType="java.lang.String">
+        select SEQ_NO from MST_DEALER_INFO mdi
+                                 inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+        where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.DEALER_PARTY_NO = #{dealerPartyNo}
+          and mddi.TRADER_NO = #{traderNo}
     </select>
 
 </mapper>

@@ -516,11 +516,11 @@ public class IbuQuoteBondService extends BaseService {
                         return ajaxResult;
                     }
                     //提交的时候根据交易类型验证
-                    /*if (StringUtil.isEmpty(item.getPartyId())&&StringUtil.equals(exportShow,"01")&&StringUtil.equals(item.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())) {
+                    if (StringUtil.isEmpty(item.getPartyId())&&StringUtil.equals(exportShow,"01")&&StringUtil.equals(item.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())) {
                         message = "指令" + item.getEntrustId() + "下组合未关联交易账户，请至[银行间业务参数管理-CFETS关联账户]中维护";
                         ajaxResult.setMessage(message);
                         return ajaxResult;
-                    }*/
+                    }
                     if (psFlag && !StringUtil.equals(one.getPs(), item.getPs())) {
                         psFlag = false;
                         message = message + "交易方向OR";

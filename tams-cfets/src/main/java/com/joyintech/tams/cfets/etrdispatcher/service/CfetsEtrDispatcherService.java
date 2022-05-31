@@ -46,6 +46,8 @@ import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid001Service;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsPledgeBondInfoDto;
 import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoinfoService;
@@ -248,6 +250,9 @@ public class CfetsEtrDispatcherService extends BaseService {
 
     @Autowired
     private EtrCommonFinProductInfoService etrCommonFinProductInfoService;
+
+    @Autowired
+    private CfetsEtrBondFirstBid001Service cfetsEtrBondFirstBid001Service;
 
     /**
      * 指令列表分页查询
@@ -1070,18 +1075,19 @@ public class CfetsEtrDispatcherService extends BaseService {
                     newTraderList.addAll(traderList);
                     errorList.clear();
                     errorList.add(new ValidMessage("同一投标日的债券一级投标已有分发记录，是否将已分发记录的交易员也调整为交易员"+newTraders.toString()));
-                }
-                if (CollectionUtils.isNotEmpty(entrustIdListYet)) {
-                    CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
-                    newEntrustIdList.addAll(entrustIdListYet);
-                    etrDispatcherDto.setBidCode("04");
-                    etrDispatcherDto.setErrorList(errorList);
-                    etrDispatcherDto.setTraderList(newTraderList.stream().distinct().collect(Collectors.toList()));
-                    newEntrustIdList.addAll(entrustIdList);
-                    etrDispatcherDto.setEntrustIdList(newEntrustIdList.stream().distinct().collect(Collectors.toList()));
-                    etrDispatcherList.add(etrDispatcherDto);
+                    if (CollectionUtils.isNotEmpty(entrustIdListYet)) {
+                        CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
+                        newEntrustIdList.addAll(entrustIdListYet);
+                        etrDispatcherDto.setBidCode("04");
+                        etrDispatcherDto.setErrorList(errorList);
+                        etrDispatcherDto.setTraderList(newTraderList.stream().distinct().collect(Collectors.toList()));
+                        newEntrustIdList.addAll(entrustIdList);
+                        etrDispatcherDto.setEntrustIdList(newEntrustIdList.stream().distinct().collect(Collectors.toList()));
+                        etrDispatcherList.add(etrDispatcherDto);
 
+                    }
                 }
+
             }
 
         }
@@ -1532,7 +1538,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                     spcdCode = spcdCode + ",02";
                     infoForm.addAll(cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode));
                 }
-            }else if(StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), dto.getBusiTypePosition())) {
+            }else if(StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), dto.getBusiTypePosition()) ||
+                    StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), dto.getBusiTypePosition())) {
                 //一级投标
                 return bondFirstLBidding(pageCode, dtCode, spcdCode,dto);
             }else {
@@ -1710,6 +1717,38 @@ public class CfetsEtrDispatcherService extends BaseService {
         List<UploadFile> files = fileAttachmentProcess.fetchByBusinessCode(dto.getEntrustId());
         resultData.put(dtCode + "_fileTable",fileTable);
         resultData.put(dtCode + "_fileTableData",files);
+        return resultData;
+    }
+
+    /**
+     * 一级投标&一级申购 指令信息
+     * @param pageCode
+     * @param dtCode
+     * @param spcdCode
+     * @param dto
+     * @return
+     */
+    private Map<String, Object> bondFirstLBidding2(String pageCode, String dtCode, String spcdCode, CommonSearchInfoRequest dto) {
+        Map<String, Object> resultData = new HashMap<>();
+        //基本信息
+        List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+        CfetsEtrBondFirstBid002Dto infoData = cfetsEtrBondFirstBid001Service.getEtrEntrustInfo(dto.getEntrustId());
+
+        resultData.put(dtCode + "_infoForm",infoForm);
+        resultData.put(dtCode + "_infoFormData",infoData);
+        //备注
+        List<CfgReadonlyFormShow> rFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",R"));
+        resultData.put(dtCode + "_rFrom",rFrom);
+        resultData.put(dtCode + "_rFromData",infoData);
+        //投标券面总额汇总
+        List<CfgReadonlyFormShow> aFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",A"));
+        resultData.put(dtCode + "_aFrom",aFrom);
+        resultData.put(dtCode + "_aFromData",infoData);
+        //投标标位
+        List<CfgDataTableShow> infoTable =  cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, null, null);
+        resultData.put(dtCode + "_infoTable",infoTable);
+        resultData.put(dtCode + "_infoTableData",infoData.getBiddingProductList());
+
         return resultData;
     }
 
