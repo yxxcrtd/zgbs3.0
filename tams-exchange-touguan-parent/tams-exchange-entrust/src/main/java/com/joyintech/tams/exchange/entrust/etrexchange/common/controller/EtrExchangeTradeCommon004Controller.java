@@ -11,6 +11,7 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.common.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
@@ -210,6 +211,7 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
                         riskTrialFlag = false;
                     }
                 }
+                entity.setRiskTrialRetDto(riskTrialRetList);
                 model.addAttribute("riskTrialSpan", riskTrialFlag ? "试算通过" : "试算不通过");
                 model.addAttribute("entity_RiskTrialRetList", riskTrialRetList);
             }
@@ -752,7 +754,10 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
     @ResponseBody
     @RequestMapping("/getFinprodMarketInfo")
     public Page<SelectOptionDto> getFinprodMarketInfo() {
-        return etrExchangeTrade001CommonService.getFinprodMarketInfo(RequestUtil.getPageParam());
+        Map<String, Object> pageParam = RequestUtil.getPageParam();
+        //ZGCPCN-724
+        pageParam.remove("expireSettleDate");
+        return etrExchangeTrade001CommonService.getFinprodMarketInfo(pageParam);
     }
 
     public List<MinPirceDto> getInterfSysMinPriceAll(@RequestBody Map<String, Object> param) {
@@ -820,8 +825,10 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
                 }
             }
         }
-        return ajax == null || CollectionUtils.isEmpty(ajax.getErrorList()) ?
-                commonCheck(result, dto.getOperateType()): ajax;
+        if (null != ajax && (!CollectionUtils.isEmpty(ajax.getErrorList()) || StringUtil.equals(ajax.getMessageType(), MessageType.确认消息.getCode()))) {
+            return ajax;
+        }
+        return commonCheck(result, dto.getOperateType());
     }
 
     /**
@@ -835,10 +842,13 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
     public AjaxResult check(EtrExchangeTradeSaveRequest dto, BindingResult result) throws Exception {
         AjaxResult ajax = etrExchangeTrade001CommonService.checkSave(dto, result);
         List<ValidMessage> validList = null;
+        String confirmMsg = "";
         if (StringUtil.equals(dto.getCurrentTab(),"dz")){
             validList = etrExchangeBlockTrade001ValidatorService.valid(dto);
+            confirmMsg += etrExchangeBlockTrade001ValidatorService.isNameSoftControl(dto);
         }else{
             validList = etrExchangeTradeCommonValidatorService.valid(dto);
+            confirmMsg += etrExchangeBlockTrade001ValidatorService.isNameSoftControl(dto);
             //无申购额度
             Map<String, Object> paramMap1 = new HashMap<String, Object>();
             paramMap1.put("finprodId", dto.getFinprodId());//金融产品代码
@@ -853,6 +863,9 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
         }
         if (!CollectionUtils.isEmpty(validList)) {
             ajax.setErrorList(validList);
+        }else if(StringUtil.isNotEmpty(confirmMsg)){
+            ajax.setMessageType(MessageType.确认消息);
+            ajax.setMessage(confirmMsg);
         }
         return ajax;
     }

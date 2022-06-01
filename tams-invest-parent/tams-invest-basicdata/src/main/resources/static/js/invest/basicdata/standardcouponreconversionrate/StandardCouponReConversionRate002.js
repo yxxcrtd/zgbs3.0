@@ -33,6 +33,8 @@ $(function() {
     var init = function() {
         let finprodIdType = false
         let accountTypes = false
+        let faType = false
+        let atType = false
         $('#brokerId').change(function(){
             var borker = $("#brokerId").val();
             if(borker == "BROKER"){
@@ -64,12 +66,24 @@ $(function() {
 
         });
         $("#finprodId").on("select2:select select2:unselecting", function(e) {
+            if(this.faType){
+                this.faType = false
+                return;
+            }
             this.finprodIdType = true
         });
         $("#accountType").on("select2:select select2:unselecting", function(e) {
+            if(this.acType){
+                this.acType = false
+                return;
+            }
             this.accountTypes = true
         });
         $("#finprodId").change(function(){
+            let values = $("#finprodId").val()
+            if(values != null && values != ""){
+                this.faType = true;
+            }
             if(this.finprodIdType){
                 $("#accountType").attr("disabled", false);
             } else {
@@ -78,6 +92,10 @@ $(function() {
             this.finprodIdType = false
         })
         $("#accountType").change(function(){
+            let values = $("#accountType").val()
+            if(values != null && values != ""){
+                this.acType = true;
+            }
             if(this.accountTypes){
                 $("#finprodId").attr("disabled", false);
             } else {

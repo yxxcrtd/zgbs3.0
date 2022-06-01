@@ -52,7 +52,7 @@ public interface CreditProtectionCertificatePeriodMapper {
      * @param refEntity
      * @return
      */
-    List<String> getRefSecsByRefEntity(@Param("refEntity") String refEntity);
+    List<String> getRefSecsByRefEntity(@Param("refEntityArray") String[] refEntityArray);
 
     /**
      * 通过组合代码查询可用数量

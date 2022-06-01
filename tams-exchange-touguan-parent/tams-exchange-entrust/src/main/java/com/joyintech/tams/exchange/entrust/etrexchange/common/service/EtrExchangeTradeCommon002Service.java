@@ -43,6 +43,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -162,7 +164,7 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                         //最新价从行情取
                         EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
                         if (hqResponse != null) {
-                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : new BigDecimal(0.00);
+                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(3, BigDecimal.ROUND_HALF_UP) : new BigDecimal(0.00);
                             entity.setPrice(lastPrice);
                         }
                         returnList.add(entity);
@@ -382,7 +384,13 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
         } else {
             param.put("declaTypeList", null);
         }
-        return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.selectEtrExchange(param));
+        //ZGCPCN-798
+        Page<EtrExchangeTradeEtrExchangeCommonResponse> page = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.selectEtrExchange(param));
+        List<EtrExchangeTradeEtrExchangeCommonResponse> root = page.getRoot();
+        List<EtrExchangeTradeEtrExchangeCommonResponse>  root2 = root.stream().filter(response -> !(StringUtil.equals(request.getTradePlat(), "02") &&
+                StringUtil.equals(response.getPs(), DictCodeList.交易方向_行权_回售.getValue()))).collect(Collectors.toList());
+        page.setRoot(root2);
+        return page;
 //		return restTemplate.postForPage(ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/selectEtrExchange",
 //				param, EtrExchangeTrade003Dto.class);
     }

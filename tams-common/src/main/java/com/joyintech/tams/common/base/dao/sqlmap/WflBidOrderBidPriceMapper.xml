@@ -21,17 +21,24 @@
     <result column="OU_PARTY_ID" jdbcType="VARCHAR" property="ouPartyId" />
     <result column="OUR_TRADER" jdbcType="VARCHAR" property="ourTrader" />
     <result column="SUBSCRIPTION_AMOUNT" jdbcType="DECIMAL" property="subscriptionAmount" />
+    <result column="PAYABLE_AMOUNT" jdbcType="DECIMAL" property="payableAmount" />
+    <result column="SETT_FEE_AMT" jdbcType="DECIMAL" property="settFeeAmt" />
     <result column="P_BID_ID" jdbcType="VARCHAR" property="pBidId" />
     <result column="IS_CANCEL" jdbcType="VARCHAR" property="isCancel" />
     <result column="TRADE_STATUS" jdbcType="VARCHAR" property="tradeStatus" />
     <result column="WORKFLOW_ID" jdbcType="VARCHAR" property="workflowId" />
     <result column="WORKFLOW_STATUS" jdbcType="VARCHAR" property="workflowStatus" />
+    <result column="INV_AIM" jdbcType="VARCHAR" property="invAim" />
+    <result column="SEC_ACCT_ID" jdbcType="VARCHAR" property="secAcctId" />
+    <result column="ACCT_NO" jdbcType="VARCHAR" property="acctNo" />
+    <result column="TRADE_AMT" jdbcType="DECIMAL" property="tradeAmt" />
+    <result column="INT_AMT" jdbcType="DECIMAL" property="intAmt" />
   </resultMap>
   <sql id="Base_Column_List">
     BID_ID, ENTRUST_ID, BID_PRICE, PORTFOLIO_ID, IS_WIN, WIN_PRICE, WIN_CPRICE, THE_WIN_PRIN_AMT, 
     WIN_PRIN_AMT, TRADE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-    IS_FROZEN_POSITION, OU_PARTY_ID, OUR_TRADER, SUBSCRIPTION_AMOUNT, P_BID_ID, IS_CANCEL, 
-    TRADE_STATUS, WORKFLOW_ID, WORKFLOW_STATUS
+    IS_FROZEN_POSITION, OU_PARTY_ID, OUR_TRADER, SUBSCRIPTION_AMOUNT,PAYABLE_AMOUNT, SETT_FEE_AMT, P_BID_ID, IS_CANCEL,
+    TRADE_STATUS, WORKFLOW_ID, WORKFLOW_STATUS,INV_AIM ,SEC_ACCT_ID ,ACCT_NO,TRADE_AMT,INT_AMT
   </sql>
   <select id="selectByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.WflBidOrderBidPriceKey" resultMap="BaseResultMap">
     select 
@@ -64,8 +71,9 @@
       TRADE_ID, CREATE_USER, CREATE_DEPT, 
       CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
       IS_FROZEN_POSITION, OU_PARTY_ID, OUR_TRADER, 
-      SUBSCRIPTION_AMOUNT, P_BID_ID, IS_CANCEL, 
-      TRADE_STATUS, WORKFLOW_ID, WORKFLOW_STATUS
+      SUBSCRIPTION_AMOUNT, PAYABLE_AMOUNT,
+      SETT_FEE_AMT,P_BID_ID, IS_CANCEL,
+      TRADE_STATUS, WORKFLOW_ID, WORKFLOW_STATUS,INV_AIM ,SEC_ACCT_ID ,ACCT_NO,TRADE_AMT,INT_AMT
       )
     values (#{bidId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{bidPrice,jdbcType=DECIMAL}, 
       #{portfolioId,jdbcType=VARCHAR}, #{isWin,jdbcType=VARCHAR}, #{winPrice,jdbcType=DECIMAL}, 
@@ -73,8 +81,10 @@
       #{tradeId,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{isFrozenPosition,jdbcType=VARCHAR}, #{ouPartyId,jdbcType=VARCHAR}, #{ourTrader,jdbcType=VARCHAR}, 
-      #{subscriptionAmount,jdbcType=DECIMAL}, #{pBidId,jdbcType=VARCHAR}, #{isCancel,jdbcType=VARCHAR}, 
-      #{tradeStatus,jdbcType=VARCHAR}, #{workflowId,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR}
+      #{subscriptionAmount,jdbcType=DECIMAL}, #{payableAmount,jdbcType=DECIMAL},
+      #{settFeeAmt,jdbcType=DECIMAL}, #{pBidId,jdbcType=VARCHAR}, #{isCancel,jdbcType=VARCHAR},
+      #{tradeStatus,jdbcType=VARCHAR}, #{workflowId,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR},
+      #{invAim,jdbcType=VARCHAR}, #{secAcctId,jdbcType=VARCHAR}, #{acctNo,jdbcType=VARCHAR}, #{tradeAmt,jdbcType=DECIMAL}, #{intAmt,jdbcType=DECIMAL}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.WflBidOrderBidPrice">
@@ -137,6 +147,12 @@
       <if test="subscriptionAmount != null">
         SUBSCRIPTION_AMOUNT,
       </if>
+      <if test="payableAmount != null">
+        PAYABLE_AMOUNT,
+      </if>
+      <if test="settFeeAmt != null">
+        SETT_FEE_AMT,
+      </if>
       <if test="pBidId != null">
         P_BID_ID,
       </if>
@@ -151,6 +167,21 @@
       </if>
       <if test="workflowStatus != null">
         WORKFLOW_STATUS,
+      </if>
+      <if test="invAim != null">
+        INV_AIM,
+      </if>
+      <if test="secAcctId != null">
+        SEC_ACCT_ID,
+      </if>
+      <if test="acctNo != null">
+        ACCT_NO,
+      </if>
+      <if test="tradeAmt != null">
+        TRADE_AMT,
+      </if>
+      <if test="intAmt != null">
+        INT_AMT,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -211,6 +242,12 @@
       <if test="subscriptionAmount != null">
         #{subscriptionAmount,jdbcType=DECIMAL},
       </if>
+      <if test="payableAmount != null">
+        #{payableAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="settFeeAmt != null">
+        #{settFeeAmt,jdbcType=DECIMAL},
+      </if>
       <if test="pBidId != null">
         #{pBidId,jdbcType=VARCHAR},
       </if>
@@ -225,6 +262,21 @@
       </if>
       <if test="workflowStatus != null">
         #{workflowStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="invAim != null">
+        #{invAim,jdbcType=VARCHAR},
+      </if>
+      <if test="secAcctId != null">
+        #{secAcctId,jdbcType=VARCHAR},
+      </if>
+      <if test="acctNo != null">
+        #{acctNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeAmt != null">
+        #{tradeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="intAmt != null">
+        #{intAmt,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -276,6 +328,12 @@
       <if test="subscriptionAmount != null">
         SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL},
       </if>
+      <if test="payableAmount != null">
+        PAYABLE_AMOUNT = #{payableAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="settFeeAmt != null">
+        SETT_FEE_AMT = #{settFeeAmt,jdbcType=DECIMAL},
+      </if>
       <if test="pBidId != null">
         P_BID_ID = #{pBidId,jdbcType=VARCHAR},
       </if>
@@ -290,6 +348,21 @@
       </if>
       <if test="workflowStatus != null">
         WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="invAim != null">
+        INV_AIM = #{invAim,jdbcType=VARCHAR},
+      </if>
+      <if test="secAcctId != null">
+        SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR},
+      </if>
+      <if test="acctNo != null">
+        ACCT_NO = #{acctNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeAmt != null">
+        TRADE_AMT = #{tradeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="intAmt != null">
+        INT_AMT = #{intAmt,jdbcType=DECIMAL},
       </if>
     </set>
     where BID_ID = #{bidId,jdbcType=VARCHAR}
@@ -314,11 +387,18 @@
       OU_PARTY_ID = #{ouPartyId,jdbcType=VARCHAR},
       OUR_TRADER = #{ourTrader,jdbcType=VARCHAR},
       SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL},
+      PAYABLE_AMOUNT = #{payableAmount,jdbcType=DECIMAL},
+      SETT_FEE_AMT = #{settFeeAmt,jdbcType=DECIMAL},
       P_BID_ID = #{pBidId,jdbcType=VARCHAR},
       IS_CANCEL = #{isCancel,jdbcType=VARCHAR},
       TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR},
       WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR},
-      WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR}
+      WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
+      INV_AIM = #{invAim,jdbcType=VARCHAR},
+      SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR},
+      ACCT_NO = #{acctNo,jdbcType=VARCHAR},
+      TRADE_AMT = #{tradeAmt,jdbcType=DECIMAL},
+      INT_AMT = #{intAmt,jdbcType=DECIMAL}
     where BID_ID = #{bidId,jdbcType=VARCHAR}
       and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
       and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}

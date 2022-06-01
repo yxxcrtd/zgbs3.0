@@ -66,6 +66,7 @@
         termDays,
         case when ETR_ENTRUST.PS in ('T68', 'T69') or ETR_ENTRUST_ADD.ASSET_TYPE = 'F07' then ETR_ENTRUST.PRICE*100
         when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then decode(ETR_ENTRUST_ADD.PRICE_TYPE,#{PRICE_CLASS_01,jdbcType=VARCHAR},ROUND(ETR_ENTRUST.PRICE,4),#{PRICE_CLASS_02,jdbcType=VARCHAR},ROUND(ETR_ENTRUST_ADD.FULL_PRICE,4))
+        when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' and ETR_ENTRUST.PRICE_MODEL = #{PRICE_MODEL_PRM03} then NULL
         when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then ROUND(ETR_ENTRUST.price,3)
          else round(decode(btm.OUTPUT_VALUE_1,#{busiTypePosition02},decode(ETR_ENTRUST_ADD.CALCULATE_FIELD,'price',ETR_ENTRUST.PRICE,'exerYield',ETR_ENTRUST_ADD.EXER_YIELD*100,'matureYield',ETR_ENTRUST_ADD.MATURE_YIELD*100),#{busiTypePosition03},ETR_ENTRUST.PRICE,NVL(ETR_ENTRUST.PRICE,
             0.00)),4)
@@ -305,9 +306,10 @@
         decode(WFL_ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F10',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F12',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F16',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'')
         termDays,
         case when WFL_ETR_ENTRUST.PS in ('T68', 'T69') or WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F07' then WFL_ETR_ENTRUST.PRICE*100
-        when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then decode(WFL_ETR_ENTRUST_ADD.PRICE_TYPE,#{PRICE_CLASS_01,jdbcType=VARCHAR},ROUND(WFL_ETR_ENTRUST.PRICE,4),#{PRICE_CLASS_02,jdbcType=VARCHAR},ROUND(ETR_ENTRUST_ADD.FULL_PRICE,4))
+        when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then decode(WFL_ETR_ENTRUST_ADD.PRICE_TYPE,#{PRICE_CLASS_01,jdbcType=VARCHAR},ROUND(WFL_ETR_ENTRUST.PRICE,4),#{PRICE_CLASS_02,jdbcType=VARCHAR},ROUND(WFL_ETR_ENTRUST_ADD.FULL_PRICE,4))
+        when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' and WFL_ETR_ENTRUST.PRICE_MODEL = #{PRICE_MODEL_PRM03} then NULL
         when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then ROUND(WFL_ETR_ENTRUST.price,3)
-            else round(decode(btm.OUTPUT_VALUE_1,#{busiTypePosition02},decode(WFL_ETR_ENTRUST_ADD.CALCULATE_FIELD,'price',WFL_ETR_ENTRUST.PRICE,'exerYield',WFL_ETR_ENTRUST_ADD.EXER_YIELD*100,'matureYield',WFL_ETR_ENTRUST_ADD.MATURE_YIELD*100),#{busiTypePosition03},WFL_ETR_ENTRUST.PRICE,NVL(WFL_ETR_ENTRUST.PRICE,
+        else round(decode(btm.OUTPUT_VALUE_1,#{busiTypePosition02},decode(WFL_ETR_ENTRUST_ADD.CALCULATE_FIELD,'price',WFL_ETR_ENTRUST.PRICE,'exerYield',WFL_ETR_ENTRUST_ADD.EXER_YIELD*100,'matureYield',WFL_ETR_ENTRUST_ADD.MATURE_YIELD*100),#{busiTypePosition03},WFL_ETR_ENTRUST.PRICE,NVL(WFL_ETR_ENTRUST.PRICE,
             0.00)),4)
             end as etrPrice,
         /*CASE
@@ -544,7 +546,7 @@
                 )
             </if>
             AND t.tradeMarket in ('03','04','12')
-            AND t.finprodType2 in ('F01','F02','F07','F11')
+            AND t.assetType in ('F01','F02','F07','F11')
         </where>
     </sql>
 
@@ -912,80 +914,82 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         order by t.TRADING_DAY desc,t.TRADE_TIME desc
     </select>-->
     <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
-	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, PP.PORTFOLIO_NAME, SCI.ACCT_NAME
+	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, PP.PORTFOLIO_NAME, SCI.ACCT_NAME   FINANCE_ACCOUNT
 	  FROM (
 	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
-			 STD.APPLY_TRADE_ID                                    BROKER_ENTRUST_ID,
+			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
 			 STD.CJBH                                              BROKER_TRADE_ID,
-			 STD.TRADE_MARKET                                      MARKET_STR,
+			 STD.TRADE_MARKET                                      MARKET,
 			 FP.FINPROD_MARKET_ID                                  STOCK_CODE,
 			 FP.FINPROD_ABBR                                       STOCK_NAME,
-			 DECODE(TT.PS, NULL, TTH.PS)                           ENTRUST_BS_STR,
+			 DECODE(TT.PS, NULL, TTH.PS)                           ENTRUST_BS,
 			 DECODE(TT.TRADED_VOLUME, NULL, TTH.TRADED_VOLUME)     TRADED_VOLUME,
 			 DECODE(TT.TRADED_PRICE, NULL, TTH.TRADED_PRICE)       TRADED_PRICE,
-			 DECODE(TT.CLEAR_BALANCE, NULL, TTH.CLEAR_BALANCE)     TRADED_BALANCE,
+			 DECODE(TT.TRADED_BALANCE, NULL, TTH.TRADED_BALANCE)   TRADED_BALANCE,
 			 DECODE(TT.TRADING_DAY, NULL, TTH.TRADING_DAY)         TRADING_DAY,
-			 DECODE(TT.TRADE_TIME, NULL, TTH.TRADE_TIME)           TRADE_TIME,
+             TO_CHAR(DECODE(TT.CREATE_TIME, NULL, TTH.CREATE_TIME),'HH24:Mi:ss')                  TRADE_TIME,
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
 			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
 			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
-			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收' 
-			 END                                                   DELIVERY_RESULT,
+			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
+               WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
+             END                                                   DELIVERY_RESULT,
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
 			 END                                                   DELIVERY_SCHEDULE,
-			 TTH.FINANCE_ACCOUNT                                   FINANCE_ACCOUNT          
+			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT
 		FROM SETTLE_TRANS_DATA STD
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
 		LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
-	   WHERE STD.DELIVERY_RESULT IN ('01', '02', '03')
+	   WHERE STD.DELIVERY_RESULT IN ('01', '02', '03', '05')
 		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
                 OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
 	  UNION
 	  SELECT TT.INSTRUCTION_ID                                     INSTRUCTION_ID,
-			 TT.BROKER_ENTRUST_ID                                  BROKER_ENTRUST_ID,
+			 TT.BROKER_ENTRUST_ID                                  ENTRUST_ID,
 			 TT.BROKER_TRADE_ID                                    BROKER_TRADE_ID,
 			 CASE
 			   WHEN TT.MARKET = 'SH' THEN '上海证券交易所'
 			   WHEN TT.MARKET = 'SZ' THEN '深圳证券交易所'
 			   ELSE NULL
-			 END                                                   MARKET_STR,
+			 END                                                   MARKET,
 			 TT.STOCK_CODE                                         STOCK_CODE,
 			 TT.STOCK_NAME                                         STOCK_NAME,
-			 TT.PS                                                 ENTRUST_BS_STR,
+			 TT.PS                                                 ENTRUST_BS,
 			 TT.TRADED_VOLUME                                      TRADED_VOLUME,
 			 TT.TRADED_PRICE                                       TRADED_PRICE,
-			 TT.CLEAR_BALANCE                                      CLEAR_BALANCE,
+			 TT.TRADED_BALANCE                                     TRADED_BALANCE,
 			 TT.TRADING_DAY                                        TRADING_DAY,
-			 TT.TRADE_TIME                                         TRADE_TIME,
+             TO_CHAR(TT.CREATE_TIME,'HH24:Mi:ss')                  TRADE_TIME,
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
 			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
 			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
-			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收' 
+			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
+               WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
 			 END                                                   DELIVERY_RESULT,
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 			   WHEN STD.DELIVERY_RESULT = '04' THEN '0'
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
 			 END                                                   DELIVERY_SCHEDULE,
-			 TT.FINANCE_ACCOUNT                                    FINANCE_ACCOUNT
-		FROM SETTLE_TRANS_DATA STD
-		LEFT JOIN T_TRADE TT
+			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT
+		FROM T_TRADE TT
+		LEFT JOIN SETTLE_TRANS_DATA STD
 		  ON TT.BROKER_TRADE_ID = STD.CJBH
 		 AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID
-		 AND STD.DELIVERY_RESULT IN ('02', '03')
+		 AND STD.DELIVERY_RESULT IN ('01', '02', '03')
 		 AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD')
 		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
                 OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
 	) A 
-	  LEFT JOIN STL_CAPACCT_INFO SCI ON A.FINANCE_ACCOUNT = SCI.ACCT_NO
+	  LEFT JOIN STL_CAPACCT_INFO SCI ON A.ACCT_ACCOUNT = SCI.ACCT_NO
 	  LEFT JOIN ETR_ENTRUST EE ON A.INSTRUCTION_ID = EE.ENTRUST_ID
 	  LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
 	  LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID

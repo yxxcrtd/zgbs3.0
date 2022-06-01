@@ -43,6 +43,7 @@ import static com.joyintech.tams.invest.common.position.constant.PositionCommonC
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.WORK_FLOW_ID;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -253,7 +254,12 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
         /*if ((DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue()).equals(resultMap.get(DELIVERY_TYPE))&&(DictCodeListExt1.交易场所_深圳证券交易所.getValue()).equals(resultMap.get(TRADE_PLACE))) {//头寸引擎深交所RTGS都是大宗交易
             resultMap.put(SHARES_TRADE_PLATFORM, DictCodeList.交易平台_大宗交易平台.getValue());
         }*/
-        resultMap.put(SHARES_TRADE_PLATFORM, entity.getTradePlat());
+        //头寸交易系统无03 枚举，仅有02，04数据字典。（02：竞价交易，04：大宗交易）
+        if(StringUtil.isNotEmpty(entity.getTradePlat())&&(StringUtil.equals(交易平台_竞价撮合平台.getValue(),entity.getTradePlat())||StringUtil.equals(交易平台_大宗交易平台.getValue(),entity.getTradePlat()))){
+            resultMap.put(SHARES_TRADE_PLATFORM, entity.getTradePlat());
+        }else{
+            resultMap.put(SHARES_TRADE_PLATFORM, null);
+        }
         resultMap.put(SETTLE_SPEED, commonPositionEngineService.parseSettleSpreed((String) resultMap.get(DELIVERY_TYPE)));
 
         String ps = entity.getPs();
@@ -419,11 +425,11 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
                     BigDecimal faceValue = etrTradeOtherCommonService.selectFaceValue(params);
                     // 标准券总额 =质押券数量*折算率*最新面值
                     BigDecimal standardSecAmount = item.getEntrustNum().multiply(entity.getEntrustPrice()).divide(BigDecimal.valueOf(10000)).multiply(faceValue);
-                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.setScale( 0, BigDecimal.ROUND_DOWN ).longValue()*100);//向下取整
+                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.multiply(BigDecimal.valueOf(100)).setScale(0, RoundingMode.HALF_DOWN));//向下取整
                 	map.put("cashAmount", null);//出入库时，可以为空
                 }else {
                     // 标准券总额 = 标准券数量*100
-                    map.put(STANDARD_SEC_AMOUNT, item.getEntrustNum().multiply(BigDecimal.valueOf(100)));
+                    map.put(STANDARD_SEC_AMOUNT, item.getEntrustNum().multiply(BigDecimal.valueOf(100)).setScale(2,RoundingMode.HALF_UP));
                 }
                 ptlList.add(map);
             }
@@ -437,7 +443,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
                     bean = new PositionRequestBaseBean(item);
                     // 券面总额 指令.指令数量*100
                     bean.setCashAmount(null);
-                    BigDecimal secAmount = item.getEntrustNum().multiply(BigDecimal.valueOf(100));
+                    BigDecimal secAmount = item.getEntrustNum().multiply(BigDecimal.valueOf(100)).setScale(2,RoundingMode.HALF_UP);
                     bean.setSecAmount(secAmount);
 
                     Map<String, Object> map = BeanUtil.object2Map(bean);

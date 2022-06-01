@@ -412,7 +412,8 @@
 	nvl(totalDeal.TRADE_AMT,0) tradeAmt,
 	totalDeal.CCY ccy,
 	totalDeal.TRADE_DATE tradeDate,
-	totalDeal.REMARK remark
+	totalDeal.REMARK remark,
+	FIN.MDATE mdate
 	FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL totalDeal
 	LEFT JOIN WFL_TRD_PRODUCT_DEAL deal on totalDeal.TOTLE_TRADE_ID = deal.TOTLE_TRADE_ID
 	LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD WFLDEAL ON deal.TRADE_ID = WFLDEAL.TRADE_ID

@@ -6,6 +6,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
@@ -194,7 +195,13 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
     @PostMapping("finprodIdLink")
     public Message<FinprodLinkDto> finprodIdLink(@RequestBody CreditProtectionCertificatePeriod001Request params) {
         try {
+            if (StringUtil.isEmpty(params.getFinprodId())) {
+                return new Message<FinprodLinkDto>().fail().setMessage("缺少参数 finprodId");
+            }
             return new Message<>(creditProtectionCertificatePeriod002Service.finprodIdLink(params));
+        } catch (BusinessException e1) {
+            logger.error(e1.getMessage(),e1);
+            return new Message<FinprodLinkDto>().fail().setMessage("资产信息不存在");
         } catch (Exception e) {
             logger.error("资产信息联动异常", e);
             return new Message<FinprodLinkDto>().fail().setMessage("资产信息联动异常");

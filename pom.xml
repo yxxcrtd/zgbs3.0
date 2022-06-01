@@ -41,7 +41,7 @@
         <module>tams-valuation-common</module>
         <module>tams-valuation-basicdata</module>
         <module>tams-valuation-parent</module>
-        <module>tams-touguan-common</module>
+<!--        <module>tams-touguan-common</module>-->
         <module>tams-cfets</module>
 <!--        <module>tams-valuation-report</module>-->
         <module>tams-exchange-trade-parent</module>

@@ -225,14 +225,15 @@ public class IbuQuoteBondService extends BaseService {
         //无错误时，进行接收操作
         if(errorList.size() == 0){
             etrInvesInfo.receptionDelegate(list);
-            List<String> entrustIds = StringUtil.splitToList(",",(String)param.get("entrustIds"));
-            for(String entrustId:entrustIds){
-                //更新操作记录日志
-                CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
-                oprHisReq.setEntrustId(entrustId);
-                oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
-                joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-            }
+            // AOP处理
+//            List<String> entrustIds = StringUtil.splitToList(",",(String)param.get("entrustIds"));
+//            for(String entrustId:entrustIds){
+//                //更新操作记录日志
+//                CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
+//                oprHisReq.setEntrustId(entrustId);
+//                oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
+//                joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+//            }
         }
         return errorList;
     }
@@ -515,11 +516,11 @@ public class IbuQuoteBondService extends BaseService {
                         return ajaxResult;
                     }
                     //提交的时候根据交易类型验证
-                    /*if (StringUtil.isEmpty(item.getPartyId())&&StringUtil.equals(exportShow,"01")&&StringUtil.equals(item.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())) {
+                    if (StringUtil.isEmpty(item.getPartyId())&&StringUtil.equals(exportShow,"01")&&StringUtil.equals(item.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())) {
                         message = "指令" + item.getEntrustId() + "下组合未关联交易账户，请至[银行间业务参数管理-CFETS关联账户]中维护";
                         ajaxResult.setMessage(message);
                         return ajaxResult;
-                    }*/
+                    }
                     if (psFlag && !StringUtil.equals(one.getPs(), item.getPs())) {
                         psFlag = false;
                         message = message + "交易方向OR";
@@ -935,11 +936,6 @@ public class IbuQuoteBondService extends BaseService {
         }else{
             boolean status = etrInvestInfoServiceImpl.updateDelegateStatus(entrustId,com.joyintech.tams.constant.DictCodeListExt3.委托状态_待分发.getValue());
         }
-        //更新操作记录日志
-        CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(entrustId);
-        oprHisReq.setOperType(DictCodeListExt3.操作类型_放弃.getValue());
-        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
         return "3";
     }
 

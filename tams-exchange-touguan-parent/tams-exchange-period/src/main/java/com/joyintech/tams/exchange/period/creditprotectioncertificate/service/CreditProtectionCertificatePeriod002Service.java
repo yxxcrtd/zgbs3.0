@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.service;
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
@@ -116,7 +117,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct,DictCodeListExt3.流程节点_审批生效.getValue());
+            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue());
         }
     }
 
@@ -150,7 +151,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct,DictCodeListExt3.流程节点_流程提交.getValue());
+            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
 //
@@ -592,6 +593,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         params.setTradeDate(iPlatformDate.getSysDate());
         FinprodLinkDto finprodLinkDto = creditProtectionCertificatePeriodMapper.findFinprodDetail(params);
 
+        if (null == finprodLinkDto) {
+            throw new BusinessException("资产不存在");
+        }
+
         String newSecPositionSwitch = CacheUtil.getSysParam("NEW_SEC_POSITION_SWITCH");
 
         List<BillingDetailsDto> details;
@@ -608,10 +613,12 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
         if (StringUtil.isEmpty(finprodLinkDto.getRefSec())) {
             if (StringUtil.isNotEmpty(finprodLinkDto.getRefEntity())) {
-                refSecs = creditProtectionCertificatePeriodMapper.getRefSecsByRefEntity(finprodLinkDto.getRefEntity());
+                String[] refEntityArray = StringUtil.split(finprodLinkDto.getRefEntity(), ",");
+                List<String> refSecsList = creditProtectionCertificatePeriodMapper.getRefSecsByRefEntity(refEntityArray);
+                refSecsList.forEach(refSecsD -> refSecs.addAll(Arrays.asList(StringUtil.split(refSecsD, ","))));
             }
         } else {
-            refSecs.add(finprodLinkDto.getRefSec());
+            refSecs.addAll(Arrays.asList(StringUtil.split(finprodLinkDto.getRefSec(), ",")));
         }
 
         finprodLinkDto.setRefSecs(refSecs);

@@ -23,6 +23,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 场外指令分发
@@ -123,10 +126,26 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     private String firstBidStatusStr;
 
     @ApiModelProperty(name="issueDate",value="投标日/发行日")
-    private String issueDate;
+    private Date issueDate;
 
     @ApiModelProperty(name="issueDateStr",value="投标日/发行日字符串")
     private String issueDateStr;
+
+    /**
+     * 交易平台
+     */
+    @ApiModelProperty(name="tradePlat",value="交易平台")
+    private String tradePlat;
+
+    @Override
+    public String getTradePlat() {
+        return tradePlat;
+    }
+
+    @Override
+    public void setTradePlat(String tradePlat) {
+        this.tradePlat = tradePlat;
+    }
 
     /**
      * 获取 otherEntrustStatus
@@ -253,7 +272,26 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     }
 
     public String getSecAcctId() {
-        return secAcctId;
+        if (StringUtil.isEmpty(secAcctId)) {
+            return null;
+        }
+        //去重
+        String[] arr = secAcctId.split(",");
+        List<String> list = new ArrayList();
+        for (int i = 0; i < arr.length; i++) {
+            String s = arr[i].trim();
+            if (!list.contains(s)) {
+                list.add(s);
+            }
+        }
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i < list.size(); i++) {
+            buffer.append(list.get(i));
+            if (i < list.size() - 1) {
+                buffer.append(",");
+            }
+        }
+        return buffer.toString();
     }
 
     public void setSecAcctId(String secAcctId) {
@@ -437,16 +475,19 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
         this.firstBidStatusStr = firstBidStatusStr;
     }
 
-    public String getIssueDate() {
+    public Date getIssueDate() {
         return issueDate;
     }
 
-    public void setIssueDate(String issueDate) {
+    public void setIssueDate(Date issueDate) {
         this.issueDate = issueDate;
     }
 
     public String getIssueDateStr() {
-        return issueDateStr;
+        if (getIssueDate() == null) {
+            return "";
+        }
+        return DateUtil.format(getIssueDate(), "yyyy-MM-dd");
     }
 
     public void setIssueDateStr(String issueDateStr) {

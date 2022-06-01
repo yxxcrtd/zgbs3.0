@@ -113,5 +113,5 @@ public interface EtrPlanAssetNMapper {
      */
     String judgeCounterType(@Param("counterId") String counterId);
 
-    double getValue(Map map);
+    Map<String, Double> getValue(Map map);
 }

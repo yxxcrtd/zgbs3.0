@@ -82,4 +82,18 @@ public interface CfgDataTableMapper {
                                           @Param("spcdCodes") List<String> spcdCodes,
                                           @Param("effeRange") Integer effeRange, @Param("rangeId") String rangeId, @Param("showInvaimOrBussinssmodel") String showInvaimOrBussinssmodel);
 
+
+    /**
+     * 查询页面隐藏域数据表格式设置
+     *
+     * @param pageCode
+     * @param dtCode
+     * @param isHide
+     * @param spcdCodes
+     * @return
+     */
+    List<CfgDataTableShow> getBySpcdCodesByIsHide(@Param("pageCode") String pageCode, @Param("dtCode") String dtCode,
+                                                  @Param("spcdCodes") List<String> spcdCodes,
+                                                  @Param("effeRange") Integer effeRange, @Param("rangeId") String rangeId,@Param("isHide") String isHide);
+
 }

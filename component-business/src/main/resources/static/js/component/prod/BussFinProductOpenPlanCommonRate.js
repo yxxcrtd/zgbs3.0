@@ -770,10 +770,6 @@
         if (selectedValue){
             if (selectedValue == ISSUE_MODE_02){
                 getElementById('div').show();
-				if (parentPageId == 'FinPlanNetAsset002' || parentPageId == 'FinPlanProfitAsset002'|| parentPageId == 'FinPlanAssetC002'){
-					$('#div1').hide();
-					$('#span1').html("赎回");
-				}
             }
             else {
                 getElementById('div').hide();
@@ -1295,11 +1291,7 @@
 			//BS-2042  草稿箱功能，净值型产品产品处理模式为单一固定期限，选择开放模式为高频开放，使用草稿时，出现了赎回计划（错误）） end
         } 
         else {
-			if (parentPageId == 'FinPlanNetAsset002' || parentPageId == 'FinPlanProfitAsset002'|| parentPageId == 'FinPlanAssetC002'){
-				$('#div1').hide();
-			}else{
-				$('#div1').show();
-			}
+			$('#div1').show();
         	$('#cfDiv').hide();
         	if(isLoaded()){
             	$('#FinNetValueProductBuild002_period').val('').trigger('change').prop('disabled', false);

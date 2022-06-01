@@ -66,7 +66,7 @@ public class RskParamReCalcReader extends BaseReader<RskParamReCalcReaderDto> {
         Map<String, Object> params = getParams();
         List<String> prodIdList = (List<String>)params.get(BatchConstant.KEY_PRODID_LIST);
         Date sysDate = (Date) params.get("sysDate");
-        // 取出未到期预占及预占下的实占报文
+        // 查询T日之前的未到期预占及预占下的实占报文
         List<RskInterfDataDto> opcInfoList = dataService.getOcpInfoList(prodIdList, sysDate);
         // 若没有数据则处理结束
         if (CollectionUtils.isEmpty(opcInfoList)) {
@@ -79,10 +79,7 @@ public class RskParamReCalcReader extends BaseReader<RskParamReCalcReaderDto> {
         Map<String, List<RskInterfDataDto>> groupMap = opcInfoList.stream().collect(
             Collectors.groupingBy(RskInterfDataDto::getSeqNo));
         // 批量报文拆分
-        groupMap.entrySet().forEach(en -> {
-            List<RskInterfDataDto> temp = en.getValue();
-            newList.addAll(filter(temp));
-        });
+        groupMap.forEach((key, temp) -> newList.addAll(filter(temp)));
         // 按照预占编号分组
         groupMap = newList.stream().collect(Collectors.groupingBy(
             dto -> isPreOccupy(dto.getInfCode()) ? dto.getEventId() : dto.getPreOccupyCode()));
@@ -138,7 +135,7 @@ public class RskParamReCalcReader extends BaseReader<RskParamReCalcReaderDto> {
                 if (!CollectionUtils.isEmpty(list)) {
                     // 找出对应的报文体
                     Map temp = list.stream().filter(item -> StringUtil.equals(dto.getEventId(),
-                        item.get("eventType"))).findFirst().orElse(null);
+                        item.get("eventId"))).findFirst().orElse(null);
                     // 非空判断
                     if (!CollectionUtils.isEmpty(temp)) {
                         // 设置报文体

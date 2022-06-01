@@ -12,6 +12,7 @@ import com.joyintech.tams.exchange.common.bean.response.CounterAcctResponse;
 import com.joyintech.tams.exchange.common.bean.response.ExchangeContextResponse;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
@@ -251,7 +252,7 @@ public class CommonController {
 
     @ApiOperation(value = "查询交易商交易员信息", notes = "查询交易商交易员信息")
     @PostMapping("/common/getDealerTraderInfo")
-    public List<TradeInfoProResponse> selectTraderInfo(@RequestBody TradeInfoProRequest dto) {
+    public List<TradeInfoProResponse> selectTraderInfo(@RequestBody @Validated TradeInfoProRequest dto) {
         if (StringUtil.equals(dto.getIsOur(), "Y")) {
             return commonManagement.getDealerTraderInfo(dto);
         }

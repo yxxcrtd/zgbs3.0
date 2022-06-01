@@ -7,54 +7,41 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.tams.component.base.core.dto;
 
 import java.util.List;
 
-import com.joyintech.tams.common.base.entity.FinCashCalcRule;
-import com.joyintech.tams.common.base.entity.FinCashInfo;
-import com.joyintech.tams.common.base.entity.FinCashPayRule;
-import com.joyintech.tams.common.base.entity.FinCashPlan;
-import com.joyintech.tams.common.base.entity.FinExercisePlan;
-import com.joyintech.tams.common.base.entity.FinExerciseRule;
-import com.joyintech.tams.common.base.entity.FinFloatCountingRule;
-import com.joyintech.tams.common.base.entity.FinOpenPlan;
-import com.joyintech.tams.common.base.entity.FinOpenRule;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.FinProductAdd;
-import com.joyintech.tams.common.base.entity.FinProductRecomment;
-import com.joyintech.tams.common.base.entity.FinProductType;
-import com.joyintech.tams.common.base.entity.FinRateInfo;
-import com.joyintech.tams.common.base.entity.JxsIssueInfo;
-import com.joyintech.tams.common.base.entity.MstBondCreditRating;
-import com.joyintech.tams.common.base.entity.PaFinProduct;
-import com.joyintech.tams.common.base.entity.RepAssetBond;
-import com.joyintech.tams.common.base.entity.RepAssetDept;
-import com.joyintech.tams.common.base.entity.RepAssetEquity;
-import com.joyintech.tams.common.base.entity.RepFund;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.report.dto.BaseRepAssetEquityInfoDto;
 
 /**
  * 〈一句话功能简述〉
  * 〈功能详细描述〉
+ *
  * @author xiexinting
  * @version 1.0 2018年9月4日
  * @see BaseFinProductBaseInfoDto
  * @since 1.0
  */
 public class BaseFinProductBaseInfoDto {
-    
+
     /**
      * 标的类金融产品entity
      */
     private FinProduct finProduct;
-    
+
     private PaFinProduct paFinProduct;
     /**
      * 金融产品附属表entity
      */
     private FinProductAdd finProductAdd;
+
+    /**
+     * 金融产品发行信息
+     */
+    private FinProductIssue finProductIssue;
+
     /**
      * 金融产品分类表entity
      */
@@ -104,21 +91,19 @@ public class BaseFinProductBaseInfoDto {
      */
     private RepFund repfund;
     /**
-     * 债券中债报送 机构类别add by shenchen 
+     * 债券中债报送 机构类别add by shenchen
      */
     private RepAssetBond repAssetBond;
     /**
      * 债券中债报送 资产负债类别
-     * 
      */
     private RepAssetDept repAssetDept;
-    
+
     /**
      * 权益类资产中债报送
-     * 
      */
     private RepAssetEquity repAssetEquity;
-    
+
     /**
      * 债券信用评级信息
      */
@@ -129,22 +114,20 @@ public class BaseFinProductBaseInfoDto {
      * 标的类金融产品推荐表
      */
     List<FinProductRecomment> finProductRecommentList;
-    
+
     /**
      * 债券中债报送--权益类资产报送信息
-     * 
-     */    
+     */
     private BaseRepAssetEquityInfoDto baseRepAssetEquityInfoDto;
-    
+
     /**
      * JXS_ISSUE_INFO
-     * 
      */
     private JxsIssueInfo jxsIssueInfo;
 
     /**
      * 获取 finProductRecommentList
-     * 
+     *
      * @return finProductRecommentList.
      */
     public List<FinProductRecomment> getFinProductRecommentList() {
@@ -153,7 +136,7 @@ public class BaseFinProductBaseInfoDto {
 
     /**
      * 设置 finProductRecommentList
-     * 
+     *
      * @param finProductRecommentList finProductRecommentList
      */
     public void setFinProductRecommentList(List<FinProductRecomment> finProductRecommentList) {
@@ -163,66 +146,72 @@ public class BaseFinProductBaseInfoDto {
 
     /**
      * 获取 标的类金融产品entity
+     *
      * @return finProduct.
      */
     public FinProduct getFinProduct() {
         return finProduct;
     }
-    
+
     /**
      * 设置 标的类金融产品entity
+     *
      * @param finProduct finProduct
      */
     public void setFinProduct(FinProduct finProduct) {
         this.finProduct = finProduct;
     }
-    
+
     /**
      * 获取 金融产品附属表entity
+     *
      * @return finProductAdd.
      */
     public FinProductAdd getFinProductAdd() {
         return finProductAdd;
     }
-    
+
     /**
      * 设置 金融产品附属表entity
+     *
      * @param finProductAdd finProductAdd
      */
     public void setFinProductAdd(FinProductAdd finProductAdd) {
         this.finProductAdd = finProductAdd;
     }
-    
+
     /**
      * 获取 金融产品分类表entity
+     *
      * @return finProductType.
      */
     public FinProductType getFinProductType() {
         return finProductType;
     }
-    
+
     /**
      * 设置 金融产品分类表entity
+     *
      * @param finProductType finProductType
      */
     public void setFinProductType(FinProductType finProductType) {
         this.finProductType = finProductType;
     }
-    
-   
-    
-    
+
+
     /**
      * 获取 金融产品现金流信息表dtolist
+     *
      * @return finCashInfoList.
      */
     public List<FinCashInfo> getFinCashInfoList() {
         return finCashInfoList;
     }
 
-    
+
     /**
      * 设置 金融产品现金流信息表dtolist
+     *
      * @param finCashInfoList finCashInfoList
      */
     public void setFinCashInfoList(List<FinCashInfo> finCashInfoList) {
@@ -231,90 +220,100 @@ public class BaseFinProductBaseInfoDto {
 
     /**
      * 获取 现金流计算规则dtolist
+     *
      * @return finCashCalcRuleList.
      */
     public List<FinCashCalcRule> getFinCashCalcRuleList() {
         return finCashCalcRuleList;
     }
-    
+
     /**
      * 设置 现金流计算规则dtolist
+     *
      * @param finCashCalcRuleList finCashCalcRuleList
      */
     public void setFinCashCalcRuleList(List<FinCashCalcRule> finCashCalcRuleList) {
         this.finCashCalcRuleList = finCashCalcRuleList;
     }
-    
+
     /**
      * 获取 现金流利率信息表dtolist
+     *
      * @return finRateInfoList.
      */
     public List<FinRateInfo> getFinRateInfoList() {
         return finRateInfoList;
     }
-    
+
     /**
      * 设置 现金流利率信息表dtolist
+     *
      * @param finRateInfoList finRateInfoList
      */
     public void setFinRateInfoList(List<FinRateInfo> finRateInfoList) {
         this.finRateInfoList = finRateInfoList;
     }
-    
+
     /**
      * 获取 现金流支付规则dtolist
+     *
      * @return finCashPayRuleList.
      */
     public List<FinCashPayRule> getFinCashPayRuleList() {
         return finCashPayRuleList;
     }
-    
+
     /**
      * 设置 现金流支付规则dtolist
+     *
      * @param finCashPayRuleList finCashPayRuleList
      */
     public void setFinCashPayRuleList(List<FinCashPayRule> finCashPayRuleList) {
         this.finCashPayRuleList = finCashPayRuleList;
     }
-    
-    
+
+
     public List<FinFloatCountingRule> getFinCashCountingRuleList() {
         return finCashCountingRuleList;
     }
 
-    
+
     public void setFinCashCountingRuleList(List<FinFloatCountingRule> finCashCountingRuleList) {
         this.finCashCountingRuleList = finCashCountingRuleList;
     }
 
     /**
      * 获取现金流计划dtolist
+     *
      * @return finCashPlanList.
      */
     public List<FinCashPlan> getFinCashPlanList() {
         return finCashPlanList;
     }
-    
+
     /**
      * 设置 现金流计划dtolist
+     *
      * @param finCashPlanList finCashPlanList
      */
     public void setFinCashPlanList(List<FinCashPlan> finCashPlanList) {
         this.finCashPlanList = finCashPlanList;
     }
-  
-    
+
+
     /**
      * 获取 金融产品行权规则dtolist
+     *
      * @return finExerciseRuleList.
      */
     public List<FinExerciseRule> getFinExerciseRuleList() {
         return finExerciseRuleList;
     }
 
-    
+
     /**
      * 设置 金融产品行权规则dtolist
+     *
      * @param finExerciseRuleList finExerciseRuleList
      */
     public void setFinExerciseRuleList(List<FinExerciseRule> finExerciseRuleList) {
@@ -323,117 +322,131 @@ public class BaseFinProductBaseInfoDto {
 
     /**
      * 获取 金融产品行权计划dtolist
+     *
      * @return finExercisePlanList.
      */
     public List<FinExercisePlan> getFinExercisePlanList() {
         return finExercisePlanList;
     }
-    
+
     /**
      * 设置 金融产品行权计划dtolist
+     *
      * @param finExercisePlanList finExercisePlanList
      */
     public void setFinExercisePlanList(List<FinExercisePlan> finExercisePlanList) {
         this.finExercisePlanList = finExercisePlanList;
     }
 
-    
+
     /**
      * 获取 finOpenPlanList
+     *
      * @return finOpenPlanList.
      */
     public List<FinOpenPlan> getFinOpenPlanList() {
         return finOpenPlanList;
     }
 
-    
+
     /**
      * 设置 finOpenPlanList
+     *
      * @param finOpenPlanList finOpenPlanList
      */
     public void setFinOpenPlanList(List<FinOpenPlan> finOpenPlanList) {
         this.finOpenPlanList = finOpenPlanList;
     }
 
-    
+
     /**
      * 获取 finOpenRuleList
+     *
      * @return finOpenRuleList.
      */
     public List<FinOpenRule> getFinOpenRuleList() {
         return finOpenRuleList;
     }
 
-    
+
     /**
      * 设置 finOpenRuleList
+     *
      * @param finOpenRuleList finOpenRuleList
      */
     public void setFinOpenRuleList(List<FinOpenRule> finOpenRuleList) {
         this.finOpenRuleList = finOpenRuleList;
     }
 
-	public PaFinProduct getPaFinProduct() {
-		return paFinProduct;
-	}
+    public PaFinProduct getPaFinProduct() {
+        return paFinProduct;
+    }
 
-	public void setPaFinProduct(PaFinProduct paFinProduct) {
-		this.paFinProduct = paFinProduct;
-	}
+    public void setPaFinProduct(PaFinProduct paFinProduct) {
+        this.paFinProduct = paFinProduct;
+    }
 
-	public RepFund getRepfund() {
-		return repfund;
-	}
+    public RepFund getRepfund() {
+        return repfund;
+    }
 
-	public void setRepfund(RepFund repfund) {
-		this.repfund = repfund;
-	}
+    public void setRepfund(RepFund repfund) {
+        this.repfund = repfund;
+    }
 
-	public RepAssetBond getRepAssetBond() {
-		return repAssetBond;
-	}
+    public RepAssetBond getRepAssetBond() {
+        return repAssetBond;
+    }
 
-	public void setRepAssetBond(RepAssetBond repAssetBond) {
-		this.repAssetBond = repAssetBond;
-	}
+    public void setRepAssetBond(RepAssetBond repAssetBond) {
+        this.repAssetBond = repAssetBond;
+    }
 
-	public RepAssetDept getRepAssetDept() {
-		return repAssetDept;
-	}
+    public RepAssetDept getRepAssetDept() {
+        return repAssetDept;
+    }
 
-	public void setRepAssetDept(RepAssetDept repAssetDept) {
-		this.repAssetDept = repAssetDept;
-	}
+    public void setRepAssetDept(RepAssetDept repAssetDept) {
+        this.repAssetDept = repAssetDept;
+    }
 
-	public List<MstBondCreditRating> getMstBondCreditRatingList() {
-		return mstBondCreditRatingList;
-	}
+    public List<MstBondCreditRating> getMstBondCreditRatingList() {
+        return mstBondCreditRatingList;
+    }
 
-	public void setMstBondCreditRatingList(List<MstBondCreditRating> mstBondCreditRatingList) {
-		this.mstBondCreditRatingList = mstBondCreditRatingList;
-	}
-    
-	public BaseRepAssetEquityInfoDto getBaseRepAssetEquityInfoDto() {
-		return baseRepAssetEquityInfoDto;
-	}
+    public void setMstBondCreditRatingList(List<MstBondCreditRating> mstBondCreditRatingList) {
+        this.mstBondCreditRatingList = mstBondCreditRatingList;
+    }
 
-	public void setBaseRepAssetEquityInfoDto(BaseRepAssetEquityInfoDto baseRepAssetEquityInfoDto) {
-		this.baseRepAssetEquityInfoDto = baseRepAssetEquityInfoDto;
-	}
+    public BaseRepAssetEquityInfoDto getBaseRepAssetEquityInfoDto() {
+        return baseRepAssetEquityInfoDto;
+    }
 
-	public JxsIssueInfo getJxsIssueInfo() {
-		return jxsIssueInfo;
-	}
+    public void setBaseRepAssetEquityInfoDto(BaseRepAssetEquityInfoDto baseRepAssetEquityInfoDto) {
+        this.baseRepAssetEquityInfoDto = baseRepAssetEquityInfoDto;
+    }
 
-	public void setJxsIssueInfo(JxsIssueInfo jxsIssueInfo) {
-		this.jxsIssueInfo = jxsIssueInfo;
-	}
+    public JxsIssueInfo getJxsIssueInfo() {
+        return jxsIssueInfo;
+    }
 
-	public RepAssetEquity getRepAssetEquity() {
-		return repAssetEquity;
-	}
+    public void setJxsIssueInfo(JxsIssueInfo jxsIssueInfo) {
+        this.jxsIssueInfo = jxsIssueInfo;
+    }
 
-	public void setRepAssetEquity(RepAssetEquity repAssetEquity) {
-		this.repAssetEquity = repAssetEquity;
-	}
+    public RepAssetEquity getRepAssetEquity() {
+        return repAssetEquity;
+    }
+
+    public void setRepAssetEquity(RepAssetEquity repAssetEquity) {
+        this.repAssetEquity = repAssetEquity;
+    }
+
+    public FinProductIssue getFinProductIssue() {
+        return finProductIssue;
+    }
+
+    public void setFinProductIssue(FinProductIssue finProductIssue) {
+        this.finProductIssue = finProductIssue;
+    }
 }

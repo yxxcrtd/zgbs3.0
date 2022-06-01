@@ -966,6 +966,9 @@
             <if test="busiTypePosition != null" >
                 BUSI_TYPE_POSITION,
             </if>
+            <if test="priceType != null" >
+                PRICE_TYPE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -1270,6 +1273,9 @@
             </if>
             <if test="busiTypePosition != null" >
                 #{busiTypePosition,jdbcType=VARCHAR},
+            </if>
+            <if test="priceType != null" >
+                #{priceType,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

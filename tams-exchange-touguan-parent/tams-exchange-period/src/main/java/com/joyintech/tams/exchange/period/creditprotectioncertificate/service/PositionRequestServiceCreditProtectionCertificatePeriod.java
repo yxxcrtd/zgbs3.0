@@ -58,7 +58,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
 
     private void period001(CreditProtectionCertificatePeriodSaveDto entity, Map<String, Object> resultMap) {
 
-        resultMap.put(INTERFACE_TYPE, "T100");
+        resultMap.put(INTERFACE_TYPE, "Certificate001");
         resultMap.put("userId", LoginUserUtil.getUserName());
 //        resultMap.put("computerId","");
         resultMap.put(TOTAL_TRADE_ID, entity.getBusiCode());

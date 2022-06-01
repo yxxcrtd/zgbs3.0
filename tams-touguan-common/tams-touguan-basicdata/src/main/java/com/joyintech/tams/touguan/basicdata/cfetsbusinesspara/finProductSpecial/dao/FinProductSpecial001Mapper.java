@@ -7,7 +7,6 @@ import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +27,14 @@ public interface FinProductSpecial001Mapper {
     List<FinProductSpecialDto> queryForPage(FinProductSpecialQueryRequest request);
 
     /**
+     * 查询
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    FinProductSpecialDto queryByFinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
+
+    /**
      * 查询下拉框
      *
      * @param request
@@ -37,13 +44,29 @@ public interface FinProductSpecial001Mapper {
 
 
     /**
-     * 判断金融产品代码是否使用过
+     * 判断金融产品代码当日是否使用过
      *
      * @param finprodId
      * @param iPlatformDate
      * @return
      */
-    Integer countFinprodIdProcessing(@Param("finprodId") String finprodId, @Param("iPlatformDate") Date iPlatformDate);
+    int countFinprodIdProcessingAndDate(@Param("finprodId") String finprodId, @Param("iPlatformDate") String iPlatformDate);
+
+    /**
+     * 查询业务表是否存在
+     *
+     * @param search
+     * @return
+     */
+    int countFinprodIdInProduct(@Param("search") String search);
+
+    /**
+     * 判断金融产品代码是否使用过
+     *
+     * @param finprodId
+     * @return
+     */
+    int countFinprodIdProcessing(@Param("finprodId") String finprodId);
 
     /**
      * 接口表简单数据查询
@@ -60,6 +83,14 @@ public interface FinProductSpecial001Mapper {
      * @return
      */
     FinProductSpecialSelectOptionDto querySampleFinProduct(FinProductSpecialSelectOptionQueryRequest request);
+
+    /**
+     * 查询特殊债券信息数量
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    int countFinprodIdForSpecial(@Param("finprodMarketId") String finprodMarketId);
 
 
 }

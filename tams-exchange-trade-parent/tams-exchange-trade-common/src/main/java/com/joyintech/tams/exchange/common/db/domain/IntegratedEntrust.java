@@ -184,6 +184,9 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
     private String tradeId;
 
+    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员ID")
+    private String tradeName;
+
     @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
     private String dealerId;
 
@@ -199,6 +202,9 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
     private String propTradeId;
+
+    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员")
+    private String propTradeName;
 
     @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
     private String propDealerId;
@@ -1118,6 +1124,14 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.tradeId = tradeId;
     }
 
+    public String getTradeName() {
+        return tradeName;
+    }
+
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
     public String getDealerId() {
         return dealerId;
     }
@@ -1141,6 +1155,14 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setPropTradeId(String propTradeId) {
         this.propTradeId = propTradeId;
+    }
+
+    public String getPropTradeName() {
+        return propTradeName;
+    }
+
+    public void setPropTradeName(String propTradeName) {
+        this.propTradeName = propTradeName;
     }
 
     public String getPropDealerId() {

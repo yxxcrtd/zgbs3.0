@@ -219,8 +219,18 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     @ApiModelProperty(name = "debRateOrg", value = "债项评级机构")
     private String debRateOrg;
 
+    @ApiModelProperty(name = "addBatch", value = "增发批次")
+    private Integer addBatch;
+
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+
+
+    /**
+     * 上市流通代码
+     */
+    @ApiModelProperty(name="circulationCode",value="上市流通代码")
+    private String circulationCode;
 
     /**
      * 操作类型：NEW,MODIFY,DELETE,REVOKE
@@ -257,6 +267,9 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getIssueStatusValue() {
+        if(this.issueStatus != null && this.issueStatus.equals("00")) {
+            return null;
+        }
         return SysDataUtil.getNameFromDataDict(DictCode.发行状态, this.issueStatus);
     }
 
@@ -742,5 +755,21 @@ public class FinTenderBondAsset001Dto extends BaseDto {
 
     public void setIssueDateStr(String issueDateStr) {
         this.issueDateStr = issueDateStr;
+    }
+
+    public String getCirculationCode() {
+        return circulationCode;
+    }
+
+    public void setCirculationCode(String circulationCode) {
+        this.circulationCode = circulationCode;
+    }
+
+    public Integer getAddBatch() {
+        return addBatch;
+    }
+
+    public void setAddBatch(Integer addBatch) {
+        this.addBatch = addBatch;
     }
 }

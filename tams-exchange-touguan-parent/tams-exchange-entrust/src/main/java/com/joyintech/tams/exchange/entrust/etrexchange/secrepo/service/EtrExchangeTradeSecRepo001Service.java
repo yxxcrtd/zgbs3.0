@@ -19,11 +19,13 @@ import com.joyintech.background.component.order.exchange.common.dto.EtrParameter
 import com.joyintech.background.component.order.exchange.common.dto.EtrSinglePortfolioDto;
 import com.joyintech.background.component.order.exchange.common.service.EtrComponentCommService;
 import com.joyintech.background.component.order.exchange.common.service.impl.EtrComponentFactory;
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
 import com.joyintech.calculation.bonds.SecIntSchedule;
 import com.joyintech.calculation.bonds.SecPrinSchedule;
 import com.joyintech.calculation.bonds.constant.*;
+import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.shell.AccurIntCalculator;
 import com.joyintech.calculation.shell.AccurIntForSecheduleCalculator;
 import com.joyintech.calculation.shell.PriceByYieldCalculator;
@@ -57,6 +59,7 @@ import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
 import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
+import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
@@ -221,6 +224,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
      */
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
+
+    @Autowired
+    private BasRiskMathCommService basRiskMathCommService;
 
 
     /**
@@ -397,6 +403,8 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         }
         //处理履历
         updateCfetsOprHis(dto.getEntrustId(), dto.getOptType());
+
+        basRiskMathCommService.insert(dto.getRiskTrialRetDto(), dto.getEntrustId());
     }
 
     /**
@@ -1516,14 +1524,14 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice()))<0)){
-                    validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice())+"]之外"));
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
                 if(quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice())+"]之外"));
                 }
             }
         }
@@ -1538,13 +1546,17 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                     if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice())+"]之外"));
                     }
                 }else{
                     if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                        if(quotation.getLastPrice().compareTo(BigDecimal.ZERO)==0){
+                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+BigDecimal.ZERO+"]之外"));
+                        }else{
+                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ ArithmeticUtil.round(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()), NumberEnum.MONEY)+","+ArithmeticUtil.round(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()),NumberEnum.MONEY)+"]之外"));
+                        }
                     }
                 }
             }
@@ -1552,7 +1564,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(quotation!=null&&quotation.getLastPrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice())+"]之外"));
                 }
             }
         }

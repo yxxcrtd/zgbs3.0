@@ -40,12 +40,20 @@ public interface FinBondMarketInfoQueryMapper {
     List<FinBondPayHSrcSecOptionDto> queryFinBondPayHSrcSecOption(@Param("secId") String secId);
 
     /**
-     * 债券信息查询
+     * 债券信息查询（接口表）
      *
      * @param param
      * @return
      */
     FinBondMarketInfoDetailQueryDto queryFinBondMarketForCoupons(Map<String, Object> param);
+
+    /**
+     * 债券信息查询
+     *
+     * @param param
+     * @return
+     */
+    FinBondMarketInfoDetailQueryDto queryFinProductForCoupons(Map<String, Object> param);
 
     /**
      * 债券信息下拉框查询
@@ -54,4 +62,21 @@ public interface FinBondMarketInfoQueryMapper {
      * @return
      */
     List<SelectOptionDto> getAssetId(Map<String, Object> param);
+
+    /**
+     * 查询付息计划信息
+     *
+     * @param map
+     * @return
+     */
+    List<FinBondMarketCashPlanDto> selectInvScheduleList(Map<String, Object> map);
+
+    /**
+     * 行权计划信息
+     *
+     * @param map
+     * @return
+     */
+    List<FinBondPayHSrcSecOptionDto> selectFinExercisePlanList(Map<String, Object> map);
+
 }

@@ -106,7 +106,7 @@ public class RskSpecificAssetType002Controller extends BaseController {
         WorkFlowParameter<RskSpecificAssetTypeDto> params = new WorkFlowParameter<RskSpecificAssetTypeDto>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(dto.getSpecificId());
+        params.setBusinessCode(dto.getFinprodId());
         params.setBusinessType(BussinessDictCodeListRds.共同业务类型_特定资产类型设置.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {

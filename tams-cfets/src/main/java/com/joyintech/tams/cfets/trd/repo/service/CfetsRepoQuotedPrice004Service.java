@@ -220,6 +220,9 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
      */
     @Autowired
     private BasePtlCashPositionInfoService basePtlCashPositionInfoServiceImpl;
+
+    @Autowired
+    private com.joyintech.tams.cfets.trd.bond.service.CfetsQuotedCommonService cfetsQuotedCommonServicevue;
     /**
      * 利率保留位数
      */
@@ -274,6 +277,11 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                     errorList.addAll(validMessageList);
 //                    break;
                 }
+                AjaxResult ajaxResultPartyId = cfetsQuotedCommonServicevue.checkpartyId(ptlAllocatio.getEntrustId(),
+                        ptlAllocatio.getPortfolioId(), DictCodeListExt3.报价系统区分类型_质押式回购登记报价.getValue());
+                if(StringUtil.isNotEmpty(ajaxResultPartyId.getMessage())){
+                    errorList.add(new ValidMessage(ajaxResultPartyId.getMessage()));
+                }
                 if (this.ACompareToB(ptlAllocatio.getTradeAmt(), ptlAllocatio.getConvertAmt(), 6) > 0
                         && StringUtil.equals(ps, DictCodeListExt3.交易方向_正回购.getValue())) {
                     errorList.add(new ValidMessage("组合分配中交易金额要小于等于质押券折算总额"));
@@ -311,8 +319,12 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                 //组合分配中交易金额要小于等于（剩余指令额度-已成功发出的未收到外汇交易中心成功反馈报价和流程中的报价-流程中交易登记额度）
                 // 已实现: 剩余指令额度 = 指令额度-生效的交易登记额度-流程中交易登记额度-已成功发出的未收到外汇交易中心成功反馈报价和流程中的报价
                 CfetsRepoDealEntrustOrderDto dto = cfetsIbuQuoteRepoMapper.findEtrLastNumByEtrId(ptlAllocatio.getEntrustId(), entity.getTotleTradeId());
-                if (ACompareToB(ptlAllocatio.getTradeAmt(), dto.getAvaNum(), 12) > 0) {
+                if (ACompareToB(ptlAllocatio.getTradeAmt(), ptlAllocatio.getAvaNum(), 12) > 0) {
                     errorList.add(new ValidMessage("组合分配中交易金额要小于等于[" + ptlAllocatio.getEntrustId() + "]剩余的指令额度"));
+                    break;
+                }
+                if (ACompareToB(ptlAllocatio.getTradeAmt(), dto.getAvaNum(), 12) > 0) {
+                    errorList.add(new ValidMessage("组合分配中交易金额要小于等于[" + ptlAllocatio.getEntrustId() + "]剩余的指令额度(存在流程中数据)"));
                     break;
                 }
                 if (StringUtil.equals(CacheUtil.getSysParam("EXPORT_SHOW"), "02")) {
@@ -783,9 +795,6 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
             PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
                     DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), entity.getPs());
         }
-//        if(StringUtil.isNotEmpty(workflowId)){
-//            throw new RuntimeException("jp");
-//        }
     }
 
     @Override

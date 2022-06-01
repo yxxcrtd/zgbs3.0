@@ -143,7 +143,7 @@
                     OR
                     i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                     OR
-                    a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{search,jdbcType=VARCHAR}, '%'))
+                    a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{initValue,jdbcType=VARCHAR}, '%'))
                 )
             </if>
             <if test="IS_ASSTE_MANAGER != null and IS_ASSTE_MANAGER != ''">
@@ -168,6 +168,9 @@
                 AND i.IS_INVEST_ADVISER = #{IS_INVEST_ADVISER}
             </if>
             <!-- 增加担保人查询条件 add by zhangnian 20191015 end -->
+            <if test="IS_ORIGINAL_OWNER != null and IS_ORIGINAL_OWNER != ''">
+                AND i.IS_ORIGINAL_OWNER = #{IS_ORIGINAL_OWNER}
+            </if>
         </where>
     </select>
     <select id="getCalendarId" resultType="com.joyintech.framework.select.SuggestDto">

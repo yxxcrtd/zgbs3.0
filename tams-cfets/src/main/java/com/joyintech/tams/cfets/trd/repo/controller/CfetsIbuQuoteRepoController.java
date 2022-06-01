@@ -178,7 +178,7 @@ public class CfetsIbuQuoteRepoController extends BaseController {
 
     @ApiOperation(value = "指令列表导出", notes = "指令列表导出")
     @ResponseBody
-    @RequestMapping("exportEntrust")
+    @PostMapping("exportEntrust")
     public void export(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response) {
         // 导出
         ExcelUitl.doExport(requestDto, response, "指令列表", () -> {
@@ -427,7 +427,7 @@ public class CfetsIbuQuoteRepoController extends BaseController {
 
     @ApiOperation(value = "当日登记导出", notes = "当日登记导出")
     @ResponseBody
-    @RequestMapping("exportDataDayReg")
+    @PostMapping("exportDataDayReg")
     public void exportDataDayReg(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response) {
         // 导出
         ExcelUitl.doExport(requestDto, response, "当日登记", () -> {
@@ -669,7 +669,7 @@ public class CfetsIbuQuoteRepoController extends BaseController {
 
     @ApiOperation(value = "强制完成检查", notes = "强制完成检查")
     @ResponseBody
-    @RequestMapping("/doForcedFinishCheck")
+    @PostMapping("/doForcedFinishCheck")
     public Message<AjaxResult> doForcedFinishCheck(@RequestBody Map<String, Object> param) {
         BondQuoteInfoDto bondQuoteInfoDto = new BondQuoteInfoDto();
         AjaxResult ar = null;
@@ -682,7 +682,7 @@ public class CfetsIbuQuoteRepoController extends BaseController {
 
     @ApiOperation(value = "强制完成", notes = "强制完成")
     @ResponseBody
-    @RequestMapping("doForcedFinish")
+    @PostMapping("doForcedFinish")
     public Message<AjaxResult> doForcedFinish(@RequestBody Map<String, Object> param) {
         AjaxResult ar;
         List<String> entrustIds = StringUtil.splitToList(",", (String) param.get("entrustIds"));
@@ -754,7 +754,7 @@ public class CfetsIbuQuoteRepoController extends BaseController {
 
     @ApiOperation(value = "质押券保存校验", notes = "根据质押券信息,到期结算日,交易方向 校验数据")
     @ResponseBody
-    @RequestMapping("/doSavePledgesCheck")
+    @PostMapping("/doSavePledgesCheck")
     public Message<AjaxResult> doSavePledgesCheck(@RequestBody RepoAutoAllocationRequest request) {
         AjaxResult ajaxResult = ibuQuoteRepoService.doSavePledgesCheck(request);
         return new Message<AjaxResult>().success().setData(ajaxResult);
@@ -775,7 +775,7 @@ public class CfetsIbuQuoteRepoController extends BaseController {
 
     @ApiOperation(value = "当日报价导出", notes = "当日报价导出")
     @ResponseBody
-    @RequestMapping("/exportDayPrice")
+    @PostMapping("/exportDayPrice")
     public void exportDayPrice(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response) {
         // 导出
         ExcelUitl.doExport(requestDto, response, "当日报价", () -> {

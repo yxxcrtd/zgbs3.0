@@ -105,6 +105,8 @@ public class InvestmentManagement extends BaseService {
     private MinTrdUnitLimitService minTrdUnitLimitService;
     @Autowired
     private MinPriceService minPriceService;
+    @Autowired
+    private InstrumentManagement instrumentManagement;
     /**
      * 是否单体服务
      */
@@ -458,6 +460,11 @@ public class InvestmentManagement extends BaseService {
     }
 
     private void fillEntrustNumViewAndLeftVolumeView(InstructionExportVo instruction) {
+        if (StringUtil.isNotEmpty(instruction.getIsNetPrice()) && StringUtil.equals(instruction.getIsNetPrice(), "N")) {
+            instruction.setEntrustPriceView(instruction.getFullPrice());
+        } else {
+            instruction.setEntrustPriceView(instruction.getEntrustPrice());
+        }
         if (instruction.volumeInstruction()) {
             long frozenQuantity = instruction.getFrozenQuantity() == null ? 0 : instruction.getFrozenQuantity().longValue();
             long entrustLeftAmt = instruction.getEntrustLeftAmt() == null ? 0 : instruction.getEntrustLeftAmt().longValue();
@@ -490,10 +497,9 @@ public class InvestmentManagement extends BaseService {
         MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean = null;
         for (Instruction instruction : instructions) {
             minPriceAndMinTrdUnitLimitBean = instruction.getMinPriceAndMinTrdUnitLimitBean();
-            // TODO: 方便测试
-            /*if (ObjectUtil.isNotNull(minPriceAndMinTrdUnitLimitBean)) {
+            if (ObjectUtil.isNotNull(minPriceAndMinTrdUnitLimitBean)) {
                 continue;
-            }*/
+            }
 
             /*if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
                 minPriceAndMinTrdUnitLimitBean = futuresInstrumentService.queryMinPriceAndMinTrdUnitLimitByFuture(instruction);
@@ -506,6 +512,16 @@ public class InvestmentManagement extends BaseService {
 //                instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
             String finprodMarketId = instruction.getFinprodMarketId();
             Instrument instrument = instrumentService.findById(finprodMarketId);
+            if (ObjectUtil.isNull(instrument)) {
+                Map<String, Object> params = new HashMap<String, Object>();
+                if (!Strings.isNullOrEmpty(finprodMarketId)) {
+                    params.put("stock_code", finprodMarketId);
+                }
+                ResultBean resultBean = instrumentManagement.flushInstrumentData(params);
+                if (ErrorCode.SUCCESS.value == resultBean.getErrorCode()) {
+                    instrument = instrumentService.findById(finprodMarketId);
+                }
+            }
             if (ObjectUtil.isNull(instrument)) {
                 logger.warn("获取合约信息失败，无法填充最小价差等交易属性信息 => 【instructionId = {}, finprodMarketId = {}】", instruction.getEntrustId(), finprodMarketId);
                 continue;
@@ -559,6 +575,7 @@ public class InvestmentManagement extends BaseService {
 
             logger.info("填充最小价差等交易属性信息 => 【minPriceAndMinTrdUnitLimitBean = {}】", minPriceAndMinTrdUnitLimitBean);
             instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
+            instructionService.asyncUpdate(instruction);
         }
     }
 
@@ -1623,6 +1640,11 @@ public class InvestmentManagement extends BaseService {
                 || STANDARD_COUPONS_IN_AND_OUT.value.equals(entrustBussType)
                 || DEBT_TO_EQUITY.value.equals(entrustBussType)) {
             instruction.setTradePlat(TradePlat.NORMAL.value);
+        }
+        //深圳大宗交易，设置交易平台为 深圳综合协议平台
+        if (投管业务类型_大宗交易.getValue().equals(instruction.getBusiTypeTg())
+                && StringUtil.equals(Market.SZSE.investValue, instruction.getTradeMarket())) {
+            instruction.setTradePlat(TradePlat.SZ_PROTOCOL.value);
         }
     }
 

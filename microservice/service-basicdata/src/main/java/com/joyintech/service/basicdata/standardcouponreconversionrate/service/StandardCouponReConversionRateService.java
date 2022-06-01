@@ -19,6 +19,7 @@ import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -86,6 +87,10 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
         return basicStandardCouponReConversionRateMapper.getList(dto);
     }
 
+    public List<StandardCouponReConversionRateDto> getBokerList(StandardCouponReConversionRateDto dto){
+        return basicStandardCouponReConversionRateMapper.getBokerList(dto);
+    }
+
     public List<WflValidInputParameter> getBusinessData(WflValidInputParameter dto){
         List<String> list = basicStandardCouponReConversionRateMapper.getBusinessData(dto);
         if (CollectionUtils.isNotEmpty(list)) {
@@ -116,6 +121,9 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
      */
     public int insert(StandardCouponReConversionRateDto dto) {
         dto.setMoreConvrate(new BigDecimal(dto.getTandardRate()).divide(new BigDecimal("100")));
+        if(StringUtils.isNotEmpty(dto.getAccountType())&&StringUtils.isEmpty(dto.getAcctNo())){
+            dto.setAcctNo(dto.getAccountType());
+        }
         return stdBondMoreConvrateInfoMapper.insertSelective(dto);
     }
 

@@ -21,6 +21,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +75,9 @@ public class InfBaseController {
     protected static final String WL_PROXY_CLIENT_IP = "WL-Proxy-Client-IP";
     @Value("${infBaseController.localhost}")
     protected String LOCALHOST;
+
+    @Autowired(required = false)
+    public IPlatformDate platformDate;
 
     /**
      * 日志
@@ -154,8 +159,9 @@ public class InfBaseController {
         // 取得端口号
         int port = getRemotePort();
         data.setBodyField(InfColumns.COM_PORT.fieldName(), port);
-        // 取得平台日期
-        String sysDate = InterfCacheUtil.getSysDate();
+        // 取得平台日期(风险里的日期，每隔20分钟刷新一次)
+        //String sysDate = InterfCacheUtil.getSysDate();
+        String sysDate = DateUtil.format(platformDate.getSysDate(),DateUtil.DEFAULT_OTHER_FORMAT);
         data.setBodyField(InfColumns.COM_SYSDATE.fieldName(), sysDate);
         // 2.2 接口模块处理
         return service.execute(data);

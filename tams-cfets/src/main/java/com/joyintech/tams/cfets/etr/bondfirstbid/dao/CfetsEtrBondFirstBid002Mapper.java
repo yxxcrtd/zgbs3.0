@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.cfets.etr.bondfirstbid.dao;
 
+import com.joyintech.framework.base.entity.ProcessMark;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -33,4 +34,11 @@ public interface CfetsEtrBondFirstBid002Mapper {
      * @return
      */
     int deleteEntrustDetailByEntrustId(@Param("entrustId")String entrustId);
+
+    /**
+     * 查询留痕表数据
+     * @param workflowId
+     * @return
+     */
+    ProcessMark getFirstBidBusinessInfo(@Param("workflowId") String workflowId);
 }

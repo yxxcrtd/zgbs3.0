@@ -116,7 +116,19 @@ public class FinTenderBondAsset003Controller extends BaseController {
         if (Objects.isNull(request)) {
             return Message.success("校验成功", null);
         } else {
-            return Message.fail("校验失败", request);
+            return Message.success("校验成功", request);
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/addCoupons")
+    @ApiOperation(value = "上市流通自动加券", notes = "上市流通自动加券")
+    public Message addCoupons(@RequestBody FinTenderBondAsset003Dto dto) {
+        AjaxResult ajaxResult = finTenderBoundAsset003Service.addCoupons(dto);
+        if (CollectionUtils.isEmpty(ajaxResult.getErrorList())) {
+            return Message.success("加券成功", null);
+        } else {
+            return Message.fail("加券失败", ajaxResult.getErrorList());
         }
     }
 
@@ -133,15 +145,14 @@ public class FinTenderBondAsset003Controller extends BaseController {
         params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
             processParameter.setOperationType(OperationType.NEW);
+            params.setBusinessType(BussinessDictCodeList.共同业务类型_上市流通.getValue());
         } else if (StringUtil.equals(dto.getOperateType(), OperationType.REVOKE.name())) {
-            processParameter.setOperationType(OperationType.REVOKE);
+            //processParameter.setOperationType(OperationType.REVOKE);
+            params.setBusinessType(BussinessDictCodeList.共同业务类型_上市流通撤销.getValue());
+            dto.setRevokeReason(dto.getRemark());
+            dto.setRemark(null);
         }
         processParameter.setWorkFlowParameter(params);
-       /* FinTenderBondAsset003Dto asset003Dto = finTenderBoundAsset003Service.getById(dto.getFinprodId());
-        if(Objects.nonNull(asset003Dto)) {
-            dto.setAppearMarketId(asset003Dto.getAppearMarketId());
-            dto.setAppearMarketAbbr(asset003Dto.getAppearMarketAbbr());
-        }*/
         try {
             finTenderBoundAsset003Service.start(processParameter, dto);
         } catch (Exception e) {

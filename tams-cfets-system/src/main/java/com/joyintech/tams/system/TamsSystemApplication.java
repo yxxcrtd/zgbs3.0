@@ -138,7 +138,12 @@ public class TamsSystemApplication extends WebApplication {
 
 	@Bean
 	public Docket systemBond() {
-		return SwaggerConfig.createDocket("银行间基础信息", "com.joyintech.tams.touguan.system.bond.special");
+		return SwaggerConfig.createDocket("银行间基础信息", "com.joyintech.tams.touguan.basicdata.cfetsbusinesspara");
+	}
+
+	@Bean
+	public Docket primarybidmanage() {
+		return SwaggerConfig.createDocket("中标结果维护", "com.joyintech.tams.cfets.trd.primarybidmanage");
 	}
 
 	public static void main(String[] args) throws Exception {

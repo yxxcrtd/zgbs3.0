@@ -34,7 +34,7 @@
             T1.TRADE_PLAT tradePlat,
             sdl5.item_value tradePlatStr,
             T7.SEC_ACCT_NAME secAcctId,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME) counterName,
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)) counterName,
             T1.TRADE_MARKET_MODE tradeMarketMode,
             sdl6.item_value tradeMarketModeStr,
             NULL AS cleanStlStatus,
@@ -42,7 +42,14 @@
             T8.SETTLE_SEQ_NO settleSeqNo,
             T1.FINPROD_ID finprodId,
             T1.CCY ccy,
-            decode(T1.PS,#{PS_T07},'04',#{PS_T08},'04',#{PS_T09},'04',#{PS_T39},'03',#{PS_T03},'01',#{PS_T01},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),#{PS_T02},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),'02') spcdCode,
+            decode(T1.PS,#{PS_T07},'04',
+                        #{PS_T08},'04',
+                        #{PS_T09},'04',
+                        #{PS_T39},'03',
+                        #{PS_T03},'01',
+                        #{PS_T01},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),
+                        #{PS_T02},'02',
+                        '02') spcdCode,
             '' remark,
             nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD) as calMode
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
@@ -54,6 +61,7 @@
         LEFT JOIN PTL_PORTFOLIO T5 ON T4.PORTFOLIO_ID = T5.PORTFOLIO_ID
         LEFT JOIN MST_COUNTER_PARTY T6 ON T1.COUNTER_ID = T6.COUNTER_ID
         LEFT JOIN MST_COUNTER_PARTY T61 ON T2.ISSUER = T61.LINK_ID AND T61.P_TYPE_ONE IS NOT NULL
+        LEFT JOIN MST_CUSTOMER_INFO T611 ON T2.ISSUER = T611.CUSTOMER_ID
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON T1.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
@@ -68,8 +76,8 @@
         from FIN_PRODUCT_TYPE_CONFIG
         where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
         ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
-        AND ((btm.Finprod_Type_Tg = 'F17' and btm.issueClass = fpi.ISSUE_CLASS) or
-        btm.Finprod_Type_Tg != 'F17')
+        AND ((T2.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpi.ISSUE_CLASS) or
+            T2.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.busi_type
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
@@ -81,11 +89,13 @@
         left join reg_fin_product_deal_total_add regAdd on match.PRE_TRADE_ID=regAdd.totle_trade_id
         left join ibu_quote_bond_det ibuDet on match.PRE_TRADE_ID=ibuDet.QUOTE_ID and ibuDet.TRADE_STATUS='07'
         WHERE (T8.SETTLE_SEQ_NO IS NULL OR T8.SETTLE_STATUS = #{DELIVERY_STATUS_01})
-        AND T1.TG_BUSI_TYPE IN (#{PINAN_BUSINESS_TYPE_09},#{PINAN_BUSINESS_TYPE_10},#{PINAN_BUSINESS_TYPE_11},
-                #{PINAN_BUSINESS_TYPE_35},#{PINAN_BUSINESS_TYPE_36},#{PINAN_BUSINESS_TYPE_37},
-                #{PINAN_BUSINESS_TYPE_20},#{PINAN_BUSINESS_TYPE_51},#{PINAN_BUSINESS_TYPE_52},
-                #{PINAN_BUSINESS_TYPE_74},#{PINAN_BUSINESS_TYPE_75},#{PINAN_BUSINESS_TYPE_76},#{PINAN_BUSINESS_TYPE_77},
-                #{PINAN_BUSINESS_TYPE_105},#{PINAN_BUSINESS_TYPE_106},#{PINAN_BUSINESS_TYPE_107},#{PINAN_BUSINESS_TYPE_108},#{PINAN_BUSINESS_TYPE_180})
+        <if test="tgBusiTypes != null and tgBusiTypes.size() > 0">
+            AND T1.TG_BUSI_TYPE IN(
+            <foreach item="item" index="index" collection="tgBusiTypes" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
         AND	T1.TRADE_STATUS =#{TRADE_STATUS_01}
         AND T1.Is_Cancel =#{isCalcN}
         <![CDATA[ AND T1.SETTLE_DATE >= #{settleDateStart}]]>
@@ -109,6 +119,9 @@
         </if>
         <if test="finprodType2 != null and finprodType2!='' ">
             AND FIN_PRODUCT_TYPE.TYPE_8= #{finprodType2}
+        </if>
+        <if test="assetType != null and assetType!='' ">
+            AND FIN_PRODUCT_TYPE.TYPE_9= #{assetType}
         </if>
         <if test="tgBusiType != null and tgBusiType!='' ">
             AND btm.busi_type = #{tgBusiType}
@@ -143,7 +156,7 @@
             sdl4.item_value,
             T1.TRADE_PLAT,
             sdl5.item_value,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME),
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)),
             T1.FINPROD_ID,
             T1.CCY,
             T7.SEC_ACCT_NAME,
@@ -181,7 +194,7 @@
             T1.TRADE_PLAT tradePlat,
             sdl5.item_value tradePlatStr,
             T7.SEC_ACCT_NAME secAcctId,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME) counterName,
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)) counterName,
             T1.TRADE_MARKET_MODE tradeMarketMode,
             sdl6.item_value tradeMarketModeStr,
             NULL AS cleanStlStatus,
@@ -189,7 +202,14 @@
             T8.SETTLE_SEQ_NO settleSeqNo,
             T1.FINPROD_ID finprodId,
             T1.CCY ccy,
-            decode(T1.PS,#{PS_T07},'04',#{PS_T08},'04',#{PS_T09},'04',#{PS_T39},'03',#{PS_T03},'01',#{PS_T01},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),#{PS_T02},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),'02') spcdCode,
+            decode(T1.PS,#{PS_T07},'04',
+                        #{PS_T08},'04',
+                        #{PS_T09},'04',
+                        #{PS_T39},'03',
+                        #{PS_T03},'01',
+                        #{PS_T01},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),
+                        #{PS_T02},'02',
+                        '02') spcdCode,
             '' remark,
             nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD) as calMode
         FROM TRD_PRODUCT_TEMP_DEAL_TOTAL T1
@@ -201,6 +221,7 @@
         LEFT JOIN PTL_PORTFOLIO T5 ON T4.PORTFOLIO_ID = T5.PORTFOLIO_ID
         LEFT JOIN MST_COUNTER_PARTY T6 ON T1.COUNTER_ID = T6.COUNTER_ID
         LEFT JOIN MST_COUNTER_PARTY T61 ON T2.ISSUER = T61.LINK_ID AND T61.P_TYPE_ONE IS NOT NULL
+        LEFT JOIN MST_CUSTOMER_INFO T611 ON T2.ISSUER = T611.CUSTOMER_ID
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON T1.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
@@ -215,8 +236,8 @@
         from FIN_PRODUCT_TYPE_CONFIG
         where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
         ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
-        AND ((btm.Finprod_Type_Tg = 'F17' and btm.issueClass = fpi.ISSUE_CLASS) or
-        btm.Finprod_Type_Tg != 'F17')
+        AND ((T2.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpi.ISSUE_CLASS) or
+        T2.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.busi_type
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
@@ -228,11 +249,13 @@
         left join reg_fin_product_deal_total_add regAdd on match.PRE_TRADE_ID=regAdd.totle_trade_id
         left join ibu_quote_bond_det ibuDet on match.PRE_TRADE_ID=ibuDet.QUOTE_ID and ibuDet.TRADE_STATUS='07'
         WHERE (T8.SETTLE_SEQ_NO IS NULL OR T8.SETTLE_STATUS = #{DELIVERY_STATUS_01})
-        AND T1.TG_BUSI_TYPE IN (#{PINAN_BUSINESS_TYPE_09},#{PINAN_BUSINESS_TYPE_10},#{PINAN_BUSINESS_TYPE_11},
-        #{PINAN_BUSINESS_TYPE_35},#{PINAN_BUSINESS_TYPE_36},#{PINAN_BUSINESS_TYPE_37},
-        #{PINAN_BUSINESS_TYPE_20},#{PINAN_BUSINESS_TYPE_51},#{PINAN_BUSINESS_TYPE_52},
-        #{PINAN_BUSINESS_TYPE_74},#{PINAN_BUSINESS_TYPE_75},#{PINAN_BUSINESS_TYPE_76},#{PINAN_BUSINESS_TYPE_77},
-        #{PINAN_BUSINESS_TYPE_105},#{PINAN_BUSINESS_TYPE_106},#{PINAN_BUSINESS_TYPE_107},#{PINAN_BUSINESS_TYPE_108},#{PINAN_BUSINESS_TYPE_180})
+        <if test="tgBusiTypes != null and tgBusiTypes.size() > 0">
+            AND T1.TG_BUSI_TYPE IN(
+            <foreach item="item" index="index" collection="tgBusiTypes" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
         AND	T1.TRADE_STATUS =#{TRADE_STATUS_01}
         AND T1.Is_Cancel =#{isCalcN}
         <![CDATA[ AND T1.SETTLE_DATE >= #{settleDateStart}]]>
@@ -256,6 +279,9 @@
         </if>
         <if test="finprodType2 != null and finprodType2!='' ">
             AND FIN_PRODUCT_TYPE.TYPE_8= #{finprodType2}
+        </if>
+        <if test="assetType != null and assetType!='' ">
+            AND FIN_PRODUCT_TYPE.TYPE_9= #{assetType}
         </if>
         <if test="tgBusiType != null and tgBusiType!='' ">
             AND btm.busi_type = #{tgBusiType}
@@ -290,7 +316,7 @@
         sdl4.item_value,
         T1.TRADE_PLAT,
         sdl5.item_value,
-        nvl(T6.COUNTER_NAME,T61.COUNTER_NAME),
+        nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)),
         T1.FINPROD_ID,
         T1.CCY,
         T7.SEC_ACCT_NAME,
@@ -329,7 +355,7 @@
             T1.TRADE_PLAT tradePlat,
             sdl5.item_value tradePlatStr,
             T7.SEC_ACCT_NAME secAcctId,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME) counterName,
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)) counterName,
             T1.TRADE_MARKET_MODE tradeMarketMode,
             sdl6.item_value tradeMarketModeStr,
             NULL AS cleanStlStatus,
@@ -337,7 +363,14 @@
             T0.SETTLE_SEQ_NO settleSeqNo,
             T0.FINPROD_ID finprodId,
             T1.CCY ccy,
-            decode(T1.PS,#{PS_T07},'04',#{PS_T08},'04',#{PS_T09},'04',#{PS_T39},'03',#{PS_T03},'01',#{PS_T01},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),#{PS_T02},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),'02') spcdCode,
+            decode(T1.PS,#{PS_T07},'04',
+                        #{PS_T08},'04',
+                        #{PS_T09},'04',
+                        #{PS_T39},'03',
+                        #{PS_T03},'01',
+                        #{PS_T01},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),
+                        #{PS_T02},'02',
+                        '02') spcdCode,
             T0.REMARK remark,
             nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD) as calMode
         FROM TRD_BANK_MANUAL_SETTLE_INFO T0
@@ -350,6 +383,7 @@
         LEFT JOIN PTL_PORTFOLIO T5 ON T4.PORTFOLIO_ID = T5.PORTFOLIO_ID
         LEFT JOIN MST_COUNTER_PARTY T6 ON T1.COUNTER_ID = T6.COUNTER_ID
         LEFT JOIN MST_COUNTER_PARTY T61 ON T2.ISSUER = T61.LINK_ID AND T61.P_TYPE_ONE IS NOT NULL
+        LEFT JOIN MST_CUSTOMER_INFO T611 ON T2.ISSUER = T611.CUSTOMER_ID
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON T1.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
         LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
         LEFT JOIN INF_PAY_ORDERS_STATUS T10 ON T9.ORDER_ID = T10.ORDER_ID
@@ -363,8 +397,8 @@
         from FIN_PRODUCT_TYPE_CONFIG
         where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
         ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
-        AND ((btm.Finprod_Type_Tg = 'F17' and btm.issueClass = fpi.ISSUE_CLASS) or
-        btm.Finprod_Type_Tg != 'F17')
+        AND ((T2.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpi.ISSUE_CLASS) or
+        T2.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.busi_type
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
@@ -404,6 +438,9 @@
         <if test="finprodType2 != null and finprodType2!='' ">
             AND FIN_PRODUCT_TYPE.TYPE_8= #{finprodType2}
         </if>
+        <if test="assetType != null and assetType!='' ">
+            AND FIN_PRODUCT_TYPE.TYPE_9= #{assetType}
+        </if>
         <if test="tgBusiType != null and tgBusiType!='' ">
             AND btm.busi_type= #{tgBusiType}
         </if>
@@ -438,7 +475,7 @@
             sdl4.item_value,
             T1.TRADE_PLAT,
             sdl5.item_value,
-            nvl(T6.COUNTER_NAME,T61.COUNTER_NAME),
+            nvl(T6.COUNTER_NAME,nvl(T61.COUNTER_NAME,T611.CUSTOMER_NAME)),
             T0.SETTLE_SEQ_NO,
             T0.FINPROD_ID,
             T1.CCY,
@@ -609,15 +646,15 @@
         SELECT ROWNUM             rowNums,
                TPDA.Entrust_Id    entrustId,
                pp.PORTFOLIO_NAME  portfolioName,
-               TPD.SHARE_AMT      qtyd,
-               ttft1.fee_amt      jsFeeAmt,
-               EE.BUSINESS_MODEL  busiTypePosition,
+               TPD.SHARE_AMT*100      qtyd,
+               TPD.fee_amt      jsFeeAmt,
+               eed.INV_AIM  busiTypePosition,
                ssai.sec_acct_name secAcctId
         FROM TRD_PRODUCT_DEAL TPD
                  INNER JOIN TRD_PRODUCT_DEAL_ADD TPDA on TPD.TRADE_ID = TPDA.TRADE_ID
                  LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
                  LEFT JOIN TRD_TRADE_FEE_DETAIL ttft1 ON tpd.trade_id = ttft1.trade_id AND ttft1.fee_type = #{feeType08}
-                 LEFT JOIN ETR_ENTRUST ee ON TPDA.Entrust_Id = ee.entrust_id
+                 LEFT JOIN ETR_ENTRUST_DETAIL eed ON TPDA.Entrust_Id = eed.entrust_id and TPDA.PORTFOLIO_ID = eed.PORTFOLIO_ID
                  LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
         where TPD.TOTLE_TRADE_ID = #{tradeId}
           and TPD.Trade_Status = '01'

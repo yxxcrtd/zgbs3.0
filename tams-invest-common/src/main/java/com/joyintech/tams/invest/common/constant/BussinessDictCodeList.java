@@ -5039,12 +5039,19 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
      * 中标结果维护与确认
      */
     共同业务类型_中标结果确认(BussinessDictCode.共同业务类型, "TRD60", "中标结果确认"),
+    共同业务类型_一级投标确认_申购_登记(BussinessDictCode.共同业务类型, "TRD95", "一级投标确认-申购-登记"),
+    共同业务类型_一级投标确认_投标_自主投标(BussinessDictCode.共同业务类型, "TRD96", "一级投标确认-投标-自主投标"),
+    共同业务类型_一级投标确认_投标_分销买入(BussinessDictCode.共同业务类型, "TRD97", "一级投标确认-投标-分销买入"),
+    共同业务类型_一级投标确认_投标_代投代缴(BussinessDictCode.共同业务类型, "TRD98", "一级投标确认-投标-代投代缴"),
 
     共同业务类型_中标结果维护(BussinessDictCode.共同业务类型, "TRD61", "中标结果维护"),
 
-    特殊债券信息业务类型(BussinessDictCode.共同业务类型, "TRD62", "特殊债券信息"),
-
-
+    /**
+     * 新债标的
+     */
+    共同业务类型_新债标的(BussinessDictCode.共同业务类型, "TRD99", "新债标的"),
+    共同业务类型_上市流通(BussinessDictCode.共同业务类型, "TRD100", "上市流通"),
+    共同业务类型_上市流通撤销(BussinessDictCode.共同业务类型, "TRD101", "上市流通撤销"),
 
     缴款状态_流程中(BussinessDictCode.缴款状态, "01", "流程中"),
     缴款状态_待二级交易(BussinessDictCode.缴款状态, "02", "待二级交易"),
@@ -5177,6 +5184,8 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
     行内资产三级分类_掉期(BussinessDictCode.行内资产三级分类, "68", "掉期"),
     指令业务类型_银证转账(BussinessDictCode.指令业务类型, "49", "银证转账"),
     指令业务类型_证银转账(BussinessDictCode.指令业务类型, "50", "证银转账"),
+    行内资产三级分类_金融债(BussinessDictCode.行内资产三级分类, "69", "金融债"),
+    行内资产三级分类_可交换债(BussinessDictCode.行内资产三级分类, "71", "可交换债"),
 
     /**
      * 行权方式_回售

@@ -1,0 +1,1 @@
+UPDATE CFG_DATATABLE_SHOW SET EXTENDCFG = '{"colAlign": "right","supportSearch":"精确"}',COLCODE = 'tradeYieldStr' WHERE PAGECODE = 'CfetsTrdConfirm' AND DTCODE = 'CfetsTrdConfirmCstpInfo' AND SPCDCODE = '999999' AND  COLNAME = '成交价(%)';

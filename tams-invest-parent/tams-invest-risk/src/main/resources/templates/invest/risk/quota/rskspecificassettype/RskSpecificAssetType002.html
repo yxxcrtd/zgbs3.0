@@ -24,6 +24,10 @@
         .pl{
             padding-left:20%;
         }
+        .form-label-wrap{
+            white-space: normal !important;
+            overflow: visible !important;
+        }
     </style>
         <form class="layui-form joyin-form-wrap"
               id="submitForm">
@@ -34,9 +38,9 @@
                    style="display: none">
                 <div class="layui-form-item pl">
                     <div class="form-inline-wrap">
-                        <label class="layui-form-label form-label-wrap" style="width:15%!important;text-align:left;"
+                        <label class="layui-form-label form-label-wrap" style="width:30%!important;text-align:left;"
                                data-th-text="#{RskSpecificAssetType001.finprodName}">资产简称</label>
-                        <div class="layui-input-inline input-inline" style="width:61%!important;">
+                        <div class="layui-input-inline input-inline" style="width:56%!important;">
                             <select id="finprodMarketId" name="finprodMarketId"
                                     class="layui-input form-input input-select"
                                     data-th-placeholder="#{SysCommon.placeholder}" allowClear="true"
@@ -46,9 +50,9 @@
                         </div>
                     </div>
                     <div class="form-inline-wrap1">
-                        <label class="layui-form-label form-label-wrap" style="width:15%!important;text-align:left;"
+                        <label class="layui-form-label form-label-wrap" style="width:30%!important;text-align:left;"
                                data-th-text="#{RskSpecificAssetType001.finprodId}">资产代码</label>
-                        <div class="layui-input-inline input-inline" style="width:61%!important;">
+                        <div class="layui-input-inline input-inline" style="width:56%!important;">
                             <input type="text" id="assetCode" name="assetCode" disabled="disabled"
                                    class="layui-input form-input" placeholder="请输入内容"
                                    data-th-placeholder="#{SysCommon.placeholder}"
@@ -97,7 +101,7 @@
                 </div>
                 <div class="layui-form-item pl">
                     <div class="form-inline-wrap">
-                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;"
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;height:50px;"
                                data-th-text="#{RskSpecificAssetType001.isLiquidity1}">是否无活跃交易市场且需要采用估值技术确定公允价值资产</label>
                         <div class="layui-input-inline input-inline" style="width:20%!important;">
                             <input type="checkbox" id="isLiquidity1" name="isLiquidity1"
@@ -106,7 +110,7 @@
                         </div>
                     </div>
                     <div class="form-inline-wrap1">
-                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;"
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left; height:50px;"
                                data-th-text="#{RskSpecificAssetType001.isLiquidity2}">是否不具备活跃交易市场或者在活跃市场中无报价，且不能采用估值技术可靠计量公允价值的</label>
                         <div class="layui-input-inline input-inline" style="width:20%!important;">
                             <input type="checkbox" id="isLiquidity2" name="isLiquidity2"

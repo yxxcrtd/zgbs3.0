@@ -66,6 +66,9 @@ public class CfetsTrdConfirmExecFirstBondInfoResponse {
     @ApiModelProperty(name = "rate", value = "参考收益率/票面利率 需转化为百分数保留四位小数", example = "0.3")
     private BigDecimal rate;
 
+    @ApiModelProperty(name = "rateStr", value = "参考收益率/票面利率 需转化为百分数保留四位小数", example = "0.3")
+    private String rateStr;
+
     @ApiModelProperty(name = "portfolioId", value = "组合代码")
     private String portfolioId;
 
@@ -140,6 +143,9 @@ public class CfetsTrdConfirmExecFirstBondInfoResponse {
 
     @ApiModelProperty(name = "busiType", value = "业务类型 04 登记", example = "04")
     private String busiType;
+
+    @ApiModelProperty(name = "finprodType2", value = "资产类型 BID一级申购", example = "04")
+    private String finprodType2;
 
 
     public String getBusiCode() {
@@ -239,6 +245,14 @@ public class CfetsTrdConfirmExecFirstBondInfoResponse {
 
     public void setRate(BigDecimal rate) {
         this.rate = rate;
+    }
+
+    public String getRateStr() {
+        return rateStr;
+    }
+
+    public void setRateStr(String rateStr) {
+        this.rateStr = rateStr;
     }
 
     public String getPortfolioId() {
@@ -445,5 +459,13 @@ public class CfetsTrdConfirmExecFirstBondInfoResponse {
 
     public void setBusiType(String busiType) {
         this.busiType = busiType;
+    }
+
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
     }
 }

@@ -2,8 +2,10 @@ package com.joyintech.tams.invest.batch.tenderbond.service;
 
 import com.google.common.collect.Lists;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
+import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
@@ -17,9 +19,13 @@ import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto
 import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.invest.batch.valbatchimport.common.service.CommonAutoCouponService;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +69,22 @@ public class FinTenderBondAssetBatchService {
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
     /**
+     * 是否单体服务
+     */
+    @Value("${application.micorservice.contextPath.single:false}")
+    private boolean isSingle;
+
+    @Autowired(required = false)
+    private JoyinRestTemplate restTemplate;
+
+    @Autowired(required = false)
+    @Qualifier("simpleRestTemplate")
+    protected JoyinRestTemplate simpleRestTemplate;
+
+    @Value("${application.micorservice.contextPath.tamsServer:http://tams-server}")
+    private String tamsSerever;
+
+    /**
      * 上市流通
      *
      * @param plateDate
@@ -101,6 +123,7 @@ public class FinTenderBondAssetBatchService {
                     //根据 资产名称、资产简称、交易场所、登记托管机构、起息日、到期日、发行人、息票品种、利率类型、币种 进行去重
                     List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getBySecId(dto.getAppearMarketId());
                     if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
+                        interList.get(0).setSecid(dto.getAppearMarketId());
                         if (this.autoBondCoupon(interList.get(0))) {
                             dto.setCirculationCode(interList.get(0).getSecid());
                             dto.setCirculationDate(plateDate);
@@ -131,6 +154,7 @@ public class FinTenderBondAssetBatchService {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             if (CollectionUtils.isNotEmpty(seqNoList)) {
                 String errorMsg = new String();
                 seqNoList.forEach(i -> {
@@ -224,7 +248,7 @@ public class FinTenderBondAssetBatchService {
         productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
         finProductAddMapper.updateForTenderBound(productAdd);
         //记录操作日志
-        saveOperate(dto.getFinprodMarketId(), dto.getRemark());
+        saveOperate(dto.getFinprodMarketId(), "");
         //发送头寸
         dto.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
         this.sendPosition(dto, plateDate, seqList);
@@ -274,11 +298,26 @@ public class FinTenderBondAssetBatchService {
     private boolean autoBondCoupon(InterfPayhsrcsecinfo payhsrcsecinfo) {
         InterfPayhsrcsecinfoDto dto = new InterfPayhsrcsecinfoDto();
         dto.setSecidList(Lists.newArrayList(payhsrcsecinfo.getSecid()));
-        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(dto);
-        if (Objects.nonNull(interfPayhsrcsecinfoDto) && CollectionUtils.isNotEmpty(interfPayhsrcsecinfoDto.getErrorBondList())) {
+        //先执行校验
+        Map<String,String> paramMap = new HashMap<>();
+        paramMap.put("appearMarketId",payhsrcsecinfo.getSecid());
+        Message message = null;
+        if(isSingle) {
+            message =  simpleRestTemplate.postForObject(tamsSerever + "/asset/tenderBondAsset003/checkAddCoupons", paramMap, Message.class);
+        }else {
+            message = restTemplate.postForObject(tamsSerever + "/asset/tenderBondAsset003/checkAddCoupons", paramMap, Message.class);
+        }
+        if(Objects.isNull(message)) {
             return false;
         }
-        return true;
+        if(Objects.nonNull(message) && message.getCode().equals("000") && Objects.isNull(message.getData())) {
+            InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(dto);
+            if (Objects.nonNull(interfPayhsrcsecinfoDto) && CollectionUtils.isNotEmpty(interfPayhsrcsecinfoDto.getErrorBondList())) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -292,6 +331,7 @@ public class FinTenderBondAssetBatchService {
         oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(DictCodeListExt3.操作类型_上市流通.getValue());
         oprHisReq.setBusiDes(remark);
+        oprHisReq.setBusiType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 

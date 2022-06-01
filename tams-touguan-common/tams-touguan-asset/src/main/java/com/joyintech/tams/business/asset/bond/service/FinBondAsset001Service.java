@@ -191,13 +191,21 @@ public class FinBondAsset001Service extends BaseService{
         Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("FINPROD_TYPE_TG_ZQ", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         //增加母资管计划筛选条件
+        List<String> tradeMarkets = new ArrayList<>();
         if (null!=request.getTradeMarket() && (StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
         || StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()))){
-            List<String> tradeMarkets = new ArrayList<>();
             tradeMarkets.add(DictCodeListExt1.交易场所_银行间.getValue());
             tradeMarkets.add(DictCodeListExt1.交易场所_商业银行柜台.getValue());
-            param.put("tradeMarkets", tradeMarkets);
+        }else if(null!=request.getTradeMarket() && (StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue()))){
+            tradeMarkets.add(DictCodeListExt1.交易场所_上海证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        }else if(null!=request.getTradeMarket() && (StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_商业银行柜台.getValue()))){
+            tradeMarkets.add(DictCodeListExt1.交易场所_上海证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_银行间.getValue());
         }
+        param.put("tradeMarkets", tradeMarkets);
         param.put("finprodMarketIdList", StringUtil.splitToList(null,request.getFinprodMarketId()));
         Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
                 request.getPageMode().getPageSize(),
@@ -265,6 +273,7 @@ public class FinBondAsset001Service extends BaseService{
         //dto转成map
         Map<String,Object> pageParam = BeanUtil.object2Map(dto);
         List<String> entrustIdList = StringUtil.splitToList(",",(String)pageParam.get("entrustId"));
+        pageParam.put("busiType",DictCodeList.共通业务类型_债券类资产信息.getValue());
         if(StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1){
             return new Page<SearchInfoOperateListResponse>();
         }else{

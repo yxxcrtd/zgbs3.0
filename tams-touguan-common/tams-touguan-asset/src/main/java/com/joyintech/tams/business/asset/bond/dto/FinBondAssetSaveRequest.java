@@ -128,7 +128,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     @ApiModelProperty(name="isSus",value="是否永续")
     private String isSus;
 
-    @ApiModelProperty(name="isRight",value="是否含权债",required=true)
+    @ApiModelProperty(name="isRight",value="是否含权债")
     private String isRight;
 
     @ApiModelProperty(name="isAllowOverwrite",value="是否允许资讯数据覆盖",required=true)
@@ -209,6 +209,9 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
 
     @ApiModelProperty(name="typeFour",value="资产三级分类",required=true)
     private String typeFour;
+
+    @ApiModelProperty(name="isAddSec",value="是否加券(加券:Y)")
+    private String isAddSec;
 
     /**
      * 选择数据
@@ -353,12 +356,12 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     /***
      * 系数
      */
-    private String coefficient;
+    private BigDecimal coefficient;
     
     /**
      * 利差
      */
-    private String spreadRate;
+    private BigDecimal spreadRate;
     
     /**
      * 机构类型(企业性质)
@@ -422,6 +425,27 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 行权日
      */
     private Date exerciseDate;
+
+    /**
+     * 行权日
+     */
+    private Date firstPayDate;
+
+    /**
+     * 担保方式
+     */
+    private String guaType;
+
+    /**
+     * 原始权益人
+     */
+    private String originalOwner;
+
+    /**
+     * 担保人
+     */
+    private String sponsor;
+
 
     /**
      * 债券评级信息list add by shenchen 2019-04-25
@@ -989,7 +1013,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 获取 coefficient
      * @return coefficient.
      */
-    public String getCoefficient() {
+    public BigDecimal getCoefficient() {
         return coefficient;
     }
 
@@ -997,7 +1021,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 设置 coefficient
      * @param coefficient coefficient
      */
-    public void setCoefficient(String coefficient) {
+    public void setCoefficient(BigDecimal coefficient) {
         this.coefficient = coefficient;
     }
 
@@ -1007,7 +1031,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 获取 spreadRate
      * @return spreadRate.
      */
-    public String getSpreadRate() {
+    public BigDecimal getSpreadRate() {
         return spreadRate;
     }
 
@@ -1015,7 +1039,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 设置 spreadRate
      * @param spreadRate spreadRate
      */
-    public void setSpreadRate(String spreadRate) {
+    public void setSpreadRate(BigDecimal spreadRate) {
         this.spreadRate = spreadRate;
     }
 
@@ -1744,7 +1768,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     /**
      * 基准利率
      */
-    private BigDecimal basicRate;
+    private String basicRate;
 
     /**
      * 利率上限
@@ -1886,11 +1910,11 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
         this.benchmarkIdAccuracy = benchmarkIdAccuracy;
     }
 
-    public BigDecimal getBasicRate() {
+    public String getBasicRate() {
         return basicRate;
     }
 
-    public void setBasicRate(BigDecimal basicRate) {
+    public void setBasicRate(String basicRate) {
         this.basicRate = basicRate;
     }
 
@@ -2056,5 +2080,45 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setPayTdayRule(String payTdayRule) {
         this.payTdayRule = payTdayRule;
+    }
+
+    public Date getFirstPayDate() {
+        return firstPayDate;
+    }
+
+    public void setFirstPayDate(Date firstPayDate) {
+        this.firstPayDate = firstPayDate;
+    }
+
+    public String getIsAddSec() {
+        return isAddSec;
+    }
+
+    public void setIsAddSec(String isAddSec) {
+        this.isAddSec = isAddSec;
+    }
+
+    public String getGuaType() {
+        return guaType;
+    }
+
+    public void setGuaType(String guaType) {
+        this.guaType = guaType;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
+    }
+
+    public String getSponsor() {
+        return sponsor;
+    }
+
+    public void setSponsor(String sponsor) {
+        this.sponsor = sponsor;
     }
 }

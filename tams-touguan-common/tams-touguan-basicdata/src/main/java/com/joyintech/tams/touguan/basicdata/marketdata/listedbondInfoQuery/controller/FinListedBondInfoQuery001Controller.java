@@ -4,11 +4,14 @@ package com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.cont
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.SelectOptionCommonRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.service.FinListedBondInfoQuery001Service;
@@ -16,10 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -33,6 +33,8 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
 
     @Autowired
     private FinListedBondInfoQuery001Service finListedBondInfoQuery001Service;
+    @Autowired
+    private IPlatformDate iPlatformDate;
 
     @ApiOperation(value = "初始化参数", notes = "初始化参数")
     @PostMapping("/initParams")
@@ -65,8 +67,10 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
         initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
         initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
+        initPageParams.put("ISSUE_CLASS", this.getSelectDataFromDataDic(DictCode.新债_发行方式, null));
         initPageParams.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
-
+        initPageParams.put("SECRATE_DATA", this.getSelectDataFromDataDic(DictCode.利率行情, null));
+        initPageParams.put("iPlatformDate", iPlatformDate.getSysDateStr());
         //导出
         initPageParams.put("EXPORT_SHOW", CacheUtil.getSysParam("EXPORT_SHOW"));
         //刷新时间
@@ -91,10 +95,24 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
     }
 
 
+    @ApiOperation(value = "待上市债券简称的联想下拉框", notes = "待上市债券简称的联想下拉框")
+    @ResponseBody
+    @PostMapping("getAssetId")
+    public Message<Page<SelectOptionDto>> getAssetId(@RequestBody SelectOptionCommonRequest request) {
+        try {
+            Page<SelectOptionDto> page = finListedBondInfoQuery001Service.getAssetId(request);
+            return new Message<Page<SelectOptionDto>>().success().setData(page);
+        } catch (Exception e) {
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("待上市债券简称的联想下拉框异常");
+        }
+    }
+
     @ResponseBody
     @PostMapping("/detail")
     @ApiOperation(value = "待上市债券市场加券信息查询", notes = "待上市债券市场加券信息查询")
-    public Message<FinListedBondInfoQuery001Dto> detail(@RequestBody FinListedBondInfoQueryRequest request) {
+    public Message<FinListedBondInfoQuery001Dto> detail(@RequestParam("secId") String secId) {
+        FinListedBondInfoQueryRequest request = new FinListedBondInfoQueryRequest();
+        request.setSecId(secId);
         return Message.success("success", finListedBondInfoQuery001Service.queryFinWindMarketForCoupons(request));
     }
 

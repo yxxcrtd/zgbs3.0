@@ -12,18 +12,19 @@
         SEC_INFO.TRADING_PLACES tradingPlaces,
         SEC_INFO.REGISTERED_CUSTODIAN registeredCustodian,
         SEC_INFO.RAISE_MODE raiseMode,
-        <!-- 发行方式 -->
+        CUSTOMER_INFO.CUSTOMER_NAME issuer,
         nvl(RDI_RELEASE_INFO.ISSUE_METHOD ,RELEASE_INFO.ISSUING_METHOD) as issueMethod,
-
+        nvl(RDI_RELEASE_INFO.BENCHMARK_CURVE_NAME, RELEASE_INFO.BENCHMARK_CURVE_NAME) as benchmarkCurveName,
         RELEASE_INFO.BIDDING_METHOD as biddingMethod,
+        to_char(RELEASE_INFO.SPREAD, 'fm99999999999990.00') as SPREAD,
         RELEASE_INFO.TENDER_TARGET as tenderTarget,
         RELEASE_INFO.ADDITIONAL_BATCHES as additionalBatches,
 
-        nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 10000 , ROUND(RELEASE_INFO.ISSUE_SIZE / 10000, 2)) as issueSize,
+        nvl( to_char(RDI_RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.00') , to_char(RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.00')) as issueSize,
 
         nvl( to_char(RDI_RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd hh:mm:ss')) AS issueDate,
 
-        nvl( to_char(RDI_RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.PAYMENT_DEADLINE,'yyyy-mm-dd hh:mm:ss')) AS eventDate,
+        nvl( to_char(RDI_RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss')) AS eventDate,
 
         RELEASE_INFO.DEBT_REGISTRATION_DATE as debtRegistrationDate,
 
@@ -43,98 +44,135 @@
         SEC_INFO.CURRENCY,
 
         nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) as issuePx,
-        nvl(RDI_RELEASE_INFO.STIPULATION_VALUE, RELEASE_INFO.STIPULATION_VALUE) as stipulationValue,
+        nvl(to_char(RDI_RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000'), to_char(RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000')) as stipulationValue,
 
         nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as
         singleMinSubAmt,
         nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as
         singleMaxSubAmt,
-        RDI_RELEASE_INFO.REMARK as REMARK
+        nvl(to_char(RDI_RELEASE_INFO.MIN_PER_TENDER_AMT, 'fm99999999999990.00'), to_char(RELEASE_INFO.MIN_PER_TENDER_AMT, 'fm99999999999990.00')) as minPerTenderAmt,
+        nvl(to_char(RDI_RELEASE_INFO.MAX_PER_TENDER_AMT, 'fm99999999999990.00'), to_char(RELEASE_INFO.MAX_PER_TENDER_AMT, 'fm99999999999990.00')) as maxPerTenderAmt,
+        RDI_RELEASE_INFO.REMARK as REMARK,
+        PRODUCT.FINPROD_ID FINPRODID,
+        nvl(to_char(RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd'), to_char(RELEASE_INFO.BID_BEGIN_DATE,'yyyy-mm-dd') ||' - '|| to_char(RELEASE_INFO.BID_END_DATE,'yyyy-mm-dd'))
+        as additionalTenderDate
+
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
         LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
+        LEFT JOIN MST_CUSTOMER_INFO_ADD CUSTOMER_INFO_ADD on SEC_INFO.ISSUER = CUSTOMER_INFO_ADD.INSITITUTE_CODE
+        LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO on CUSTOMER_INFO_ADD.CUSTOMER_ID = CUSTOMER_INFO.CUSTOMER_ID
+        LEFT JOIN FIN_PRODUCT PRODUCT on SEC_INFO.SEC_ID = PRODUCT.FINPROD_MARKET_ID
+
         <where>
             SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd')
 
             <if test="secId !=null and secId !=''">
-                AND SEC_INFO.SECID = #{secId,jdbcType=VARCHAR}
+                AND SEC_INFO.SEC_ID = #{secId,jdbcType=VARCHAR}
             </if>
 
-            <if test="market !=null and market !=''">
-                AND SEC_INFO.MARKET = #{market,jdbcType=VARCHAR}
+            <if test="tradingPlaces !=null and tradingPlaces !=''">
+                AND SEC_INFO.TRADING_PLACES = #{tradingPlaces,jdbcType=VARCHAR}
             </if>
 
-            <if test="institution !=null and institution !=''">
-                AND SEC_INFO.institution = #{institution,jdbcType=VARCHAR}
+            <if test="primaryClassifications != null and primaryClassifications.size() > 0">
+                AND SEC_INFO.PRIMARY_CLASSIFICATION in
+                <foreach collection="primaryClassifications" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="secondaryClassifications != null and secondaryClassifications.size() > 0">
+                AND SEC_INFO.SECONDARY_CLASSIFICATION in
+                <foreach collection="secondaryClassification" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="registeredCustodian !=null and registeredCustodian !=''">
+                AND SEC_INFO.REGISTERED_CUSTODIAN = #{registeredCustodian,jdbcType=VARCHAR}
+            </if>
+
+            <if test="raiseMode !=null and raiseMode !=''">
+                AND SEC_INFO.RAISE_MODE = #{raiseMode,jdbcType=VARCHAR}
             </if>
 
             <if test="issuer !=null and issuer !=''">
-                AND SEC_INFO.ISSUERSHORT = #{issuer,jdbcType=VARCHAR}
+                AND SEC_INFO.ISSUER = #{issuer,jdbcType=VARCHAR}
             </if>
 
             <if test="issueDateStart != null">
-                AND SEC_INFO.PUBENDDATE >= #{issueDateStart,jdbcType=DATE}
+                AND RELEASE_INFO.ISSUE_DATE >= #{issueDateStart,jdbcType=DATE}
             </if>
 
             <if test="issueDateEnd != null">
-                AND SEC_INFO.PUBENDDATE <![CDATA[ <= ]]> #{issueDateEnd,jdbcType=DATE}
+                AND RELEASE_INFO.ISSUE_DATE <![CDATA[ <= ]]> #{issueDateEnd,jdbcType=DATE}
             </if>
 
             <if test="vdateStart != null">
-                AND SEC_INFO.VDATE >= #{vdateStart,jdbcType=DATE}
+                AND SEC_INFO.VALUE_DATE >= #{vdateStart,jdbcType=DATE}
             </if>
 
             <if test="vdateEnd != null">
-                AND SEC_INFO.VDATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
+                AND SEC_INFO.VALUE_DATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
             </if>
 
             <if test="mdateStart != null">
-                AND SEC_INFO.MDATE >= #{mdateStart,jdbcType=DATE}
+                AND SEC_INFO.EXPIRY_DATE >= #{mdateStart,jdbcType=DATE}
             </if>
 
             <if test="mdateEnd != null">
-                AND SEC_INFO.MDATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
+                AND SEC_INFO.EXPIRY_DATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
             </if>
 
-            <if test="theOryOptionPayDayStart != null">
-                AND SEC_INFO.THEORYOPTIONPAYDAY >= #{theOryOptionPayDayStart,jdbcType=DATE}
+            <if test="listingDateStart != null">
+                AND RELEASE_INFO.LISTING_DATE >= #{listingDateStart,jdbcType=DATE}
             </if>
 
-            <if test="theOryOptionPayDayEnd != null">
-                AND SEC_INFO.THEORYOPTIONPAYDAY <![CDATA[ <=]]> #{theOryOptionPayDayEnd,jdbcType=DATE}
+            <if test="listingDateEnd != null">
+                AND RELEASE_INFO.LISTING_DATE <![CDATA[ <=]]> #{listingDateEnd,jdbcType=DATE}
+            </if>
+
+            <if test="listingCode !=null and listingCode !=''">
+                AND RELEASE_INFO.LISTING_CODE = #{listingCode,jdbcType=VARCHAR}
+            </if>
+
+            <if test="issueMethod !=null and issueMethod !=''">
+                AND RELEASE_INFO.ISSUING_METHOD = #{issueMethod,jdbcType=VARCHAR}
+            </if>
+
+            <if test="biddingMethod !=null and biddingMethod !=''">
+                AND RELEASE_INFO.BIDDING_METHOD = #{biddingMethod,jdbcType=VARCHAR}
+            </if>
+
+            <if test="tenderTarget !=null and tenderTarget !=''">
+                AND RELEASE_INFO.TENDER_TARGET = #{tenderTarget,jdbcType=VARCHAR}
             </if>
 
             <if test="couponSpecies !=null and couponSpecies !=''">
-                AND SEC_INFO.COUPONSPECIES = #{couponSpecies,jdbcType=VARCHAR}
+                AND SEC_INFO.VARIETY_OF_COUPONS = #{couponSpecies,jdbcType=VARCHAR}
             </if>
 
             <if test="rateType !=null and rateType !=''">
-                AND SEC_INFO.INTERESTRATE = #{rateType,jdbcType=VARCHAR}
+                AND SEC_INFO.RATE_TYPE = #{rateType,jdbcType=VARCHAR}
             </if>
 
-            <if test="payCycle !=null and payCycle !=''">
-                AND SEC_INFO.PAYCYCLE = #{payCycle,jdbcType=VARCHAR}
+            <if test="interestPaymentFrequency !=null and interestPaymentFrequency !=''">
+                AND SEC_INFO.INTEREST_PAYMENT_FREQUENCY = #{interestPaymentFrequency,jdbcType=VARCHAR}
             </if>
 
             <if test="currency !=null and currency !=''">
                 AND SEC_INFO.CURRENCY = #{currency,jdbcType=VARCHAR}
             </if>
 
-            <if test="isSus !=null and isSus !=''">
-                AND SEC_INFO.ISSUS = #{isSus,jdbcType=VARCHAR}
+            <if test="eventDateStart != null">
+                AND RELEASE_INFO.PAYMENT_DEADLINE >= #{eventDateStart,jdbcType=DATE}
             </if>
 
-            <if test="isRight !=null and isRight !='' and isRight == Y">
-                AND ( SEC_INFO.CALLOPTION = 'Y' OR SEC_INFO.PUTOPTION = 'Y')
+            <if test="eventDateEnd != null">
+                AND RELEASE_INFO.PAYMENT_DEADLINE <![CDATA[ <=]]> #{eventDateEnd,jdbcType=DATE}
             </if>
 
-            <if test="isRight !=null and isRight !='' and isRight == N">
-                AND ( SEC_INFO.CALLOPTION = 'N' AND SEC_INFO.PUTOPTION = 'N')
-            </if>
-
-            <if test="optionType !=null and optionType !=''">
-                AND SEC_INFO.OPTIONTYPE = #{optionType,jdbcType=VARCHAR}
-            </if>
 
             <if test="zxGrade !=null and zxGrade !=''">
                 AND SEC_INFO.RATING in (#{zxGrade,jdbcType=VARCHAR})
@@ -147,41 +185,34 @@
             <if test="search !=null and search !=''">
                 AND (
                 SEC_INFO.SEC_ID like '%' || #{search} || '%' OR
-                SEC_INFO.MARKET like '%' || #{search} || '%' OR
-                SEC_INFO.ISSUERSHORT like '%' || #{search} || '%' OR
-                to_char(SEC_INFO.PUBENDDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(SEC_INFO.VDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(SEC_INFO.MDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(SEC_INFO.THEORYOPTIONPAYDAY,'yyyy-MM-dd') = #{search} OR
-                SEC_INFO.COUPONSPECIES like '%' || #{search} || '%' OR
-                SEC_INFO.INTERESTRATE like '%' || #{search} || '%' OR
-                SEC_INFO.PAYCYCLE like '%' || #{search} || '%' OR
-                SEC_INFO.CCY like '%' || #{search} || '%' OR
-                SEC_INFO.ISSUS like '%' || #{search} || '%' OR
-                SEC_INFO.OPTIONTYPE like '%' || #{search} || '%' OR
-                SEC_INFO.RATING like '%' || #{search} || '%' OR
-                SEC_INFO.RATING like '%' || #{search} || '%'
+                SEC_INFO.CURRENCY like '%' || #{search} || '%'
                 )
             </if>
         </where>
         )
-        ORDER BY PRIMARYCLASSIFICATION,
-        SECONDARYCLASSIFICATION,
-        ISSUEDATE,
-        SECID
+        <choose>
+            <when test="pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+                order by ${pageMode.sort}  ${pageMode.direction}
+            </when>
+            <otherwise>
+                ORDER BY PRIMARYCLASSIFICATION,
+                SECONDARYCLASSIFICATION,
+                ISSUEDATE,
+                SECID
+            </otherwise>
+        </choose>
     </select>
 
 
     <select id="queryFinWindMarketForCoupons"
-            resultType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto"
-            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest">
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto">
         SELECT
         SEC_INFO.SEC_ID secId,
         SEC_INFO.BOND_NAME bondName,
         SEC_INFO.BOND_ABBREVIATION bondAbbreviation,
         SEC_INFO.TRADING_PLACES tradingPlaces,
         SEC_INFO.REGISTERED_CUSTODIAN registeredCustodian,
-        SEC_INFO.ISSUER,
+        CUSTOMER_INFO.CUSTOMER_NAME issuer,
         SEC_INFO.RAISE_MODE raiseMode,
         SEC_INFO.DOMESTIC_AND_FOREIGN domesticAndForeign,
         SEC_INFO.IS_BONDS_WITH_RIGHTS isBondsWithRights,
@@ -197,44 +228,48 @@
         RELEASE_INFO.TENDER_TARGET as tenderTarget,
         RELEASE_INFO.ADDITIONAL_BATCHES as additionalBatches,
 
-        nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 100000000, ROUND(RELEASE_INFO.ISSUE_SIZE, 2)) as issueSize,
-        nvl(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as issueDate,
-        nvl(TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) as eventDate,
+        nvl( to_char(RDI_RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.0000') , to_char(RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.0000')) as issueSize,
+
+        nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss')) as issueDate,
+        TO_CHAR(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-mm-dd hh:mm:ss') as eventDate,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss')) as payDate,
+
         RELEASE_INFO.DEBT_REGISTRATION_DATE AS debtRegistrationDate,
 
         RELEASE_INFO.LISTING_DATE AS listingDate,
         RELEASE_INFO.LISTING_CODE AS listingCode,
         SEC_INFO.CROSS_MARKET_CODE AS crossMarketCode,
 
-        nvl(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
-        'yyyy-MM-dd')) as interestAccrualDate,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
+        'yyyy-mm-dd hh:mm:ss')) as interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
         SEC_INFO.EXPIRY_DATE expiryDate,
         SEC_INFO.PRIMARY_CLASSIFICATION primaryClassification,
         SEC_INFO.SECONDARY_CLASSIFICATION secondaryClassification,
-        SEC_INFO.VARIETY_OF_COUPONS varietyOfCoupons,
+        SEC_INFO.VARIETY_OF_COUPONS couponSpecies,
         SEC_INFO.INTEREST_PAYMENT_FREQUENCY interestPaymentFrequency,
         SEC_INFO.RATE_TYPE rateType,
         SEC_INFO.CURRENCY,
+        nvl( to_char(RDI_RELEASE_INFO.ISSUE_PX, 'fm99999999999990.0000') , to_char(RELEASE_INFO.ISSUE_PX, 'fm99999999999990.0000')) as issuePx,
+        nvl( to_char(RDI_RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000') , to_char( RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000')) as stipulationValue,
 
-        nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) as issuePx,
-        nvl(RDI_RELEASE_INFO.STIPULATION_VALUE, RELEASE_INFO.STIPULATION_VALUE) as stipulationValue,
-
-        nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 100000000, RELEASE_INFO.MIN_PER_TENDER_AMT) as singleMinSubAmt,
-        nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 100000000, RELEASE_INFO.MAX_PER_TENDER_AMT) as singleMaxSubAmt,
+        nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT, RELEASE_INFO.SINGLE_MIN_SUB_AMT) as singleMinSubAmt,
+        nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT, RELEASE_INFO.SINGLE_MAX_SUB_AMT) as singleMaxSubAmt,
 
         RDI_RELEASE_INFO.REMARK AS remark,
 
-        nvl(RDI_RELEASE_INFO.COUPON_RATE, RELEASE_INFO.COUPON_RATE) as couponRate,
+        nvl(to_char(RDI_RELEASE_INFO.COUPON_RATE, 'fm99999999999990.0000'), to_char(RELEASE_INFO.COUPON_RATE, 'fm99999999999990.0000')) as couponRate,
         nvl(RDI_RELEASE_INFO.BENCHMARK_CURVE_NAME, RELEASE_INFO.BENCHMARK_CURVE_NAME) as benchmarkCurveName,
         nvl(RDI_RELEASE_INFO.DECIMAL_PLACES, RELEASE_INFO.DECIMAL_PLACES) as decimalPlaces,
-        nvl(RDI_RELEASE_INFO.SPREAD, RELEASE_INFO.SPREAD) as spread,
+        nvl(to_char(RDI_RELEASE_INFO.SPREAD, 'fm99999999999990.00'), to_char(RELEASE_INFO.SPREAD, 'fm99999999999990.00')) as spread,
 
         RELEASE_INFO.ISSUE_START_TIME AS issueStartTime,
         RELEASE_INFO.ISSUE_END_TIME AS issueEndTime,
-        RELEASE_INFO.BID_DATE as bidDate,
-        RELEASE_INFO.ADDITIONAL_TENDER_DATE as additionalTenderDate,
+        RELEASE_INFO.BID_BEGIN_DATE as bidBeginDate,
+        RELEASE_INFO.BID_END_DATE as bidEndDate,
+        RELEASE_INFO.ADDITIONAL_TENDER_BEGIN_DATE as additionalTenderBeginDate,
+        RELEASE_INFO.ADDITIONAL_TENDER_END_DATE as additionalTenderEndDate,
 
         nvl(RDI_RELEASE_INFO.MAX_SUB_AMT * 100000000, RELEASE_INFO.MAX_SUB_AMT) as maxSubAmt,
         nvl(RDI_RELEASE_INFO.MIN_PER_TENDER_AMT * 100000000, RELEASE_INFO.MIN_PER_TENDER_AMT) as minPerTenderAmt,
@@ -254,8 +289,11 @@
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID --wind一级未发行债券发行信息接口表
         LEFT JOIN (SELECT * FROM INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in('CD','14')) RDI_RELEASE_INFO ON
         RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
+
+        LEFT JOIN MST_CUSTOMER_INFO_ADD CUSTOMER_INFO_ADD on SEC_INFO.ISSUER = CUSTOMER_INFO_ADD.INSITITUTE_CODE
+        LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO on CUSTOMER_INFO_ADD.CUSTOMER_ID = CUSTOMER_INFO.CUSTOMER_ID
         <where>
-            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd')
+            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd') AND rownum = 1
 
             <if test="secId !=null and secId !=''">
                 AND SEC_INFO.SEC_ID = #{secId,jdbcType=VARCHAR}
@@ -374,5 +412,23 @@
             AND OUTPUT_VALUE_3 = #{outputValue3}
         </if>
         and ROWNUM = 1
+    </select>
+
+
+    <select id="getAssetId" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        SEC_ID id,
+        BOND_ABBREVIATION text,
+        BOND_ABBREVIATION object,
+        SEC_ID parentId
+        FROM INTERF_WIND_UNRELEASE_SEC_INFO
+        <where>
+            <if test="search != null and search != ''">
+                and (SEC_ID like concat(concat('%',#{search}),'%')
+                or BOND_ABBREVIATION like concat(concat('%',#{search}),'%')
+                or BOND_NAME like concat(concat('%',#{search}),'%')
+                )
+            </if>
+        </where>
     </select>
 </mapper>

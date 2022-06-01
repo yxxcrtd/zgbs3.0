@@ -15,7 +15,7 @@ public enum InvestAssetTypeEnum implements IEnum<String> {
     STOCK("股票", "F11"),
     SHARE_OPTION("期权", "F18"),
     FUTURES("期货", "F20"),
-    CREDIT_PROTECTION_CERTIFICATE("信用保护凭证", "F36"),
+    CREDIT_PROTECTION_CERTIFICATE("信用保护凭证", "F37"),
     ;
     public String name;
     public String value;

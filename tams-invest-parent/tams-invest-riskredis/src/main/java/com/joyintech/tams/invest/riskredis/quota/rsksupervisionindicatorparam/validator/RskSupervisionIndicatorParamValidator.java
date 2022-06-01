@@ -70,26 +70,24 @@ public class RskSupervisionIndicatorParamValidator implements BeanValidator {
                 }
             }
             if(StringUtil.equals(dto.getParaDisplayType(), BussinessDictCodeListRds.指标参数实现类型_SQL.getValue())){
-                if(dto.getMrContent()==null||dto.getMrContent()==""){
+                if(StringUtil.isBlank(dto.getMrContent())){
                     errorList.add(new ValidMessage("mrContent",getMessage("BUSS_COM_E_0038",
                             getMessage("RskSupervisionIndicatorParam002.mrContent"))));
                 }
                 // 当计算方式是redis时才判断redis存储识别域是否为空, fuyongsheng 20210820 edit
                 if(StringUtil.equals(dto.getParamMathType(), BussinessDictCodeListRds.指标参数计算方式_REDIS.getValue())
-                        && (dto.getRedisField()==null||dto.getRedisField()=="")){
+                        &&StringUtil.isBlank(dto.getRedisField())){
                     errorList.add(new ValidMessage("redisField",getMessage("BUSS_COM_E_0038",
                             getMessage("RskSupervisionIndicatorParam002.redisField"))));
                 }
-                if(dto.getMcContent()==null||dto.getMcContent()==""){
+                if(StringUtil.isBlank(dto.getMcContent())){
                     errorList.add(new ValidMessage("mcContent",getMessage("BUSS_COM_E_0038",
                             getMessage("RskSupervisionIndicatorParam002.mcContent"))));
                 }
             }
-            if(StringUtil.equals(dto.getIsForbid(), "Y")){
-         	   if(dto.getForbidEnum()==null||dto.getForbidEnum()==""){
-                    errorList.add(new ValidMessage("forbidEnum",getMessage("BUSS_COM_E_0038",
-                            getMessage("RskSupervisionIndicatorParam002.forbidEnum"))));
-                }
+            if(StringUtil.equals(dto.getIsForbid(), "Y")&&StringUtil.isBlank(dto.getForbidEnum())){
+                errorList.add(new ValidMessage("forbidEnum",getMessage("BUSS_COM_E_0038",
+                        getMessage("RskSupervisionIndicatorParam002.forbidEnum"))));
             }
             if(StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_NEW)){
 	             if(rskSupervisionIndicatorParamService.selectParaCode(dto.getParaCode())>0){

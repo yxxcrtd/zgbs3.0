@@ -552,6 +552,16 @@ public class FinProductAddDto {
     @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
     private String crossMarketCode;
 
+    /**
+     * 担保方式
+     */
+    private String guaType;
+
+    /**
+     * 原始权益人
+     */
+    private String originalOwner;
+
 
     /**
      * 取得 金融产品代码
@@ -2120,5 +2130,21 @@ public class FinProductAddDto {
 
     public void setAppearMarketAbbr(String appearMarketAbbr) {
         this.appearMarketAbbr = appearMarketAbbr;
+    }
+
+    public String getGuaType() {
+        return guaType;
+    }
+
+    public void setGuaType(String guaType) {
+        this.guaType = guaType;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
     }
 }

@@ -29,10 +29,14 @@
         NVL(T8.YIELD,0)*100 rate,
         T6.BENCHMARK_ID basisRate,
         T6.COEFFICIENT basisRateRatio,
-        T6.SPREAD_RATE*100 spreadRate,
+        T6.SPREAD_RATE spreadRate,
         T6.FIRST_CONFIRM_DATE firstRateFixDate,
-        T8.BASIS basis,
-        T8.MARKET_BASIS marketBasis,
+        Case when T8.BASIS = 'A/A_B_COUP' THEN 'A/A'
+             when T8.BASIS = 'A/A_B_DAY' THEN 'A/A'
+             else T8.BASIS END  basis,
+        Case when T8.MARKET_BASIS = 'A/A_B_COUP' THEN 'A/A'
+        when T8.MARKET_BASIS = 'A/A_B_DAY' THEN 'A/A'
+        else T8.MARKET_BASIS END  marketBasis,
         T1.IS_RIGHT isRight,
         T1.IS_SUS isSus,
         T1.ISSUE_TYPE issueType,
@@ -283,7 +287,7 @@
             T1.VDATE VDATE,
             T1.MDATE MDATE,
             T1.DELISTING_DATE delistingDate,
-            NVl(T1.ISSUE_AMT,0)/100000000 ISSUE_AMT,
+            NVl(T1.ISSUE_AMT,0) ISSUE_AMT,
             T1.ISSUER ISSUER,
             T3.TYPE_9 TYPE_9,
             T3.TYPE_10 TYPE_10,
@@ -300,6 +304,7 @@
             T2.CROSS_MARKET_CODE CROSS_MARKET_CODE,
             T1.SUSTAINABLE_REMARK sustainableRemark,
             T5.CON_FINPROD_ID CON_FINPROD_ID,
+            T6.FINPROD_ABBR conFinprodName,
             T5.CON_VDATE CON_VDATE,
             T5.CON_PRICE CON_PRICE,
             100/T5.CON_PRICE CON_PROPORTION,
@@ -311,24 +316,28 @@
             T12.YIELD YIELD,
             T16.BENCHMARK_ID_ACCURACY BENCHMARK_ID_ACCURACY,
             T16.BENCHMARK_ID basicRate,
-            T16.COEFFICIENT COEFFICIENT,
-            T16.SPREAD_RATE SPREAD_RATE,
-            T16.HIGHEST_RATE HIGHEST_RATE,
-            T16.LOWEST_RATE LOWEST_RATE,
-            T16.RESET_TYPE    RESET_TYPE,
-            T16.OBSERVE_BEF_DAY OBSERVE_BEF_DAY,
-            T16.OBSERVE_BEF_UNIT OBSERVE_BEF_UNIT,
-            T16.FIRST_CONFIRM_DATE FIRST_CONFIRM_DATE,
+            T16.COEFFICIENT coefficient,
+            T16.SPREAD_RATE spreadRate,
+            T16.HIGHEST_RATE highestRate,
+            T16.LOWEST_RATE lowestRate,
+            T16.RESET_TYPE    resetType,
+            T16.OBSERVE_BEF_DAY observeBefDay,
+            T16.OBSERVE_BEF_UNIT observeBefUnit,
+            T16.FIRST_CONFIRM_DATE firstConfirmDate,
             T12.BASIS BASIS,
             T12.MARKET_BASIS MARKET_BASIS,
-            T12.BASIS intpayRule,
             T1.REMARK REMARK,
             NVL(T4.CIRCULATION_DATE,T7.LISTING_DATE)  listingDate,
             T10.CASH_ID interestCashId,
             T11.CASH_ID principalCashId,
             T13.PAY_CYCLE  payCycle,
             T13.PAY_TDAY_RULE  payTdayRule,
-            T13.CALC_RULE  calcRule
+            T13.CALC_RULE  calcRule,
+            T13.FIRST_PAY_DATE firstPayDate,
+            T2.IS_SEC_BOND isSecBond,
+            T2.GUA_TYPE guaType,
+            T2.ORIGINAL_OWNER originalOwner,
+            T1.SPONSOR sponsor
         FROM FIN_PRODUCT T1
         LEFT JOIN FIN_PRODUCT_ADD T2
         ON		T2.FINPROD_ID = T1.FINPROD_ID
@@ -1070,6 +1079,7 @@
                     LEFT JOIN SYS_USER SUR ON reg.CREATE_USER = SUR.user_name
                     LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
            WHERE his.entrust_id = #{entrustId}
+             AND his.BUSINESS_TYPE = #{busiType}
            order by his.OPER_TIME desc) t
     </select>
 
@@ -1269,6 +1279,7 @@
             T1.BASE_TYPE,
             T1.BASE_DATE_TYPE,
             T1.BASIS,
+            T1.MARKET_BASIS MARKET_BASIS,
             T1.YIELD*100 YIELD,
             T1.IS_INITIAL,
             T1.BRANCH,
@@ -1610,6 +1621,91 @@
         </if>
         <if test="inputValue3 != null and inputValue3 != ''">
             AND INPUT_VALUE_3 = #{inputValue3}
-        </if> and ROWNUM=1
+        </if>
+        <if test="inputValue4 != null and inputValue4 != ''">
+            AND INPUT_VALUE_4 = #{inputValue4}
+        </if>and ROWNUM=1
+    </select>
+
+    <delete id="deleteCfetsOprHis">
+        delete ETR_ENTRUST_OPER_HIS where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </delete>
+
+    <select id="selectFinProductIssue" resultMap="com.joyintech.tams.common.base.dao.FinProductIssueMapper.BaseResultMap" parameterType="java.lang.String" >
+        select
+            T1.FINPROD_ID         ,
+            T1.ISSUE_CLASS        ,
+            T1.TENDER_TYPE        ,
+            T1.TENDER_TARGET      ,
+            T1.PLAN_ISSUE_AMT     ,
+            T1.ISSUE_STYLE        ,
+            T1.ADD_BATCH          ,
+            T1.ISSUE_PRICE        ,
+            T1.REFER_YIELD        ,
+            T1.INT_RATE_ID        ,
+            T1.RATE_GRADE         ,
+            T1.BP                 ,
+            T1.ISSUE_DATE         ,
+            T1.PAY_DATE           ,
+            T1.FIRST_CONFIRM_DATE ,
+            T1.ISSUE_SDATE        ,
+            T1.ISSUE_EDATE        ,
+            T1.TENDER_SDATE       ,
+            T1.TENDER_EDATE       ,
+            T1.PAY_EDATE          ,
+            T1.ASSIGN_REGDATE     ,
+            T1.MIN_PAMT           ,
+            T1.MAX_PAMT           ,
+            T1.MAX_TOTALAMT       ,
+            T1.MIN_PER_TAMT       ,
+            T1.MAX_PER_UTAMT      ,
+            T1.MIN_TAMT           ,
+            T1.MAX_TAMT           ,
+            T1.TENDER_UNIT        ,
+            T1.MAX_TENDER_UNIT    ,
+            T1.MAX_TENDER_PLUS    ,
+            T1.SERI_Y_N           ,
+            T1.MAX_TOTAL_TENDER   ,
+            T1.PAY_CYCLE          ,
+            T1.INT_TYPE
+        from FIN_PRODUCT_ISSUE T1
+        LEFT JOIN FIN_PRODUCT T2 ON T2.FINPROD_ID = T1.FINPROD_ID
+        where T2.CIRCULATION_CODE = #{finprodMarketId,jdbcType=VARCHAR}
+    </select>
+
+    <select id = "isTransInAssetTwo" resultType="java.lang.Integer">
+        SELECT
+            SUM (num)
+        FROM(
+                SELECT COUNT(TRADE_ID) num
+                FROM TRD_PRODUCT_DEAL
+                WHERE FINPROD_ID = #{finprodId}
+                  AND PS NOT IN ('T09','T08','T07','T27','T30','T33')
+                  AND TOTLE_TRADE_ID NOT IN (SELECT TRADE_ID FROM TRD_BANK_MANUAL_SETTLE_INFO )
+                UNION ALL
+                SELECT COUNT(TRADE_ID) num
+                FROM WFL_TRD_PRODUCT_DEAL
+                WHERE FINPROD_ID = #{finprodId}
+                  AND PS NOT IN ('T09','T08','T07','T27','T30','T33')
+                  AND TOTLE_TRADE_ID NOT IN (SELECT TRADE_ID FROM TRD_BANK_MANUAL_SETTLE_INFO )
+                UNION ALL
+                SELECT COUNT(ENTRUST_ID) num
+                FROM ETR_ENTRUST
+                WHERE FINPROD_ID = #{finprodId}
+                  AND ENTRUST_STATUS != '06'
+                  AND ENTRUST_ID NOT IN (SELECT TPDA.ENTRUST_ID FROM TRD_PRODUCT_DEAL TPD
+                                                      LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+                                                             ON TPD.TRADE_ID = TPDA.TRADE_ID
+                  WHERE TPDA.ENTRUST_ID IS NOT NULL AND TPD.TOTLE_TRADE_ID IN (SELECT TRADE_ID FROM TRD_BANK_MANUAL_SETTLE_INFO ))
+                UNION ALL
+                SELECT COUNT(ENTRUST_ID) num
+                FROM WFL_ETR_ENTRUST
+                WHERE FINPROD_ID = #{finprodId}
+                  AND ENTRUST_STATUS != '06'
+                  AND ENTRUST_ID NOT IN (SELECT TPDA.ENTRUST_ID FROM TRD_PRODUCT_DEAL TPD
+                                                         LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+                                                                   ON TPD.TRADE_ID = TPDA.TRADE_ID
+                         WHERE  TPDA.ENTRUST_ID IS NOT NULL AND TPD.TOTLE_TRADE_ID IN (SELECT TRADE_ID FROM TRD_BANK_MANUAL_SETTLE_INFO ))
+            )
     </select>
 </mapper>

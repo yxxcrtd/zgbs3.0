@@ -562,10 +562,10 @@
         left join STL_SEC_ACCT_INFO SSAI on SCI.ACCT_NO = SSAI.TRD_ACCT_ID
         <where>
             <if test="tradePlace != null and tradePlace != ''">
-                SSAI.TRADE_PLACE = #{tradePlace}
+                mdi.TRADE_MARKET = #{tradePlace}
             </if>
             <if test="acctNo != null and acctNo != ''">
-                and  SSAI.TRD_ACCT_ID = #{acctNo}
+                and  SCI.ACCT_NO = #{acctNo}
             </if>
             <if test="isOur != null and isOur != ''">
                 and MDDI.IS_OUR = #{isOur}
@@ -620,7 +620,7 @@
         from FIN_EXERCISE_PLAN
         where
             FINPROD_ID = #{finprodId}
-            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE}
+            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE} and EXERCISE_TYPE in ('01','02')
     </select>
 
 

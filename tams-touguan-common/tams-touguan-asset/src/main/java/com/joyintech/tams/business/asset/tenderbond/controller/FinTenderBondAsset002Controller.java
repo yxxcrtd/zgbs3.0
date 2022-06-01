@@ -8,12 +8,11 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.framework.validation.ValidUtil;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset001Dto;
-import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset004Dto;
-import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset004Dto;
 import com.joyintech.tams.business.asset.tenderbond.service.FinTenderBondAssetService;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
@@ -21,11 +20,9 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
-import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @PageId("FinTenderBondAsset002")
@@ -62,8 +60,15 @@ public class FinTenderBondAsset002Controller extends BaseController {
             params.put("businessId", entity.getFinprodMarketId());
         } else {//来自新增或者修改
             String finprodId = getParam("finprodId");
-            if (StringUtil.isNotEmpty(finprodId)) {//修改
+            if (StringUtil.isNotEmpty(finprodId)) {
+                //修改
                 entity = finTenderBoundAssetService.getById(finprodId);
+                if (Objects.nonNull(entity) && Objects.nonNull(entity.getCirculationCode())) {
+                    entity.getProductAddDto().setAppearMarketId(entity.getCirculationCode());
+                    entity.getProductAddDto().setListingDate(entity.getCirculationDate());
+                } else if(Objects.isNull(entity)){
+                    entity = finTenderBoundAssetService.addCoupons(finprodId);
+                }
                 params.put("businessId", entity.getFinprodMarketId());
             }
         }
@@ -86,7 +91,9 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.put("CUSTOM_ASSET_TYPE_FOUR", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
         params.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
         params.put("SVR_BASIS_TYPE_ACCURACY", this.getSelectDataFromDataDic(DictCode.基准利率精度, null));
-        params.put("AMT_INCOME_TYPE",this.getSelectDataFromDataDic(DictCode.本金收益特征, null));
+        params.put("AMT_INCOME_TYPE", this.getSelectDataFromDataDic(DictCode.本金收益特征, null));
+        params.put("GUARANTEE_MODE", this.getSelectDataFromDataDic(DictCode.新债_担保方式, null));
+
 
         params.put(GlobalConstant.ENTITY, entity);
         //pageId
@@ -147,12 +154,12 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
         params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
             processParameter.setOperationType(OperationType.NEW);
         } else if (StringUtil.equals(dto.getOperateType(), OperationType.MODIFY.name())) {
             processParameter.setOperationType(OperationType.MODIFY);
-        }else{
+        } else {
             processParameter.setOperationType(OperationType.DELETE);
         }
         processParameter.setWorkFlowParameter(params);
@@ -174,7 +181,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(asset004Dto.getElementId());
         params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         FinTenderBondAsset002Dto dto = finTenderBoundAssetService.getById(asset004Dto.getFinprodId());
         dto.setRemark(asset004Dto.getRemark());
         dto.setOperateType(OperationType.DELETE.name());

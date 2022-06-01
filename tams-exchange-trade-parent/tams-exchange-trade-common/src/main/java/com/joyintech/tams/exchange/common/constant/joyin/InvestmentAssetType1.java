@@ -16,6 +16,10 @@ public enum InvestmentAssetType1 implements IEnum<String> {
         this.value = value;
     }
 
+    public static boolean isBiddingRepo(String value){
+        return InvestmentAssetType1.BIDDING_REPO.value.equals(value);
+    }
+
     @Override
     public String getCode() {
         return value;

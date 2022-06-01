@@ -75,6 +75,9 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
 
         if(StringUtil.equals(entrustDto.getEntrustClass(),DictCodeListExt3.投资指令类型_多组合单资产指令.getValue())) {
             for (ExchangeTransMatchCommonEntrustDetailDto detailDto:entrustDto.getEntrustDetailDtoList()) {
+                if(detailDto.getMarchQty() == null || detailDto.getMarchQty().compareTo(BigDecimal.ZERO) <= 0){
+                    continue;
+                }
                 ExchangeTransMatchCommonEntrustDto entrustDtoTmp = new ExchangeTransMatchCommonEntrustDto();
                 BeanUtil.copyPropertiesIgnoreNull(entrustDtoTmp,entrustDto);
                 entrustDtoTmp.setPortfolioId(detailDto.getPortfolioId());

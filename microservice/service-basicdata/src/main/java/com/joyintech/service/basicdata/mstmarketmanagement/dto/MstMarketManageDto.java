@@ -1,7 +1,5 @@
 package com.joyintech.service.basicdata.mstmarketmanagement.dto;
 
-import java.util.Date;
-
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -19,6 +17,16 @@ public class MstMarketManageDto  extends BaseEntity implements ProcessEntity{
      * <意义，目的和功能，以及可能被用到的地方>
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 操作类型
+     */
+    private String operateType;
+
+    /**
+     * 画面打开模式
+     */
+    private String pageModel;
     /**
      * 市场代码
      */
@@ -166,14 +174,32 @@ public class MstMarketManageDto  extends BaseEntity implements ProcessEntity{
      * sql排序标识
      */
     private String sqlSortString;
-    
-    
-    
-    
-    
-    
-    
-    
+    /**
+     * 评级日期，修改时记录修改前的评级日期
+     */
+    private String oldGradeDate;
+    /**
+     * 评级机构，修改时记录修改前的评级机构
+     */
+    private String oldGradeOrgId;
+
+
+    public String getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(String operateType) {
+        this.operateType = operateType;
+    }
+
+    public String getPageModel() {
+        return pageModel;
+    }
+
+    public void setPageModel(String pageModel) {
+        this.pageModel = pageModel;
+    }
+
     /**
      * 获取 groupName
      * @return groupName.
@@ -657,6 +683,22 @@ public class MstMarketManageDto  extends BaseEntity implements ProcessEntity{
 
     public void setSqlSortString(String sqlSortString) {
         this.sqlSortString = sqlSortString;
+    }
+
+    public String getOldGradeDate() {
+        return oldGradeDate;
+    }
+
+    public void setOldGradeDate(String oldGradeDate) {
+        this.oldGradeDate = oldGradeDate;
+    }
+
+    public String getOldGradeOrgId() {
+        return oldGradeOrgId;
+    }
+
+    public void setOldGradeOrgId(String oldGradeOrgId) {
+        this.oldGradeOrgId = oldGradeOrgId;
     }
 }
 

@@ -1,8 +1,6 @@
 package com.joyintech.tams.exchange.terminal.trade.mock;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
@@ -59,16 +57,12 @@ public class MockTradeClient implements ITradeRequest {
     private TradeResponseImpl tradeResponse;
     private ITerminalMsgNotify iTerminalMsgNotify;
 
-    @Autowired
-    protected RestTemplate restTemplate;
-
-    private static String URL = "http://127.0.0.1:8080/tams/service/joyin/quote/tick";
-
     @Override
     public Set<String> getLoginAccount() {
         return new HashSet<>();
     }
 
+    @Override
     public void setITerminalMsgNotify(ITerminalMsgNotify iTerminalMsgNotify) {
         this.iTerminalMsgNotify = iTerminalMsgNotify;
     }
@@ -257,6 +251,7 @@ public class MockTradeClient implements ITradeRequest {
         } else {
             trade.setTradedPrice(entrust.getEntrustPrice());
         }
+        trade.setFullPrice(entrust.getFullPrice());
         trade.setBsFlag(entrust.getBsFlag());
         trade.setAssetType(entrust.getAssetType());
         trade.setTradeType(tradeType);
@@ -271,6 +266,7 @@ public class MockTradeClient implements ITradeRequest {
         trade.setEntrustId(entrust.getId());
         trade.setTradeTime(now.get(Calendar.HOUR_OF_DAY) + "" + now.get(Calendar.MINUTE) + "" + now.get(Calendar.SECOND));
         trade.setBrokerTradeId(trade.getTradeTime() + brokerTradeId.incrementAndGet());
+        trade.setPs(entrust.getPs());
         return trade;
     }
 
@@ -702,26 +698,6 @@ public class MockTradeClient implements ITradeRequest {
         mockTradeResponse.resQueryIntegratedQuotes(integratedQuotes, requestId);
     }
 
-    @Value("${mock.quote-tick-url:http://127.0.0.1:8080/tams/service/joyin/quote/tick}")
-    private String quoteTickUrl;
-
-    private TickBean queryQuoteTick(String stockCode) {
-        try {
-            HttpRequest request = HttpRequest.post(quoteTickUrl)
-                    .body(JSONUtil.createObj()
-                            .set("userId", "xxx")
-                            .set("stockCode", stockCode)
-                            .toString());
-            String body = request.execute().body();
-            logger.info("行情信息：{}", body);
-            ResultBean resultBean = JSONUtil.toBean(body, ResultBean.class);
-            return Convert.convert(TickBean.class, resultBean.getData());
-        } catch (Exception e) {
-            logger.error("获取行情失败：stockCode={}", stockCode, e);
-        }
-        return null;
-    }
-
     @Override
     public void queryEnable(EnableQryBean qryBean, Long requestId) {
     }
@@ -763,7 +739,7 @@ public class MockTradeClient implements ITradeRequest {
     public void onTrade(Trade trade) {
         if (!(IntegratedEntrustUtils.isProtocolBack_SH(trade.getEntrustProp())
                 || IntegratedEntrustUtils.isProtocolBack_SZ(trade.getEntrustProp())) && !InvestAssetTypeEnum.FUTURES.value.equals(trade.getAssetType())) {
-            trade.setTradedBalance(TradeUtils.calculateBalanceForRisk(trade.getEntrustBs(), trade.getTradedPrice(), trade.getTradedVolume(), trade.getAssetType()));
+            trade.setTradedBalance(TradeUtils.calculateBalanceForRisk(trade.getFullPrice(), trade.getTradedPrice(), trade.getTradedVolume(), trade.getAssetType(), trade.getPs()));
         }
         if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
             trade.setBrokerTradeId(trade.getEntrustId());
@@ -1047,4 +1023,32 @@ public class MockTradeClient implements ITradeRequest {
         mockTradeResponse.resQueryNegotiateQuoteReceive(negotiateQuoteReceiveBeans, requestId);
     }
 
+
+    @Value("${mock.quote-tick-url:http://127.0.0.1:8080/tams/service/joyin/quote/tick}")
+    private String quoteTickUrl;
+
+    private TickBean queryQuoteTick(String stockCode) {
+        try {
+//            HttpRequest request = HttpRequest.post(quoteTickUrl)
+//                    .body(JSONUtil.createObj()
+//                            .set("userId", "xxx")
+//                            .set("stockCode", stockCode)
+//                            .toString());
+//            String body = request.execute().body();
+//            logger.info("行情信息：{}", body);
+//            ResultBean resultBean = JSONUtil.toBean(body, ResultBean.class);
+
+            Map<String, Object> params = Maps.newHashMap();
+            params.put("userId", "xxx");
+            params.put("stockCode", stockCode);
+
+            RestTemplate restTemplate = SpringContextUtils.getBean(RestTemplate.class);
+
+            ResultBean resultBean = restTemplate.postForObject(quoteTickUrl, params, ResultBean.class);
+            return Convert.convert(TickBean.class, resultBean.getData());
+        } catch (Exception e) {
+            logger.error("获取行情失败：stockCode={}", stockCode, e);
+        }
+        return null;
+    }
 }

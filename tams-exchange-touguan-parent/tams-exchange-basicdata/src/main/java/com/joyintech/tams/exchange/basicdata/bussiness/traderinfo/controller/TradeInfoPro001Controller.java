@@ -288,7 +288,13 @@ public class TradeInfoPro001Controller extends BaseController {
                     }
                 }
             }
-
+            if(StringUtil.equals(dto.getTradeMarket(),"04")) {
+                if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto))){
+                    return new Message().fail().setMessage("一条交易商信息下，不同交易主体类型之间，交易主体代码不允许重复!");
+                }else if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoTraderNo(dto))){
+                    return new Message().fail().setMessage("一条交易商信息下，交易主体代码+交易员代码应是唯一的!");
+                }
+            }
                //新增交易商详情信息
             insertDealerDetails1(tradeInfoProSaveRequest);
             return new Message().success();
@@ -302,6 +308,10 @@ public class TradeInfoPro001Controller extends BaseController {
 
     private int hasSameTrader(TradeInfoProSaveRequest dto) {
         return tradeInfoPro001Service.hasSameTrader(dto);
+    }
+
+    private String hasSameTraderSeqNo(TradeInfoProSaveRequest dto) {
+        return tradeInfoPro001Service.hasSameTraderSeqNo(dto);
     }
 
     private int hasDealerParty(TradeInfoProSaveRequest dto) {
@@ -387,6 +397,11 @@ public class TradeInfoPro001Controller extends BaseController {
             if (dto.getDealerPartyName().getBytes().length>50){
                 return new Message().fail().setMessage("交易主体名称输入的字符过长，请重新输入!");
             }
+            if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto))&&!tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto).contains(dto.getSeqNo())){
+                return new Message().fail().setMessage("一条交易商信息下，不同交易主体类型之间，交易主体代码不允许重复!");
+            }else if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoTraderNo(dto))&&!StringUtil.equals(tradeInfoPro001Service.hasSameDealerPartyNoTraderNo(dto),dto.getSeqNo())){
+                return new Message().fail().setMessage("一条交易商信息下，交易主体代码+交易员代码应是唯一的!");
+            }
         }
         //一个交易商只能维护一个 本方交易员
         if (existsOur(dto)>0 && StringUtil.equals(dto.getIsOur(),"Y")&&StringUtil.equals(dto.getIsOurPre(),"N")){
@@ -400,6 +415,33 @@ public class TradeInfoPro001Controller extends BaseController {
 //            String seqNo = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param): IDGenerator.generate();
 //            tradeInfoProSaveRequest.setSeqNo(seqNo);
 //            insertDealerDetails1(tradeInfoProSaveRequest);
+            //深交所交易主体类型为机构经济/个人经济时，交易主体代码应只允许维护一条
+            //深交所交易主体类型为机构经济/个人经济时，交易主体代码应只允许维护一条
+            if(StringUtil.equals(dto.getTradeMarket(),"04")&&(StringUtil.equals(dto.getDealerPartyType(),"03"))){
+                if (hasDealerParty(dto)==0){
+                    if (existsDealerParty(dto)>0){
+                        return new Message().fail().setMessage("深交所交易主体类型为机构经济时,交易主体代码应只允许维护一条!");
+                    }
+                }else {
+                    if (StringUtils.isNotEmpty(hasSameTraderSeqNo(dto))&&!StringUtil.equals(dto.getSeqNo(),hasSameTraderSeqNo(dto))){
+                        return new Message().fail().setMessage("同一个交易主体下，交易员代码不能重复!");
+                    }
+                }
+            }
+            if(StringUtil.equals(dto.getTradeMarket(),"04")&&(StringUtil.equals(dto.getDealerPartyType(),"04"))){
+//                if (existsDealerParty(dto)>0){
+//                    return new Message().fail().setMessage("深交所交易主体类型为个人经济时,交易主体代码应只允许维护一条!");
+//                }
+                if (hasDealerParty(dto)==0){
+                    if (existsDealerParty(dto)>0){
+                        return new Message().fail().setMessage("深交所交易主体类型为个人经济时,交易主体代码应只允许维护一条!");
+                    }
+                }else {
+                    if (StringUtils.isNotEmpty(hasSameTraderSeqNo(dto))&&!StringUtil.equals(dto.getSeqNo(),hasSameTraderSeqNo(dto))){
+                        return new Message().fail().setMessage("同一个交易主体下，交易员代码不能重复!");
+                    }
+                }
+            }
             int n = 0;
             if (StringUtil.equals(dto.getTradeMarket(),"03")){
                 if(existsTrader(dto)>0 && !StringUtil.equals(dto.getTraderNo(),dto.getTraderNoPre())){

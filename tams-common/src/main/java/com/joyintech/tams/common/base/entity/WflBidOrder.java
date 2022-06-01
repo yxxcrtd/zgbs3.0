@@ -43,7 +43,7 @@ public class WflBidOrder extends BaseEntity {
     private String isWin;
 
     /**
-     * 中标券面总额
+     * 投标券面总额
      */
     private BigDecimal winPrinAmt;
 
@@ -117,6 +117,46 @@ public class WflBidOrder extends BaseEntity {
      * 分配方式
      */
     private String dipType;
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    /**
+     * 投标方式
+     */
+    private String bidModle;
+
+    /**
+     * 净价(元)
+     */
+    private BigDecimal unitCprice;
+
+    /**
+     * 应计利息
+     */
+    private BigDecimal unitInt;
+
+    /**
+     * 交易金额
+     */
+    private BigDecimal tradeAmt;
+
+    /**
+     * 应计利息总额
+     */
+    private BigDecimal intAmt;
+
+    /**
+     * 债权债务登记日
+     */
+    private Date assignRegdate;
+
+    /**
+     * 上市日
+     */
+    private Date onmarketDate;
 
     /**
      * 投标编号
@@ -227,18 +267,18 @@ public class WflBidOrder extends BaseEntity {
     }
 
     /**
-     * 中标券面总额
+     * 投标券面总额
      *
-     * @return WIN_PRIN_AMT 中标券面总额
+     * @return WIN_PRIN_AMT 投标券面总额
      */
     public BigDecimal getWinPrinAmt() {
         return winPrinAmt;
     }
 
     /**
-     * 中标券面总额
+     * 投标券面总额
      *
-     * @param winPrinAmt 中标券面总额
+     * @param winPrinAmt 投标券面总额
      */
     public void setWinPrinAmt(BigDecimal winPrinAmt) {
         this.winPrinAmt = winPrinAmt;
@@ -465,5 +505,69 @@ public class WflBidOrder extends BaseEntity {
 
     public void setDipType(String dipType) {
         this.dipType = dipType;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
+    public BigDecimal getUnitCprice() {
+        return unitCprice;
+    }
+
+    public void setUnitCprice(BigDecimal unitCprice) {
+        this.unitCprice = unitCprice;
+    }
+
+    public BigDecimal getUnitInt() {
+        return unitInt;
+    }
+
+    public void setUnitInt(BigDecimal unitInt) {
+        this.unitInt = unitInt;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
+    }
+
+    public BigDecimal getIntAmt() {
+        return intAmt;
+    }
+
+    public void setIntAmt(BigDecimal intAmt) {
+        this.intAmt = intAmt;
+    }
+
+    public Date getAssignRegdate() {
+        return assignRegdate;
+    }
+
+    public void setAssignRegdate(Date assignRegdate) {
+        this.assignRegdate = assignRegdate;
+    }
+
+    public Date getOnmarketDate() {
+        return onmarketDate;
+    }
+
+    public void setOnmarketDate(Date onmarketDate) {
+        this.onmarketDate = onmarketDate;
     }
 }

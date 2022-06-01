@@ -78,10 +78,19 @@
                 like '%' || #{search} || '%'
                 or decode(T.transactioncom,0,'0.00',to_char(T.transactioncom,'FM90.90'))=#{search} or to_char(T.transactioncom)=#{search}
                 or decode(T.tradeFinishPercent,0,'0.00',to_char(T.tradeFinishPercent,'FM90.90'))=#{search} or to_char(T.tradeFinishPercent)=#{search}
-                or decode(T.entrustNum,0,'0.00',to_char(T.entrustNum/10000,'FM999999999990.90'))=#{search} or to_char(T.entrustNum)=#{search}
+                or decode(T.entrustNum,0,'0.00',to_char(T.entrustNum/10000,'FM999999999990.90'))=#{search} or to_char(T.entrustNum/10000)=#{search}
                 or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{search}
                 or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{search}
                 or replace(to_char(T.entrustDate,'yyyy-MM-dd'),'-','/')=#{search}
+                or to_char(T.issueDate,'yyyy-MM-dd')=#{search}
+                or to_char(T.payDate,'yyyy-MM-dd')=#{search}
+                or to_char(T.entrustDate,'yyyy-MM-dd')=#{search}
+                or to_char(T.issueDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+                or to_char(T.payDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+                or to_char(T.entrustDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+                or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+                or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+                or replace(to_char(T.entrustDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
                 or T.transmitTime=#{search}
                 )
         </if>
@@ -147,7 +156,7 @@
                 </foreach>
             </if>
             <if test="issueDateStart != null and !issueDateStart.isEmpty() ">
-                AND T.issueDate >= to_date(#{entrustDateStart}, 'yyyy-MM-dd')
+                AND T.issueDate >= to_date(#{issueDateStart}, 'yyyy-MM-dd')
             </if>
             <if test="issueDateEnd != null and !issueDateEnd.isEmpty() ">
                 AND T.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
@@ -382,6 +391,12 @@
             or to_char(T.rate)=#{search}
             or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{search}
+            or to_char(T.issueDate,'yyyy-MM-dd')=#{search}
+            or to_char(T.payDate,'yyyy-MM-dd')=#{search}
+            or to_char(T.issueDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or to_char(T.payDate,'yyyy-MM-dd')=#{year}||'-'||#{search}
+            or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+            or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
             )
         </if>
     </sql>
@@ -453,7 +468,7 @@
             ourTraderName,
             bidDate
         from (
-            select case when bo.IS_CANCEL = 'N' then '02' else '03' end      validStatus,
+            select distinct case when bo.IS_CANCEL = 'N' then '02' else '03' end      validStatus,
                    bo.BID_ID              bidId,
                    bo.SUBSCRIPTION_AMOUNT subscriptionAmount,
                    bo.PAYABLE_AMOUNT      payableAmount,
@@ -479,7 +494,7 @@
                     </foreach>
                 </if>
             union all
-            select '01'        validStatus,
+            select distinct '01'        validStatus,
                    wbo.BID_ID              bidId,
                    wbo.SUBSCRIPTION_AMOUNT subscriptionAmount,
                    wbo.PAYABLE_AMOUNT      payableAmount,
@@ -527,7 +542,7 @@
                     case
                         when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                             then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
-                        else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990') end rate,
+                        else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990')||'%' end rate,
                    bobp.PORTFOLIO_ID                                    portfolioId,
                    bobp.PORTFOLIO_NAME                                  portfolioName,
                    fpi.ISSUE_DATE                                       issueDate,
@@ -537,7 +552,7 @@
                    bo.OU_PARTY_ID                                       ouPartyId,
                    mcci.PARTY_ABBR                                      ouPartyIdAbbr,
                    bo.OUR_TRADER                                        ourTrader,
-                   mcct.TRADER_NAME                                     ourTraderName,
+                   mcct.real_name                                     ourTraderName,
                    fp.ISSUER                                            issuer,
                    mci.CUSTOMER_NAME                                    issuerName,
                    bo.BID_ID                                            tradeId,
@@ -565,7 +580,7 @@
                      left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = bo.FINPROD_ID
                      left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
                      left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
-                     left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+                     left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
                      left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
                      left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = bo.BID_ID
                      left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tfpdt.TOTLE_TRADE_ID = tmi.TRD_ID
@@ -600,7 +615,7 @@
                    bo.OU_PARTY_ID               ouPartyId,
                    mcci.PARTY_ABBR              ouPartyIdAbbr,
                     bo.OUR_TRADER               ourTrader,
-                    mcct.TRADER_NAME            ourTraderName,
+                    mcct.real_name            ourTraderName,
                    fp.ISSUER                    issuer,
                    mci.CUSTOMER_NAME            issuerName,
                    bo.BID_ID                    tradeId,
@@ -628,7 +643,7 @@
                      left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = bo.FINPROD_ID
                      left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
                      left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
-                     left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+                     left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
                      left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
                      left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = bo.BID_ID
                      left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tfpdt.TOTLE_TRADE_ID = tmi.TRD_ID

@@ -243,20 +243,27 @@ public class FinBondAsset001Controller extends BaseController{
                     return new Message<AjaxResult>().success().setData(res);
                 }
             }
+
         }
-        if("delete".equals(dto.getOperateType())){
-            if (dto.getSelectedItem() != null && dto.getSelectedItem().size()>0
-                    && dto.getSelectedItem().get(0).getFinprodId() != null){
-                String finprodId = dto.getSelectedItem().get(0).getFinprodId();
-                int count = finBondAssetService.selectIsIssueAsset(finprodId);
-                if (count > 0){
-                    ValidMessage validMessage = new ValidMessage("上市债券不允许删除,请先撤销对应的上市流通交易");
-                    errorList.add(validMessage);
-                    res.setErrorList(errorList);
-                    res.setMessageType(MessageType.错误消息);
-                    return new Message<AjaxResult>().success().setData(res);
-                }
-            }    
+        if (dto.getSelectedItem() != null && dto.getSelectedItem().size()>0
+                && dto.getSelectedItem().get(0).getFinprodMarketId() != null){
+            String finprodId = commonBusinessService.getFinProdId(dto.getSelectedItem().get(0).getFinprodMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null) ;
+            int count = finBondAssetService.selectIsIssueAsset(finprodId);
+            if (count > 0){
+                ValidMessage validMessage = new ValidMessage("上市债券不允许删除,请先撤销对应的上市流通交易");
+                errorList.add(validMessage);
+                res.setErrorList(errorList);
+                res.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().success().setData(res);
+            }
+            int count1 = finBondAssetService.isTransInAssetTwo(finprodId);
+            if (count1 > 0){
+                ValidMessage validMessage = new ValidMessage("存在流程中/待执行指令交易数据，不可删除");
+                errorList.add(validMessage);
+                res.setErrorList(errorList);
+                res.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().success().setData(res);
+            }
         }
         //新增撤销校验，不允许删除上市债券  add by mashukai 20210425 end
         AjaxResult ajaxResult = commonCheck(result, dto.getOperateType());
@@ -289,6 +296,14 @@ public class FinBondAsset001Controller extends BaseController{
                 if(finBondAssetService.selectCountByfinprodId(finProdId)==0){
                     errorList.add(new ValidMessage("",
                             getMessage("该数据已被删除!")));
+                    wr.setErrorList(errorList);
+                    wr.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(wr);
+                }
+                int count1 = finBondAssetService.isTransInAssetTwo(finProdId);
+                if (count1 > 0){
+                    ValidMessage validMessage = new ValidMessage("存在流程中/待执行指令交易数据，不可修改");
+                    errorList.add(validMessage);
                     wr.setErrorList(errorList);
                     wr.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(wr);
@@ -383,7 +398,7 @@ public class FinBondAsset001Controller extends BaseController{
             FinBondAssetRequest dto = requestDto.getDto(FinBondAssetRequest.class);
             List<FinBondAssetResponse> dataList = finBondAsset001Service.selectForPage(dto).getRoot();
             for(FinBondAssetResponse data:dataList){
-                finBondAssetService.updateCfetsOprHis(data.getFinprodId(),"export");
+                finBondAssetService.updateCfetsOprHis(data.getFinprodId(),"export","");
             }
             return dataList;
         });

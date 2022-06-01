@@ -3,10 +3,15 @@ package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -74,6 +79,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "marketAmt", value = "债券市场余额")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal marketAmt;
+
+    @ApiModelProperty(name = "issuer", value = "发行人编码")
+    private String issuer;
 
     @ApiModelProperty(name = "issuerName", value = "发行人")
     private String issuerName;
@@ -181,6 +189,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "ratebasic", value = "计息基础")
     private String ratebasic;
 
+    @ApiModelProperty(name = "marketBasis", value = "交易市场计息基础")
+    private String marketBasis;
+
     @ApiModelProperty(name = "workDayRule", value = "营业日准则")
     private String workDayRule;
 
@@ -230,14 +241,26 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "isNetprice", value = "是否净价交易")
     private String isNetprice;
 
+    @ApiModelProperty(name="isNoGuard",value="是否非担保(条件必填)")
+    private String isNoGuard;
+
     @ApiModelProperty(name = "conFinprodId", value = "正股代码")
     private String conFinprodId;
+
+    @ApiModelProperty(name = "conFinprodName", value = "转股名称")
+    private String conFinprodName;
+
+    @ApiModelProperty(name = "conProportion", value = "转股比例")
+    private BigDecimal conProportion;
 
     @ApiModelProperty(name = "conShareId", value = "转股代码")
     private String conShareId;
 
     @ApiModelProperty(name = "conVdate", value = "转股起始日")
     private Date conVdate;
+
+    @ApiModelProperty(name = "calcRule", value = "推算方式")
+    private String calcRule;
 
     @ApiModelProperty(name = "conPrice", value = "转股价格")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -251,8 +274,22 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal redeemPrice;
 
-    @ApiModelProperty(name = "conceptTypes", value = "概念板块")
-    private List<String> conceptTypes;
+    @ApiModelProperty(name = "conceptType", value = "概念板块Code")
+    private List<String> conceptType;
+
+    @ApiModelProperty(name = "conceptTypeStr", value = "概念板块")
+    private String conceptTypeStr;
+
+    @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
+    private String capiIncomeFeature;
+
+    @ApiModelProperty(name="listingDate",value="上市日")
+    private Date listingDate;
+
+    private String principalCashId;
+
+    @ApiModelProperty(name="yield",value="初始利率")
+    private BigDecimal yield;
 
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
@@ -452,7 +489,7 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     }
 
     public void setCouponSpecies(String couponSpecies) {
-        this.couponSpecies = couponSpecies;
+        this.couponSpecies = couponSpecies == null ? null : couponSpecies.trim();
     }
 
     public String getInterestRate() {
@@ -775,14 +812,6 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
         this.bondMarketInvRepayDtos = bondMarketInvRepayDtos;
     }
 
-    public List<String> getConceptTypes() {
-        return conceptTypes;
-    }
-
-    public void setConceptTypes(List<String> conceptTypes) {
-        this.conceptTypes = conceptTypes;
-    }
-
     public String getBasisStyle() {
         return basisStyle;
     }
@@ -869,5 +898,123 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setRedeemPrice(BigDecimal redeemPrice) {
         this.redeemPrice = redeemPrice;
+    }
+
+    public List<String> getConceptType() {
+        List<String> conceptType = new ArrayList<>();
+        if (DictCodeList.是否_是.getValue().equals(this.getCityInvestSecChb())) {
+            conceptType.add("01");
+        }
+        if (DictCodeList.是否_是.getValue().equals(this.getIsGreenBond())) {
+            conceptType.add("02");
+        }
+        if (DictCodeList.是否_是.getValue().equals(this.getIsSecBond())) {
+            conceptType.add("04");
+        }
+        if (DictCodeList.是否_是.getValue().equals(this.getIssus())) {
+            conceptType.add("05");
+        }
+        if (DictCodeList.是否_是.getValue().equals(this.getCalloption()) || DictCodeList.是否_是.getValue().equals(this.getPutoption())) {
+            conceptType.add("06");
+        }
+        return conceptType;
+    }
+
+    public void setConceptType(List<String> conceptType) {
+        this.conceptType = conceptType;
+    }
+
+    public String getConceptTypeStr() {
+        List<String> conceptTypes = getConceptType();
+        if (CollectionUtils.isEmpty(conceptTypes)) {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder();
+        conceptTypes.stream().forEach(conceptType -> builder.append(SysDataUtil.getNameFromDataDict(DictCode.概念标识, conceptType)).append(","));
+        return builder.toString();
+    }
+
+    public void setConceptTypeStr(String conceptTypeStr) {
+        this.conceptTypeStr = conceptTypeStr;
+    }
+
+    public String getCapiIncomeFeature() {
+        return capiIncomeFeature;
+    }
+
+    public void setCapiIncomeFeature(String capiIncomeFeature) {
+        this.capiIncomeFeature = capiIncomeFeature;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getConFinprodName() {
+        return conFinprodName;
+    }
+
+    public void setConFinprodName(String conFinprodName) {
+        this.conFinprodName = conFinprodName;
+    }
+
+    public String getMarketBasis() {
+        return marketBasis;
+    }
+
+    public void setMarketBasis(String marketBasis) {
+        this.marketBasis = marketBasis;
+    }
+
+    public BigDecimal getConProportion() {
+        return conProportion;
+    }
+
+    public void setConProportion(BigDecimal conProportion) {
+        this.conProportion = conProportion;
+    }
+
+    public Date getListingDate() {
+        return listingDate;
+    }
+
+    public void setListingDate(Date listingDate) {
+        this.listingDate = listingDate;
+    }
+
+    public String getPrincipalCashId() {
+        return principalCashId;
+    }
+
+    public void setPrincipalCashId(String principalCashId) {
+        this.principalCashId = principalCashId;
+    }
+
+    public String getCalcRule() {
+        return calcRule;
+    }
+
+    public void setCalcRule(String calcRule) {
+        this.calcRule = calcRule;
+    }
+
+    public BigDecimal getYield() {
+        return yield;
+    }
+
+    public void setYield(BigDecimal yield) {
+        this.yield = yield;
     }
 }

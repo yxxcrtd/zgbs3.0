@@ -21,6 +21,7 @@ import com.joyintech.tams.business.asset.bond.dto.BondFinCashPlanDto;
 import com.joyintech.tams.business.asset.bond.dto.BondFinExercisePlanDto;
 import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.common.base.entity.FinCashPlan;
+import com.joyintech.tams.common.base.entity.FinExercisePlan;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
@@ -30,11 +31,14 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.service.InvDataCheckService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tools.collectors.JoyinCollectors;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 债券标的信息业务验证
@@ -117,6 +121,15 @@ public class FinBondAssetValidatorService implements BeanValidator{
 
                 if((dto.getInvRepayList() ==null)) {
                     resultList.add(new ValidMessage("息票品种为附息或利随本清时，还本计划不能为空!"));
+                }else{
+                    if (StringUtil.equals(dto.getOperateStatus(),"MODIFY")) {
+                        for (BondFinCashPlanDto bondFinCashPlanDto : dto.getInvRepayList()) {
+//                            if (DateUtil.compareDate(bondFinCashPlanDto.getPayDate(), iPlatformDate.getSysDate()) < 0) {
+//                                resultList.add(new ValidMessage("还本计划支付日不能小于平台日"));
+//                                break;
+//                            }
+                        }
+                    }
                 }
                 if (DictCodeList.息票品种_附息.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())){
                     if (dto.getFinInterestFactorDto().getMarketBasis()== null){
@@ -145,6 +158,12 @@ public class FinBondAssetValidatorService implements BeanValidator{
                                     "付息计划,计息开始日不可以大于计息结束日"));
                             break;
                         }
+                        if (StringUtil.equals(dto.getOperateStatus(),"MODIFY")) {
+//                            if (DateUtil.compareDate(finCashPlanEntity.getPayDate(), iPlatformDate.getSysDate()) < 0) {
+//                                resultList.add(new ValidMessage("付息计划支付日不能小于平台日"));
+//                                break;
+//                            }
+                        }
                     }
                 }
             }
@@ -167,7 +186,7 @@ public class FinBondAssetValidatorService implements BeanValidator{
             	    for(BondFinExercisePlanDto finExercisePlan : dto.getFinExercisePlanList()){
                         if (finExercisePlan.getExercisePrice() == null) {
                             resultList.add(new ValidMessage(getMessage("行权计划中的行权价（净价）不能为空!")));
-                            continue;
+                            break;
                         }
                     }
                 }
@@ -189,8 +208,68 @@ public class FinBondAssetValidatorService implements BeanValidator{
                 if(StringUtil.isNotEmpty(dto.getRepAssetType())
                         &&StringUtil.equals(dto.getRepAssetType(), DictCodeListExt2.资产_负债二级类别_地方政府债.getValue())){
                     if(dto.getBussFinBondRepInfoDto()!=null && !StringUtil.isNotEmpty(dto.getBussFinBondRepInfoDto().getBankSecZxzq())){
-                        resultList.add(new ValidMessage("bussFinBondRepInfoDto.bankSecZxzq",
-                                getMessage("是否专项债券数据不能为空。")));
+                        resultList.add(new ValidMessage("bussFinBondRepInfoDto.bankSecZxzq","是否专项债券数据不能为空。"));
+                    }
+                }
+            }
+            if (StringUtil.equals(dto.getIsRight(),DictCodeList.是否_是.getValue())){
+                if (!CollectionUtils.isNotEmpty(dto.getFinExercisePlanList())){
+                    resultList.add(new ValidMessage("是否含权债为是时，行权计划列表不能为空"));
+                }
+                //行权计划列表中，行权方式、理论行权日、实际行权日没有填写时
+                for (BondFinExercisePlanDto finExercisePlan:dto.getFinExercisePlanList()){
+                    if (!StringUtil.isNotEmpty(finExercisePlan.getExerciseType())){
+                        resultList.add(new ValidMessage("行权计划列表中,行权方式不能为空"));
+                        break;
+                    }
+                    if (!StringUtil.isNotEmpty(finExercisePlan.getExerciseDate())){
+                        resultList.add(new ValidMessage("行权计划列表中,理论行权日不能为空"));
+                        break;
+                    }
+                    if (!StringUtil.isNotEmpty(finExercisePlan.getActExerciseDate())){
+                        resultList.add(new ValidMessage("行权计划列表中,实际行权日不能为空"));
+                        break;
+                    }
+//                    期望：理论行权日>=行权申请结束日>=行权申请开始日
+//                    4.同一行权方式的理论行权日不可重复；----目前未实现
+//                    5.行权赎回/行权回售的理论行权日必须为其中一个实际计息截止日；---目前未实现
+//                    6.理论行权日不大于到期日；---目前未实现
+//                    7.按理论行权日升序排序；---目前未实现
+                    if (DateUtil.compareDate(finExercisePlan.getExerciseDate(),finExercisePlan.getMdate())<0){
+                        resultList.add(new ValidMessage("理论行权日数据必须大于等于行权申请终止日数据"));
+                        break;
+                    }
+                    if (DateUtil.compareDate(finExercisePlan.getMdate(),finExercisePlan.getVdate())<0){
+                        resultList.add(new ValidMessage("行权申请终止日数据必须大于等于行权申请起始日数据"));
+                        break;
+                    }
+                    if (DateUtil.compareDate(finExercisePlan.getExerciseDate(),dto.getMdate())>0){
+                        resultList.add(new ValidMessage("理论行权日不能大于到期日"));
+                        break;
+                    }
+                }
+                Map<String, List<BondFinExercisePlanDto>> finExercisePlanMap = dto.getFinExercisePlanList().stream().collect(JoyinCollectors.groupingBy(item -> item.getExerciseType()+GlobalConstant.COMMA+item.getExerciseDate()));
+                for (String exerciseType:finExercisePlanMap.keySet()){
+                      if(finExercisePlanMap.get(exerciseType).size()>1){
+                          resultList.add(new ValidMessage("同一行权方式的理论行权日不可重复"));
+                          break;
+                      }
+                }
+                if(null!=dto.getFinPayInterestStdInfoDto() && null!=dto.getFinPayInterestStdInfoDto().getInvScheduleList()
+                        &&!dto.getFinPayInterestStdInfoDto().getInvScheduleList().isEmpty()) {
+                    List<BondFinExercisePlanDto> finExercisePlanList = dto.getFinExercisePlanList().stream().filter(item -> StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_赎回.getValue()) || StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_回售.getValue())).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(finExercisePlanList)) {
+                        boolean exerciseFlag = true;
+                        for (BondFinCashPlanDto planDto : dto.getFinPayInterestStdInfoDto().getInvScheduleList()) {
+                            for (BondFinExercisePlanDto planDtoTwo : finExercisePlanList) {
+                                if (DateUtil.compareDate(planDto.getMdate(), planDtoTwo.getExerciseDate()) == 0) {
+                                    exerciseFlag = false;
+                                }
+                            }
+                        }
+                        if (exerciseFlag) {
+                            resultList.add(new ValidMessage("行权赎回/行权回售的理论行权日必须为其中一个实际计息截止日"));
+                        }
                     }
                 }
             }

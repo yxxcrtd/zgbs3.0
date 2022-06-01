@@ -69,8 +69,8 @@
 		  <!--modify by etliu 20220324 end-->
           F.request_id quoterefId,/**交易所请求号*/
 		  A.ENTRUST_DATE tradeDate,/**委托日期*/
-		  A.VDATE,/**委托开始日*/
-		  A.Mdate,/**委托结束日*/
+		  A.VDATE VDATE,/**委托开始日*/
+		  A.Mdate MDATE,/**委托结束日*/
 		  CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0) END entrustAmt, /**委托额度*/
           CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM ELSE DECODE(F.TARGET_TYPE, '01',case when A.PS in ('T93', 'T94') THEN FDP.PLEDGE_NUMBER ELSE A.ENTRUST_NUM END, 0) END entrustNum, /**委托数量*/
 		  A.ENTRUST_STATUS entrustStatus,/**委托状态*/
@@ -79,9 +79,9 @@
 			  ELSE A.PRICE END
 			entrustPrice,/**委托单价*/ -->
 		  nvl(A.PRICE,FTP.INT_RATE) as entrustPrice,/**委托单价*/
-		  A.INV_AIM invAim,/**投资目的*/
+		  nvl(A.BUSINESS_MODEL,A.INV_AIM) invAim,/**投资目的*/
 		  F.FULL_PRICE fullPrice,/**全价*/
-		  A.PRICE_MODEL   priceMode,/**限价模式 */
+		  NVL(A.PRICE_MODEL,'PRM01') priceMode,/**限价模式 */
 		  FS.finishamt entrustLeftAmt,/*已完成数量*/
 		  F.SETTLE_SPREED settleSpeed,/**清算速度*/
 		  F.VDATE valueDate,/**起息日*/
@@ -127,14 +127,14 @@
 		END pledgeeType,
 		F.DERIVATIVE_BS_DIR derivativeBsDir,
 		F.DERIVATIVE_OC_FLAG derivativeOcFlag,
-		A.ENTRUST_CLASS,
+		A.ENTRUST_CLASS entrustClass,
 		F.BUSI_TYPE_POSITION busiTypeTg,
-		A.BUSINESS_MODEL,
 		A.ENTRUST_TYPE entrustBussType,
         F.PRICE_TYPE priceType,
         F.TARGET_TYPE targetType,
 		FRA.IS_NO_GUARD isNoGuard,
-        decode(F.PRICE_TYPE,'01','Y','02','N','') isNetPrice
+        decode(F.PRICE_TYPE,'01','Y','02','N','') isNetPrice,
+		nvl(A.BUSINESS_MODEL,A.INV_AIM) businessModel
 		FROM ETR_ENTRUST A
 		LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
@@ -176,9 +176,9 @@
             </if>
         </where>
     </select>
-   
+
    <select id="queryEtrPledgeListByEtrId" resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePledgeDto">
-   		SELECT 
+   		SELECT
 	        A.ENTRUST_ID entrustId,/*委托代码*/
 	        A.FINPROD_ID finprodId,/*金融产品代码*/
 	        C.FINPROD_ABBR finprodAbbr,/*金融产品简称*/
@@ -196,7 +196,7 @@
             A1.Pledge_Number oldPledgeNumber,/*质押数量*/
             A1.PLEDGE_RATIO  oldPledgeRatio,/*质押率*/
             A1.PLEDGE_AMT oldPledgeAmt/*质押金额*/
-	    FROM 
+	    FROM
 	    ETR_PLEDGE A
 	    LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
         LEFT JOIN ETR_ENTRUST E ON E.ENTRUST_ID =  A.ENTRUST_ID AND E.PS = 'T94'
@@ -218,5 +218,5 @@
 			#{item}
 		</foreach>
 	</select>
-   
+
 </mapper>

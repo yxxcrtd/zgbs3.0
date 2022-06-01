@@ -10,12 +10,12 @@
             #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
     </insert>
     <insert id="insertDealerDetails" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProSaveRequest">
-        insert into MST_DEALER_DETAIL_INFO (SEQ_NO, CUSTOMER_ID, DEALER_NO,
+        insert into MST_DEALER_DETAIL_INFO (SEQ_NO, CUSTOMER_ID, DEALER_NO,TRADE_MARKET,
             DEALER_PARTY_NO, DEALER_PARTY_TYPE, DEALER_PARTY_NAME,
             TRADER_NO, TRADER_NAME, IS_OUR,
             CREATE_USER, CREATE_DEPT, CREATE_TIME,
             UPDATE_USER, UPDATE_TIME)
-        values (#{seqNo,jdbcType=VARCHAR}, #{customerId,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR},
+        values (#{seqNo,jdbcType=VARCHAR}, #{customerId,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR},#{tradeMarket,jdbcType=VARCHAR},
             #{dealerPartyNo,jdbcType=VARCHAR}, #{dealerPartyType,jdbcType=VARCHAR}, #{dealerPartyName,jdbcType=VARCHAR},
             #{traderNo,jdbcType=VARCHAR}, #{trader,jdbcType=VARCHAR}, #{isOur,jdbcType=VARCHAR},
             #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
@@ -166,10 +166,10 @@
     <delete id="deleteDealer">
         delete from MST_DEALER_INFO
         where CUSTOMER_ID = #{customerId}
-        and DEALER_NO = #{dealerNo}
+        and TRADE_MARKET = #{tradeMarket}
     </delete>
     <delete id="deleteDealerDetails">
-        delete from MST_DEALER_DETAIL_INFO where  CUSTOMER_ID = #{customerId} and DEALER_NO = #{dealerNo}
+        delete from MST_DEALER_DETAIL_INFO where  CUSTOMER_ID = #{customerId} and TRADE_MARKET = #{tradeMarket}
     </delete>
     <delete id="deleteTrader">
         delete from MST_DEALER_DETAIL_INFO where  SEQ_NO = #{seqNo,jdbcType=VARCHAR}
@@ -177,5 +177,24 @@
     <delete id="deleteTraderSJ">
             delete from MST_DEALER_DETAIL_INFO where  SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </delete>
+
+    <select id="hasSameDealerPartyNoDiffType" resultType="java.lang.String">
+        select wm_concat(SEQ_NO) from  MST_DEALER_DETAIL_INFO MDDI
+        where MDDI.CUSTOMER_ID = #{customerId} and MDDI.TRADE_MARKET = #{tradeMarket}
+           and MDDI.DEALER_PARTY_TYPE != #{dealerPartyType} and MDDI.DEALER_PARTY_NO = #{dealerPartyNo}
+    </select>
+
+    <select id="hasSameDealerPartyNoTraderNo" resultType="java.lang.String">
+        select SEQ_NO from  MST_DEALER_DETAIL_INFO MDDI
+        where MDDI.CUSTOMER_ID = #{customerId} and MDDI.TRADE_MARKET = #{tradeMarket}
+          and MDDI.DEALER_PARTY_NO = #{dealerPartyNo}  and MDDI.TRADER_NO = #{traderNo}
+    </select>
+
+    <select id="hasSameTraderSeqNo" resultType="java.lang.String">
+        select SEQ_NO from MST_DEALER_INFO mdi
+                                 inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+        where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.DEALER_PARTY_NO = #{dealerPartyNo}
+          and mddi.TRADER_NO = #{traderNo}
+    </select>
 
 </mapper>

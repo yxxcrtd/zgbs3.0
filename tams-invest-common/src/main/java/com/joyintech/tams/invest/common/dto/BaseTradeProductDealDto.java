@@ -104,7 +104,28 @@ public class BaseTradeProductDealDto {
      * 交易费用明细表
      */
     private List<TrdTradeFeeDetail> trdTradeFeeDetailList;
-    
+
+    // TrdBankManualSettleInfo
+    private TrdBankManualSettleInfo trdBankManualSettleInfo;
+    // TrdBankManualSettleFlow
+    private TrdBankManualSettleFlow trdBankManualSettleFlow;
+
+    public TrdBankManualSettleInfo getTrdBankManualSettleInfo() {
+        return trdBankManualSettleInfo;
+    }
+
+    public void setTrdBankManualSettleInfo(TrdBankManualSettleInfo trdBankManualSettleInfo) {
+        this.trdBankManualSettleInfo = trdBankManualSettleInfo;
+    }
+
+    public TrdBankManualSettleFlow getTrdBankManualSettleFlow() {
+        return trdBankManualSettleFlow;
+    }
+
+    public void setTrdBankManualSettleFlow(TrdBankManualSettleFlow trdBankManualSettleFlow) {
+        this.trdBankManualSettleFlow = trdBankManualSettleFlow;
+    }
+
     /**
      * 交易费用表(通道费）
      */
@@ -198,6 +219,11 @@ public class BaseTradeProductDealDto {
      *数据已入新头寸，Y：已入
      */
     private String isExistNew;
+
+    /**
+     * 业务阶段 01 登记 02 成交 03 交收 04 交收失败
+     */
+    private String stage;
 
     public Date getExRightsDate() {
         return exRightsDate;
@@ -685,5 +711,13 @@ public class BaseTradeProductDealDto {
 
     public void setIsExistNew(String isExistNew) {
         this.isExistNew = isExistNew;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
     }
 }

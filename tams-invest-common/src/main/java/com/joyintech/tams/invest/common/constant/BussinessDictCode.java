@@ -1417,6 +1417,7 @@ public enum BussinessDictCode implements com.joyintech.framework.base.BaseDictCo
      */
     组合估值方法("PTL_VALUATION_METHOD"),
     报价方式_登记("QUOTE_STYLE"),
+    分配方式("DISTRIBUTION"),
 
     ;
     /**

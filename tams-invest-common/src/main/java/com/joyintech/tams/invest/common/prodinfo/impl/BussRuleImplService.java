@@ -13,12 +13,14 @@ package com.joyintech.tams.invest.common.prodinfo.impl;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.RskPortfolioIndicatorMapper;
 import com.joyintech.tams.common.base.entity.RskPortfolioIndicator;
 import com.joyintech.tams.common.base.entity.RskRulePortfolio;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.batchList.service.BatchListService;
+import com.joyintech.tams.invest.common.riskinfrds.info.entity.IProdInfo;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.prodinfo.BussRuleService;
@@ -48,6 +50,12 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
     @Autowired
     private BatchListService<RskPortfolioIndicator> rskPortIndicatorService;
 
+    /**
+     * 组合关联指标Mapper
+     */
+    @Autowired
+    private RskPortfolioIndicatorMapper rskPortfolioIndicatorMapper;
+
     @Autowired
     private RskRuleCommonMapper rskRuleCommonMapper;
 
@@ -61,6 +69,9 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
      */
     @Override
     public List<String> matchRulePort(IPtlRule ruleData) {
+        if(null==ruleData){
+            return new ArrayList<String>();
+        }
         //查询规则信息，按参数序号倒序排列
         List<IRskRulePoolConfig> resultList=rskRuleCommonMapper.getRulePoolConfig(ruleData.getRuleId());
         if(StringUtil.isEmptyList(resultList)){
@@ -89,6 +100,55 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
         return matchCommonRule(resultList);
     }
 
+    /**
+     * 匹配规则
+     * @param portEntity
+     * @return
+     */
+    @Override
+    public <T extends IProdInfo> void matchRulePortByPort(T portEntity) {
+        if(null==portEntity){
+            return;
+        }
+        List<String> ptlRuleIdList =new ArrayList<>();
+        List<IRskRulePoolConfig> ptlPoolList=rskRuleCommonMapper.selectPtlRuleAll();
+        Map<String,List<IRskRulePoolConfig>> ptlPoolMap=ptlPoolList.stream().collect(Collectors.groupingBy(IRskRulePoolConfig::getRuleId));
+        ptlPoolMap.keySet().forEach(key->{
+            List<String> portList =new ArrayList<>();
+            if(CommonUtil.isType(portEntity.getIssueMode(),DictCodeList.开放类型_开放式)){
+                portList.add(portEntity.getProdId());
+            }
+            //按paramNum倒序排
+            List<IRskRulePoolConfig> newPtlPoolList=ptlPoolMap.get(key).stream().sorted(Comparator.comparing(IRskRulePoolConfig::getParamNum).reversed()).collect(Collectors.toList());
+            //系统内处理为（（A∪B）∩C）∪D，由外向内逐层处理
+            String sqlWhere=StringUtil.EMPTY;
+            for(IRskRulePoolConfig dto:newPtlPoolList){
+                //---流动性风险改造过滤开放周期 start---
+                sqlWhere=dto.getPoolSql(portList,sqlWhere);
+                //---流动性风险改造过滤开放周期 end---
+            }
+            //查询符合规则的组合
+            if(!StringUtil.isEmptyList(rskRuleCommonMapper.getMatchPortData(sqlWhere,portEntity.getProdId(),DateUtil.format(StringUtil.isNotEmpty(platformDate.getSysDate()) ? platformDate.getSysDate() : new Date())))){
+                ptlRuleIdList.add(key);//说明当前这个规则符合这个组合的属性
+            }
+        });
+        if (!StringUtil.isEmptyList(ptlRuleIdList)) {
+            //---流动性风险改造入规则关联组合表 start---
+            insertRulePortList(Arrays.asList(portEntity.getProdId()),ptlRuleIdList,()->Arrays.asList(portEntity.getProdId()));
+            //---流动性风险改造入规则关联组合表 end---
+            List<String> ruleIndList=rskRuleCommonMapper.selectRuleRelInd(ptlRuleIdList);
+            for (String indId : ruleIndList) {
+                RskPortfolioIndicator rskPortfolioIndicator = new RskPortfolioIndicator();
+                rskPortfolioIndicator.setIndId(indId);
+                rskPortfolioIndicator.setStartDate(DateUtil.platDateFromCache());
+                rskPortfolioIndicator.setPortfolioLevel(BussinessDictCodeListRds.组合层次_单组合.getValue());
+                rskPortfolioIndicator.setPortfolioId(portEntity.getProdId());
+                rskPortfolioIndicatorMapper.deleteByPrimaryKey(rskPortfolioIndicator);
+                rskPortfolioIndicatorMapper.insertSelective(rskPortfolioIndicator);
+            }
+        }
+    }
+
     private <T extends IRskRulePoolConfig> List<String> matchCommonRule(List<T> resultList){
         List<String> portList =new ArrayList<>();
         Date platDate=platformDate.getSysDate();
@@ -98,7 +158,7 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
             //---流动性风险改造过滤开放周期 start---
             if(CommonUtil.isType(dto.getClassifyDimension(),BussinessDictCodeListRds.分类维度_开放周期)){
                 portList= rskRuleCommonMapper.getMatchPortData(RiskUtil.getTableColumn(DictCodeListExt1.分类维度_开放类型.getValue())
-                        +"='"+ DictCodeList.开放类型_开放式.getValue()+"'",BussinessDictCodeListRds.是否_否.getValue(),DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
+                        +"='"+ DictCodeList.开放类型_开放式.getValue()+"'",null,DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
                 sqlWhere=dto.getPoolSql(portList,sqlWhere);
             }else {
                 sqlWhere=dto.getPoolSql(portList,sqlWhere);
@@ -106,7 +166,7 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
             //---流动性风险改造过滤开放周期 end---
         }
         //查询符合规则的组合且在组合关联指标表中已有的组合排除，即之前已绑定的不用再管了(现改成不排除)
-        portList= rskRuleCommonMapper.getMatchPortData(sqlWhere,BussinessDictCodeListRds.是否_否.getValue(),DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
+        portList= rskRuleCommonMapper.getMatchPortData(sqlWhere,null,DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
         return portList;
     }
 

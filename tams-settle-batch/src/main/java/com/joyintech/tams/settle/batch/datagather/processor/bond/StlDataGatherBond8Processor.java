@@ -75,6 +75,8 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
                 List<TrdFinProductDealTotal> trdFinProductDealTotalList = stlDataGatherMapper.selectTotalTradesBytotleTradeId(tradeIdTgList);
                 // 汇总交易的交易份额
                 BigDecimal shareAmtTotal = trdFinProductDealTotalList.stream().map(TrdFinProductDealTotal::getShareAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                // 根据汇总的成交明细查询出原成交明细列表
+                List<SettleTransDataDto> stdDetailList = stlDataGatherMapper.selectSettleTransDatas(paraMap);
                 // 处理尾插用
                 Map<String, BigDecimal> amtInfoMap = new HashMap<>();
                 amtInfoDealMap(amtInfoMap);
@@ -102,8 +104,7 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
                     PtlTrade ptlTrade = new PtlTrade();
                     ptlTrade.setPortfolioId(trdProductDeal.getPortfolioId());
                     ptlTradeList.add(createPtlTrade(ptlTrade, trdProductDeal));
-                    // 根据汇总的成交明细查询出原成交明细列表
-                    List<SettleTransDataDto> stdDetailList = stlDataGatherMapper.selectSettleTransDatas(paraMap);
+
                     // 循环原成交明细列表
                     for (SettleTransDataDto settleTransDataDetail : stdDetailList) {
                         // 投管交易关系

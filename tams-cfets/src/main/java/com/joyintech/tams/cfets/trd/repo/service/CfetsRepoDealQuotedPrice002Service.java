@@ -201,6 +201,9 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
     @Autowired
     IbuQuoteMapper ibuQuoteMapper;
 
+    @Autowired
+    private com.joyintech.tams.cfets.trd.bond.service.CfetsQuotedCommonService cfetsQuotedCommonServicevue;
+
     /**
      * 报价初始化校验
      *
@@ -588,6 +591,11 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                 if (validMessageList != null && !validMessageList.isEmpty()) {
                     errorList.addAll(validMessageList);
 //                    break;
+                }
+                AjaxResult ajaxResultPartyId = cfetsQuotedCommonServicevue.checkpartyId(ptlAllocatio.getEntrustId(),
+                        ptlAllocatio.getPortfolioId(), DictCodeListExt3.报价系统区分类型_质押式回购对话报价.getValue());
+                if(StringUtil.isNotEmpty(ajaxResultPartyId.getMessage())){
+                    errorList.add(new ValidMessage(ajaxResultPartyId.getMessage()));
                 }
                 if (cfetsRepoQuotedPrice004Service.ACompareToB(ptlAllocatio.getTradeAmt(), ptlAllocatio.getConvertAmt(), 6) > 0
                         && StringUtil.equals(ps, DictCodeListExt3.交易方向_正回购.getValue())) {

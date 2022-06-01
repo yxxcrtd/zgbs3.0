@@ -194,10 +194,11 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     }
 
     @ApiOperation(value = "查询资产是否进行了SPPI测试", notes = "查询资产是否进行了SPPI测试")
-    @PostMapping("/queryAssetIsSppiTest/{finprodId:.+}")
+    @PostMapping("/queryAssetIsSppiTest")
     @ResponseBody
-    public Message<SppiImportData> queryAssetIsSppiTest(@PathVariable String finprodId) {
+    public Message<SppiImportData> queryAssetIsSppiTest(@RequestBody Map<String, Object> param) {
         try {
+            String finprodId = (String) param.get("finprodId");
             SppiImportData data = cfetsEtrBondFirstBid001Service.queryAssetIsSppiTest(finprodId);
             return new Message<SppiImportData>().success().setData(data);
         } catch (Exception e) {
@@ -207,10 +208,15 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     }
 
     @ApiOperation(value = "一级投标指令查询业务模式", notes = "一级投标指令查询业务模式")
-    @PostMapping("/queryInvAim/{portfolioId}/{finprodId:.+}")
+    @PostMapping("/queryInvAim")
     @ResponseBody
-    public Message<String> queryInvAim(@PathVariable("portfolioId") String portfolioId, @PathVariable String finprodId) {
+    public Message<String> queryInvAim(@RequestBody Map<String, Object> param) {
         try {
+            String portfolioId = (String) param.get("portfolioId");
+            String finprodId = (String) param.get("finprodId");
+            if (StringUtil.isEmpty(portfolioId) || StringUtil.isEmpty(finprodId)) {
+                return new Message<String>().fail().setMessage("查询条件：组合或资产代码为空!");
+            }
             String restult = cfetsEtrBondFirstBid001Service.queryInvAim(portfolioId, finprodId);
             if (StringUtil.isEmpty(restult)) {
                 restult = "";
@@ -223,10 +229,15 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     }
 
     @ApiOperation(value = "一级投标指令查询证券账户", notes = "一级投标指令查询证券账户")
-    @PostMapping("/querySecAcctId/{portfolioId}/{finprodId:.+}")
+    @PostMapping("/querySecAcctId")
     @ResponseBody
-    public Message<String> querySecAcctId(@PathVariable("portfolioId") String portfolioId, @PathVariable String finprodId) {
+    public Message<String> querySecAcctId(@RequestBody Map<String, Object> param) {
         try {
+            String portfolioId = (String) param.get("portfolioId");
+            String finprodId = (String) param.get("finprodId");
+            if (StringUtil.isEmpty(portfolioId) || StringUtil.isEmpty(finprodId)) {
+                return new Message<String>().fail().setMessage("查询条件：组合或资产代码为空!");
+            }
             //证券账户
             String secAcctId = cfetsEtrBondFirstBid001Service.queryPortfolioSecAcctId(portfolioId, finprodId);
             if (StringUtil.isEmpty(secAcctId)) {
@@ -281,14 +292,18 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     /**
      * 资产检查
      *
-     * @param finprodId
+     * @param param
      * @return
      */
     @ApiOperation(value = "资产检查", notes = "资产检查")
-    @PostMapping("/finprodIdCheck/{finprodId:.+}")
+    @PostMapping("/finprodIdCheck")
     @ResponseBody
-    public Message<AjaxResult> finprodIdCheck(@PathVariable String finprodId) {
+    public Message<AjaxResult> finprodIdCheck(@RequestBody Map<String, Object> param) {
         try {
+            String finprodId = (String) param.get("finprodId");
+            if (StringUtil.isEmpty(finprodId)) {
+                return new Message<AjaxResult>().fail().setMessage("查询条件：资产代码为空!");
+            }
             AjaxResult ajaxResult = cfetsEtrBondFirstBid001Service.finprodIdCheck(finprodId);
             return new Message<AjaxResult>().success().setData(ajaxResult);
         } catch (Exception e) {
@@ -297,11 +312,15 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         }
     }
 
-    @PostMapping("/getEtrFinProductInfo/{finprodId:.+}")
+    @PostMapping("/getEtrFinProductInfo")
     @ApiOperation(value = "债券信息查询功能", notes = "债券信息查询功能")
     @ResponseBody
-    public Message<CfetsEtrFinProductInfoResponse> getEtrFinProductInfo(@PathVariable String finprodId) {
+    public Message<CfetsEtrFinProductInfoResponse> getEtrFinProductInfo(@RequestBody Map<String, Object> param) {
         try {
+            String finprodId = (String) param.get("finprodId");
+            if (StringUtil.isEmpty(finprodId)) {
+                return new Message<CfetsEtrFinProductInfoResponse>().fail().setMessage("查询条件：资产代码为空!");
+            }
             CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
             dto.setFinprodId(finprodId);
             CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);

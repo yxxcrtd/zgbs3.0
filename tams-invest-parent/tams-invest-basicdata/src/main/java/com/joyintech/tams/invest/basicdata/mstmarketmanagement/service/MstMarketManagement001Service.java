@@ -2,6 +2,8 @@ package com.joyintech.tams.invest.basicdata.mstmarketmanagement.service;
 
 import java.util.List;
 import java.util.Map;
+
+import com.joyintech.framework.select.SelectOptionDto;
 import org.springframework.stereotype.Service;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.export.ExportParam;
@@ -32,9 +34,9 @@ implements BaseProcessService<MstMarketManagementDto>{
 	    }
 
 	@Override
-	public void doComplete(MstMarketManagementDto arg0, OperationType arg1) {
-		 
-		
+	public void doComplete(MstMarketManagementDto entity, OperationType type) {
+		restTemplate.postForObject(
+		ServiceApplication.BASICDATA_SERVICE_NAME + "/MstMarketManagement/doComplete",entity, Integer.class);
 	}
 
 	 /**
@@ -74,5 +76,17 @@ implements BaseProcessService<MstMarketManagementDto>{
     @Override
     public Page<MstMarketManagementDto> selectPageData(Map<String, Object> selectParam) {
     	return selectForPage(selectParam);
+    }
+
+    public Page<SelectOptionDto> getCodeName(Map<String, Object> param) {
+		return restTemplate.postForPage(
+				ServiceApplication.BASICDATA_SERVICE_NAME + "/MstMarketManagement/getCodeName",
+				param, SelectOptionDto.class);
+    }
+
+    public MstMarketManagementDto selectDetail(MstMarketManagementDto entity) {
+		return restTemplate.postForObject(
+		ServiceApplication.BASICDATA_SERVICE_NAME + "/MstMarketManagement/selectDetail",
+				entity, MstMarketManagementDto.class);
     }
 }

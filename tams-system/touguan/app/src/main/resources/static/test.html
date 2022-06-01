@@ -5,25 +5,26 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    html, body, iframe {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #iframe {
+      width: 100%;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-  <button id="button">关闭弹框</button>
+  <div style="width: 100%;">
+    <iframe id="iframe" style="height: 200px" src="./iframe.html"></iframe>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.10.3/qs.min.js"></script>
-  <script>
-    (function() {
-      var params = Qs.parse(window.location.search.slice(1));
-      var button = document.getElementById('button');
-
-      button.addEventListener('click', () => {
-        if (
-          params.closeFuncName &&
-          typeof parent[params.closeFuncName] === 'function'
-        ) {
-          parent[params.closeFuncName]();
-        }
-      }, false);
-    })();
-  </script>
+    <button id="btnSave_wfl">保存</button>
+    <button id="btnSubmit_wfl">提交</button>
+    <button id="btnCancel_wfl">作废</button>
+  </div>
 </body>
 </html>

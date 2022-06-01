@@ -9,13 +9,18 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
+import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.FinCashCalcRuleMapper;
 import com.joyintech.tams.common.base.dao.FinCashPlanMapper;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjRequest;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto;
 import com.joyintech.tams.invest.common.asset.dto.RateAdjDto;
 import com.joyintech.tams.invest.common.asset.service.RateAdjService;
@@ -68,6 +73,15 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
 
     @Autowired
     private FinCashPlanMapper finCashPlanMapper;
+
+    @Autowired
+    private FinBondAssetService finBondAssetService;
+
+    @Autowired
+    private CommonBusinessService commonBusinessService;
+
+    @Autowired
+    private JoyinbusinessCommonService joyinbusinessCommonService;
     /**
      * 初始化信息--前台分页 <功能详细描述>
      *
@@ -81,13 +95,12 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         List<FinAssetRateAdjResponse> finAssetRateAdjList = finBondAssetMapper.getfinAssetRateAdjByProductId(paramMap);
         for (FinAssetRateAdjResponse entity : finAssetRateAdjList) {
             String updateFlg = StringUtil.EMPTY;
-            if (StringUtil.equals(entity.getIsInitial(), DictCodeList.是否_是.getValue())) {
+            if (finBondAssetService.isTransInAssetTwo(entity.getFinprodId())!=0 &&
+                    DateUtil.compareDate(entity.getEffDate(), iPlatformDate.getSysDate()) == 0) {
                 updateFlg = "02";
-            }
-            else if (DateUtil.compareDate(entity.getEffDate(), iPlatformDate.getSysDate()) == -1) {
+            }else if ( DateUtil.compareDate(entity.getEffDate(), iPlatformDate.getSysDate()) == -1) {
                 updateFlg = "02";
-            }
-            else {
+            } else {
                 updateFlg = "01";
             }
             entity.setUpdateFlg(updateFlg);
@@ -135,6 +148,7 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         String baseType = finAssetRateAdjList.get(0).getBaseType();
         String baseDateType = finAssetRateAdjList.get(0).getBaseDateType();
         String basis = finAssetRateAdjList.get(0).getBasis();
+        String marketBasis = finAssetRateAdjList.get(0).getMarketBasis();
         BigDecimal issueAmt = finAssetRateAdjList.get(0).getIssueAmt();
         Long branch = finAssetRateAdjList.get(0).getBranch();
         String finprodType2 =  finAssetRateAdjList.get(0).getFinprodType2();
@@ -153,6 +167,7 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
             finCashCalcRule.setBaseType(baseType);
             finCashCalcRule.setBaseDateType(baseDateType);
             finCashCalcRule.setBasis(basis);
+            finCashCalcRule.setMarketBasis(marketBasis);
             if (!StringUtil.isNotEmpty(entity.getIsInitial())){
                 entity.setIsInitial(DictCodeList.是否_否.getValue());
             }
@@ -199,6 +214,7 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         String baseType = finAssetRateAdjList.get(0).getBaseType();
         String baseDateType = finAssetRateAdjList.get(0).getBaseDateType();
         String basis = finAssetRateAdjList.get(0).getBasis();
+        String marketBasis = finAssetRateAdjList.get(0).getMarketBasis();
         BigDecimal issueAmt = finAssetRateAdjList.get(0).getIssueAmt();
         String finprodType2 =  finAssetRateAdjList.get(0).getFinprodType2();
         BigDecimal investRate = finAssetRateAdjList.get(0).getInvestRate();
@@ -228,6 +244,7 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
             finCashCalcRule.setBaseType(baseType);
             finCashCalcRule.setBaseDateType(baseDateType);
             finCashCalcRule.setBasis(basis);
+            finCashCalcRule.setMarketBasis(marketBasis);
             if (!StringUtil.isNotEmpty(entity.getIsInitial())){
                 entity.setIsInitial(DictCodeList.是否_否.getValue());
             }
@@ -246,6 +263,24 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         dto.setPaFinCashCalcRuleList(paFinCashCalcRuleList);
         dto.setFinCashCalcRuleList(finCashCalcRuleList);
         return dto;
+    }
+
+    @Override
+    public void doInsert(FinAssetRateAdjResponse entity, OperationType type){
+        finBondAssetService.updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整.getValue(),entity.getWorkflowId());
+    }
+
+    @Override
+    public void doUpdate(FinAssetRateAdjResponse entity) {
+        finBondAssetService.updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整.getValue(),entity.getWorkflowId());
+    }
+
+    @Override
+    public void doDelete(String workflowId){
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setWorkflowId(workflowId);
+        oprHisReq.setBusiDes("作废");
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
     /**
@@ -281,6 +316,11 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         //针对还本不付息资产，还本时，计划应付利息应等于区间还本未付利息
         entity =encapFinCashPlanIntAmt(entity);
         insert(entity);
+//        if (StringUtil.isNotEmpty(entity.getFinprodMarketId())) {
+//            finBondAssetService.updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整.getValue(),entity.getWorkflowId());
+//        }else{
+//            finBondAssetService.updateCfetsOprHis(entity.getSelectedItem().get(0).getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整.getValue(),entity.getWorkflowId());
+//        }
     }
 
     public void insert(FinAssetRateAdjResponse dto){

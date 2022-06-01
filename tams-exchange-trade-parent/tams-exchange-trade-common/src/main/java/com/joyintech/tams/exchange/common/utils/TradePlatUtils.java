@@ -52,10 +52,10 @@ public class TradePlatUtils {
      *  交易端交易平台-->指令端交易平台
      */
 	public static String trd2EtrTradePlat(String market,String tradePlat,String assetType1,String busiTypeTg) {
-    	if(Market.SZSE.value.equals(market) && TradePlat.SZ_PROTOCOL.value.equals(tradePlat) && !InvestmentAssetType1.NEGOTIATED_REPO.equals(assetType1)) {
+    	if(Market.SZSE.investValue.equals(market) && TradePlat.SZ_PROTOCOL.value.equals(tradePlat) && !InvestmentAssetType1.NEGOTIATED_REPO.equals(assetType1)) {
     		return TradePlat.ETR_SCALE.value;
     	}
-    	if(Market.SHSE.value.equals(market) && TradePlat.SH_FIXED_INCOME.value.equals(tradePlat) && !InvestmentAssetType1.NEGOTIATED_REPO.equals(assetType1)) {
+    	if(Market.SHSE.investValue.equals(market) && TradePlat.SH_FIXED_INCOME.value.equals(tradePlat) && !InvestmentAssetType1.NEGOTIATED_REPO.equals(assetType1)) {
     		return TradePlat.ETR_FIXED_INCOME.value;
     	}    
     	if(TradePlat.NORMAL.value.equals(tradePlat)) {

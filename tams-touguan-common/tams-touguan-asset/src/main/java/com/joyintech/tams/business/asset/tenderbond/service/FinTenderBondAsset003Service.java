@@ -1,15 +1,19 @@
 package com.joyintech.tams.business.asset.tenderbond.service;
 
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.*;
@@ -80,24 +84,40 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
 
     @Resource
+    private JoyinbusinessCommonService joyinbusinessCommonService;
+
+    @Resource
     private IPlatformDate iPlatformDate;
 
     @Override
     public String generateTitle(FinTenderBondAsset003Dto entity, OperationType operationType) {
-        return String.format("资产代码(%s) 资产简称(%s) 上市流通", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
-                StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr());
+        return String.format("新债标的资产简称(%s) 上市日(%s) 债券标的资产简称(%s)", entity.getFinprodAbbr(),
+                DateUtil.format(entity.getListingDate(), "yyyy-MM-dd"), entity.getAppearMarketAbbr());
     }
 
     @Override
     public void doInsert(FinTenderBondAsset003Dto entity, OperationType type) {
-        if(type == OperationType.REVOKE) return;
-        Map<String,String> param = new HashMap();
-        param.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
-        param.put("finprodMarketId",entity.getAppearMarketId());
+        if (OperationType.REVOKE == type) {
+            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "上市流通撤销原因：" + entity.getRevokeReason(), DictCodeListExt3.操作类型_上市流通撤销,entity.getWorkflowId());
+        } else {
+            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "", DictCodeListExt3.操作类型_上市流通,entity.getWorkflowId());
+        }
+        if (type == OperationType.REVOKE) return;
+        Map<String, String> param = new HashMap();
+        param.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
+        param.put("finprodMarketId", entity.getAppearMarketId());
         String finproductId = finTenderBoundAssetMapper.selectFinprodId(param);
-        if(StringUtil.isEmpty(finproductId)) {//执行加券
+        if (StringUtil.isEmpty(finproductId)) {//执行加券
             finBondMarketInfoQuery001Service.addCoupons(entity.getAppearMarketId());
         }
+    }
+
+    @Override
+    public void doDelete(String workflowId) {
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setWorkflowId(workflowId);
+        oprHisReq.setBusiDes("作废");
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
     @Override
@@ -121,12 +141,13 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 product.setFinprodId(dto.getFinprodId());
                 product.setCirculationCode(null);
                 product.setCirculationDate(null);
+                product.setRemark("上市流通撤销原因：" + dto.getRevokeReason());
                 finProductMapper.updateForTenderBound(product);
                 FinProductAdd productAdd = new FinProductAdd();
                 productAdd.setFinprodId(dto.getFinprodId());
                 productAdd.setIssueStatus(null);
                 finProductAddMapper.updateForTenderBound(productAdd);
-                if(dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日期和平台日相等的时候才会发撤销头寸
+                if (dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日期和平台日相等的时候才会发撤销头寸
                     try {
                         PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_上市流通.getValue(), DictCodeList.交易方向_上市流通.getValue());
                     } catch (PositionException e) {
@@ -135,7 +156,6 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                         throw new PositionException(e);
                     }
                 }
-                finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通撤销);
             }
         } else {
             FinProduct product1 = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
@@ -173,14 +193,13 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             productAdd.setFinprodId(dto.getFinprodId());
             productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
             finProductAddMapper.updateForTenderBound(productAdd);
-            finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通);
-            if(dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日和平台日相等时才发头寸
-                Map<String,String> params = new HashMap();
-                params.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
-                params.put("finprodMarketId",dto.getAppearMarketId());
+            if (dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日和平台日相等时才发头寸
+                Map<String, String> params = new HashMap();
+                params.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
+                params.put("finprodMarketId", dto.getAppearMarketId());
                 String finproductId = finTenderBoundAssetMapper.selectFinprodId(params);
                 //调用头寸
-                BaseMap param = BaseMap.newMap().put("userId", StringUtil.getOrElse(SecurityUtil.getLoginUser().getUserName(),"SYSTEM"))
+                BaseMap param = BaseMap.newMap().put("userId", StringUtil.getOrElse(SecurityUtil.getLoginUser().getUserName(), "SYSTEM"))
                         .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
                         .put("afterListingFinprodId", finproductId)
                         .put("beforeListingFinprodId", product.getFinprodId())
@@ -193,13 +212,13 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                         .put("ccy", product1.getCcy())
                         .put("balanceCheck", DictCodeList.是否_否.getValue())
                         .put("interfaceType", "Bond001")
-                        .put("tradePlace",product1.getTradeMarket())
-                        .put("decisionAct",DictCodeListExt3.系统动作_新建.getValue())
-                        .put("flowStatus","02")
-                        .put("isListingGenerate",DictCodeList.是否_是.getValue());
-                if(product1.getTradeMarket().equals(DictCodeListExt1.交易场所_银行间.getValue()) || product1.getTradeMarket().equals(DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
+                        .put("tradePlace", product1.getTradeMarket())
+                        .put("decisionAct", DictCodeListExt3.系统动作_新建.getValue())
+                        .put("flowStatus", "02")
+                        .put("isListingGenerate", DictCodeList.是否_是.getValue());
+                if (product1.getTradeMarket().equals(DictCodeListExt1.交易场所_银行间.getValue()) || product1.getTradeMarket().equals(DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
                     param.put("interfaceType", "Bond001");
-                }else {
+                } else {
                     param.put("interfaceType", "Bond002");
                 }
                 try {
@@ -223,7 +242,15 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
         return finTenderBoundAssetMapper.getByFinProductId(finprodId);
     }
 
-
+    /**
+     * 加券
+     *
+     * @param dto
+     * @return
+     */
+    public AjaxResult addCoupons(FinTenderBondAsset003Dto dto) {
+        return finBondMarketInfoQuery001Service.addCoupons(dto.getAppearMarketId());
+    }
 
     /**
      * 上市流通时校验是否可以自动加券
@@ -233,22 +260,30 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      */
     public FinBondAssetSaveRequest validAddCoupons(FinTenderBondAsset003Dto dto) {
         List<ValidMessage> validMessages = new ArrayList<>();
-        Map<String,String> param = new HashMap();
-        param.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
-        param.put("finprodMarketId",dto.getAppearMarketId());
+        Map<String, String> param = new HashMap();
+        param.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
+        param.put("finprodMarketId", dto.getAppearMarketId());
         String finproductId = finTenderBoundAssetMapper.selectFinprodId(param);
-        if(StringUtil.isEmpty(finproductId)) {
+        if (StringUtil.isEmpty(finproductId)) {
             FinBondAssetSaveRequest request = finBondAssetService.getInterfBondDto(dto.getAppearMarketId());
+            if (Objects.isNull(request)) {
+                request = new FinBondAssetSaveRequest();
+                request.setFinprodMarketId(dto.getAppearMarketId());
+                return request;
+            }
             if (StringUtil.isNotEmpty(dto)) {
                 request.setCreditFlag("");
                 request.setFinprodMarketId(dto.getAppearMarketId());
-                ValidUtils.valid(request,validMessages);
-                ValidUtils.valid(request.getFinProductConvertible(),validMessages);
-                ValidUtils.valid(request.getFinInterestFactorDto(),validMessages);
+                ValidUtils.valid(request, validMessages);
+                ValidUtils.valid(request.getFinProductConvertible(), validMessages);
+                ValidUtils.valid(request.getFinInterestFactorDto(), validMessages);
+                if (StringUtil.isEmpty(request.getType9()) || StringUtil.isEmpty(request.getType10()) && StringUtil.isEmpty(request.getType11())) {
+                    validMessages.add(new ValidMessage("资产类型不能为空"));
+                }
                 validMessages.addAll(finBondAssetValidatorService.valid(request));
-                if(CollectionUtils.isNotEmpty(validMessages)) {
+                if (CollectionUtils.isNotEmpty(validMessages)) {
                     return request;
-                }else {
+                } else {
                     return null;
                 }
             }
@@ -264,17 +299,17 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      */
     public List<ValidMessage> valid(FinTenderBondAsset003Dto dto) {
         List<ValidMessage> validMessages = new ArrayList<>();
-        if (StringUtil.isEmpty(dto.getWorkflowId()) && finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003","FinTenderBondAsset002")) {
+        if (StringUtil.isEmpty(dto.getWorkflowId()) && finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003", "FinTenderBondAsset002")) {
             validMessages.add(new ValidMessage("存在流程中的数据"));
         }
-        if(StringUtil.isEmpty(dto.getOperateType())) {
+        if (StringUtil.isEmpty(dto.getOperateType())) {
             validMessages.add(new ValidMessage("操作类型不能为空"));
         }
-        if(StringUtil.isEmpty(dto.getIssueStage())) {
+        if (StringUtil.isEmpty(dto.getIssueStage())) {
             validMessages.add(new ValidMessage("发行阶段不能为空"));
         }
         if (StringUtil.equals(dto.getOperateType(), OperationType.REVOKE.name())) {
-            if(!(StringUtil.isNotEmpty(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(),DictCodeListExt1.发行状态_发行成功.getValue())
+            if (!(StringUtil.isNotEmpty(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(), DictCodeListExt1.发行状态_发行成功.getValue())
                     && StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已发行.getValue()))) {
                 if (StringUtil.isNotEmpty(dto.getListingDate()) && dto.getListingDate().compareTo(iPlatformDate.getSysDate()) < 0) {
                     validMessages.add(new ValidMessage("上市日小于平台日不允许撤销"));
@@ -283,7 +318,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     validMessages.add(new ValidMessage("发行阶段不为已上市的不能进行撤销"));
                 }
             }
-            Integer count = finTenderBoundAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),DictCodeList.是否_否.getValue());
+            Integer count = finTenderBoundAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(), DictCodeList.是否_否.getValue());
             if (Objects.nonNull(count) && count > 0) {
                 validMessages.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
@@ -295,9 +330,12 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 validMessages.add(new ValidMessage("发行阶段不为已发行的不能进行上市流通"));
             }
             if (Objects.nonNull(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(), DictCodeListExt1.发行状态_发行成功.getValue())) {
-                validMessages.add(new ValidMessage("发行状态为发行成功的不能再次进行上市流通"));
+                FinProduct product = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+                if(Objects.nonNull(product) && !StringUtil.isEmpty(product.getCirculationCode())) {
+                    validMessages.add(new ValidMessage("发行状态为发行成功的不能再次进行上市流通"));
+                }
             }
-            if(Objects.nonNull(dto.getIssueDate()) && Objects.nonNull(dto.getListingDate()) && dto.getListingDate().compareTo(dto.getIssueDate()) < 0) {
+            if (Objects.nonNull(dto.getIssueDate()) && Objects.nonNull(dto.getListingDate()) && dto.getListingDate().compareTo(dto.getIssueDate()) < 0) {
                 validMessages.add(new ValidMessage("上市日需大于等于发行日"));
             }
         }
