@@ -1,14 +1,13 @@
 package com.joyintech.tams.invest.common.position.dao;
 
-import java.util.List;
-
+import com.joyintech.tams.invest.common.position.dto.InterfPositionConfigDto;
 import org.springframework.stereotype.Repository;
 
-import com.joyintech.tams.invest.common.position.dto.InterfPositionConfigDto;
+import java.util.List;
 
 /**
  * 头寸接口配置Mapper
- * 
+ *
  * @author yflv
  * @version 1.0 2022年2月21日
  * @see InterfPositionConfigMapper
@@ -16,14 +15,21 @@ import com.joyintech.tams.invest.common.position.dto.InterfPositionConfigDto;
  */
 @Repository
 public interface InterfPositionConfigMapper {
-    
+
 
     /**
-               *查询头寸接口配置
-     * @param param
+     * 查询头寸接口配置
+     *
      * @return
      */
-	List<InterfPositionConfigDto> searchInterfPositionConfig();
-	List<InterfPositionConfigDto> searchInterfPositionConfigByWhere(InterfPositionConfigDto where);
-    
+    List<InterfPositionConfigDto> searchInterfPositionConfig();
+
+    /**
+     * 查询头寸接口配置
+     *
+     * @param where
+     * @return
+     */
+    List<InterfPositionConfigDto> searchInterfPositionConfigByWhere(InterfPositionConfigDto where);
+
 }
