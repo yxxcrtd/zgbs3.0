@@ -54,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -435,6 +436,101 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         }
         if (CollectionUtils.isNotEmpty(handSumList)) {
             bidFirmSumDtoList.addAll(handSumList);
+        }
+        String sort = dto.getPageMode().getSort();
+        String direction = dto.getPageMode().getDirection();
+        return getSortByBidFirmList(bidFirmSumDtoList, sort, direction);
+    }
+
+    /**
+     * 对汇总数据进行排序
+     * @param bidFirmSumDtoList
+     * @param sort
+     * @param direction
+     * @return
+     */
+    private List<CfetsTrdFirstBidFirmEntrustDto> getSortByBidFirmList(List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoList, String sort, String direction) {
+        if (StringUtil.isEmpty(sort)) {
+            return bidFirmSumDtoList;
+        }
+        if ("entrustStatus".equals(sort)) {
+            if("desc".equals(direction)) {
+               return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getEntrustStatus).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getEntrustStatus)).collect(Collectors.toList());
+            }
+        }
+
+        if ("firstBidStatus".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFirstBidStatus).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFirstBidStatus)).collect(Collectors.toList());
+            }
+        }
+
+        if ("finprodMarketId".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFinprodMarketId).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFinprodMarketId)).collect(Collectors.toList());
+            }
+        }
+
+        if ("finprodAbbr".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFinprodAbbr).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFinprodAbbr)).collect(Collectors.toList());
+            }
+        }
+
+        if ("tenderTarget".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getTenderTarget).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getTenderTarget)).collect(Collectors.toList());
+            }
+        }
+
+        if ("portfolioId".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getPortfolioId).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getPortfolioId)).collect(Collectors.toList());
+            }
+        }
+
+        if ("portfolioName".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getPortfolioName).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getPortfolioName)).collect(Collectors.toList());
+            }
+        }
+
+        if ("tradeMarket".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getTradeMarket).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getTradeMarket)).collect(Collectors.toList());
+            }
+        }
+
+        if ("invManagerName".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getInvManagerName).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getInvManagerName)).collect(Collectors.toList());
+            }
+        }
+
+        if ("counterName".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getCounterName).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getCounterName)).collect(Collectors.toList());
+            }
         }
 
         return bidFirmSumDtoList;

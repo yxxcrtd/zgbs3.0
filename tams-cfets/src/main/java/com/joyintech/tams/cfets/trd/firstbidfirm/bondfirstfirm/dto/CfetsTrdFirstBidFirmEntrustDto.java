@@ -317,9 +317,7 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     }
 
     public String getIssueDateStr() {
-        if (null != this.getIssueDateStart() && StringUtil.equals(DictCodeListExt4.新债_发行方式_招标发行.getValue(), getIssueClass()) &&
-                (StringUtil.equals(DictCodeListExt4.招标标的_价格.getValue(), getTenderTarget())
-                        || StringUtil.equals(DictCodeListExt4.招标标的_利率.getValue(), getTenderTarget()))) {
+        if (null == this.getIssueDateEnd() && null != this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart());
         }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
