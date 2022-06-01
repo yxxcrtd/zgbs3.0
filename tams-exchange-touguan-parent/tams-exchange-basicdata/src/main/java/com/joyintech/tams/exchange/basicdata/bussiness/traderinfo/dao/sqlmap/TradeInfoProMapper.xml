@@ -197,4 +197,8 @@
           and mddi.TRADER_NO = #{traderNo}
     </select>
 
+    <select id="existsTraderSingle" resultType="java.lang.String">
+        select wm_concat(DEALER_NO) from MST_DEALER_INFO where  DEALER_NO = #{dealerNo}
+    </select>
+
 </mapper>

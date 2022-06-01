@@ -112,7 +112,7 @@ public class CfetsEtrIbRepoLibController extends BaseController{
         if (result != null && result.hasErrors()) {
             return new Message<AjaxResult>().fail().setData(commonCheck(result, null));
         }
-        cfetsIbRepoLibService.inSave(dto);
-        return new Message<AjaxResult>().success().setData(new AjaxResult("保存成功！"));
+        AjaxResult ajaxResult = cfetsIbRepoLibService.inSave(dto);
+        return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 }
