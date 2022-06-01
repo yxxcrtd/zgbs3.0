@@ -991,13 +991,16 @@ public class CfetsEtrDispatcherService extends BaseService {
 
         if (CollectionUtils.isNotEmpty(finprodIdListBid)) {
             for (String finprodId : finprodIdListBid) {
+                CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
+                dto.setFinprodId(finprodId);
+                CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
                 List<String> traders = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_已接收.getValue())
                         .stream().distinct().collect(Collectors.toList());
                 if (CollectionUtils.isNotEmpty(traders)) {
                     Collections.sort(traders);
                     Collections.sort(tradersList);
                     if (!traders.toString().equals(tradersList.toString())) {
-                        errorList.add(new ValidMessage("同一投标日的债券[" + finprodId + "]一级投标已有交易员接收，必须分给交易员" + traders.toString()));
+                        errorList.add(new ValidMessage("同一投标日的债券[" + finProductInfo.getFinprodMarketId() + "]一级投标已有交易员接收，必须分给交易员" + traders.toString()));
                     }
                 }
             }
