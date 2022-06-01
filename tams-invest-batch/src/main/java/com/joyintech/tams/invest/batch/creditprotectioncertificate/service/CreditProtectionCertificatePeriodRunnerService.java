@@ -4,6 +4,7 @@ import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -14,10 +15,12 @@ import com.joyintech.tams.invest.batch.creditprotectioncertificate.dao.CreditPro
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodWriterDto;
 import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
+import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
 import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
-import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -39,6 +42,8 @@ import static com.joyintech.tams.invest.common.position.constant.PositionCommonC
 @Service
 @Scope("prototype")
 public class CreditProtectionCertificatePeriodRunnerService {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private CreditProtectionCertificatePeriodRunnerMapper creditProtectionCertificatePeriodRunnerMapper;
@@ -73,136 +78,158 @@ public class CreditProtectionCertificatePeriodRunnerService {
     @Autowired
     private EtrSecPositionFlowMapper etrSecPositionFlowMapper;
 
+    @Autowired
+    private BaseGetBussinessId baseGetBussinessId;
+
 
     public void dealExpireData(CreditProtectionCertificatePeriodWriterDto writerDto) {
+        try {
 
-        List<CreditProtectionCertificatePeriodExpireDataDto> expireDatas = writerDto.getExpireDatas();
+            List<CreditProtectionCertificatePeriodExpireDataDto> expireDatas = writerDto.getExpireDatas();
 
-        //汇总交易编号
-        String businessCode = generateBusinessCode();
-        writerDto.setBussinessCode(businessCode);
+            //汇总交易编号
+            String businessCode = generateBusinessCode();
+            writerDto.setBussinessCode(businessCode);
 
-        //平台日
-        Date platDate = iPlatformDate.getSysDate();
+            //平台日
+            Date platDate = iPlatformDate.getSysDate();
 
-        String calendarId;
+            String calendarId;
 
-        if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(expireDatas.get(0).getTradeMarket())) {
-            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SHJYS_CALID");
-        } else {
-            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
+            if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(expireDatas.get(0).getTradeMarket())) {
+                calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SHJYS_CALID");
+            } else {
+                calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
+            }
+            // 下一个交易日
+            Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
+            BigDecimal amount = BigDecimal.ZERO;
+
+            for (CreditProtectionCertificatePeriodExpireDataDto expireData : expireDatas) {
+                String businessCodeForDetail = generateBusinessCode();
+                expireData.setTradeId(businessCodeForDetail);
+                amount = amount.add(expireData.getRepNomCapi());
+                //处理明细数据
+                TrdProductDeal trdProductDeal = new TrdProductDeal();
+                TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
+                PtlTrade ptlTrade = new PtlTrade();
+
+                trdProductDeal.setTradeId(businessCodeForDetail);
+                trdProductDeal.setFinprodId(writerDto.getFinprodId());
+                trdProductDeal.setFinprodType(DictCodeListExt1.金融产品类型_信用保护凭证.getValue());
+                trdProductDeal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+                trdProductDeal.setBranch(0L);
+                trdProductDeal.setTradeDate(platDate);
+                trdProductDeal.setVdate(expireData.getVdate());
+                trdProductDeal.setMdate(expireData.getMdate());
+                trdProductDeal.setSettleDate(nextWorkDate);
+                trdProductDeal.setShareAmt(expireData.getRepNomCapi());
+                trdProductDeal.setTradeAmt(BigDecimal.ZERO);
+                trdProductDeal.setPs(DictCodeList.交易方向_到期.getValue());
+                trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
+                trdProductDeal.setIsCancel(DictCodeListExt1.是否_否.getValue());
+                trdProductDeal.setTotleTradeId(businessCode);
+                trdProductDeal.setTradeMarket(expireData.getTradeMarket());
+                trdProductDeal.setSecManageAcctId(expireData.getSecAcctId());
+                trdProductDeal.setTgBusiType(DictCodeListExt1.平安业务类型_到期.getValue());
+                trdProductDeal.setCreateUser("SYSTEM");
+                trdProductDeal.setCreateTime(platDate);
+                trdProductDeal.setUpdateTime(DateUtil.now());
+                trdProductDeal.setUpdateUser("SYSTEM");
+                trdProductDeal.setCreateDept("dept");
+
+                trdProductDealAdd.setTradeId(businessCodeForDetail);
+                trdProductDealAdd.setPortfolioId(expireData.getPortfolioId());
+                trdProductDealAdd.setCreateUser("SYSTEM");
+                trdProductDealAdd.setCreateTime(platDate);
+                trdProductDealAdd.setUpdateTime(DateUtil.now());
+                trdProductDealAdd.setUpdateUser("SYSTEM");
+                trdProductDealAdd.setCreateDept("dept");
+
+
+                ptlTrade.setPortfolioId(expireData.getPortfolioId());
+                ptlTrade.setBusiNo(businessCodeForDetail);
+                ptlTrade.setBusiId(businessCodeForDetail);
+                ptlTrade.setBusiTable("02");
+                ptlTrade.setSettleDate(nextWorkDate);
+                ptlTrade.setBusiType(trdProductDeal.getBusiType());
+                ptlTrade.setSecManageAcctId(expireData.getSecAcctId());
+                ptlTrade.setCreateUser("SYSTEM");
+                ptlTrade.setCreateTime(platDate);
+                ptlTrade.setUpdateTime(DateUtil.now());
+                ptlTrade.setUpdateUser("SYSTEM");
+                ptlTrade.setCreateDept("dept");
+
+                trdProductDealMapper.insertSelective(trdProductDeal);
+                trdProductDealAddMapper.insertSelective(trdProductDealAdd);
+                ptlTradeMapper.insertSelective(ptlTrade);
+            }
+
+            //汇总数据
+            TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
+            TrdDealTotalAdd trdDealTotalAdd = new TrdDealTotalAdd();
+
+            trdFinProductDealTotal.setBusiType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
+            trdFinProductDealTotal.setTotleTradeId(businessCode);
+            trdFinProductDealTotal.setFinprodId(writerDto.getFinprodId());
+            trdFinProductDealTotal.setFinprodType(DictCodeListExt1.金融产品类型_信用保护凭证.getValue());
+            trdFinProductDealTotal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+            trdFinProductDealTotal.setTradeDate(platDate);
+            trdFinProductDealTotal.setMdate(expireDatas.get(0).getMdate());
+            trdFinProductDealTotal.setVdate(expireDatas.get(0).getVdate());
+            trdFinProductDealTotal.setSettleDate(nextWorkDate);
+            trdFinProductDealTotal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            trdFinProductDealTotal.setTradeAmt(BigDecimal.ZERO);
+            trdFinProductDealTotal.setPs(DictCodeList.交易方向_到期.getValue());
+            trdFinProductDealTotal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
+            trdFinProductDealTotal.setIsCancel(DictCodeListExt1.是否_否.getValue());
+            trdFinProductDealTotal.setTradeMarket(expireDatas.get(0).getTradeMarket());
+            trdFinProductDealTotal.setCreateUser("SYSTEM");
+            trdFinProductDealTotal.setCreateTime(platDate);
+            trdFinProductDealTotal.setUpdateTime(DateUtil.now());
+            trdFinProductDealTotal.setUpdateUser("SYSTEM");
+            trdFinProductDealTotal.setCreateDept("dept");
+            trdFinProductDealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_到期.getValue());
+            trdFinProductDealTotal.setShareAmt(amount);
+
+            trdDealTotalAdd.setTotleTradeId(businessCode);
+            trdDealTotalAdd.setCreateUser("SYSTEM");
+            trdDealTotalAdd.setCreateTime(platDate);
+            trdDealTotalAdd.setUpdateTime(DateUtil.now());
+            trdDealTotalAdd.setUpdateUser("SYSTEM");
+            trdDealTotalAdd.setCreateDept("dept");
+
+            trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
+            trdDealTotalAddMapper.insertSelective(trdDealTotalAdd);
+
+            sendNewPosition(writerDto);
+            dealOldPosition(writerDto, nextWorkDate, false);
+        } catch (Exception e) {
+            logger.error("信用保护凭证自动生成错误", e);
+            throw e;
         }
-        // 下一个交易日
-        Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
-        BigDecimal amount = BigDecimal.ZERO;
-
-        for (CreditProtectionCertificatePeriodExpireDataDto expireData : expireDatas) {
-            String businessCodeForDetail = generateBusinessCode();
-            expireData.setTradeId(businessCodeForDetail);
-            amount = amount.add(expireData.getRepNomCapi());
-            //处理明细数据
-            TrdProductDeal trdProductDeal = new TrdProductDeal();
-            TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
-            PtlTrade ptlTrade = new PtlTrade();
-
-            trdProductDeal.setTradeId(businessCodeForDetail);
-            trdProductDeal.setFinprodId(writerDto.getFinprodId());
-            trdProductDeal.setFinprodType(DictCodeListExt1.金融产品类型_信用保护凭证.getValue());
-            trdProductDeal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
-            trdProductDeal.setBranch(0L);
-            trdProductDeal.setTradeDate(platDate);
-            trdProductDeal.setVdate(expireData.getVdate());
-            trdProductDeal.setMdate(expireData.getMdate());
-            trdProductDeal.setSettleDate(nextWorkDate);
-            trdProductDeal.setShareAmt(expireData.getRepNomCapi());
-            trdProductDeal.setTradeAmt(BigDecimal.ZERO);
-            trdProductDeal.setPs(DictCodeList.交易方向_到期.getValue());
-            trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
-            trdProductDeal.setIsCancel(DictCodeListExt1.是否_否.getValue());
-            trdProductDeal.setTotleTradeId(businessCode);
-            trdProductDeal.setTradeMarket(expireData.getTradeMarket());
-            trdProductDeal.setSecManageAcctId(expireData.getSecAcctId());
-            trdProductDeal.setTgBusiType(DictCodeListExt1.平安业务类型_到期.getValue());
-            trdProductDeal.setCreateUser("SYSTEM");
-            trdProductDeal.setCreateTime(platDate);
-            trdProductDeal.setUpdateTime(DateUtil.now());
-            trdProductDeal.setUpdateUser("SYSTEM");
-            trdProductDeal.setCreateDept("dept");
-
-            trdProductDealAdd.setTradeId(businessCodeForDetail);
-            trdProductDealAdd.setPortfolioId(expireData.getPortfolioId());
-            trdProductDealAdd.setCreateUser("SYSTEM");
-            trdProductDealAdd.setCreateTime(platDate);
-            trdProductDealAdd.setUpdateTime(DateUtil.now());
-            trdProductDealAdd.setUpdateUser("SYSTEM");
-            trdProductDealAdd.setCreateDept("dept");
-
-
-            ptlTrade.setPortfolioId(expireData.getPortfolioId());
-            ptlTrade.setBusiNo(businessCodeForDetail);
-            ptlTrade.setBusiId(businessCodeForDetail);
-            ptlTrade.setBusiTable("02");
-            ptlTrade.setSettleDate(nextWorkDate);
-            ptlTrade.setBusiType(trdProductDeal.getBusiType());
-            ptlTrade.setSecManageAcctId(expireData.getSecAcctId());
-            ptlTrade.setCreateUser("SYSTEM");
-            ptlTrade.setCreateTime(platDate);
-            ptlTrade.setUpdateTime(DateUtil.now());
-            ptlTrade.setUpdateUser("SYSTEM");
-            ptlTrade.setCreateDept("dept");
-
-            trdProductDealMapper.insertSelective(trdProductDeal);
-            trdProductDealAddMapper.insertSelective(trdProductDealAdd);
-            ptlTradeMapper.insertSelective(ptlTrade);
-        }
-
-        //汇总数据
-        TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
-        TrdDealTotalAdd trdDealTotalAdd = new TrdDealTotalAdd();
-
-        trdFinProductDealTotal.setTotleTradeId(businessCode);
-        trdFinProductDealTotal.setFinprodId(writerDto.getFinprodId());
-        trdFinProductDealTotal.setFinprodType(DictCodeListExt1.金融产品类型_信用保护凭证.getValue());
-        trdFinProductDealTotal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
-        trdFinProductDealTotal.setTradeDate(platDate);
-        trdFinProductDealTotal.setMdate(expireDatas.get(0).getMdate());
-        trdFinProductDealTotal.setVdate(expireDatas.get(0).getVdate());
-        trdFinProductDealTotal.setSettleDate(nextWorkDate);
-        trdFinProductDealTotal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
-        trdFinProductDealTotal.setTradeAmt(BigDecimal.ZERO);
-        trdFinProductDealTotal.setPs(DictCodeList.交易方向_到期.getValue());
-        trdFinProductDealTotal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
-        trdFinProductDealTotal.setIsCancel(DictCodeListExt1.是否_否.getValue());
-        trdFinProductDealTotal.setTradeMarket(expireDatas.get(0).getTradeMarket());
-        trdFinProductDealTotal.setCreateUser("SYSTEM");
-        trdFinProductDealTotal.setCreateTime(platDate);
-        trdFinProductDealTotal.setUpdateTime(DateUtil.now());
-        trdFinProductDealTotal.setUpdateUser("SYSTEM");
-        trdFinProductDealTotal.setCreateDept("dept");
-        trdFinProductDealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_到期.getValue());
-        trdFinProductDealTotal.setShareAmt(amount);
-
-        trdDealTotalAdd.setTotleTradeId(businessCode);
-        trdDealTotalAdd.setCreateUser("SYSTEM");
-        trdDealTotalAdd.setCreateTime(platDate);
-        trdDealTotalAdd.setUpdateTime(DateUtil.now());
-        trdDealTotalAdd.setUpdateUser("SYSTEM");
-        trdDealTotalAdd.setCreateDept("dept");
-
-        trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
-        trdDealTotalAddMapper.insertSelective(trdDealTotalAdd);
-
-        sendNewPosition(writerDto);
-        dealOldPosition(writerDto, nextWorkDate, false);
     }
 
     private String generateBusinessCode() {
         BussinessCodeParameter parameter = new BussinessCodeParameter();
         parameter.setCommonBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期);
         // 生成的业务编号
-        return restTemplate.postForObject(
-                ServiceApplication.COMMON_SERVICE_NAME + "/core/selectRule", parameter,
-                String.class);
+        if (null != baseGetBussinessId) {
+            if (null != parameter.getCommonBusinessExtType() && !parameter.getCommonBusinessExtType().isEmpty()) {
+                if (StringUtil.isNotEmpty(parameter.getCommonBusinessType())) {
+                    parameter.getCommonBusinessType().setCodeName(
+                            parameter.getCommonBusinessExtType().get("codeName").toString());
+                    parameter.getCommonBusinessType().setValue(parameter.getCommonBusinessExtType().get("value").toString());
+                } else {
+                    DictCodeList dictCodeList = DictCodeList.枚举LIST_EXT转换LIST;
+                    dictCodeList.setCodeName(parameter.getCommonBusinessExtType().get("codeName").toString());
+                    dictCodeList.setValue(parameter.getCommonBusinessExtType().get("value").toString());
+                    parameter.setCommonBusinessType(dictCodeList);
+                }
+            }
+            return baseGetBussinessId.buildBussinessCode(parameter);
+        }
+        return IDGenerator.generate();
     }
 
     /**
@@ -329,7 +356,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptl.put("portfolioId", expireDataDto.getPortfolioId());
             ptl.put("finprodId", expireDataDto.getFinprodId());
             ptl.put("tradeId", expireDataDto.getTradeId());
-//            ptl.put("cashAcctId",baseBussinessDto.getTrdProductDeal())
+            ptl.put("cashAcctId",expireDataDto.getAcctNo());
             ptl.put("secAcctId", expireDataDto.getSecAcctId());
             ptl.put("secAmount", expireDataDto.getRepNomCapi());
             ptl.put("cashAmount", BigDecimal.ZERO);

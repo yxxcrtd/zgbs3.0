@@ -40,28 +40,37 @@
     </select>
     <select id="selectExpireDataForNew"
             resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
-        SELECT R.PORTFOLIO_ID portfolioId,
-               R.FINPROD_ID   finprodId,
-               R.AMOUNT       repNomCapi,
-               R.SEC_ACCT_ID  secAcctId,
-               F.MDATE        mdate,
-               F.VDATE        vdate
+        SELECT R.PORTFOLIO_ID   portfolioId,
+               R.FINPROD_ID     finprodId,
+               R.AMOUNT         repNomCapi,
+               R.SEC_ACCT_ID    secAcctId,
+               F.MDATE          mdate,
+               F.VDATE          vdate,
+               F.TRADE_MARKET   tradeMarket,
+               sci.BUSI_ACCT_NO acctNo
         FROM PTL_SEC_POSITION_RULE R
                  LEFT JOIN FIN_PRODUCT F ON R.FINPROD_ID = F.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = R.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.REC_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on R.PORTFOLIO_ID = pp.PORTFOLIO_ID
         WHERE R.FINPROD_ID = #{finprodId}
           AND R.CDATE = #{executeDate}
     </select>
     <select id="selectExpireDataForOld"
             resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
-        SELECT R.PORTFOLIO_ID portfolioId,
-               R.FINPROD_ID   finprodId,
-               R.AMOUNT       repNomCapi,
-               R.SEC_ACCT_ID  secAcctId,
-               F.MDATE        mdate,
-               F.VDATE        vdate,
-               F.TRADE_MARKET
+        SELECT R.PORTFOLIO_ID   portfolioId,
+               R.FINPROD_ID     finprodId,
+               R.AMOUNT         repNomCapi,
+               R.SEC_ACCT_ID    secAcctId,
+               F.MDATE          mdate,
+               F.VDATE          vdate,
+               F.TRADE_MARKET   tradeMarket,
+               sci.BUSI_ACCT_NO acctNo
         FROM PTL_SEC_POSITION R
                  LEFT JOIN FIN_PRODUCT F ON R.FINPROD_ID = F.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = R.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.REC_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on R.PORTFOLIO_ID = pp.PORTFOLIO_ID
         WHERE R.FINPROD_ID = #{finprodId}
           AND R.CDATE = #{executeDate}
     </select>

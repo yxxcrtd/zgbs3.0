@@ -27,6 +27,16 @@ public class CreditProtectionCertificatePeriodExpireDataDto {
 
     private String tradeMarket;
 
+    private String acctNo;
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
     public String getTradeId() {
         return tradeId;
     }
