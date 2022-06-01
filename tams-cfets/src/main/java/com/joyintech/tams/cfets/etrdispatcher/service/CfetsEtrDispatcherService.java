@@ -277,6 +277,10 @@ public class CfetsEtrDispatcherService extends BaseService {
         pageParam.put("busiTypePosition05", DictCodeListExt3.头寸业务类型_质押式回购首期.getValue());
         pageParam.put("busiTypePosition35", DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
 
+        pageParam.put("PRICE_MODEL_PRM03", DictCodeListExt2.价格模式_市价指令.getValue());
+        pageParam.put("PRICE_CLASS_01", DictCodeListExt3.计价方式_净价.getValue());
+        pageParam.put("PRICE_CLASS_02", DictCodeListExt3.计价方式_全价.getValue());
+
         List<String> listTemp = Arrays.asList(dto.getEntrustStatus());
         if (!listTemp.contains("all")) {
             pageParam.put("entrustStatusList", listTemp);
