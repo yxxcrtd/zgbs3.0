@@ -619,8 +619,7 @@ public class PortfolioManager extends BaseService {
         BigDecimal adjustedPrice = entrustPrice;
         // 市价订单
         // 如果是市价指令+限价订单时，委托价格不为0
-        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)
-                && !EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
+        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)) {
 //            adjustedPrice = this.getMarketPrice(tick, entrustBs);
             adjustedPrice = lastPrice;
         }
@@ -668,17 +667,13 @@ public class PortfolioManager extends BaseService {
             //卖出 取指令最高价； 不得小于跌停价；
             //注意：买入价格向上调/卖出价格向下调     给出提示“委托价格必须优于所有指令价格”且自动调回
             if (EntrustBs.isBuy(entrustBs)) {
-                BigDecimal min = tempList.stream()
-                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
-                        .map(o -> {
-                            if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
-                                return o.getFullPrice();
-                            } else {
-                                return o.getEntrustPrice();
-                            }
-                        })
-                        .min(Comparator.naturalOrder())
-                        .orElse(BigDecimal.ZERO);
+                BigDecimal min = tempList.stream().filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value)).map(o -> {
+                    if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
+                        return o.getFullPrice();
+                    } else {
+                        return o.getEntrustPrice();
+                    }
+                }).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
                 if (min.compareTo(upperLimitPrice) > 0) {
                     adjustedPrice = upperLimitPrice;
                 } else {
@@ -690,17 +685,13 @@ public class PortfolioManager extends BaseService {
                     adjustedPrice = entrustPrice;
                 }
             } else {
-                BigDecimal max = tempList.stream()
-                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
-                        .map(o -> {
-                            if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
-                                return o.getFullPrice();
-                            } else {
-                                return o.getEntrustPrice();
-                            }
-                        })
-                        .max(Comparator.naturalOrder())
-                        .orElse(BigDecimal.ZERO);
+                BigDecimal max = tempList.stream().filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value)).map(o -> {
+                    if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
+                        return o.getFullPrice();
+                    } else {
+                        return o.getEntrustPrice();
+                    }
+                }).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
                 if (max.compareTo(lowerLimitPrice) < 0) {
                     adjustedPrice = lowerLimitPrice;
                 } else {
@@ -1047,8 +1038,7 @@ public class PortfolioManager extends BaseService {
 //        return list;
 //    }
 
-    private List<FairPortfolioResponse> getFairInstructionList(List<PortfolioInstructionContextDto> fairList,
-                                                               PortfolioAllocationResponse result, OrderPlaceBean bean) {
+    private List<FairPortfolioResponse> getFairInstructionList(List<PortfolioInstructionContextDto> fairList, PortfolioAllocationResponse result, OrderPlaceBean bean) {
         List<FairPortfolioResponse> list = new ArrayList<>();
 
         long sumEntrustVolume = 0;
@@ -1549,6 +1539,7 @@ public class PortfolioManager extends BaseService {
         log.info("checkFairOrder() called with parameters => 【bean = {}】", bean);
         OrderPlaceBean orderPlaceBean = new OrderPlaceBean();
         BeanUtils.copyProperties(bean, orderPlaceBean);
+
         // 方法返回
         PortfolioAllocationResponse result = new PortfolioAllocationResponse();
 
@@ -1561,21 +1552,6 @@ public class PortfolioManager extends BaseService {
             result.setInfoDetails(ErrorCode.getStr(ErrorCode.INSTRUCTIONS_NOT_EXIST));
             return ResultBean.success(result);
         }
-
-        // 过滤公平相关指令
-        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
-        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
-        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
-        log.info("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
-
-        List<FairPortfolioResponse> list = Lists.newArrayList();
-        simpleFiltingList.forEach(o -> {
-            FairPortfolioResponse response = new FairPortfolioResponse();
-            BeanUtils.copyProperties(o, response);
-
-            list.add(response);
-        });
-        result.setList(list);
 
         // 判断进入公平交易
         if (!EntrustUtils.isFairOrder(orderPlaceBean, instruction)) {
@@ -1595,23 +1571,63 @@ public class PortfolioManager extends BaseService {
                 return ResultBean.success(result);
             }
         }
+        // 获取公平交易相关指令
+        TickBean tick = (TickBean) tickBean.getData();
+        // 获取委托价格
+        BigDecimal entrustPrice;
+        if (StringUtil.isNotEmpty(instruction.getIsNetPrice()) && StringUtil.equals(instruction.getIsNetPrice(), "N")) {
+            entrustPrice = bean.getFullPrice();
+        } else {
+            entrustPrice = bean.getEntrustPrice();
+        }
+        // 最新价
+        BigDecimal lastPrice = TradeUtils.getBigDecimal(tick.getLastPrice(), 4);
+        // 如果是市价指令+限价订单时，委托价格不为0
+        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)) {
+            entrustPrice = lastPrice;
+        }
+
+        //当前指令剩余量
+        long num;
+        if (EntrustUtils.isVolume(instruction)) {
+            num = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
+        } else {
+            BigDecimal amt = TradeUtils.subtract(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), 2);
+            num = TradeUtils.divide(amt, entrustPrice, 2).longValue();
+        }
+        if (num <= 0) {
+            log.error("指令剩余数量不足: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails("指令剩余数量不足");
+            return ResultBean.success(result);
+        }
+
+        // 过滤公平相关指令
+        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
+        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
+        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+        log.info("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
+        if (CollectionUtils.isEmpty(simpleFiltingList) && simpleFiltingList.size() < 2) {
+            log.error("不满足公平交易: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails("不满足公平交易");
+            return ResultBean.success(result);
+        }
 
         // 系统参数：未接收指令的公平处理模式 01：是；02：否
         if (EntrustUtils.isfairModeWithUnacceptInstructionForbid()) {
             List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.WAIT_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), instruction.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
             if (waitReceiveList.size() > 0) {
                 log.error("未接收且影响公平交易的相关指令: {}", JsonUtils.getJsonFromObject(waitReceiveList));
-                result.setInfoLevel("1");
+                result.setInfoLevel("2");
                 result.setInfoDetails(ErrorCode.getStr(ErrorCode.FAIR_INSTRUCTIONS_UNACCEPT_ERROR));
                 return ResultBean.success(result);
             }
         }
 
-        // 获取公平交易相关指令
-        TickBean tick = (TickBean) tickBean.getData();
         Long fairTotalLeftVolume = getFairTotalLeftVolume(orderPlaceBean, instruction, tick);
         result.setTotalLeftVolume(fairTotalLeftVolume);
-
+        result.setInfoLevel("0");
         return ResultBean.success(result);
 
     }
@@ -1643,8 +1659,7 @@ public class PortfolioManager extends BaseService {
         BigDecimal adjustedPrice = entrustPrice;
         // 市价订单
         // 如果是市价指令+限价订单时，委托价格不为0
-        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)
-                && !EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
+        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)) {
             adjustedPrice = lastPrice;
         }
 
@@ -1666,17 +1681,13 @@ public class PortfolioManager extends BaseService {
         // 系统参数：委托价格不优于指令价格时的处理模式:01-禁止
         if (EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid() || TradeUtils.isZero(entrustPrice)) {
             if (EntrustBs.isBuy(entrustBs)) {
-                BigDecimal min = tempList.stream()
-                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
-                        .map(o -> {
-                            if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
-                                return o.getFullPrice();
-                            } else {
-                                return o.getEntrustPrice();
-                            }
-                        })
-                        .min(Comparator.naturalOrder())
-                        .orElse(BigDecimal.ZERO);
+                BigDecimal min = tempList.stream().filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value)).map(o -> {
+                    if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
+                        return o.getFullPrice();
+                    } else {
+                        return o.getEntrustPrice();
+                    }
+                }).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
                 if (min.compareTo(upperLimitPrice) > 0) {
                     adjustedPrice = upperLimitPrice;
                 } else {
@@ -1688,17 +1699,13 @@ public class PortfolioManager extends BaseService {
                     adjustedPrice = entrustPrice;
                 }
             } else {
-                BigDecimal max = tempList.stream()
-                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
-                        .map(o -> {
-                            if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
-                                return o.getFullPrice();
-                            } else {
-                                return o.getEntrustPrice();
-                            }
-                        })
-                        .max(Comparator.naturalOrder())
-                        .orElse(BigDecimal.ZERO);
+                BigDecimal max = tempList.stream().filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value)).map(o -> {
+                    if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
+                        return o.getFullPrice();
+                    } else {
+                        return o.getEntrustPrice();
+                    }
+                }).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
                 if (max.compareTo(lowerLimitPrice) < 0) {
                     adjustedPrice = lowerLimitPrice;
                 } else {
