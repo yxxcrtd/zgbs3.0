@@ -229,6 +229,11 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             String totalTradeId = null;
             List<InfContractPortfolioDetail> details = trdCommonBaseService.getInfContractPortfolioDetails(infContractDetailfile.getSeqno());
             if(!CollectionUtils.isEmpty(details)){
+                // modify by etliu 20220601 start
+                // 3.0.6场内 ZGCPCN-1085: 【手工交收管理】多组合场内现券下单成交回报后，手工交收管理查询展示的数据重复了
+                int dataIndex = 0;
+                // modify by etliu 20220601 end
+
                 for(InfContractPortfolioDetail detail : details){
                     TrdTempDto trdTempDto = new TrdTempDto();
                     trdTempDto.setTotleTradeId(totalTradeId);
@@ -236,7 +241,13 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                     infContractDetailfile.setPortfolioId(detail.getPortfolioId());
                     infContractDetailfile.setShareAmt(detail.getShareAmt());
                     infContractDetailfile.setTradeAmt(detail.getTradeAmt());
-                    handleTradeInfo(trdTempDto, infContractDetailfile);
+
+                    // modify by etliu 20220601 start
+                    // 3.0.6场内 ZGCPCN-1085: 【手工交收管理】多组合场内现券下单成交回报后，手工交收管理查询展示的数据重复了
+//                    handleTradeInfo(trdTempDto, infContractDetailfile);
+                    handleTradeInfo(trdTempDto, infContractDetailfile, dataIndex++);
+                    // modify by etliu 20220601 end
+
                     totalTradeId = trdTempDto.getTotleTradeId();
                     trdTempDtoList.add(trdTempDto);
                 }
@@ -245,7 +256,12 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         else{
             TrdTempDto trdTempDto = new TrdTempDto();
             trdTempDtoList.add(trdTempDto);
-            handleTradeInfo(trdTempDto, infContractDetailfile);
+
+            // modify by etliu 20220601 start
+            // 3.0.6场内 ZGCPCN-1085: 【手工交收管理】多组合场内现券下单成交回报后，手工交收管理查询展示的数据重复了
+//            handleTradeInfo(trdTempDto, infContractDetailfile);
+            handleTradeInfo(trdTempDto, infContractDetailfile, 0);
+            // modify by etliu 20220601 end
         }
         // 处理头寸
         positionRequestTradeReportService.sendTradeReportPositionRequest(trdTempDtoList);
@@ -258,7 +274,11 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
      * @param infContractDetailfile
      * @throws Exception
      */
-    private void handleTradeInfo(TrdTempDto trdTempDto,InfContractDetailfile infContractDetailfile) throws Exception{
+    // modify by etliu 20220601 start
+    // 3.0.6场内 ZGCPCN-1085: 【手工交收管理】多组合场内现券下单成交回报后，手工交收管理查询展示的数据重复了
+//    private void handleTradeInfo(TrdTempDto trdTempDto,InfContractDetailfile infContractDetailfile) throws Exception{
+    private void handleTradeInfo(TrdTempDto trdTempDto,InfContractDetailfile infContractDetailfile, int dataIndex) throws Exception{
+        // modify by etliu 20220601 end
         if(DictCodeListExt3.交易方向_质押券入库.getValue().equals(infContractDetailfile.getPs())
                 || DictCodeListExt3.交易方向_质押券出库.getValue().equals(infContractDetailfile.getPs())) {
             //标准券入出库成交数据接入：
@@ -349,19 +369,26 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 if (trdTempDto != null) {
                     logger.debug("【成交数据预清算数据】trdTempDto: {}, infContractDetailfile: {}", JSON.toJSONString(trdTempDto),
                             JSON.toJSONString(infContractDetailfile));
-                    // 手工交收判断 add by yufei 20201022 start
-                    if(StringUtil.isNotEmpty(infContractDetailfile.getSettleDay())
-                            && StringUtil.isNotEmpty(infContractDetailfile.getBusiType())){
-                        logger.info("【成交数据预清算手工交收处理-开始】tradePreClearing entrustId: {}, seqno: {}",
-                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
-                        trdTempDto.setIsManualSettle("Y");
-                        this.saveSettleInfo(infContractDetailfile,trdTempDto);
+                    // modify by etliu 20220601 start
+                    // 3.0.6场内 ZGCPCN-1085: 【手工交收管理】多组合场内现券下单成交回报后，手工交收管理查询展示的数据重复了
+                    if (dataIndex == 0) {
+                        // 手工交收判断 add by yufei 20201022 start
+                        if(StringUtil.isNotEmpty(infContractDetailfile.getSettleDay())
+                                && StringUtil.isNotEmpty(infContractDetailfile.getBusiType())){
+                            logger.info("【成交数据预清算手工交收处理-开始】tradePreClearing entrustId: {}, seqno: {}",
+                                    infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
-                        logger.info("【成交数据预清算手工交收处理-结束】tradePreClearing entrustId: {}, seqno: {}",
-                            infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                            trdTempDto.setIsManualSettle("Y");
+                            this.saveSettleInfo(infContractDetailfile,trdTempDto);
+
+                            logger.info("【成交数据预清算手工交收处理-结束】tradePreClearing entrustId: {}, seqno: {}",
+                                    infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
+                        }
+                        // 手工交收判断 add by yufei 20201022 end
                     }
-                    // 手工交收判断 add by yufei 20201022 end
+                    // modify by etliu 20220601 end
+
                     if(!DictCodeListExt3.平安资产类型_期货.getValue().equals(type8)){
                         logger.info("【成交数据预清算入库处理-开始】tradePreClearing entrustId: {}, seqno: {}",
                             infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
