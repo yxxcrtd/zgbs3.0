@@ -117,6 +117,11 @@ public class EtrPlanAssetC002Controller extends BaseController {
         else if (WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(entrustId)) {
             EtrPlanAssetCDto dto = etrPlanAssetCService.selectByKey(entrustId);
             if (dto.getEntrustAmt2() == null) {
+                //add wsz 20220601 修改指令金额显示错误 3.0.6场内 ZGCPCN-1036 start
+                if(dto.getEntrustAmt() == null&& dto.getPrice() != null && dto.getEntrustNum() != null){
+                    dto.setEntrustAmt(dto.getPrice().add(dto.getEntrustNum()));
+                }
+                //add wsz 20220601 修改指令金额显示错误 3.0.6场内 ZGCPCN-1036 end
                 dto.setEntrustAmt2(dto.getEntrustAmt());
             }
             if (dto.getEntrustNum2() == null) {

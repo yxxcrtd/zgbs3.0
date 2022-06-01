@@ -534,7 +534,7 @@
         on FP.FINPROD_ID = FPT.FINPROD_ID
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
-        AND FP.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37})<!--  债券 -->
+        AND FP.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F37})<!--  债券 -->
         <!--AND FPT.type_6 != #{type6_B14}  非可转债 -->
         <if test="portfolioIdList != null and portfolioIdList.size()>0">
             <foreach collection="portfolioIdList" open="AND TEMP.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
@@ -645,8 +645,8 @@
         from PTL_SEC_UNITCOST a
         LEFT JOIN FIN_PRODUCT b ON a.FINPROD_ID =b.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE c ON a.FINPROD_ID =c.FINPROD_ID
-        WHERE   (( b.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37})
-        AND b.TRADE_MARKET in(#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37}) )
+        WHERE   (( b.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37})
+        AND b.TRADE_MARKET in(#{FINPROD_TYPE_TG_F37}) )
         or (b.TRADE_MARKET in (#{SVR_TRADE_MARKET_03} ,#{SVR_TRADE_MARKET_04})))
         AND a.CDATE =#{cdate}
         <if test="portfolioIdList != null">

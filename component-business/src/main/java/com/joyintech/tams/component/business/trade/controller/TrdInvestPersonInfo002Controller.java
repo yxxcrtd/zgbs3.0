@@ -18,6 +18,7 @@ import com.joyintech.framework.util.RequestUtil;
 
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,6 +37,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 投资交易人员信息controller
@@ -100,6 +102,11 @@ public class TrdInvestPersonInfo002Controller extends BaseController {
                 model.addAttribute("innerTrade", Boolean.FALSE.toString());
             }
             // ZGZGST-2008: fuyongsheng 20210918 add end
+            //add  wsz 20220601 交易对手不显示问题修改 start 3.0.6场内 ZGCPCN-1007
+            if(Objects.equals("trdInvestPersonInfo002Dto",this.getParam("entityName"))){
+                model.addAttribute("innerTrade", Boolean.FALSE.toString());
+            }
+            //add  wsz 交易对手不显示问题修改end
         }
         HashMap<String, Object> param = new HashMap<>();
 //        model.addAttribute("COUNTER_ID_LIST",
