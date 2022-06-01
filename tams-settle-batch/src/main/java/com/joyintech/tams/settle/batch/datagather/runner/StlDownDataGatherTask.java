@@ -13,9 +13,11 @@ import com.joyintech.tams.settle.batch.datagather.dto.InvestTradeWriteDto;
 import com.joyintech.tams.settle.batch.datagather.listener.StlDataGatherJobListener;
 import com.joyintech.tams.settle.batch.datagather.processor.*;
 import com.joyintech.tams.settle.batch.datagather.processor.bond.*;
+import com.joyintech.tams.settle.batch.datagather.processor.credit.StlDataGatherCredit1Processor;
 import com.joyintech.tams.settle.batch.datagather.processor.repo.*;
 import com.joyintech.tams.settle.batch.datagather.reader.*;
 import com.joyintech.tams.settle.batch.datagather.reader.bond.*;
+import com.joyintech.tams.settle.batch.datagather.reader.credit.StlDataGatherCredit1Reader;
 import com.joyintech.tams.settle.batch.datagather.reader.repo.*;
 import com.joyintech.tams.settle.batch.datagather.writer.StlDataGatherWriter;
 import org.slf4j.Logger;
@@ -60,6 +62,15 @@ public class StlDownDataGatherTask extends BatchBaseService {
     private StlDataGatherBond7Reader stlDataGatherBond7Reader;
 
     @Autowired
+    private StlDataGatherBond8Reader stlDataGatherBond8Reader;
+
+    @Autowired
+    private StlDataGatherBond9Reader stlDataGatherBond9Reader;
+
+    @Autowired
+    private StlDataGatherCredit1Reader stlDataGatherCredit1Reader;
+
+    @Autowired
     private StlDataGatherBond1Processor stlDataGatherBond1Processor;
 
     @Autowired
@@ -76,6 +87,15 @@ public class StlDownDataGatherTask extends BatchBaseService {
 
     @Autowired
     private StlDataGatherBond7Processor stlDataGatherBond7Processor;
+
+    @Autowired
+    private StlDataGatherBond8Processor stlDataGatherBond8Processor;
+
+    @Autowired
+    private StlDataGatherBond9Processor stlDataGatherBond9Processor;
+
+    @Autowired
+    private StlDataGatherCredit1Processor stlDataGatherCredit1Processor;
 
     @Autowired
     private StlDataGatherFund1Reader stlDataGatherFund1Reader;
@@ -138,6 +158,9 @@ public class StlDownDataGatherTask extends BatchBaseService {
             .batch("shares1", stlDataGatherShares1Reader, stlDataGatherShares1Processor, stlDataGatherWriter)
             .batch("shares3", stlDataGatherShares3Reader, stlDataGatherShares3Processor, stlDataGatherWriter)
             .batch("bond7", stlDataGatherBond7Reader, stlDataGatherBond7Processor, stlDataGatherWriter)
+            .batch("bond8", stlDataGatherBond8Reader, stlDataGatherBond8Processor, stlDataGatherWriter)
+            .batch("bond9", stlDataGatherBond9Reader, stlDataGatherBond9Processor, stlDataGatherWriter)
+            .batch("credit1", stlDataGatherCredit1Reader, stlDataGatherCredit1Processor, stlDataGatherWriter)
             .buildFlow("债券买卖交易", "bond1")
             .buildFlow("可转债申购", "bond2")
             .buildFlow("可转债申购确认", "bond3")
@@ -149,10 +172,14 @@ public class StlDownDataGatherTask extends BatchBaseService {
             .buildFlow("股票新股中签交易", "shares1")
             .buildFlow("股票申购确认交易", "shares3")
             .buildFlow("债券股票上市流通", "bond7")
+            .buildFlow("债券一级投标_交收结果", "bond8")
+            .buildFlow("债券一级投标_交收通知", "bond9")
+            .buildFlow("信用保护凭证买入、卖出交易", "credit1")
             .parallelBuilder(this.getBatchTask().getBeanName() + StringUtil.SPACE + this.getBatchTask().getTaskId(),
                     stlDataGatherJobListener,
                     "债券买卖交易", "可转债申购", "可转债申购确认", "债转股", "配债", "基金买入、卖出、除权交易"
-                    , "债券质押式回购_首期", "债券质押式协议回购_逆回购_到期交易", "股票新股中签交易","股票申购确认交易", "债券股票上市流通")
+                    , "债券质押式回购_首期", "债券质押式协议回购_逆回购_到期交易", "股票新股中签交易","股票申购确认交易", "债券股票上市流通"
+                    ,"债券一级投标_交收结果", "债券一级投标_交收通知", "信用保护凭证买入、卖出交易")
             .run();
 
         return jobExecution;
