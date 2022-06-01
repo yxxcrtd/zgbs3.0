@@ -9,6 +9,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dao.MskCreditInfoProMapper;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProRequest;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest;
@@ -138,6 +139,7 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
 
     public Page<SelectOptionDto> getFinprodMarketInfo(MskCreditInfoProSaveRequest request) {
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
+        pageParam.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         return this.queryForPageForSelectReturn(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),() -> mskCreditInfoProMapper.getFinprodMarketInfo(pageParam));
     }
 }

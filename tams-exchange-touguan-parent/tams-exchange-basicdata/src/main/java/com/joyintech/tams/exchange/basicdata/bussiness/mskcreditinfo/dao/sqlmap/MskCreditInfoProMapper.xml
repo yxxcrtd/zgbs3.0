@@ -334,16 +334,25 @@
     </resultMap>
 
     <select id="getFinprodMarketInfo" resultMap="finprodIdMap">
-    SELECT
-    distinct
-    FIN.FINPROD_MARKET_ID AS id,
-    FIN.FINPROD_MARKET_ID object,
-    FIN.FINPROD_ABBR AS text
-    FROM
-    FIN_PRODUCT  FIN
-    LEFT JOIN
-        INTERF_CREDITINFO	i
-        ON	 i.SECID = FIN.FINPROD_ID
+        SELECT DISTINCT id,object,text from (
+        select
+        FIN.FINPROD_MARKET_ID AS id,
+        FIN.FINPROD_MARKET_ID object,
+        FIN.FINPROD_ABBR AS text
+        FROM
+        FIN_PRODUCT  FIN  where FINPROD_TYPE2=#{finprodType2}
+
+        union all
+        select
+        i.SECID AS id,
+        i.SECID object,
+        i.SECNAME AS text
+        from   INTERF_CREDITINFO	i ) t
+        <where>
+            <if test="search != null and !search.equals('')">
+                AND (t.id like concat('%',concat(#{search},'%')) OR t.text like concat('%',concat(#{search},'%')))
+            </if>
+        </where>
     </select>
 
     <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" >
