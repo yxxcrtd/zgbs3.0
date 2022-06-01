@@ -523,10 +523,10 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
                 }
 
                 if (CollectionUtils.isNotEmpty(counterIdList)) {
-                    bidFirmSum.setCounterId(StringUtil.join(counterIdList, ","));
+                    bidFirmSum.setCounterId(StringUtil.join(counterIdList.stream().distinct().collect(Collectors.toList()), ","));
                 }
                 if (CollectionUtils.isNotEmpty(counterNameList)) {
-                    bidFirmSum.setCounterName(StringUtil.join(counterNameList, ","));
+                    bidFirmSum.setCounterName(StringUtil.join(counterNameList.stream().distinct().collect(Collectors.toList()), ","));
                 }
 
 
