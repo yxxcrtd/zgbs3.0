@@ -500,13 +500,14 @@
                    WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN
                        '01'
                    ELSE NULL
-                   END AS                                   BASICSTYLE,
+                   END AS                                   basisStyle,
                PAYHSRCSECINFO.FIRSTRATEDAY,
                PAYHSRCSECINFO.SCHECALRULE,
                PAYHSRCSECINFO.PAYCYCLE,
                PAYHSRCSECINFO.WORKDAYRULE,
                PAYHSRCSECINFO.REMARK,
-               PAYHSRCSECINFO.PAPERIR yield
+               PAYHSRCSECINFO.PAPERIR yield,
+               'Y' ISWIND
         FROM INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
                  LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO1
                            ON PAYHSRCSECINFO.ISSUERSHORT = CUSTOMER_INFO1.CUSTOMER_ID
@@ -553,7 +554,7 @@
         T2.IS_NO_GUARD isNoGuard,
         T1.CCY CCY,
         T1.CAPI_INCOME_FEATURE capiIncomeFeature,
-        T2.CONCEPT_TYPE conceptType,
+        T2.CONCEPT_TYPE conceptTypes,
         T2.CROSS_MARKET_CODE crossMarketCode,
         T1.SUSTAINABLE_REMARK remark,
         T5.CON_FINPROD_ID conFinprodId,
@@ -582,7 +583,7 @@
         T11.CASH_ID principalCashId,
         T13.PAY_CYCLE payCycle,
         T13.PAY_TDAY_RULE workDayRule,
-        T13.CALC_RULE calcRule,
+        T13.CALC_RULE schecalRule,
         T13.FIRST_PAY_DATE firstRateDay,
         T2.IS_SEC_BOND isSecBond,
         T2.GUA_TYPE guarType,
@@ -590,7 +591,7 @@
         T1.SPONSOR guarantor,
         Case when T12.BASIS = 'A/A_B_COUP' THEN 'A/A'
         when T12.BASIS = 'A/A_B_DAY' THEN 'A/A'
-        else T12.BASIS END  basis,
+        else T12.BASIS END  ratebasic,
         Case when T12.MARKET_BASIS = 'A/A_B_COUP' THEN 'A/A'
         when T12.MARKET_BASIS = 'A/A_B_DAY' THEN 'A/A'
         else T12.MARKET_BASIS END  marketBasis

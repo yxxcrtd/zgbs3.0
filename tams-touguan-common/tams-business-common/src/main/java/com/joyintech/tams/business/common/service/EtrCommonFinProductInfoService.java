@@ -3,12 +3,12 @@ package com.joyintech.tams.business.common.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.busicommon.productRating.dto.CommonProductRatingDto;
+import com.joyintech.tams.busicommon.productRating.service.CommonProductRatingService;
 import com.joyintech.tams.business.common.dao.EtrCommonFinProductInfoMapper;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoRequest;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoResponse;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
-//import com.joyintech.tams.component.business.basicdata.dto.BusiFinProductRatingDto;
-//import com.joyintech.tams.component.business.basicdata.service.BusiProductRatingService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import org.apache.commons.collections.CollectionUtils;
@@ -42,8 +42,8 @@ public class EtrCommonFinProductInfoService extends BaseService {
     /**
      * 产品评级共通
      */
-//    @Autowired(required = false)
-//    private BusiProductRatingService busiProductRatingService;
+    @Autowired(required = false)
+    private CommonProductRatingService commonProductRatingService;
 
 
     /**
@@ -153,26 +153,26 @@ public class EtrCommonFinProductInfoService extends BaseService {
     private void setGrade(CfetsEtrFinProductInfoResponse finProductInfo) {
         Map<String, Object> param = new HashMap<>();
         param.put("oCode", finProductInfo.getIssuer());
-        param.put("oType", DictCodeList.评级类型_主体评级.getValue());
+        param.put("baseDataType","01");
         //查询评级类型为主体评级的数据
-//        List<BusiFinProductRatingDto> ztList = busiProductRatingService.getZtBestRatingByOrgId(param);
-//        List<BusiFinProductRatingDto> ztListNew = ztList.stream().sorted(Comparator.comparing(BusiFinProductRatingDto::getGradeDate).reversed()).collect(Collectors.toList());
-//        if (CollectionUtils.isNotEmpty(ztListNew)) {
-//            //只取第一条数据
-//            finProductInfo.setZtGradeOrgId(ztListNew.get(0).getGradeOrgId());
-//            finProductInfo.setZtGrade(ztListNew.get(0).getGradeResult());
-//        }
-//        Map<String, Object> zxparam = new HashMap<>();
-//        zxparam.put("oCode", finProductInfo.getFinprodMarketId());
-//        zxparam.put("oType", DictCodeList.评级类型_债项评级.getValue());
-//        //查询评级类型是债项评级的数据
-//        List<BusiFinProductRatingDto> zxList = busiProductRatingService.getZxBestRatingByMarketId(zxparam);
-//        List<BusiFinProductRatingDto> zxListNew = zxList.stream().sorted(Comparator.comparing(BusiFinProductRatingDto::getGradeDate).reversed()).collect(Collectors.toList());
-//        if (CollectionUtils.isNotEmpty(zxListNew)) {
-//            //只取第一条数据
-//            finProductInfo.setZxGradeOrgId(zxList.get(0).getGradeOrgId());
-//            finProductInfo.setZxGrade(zxList.get(0).getGradeResult());
-//        }
+        List<CommonProductRatingDto> ztList = commonProductRatingService.getProductOrgRating(param);
+        List<CommonProductRatingDto> ztListNew = ztList.stream().sorted(Comparator.comparing(CommonProductRatingDto::getGradeDate).reversed()).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(ztListNew)) {
+            //只取第一条数据
+            finProductInfo.setZtGradeOrgId(ztListNew.get(0).getGradeOrgId());
+            finProductInfo.setZtGrade(ztListNew.get(0).getGradeResult());
+        }
+        Map<String, Object> zxparam = new HashMap<>();
+        zxparam.put("oCode", finProductInfo.getFinprodMarketId());
+        zxparam.put("baseDataType","01");
+        //查询评级类型是债项评级的数据
+        List<CommonProductRatingDto> zxList = commonProductRatingService.getProductMarketRating(zxparam);
+        List<CommonProductRatingDto> zxListNew = zxList.stream().sorted(Comparator.comparing(CommonProductRatingDto::getGradeDate).reversed()).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(zxListNew)) {
+            //只取第一条数据
+            finProductInfo.setZxGradeOrgId(zxList.get(0).getGradeOrgId());
+            finProductInfo.setZxGrade(zxList.get(0).getGradeResult());
+        }
     }
 
     /**

@@ -31,10 +31,7 @@ import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.component.business.settle.BussSettleOrderCommService;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.dto.common.BussTrdTransferOrderBase;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
@@ -385,8 +382,12 @@ public class CfetsTrdQueryController extends BaseController {
                                                      @PathVariable("spcdCode") String spcdCode,
                                                      @RequestBody CfetsTrdQueryTradeInfoListResponse dto) throws Exception {
         try {
-            Map<String,Object> resultData = cfetsTrdQueryService.findBidTradeDetailInfo(pageCode,dtCode,spcdCode,dto);
-            if (!StringUtil.isNotEmpty(resultData)) {
+            Map<String, Object> resultData = new HashMap<>();
+            if (DictCodeListExt4.投标方式_分销买入.getValue().equals(dto.getBidModle())
+                    || DictCodeListExt4.投标方式_自主投标.getValue().equals(dto.getBidModle())
+                    || StringUtil.equals(dto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
+                resultData = cfetsTrdQueryService.findBidTradeDetailInfo(pageCode, dtCode, spcdCode, dto);
+            }else{
                 resultData = cfetsTrdQueryService.findTradeDetailInfo(pageCode, dtCode, spcdCode, dto);
             }
             return new Message<Map<String,Object>>().success().setData(resultData);

@@ -53,11 +53,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -266,20 +262,34 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         List<ValidMessage> errorList = new ArrayList<>();
         if (!StringUtil.isNotEmpty(param.get("remark"))) {
             errorList.add(new ValidMessage("请输入退回原因!"));
+            ajaxResult.setErrorList(errorList);
+            return ajaxResult;
         }
+
         // 2.查询指令状态及执行进度
         this.setParam(param);
         List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtos = cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
         if (CollectionUtils.isNotEmpty(cfetsTrdFirstBidFirmEntrustDtos)) {
-            cfetsTrdFirstBidFirmEntrustDtos.forEach(item -> {
-                if (!(StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue()) && item.getTransactioncom().compareTo(BigDecimal.ZERO) == 0)) {
-                    errorList.add(new ValidMessage("只可对已接收或者执行进度为0的指令执行退回操作!"));
+            for (CfetsTrdFirstBidFirmEntrustDto item : cfetsTrdFirstBidFirmEntrustDtos) {
+                if (!( StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue()) &&
+                        StringUtil.equals(item.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue()))) {
+                    errorList.add(new ValidMessage("只可对已接收且中标状态为待投标指令执行退回操作!"));
+                    ajaxResult.setErrorList(errorList);
+                    return ajaxResult;
+                }
+
+                if (!(item.getTransactioncom().compareTo(BigDecimal.ZERO) == 0)) {
+                    errorList.add(new ValidMessage("只可对执行进度为0的指令执行退回操作!"));
+                    ajaxResult.setErrorList(errorList);
+                    return ajaxResult;
                 }
                 param.put("entrustId", item.getEntrustId());
                 if (cfetsTrdFirstBidFirm001Mapper.checkDataStatus(param) > 0) {
                     errorList.add(new ValidMessage("存在流程中的交易数据，不可退回!"));
+                    ajaxResult.setErrorList(errorList);
+                    return ajaxResult;
                 }
-            });
+            }
         }
         ajaxResult.setErrorList(errorList);
         return ajaxResult;
@@ -322,7 +332,26 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         String loginUserId = LoginUserUtil.getUserName();
         param.put("loginUserId", loginUserId);
         param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
-        //param.put("loginUserId", "jp");
+        //param.put("loginUserId", "chujy");
+    }
+
+    /**
+     * 指令查询参数初始化
+     *
+     * @param param
+     */
+    private void setParams(Map<String, Object> param) {
+        param.put("ISSUE_CLASS_02", DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        param.put("ISSUE_CLASS_03", DictCodeListExt4.新债_发行方式_簿记建档.getValue());
+        param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
+        param.put("YN_N", DictCodeListExt1.是否_否.getValue());
+        String loginUserId = LoginUserUtil.getUserName();
+        param.put("loginUserId", loginUserId);
+        param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
+        if(!StringUtil.isNotEmpty(param.get("firstBidStatus"))){
+            param.put("firstBidStatus", Arrays.asList(DictCodeList.一级投标中标状态_已投标.getValue(),
+                    DictCodeList.一级投标中标状态_未中标.getValue(), DictCodeList.一级投标中标状态_已中标.getValue()));
+        }
     }
 
 
@@ -422,6 +451,101 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         if (CollectionUtils.isNotEmpty(handSumList)) {
             bidFirmSumDtoList.addAll(handSumList);
         }
+        String sort = dto.getPageMode().getSort();
+        String direction = dto.getPageMode().getDirection();
+        return getSortByBidFirmList(bidFirmSumDtoList, sort, direction);
+    }
+
+    /**
+     * 对汇总数据进行排序
+     * @param bidFirmSumDtoList
+     * @param sort
+     * @param direction
+     * @return
+     */
+    private List<CfetsTrdFirstBidFirmEntrustDto> getSortByBidFirmList(List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoList, String sort, String direction) {
+        if (StringUtil.isEmpty(sort)) {
+            return bidFirmSumDtoList;
+        }
+        if ("entrustStatus".equals(sort)) {
+            if("desc".equals(direction)) {
+               return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getEntrustStatus).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getEntrustStatus)).collect(Collectors.toList());
+            }
+        }
+
+        if ("firstBidStatus".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFirstBidStatus).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFirstBidStatus)).collect(Collectors.toList());
+            }
+        }
+
+        if ("finprodMarketId".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFinprodMarketId).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFinprodMarketId)).collect(Collectors.toList());
+            }
+        }
+
+        if ("finprodAbbr".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFinprodAbbr).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFinprodAbbr)).collect(Collectors.toList());
+            }
+        }
+
+        if ("tenderTarget".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getTenderTarget).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getTenderTarget)).collect(Collectors.toList());
+            }
+        }
+
+        if ("portfolioId".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getPortfolioId).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getPortfolioId)).collect(Collectors.toList());
+            }
+        }
+
+        if ("portfolioName".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getPortfolioName).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getPortfolioName)).collect(Collectors.toList());
+            }
+        }
+
+        if ("tradeMarket".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getTradeMarket).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getTradeMarket)).collect(Collectors.toList());
+            }
+        }
+
+        if ("invManagerName".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getInvManagerName).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getInvManagerName)).collect(Collectors.toList());
+            }
+        }
+
+        if ("counterName".equals(sort)) {
+            if("desc".equals(direction)) {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getCounterName).reversed()).collect(Collectors.toList());
+            }else {
+                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getCounterName)).collect(Collectors.toList());
+            }
+        }
 
         return bidFirmSumDtoList;
     }
@@ -440,78 +564,87 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         for (Map.Entry<String, List<CfetsTrdFirstBidFirmEntrustDto>> entry : counterIsNullMap.entrySet()) {
             CfetsTrdFirstBidFirmEntrustDto bidFirmSum = new CfetsTrdFirstBidFirmEntrustDto();
             List<CfetsTrdFirstBidFirmEntrustDto> bidFirmDetail = entry.getValue();
-            bidFirmSum.setCfetsTrdFirstBidFirmEntrustDtos(bidFirmDetail);
-            bidFirmSum.setEntrustStatus(bidFirmDetail.get(0).getEntrustStatus());
-            bidFirmSum.setFirstBidStatus(bidFirmDetail.get(0).getFirstBidStatus());
-            //唯一标识 前端用
-            bidFirmSum.setEntrustIdKey(bidFirmDetail.get(0).getEntrustId()+"KEY");
-            //重新计算执行进度和成交进度
-            //已完成额度
-            BigDecimal sumFinishAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getFinishAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-            //已成交额度
-            BigDecimal sumFinishDealAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getFinishDealAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-            //剩余指令额度
-            BigDecimal sumAvaNum = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getAvaNum).reduce(BigDecimal.ZERO, BigDecimal::add);
-            //剩余成交额度
-            BigDecimal sumAvaDealAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getAvaDealAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-            BigDecimal sumEntrustNum = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getEntrustNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (bidFirmDetail.size() == 1) {
+                bidFirmDetail.stream().forEach( item ->{
+                    item.setSumFlag(Boolean.TRUE);
+                });
+                bidFirmSumDtoList.addAll(bidFirmDetail);
+            }else {
+                bidFirmSum.setCfetsTrdFirstBidFirmEntrustDtos(bidFirmDetail);
+                bidFirmSum.setEntrustStatus(bidFirmDetail.get(0).getEntrustStatus());
+                bidFirmSum.setFirstBidStatus(bidFirmDetail.get(0).getFirstBidStatus());
+                //唯一标识 前端用
+                bidFirmSum.setEntrustIdKey(bidFirmDetail.get(0).getEntrustId()+"KEY");
+                //重新计算执行进度和成交进度
+                //已完成额度
+                BigDecimal sumFinishAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getFinishAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                //已成交额度
+                BigDecimal sumFinishDealAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getFinishDealAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                //剩余指令额度
+                BigDecimal sumAvaNum = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getAvaNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+                //剩余成交额度
+                BigDecimal sumAvaDealAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getAvaDealAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal sumEntrustNum = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getEntrustNum).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            bidFirmSum.setFinishAmt(sumFinishAmt);
-            bidFirmSum.setFinishDealAmt(sumFinishDealAmt);
-            bidFirmSum.setAvaNum(sumAvaNum);
-            bidFirmSum.setAvaDealAmt(sumAvaDealAmt);
-            bidFirmSum.setTransactioncom(ArithmeticUtil.divide(sumFinishAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
-            bidFirmSum.setTradeFinishPercent(ArithmeticUtil.divide(sumFinishDealAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
-            bidFirmSum.setFinprodId(bidFirmDetail.get(0).getFinprodId());
-            bidFirmSum.setFinprodMarketId(bidFirmDetail.get(0).getFinprodMarketId());
-            bidFirmSum.setFinprodAbbr(bidFirmDetail.get(0).getFinprodAbbr());
-            bidFirmSum.setTenderTarget(bidFirmDetail.get(0).getTenderTarget());
-            bidFirmSum.setTenderTargetStr(bidFirmDetail.get(0).getTenderTargetStr());
+                bidFirmSum.setFinishAmt(sumFinishAmt);
+                bidFirmSum.setFinishDealAmt(sumFinishDealAmt);
+                bidFirmSum.setAvaNum(sumAvaNum);
+                bidFirmSum.setAvaDealAmt(sumAvaDealAmt);
+                bidFirmSum.setTransactioncom(ArithmeticUtil.divide(sumFinishAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
+                bidFirmSum.setTradeFinishPercent(ArithmeticUtil.divide(sumFinishDealAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
+                bidFirmSum.setFinprodId(bidFirmDetail.get(0).getFinprodId());
+                bidFirmSum.setFinprodMarketId(bidFirmDetail.get(0).getFinprodMarketId());
+                bidFirmSum.setFinprodAbbr(bidFirmDetail.get(0).getFinprodAbbr());
+                bidFirmSum.setTenderTarget(bidFirmDetail.get(0).getTenderTarget());
+                bidFirmSum.setTenderTargetStr(bidFirmDetail.get(0).getTenderTargetStr());
+                bidFirmSum.setIssueDateStr(bidFirmDetail.get(0).getIssueDateStr());
 
-            bidFirmSum.setEntrustNum(sumEntrustNum);
-            //投标标位去重
-            List<String> bidPriceList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getBidPrice)
-                    .distinct().sorted().collect(Collectors.toList());
-            bidFirmSum.setBidPrice(StringUtil.join(bidPriceList, ","));
-            List<String> portfolioIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioId)
-                    .distinct().sorted().collect(Collectors.toList());
-            List<String> portfolioNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioName)
-                    .distinct().sorted().collect(Collectors.toList());
-            bidFirmSum.setPortfolioId(StringUtil.join(portfolioIdList, ","));
-            bidFirmSum.setPortfolioName(StringUtil.join(portfolioNameList, ","));
-            bidFirmSum.setTradeMarket(bidFirmDetail.get(0).getTradeMarket());
-            bidFirmSum.setTradeMarketStr(bidFirmDetail.get(0).getTradeMarketStr());
+                bidFirmSum.setEntrustNum(sumEntrustNum);
+                //投标标位去重
+                List<String> bidPriceList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getBidPrice)
+                        .distinct().sorted().collect(Collectors.toList());
+                bidFirmSum.setBidPrice(StringUtil.join(bidPriceList, ","));
+                List<String> portfolioIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioId)
+                        .distinct().sorted().collect(Collectors.toList());
+                List<String> portfolioNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioName)
+                        .distinct().sorted().collect(Collectors.toList());
+                bidFirmSum.setPortfolioId(StringUtil.join(portfolioIdList, ","));
+                bidFirmSum.setPortfolioName(StringUtil.join(portfolioNameList, ","));
+                bidFirmSum.setTradeMarket(bidFirmDetail.get(0).getTradeMarket());
+                bidFirmSum.setTradeMarketStr(bidFirmDetail.get(0).getTradeMarketStr());
 
-            List<String> invManagerIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerId)
-                    .distinct().sorted().collect(Collectors.toList());
-            List<String> invManagerNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerName)
-                    .distinct().sorted().collect(Collectors.toList());
-            bidFirmSum.setInvManagerId(StringUtil.join(invManagerIdList, ","));
-            bidFirmSum.setInvManagerName(StringUtil.join(invManagerNameList, ","));
+                List<String> invManagerIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerId)
+                        .distinct().sorted().collect(Collectors.toList());
+                List<String> invManagerNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerName)
+                        .distinct().sorted().collect(Collectors.toList());
+                bidFirmSum.setInvManagerId(StringUtil.join(invManagerIdList, ","));
+                bidFirmSum.setInvManagerName(StringUtil.join(invManagerNameList, ","));
 
-            List<String> counterIdList = new ArrayList<>();
-            List<String> counterNameList = new ArrayList<>();
-            for (CfetsTrdFirstBidFirmEntrustDto bidFirmDto : bidFirmDetail) {
+                List<String> counterIdList = new ArrayList<>();
+                List<String> counterNameList = new ArrayList<>();
+                for (CfetsTrdFirstBidFirmEntrustDto bidFirmDto : bidFirmDetail) {
 
-                if (StringUtil.isNotEmpty(bidFirmDto.getCounterId())) {
-                    counterIdList.add(bidFirmDto.getCounterId());
+                    if (StringUtil.isNotEmpty(bidFirmDto.getCounterId())) {
+                        counterIdList.add(bidFirmDto.getCounterId());
+                    }
+                    if (StringUtil.isNotEmpty(bidFirmDto.getCounterName())) {
+                        counterNameList.add(bidFirmDto.getCounterName());
+                    }
                 }
-                if (StringUtil.isNotEmpty(bidFirmDto.getCounterName())) {
-                    counterNameList.add(bidFirmDto.getCounterName());
+
+                if (CollectionUtils.isNotEmpty(counterIdList)) {
+                    bidFirmSum.setCounterId(StringUtil.join(counterIdList.stream().distinct().collect(Collectors.toList()), ","));
                 }
+                if (CollectionUtils.isNotEmpty(counterNameList)) {
+                    bidFirmSum.setCounterName(StringUtil.join(counterNameList.stream().distinct().collect(Collectors.toList()), ","));
+                }
+
+
+                bidFirmSum.setSumFlag(Boolean.TRUE);
+
+                bidFirmSumDtoList.add(bidFirmSum);
             }
 
-            if (CollectionUtils.isNotEmpty(counterIdList)) {
-                bidFirmSum.setCounterId(StringUtil.join(counterIdList, ","));
-            }
-            if (CollectionUtils.isNotEmpty(counterNameList)) {
-                bidFirmSum.setCounterName(StringUtil.join(counterNameList, ","));
-            }
-
-
-            bidFirmSum.setSumFlag(Boolean.TRUE);
-
-            bidFirmSumDtoList.add(bidFirmSum);
 
         }
         return bidFirmSumDtoList;
@@ -634,7 +767,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      */
     public Page<CfetsTrdFirstBidFirmTenderInfoDto> tenderSearch(CfetsTrdFirstBidFirmTenderInfoRequest request) {
         Map<String, Object> param = BeanUtil.object2Map(request);
-        this.setParam(param);
+        this.setParams(param);
         return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.tenderSearch(param));
     }
 
@@ -648,7 +781,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      */
     public Page<CfetsTrdFirstBidFirmDistributionInfoDto> distributionSearch(CfetsTrdFirstBidFirmDistributionInfoRequest request) {
         Map<String, Object> param = BeanUtil.object2Map(request);
-        this.setParam(param);
+        this.setParams(param);
         return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.distributionSearch(param));
     }
 

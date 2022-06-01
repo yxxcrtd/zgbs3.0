@@ -68,6 +68,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     @ApiModelProperty(name="tenderTarget",value="招标标的")
     private String tenderTarget;
 
+    @ApiModelProperty(name="issueClass",value="发行方式")
+    private String issueClass;
+
     @ApiModelProperty(name="tenderTargetStr",value="招标标的字典值")
     private String tenderTargetStr;
 
@@ -129,17 +132,17 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
-    @ApiModelProperty(name = "LastModifiedDate", value = "最近修改日期")
-    private Date LastModifiedDate;
+    @ApiModelProperty(name = "lastModifiedDate", value = "最近修改日期")
+    private Date lastModifiedDate;
 
-    @ApiModelProperty(name = "LastModifiedDateStr", value = "最近修改日期格式化,展示用")
-    private String LastModifiedDateStr;
+    @ApiModelProperty(name = "lastModifiedDateStr", value = "最近修改日期格式化,展示用")
+    private String lastModifiedDateStr;
 
-    @ApiModelProperty(name = "LastModifiedTime", value = "最近修改时间")
-    private Date LastModifiedTime;
+    @ApiModelProperty(name = "lastModifiedTime", value = "最近修改时间")
+    private Date lastModifiedTime;
 
-    @ApiModelProperty(name = "LastModifiedTimeStr", value = "最近修改时间格式化,展示用")
-    private String LastModifiedTimeStr;
+    @ApiModelProperty(name = "lastModifiedTimeStr", value = "最近修改时间格式化,展示用")
+    private String lastModifiedTimeStr;
 
     @ApiModelProperty(name = "firstBidStatus", value = "中标状态", example = "A1")
     private String firstBidStatus;
@@ -305,7 +308,18 @@ public class CfetsTrdFirstBidFirmEntrustDto {
         this.issueDate = issueDate;
     }
 
+    public String getIssueClass() {
+        return issueClass;
+    }
+
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
+    }
+
     public String getIssueDateStr() {
+        if (null == this.getIssueDateEnd() && null != this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart());
+        }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
         }
@@ -388,42 +402,51 @@ public class CfetsTrdFirstBidFirmEntrustDto {
         this.remark = remark;
     }
 
+
     public Date getLastModifiedDate() {
-        return LastModifiedDate;
+        return lastModifiedDate;
     }
 
     public void setLastModifiedDate(Date lastModifiedDate) {
-        LastModifiedDate = lastModifiedDate;
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getLastModifiedDateStr() {
         if (null != this.getLastModifiedDate()) {
             return DateUtil.format(this.getLastModifiedDate());
         }
-        return LastModifiedDateStr;
+        //取最近一次修改日期，如未修改，默认为等于指令日期
+        if (null != this.getEntrustDate()) {
+            return DateUtil.format(this.getEntrustDate());
+        }
+        return lastModifiedDateStr;
     }
 
     public void setLastModifiedDateStr(String lastModifiedDateStr) {
-        LastModifiedDateStr = lastModifiedDateStr;
+        this.lastModifiedDateStr = lastModifiedDateStr;
     }
 
     public Date getLastModifiedTime() {
-        return LastModifiedTime;
+        return lastModifiedTime;
     }
 
     public void setLastModifiedTime(Date lastModifiedTime) {
-        LastModifiedTime = lastModifiedTime;
+        this.lastModifiedTime = lastModifiedTime;
     }
 
     public String getLastModifiedTimeStr() {
-        if (null != this.getLastModifiedTime()) {
-            return DateUtil.format(this.getLastModifiedTime());
+        if (null != this.getLastModifiedDate()) {
+            return DateUtil.format(this.getLastModifiedDate(), "HH:mm:ss");
         }
-        return LastModifiedTimeStr;
+        //取值最近一次修改生效时间，如未修改，默认等于下达时间
+        if (null != this.getTransmitTime()) {
+            return this.getTransmitTime();
+        }
+        return lastModifiedTimeStr;
     }
 
     public void setLastModifiedTimeStr(String lastModifiedTimeStr) {
-        LastModifiedTimeStr = lastModifiedTimeStr;
+        this.lastModifiedTimeStr = lastModifiedTimeStr;
     }
 
     public String getFirstBidStatus() {

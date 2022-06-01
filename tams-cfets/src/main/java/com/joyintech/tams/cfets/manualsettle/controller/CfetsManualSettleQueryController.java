@@ -4,14 +4,20 @@ package com.joyintech.tams.cfets.manualsettle.controller;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.cfets.manualsettle.dto.*;
 import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleQueryService;
+import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdQueryTradeInfoListResponse;
+import com.joyintech.tams.cfets.trdquery.service.CfetsTrdQueryService;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +42,9 @@ public class CfetsManualSettleQueryController extends BaseController {
 
     @Autowired
     private CfetsManualSettleQueryService cfetsManualSettleQueryService;
+
+    @Autowired
+    private CfetsTrdQueryService cfetsTrdQueryService;
 
     @Autowired
     private IPlatformDate platformDateImpl;
@@ -134,7 +143,18 @@ public class CfetsManualSettleQueryController extends BaseController {
                                                               @PathVariable("spcdCode") String spcdCode,
                                                               @RequestBody CfetsManualSettleCommonRequest dto) throws Exception {
         try {
-            Map<String,Object> resultData = cfetsManualSettleQueryService.findManualSettleInfo(pageCode,dtCode,spcdCode,dto);
+            Map<String,Object> resultData = new HashMap<>();
+            CfetsManualSettleDto settleDto = dto.getSelectedItem().get(0);
+            if ((DictCodeListExt4.投标方式_分销买入.getValue().equals(settleDto.getBidModle())
+                    || DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())
+                    || StringUtil.equals(settleDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())
+                    && !StringUtil.equals("01", dto.getPageFrom()))) {
+                CfetsTrdQueryTradeInfoListResponse response = new CfetsTrdQueryTradeInfoListResponse();
+                BeanUtil.copyPropertiesIgnoreNull(response,settleDto);
+                resultData =  cfetsTrdQueryService.selectManualSettleInfo(pageCode, dtCode, spcdCode, response);
+            }else {
+                resultData = cfetsManualSettleQueryService.findManualSettleInfo(pageCode, dtCode, spcdCode, dto);
+            }
             return new Message<Map<String,Object>>().success().setData(resultData);
         } catch (Exception e) {
             logger.error("查询成交信息数据异常", e);
