@@ -15,6 +15,7 @@ import com.joyintech.service.bankuplink.bond.service.CfetsBondDealQuotedPriceSer
 import com.joyintech.service.bankuplink.ibu.service.IbuComponentCommonService;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
@@ -344,6 +345,12 @@ public class IbuQuoteBondService extends BaseService {
             paramExer.put("finprodId",cfetsBondDealQuoteCommonDto.getFinprodId());
             Boolean flag=cfetsetrIbBondinfoMapper.queryAssetIsRight(paramExer);
             cfetsBondDealQuoteCommonDto.setExercisePlan(flag);
+            // 特殊债券信息查询
+            List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(cfetsBondDealQuoteCommonDto.getFinprodId()));
+            if (CollectionUtils.isNotEmpty(list)) {
+                cfetsBondDealQuoteCommonDto.setIsDefaultBondIndicator(list.get(0).getIsDefaultBondIndicator());
+                cfetsBondDealQuoteCommonDto.setIsSpecialDebt(list.get(0).getIsSpecialDebt());
+            }
 
             //登记本方交易员应默认当前登录用户姓名
             cfetsBondDealQuoteCommonDto.setQuoteMySideTrader(cfetsBondDealQuoteCommonDto.getMySideTrader());
