@@ -20,6 +20,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.asset.bond.service.FinBondAsset001Service;
+import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.common.base.entity.FinCashPlan;
@@ -27,6 +28,7 @@ import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
+import com.joyintech.tams.component.business.riskrds.service.RskNodeConfigService;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,10 +49,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
@@ -98,6 +97,9 @@ public class FinBondAsset001Controller extends BaseController{
 
     @Autowired
     private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private RskNodeConfigService rskNodeConfigService;
 
     @ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/init")
@@ -424,5 +426,18 @@ public class FinBondAsset001Controller extends BaseController{
             logger.error("查询操作记录分页数据异常", e);
             return new Message<Page<SearchInfoOperateListResponse>>().fail().setMessage("查询操作记录分页数据异常");
         }
+    }
+
+    @PostMapping("/test")
+    @ResponseBody
+    public Message test(@RequestBody BaseMap param) {
+       /* BaseMap param = BaseMap.newMap().put("interfaceId","Bond001")
+               .put("busiAct","01")
+                .put("ps","T02")
+                .put("tradePlace","01")
+                .put("decisionAct","01")
+                .put("flowStatus","01")
+                .put("busiType","02");*/
+        return Message.success("",rskNodeConfigService.getNodeConfig(param));
     }
 }
