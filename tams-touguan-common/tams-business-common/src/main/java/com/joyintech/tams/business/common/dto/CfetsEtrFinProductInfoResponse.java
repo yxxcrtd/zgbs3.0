@@ -667,12 +667,20 @@ public class CfetsEtrFinProductInfoResponse {
         return zxGrade;
     }
 
+    public String getZxGradeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.评级结果, getZxGrade());
+    }
+
     public void setZxGrade(String zxGrade) {
         this.zxGrade = zxGrade;
     }
 
     public String getZtGrade() {
         return ztGrade;
+    }
+
+    public String getZtGradeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.评级结果, getZtGrade());
     }
 
     public void setZtGrade(String ztGrade) {

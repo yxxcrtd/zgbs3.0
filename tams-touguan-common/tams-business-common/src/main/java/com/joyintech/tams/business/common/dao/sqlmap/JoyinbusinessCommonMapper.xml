@@ -81,29 +81,36 @@
             <result column="PRICE" property="price" jdbcType="DOUBLE" />
             <result column="EXERCISE_DATE" property="exerciseDate" jdbcType="VARCHAR" />
             <result column="ACT_EXERCISE_DATE" property="actExerciseDate" jdbcType="VARCHAR" />
+            <result column="is_Special" property="isSpecial" jdbcType="VARCHAR" />
         </association>
     </resultMap>
     <select id="getfinprodIdForAdd" resultMap="finprodIdMap">
         SELECT
-        T1.FINPROD_MARKET_ID id,
-        T1.FINPROD_ABBR text,
-        T1.FINPROD_NAME,
-        T1.FINPROD_ID,
-        T1.CALENDAR_ID,
-        T1.TRADE_MARKET,
-        T1.IS_RIGHT,
-        T2.TYPE_9,
-        T2.TYPE_10,
-        T2.TYPE_11,
-        to_char(T1.VDATE,'yyyy-MM-dd') VDATE,
-        to_char(T1.MDATE, 'yyyy-MM-dd') MDATE,
-        T1.CCY,
-        null as PRICE
+            T1.FINPROD_MARKET_ID id,
+            T1.FINPROD_ABBR text,
+            T1.FINPROD_NAME,
+            T1.FINPROD_ID,
+            T1.CALENDAR_ID,
+            T1.TRADE_MARKET,
+            T1.IS_RIGHT,
+            T2.TYPE_9,
+            T2.TYPE_10,
+            T2.TYPE_11,
+            to_char(T1.VDATE,'yyyy-MM-dd') VDATE,
+            to_char(T1.MDATE, 'yyyy-MM-dd') MDATE,
+            T1.CCY,
+            null as PRICE,
+            case
+                when fps.IS_ABS = 'Y' or fpt.TYPE_11 in ('127','128') or fps.IS_SPECIAL_DEBT = 'Y' or fps.IS_DEFAULT_BOND_INDICATOR = 'Y'
+                then 'Y' else 'N'
+            end is_Special
         FROM
-        FIN_PRODUCT T1
+            FIN_PRODUCT T1
         LEFT JOIN FIN_PRODUCT_TYPE T2 ON T1.FINPROD_ID = T2.FINPROD_ID
+        left join FIN_PRODUCT_TYPE fpt on T1.FINPROD_ID = fpt.FINPROD_ID
+        left join FIN_PRODUCT_SPECIAL fps on fps.FINPROD_MARKET_ID = T1.FINPROD_MARKET_ID
         LEFT JOIN MST_BOND_MARKET_INFO mbmi  ON T1.FINPROD_MARKET_ID  = mbmi.SEC_ID
-        AND mbmi.VALUE_DATE = #{platDate,jdbcType=DATE}
+            AND mbmi.VALUE_DATE = #{platDate,jdbcType=DATE}
         <include refid="getfinprodIdForAddWhere"></include>
     </select>
     <select id="getfinprodIdForNewBond" resultMap="finprodIdMap">
@@ -893,5 +900,24 @@
 		where P.PORTFOLIO_ID = #{portfolioId}
             AND P.ACCT_TYPE = #{acctType}
             and rownum=1
+    </select>
+
+    <select id="queryFinProductSpecialByFinprodIds"
+            resultType="com.joyintech.tams.business.common.dto.FinProductSpecialDto">
+        select fp.FINPROD_MARKET_ID                                                                                             finprodMarketId,
+               case when fps.IS_ABS = 'Y' then fps.IS_ABS else case when fpt.TYPE_11 in ('127','128') then 'Y' else 'N' end end isAbs,
+               nvl(fps.IS_SPECIAL_DEBT, 'N')                                                                                    isSpecialDebt,
+               nvl(fps.IS_DEFAULT_BOND_INDICATOR, 'N')                                                                          isDefaultBondIndicator,
+               fp.FINPROD_ABBR finprodAbbr
+        from FIN_PRODUCT fp
+         left join FIN_PRODUCT_TYPE fpt on fp.FINPROD_ID = fpt.FINPROD_ID
+         left join FIN_PRODUCT_SPECIAL fps on fps.FINPROD_MARKET_ID = fp.FINPROD_MARKET_ID
+         <where>
+             <if test="finprodIds != null and finprodIds.size()>0">
+                 <foreach collection="finprodIds" item="finprodId" open=" fp.FINPROD_ID in (" close=")">
+                     #{finprodId}
+                 </foreach>
+             </if>
+         </where>
     </select>
 </mapper>

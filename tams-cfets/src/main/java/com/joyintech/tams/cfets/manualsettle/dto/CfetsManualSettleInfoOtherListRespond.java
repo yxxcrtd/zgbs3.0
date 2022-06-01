@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 银行间手工交收无组合分配信息返回参数DTO
@@ -194,6 +195,9 @@ public class CfetsManualSettleInfoOtherListRespond {
 
     @ApiModelProperty(name = "bidDateEnd", value = "投标日结束日期", example = "2021-12-21")
     private Date bidDateEnd;
+
+    @ApiModelProperty(name = "bidDateList", value = "投标日日期区间", example = "[2021-12-21]")
+    private List<Date> bidDateList;
 
     @ApiModelProperty(name = "assignRegdate", value = "债权债务登记日")
     private Date assignRegdate;
@@ -848,4 +852,13 @@ public class CfetsManualSettleInfoOtherListRespond {
     public void setBusiType(String busiType) {
         this.busiType = busiType;
     }
+
+    public List<Date> getBidDateList() {
+        return bidDateList;
+    }
+
+    public void setBidDateList(List<Date> bidDateList) {
+        this.bidDateList = bidDateList;
+    }
+
 }

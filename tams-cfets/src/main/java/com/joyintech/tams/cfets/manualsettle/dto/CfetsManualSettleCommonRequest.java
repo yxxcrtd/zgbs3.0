@@ -24,6 +24,9 @@ public class CfetsManualSettleCommonRequest {
     @ApiModelProperty(name="pageMode",value="分页对象")
     private PageMode pageMode;
 
+    @ApiModelProperty(name="pageFrom",value="页面标志位 01 交收管理 02 交易查询",example = "01")
+    private String pageFrom;
+
     public List<CfetsManualSettleDto> getSelectedItem() {
         return selectedItem;
     }
@@ -38,5 +41,13 @@ public class CfetsManualSettleCommonRequest {
 
     public void setPageMode(PageMode pageMode) {
         this.pageMode = pageMode;
+    }
+
+    public String getPageFrom() {
+        return pageFrom;
+    }
+
+    public void setPageFrom(String pageFrom) {
+        this.pageFrom = pageFrom;
     }
 }

@@ -3398,7 +3398,7 @@
                 } else {
                     $("#riskTrialSpan").html("&nbsp;&nbsp;" + riskTrialSpan);
                 }
-                setRiskFlag(0);
+                // setRiskFlag(0);
             }
             linkEntrustNumUnit();
             if (ps == PS_T04 && finprodType2 == FINPROD_TYPE_TG_F10) {

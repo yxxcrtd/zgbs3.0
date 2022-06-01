@@ -1290,7 +1290,11 @@
         select
             F_TRADE_ID
         from TRD_PRODUCT_TEMP_DEAL
-        WHERE TRADE_ID =#{tradeId} or totle_trade_id =#{tradeId}
+        WHERE
+            (TRADE_ID =#{tradeId} or totle_trade_id =#{tradeId})
+            <!--ZGCPCN-1074:多组合会取到两条相同数据,取第一条 modify by fuyongsheng 20220601 start-->
+            AND ROWNUM = 1
+            <!--ZGCPCN-1074:多组合会取到两条相同数据,取第一条 modify by fuyongsheng 20220601 end-->
     </select>
 
     <select id="selectOrderInfo" resultType="com.joyintech.tams.invest.common.trade.dto.OrderInfoDto">
