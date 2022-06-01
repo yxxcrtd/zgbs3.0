@@ -58,7 +58,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
 
     private void period001(CreditProtectionCertificatePeriodSaveDto entity, Map<String, Object> resultMap) {
 
-        resultMap.put(INTERFACE_TYPE, "Certificate001");
+        resultMap.put(INTERFACE_TYPE, "CPC001");
         resultMap.put("userId", LoginUserUtil.getUserName());
 //        resultMap.put("computerId","");
         resultMap.put(TOTAL_TRADE_ID, entity.getBusiCode());
@@ -82,7 +82,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
 
         resultMap.put(WORK_FLOW_ID, entity.getWorkflowId());
         resultMap.put("ceSettleType", entity.getSettleMethod());
-        resultMap.put("cDate", DateUtil.format(entity.getDeliverDate()));
+        resultMap.put("cDate", DateUtil.format(entity.getTradeDate()));
         resultMap.put(CCY, DictCodeList.币种_人民币_CNY.getValue());
 
         List<Map<String, Object>> ptlList = new ArrayList<>();
@@ -97,6 +97,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
             ptl.put("secAcctId", baseBussinessDto.getTrdProductDeal().getSecManageAcctId());
             ptl.put("secAmount", baseBussinessDto.getTrdProductDeal().getShareAmt());
             ptl.put("cashAmount", baseBussinessDto.getTrdProductDeal().getTradeAmt());
+            ptl.put("cashAcctId",baseBussinessDto.getBillingDetail().getAcctNo());
             ptlList.add(ptl);
             if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
                 Map<String, Object> ptlSub = new HashMap<>();

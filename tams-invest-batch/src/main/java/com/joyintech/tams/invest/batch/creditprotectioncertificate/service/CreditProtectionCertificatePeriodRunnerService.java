@@ -140,6 +140,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
 
             ptlTrade.setPortfolioId(expireData.getPortfolioId());
             ptlTrade.setBusiNo(businessCodeForDetail);
+            ptlTrade.setBusiId(businessCodeForDetail);
             ptlTrade.setBusiTable("02");
             ptlTrade.setSettleDate(nextWorkDate);
             ptlTrade.setBusiType(trdProductDeal.getBusiType());
@@ -249,6 +250,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             etrSecPositionFlow.setUpdateTime(DateUtil.now());
             etrSecPositionFlow.setUpdateUser("SYSTEM");
             etrSecPositionFlow.setCreateDept("dept");
+            etrSecPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
             etrSecPositionFlows.add(etrSecPositionFlow);
 
             //交易持仓流水
@@ -271,6 +273,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow.setUpdateTime(DateUtil.now());
             ptlSecPositionFlow.setUpdateUser("SYSTEM");
             ptlSecPositionFlow.setCreateDept("dept");
+            ptlSecPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
             ptlSecPositionFlows.add(ptlSecPositionFlow);
 
             PtlSecPositionFlow ptlSecPositionFlow2 = new PtlSecPositionFlow();
@@ -303,7 +306,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
         resultMap.put("systemAct", 系统动作_新建.getValue());
         resultMap.put("flowStatus", DictCodeListExt3.流程节点_审批生效.getValue());
 
-        resultMap.put(INTERFACE_TYPE, "Certificate001");
+        resultMap.put(INTERFACE_TYPE, "CPC001");
         resultMap.put("userId", "SYSTEM");
 //        resultMap.put("computerId","");
         resultMap.put(TOTAL_TRADE_ID, writerDto.getBussinessCode());

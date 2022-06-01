@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.period.creditprotectioncertificate.service;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -109,11 +110,11 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
         deleteFlow(entity.getWorkflowId());
         insertDate(baseBussinessDto, entity);
-        if (!StringUtil.equals("save", entity.getOperateType())) {
+        if (!StringUtil.equalsIgnoreCase("save", entity.getOperateType())) {
             doOldPositionConfirm(entity, false);
             String decisionAct = 系统动作_修改.getValue();
             String systemAct = 系统动作_修改.getValue();
-            if ("new".equals(entity.getOptType())) {
+            if ("new".equalsIgnoreCase(entity.getOptType())) {
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
@@ -126,11 +127,11 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
         deleteFlow(entity.getWorkflowId());
         insertFlow(baseBussinessDto, entity);
-        if (!StringUtil.equals("save", entity.getOperateType())) {
+        if (!StringUtil.equalsIgnoreCase("save", entity.getOperateType())) {
             doOldPositionSubmit(entity, false);
             String decisionAct = 系统动作_修改.getValue();
             String systemAct = 系统动作_修改.getValue();
-            if ("new".equals(entity.getOptType())) {
+            if ("new".equalsIgnoreCase(entity.getOptType())) {
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
@@ -143,11 +144,11 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
         deleteFlow(entity.getWorkflowId());
         insertFlow(baseBussinessDto, entity);
-        if (!StringUtil.equals("save", entity.getOperateType())) {
+        if (!StringUtil.equalsIgnoreCase("save", entity.getOperateType())) {
             doOldPositionSubmit(entity, false);
             String decisionAct = 系统动作_修改.getValue();
             String systemAct = 系统动作_修改.getValue();
-            if ("new".equals(entity.getOptType())) {
+            if ("new".equalsIgnoreCase(entity.getOptType())) {
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
@@ -344,6 +345,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     //处理明细
     private BaseBussinessDto genBaseBussinessDto2(CreditProtectionCertificatePeriodSaveDto dto, BillingDetailsDto billingDetail) {
         BaseBussinessDto result = new BaseBussinessDto();
+        result.setBillingDetail(billingDetail);
         String totleTradeId;
         if (StringUtil.isEmpty(billingDetail.getBusiCode())) {
             totleTradeId = generateBusiCode(dto);
@@ -395,6 +397,8 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         trdProductDeal.setUpdateUser(LoginUserUtil.getUserName());
         trdProductDeal.setCreateTime(platDate);
         trdProductDeal.setUpdateTime(DateUtil.now());
+        trdProductDeal.setSecManageAcctId(billingDetail.getSecAcctId());
+        trdProductDeal.setPortfolioId(billingDetail.getPortfolioId());
 
         trdProductDeal.setTgBusiType(dto.getCreditEvent());
         result.setTrdProductDeal(trdProductDeal);
@@ -444,13 +448,14 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             trdProductDeal2.setIsCancel(DictCodeListExt1.是否_否.getValue());
             trdProductDeal2.setTotleTradeId(dto.getBusiCode());
 
-            trdProductDeal2.setSecManageAcctId(dto.getSecManageAcctId());
 
             trdProductDeal2.setCreateUser(LoginUserUtil.getUserName());
             trdProductDeal2.setCreateDept(LoginUserUtil.getDeptCode());
             trdProductDeal2.setUpdateUser(LoginUserUtil.getUserName());
             trdProductDeal2.setCreateTime(platDate);
             trdProductDeal2.setUpdateTime(DateUtil.now());
+            trdProductDeal2.setSecManageAcctId(billingDetail.getSecAcctId());
+            trdProductDeal2.setPortfolioId(billingDetail.getPortfolioId());
 
             trdProductDeal2.setTgBusiType(dto.getCreditEvent());
             result.setTrdProductDeal2(trdProductDeal2);
@@ -491,6 +496,8 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
         if (StringUtil.equals(dto.getOperateType(), BussinessConstant.SUBMIT)) {
             PtlTrade ptlTrade = new PtlTrade();
+            ptlTrade.setBusiNo(totleTradeId);
+            ptlTrade.setBusiTable("02");
             ptlTrade.setPortfolioId(billingDetail.getPortfolioId());
             ptlTrade.setBusiId(totleTradeId);
             ptlTrade.setBusiType(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
@@ -620,8 +627,15 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         } else {
             refSecs.addAll(Arrays.asList(StringUtil.split(finprodLinkDto.getRefSec(), ",")));
         }
+        List<SelectOptionDto> refSecsOption = new ArrayList<>();
+        for (String refSec : refSecs) {
+            SelectOptionDto selectOptionDto = new SelectOptionDto();
+            selectOptionDto.setId(refSec);
+            selectOptionDto.setText(refSec);
+            refSecsOption.add(selectOptionDto);
+        }
 
-        finprodLinkDto.setRefSecs(refSecs);
+        finprodLinkDto.setRefSecs(refSecsOption);
         return finprodLinkDto;
     }
 
@@ -688,6 +702,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
                 etrSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
                 etrSecPositionFlow.setUpdateTime(DateUtil.now());
+                etrSecPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 etrSecPositionFlows.add(etrSecPositionFlow);
 
                 //交易持仓流水
@@ -709,6 +724,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
                 ptlSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
                 ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
+                ptlSecPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 ptlSecPositionFlow.setUpdateTime(DateUtil.now());
                 ptlSecPositionFlows.add(ptlSecPositionFlow);
 
@@ -753,6 +769,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
                 etrSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
                 etrSecPositionFlow.setUpdateTime(DateUtil.now());
+                etrSecPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 etrSecPositionFlows.add(etrSecPositionFlow);
 
                 //指令持仓流水&指令持仓：扣减可用T+0交付债券'债券交付数量'
@@ -782,6 +799,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
                 ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
                 ptlSecPositionFlow.setUpdateTime(DateUtil.now());
+                ptlSecPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 ptlSecPositionFlows.add(ptlSecPositionFlow);
 
                 //交易持仓流水&交易持仓：扣减可用T+0交付债券'债券交付数量'

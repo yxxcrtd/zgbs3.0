@@ -134,6 +134,17 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     @ApiModelProperty(name = "deliverDate",value = "交付时间")
     private Date deliverDate;
 
+    @ApiModelProperty(name="revokeReason",value="撤销原因")
+    private String revokeReason;
+
+    public String getRevokeReason() {
+        return revokeReason;
+    }
+
+    public void setRevokeReason(String revokeReason) {
+        this.revokeReason = revokeReason;
+    }
+
     public String getValidStatus() {
         return validStatus;
     }

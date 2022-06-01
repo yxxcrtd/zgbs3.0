@@ -60,5 +60,13 @@ public interface CreditProtectionCertificatePeriodMapper {
      * @param iplatDate
      * @return
      */
+    BigDecimal getAmountByPortfolioIdOld(@Param("finprodMarketId") String finprodMarketId, @Param("portfolioId") String portfolioId, @Param("tradeDate") Date tradeDate);
+
+    /**
+     * 通过组合代码查询可用数量
+     * @param portfolioId
+     * @param iplatDate
+     * @return
+     */
     BigDecimal getAmountByPortfolioId(@Param("finprodMarketId") String finprodMarketId, @Param("portfolioId") String portfolioId, @Param("tradeDate") Date tradeDate);
 }

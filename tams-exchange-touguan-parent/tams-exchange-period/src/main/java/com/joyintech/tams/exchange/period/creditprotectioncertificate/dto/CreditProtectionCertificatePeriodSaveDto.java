@@ -155,6 +155,7 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
     /**
      * 结算明细
      */
+    @NotEmpty(fieldName = "结算明细", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "billingDetails",value = "结算明细")
     private List<BillingDetailsDto> billingDetails;
 

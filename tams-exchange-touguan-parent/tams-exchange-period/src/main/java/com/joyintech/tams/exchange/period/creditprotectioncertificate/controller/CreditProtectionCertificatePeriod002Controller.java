@@ -114,53 +114,65 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
     @ResponseBody
     public Message<AjaxResult> check(@RequestBody @Validated({ValidateGroupEdit.class}) CreditProtectionCertificatePeriodSaveDto dto, BindingResult br)
             throws Exception {
-        AjaxResult ajaxResult = new AjaxResult();
-        List<ValidMessage> validMessages = creditProtectionCertificatePeriodSaveDtoValidator.valid(dto);
-        if (!validMessages.isEmpty()) {
-            ajaxResult.setErrorList(validMessages);
-            return new Message<AjaxResult>().success().setData(ajaxResult);
-        }
-        //保护凭证的名义本金数量超过组合下可用数量
-        //债券交付数量不超过组合下的债券可用数量
-        boolean isError = StringUtil.equals(CacheUtil.getSysParam("AMOUNT_CONTROL_STL"), "01");
-        List<BillingDetailsDto> billingDetails = dto.getBillingDetails();
-        StringBuilder confirmMessage = new StringBuilder();
-        for (BillingDetailsDto billingDetail : billingDetails) {
-            BigDecimal amount = creditProtectionCertificatePeriodMapper.getAmountByPortfolioId(dto.getFinprodMarketId(), billingDetail.getPortfolioId(), dto.getTradeDate());
-            if (billingDetail.getRepNomCapi().compareTo(amount) > 0) {
-                if (isError) {
-                    ValidMessage validMessage = new ValidMessage();
-                    validMessage.setField("repNomCapi");
-                    validMessage.setMessage("保护凭证的名义本金数量不可超过组合下可用数量");
-                    validMessages.add(validMessage);
-                } else {
-                    confirmMessage.append("保护凭证的名义本金数量不可超过组合下可用数量;");
+        try {
+            AjaxResult ajaxResult = new AjaxResult();
+            List<ValidMessage> validMessages = creditProtectionCertificatePeriodSaveDtoValidator.valid(dto);
+            if (!validMessages.isEmpty()) {
+                ajaxResult.setErrorList(validMessages);
+                return new Message<AjaxResult>().success().setData(ajaxResult);
+            }
+            //保护凭证的名义本金数量超过组合下可用数量
+            //债券交付数量不超过组合下的债券可用数量
+            boolean isError = StringUtil.equals(CacheUtil.getSysParam("AMOUNT_CONTROL_STL"), "01");
+            List<BillingDetailsDto> billingDetails = dto.getBillingDetails();
+            StringBuilder confirmMessage = new StringBuilder();
+            String newSecPositionSwitch = CacheUtil.getSysParam("NEW_SEC_POSITION_SWITCH");
+            Date platformDate = DateUtil.platDateFromCache();
+            for (BillingDetailsDto billingDetail : billingDetails) {
+                BigDecimal amount;
+                if (DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
+                    amount = creditProtectionCertificatePeriodMapper.getAmountByPortfolioIdOld(dto.getFinprodMarketId(), billingDetail.getPortfolioId(), platformDate);
+                } else { // 默认查新头寸
+                    amount = creditProtectionCertificatePeriodMapper.getAmountByPortfolioId(dto.getFinprodMarketId(), billingDetail.getPortfolioId(), platformDate);
+                }
+                if (billingDetail.getRepNomCapi().compareTo(amount) > 0) {
+                    if (isError) {
+                        ValidMessage validMessage = new ValidMessage();
+                        validMessage.setField("repNomCapi");
+                        validMessage.setMessage("保护凭证的名义本金数量不可超过组合下可用数量");
+                        validMessages.add(validMessage);
+                    } else {
+                        confirmMessage.append("保护凭证的名义本金数量不可超过组合下可用数量;");
+                    }
+                }
+                if (billingDetail.getDeliverBondAmount() != null && billingDetail.getDeliveryAmount().compareTo(amount) > 0) {
+                    if (isError) {
+                        ValidMessage validMessage = new ValidMessage();
+                        validMessage.setField("deliverBondAmount");
+                        validMessage.setMessage("债券交付数量不超过该组合下的债券可用数量");
+                        validMessages.add(validMessage);
+                    } else {
+                        confirmMessage.append("债券交付数量不超过该组合下的债券可用数量;");
+                    }
+                }
+                if (confirmMessage.length() > 0 || !validMessages.isEmpty()) {
+                    break;
                 }
             }
-            if (billingDetail.getDeliverBondAmount() != null && billingDetail.getDeliveryAmount().compareTo(amount) > 0) {
-                if (isError) {
-                    ValidMessage validMessage = new ValidMessage();
-                    validMessage.setField("deliverBondAmount");
-                    validMessage.setMessage("债券交付数量不超过该组合下的债券可用数量");
-                    validMessages.add(validMessage);
-                } else {
-                    confirmMessage.append("债券交付数量不超过该组合下的债券可用数量;");
-                }
-            }
-            if (confirmMessage.length() > 0 || !validMessages.isEmpty()) {
-                break;
-            }
-        }
 
-        if (!validMessages.isEmpty()) {
-            ajaxResult.setErrorList(validMessages);
-        } else if (confirmMessage.length() > 0) {
-            ajaxResult.setMessageType(MessageType.确认消息);
-            ajaxResult.setData(confirmMessage);
-        } else {
-            ajaxResult.setMessage("校验成功");
+            if (!validMessages.isEmpty()) {
+                ajaxResult.setErrorList(validMessages);
+            } else if (confirmMessage.length() > 0) {
+                ajaxResult.setMessageType(MessageType.确认消息);
+                ajaxResult.setData(confirmMessage);
+            } else {
+                ajaxResult.setMessage("校验成功");
+            }
+            return new Message<AjaxResult>().success().setData(ajaxResult);
+        } catch (Exception e) {
+            logger.error("check异常", e);
+            return new Message<AjaxResult>().fail().setMessage("check异常");
         }
-        return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
     @ApiOperation(value = "保存提交", notes = "保存提交")
@@ -168,26 +180,30 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
     @ResponseBody
     public Message<AjaxResult> save(@RequestBody CreditProtectionCertificatePeriodSaveDto dto, BindingResult br)
             throws Exception {
+        try {
+            dto.setPaBussType(dto.getSettleMethod());
 
-        dto.setPaBussType(dto.getSettleMethod());
-
-        ProcessParameter<CreditProtectionCertificatePeriodSaveDto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<CreditProtectionCertificatePeriodSaveDto> params = new WorkFlowParameter<>();
-        params.setPageId(this.getPageId());
-        params.setElementId(dto.getElementId());
-        if (StringUtil.isBlank(dto.getBusiCode())) {
-            String busiCode = creditProtectionCertificatePeriod002Service.generateBusiCode(dto);
-            dto.setBusiCode(busiCode);
+            ProcessParameter<CreditProtectionCertificatePeriodSaveDto> processParameter = new ProcessParameter<>();
+            WorkFlowParameter<CreditProtectionCertificatePeriodSaveDto> params = new WorkFlowParameter<>();
+            params.setPageId(this.getPageId());
+            params.setElementId(dto.getElementId());
+            if (StringUtil.isBlank(dto.getBusiCode())) {
+                String busiCode = creditProtectionCertificatePeriod002Service.generateBusiCode(dto);
+                dto.setBusiCode(busiCode);
+            }
+            params.setBusinessCode(dto.getBusiCode());
+            params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
+            params.setComment(creditProtectionCertificatePeriod002Service.generateComment(dto));
+            processParameter.setWorkFlowParameter(params);
+            String msg = creditProtectionCertificatePeriod002Service.start(processParameter, dto);
+            if (StringUtil.isBlank(msg)) {
+                return new Message<AjaxResult>().success().setData(new AjaxResult("保存成功"));
+            }
+            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        } catch (Exception e) {
+            logger.error("保存失败", e);
+            return new Message<AjaxResult>().fail().setData(new AjaxResult("保存失败",MessageType.错误消息));
         }
-        params.setBusinessCode(dto.getBusiCode());
-        params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
-        params.setComment(creditProtectionCertificatePeriod002Service.generateComment(dto));
-        processParameter.setWorkFlowParameter(params);
-        String msg = creditProtectionCertificatePeriod002Service.start(processParameter, dto);
-        if (StringUtil.isBlank(msg)) {
-            return new Message<AjaxResult>().success();
-        }
-        return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
     }
 
     @ApiOperation(value = "资产信息联动", notes = "资产信息联动")
@@ -200,7 +216,7 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             }
             return new Message<>(creditProtectionCertificatePeriod002Service.finprodIdLink(params));
         } catch (BusinessException e1) {
-            logger.error(e1.getMessage(),e1);
+            logger.error(e1.getMessage(), e1);
             return new Message<FinprodLinkDto>().fail().setMessage("资产信息不存在");
         } catch (Exception e) {
             logger.error("资产信息联动异常", e);

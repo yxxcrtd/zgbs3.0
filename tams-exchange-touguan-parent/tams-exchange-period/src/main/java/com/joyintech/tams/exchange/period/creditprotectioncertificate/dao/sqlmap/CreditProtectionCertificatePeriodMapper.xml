@@ -302,7 +302,7 @@
         </foreach>
         and fa.REF_SEC is not null
     </select>
-    <select id="getAmountByPortfolioId" resultType="java.math.BigDecimal">
+    <select id="getAmountByPortfolioIdOld" resultType="java.math.BigDecimal">
         select nvl(p.AMOUNT, 0) / 10000
         from PTL_SEC_POSITION p
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
@@ -313,6 +313,19 @@
           and fp.FINPROD_MARKET_ID = #{finprodMarketId}
           and p.CDATE = #{tradeDate}
           and p.HODING_TYPE = '03'
+    </select>
+
+    <select id="getAmountByPortfolioId" resultType="java.math.BigDecimal">
+        select nvl(p.AMOUNT, 0) / 10000
+        from PTL_SEC_POSITION_RULE p
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.REC_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on p.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        where p.PORTFOLIO_ID = #{portfolioId}
+          and fp.FINPROD_MARKET_ID = #{finprodMarketId}
+          and p.CDATE = #{tradeDate}
+          and p.HODING_TYPE = 'A_001'
     </select>
     <sql id="findPageQueryConditions">
         <if test="search != null and search != ''">

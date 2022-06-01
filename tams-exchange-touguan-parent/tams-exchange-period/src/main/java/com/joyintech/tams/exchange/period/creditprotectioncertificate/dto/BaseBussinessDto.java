@@ -11,6 +11,7 @@ import com.joyintech.tams.common.base.entity.*;
  * @since 1.0
  */
 public class BaseBussinessDto extends BaseEntity {
+    private BillingDetailsDto billingDetail;
     /**
      * 汇总交易表
      */
@@ -114,5 +115,13 @@ public class BaseBussinessDto extends BaseEntity {
 
     public void setTrdProductDeal2(TrdProductDeal trdProductDeal2) {
         this.trdProductDeal2 = trdProductDeal2;
+    }
+
+    public BillingDetailsDto getBillingDetail() {
+        return billingDetail;
+    }
+
+    public void setBillingDetail(BillingDetailsDto billingDetail) {
+        this.billingDetail = billingDetail;
     }
 }

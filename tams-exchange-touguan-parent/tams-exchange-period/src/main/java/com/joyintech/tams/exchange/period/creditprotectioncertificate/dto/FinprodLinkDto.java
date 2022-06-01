@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.dto;
 
+import com.joyintech.framework.select.SelectOptionDto;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
@@ -89,7 +90,7 @@ public class FinprodLinkDto {
      * 参考债项选择列表
      */
     @ApiModelProperty(name = "refSecs", value = "参考债项选择列表")
-    private List<String> refSecs;
+    private List<SelectOptionDto> refSecs;
 
     @ApiModelProperty(name = "settleMethod", value = "结算方式")
     private String settleMethod;
@@ -102,11 +103,11 @@ public class FinprodLinkDto {
         this.settleMethod = settleMethod;
     }
 
-    public List<String> getRefSecs() {
+    public List<SelectOptionDto> getRefSecs() {
         return refSecs;
     }
 
-    public void setRefSecs(List<String> refSecs) {
+    public void setRefSecs(List<SelectOptionDto> refSecs) {
         this.refSecs = refSecs;
     }
 
