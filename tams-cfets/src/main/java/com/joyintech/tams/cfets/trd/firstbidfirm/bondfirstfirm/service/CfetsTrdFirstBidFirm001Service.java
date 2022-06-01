@@ -53,11 +53,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -336,6 +332,10 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         String loginUserId = LoginUserUtil.getUserName();
         param.put("loginUserId", loginUserId);
         param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
+        if(!StringUtil.isNotEmpty(param.get("firstBidStatus"))){
+            param.put("firstBidStatus", Arrays.asList(DictCodeList.一级投标中标状态_已投标.getValue(),
+                    DictCodeList.一级投标中标状态_未中标.getValue(), DictCodeList.一级投标中标状态_已中标.getValue()));
+        }
         //param.put("loginUserId", "chujy");
     }
 
