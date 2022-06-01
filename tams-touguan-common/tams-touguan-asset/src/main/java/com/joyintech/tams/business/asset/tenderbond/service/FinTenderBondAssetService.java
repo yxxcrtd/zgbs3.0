@@ -526,6 +526,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         List<ValidMessage> validList = new ArrayList<>();
         Map<String, String> param = new HashMap<>();
         param.put("finprodMarketId", dto.getFinprodMarketId());
+        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
             validList.add(new ValidMessage("资产代码已存在"));
         }
@@ -558,6 +559,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());
+                param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
                 if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
                     validList.add(new ValidMessage("资产代码已存在"));
                 }
