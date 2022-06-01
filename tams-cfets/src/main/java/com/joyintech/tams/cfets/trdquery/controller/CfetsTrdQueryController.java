@@ -383,7 +383,6 @@ public class CfetsTrdQueryController extends BaseController {
                                                      @RequestBody CfetsTrdQueryTradeInfoListResponse dto) throws Exception {
         try {
             Map<String, Object> resultData = new HashMap<>();
-            dto.setBidModle("03");
             if (DictCodeListExt4.投标方式_分销买入.getValue().equals(dto.getBidModle())
                     || DictCodeListExt4.投标方式_自主投标.getValue().equals(dto.getBidModle())
                     || StringUtil.equals(dto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {

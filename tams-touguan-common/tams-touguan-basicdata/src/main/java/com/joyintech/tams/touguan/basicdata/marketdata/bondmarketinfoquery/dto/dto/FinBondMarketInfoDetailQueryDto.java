@@ -909,11 +909,6 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     public List<String> getConceptType() {
         List<String> conceptType = new ArrayList<>();
         if (StringUtil.isNotBlank(getIsWind()) && getIsWind().equals(DictCodeList.是否_是.getValue())) {
-            String conceptTypes = getConceptTypes();
-            if (StringUtil.isNotBlank(conceptTypes)) {
-                return Arrays.asList(conceptTypes.split(","));
-            }
-        } else {
             if (DictCodeList.是否_是.getValue().equals(this.getCityInvestSecChb())) {
                 conceptType.add("01");
             }
@@ -928,6 +923,11 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
             }
             if (DictCodeList.是否_是.getValue().equals(this.getCalloption()) || DictCodeList.是否_是.getValue().equals(this.getPutoption())) {
                 conceptType.add("06");
+            }
+        } else {
+            String conceptTypes = getConceptTypes();
+            if (StringUtil.isNotBlank(conceptTypes)) {
+                return Arrays.asList(conceptTypes.split(","));
             }
         }
         return conceptType;
