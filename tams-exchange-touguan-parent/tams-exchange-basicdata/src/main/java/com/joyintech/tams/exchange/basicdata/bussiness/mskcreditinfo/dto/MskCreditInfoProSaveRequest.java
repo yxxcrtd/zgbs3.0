@@ -75,6 +75,17 @@ public class MskCreditInfoProSaveRequest extends BaseEntity implements ProcessEn
     @ApiModelProperty(name="pageMode",value="分页对象",example="{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
+    @ApiModelProperty(name="search",value="关键字",example="A1")
+    private String search;
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
     public String getFinprodAbbr() {
         return finprodAbbr;
     }

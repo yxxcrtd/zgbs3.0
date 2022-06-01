@@ -22,6 +22,8 @@ import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.service.trade.processor.check.CommonCheckKit;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -398,8 +400,10 @@ public class PriceHelper {
         for (OpenCloseTime openCloseTime : tradePeriod) {
             result = DateUtil.isIn(DateUtil.parseTime(localTime), DateUtil.parseTime(openCloseTime.getOpenTime()), DateUtil.parseTime(openCloseTime.getCloseTime()));
             if (result) {
-                tradeTimeStage = Integer.parseInt(openCloseTime.getPriceTimeType());
-                break;
+            	if(StringUtils.isNotEmpty(openCloseTime.getPriceTimeType())) {
+            		tradeTimeStage = Integer.parseInt(openCloseTime.getPriceTimeType());
+            		break;
+            	}
             }
         }
         return tradeTimeStage;
