@@ -2840,15 +2840,23 @@
         }
     }
 
-    //根据是否纳入金额结算 设置清算速度
-    var setSettleSpeed = function (isNetSett) {
-        if (isNetSett == YES_OR_NO_Y) {
-            $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_02).trigger('change');
-        } else {
+    // modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0 start
+    //根据是否非担保 设置清算速度
+    // var setSettleSpeed = function (isNetSett) {
+    var setSettleSpeed = function (isNoGuard) {
+        // if (isNetSett == YES_OR_NO_Y) {
+        //     $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_02).trigger('change');
+        // } else {
+        //     $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_01).trigger('change');
+        // }
+        if (isNoGuard == YES_OR_NO_Y) {
             $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_01).trigger('change');
+        } else {
+            $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_02).trigger('change');
         }
         $("#settleSpeed_" + currentTab).attr("disabled", true);
     }
+    // modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0 end
 
 
     /**
