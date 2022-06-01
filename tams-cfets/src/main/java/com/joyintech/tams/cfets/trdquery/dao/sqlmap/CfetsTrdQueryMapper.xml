@@ -4634,7 +4634,7 @@
 				BO.ONMARKET_DATE  onmarketDate,
 				BO.BID_MODLE bidModle,
 				BO.PAY_TYPE payType,
-				SUM(EEBP.BID_PRIN_AMT)/100 bidPrinAmt,
+				EEBP.BID_PRIN_AMT bidPrinAmt,
 				TFPDT.PRIN_AMT/10000 prinAmt,
 				BO.WIN_PRICE winPrice,
 				TFPDT.UNIT_CPRICE unitCprice,
@@ -4657,12 +4657,13 @@
         AND		BO.BID_MODLE = #{WIN_TYPE_03}
         LEFT JOIN ( select  TPD.TOTLE_TRADE_ID, SUM(EEBP.BID_PRIN_AMT)  BID_PRIN_AMT
                     from TRD_PRODUCT_DEAL TPD
+                    LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+                    ON TPD.TRADE_ID = TPDA.TRADE_ID
                     LEFT JOIN ETR_ENTRUST EE
-                    ON EE.ENTRUST_ID = TPD.ENTRUST_ID
+                    ON EE.ENTRUST_ID = TPDA.ENTRUST_ID
                     LEFT JOIN  ETR_ENTRUST_BID_PRICE EEBP
                            ON  EEBP.ENTRUST_ID = EE.ENTRUST_ID
-                           AND EEBP.PORTFOLIO_ID = EED.PORTFOLIO_ID
-                           AND EEBP.BID_PRICE = BRBP.BID_PRICE
+                           AND EEBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
                     GROUP BY TPD.TOTLE_TRADE_ID
         ) EEBP ON TFPDT.TOTLE_TRADE_ID = EEBP.TOTLE_TRADE_ID
         LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on TFPDT.TRADER=m1.PARTY_ID
@@ -4679,7 +4680,7 @@
     <select id="findFxmrPortIntFenPeiInfoList" resultType="com.joyintech.tams.cfets.trdquery.dto.BidPortIntFenPeiInfoDto">
         SELECT
             BO.DIP_TYPE   dipType,
-            TPD.ENTRUST_ID   entrustId,
+            TPDA.ENTRUST_ID   entrustId,
             PP.PORTFOLIO_NAME  portfolioName,
             TPD.PRIN_AMT/10000 prinAmt,
             TPD.FEE_AMT     prinAmt,
@@ -4706,7 +4707,7 @@
             ON  BRBP.BID_ID = BO.BID_ID
             AND	BRBP.ENTRUST_ID = TPDA.ENTRUST_ID
             AND	BRBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
-            AND	BRBP.SEC_ACCT_ID = TFPDT.SEC_ACCT_ID
+            AND	BRBP.SEC_ACCT_ID = TFPDT.SEC_MANAGE_ACCT_ID
      LEFT JOIN ETR_ENTRUST EE
             ON EE.ENTRUST_ID = TPDA.ENTRUST_ID
      LEFT JOIN ETR_ENTRUST_DETAIL EED
@@ -4758,7 +4759,7 @@
         BO.ONMARKET_DATE onmarketDate,
         BO.BID_MODLE  bidModle,
         BO.PAY_TYPE payType,
-        SUM(BRBP.WIN_PRIN_AMT)/10000 bidPrinAmt,
+        EEBP.WIN_PRIN_AMT/10000 bidPrinAmt,
         TFPDT.PRIN_AMT/10000 prinAmt,
         BRT.WIN_PRICE  winPrice,
         TFPDT.FEE_AMT  settleFeeAmt,
@@ -4785,10 +4786,12 @@
         AND	BO.BID_MODLE IN(#{WIN_TYPE_01},#{WIN_TYPE_02})
     LEFT JOIN ( select  TPD.TOTLE_TRADE_ID ,BRBP.BID_ID, SUM(BRBP.WIN_PRIN_AMT)  WIN_PRIN_AMT
                 from TRD_PRODUCT_DEAL TPD
+                LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+                ON  TPDA.TRADE_ID = TPD.TRADE_ID
                  LEFT JOIN BID_ORDER_BID_PRICE BRBP
-                               ON  BRBP.ENTRUST_ID = TPD.ENTRUST_ID
-                               AND	BRBP.PORTFOLIO_ID = TPD.PORTFOLIO_ID
-                               AND	BRBP.SEC_ACCT_ID = TFPDT.SEC_ACCT_ID
+                               ON  BRBP.ENTRUST_ID = TPDA.ENTRUST_ID
+                               AND	BRBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
+                               AND	BRBP.SEC_ACCT_ID = TPD.SEC_MANAGE_ACCT_ID
                 GROUP BY TPD.TOTLE_TRADE_ID,BRBP.BID_ID
     ) EEBP ON TFPDT.TOTLE_TRADE_ID = EEBP.TOTLE_TRADE_ID AND BO.BID_ID = EEBP.BID_ID
       LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on TFPDT.TRADER=m1.PARTY_ID
@@ -4832,7 +4835,7 @@
                 ON	BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
                 AND	BRD.ENTRUST_ID = TPDA.ENTRUST_ID
                 AND	BRD.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
-                AND	BRD.SEC_ACCT_ID = TFPDT.SEC_ACCT_ID
+                AND	BRD.SEC_ACCT_ID = TPD.SEC_MANAGE_ACCT_ID
          LEFT JOIN  BID_ORDER BO
                 ON	BO.TRADE_STATUS = #{TRADE_STATUS_01}
                 AND	BO.IS_CANCEL = 'N'
@@ -4842,7 +4845,7 @@
                 ON	BRBP.BID_ID = BO.BID_ID
                 AND	BRBP.ENTRUST_ID = TPDA.ENTRUST_ID
                 AND	BRBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
-                AND	BRBP.SEC_ACCT_ID = TFPDT.SEC_ACCT_ID
+                AND	BRBP.SEC_ACCT_ID = TPD.SEC_MANAGE_ACCT_ID
         LEFT JOIN PTL_PORTFOLIO  PP
             ON	 BRBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
         LEFT JOIN ETR_ENTRUST EE
@@ -4915,7 +4918,7 @@
         SELECT
             ROWNUM     seqNo,
             BO.DIP_TYPE   dipType,
-            TPD.ENTRUST_ID   entrustId,
+            TPDA.ENTRUST_ID   entrustId,
             PP.PORTFOLIO_NAME  portfolioName,
             TPD.PRIN_AMT/10000 prinAmt,
             TPD.FEE_AMT     feeAmt,
@@ -5100,7 +5103,7 @@
 
 
     <select id="findYjsgBidTradeDetailInfo" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdBidInfoResponse">
-        SELECT  EE.FINPROD_ID as finprodId,
+        SELECT  BO.FINPROD_ID as finprodId,
                 FP.FINPROD_MARKET_ID   AS	finprodMarketId,
                 FP.FINPROD_ABBR	  AS	finprodAbbr,
                 bo.OUR_TRADER  AS	trader,
@@ -5111,7 +5114,7 @@
                 case
                     when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                         then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
-                    when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD
+                    when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD)
                     end rateStr,
                 case
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
@@ -5127,18 +5130,18 @@
          LEFT JOIN MST_COUNTER_PARTY mcp ON BO.COUNTER_ID= mcp.COUNTER_ID
         where bo.BID_ID = #{bidId}
         UNION ALL
-        SELECT  EE.FINPROD_ID as finprodId,
+        SELECT  wbo.FINPROD_ID as finprodId,
                 FP.FINPROD_MARKET_ID   AS	finprodMarketId,
                 FP.FINPROD_ABBR	  AS	finprodAbbr,
                 wbo.OUR_TRADER AS	trader,
                 m1.PARTY_ABBR as traderidStr,
                 wbo.OUR_TRADER  AS	counterId,
-                MCCI.TRADER_NAME AS counterIdStr,
+                MCCI.COUNTER_NAME AS counterIdStr,
                 FPI.ISSUE_PRICE issuePrice,
                 case
                     when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                         then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
-                    when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD
+                    when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD)
                     end rateStr,
                 case
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
@@ -5147,13 +5150,12 @@
                 wbo.PAYABLE_AMOUNT  payableAmount,
                 wbo.SETT_FEE_AMT  settleFeeAmt
          from WFL_BID_ORDER wbo
-         left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+         left join FIN_PRODUCT fp on fp.FINPROD_ID = wbo.FINPROD_ID
          left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
          left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
          LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on wbo.OUR_TRADER=m1.PARTY_ID
          LEFT JOIN MST_COUNTER_PARTY mcci ON wbo.COUNTER_ID= mcci.COUNTER_ID
-         left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
-        where bo.BID_ID = #{bidId}
+        where wbo.BID_ID = #{bidId}
     </select>
 
     <select id="findYjsgFenPeiInfoList" resultType="com.joyintech.tams.cfets.trdquery.dto.BidPortIntFenPeiInfoDto">
@@ -5181,13 +5183,13 @@
                 eed.INV_AIM invAim,
                 eed.SEC_ACCT_ID secManageAcctId,
                 ssai.SEC_ACCT_NAME secManageAcctIdStr,
-                bo.dip_Type dipType
+                wbo.dip_Type dipType
         from WFL_BID_ORDER wbo
          left join WFL_BID_ORDER_BID_PRICE wbrbp on wbo.BID_ID = wbrbp.BID_ID
          left join PTL_PORTFOLIO pp on wbrbp.PORTFOLIO_ID = pp.PORTFOLIO_ID
          left join ETR_ENTRUST_DETAIL eed on wbrbp.ENTRUST_ID = eed.ENTRUST_ID and wbrbp.PORTFOLIO_ID = eed.PORTFOLIO_ID
          left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
-        where bo.BID_ID = #{bidId}
+        where wbo.BID_ID = #{bidId}
     </select>
 </mapper>
 

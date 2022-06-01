@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.service.trade.controller;
 
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.exchange.common.ResponseResultBody;
+import com.joyintech.tams.exchange.common.bean.CheckFairOrderBean;
 import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
 import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.request.PortfolioInfoRequest;
@@ -106,6 +107,20 @@ public class PortfolioController {
             return new Message<>(portfolioManager.queryPortfolioCalculateWithFair(bean));
         } catch (Exception e) {
             logger.error("查询公平指令信息异常：{}", e.getMessage(), e);
+            return new Message<PortfolioAllocationResponse>().fail().setMessage(e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/checkFairOrder")
+    @ApiOperation(value = "判断是否可以做公平交易", notes = "判断是否可以做公平交易")
+    public Message<PortfolioAllocationResponse> checkFairOrder(@RequestBody @Validated CheckFairOrderBean bean) {
+        if (!MasterUtil.isMaster()) {
+            return MasterUtil.postForObject(bean);
+        }
+        try {
+            return new Message<>(portfolioManager.checkFairOrder(bean));
+        } catch (Exception e) {
+            logger.error("判断是否可以做公平交易异常：{}", e.getMessage(), e);
             return new Message<PortfolioAllocationResponse>().fail().setMessage(e.getMessage());
         }
     }

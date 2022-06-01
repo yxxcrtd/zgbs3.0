@@ -1201,7 +1201,7 @@ public class CfetsTrdQueryService extends BaseService{
             return resultData;
         }
         String userId = SecurityUtil.getLoginUser().getUserName();
-        if(DictCodeListExt4.投标方式_分销买入.equals(settleDto.getBidModle())) {
+        if(DictCodeListExt4.投标方式_分销买入.getValue().equals(settleDto.getBidModle())) {
              //基础信息
             List<CfgReadonlyFormShow> baseForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "03W");
             //金额信息03W,M
@@ -1250,7 +1250,7 @@ public class CfetsTrdQueryService extends BaseService{
             resultData.put("CfetsTrdQueryBidInfo_dataform", dataform);
             resultData.put("CfetsTrdQueryBidInfo_datatablep", portIntFenPeiInfoDtoList);
             return resultData;
-        } else if(DictCodeListExt4.投标方式_自主投标.equals(settleDto.getBidModle())) {
+        } else if(DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())) {
             //基础信息
             List<CfgReadonlyFormShow> baseForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "01W");
             //金额信息05,M
@@ -1290,6 +1290,9 @@ public class CfetsTrdQueryService extends BaseService{
             pageParam.put("ISSUE_CLASS_03", DictCodeListExt4.新债_发行方式_簿记建档.getValue());
             pageParam.put("spcdCode", spcdCode);
             pageParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+            pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
+            pageParam.put("WIN_TYPE_01", DictCodeListExt4.投标方式_自主投标.getValue());
+            pageParam.put("WIN_TYPE_02", DictCodeListExt4.投标方式_代投代缴.getValue());
             pageParam.put("WIN_TYPE_03", DictCodeListExt4.投标方式_分销买入.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findZztbManualSettleInfo(pageParam);
@@ -1468,6 +1471,7 @@ public class CfetsTrdQueryService extends BaseService{
 
 
             Map<String, Object> pageParam = BeanUtil.object2Map(dto);
+            pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
             pageParam.put("FINPROD_TYPE_TGF01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             pageParam.put("TRADE_STATUS01", DictCodeListExt1.交易状态_初始.getValue());
             pageParam.put("YESNO_N", DictCodeList.是否_否.getValue());
@@ -1514,7 +1518,7 @@ public class CfetsTrdQueryService extends BaseService{
             return resultData;
         }
         String userId = SecurityUtil.getLoginUser().getUserName();
-        if(DictCodeListExt4.投标方式_分销买入.equals(settleDto.getBidModle())) {
+        if(DictCodeListExt4.投标方式_分销买入.getValue().equals(settleDto.getBidModle())) {
             //基础信息
             List<CfgReadonlyFormShow> baseForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "03W");
             //金额信息03W,M
@@ -1563,7 +1567,7 @@ public class CfetsTrdQueryService extends BaseService{
             resultData.put("CfetsTrdQueryBidInfo_dataform", dataform);
             resultData.put("CfetsTrdQueryBidInfo_datatablep", portIntFenPeiInfoDtoList);
             return resultData;
-        } else if(DictCodeListExt4.投标方式_自主投标.equals(settleDto.getBidModle())) {
+        } else if(DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())) {
             //基础信息
             List<CfgReadonlyFormShow> baseForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "01W");
             //金额信息05,M
@@ -1602,7 +1606,10 @@ public class CfetsTrdQueryService extends BaseService{
             pageParam.put("ISSUE_CLASS_02", DictCodeListExt4.新债_发行方式_招标发行.getValue());
             pageParam.put("ISSUE_CLASS_03", DictCodeListExt4.新债_发行方式_簿记建档.getValue());
             pageParam.put("spcdCode", spcdCode);
+            pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
             pageParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+            pageParam.put("WIN_TYPE_01", DictCodeListExt4.投标方式_自主投标.getValue());
+            pageParam.put("WIN_TYPE_02", DictCodeListExt4.投标方式_代投代缴.getValue());
             pageParam.put("WIN_TYPE_03", DictCodeListExt4.投标方式_分销买入.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findZztbManualSettleInfo(pageParam);

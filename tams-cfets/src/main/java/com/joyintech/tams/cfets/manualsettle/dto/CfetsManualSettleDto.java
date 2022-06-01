@@ -138,6 +138,31 @@ public class CfetsManualSettleDto extends BaseEntity implements ProcessEntity {
     @ApiModelProperty(name="remark",value="交收失败原因",example="A1")
     private String remark;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型",example="A1")
+    private String busiTypePosition;
+
+    @ApiModelProperty(name="bidModle",value="发行方式",example="A1")
+    private String bidModle;
+
+    @ApiModelProperty(name="totleTradeId",value="交易编号",example="A1")
+    private String totleTradeId;
+
+    public String getTotleTradeId() {
+        return totleTradeId;
+    }
+
+    public void setTotleTradeId(String totleTradeId) {
+        this.totleTradeId = totleTradeId;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
     public String getSettleStatus() {
         return settleStatus;
     }
@@ -448,5 +473,13 @@ public class CfetsManualSettleDto extends BaseEntity implements ProcessEntity {
 
     public void setTradeMarketModeStr(String tradeMarketModeStr) {
         this.tradeMarketModeStr = tradeMarketModeStr;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 }
