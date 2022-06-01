@@ -328,21 +328,21 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
         Map<String, Object> vDateNato = baseAssetCashPositionCommMapper.selectVDateNato(baseTradeDto.getTrdProductDeal().getFinprodId());
         String profitType = vDateNato == null ? null : (String)vDateNato.get("PROFIT_TYPE");//获取收益类型
         List<StlPayOrdersDto> globalStlOrderList=new ArrayList<StlPayOrdersDto>();
+        /*-------------------裴家俊------add------2018/11/23-------------end--------------------*/
         if(认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())
-        		&& DictCodeListExt1.金融产品类型_投管用_基金.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())||
-        		认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
-        		DictCodeList.收益类型_净值型.getValue().equals(profitType)&& DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())||
-        		认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
-                DictCodeList.收益类型_货币型.getValue().equals(profitType)&& DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())
+                && DictCodeListExt1.金融产品类型_投管用_基金.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())||
+                认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
+                        DictCodeList.收益类型_净值型.getValue().equals(profitType)&& DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())||
+                认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
+                        DictCodeList.收益类型_货币型.getValue().equals(profitType)&& DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())
                 // add by etliu 20210421 权益类资产相关代码合并 start
                 || 认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
-                        DictCodeListExt3.金融产品类型_投管用_权益类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())
-                // add by etliu 20210421 权益类资产相关代码合并 end
+                DictCodeListExt3.金融产品类型_投管用_权益类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())
+            // add by etliu 20210421 权益类资产相关代码合并 end
         ){
-        			globalStlOrderList=baseTradeDto.getStlPayOrdersList();
-        			baseTradeDto.setStlPayOrdersList(new ArrayList<StlPayOrdersDto>());
+            globalStlOrderList=baseTradeDto.getStlPayOrdersList();
+            baseTradeDto.setStlPayOrdersList(new ArrayList<StlPayOrdersDto>());
         }
-        /*-------------------裴家俊------add------2018/11/23-------------end--------------------*/
         if (!finProductTradeDto.isNeedSum()) {
         	//update by wangpeng  20191225 通道费改造 项目类，计划类利率 不需要入库通道信息
             String chlModelType = CacheUtil.getSysParam("CHL_MODEL_TYPE");

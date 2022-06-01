@@ -280,7 +280,11 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             newPathFile.mkdir();
         }
         File folder = new SafelyFile(newPathFile,newfileName);
-        folder.createNewFile();
+        //修改上传文件
+        if (!folder.getParentFile().exists())
+            folder.getParentFile().mkdirs();
+        if (!folder.exists())
+            folder.createNewFile();
         FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
         SysUploadFileInfo fileInfo = new SysUploadFileInfo();
         String uuid = UUID.randomUUID().toString().replace("-", "");
