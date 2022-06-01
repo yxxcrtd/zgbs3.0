@@ -334,9 +334,9 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
         String loginUserId = LoginUserUtil.getUserName();
-        //param.put("loginUserId", loginUserId);
+        param.put("loginUserId", loginUserId);
         param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
-        param.put("loginUserId", "chujy");
+        //param.put("loginUserId", "chujy");
     }
 
 
