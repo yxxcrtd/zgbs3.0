@@ -1366,7 +1366,10 @@
 
     <select id="IsSpeedTOneOrZero" resultType="java.lang.String">
         SELECT
-            decode(fpa.TRADE_PLAT,'03', 'Y', 'N')
+            <!-- modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0】 start -->
+            <!--decode(fpa.TRADE_PLAT,'03', 'Y', 'N') -->
+            fpa.IS_NO_GUARD
+            <!-- modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0】 end -->
         FROM
             fin_product fp
             LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID
