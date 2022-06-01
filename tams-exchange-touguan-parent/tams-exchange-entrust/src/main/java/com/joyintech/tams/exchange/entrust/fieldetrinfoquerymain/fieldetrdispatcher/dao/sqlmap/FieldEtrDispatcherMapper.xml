@@ -510,17 +510,10 @@
             case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
             else ete.entrust_num
             end as entrustNum,
-            /*decode(
-            eted.ASSET_TYPE,
-            'F01',
-            NVL( ete.ENTRUST_AMT,ete.ENTRUST_NUM),
-            'F10',
-            NVL( ete.ENTRUST_NUM * 100, 0 ),
-            NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
-            ) entrustAmt,*/
             case
                 when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
-                when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))
+                /*when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))*/
+                when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_AMT, 0 )
                 when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
                 else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
             end as entrustAmt,
@@ -657,17 +650,10 @@
         case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
         else ete.entrust_num
         end as entrustNum,
-        /*decode(
-        eted.ASSET_TYPE,
-        'F01',
-        NVL( ete.ENTRUST_AMT,ete.ENTRUST_NUM),
-        'F10',
-        NVL( ete.ENTRUST_NUM * 100, 0 ),
-        NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
-        ) entrustAmt,*/
         case
             when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
-        when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))
+        /*when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))*/
+        when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_AMT, 0 )
             when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
             else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
         end as entrustAmt,

@@ -1596,22 +1596,10 @@
         case when eted.BUSI_TYPE_POSITION in ('EX017','EX005')  THEN round(ete.entrust_num/100,4)
         when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
         else ete.entrust_num end entrustNum,
-        <!--ete.entrust_amt entrustAmt,
-        按照列表查询价格修改 -->
---         decode(
---         eted.ASSET_TYPE,
---         'F01',
---         /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
---         decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
---         'F10',
---         NVL( ete.ENTRUST_NUM * 100, 0 ),
---         'F07',
---         nvl(ete.ENTRUST_AMT/10000,0),
---         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
---         ) entrustAmt,
         case
         when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
-        when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))
+        /*when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))*/
+        when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_AMT, 0 )
         when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
         else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
         end as entrustAmt,
@@ -1713,31 +1701,10 @@
         case when eted.BUSI_TYPE_POSITION in ('EX017','EX005') THEN round(ete.entrust_num/100,4)
         when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
         else ete.entrust_num end entrustNum,
-        <!--ete.entrust_amt entrustAmt,
-           按照列表查询价格修改 -->
-        <!--decode(
-        eted.ASSET_TYPE,
-        'F01',
-        /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
-        decode(ete.TRADE_MARKET,'03',ete.ENTRUST_AMT,'04',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),
-        'F10',
-        NVL( ete.ENTRUST_NUM * 100, 0 ),
-        NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
-        ) entrustAmt,-->
---         decode(
---         eted.ASSET_TYPE,
---         'F01',
---         /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
---         decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
---         'F10',
---         NVL( ete.ENTRUST_NUM * 100, 0 ),
---         'F07',
---         nvl(ete.ENTRUST_AMT/10000,0),
---         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
---         ) entrustAmt,
         case
         when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
-        when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))
+        /*when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))*/
+        when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_AMT, 0 )
         when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
         else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
         end as entrustAmt,
