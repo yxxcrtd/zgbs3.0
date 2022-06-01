@@ -1,0 +1,1 @@
+delete from SYS_DATADICT_LIST where DICT_CODE = 'DELIVERY_BUS_TYPE' and ITEM_CODE in ('01', '02', '03', '04');
