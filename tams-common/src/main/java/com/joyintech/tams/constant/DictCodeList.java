@@ -1871,6 +1871,7 @@ public enum DictCodeList implements BaseDictCodeList {
 	推算方式_起息日向后(DictCode.推算方式,"01","起息日向后"),
 	推算方式_到期日向前(DictCode.推算方式,"02","到期日向前"),
 	推算方式_首次支付日(DictCode.推算方式,"03","首次支付日"),
+    推算方式_首次付息日(DictCode.推算方式,"03","首次付息日"),
 	支付方式_红利再投(DictCode.支付方式,"01","红利再投"),
 	支付方式_现金(DictCode.支付方式,"02","现金"),
 	频率_日(DictCode.频率,"01","日"),
