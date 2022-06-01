@@ -873,10 +873,28 @@
                 let parms = {
                     finprodId: secId
                 }
+                var param1 = {};
+                param1.secId = secId;
                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/IsSpeedTOneOrZero', parms,
                     function (result) {
                         setSettleSpeed(result.data);
                     })
+                Joyin.ajaxSync(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/IsBondAsset', param1, function(result) {
+                    if(result.data=='2') {     //2 返回2代表所选资产是债券且中债sppi通过
+                        $("#businessModelDiv_"+ currentTab).show();
+                        $("#businessModel_" + currentTab).val("").trigger('change');
+                        $("#businessModel_" + currentTab).prop("disabled", false);
+                    }else if(result.data=='3'){ //3 返回3代表所选资产是债券且中债sppi不通过
+                        $("#businessModelDiv_"+ currentTab).show();
+                        $("#businessModel_" + currentTab).val("FVTPL").trigger('change');
+                        $("#businessModel_" + currentTab).prop("disabled", true);
+                    }else if(result.data=="4"){
+                        Joyin.error("当前资产未进行SPPI测试，无法进行指令提交/保存。");
+                        $("#secId_" + currentTab).val("").trigger('change');
+                    }else if(result.data=='1'){
+                        $("#businessModelDiv_"+ currentTab).hide();
+                    }
+                });
             }
         }
         // 证券代码选择后联动【行情信息】
