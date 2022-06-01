@@ -415,7 +415,7 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     public String getLastModifiedDateStr() {
         if (null != this.getLastModifiedDate()) {
-            return DateUtil.format(this.getEntrustDate());
+            return DateUtil.format(this.getLastModifiedDate());
         }
         //取最近一次修改日期，如未修改，默认为等于指令日期
         if (null != this.getEntrustDate()) {
