@@ -317,9 +317,7 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     }
 
     public String getIssueDateStr() {
-        if (null != this.getIssueDateStart() && StringUtil.equals(DictCodeListExt4.新债_发行方式_招标发行.getValue(), getIssueClass()) &&
-                (StringUtil.equals(DictCodeListExt4.招标标的_价格.getValue(), getTenderTarget())
-                        || StringUtil.equals(DictCodeListExt4.招标标的_利率.getValue(), getTenderTarget()))) {
+        if (null == this.getIssueDateEnd() && null != this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart());
         }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
@@ -415,7 +413,7 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     public String getLastModifiedDateStr() {
         if (null != this.getLastModifiedDate()) {
-            return DateUtil.format(this.getEntrustDate());
+            return DateUtil.format(this.getLastModifiedDate());
         }
         //取最近一次修改日期，如未修改，默认为等于指令日期
         if (null != this.getEntrustDate()) {

@@ -378,11 +378,16 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, productInfoRequest);
 
         dto.setIssueClass(finProductInfo.getIssueClass());
+        dto.setFinprodMarketId(finProductInfo.getFinprodMarketId());
+        dto.setFinprodAbbr(finProductInfo.getFinprodAbbr());
         if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
             dto.setIssueDate(finProductInfo.getIssueDate());
             dto.setPayDate(finProductInfo.getPayDate());
             dto.setIssuePrice(new BigDecimal(finProductInfo.getIssuePrice()));
             dto.setReferYield(finProductInfo.getReferYield());
+            dto.setTenderTarget(finProductInfo.getTenderTarget());
+            dto.setTenderSdate(finProductInfo.getTenderSdate());
+            dto.setTenderEdate(finProductInfo.getTenderEdate());
 
         }else {
             //查询所有的对手方
@@ -400,8 +405,6 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
             dto.setTenderTarget(finProductInfo.getTenderTarget());
         }
 
-        dto.setFinprodAbbr(finProductInfo.getFinprodAbbr());
-        dto.setFinprodMarketId(finProductInfo.getFinprodMarketId());
 
         List<CfetsBiddingProductDto> biddingProductList = new ArrayList<>();
         //查询指令明细信息
@@ -422,6 +425,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
 
                 //查询指令标位信息
                 List<EtrEntrustBidPrice> bidPrices = cfetsEtrBondFirstBid001Mapper.selectBidPriceById(entrustId);
+                Integer rownum = 1;
                 for (EtrEntrustBidPrice bidPrice : bidPrices) {
                     CfetsBiddingProductDto productDto = new CfetsBiddingProductDto();
                     productDto.setPortfolioId(bidPrice.getPortfolioId());
@@ -437,7 +441,8 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
                         productDto.setBusinessModel(etrEntrustDetail.getInvAim());
                         productDto.setPortfolioTotalBidPrinAmt(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), BigDecimal.valueOf(100)));
                     }
-
+                    productDto.setRownum(rownum.toString());
+                    rownum ++ ;
                     biddingProductList.add(productDto);
                 }
             }
