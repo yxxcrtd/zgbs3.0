@@ -71,7 +71,7 @@
             END           AS issueDateStart/*投标日 开始*/,
             CASE
             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-            THEN fpi.ISSUE_DATE
+            THEN null
             WHEN (fpi.ISSUE_CLASS = '02' AND
             (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
             OR fpi.ISSUE_CLASS = '03'
@@ -290,11 +290,11 @@
                 END           AS issueDateStart/*投标日 开始*/,
             CASE
                 WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                    THEN fpi.ISSUE_DATE
+                    THEN null
                 WHEN (fpi.ISSUE_CLASS = '02' AND
                       (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                     OR fpi.ISSUE_CLASS = '03'
-                    THEN fpi.TENDER_SDATE
+                    THEN fpi.TENDER_EDATE
                 END           AS issueDateEnd/*投标日 结束*/,
             fpi.PAY_EDATE                            payEdate,
             ee.ENTRUST_DATE                          entrustDate,
@@ -380,11 +380,11 @@
                             END           AS issueDateStart/*投标日 开始*/,
                         CASE
                             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                                THEN fpi.ISSUE_DATE
+                                THEN null
                             WHEN (fpi.ISSUE_CLASS = '02' AND
                                   (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                                 OR fpi.ISSUE_CLASS = '03'
-                                THEN fpi.TENDER_SDATE
+                                THEN fpi.TENDER_EDATE
                             END           AS issueDateEnd/*投标日 结束*/,
                         ee.ENTRUST_NUM *100   AS etrBidPriceTotal/*指令投标券面总额*/,
                         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
@@ -474,11 +474,11 @@
                             END         AS issueDateStart/*投标日 开始*/,
                         CASE
                             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                                THEN fpi.ISSUE_DATE
+                                THEN null
                             WHEN (fpi.ISSUE_CLASS = '02' AND
                                   (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                                 OR fpi.ISSUE_CLASS = '03'
-                                THEN fpi.TENDER_SDATE
+                                THEN fpi.TENDER_EDATE
                             END         AS issueDateEnd/*投标日 结束*/,
                         ee.ENTRUST_NUM*100  AS etrBidPriceTotal/*指令投标券面总额*/,
                         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
@@ -597,10 +597,10 @@
                      END           AS bidDateStart/*投标日 开始*/,
                  CASE
                      WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                         THEN fpi.ISSUE_DATE
+                         THEN null
                      WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                          OR fpi.ISSUE_CLASS = '03'
-                         THEN fpi.TENDER_SDATE
+                         THEN fpi.TENDER_EDATE
                      END           AS bidDateEnd/*投标日 结束*/,
                  ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
@@ -713,10 +713,10 @@
                      END           AS bidDateStart/*投标日 开始*/,
                  CASE
                      WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                         THEN fpi.ISSUE_DATE
+                         THEN null
                      WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                          OR fpi.ISSUE_CLASS = '03'
-                         THEN fpi.TENDER_SDATE
+                         THEN fpi.TENDER_EDATE
                      END           AS bidDateEnd/*投标日 结束*/,
                  ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
@@ -922,11 +922,11 @@
                         END           AS bidDateStart/*投标日 开始*/,
                     CASE
                         WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                            THEN fpi.ISSUE_DATE
+                            THEN null
                         WHEN (fpi.ISSUE_CLASS = '02' AND
                               (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                             OR fpi.ISSUE_CLASS = '03'
-                            THEN fpi.TENDER_SDATE
+                            THEN fpi.TENDER_EDATE
                         END           AS bidDateEnd/*投标日 结束*/,
                     ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
                     bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
@@ -1045,11 +1045,11 @@
                         END         AS bidDateStart/*投标日 开始*/,
                     CASE
                         WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                            THEN fpi.ISSUE_DATE
+                            THEN null
                         WHEN (fpi.ISSUE_CLASS = '02' AND
                               (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                             OR fpi.ISSUE_CLASS = '03'
-                            THEN fpi.TENDER_SDATE
+                            THEN fpi.TENDER_EDATE
                         END         AS bidDateEnd/*投标日 结束*/,
                     ee.ENTRUST_NUM  AS etrBidPriceTotal/*指令投标券面总额*/,
                     bo.WIN_PRIN_AMT AS bidPriceTotal/*券面总额*/,

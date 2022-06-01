@@ -87,10 +87,10 @@
                    END                       AS bidDateStart/*投标日 开始*/,
                CASE
                    WHEN fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND fpi.TENDER_TYPE IN (#{TENDER_TYPE_01}, #{TENDER_TYPE_02})
-                       THEN fpi.ISSUE_DATE
+                       THEN null
                    WHEN (fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN (#{TENDER_TYPE_03}, #{TENDER_TYPE_04})))
                        OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
-                       THEN fpi.TENDER_SDATE
+                       THEN fpi.TENDER_EDATE
                    END                       AS bidDateEnd/*投标日 结束*/,
                 case when fpi.PAY_EDATE is not null then fpi.PAY_EDATE else fpi.PAY_DATE end payEdate/*缴款截止日*/,
                 case when fpi.PAY_DATE is not null then fpi.PAY_DATE else fpi.PAY_EDATE end payDate/*缴款日*/,
@@ -240,10 +240,10 @@
                    END           AS bidDateStart/*投标日 开始*/,
                CASE
                    WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                       THEN fpi.ISSUE_DATE
+                       THEN null
                    WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                        OR fpi.ISSUE_CLASS = '03'
-                       THEN fpi.TENDER_SDATE
+                       THEN fpi.TENDER_EDATE
                    END           AS bidDateEnd/*投标日 结束*/,
                bo.PAY_DATE          payDate/*缴款日*/,
                fpi.PAY_EDATE          payEdate/*缴款截止日*/,
@@ -310,10 +310,10 @@
                    END           AS bidDateStart/*投标日 开始*/,
                CASE
                    WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                       THEN fpi.ISSUE_DATE
+                       THEN null
                    WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                        OR fpi.ISSUE_CLASS = '03'
-                       THEN fpi.TENDER_SDATE
+                       THEN fpi.TENDER_EDATE
                    END           AS bidDateEnd/*投标日 结束*/,
                bo.PAY_DATE          payDate/*缴款日*/,
                fpi.PAY_EDATE          payEdate/*缴款截止日*/,

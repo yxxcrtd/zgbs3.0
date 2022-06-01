@@ -332,11 +332,26 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         String loginUserId = LoginUserUtil.getUserName();
         param.put("loginUserId", loginUserId);
         param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
+        //param.put("loginUserId", "chujy");
+    }
+
+    /**
+     * 指令查询参数初始化
+     *
+     * @param param
+     */
+    private void setParams(Map<String, Object> param) {
+        param.put("ISSUE_CLASS_02", DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        param.put("ISSUE_CLASS_03", DictCodeListExt4.新债_发行方式_簿记建档.getValue());
+        param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
+        param.put("YN_N", DictCodeListExt1.是否_否.getValue());
+        String loginUserId = LoginUserUtil.getUserName();
+        param.put("loginUserId", loginUserId);
+        param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
         if(!StringUtil.isNotEmpty(param.get("firstBidStatus"))){
             param.put("firstBidStatus", Arrays.asList(DictCodeList.一级投标中标状态_已投标.getValue(),
                     DictCodeList.一级投标中标状态_未中标.getValue(), DictCodeList.一级投标中标状态_已中标.getValue()));
         }
-        //param.put("loginUserId", "chujy");
     }
 
 
@@ -657,7 +672,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      */
     public Page<CfetsTrdFirstBidFirmTenderInfoDto> tenderSearch(CfetsTrdFirstBidFirmTenderInfoRequest request) {
         Map<String, Object> param = BeanUtil.object2Map(request);
-        this.setParam(param);
+        this.setParams(param);
         return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.tenderSearch(param));
     }
 
@@ -671,7 +686,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      */
     public Page<CfetsTrdFirstBidFirmDistributionInfoDto> distributionSearch(CfetsTrdFirstBidFirmDistributionInfoRequest request) {
         Map<String, Object> param = BeanUtil.object2Map(request);
-        this.setParam(param);
+        this.setParams(param);
         return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.distributionSearch(param));
     }
 
