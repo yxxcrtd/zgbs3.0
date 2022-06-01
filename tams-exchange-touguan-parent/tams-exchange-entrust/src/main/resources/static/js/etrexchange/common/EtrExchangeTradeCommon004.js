@@ -4369,7 +4369,7 @@
                         }
                     }
                     if (!checkFlag) {
-                        Joyin.error("系列户才能下指令")
+                        Joyin.error("修改时组合分配必须为系列户")
                         return false;
                     }
                 }
