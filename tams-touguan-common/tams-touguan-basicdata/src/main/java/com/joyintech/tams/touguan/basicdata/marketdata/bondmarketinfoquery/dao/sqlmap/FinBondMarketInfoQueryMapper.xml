@@ -500,7 +500,7 @@
                    WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN
                        '01'
                    ELSE NULL
-                   END AS                                   BASICSTYLE,
+                   END AS                                   basisStyle,
                PAYHSRCSECINFO.FIRSTRATEDAY,
                PAYHSRCSECINFO.SCHECALRULE,
                PAYHSRCSECINFO.PAYCYCLE,
