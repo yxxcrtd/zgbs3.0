@@ -336,7 +336,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         String loginUserId = LoginUserUtil.getUserName();
         param.put("loginUserId", loginUserId);
         param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
-        //param.put("loginUserId", "jp");
+        //param.put("loginUserId", "chujy");
     }
 
 
@@ -455,6 +455,9 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             CfetsTrdFirstBidFirmEntrustDto bidFirmSum = new CfetsTrdFirstBidFirmEntrustDto();
             List<CfetsTrdFirstBidFirmEntrustDto> bidFirmDetail = entry.getValue();
             if (bidFirmDetail.size() == 1) {
+                bidFirmDetail.stream().forEach( item ->{
+                    item.setSumFlag(Boolean.TRUE);
+                });
                 bidFirmSumDtoList.addAll(bidFirmDetail);
             }else {
                 bidFirmSum.setCfetsTrdFirstBidFirmEntrustDtos(bidFirmDetail);
