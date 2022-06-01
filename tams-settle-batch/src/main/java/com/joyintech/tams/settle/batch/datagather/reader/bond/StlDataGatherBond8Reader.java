@@ -1,6 +1,5 @@
 package com.joyintech.tams.settle.batch.datagather.reader.bond;
 
-import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
 import com.joyintech.tams.settle.batch.datagather.reader.StlDataGatherReader;
 import org.springframework.context.annotation.Lazy;
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * 一级投标债
+ * 一级投标债(交收结果)
  * @author fuyongsheng
  * @date 2022年05月12日
  * @see StlDataGatherBond8Reader
