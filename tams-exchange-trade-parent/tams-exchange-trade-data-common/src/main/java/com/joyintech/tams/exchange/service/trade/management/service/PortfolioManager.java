@@ -674,14 +674,16 @@ public class PortfolioManager extends BaseService {
                         return o.getEntrustPrice();
                     }
                 }).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
-                if (min.compareTo(upperLimitPrice) > 0) {
-                    adjustedPrice = upperLimitPrice;
-                } else {
+//                if (min.compareTo(upperLimitPrice) > 0) {
+//                    adjustedPrice = upperLimitPrice;
+//                } else {
+//                    adjustedPrice = min;
+//                }
+                if (min.compareTo(BigDecimal.ZERO) > 0) {
                     adjustedPrice = min;
                 }
-
                 // 调整后价格不能比委托价格更高
-                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) > 0) {
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && min.compareTo(entrustPrice) > 0) {
                     adjustedPrice = entrustPrice;
                 }
             } else {
@@ -692,14 +694,16 @@ public class PortfolioManager extends BaseService {
                         return o.getEntrustPrice();
                     }
                 }).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
-                if (max.compareTo(lowerLimitPrice) < 0) {
-                    adjustedPrice = lowerLimitPrice;
-                } else {
+//                if (max.compareTo(lowerLimitPrice) < 0) {
+//                    adjustedPrice = lowerLimitPrice;
+//                } else {
+//                    adjustedPrice = max;
+//                }
+                if (max.compareTo(BigDecimal.ZERO) > 0) {
                     adjustedPrice = max;
                 }
-
                 // 调整后价格不能比委托价格更低
-                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) < 0) {
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && max.compareTo(entrustPrice) < 0) {
                     adjustedPrice = entrustPrice;
                 }
             }
@@ -1638,10 +1642,6 @@ public class PortfolioManager extends BaseService {
     public Long getFairTotalLeftVolume(OrderPlaceBean bean, Instruction instruction, TickBean tick) {
         // 最新价
         BigDecimal lastPrice = TradeUtils.getBigDecimal(tick.getLastPrice(), 4);
-        // 涨停价
-        BigDecimal upperLimitPrice = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
-        // 跌停价
-        BigDecimal lowerLimitPrice = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
 
         // 构造返回列表
         List<PortfolioInstructionContextDto> resultList = new ArrayList<>();
@@ -1688,14 +1688,13 @@ public class PortfolioManager extends BaseService {
                         return o.getEntrustPrice();
                     }
                 }).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
-                if (min.compareTo(upperLimitPrice) > 0) {
-                    adjustedPrice = upperLimitPrice;
-                } else {
+
+                if (min.compareTo(BigDecimal.ZERO) > 0) {
                     adjustedPrice = min;
                 }
 
                 // 调整后价格不能比委托价格更高
-                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) > 0) {
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && min.compareTo(entrustPrice) > 0) {
                     adjustedPrice = entrustPrice;
                 }
             } else {
@@ -1706,14 +1705,13 @@ public class PortfolioManager extends BaseService {
                         return o.getEntrustPrice();
                     }
                 }).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
-                if (max.compareTo(lowerLimitPrice) < 0) {
-                    adjustedPrice = lowerLimitPrice;
-                } else {
+
+                if (max.compareTo(BigDecimal.ZERO) > 0) {
                     adjustedPrice = max;
                 }
 
                 // 调整后价格不能比委托价格更低
-                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) < 0) {
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && max.compareTo(entrustPrice) < 0) {
                     adjustedPrice = entrustPrice;
                 }
             }
@@ -1759,13 +1757,16 @@ public class PortfolioManager extends BaseService {
             price = BigDecimal.valueOf(100L);
         }
         PortfolioInstructionContextDto dto = null;
-        tempList = tempList.stream().filter(o -> !StringUtil.equals(o.getEntrustClass(), 是否_否.getValue())).collect(Collectors.toList());
         for (Instruction ins : tempList) {
             dto = new PortfolioInstructionContextDto();
-            if (EntrustUtils.isVolume(ins)) {
-                dto.setLeftVolume(ins.getEntrustNum() - ins.getEntrustLeftAmt().longValue() - ins.getFrozenQuantity().longValue());
+            if (StringUtil.equals(ins.getEntrustClass(), 是否_否.getValue())) {
+                dto.setLeftVolume(0L);
             } else {
-                dto.setLeftVolume(TradeUtils.divide(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2), price, 2).longValue());
+                if (EntrustUtils.isVolume(ins)) {
+                    dto.setLeftVolume(ins.getEntrustNum() - ins.getEntrustLeftAmt().longValue() - ins.getFrozenQuantity().longValue());
+                } else {
+                    dto.setLeftVolume(TradeUtils.divide(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2), price, 2).longValue());
+                }
             }
             resultList.add(dto);
         }

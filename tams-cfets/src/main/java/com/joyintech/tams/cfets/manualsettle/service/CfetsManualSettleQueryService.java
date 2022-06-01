@@ -4,10 +4,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.dao.CfgDataTableFlagMapper;
 import com.joyintech.tams.business.common.dao.CfgDataTableMapper;
 import com.joyintech.tams.business.common.dao.CfgReadonlyFormShowMapper;
@@ -27,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -284,27 +283,36 @@ public class CfetsManualSettleQueryService extends BaseService{
                 Arrays.asList(BussinessDictCodeList.共同业务类型_中标结果维护.getValue(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue()));
         //基本信息
         CfetsManualSettleInfoOtherListRespond respond = cfetsManualSettleMapper.findManualSettleInfoBidFirm(pageParam);
+        List<Date> dates = new ArrayList<>();
+        dates.add(respond.getBidDateStart());
+        dates.add(respond.getBidDateEnd());
+        respond.setBidDateList(dates);
         String spcdCodeTemp = "01";
-        if (StringUtil.equals(respond.getBusiType(), DictCodeListExt4.平安业务类型_债券分销买入确认.getValue())) {
+        if (StringUtil.equals(respond.getBusiType(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue())) {
             spcdCode = spcdCodeTemp + "FXB";
             // 基本信息
             List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             resultData.put("infoForm", infoForm);
-            resultData.put("infoData", respond);
             // 金额信息
             spcdCode = spcdCodeTemp + "FXA";
             List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             resultData.put("infoForm1", infoForm1);
-            resultData.put("infoData1", respond);
             // 投标产品列表
             spcdCode = spcdCodeTemp + "FXP";
             List<CfgReadonlyFormShow> infoForm2 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             resultData.put("infoForm2", infoForm2);
-            resultData.put("infoData2", SysDataUtil.getNameFromDataDict(DictCode.组合分配方式, respond.getSpanTextOne()));
             // 查看页面表格不可编辑,不会有个性化配置
             List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, EFFERANGE_NO, USER_ID);
             List<PortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsManualSettleMapper.findBidFirmPortIntFenPeiInfoList(pageParam);
+            BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
+            for (PortIntFenPeiInfoDto item : portIntFenPeiInfoDtoList) {
+                etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, item.getUnFinshAmt());
+            }
+            respond.setEtrBidPriceTotal(etrBidPriceTotal);
             resultData.put("talbeForm", infoForm4);
+            resultData.put("infoData", respond);
+            resultData.put("infoData1", respond);
+            resultData.put("infoData2", SysDataUtil.getNameFromDataDict(DictCode.组合分配方式, respond.getSpanTextOne()));
             resultData.put("talbeData", portIntFenPeiInfoDtoList);
             // 金额信息
             spcdCode = spcdCodeTemp + "FXR";
@@ -316,21 +324,26 @@ public class CfetsManualSettleQueryService extends BaseService{
             // 基本信息
             List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             resultData.put("infoForm", infoForm);
-            resultData.put("infoData", respond);
             // 金额信息
             spcdCode = spcdCodeTemp + "ZBA";
             List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             resultData.put("infoForm1", infoForm1);
-            resultData.put("infoData1", respond);
             // 投标产品列表
             spcdCode = spcdCodeTemp + "ZBP";
             List<CfgReadonlyFormShow> infoForm2 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             resultData.put("infoForm2", infoForm2);
-            resultData.put("infoData2", SysDataUtil.getNameFromDataDict(DictCode.中标方式, respond.getSpanTextOne()));
             // 查看页面表格不可编辑,不会有个性化配置
             List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, EFFERANGE_NO, USER_ID);
             List<PortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsManualSettleMapper.findBidFirmPortIntFenPeiInfoList(pageParam);
+            BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
+            for (PortIntFenPeiInfoDto item : portIntFenPeiInfoDtoList) {
+                etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, item.getUnFinshAmt());
+            }
+            respond.setEtrBidPriceTotal(etrBidPriceTotal);
             resultData.put("talbeForm", infoForm4);
+            resultData.put("infoData", respond);
+            resultData.put("infoData1", respond);
+            resultData.put("infoData2", SysDataUtil.getNameFromDataDict(DictCode.中标方式, respond.getSpanTextOne()));
             resultData.put("talbeData", portIntFenPeiInfoDtoList);
             // 金额信息
             spcdCode = spcdCodeTemp + "ZBR";

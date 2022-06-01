@@ -97,6 +97,7 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.activiti.engine.impl.util.CollectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -471,6 +472,13 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
 
     @Override
     public void doUpdate(EtrExchangeTradeSaveSecRepoRequest entity) {
+
+        if (!CollectionUtils.isEmpty(entity.getPortfolioList())) {
+            entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
+            entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
+            entity.setSecAcctId(entity.getPortfolioList().get(0).getSecAcctId());
+        }
+
         // nothing to do just for aspect
         Map<String, Object> map = new HashMap<>();
         // 新增交易对手席位

@@ -233,7 +233,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         List<ValidMessage> errorList = new ArrayList<>();
         Date systemDate = iPlatformDate.getSysDate();
         List<String> entrustIdList = new ArrayList<>();
-        logger.debug("自动分配,入参:" + JsonUtils.object2Json(request));
+        logger.debug("<投标确认>界面初始化检查,入参:" + JsonUtils.object2Json(request));
         List<CfetsTrdFirstBidFirmEntrustDto> list = request.getEntrustDtos();
         if (StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"))) {
             List<CfetsTrdFirstBidFirmEntrustDto> listTemp = new ArrayList<>();

@@ -1,8 +1,12 @@
 package com.joyintech.tams.cfets.etr.repo.service;
 
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.cfets.etr.repo.dao.CfetsEtrIbRepoLib001Mapper;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoLibAvaPledgeBondResponse;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoLibDto;
@@ -10,13 +14,16 @@ import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrRepoLibAvaPledgeBondRequest
 import com.joyintech.tams.common.base.dao.EtrEntrustPledgeMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrustPledge;
 import com.joyintech.tams.common.base.entity.EtrEntrustPledgeKey;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +35,9 @@ public class CfetsIbRepoLibService {
 
     @Autowired
     private EtrEntrustPledgeMapper etrEntrustPledgeMapper;
+
+    @Autowired
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
     /**
      * 平台日期
@@ -79,9 +89,27 @@ public class CfetsIbRepoLibService {
      * @since 1.0
      */
     @Transactional(rollbackFor = Exception.class)
-    public Long inSave(CfetsEtrIbRepoLibDto dto) {
+    public AjaxResult inSave(CfetsEtrIbRepoLibDto dto) {
+        AjaxResult ajaxResult = new AjaxResult();
         Long saveCount = 0L;
         if (!StringUtil.isEmptyList(dto.getPledgeBondList())) {
+            List<String> finprodIds = new ArrayList<>();
+            dto.getPledgeBondList().forEach(item->{
+                finprodIds.add(item.getFinprodId());
+            });
+            List<FinProductSpecialDto> finProductSpecialDtos = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(finprodIds);
+            List<ValidMessage> errorList = new ArrayList<>();
+            finProductSpecialDtos.forEach(finProductSpecialDto -> {
+                if (StringUtil.equals(finProductSpecialDto.getIsDefaultBondIndicator(), DictCodeList.是否_是.getValue())) {
+                    errorList.add(new ValidMessage("债券" + finProductSpecialDto.getFinprodAbbr()
+                            + "(" + finProductSpecialDto.getFinprodMarketId() + ")为到期违约债,不可质押!"));
+                }
+            });
+            if(CollectionUtils.isNotEmpty(errorList)){
+                ajaxResult.setErrorList(errorList);
+                ajaxResult.resetStatuCode();
+                return ajaxResult;
+            }
             for (CfetsEtrIbRepoLibDto temp : dto.getPledgeBondList()) {
                 EtrEntrustPledge etrEntrustPledge = new EtrEntrustPledge();
                 etrEntrustPledge.setPortfolioId(temp.getPortfolioId());
@@ -89,27 +117,30 @@ public class CfetsIbRepoLibService {
                 etrEntrustPledge.setBranch(temp.getBranch());
                 etrEntrustPledge.setSecAcctId(temp.getSecAcctId());
                 etrEntrustPledge.setScale(temp.getScale());
-                if(!StringUtil.isNotEmpty(dto.getPledgeStockId())){
+                if (!StringUtil.isNotEmpty(dto.getPledgeStockId())) {
                     dto.setPledgeStockId("999999");
                 }
                 etrEntrustPledge.setPledgeStockId(dto.getPledgeStockId());
-                
+
                 EtrEntrustPledgeKey etrEntrustPledgeKey = new EtrEntrustPledge();
                 etrEntrustPledgeKey.setPortfolioId(temp.getPortfolioId());
                 etrEntrustPledgeKey.setFinprodId(temp.getFinprodId());
                 etrEntrustPledgeKey.setBranch(temp.getBranch());
                 etrEntrustPledgeKey.setSecAcctId(temp.getSecAcctId());
                 etrEntrustPledgeKey.setPledgeStockId(dto.getPledgeStockId());
-                
+
                 // 若存在数据，则删除后，在插入。
-                EtrEntrustPledge count = cfetsEtrIbRepoLib001Mapper.selectEtrEntrustPledge(etrEntrustPledge) ;
-                if(count != null){
-                	cfetsEtrIbRepoLib001Mapper.deleteEtrEntrustPledge(etrEntrustPledge) ;
+                EtrEntrustPledge count = cfetsEtrIbRepoLib001Mapper.selectEtrEntrustPledge(etrEntrustPledge);
+                if (count != null) {
+                    cfetsEtrIbRepoLib001Mapper.deleteEtrEntrustPledge(etrEntrustPledge);
                 }
                 saveCount += etrEntrustPledgeMapper.insert(etrEntrustPledge);
             }
         }
-        return saveCount;
+        if (CollectionUtils.isEmpty(ajaxResult.getErrorList())) {
+            ajaxResult = new AjaxResult("保存成功！");
+        }
+        return ajaxResult;
     }
 
 }
