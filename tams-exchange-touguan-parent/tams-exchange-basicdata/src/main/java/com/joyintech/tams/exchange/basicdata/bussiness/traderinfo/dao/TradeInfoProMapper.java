@@ -67,4 +67,6 @@ public interface TradeInfoProMapper {
     String hasSameDealerPartyNoTraderNo(TradeInfoProSaveRequest dto);
 
     String hasSameTraderSeqNo(TradeInfoProSaveRequest dto);
+
+    String  existsTraderSingle(TradeInfoProSaveRequest dto);
 }
