@@ -38,6 +38,7 @@ import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid001Mapper;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid002Mapper;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
@@ -89,6 +90,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -182,6 +184,9 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
     @Autowired
     private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
+
+    @Autowired
+    private CfetsEtrBondFirstBid001Mapper cfetsEtrBondFirstBid001Mapper;
 
     @Override
     public void doInsert(CfetsEtrBondFirstBid002Dto entity, OperationType operationType) {
@@ -1225,6 +1230,23 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 ajaxResult.setErrorList(messages);
                 return ajaxResult;
             }
+
+            //查询指令明细信息
+            List<EtrEntrustDetail> etrEntrustDetails = cfetsEtrBondFirstBid001Mapper.selectEntrustDetailById(cfetsDto.getEntrustId());
+            List<CfetsBiddingProductDto> biddingProductDtos = cfetsDto.getBiddingProductList();
+            List<String> secIdOlds = etrEntrustDetails.stream().filter( item ->StringUtil.isNotEmpty(item.getSecAcctId()))
+                    .map(EtrEntrustDetail::getSecAcctId).distinct().collect(Collectors.toList());
+            List<String> secIdNews = biddingProductDtos.stream().filter( item ->StringUtil.isNotEmpty(item.getSecAcctId()))
+                    .map(CfetsBiddingProductDto::getSecAcctId).distinct().collect(Collectors.toList());
+
+            Collections.sort(secIdOlds);
+            Collections.sort(secIdNews);
+            if (!StringUtil.equals(secIdOlds.toString(),secIdNews )) {
+                messages.add(new ValidMessage("指令修改需保证与原指令证券账户一致！"));
+                ajaxResult.setErrorList(messages);
+                return ajaxResult;
+            }
+
         }
         if (StringUtil.isEmpty(cfetsDto.getFinprodId())) {
             messages.add(new ValidMessage("请输入资产代码！"));
@@ -1254,10 +1276,13 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     if (StringUtil.isEmpty(bidDto.getAcctNo())) {
                         messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],资金账户不能为空！"));
                     }
-                    //资金账户对应的证券账户
-                    if (StringUtil.isEmpty(bidDto.getSecAcctId())) {
-                        messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],证券账户不能为空！"));
+                    if (StringUtil.isNotEmpty(bidDto.getAcctNo())) {
+                        //资金账户对应的证券账户
+                        if (StringUtil.isEmpty(bidDto.getSecAcctId())) {
+                            messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],证券账户不能为空！"));
+                        }
                     }
+
                 }
 
                 if (bidDto.getBidPrinAmt() == null) {
