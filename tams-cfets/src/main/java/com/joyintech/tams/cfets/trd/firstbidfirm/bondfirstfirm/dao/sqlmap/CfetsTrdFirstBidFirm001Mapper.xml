@@ -60,6 +60,7 @@
         fp.FINPROD_MARKET_ID                     finprodMarketId,
         fp.FINPROD_ABBR                          finprodAbbr,
         fpi.TENDER_TARGET                        tenderTarget,
+        fpi.ISSUE_CLASS                          issueClass,
         CASE
             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
             THEN fpi.ISSUE_DATE
@@ -172,6 +173,7 @@
         T.finprodMarketId,
         T.finprodAbbr,
         T.tenderTarget,
+        T.issueClass,
         T.issueDateStart,
         T.issueDateEnd,
         T.bidPrice,

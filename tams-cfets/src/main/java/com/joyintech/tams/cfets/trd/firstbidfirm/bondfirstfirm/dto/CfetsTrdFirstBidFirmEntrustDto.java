@@ -68,6 +68,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     @ApiModelProperty(name="tenderTarget",value="招标标的")
     private String tenderTarget;
 
+    @ApiModelProperty(name="issueClass",value="发行方式")
+    private String issueClass;
+
     @ApiModelProperty(name="tenderTargetStr",value="招标标的字典值")
     private String tenderTargetStr;
 
@@ -305,7 +308,20 @@ public class CfetsTrdFirstBidFirmEntrustDto {
         this.issueDate = issueDate;
     }
 
+    public String getIssueClass() {
+        return issueClass;
+    }
+
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
+    }
+
     public String getIssueDateStr() {
+        if (null != this.getIssueDateStart() && StringUtil.equals(DictCodeListExt4.新债_发行方式_招标发行.getValue(), getIssueClass()) &&
+                (StringUtil.equals(DictCodeListExt4.招标标的_价格.getValue(), getTenderTarget())
+                        || StringUtil.equals(DictCodeListExt4.招标标的_利率.getValue(), getTenderTarget()))) {
+            return DateUtil.format(this.getIssueDateStart());
+        }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
         }
