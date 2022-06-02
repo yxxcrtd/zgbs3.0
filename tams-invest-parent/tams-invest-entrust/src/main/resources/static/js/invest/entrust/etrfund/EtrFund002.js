@@ -568,7 +568,8 @@
             // $("#pschange1").show();
             $("#pschange2").hide();
             $("#entrustAmt0").show();
-            $("#entrustNum0").show();
+            $("#entrustNum0").hide();
+            $("#entrustNum").val('');
             $('#changeToFinprodMarketId_div').hide();
             $('#changeToFinprodMarketId').val('');
             if(pageModel === PAGE_MODEL_REFERENCE) {
