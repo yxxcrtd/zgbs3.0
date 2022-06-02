@@ -328,6 +328,25 @@ public class TrdProductDealAdd extends BaseEntity {
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal lendinIntAmt;
 
+    /**
+     * 本方交易商
+     */
+    private String dealerNo;
+
+    /**
+     * 本方交易主体
+     */
+    private String dealerPartyNo;
+
+    /**
+     * 对手方交易商
+     */
+    private String outDealerNo;
+
+    /**
+     * 对手方交易主体
+     */
+    private String outDealerPartyNo;
 
     /**
      * 取得 交易编号
@@ -1208,5 +1227,37 @@ public class TrdProductDealAdd extends BaseEntity {
 
     public void setLendinIntAmt(BigDecimal lendinIntAmt) {
         this.lendinIntAmt = lendinIntAmt;
+    }
+
+    public String getDealerNo() {
+        return dealerNo;
+    }
+
+    public void setDealerNo(String dealerNo) {
+        this.dealerNo = dealerNo;
+    }
+
+    public String getDealerPartyNo() {
+        return dealerPartyNo;
+    }
+
+    public void setDealerPartyNo(String dealerPartyNo) {
+        this.dealerPartyNo = dealerPartyNo;
+    }
+
+    public String getOutDealerNo() {
+        return outDealerNo;
+    }
+
+    public void setOutDealerNo(String outDealerNo) {
+        this.outDealerNo = outDealerNo;
+    }
+
+    public String getOutDealerPartyNo() {
+        return outDealerPartyNo;
+    }
+
+    public void setOutDealerPartyNo(String outDealerPartyNo) {
+        this.outDealerPartyNo = outDealerPartyNo;
     }
 }

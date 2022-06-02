@@ -216,6 +216,26 @@ public class TrdDealTotalAdd extends BaseEntity {
     private String ouPartyId;
 
     /**
+     * 本方交易商
+     */
+    private String dealerNo;
+
+    /**
+     * 本方交易主体
+     */
+    private String dealerPartyNo;
+
+    /**
+     * 对手方交易商
+     */
+    private String outDealerNo;
+
+    /**
+     * 对手方交易主体
+     */
+    private String outDealerPartyNo;
+
+    /**
      * 取得 汇总交易编号
      * @return 汇总交易编号
      */
@@ -800,5 +820,37 @@ public class TrdDealTotalAdd extends BaseEntity {
 
     public void setOuPartyId(String ouPartyId) {
         this.ouPartyId = ouPartyId;
+    }
+
+    public String getDealerNo() {
+        return dealerNo;
+    }
+
+    public void setDealerNo(String dealerNo) {
+        this.dealerNo = dealerNo;
+    }
+
+    public String getDealerPartyNo() {
+        return dealerPartyNo;
+    }
+
+    public void setDealerPartyNo(String dealerPartyNo) {
+        this.dealerPartyNo = dealerPartyNo;
+    }
+
+    public String getOutDealerNo() {
+        return outDealerNo;
+    }
+
+    public void setOutDealerNo(String outDealerNo) {
+        this.outDealerNo = outDealerNo;
+    }
+
+    public String getOutDealerPartyNo() {
+        return outDealerPartyNo;
+    }
+
+    public void setOutDealerPartyNo(String outDealerPartyNo) {
+        this.outDealerPartyNo = outDealerPartyNo;
     }
 }

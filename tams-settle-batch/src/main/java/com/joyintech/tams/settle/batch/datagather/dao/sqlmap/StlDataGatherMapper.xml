@@ -444,12 +444,12 @@
 		NVL(NVL(te.INSTRUCTION_ID, teh.INSTRUCTION_ID), NVL(tie.INSTRUCTION_ID, tieh.INSTRUCTION_ID)) ORDER_ID,
 		case when ptl.PROFIT_TYPE = '01' then 'FVTPL' else 'AC' end as invAim,ee.ENTRUST_ID,
 		stdta.REPO_TYPE,
-		NVL(tie.TRADE_ID, tieh.TRADE_ID) traderId,
-		NVL(tie.PROP_TRADE_ID, tieh.PROP_TRADE_ID) propTraderId,
-		NVL(tie.INVESTOR_ID, tieh.INVESTOR_ID) INVESTOR_ID,
-		NVL(tie.PROP_INVESTOR_ID, tieh.PROP_INVESTOR_ID) PROP_INVESTOR_ID,
-		NVL(tie.DEALER_ID, tieh.DEALER_ID) DEALER_ID,
-		NVL(tie.PROP_DEALER_ID, tieh.PROP_DEALER_ID) PROP_DEALER_ID,
+		NVL(tie.TRADE_ID, tieh.TRADE_ID) trader,
+		NVL(tie.PROP_TRADE_ID, tieh.PROP_TRADE_ID) counterTrader,
+		NVL(tie.INVESTOR_ID, tieh.INVESTOR_ID) dealerPartyNo,
+		NVL(tie.PROP_INVESTOR_ID, tieh.PROP_INVESTOR_ID) outDealerPartyNo,
+		NVL(tie.DEALER_ID, tieh.DEALER_ID) dealerNo,
+		NVL(tie.PROP_DEALER_ID, tieh.PROP_DEALER_ID) outDealerNo,
 		<!--<include refid="settleTransDataSql"></include>-->
 		<include refid="settleTransDataTotalSql"></include>
 		LEFT JOIN SETTLE_TRANS_DATA_TOTAL_STATUS stdts ON std.SEQ_ID = stdts.SEQ_NO

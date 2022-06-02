@@ -1,9 +1,7 @@
 package com.joyintech.tams.invest.common.transmatch.dto;
 
-import com.joyintech.background.component.common.pack.common.base.BaseEntity;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.SettleTransDataAdd;
 import com.joyintech.tams.common.base.entity.SettleTransDataTotal;
 import com.joyintech.tams.common.base.entity.SettleTransDataTotalAdd;
 import com.joyintech.tams.common.base.entity.SettleTransDataTotalPledge;
@@ -68,79 +66,79 @@ public class ExchangeTransMatchCommonDto extends SettleTransDataTotal {
     /**
      * 本方交易员
      */
-    private String traderId;
+    private String trader;
 
     /**
      * 对手方交易员
      */
-    private String propTraderId;
+    private String counterTrader;
 
     /**
-     * 本方交易商Id
+     * 本方交易商
      */
-    private String dealerId;
+    private String dealerNo;
 
     /**
-     * 对手方交易商Id
+     * 对手方交易商
      */
-    private String propDealerId;
+    private String outDealerNo;
 
     /**
-     * 本方交易主体Id
+     * 本方交易主体
      */
-    private String investorId;
+    private String dealerPartyNo;
 
     /**
      * 对手方交易主体
      */
-    private String propInvestorId;
+    private String outDealerPartyNo;
 
-    public String getTraderId() {
-        return traderId;
+    public String getTrader() {
+        return trader;
     }
 
-    public void setTraderId(String traderId) {
-        this.traderId = traderId;
+    public void setTrader(String trader) {
+        this.trader = trader;
     }
 
-    public String getPropTraderId() {
-        return propTraderId;
+    public String getCounterTrader() {
+        return counterTrader;
     }
 
-    public void setPropTraderId(String propTraderId) {
-        this.propTraderId = propTraderId;
+    public void setCounterTrader(String counterTrader) {
+        this.counterTrader = counterTrader;
     }
 
-    public String getDealerId() {
-        return dealerId;
+    public String getDealerNo() {
+        return dealerNo;
     }
 
-    public void setDealerId(String dealerId) {
-        this.dealerId = dealerId;
+    public void setDealerNo(String dealerNo) {
+        this.dealerNo = dealerNo;
     }
 
-    public String getPropDealerId() {
-        return propDealerId;
+    public String getOutDealerNo() {
+        return outDealerNo;
     }
 
-    public void setPropDealerId(String propDealerId) {
-        this.propDealerId = propDealerId;
+    public void setOutDealerNo(String outDealerNo) {
+        this.outDealerNo = outDealerNo;
     }
 
-    public String getInvestorId() {
-        return investorId;
+    public String getDealerPartyNo() {
+        return dealerPartyNo;
     }
 
-    public void setInvestorId(String investorId) {
-        this.investorId = investorId;
+    public void setDealerPartyNo(String dealerPartyNo) {
+        this.dealerPartyNo = dealerPartyNo;
     }
 
-    public String getPropInvestorId() {
-        return propInvestorId;
+    public String getOutDealerPartyNo() {
+        return outDealerPartyNo;
     }
 
-    public void setPropInvestorId(String propInvestorId) {
-        this.propInvestorId = propInvestorId;
+    public void setOutDealerPartyNo(String outDealerPartyNo) {
+        this.outDealerPartyNo = outDealerPartyNo;
     }
 
     public String getMatchType() {
