@@ -86,7 +86,7 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 
 		}catch (Exception e){
 			logger.error("成交消息接收失败-错误信息:{}" + e.getMessage());
-			logger.error("成交消息接收失败-错误信息:{}" + e);
+			logger.error("成交消息接收失败-错误信息:{}" + e.getStackTrace());
 			e.printStackTrace();
 			logger.error("成交消息接收失败-错误信息:{},消息内容:{}", e.getLocalizedMessage(), tradeMessageStr);
 			//throw new Exception("成交消息接收失败");

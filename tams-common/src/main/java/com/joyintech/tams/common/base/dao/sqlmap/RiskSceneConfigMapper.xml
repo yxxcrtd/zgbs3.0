@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.common.base.dao.RiskSceneConfigMapper" >
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.RiskSceneConfig" >
+        <id column="SEQ_NO" property="seqNo" jdbcType="VARCHAR" />
+        <result column="BUSINESS_TYPE" property="businessType" jdbcType="VARCHAR" />
+        <result column="FINPROD_TYPE2" property="finprodType2" jdbcType="VARCHAR" />
+        <result column="PS" property="ps" jdbcType="VARCHAR" />
+        <result column="DECISION_TYPE" property="decisionType" jdbcType="VARCHAR" />
+        <result column="WORKFLOW_STATUS" property="workflowStatus" jdbcType="VARCHAR" />
+        <result column="SPECIAL_MATCH" property="specialMatch" jdbcType="VARCHAR" />
+        <result column="IND_PRE_CODE" property="indPreCode" jdbcType="VARCHAR" />
+        <result column="INDICATOR_CONTROL" property="indicatorControl" jdbcType="VARCHAR" />
+        <result column="INDICATOR_OCCUPY" property="indicatorOccupy" jdbcType="VARCHAR" />
+        <result column="INDICATOR_APPROVE" property="indicatorApprove" jdbcType="VARCHAR" />
+        <result column="CREDIT_PRE_CODE" property="creditPreCode" jdbcType="VARCHAR" />
+        <result column="CREDIT_CONTROL" property="creditControl" jdbcType="VARCHAR" />
+        <result column="CREDIT_OCCUPY" property="creditOccupy" jdbcType="VARCHAR" />
+        <result column="AUTHORIZE_CONTROL" property="authorizeControl" jdbcType="VARCHAR" />
+        <result column="AUTHORIZE_APPROVE" property="authorizeApprove" jdbcType="VARCHAR" />
+        <result column="NAME_LIST_CONTROL" property="nameListControl" jdbcType="VARCHAR" />
+        <result column="NAME_LIST_TYPE" property="nameListType" jdbcType="VARCHAR" />
+        <result column="PAGE_ID" property="pageId" jdbcType="VARCHAR" />
+        <result column="MODULE_ID" property="moduleId" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        SEQ_NO SEQ_NO, BUSINESS_TYPE BUSINESS_TYPE, FINPROD_TYPE2 FINPROD_TYPE2, PS PS, DECISION_TYPE DECISION_TYPE, 
+        WORKFLOW_STATUS WORKFLOW_STATUS, SPECIAL_MATCH SPECIAL_MATCH, IND_PRE_CODE IND_PRE_CODE, 
+        INDICATOR_CONTROL INDICATOR_CONTROL, INDICATOR_OCCUPY INDICATOR_OCCUPY, INDICATOR_APPROVE INDICATOR_APPROVE, 
+        CREDIT_PRE_CODE CREDIT_PRE_CODE, CREDIT_CONTROL CREDIT_CONTROL, CREDIT_OCCUPY CREDIT_OCCUPY, 
+        AUTHORIZE_CONTROL AUTHORIZE_CONTROL, AUTHORIZE_APPROVE AUTHORIZE_APPROVE, NAME_LIST_CONTROL NAME_LIST_CONTROL, 
+        NAME_LIST_TYPE NAME_LIST_TYPE, PAGE_ID PAGE_ID, MODULE_ID MODULE_ID
+    </sql>
+    <sql id="Sql_All_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.RiskSceneConfigMapper.Base_Column_List" />
+        from RISK_SCENE_CONFIG
+    </sql>
+    <sql id="Sql_All_Effective_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.RiskSceneConfigMapper.Base_Column_List" />
+        from RISK_SCENE_CONFIG
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.RiskSceneConfigMapper.Base_Column_List" />
+        from RISK_SCENE_CONFIG
+        where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from RISK_SCENE_CONFIG
+        where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.RiskSceneConfig" >
+        insert into RISK_SCENE_CONFIG (SEQ_NO, BUSINESS_TYPE, FINPROD_TYPE2, 
+            PS, DECISION_TYPE, WORKFLOW_STATUS, 
+            SPECIAL_MATCH, IND_PRE_CODE, INDICATOR_CONTROL, 
+            INDICATOR_OCCUPY, INDICATOR_APPROVE, CREDIT_PRE_CODE, 
+            CREDIT_CONTROL, CREDIT_OCCUPY, AUTHORIZE_CONTROL, 
+            AUTHORIZE_APPROVE, NAME_LIST_CONTROL, NAME_LIST_TYPE, 
+            PAGE_ID, MODULE_ID)
+        values (#{seqNo,jdbcType=VARCHAR}, #{businessType,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR}, 
+            #{ps,jdbcType=VARCHAR}, #{decisionType,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR}, 
+            #{specialMatch,jdbcType=VARCHAR}, #{indPreCode,jdbcType=VARCHAR}, #{indicatorControl,jdbcType=VARCHAR}, 
+            #{indicatorOccupy,jdbcType=VARCHAR}, #{indicatorApprove,jdbcType=VARCHAR}, #{creditPreCode,jdbcType=VARCHAR}, 
+            #{creditControl,jdbcType=VARCHAR}, #{creditOccupy,jdbcType=VARCHAR}, #{authorizeControl,jdbcType=VARCHAR}, 
+            #{authorizeApprove,jdbcType=VARCHAR}, #{nameListControl,jdbcType=VARCHAR}, #{nameListType,jdbcType=VARCHAR}, 
+            #{pageId,jdbcType=VARCHAR}, #{moduleId,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.RiskSceneConfig" >
+        insert into RISK_SCENE_CONFIG
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="seqNo != null" >
+                SEQ_NO,
+            </if>
+            <if test="businessType != null" >
+                BUSINESS_TYPE,
+            </if>
+            <if test="finprodType2 != null" >
+                FINPROD_TYPE2,
+            </if>
+            <if test="ps != null" >
+                PS,
+            </if>
+            <if test="decisionType != null" >
+                DECISION_TYPE,
+            </if>
+            <if test="workflowStatus != null" >
+                WORKFLOW_STATUS,
+            </if>
+            <if test="specialMatch != null" >
+                SPECIAL_MATCH,
+            </if>
+            <if test="indPreCode != null" >
+                IND_PRE_CODE,
+            </if>
+            <if test="indicatorControl != null" >
+                INDICATOR_CONTROL,
+            </if>
+            <if test="indicatorOccupy != null" >
+                INDICATOR_OCCUPY,
+            </if>
+            <if test="indicatorApprove != null" >
+                INDICATOR_APPROVE,
+            </if>
+            <if test="creditPreCode != null" >
+                CREDIT_PRE_CODE,
+            </if>
+            <if test="creditControl != null" >
+                CREDIT_CONTROL,
+            </if>
+            <if test="creditOccupy != null" >
+                CREDIT_OCCUPY,
+            </if>
+            <if test="authorizeControl != null" >
+                AUTHORIZE_CONTROL,
+            </if>
+            <if test="authorizeApprove != null" >
+                AUTHORIZE_APPROVE,
+            </if>
+            <if test="nameListControl != null" >
+                NAME_LIST_CONTROL,
+            </if>
+            <if test="nameListType != null" >
+                NAME_LIST_TYPE,
+            </if>
+            <if test="pageId != null" >
+                PAGE_ID,
+            </if>
+            <if test="moduleId != null" >
+                MODULE_ID,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="seqNo != null" >
+                #{seqNo,jdbcType=VARCHAR},
+            </if>
+            <if test="businessType != null" >
+                #{businessType,jdbcType=VARCHAR},
+            </if>
+            <if test="finprodType2 != null" >
+                #{finprodType2,jdbcType=VARCHAR},
+            </if>
+            <if test="ps != null" >
+                #{ps,jdbcType=VARCHAR},
+            </if>
+            <if test="decisionType != null" >
+                #{decisionType,jdbcType=VARCHAR},
+            </if>
+            <if test="workflowStatus != null" >
+                #{workflowStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="specialMatch != null" >
+                #{specialMatch,jdbcType=VARCHAR},
+            </if>
+            <if test="indPreCode != null" >
+                #{indPreCode,jdbcType=VARCHAR},
+            </if>
+            <if test="indicatorControl != null" >
+                #{indicatorControl,jdbcType=VARCHAR},
+            </if>
+            <if test="indicatorOccupy != null" >
+                #{indicatorOccupy,jdbcType=VARCHAR},
+            </if>
+            <if test="indicatorApprove != null" >
+                #{indicatorApprove,jdbcType=VARCHAR},
+            </if>
+            <if test="creditPreCode != null" >
+                #{creditPreCode,jdbcType=VARCHAR},
+            </if>
+            <if test="creditControl != null" >
+                #{creditControl,jdbcType=VARCHAR},
+            </if>
+            <if test="creditOccupy != null" >
+                #{creditOccupy,jdbcType=VARCHAR},
+            </if>
+            <if test="authorizeControl != null" >
+                #{authorizeControl,jdbcType=VARCHAR},
+            </if>
+            <if test="authorizeApprove != null" >
+                #{authorizeApprove,jdbcType=VARCHAR},
+            </if>
+            <if test="nameListControl != null" >
+                #{nameListControl,jdbcType=VARCHAR},
+            </if>
+            <if test="nameListType != null" >
+                #{nameListType,jdbcType=VARCHAR},
+            </if>
+            <if test="pageId != null" >
+                #{pageId,jdbcType=VARCHAR},
+            </if>
+            <if test="moduleId != null" >
+                #{moduleId,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.RiskSceneConfig" >
+        insert into RISK_SCENE_CONFIG(SEQ_NO, BUSINESS_TYPE, FINPROD_TYPE2, PS, DECISION_TYPE, 
+        WORKFLOW_STATUS, SPECIAL_MATCH, IND_PRE_CODE, INDICATOR_CONTROL, INDICATOR_OCCUPY, 
+        INDICATOR_APPROVE, CREDIT_PRE_CODE, CREDIT_CONTROL, CREDIT_OCCUPY, AUTHORIZE_CONTROL, 
+        AUTHORIZE_APPROVE, NAME_LIST_CONTROL, NAME_LIST_TYPE, PAGE_ID, MODULE_ID)
+        select SEQ_NO, BUSINESS_TYPE, FINPROD_TYPE2, PS, DECISION_TYPE, 
+            WORKFLOW_STATUS, SPECIAL_MATCH, IND_PRE_CODE, INDICATOR_CONTROL, INDICATOR_OCCUPY, 
+            INDICATOR_APPROVE, CREDIT_PRE_CODE, CREDIT_CONTROL, CREDIT_OCCUPY, AUTHORIZE_CONTROL, 
+            AUTHORIZE_APPROVE, NAME_LIST_CONTROL, NAME_LIST_TYPE, PAGE_ID, MODULE_ID
+             from RISK_SCENE_CONFIG
+             where 1 = 1 and SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.RiskSceneConfig" >
+        update RISK_SCENE_CONFIG
+        <set >
+            <if test="businessType != null" >
+                BUSINESS_TYPE = #{businessType,jdbcType=VARCHAR},
+            </if>
+            <if test="finprodType2 != null" >
+                FINPROD_TYPE2 = #{finprodType2,jdbcType=VARCHAR},
+            </if>
+            <if test="ps != null" >
+                PS = #{ps,jdbcType=VARCHAR},
+            </if>
+            <if test="decisionType != null" >
+                DECISION_TYPE = #{decisionType,jdbcType=VARCHAR},
+            </if>
+            <if test="workflowStatus != null" >
+                WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="specialMatch != null" >
+                SPECIAL_MATCH = #{specialMatch,jdbcType=VARCHAR},
+            </if>
+            <if test="indPreCode != null" >
+                IND_PRE_CODE = #{indPreCode,jdbcType=VARCHAR},
+            </if>
+            <if test="indicatorControl != null" >
+                INDICATOR_CONTROL = #{indicatorControl,jdbcType=VARCHAR},
+            </if>
+            <if test="indicatorOccupy != null" >
+                INDICATOR_OCCUPY = #{indicatorOccupy,jdbcType=VARCHAR},
+            </if>
+            <if test="indicatorApprove != null" >
+                INDICATOR_APPROVE = #{indicatorApprove,jdbcType=VARCHAR},
+            </if>
+            <if test="creditPreCode != null" >
+                CREDIT_PRE_CODE = #{creditPreCode,jdbcType=VARCHAR},
+            </if>
+            <if test="creditControl != null" >
+                CREDIT_CONTROL = #{creditControl,jdbcType=VARCHAR},
+            </if>
+            <if test="creditOccupy != null" >
+                CREDIT_OCCUPY = #{creditOccupy,jdbcType=VARCHAR},
+            </if>
+            <if test="authorizeControl != null" >
+                AUTHORIZE_CONTROL = #{authorizeControl,jdbcType=VARCHAR},
+            </if>
+            <if test="authorizeApprove != null" >
+                AUTHORIZE_APPROVE = #{authorizeApprove,jdbcType=VARCHAR},
+            </if>
+            <if test="nameListControl != null" >
+                NAME_LIST_CONTROL = #{nameListControl,jdbcType=VARCHAR},
+            </if>
+            <if test="nameListType != null" >
+                NAME_LIST_TYPE = #{nameListType,jdbcType=VARCHAR},
+            </if>
+            <if test="pageId != null" >
+                PAGE_ID = #{pageId,jdbcType=VARCHAR},
+            </if>
+            <if test="moduleId != null" >
+                MODULE_ID = #{moduleId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.RiskSceneConfig" >
+        update RISK_SCENE_CONFIG
+        set BUSINESS_TYPE = #{businessType,jdbcType=VARCHAR},
+            FINPROD_TYPE2 = #{finprodType2,jdbcType=VARCHAR},
+            PS = #{ps,jdbcType=VARCHAR},
+            DECISION_TYPE = #{decisionType,jdbcType=VARCHAR},
+            WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
+            SPECIAL_MATCH = #{specialMatch,jdbcType=VARCHAR},
+            IND_PRE_CODE = #{indPreCode,jdbcType=VARCHAR},
+            INDICATOR_CONTROL = #{indicatorControl,jdbcType=VARCHAR},
+            INDICATOR_OCCUPY = #{indicatorOccupy,jdbcType=VARCHAR},
+            INDICATOR_APPROVE = #{indicatorApprove,jdbcType=VARCHAR},
+            CREDIT_PRE_CODE = #{creditPreCode,jdbcType=VARCHAR},
+            CREDIT_CONTROL = #{creditControl,jdbcType=VARCHAR},
+            CREDIT_OCCUPY = #{creditOccupy,jdbcType=VARCHAR},
+            AUTHORIZE_CONTROL = #{authorizeControl,jdbcType=VARCHAR},
+            AUTHORIZE_APPROVE = #{authorizeApprove,jdbcType=VARCHAR},
+            NAME_LIST_CONTROL = #{nameListControl,jdbcType=VARCHAR},
+            NAME_LIST_TYPE = #{nameListType,jdbcType=VARCHAR},
+            PAGE_ID = #{pageId,jdbcType=VARCHAR},
+            MODULE_ID = #{moduleId,jdbcType=VARCHAR}
+        where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </update>
+</mapper>

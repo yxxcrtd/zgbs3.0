@@ -60,8 +60,7 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
         for (TradeInfoProResponse tradeInfoPro:queryList){
               //根据一级查二级
 //              List<TraderInfoDto> dto1 = tradeInfoProMapper.findTrader(tradeInfoProResponse);
-
-              childList = tradeInfoProMapper.findTrader(tradeInfoPro);
+            childList = tradeInfoProMapper.findTrader(tradeInfoPro);
 //              tradeInfoProResponseList.add(tradeInfoProResponse1);
 
               if (childList!= null){

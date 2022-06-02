@@ -312,6 +312,9 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
             dto.setCalculateField("03");
             if (StringUtil.isNotEmpty(dto.getFinprodId())){
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+                if (!StringUtil.isNotEmpty(finProduct.getCirculationCode())){
+                     return new Message<CalcPriceAndYieldResponse>().success().setData(null);
+                }
                if (StringUtil.equals( finProduct.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
                   dto.setFinprodId("F01_"+finProduct.getCirculationCode());
                }
