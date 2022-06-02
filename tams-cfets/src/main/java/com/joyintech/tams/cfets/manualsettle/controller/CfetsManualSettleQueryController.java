@@ -147,7 +147,7 @@ public class CfetsManualSettleQueryController extends BaseController {
             CfetsManualSettleDto settleDto = dto.getSelectedItem().get(0);
             if ((DictCodeListExt4.投标方式_分销买入.getValue().equals(settleDto.getBidModle())
                     || DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())
-                    || StringUtil.equals(settleDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())
+                    || StringUtil.equals(settleDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())
                     && !StringUtil.equals("01", dto.getPageFrom()))) {
                 CfetsTrdQueryTradeInfoListResponse response = new CfetsTrdQueryTradeInfoListResponse();
                 BeanUtil.copyPropertiesIgnoreNull(response,settleDto);

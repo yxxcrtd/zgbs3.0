@@ -7,6 +7,7 @@
         <id column="ID" jdbcType="VARCHAR" property="id"/>
         <result column="BUSI_TYPE" jdbcType="VARCHAR" property="busiType"/>
         <result column="BUSI_ID" jdbcType="VARCHAR" property="busiId"/>
+        <result column="INSTRUCTION_ID" jdbcType="VARCHAR" property="instructionId"/>
         <result column="BUSI_STATUS" jdbcType="VARCHAR" property="busiStatus"/>
         <result column="PORTFOLIO_ID" jdbcType="VARCHAR" property="portfolioId"/>
         <result column="PORTFOLIO_NAME" jdbcType="VARCHAR" property="portfolioName"/>
@@ -16,7 +17,7 @@
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID, BUSI_TYPE, BUSI_ID, BUSI_STATUS, PORTFOLIO_ID, PORTFOLIO_NAME, TARGET_AMT, TARGET_NUM,
+        ID, BUSI_TYPE, BUSI_ID, INSTRUCTION_ID, BUSI_STATUS, PORTFOLIO_ID, PORTFOLIO_NAME, TARGET_AMT, TARGET_NUM,
         TARGET_TYPE
     </sql>
 

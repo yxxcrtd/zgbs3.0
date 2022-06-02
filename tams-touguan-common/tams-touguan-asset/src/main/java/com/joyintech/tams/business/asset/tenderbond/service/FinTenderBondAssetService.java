@@ -233,12 +233,16 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
         config.setInputValue2(dto.getType9());
         config.setInputValue3(dto.getType10());
-        List<FinProductTypeConfig> resultTypeList = assetCommonMapper.getAssetThreeType(config);
-        if(CollectionUtils.isNotEmpty(resultTypeList)) {
-            dto.setType9(resultTypeList.get(0).getInputValue2());
-            dto.setType10(resultTypeList.get(0).getInputValue3());
-            dto.setType11(resultTypeList.get(0).getInputValue4());
+        // add by caiqun 20220602 start wind一级分类、wind二级分类都为空时，则不查资产分类表
+        if(!(StringUtil.isEmpty(dto.getType9()) && StringUtil.isEmpty(dto.getType10()))){
+            List<FinProductTypeConfig> resultTypeList = assetCommonMapper.getAssetThreeType(config);
+            if(CollectionUtils.isNotEmpty(resultTypeList)) {
+                dto.setType9(resultTypeList.get(0).getInputValue2());
+                dto.setType10(resultTypeList.get(0).getInputValue3());
+                dto.setType11(resultTypeList.get(0).getInputValue4());
+            }
         }
+        // add by caiqun 20220602 end wind一级分类、wind二级分类都为空时，则不查资产分类表
         FinProductAddDto addDto = finTenderBondAssetMapper.getProductAddFromInterface(param);
         addDto.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         if(addDto != null) {

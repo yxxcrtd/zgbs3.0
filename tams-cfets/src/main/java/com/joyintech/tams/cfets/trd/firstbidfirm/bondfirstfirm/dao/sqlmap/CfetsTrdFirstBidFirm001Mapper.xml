@@ -609,9 +609,10 @@
                          OR fpi.ISSUE_CLASS = '03'
                          THEN fpi.TENDER_EDATE
                      END           AS bidDateEnd/*投标日 结束*/,
-                 ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+                 ee.ENTRUST_NUM*100   etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
-                 bobp.BID_PRICE    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                bobp.BID_PRICE    AS bidPriceAndUntil,
                  bobp.bidPriceNum    AS bidPriceNum,
                  bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                  bo.PAY_TYPE       AS payType/*缴款方式*/,
@@ -636,7 +637,8 @@
                            when t3.TENDER_TARGET = '03'
                                then to_char(t0.BID_PRICE * 10000, 'FM9999999990.90')
                            end, ',') within group (order by t0.ENTRUST_ID) AS bidPriceNum,
-                       t0.BID_ID
+                       t0.BID_ID,
+                        decode(t3.TENDER_TARGET,'01','%','02','元','03','BP',null) until
                 from BID_ORDER_BID_PRICE t0
                          LEFT JOIN BID_ORDER t1 on t1.BID_ID = t0.BID_ID
                          LEFT JOIN FIN_PRODUCT t2
@@ -644,7 +646,7 @@
                          LEFT JOIN
                      FIN_PRODUCT_ISSUE t3
                      ON t3.FINPROD_ID = t2.FINPROD_ID
-                group by t0.BID_ID) bobp
+                group by t0.BID_ID,t3.TENDER_TARGET) bobp
                ON bobp.BID_ID = bo.BID_ID
                    LEFT JOIN
                FIN_PRODUCT fp
@@ -725,9 +727,10 @@
                          OR fpi.ISSUE_CLASS = '03'
                          THEN fpi.TENDER_EDATE
                      END           AS bidDateEnd/*投标日 结束*/,
-                 ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+                 ee.ENTRUST_NUM*100   etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
-                 bobp.BID_PRICE    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                bobp.BID_PRICE    AS bidPriceAndUntil,
                  bobp.bidPriceNum    AS bidPriceNum,
                  bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                  bo.PAY_TYPE       AS payType/*缴款方式*/,
@@ -752,7 +755,8 @@
                            when t3.TENDER_TARGET = '03'
                                then to_char(t0.BID_PRICE * 10000, 'FM9999999990.90')
                            end, ',') within group (order by t0.ENTRUST_ID) AS bidPriceNum,
-                       t0.BID_ID
+                       t0.BID_ID,
+                        decode(t3.TENDER_TARGET,'01','%','02','元','03','BP',null) until
                 from WFL_BID_ORDER_BID_PRICE t0
                          LEFT JOIN WFL_BID_ORDER t1 on t1.BID_ID = t0.BID_ID
                          LEFT JOIN FIN_PRODUCT t2
@@ -760,7 +764,7 @@
                          LEFT JOIN
                      FIN_PRODUCT_ISSUE t3
                      ON t3.FINPROD_ID = t2.FINPROD_ID
-                group by t0.BID_ID) bobp
+                group by t0.BID_ID,t3.TENDER_TARGET) bobp
                ON bobp.BID_ID = bo.BID_ID
                    LEFT JOIN
                FIN_PRODUCT fp
@@ -844,7 +848,7 @@
          </if>
      </where>
     group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId, T.finprodAbbr, T.tenderTarget, T.bidDateStart,
-             T.bidDateEnd, T.etrBidPriceTotal, T.totalBiddingNum, T.bidprice,T.bidPriceNum, T.biddingMethod, T.payType, T.bidCfmDate, T.tradeMarket,
+             T.bidDateEnd, T.etrBidPriceTotal, T.totalBiddingNum, T.bidprice,T.bidPriceNum,T.bidPriceAndUntil, T.biddingMethod, T.payType, T.bidCfmDate, T.tradeMarket,
              T.counterId, T.counterName, T.remark
     </select>
 
@@ -860,6 +864,7 @@
             or decode(T.etrBidPriceTotal,0,'0.00',to_char(T.etrBidPriceTotal/10000,'FM99999999999990.90'))=#{search} or to_char(T.etrBidPriceTotal)=#{search}
             or decode(T.totalBiddingNum,0,'0.00',to_char(T.totalBiddingNum/10000,'FM9999999999990.90'))=#{search} or to_char(T.totalBiddingNum)=#{search}
             or (INSTR(t.bidPriceNum,concat(#{search},','))>0 OR  INSTR(t.bidPriceNum,concat(#{search},','))>0 OR t.bidPriceNum = #{search} )
+            or (INSTR(t.bidPriceAndUntil,concat(#{search},','))>0 OR  INSTR(t.bidPriceAndUntil,concat(#{search},','))>0 OR t.bidPriceAndUntil = #{search} )
             or (INSTR(t.bidPrice,concat(#{search},','))>0 OR  INSTR(t.bidPrice,concat(#{search},','))>0 OR t.bidPrice = #{search} )
             or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{search}
@@ -935,9 +940,11 @@
                             OR fpi.ISSUE_CLASS = '03'
                             THEN fpi.TENDER_EDATE
                         END           AS bidDateEnd/*投标日 结束*/,
-                    ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+                    ee.ENTRUST_NUM*100   etrBidPriceTotal/*指令投标券面总额*/,
                     bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
-                    bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+                    bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                    bobp.BID_PRICE    AS bidPriceAndUntil,
+                    bobp.bidPriceNum    AS bidPriceNum,
                     bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                     bo.PAY_TYPE       AS payType/*缴款方式*/,
                     case
@@ -967,7 +974,15 @@
                                       when t3.TENDER_TARGET = '03'
                                           then to_char(t0.BID_PRICE * 10000, 'FM99990.90') || 'BP'
                                       end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
-                          t0.BID_ID
+                       listagg(case
+                           when t3.TENDER_TARGET = '01'
+                               then to_char(t0.BID_PRICE * 100, 'FM999999990.9990')
+                           when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999990.9990')
+                           when t3.TENDER_TARGET = '03'
+                               then to_char(t0.BID_PRICE * 10000, 'FM9999999990.90')
+                           end, ',') within group (order by t0.ENTRUST_ID) AS bidPriceNum,
+                          t0.BID_ID,
+                            decode(t3.TENDER_TARGET,'01','%','02','元','03','BP',null) until
                    from BID_ORDER_BID_PRICE t0
                             LEFT JOIN BID_ORDER t1 on t1.BID_ID = t0.BID_ID
                             LEFT JOIN FIN_PRODUCT t2
@@ -975,7 +990,7 @@
                             LEFT JOIN
                         FIN_PRODUCT_ISSUE t3
                         ON t3.FINPROD_ID = t2.FINPROD_ID
-                   group by t0.BID_ID) bobp
+                   group by t0.BID_ID,t3.TENDER_TARGET) bobp
                   ON bobp.BID_ID = bo.BID_ID
                       LEFT JOIN
                   FIN_PRODUCT fp
@@ -1058,9 +1073,11 @@
                             OR fpi.ISSUE_CLASS = '03'
                             THEN fpi.TENDER_EDATE
                         END         AS bidDateEnd/*投标日 结束*/,
-                    ee.ENTRUST_NUM  AS etrBidPriceTotal/*指令投标券面总额*/,
+                    ee.ENTRUST_NUM*100 etrBidPriceTotal/*指令投标券面总额*/,
                     bo.WIN_PRIN_AMT AS bidPriceTotal/*券面总额*/,
-                    bobp.BID_PRICE  AS bidprice/*投标标位, 多个逗号分隔展示*/,
+                    bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                    bobp.BID_PRICE    AS bidPriceAndUntil,
+                    bobp.bidPriceNum    AS bidPriceNum,
                     bo.BID_MODLE    AS biddingMethod/*投标方式*/,
                     bo.PAY_TYPE     AS payType/*缴款方式*/,
                     case
@@ -1090,7 +1107,14 @@
                                       when t3.TENDER_TARGET = '03'
                                           then to_char(t0.BID_PRICE * 10000, 'FM9999990.90') || 'BP'
                                       end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
-                          t0.BID_ID
+                       listagg(case
+                           when t3.TENDER_TARGET = '01'
+                               then to_char(t0.BID_PRICE * 100, 'FM999999990.9990')
+                           when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999990.9990')
+                           when t3.TENDER_TARGET = '03'
+                               then to_char(t0.BID_PRICE * 10000, 'FM9999999990.90')
+                           end, ',') within group (order by t0.ENTRUST_ID) AS bidPriceNum,
+                          t0.BID_ID,decode(t3.TENDER_TARGET,'01','%','02','元','03','BP',null) until
                    from WFL_BID_ORDER_BID_PRICE t0
                             LEFT JOIN WFL_BID_ORDER t1 on t1.BID_ID = t0.BID_ID
                             LEFT JOIN FIN_PRODUCT t2
@@ -1098,7 +1122,7 @@
                             LEFT JOIN
                         FIN_PRODUCT_ISSUE t3
                         ON t3.FINPROD_ID = t2.FINPROD_ID
-                   group by t0.BID_ID) bobp
+                   group by t0.BID_ID,t3.TENDER_TARGET) bobp
                   ON bobp.BID_ID = bo.BID_ID
                       LEFT JOIN
                   FIN_PRODUCT fp
@@ -1182,7 +1206,7 @@
             </if>
         </where>
     group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId,
-             T.finprodAbbr, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice, T.biddingMethod,
+             T.finprodAbbr, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice,T.bidPriceAndUntil,T.bidPriceNum, T.biddingMethod,
              T.payType, T.winPrice, T.price, T.payableAmount, T.settFeeAmt, T.payDate, T.assignRegdate, T.listingDate,
              T.bidCfmDate, T.counterName,T.remark, T.dealDate,T.tradeMarket,T.tenderTarget,T.counterId
     </select>
@@ -1198,7 +1222,9 @@
             like '%' || #{search} || '%'
             or decode(T.etrBidPriceTotal,0,'0.00',to_char(T.etrBidPriceTotal/10000,'FM99999999999990.90'))=#{search} or to_char(T.etrBidPriceTotal)=#{search}
             or decode(T.bidPriceTotal,0,'0.00',to_char(T.bidPriceTotal/10000,'FM9999999999990.90'))=#{search} or to_char(T.bidPriceTotal)=#{search}
-            or decode(T.bidprice,0,'0.00',to_char(T.bidprice,'FM999999999990.9990'))=#{search} or to_char(T.bidprice)=#{search}
+            or (INSTR(t.bidPriceNum,concat(#{search},','))>0 OR  INSTR(t.bidPriceNum,concat(#{search},','))>0 OR t.bidPriceNum = #{search} )
+            or (INSTR(t.bidPriceAndUntil,concat(#{search},','))>0 OR  INSTR(t.bidPriceAndUntil,concat(#{search},','))>0 OR t.bidPriceAndUntil = #{search} )
+            or (INSTR(t.bidPrice,concat(#{search},','))>0 OR  INSTR(t.bidPrice,concat(#{search},','))>0 OR t.bidPrice = #{search} )
             or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidCfmDate,'yyyy-MM-dd'),'-','/')=#{search}

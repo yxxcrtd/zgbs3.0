@@ -414,10 +414,12 @@ public class CfetsTrdQueryService extends BaseService{
                     bidPrinAmt= ArithmeticUtil.doAdd(bidPrinAmt,fenPeiInfoDto.getBidPrinAmt());
                 }
             }
-            bidPortIntFenPeiInfoDto.setWinPrice(winPrice);
-            bidPortIntFenPeiInfoDto.setTotalWinPrinAmt(totalWinPrinAmt);
-            bidPortIntFenPeiInfoDto.setBidPrinAmt(bidPrinAmt);
-            datahlist.add(bidPortIntFenPeiInfoDto);
+            if (StringUtil.isNotEmpty(winPrice)){
+                bidPortIntFenPeiInfoDto.setWinPrice(winPrice);
+                bidPortIntFenPeiInfoDto.setTotalWinPrinAmt(totalWinPrinAmt);
+                bidPortIntFenPeiInfoDto.setBidPrinAmt(bidPrinAmt);
+                datahlist.add(bidPortIntFenPeiInfoDto);
+            }
             resultData.put(dtCode + "_dataform", dataform);
             resultData.put(dtCode + "_datalist", datalist);
             resultData.put(dtCode + "_datahlist", datahlist);
