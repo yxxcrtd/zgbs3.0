@@ -129,9 +129,8 @@
                     ssai.SEC_ACCT_NAME/*证券账户*/,
                     ee.INV_MANAGER_ID/*投资经理ID*/,
                     SU.REAL_NAME INV_MANAGER_NAME/*投资经理*/,
-                    eed.ENTRUST_NUM*100 ENTRUST_NUM /*委托券面总额*/,
-                    eed.ENTRUST_NUM*100 avaNum /*剩余券面总额*/,
-                    eebp.BID_PRIN_AMT*100 BID_PRIN_AMT /*委托投标券面*/
+                    eebp.BID_PRIN_AMT*100 avaNum /*剩余券面总额*/,
+                    eebp.BID_PRIN_AMT*100 ENTRUST_NUM /*委托投标券面*/
         from ETR_ENTRUST ee
                  left join ETR_ENTRUST_DETAIL eed on ee.ENTRUST_ID = eed.ENTRUST_ID
                  left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eed.PORTFOLIO_ID
