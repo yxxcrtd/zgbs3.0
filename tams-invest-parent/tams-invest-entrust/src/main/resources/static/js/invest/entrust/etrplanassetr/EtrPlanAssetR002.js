@@ -2,7 +2,7 @@
  * 计划类净值委托新建
  */
 (function() {
-
+    let invAims = invAim;
     var getriskdata = function () {
         var entrustAmt = $('#entrustAmt').val();
         var entrustNum = $('#entrustNum').val();
@@ -35,6 +35,11 @@
         // add by zhangrui1 交易对手影响风险试算 start
         object.counterId = ['counterId', 'EtrInvestPersonInfo.counterId'];
         // add by zhangrui1 交易对手影响风险试算 end
+        //add wsz 修改 不显示业务模式 start
+        if(invAims != null){
+            $('#businessModel').textSelect('setValue', invAims);
+        }
+        //add wsz 修改 不显示业务模式 end
         return object;
     }
     /**

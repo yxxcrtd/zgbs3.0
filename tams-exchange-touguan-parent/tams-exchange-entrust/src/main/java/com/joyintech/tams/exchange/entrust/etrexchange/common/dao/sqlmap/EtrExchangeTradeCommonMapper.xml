@@ -167,7 +167,7 @@
         END AS finishAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
+        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
         END AS avaNum,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
@@ -175,7 +175,7 @@
         END AS finishDealAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
+        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
         END AS avaDealAmt,
         nvl(detail.PORTFOLIO_ID,T5.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,T5.PORTFOLIO_NAME) portfolioName,
@@ -1366,7 +1366,10 @@
 
     <select id="IsSpeedTOneOrZero" resultType="java.lang.String">
         SELECT
-            decode(fpa.TRADE_PLAT,'03', 'Y', 'N')
+            <!-- modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0】 start -->
+            <!--decode(fpa.TRADE_PLAT,'03', 'Y', 'N') -->
+            fpa.IS_NO_GUARD
+            <!-- modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0】 end -->
         FROM
             fin_product fp
             LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID

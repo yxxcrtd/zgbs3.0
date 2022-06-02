@@ -429,7 +429,6 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
         // 交易场所
         map.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         map.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
-        map.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         map.put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         map.put("type6_B14",DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
         Map pageMode = (Map) map.get("pageMode");

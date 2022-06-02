@@ -61,7 +61,8 @@
                mdi.DEALER_NO dealerNo,
                mdi.TRADE_MARKET tradeMarket,
                mci.CUSTOMER_ID customerId,
-                mci.CUSTOMER_NAME dealerName
+                mci.CUSTOMER_NAME dealerName,
+               MDDI.IS_OUR
     from
                MST_DEALER_INFO mdi
     left JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
@@ -125,6 +126,9 @@
           inner JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
                and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
           where mdi.CUSTOMER_ID = #{customerId} and mdi.DEALER_NO = #{dealerNo}
+        <if test="isOur != null and isOur != ''">
+            and MDDI.IS_OUR = #{isOur}
+        </if>
     </select>
     <select id="existsTrader" resultType="java.lang.Integer">
          select count(1) from MST_DEALER_INFO mdi

@@ -473,6 +473,10 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         entity.getEtrEntrustAdd().setBusiTypePosition(DictCodeListExt3.投管业务类型_信用保护凭证.getValue());
         entity.getEtrEntrust().setEntrustStatus(DictCodeListExt3.委托状态_流程中.getValue());
         entity.setWorkFlowId(dto.getWorkflowId());
+        //如果目标为空视之为按照数量
+        if(StringUtil.isEmpty(entity.getEtrEntrustAdd().getTargetType())){
+            entity.getEtrEntrustAdd().setTargetType("01");
+        }
         restTemplate.postForObject(
                 ServiceApplication.ENTRUST_SERVICE_NAME + "/common/entrustcommonbase/doInsertEtrFlow", entity,
                 Boolean.class);
