@@ -413,7 +413,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             // 证券管理户代码
             trdProductDeal.setSecManageAcctId(settleTransData.getSecAcctId());
             // 关联系统交易编号
-            trdProductDeal.setfTradeId(settleTransData.getCjbh());
+            // trdProductDeal.setfTradeId(settleTransData.getCjbh());
+            trdProductDeal.setfTradeId(dealDto.getSeqId());
             // 现金流代码
             trdProductDeal.setCashId(null);
             // 登记托管机构
