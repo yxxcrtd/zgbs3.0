@@ -183,8 +183,8 @@
             BOBP.ENTRUST_ID   entrustId,
             BOBP.PORTFOLIO_ID   portfolioId,
             pp.PORTFOLIO_NAME portfolioName,
-            NVL(BOBP.THE_WIN_PRIN_AMT,SHARE_AMT)   totalBidPrinamt,
-            NVL(BOBP.WIN_PRIN_AMT,SHARE_AMT)  winPrinAmt,
+            NVL(BOBP.THE_WIN_PRIN_AMT,SHARE_AMT)/10000  totalBidPrinamt,
+            NVL(BOBP.WIN_PRIN_AMT,SHARE_AMT)/10000  winPrinAmt,
             BOBP.BID_PRICE        winPrice,
             BOBP.INV_AIM   invAim
         from BID_ORDER_BID_PRICE BOBP
