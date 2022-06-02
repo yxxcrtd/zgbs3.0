@@ -334,9 +334,9 @@ public class EtrExchangeTradePositionsCommonResponse {
             String[] models = StringUtil.split(getBusinessModel(), ",");
             StringBuilder str = new StringBuilder();
             for (String model : models) {
-                str.append(SysDataUtil.getNameFromDataDict(DictCode.业务模式, getBusinessModel())).append(",");
+                str.append(SysDataUtil.getNameFromDataDict(DictCode.业务模式, model)).append(",");
             }
-            return str.substring(0, str.length() - 1);
+            return str.length() > 0 ? str.substring(0, str.length() - 1) : "";
         } else {
             return "";
         }
