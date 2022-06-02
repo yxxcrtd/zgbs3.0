@@ -1234,22 +1234,25 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 ajaxResult.setErrorList(messages);
                 return ajaxResult;
             }
+            //报价发行时，修改校验证券账户
+            if (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+                //查询指令明细信息
+                List<EtrEntrustDetail> etrEntrustDetails = cfetsEtrBondFirstBid001Mapper.selectEntrustDetailById(cfetsDto.getEntrustId());
+                List<CfetsBiddingProductDto> biddingProductDtos = cfetsDto.getBiddingProductList();
+                List<String> secIdOlds = etrEntrustDetails.stream().filter( item ->StringUtil.isNotEmpty(item.getSecAcctId()))
+                        .map(EtrEntrustDetail::getSecAcctId).distinct().collect(Collectors.toList());
+                List<String> secIdNews = biddingProductDtos.stream().filter( item ->StringUtil.isNotEmpty(item.getSecAcctId()))
+                        .map(CfetsBiddingProductDto::getSecAcctId).distinct().collect(Collectors.toList());
 
-            //查询指令明细信息
-            List<EtrEntrustDetail> etrEntrustDetails = cfetsEtrBondFirstBid001Mapper.selectEntrustDetailById(cfetsDto.getEntrustId());
-            List<CfetsBiddingProductDto> biddingProductDtos = cfetsDto.getBiddingProductList();
-            List<String> secIdOlds = etrEntrustDetails.stream().filter( item ->StringUtil.isNotEmpty(item.getSecAcctId()))
-                    .map(EtrEntrustDetail::getSecAcctId).distinct().collect(Collectors.toList());
-            List<String> secIdNews = biddingProductDtos.stream().filter( item ->StringUtil.isNotEmpty(item.getSecAcctId()))
-                    .map(CfetsBiddingProductDto::getSecAcctId).distinct().collect(Collectors.toList());
-
-            Collections.sort(secIdOlds);
-            Collections.sort(secIdNews);
-            if (!StringUtil.equals(secIdOlds.toString(),secIdNews )) {
-                messages.add(new ValidMessage("指令修改需保证与原指令证券账户一致！"));
-                ajaxResult.setErrorList(messages);
-                return ajaxResult;
+                Collections.sort(secIdOlds);
+                Collections.sort(secIdNews);
+                if (!StringUtil.equals(secIdOlds.toString(),secIdNews.toString())) {
+                    messages.add(new ValidMessage("指令修改需保证与原指令证券账户一致！"));
+                    ajaxResult.setErrorList(messages);
+                    return ajaxResult;
+                }
             }
+
 
         }
         if (StringUtil.isEmpty(cfetsDto.getFinprodId())) {
