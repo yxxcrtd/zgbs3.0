@@ -1059,7 +1059,7 @@
     </select>
 
     <select id="getSearchTabInfoQueryOperate" resultType="com.joyintech.tams.business.asset.bond.dto.SearchInfoOperateListResponse">
-        SELECT rownum SEQ_NO,t.* from (select
+        SELECT distinct rownum SEQ_NO,t.* from (select
                his.ENTRUST_ID,
                FP.FINPROD_ABBR,
                his.OPER_TYPE,
@@ -1080,6 +1080,7 @@
                     LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
            WHERE his.entrust_id = #{entrustId}
              AND his.BUSINESS_TYPE = #{busiType}
+             AND FP.FINPROD_TYPE = 'F01'
            order by his.OPER_TIME desc) t
     </select>
 
