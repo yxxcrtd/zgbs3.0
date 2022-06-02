@@ -1,0 +1,2 @@
+ update SYS_DATADICT_LIST set ITEM_VALUE ='中标结果维护'  where DICT_CODE= 'COMMON_BUSINESS_TYPE' and ITEM_CODE = 'TRD61'; 
+ UPDATE SYS_PAGE SET REMARK = '中标结果维护' WHERE PAGE_ID = 'CfetsPrimaryBidManage002';

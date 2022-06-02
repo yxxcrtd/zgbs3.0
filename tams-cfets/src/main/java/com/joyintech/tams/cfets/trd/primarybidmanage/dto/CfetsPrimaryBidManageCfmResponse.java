@@ -1,9 +1,11 @@
 package com.joyintech.tams.cfets.trd.primarybidmanage.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -53,7 +55,14 @@ public class CfetsPrimaryBidManageCfmResponse {
     private String tenderTargetStr;
 
     @ApiModelProperty(name="bidDate",value="投标日")
-    private Date bidDate;
+    private String bidDate;
+
+    @ApiModelProperty(name="bidDateStart",value="投标结束日")
+    private Date bidDateStart;
+
+    @ApiModelProperty(name="bidDateEnd",value="投标结束日")
+    private Date bidDateEnd;
+
 
     @ApiModelProperty(name="bidPrinAmt",value="指令投标券面总额(万元)")
     private BigDecimal bidPrinAmt;
@@ -185,12 +194,12 @@ public class CfetsPrimaryBidManageCfmResponse {
     public void setTenderTargetStr(String tenderTargetStr) {
         this.tenderTargetStr = tenderTargetStr;
     }
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
-    public Date getBidDate() {
-        return bidDate;
+
+    public String getBidDate() {
+        return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) +"-"+DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN) ;
     }
 
-    public void setBidDate(Date bidDate) {
+    public void setBidDate(String bidDate) {
         this.bidDate = bidDate;
     }
 
@@ -243,7 +252,7 @@ public class CfetsPrimaryBidManageCfmResponse {
     }
 
     public String getPayTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.缴款方式, this.getPayType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.缴款方式, this.getPayType());
     }
 
     public void setPayTypeStr(String payTypeStr) {
@@ -385,5 +394,21 @@ public class CfetsPrimaryBidManageCfmResponse {
 
     public void setBidModleStr(String bidModleStr) {
         this.bidModleStr = bidModleStr;
+    }
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    public Date getBidDateStart() {
+        return bidDateStart;
+    }
+
+    public void setBidDateStart(Date bidDateStart) {
+        this.bidDateStart = bidDateStart;
+    }
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    public Date getBidDateEnd() {
+        return bidDateEnd;
+    }
+
+    public void setBidDateEnd(Date bidDateEnd) {
+        this.bidDateEnd = bidDateEnd;
     }
 }

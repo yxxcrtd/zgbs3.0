@@ -58,6 +58,11 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
         TraderInfoDto traderInfoDto = null;
 
         for (TradeInfoProResponse tradeInfoPro:queryList){
+            // ZGCPCN-1081:带入本方标识查询条件 modify by fuyongsheng 20220602 start
+            if(StringUtil.isNotEmpty(dto.getIsOur())){
+                tradeInfoPro.setIsOur(dto.getIsOur());
+            }
+            // ZGCPCN-1081:带入本方标识查询条件 modify by fuyongsheng 20220602 end
               //根据一级查二级
 //              List<TraderInfoDto> dto1 = tradeInfoProMapper.findTrader(tradeInfoProResponse);
             childList = tradeInfoProMapper.findTrader(tradeInfoPro);

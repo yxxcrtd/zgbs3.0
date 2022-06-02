@@ -2507,13 +2507,15 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
      * @return true:计算指标,false:不计算指标
      */
     protected boolean isCalcIndicator(List<IEvent> eventList){
-    	for(IEvent event:eventList){
-    		if (CommonUtil.isType(event.getIsCalcIndicator(), BussinessDictCodeListRds.是否_否)) {
-    			getLogger().info("风控事项 {} 不计算指标",event.getEventName());
-    			return false;
-    		}
-    	}
-    	return true;
+        Iterator<IEvent> iterator = eventList.iterator();
+        while (iterator.hasNext()){
+            IEvent event = iterator.next();
+            if (CommonUtil.isType(event.getIsCalcIndicator(), BussinessDictCodeListRds.是否_否)) {
+                getLogger().info("风控事项 {} 不计算指标",event.getEventName());
+                iterator.remove();
+            }
+        }
+        return !StringUtil.isEmptyList(eventList);
     }
 
     /**

@@ -549,8 +549,8 @@ public class EntrustUtils {
                 && (DictCodeListExt2.交易方向_买入.getValue().equals(instruction.getPs())
                 || DictCodeListExt2.交易方向_卖出.getValue().equals(instruction.getPs())
                 || DictCodeListExt2.交易方向_正回购.getValue().equals(instruction.getPs())
-                || DictCodeListExt2.交易方向_逆回购.getValue().equals(instruction.getPs())
-        );
+                || DictCodeListExt2.交易方向_逆回购.getValue().equals(instruction.getPs()))
+                && !StringUtil.equals(instruction.getPriceMode(), InstructionPriceMode.LARGE_AFTER_CLOSING_PRICE.value);
     }
 
     /**

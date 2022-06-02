@@ -336,6 +336,13 @@ public class EtrPlanAssetCService extends BaseService<EtrPlanAssetCDto>{
             if(iPlatformDate != null){
                 etrEntrust.setEntrustDate(iPlatformDate.getSysDate());
             }
+            //add wsz ZGCPCN-1036 20220602 start
+            //计划类货币型卖出指令提交后，分发接收，指令接收画面的指令份额、待结转份额和指令金额显示均不对
+            if(StringUtil.equals(dto.getPs(), DictCodeList.交易方向_买入.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_卖出.getValue())){
+                etrEntrust.setEntrustAmt(dto.getEntrustAmt2());
+                etrEntrust.setEntrustNum(dto.getEntrustNum2());
+            }
+            //add wsz ZGCPCN-1036 20220602 end
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, dto);
             etrEntrustAdd.setVdate(null);
             etrEntrustAdd.setMdate(null);

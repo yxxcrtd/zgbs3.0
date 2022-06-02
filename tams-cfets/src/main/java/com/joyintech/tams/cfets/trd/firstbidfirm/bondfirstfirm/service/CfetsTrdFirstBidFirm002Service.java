@@ -2285,7 +2285,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     SysWflBusinessList sysWflBusinessList = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
                     if (StringUtil.equals(sysWflBusinessList.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
                         isSubmit = false;
-                        entity.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                        entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                         this.sendPositionMethod(entity, isSubmit, confirmOk);
                     } else {
                         entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
@@ -2702,12 +2702,20 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 // 考虑到存在多组合指令的情况
                 if (etrFinishStatusDtoMap.get(productDto.getEntrustId()) != null) {
                     status = etrFinishStatusDtoMap.get(productDto.getEntrustId());
-                    status.setEntFinishAmt(ArithmeticUtil.doAdd(status.getEntFinishAmt(), productDto.getTotalBiddingNum()));
+                    if (StringUtil.isNotEmpty(productDto.getTotalBiddingNum())) {
+                        status.setEntFinishAmt(ArithmeticUtil.doAdd(status.getEntFinishAmt(), productDto.getTotalBiddingNum()));
+                    } else if (StringUtil.isNotEmpty(productDto.getBidPriceTotal())) {
+                        status.setEntFinishAmt(ArithmeticUtil.doAdd(status.getEntFinishAmt(), productDto.getBidPriceTotal()));
+                    }
                 } else {
                     status.setEntrustId(productDto.getEntrustId());
                     status.setTradeId(dto.getBidId());
                     status.setFinishDate(dto.getTradeDate());
-                    status.setEntFinishAmt(productDto.getTotalBiddingNum());
+                    if (StringUtil.isNotEmpty(productDto.getTotalBiddingNum())) {
+                        status.setEntFinishAmt(productDto.getTotalBiddingNum());
+                    } else if (StringUtil.isNotEmpty(productDto.getBidPriceTotal())) {
+                        status.setEntFinishAmt(productDto.getBidPriceTotal());
+                    }
                     status.setTrader(dto.getOurTrader());
                     etrFinishStatusDtoMap.put(productDto.getEntrustId(), status);
                 }

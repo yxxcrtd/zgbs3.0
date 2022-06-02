@@ -777,7 +777,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             restTemplate.postForObject(ServiceApplication.BASICDATA_SERVICE_NAME + "/InterfSysTrdConfig/insertCounterTraderId", map,
                     Object.class);
         }
-        if (!StringUtil.equals("revoke", entity.getOperateType()) && !StringUtil.equals("delete", entity.getOperateType())) {
+        if (!StringUtil.equals("revoke", entity.getOperateType()) && !StringUtil.equals("delete", entity.getOperateType()) && !StringUtil.equals("save", entity.getOperateType())) {
             //退回的移到备份表
             doInsertBackupQuery(entity);
             // 先删除流程中数据

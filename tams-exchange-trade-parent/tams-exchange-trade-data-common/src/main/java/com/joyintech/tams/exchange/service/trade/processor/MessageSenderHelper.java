@@ -4,18 +4,12 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.investment.TradeMessage;
-import com.joyintech.tams.exchange.common.constant.BusinessFlag;
-import com.joyintech.tams.exchange.common.constant.EntrustBs;
-import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instruction.BusinessType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
-import com.joyintech.tams.exchange.common.utils.JsonUtils;
-import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
-import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,12 +168,10 @@ public class MessageSenderHelper {
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
             //到期结算金额
             tradeMessage.setDealBalance(entrust.getBackBalance());
-        } else if (InvestmentAssetType.isBond(trade.getAssetType())
-                && EntrustProp.isTrade(entrust.getEntrustProp())
-                && Objects.nonNull(tradeMessage.getFullPrice())
-                && tradeMessage.getFullPrice() != 0) {
+        } else if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             //成交全价金额
-            tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
+            tradeMessage.setDealBalance(trade.getClearBalance());
         }
 
         // 业务类型（手工交收用）

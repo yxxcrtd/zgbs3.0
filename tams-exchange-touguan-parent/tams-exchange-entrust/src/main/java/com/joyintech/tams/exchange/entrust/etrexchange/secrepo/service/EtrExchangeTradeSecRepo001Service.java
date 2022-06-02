@@ -1202,8 +1202,17 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 case "02":
                     // 全价总额==>到期收益率
                     yieldPriceInParameter.setFullPrice(fprice);
-                    yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
-                    yield = yieldPriceOutParameter.getMatYield();
+
+                    // modify by etliu 20220602 start
+                    // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                    try {
+                        yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
+                        yield = yieldPriceOutParameter.getMatYield();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    // modify by etliu 20220602 end
+
                     if (secInfoModelDto.getNextExeDate() != null) {
                         // 全价总额==>行权收益率
                         yieldPriceInParameter.setNextExeDate(toLocalDate(secInfoModelDto.getNextExeDate()));

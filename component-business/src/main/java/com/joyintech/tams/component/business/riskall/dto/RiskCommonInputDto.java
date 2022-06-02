@@ -67,6 +67,11 @@ public class RiskCommonInputDto extends RiskNodeConfigDtl {
      */
     private String ps;
 
+    /**
+     * 金融产品代码
+     */
+    private String finprodId;
+
 
     public List<InterfRiskRdsDto> getRiskRdsDtoList() {
         return riskRdsDtoList;
@@ -138,5 +143,13 @@ public class RiskCommonInputDto extends RiskNodeConfigDtl {
 
     public void setPs(String ps) {
         this.ps = ps;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }

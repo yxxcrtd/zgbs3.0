@@ -1826,7 +1826,7 @@ public class PortfolioManager extends BaseService {
         // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
         List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
         log.info("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
-        if (CollectionUtils.isEmpty(simpleFiltingList) || simpleFiltingList.size() < 2) {
+        if (CollectionUtils.isEmpty(simpleFiltingList)) {
             log.error("不满足公平交易: InstructionId [{}]", instructionId);
             result.setInfoLevel("1");
             result.setInfoDetails("不满足公平交易");
