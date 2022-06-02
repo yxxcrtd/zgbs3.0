@@ -16,8 +16,9 @@
         FP.FINPROD_MARKET_ID finprodMarketId,
         FP.FINPROD_ABBR finprodAbbr,
         FPI.TENDER_TARGET tenderTarget,
-        BO.BID_DATE bidDate,
-        BOBP.ENTRUST_NUM/100 bidPrinAmt,
+        FPI.TENDER_SDATE   bidDateStart,
+        FPI.TENDER_EDATE   bidDateEnd,
+        BOBP.ENTRUST_NUM/10000 bidPrinAmt,
         BO.WIN_PRIN_AMT/10000 totalBiddingNum,
         BOBP.BID_PRICE bidPrice,
         BO.BID_MODLE bidModle,
@@ -31,10 +32,12 @@
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE,'fm999999990.99999')||'%','02',to_char(BID_PRICE,'fm999999990.99999')||'元','03',to_char(BID_PRICE,'fm999999990.99')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
-        group by BID_ID
+        LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
+        group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
         WHERE FPI.ISSUE_CLASS = '02'  AND BO.IS_CANCEL = 'N' AND
@@ -66,10 +69,12 @@
                 </foreach>
             </if>
             <if test="bidDateStart != null and bidDateStart != ''">
-                <![CDATA[AND  BO.BID_DATE >= TO_DATE(#{bidDateStart},'YYYY-MM-DD') ]]>
+                <![CDATA[AND  FPI.TENDER_SDATE >= TO_DATE(#{bidDateStart},'YYYY-MM-DD') ]]>
+                <![CDATA[AND  FPI.TENDER_EDATE >= TO_DATE(#{bidDateStart},'YYYY-MM-DD') ]]>
             </if>
             <if test="bidDateEnd != null and bidDateEnd != ''">
-                <![CDATA[AND  BO.BID_DATE <= TO_DATE(#{bidDateEnd},'YYYY-MM-DD')]]>
+                <![CDATA[AND  FPI.TENDER_SDATE <= TO_DATE(#{bidDateEnd},'YYYY-MM-DD')]]>
+                <![CDATA[AND  FPI.TENDER_EDATE <= TO_DATE(#{bidDateEnd},'YYYY-MM-DD')]]>
             </if>
             <if test="bidCfmDateStart != null and bidCfmDateStart != ''">
                 <![CDATA[AND  BO.BID_DATE >= TO_DATE(#{bidCfmDateStart},'YYYY-MM-DD') ]]>
@@ -127,7 +132,8 @@
                 like '%' || #{search} || '%'
                 or to_char(ss.bidPrinAmt)=#{search}
                 or to_char(ss.totalBiddingNum)=#{search}
-                or to_char(ss.bidDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.bidDateStart,'YYYY-MM-DD')=#{search}
+                or to_char(ss.bidDateEnd,'YYYY-MM-DD')=#{search}
                 or to_char(ss.bidCfmDate,'YYYY-MM-DD')=#{search}
                 )
             </where>
