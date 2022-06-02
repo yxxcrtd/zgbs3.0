@@ -172,31 +172,33 @@ public class PortfolioTradeMessageHelper {
      * 组装撤单组合分配
      */
     public List<PortfolioCalculateResponse> buildCancelPortfolioCalculateResponse(EntrustInterface entrust, PositionInstructionRequest instructionClone) {
-        logger.info("构建撤单组合分配：【instructionId={}】,【entrustId={}】", instructionClone.getEntrustId(), entrust.getId());
+        String entrustId = instructionClone.getEntrustId();
+        logger.info("构建撤单组合分配：【instructionId={}】,【entrustId={}】", entrustId, entrust.getId());
 
         List<PortfolioCalculateResponse> calculateResponses = Lists.newArrayList();
 
         //1、查询下单委托组合分配
-        logger.info("查询下单委托组合分配：【instructionId={}】,【entrustId={}】", instructionClone.getEntrustId(), entrust.getId());
-        List<PortfolioDetail> orderDetails = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(instructionClone.getEntrustId(), PortfolioDetailBusiTypeEnum.ORDER.getCode())
+        logger.info("查询下单委托组合分配：【instructionId={}】,【entrustId={}】", entrustId, entrust.getId());
+        List<PortfolioDetail> orderDetails = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(entrustId, PortfolioDetailBusiTypeEnum.ORDER.getCode())
                 .stream().filter(o -> StringUtil.equals(o.getBusiId(), entrust.getId())).collect(Collectors.toList());
 
         //获取成交编号
-        Set<String> tradeIdSet = tradeService.queryTradeByInstructionId(instructionClone.getEntrustId())
+        Set<String> tradeIdSet = tradeService.queryTradeByInstructionId(entrustId)
                 .stream().filter(o -> StringUtil.equals(o.getEntrustId(), entrust.getId()))
                 .map(Trade::getId).collect(Collectors.toSet());
 
         //2、查询成交组合分配
-        logger.info("查询成交组合分配：【instructionId={}】,【entrustId={}】", instructionClone.getEntrustId(), entrust.getId());
-        Map<String, List<PortfolioDetail>> tradeDetailsMap = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(instructionClone.getEntrustId(), PortfolioDetailBusiTypeEnum.TRADE.getCode())
+        logger.info("查询成交组合分配：【instructionId={}】,【entrustId={}】", entrustId, entrust.getId());
+        Map<String, List<PortfolioDetail>> tradeDetailsMap = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(entrustId, PortfolioDetailBusiTypeEnum.TRADE.getCode())
                 .stream().filter(o -> tradeIdSet.contains(o.getBusiId())).collect(Collectors.groupingBy(PortfolioDetail::getPortfolioId));
 
         List<PortfolioDetail> cancelDetails = Lists.newArrayList();
 
         //3、保存 撤销组合分配
-        logger.info("构建撤单组合分配：保存 委托组合分配，【instructionId={}】,【entrustId={}】", instructionClone.getEntrustId(), entrust.getId());
+        logger.info("构建撤单组合分配：保存 委托组合分配，【instructionId={}】,【entrustId={}】", entrustId, entrust.getId());
         orderDetails.forEach(o -> {
             o.setBusiId(entrust.getId());
+            o.setInstructionId(entrustId);
 
             List<PortfolioDetail> list = tradeDetailsMap.get(o.getPortfolioId());
             if (CollectionUtils.isNotEmpty(list)) {
@@ -212,7 +214,7 @@ public class PortfolioTradeMessageHelper {
         });
 
         //4、组装委托组合分配
-        logger.info("构建撤单组合分配：组装委托组合分配，【instructionId={}】,【entrustId={}】", instructionClone.getEntrustId(), entrust.getId());
+        logger.info("构建撤单组合分配：组装委托组合分配，【instructionId={}】,【entrustId={}】", entrustId, entrust.getId());
         PortfolioCalculateResponse calculateResponse = null;
         for (PortfolioDetail portfolioDetail : cancelDetails) {
             calculateResponse = new PortfolioCalculateResponse();
