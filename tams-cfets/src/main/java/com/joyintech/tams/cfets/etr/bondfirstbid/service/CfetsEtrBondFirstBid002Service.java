@@ -407,7 +407,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
                 isSubmit = false;
             }
-            this.packageEquityForSubmit(entity);
+            this.packageEquityForSubmit(entity, isSubmit);
             if ("submit".equals(entity.getOperateType()) && isSubmit) {
                 List<CfetsEtrBondFirstBid002Dto> dataList = entity.getEtrInvestBondFirstBidDtos().stream()
                         .filter(dto -> StringUtil.isNotEmpty(dto.getEntrustId())).collect(Collectors.toList());
@@ -454,7 +454,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      * 保存提交时，后台数据转换
      * @param dto
      */
-    private CfetsEtrBondFirstBid002Dto packageEquityForSubmit(CfetsEtrBondFirstBid002Dto dto) {
+    private CfetsEtrBondFirstBid002Dto packageEquityForSubmit(CfetsEtrBondFirstBid002Dto dto, Boolean isSubmit) {
 
         //查询资产信息
         CfetsEtrFinProductInfoResponse finProductInfo = new CfetsEtrFinProductInfoResponse();
@@ -528,7 +528,11 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                         if (null != transmitTimeDto && StringUtil.isNotEmpty(transmitTimeDto.getTransmitTime())) {
                             dd.setTransmitTime(transmitTimeDto.getTransmitTime());
                         }
-                        dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                        if (!isSubmit) {
+                            dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+                        }else {
+                            dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                        }
                     } else {
                         dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                     }
@@ -553,7 +557,12 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     if (null != transmitTimeDto && StringUtil.isNotEmpty(transmitTimeDto.getTransmitTime())) {
                         dd.setTransmitTime(transmitTimeDto.getTransmitTime());
                     }
-                    dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                    if (!isSubmit) {
+                        dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+                    }else {
+                        dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                    }
+
                 } else {
                     dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                 }
@@ -577,7 +586,11 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 if (null != transmitTimeDto && StringUtil.isNotEmpty(transmitTimeDto.getTransmitTime())) {
                     dd.setTransmitTime(transmitTimeDto.getTransmitTime());
                 }
-                dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                if (!isSubmit) {
+                    dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+                }else {
+                    dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                }
             } else {
                 dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             }
