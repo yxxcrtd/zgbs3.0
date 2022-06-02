@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.common.base.dao.RiskNodeConfigMapper">
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.RiskNodeConfig">
+    <id column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="NODE_NAME" jdbcType="VARCHAR" property="nodeName" />
+    <result column="NODE_TYPE" jdbcType="VARCHAR" property="nodeType" />
+    <result column="NODE_CODE" jdbcType="VARCHAR" property="nodeCode" />
+    <result column="NODE_VAL" jdbcType="VARCHAR" property="nodeVal" />
+    <result column="NODE_DESC" jdbcType="VARCHAR" property="nodeDesc" />
+    <result column="NODE_LEVEL" jdbcType="DECIMAL" property="nodeLevel" />
+    <result column="P_NODE_ID" jdbcType="VARCHAR" property="pNodeId" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    NODE_ID, NODE_NAME, NODE_TYPE, NODE_CODE, NODE_VAL, NODE_DESC, NODE_LEVEL, P_NODE_ID, 
+    STATUS, REMARK, UPDATE_USER, CREATE_TIME, UPDATE_TIME
+  </sql>
+
+  <select id="selectByRootId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+      NODE_ID, NODE_NAME, NODE_TYPE, NODE_CODE, NODE_VAL, NODE_DESC, NODE_LEVEL, nvl(P_NODE_ID,'0') as P_NODE_ID,
+      STATUS, REMARK, UPDATE_USER, CREATE_TIME, UPDATE_TIME    from RSK_NODE_CONFIG
+    start with NODE_ID = #{nodeId,jdbcType=VARCHAR} connect by prior NODE_ID=P_NODE_ID
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from RSK_NODE_CONFIG
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from RSK_NODE_CONFIG
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.RiskNodeConfig">
+    insert into RSK_NODE_CONFIG (NODE_ID, NODE_NAME, NODE_TYPE, 
+      NODE_CODE, NODE_VAL, NODE_DESC, 
+      NODE_LEVEL, P_NODE_ID, STATUS, 
+      REMARK, UPDATE_USER, CREATE_TIME, 
+      UPDATE_TIME)
+    values (#{nodeId,jdbcType=VARCHAR}, #{nodeName,jdbcType=VARCHAR}, #{nodeType,jdbcType=VARCHAR}, 
+      #{nodeCode,jdbcType=VARCHAR}, #{nodeVal,jdbcType=VARCHAR}, #{nodeDesc,jdbcType=VARCHAR}, 
+      #{nodeLevel,jdbcType=DECIMAL}, #{pNodeId,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
+      #{remark,jdbcType=VARCHAR}, #{updateUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.RiskNodeConfig">
+    insert into RSK_NODE_CONFIG
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="nodeId != null">
+        NODE_ID,
+      </if>
+      <if test="nodeName != null">
+        NODE_NAME,
+      </if>
+      <if test="nodeType != null">
+        NODE_TYPE,
+      </if>
+      <if test="nodeCode != null">
+        NODE_CODE,
+      </if>
+      <if test="nodeVal != null">
+        NODE_VAL,
+      </if>
+      <if test="nodeDesc != null">
+        NODE_DESC,
+      </if>
+      <if test="nodeLevel != null">
+        NODE_LEVEL,
+      </if>
+      <if test="pNodeId != null">
+        P_NODE_ID,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="nodeId != null">
+        #{nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeName != null">
+        #{nodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeType != null">
+        #{nodeType,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeCode != null">
+        #{nodeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeVal != null">
+        #{nodeVal,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeDesc != null">
+        #{nodeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeLevel != null">
+        #{nodeLevel,jdbcType=DECIMAL},
+      </if>
+      <if test="pNodeId != null">
+        #{pNodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.RiskNodeConfig">
+    update RSK_NODE_CONFIG
+    <set>
+      <if test="nodeName != null">
+        NODE_NAME = #{nodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeType != null">
+        NODE_TYPE = #{nodeType,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeCode != null">
+        NODE_CODE = #{nodeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeVal != null">
+        NODE_VAL = #{nodeVal,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeDesc != null">
+        NODE_DESC = #{nodeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeLevel != null">
+        NODE_LEVEL = #{nodeLevel,jdbcType=DECIMAL},
+      </if>
+      <if test="pNodeId != null">
+        P_NODE_ID = #{pNodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.RiskNodeConfig">
+    update RSK_NODE_CONFIG
+    set NODE_NAME = #{nodeName,jdbcType=VARCHAR},
+      NODE_TYPE = #{nodeType,jdbcType=VARCHAR},
+      NODE_CODE = #{nodeCode,jdbcType=VARCHAR},
+      NODE_VAL = #{nodeVal,jdbcType=VARCHAR},
+      NODE_DESC = #{nodeDesc,jdbcType=VARCHAR},
+      NODE_LEVEL = #{nodeLevel,jdbcType=DECIMAL},
+      P_NODE_ID = #{pNodeId,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

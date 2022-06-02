@@ -247,6 +247,7 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 			}
 		}
 		trdProductTempDeal.setTgBusiType(paBussType);
+		trdProductTempDeal.setBusiType(null == paBussType ? "BUSI_TYPE" : paBussType);
 		 // 本方交易员 根据委托代码获取委托指令分发信息的指定交易员
 		String trader = entrustMsgbyMQMapper.queryTradeId(infContractDetailfile.getEntrustId());
 		if (trader != null) {
@@ -267,7 +268,7 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 				null == trdProductTempDealTotalMapper.selectByPrimaryKey(trdTempDto.getTotleTradeId())){
 			// 写入金融产品临时汇总交易表
 			TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
-			BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdTempDto.getTrdProductTempDeal());
+			BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdProductTempDeal);
 			trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
 		}
 		// 多组合系列户指令需要登录临时汇总交易表 add by fuyongsheng 20220511 end

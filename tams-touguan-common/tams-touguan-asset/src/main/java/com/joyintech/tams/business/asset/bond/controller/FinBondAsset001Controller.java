@@ -91,9 +91,6 @@ public class FinBondAsset001Controller extends BaseController{
     @Autowired
     private IPlatformDate iPlatformDate;
 
-    /*@Autowired
-    private RskNodeConfigService rskNodeConfigService;*/
-
     @ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/init")
     @ResponseBody
@@ -232,7 +229,7 @@ public class FinBondAsset001Controller extends BaseController{
                 parameter.setPageId("FinBondAsset002");
                 parameter.setBusinessDataPk1(entity.getFinprodMarketId());
                 if (finBondAssetService.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可删除!")));
+                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！不可删除!")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
@@ -280,7 +277,7 @@ public class FinBondAsset001Controller extends BaseController{
                 parameter.setPageId("FinBondAsset002");
                 parameter.setBusinessDataPk1(entity.getFinprodMarketId());
                 if (finBondAssetService.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可修改!")));
+                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！不可修改!")));
                     wr.setErrorList(errorList);
                     wr.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(wr);
@@ -421,16 +418,4 @@ public class FinBondAsset001Controller extends BaseController{
         }
     }
 
-   /* @PostMapping("/test")
-    @ResponseBody
-    public Message test(@RequestBody BaseMap param) {
-       *//* BaseMap param = BaseMap.newMap().put("interfaceId","Bond001")
-               .put("busiAct","01")
-                .put("ps","T02")
-                .put("tradePlace","01")
-                .put("decisionAct","01")
-                .put("flowStatus","01")
-                .put("busiType","02");*//*
-        return Message.success("",rskNodeConfigService.getNodeConfig(param));
-    }*/
 }
