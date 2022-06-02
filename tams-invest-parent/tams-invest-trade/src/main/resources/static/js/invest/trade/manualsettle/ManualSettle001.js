@@ -97,18 +97,18 @@
             // ,{field:'settleNum',title: '交割数量', width:'150', type:'money'}
             // ,{field:'settleAmt', title: '交割金额', width:'150', type:'money'}
             ,{field:'settleNum',title: '交收数量', width:'150', type:'money', visible:false}
-            ,{field:'settleNumStr',title: '交收数量', width:'150', type:'money'}
+            ,{field:'settleNumStr',title: '交收数量', width:'150', type:'money', sortField:'settleNum'}
             ,{field:'settleAmt', title: '交收金额', width:'150', type:'money'}
             // GNS-940:修改字段展示名称 modify by fuyongsheng 20220222 end
             ,{field:'prin', title: '回购金额', width:'150', type:'money', visible:false}
-            ,{field:'prinStr', title: '回购金额', width:'150', type:'money'}
+            ,{field:'prinStr', title: '回购金额', width:'150', type:'money', sortField:'prin'}
             ,{field:'mTradeAmt', title: '到期结算金额', width:'150', type:'money'}
             // ,{field:'pledgeId', title: '质押券代码', width:'150'}
             ,{field:'pledgeId', title: '质押券代码', width:'150', visible:false}
             ,{field:'pledgeIdAbbr', title: '质押券代码', width:'150'}
             ,{field:'pledgeName', title: '质押券名称', width:'150'}
             ,{field:'pledgeNumber', title: '质押券数量', width:'150', visible:false}
-            ,{field:'pledgeNumberStr', title: '质押券数量', width:'150'}
+            ,{field:'pledgeNumberStr', title: '质押券数量', width:'150', sortField:'pledgeNumber'}
             ,{field:'bPledgeId', title: '原质押券代码', width:'150', visible:false}
             ,{field:'bPledgeIdAbbr', title: '原质押券代码', width:'150'}
             ,{field:'busiType', title: '业务类别', width:'150', visible:false}
@@ -146,16 +146,16 @@
             ,{field:'finprodMarketId', title:'资产代码', width:'150'}
             ,{field:'finprodName', title:'资产名称', width:'150'}
             ,{field:'settleNum',title: '交收数量', width:'150', type:'money', visible:false}
-            ,{field:'settleNumStr',title: '交收数量', width:'150', type:'money'}
+            ,{field:'settleNumStr',title: '交收数量', width:'150', type:'money', sortField:'settleNum'}
             ,{field:'settleAmt',title:'交收金额', width:'150', type:'money'}
             ,{field:'prin', title: '回购金额', width:'150', type:'money', visible:false}
-            ,{field:'prinStr', title: '回购金额', width:'150', type:'money'}
+            ,{field:'prinStr', title: '回购金额', width:'150', type:'money', sortField:'prin'}
             ,{field:'mTradeAmt', title: '到期结算金额', width:'150', type:'money'}
             ,{field:'pledgeId', title: '质押券代码', width:'150', visible:false}
             ,{field:'pledgeIdAbbr', title: '质押券代码', width:'150'}
             ,{field:'pledgeName', title: '质押券名称', width:'150'}
             ,{field:'pledgeNumber', title: '质押券数量', width:'150', visible:false}
-            ,{field:'pledgeNumberStr', title: '质押券数量', width:'150'}
+            ,{field:'pledgeNumberStr', title: '质押券数量', width:'150', sortField:'pledgeNumber'}
             ,{field:'bPledgeId', title: '原质押券代码', width:'150', visible:false}
             ,{field:'bPledgeIdAbbr', title: '原质押券代码', width:'150'}
             ,{field:'operType', title:'操作类型', width:'200', visible:false}
