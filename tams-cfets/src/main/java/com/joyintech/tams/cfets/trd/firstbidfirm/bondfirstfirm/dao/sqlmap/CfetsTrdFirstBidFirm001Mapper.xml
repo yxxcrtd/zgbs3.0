@@ -268,6 +268,13 @@
                 </foreach>
                 /*指令代码查询*/
             </if>
+            <if test="existEntrustIds != null and existEntrustIds.size()>0">
+                AND
+                <foreach collection="existEntrustIds" open=" T.entrustId not in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+                /*指令代码查询*/
+            </if>
         </where>
         <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
             order by ${pageMode.sort} ${pageMode.direction}
