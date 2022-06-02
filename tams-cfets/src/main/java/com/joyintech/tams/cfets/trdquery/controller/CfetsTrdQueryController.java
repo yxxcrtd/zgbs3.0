@@ -385,7 +385,7 @@ public class CfetsTrdQueryController extends BaseController {
             Map<String, Object> resultData = new HashMap<>();
             if (DictCodeListExt4.投标方式_分销买入.getValue().equals(dto.getBidModle())
                     || DictCodeListExt4.投标方式_自主投标.getValue().equals(dto.getBidModle())
-                    || StringUtil.equals(dto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
+                    || StringUtil.equals(dto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
                 resultData = cfetsTrdQueryService.findBidTradeDetailInfo(pageCode, dtCode, spcdCode, dto);
             }else{
                 resultData = cfetsTrdQueryService.findTradeDetailInfo(pageCode, dtCode, spcdCode, dto);
