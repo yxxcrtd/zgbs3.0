@@ -11,10 +11,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
-import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
-import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
-import com.joyintech.tams.business.common.dto.SecInfoModelDto;
-import com.joyintech.tams.business.common.dto.SecManageAcctIdRequestDto;
+import com.joyintech.tams.business.common.dto.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -493,5 +490,17 @@ public class JoyinbusinessCommonService extends BaseService {
      */
     public String qryPortfolioCashAcctId(Map<String, Object> map) {
         return joyinbusinessCommonMapper.qryPortfolioCashAcctId(map);
+    }
+
+    /**
+     * 查询债券的特殊债券信息
+     *
+     * @param finprodIds 资产代码
+     * @return com.joyintech.tams.business.common.dto.FinProductSpecialDto
+     * @author jiangpeng
+     * @date 2022/6/1 14:41
+     */
+    public List<FinProductSpecialDto> queryFinProductSpecialByFinprodIds(List<String> finprodIds) {
+        return joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(finprodIds);
     }
 }

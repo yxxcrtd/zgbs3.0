@@ -60,8 +60,7 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
         for (TradeInfoProResponse tradeInfoPro:queryList){
               //根据一级查二级
 //              List<TraderInfoDto> dto1 = tradeInfoProMapper.findTrader(tradeInfoProResponse);
-
-              childList = tradeInfoProMapper.findTrader(tradeInfoPro);
+            childList = tradeInfoProMapper.findTrader(tradeInfoPro);
 //              tradeInfoProResponseList.add(tradeInfoProResponse1);
 
               if (childList!= null){
@@ -156,5 +155,8 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
     }
     public String hasSameTraderSeqNo(TradeInfoProSaveRequest dto) {
         return tradeInfoProMapper.hasSameTraderSeqNo(dto);
+    }
+    public String existsTraderSingle(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.existsTraderSingle(dto);
     }
 }

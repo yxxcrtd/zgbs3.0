@@ -10,40 +10,39 @@
  
 package com.joyintech.tams.business.asset.bond.controller;
 
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.JoyinMessage;
 import com.joyintech.framework.ajax.MessageType;
-import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.annotation.PageId;
+import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.asset.bond.service.FinBondAsset001Service;
-import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.util.ExcelUitl;
-import com.joyintech.tams.common.base.entity.FinCashPlan;
-import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
-import com.joyintech.tams.component.business.common.service.CommonBusinessService;
-import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
-import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
-import com.joyintech.tams.invest.asset.bond.dto.FinBondTargetAssetDto;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.dto.ProcessParameter;
+import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -51,19 +50,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import com.joyintech.framework.ajax.AjaxResult;
-import com.joyintech.framework.annotation.PageId;
-import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.workflow.engine.dto.ProcessParameter;
-import com.joyintech.workflow.engine.dto.WorkFlowParameter;
-import com.joyintech.workflow.engine.util.WorkFlowUtil;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 债券标的
@@ -98,6 +90,9 @@ public class FinBondAsset001Controller extends BaseController{
 
     @Autowired
     private IPlatformDate iPlatformDate;
+
+    /*@Autowired
+    private RskNodeConfigService rskNodeConfigService;*/
 
     @ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/init")
@@ -425,4 +420,17 @@ public class FinBondAsset001Controller extends BaseController{
             return new Message<Page<SearchInfoOperateListResponse>>().fail().setMessage("查询操作记录分页数据异常");
         }
     }
+
+   /* @PostMapping("/test")
+    @ResponseBody
+    public Message test(@RequestBody BaseMap param) {
+       *//* BaseMap param = BaseMap.newMap().put("interfaceId","Bond001")
+               .put("busiAct","01")
+                .put("ps","T02")
+                .put("tradePlace","01")
+                .put("decisionAct","01")
+                .put("flowStatus","01")
+                .put("busiType","02");*//*
+        return Message.success("",rskNodeConfigService.getNodeConfig(param));
+    }*/
 }

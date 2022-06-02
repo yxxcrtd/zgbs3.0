@@ -1,10 +1,7 @@
 package com.joyintech.tams.business.common.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.tams.business.common.dto.CashPositionFlowDto;
-import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
-import com.joyintech.tams.business.common.dto.PtlCashPositionFlowDto;
-import com.joyintech.tams.business.common.dto.SecInfoModelDto;
+import com.joyintech.tams.business.common.dto.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -256,4 +253,12 @@ public interface JoyinbusinessCommonMapper {
      * @date 2021/12/13 16:14
      */
     String qryPortfolioCashAcctId(Map<String, Object> param);
+
+    /**
+     * 特殊债券信息查询
+     *
+     * @param finprodIds 资产代码
+     * @return
+     */
+    List<FinProductSpecialDto> queryFinProductSpecialByFinprodIds(@Param("finprodIds") List<String> finprodIds);
 }

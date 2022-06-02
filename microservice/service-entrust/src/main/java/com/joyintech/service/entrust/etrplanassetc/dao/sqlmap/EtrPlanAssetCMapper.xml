@@ -374,6 +374,7 @@
 		<result column="finprodName"  property="finprodName"/>
 		<result column="entrustNum"  property="entrustNum"/>
 		<result column="entrustAmt"  property="entrustAmt"/>
+		<result column="price"  property="price"/>
 		<result column="ps"  property="ps"/>
 		<result column="proAvailableCash"  property="proAvailableCash"/>
 		<result column="accAvailableCash"  property="accAvailableCash"/>
@@ -387,7 +388,7 @@
 		</association>
 	</resultMap>
 
-	<select id="selectByKey" resultMap="selByKeyResult">
+	<select id="selectByKey" resultMap="selByKeyResult" >
 		SELECT
 		T1.ENTRUST_ID		 entrustId,
 		T1.PORTFOLIO_ID		 portfolioId,
@@ -406,6 +407,7 @@
 		T1.PS                ps,
 		T1.ENTRUST_AMT		 entrustAmt,
 		T1.ENTRUST_NUM		 entrustNum,
+		T1.PRICE 			 price,
 		T1.PRO_AVAILABLE_CASH proAvailableCash,
 		T1.ACC_AVAILABLE_CASH accAvailableCash,
 		T1.REMARK            remark,
@@ -450,6 +452,7 @@
 		T1.PS                ps,
 		T1.ENTRUST_AMT		 entrustAmt,
 		T1.ENTRUST_NUM		 entrustNum,
+		T1.PRICE 			 price,
 		T1.PRO_AVAILABLE_CASH proAvailableCash,
 		T1.ACC_AVAILABLE_CASH accAvailableCash,
 		T1.REMARK            remark,

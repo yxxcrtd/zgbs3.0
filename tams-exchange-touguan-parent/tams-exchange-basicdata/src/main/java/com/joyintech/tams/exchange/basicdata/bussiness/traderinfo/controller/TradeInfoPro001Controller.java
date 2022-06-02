@@ -204,8 +204,8 @@ public class TradeInfoPro001Controller extends BaseController {
             return new Message().fail().setMessage("交易商输入的字符过长，请重新输入!");
         }
         try{
-            if(existsDealer(tradeInfoProSaveRequest)>0){
-                return new Message().fail().setMessage("交易商名称和交易商代码已存在，请勿重复插入！");
+            if(StringUtil.isNotEmpty(tradeInfoPro001Service.existsTraderSingle(tradeInfoProSaveRequest))){
+                return new Message().fail().setMessage("交易商代码已存在，请勿重复插入！");
             }else if (existsDealerAndTradeMarket(tradeInfoProSaveRequest)>0){
                 return new Message().fail().setMessage("交易商和交易场所不能重复！");
             }
@@ -358,8 +358,8 @@ public class TradeInfoPro001Controller extends BaseController {
         String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);//客户代码，交易商代码不能改
         dto.setCustomerId(dealerName);
         try{
-            if(existsDealer(dto)>0){
-                return new Message().fail().setMessage("交易商名称和交易商代码不能重复！");
+            if(StringUtil.isNotEmpty(tradeInfoPro001Service.existsTraderSingle(dto))&&!tradeInfoPro001Service.existsTraderSingle(dto).contains(dto.getTraderNo())){
+                return new Message().fail().setMessage("交易商名称不能重复！");
             }else if (existsDealerAndTradeMarket(dto)>0){
                 return new Message().fail().setMessage("交易商和交易场所不能重复！");
             }

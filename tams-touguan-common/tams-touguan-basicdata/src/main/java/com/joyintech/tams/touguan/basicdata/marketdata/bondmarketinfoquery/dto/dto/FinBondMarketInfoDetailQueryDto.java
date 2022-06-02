@@ -614,6 +614,15 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
         return schecalRule;
     }
 
+    public String getSchecalRuleStr() {
+        if (DictCodeList.推算方式_首次付息日.getValue().equals(getSchecalRule())) {
+            return DictCodeList.推算方式_首次付息日.getCodeName();
+        } else {
+            return SysDataUtil.getNameFromDataDict(DictCode.推算方式, getSchecalRule());
+        }
+    }
+
+
     public void setSchecalRule(String schecalRule) {
         this.schecalRule = schecalRule;
     }

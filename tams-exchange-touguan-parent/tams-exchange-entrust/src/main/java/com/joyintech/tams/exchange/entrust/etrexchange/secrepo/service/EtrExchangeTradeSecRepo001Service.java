@@ -97,6 +97,7 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.activiti.engine.impl.util.CollectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -236,6 +237,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
     public void doComplete(EtrExchangeTradeSaveSecRepoRequest dto, OperationType arg1) {
         // TODO Auto-generated method stub
         Map<String, Object> map = new HashMap<>();
+        if (!CollectionUtils.isEmpty(dto.getPortfolioList())) {
+            dto.setPortfolioId(dto.getPortfolioList().get(0).getPortfolioId());
+            dto.setAcctNo(dto.getPortfolioList().get(0).getAcctNo());
+            dto.setSecAcctId(dto.getPortfolioList().get(0).getSecAcctId());
+        }
         // 新增交易对手席位
         if (StringUtil.isNotEmpty(dto.getCounterId()) && StringUtil.isNotEmpty(dto.getSeatId())) {
             map.put("counterId", dto.getCounterId());
@@ -471,6 +477,13 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
 
     @Override
     public void doUpdate(EtrExchangeTradeSaveSecRepoRequest entity) {
+
+        if (!CollectionUtils.isEmpty(entity.getPortfolioList())) {
+            entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
+            entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
+            entity.setSecAcctId(entity.getPortfolioList().get(0).getSecAcctId());
+        }
+
         // nothing to do just for aspect
         Map<String, Object> map = new HashMap<>();
         // 新增交易对手席位
@@ -626,6 +639,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
 
     @Override
     public void doInsert(EtrExchangeTradeSaveSecRepoRequest entity, OperationType type) {
+        if (!CollectionUtils.isEmpty(entity.getPortfolioList())) {
+            entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
+            entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
+            entity.setSecAcctId(entity.getPortfolioList().get(0).getSecAcctId());
+        }
         if ("save".equals(entity.getOperateType())) {
             return;
         }

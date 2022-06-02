@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- * @description 债券一级投标 （投资交易汇总批处理后，需要匹配指令）
+ * @description 债券一级投标(交收通知)
  * @author huwei1
  * @createDate 2022/5/16
  */

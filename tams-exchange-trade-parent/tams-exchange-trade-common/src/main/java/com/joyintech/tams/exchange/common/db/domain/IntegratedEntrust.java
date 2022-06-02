@@ -184,7 +184,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
     private String tradeId;
 
-    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员ID")
+    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员名称")
     private String tradeName;
 
     @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
@@ -200,13 +200,13 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     private String investorName;
 
 
-    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
+    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员ID")
     private String propTradeId;
 
-    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员")
+    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员名称")
     private String propTradeName;
 
-    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
+    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商ID")
     private String propDealerId;
 
     @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")

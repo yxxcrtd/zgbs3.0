@@ -7,11 +7,9 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListStl;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
@@ -302,8 +300,6 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         ptlTrade.setSecManageAcctId(trdProductDeal.getSecManageAcctId());
         // 实际发生日
         ptlTrade.setSettleDate(trdProductDeal.getSettleDate());
-        // 业务类型
-        ptlTrade.setBusiType(DictCodeListStl.共通业务类型_信用保护凭证交易.getValue());
 
         ptlTradeList.add(ptlTrade);
         return ptlTradeList;
@@ -328,7 +324,7 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         trdProductDeal.setPs(entrustDto.getPs());
         // 到期收益率和行权收益率
         this.calc(trdProductDeal);
-        trdProductDeal.setTgBusiType(getTgBusiType(entrustDto.getPs()));
+        trdProductDeal.setTgBusiType(getTgBusiType(transDto.getDeliveryResult()));
 
         // 到期收益率
         trdFinProductDealTotal.setYield(trdProductDeal.getYield());
@@ -338,25 +334,16 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         return trdProductDeal;
     }
 
-    private String getTgBusiType(String ps) {
-        if(com.joyintech.framework.util.StringUtil.equals(ps, DictCodeList.交易方向_买入.getValue())) {
-            return DictCodeListStl.业务场景分类明细_信用保护凭证_买入.getValue();
+    private String getTgBusiType(String deliveryResult) {
+        if(DictCodeListExt4.交收结果_交收通知.getValue().equals(deliveryResult)) {
+            return "204";
         }
-        if(com.joyintech.framework.util.StringUtil.equals(ps, DictCodeList.交易方向_卖出.getValue())) {
-            return DictCodeListStl.业务场景分类明细_信用保护凭证_卖出.getValue();
-        }
-        return null;
+        return "205";
     }
 
     public TrdProductDeal createProductDeal(ExchangeTransMatchCommonDto transDto, ExchangeTransMatchCommonEntrustDto entrustDto,TrdFinProductDealTotal trdFinProductDealTotal) {
         TrdProductDeal trdProductDeal = new TrdProductDeal();
         BussinessCodeParameter codeParameter = new BussinessCodeParameter();
-        if (entrustDto.getPs().equals(DictCodeList.交易方向_买入.getValue())) {
-            codeParameter.setCommonBusinessType(DictCodeListStl.业务场景分类明细_信用保护凭证_买入);
-        }
-        if (entrustDto.getPs().equals(DictCodeList.交易方向_卖出.getValue())) {
-            codeParameter.setCommonBusinessType(DictCodeListStl.业务场景分类明细_信用保护凭证_卖出);
-        }
         // 交易编号
         trdProductDeal.setTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
         // 业务类型
@@ -552,17 +539,10 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
 
         BussinessCodeParameter codeParameter = new BussinessCodeParameter();
-        if (entrustDto.getPs().equals(DictCodeList.交易方向_买入.getValue())) {
-            codeParameter.setCommonBusinessType(DictCodeListStl.业务场景分类明细_信用保护凭证_买入);
-        }
-        if (entrustDto.getPs().equals(DictCodeList.交易方向_卖出.getValue())) {
-            codeParameter.setCommonBusinessType(DictCodeListStl.业务场景分类明细_信用保护凭证_卖出);
-        }
-
         // 汇总交易编号
         trdFinProductDealTotal.setTotleTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
         // 业务类型
-        trdFinProductDealTotal.setBusiType(DictCodeListStl.共通业务类型_信用保护凭证交易.getValue());
+        trdFinProductDealTotal.setBusiType(BussinessDictCodeList.共同业务类型_债券投资交易.getValue());
         // 金融产品代码
         trdFinProductDealTotal.setFinprodId(transDto.getFinprodId());
         // 金融产品类型（投管分类）
