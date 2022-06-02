@@ -1,0 +1,2 @@
+UPDATE CFG_DATATABLE_SHOW SET EXTENDCFG = '{"colAlign": "right","supportSearch":"精确","dataType":"amount","precision":"2"}' WHERE PAGECODE = 'CfetsTrdFirstBidFirm001' AND DTCODE = 'DistributionInfo' AND SPCDCODE = '999999' AND COLCODE = 'payableAmount' ;
+UPDATE CFG_DATATABLE_SHOW SET EXTENDCFG = '{"colAlign": "right","supportSearch":"精确","dataType":"amount","precision":"2"}' WHERE PAGECODE = 'CfetsTrdFirstBidFirm001' AND DTCODE = 'DistributionInfo' AND SPCDCODE = '999999' AND COLCODE = 'settFeeAmt';

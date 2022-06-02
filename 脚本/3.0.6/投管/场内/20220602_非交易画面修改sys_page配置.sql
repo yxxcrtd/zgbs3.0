@@ -1,1 +1,1 @@
-update sys_page set menu_id='SETTLE_MANAGEMENT_001_003_013'    where  page_id='EtrExchangeTradeFjyywzl001'
+update sys_page set menu_id='SETTLE_MANAGEMENT_001_003_013'    where  page_id='EtrExchangeTradeFjyywzl001';

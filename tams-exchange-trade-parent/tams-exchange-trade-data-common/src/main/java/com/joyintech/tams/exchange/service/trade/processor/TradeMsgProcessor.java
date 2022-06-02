@@ -835,7 +835,7 @@ public class TradeMsgProcessor {
             instructionClone.setEntrustNum(entrust.getEntrustVolume() - entrust.getTradedVolume());
 
             //组装撤单组合分配
-            List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildPortfolioCalculateResponse(entrust, instructionClone, PortfolioDetailBusiTypeEnum.CANCEL);
+            List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildCancelPortfolioCalculateResponse(entrust, instructionClone);
             if (CollectionUtils.isEmpty(portfolioCalculateResponses)) {
                 logger.error("【未组装撤单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
                 return;
