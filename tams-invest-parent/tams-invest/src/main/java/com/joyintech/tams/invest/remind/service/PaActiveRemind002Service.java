@@ -15,6 +15,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
@@ -539,7 +540,13 @@ public class PaActiveRemind002Service extends BaseService<PaActiveRemind001Dto> 
         String smallCategory = (String)param.get("smallCategory");
         param.put("R12S1", BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue());
         param.put("userId", LoginUserUtil.getUserName());
-        dto.addAll(paActiveRemind002Mapper.selramindR12S1(param));
+        com.joyintech.framework.base.intf.Page page = CacheUtil.getPage("EtrExchangeTradeFjyywzl001");
+        String menuId=page.getMenuId();
+        List<PaActiveRemind001Dto> list=paActiveRemind002Mapper.selramindR12S1(param);
+        list.stream().forEach(item->{
+            item.setMenuId(menuId);
+        });
+        dto.addAll(list);
     }
 
     /**
