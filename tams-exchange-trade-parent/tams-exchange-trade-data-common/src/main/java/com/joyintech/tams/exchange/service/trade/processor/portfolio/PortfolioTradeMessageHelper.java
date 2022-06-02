@@ -7,6 +7,8 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
@@ -14,6 +16,7 @@ import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
 import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
@@ -56,10 +59,16 @@ public class PortfolioTradeMessageHelper {
     public List<PortfolioTradeMessage> buildPortfolioTradeMessage(EntrustInterface entrust, Trade trade, Instruction instruction) {
         List<PortfolioTradeMessage> portfolioTradeMessages = Lists.newArrayList();
 
+        BigDecimal tradedPrice = trade.getTradedPrice();
+        if(InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)){
+            tradedPrice = trade.getFullPrice();
+        }
+
         //1、调用通用分配接口，构建成交组合分配
         logger.info("调用通用分配接口，构建成交组合分配");
         Map<String, PortfolioDetail> portfolioDetailMap = Maps.newHashMap();
-        ResultBean resultBean = portfolioAssignHelper.queryPortfolioAssign(instruction.getEntrustId(), PortfolioDetailBusiTypeEnum.TRADE, BigDecimal.valueOf(trade.getTradedVolume()), trade.getTradedPrice(), trade.getEntrustProp());
+        ResultBean resultBean = portfolioAssignHelper.queryPortfolioAssign(instruction.getEntrustId(), PortfolioDetailBusiTypeEnum.TRADE, BigDecimal.valueOf(trade.getTradedVolume()), tradedPrice, trade.getEntrustProp());
         if (ErrorCode.SUCCESS.value() == resultBean.getErrorCode()) {
             portfolioDetailMap.putAll((Map<String, PortfolioDetail>) resultBean.getData());
         } else {
