@@ -102,11 +102,6 @@ public class TrdInvestPersonInfo002Controller extends BaseController {
                 model.addAttribute("innerTrade", Boolean.FALSE.toString());
             }
             // ZGZGST-2008: fuyongsheng 20210918 add end
-            //add  wsz 20220601 交易对手不显示问题修改 start 3.0.6场内 ZGCPCN-1007
-            if(Objects.equals("trdInvestPersonInfo002Dto",this.getParam("entityName"))){
-                model.addAttribute("innerTrade", Boolean.FALSE.toString());
-            }
-            //add  wsz 交易对手不显示问题修改end
         }
         HashMap<String, Object> param = new HashMap<>();
 //        model.addAttribute("COUNTER_ID_LIST",
