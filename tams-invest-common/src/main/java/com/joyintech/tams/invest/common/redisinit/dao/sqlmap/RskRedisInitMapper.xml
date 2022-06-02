@@ -190,7 +190,11 @@
         m.TRADE_MARKET tradeMarket,
         m.ISSUE_TYPE issueType,
         n.INVEST_NATURE investNature,
-        n.IS_SEVEN_DAY_CASHABLE isSevenDayCashable,
+        CASE WHEN n.IS_SEVEN_DAY_CASHABLE = 'Y' OR  NVL(RSAT3.IS_LIQUIDITY3, 'N') = 'Y' THEN
+            'Y'
+        ELSE
+            'N'
+        END isSevenDayCashable,
         n.IS_OPEN_EVERYDAY isOpenEveryDay,
         n.BOND_RISK_TYPE bondRiskType,
         y.TYPE_4 type4,
