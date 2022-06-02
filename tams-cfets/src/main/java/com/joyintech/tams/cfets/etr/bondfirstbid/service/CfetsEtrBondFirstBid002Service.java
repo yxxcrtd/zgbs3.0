@@ -789,8 +789,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
             //委托附属表
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
+            etrEntrustAdd.setBusiTypePosition(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
             if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                 etrEntrustAdd.setSecAcctId(dto.getSecAcctId());
+                etrEntrustAdd.setBusiTypePosition(DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
             }
             etrEntrustAdd.setEntrustId(dto.getEntrustId());
             etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_债券.getValue());
@@ -883,8 +885,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
             //委托附属表
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
+            etrEntrustAdd.setBusiTypePosition(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
             if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                 etrEntrustAdd.setSecAcctId(dto.getSecAcctId());
+                etrEntrustAdd.setBusiTypePosition(DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
             }
             etrEntrustAdd.setEntrustId(dto.getEntrustId());
             etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_债券.getValue());
