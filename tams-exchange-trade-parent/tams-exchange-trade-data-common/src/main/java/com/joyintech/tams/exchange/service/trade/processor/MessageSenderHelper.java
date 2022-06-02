@@ -171,7 +171,7 @@ public class MessageSenderHelper {
         } else if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             //成交全价金额
-            tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
+            tradeMessage.setDealBalance(trade.getClearBalance());
         }
 
         // 业务类型（手工交收用）
