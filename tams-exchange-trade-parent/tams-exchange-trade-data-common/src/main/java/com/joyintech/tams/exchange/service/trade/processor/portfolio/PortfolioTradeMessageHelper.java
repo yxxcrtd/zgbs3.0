@@ -17,6 +17,7 @@ import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
 import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
+import com.joyintech.tams.exchange.datacommon.db.service.TradeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -163,6 +165,9 @@ public class PortfolioTradeMessageHelper {
         return calculateResponses;
     }
 
+    @Autowired
+    private TradeService tradeService;
+
     /**
      * 组装撤单组合分配
      */
@@ -176,10 +181,15 @@ public class PortfolioTradeMessageHelper {
         List<PortfolioDetail> orderDetails = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(instructionClone.getEntrustId(), PortfolioDetailBusiTypeEnum.ORDER.getCode())
                 .stream().filter(o -> StringUtil.equals(o.getBusiId(), entrust.getId())).collect(Collectors.toList());
 
+        //获取成交编号
+        Set<String> tradeIdSet = tradeService.queryTradeByInstructionId(instructionClone.getEntrustId())
+                .stream().filter(o -> StringUtil.equals(o.getEntrustId(), entrust.getId()))
+                .map(Trade::getId).collect(Collectors.toSet());
+
         //2、查询成交组合分配
         logger.info("查询成交组合分配：【instructionId={}】,【entrustId={}】", instructionClone.getEntrustId(), entrust.getId());
         Map<String, List<PortfolioDetail>> tradeDetailsMap = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(instructionClone.getEntrustId(), PortfolioDetailBusiTypeEnum.TRADE.getCode())
-                .stream().filter(o -> StringUtil.equals(o.getBusiId(), entrust.getId())).collect(Collectors.groupingBy(PortfolioDetail::getPortfolioId));
+                .stream().filter(o -> tradeIdSet.contains(o.getBusiId())).collect(Collectors.groupingBy(PortfolioDetail::getPortfolioId));
 
         List<PortfolioDetail> cancelDetails = Lists.newArrayList();
 
@@ -189,7 +199,7 @@ public class PortfolioTradeMessageHelper {
             o.setBusiId(entrust.getId());
 
             List<PortfolioDetail> list = tradeDetailsMap.get(o.getPortfolioId());
-            if(CollectionUtils.isNotEmpty(list)){
+            if (CollectionUtils.isNotEmpty(list)) {
                 BigDecimal tradeNum = list.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
                 BigDecimal tradeAmt = list.stream().map(PortfolioDetail::getTargetAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
                 o.setTargetNum(o.getTargetNum().subtract(tradeNum));
