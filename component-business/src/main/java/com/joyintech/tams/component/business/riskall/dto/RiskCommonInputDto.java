@@ -1,6 +1,6 @@
 package com.joyintech.tams.component.business.riskall.dto;
 
-import com.joyintech.tams.common.base.entity.RiskSceneConfig;
+import com.joyintech.tams.common.base.entity.RiskNodeConfigDtl;
 import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.invest.common.risk.dto.RiskNameListDto;
@@ -18,7 +18,7 @@ import java.util.List;
  * @since 1.0
  */
 
-public class RiskCommonInputDto extends RiskSceneConfig {
+public class RiskCommonInputDto extends RiskNodeConfigDtl {
 
     /**
      * 指标试算入参信息
@@ -132,12 +132,10 @@ public class RiskCommonInputDto extends RiskSceneConfig {
         this.tradeMarket = tradeMarket;
     }
 
-    @Override
     public String getPs() {
         return ps;
     }
 
-    @Override
     public void setPs(String ps) {
         this.ps = ps;
     }

@@ -1,135 +1,72 @@
--- auto-generated definition
-DROP TABLE RISK_SCENE_CONFIG;
-create table RISK_SCENE_CONFIG
+-- AUTO-GENERATED DEFINITION
+CREATE TABLE RSK_NODE_CONFIG
 (
-    SEQ_NO            VARCHAR2(32) not null
-        constraint RISK_SCENE_CONFIG_PK
-        primary key,
-    BUSINESS_TYPE     VARCHAR2(8),
-    FINPROD_TYPE2     VARCHAR2(16),
-    PS                VARCHAR2(8),
-    DECISION_TYPE     VARCHAR2(8),
-    WORKFLOW_STATUS   VARCHAR2(8),
-    SPECIAL_MATCH     VARCHAR2(100),
-    IND_PRE_CODE      VARCHAR2(100),
-    INDICATOR_CONTROL VARCHAR2(8),
-    INDICATOR_OCCUPY  VARCHAR2(8),
-    INDICATOR_APPROVE VARCHAR2(8),
-    CREDIT_PRE_CODE   VARCHAR2(100),
-    CREDIT_CONTROL    VARCHAR2(8),
-    CREDIT_OCCUPY     VARCHAR2(8),
-    AUTHORIZE_CONTROL VARCHAR2(8),
-    AUTHORIZE_APPROVE VARCHAR2(8),
-    NAME_LIST_CONTROL VARCHAR2(2),
-    NAME_LIST_TYPE    VARCHAR2(8),
-    PAGE_ID           VARCHAR2(8),
-    MODULE_ID         VARCHAR2(32)
-)
-    /
+    NODE_ID     VARCHAR2(64),
+    NODE_NAME   VARCHAR2(100),
+    NODE_TYPE   VARCHAR2(50),
+    NODE_CODE   VARCHAR2(50),
+    NODE_VAL    VARCHAR2(50),
+    NODE_DESC   VARCHAR2(100),
+    NODE_LEVEL  NUMBER,
+    P_NODE_ID   VARCHAR2(50),
+    STATUS      NUMBER default 0,
+    REMARK      VARCHAR2(200),
+    UPDATE_USER VARCHAR2(20),
+    CREATE_TIME TIMESTAMP(6),
+    UPDATE_TIME TIMESTAMP(6),
+    constraint PK_RSK_NODE_CONFIG primary key (NODE_ID)
+);
+COMMENT ON TABLE RSK_NODE_CONFIG IS 'é£ŽæŽ§èŠ‚ç‚¹é…ç½®è¡¨';
+COMMENT ON COLUMN RSK_NODE_CONFIG.NODE_ID IS 'èŠ‚ç‚¹id';
+COMMENT ON COLUMN RSK_NODE_CONFIG.NODE_NAME IS 'èŠ‚ç‚¹åç§°';
+COMMENT ON COLUMN RSK_NODE_CONFIG.NODE_TYPE IS 'èŠ‚ç‚¹ç±»åž‹';
+COMMENT ON COLUMN RSK_NODE_CONFIG.NODE_CODE IS 'æŒ‡æ ‡è§¦å‘å®¡æ‰¹ï¼š00ï¼šä¸è§¦å‘ 01ï¼šè§¦å‘';
+COMMENT ON COLUMN RSK_NODE_CONFIG.NODE_VAL IS 'èŠ‚ç‚¹åŒ¹é…å€¼';
+COMMENT ON COLUMN RSK_NODE_CONFIG.NODE_DESC IS 'èŠ‚ç‚¹åŒ¹é…å€¼æè¿°';
+COMMENT ON COLUMN RSK_NODE_CONFIG.NODE_LEVEL IS 'å±‚çº§';
+COMMENT ON COLUMN RSK_NODE_CONFIG.P_NODE_ID IS 'çˆ¶èŠ‚ç‚¹';
+COMMENT ON COLUMN RSK_NODE_CONFIG.STATUS IS 'æ˜¯å¦æœ‰æ•ˆ é»˜è®¤ 0 æœ‰æ•ˆ,1 æ— æ•ˆ';
+COMMENT ON COLUMN RSK_NODE_CONFIG.REMARK IS 'å¤‡æ³¨';
+COMMENT ON COLUMN RSK_NODE_CONFIG.UPDATE_USER IS 'åˆ›å»ºäºº';
+COMMENT ON COLUMN RSK_NODE_CONFIG.CREATE_TIME IS 'åˆ›å»ºæ—¶é—´';
+COMMENT ON COLUMN RSK_NODE_CONFIG.UPDATE_TIME IS 'æ›´æ–°æ—¶é—´';
 
-comment on table RISK_SCENE_CONFIG is '·çÏÕ³¡¾°ÅäÖÃ±í'
-/
 
-comment on column RISK_SCENE_CONFIG.SEQ_NO is 'Ö÷¼ü£¨Á÷Ë®£©'
-/
 
-comment on column RISK_SCENE_CONFIG.BUSINESS_TYPE is 'ÒµÎñÀàÐÍ£ºÊý¾Ý×Öµä.Í·´çÒµÎñÀàÐÍ'
-/
+CREATE TABLE RSK_NODE_CONFIG_DTL
+(
+    NODE_ID            VARCHAR2(64),
+    INDICATOR_PRE_NODE VARCHAR2(100),
+    INDICATOR_CONTROL  VARCHAR2(10),
+    INDICATOR_APPROVE  VARCHAR2(50),
+    INDICATOR_OCCUPY   VARCHAR2(32),
+    CREDIT_PRE_NODE    VARCHAR2(100),
+    CREDIT_CONTROL     VARCHAR2(50),
+    CREDIT_OCCUPY      VARCHAR2(50),
+    AUTHORIZE_CONTROL  VARCHAR2(50),
+    AUTHORIZE_APPROVE  VARCHAR2(50),
+    NAME_LIST_CONTROL  VARCHAR2(50),
+    NAME_LIST_TYPE     VARCHAR2(50),
+    REMARK             VARCHAR2(200),
+    UPDATE_USER VARCHAR2(20),
+    CREATE_TIME TIMESTAMP(6),
+    UPDATE_TIME TIMESTAMP(6),
+    constraint PK_RSK_NODE_CONFIG_DTL primary key (NODE_ID)
+);
+COMMENT ON TABLE RSK_NODE_CONFIG_DTL IS 'é£ŽæŽ§èŠ‚ç‚¹é…ç½®æ˜Žç»†è¡¨';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.NODE_ID IS 'é…ç½®èŠ‚ç‚¹id';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.INDICATOR_PRE_NODE IS 'æŒ‡æ ‡å‰ç½®èŠ‚ç‚¹';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.INDICATOR_CONTROL IS 'æŒ‡æ ‡æŽ§åˆ¶ï¼š00ï¼šä¸æŽ§ 01ï¼šè½¯æŽ§ 02ï¼šç¡¬æŽ§';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.INDICATOR_APPROVE IS 'æŒ‡æ ‡è§¦å‘å®¡æ‰¹ï¼š00ï¼šä¸è§¦å‘ 01ï¼šè§¦å‘';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.INDICATOR_OCCUPY IS 'æŒ‡æ ‡å ç”¨ç±»åž‹ï¼š00ï¼šä¸å ,01ï¼šé¢„å ,02ï¼šå®žå ,03ï¼šé¢„å é‡Šæ”¾,04ï¼šå®žå é‡Šæ”¾,05ï¼šé¢„å é‡Šæ”¾å†é¢„å ,06ï¼šå®žå é‡Šæ”¾å†å®žå ,07ï¼šå®žå é¢„å é‡Šæ”¾';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.CREDIT_CONTROL IS 'æŽˆä¿¡æŽ§åˆ¶ï¼š00ï¼šä¸æŽ§ 01ï¼šè½¯æŽ§ 02ï¼šç¡¬æŽ§';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.CREDIT_OCCUPY IS 'æŽˆä¿¡å ç”¨ï¼šæŒ‡æ ‡å ç”¨ç±»åž‹ï¼š00ï¼šä¸å ,01ï¼šé¢„å ,02ï¼šå®žå ,03ï¼šé¢„å é‡Šæ”¾,04ï¼šå®žå é‡Šæ”¾,05ï¼šé¢„å é‡Šæ”¾å†é¢„å ,06ï¼šå®žå é‡Šæ”¾å†å®žå ,07ï¼šå®žå é¢„å é‡Šæ”¾';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.AUTHORIZE_CONTROL IS 'æŽˆæƒæŽ§åˆ¶ï¼š00ï¼šä¸æŽ§ 01ï¼šè½¯æŽ§ 02ï¼šç¡¬æŽ§';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.AUTHORIZE_APPROVE IS 'æŽˆæƒè§¦å‘å®¡æ‰¹ï¼š00ï¼šä¸è§¦å‘ 01ï¼šè§¦å‘';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.NAME_LIST_CONTROL IS 'åå•æŽ§åˆ¶ï¼š00ï¼šä¸æŽ§ 01ï¼šè½¯æŽ§ 02ï¼šç¡¬æŽ§';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.NAME_LIST_TYPE IS 'æŽ§åˆ¶åå•ç±»åž‹ï¼š01ï¼šèµ„äº§ 02ï¼šæœºæž„ 03ï¼šèµ„äº§å’Œæœºæž„';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.REMARK IS 'å¤‡æ³¨';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.UPDATE_USER IS 'æ›´æ–°äºº';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.CREATE_TIME IS 'åˆ›å»ºæ—¶é—´';
+COMMENT ON COLUMN RSK_NODE_CONFIG_DTL.UPDATE_TIME IS 'æ›´æ–°æ—¶é—´';
 
-comment on column RISK_SCENE_CONFIG.FINPROD_TYPE2 is '×Ê²ú´óÀà£ºÊý¾Ý×Öµä.½ðÈÚ²úÆ·ÀàÐÍ(Í¶¹ÜÓÃ)'
-/
-
-comment on column RISK_SCENE_CONFIG.PS is '½»Ò×·½Ïò£ºÊý¾Ý×Öµä.½»Ò×·½Ïò'
-/
-
-comment on column RISK_SCENE_CONFIG.DECISION_TYPE is '¾ö²ß¶¯×÷£ºÊý¾Ý×Öµä.ÏµÍ³¶¯×÷
-ÐÂ½¨/ÐÞ¸Ä/³·»Ø/ÍË»Ø/¹Ø±Õ/³É½»/Íê³É/×÷·Ï/»Ø¹ö/³·Ïú'
-/
-
-comment on column RISK_SCENE_CONFIG.WORKFLOW_STATUS is 'Á÷³Ì×´Ì¬£ºÊý¾Ý×Öµä.Á÷³Ì½Úµã
-Á÷³ÌÌá½»/ÉóÅúÉúÐ§/Á÷³ÌÍË»Ø'
-/
-
-comment on column RISK_SCENE_CONFIG.SPECIAL_MATCH is 'ÌØÊâÆ¥Åä×Ö¶Î(ÒµÎñ×Ö¶ÎÆ´½Ó)
-'
-/
-
-comment on column RISK_SCENE_CONFIG.IND_PRE_CODE is 'Ö¸±êÕ¼ÓÃÇ°ÖÃ½Úµã£ºÇ°ÖÃ½Úµã×Ö¶ÎÃû
-'
-/
-
-comment on column RISK_SCENE_CONFIG.INDICATOR_CONTROL is 'Ö¸±ê¿ØÖÆ
-00£º²»¿Ø
-01£ºÈí¿Ø
-02£ºÓ²¿Ø'
-/
-
-comment on column RISK_SCENE_CONFIG.INDICATOR_OCCUPY is 'Ö¸±êÕ¼ÓÃÀàÐÍ
-00£º²»Õ¼
-01£ºÔ¤Õ¼
-02£ºÊµÕ¼
-03£ºÔ¤Õ¼ÊÍ·Å
-04£ºÊµÕ¼ÊÍ·Å
-05£ºÔ¤Õ¼ÊÍ·ÅÔÙÔ¤Õ¼
-06£ºÊµÕ¼ÊÍ·ÅÔÙÊµÕ¼
-07£ºÊµÕ¼Ô¤Õ¼ÊÍ·Å'
-/
-
-comment on column RISK_SCENE_CONFIG.INDICATOR_APPROVE is 'Ö¸±êÉóÅú
-00£º²»´¥·¢
-01£º´¥·¢'
-/
-
-comment on column RISK_SCENE_CONFIG.CREDIT_PRE_CODE is 'ÊÚÐÅÕ¼ÓÃÇ°ÖÃ½Úµã
-Ç°ÖÃ½Úµã×Ö¶ÎÃû
-'
-/
-
-comment on column RISK_SCENE_CONFIG.CREDIT_CONTROL is 'ÊÚÐÅ¿ØÖÆ
-00£º²»¿Ø
-01£ºÈí¿Ø
-02£ºÓ²¿Ø
-'
-/
-
-comment on column RISK_SCENE_CONFIG.CREDIT_OCCUPY is 'ÊÚÐÅÕ¼ÓÃÀàÐÍ£º
-00£º²»Õ¼
-01£ºÔ¤Õ¼
-02£ºÊµÕ¼
-03£ºÔ¤Õ¼ÊÍ·Å
-04£ºÊµÕ¼ÊÍ·Å
-05£ºÔ¤Õ¼ÊÍ·ÅÔÙÔ¤Õ¼
-06£ºÊµÕ¼ÊÍ·ÅÔÙÊµÕ¼
-07£ºÊµÕ¼Ô¤Õ¼ÊÍ·Å
-'
-/
-
-comment on column RISK_SCENE_CONFIG.AUTHORIZE_CONTROL is 'ÊÚÈ¨¿ØÖÆ
-00£º²»¿Ø
-01£ºÈí¿Ø
-02£ºÓ²¿Ø'
-/
-
-comment on column RISK_SCENE_CONFIG.AUTHORIZE_APPROVE is 'ÊÚÈ¨ÉóÅú
-01£º´¥·¢
-02£º²»´¥·¢'
-/
-
-comment on column RISK_SCENE_CONFIG.NAME_LIST_CONTROL is 'Ãûµ¥
-00£º²»¿Ø
-01£ºÈí¿Ø
-02£ºÓ²¿Ø'
-/
-
-comment on column RISK_SCENE_CONFIG.NAME_LIST_TYPE is 'Ãûµ¥ÀàÐÍ
-01£º×Ê²ú
-02£º»ú¹¹
-03£º×Ê²úºÍ»ú¹¹
-'
-/
-
-comment on column RISK_SCENE_CONFIG.PAGE_ID is '»­ÃæID'
-/
-
-comment on column RISK_SCENE_CONFIG.MODULE_ID is 'Ä£°åId'
-/
