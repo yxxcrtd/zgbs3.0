@@ -121,9 +121,13 @@ public class PortfolioTradeMessageHelper {
         logger.info("构建下单组合分配：【instructionId={}】,【entrustId={}】", instructionClone.getEntrustId(), entrust.getId());
 
         List<PortfolioCalculateResponse> calculateResponses = Lists.newArrayList();
-
+        BigDecimal tradedPrice = entrust.getEntrustPrice();
+        if(InvestmentAssetType.BOND.codeEquals(instructionClone.getAssetType())
+                && EnumUtil.in(instructionClone.getPs(), InstructionPs.BUY, InstructionPs.SELL)){
+            tradedPrice = entrust.getFullPrice();
+        }
         //1、调用通用分配接口，构建组合分配
-        ResultBean resultBean = portfolioAssignHelper.queryPortfolioAssign(instructionClone.getEntrustId(), busiType, BigDecimal.valueOf(instructionClone.getEntrustNum()), instructionClone.getEntrustPrice(), entrust.getEntrustProp());
+        ResultBean resultBean = portfolioAssignHelper.queryPortfolioAssign(instructionClone.getEntrustId(), busiType, BigDecimal.valueOf(instructionClone.getEntrustNum()), tradedPrice, entrust.getEntrustProp());
 
         Map<String, PortfolioDetail> portfolioDetailMap = Maps.newHashMap();
         if (ErrorCode.SUCCESS.value() == resultBean.getErrorCode()) {
