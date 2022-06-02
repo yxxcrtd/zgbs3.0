@@ -18,26 +18,28 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.business.common.dto.CommonSearchInfoRequest;
 import com.joyintech.tams.business.common.dto.FieldExportRequestDto;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FinProdResponse;
+import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.CfetsEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.EntrustQueryBean;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListRequest;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListResponse;
+import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FinProdResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.TradeQueryBean;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.service.FieldEtrInfoQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.joyintech.tams.business.common.pojo.Message;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +64,14 @@ public class FieldEtrInfoQueryController extends BaseController {
         Map<String, Object> initPageParams = new HashMap<>();
         //数据字典初始化数据
         initPageParams.put("PINAN_ASSET_TYPE", this.getSelectDataFromDataDic(DictCode.平安资产类型, null));
-        initPageParams.put("BUSI_TYPE_POSITION", this.getSelectDataFromDataDic(DictCode.投管业务类型, null));
+        SelectDto busiTypePosition = this.getSelectDataFromDataDic(DictCode.头寸业务类型, null);
+        SelectDto busiTypeTg = this.getSelectDataFromDataDic(DictCode.投管业务类型, null);
+        List<SelectOptionDto> selectOptionDtoList = new ArrayList<>();
+        selectOptionDtoList.addAll(busiTypePosition.getOptions());
+        selectOptionDtoList.addAll(busiTypeTg.getOptions());
+        busiTypePosition.setOptions(selectOptionDtoList);
+        initPageParams.put("BUSI_TYPE_POSITION",busiTypePosition);
+
         initPageParams.put("TRADE_MARKET", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种, null));
         initPageParams.put("ACCOUNT_SPEED", this.getSelectDataFromDataDic(DictCode.清算速度, null));
@@ -161,6 +170,29 @@ public class FieldEtrInfoQueryController extends BaseController {
         } catch (Exception e) {
             logger.error("查询指令管理分页数据异常", e);
             return new Message<Page<EntrustQueryBean>>().fail().setMessage("查询指令成交异常");
+        }
+    }
+
+    /**
+     * 一级债券指令执行查询
+     *
+     * @param dto
+     * @return Page<CfetsEtrDispatcherExeListInfoResponse>
+     * @throws Exception Exception
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value = "一级债券指令执行查询", notes = "一级债券指令执行查询")
+    @PostMapping("/getEtrBondFirstExeListInfo")
+    @ResponseBody
+    public Message<Page<CfetsEtrBondFirstExeListInfoResponse>> getEtrBondFirstExeListInfo(@RequestBody CommonSearchInfoRequest dto)
+            throws Exception {
+        try {
+            Page<CfetsEtrBondFirstExeListInfoResponse> returnDto = fieldEtrInfoQueryService.getEtrBondFirstExeListInfo(dto);
+            return new Message<Page<CfetsEtrBondFirstExeListInfoResponse>>().success().setData(returnDto);
+        } catch (Exception e) {
+            logger.error("一级债券指令执行查询异常", e);
+            return new Message<Page<CfetsEtrBondFirstExeListInfoResponse>>().fail().setMessage("一级债券指令执行查询查询异常");
         }
     }
 
