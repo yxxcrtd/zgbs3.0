@@ -149,7 +149,8 @@
         FP.FINPROD_MARKET_ID finprodMarketId,
         FP.FINPROD_ABBR finprodAbbr,
         FPI.TENDER_TARGET tenderTarget,
-        BO.BID_DATE       bidDate,
+        FPI.TENDER_SDATE   bidDateStart,
+        FPI.TENDER_EDATE   bidDateEnd,
         BOBP.ENTRUST_NUM/100  bidPrinAmt,
         BO.WIN_PRIN_AMT/10000 totalBiddingNum,
         BOBP.BID_PRICE    bidPrice,
@@ -182,11 +183,23 @@
             BOBP.ENTRUST_ID   entrustId,
             BOBP.PORTFOLIO_ID   portfolioId,
             pp.PORTFOLIO_NAME portfolioName,
-            NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000   totalBidPrinamt,
-            BOBP.WIN_PRIN_AMT     winPrinAmt,
-            BOBP.WIN_PRICE        winPrice,
+            NVL(BOBP.THE_WIN_PRIN_AMT,SHARE_AMT)   totalBidPrinamt,
+            NVL(BOBP.WIN_PRIN_AMT,SHARE_AMT)  winPrinAmt,
+            BOBP.BID_PRICE        winPrice,
             BOBP.INV_AIM   invAim
         from BID_ORDER_BID_PRICE BOBP
+        LEFT JOIN (
+             select  BO.BID_ID,TPDA.ENTRUST_ID ,SUM(TPD.SHARE_AMT)  SHARE_AMT
+             from TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
+             LEFT JOIN TRD_PRODUCT_DEAL TPD
+                       ON TFPDT.TOTLE_TRADE_ID = TPD.TOTLE_TRADE_ID
+             LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+                       ON TPD.TRADE_ID = TPDA.TRADE_ID
+             LEFT JOIN BID_ORDER BO
+                       ON BO.BID_ID = TFPDT.P_TOTLE_TRADE_ID
+             GROUP BY TPDA.ENTRUST_ID,BO.BID_ID
+            ) TPD  ON TPD.ENTRUST_ID = BOBP.ENTRUST_ID
+            AND BOBP.BID_ID = TPD.BID_ID
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN PTL_PORTFOLIO pp on BOBP.PORTFOLIO_ID = pp.PORTFOLIO_ID
         WHERE BOBP.BID_ID = #{bidId}

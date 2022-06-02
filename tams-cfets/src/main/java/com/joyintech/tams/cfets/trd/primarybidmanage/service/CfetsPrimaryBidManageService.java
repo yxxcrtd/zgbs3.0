@@ -185,6 +185,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 detailTable = cfgDataTableMapper.getByPageCode(pageCode, "BidProductInfo", spcdCode, EFFERANGE_IS, userId);
             }
             flag = cfgDataTableFlagMapper.getByPageCodeAndDtCode(pageCode, "SummaryBidInfo", spcdCode, userId);
+
             List<CfgDataTableShow> listTable = null;
             if (null == flag) {
                 listTable = cfgDataTableMapper.getByPageCode(pageCode, "SummaryBidInfo", spcdCode, EFFERANGE_NO, USER_ID);
@@ -193,28 +194,30 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             CfetsPrimaryBidManageCfmResponse response = cfetsPrimaryBidManageMapper.getBidManageCfmInfo(param);
             List<BidProductDto> bidProductList = cfetsPrimaryBidManageMapper.getBidProductList(param);
-            Map<BigDecimal, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
-            List<SummaryBidDto>  summaryBidList = new ArrayList<>();
-            for(BigDecimal winPrice:summaryBidMap.keySet()){
-                SummaryBidDto summaryBidDto = new SummaryBidDto();
-                BigDecimal totalBidPrinamt = null;
-                BigDecimal winPrinAmt = null;
-                for (BidProductDto bidProductDto:summaryBidMap.get(winPrice)){
-                    totalBidPrinamt = ArithmeticUtil.doAdd(totalBidPrinamt,bidProductDto.getTotalBidPrinamt());
-                    winPrinAmt = ArithmeticUtil.doAdd(winPrinAmt,bidProductDto.getWinPrinAmt());
+            if(StringUtil.isNotEmpty(response.getBidModle()) && response.getBidModle().equals(DictCodeListExt4.投标方式_自主投标)) {
+                Map<BigDecimal, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
+                List<SummaryBidDto> summaryBidList = new ArrayList<>();
+                for (BigDecimal winPrice : summaryBidMap.keySet()) {
+                    SummaryBidDto summaryBidDto = new SummaryBidDto();
+                    BigDecimal totalBidPrinamt = null;
+                    BigDecimal winPrinAmt = null;
+                    for (BidProductDto bidProductDto : summaryBidMap.get(winPrice)) {
+                        totalBidPrinamt = ArithmeticUtil.doAdd(totalBidPrinamt, bidProductDto.getTotalBidPrinamt());
+                        winPrinAmt = ArithmeticUtil.doAdd(winPrinAmt, bidProductDto.getWinPrinAmt());
+                    }
+                    summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
+                    summaryBidDto.setWinPrinAmt(winPrinAmt);
+                    summaryBidDto.setWinPrice(winPrice);
+                    summaryBidList.add(summaryBidDto);
                 }
-                summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
-                summaryBidDto.setWinPrinAmt(winPrinAmt);
-                summaryBidDto.setWinPrice(winPrice);
-                summaryBidList.add(summaryBidDto);
+                resultData.put(dtCode + "_formList", listTable);
+                resultData.put(dtCode + "_list", summaryBidList);
             }
 //            response.setSummaryBidList(summaryBidList);
             resultData.put(dtCode + "_form", infoForm);
             resultData.put(dtCode + "_formDetail", detailTable);
-            resultData.put(dtCode + "_formList", listTable);
             resultData.put(dtCode + "_data", response);
             resultData.put(dtCode + "_detail", bidProductList);
-            resultData.put(dtCode + "_list", summaryBidList);
             return resultData;
         }
         return null;
