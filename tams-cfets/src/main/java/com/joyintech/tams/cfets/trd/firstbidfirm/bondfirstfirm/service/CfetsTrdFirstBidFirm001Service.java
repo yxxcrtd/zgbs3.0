@@ -540,11 +540,18 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         }
 
         if ("counterName".equals(sort)) {
+            List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoListNew = new ArrayList<>();
+            List<CfetsTrdFirstBidFirmEntrustDto> counterNotNull = bidFirmSumDtoList.stream()
+                    .filter( item -> StringUtil.isNotEmpty(item.getCounterName())).collect(Collectors.toList());
+            List<CfetsTrdFirstBidFirmEntrustDto> counterNull = bidFirmSumDtoList.stream()
+                    .filter( item -> StringUtil.isEmpty(item.getCounterName())).collect(Collectors.toList());
             if("desc".equals(direction)) {
-                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getCounterName).reversed()).collect(Collectors.toList());
+                bidFirmSumDtoListNew.addAll(counterNotNull.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getCounterName).reversed()).collect(Collectors.toList()));
             }else {
-                return bidFirmSumDtoList.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getCounterName)).collect(Collectors.toList());
+                bidFirmSumDtoListNew.addAll(counterNotNull.stream().sorted(Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getCounterName)).collect(Collectors.toList()));
             }
+            bidFirmSumDtoListNew.addAll(counterNull);
+            return bidFirmSumDtoListNew;
         }
 
         return bidFirmSumDtoList;

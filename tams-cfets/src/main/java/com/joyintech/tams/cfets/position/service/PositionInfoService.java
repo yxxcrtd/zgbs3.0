@@ -211,7 +211,7 @@ public class PositionInfoService {
         // rs.put("cashT1", ArithmeticUtil.doAdd(cashT1, outMap.getBigDecimal("T1KYXJ")));
         rs.put("cashT", cashT);
         rs.put("cashT1", cashT1);
-        rs.put("realCash", ArithmeticUtil.doAdd(realCash, outMap.getBigDecimal("ZHXJ")));
+        rs.put("realCash", realCash);
         rs.put("secDesirableCash", secDesirableCash);
         return rs;
     }

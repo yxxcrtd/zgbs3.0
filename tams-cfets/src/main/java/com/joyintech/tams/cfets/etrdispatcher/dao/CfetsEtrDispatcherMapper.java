@@ -11,6 +11,7 @@
 package com.joyintech.tams.cfets.etrdispatcher.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherAutoRequest;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherExeListInfoResponse;
@@ -115,6 +116,13 @@ public interface CfetsEtrDispatcherMapper {
     List<CfetsEtrDispatcherTraderListRequest> getEtrTraderAndWorkloadList(Map<String, Object> param);
 
     List<CfetsEtrDispatcherExeListInfoResponse> getEtrDispatcherExeListInfo(Map<String, Object> pageParam);
+
+    /**
+     * 一级债券指令执行查询
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(Map<String, Object> pageParam);
 
     List<CfetsEtrDispatcherDealListInfoResponse> getEtrDispatcherDealListInfo(Map<String, Object> pageParam);
 
@@ -240,4 +248,6 @@ public interface CfetsEtrDispatcherMapper {
      * @return
      */
     CfetsEtrDispatcherTradeListResponse getEtrFirstBidInfo(@Param("entrustId") String entrustId);
+
+
 }

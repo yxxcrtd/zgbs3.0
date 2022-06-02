@@ -414,7 +414,7 @@
                         bo.COUNTER_ID     AS counterId/*交易对手*/,
                         mcp.COUNTER_NAME  AS counterName,
                         bo.REMARK         AS remark/*备注*/,
-                        null                 dealDate/*成交日期*/
+                        bo.BID_DATE          dealDate/*成交日期*/
                  FROM BID_ORDER bo
                           LEFT JOIN
                       (select listagg(case
@@ -451,7 +451,7 @@
                           LEFT JOIN
                       ETR_ENTRUST ee
                       ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-                    left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+                    left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
                 <where>
                     bo.TRADE_STATUS = '01'
                     <if test="entrustId != null and entrustId != '' ">
@@ -508,7 +508,7 @@
                         bo.COUNTER_ID     AS counterId/*交易对手*/,
                         mcp.COUNTER_NAME  AS counterName,
                         bo.REMARK       AS remark/*备注*/,
-                        null               dealDate/*成交日期*/
+                        bo.BID_DATE            dealDate/*成交日期*/
                  FROM WFL_BID_ORDER bo
                           LEFT JOIN
                       (select listagg(case
@@ -545,7 +545,7 @@
                           LEFT JOIN
                       ETR_ENTRUST ee
                       ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-                    left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+                    left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
                     <where>
                         <if test="entrustId != null and entrustId != '' ">
                             AND ee.ENTRUST_ID = #{entrustId}

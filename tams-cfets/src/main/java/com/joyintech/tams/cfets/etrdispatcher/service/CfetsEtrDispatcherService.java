@@ -52,6 +52,7 @@ import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsPledgeBondInfoDto;
 import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoinfoService;
 import com.joyintech.tams.cfets.etrdispatcher.dao.CfetsEtrDispatcherMapper;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherAutoRequest;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealRequest;
@@ -790,6 +791,21 @@ public class CfetsEtrDispatcherService extends BaseService {
             }
         }
         return page;
+    }
+
+    /**
+     * 一级债券指令执行查询
+     * @param dto
+     * @return
+     */
+    public Page<CfetsEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(CommonSearchInfoRequest dto) {
+        Map<String, Object> pageParam = BeanUtil.object2Map(dto);
+        List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
+        if (StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1) {
+            return new Page<CfetsEtrBondFirstExeListInfoResponse>();
+        }
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
+                () -> cfetsEtrDispatcherMapper.getEtrBondFirstExeListInfo(pageParam));
     }
 
     /**
@@ -2101,4 +2117,6 @@ public class CfetsEtrDispatcherService extends BaseService {
         return ajaxResult;
 
     }
+
+
 }
