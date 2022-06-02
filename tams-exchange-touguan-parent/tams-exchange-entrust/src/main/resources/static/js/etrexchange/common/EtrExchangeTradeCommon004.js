@@ -3515,7 +3515,9 @@
         var finprodId = $('#finprodId_' + currentTab).val();
         var finprodType2 = $('#finprodType2_' + currentTab).val();
         if (finprodId != "" && FINPROD_TYPE_TG_ZYSHG != finprodType2) {
-            var url = "invest/asset/bond/FinBondTargetAsset002/init"; // 默认债券标的
+            // var url = "invest/asset/bond/FinBondTargetAsset002/init"; // 默认债券标的"zq2022041801.SH"
+            //新 债券信息页面
+            var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
             if (FINPROD_TYPE_TG_F06 == finprodType2) {
                 var flagStr = finprodId.substr(finprodId.length - 2, finprodId.length);
                 // 场内基金标的
