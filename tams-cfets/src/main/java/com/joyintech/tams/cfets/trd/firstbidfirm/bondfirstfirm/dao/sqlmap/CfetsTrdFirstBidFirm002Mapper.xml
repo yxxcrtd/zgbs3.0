@@ -51,8 +51,8 @@
             <result property="bidPriceTotal" column="TRADE_AMT" jdbcType="DECIMAL"/>
             <result property="settFeeAmt" column="SETT_FEE_AMT" jdbcType="DECIMAL"/>
             <result property="tradeAmt" column="TRADE_AMT" jdbcType="DECIMAL"/>
-            <result property="intAmt" column="UNIT_INT" jdbcType="DECIMAL"/>
             <result property="payAmt" column="PAYABLE_AMOUNT" jdbcType="DECIMAL"/>
+            <result property="intAmtTatol" column="INT_AMT" jdbcType="DECIMAL"/>
             <result property="bidPrice" column="BID_PRICE" jdbcType="DECIMAL"/>
             <result property="businessModel" column="INV_AIM" jdbcType="VARCHAR"/>
             <result property="acctNo" column="ACCT_NO" jdbcType="VARCHAR"/>
@@ -259,7 +259,8 @@
                    when fpi.TENDER_TARGET = '02' then bo.WIN_PRICE
                    when fpi.TENDER_TARGET = '03' then bo.WIN_PRICE * 10000
                    end              winPrice/*中标标位*/,
-               bo.UNIT_INT   /*应计利息*/,
+               bo.UNIT_INT  intAmt /*应计利息*/,
+               bo.UNIT_CPRICE  price /*净价*/,
                bo.SETT_FEE_AMT    settFeeAmt/*结算服务费*/,
                bo.REMARK       AS remark/*备注*/,
                bobp.ENTRUST_ID,
@@ -269,6 +270,7 @@
                bobp.SETT_FEE_AMT/*结算服务费*/,
                bobp.TRADE_AMT/*交易金额*/,
                bobp.INT_AMT/*应计利息总额*/,
+               bobp.ACCT_NO/*资金账户*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
                bobp.BID_PRICE/*标位*/,
                eed.INV_AIM/*业务模式*/,
@@ -279,6 +281,7 @@
                ee.INV_MANAGER_ID ,
                su.REAL_NAME     INV_MANAGER_NAME,
                bo.COUNTER_ID counterId,
+               ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
                ROWNUM rn
         from BID_ORDER bo
                  left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
@@ -329,7 +332,8 @@
                    when fpi.TENDER_TARGET = '02' then bo.WIN_PRICE
                    when fpi.TENDER_TARGET = '03' then bo.WIN_PRICE * 10000
                    end              winPrice/*中标标位*/,
-               bo.UNIT_INT   /*应计利息*/,
+               bo.UNIT_INT  intAmt /*应计利息*/,
+               bo.UNIT_CPRICE  price /*净价*/,
                bo.SETT_FEE_AMT    settFeeAmt/*结算服务费*/,
                bo.REMARK       AS remark/*备注*/,
                bobp.ENTRUST_ID,
@@ -339,6 +343,7 @@
                bobp.SETT_FEE_AMT/*结算服务费*/,
                bobp.TRADE_AMT/*交易金额*/,
                bobp.INT_AMT/*应计利息总额*/,
+               bobp.ACCT_NO/*资金账户*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
                bobp.BID_PRICE/*标位*/,
                eed.INV_AIM/*业务模式*/,
@@ -349,6 +354,7 @@
                ee.INV_MANAGER_ID invManagerId,
                su.REAL_NAME     invManagerName,
                bo.COUNTER_ID counterId,
+               ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
                ROWNUM rn
         from WFL_BID_ORDER bo
                  left join WFL_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
