@@ -1788,11 +1788,13 @@
         <include refid="Query_Column_List"/>
         FROM T_TRADE a left join T_INSTRUCTION b on a.INSTRUCTION_ID =b.ENTRUST_ID
         where a.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+        AND a.TRADE_TYPE = '0'
         UNION ALL
         select
         <include refid="Query_Column_List"/>
         FROM T_TRADEHISTORY a left join T_INSTRUCTION b on a.INSTRUCTION_ID =b.ENTRUST_ID
         where a.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+        AND AND a.TRADE_TYPE = '0'
     </select>
 
     <resultMap id="QueryResultMap" type="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherExeListInfoResponse">
