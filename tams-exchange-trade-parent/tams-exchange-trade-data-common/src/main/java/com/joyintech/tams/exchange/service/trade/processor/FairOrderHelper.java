@@ -196,18 +196,18 @@ public class FairOrderHelper {
             return true;
         }
 
-        //卖出价格不得小于最优价，买入不得高于最优价
-        BigDecimal price = portfolioAllocationResponse.getPrice();
-        if (order.getEntrustBs().equals(EntrustBs.SELL.value)
-                && TradeUtils.lessThan(order.getOrderPrice(), price)) {
-            order.setErrorCode(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.value);
-            order.setErrorMsg(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.errorMsg);
-            return true;
-        } else if (order.getEntrustBs().equals(EntrustBs.BUY.value)
-                && TradeUtils.bigThan(order.getOrderPrice(), price)) {
-            order.setErrorCode(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.value);
-            order.setErrorMsg(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.errorMsg);
-            return true;
+        long totoleNum = instructions.stream().map(Instruction::getTermDays).reduce(BigDecimal.ZERO, BigDecimal::add).longValue();
+        if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid() && totoleNum == 0) {
+            //卖出价格不得小于最优价，买入不得高于最优价
+            if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {
+                order.setErrorCode(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.value);
+                order.setErrorMsg(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.errorMsg);
+                return true;
+            } else if (order.getEntrustBs().equals(EntrustBs.BUY.value)) {
+                order.setErrorCode(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.value);
+                order.setErrorMsg(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.errorMsg);
+                return true;
+            }
         }
 
         order.setBusinessFlag(BusinessFlag.FAIR.value);
@@ -262,7 +262,6 @@ public class FairOrderHelper {
 
     //下委托及风险审批
     public void handleFairOrder(Order order, WorkflowBean workflow) {
-
         List<FairPortfolioResponse> fairInstructions = getFairInstructions(order);
         // fairInstructions是根据组合维度的生成的，需要根据指令代码重新聚合，注意字段借用
         Map<String, List<Instruction>> instructionMap = fairInstructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
