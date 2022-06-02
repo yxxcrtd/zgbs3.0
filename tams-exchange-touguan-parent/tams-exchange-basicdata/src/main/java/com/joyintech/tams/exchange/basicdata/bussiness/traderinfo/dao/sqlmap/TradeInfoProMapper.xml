@@ -61,8 +61,7 @@
                mdi.DEALER_NO dealerNo,
                mdi.TRADE_MARKET tradeMarket,
                mci.CUSTOMER_ID customerId,
-                mci.CUSTOMER_NAME dealerName,
-               MDDI.IS_OUR
+                mci.CUSTOMER_NAME dealerName
     from
                MST_DEALER_INFO mdi
     left JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
