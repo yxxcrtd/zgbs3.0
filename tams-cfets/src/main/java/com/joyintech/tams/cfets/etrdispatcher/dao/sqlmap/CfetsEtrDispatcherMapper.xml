@@ -1457,6 +1457,18 @@
         T.counterId,
         T.counterName,
         T.remark,
+        T.purchaseDate,
+        T.secAcctName,
+        T.secType,
+        T.portfolioId,
+        T.portfolioName,
+        T.subscriptionAmount,
+        T.ouPartyId,
+        T.ouPartyIdAbbr,
+        T.ourTrader,
+        T.ourTraderName,
+        T.issuer,
+        T.issuerName,
         T.dealDate
         from (
         SELECT CASE
@@ -1509,6 +1521,18 @@
         bo.COUNTER_ID     AS counterId/*交易对手*/,
         mcp.COUNTER_NAME  AS counterName,
         bo.REMARK         AS remark/*备注*/,
+        bo.CREATE_TIME     purchaseDate/*申购日期*/,
+        ssai.SEC_ACCT_NAME   secAcctName/*证券账户*/,
+        fpt.TYPE_11          secType/*资产分类*/,
+        bobp2.PORTFOLIO_ID      portfolioId/*组合代码*/,
+        bobp2.PORTFOLIO_NAME    portfolioName/*组合名称*/,
+        bo.SUBSCRIPTION_AMOUNT  subscriptionAmount/*认购量*/,
+        bo.OU_PARTY_ID                                       ouPartyId/*本方id*/,
+        mcci.PARTY_ABBR                                      ouPartyIdAbbr/*本方名称*/,
+        bo.OUR_TRADER                                        ourTrader/*本方交易员id*/,
+        mcct.real_name                                     ourTraderName/*本方交易员名称*/,
+        fp.ISSUER                                            issuer/*发行人id*/,
+        mci.CUSTOMER_NAME                                    issuerName/*发行人名称*/,
         bo.BID_DATE          dealDate/*成交日期*/
         FROM BID_ORDER bo
         LEFT JOIN
@@ -1547,6 +1571,25 @@
         ETR_ENTRUST ee
         ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
         left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
+        left join (select listagg(t0.PORTFOLIO_ID, ',')
+        within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_ID,
+        listagg(pp.PORTFOLIO_NAME, ',')
+        within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_NAME,
+        t0.ENTRUST_ID                                               ENTRUST_ID,
+        t0.BID_ID                                                   BID_ID,
+        eed.SEC_ACCT_ID
+        from BID_ORDER_BID_PRICE t0
+        left join ETR_ENTRUST_DETAIL eed
+        on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
+        left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
+        where t0.BID_PRICE = 99999999
+        group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
+        on bo.BID_ID = bobp2.BID_ID
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
+        left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+        left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
+        left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         <where>
             bo.TRADE_STATUS = '01'
             <if test="entrustId != null and entrustId != '' ">
@@ -1603,6 +1646,18 @@
         bo.COUNTER_ID     AS counterId/*交易对手*/,
         mcp.COUNTER_NAME  AS counterName,
         bo.REMARK       AS remark/*备注*/,
+        bo.CREATE_TIME     purchaseDate/*申购日期*/,
+        ssai.SEC_ACCT_NAME   secAcctName/*证券账户*/,
+        fpt.TYPE_11          secType/*资产分类*/,
+        bobp2.PORTFOLIO_ID      portfolioId/*组合代码*/,
+        bobp2.PORTFOLIO_NAME    portfolioName/*组合名称*/,
+        bo.SUBSCRIPTION_AMOUNT  subscriptionAmount/*认购量*/,
+        bo.OU_PARTY_ID                                       ouPartyId/*本方id*/,
+        mcci.PARTY_ABBR                                      ouPartyIdAbbr/*本方名称*/,
+        bo.OUR_TRADER                                        ourTrader/*本方交易员id*/,
+        mcct.real_name                                     ourTraderName/*本方交易员名称*/,
+        fp.ISSUER                                            issuer/*发行人id*/,
+        mci.CUSTOMER_NAME                                    issuerName/*发行人名称*/,
         bo.BID_DATE            dealDate/*成交日期*/
         FROM WFL_BID_ORDER bo
         LEFT JOIN
@@ -1641,6 +1696,25 @@
         ETR_ENTRUST ee
         ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
         left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
+        left join (select listagg(t0.PORTFOLIO_ID, ',')
+        within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_ID,
+        listagg(pp.PORTFOLIO_NAME, ',')
+        within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_NAME,
+        t0.ENTRUST_ID                                               ENTRUST_ID,
+        t0.BID_ID                                                   BID_ID,
+        eed.SEC_ACCT_ID
+        from WFL_BID_ORDER_BID_PRICE t0
+        left join ETR_ENTRUST_DETAIL eed
+        on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
+        left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
+        where t0.BID_PRICE = 99999999
+        group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
+        on bo.BID_ID = bobp2.BID_ID
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
+        left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+        left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
+        left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         <where>
             <if test="entrustId != null and entrustId != '' ">
                 AND ee.ENTRUST_ID = #{entrustId}

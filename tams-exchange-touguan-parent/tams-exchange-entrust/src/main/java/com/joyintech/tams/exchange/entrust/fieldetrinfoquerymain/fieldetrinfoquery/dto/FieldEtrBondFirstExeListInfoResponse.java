@@ -77,6 +77,9 @@ public class FieldEtrBondFirstExeListInfoResponse {
     @ApiModelProperty(name = "payableAmount", value = "缴款金额", example = "1000.00")
     private BigDecimal payableAmount;
 
+    @ApiModelProperty(name = "tradeAmt", value = "交易金额", example = "1000.00")
+    private BigDecimal tradeAmt;
+
     @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
     private BigDecimal settFeeAmt;
 
@@ -504,6 +507,14 @@ public class FieldEtrBondFirstExeListInfoResponse {
 
     public void setIssueDateEnd(Date issueDateEnd) {
         this.issueDateEnd = issueDateEnd;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
     }
 }
 
