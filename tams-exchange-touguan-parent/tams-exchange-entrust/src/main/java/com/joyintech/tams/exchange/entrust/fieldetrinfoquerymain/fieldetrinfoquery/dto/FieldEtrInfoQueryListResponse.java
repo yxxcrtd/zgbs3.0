@@ -75,7 +75,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     private String effectFlag;
 
     @ApiModelProperty(name="etrPrice",value="指令价格",example="99")
-    private BigDecimal etrPrice;
+    private String etrPrice;
 
     @ApiModelProperty(name="exeProgress",value="执行进度%",example="50%")
     private BigDecimal exeProgress;
@@ -395,25 +395,34 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         return SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
     }
 
-    public BigDecimal getEtrPrice() {
-        if (etrPrice == null){
-            return null;
-        }
-        if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), this.getBusiTypePosition()) &&
-                StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), this.getPriceModel())){
-            return null;
-        }
-        if (StringUtil.equals(this.getBusiTypePosition(),DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
-            return null;
-        }
-        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
-            && StringUtils.equals("PRM03",this.getPriceModel())){
-            return new BigDecimal("0.00");
-        }
-        if(StringUtils.equals(getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
-            return etrPrice.setScale(3,BigDecimal.ROUND_HALF_UP);
-        }
-        return etrPrice.setScale(4, RoundingMode.HALF_UP);
+//    public BigDecimal getEtrPrice() {
+//        if (etrPrice == null){
+//            return null;
+//        }
+//        if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), this.getBusiTypePosition()) &&
+//                StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), this.getPriceModel())){
+//            return null;
+//        }
+//        if (StringUtil.equals(this.getBusiTypePosition(),DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+//            return null;
+//        }
+//        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
+//            && StringUtils.equals("PRM03",this.getPriceModel())){
+//            return new BigDecimal("0.00");
+//        }
+//        if(StringUtils.equals(getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+//            return etrPrice.setScale(3,BigDecimal.ROUND_HALF_UP);
+//        }
+//        return etrPrice.setScale(4, RoundingMode.HALF_UP);
+//    }
+
+
+    public String getEtrPrice() {
+        return etrPrice;
+    }
+
+    public void setEtrPrice(String etrPrice) {
+        this.etrPrice = etrPrice;
     }
 
     public String getEtrPriceStr() {
@@ -431,9 +440,9 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         return tips + getEtrPrice();
     }
 
-    public void setEtrPrice(BigDecimal etrPrice) {
-        this.etrPrice = etrPrice;
-    }
+//    public void setEtrPrice(BigDecimal etrPrice) {
+//        this.etrPrice = etrPrice;
+//    }
 
     public BigDecimal getExecFinishAmt() {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){

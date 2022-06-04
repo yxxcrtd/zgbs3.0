@@ -460,6 +460,34 @@
         delete from AUTO_DISPENSE_RIGHT
     </delete>
 
+    <select id="getBiddingProduct" resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto.FieldEtrBiddingProductDto">
+        SELECT
+            eebp.PORTFOLIO_ID portfolioId,
+            pp.PORTFOLIO_NAME portfolioName,
+            eed.ACCT_NO acctNo,
+            eebp.BID_PRICE bidPrice,
+            eebp.BID_PRIN_AMT*100 bidPrinAmt,
+            eed.ENTRUST_NUM*100 portfolioTotalBidPrinAmt,
+            eed.INV_AIM businessModel
+        FROM ETR_ENTRUST_BID_PRICE eebp
+                 LEFT JOIN ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID = eebp.ENTRUST_ID
+                 LEFT JOIN PTL_PORTFOLIO pp ON eebp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        WHERE eebp.ENTRUST_ID = #{entrustId}
+        UNION ALL
+
+        SELECT
+            eebp.PORTFOLIO_ID portfolioId,
+            pp.PORTFOLIO_NAME portfolioName,
+            eed.ACCT_NO acctNo,
+            eebp.BID_PRICE bidPrice,
+            eebp.BID_PRIN_AMT*100 bidPrinAmt,
+            eed.ENTRUST_NUM*100 portfolioTotalBidPrinAmt,
+            eed.INV_AIM businessModel
+        FROM WFL_ETR_ENTRUST_BID_PRICE eebp
+                 LEFT JOIN WFL_ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID = eebp.ENTRUST_ID
+                 LEFT JOIN PTL_PORTFOLIO pp ON eebp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        WHERE eebp.ENTRUST_ID = #{entrustId}
+    </select>
     <select id="getEtrDispatcherInfo"
             resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto.FieldEtrDispatcherInfoResponse">
         SELECT
@@ -469,6 +497,12 @@
            	nvl(detail.PORTFOLIO_ID,pp.PORTFOLIO_ID) portfolioId,
             nvl(detail.PORTFOLIO_NAME,pp.PORTFOLIO_NAME) portfolioName,
             ete.BUSINESS_MODEL busiModel,
+            fpi.ISSUE_CLASS issueClass,
+            fpi.TENDER_TARGET tenderTarget,
+            fpi.ISSUE_DATE issueDate,
+            fpi.TENDER_SDATE tenderSdate,
+            fpi.TENDER_EDATE tenderEdate,
+            fpi.PAY_EDATE payEdate,
             CASE
             WHEN eted.ASSET_TYPE = 'F07'
             AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
@@ -508,6 +542,7 @@
             to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
             /*ete.entrust_num entrustNum,*/
             case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
+            when #{busiTypePosition} in ('01') then ete.entrust_num*100
             else ete.entrust_num
             end as entrustNum,
             case
@@ -598,6 +633,7 @@
         LEFT JOIN SYS_USER su on ete.INV_MANAGER_ID = su.USER_NAME
         left join MST_COUNTER_PARTY mcp on ete.COUNTER_ID = mcp.COUNTER_ID
         LEFT JOIN OPT_TARGET_INFO ON eted.ASSET_TYPE_10 = OPT_TARGET_INFO.TARGET_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi  ON fp.FINPROD_ID  = fpi.FINPROD_ID
         WHERE ete.entrust_id = #{entrustId}
 
         union all
@@ -609,6 +645,12 @@
         nvl(detail.PORTFOLIO_ID,pp.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,pp.PORTFOLIO_NAME) portfolioName,
         ete.BUSINESS_MODEL busiModel,
+        fpi.ISSUE_CLASS issueClass,
+        fpi.TENDER_TARGET tenderTarget,
+        fpi.ISSUE_DATE issueDate,
+        fpi.TENDER_SDATE tenderSdate,
+        fpi.TENDER_EDATE tenderEdate,
+        fpi.PAY_EDATE payEdate,
         CASE
         WHEN eted.ASSET_TYPE = 'F07'
         AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
@@ -647,7 +689,8 @@
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
         /*ete.entrust_num entrustNum,*/
-        case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
+        case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/
+        when #{busiTypePosition} in ('01') then ete.entrust_num*100
         else ete.entrust_num
         end as entrustNum,
         case
@@ -737,6 +780,7 @@
         LEFT JOIN SYS_USER su on ete.INV_MANAGER_ID = su.USER_NAME
         left join MST_COUNTER_PARTY mcp on ete.COUNTER_ID = mcp.COUNTER_ID
         LEFT JOIN OPT_TARGET_INFO ON eted.ASSET_TYPE_10 = OPT_TARGET_INFO.TARGET_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi  ON fp.FINPROD_ID  = fpi.FINPROD_ID
         WHERE ete.entrust_id = #{entrustId}
     </select>
 

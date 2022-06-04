@@ -1792,11 +1792,11 @@ public class CfetsEtrDispatcherService extends BaseService {
         //备注
         List<CfgReadonlyFormShow> rFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",R"));
         resultData.put(dtCode + "_rFrom",rFrom);
-        resultData.put(dtCode + "_rFromData",infoData.getRemark());
+        resultData.put(dtCode + "_rFromData",infoData);
         //投标券面总额汇总
         List<CfgReadonlyFormShow> aFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",A"));
         resultData.put(dtCode + "_aFrom",aFrom);
-        resultData.put(dtCode + "_aFromData",infoData.getTotalBiddingNum());
+        resultData.put(dtCode + "_aFromData",infoData);
         //投标产品列表
         List<CfgDataTableShow> infoTable =  cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, null, null);
         resultData.put(dtCode + "_infoTable",infoTable);
