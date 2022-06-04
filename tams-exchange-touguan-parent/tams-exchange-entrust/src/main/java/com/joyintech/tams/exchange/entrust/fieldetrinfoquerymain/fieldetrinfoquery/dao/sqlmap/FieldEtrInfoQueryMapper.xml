@@ -1209,7 +1209,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         WHERE tdta.ENTRUST_ID = #{instructionId,jdbcType=VARCHAR} -->
     </select>
 
-    <select id="getEtrBondFirstExeListInfo" resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.CfetsEtrBondFirstExeListInfoResponse">
+    <select id="getEtrBondFirstExeListInfo" resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrBondFirstExeListInfoResponse">
         select T.effectiveStatus,
         T.firstBidStatus,
         T.bidId,
@@ -1288,7 +1288,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         bo.COUNTER_ID     AS counterId/*交易对手*/,
         mcp.COUNTER_NAME  AS counterName,
         bo.REMARK         AS remark/*备注*/,
-        null                 dealDate/*成交日期*/
+        bo.BID_DATE          dealDate/*成交日期*/
         FROM BID_ORDER bo
         LEFT JOIN
         (select listagg(case
@@ -1325,7 +1325,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN
         ETR_ENTRUST ee
         ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-        left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+        left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
         <where>
             bo.TRADE_STATUS = '01'
             <if test="entrustId != null and entrustId != '' ">
@@ -1382,7 +1382,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         bo.COUNTER_ID     AS counterId/*交易对手*/,
         mcp.COUNTER_NAME  AS counterName,
         bo.REMARK       AS remark/*备注*/,
-        null               dealDate/*成交日期*/
+        bo.BID_DATE            dealDate/*成交日期*/
         FROM WFL_BID_ORDER bo
         LEFT JOIN
         (select listagg(case
@@ -1419,7 +1419,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN
         ETR_ENTRUST ee
         ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-        left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+        left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
         <where>
             <if test="entrustId != null and entrustId != '' ">
                 AND ee.ENTRUST_ID = #{entrustId}

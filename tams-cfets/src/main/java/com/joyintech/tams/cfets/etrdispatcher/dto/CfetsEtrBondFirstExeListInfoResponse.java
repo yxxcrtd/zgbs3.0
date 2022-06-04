@@ -11,7 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ApiModel(value = "一级投标投标确认执行明细信息", description = "一级投标投标确认执行明细信息")
+@ApiModel(value = "一级投标指令执行明细", description = "一级投标指令执行明细")
 public class CfetsEtrBondFirstExeListInfoResponse {
 
     @ApiModelProperty(name = "effectiveStatus", value = "有效状态Code", example = "A1")
@@ -224,6 +224,9 @@ public class CfetsEtrBondFirstExeListInfoResponse {
     }
 
     public String getIssueDateStr() {
+        if (null == this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart());
+        }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
         }
