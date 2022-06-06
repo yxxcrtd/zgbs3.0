@@ -117,13 +117,6 @@ public class TradeMsgProcessor {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    private AtomicInteger brokerTradeId = new AtomicInteger(0);
-    private AtomicInteger localOffset = new AtomicInteger(9000);
-    private static int timeZoneOffset = 0;
-    static {
-        timeZoneOffset = TimeZone.getDefault().getRawOffset();
-    }
-
     public boolean handleFrozenPendingApprovalEntrust(Entrust entrust) {
         logger.info("handleFrozenPendingApprovalEntrust {}", entrust.getId());
         FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(entrust.getStockCode());
@@ -332,13 +325,6 @@ public class TradeMsgProcessor {
 
     public void handIntegratedEntrust(IntegratedEntrust integratedEntrust, TradeAgent agent, int processType) {
         logger.info("handle IntegratedEntrust attribute value {}", integratedEntrust.getId());
-
-        //信用保护凭证不走交易直接，走交易登记逻辑
-        if(StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), integratedEntrust.getBusiTypeTg())) {
-        	this.integratedEntrustNonAgent(integratedEntrust);
-        	return;
-        }
-
         transactionHelper.addIntegratedEntrust(integratedEntrust);
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
         transactionHelper.setInstructionBean(instruction);
@@ -364,68 +350,6 @@ public class TradeMsgProcessor {
         if (TradeUtils.isFrozenVolume(orderInterface.getEntrustProp(), orderInterface.getEntrustBs(), orderInterface.getAssetType())) {
             orderInterface.setFrozenVolume(orderInterface.getEntrustVolume());
         }
-    }
-
-    private void integratedEntrustNonAgent(IntegratedEntrust integratedEntrust) {
-    	integratedEntrust.setLocalEntrustId(genLocalId());
-    	integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
-    	int dbSaveType =  DBSaveType.SINGLE.value ;//同步更新委托状态
-    	integratedEntrustService.asyncUpdate(integratedEntrust, dbSaveType);
-    	TerminalId terminalId = new TerminalId();
-        BeanUtils.copyProperties(integratedEntrust, terminalId);
-    	terminalId.setId(integratedEntrust.getId());
-    	integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
-    	this.onRspIntegratedEntrust(terminalId);
-    	integratedEntrust.setEntrustStatus(EntrustStatus.SUCCEEDED.value);
-    	integratedEntrust.setTradedVolume(integratedEntrust.getEntrustVolume());
-    	integratedEntrustService.asyncUpdate(integratedEntrust, dbSaveType);
-    	this.onRtnIntegratedEntrust(integratedEntrust);
-    	Trade trade = getTrade(integratedEntrust, Calendar.getInstance(), TradeType.NORMAL.value);
-    	this.onTrade(trade);
-    	return;
-    }
-
-    private Trade getTrade(EntrustInterface entrust, Calendar now, int tradeType) {
-        Trade trade = new Trade();
-        trade.setTradedVolume(entrust.getEntrustVolume());
-        trade.setAccountId(entrust.getAccountId());
-        trade.setTradingDay(entrust.getTradingDay());
-        trade.setMarket(entrust.getMarket());
-        trade.setFinanceAccount(entrust.getFinanceAccount());
-        trade.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
-        trade.setEntrustBs(entrust.getEntrustBs());
-        trade.setIsFullPrice(entrust.getIsFullPrice());
-        //全价
-        if (FullPriceConst.FULL_PRICE.value.equals(entrust.getIsFullPrice())) {
-            trade.setTradedPrice(entrust.getFullPrice());
-        } else {
-            trade.setTradedPrice(entrust.getEntrustPrice());
-        }
-        trade.setBsFlag(entrust.getBsFlag());
-        trade.setAssetType(entrust.getAssetType());
-        trade.setTradeType(tradeType);
-        trade.setBrokerEntrustId(entrust.getBrokerEntrustId());
-        trade.setStockName(entrust.getStockName());
-        trade.setEntrustProp(entrust.getEntrustProp());
-        if (InvestAssetTypeEnum.FUTURES.value.equals(entrust.getAssetType())) {
-            trade.setOffsetFlag(entrust.getOffsetFlag());
-            trade.setHedgeFlag(entrust.getHedgeFlag());
-        }
-        trade.setLocalEntrustId(entrust.getLocalEntrustId());
-        trade.setEntrustId(entrust.getId());
-        trade.setTradeTime(now.get(Calendar.HOUR_OF_DAY) + "" + now.get(Calendar.MINUTE) + "" + now.get(Calendar.SECOND));
-        trade.setBrokerTradeId(trade.getTradeTime() + brokerTradeId.incrementAndGet());
-        return trade;
-    }
-
-    private String genLocalId() {
-        int tempOffSet = localOffset.incrementAndGet();
-        if (tempOffSet > 9999) {
-            tempOffSet = 9000;
-            localOffset.set(9000);
-        }
-        long beginMill = System.currentTimeMillis() / (1000 * 3600 * 24) * (1000 * 3600 * 24) - timeZoneOffset;
-        return String.format("%s%04d", (System.currentTimeMillis() - beginMill) / 1000, tempOffSet);
     }
 
     private boolean frozenOrderAndInstruction(Order order, Instruction instruction) {

@@ -1,17 +1,15 @@
 package com.joyintech.tams.exchange.terminal.agent;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
+import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,35 +21,8 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.util.TypeUtils;
 import com.google.common.collect.Maps;
-import com.joyintech.tams.exchange.common.bean.AccountLoginReqBean;
-import com.joyintech.tams.exchange.common.bean.EnableQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesInstrumentCommissionRateQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesInstrumentMarginRateQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesInstrumentQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesPositionDetailQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesPositionQryBean;
-import com.joyintech.tams.exchange.common.bean.HistoryQryBean;
-import com.joyintech.tams.exchange.common.bean.InstrumentQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
-import com.joyintech.tams.exchange.common.bean.PositionQueryBean;
-import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.ReissueEntrustBean;
-import com.joyintech.tams.exchange.common.bean.ReissueEntrustQryBean;
-import com.joyintech.tams.exchange.common.bean.ReissueTradeBean;
-import com.joyintech.tams.exchange.common.bean.ReissueTradeQryBean;
-import com.joyintech.tams.exchange.common.bean.RepairConnectionMsg;
-import com.joyintech.tams.exchange.common.bean.ServerExtendInfo;
-import com.joyintech.tams.exchange.common.bean.TerminalLogin;
-import com.joyintech.tams.exchange.common.bean.TerminalLoginRet;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
-import com.joyintech.tams.exchange.common.constant.AgentType;
-import com.joyintech.tams.exchange.common.constant.EntrustStatus;
-import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.Account;
 import com.joyintech.tams.exchange.common.db.domain.CancelEntrustBean;
 import com.joyintech.tams.exchange.common.db.domain.Entrust;
@@ -209,7 +180,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
      */
     @Override
     protected void handleAsyncMessage(long requestId, int functionCode, Object message) {
-    	logger.debug("TerminalAgent handleAsyncMessage requestId:{} functionCode:{} message:{}", requestId, functionCode, JsonUtils.getJsonFromObject(message));
+        logger.debug("TerminalAgent handleAsyncMessage requestId:{} functionCode:{} message:{}", requestId, functionCode, JsonUtils.getJsonFromObject(message));
         if (functionCode == FunctionCode.REQ_ACCOUNT_LOGIN.value) { //终端登陆
             onReqLoginAccount((AccountLoginReqBean) message, requestId);
         } else if (functionCode == FunctionCode.REQ_ACCOUNT_LOGOUT.value) { // 终端退出
@@ -273,7 +244,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
         } else if (functionCode == FunctionCode.REQ_QRY_FUTURES_COMMISSION_RATE.value) {
             queryFuturesInstrumentCommissionRate((FuturesInstrumentCommissionRateQryBean) message, requestId);
         } else if (functionCode == FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE.value) {
-        	queryNegotiateQuoteReceive((NegotiateQuoteQueryBean) message, requestId);
+            queryNegotiateQuoteReceive((NegotiateQuoteQueryBean) message, requestId);
         } else if (functionCode != FunctionCode.ACK.value) {    // 未知消息
             logger.warn("unknown functionCode:{} message:{}", functionCode, JsonUtils.getJsonFromObject(message));
         }
@@ -288,7 +259,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
      */
     @Override
     protected Object getResponseObjectFromMessage(ProtocolMessage message) throws Exception {
-    	logger.debug("TerminalAgent getResponseObjectFromMessage functionCode:{} message:{}", message.getFc(), message.getBody());
+        logger.debug("TerminalAgent getResponseObjectFromMessage functionCode:{} message:{}", message.getFc(), message.getBody());
         if (message.getFc() == FunctionCode.REQ_ACCOUNT_LOGIN.value) {
             return JsonUtils.getObjectFromJson(message.getBody(), AccountLoginReqBean.class);
         } else if (message.getFc() == FunctionCode.REQ_ACCOUNT_LOGOUT.value) {
@@ -385,6 +356,23 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
 
     @Override
     public void onReqIntegratedEntrust(IntegratedEntrust integratedEntrust, long requestId) {
+        //信用保护凭证不走交易直接，走交易登记逻辑
+        if (StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), integratedEntrust.getBusiTypeTg())) {
+            integratedEntrust.setLocalEntrustId(genLocalId());
+            integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
+            integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
+            tradeResponse.resIntegratedEntrust(integratedEntrust);
+
+            integratedEntrust.setEntrustStatus(EntrustStatus.SUCCEEDED.value);
+            integratedEntrust.setTradedVolume(integratedEntrust.getEntrustVolume());
+            this.onIntegratedEntrust(integratedEntrust);
+
+            Trade trade = getTrade(integratedEntrust, Calendar.getInstance(), TradeType.NORMAL.value);
+            this.onTrade(trade);
+
+            return;
+        }
+
         ITradeRequest request = tradeRequestMap.get(integratedEntrust.getAccountId());
         integratedEntrust.setLocalEntrustId(genLocalId());
         entrustIdManager.setLocalEntrustIdMapping(integratedEntrust.getAccountId(), integratedEntrust.getLocalEntrustId(), integratedEntrust.getId());
@@ -397,6 +385,32 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
             requestIdEntrustMap.put(integratedEntrust.getId(), requestId);
             request.integratedEntrust(integratedEntrust, requestId);
         }
+    }
+
+    private AtomicInteger brokerTradeId = new AtomicInteger(0);
+
+    private Trade getTrade(EntrustInterface entrust, Calendar now, int tradeType) {
+        Trade trade = new Trade();
+        trade.setTradedVolume(entrust.getEntrustVolume());
+        trade.setAccountId(entrust.getAccountId());
+        trade.setTradingDay(entrust.getTradingDay());
+        trade.setMarket(entrust.getMarket());
+        trade.setFinanceAccount(entrust.getFinanceAccount());
+        trade.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
+        trade.setEntrustBs(entrust.getEntrustBs());
+        trade.setIsFullPrice(entrust.getIsFullPrice());
+        trade.setTradedPrice(entrust.getEntrustPrice());
+        trade.setBsFlag(entrust.getBsFlag());
+        trade.setAssetType(entrust.getAssetType());
+        trade.setTradeType(tradeType);
+        trade.setBrokerEntrustId(entrust.getBrokerEntrustId());
+        trade.setStockName(entrust.getStockName());
+        trade.setEntrustProp(entrust.getEntrustProp());
+        trade.setLocalEntrustId(entrust.getLocalEntrustId());
+        trade.setEntrustId(entrust.getId());
+        trade.setTradeTime(now.get(Calendar.HOUR_OF_DAY) + "" + now.get(Calendar.MINUTE) + "" + now.get(Calendar.SECOND));
+        trade.setBrokerTradeId(trade.getTradeTime() + brokerTradeId.incrementAndGet());
+        return trade;
     }
 
     @Override
@@ -418,7 +432,9 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
         agentType = AgentType.MOCK.value.equals(agentType) ? agentType : serverExtendInfo.getAgentType();
         ITradeRequest tradeRequest = SpringContextUtils.getBean(agentType);
         tradeRequest.setITerminalMsgNotify(this);
-        if (AgentType.KD_GATEWAY.value.equals(agentType)) TypeUtils.compatibleWithFieldName = true;
+        if (AgentType.KD_GATEWAY.value.equals(agentType)) {
+            TypeUtils.compatibleWithFieldName = true;
+        }
         agentTypeMap.put(agentType, tradeRequest);
         // 若营业部信息已经连接过，则不重复连接,否则连接
         if (!serverExtendInfoSet.contains(serverExtendInfo)) {
@@ -549,6 +565,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
         tradeRequestMap.get(positionQueryBean.getAccountId()).queryAccountPosition(positionQueryBean, requestId);
     }
 
+    @Override
     public void onReqInstrumentInfo(InstrumentQryBean instrumentQryBean, long requestId) {
         tradeRequestMap.get(instrumentQryBean.getAccountId()).queryInstrumentInfo(instrumentQryBean, requestId);
     }
@@ -592,7 +609,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
         logger.info("queryIntegratedFixedIncomeQuote accountId:{}", integratedFixedIncomeQuoteQryBean.getAccountId());
         tradeRequestMap.get(integratedFixedIncomeQuoteQryBean.getAccountId()).queryIntegratedFixedIncomeQuote(integratedFixedIncomeQuoteQryBean, requestId);
     }
-    
+
     //深圳我收到的协商成交行情查询
     @Override
     public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
