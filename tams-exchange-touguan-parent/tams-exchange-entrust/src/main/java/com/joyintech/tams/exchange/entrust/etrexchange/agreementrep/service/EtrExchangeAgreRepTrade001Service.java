@@ -2097,19 +2097,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         etrSinglePortfolioDto.setInvAim(null);// 投资目的
         etrSinglePortfolioDto.setTradeMarket(dto.getTradeMarket());// 交易场所
         etrSinglePortfolioDto.setBusiTypePosition(dto.getBusiTypePosition());
-        //etrSinglePortfolioDto.setTradePlat(dto.getTradePlat());// 交易平台
-        /*
-         * if 画面.交易平台 = 数据字典.交易平台.大宗交易平台 and 画面.交易场所 = 数据字典.交易场所.深圳证券交易所
-         * 交易平台 = 数据字典.交易平台.综合协议平台
-         * else if 画面.交易平台 = 数据字典.交易平台.大宗交易平台 and 画面.交易场所 = 数据字典.交易场所.上海证券交易所
-         * 交易平台 = 数据字典.交易平台.大宗交易平台 end
-         */
-        if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dto.getTradeMarket())) {
-            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_综合协议交易平台.getValue());
+        etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_综合协议交易平台.getValue());
 
-        } else if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dto.getTradeMarket())) {
-            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_固定收益平台.getValue());
-        }
 
         /***********************************************************************/
         
