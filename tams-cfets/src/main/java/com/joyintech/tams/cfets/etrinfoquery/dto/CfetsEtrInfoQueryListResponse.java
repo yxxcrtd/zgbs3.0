@@ -363,6 +363,9 @@ public class CfetsEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getBidModle() {
+        if ( null == this.bidModle) {
+            return "";
+        }
         return bidModle;
     }
 
@@ -371,6 +374,9 @@ public class CfetsEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getIsWin() {
+        if ( null == this.isWin) {
+            return "";
+        }
         return isWin;
     }
 

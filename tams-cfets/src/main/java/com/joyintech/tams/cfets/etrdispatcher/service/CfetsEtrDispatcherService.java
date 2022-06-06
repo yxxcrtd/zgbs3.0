@@ -45,6 +45,7 @@ import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid001Service;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
@@ -838,8 +839,15 @@ public class CfetsEtrDispatcherService extends BaseService {
 //                    response.setBidprice(dto2.getEtrPrice());
 //                }
 //            }
-            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherFirstBidDealListInfo(pageParam));
-        //中标结果明细
+
+            if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_自主投标.getValue()) && StringUtil.equals(dto.getIsWin(), DictCodeList.是否_是)) {
+                //未中标查询中标结果明细
+                page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrPrimaryBidDealListInfo(pageParam));
+            }else {
+                page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherFirstBidDealListInfo(pageParam));
+            }
+
+
         }else {
             page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherDealListInfo(pageParam));
         }
@@ -1786,6 +1794,18 @@ public class CfetsEtrDispatcherService extends BaseService {
         if (CollectionUtils.isNotEmpty(infoData.getBiddingProductList()) &&
                 StringUtil.isNotEmpty(infoData.getBiddingProductList().get(0).getSecAcctId())) {
             infoData.setSecAcctId(infoData.getBiddingProductList().get(0).getSecAcctId());
+            for (CfetsBiddingProductDto bidDto : infoData.getBiddingProductList()) {
+                //处理标位信息
+                if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
+                    bidDto.setBidPriceStr(ArithmeticUtil.multiply(bidDto.getBidPrice(),new BigDecimal(100)).setScale(4,RoundingMode.HALF_UP).toString()+"%");
+                }
+                if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())) {
+                    bidDto.setBidPriceStr(bidDto.getBidPrice().setScale(4,RoundingMode.HALF_UP).toString()+"元");
+                }
+                if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                    bidDto.setBidPriceStr(ArithmeticUtil.multiply(bidDto.getBidPrice(),new BigDecimal(10000)).setScale(2,RoundingMode.HALF_UP).toString()+"BP");
+                }
+            }
         }
 
         resultData.put(dtCode + "_infoForm",infoForm);

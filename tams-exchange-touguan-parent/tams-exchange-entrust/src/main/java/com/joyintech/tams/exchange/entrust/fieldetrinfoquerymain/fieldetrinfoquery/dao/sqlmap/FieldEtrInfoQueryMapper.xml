@@ -1210,7 +1210,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
     </select>
 
     <select id="getEtrBondFirstExeListInfo" resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrBondFirstExeListInfoResponse">
-        select T.effectiveStatus,
+        select
+        T.effectiveStatus,
         T.firstBidStatus,
         T.bidId,
         T.finprodId,
@@ -1431,12 +1432,35 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         </where>
 
         ) T
-        group by T.effectiveStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId, T.finprodAbbr,T.tenderTarget,T.issueDateStart,
-        T.issueDateEnd, T.etrBidPriceTotal, T.tradeMarket, T.totalBiddingNum, T.bidprice,
+        group by
+        T.effectiveStatus,
+        T.firstBidStatus,
+        T.bidId,
+        T.finprodId,
+        T.finprodMarketId,
+        T.finprodAbbr,
+        T.tenderTarget,
+        T.issueDateStart,
+        T.issueDateEnd,
+        T.etrBidPriceTotal,
+        T.tradeMarket,
+        T.totalBiddingNum,
+        T.bidprice,
         T.biddingMethod,
-        T.payType, T.winPrice, T.price, T.payableAmount, T.settFeeAmt, T.payDate, T.assignRegdate, T.listingDate,
-        T.bidConfirmDate, T.counterId, T.counterName,
-        T.remark, T.dealDate
+        T.payType,
+        T.winPrice,
+        T.price,
+        T.tradeAmt,
+        T.payableAmount,
+        T.settFeeAmt,
+        T.payDate,
+        T.assignRegdate,
+        T.listingDate,
+        T.bidConfirmDate,
+        T.counterId,
+        T.counterName,
+        T.remark,
+        T.dealDate
     </select>
 
     <select id="getEtrDispatcherExeListInfo"
