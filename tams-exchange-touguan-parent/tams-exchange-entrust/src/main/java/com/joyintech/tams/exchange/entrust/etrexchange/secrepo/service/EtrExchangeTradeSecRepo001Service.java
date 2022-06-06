@@ -99,6 +99,8 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -126,6 +128,10 @@ import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcServic
 @Service("etrExchangeTradeSecRepo001Service")
 public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrExchangeTradeSaveSecRepoRequest>
         implements BaseProcessService<EtrExchangeTradeSaveSecRepoRequest> {
+    /**
+     * 日志
+     */
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     public static String queryIntegratedTick = "/joyin/quote/tick";
     /**
@@ -1209,7 +1215,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
                         yield = yieldPriceOutParameter.getMatYield();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.debug("02根据全价总额计算到期收益率异常:{}", e);
                     }
                     // modify by etliu 20220602 end
 
@@ -1218,8 +1224,15 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         yieldPriceInParameter.setNextExeDate(toLocalDate(secInfoModelDto.getNextExeDate()));
                         yieldPriceInParameter.setNextExePrice(secInfoModelDto.getNextExercisePrice());
                         if (yieldPriceInParameter.getNextExePrice() != null) {
-                            yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
-                            exerYield = yieldPriceOutParameter.getExeYield();
+                            // modify by fuyongsheng 20220606 start
+                            // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                            try {
+                                yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
+                                exerYield = yieldPriceOutParameter.getExeYield();
+                            } catch (Exception e) {
+                                logger.debug("02根据全价总额计算行权收益率异常:{}", e);
+                            }
+                            // modify by fuyongsheng 20220606 end
                         }
                     }
                     break;
@@ -1227,16 +1240,30 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 case "03":
                     // 到期收益率==>全价总额
                     priceYieldInParameter.setMatYield(yield);
-                    priceYieldOutParameter = priceByYieldCalculator.calculate(priceYieldInParameter);
-                    fprice = priceYieldOutParameter.getFullPrice();
+                    // modify by fuyongsheng 20220606 start
+                    // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                    try {
+                        priceYieldOutParameter = priceByYieldCalculator.calculate(priceYieldInParameter);
+                        fprice = priceYieldOutParameter.getFullPrice();
+                    } catch (Exception e) {
+                        logger.debug("03根据到期收益率计算全价总额异常:{}", e);
+                    }
+                    // modify by fuyongsheng 20220606 end
                     // 全价总额==>行权收益率
                     if (secInfoModelDto.getNextExeDate() != null) {
                         yieldPriceInParameter.setFullPrice(fprice);
                         yieldPriceInParameter.setNextExeDate(toLocalDate(secInfoModelDto.getNextExeDate()));
                         yieldPriceInParameter.setNextExePrice(secInfoModelDto.getNextExercisePrice());
                         if (yieldPriceInParameter.getNextExePrice() != null) {
-                            yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
-                            exerYield = yieldPriceOutParameter.getExeYield();
+                            // modify by fuyongsheng 20220606 start
+                            // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                            try {
+                                yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
+                                exerYield = yieldPriceOutParameter.getExeYield();
+                            } catch (Exception e) {
+                                logger.debug("03根据全价总额计算行权收益率异常:{}", e);
+                            }
+                            // modify by fuyongsheng 20220606 end
                         }
                     }
                     break;
@@ -1247,12 +1274,26 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         priceYieldInParameter.setMatYield(exerYield);
                         yieldPriceInParameter.setNextExeDate(toLocalDate(secInfoModelDto.getNextExeDate()));
                         yieldPriceInParameter.setNextExePrice(secInfoModelDto.getNextExercisePrice());
-                        priceYieldOutParameter = priceByYieldCalculator.calculate(priceYieldInParameter);
-                        fprice = priceYieldOutParameter.getFullPrice();
+                        // modify by fuyongsheng 20220606 start
+                        // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                        try {
+                            priceYieldOutParameter = priceByYieldCalculator.calculate(priceYieldInParameter);
+                            fprice = priceYieldOutParameter.getFullPrice();
+                        } catch (Exception e) {
+                            logger.debug("04根据行权收益率计算全价总额异常:{}", e);
+                        }
+                        // modify by fuyongsheng 20220606 end
                         // 全价总额==>到期收益率
                         yieldPriceInParameter.setFullPrice(fprice);
-                        yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
-                        yield = yieldPriceOutParameter.getMatYield();
+                        // modify by fuyongsheng 20220606 start
+                        // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                        try {
+                            yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
+                            yield = yieldPriceOutParameter.getMatYield();
+                        } catch (Exception e) {
+                            logger.debug("04全价总额计算到期收益率异常:{}", e);
+                        }
+                        // modify by fuyongsheng 20220606 end
                     }
                     break;
                 default:
@@ -1288,7 +1329,10 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         result.put("intAmt", intAmt);
         result.put("cprice", cprice);
         result.put("cpriceAmt", cpriceAmt);
-        result.put("fprice", fprice);
+        // modify by fuyongsheng 20220606 start
+        // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+        result.put("fprice", fprice == null ? BigDecimal.ZERO : fprice);
+        // modify by fuyongsheng 20220606 end
         result.put("fpriceAmt", fpriceAmt);
         result.put("yield", yield == null ? new BigDecimal(0.00) : yield);
         result.put("exerYield", exerYield);

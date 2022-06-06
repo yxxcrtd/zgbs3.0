@@ -56,6 +56,12 @@ public class CommonSearchInfoRequest {
     @ApiModelProperty(name = "ccy", value = "币种", example = "字符串1")
     private String ccy;
 
+    @ApiModelProperty(name = "bidModle", value = "投标方式")
+    private String bidModle;
+
+    @ApiModelProperty(name = "isWin", value = "中标结果")
+    private String isWin;
+
     public String getTradeMarket() {
         return tradeMarket;
     }
@@ -166,6 +172,22 @@ public class CommonSearchInfoRequest {
 
     public void setCcy(String ccy) {
         this.ccy = ccy;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
+    public String getIsWin() {
+        return isWin;
+    }
+
+    public void setIsWin(String isWin) {
+        this.isWin = isWin;
     }
 }
 

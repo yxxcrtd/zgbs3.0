@@ -39,6 +39,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dao.FieldEtrDispatcherMapper;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto.FieldEtrBiddingProductDto;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto.FieldEtrDispatcherAutoRequest;
@@ -65,6 +66,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -585,6 +587,22 @@ public class FieldEtrDispatcherService extends BaseService{
         //基本信息
         List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
         FieldEtrDispatcherInfoResponse infoData = this.getEtrDispatcherInfo(dto);
+
+
+        if (!CollectionUtils.isEmpty(infoData.getBiddingProductDtos())) {
+            for (FieldEtrBiddingProductDto bidDto : infoData.getBiddingProductDtos()) {
+                //处理标位信息
+                if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
+                    bidDto.setBidPriceStr(ArithmeticUtil.multiply(bidDto.getBidPrice(), new BigDecimal(100)).setScale(4, RoundingMode.HALF_UP).toString() + "%");
+                }
+                if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())) {
+                    bidDto.setBidPriceStr(bidDto.getBidPrice().setScale(4, RoundingMode.HALF_UP).toString() + "元");
+                }
+                if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                    bidDto.setBidPriceStr(ArithmeticUtil.multiply(bidDto.getBidPrice(), new BigDecimal(10000)).setScale(2, RoundingMode.HALF_UP).toString() + "BP");
+                }
+            }
+        }
 
         resultData.put(dtCode + "_infoForm",infoForm);
         resultData.put(dtCode + "_infoFormData",infoData);

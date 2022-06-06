@@ -116,6 +116,13 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     @ApiModelProperty(name="assetType1",value="资产一级类型",example="质押式协议回购")
     private String assetType1;
 
+    @ApiModelProperty(name = "bidModle", value = "投标方式")
+    private String bidModle;
+
+    @ApiModelProperty(name = "isWin", value = "中标结果")
+    private String isWin;
+
+
     /**
      * 获取 otherEntrustStatus
      * @return otherEntrustStatus.
@@ -622,5 +629,21 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
                 break;
         }
         return termDays;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
+    public String getIsWin() {
+        return isWin;
+    }
+
+    public void setIsWin(String isWin) {
+        this.isWin = isWin;
     }
 }

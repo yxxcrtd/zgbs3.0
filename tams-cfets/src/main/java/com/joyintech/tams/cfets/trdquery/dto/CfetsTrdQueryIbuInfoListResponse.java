@@ -258,6 +258,9 @@ public class CfetsTrdQueryIbuInfoListResponse {
     @ApiModelProperty(name="calMode",value="计算方式",example="计算方式供前台判断使用")
     private String calMode;
 
+    @ApiModelProperty(name="effectFlag",value="有效状态",example="02")
+    private String effectFlag;
+
     public String getEffectiveStatus() {
         return effectiveStatus;
     }
@@ -843,5 +846,13 @@ public class CfetsTrdQueryIbuInfoListResponse {
 
     public void setCalMode(String calMode) {
         this.calMode = calMode;
+    }
+
+    public String getEffectFlag() {
+        return effectFlag;
+    }
+
+    public void setEffectFlag(String effectFlag) {
+        this.effectFlag = effectFlag;
     }
 }
