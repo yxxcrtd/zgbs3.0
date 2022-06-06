@@ -486,10 +486,10 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     }
 
     public String getTenderTargetStr() {
-        if (StringUtil.isEmpty(getIssueClass())) {
+        if (StringUtil.isEmpty(getTenderTarget())) {
             return null;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getIssueClass());
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getTenderTarget());
     }
 
     public void setTenderTargetStr(String tenderTargetStr) {

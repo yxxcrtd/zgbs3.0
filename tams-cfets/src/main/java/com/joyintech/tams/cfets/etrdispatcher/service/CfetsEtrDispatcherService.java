@@ -31,7 +31,6 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.etrbondfirstlbidding.dao.EtrBondFirstLBiddingMapper;
-import com.joyintech.service.entrust.etrbondfirstlbidding.dto.EtrBondFirstLBiddingDto;
 import com.joyintech.service.entrust.etrbondfirstlbidding.service.EtrBondFirstLBiddingService;
 import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommandDispatcherDto;
 import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommandDispatcherTotalDto;
@@ -79,7 +78,6 @@ import com.joyintech.tams.common.base.entity.EtrAutoDispenseRuleDetail;
 import com.joyintech.tams.common.base.entity.EtrDistribute;
 import com.joyintech.tams.common.base.entity.EtrDistributeKey;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.common.base.entity.User;
@@ -1717,58 +1715,58 @@ public class CfetsEtrDispatcherService extends BaseService {
         return resultData;
     }
 
-    private Map<String, Object> bondFirstLBidding(String pageCode, String dtCode, String spcdCode, CommonSearchInfoRequest dto) {
-        Map<String, Object> resultData = new HashMap<>();
-        //基本信息
-        List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
-        EtrBondFirstLBiddingDto infoData = etrBondFirstLBiddingService.selectByKey(dto.getEntrustId(),dto.getFinprodId(),dto.getPortfolioId());
-        if(Objects.nonNull(infoData)) {
-            BigDecimal entrustNum = BigDecimal.ZERO;
-            if(!CollectionUtils.isEmpty(infoData.getBidPriceList())) {
-                for(EtrEntrustBidPrice bidPrice : infoData.getBidPriceList()) {
-                    entrustNum = ArithmeticUtil.doAdd(bidPrice.getBidPrinAmt(),entrustNum);
-                    bidPrice.setBidPrinAmt(ArithmeticUtil.divide(bidPrice.getBidPrinAmt(),new BigDecimal("10000"),4));
-                }
-                infoData.setEntrustNum(ArithmeticUtil.divide(entrustNum,new BigDecimal("10000"),4));
-            }
-            Map<String,Object> param = new HashMap<>();
-            param.put("portfolioId",dto.getPortfolioId());
-            param.put("finprodId",dto.getFinprodId());
-            param.put("ccy",dto.getCcy());
-            Map<String, Object> map = etrCommonService.getProAvailableCash(param);
-            if(Objects.nonNull(map.get("cashT1"))) {
-                infoData.setProAvailableCash1((BigDecimal) map.get("cashT1"));
-            }
-            if(Objects.nonNull(map.get("cashT"))) {
-                infoData.setProAvailableCash((BigDecimal) map.get("cashT"));
-            }
-        }
-        resultData.put(dtCode + "_infoForm",infoForm);
-        resultData.put(dtCode + "_infoFormData",infoData);
-        //备注
-        List<CfgReadonlyFormShow> rFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",R"));
-        resultData.put(dtCode + "_rFrom",rFrom);
-        resultData.put(dtCode + "_rFromData",infoData);
-        //投标券面总额汇总
-        List<CfgReadonlyFormShow> aFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",A"));
-        resultData.put(dtCode + "_aFrom",aFrom);
-        resultData.put(dtCode + "_aFromData",infoData);
-        //投标标位
-        List<CfgDataTableShow> infoTable =  cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, null, null);
-        resultData.put(dtCode + "_infoTable",infoTable);
-        resultData.put(dtCode + "_infoTableData",infoData.getBidPriceList());
-        //指令投资人员信息
-        List<CfgReadonlyFormShow> invInfoFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",P"));
-        CfetsEtrDispatcherInvResponse invDto = this.getInvInfo(dto);
-        resultData.put(dtCode + "_invInfoFrom",invInfoFrom);
-        resultData.put(dtCode + "_invInfoFromData",invDto);
-        //附件信息-字段
-        List<CfgDataTableShow> fileTable = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode.concat(",F"), null, null);
-        List<UploadFile> files = fileAttachmentProcess.fetchByBusinessCode(dto.getEntrustId());
-        resultData.put(dtCode + "_fileTable",fileTable);
-        resultData.put(dtCode + "_fileTableData",files);
-        return resultData;
-    }
+//    private Map<String, Object> bondFirstLBidding(String pageCode, String dtCode, String spcdCode, CommonSearchInfoRequest dto) {
+//        Map<String, Object> resultData = new HashMap<>();
+//        //基本信息
+//        List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+//        EtrBondFirstLBiddingDto infoData = etrBondFirstLBiddingService.selectByKey(dto.getEntrustId(),dto.getFinprodId(),dto.getPortfolioId());
+//        if(Objects.nonNull(infoData)) {
+//            BigDecimal entrustNum = BigDecimal.ZERO;
+//            if(!CollectionUtils.isEmpty(infoData.getBidPriceList())) {
+//                for(EtrEntrustBidPrice bidPrice : infoData.getBidPriceList()) {
+//                    entrustNum = ArithmeticUtil.doAdd(bidPrice.getBidPrinAmt(),entrustNum);
+//                    bidPrice.setBidPrinAmt(ArithmeticUtil.divide(bidPrice.getBidPrinAmt(),new BigDecimal("10000"),4));
+//                }
+//                infoData.setEntrustNum(ArithmeticUtil.divide(entrustNum,new BigDecimal("10000"),4));
+//            }
+//            Map<String,Object> param = new HashMap<>();
+//            param.put("portfolioId",dto.getPortfolioId());
+//            param.put("finprodId",dto.getFinprodId());
+//            param.put("ccy",dto.getCcy());
+//            Map<String, Object> map = etrCommonService.getProAvailableCash(param);
+//            if(Objects.nonNull(map.get("cashT1"))) {
+//                infoData.setProAvailableCash1((BigDecimal) map.get("cashT1"));
+//            }
+//            if(Objects.nonNull(map.get("cashT"))) {
+//                infoData.setProAvailableCash((BigDecimal) map.get("cashT"));
+//            }
+//        }
+//        resultData.put(dtCode + "_infoForm",infoForm);
+//        resultData.put(dtCode + "_infoFormData",infoData);
+//        //备注
+//        List<CfgReadonlyFormShow> rFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",R"));
+//        resultData.put(dtCode + "_rFrom",rFrom);
+//        resultData.put(dtCode + "_rFromData",infoData);
+//        //投标券面总额汇总
+//        List<CfgReadonlyFormShow> aFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",A"));
+//        resultData.put(dtCode + "_aFrom",aFrom);
+//        resultData.put(dtCode + "_aFromData",infoData);
+//        //投标标位
+//        List<CfgDataTableShow> infoTable =  cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, null, null);
+//        resultData.put(dtCode + "_infoTable",infoTable);
+//        resultData.put(dtCode + "_infoTableData",infoData.getBidPriceList());
+//        //指令投资人员信息
+//        List<CfgReadonlyFormShow> invInfoFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",P"));
+//        CfetsEtrDispatcherInvResponse invDto = this.getInvInfo(dto);
+//        resultData.put(dtCode + "_invInfoFrom",invInfoFrom);
+//        resultData.put(dtCode + "_invInfoFromData",invDto);
+//        //附件信息-字段
+//        List<CfgDataTableShow> fileTable = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode.concat(",F"), null, null);
+//        List<UploadFile> files = fileAttachmentProcess.fetchByBusinessCode(dto.getEntrustId());
+//        resultData.put(dtCode + "_fileTable",fileTable);
+//        resultData.put(dtCode + "_fileTableData",files);
+//        return resultData;
+//    }
 
     /**
      * 一级投标&一级申购 指令信息
@@ -1778,7 +1776,7 @@ public class CfetsEtrDispatcherService extends BaseService {
      * @param dto
      * @return
      */
-    private Map<String, Object> bondFirstLBidding2(String pageCode, String dtCode, String spcdCode, CommonSearchInfoRequest dto) {
+    private Map<String, Object> bondFirstLBidding(String pageCode, String dtCode, String spcdCode, CommonSearchInfoRequest dto) {
         Map<String, Object> resultData = new HashMap<>();
         //基本信息
         List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
