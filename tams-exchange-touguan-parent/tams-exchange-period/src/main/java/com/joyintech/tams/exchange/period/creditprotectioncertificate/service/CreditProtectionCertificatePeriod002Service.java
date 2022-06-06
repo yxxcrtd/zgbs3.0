@@ -118,7 +118,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue());
+//            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue());
         }
     }
 
@@ -135,7 +135,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
+//            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
 
@@ -152,7 +152,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
+//            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
 //
@@ -182,7 +182,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         CreditProtectionCertificatePeriodSaveDto dto = getBussinessEntityByWorkflowId(entity.getWorkflowId());
         doOldPositionSubmit(dto, true);
         doOldPositionConfirm(dto, true);
-        positionRequestService.sendRevokeCreditProtectionCertificatePeriod(entity);
+//        positionRequestService.sendRevokeCreditProtectionCertificatePeriod(entity);
     }
 
     private void insertFlow(BaseBussinessDto baseBussinessDto, CreditProtectionCertificatePeriodSaveDto entity) {
@@ -226,15 +226,6 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         for (BillingDetailsDto billingDetail : billingDetails) {
             BaseBussinessDto baseBussinessDto1 = genBaseBussinessDto2(entity, billingDetail);
 
-            //金融产品交易汇总表
-            TrdFinProductDealTotal trdFinProductDealTotal = baseBussinessDto1.getTrdFinProductDealTotal();
-            trdFinProductDealTotal.setWorkflowId(entity.getWorkflowId());
-            trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
-
-            //金融产品交易汇总附属表
-            TrdDealTotalAdd trdDealTotalAdd = baseBussinessDto1.getTrdDealTotalAdd();
-            trdDealTotalAdd.setWorkflowId(entity.getWorkflowId());
-            trdDealTotalAddMapper.insertSelective(trdDealTotalAdd);
             //金融产品交易
             TrdProductDeal trdProductDeal = baseBussinessDto1.getTrdProductDeal();
             trdProductDeal.setWorkflowId(entity.getWorkflowId());
@@ -403,6 +394,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         trdProductDeal.setPortfolioId(billingDetail.getPortfolioId());
 
         trdProductDeal.setTgBusiType(dto.getCreditEvent());
+        trdProductDeal.setRemark(billingDetail.getRemark());
         result.setTrdProductDeal(trdProductDeal);
 
         //金融产品交易附属表
@@ -460,6 +452,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             trdProductDeal2.setPortfolioId(billingDetail.getPortfolioId());
 
             trdProductDeal2.setTgBusiType(dto.getCreditEvent());
+            trdProductDeal2.setRemark(billingDetail.getRemark());
             result.setTrdProductDeal2(trdProductDeal2);
 
             //金融产品交易附属表
@@ -888,6 +881,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             ptlSecPositionFlow.setUpdateUser(LoginUserUtil.getUserName());
             ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
             ptlSecPositionFlow.setUpdateTime(DateUtil.now());
+            ptlSecPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
             ptlSecPositionFlows.add(ptlSecPositionFlow);
 
             //交易持仓流水&交易持仓：扣减实际T+1信用保护凭证'名义本金'

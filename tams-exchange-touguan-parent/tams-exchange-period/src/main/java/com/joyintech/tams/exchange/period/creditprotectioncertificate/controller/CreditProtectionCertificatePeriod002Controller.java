@@ -4,6 +4,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
@@ -13,6 +14,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -95,12 +97,9 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
         initPageParams.put("iPlatformDate", DateUtil.format(platformDate));
 
         //流程id
-        String businessCode = "null".equals(getParam("businessCode")) ? null : getParam("businessCode");
-        if (StringUtil.isNotEmpty(businessCode)) {
-            ProcessMark processMark = new ProcessMark();
-            processMark.setPageId(this.getPageId());
-            processMark.setBusinessDataPk1(businessCode);
-            CreditProtectionCertificatePeriodSaveDto dto = creditProtectionCertificatePeriod002Service.getBussinessEntityByPk(processMark);
+        String workflowId = "null".equals(getParam("workflowId")) ? null : getParam("workflowId");
+        if (StringUtil.isNotEmpty(workflowId)) {
+            CreditProtectionCertificatePeriodSaveDto dto = creditProtectionCertificatePeriod002Service.getBussinessEntityByWorkflowId(workflowId);
 //            CreditProtectionCertificatePeriodSaveDto dto = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(businessCode);
             if (null != dto) {
                 initPageParams.put(GlobalConstant.ENTITY, dto);
@@ -200,9 +199,12 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
                 return new Message<AjaxResult>().success().setData(new AjaxResult("保存成功"));
             }
             return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        } catch (PositionException e1) {
+            logger.error("头寸处理异常", e1);
+            return new Message<AjaxResult>().fail().setData(new AjaxResult(e1.getMessage(), MessageType.错误消息));
         } catch (Exception e) {
             logger.error("保存失败", e);
-            return new Message<AjaxResult>().fail().setData(new AjaxResult("保存失败",MessageType.错误消息));
+            return new Message<AjaxResult>().fail().setData(new AjaxResult("保存失败", MessageType.错误消息));
         }
     }
 
@@ -224,5 +226,18 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
         }
     }
 
-
+    @ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+    @ResponseBody
+    @PostMapping("/getApproveEntity")
+    public Message<CreditProtectionCertificatePeriodSaveDto> getApproveEntity(@RequestBody BaseEntity req) {
+        try {
+            CreditProtectionCertificatePeriodSaveDto entity = new CreditProtectionCertificatePeriodSaveDto();
+            if (StringUtil.isNotEmpty(req.getWorkflowId())) {
+                entity = creditProtectionCertificatePeriod002Service.getBussinessEntityByWorkflowId(req.getWorkflowId());
+            }
+            return new Message<CreditProtectionCertificatePeriodSaveDto>().success().setData(entity);
+        } catch (Exception e) {
+            return new Message<CreditProtectionCertificatePeriodSaveDto>().fail().setMessage("查询异常");
+        }
+    }
 }

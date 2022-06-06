@@ -176,6 +176,7 @@
                tfpdl.M_DELIVERY_TYPE           settleMethod,
                TDTA.DELIVER_BOND               deliverBond,
                tfpdl.TRADE_DATE                deliverDate,
+               tfpdl.TRADE_DATE                tradeDate,
                tfpdl.TOTLE_TRADE_ID            busiCode,
                fp.TRADE_MARKET                 tradeMarket
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
@@ -196,6 +197,7 @@
                tfpdl.M_DELIVERY_TYPE           settleMethod,
                TDTA.DELIVER_BOND               deliverBond,
                tfpdl.TRADE_DATE                deliverDate,
+               tfpdl.TRADE_DATE                tradeDate,
                tfpdl.TOTLE_TRADE_ID            busiCode,
                fp.TRADE_MARKET                 tradeMarket
         from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
@@ -225,7 +227,7 @@
                                    T1.SEC_MANAGE_ACCT_ID,
                                    T2.PORTFOLIO_ID
                             FROM TRD_PRODUCT_DEAL T1
-                                     LEFT JOIN TRD_PRODUCT_DEAL_ADD T2 ON T1.TOTLE_TRADE_ID = T2.TRADE_ID
+                                     LEFT JOIN TRD_PRODUCT_DEAL_ADD T2 ON T1.TRADE_ID = T2.TRADE_ID
                             WHERE T1.FINPROD_TYPE2 = 'F01') T ON T.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
             AND TFPDL.SEC_MANAGE_ACCT_ID = T.SEC_MANAGE_ACCT_ID AND TPDA.PORTFOLIO_ID = T.PORTFOLIO_ID
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
@@ -233,7 +235,7 @@
                  left join PTL_PORTFOLIO pp on TPDA.PORTFOLIO_ID = pp.PORTFOLIO_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = tfpdl.SEC_MANAGE_ACCT_ID
                  left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
-        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR} and tfpdl.FINPROD_TYPE2 = 'F37'
         union all
         select TPDA.PORTFOLIO_ID           portfolioId,
                pp.PORTFOLIO_NAME           portfolioName,
@@ -254,7 +256,7 @@
                                    T1.SEC_MANAGE_ACCT_ID,
                                    T2.PORTFOLIO_ID
                             FROM WFL_TRD_PRODUCT_DEAL T1
-                                     LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD T2 ON T1.TOTLE_TRADE_ID = T2.TRADE_ID
+                                     LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD T2 ON T1.TRADE_ID = T2.TRADE_ID
                             WHERE T1.FINPROD_TYPE2 = 'F01') T ON T.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
             AND TFPDL.SEC_MANAGE_ACCT_ID = T.SEC_MANAGE_ACCT_ID AND TPDA.PORTFOLIO_ID = T.PORTFOLIO_ID
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
@@ -262,7 +264,7 @@
                  left join PTL_PORTFOLIO pp on TPDA.PORTFOLIO_ID = pp.PORTFOLIO_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = tfpdl.SEC_MANAGE_ACCT_ID
                  left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
-        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR} and tfpdl.FINPROD_TYPE2 = 'F37'
     </select>
     <select id="getBillingDetailsByFinprodMarketId"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
