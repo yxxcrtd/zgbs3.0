@@ -507,6 +507,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                     }
                 }
                 finPayInterestStdInfoDto.setInvScheduleList(invScheduleList);
+                if (StringUtil.equals(finPayInterestStdInfoDto.getCouponSpecies(),DictCodeList.息票品种_利随本清.getValue())){
+                    finPayInterestStdInfoDto.setPayCycle(null);
+                }
                 dto.setFinPayInterestStdInfoDto(finPayInterestStdInfoDto);
             }
             //付息信息

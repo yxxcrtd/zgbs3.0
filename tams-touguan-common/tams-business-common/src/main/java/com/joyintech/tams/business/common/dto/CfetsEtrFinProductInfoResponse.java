@@ -162,15 +162,13 @@ public class CfetsEtrFinProductInfoResponse {
      * 每标位最低投标量
      */
     @ApiModelProperty(name = "minPerTamt", value = "每标位最低投标量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal minPerTamt;
+    private String minPerTamt;
 
     /**
      * 每标位最高投标量
      */
     @ApiModelProperty(name = "maxPerUtamt", value = "每标位最高投标量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal maxPerUtamt;
+    private String maxPerUtamt;
 
     /**
      * 单笔最低认购量
@@ -492,19 +490,28 @@ public class CfetsEtrFinProductInfoResponse {
         this.addBatch = addBatch;
     }
 
-    public BigDecimal getMinPerTamt() {
+    public String getMinPerTamt() {
         return minPerTamt;
     }
 
-    public void setMinPerTamt(BigDecimal minPerTamt) {
+
+    public String getMinPerTamtStr() {
+        return StringUtil.isNotBlank(getMinPerTamt()) ? getMinPerTamt() + "亿元" : "";
+    }
+
+    public void setMinPerTamt(String minPerTamt) {
         this.minPerTamt = minPerTamt;
     }
 
-    public BigDecimal getMaxPerUtamt() {
+    public String getMaxPerUtamt() {
         return maxPerUtamt;
     }
 
-    public void setMaxPerUtamt(BigDecimal maxPerUtamt) {
+    public String getMaxPerUtamtStr() {
+        return StringUtil.isNotBlank(getMaxPerUtamt()) ? getMaxPerUtamt() + "亿元" : "";
+    }
+
+    public void setMaxPerUtamt(String maxPerUtamt) {
         this.maxPerUtamt = maxPerUtamt;
     }
 
@@ -615,6 +622,10 @@ public class CfetsEtrFinProductInfoResponse {
 
     public String getPlanIssueAmt() {
         return planIssueAmt;
+    }
+
+    public String getPlanIssueAmtStr() {
+        return StringUtil.isNotBlank(getPlanIssueAmt()) ? getPlanIssueAmt() + "亿元" : "";
     }
 
     public void setPlanIssueAmt(String planIssueAmt) {

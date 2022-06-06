@@ -89,7 +89,11 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         pageParam.put("COMMON_BUSINESS_TYPE_TRD97", BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
         List<String> isWinList = StringUtil.splitToList(null, request.getIsWin());
         pageParam.put("isWinList", isWinList);
-        pageParam.put("sort",request.getPageMode().getSort());
+        if (StringUtil.isNotEmpty(request.getPageMode().getSort()) && StringUtil.equals(request.getPageMode().getSort(),"bidDate")){
+            pageParam.put("sort","bidDateStart");
+        }else{
+            pageParam.put("sort",request.getPageMode().getSort());
+        }
         pageParam.put("direction",request.getPageMode().getDirection());
         Page<CfetsPrimaryBidManageCfmResponse> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),

@@ -5118,7 +5118,7 @@
                     end rateStr,
                 case
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                        then fpi.REFER_YIELD end rateYleid,
+                        then nvl(fpi.REFER_YIELD,0)*100 end rateYleid,
                 bo.SUBSCRIPTION_AMOUNT subAmt,
                 bo.PAYABLE_AMOUNT  payableAmount,
                 bo.SETT_FEE_AMT  settleFeeAmt
@@ -5145,7 +5145,7 @@
                     end rateStr,
                 case
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                        then fpi.REFER_YIELD end rateYleid,
+                        then nvl(fpi.REFER_YIELD,0)*100 end rateYleid,
                 wbo.SUBSCRIPTION_AMOUNT subAmt,
                 wbo.PAYABLE_AMOUNT  payableAmount,
                 wbo.SETT_FEE_AMT  settleFeeAmt
@@ -5161,7 +5161,7 @@
     <select id="findYjsgFenPeiInfoList" resultType="com.joyintech.tams.cfets.trdquery.dto.BidPortIntFenPeiInfoDto">
         SELECT    brbp.ENTRUST_ID entrustId,
                   pp.PORTFOLIO_NAME portfolioName,
-                  brbp.SUBSCRIPTION_AMOUNT subAmt,
+                  brbp.SUBSCRIPTION_AMOUNT/10000 subAmt,
                   brbp.PAYABLE_AMOUNT payableAmount,
                   brbp.SETT_FEE_AMT settleFeeAmt,
                   eed.INV_AIM invAim,
@@ -5177,7 +5177,7 @@
         UNION ALL
         SELECT  wbrbp.ENTRUST_ID entrustId,
                 pp.PORTFOLIO_NAME portfolioName,
-                wbrbp.SUBSCRIPTION_AMOUNT subAmt,
+                wbrbp.SUBSCRIPTION_AMOUNT/10000 subAmt,
                 wbrbp.PAYABLE_AMOUNT payableAmount,
                 wbrbp.SETT_FEE_AMT settleFeeAmt,
                 eed.INV_AIM invAim,

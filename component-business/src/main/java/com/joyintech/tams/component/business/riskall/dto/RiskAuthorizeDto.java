@@ -11,7 +11,13 @@ public class RiskAuthorizeDto extends RskAuthorizeMng {
      */
     private boolean authorizeLimit;
 
-    public String getRskStatus(){
+
+    /**
+     * 试算结果
+     */
+    private String rskStatus;
+
+    public String getAuthorizeLimitStr(){
         return authorizeLimit ? "超授权" : "通过";
     }
 
@@ -37,5 +43,18 @@ public class RiskAuthorizeDto extends RskAuthorizeMng {
 
     public void setAuthorizeLimit(boolean authorizeLimit) {
         this.authorizeLimit = authorizeLimit;
+    }
+
+
+    public String getRskStatusStr() {
+        return SysDatadictUtil.getNameFromDataDict(DictCode.试算结果,rskStatus);
+    }
+
+    public String getRskStatus() {
+        return rskStatus;
+    }
+
+    public void setRskStatus(String rskStatus) {
+        this.rskStatus = rskStatus;
     }
 }
