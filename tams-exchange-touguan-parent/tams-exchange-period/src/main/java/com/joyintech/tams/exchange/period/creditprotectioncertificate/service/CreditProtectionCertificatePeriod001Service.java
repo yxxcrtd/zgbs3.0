@@ -34,10 +34,10 @@ public class CreditProtectionCertificatePeriod001Service extends CommonExportSer
         paramsMap.put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         paramsMap.put("YES_OR_NO_N", DictCodeList.是否_否.getValue());
 
-        paramsMap.put("finprodIdList", StringUtil.splitToList(params.getFinprodId(), ","));
-        paramsMap.put("busiCodeList", StringUtil.splitToList(params.getBusinessCode(), ","));
+        paramsMap.put("finprodIdList", StringUtil.splitToList( ",",params.getFinprodId()));
+        paramsMap.put("busiCodeList", StringUtil.splitToList(",",params.getBusinessCode()));
         paramsMap.put("busiTypeList", params.getBusinessTypeList());
-        paramsMap.put("validStatusList", StringUtil.splitToList(params.getValidStatus(), ","));
+        paramsMap.put("validStatusList", StringUtil.splitToList( ",",params.getValidStatus()));
 
         return super.queryForPage(params.getPageMode().getPageNo(), params.getPageMode().getPageSize(),
                 () -> creditProtectionCertificatePeriodMapper.findPage(paramsMap));

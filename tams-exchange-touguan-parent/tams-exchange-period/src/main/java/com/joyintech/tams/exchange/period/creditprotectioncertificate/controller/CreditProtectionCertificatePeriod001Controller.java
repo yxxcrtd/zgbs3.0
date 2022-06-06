@@ -210,8 +210,14 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
             processMark.setPageId("CreditProtectionCertificatePeriod002");
             processMark.setBusinessDataPk1(dto.getBusiCode());
             CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getBussinessEntityByPk(processMark);
-            params.setPageId(dto.getPageId());
-            params.setElementId(dto.getElementId());
+            if(null == entity){
+                entity = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(dto.getBusiCode());
+            }
+            entity.setPageId("CreditProtectionCertificatePeriod002");
+            entity.setElementId("CreditProtectionCertificatePeriod002_btn_revoke");
+            entity.setWorkflowParameter("REVOKE|||1|CreditProtectionCertificatePeriod002|CreditProtectionCertificatePeriod002_btn_revoke|false");
+            params.setPageId(entity.getPageId());
+            params.setElementId(entity.getElementId());
             params.setBusinessCode(dto.getBusiCode());
             params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
             params.setComment(creditProtectionCertificatePeriod002Service.generateComment(entity));
