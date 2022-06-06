@@ -126,13 +126,17 @@ public class FinFundTargetValidator implements BeanValidator {
                     resultList.add(new ValidMessage("trmFundType",
                             getMessage("FinFundTarget002.trmFundType01", getMessage("FinFundTarget002.trmFundType"))));
                 }
-                if (StringUtil.equals(DictCodeList.基金类资产类型_货币基金.getValue(), dto.getFundType())&&
-                        !(StringUtil.equals(dto.getTrmFundType(),DictCodeListExt2.交易所基金类型_ETF.getValue())||
-                        StringUtil.equals(dto.getTrmFundType(),DictCodeListExt2.交易所基金类型_实时申赎货币基金.getValue()))){
-                    resultList.add(new ValidMessage("trmFundType",
-                            getMessage("FinFundTarget002.trmFundType02", getMessage("FinFundTarget002.trmFundType"))));
+                // add wsz 20220601 修改前端验证问题 ZGCPCN-1046 公募基金标的新建画面，无法新建场外货币基金 start
+                if(StringUtil.equals(dto.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                        ||StringUtil.equals(dto.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                    if (StringUtil.equals(DictCodeList.基金类资产类型_货币基金.getValue(), dto.getFundType())&&
+                            !(StringUtil.equals(dto.getTrmFundType(),DictCodeListExt2.交易所基金类型_ETF.getValue())||
+                                    StringUtil.equals(dto.getTrmFundType(),DictCodeListExt2.交易所基金类型_实时申赎货币基金.getValue()))){
+                        resultList.add(new ValidMessage("trmFundType",
+                                getMessage("FinFundTarget002.trmFundType02", getMessage("FinFundTarget002.trmFundType"))));
+                    }
                 }
-
+                // add wsz 20220601 修改前端验证问题 ZGCPCN-1046 公募基金标的新建画面，无法新建场外货币基金 end
                 /*if(list.size()>0){
                     resultList.add(
                         new ValidMessage(this.getMessage("BUSS_COM_E_0006", getMessage("MstFeeVarieties002.feeName"))));
@@ -145,13 +149,17 @@ public class FinFundTargetValidator implements BeanValidator {
                     resultList.add(new ValidMessage("trmFundType",
                             getMessage("FinFundTarget002.trmFundType01", getMessage("FinFundTarget002.trmFundType"))));
                 }
-                if (StringUtil.equals(DictCodeList.基金类资产类型_货币基金.getValue(), dto.getFundType())&&
-                        !(StringUtil.equals(dto.getTrmFundType(),DictCodeListExt2.交易所基金类型_ETF.getValue())||
-                                StringUtil.equals(dto.getTrmFundType(),DictCodeListExt2.交易所基金类型_实时申赎货币基金.getValue()))){
-                    resultList.add(new ValidMessage("trmFundType",
-                            getMessage("FinFundTarget002.trmFundType02", getMessage("FinFundTarget002.trmFundType"))));
+                // add wsz 20220601 修改前端验证问题 ZGCPCN-1046 公募基金标的新建画面，无法新建场外货币基金 start
+                if(StringUtil.equals(dto.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                        ||StringUtil.equals(dto.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+                    if (StringUtil.equals(DictCodeList.基金类资产类型_货币基金.getValue(), dto.getFundType()) &&
+                            !(StringUtil.equals(dto.getTrmFundType(), DictCodeListExt2.交易所基金类型_ETF.getValue()) ||
+                                    StringUtil.equals(dto.getTrmFundType(), DictCodeListExt2.交易所基金类型_实时申赎货币基金.getValue()))) {
+                        resultList.add(new ValidMessage("trmFundType",
+                                getMessage("FinFundTarget002.trmFundType02", getMessage("FinFundTarget002.trmFundType"))));
+                    }
                 }
-
+                // add wsz 20220601 修改前端验证问题 ZGCPCN-1046 公募基金标的新建画面，无法新建场外货币基金 end
                 // 获取原来的数据。
                 String finprodMarketId = dto.getFinprodMarketId();
                 String oldFinprodMarketId = dto.getOldFinprodMarketId();
