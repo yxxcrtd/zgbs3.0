@@ -48,7 +48,7 @@
             <result property="avaNum" column="avaNum" jdbcType="DECIMAL"/>
             <result property="entrustNum" column="ENTRUST_NUM" jdbcType="DECIMAL"/>
             <result property="bidPrinAmt" column="BID_PRIN_AMT" jdbcType="DECIMAL"/>
-            <result property="bidPriceTotal" column="TRADE_AMT" jdbcType="DECIMAL"/>
+            <result property="bidPriceTotal" column="THE_WIN_PRIN_AMT" jdbcType="DECIMAL"/>
             <result property="settFeeAmt" column="SETT_FEE_AMT" jdbcType="DECIMAL"/>
             <result property="tradeAmt" column="TRADE_AMT" jdbcType="DECIMAL"/>
             <result property="payAmt" column="PAYABLE_AMOUNT" jdbcType="DECIMAL"/>

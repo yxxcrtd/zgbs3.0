@@ -1901,7 +1901,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     wflBidOrderBidPrice.setBidPrice(item.getBidPrice());
                 }
                 // 投标券面总额
-                wflBidOrderBidPrice.setTheWinPrinAmt(item.getTotalBiddingNum());
+                wflBidOrderBidPrice.setTheWinPrinAmt(item.getBidPriceTotal());
                 // 组合代码
                 wflBidOrderBidPrice.setPortfolioId(item.getPortfolioId());
                 // 投资目的
