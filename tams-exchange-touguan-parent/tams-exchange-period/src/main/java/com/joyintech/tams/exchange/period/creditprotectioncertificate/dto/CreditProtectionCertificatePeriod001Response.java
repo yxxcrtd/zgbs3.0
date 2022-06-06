@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -101,12 +102,14 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     /**
      * 信用事件发生时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "creditEventHappenedDate",value = "信用事件发生时间")
     private Date creditEventHappenedDate;
 
     /**
      * 信用事件决定日
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "creditEventResolveDate",value = "信用事件决定日")
     private Date creditEventResolveDate;
 
@@ -131,6 +134,7 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     /**
      * 交付时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "deliverDate",value = "交付时间")
     private Date deliverDate;
 
