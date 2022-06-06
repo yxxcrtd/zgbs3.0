@@ -164,7 +164,7 @@
         <where>
             T1.CCY = 'CNY'
             AND T1.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
-            AND T1.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+            AND T1.DELISTING_DATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
             AND (mbmi.MARKET_AMT > 0 OR mbmi.MARKET_AMT IS NULL )
             <if test="assestType != null and assestType.size() > 0">
                 AND T1.FINPROD_TYPE2 in
@@ -189,7 +189,7 @@
         <where>
             T1.CCY = 'CNY'
             AND T1.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
-            AND T1.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+            AND T1.DELISTING_DATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
             AND (mbmi.MARKET_AMT > 0 OR mbmi.MARKET_AMT IS NULL )
             <if test="assestType != null and assestType.size() > 0">
                 AND T1.FINPROD_TYPE2 in
@@ -401,7 +401,7 @@
         ON T1.FINPROD_ID = T2.FINPROD_ID
         where
             T1.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
-            AND T1.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+            AND T1.DELISTING_DATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
             AND (mbmi.MARKET_AMT > 0 OR mbmi.MARKET_AMT IS NULL )
             AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
             and  T1.is_right='Y'
