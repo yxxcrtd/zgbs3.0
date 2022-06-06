@@ -96,8 +96,6 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
     public void doComplete(MskCreditInfoProSaveRequest mskCreditInfoProSaveRequest, OperationType operationType) {
         if (OperationType.DELETE == operationType) {
             this.delete(mskCreditInfoProSaveRequest);
-        }else if(OperationType.NEW == operationType){
-            this.insert(mskCreditInfoProSaveRequest);
         }else if(OperationType.MODIFY == operationType){
             this.update(mskCreditInfoProSaveRequest);
         }

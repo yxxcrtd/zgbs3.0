@@ -135,7 +135,7 @@
              MST_CREDIT_MARKET_INFO		m
          LEFT JOIN
              FIN_PRODUCT		f
-         ON	 f.FINPROD_ID=m.SECID
+         ON	 f.FINPROD_MARKET_ID=m.SECID
          LEFT JOIN
              INTERF_CREDITINFO	i
          ON	 i.SECID = m.SECID
@@ -184,7 +184,7 @@
         MST_CREDIT_MARKET_INFO		m
         LEFT JOIN
         FIN_PRODUCT		f
-        ON	 f.FINPROD_ID=m.SECID
+        ON	 f.FINPROD_MARKET_ID=m.SECID
         LEFT JOIN
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
@@ -249,7 +249,7 @@
         MST_CREDIT_MARKET_INFO		m
         LEFT JOIN
         FIN_PRODUCT		f
-        ON	 f.FINPROD_ID=m.SECID
+        ON	 f.FINPROD_MARKET_ID=m.SECID
         LEFT JOIN
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
@@ -316,7 +316,7 @@
         MST_CREDIT_MARKET_INFO		m
         LEFT JOIN
         FIN_PRODUCT		f
-        ON	 f.FINPROD_ID=m.SECID
+        ON	 f.FINPROD_MARKET_ID=m.SECID
         LEFT JOIN
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
