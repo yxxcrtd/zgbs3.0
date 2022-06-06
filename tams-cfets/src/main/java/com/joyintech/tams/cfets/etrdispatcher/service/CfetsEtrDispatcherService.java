@@ -829,16 +829,19 @@ public class CfetsEtrDispatcherService extends BaseService {
             return new Page<CfetsEtrDispatcherDealListInfoResponse>();
         }
         Page<CfetsEtrDispatcherDealListInfoResponse> page = null;
-        if(StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
+        if(StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
+                StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
             //这里处理一级投标
-            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherBidDealListInfo(pageParam));
-            for(CfetsEtrDispatcherDealListInfoResponse response : page.getRoot()) {
-                CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrBidInfo(response.getEntrustId());
-                if(StringUtil.isNotEmpty(dto2)) {
-                    response.setIsWin(dto2.getIsWin());
-                    response.setBidprice(dto2.getEtrPrice());
-                }
-            }
+//            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherBidDealListInfo(pageParam));
+//            for(CfetsEtrDispatcherDealListInfoResponse response : page.getRoot()) {
+//                CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrBidInfo(response.getEntrustId());
+//                if(StringUtil.isNotEmpty(dto2)) {
+//                    response.setIsWin(dto2.getIsWin());
+//                    response.setBidprice(dto2.getEtrPrice());
+//                }
+//            }
+            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherFirstBidDealListInfo(pageParam));
+        //中标结果明细
         }else {
             page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherDealListInfo(pageParam));
         }
