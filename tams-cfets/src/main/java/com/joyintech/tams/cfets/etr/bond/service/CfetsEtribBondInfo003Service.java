@@ -59,6 +59,7 @@ import com.joyintech.service.entrust.common.service.WFlowCommonService;
 import com.joyintech.service.entrust.etrcommanddispatcher.service.EtrCommandDispatcherService;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
@@ -230,6 +231,12 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
     private BaseGetBusinessId bussGetBussinessIdService;
     @Autowired
     private CfetsEtrIbBondinfo002Service cfetsEtrIbBondinfo002Service;
+
+    @Autowired
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
+
+    @Autowired
+    private IPlatformDate pPlatformDate;
 
     /**
      * 判断是否含权债
@@ -697,6 +704,10 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
         SecInfoModelDto secInfoModelDto = restTemplate.postForObject(
                 ServiceApplication.TRADE_SERVICE_NAME + "/TrdBondInvestTrade/getSecInfoModel",
                 tempParamMap, SecInfoModelDto.class);
+        FinCashCalcRule finCashCalcRule = joyinbusinessCommonMapper.selectBasisByFinprodId(dto.getFinprodId(), pPlatformDate.getSysDate());
+        if (StringUtil.isNotEmpty(finCashCalcRule) && StringUtil.isNotEmpty(finCashCalcRule.getMarketBasis())) {
+            secInfoModelDto.setBasis(finCashCalcRule.getMarketBasis());
+        }
         SecInfoModel secInfoModel = this.toSecInfoModel(secInfoModelDto);
         // 如果交易场所为上交所、深交所的情况
         if (isJiaoYiSuo) {

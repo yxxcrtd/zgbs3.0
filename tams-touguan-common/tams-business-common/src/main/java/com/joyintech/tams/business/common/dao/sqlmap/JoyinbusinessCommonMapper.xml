@@ -920,4 +920,13 @@
              </if>
          </where>
     </select>
+
+    <select id="selectBasisByFinprodId" resultType="com.joyintech.tams.common.base.entity.FinCashCalcRule">
+        select fccr.FINPROD_ID, fccr.MARKET_BASIS, fccr.BASIS
+        from (
+        select row_number() over (PARTITION BY FINPROD_ID order by EFF_DATE desc ) num, CASH_ID
+        from FIN_CASH_CALC_RULE
+        where EFF_DATE <![CDATA[<=]]> #{sysDate} and FINPROD_ID = #{finprodId}) T
+        left join FIN_CASH_CALC_RULE fccr on fccr.CASH_ID = T.CASH_ID and T.num = 1
+    </select>
 </mapper>
