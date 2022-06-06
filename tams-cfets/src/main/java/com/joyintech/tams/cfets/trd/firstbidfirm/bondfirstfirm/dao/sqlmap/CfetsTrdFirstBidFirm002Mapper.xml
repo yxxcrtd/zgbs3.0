@@ -141,12 +141,11 @@
                  LEFT JOIN SYS_USER SU ON ee.INV_MANAGER_ID = SU.USER_NAME
                  LEFT JOIN STL_SEC_ACCT_INFO ssai ON eed.SEC_ACCT_ID = ssai.SEC_ACCT_ID
                  LEFT JOIN MST_COUNTER_PARTY MCP ON ee.COUNTER_ID = MCP.COUNTER_ID
-                 left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
+                 left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
                                 from BID_ORDER_BID_PRICE
                                 where IS_CANCEL = 'N'
                                   and TRADE_STATUS = '01'
-                                group by BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE) T on T.ENTRUST_ID = eebp.ENTRUST_ID and T.PORTFOLIO_ID = eebp.PORTFOLIO_ID
-                                and T.BID_ID = bobp.BID_ID and T.BID_PRICE = eebp.BID_PRICE
+                                group by  ENTRUST_ID, PORTFOLIO_ID, BID_PRICE) T on T.ENTRUST_ID = eebp.ENTRUST_ID and T.PORTFOLIO_ID = eebp.PORTFOLIO_ID  and T.BID_PRICE = eebp.BID_PRICE
         <where>
             <if test="entrustIdList != null and entrustIdList.size()>0">
                 ee.ENTRUST_ID in
@@ -302,12 +301,12 @@
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
                  left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
                  left join ETR_ENTRUST_BID_PRICE eebp on eebp.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eebp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
-                 left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
+                 left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum,  ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
                                 from BID_ORDER_BID_PRICE
                                 where IS_CANCEL = 'N'
                                   and TRADE_STATUS = '01'
-                                group by BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE) T on T.ENTRUST_ID = eebp.ENTRUST_ID and T.PORTFOLIO_ID = eebp.PORTFOLIO_ID
-                                and T.BID_ID = bobp.BID_ID and T.BID_PRICE = eebp.BID_PRICE
+                                group by ENTRUST_ID, PORTFOLIO_ID, BID_PRICE) T on T.ENTRUST_ID = eebp.ENTRUST_ID and T.PORTFOLIO_ID = eebp.PORTFOLIO_ID
+                                and T.BID_PRICE = eebp.BID_PRICE
         where bo.BID_ID = #{bidId}
         union all
         select bo.FINPROD_ID           finprodId,
@@ -383,12 +382,12 @@
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
                  left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
                  left join ETR_ENTRUST_BID_PRICE eebp on eebp.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eebp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
-                 left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
+                 left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
                                 from BID_ORDER_BID_PRICE
                                 where IS_CANCEL = 'N'
                                   and TRADE_STATUS = '01'
-                                group by BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE) T on T.ENTRUST_ID = eebp.ENTRUST_ID and T.PORTFOLIO_ID = eebp.PORTFOLIO_ID
-                                and T.BID_ID = bobp.BID_ID and T.BID_PRICE = eebp.BID_PRICE
+                                group by ENTRUST_ID, PORTFOLIO_ID, BID_PRICE) T on T.ENTRUST_ID = eebp.ENTRUST_ID and T.PORTFOLIO_ID = eebp.PORTFOLIO_ID
+                                 and T.BID_PRICE = eebp.BID_PRICE
         where bo.BID_ID = #{bidId}
     </select>
 
