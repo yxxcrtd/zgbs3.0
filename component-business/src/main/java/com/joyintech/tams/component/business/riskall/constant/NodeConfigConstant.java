@@ -46,5 +46,10 @@ public class NodeConfigConstant {
      */
     public static final String REPO003 = "REPO003";
 
+    /**
+     * 数据
+     */
+    public static final String DATA = "data";
+
 
 }

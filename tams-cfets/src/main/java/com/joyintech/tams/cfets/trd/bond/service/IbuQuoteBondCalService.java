@@ -16,6 +16,8 @@ import com.joyintech.framework.util.*;
 import com.joyintech.service.bankuplink.bond.service.CfetsBondDealQuotedPriceService;
 import com.joyintech.service.bankuplink.calc.service.SecCalRequestQuoteService;
 import com.joyintech.service.bankuplink.calc.service.SecCalUtil;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.AutoAllocationRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
@@ -36,6 +38,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.entrust.etribbondinfo.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.entrust.etribbondinfo.dto.SecInfoModelDto;
 import com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -88,6 +91,12 @@ public class IbuQuoteBondCalService extends BaseService {
     @Autowired
     private SecCalRequestQuoteService secCalRequestQuoteService;
 
+    @Autowired
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
+
+    @Autowired
+    private IPlatformDate pPlatformDate;
+
     /**
      * 数据联动计算
      *
@@ -100,6 +109,13 @@ public class IbuQuoteBondCalService extends BaseService {
         //BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealDialogueQuoteDto, calRequest);
         //cfetsBondDealDialogueQuoteDto.setAvaNum(calRequest.getShareAmt());
         //BeanUtil.copyPropertiesIgnoreNull(calRespone,cfetsBondDealQuotedPriceService.calcAmt(cfetsBondDealDialogueQuoteDto));
+        // 特殊债券信息查询
+        List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(calRequest.getFinprodId()));
+        if (CollectionUtils.isNotEmpty(list)) {
+            if (StringUtil.equals(list.get(0).getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
+                calRequest.setUnitInt(null);
+            }
+        }
         calRespone = calAmt(calRequest);
         if (null != calRespone.getFpriceAmt()) {
             calRequest.setFpriceAmt(calRespone.getFpriceAmt());
@@ -129,6 +145,29 @@ public class IbuQuoteBondCalService extends BaseService {
         /*return restTemplate.postForObject(
                     ServiceApplication.BANKUPLINK_SERVICE_NAME + "/CfetsBondDealQuotedPrice/calcAmt",
                     calRequest, CalRespone.class);*/
+    }
+
+    /**
+     * 结算金额反算全价、应计利息、应计利息总额
+     *
+     * @param calRequest
+     * @return
+     */
+    public CalRespone calculationByFpriceAmt(CalRequest calRequest) {
+        CalRespone calRespone = new CalRespone();
+        BeanUtil.copyPropertiesIgnoreNull(calRespone,calRequest);;
+        logger.debug("结算金额反算全价、应计利息、应计利息总额,结算金额:" + calRequest.getFpriceAmt());
+        if(!StringUtil.isNotEmpty(calRequest.getFpriceAmt())){
+            logger.error("结算金额传值为空");
+            return calRespone;
+        }
+        //金额面板.应计利息总额=画面.结算金额-画面.交易金额
+        calRespone.setIntAmt(ArithmeticUtil.subtract(calRespone.getFpriceAmt(),calRespone.getCpriceAmt()));
+        //金额面板.应计利息 金额面板.应计利息总额/(券面总额（万元）*10000)*100
+        calRespone.setUnitInt(ArithmeticUtil.divide(calRespone.getIntAmt(),calRespone.getCpriceAmt(),8));
+        //金额面板.全价=净价+应计利息
+        calRespone.setUnitFprice(ArithmeticUtil.doAdd(calRespone.getUnitInt(),calRespone.getPrice()));
+        return calRespone;
     }
 
     /**
@@ -460,6 +499,10 @@ public class IbuQuoteBondCalService extends BaseService {
         SecInfoModelDto secInfoModelDto = restTemplate.postForObject(
                 ServiceApplication.TRADE_SERVICE_NAME + "/TrdBondInvestTrade/getSecInfoModel",
                 tempParamMap, SecInfoModelDto.class);
+        FinCashCalcRule finCashCalcRule = joyinbusinessCommonMapper.selectBasisByFinprodId(dto.getFinprodId(),pPlatformDate.getSysDate());
+        if (StringUtil.isNotEmpty(finCashCalcRule) && StringUtil.isNotEmpty(finCashCalcRule.getMarketBasis())) {
+            secInfoModelDto.setBasis(finCashCalcRule.getMarketBasis());
+        }
         SecInfoModel secInfoModel = this.toSecInfoModel(secInfoModelDto);
         // e.获取债券的还本计划信息
         List<SecPrinSchedule> secPrinScheduleList = new ArrayList<SecPrinSchedule>();

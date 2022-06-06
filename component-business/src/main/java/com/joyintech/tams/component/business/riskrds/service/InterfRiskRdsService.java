@@ -614,6 +614,97 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             v.getEventType());
         return res;
     }
+
+    /**
+     * 批量处理
+     *
+     * @param v 调用接口属性
+     * @param tList 内容
+     * @param consumer 自定义处理
+     * @return 风控计算结果
+     * @throws Exception 异常
+     */
+    public <T> List<Map<String, Object>> getRiskRdsListData(V v, Collection tList,Consumer<Map<String, Object>> consumer) {
+        logger.info("==========后端批量交易或批量委托类转换接口:{} {} start==========", v.getInfCode(),
+                v.getEventType());
+        if (CollectionUtils.isEmpty(tList)) {
+            logger.info("==========空的报文体==========");
+            return null;
+        }
+        if (consumer == null) {
+            consumer = map -> {
+                // nothing to do
+            };
+        }
+        Set<String> counterIdSet = new HashSet<>();
+        List<Map<String, Object>> sourcetList = new ArrayList<>();
+        // add by zhangrui1 基金转换申请取最新净值 start
+        List<String> assetList = new ArrayList<>();
+        // add by zhangrui1 基金转换申请取最新净值 end
+        // 取出所有的交易对手判断是否内部交易对手
+        for (Object t : tList) {
+            Map<String, Object> dataMap = JsonUtils.object2Map(t);
+            // 个别处理
+            consumer.accept(dataMap);
+            // 交易对手
+            String counterId = (String)CommonUtil.findValue(dataMap,
+                    PageFieldToInterfFactory.INF_COUNTERID);
+            if (!StringUtil.isEmpty(counterId)) {
+                counterIdSet.add(counterId);
+            }
+            sourcetList.add(dataMap);
+            // add by zhangrui1 基金转换申请取最新净值 start
+            String ps = (String)CommonUtil.findValue(dataMap, "ps");
+            if (CommonUtil.isType(ps, DictCodeListExt2.交易方向_转换申请)) {
+                assetList.add((String)dataMap.get("finprodId"));
+            }
+            // add by zhangrui1 基金转换申请取最新净值 end
+        }
+
+        // 取出内部交易对手
+        Map<String, String> portfolioIds = selectInnerCounter(counterIdSet);
+        List<Map<String, Object>> targetList = new ArrayList<>();
+        List<String> tradeIds = new ArrayList<>();
+        // add by zhangrui1 基金转换申请取最新净值 start
+        Map<String, BigDecimal> valMap = fundNetService.getValuationMap(assetList);
+        // add by zhangrui1 基金转换申请取最新净值 end
+        for (Map<String, Object> dataMap : sourcetList) {
+            // add by zhangrui1 基金转换申请取最新净值 start
+            String ps = (String)CommonUtil.findValue(dataMap, "ps");
+            if (CommonUtil.isType(ps, DictCodeListExt2.交易方向_转换申请)) {
+                dataMap.put("netPrice", valMap.get((String)dataMap.get("finprodId")));
+            }
+            // add by zhangrui1 基金转换申请取最新净值 end
+            // 报文结构处理
+
+            try {
+                doListCommon(v, dataMap, portfolioIds, tradeIds, targetList);
+            } catch (Exception e) {
+                ;
+            }
+        }
+        // 取得交易的反向交易编号
+        Map<String, String> rTradeIdMap = selectRTradeIds(tradeIds);
+        // 替换反向交易编号
+        if (!CollectionUtils.isEmpty(targetList) && StringUtil.equals(
+                BussinessDictCodeListRds.接口系统ID_实占释放批量接口.getValue(), v.getInfCode())) {
+            targetList.forEach(map -> {
+                String eventId = (String)map.get(PageFieldToInterfFactory.INF_EVENTID);
+                if (rTradeIdMap.containsKey(eventId)) {
+                    map.put(PageFieldToInterfFactory.INF_EVENTID, rTradeIdMap.get(eventId));
+                }
+            });
+        }
+        // add by zhangrui1 根据资产类型设置开关 start
+        if (isRskOpened(v.getAssetType())) {
+            return null;
+        }
+        // add by zhangrui1 根据资产类型设置开关 end
+        // 调用风险服务执行计算
+        //ClientData res = sendListDataCommon(targetList, v.getInfCode());
+        logger.info("==========后端批量交易或批量委托类转换接口:{} {} end==========", v.getInfCode(),v.getEventType());
+        return targetList;
+    }
     // 多组合、多对多指令/交易处理共通 by zhangrui1 end
 
     /**
