@@ -1,8 +1,6 @@
 package com.joyintech.tams.exchange.datacommon.db.dao;
 
 
-import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
-import com.joyintech.tams.exchange.common.db.domain.InstructionPledgeExample;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledgeHistory;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledgeHistoryExample;
 import org.apache.ibatis.annotations.Param;

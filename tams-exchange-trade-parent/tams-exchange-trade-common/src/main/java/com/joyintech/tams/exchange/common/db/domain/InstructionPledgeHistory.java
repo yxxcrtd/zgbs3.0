@@ -106,6 +106,9 @@ public class InstructionPledgeHistory implements Serializable, KeyMethodInterfac
     @ApiModelProperty(required = false,name="count",value="数量")
     private int count;
 
+    @ApiModelProperty(required = false,name="displaceDir",value="置换方向")
+    private String displaceDir;
+
     @Id
     @Override
     public String getId() {
@@ -267,5 +270,13 @@ public class InstructionPledgeHistory implements Serializable, KeyMethodInterfac
 
     public void setOldPledgeAmt(BigDecimal oldPledgeAmt) {
         this.oldPledgeAmt = oldPledgeAmt;
+    }
+
+    public String getDisplaceDir() {
+        return displaceDir;
+    }
+
+    public void setDisplaceDir(String displaceDir) {
+        this.displaceDir = displaceDir;
     }
 }

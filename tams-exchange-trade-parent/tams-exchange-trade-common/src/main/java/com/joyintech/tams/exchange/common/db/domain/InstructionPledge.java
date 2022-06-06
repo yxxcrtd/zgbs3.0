@@ -107,6 +107,12 @@ public class InstructionPledge implements Serializable, KeyMethodInterface<Strin
     @ApiModelProperty(required = false,name="count",value="数量")
     private int count;
 
+    /**
+     * @see com.joyintech.tams.exchange.common.enums.invest.PledgeDisPlaceDirEnum
+     */
+    @ApiModelProperty(required = false,name="displaceDir",value="置换方向")
+    private String displaceDir;
+
     @Id
     @Override
     public String getId() {
@@ -268,5 +274,13 @@ public class InstructionPledge implements Serializable, KeyMethodInterface<Strin
 
     public void setOldPledgeAmt(BigDecimal oldPledgeAmt) {
         this.oldPledgeAmt = oldPledgeAmt;
+    }
+
+    public String getDisplaceDir() {
+        return displaceDir;
+    }
+
+    public void setDisplaceDir(String displaceDir) {
+        this.displaceDir = displaceDir;
     }
 }
