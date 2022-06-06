@@ -1,21 +1,17 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.service.repo;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.joyintech.background.component.common.pack.common.base.BaseService;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
-import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
-import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
-import com.joyintech.tams.common.base.dao.SettleTransDataPledgeMapper;
+import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.TrdProductDealDto;
@@ -27,7 +23,6 @@ import com.joyintech.tams.invest.common.position.dto.PostionParameter;
 import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
-import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDetailDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTransMatchCommonMapper;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.CommonTrdTempDto;
@@ -170,9 +165,9 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
             trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
         }
         // 本方交易员
-        trdProductDeal.setTrader(null);
+        trdProductDeal.setTrader(settleTransData.getTrader());
         // 对手方交易员
-        trdProductDeal.setCounterTrader(null);
+        trdProductDeal.setCounterTrader(settleTransData.getCounterTrader());
         // 对手方联系方式
         trdProductDeal.setCounterContact(null);
         // 证券管理户代码
@@ -217,6 +212,14 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         else {
             trdProductDealAdd.setGenType(DictCodeListExt1.生成方式_画面录入.getValue());
         }
+        // 本方交易商
+        trdProductDealAdd.setDealerNo(dealDto.getDealerNo());
+        // 对手方交易商
+        trdProductDealAdd.setOutDealerNo(dealDto.getOutDealerNo());
+        // 本方交易主体
+        trdProductDealAdd.setDealerPartyNo(dealDto.getDealerPartyNo());
+        // 对手方交易主体
+        trdProductDealAdd.setOutDealerPartyNo(dealDto.getOutDealerPartyNo());
         return trdProductDealAdd;
     }
 
@@ -304,6 +307,9 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
      */
     public List<StlPayOrdersDto> generateStlPayOrdersList(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto, TrdProductDeal trdProductDeal) {
         List<StlPayOrdersDto> stlPayOrdersList = new ArrayList<>();
+        if(trdProductDeal.getTradeAmt() == null){
+            return stlPayOrdersList;
+        }
         StlPayOrdersDto stlPayOsrdersDto = createStlPayOrders(dealDto, entrustDto, trdProductDeal);
         // 收付方向
         if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(), dealDto.getFinprodType2())) {
@@ -426,7 +432,14 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         BeanUtil.copyPropertiesIgnoreNull(trdDealTotalAdd, trdFinProductDealTotal);
         trdDealTotalAdd.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
         trdDealTotalAdd.setEntrustId(entrustDto.getEntrustId());
-
+        // 本方交易商
+        trdDealTotalAdd.setDealerNo(dealDto.getDealerNo());
+        // 对手方交易商
+        trdDealTotalAdd.setOutDealerNo(dealDto.getOutDealerNo());
+        // 本方交易主体
+        trdDealTotalAdd.setDealerPartyNo(dealDto.getDealerPartyNo());
+        // 对手方交易主体
+        trdDealTotalAdd.setOutDealerPartyNo(dealDto.getOutDealerPartyNo());
         return trdDealTotalAdd;
     }
 
@@ -469,9 +482,10 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         //置换方向 = 同金融产品交易.交易方向
         finPledgeDisplaceDetail.setTradeType(trdProductDeal.getPs());
         //换出面额 = 同金融产品交易.交易份额
-        finPledgeDisplaceDetail.setPledgeDisplaceAmt(trdProductDeal.getShareAmt());
+        // finPledgeDisplaceDetail.setPledgeDisplaceAmt(trdProductDeal.getShareAmt());
+        finPledgeDisplaceDetail.setPledgeDisplaceAmt(ArithmeticUtil.multiply(trdProductDeal.getShareAmt(), new BigDecimal(100)));
         //折算比例 = 同金融产品交易.单位净价
-        finPledgeDisplaceDetail.setScale(trdProductDeal.getUnitCprice());
+        // finPledgeDisplaceDetail.setScale(trdProductDeal.getUnitCprice());
 
         return finPledgeDisplaceDetail;
     }
@@ -480,60 +494,97 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
     /**
      * 生成质押券置换结果
      * @param dealDto
-     * @param entrustDto
-     * @param trdFinProductDealTotal
+     * @param commonEntrustDto
+     * @param total
+     * @param firstFinDealPledgeList
+     * @param updateFinDealPledges
      * @return
      */
-    public List<FinPledgeDisplaceResult> genFinPledgeDisplaceResult(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto, TrdFinProductDealTotal trdFinProductDealTotal){
-        //业务编号 = 同汇总交易.金融产品代码
+    public List<FinPledgeDisplaceResult> genFinPledgeDisplaceResult(ExchangeTransMatchCommonDto dealDto,
+                                                                    ExchangeTransMatchCommonEntrustDto commonEntrustDto,
+                                                                    TrdFinProductDealTotal total,
+                                                                    List<FinDealPledge> firstFinDealPledgeList,
+                                                                    List<FinDealPledge> updateFinDealPledges){
+        if(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(dealDto.getBusiSceneCalss())){
+            return new ArrayList<>();
+        }
+        if(CollectionUtils.isEmpty(firstFinDealPledgeList)){
+            return new ArrayList<>();
+        }
         List<FinPledgeDisplaceResult> finPledgeDisplaceResultList = new ArrayList<>();
-        for(SettleTransDataTotalPledge settleTransDataTotalPledge: dealDto.getSettleTransDataTotalPledgeList()) {
-            FinPledgeDisplaceResult finPledgeDisplaceResult = new FinPledgeDisplaceResult();
-            finPledgeDisplaceResult.setBranch(new BigDecimal(0));
-            //金融产品代码 = 汇总成交质押品匹配结果表.质押金融产品代码
-            finPledgeDisplaceResult.setTradeId(trdFinProductDealTotal.getTotleTradeId());
-            //金融产品代码 = 汇总成交质押品匹配结果表.质押金融产品代码
-            finPledgeDisplaceResult.setFinprodId(settleTransDataTotalPledge.getPledgeFinprodId());
-            //结果类型 = if 汇总成交质押品匹配结果表.置换方向= 换入 then 置换后 else 置换前 end if
-            if(StringUtil.equals(settleTransDataTotalPledge.getDisplaceDirection(),DictCodeListExt3.质押券置换_置换方向_换入.getValue())) {
-                finPledgeDisplaceResult.setResultType(DictCodeListExt3.质押券置换_置换结果_置换后.getValue());
-                //质押券面总额 = 汇总成交质押品匹配结果表.匹配份额*质押面值
-                finPledgeDisplaceResult.setPledgeAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),settleTransDataTotalPledge.getPledgeFaceValue()));
-            }
-            else {
-                finPledgeDisplaceResult.setResultType(DictCodeListExt3.质押券置换_置换结果_置换前.getValue());
-                if(StringUtil.equals(dealDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())) {
-                    //换入的折算率
-                    SettleTransDataTotalPledge hrSettleTransDataTotalPledge = dealDto.getSettleTransDataTotalPledgeList().stream().filter(item->StringUtil.equals(item.getDisplaceDirection(),DictCodeListExt3.质押券置换_置换方向_换入.getValue())).findFirst().get();
-                    if(StringUtil.isNotEmpty(hrSettleTransDataTotalPledge)) {
-                        BigDecimal hrScale = hrSettleTransDataTotalPledge.getPledgeRatio();
-                        //质押券面总额 = 换入券面总额*换入折算率/换出折算率
-                        BigDecimal hcPledgeAmt = ArithmeticUtil.divide(ArithmeticUtil.multiply(ArithmeticUtil.multiply(entrustDto.getMarchQty(),settleTransDataTotalPledge.getPledgeFaceValue()),hrScale),settleTransDataTotalPledge.getPledgeRatio(),4);
-                        finPledgeDisplaceResult.setPledgeAmt(hcPledgeAmt);
-                    }
-                }
-                else {
-                    //质押券面总额 = 汇总成交质押品匹配结果表.匹配份额*质押面值
-                    BigDecimal hcPledgeAmt = ArithmeticUtil.multiply(entrustDto.getMarchQty(),settleTransDataTotalPledge.getPledgeFaceValue());
-                    finPledgeDisplaceResult.setPledgeAmt(hcPledgeAmt);
-                }
+        // 获取质押品置换结果-置换前信息
+        List<FinPledgeDisplaceResult> beforedisplaceResult = this.getBeforeDisplaceResult(firstFinDealPledgeList, total);
+        finPledgeDisplaceResultList.addAll(beforedisplaceResult);
 
-            }
-
-            //折算比例 = 汇总成交质押品匹配结果表.质押率
-            finPledgeDisplaceResult.setScale(settleTransDataTotalPledge.getPledgeRatio());
-
-            finPledgeDisplaceResultList.add(finPledgeDisplaceResult);
+        // 获取质押品置换结果-置换后信息
+        if(DictCodeListExt3.交易方向_中途换券.getValue().equals(commonEntrustDto.getPs())){
+            List<FinPledgeDisplaceResult> afterReplaceResult = this.getAfterDisplaceResult(dealDto, total, updateFinDealPledges);
+            finPledgeDisplaceResultList.addAll(afterReplaceResult);
         }
         return finPledgeDisplaceResultList;
     }
 
     /**
-     * 生成金融产品交易标的
-     * 对于交易方向为‘买入’的数据生成1条数据
-     * @param trdProductDeal
+     * 获取质押品置换结果-置换前信息
+     * @param firstFinDealPledgeList
+     * @param total
      * @return
      */
+    private List<FinPledgeDisplaceResult> getBeforeDisplaceResult(List<FinDealPledge> firstFinDealPledgeList, TrdFinProductDealTotal total){
+        List<FinPledgeDisplaceResult> beforeDisplaceResult = new ArrayList<>();
+        for(FinDealPledge finDealPledge : firstFinDealPledgeList) {
+            FinPledgeDisplaceResult finPledgeDisplaceResult = new FinPledgeDisplaceResult();
+            finPledgeDisplaceResult.setBranch(new BigDecimal(0));
+            //业务编号 = 汇总交易表.汇总交易编号
+            finPledgeDisplaceResult.setTradeId(total.getTotleTradeId());
+            //金融产品代码 = 首期.质押金融产品代码
+            finPledgeDisplaceResult.setFinprodId(finDealPledge.getPledgeFinprodId());
+            // 结果类型 = 置换前
+            finPledgeDisplaceResult.setResultType(DictCodeListExt3.质押券置换_置换结果_置换前.getValue());
+            // 质押券面总额 = 首期.质押券面总额
+            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeAmt());
+            // 折算比例 = 首期.质押率
+            finPledgeDisplaceResult.setScale(finDealPledge.getPledgeRatio());
+            beforeDisplaceResult.add(finPledgeDisplaceResult);
+        }
+        return beforeDisplaceResult;
+    }
+
+    /**
+     * 获取质押品置换结果-置换后信息
+     * @param dealDto
+     * @param total
+     * @param updateFinDealPledges
+     * @return
+     */
+    private List<FinPledgeDisplaceResult> getAfterDisplaceResult(ExchangeTransMatchCommonDto dealDto,
+                                                                 TrdFinProductDealTotal total,
+                                                                 List<FinDealPledge> updateFinDealPledges) {
+        List<FinPledgeDisplaceResult> afterDisplaceResult = new ArrayList<>();
+        for(FinDealPledge finDealPledge : updateFinDealPledges) {
+            FinPledgeDisplaceResult finPledgeDisplaceResult = new FinPledgeDisplaceResult();
+            finPledgeDisplaceResult.setBranch(new BigDecimal(0));
+            //业务编号 = 汇总交易表.汇总交易编号
+            finPledgeDisplaceResult.setTradeId(total.getTotleTradeId());
+            //金融产品代码 = 更新后质押品.质押金融产品代码
+            finPledgeDisplaceResult.setFinprodId(finDealPledge.getPledgeFinprodId());
+            // 结果类型 = 置换后
+            finPledgeDisplaceResult.setResultType(DictCodeListExt3.质押券置换_置换结果_置换后.getValue());
+            // 质押券面总额 = 更新后质押品.质押券面总额
+            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeAmt());
+            // 质押率 = 更新后质押品.质押率
+            finPledgeDisplaceResult.setScale(finDealPledge.getPledgeRatio());
+            afterDisplaceResult.add(finPledgeDisplaceResult);
+        }
+        return afterDisplaceResult;
+    }
+
+        /**
+         * 生成金融产品交易标的
+         * 对于交易方向为‘买入’的数据生成1条数据
+         * @param trdProductDeal
+         * @return
+         */
     public FinTradeProduct genFinTradeProduct(SettleTransData settleTransData,TrdProductDeal trdProductDeal) {
         FinTradeProduct finTradeProduct = new FinTradeProduct();
         finTradeProduct.setFinprodId(trdProductDeal.getFinprodId());

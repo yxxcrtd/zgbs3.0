@@ -1,9 +1,6 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.service.repo;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.SettleTransDataTotalPledge;
-import com.joyintech.tams.common.base.entity.TrdDealTotalAdd;
-import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -62,6 +59,10 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             baseTradeProductDealDto.setPaTrdProductDeal(this.genPaTrdProductDeal(dealDto, entrustDto, trdProductDeal));
             //生成划款指令表
             baseTradeProductDealDto.setStlPayOrdersList(this.generateStlPayOrdersList(dealDto, entrustDto, trdProductDeal));
+            //质押品信息表
+            if(!DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(dealDto.getBusiSceneCalss())){
+                baseTradeProductDealDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,trdFinProductDealTotal));
+            }
             baseTradeProductDealDtoList.add(baseTradeProductDealDto);
         }
         return baseTradeProductDealDtoList;
@@ -139,7 +140,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 随交易支付费用
         dealTotal.setFeeAmtPay(null);
         // 交易金额
-        dealTotal.setTradeAmt(null);
+        dealTotal.setTradeAmt(entrustDto.getMarchAmt());
         // 未随交易支付费用
         dealTotal.setFeeAmtUnpay(null);
         // 总交易费用
@@ -361,4 +362,30 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
         return trdProductDeal;
     }
+
+    /**
+     * 生成质押品信息表
+     * @param dealDto
+     * @param total
+     * @return
+     */
+    private List<FinDealPledge> genFinDealPledgeList(ExchangeTransMatchCommonDto dealDto, TrdFinProductDealTotal total){
+        List<FinDealPledge> finDealPledgeList = new ArrayList<>();
+        if(!StringUtil.isEmptyList(dealDto.getSettleTransDataTotalPledgeList())) {
+            for(SettleTransDataTotalPledge transDataTotalPledge:dealDto.getSettleTransDataTotalPledgeList()) {
+                FinDealPledge finDealPledge = new FinDealPledge();
+                finDealPledge.setFinprodId(total.getFinprodId());
+                finDealPledge.setBranch(total.getBranch());
+                finDealPledge.setPledgeFinprodId(transDataTotalPledge.getPledgeFinprodId());
+                finDealPledge.setPledgeFaceValue(transDataTotalPledge.getPledgeFaceValue());
+                finDealPledge.setPledgeNumber(transDataTotalPledge.getPledgeNumber());
+                finDealPledge.setPledgeRatio(transDataTotalPledge.getPledgeRatio());
+                finDealPledge.setPledgeAmt(transDataTotalPledge.getPledgeAmt());
+                finDealPledgeList.add(finDealPledge);
+            }
+        }
+
+        return finDealPledgeList;
+    }
+
 }

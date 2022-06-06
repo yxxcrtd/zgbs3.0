@@ -3,32 +3,65 @@
 <mapper namespace="com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTransMatchCommonMapper" >
     <select id="getEtrEntrustByIdList" resultType="com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDto">
         SELECT * FROM (
-            select
-            T2.TARGET_TYPE targetType,
-            T2.TRADER trader,
-            T2.DEAL_MODE,
-            CASE
-                WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93},#{PS_T94})) THEN
-                    NVL(T3.PLEDGE_NUMBER,0) - NVL(S.MARCH_QTY_EN,0)
-            ELSE
+            SELECT
+                T2.TARGET_TYPE targetType,
+                T2.TRADER trader,
+                T2.DEAL_MODE,
+                CASE
+                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93})) THEN
+                        NVL(T3.PLEDGE_NUMBER,0) - NVL(ST93.MARCH_QTY_EN,0)
+                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T94})) THEN
+                        NVL(T3.PLEDGE_NUMBER,0) - NVL(ST94.MARCH_QTY_EN,0)
+                ELSE
                     NVL(T1.ENTRUST_NUM,0) - NVL(S.MARCH_QTY_EN,0) END remainEntrustNum,
-            CASE
-            WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93},#{PS_T94})) THEN
-                    NVL(T3.PLEDGE_NUMBER,0) - NVL(S.MARCH_QTY_EN,0)
-            ELSE
+                CASE
+                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93})) THEN
+                        NVL(T3.PLEDGE_NUMBER,0) - NVL(ST93.MARCH_QTY_EN,0)
+                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T94})) THEN
+                    NVL(T3.PLEDGE_NUMBER,0) - NVL(ST94.MARCH_QTY_EN,0)
+                ELSE
                     NVL(T1.ENTRUST_AMT,0) - NVL(S.MARCH_AMT_EN,0)
-            END remainEntrustAmt,
-            T1.*
-            from ETR_ENTRUST T1
-            left join
-                ETR_ENTRUST_ADD T2
-                ON T1.ENTRUST_ID = T2.ENTRUST_ID
-            LEFT JOIN (SELECT ENTRUNST_TRADE_ID,
-                        NVL(SUM(MARCH_QTY_EN), 0) MARCH_QTY_EN,
-                        NVL(SUM(MARCH_AMT_EN), 0) MARCH_AMT_EN
-                        FROM SETTLE_TRANS_DATA_TOTAL_MATCH
-                        GROUP BY ENTRUNST_TRADE_ID) S
-                ON S.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
+                END remainEntrustAmt,
+                T1.*
+            FROM ETR_ENTRUST T1
+            LEFT JOIN
+                ETR_ENTRUST_ADD T2 ON T1.ENTRUST_ID = T2.ENTRUST_ID
+            LEFT JOIN (
+                SELECT
+                    ENTRUNST_TRADE_ID,
+                    NVL(SUM(MARCH_QTY_EN), 0) MARCH_QTY_EN,
+                    NVL(SUM(MARCH_AMT_EN), 0) MARCH_AMT_EN
+                FROM
+                    SETTLE_TRANS_DATA_TOTAL_MATCH
+                GROUP BY
+                    ENTRUNST_TRADE_ID
+            ) S ON S.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
+            <!--协议回购中途换券T93-->
+            LEFT JOIN (
+                SELECT
+                    ENTRUNST_TRADE_ID,
+                    NVL(SUM(MARCH_QTY_EN), 0) MARCH_QTY_EN,
+                    NVL(SUM(MARCH_AMT_EN), 0) MARCH_AMT_EN
+                FROM
+                    SETTLE_DATA_TOTAL_PLEDGE_MATCH
+                WHERE
+                    DISPLACE_DIRECTION = #{DISPLACE_DIRECTION_01}
+                GROUP BY
+                    ENTRUNST_TRADE_ID
+            ) ST93 ON ST93.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
+            <!--协议回购解除质押T94-->
+            LEFT JOIN (
+                SELECT
+                    ENTRUNST_TRADE_ID,
+                    NVL(SUM(MARCH_QTY_EN), 0) MARCH_QTY_EN,
+                    NVL(SUM(MARCH_AMT_EN), 0) MARCH_AMT_EN
+                FROM
+                    SETTLE_DATA_TOTAL_PLEDGE_MATCH
+                WHERE
+                    DISPLACE_DIRECTION = #{DISPLACE_DIRECTION_02}
+                GROUP BY
+                    ENTRUNST_TRADE_ID
+            ) ST94 ON ST94.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
             LEFT JOIN ETR_PLEDGE T3
                 ON T3.ENTRUST_ID = T1.ENTRUST_ID
                 AND T3.FINPROD_ID = T1.FINPROD_ID
