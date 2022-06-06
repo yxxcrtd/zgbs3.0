@@ -414,15 +414,17 @@ public class TrdFundInvestTradeValidator implements TradeCommonValidator {
                     if (entrustAmt.compareTo(new BigDecimal("-1")) == 0) {
                         entrustAmt = ArithmeticUtil.multiply(entrustNum, dto.getUnitCprice());
                     }
-                    if (finishAmt != null) {
+                    //add  wsz 修改数据为空判定失败问题 ZGCPCN-1139 start
+                    if (finishAmt != null && entrustAmt != null) {
                         entrustAmt = entrustAmt.subtract(finishAmt);
                     }
-                    if (prinAmt != null) {
+                    if (prinAmt != null && entrustAmt != null) {
                         entrustAmt = entrustAmt.subtract(prinAmt);
                     }
-                    if (tradeAmt.compareTo(entrustAmt) == 1) {
+                    if (entrustAmt != null && tradeAmt.compareTo(entrustAmt) == 1) {
                         errorList.add(new ValidMessage("tradeAmt", this.getMessage("TRD_X_0004") + entrustAmt));
                     }
+                    //add  wsz 修改数据为空判定失败问题 ZGCPCN-1139 end
                 }
             }
             // 验证流程中是否存在该委托
