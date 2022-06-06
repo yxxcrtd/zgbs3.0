@@ -591,7 +591,7 @@
             old.origRepSecId oldFinprodMarketId,
             eted.DEAL_MODE dealMode,  /** 申报类型 **/
             decode(eted.BUSI_TYPE_POSITION,'EX005',ete.entrust_num * ete.price/100,nvl(ete.entrust_num * ete.price, ete.entrust_num)) pledgeStandardNumber,
-        --             nvl(ete.entrust_num * ete.price, ete.entrust_num) pledgeStandardNumber, /** 标准券额度 **/
+        <!--             nvl(ete.entrust_num * ete.price, ete.entrust_num) pledgeStandardNumber,--> /** 标准券额度 **/
             fp.Is_Right isRight,
             eted.DEAL_MODE declaType,
             ete.FINPROD_ID finprodId
@@ -689,7 +689,7 @@
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
         /*ete.entrust_num entrustNum,*/
-        case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/
+        case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
         when #{busiTypePosition} in ('01') then ete.entrust_num*100
         else ete.entrust_num
         end as entrustNum,
@@ -739,7 +739,7 @@
         old.origRepSecId oldFinprodMarketId,
         eted.DEAL_MODE dealMode,  /** 申报类型 **/
         decode(eted.BUSI_TYPE_POSITION,'EX005',ete.entrust_num * ete.price/100,nvl(ete.entrust_num * ete.price, ete.entrust_num)) pledgeStandardNumber,
---         nvl(ete.entrust_num * ete.price, ete.entrust_num) pledgeStandardNumber, /** 标准券额度 **/
+<!--         nvl(ete.entrust_num * ete.price, ete.entrust_num) pledgeStandardNumber,--> /** 标准券额度 **/
         fp.Is_Right isRight,
         eted.DEAL_MODE declaType,
         ete.FINPROD_ID finprodId
