@@ -286,16 +286,17 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 if (StringUtil.isEmpty(counterId)) {
                     counterId = entrustDto.getCounterId();
                 }
-                if (!StringUtil.equals(counterId, entrustDto.getCounterId())) {
+                if (StringUtil.isNotEmpty(entrustDto.getCounterId())
+                        && !StringUtil.equals(counterId, entrustDto.getCounterId())) {
                     if (StringUtil.isNotEmpty(msg)) {
                         msg += "OR";
                     }
                     msg += "交易对手";
                 }
                 if (StringUtil.isNotEmpty(msg)) {
-//                    msg = "【" + msg + "】不同";
+                    msg = "【" + msg + "】不同";
                     errorList.add(new ValidMessage(msg));
-                    errorList.add(new ValidMessage(getMessage("COMMON_NOTSAME_001", msg)));
+//                    errorList.add(new ValidMessage(getMessage("COMMON_NOTSAME_001", msg)));
                     break;
                 }
                 entrustIdList.add(entrustDto.getEntrustId());
@@ -386,9 +387,19 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         List<CfetsTrdFirstBidFirmInfoDto> list = cfetsTrdFirstBidFirm002Mapper.selectProductsInit(param);
         if (CollectionUtils.isEmpty(list) || list.size() > 1) {
             logger.error("初始化结果数不为1 " + JsonUtils.object2Json(list));
-            return null;
+        }
+        String counterId = null;
+        List<CfetsTrdFirstBidFirmProductDto> productDtos = new ArrayList<>();
+        for(CfetsTrdFirstBidFirmInfoDto item:list) {
+            // 交易对手
+            if (StringUtil.isEmpty(counterId)) {
+                counterId = item.getCounterId();
+            }
+            productDtos.addAll(item.getProductDtos());
         }
         cfetsTrdFirstBidFirmInfoDto = list.get(0);
+        cfetsTrdFirstBidFirmInfoDto.setProductDtos(productDtos);
+        cfetsTrdFirstBidFirmInfoDto.setCounterId(counterId);
         if (StringUtil.isEmpty(bidModel)) {
             bidModel = cfetsTrdFirstBidFirm002Mapper.selectBidModelInData(param);
         }
