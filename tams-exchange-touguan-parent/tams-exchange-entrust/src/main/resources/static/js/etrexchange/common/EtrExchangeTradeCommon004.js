@@ -755,8 +755,8 @@
                     return jJHQXX.ceiling.toFixed(2);
                 }
             } else {
-                //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
-                return jJHQXX.ceiling.toFixed(2);
+                // rent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
+                return jJHQXX.latest.toFixed(2);
             }
         } else if (currentTab == "dz") {
             var secId = $("#secId_" + currentTab).val();

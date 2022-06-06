@@ -239,7 +239,7 @@
             left join stl_sec_acct_info stlinfo on deal.SEC_ACCT_ID = stlinfo.sec_acct_id
             /*left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID*/
             left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
-            where bo.BID_DATE= #{sysDate,jdbcType=DATE} and bo.trade_status='01' and bo.is_cancel='N'
+            where bo.BID_DATE= #{sysDate,jdbcType=DATE} and bo.trade_status='01' and bo.is_cancel='N' and bo.BID_MODLE is null
             AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where bo.BID_ID=match.pre_trade_id)
             <if test="userId != null and userId != ''">
                 and bo.OUR_TRADER = #{userId}

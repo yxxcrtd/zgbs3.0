@@ -70,6 +70,12 @@ public class CfetsPrimaryBidManageCfmResponse {
     @ApiModelProperty(name="totalBiddingNum",value="汇总投标券面总额(万元)")
     private BigDecimal totalBiddingNum;
 
+    @ApiModelProperty(name="bidPrinAmtStr",value="指令投标券面总额(万元)Str")
+    private String bidPrinAmtStr;
+
+    @ApiModelProperty(name="totalBiddingNumStr",value="汇总投标券面总额(万元)Str")
+    private String totalBiddingNumStr;
+
     @ApiModelProperty(name="bidPrice",value="投标标位")
     private String bidPrice;
 
@@ -410,5 +416,21 @@ public class CfetsPrimaryBidManageCfmResponse {
 
     public void setBidDateEnd(Date bidDateEnd) {
         this.bidDateEnd = bidDateEnd;
+    }
+
+    public String getBidPrinAmtStr() {
+        return bidPrinAmtStr;
+    }
+
+    public void setBidPrinAmtStr(String bidPrinAmtStr) {
+        this.bidPrinAmtStr = bidPrinAmtStr;
+    }
+
+    public String getTotalBiddingNumStr() {
+        return totalBiddingNumStr;
+    }
+
+    public void setTotalBiddingNumStr(String totalBiddingNumStr) {
+        this.totalBiddingNumStr = totalBiddingNumStr;
     }
 }
