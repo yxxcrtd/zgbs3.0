@@ -116,6 +116,7 @@ public class EtrCommonFinProductInfoService extends BaseService {
             return sb.append(BASE_SPCD_CODE).append(COMM).append(DictCodeListExt4.新债_发行方式_报价发行.getValue()).toString();
         }
 
+
         if (DictCodeListExt4.招标方式_单一价格招标.getValue().equals(tenderType) || DictCodeListExt4.招标方式_数量招标.getValue().equals(tenderType)) {
             return sb.append(BASE_SPCD_CODE)
                     .append(COMM)
@@ -127,16 +128,16 @@ public class EtrCommonFinProductInfoService extends BaseService {
                     .toString();
         }
 
-        if (DictCodeListExt4.发行类型_首发.getValue().equals(issueStyle) || DictCodeListExt4.发行类型_首发.getValue().equals(issueStyle)) {
+        if (DictCodeListExt4.发行类型_增发.getValue().equals(issueStyle) || DictCodeListExt4.发行类型_首发.getValue().equals(issueStyle)) {
             return sb.append(BASE_SPCD_CODE)
                     .append(COMM)
                     .append(DictCodeListExt4.新债_发行方式_招标发行.getValue())
                     .append(SEPARATOR)
                     .append(DictCodeListExt4.新债_发行方式_簿记建档.getValue())
                     .append(AMPERS_AND)
-                    .append(DictCodeListExt4.招标方式_单一价格招标.getValue())
+                    .append(DictCodeListExt4.招标方式_荷兰式招标.getValue())
                     .append(SEPARATOR)
-                    .append(DictCodeListExt4.招标方式_数量招标.getValue())
+                    .append(DictCodeListExt4.招标方式_混合式招标.getValue())
                     .append(AMPERS_AND)
                     .append(issueStyle)
                     .toString();

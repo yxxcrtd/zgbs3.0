@@ -130,6 +130,9 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 		// 金融产品临时交易表Entity
 		TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
 		BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, infContractDetailfile);
+		// ZGCPCN-1133:需登录交易状态 modify by fuyongsheng 20220606 start
+		trdProductTempDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
+		// ZGCPCN-1133:需登录交易状态 modify by fuyongsheng 20220606 end
 		// 金融产品交易DTO.关联系统交易编号 = 成交明细DTO.成交编号
 		if (StringUtils.isNotEmpty(infContractDetailfile.getDealNo())) {
 			trdProductTempDeal.setfTradeId(infContractDetailfile.getDealNo());
