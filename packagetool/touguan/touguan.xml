@@ -87,6 +87,7 @@
         <module>../../tams-svreport-common</module>
         <module>../../tams-svreport-parent/tams-svreport-interf</module>
         <module>../../tams-exchange-trade-parent</module>
+        <module>../../tams-touguan-common</module>
 <!--        <module>../../tams-exchange-trade-parent/tams-exchange-trade-common</module>-->
 <!--        <module>../../tams-exchange-trade-parent/tams-exchange-trade-data-common</module>-->
 <!--        <module>../../tams-exchange-trade-parent/tams-exchange-trade-quote</module>-->
