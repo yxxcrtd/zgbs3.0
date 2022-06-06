@@ -417,6 +417,9 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
     private String isNetPrice;
 
+    @ApiModelProperty(name = "quoteRequestId", value = "行情请求编号")
+    private String quoteRequestId;
+
     @Id
     public String getEntrustId() {
         return entrustId;
@@ -1128,6 +1131,14 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     public void setIsNetPrice(String isNetPrice) {
         this.isNetPrice = isNetPrice;
+    }
+
+    public String getQuoteRequestId() {
+        return quoteRequestId;
+    }
+
+    public void setQuoteRequestId(String quoteRequestId) {
+        this.quoteRequestId = quoteRequestId;
     }
 
     public long getLeftVolume() {

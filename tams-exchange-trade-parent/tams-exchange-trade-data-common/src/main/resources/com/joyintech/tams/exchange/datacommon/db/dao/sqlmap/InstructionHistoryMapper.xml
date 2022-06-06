@@ -87,6 +87,7 @@
         <result column="TARGET_TYPE" property="targetType" jdbcType="VARCHAR"/>
         <result column="IS_NO_GUARD" property="isNoGuard" jdbcType="VARCHAR"/>
         <result column="IS_NET_PRICE" property="isNetPrice" jdbcType="VARCHAR"/>
+        <result column="QUOTE_REQUEST_ID" property="quoteRequestId" jdbcType="VARCHAR"/>
     </resultMap>
     <resultMap id="ResultMapWithBLOBs" type="com.joyintech.tams.exchange.common.db.domain.InstructionHistory"
                extends="BaseResultMap">
@@ -165,7 +166,7 @@
     ASSET_TYPE, ASSET_TYPE1, ASSET_TYPE10, ASSET_TYPE11, INV_AIM, APPROVER_FLAGE, OUR_TRADER,
     IS_AUTO_RECEIVE, V_PAY_DATE, M_PAY_DATE, CAP_DAYS, M_INT_AMT, M_TRADE_AMT, FIRST_REPO_PS, REMARK,
     DERIVATIVE_BS_DIR, DERIVATIVE_OC_FLAG, ENTRUST_BUSS_TYPE, DELIVERY_METHOD,CREATE_TIME,UPDATE_TIME,
-    TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE
+    TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE,QUOTE_REQUEST_ID
     </sql>
     <sql id="Blob_Column_List">
         TRADERS_INFO
@@ -259,7 +260,7 @@
                                            M_INT_AMT, M_TRADE_AMT, FIRST_REPO_PS, TRADERS_INFO,
                                            REMARK, DERIVATIVE_BS_DIR, DERIVATIVE_OC_FLAG,
                                            ENTRUST_BUSS_TYPE, DELIVERY_METHOD, ENTRUST_CLASS, BUSI_TYPE_TG,
-                                           CREATE_TIME,UPDATE_TIME,TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE)
+                                           CREATE_TIME,UPDATE_TIME,TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE,QUOTE_REQUEST_ID)
         values (#{entrustId,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, #{portfolioName,jdbcType=VARCHAR},
                 #{finprodId,jdbcType=VARCHAR}, #{finprodAbbr,jdbcType=VARCHAR}, #{finprodName,jdbcType=VARCHAR},
                 #{finprodType2,jdbcType=VARCHAR}, #{acctNo,jdbcType=VARCHAR}, #{ccy,jdbcType=VARCHAR},
@@ -289,7 +290,7 @@
                 #{derivativeOcFlag,jdbcType=VARCHAR}, #{entrustBussType,jdbcType=VARCHAR},
                 #{deliveryMethod,jdbcType=VARCHAR}, #{entrustClass,jdbcType=VARCHAR}, #{busiTypeTg,jdbcType=VARCHAR},
                 #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{targetType,jdbcType=VARCHAR},
-                #{isNoGuard,jdbcType=VARCHAR}, #{isNetPrice,jdbcType=VARCHAR})
+                #{isNoGuard,jdbcType=VARCHAR}, #{isNetPrice,jdbcType=VARCHAR}, #{quoteRequestId,jdbcType=VARCHAR})
     </insert>
 
     <sql id="insertSql">
@@ -553,6 +554,9 @@
             <if test="isNetPrice != null">
                 IS_NET_PRICE,
             </if>
+            <if test="quoteRequestId != null">
+                QUOTE_REQUEST_ID,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entrustId != null">
@@ -812,6 +816,9 @@
             </if>
             <if test="isNetPrice != null">
                 #{isNetPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="quoteRequestId != null">
+                #{quoteRequestId,jdbcType=VARCHAR},
             </if>
         </trim>
     </sql>
@@ -1073,6 +1080,9 @@
             </if>
             <if test="isNetPrice != null">
                 IS_NET_PRICE = #{isNetPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="quoteRequestId != null">
+                QUOTE_REQUEST_ID = #{quoteRequestId,jdbcType=VARCHAR},
             </if>
         </set>
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
@@ -1363,6 +1373,9 @@
             <if test="record.isNetPrice != null">
                 IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
             </if>
+            <if test="record.quoteRequestId != null">
+                QUOTE_REQUEST_ID = #{record.quoteRequestId,jdbcType=VARCHAR},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -1454,7 +1467,8 @@
         UPDATE_TIME = #{record.updateTime,jdbcType=TIMESTAMP},
         TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
         IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
-        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR}
+        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+        QUOTE_REQUEST_ID = #{record.quoteRequestId,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -1544,7 +1558,8 @@
         UPDATE_TIME = #{record.updateTime,jdbcType=TIMESTAMP},
         TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
         IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
-        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR}
+        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+        QUOTE_REQUEST_ID = #{record.quoteRequestId,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -1642,7 +1657,8 @@
             UPDATE_TIME         = #{updateTime,jdbcType=TIMESTAMP},
             TARGET_TYPE         = #{targetType, jdbcType= VARCHAR},
             IS_NO_GUARD         = #{isNoGuard,jdbcType=VARCHAR},
-            IS_NET_PRICE        = #{isNetPrice,jdbcType=VARCHAR}
+            IS_NET_PRICE        = #{isNetPrice,jdbcType=VARCHAR},
+            QUOTE_REQUEST_ID    = #{quoteRequestId,jdbcType=VARCHAR}
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </update>
 
@@ -1731,7 +1747,8 @@
             UPDATE_TIME         = #{updateTime,jdbcType=TIMESTAMP},
             TARGET_TYPE         = #{targetType, jdbcType= VARCHAR},
             IS_NO_GUARD         = #{isNoGuard,jdbcType=VARCHAR},
-            IS_NET_PRICE        = #{isNetPrice,jdbcType=VARCHAR}
+            IS_NET_PRICE        = #{isNetPrice,jdbcType=VARCHAR},
+            QUOTE_REQUEST_ID    = #{quoteRequestId,jdbcType=VARCHAR}
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </update>
 </mapper>
