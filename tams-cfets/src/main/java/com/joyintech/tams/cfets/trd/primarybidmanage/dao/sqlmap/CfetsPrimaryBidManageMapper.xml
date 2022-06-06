@@ -18,7 +18,7 @@
         FPI.TENDER_TARGET tenderTarget,
         FPI.TENDER_SDATE   bidDateStart,
         FPI.TENDER_EDATE   bidDateEnd,
-        BOBP.ENTRUST_NUM/10000 bidPrinAmt,
+        BOBP.ENTRUST_NUM/100 bidPrinAmt,
         BO.WIN_PRIN_AMT/10000 totalBiddingNum,
         BOBP.BID_PRICE bidPrice,
         BO.BID_MODLE bidModle,
@@ -32,7 +32,7 @@
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE,'fm999999990.99999')||'%','02',to_char(BID_PRICE,'fm999999990.99999')||'元','03',to_char(BID_PRICE,'fm999999990.99')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.99999')||'%','02',to_char(BID_PRICE,'fm999999990.99999')||'元','03',to_char(BID_PRICE,'fm999999990.99')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
@@ -40,7 +40,7 @@
         group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
-        WHERE FPI.ISSUE_CLASS = '02'  AND BO.IS_CANCEL = 'N' AND
+        WHERE FPI.ISSUE_CLASS = '02' AND BO.BID_MODLE !='03' AND BO.IS_CANCEL = 'N' AND
         BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE =#{COMMON_BUSINESS_TYPE_TRD97} and
         TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL='N')
         <if test="finprodIdList != null and finprodIdList.size() > 0">
@@ -111,6 +111,7 @@
                 </foreach>
             </if>
         ) ss
+        left join SYS_DATADICT_LIST sdl_isWin on ss.isWin=sdl_isWin.ITEM_CODE and sdl_isWin.DICT_CODE='FIRST_BID_STATUS'
         left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
         left join SYS_DATADICT_LIST sdl_otherEffectFlag on ss.otherEffectFlag=sdl_otherEffectFlag.ITEM_CODE and sdl_otherEffectFlag.DICT_CODE='STATUS_VALID'
         left join SYS_DATADICT_LIST sdl_tt on ss.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
@@ -125,7 +126,7 @@
     </select>
     <sql id="keywordsCfmWhere">
         <if test="search != null and search != ''">
-            <where>( sdl_otherEffectFlag.ITEM_VALUE || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
+            <where>( sdl_otherEffectFlag.ITEM_VALUE || '|' || sdl_isWin.ITEM_VALUE || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
                 || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
                 || '|' || sdl_ept.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.counterName
                 || '|' || ss.remark
@@ -134,6 +135,7 @@
                 or to_char(ss.totalBiddingNum)=#{search}
                 or to_char(ss.bidDateStart,'YYYY-MM-DD')=#{search}
                 or to_char(ss.bidDateEnd,'YYYY-MM-DD')=#{search}
+                or to_char(ss.bidDateStart,'YYYY-MM-DD')||'-'||to_char(ss.bidDateEnd,'YYYY-MM-DD')=#{search}
                 or to_char(ss.bidCfmDate,'YYYY-MM-DD')=#{search}
                 )
             </where>
