@@ -856,13 +856,13 @@
             $(".pschange").show();
             $("#pschange2").hide();
             $("#entrustAmt0").show();
-            $("#entrustNum0").show();
+            $("#entrustNum0").hide();
             $("#entrustAmt").attr("disabled",false);
         }
         else if($("#ps").val()==T02){
             $(".pschange").hide();
             $("#pschange2").show();
-            $("#entrustAmt0").show();
+            $("#entrustAmt0").hide();
             $("#entrustNum0").show();
             $("#entrustNum").attr("disabled",false);
         }

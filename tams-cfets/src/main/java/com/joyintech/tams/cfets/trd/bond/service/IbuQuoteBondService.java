@@ -350,6 +350,12 @@ public class IbuQuoteBondService extends BaseService {
             if (CollectionUtils.isNotEmpty(list)) {
                 cfetsBondDealQuoteCommonDto.setIsDefaultBondIndicator(list.get(0).getIsDefaultBondIndicator());
                 cfetsBondDealQuoteCommonDto.setIsSpecialDebt(list.get(0).getIsSpecialDebt());
+                cfetsBondDealQuoteCommonDto.setIsAbs(list.get(0).getIsAbs());
+                if (StringUtil.equals(cfetsBondDealQuoteCommonDto.getIsAbs(), DictCodeListExt1.是否_是.getValue())
+                        || StringUtil.equals(cfetsBondDealQuoteCommonDto.getIsDefaultBondIndicator(), DictCodeListExt1.是否_是.getValue())
+                        || StringUtil.equals(cfetsBondDealQuoteCommonDto.getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
+                    cfetsBondDealQuoteCommonDto.setIsSpecial(DictCodeListExt1.是否_是.getValue());
+                }
             }
 
             //登记本方交易员应默认当前登录用户姓名

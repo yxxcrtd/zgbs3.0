@@ -11,8 +11,8 @@ import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ApiModel(value = "一级投标投标确认执行明细信息", description = "一级投标投标确认执行明细信息")
-public class CfetsEtrBondFirstExeListInfoResponse {
+@ApiModel(value = "一级投标指令执行明细", description = "一级投标指令执行明细")
+public class FieldEtrBondFirstExeListInfoResponse {
 
     @ApiModelProperty(name = "effectiveStatus", value = "有效状态Code", example = "A1")
     private String effectiveStatus;
@@ -76,6 +76,9 @@ public class CfetsEtrBondFirstExeListInfoResponse {
 
     @ApiModelProperty(name = "payableAmount", value = "缴款金额", example = "1000.00")
     private BigDecimal payableAmount;
+
+    @ApiModelProperty(name = "tradeAmt", value = "交易金额", example = "1000.00")
+    private BigDecimal tradeAmt;
 
     @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
     private BigDecimal settFeeAmt;
@@ -224,6 +227,9 @@ public class CfetsEtrBondFirstExeListInfoResponse {
     }
 
     public String getIssueDateStr() {
+        if (null != this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart());
+        }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
         }
@@ -501,6 +507,14 @@ public class CfetsEtrBondFirstExeListInfoResponse {
 
     public void setIssueDateEnd(Date issueDateEnd) {
         this.issueDateEnd = issueDateEnd;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
     }
 }
 

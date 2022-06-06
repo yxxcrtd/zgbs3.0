@@ -214,11 +214,17 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name="softSkipMode",value="软控,是否确认")
     private String softSkipMode;
 
-    @ApiModelProperty(name = "isSpecialDebt", value = "债券是否特殊债")
+    @ApiModelProperty(name = "isAbs", value = "是否资产支持证券 Y/N")
+    private String isAbs;
+
+    @ApiModelProperty(name = "isSpecialDebt", value = "债券是否特殊债 Y/N")
     private String isSpecialDebt;
 
-    @ApiModelProperty(name = "tenderType", value = "债券是否到期违约债")
+    @ApiModelProperty(name = "isDefaultBondIndicator", value = "债券是否到期违约债 Y/N")
     private String isDefaultBondIndicator;
+
+    @ApiModelProperty(name = "isSpecial", value = "是否锚定净价 Y/N")
+    private String isSpecial;
 
     private List<String> counterIdList;
 
@@ -772,6 +778,22 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
 
     public void setIsDefaultBondIndicator(String isDefaultBondIndicator) {
         this.isDefaultBondIndicator = isDefaultBondIndicator;
+    }
+
+    public String getIsAbs() {
+        return isAbs;
+    }
+
+    public void setIsAbs(String isAbs) {
+        this.isAbs = isAbs;
+    }
+
+    public String getIsSpecial() {
+        return isSpecial;
+    }
+
+    public void setIsSpecial(String isSpecial) {
+        this.isSpecial = isSpecial;
     }
 }
 

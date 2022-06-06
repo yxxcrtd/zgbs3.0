@@ -13,6 +13,7 @@ package com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispat
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.common.base.entity.EtrDistributeKey;
 import com.joyintech.tams.common.base.entity.User;
+import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto.FieldEtrBiddingProductDto;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto.FieldEtrDispatcherAutoRequest;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto.FieldEtrDispatcherDealListInfoResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto.FieldEtrDispatcherExeListInfoResponse;
@@ -84,6 +85,13 @@ public interface FieldEtrDispatcherMapper {
      * @since 1.0
      */
     List<FieldEtrDispatcherInfoResponse> getEtrDispatcherInfo(Map<String, Object> pageParam);
+
+    /**
+     * 查询
+     * @param pageParam
+     * @return
+     */
+    List<FieldEtrBiddingProductDto> getBiddingProduct (Map<String, Object> pageParam);
 
     /**
      * 交易员列表模糊查询

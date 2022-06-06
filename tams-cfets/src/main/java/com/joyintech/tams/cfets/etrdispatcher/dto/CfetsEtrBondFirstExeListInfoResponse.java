@@ -11,7 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ApiModel(value = "一级投标投标确认执行明细信息", description = "一级投标投标确认执行明细信息")
+@ApiModel(value = "一级投标指令执行明细", description = "一级投标指令执行明细")
 public class CfetsEtrBondFirstExeListInfoResponse {
 
     @ApiModelProperty(name = "effectiveStatus", value = "有效状态Code", example = "A1")
@@ -77,6 +77,9 @@ public class CfetsEtrBondFirstExeListInfoResponse {
     @ApiModelProperty(name = "payableAmount", value = "缴款金额", example = "1000.00")
     private BigDecimal payableAmount;
 
+    @ApiModelProperty(name = "tradeAmt", value = "交易金额", example = "1000.00")
+    private BigDecimal tradeAmt;
+
     @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
     private BigDecimal settFeeAmt;
 
@@ -122,6 +125,12 @@ public class CfetsEtrBondFirstExeListInfoResponse {
     @ApiModelProperty(required = false, name = "dealDateStr", value = "成交日期格式化")
     private String dealDateStr;
 
+    @ApiModelProperty(name = "purchaseDate", value = "申购日期")
+    private Date purchaseDate;
+
+    @ApiModelProperty(required = false, name = "purchaseDateStr", value = "申购日期格式化")
+    private String purchaseDateStr;
+
     @ApiModelProperty(name = "tradeMarket", value = "交易场所")
     private String tradeMarket;
 
@@ -136,6 +145,43 @@ public class CfetsEtrBondFirstExeListInfoResponse {
 
     @ApiModelProperty(required = false, name = "remark", value = "备注")
     private String remark;
+
+    @ApiModelProperty(name = "secAcctName", value = "证券账户名称,展示用")
+    private String secAcctName;
+
+    @ApiModelProperty(name = "secType", value = "债券分类")
+    private String secType;
+
+    @ApiModelProperty(name = "secTypeStr", value = "债券分类名称,展示用")
+    private String secTypeStr;
+
+    @ApiModelProperty(name = "subscriptionAmount", value = "认购量,需转化为万元", example = "1000.00")
+    private BigDecimal subscriptionAmount;
+
+    @ApiModelProperty(name = "issuer", value = "发行人id", example = "001")
+    private String issuer;
+
+    @ApiModelProperty(name = "issuerName", value = "发行人名称,展示用", example = "发行人1")
+    private String issuerName;
+
+    @ApiModelProperty(name = "ouPartyId", value = "本方id", example = "114912384")
+    private String ouPartyId;
+
+    @ApiModelProperty(name = "ouPartyIdAbbr", value = "本方简称", example = "广发银行")
+    private String ouPartyIdAbbr;
+
+    @ApiModelProperty(name = "ourTrader", value = "本方交易员id(申购人)", example = "001")
+    private String ourTrader;
+
+    @ApiModelProperty(name = "ourTraderName", value = "本方交易员名称", example = "交易员1")
+    private String ourTraderName;
+
+    @ApiModelProperty(name = "portfolioId", value = "组合代码,多个用逗号分隔", example = "A")
+    private String portfolioId;
+
+    @ApiModelProperty(name = "portfolioName", value = "组合名称,多个用逗号分隔", example = "组合A")
+    private String portfolioName;
+
 
     public String getEffectiveStatus() {
         return effectiveStatus;
@@ -224,6 +270,9 @@ public class CfetsEtrBondFirstExeListInfoResponse {
     }
 
     public String getIssueDateStr() {
+        if (null == this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart());
+        }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
         }
@@ -479,6 +528,25 @@ public class CfetsEtrBondFirstExeListInfoResponse {
         this.dealDateStr = dealDateStr;
     }
 
+    public Date getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(Date purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public String getPurchaseDateStr() {
+        if (null != this.getPurchaseDate()) {
+            return DateUtil.format(this.getPurchaseDate());
+        }
+        return purchaseDateStr;
+    }
+
+    public void setPurchaseDateStr(String purchaseDateStr) {
+        this.purchaseDateStr = purchaseDateStr;
+    }
+
     public BigDecimal getEtrBidPriceTotal() {
         return etrBidPriceTotal;
     }
@@ -501,6 +569,113 @@ public class CfetsEtrBondFirstExeListInfoResponse {
 
     public void setIssueDateEnd(Date issueDateEnd) {
         this.issueDateEnd = issueDateEnd;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
+    }
+
+    public String getSecAcctName() {
+        return secAcctName;
+    }
+
+    public void setSecAcctName(String secAcctName) {
+        this.secAcctName = secAcctName;
+    }
+
+    public String getSecType() {
+        return secType;
+    }
+
+    public void setSecType(String secType) {
+        this.secType = secType;
+    }
+
+    public String getSecTypeStr() {
+        if (StringUtil.isEmpty(getSecType())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, getSecType());
+    }
+
+    public void setSecTypeStr(String secTypeStr) {
+        this.secTypeStr = secTypeStr;
+    }
+
+    public BigDecimal getSubscriptionAmount() {
+        return subscriptionAmount;
+    }
+
+    public void setSubscriptionAmount(BigDecimal subscriptionAmount) {
+        this.subscriptionAmount = subscriptionAmount;
+    }
+
+    public String getIssuerName() {
+        return issuerName;
+    }
+
+    public void setIssuerName(String issuerName) {
+        this.issuerName = issuerName;
+    }
+
+    public String getOuPartyId() {
+        return ouPartyId;
+    }
+
+    public void setOuPartyId(String ouPartyId) {
+        this.ouPartyId = ouPartyId;
+    }
+
+    public String getOuPartyIdAbbr() {
+        return ouPartyIdAbbr;
+    }
+
+    public void setOuPartyIdAbbr(String ouPartyIdAbbr) {
+        this.ouPartyIdAbbr = ouPartyIdAbbr;
+    }
+
+    public String getOurTrader() {
+        return ourTrader;
+    }
+
+    public void setOurTrader(String ourTrader) {
+        this.ourTrader = ourTrader;
+    }
+
+    public String getOurTraderName() {
+        return ourTraderName;
+    }
+
+    public void setOurTraderName(String ourTraderName) {
+        this.ourTraderName = ourTraderName;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getPortfolioId() {
+        return portfolioId;
+    }
+
+    public void setPortfolioId(String portfolioId) {
+        this.portfolioId = portfolioId;
+    }
+
+    public String getPortfolioName() {
+        return portfolioName;
+    }
+
+    public void setPortfolioName(String portfolioName) {
+        this.portfolioName = portfolioName;
     }
 }
 

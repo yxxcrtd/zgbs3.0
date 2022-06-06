@@ -829,16 +829,19 @@ public class CfetsEtrDispatcherService extends BaseService {
             return new Page<CfetsEtrDispatcherDealListInfoResponse>();
         }
         Page<CfetsEtrDispatcherDealListInfoResponse> page = null;
-        if(StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
+        if(StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
+                StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
             //这里处理一级投标
-            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherBidDealListInfo(pageParam));
-            for(CfetsEtrDispatcherDealListInfoResponse response : page.getRoot()) {
-                CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrBidInfo(response.getEntrustId());
-                if(StringUtil.isNotEmpty(dto2)) {
-                    response.setIsWin(dto2.getIsWin());
-                    response.setBidprice(dto2.getEtrPrice());
-                }
-            }
+//            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherBidDealListInfo(pageParam));
+//            for(CfetsEtrDispatcherDealListInfoResponse response : page.getRoot()) {
+//                CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrBidInfo(response.getEntrustId());
+//                if(StringUtil.isNotEmpty(dto2)) {
+//                    response.setIsWin(dto2.getIsWin());
+//                    response.setBidprice(dto2.getEtrPrice());
+//                }
+//            }
+            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherFirstBidDealListInfo(pageParam));
+        //中标结果明细
         }else {
             page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherDealListInfo(pageParam));
         }
@@ -1792,11 +1795,11 @@ public class CfetsEtrDispatcherService extends BaseService {
         //备注
         List<CfgReadonlyFormShow> rFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",R"));
         resultData.put(dtCode + "_rFrom",rFrom);
-        resultData.put(dtCode + "_rFromData",infoData.getRemark());
+        resultData.put(dtCode + "_rFromData",infoData);
         //投标券面总额汇总
         List<CfgReadonlyFormShow> aFrom = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",A"));
         resultData.put(dtCode + "_aFrom",aFrom);
-        resultData.put(dtCode + "_aFromData",infoData.getTotalBiddingNum());
+        resultData.put(dtCode + "_aFromData",infoData);
         //投标产品列表
         List<CfgDataTableShow> infoTable =  cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, null, null);
         resultData.put(dtCode + "_infoTable",infoTable);

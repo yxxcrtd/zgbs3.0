@@ -10,8 +10,8 @@
  
 package com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dao;
 
-import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.CfetsEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.EntrustQueryBean;
+import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FinProdResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.TradeQueryBean;
@@ -57,5 +57,5 @@ public interface FieldEtrInfoQueryMapper {
      * @param pageParam
      * @return
      */
-    List<CfetsEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(Map<String, Object> pageParam);
+    List<FieldEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(Map<String, Object> pageParam);
 }

@@ -27,8 +27,8 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dao.FieldEtrInfoQueryMapper;
-import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.CfetsEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.EntrustQueryBean;
+import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListRequest;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FinProdResponse;
@@ -207,11 +207,11 @@ public class FieldEtrInfoQueryService extends BaseService {
      * @param dto
      * @return
      */
-    public Page<CfetsEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(CommonSearchInfoRequest dto) {
+    public Page<FieldEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(CommonSearchInfoRequest dto) {
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
         if (StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1) {
-            return new Page<CfetsEtrBondFirstExeListInfoResponse>();
+            return new Page<FieldEtrBondFirstExeListInfoResponse>();
         }
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
                 () -> fieldEtrInfoQueryMapper.getEtrBondFirstExeListInfo(pageParam));

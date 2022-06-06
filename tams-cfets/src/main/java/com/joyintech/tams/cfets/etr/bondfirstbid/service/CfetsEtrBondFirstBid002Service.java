@@ -59,6 +59,7 @@ import com.joyintech.tams.common.base.entity.WflEtrEntrust;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
+import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -73,6 +74,7 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
+import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
@@ -187,6 +189,13 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
     @Autowired
     private CfetsEtrBondFirstBid001Mapper cfetsEtrBondFirstBid001Mapper;
+
+    /**
+     * 业务编号组件
+     */
+    @Autowired
+    private BaseGetBusinessId bussGetBussinessIdService;
+
 
     @Override
     public void doInsert(CfetsEtrBondFirstBid002Dto entity, OperationType operationType) {
@@ -490,10 +499,9 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 dto.setIssueDate(finProductInfo.getIssueDate());
                 dto.setPayEdate(finProductInfo.getPayEdate());
                 dto.setCounterName(counterMap.get(dto.getCounterId()));
-                dto.setTenderTarget(finProductInfo.getTenderTarget());
             }
         }
-        dto.setEntrustId(dto.getEtrInvestBondFirstBidDtos().get(0).getEntrustId());
+
         //流程中数据对象重复  取值有问题 这个处理为空
         dto.setEtrInvestBondFirstBidDtos(null);
 
@@ -614,6 +622,15 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             dto.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
         }
         dto.setRiskTrialRetDto(riskTrialRetDto);
+
+        for (CfetsEtrBondFirstBid002Dto firstBid002Dto : etrInvestBondFirstBidList) {
+            if (StringUtil.isEmpty(dto.getEntrustId())) {
+                BussinessCodeParameter param = new BussinessCodeParameter();
+                param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
+                String code = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
+                firstBid002Dto.setEntrustId(code);
+            }
+        }
         dto.setEtrInvestBondFirstBidDtos(etrInvestBondFirstBidList);
         return dto;
     }
