@@ -43,6 +43,10 @@
         <result column="INT_SETT_TYPE" property="intSettType" jdbcType="VARCHAR" />
         <result column="CLEAR_REC_AMT" property="clearRecAmt" jdbcType="DECIMAL" />
         <result column="CLEAR_LOSS_AMT" property="clearLossAmt" jdbcType="DECIMAL" />
+        <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+        <result column="OUT_DEALER_NO" property="outDealerNo" jdbcType="VARCHAR" />
+        <result column="DEALER_PARTY_NO" property="dealerPartyNo" jdbcType="VARCHAR" />
+        <result column="OUT_DEALER_PARTY_NO" property="outDealerPartyNo" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         TOTLE_TRADE_ID TOTLE_TRADE_ID, ENTRUST_ID ENTRUST_ID, OUR_SHARE_AMT OUR_SHARE_AMT, 
@@ -56,7 +60,8 @@
         TERMINATE_RATE TERMINATE_RATE, MP_FINPROD_ID MP_FINPROD_ID, MP_BRANCH MP_BRANCH, 
         IS_CASHSET IS_CASHSET, GEN_TYPE GEN_TYPE, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, 
         CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, PENALTY_INTAMT PENALTY_INTAMT, 
-        INT_SETT_TYPE INT_SETT_TYPE, CLEAR_REC_AMT CLEAR_REC_AMT, CLEAR_LOSS_AMT CLEAR_LOSS_AMT
+        INT_SETT_TYPE INT_SETT_TYPE, CLEAR_REC_AMT CLEAR_REC_AMT, CLEAR_LOSS_AMT CLEAR_LOSS_AMT, DEALER_NO DEALER_NO,
+        OUT_DEALER_NO OUT_DEALER_NO, DEALER_PARTY_NO DEALER_PARTY_NO, OUT_DEALER_PARTY_NO OUT_DEALER_PARTY_NO
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -92,7 +97,8 @@
             IS_CASHSET, GEN_TYPE, CREATE_USER, 
             CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
             UPDATE_TIME, PENALTY_INTAMT, INT_SETT_TYPE, 
-            CLEAR_REC_AMT, CLEAR_LOSS_AMT)
+            CLEAR_REC_AMT, CLEAR_LOSS_AMT,
+            DEALER_NO, OUT_DEALER_NO, DEALER_PARTY_NO, OUT_DEALER_PARTY_NO)
         values (#{totleTradeId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{ourShareAmt,jdbcType=DECIMAL}, 
             #{lendinShareAmt,jdbcType=DECIMAL}, #{ourCpriceAmt,jdbcType=DECIMAL}, #{lendinCpriceAmt,jdbcType=DECIMAL}, 
             #{ourFpriceAmt,jdbcType=DECIMAL}, #{lendinFpriceAmt,jdbcType=DECIMAL}, #{ourFpriceAmt2,jdbcType=DECIMAL}, 
@@ -106,7 +112,8 @@
             #{isCashset,jdbcType=VARCHAR}, #{genType,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
             #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
             #{updateTime,jdbcType=TIMESTAMP}, #{penaltyIntamt,jdbcType=DECIMAL}, #{intSettType,jdbcType=VARCHAR}, 
-            #{clearRecAmt,jdbcType=DECIMAL}, #{clearLossAmt,jdbcType=DECIMAL})
+            #{clearRecAmt,jdbcType=DECIMAL}, #{clearLossAmt,jdbcType=DECIMAL}, #{dealerNo,jdbcType=VARCHAR},
+            #{outDealerNo,jdbcType=VARCHAR}, #{dealerPartyNo,jdbcType=VARCHAR}, #{outDealerPartyNo,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.TrdDealTotalAdd" >
         insert into TRD_DEAL_TOTAL_ADD
@@ -237,6 +244,18 @@
             <if test="ouPartyId != null" >
                 OU_PARTY_ID,
             </if>
+            <if test="dealerNo != null" >
+                DEALER_NO,
+            </if>
+            <if test="outDealerNo != null" >
+                OUT_DEALER_NO,
+            </if>
+            <if test="dealerPartyNo != null" >
+                DEALER_PARTY_NO,
+            </if>
+            <if test="outDealerPartyNo != null" >
+                OUT_DEALER_PARTY_NO,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="totleTradeId != null" >
@@ -365,6 +384,18 @@
             <if test="ouPartyId != null" >
                 #{ouPartyId,jdbcType=VARCHAR},
             </if>
+            <if test="dealerNo != null" >
+                #{dealerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outDealerNo != null" >
+                #{outDealerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="dealerPartyNo != null" >
+                #{dealerPartyNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outDealerPartyNo != null" >
+                #{outDealerPartyNo,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.TrdDealTotalAdd" >
@@ -375,7 +406,7 @@
         DEVIATION, CONVERSION_RAT, BCON_UNIT_CPRICE2, CONVERSION_TYPE, ASSET_RECOMMAND_ORG, 
         TERMINATE_RATE, MP_FINPROD_ID, MP_BRANCH, IS_CASHSET, GEN_TYPE, CREATE_USER, CREATE_DEPT, 
         CREATE_TIME, UPDATE_USER, UPDATE_TIME, PENALTY_INTAMT, INT_SETT_TYPE, CLEAR_REC_AMT, 
-        CLEAR_LOSS_AMT)
+        CLEAR_LOSS_AMT, DEALER_NO, OUT_DEALER_NO, DEALER_PARTY_NO, OUT_DEALER_PARTY_NO)
         select TOTLE_TRADE_ID, ENTRUST_ID, OUR_SHARE_AMT, LENDIN_SHARE_AMT, 
             OUR_CPRICE_AMT, LENDIN_CPRICE_AMT, OUR_FPRICE_AMT, LENDIN_FPRICE_AMT, OUR_FPRICE_AMT2, 
             LENDIN_FPRICE_AMT2, PURCH_MODLE, PURCH_TYPE, PURCH_DATE, PUR_PAY_DATE, PUR_CFM_DATE, 
@@ -383,7 +414,7 @@
             DEVIATION, CONVERSION_RAT, BCON_UNIT_CPRICE2, CONVERSION_TYPE, ASSET_RECOMMAND_ORG, 
             TERMINATE_RATE, MP_FINPROD_ID, MP_BRANCH, IS_CASHSET, GEN_TYPE, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, PENALTY_INTAMT, INT_SETT_TYPE, CLEAR_REC_AMT, 
-            CLEAR_LOSS_AMT
+            CLEAR_LOSS_AMT, DEALER_NO, OUT_DEALER_NO, DEALER_PARTY_NO, OUT_DEALER_PARTY_NO
              from TRD_DEAL_TOTAL_ADD
              where 1 = 1 and TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </insert>
@@ -501,6 +532,18 @@
             <if test="clearLossAmt != null" >
                 CLEAR_LOSS_AMT = #{clearLossAmt,jdbcType=DECIMAL},
             </if>
+            <if test="dealerNo != null" >
+                DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outDealerNo != null" >
+                OUT_DEALER_NO = #{outDealerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="dealerPartyNo != null" >
+                DEALER_PARTY_NO = #{dealerPartyNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outDealerPartyNo != null" >
+                OUT_DEALER_PARTY_NO = #{outDealerPartyNo,jdbcType=VARCHAR},
+            </if>
         </set>
         where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </update>
@@ -542,7 +585,11 @@
             PENALTY_INTAMT = #{penaltyIntamt,jdbcType=DECIMAL},
             INT_SETT_TYPE = #{intSettType,jdbcType=VARCHAR},
             CLEAR_REC_AMT = #{clearRecAmt,jdbcType=DECIMAL},
-            CLEAR_LOSS_AMT = #{clearLossAmt,jdbcType=DECIMAL}
+            CLEAR_LOSS_AMT = #{clearLossAmt,jdbcType=DECIMAL},
+            DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+            OUT_DEALER_NO = #{outDealerNo,jdbcType=VARCHAR},
+            DEALER_PARTY_NO = #{dealerPartyNo,jdbcType=VARCHAR},
+            OUT_DEALER_PARTY_NO = #{outDealerPartyNo,jdbcType=VARCHAR}
         where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </update>
 </mapper>
