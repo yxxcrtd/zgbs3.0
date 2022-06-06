@@ -129,7 +129,7 @@
                     ssai.SEC_ACCT_NAME/*证券账户*/,
                     ee.INV_MANAGER_ID/*投资经理ID*/,
                     SU.REAL_NAME INV_MANAGER_NAME/*投资经理*/,
-                    eebp.BID_PRIN_AMT*100 avaNum /*剩余券面总额*/,
+                    nvl(eebp.BID_PRIN_AMT*100 - T.finshNum,0) avaNum /*剩余券面总额*/,
                     eebp.BID_PRIN_AMT*100 ENTRUST_NUM /*委托投标券面*/
         from ETR_ENTRUST ee
                  left join ETR_ENTRUST_DETAIL eed on ee.ENTRUST_ID = eed.ENTRUST_ID
@@ -141,6 +141,12 @@
                  LEFT JOIN SYS_USER SU ON ee.INV_MANAGER_ID = SU.USER_NAME
                  LEFT JOIN STL_SEC_ACCT_INFO ssai ON eed.SEC_ACCT_ID = ssai.SEC_ACCT_ID
                  LEFT JOIN MST_COUNTER_PARTY MCP ON ee.COUNTER_ID = MCP.COUNTER_ID
+                 left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
+                                from BID_ORDER_BID_PRICE
+                                where IS_CANCEL = 'N'
+                                  and TRADE_STATUS = '01'
+                                group by BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE) T on T.ENTRUST_ID = eebp.ENTRUST_ID and T.PORTFOLIO_ID = eebp.PORTFOLIO_ID
+                                and T.BID_ID = bobp.BID_ID and T.BID_PRICE = eebp.BID_PRICE
         <where>
             <if test="entrustIdList != null and entrustIdList.size()>0">
                 ee.ENTRUST_ID in
@@ -271,6 +277,7 @@
                bobp.INT_AMT/*应计利息总额*/,
                bobp.ACCT_NO/*资金账户*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
+               nvl(eebp.BID_PRIN_AMT*100 - T.finshNum,0) avaNum,
                bobp.BID_PRICE/*标位*/,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
@@ -294,6 +301,13 @@
                  left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
                  left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+                 left join ETR_ENTRUST_BID_PRICE eebp on eebp.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eebp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                 left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
+                                from BID_ORDER_BID_PRICE
+                                where IS_CANCEL = 'N'
+                                  and TRADE_STATUS = '01'
+                                group by BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE) T on T.ENTRUST_ID = eebp.ENTRUST_ID and T.PORTFOLIO_ID = eebp.PORTFOLIO_ID
+                                and T.BID_ID = bobp.BID_ID and T.BID_PRICE = eebp.BID_PRICE
         where bo.BID_ID = #{bidId}
         union all
         select bo.FINPROD_ID           finprodId,
@@ -344,6 +358,7 @@
                bobp.INT_AMT/*应计利息总额*/,
                bobp.ACCT_NO/*资金账户*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
+               nvl(eebp.BID_PRIN_AMT*100 - T.finshNum,0) avaNum,
                bobp.BID_PRICE/*标位*/,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
@@ -367,6 +382,13 @@
                  left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
                  left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+                 left join ETR_ENTRUST_BID_PRICE eebp on eebp.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eebp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                 left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
+                                from BID_ORDER_BID_PRICE
+                                where IS_CANCEL = 'N'
+                                  and TRADE_STATUS = '01'
+                                group by BID_ID, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE) T on T.ENTRUST_ID = eebp.ENTRUST_ID and T.PORTFOLIO_ID = eebp.PORTFOLIO_ID
+                                and T.BID_ID = bobp.BID_ID and T.BID_PRICE = eebp.BID_PRICE
         where bo.BID_ID = #{bidId}
     </select>
 
