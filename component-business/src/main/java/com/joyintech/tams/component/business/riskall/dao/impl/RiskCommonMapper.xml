@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.component.business.riskall.dao.RiskCommonMapper">
+    <select id="findRiskAuthorize" resultType="com.joyintech.tams.component.business.riskall.dto.RiskAuthorizeDto">
+        SELECT ROLE_POS,USER_NAME,ASSET_TYPE,ASSET_SEC_TYPE,TRADE_MARKET,TRADE_DIRECTION,max(AUTHORIZE_LIMIT_AMT) AUTHORIZE_LIMIT_AMT, max(AUTHORIZE_TYPE) AUTHORIZE_TYPE FROM RSK_AUTHORIZE_MNG
+        WHERE AUTHORIZE_TYPE IN (#{AUTHORIZE_TYPE_02}, #{AUTHORIZE_TYPE_03})
+        <if test="tradeDirection != null and !tradeDirection.isEmpty()">
+            AND (TRADE_DIRECTION IS NULL OR TRADE_DIRECTION = #{tradeDirection})
+        </if>
+        <if test="assetSecType != null and !assetSecType.isEmpty()">
+            AND (ASSET_SEC_TYPE IS NULL OR ASSET_SEC_TYPE = #{assetSecType})
+        </if>
+        <if test="tradeMarket != null and tradeMarket != ''">
+            AND (TRADE_MARKET IS NULL OR TRADE_MARKET = #{tradeMarket})
+        </if>
+        AND ASSET_TYPE = #{assetType}
+        AND USER_NAME = #{userName}
+        GROUP BY ROLE_POS,USER_NAME,ASSET_TYPE,ASSET_SEC_TYPE,TRADE_MARKET,TRADE_DIRECTION
+    </select>
+</mapper>

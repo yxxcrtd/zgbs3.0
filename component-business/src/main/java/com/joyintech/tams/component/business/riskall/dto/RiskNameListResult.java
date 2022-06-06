@@ -1,5 +1,8 @@
 package com.joyintech.tams.component.business.riskall.dto;
 
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.systemtools.util.SysDatadictUtil;
+
 public class RiskNameListResult {
 
     /**
@@ -57,12 +60,20 @@ public class RiskNameListResult {
         this.listName = listName;
     }
 
+    public String getListTypeStr() {
+        return SysDatadictUtil.getNameFromDataDict(DictCode.名单属性,listType);
+    }
+
     public String getListType() {
         return listType;
     }
 
     public void setListType(String listType) {
         this.listType = listType;
+    }
+
+    public String getRskStatusStr() {
+        return SysDatadictUtil.getNameFromDataDict(DictCode.试算结果,rskStatus);
     }
 
     public String getRskStatus() {
