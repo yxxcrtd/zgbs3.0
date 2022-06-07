@@ -214,7 +214,7 @@
     <sql id="onlyRegBidInfo">
         SELECT
             distinct decode(BO.IS_CANCEL,'Y','撤销','N','有效')	effectiveStatusStr,
-            FPT.TYPE_9  AS	finprodType2,
+            decode(FPT.TYPE_9,'02','01')  AS	finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN 	#{BUSI_TYPE_POSITION_01}
              WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END AS	busiTypePosition,
             FP.finprod_id as finprodId,
@@ -229,7 +229,7 @@
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END
                 AS	faceValue,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BRBP.BID_PRICE
-            WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD,4),'FM99999990.0000')  END AS tradeYield,
+            WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD*100,4),'FM99999990.0000')||'%' END AS tradeYield,
             null									AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.PAYABLE_AMOUNT END AS	tradeAmt,
@@ -359,7 +359,7 @@
     <sql id="onlyWflRegBidInfo">
         SELECT
             '流程中'	effectiveStatusStr,
-             FPT.TYPE_9 AS finprodType2,
+            decode(FPT.TYPE_9,'02','01') AS finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34} END AS	busiTypePosition,
             FP.FINPROD_ID as finprodId,
@@ -374,14 +374,14 @@
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN WBO.SUBSCRIPTION_AMOUNT/10000
                 END AS	faceValue,
                 CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN WBRBP.BID_PRICE
-                WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD,4),'FM990.0000') END AS	tradeYield,
+                WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD*100,4),'FM990.0000')||'%' END AS	tradeYield,
             null	AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN WBO.PAYABLE_AMOUNT END  AS	tradeAmt,
             WBO.BID_ID AS busiCode,
             WBO.OUR_TRADER	AS	trader,
             to_char(WBO.BID_DATE,'yyyy-MM-dd') 	AS	regTradeDate,
-            to_char(WBO.BID_DATE,'yyyy-MM-dd')	AS	confirmTradeDate,
+            null	AS	confirmTradeDate,
             WBO.COUNTER_ID		AS	counterId,
             MCCI.COUNTER_NAME AS counterIdStr,
             WBRBP.PORTFOLIO_ID	AS portfolioIds,
