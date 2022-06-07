@@ -1,12 +1,16 @@
 package com.joyintech.tams.cfets.risk.service;
 
 import com.google.common.collect.Lists;
+import com.joyintech.background.component.common.pack.common.util.JsonUtils;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
+import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
+import com.joyintech.tams.cfets.etr.bond.service.CfetsEtribBondInfo003Service;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
 import com.joyintech.tams.common.base.entity.RiskNodeConfigDtl;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
@@ -24,6 +28,8 @@ import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.invest.common.risk.dto.RiskNameListDto;
 import com.joyintech.tams.invest.common.trade.dao.CreditLinesDealsMapper;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
+import com.joyintech.workflow.engine.WorkflowContext;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +39,8 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 
 /**
  * 用来组装风险试算需要的指标、授信、授权、名单试算所需要的参数
@@ -58,11 +66,56 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @return
      */
     public RiskCommonOutputDto doRisk(BaseMap param) {
+        WorkflowContext.getProcessMarkService().getBusinessInfo("").getPageId();
         RiskCommonInputDto inputDto = getRiskInputParam(param);
         if (inputDto == null) return null;
         return doRisk(inputDto);
     }
 
+    private BaseMap generateBusinessDto(Object obj,String decisionAct,String flowStatus,boolean isCheck){
+        String pageId = "";
+        ProcessMark processMark;
+        String businessJson = JsonUtils.object2Json(obj);
+        // 入参为 workflowId 时 ，需要从流程中获取业务参数
+        if (obj instanceof String){
+            processMark = WorkflowContext.getProcessMarkService().getBusinessInfo((String) obj);
+            pageId = processMark.getPageId();
+            businessJson = processMark.getBusinessData();
+        }
+        if (obj instanceof CfetsEtribBondInfo003Dto || StringUtil.equals(pageId,"CfetsEtrIbBondinfo003")) {
+            CfetsEtribBondInfo003Dto dto = JsonUtils.json2Object(businessJson,CfetsEtribBondInfo003Dto.class);
+            return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
+                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
+                    .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                    .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
+                    .put("tradePlace", 交易场所_银行间.getValue())
+                    .put("ps", dto.getPs())
+                    .put("isCheck", isCheck)
+                    .put("data", dto);
+        }
+        return null;
+    }
+
+    /**
+     * 指标、授信、名单、授权check
+     **/
+    public RiskCommonOutputDto buildParamThenRisk(Object obj,String decisionAct,String flowStatus,boolean isCheck) {
+        BaseMap map = generateBusinessDto(obj,decisionAct,flowStatus,isCheck);
+        RiskCommonInputDto inputDto = getRiskInputParam(map);
+        if (inputDto == null) return null;
+        return doRisk(inputDto);
+    }
+
+    /**
+     * 指标和授信占用
+     **/
+    public void buildParamThenOccupy(Object obj,String decisionAct,String flowStatus,boolean isCheck) {
+        BaseMap map = generateBusinessDto(obj,decisionAct,flowStatus,isCheck);
+        RiskCommonInputDto inputDto = getRiskInputParam(map);
+        if (inputDto == null) return;
+        doOccupy(inputDto);
+    }
 
     /**
      * 指标和授信占用
