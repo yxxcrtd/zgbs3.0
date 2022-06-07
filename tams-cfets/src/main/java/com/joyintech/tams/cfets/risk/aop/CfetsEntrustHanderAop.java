@@ -30,8 +30,8 @@ import java.util.List;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 
-@Component
-@Aspect
+//@Component
+//@Aspect
 public class CfetsEntrustHanderAop {
     /**
      * 日志

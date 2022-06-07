@@ -35,8 +35,8 @@ import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_行权回售;
 import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.行权方式_回售;
 
-@Component
-@Aspect
+//@Component
+//@Aspect
 public class CfetsTradeHandlerAop {
 
     @Autowired
