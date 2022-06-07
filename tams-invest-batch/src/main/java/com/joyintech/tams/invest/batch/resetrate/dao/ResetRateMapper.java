@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.common.base.entity.MstIntRateInfo;
 import org.springframework.stereotype.Repository;
 
 import com.joyintech.tams.common.base.entity.InterfFloatingcouponsrate;
@@ -36,6 +37,11 @@ public interface ResetRateMapper {
     List<FinRateInfoDto> selectAllRateInfo(Map<String,Object> map);
     
     List<InterfFloatingcouponsrate> selectInterfFloatingcouponsrate(Map<String,Object> map);
+
+    /**
+     * wind接口利率行情
+     */
+    MstIntRateInfo selectInterfIntRateInfo(Map<String,Object> map);
 
     MstIntRateInfoDto getMstIntRateInfo(Map<String,Object> paramMap); 
     
