@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.common.bean.response.quote.repurchase;
 
 
+import com.google.common.base.MoreObjects;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -121,6 +122,9 @@ public class RepurchaseQuoteReceiveResponse {
 
     @ApiModelProperty(name = "account", value = "本方资金账号")
     private String account;
+
+    @ApiModelProperty(name = "accountName", value = "本方资金账号名称")
+    private String accountName;
 
     @ApiModelProperty(name = "requestTypeStr", value = "对手方请求类型（首期、提前购回、中途换券、到期续做、解除质押、到期购回）")
     private String requestTypeStr;
@@ -456,6 +460,14 @@ public class RepurchaseQuoteReceiveResponse {
         this.account = account;
     }
 
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
     public String getRequestTypeStr() {
         return requestTypeStr;
     }
@@ -502,5 +514,58 @@ public class RepurchaseQuoteReceiveResponse {
 
     public void setCpInvestorTypeStr(String cpInvestorTypeStr) {
         this.cpInvestorTypeStr = cpInvestorTypeStr;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("requestNo", requestNo)
+                .add("requestType", requestType)
+                .add("bs", bs)
+                .add("tradeMarket", tradeMarket)
+                .add("stockCode", stockCode)
+                .add("stockName", stockName)
+                .add("pledgeNumber", pledgeNumber)
+                .add("repoAmount", repoAmount)
+                .add("repoRate", repoRate)
+                .add("discount", discount)
+                .add("firstSettleDate", firstSettleDate)
+                .add("compactTerm", compactTerm)
+                .add("backDate", backDate)
+                .add("repoMdate", repoMdate)
+                .add("capDays", capDays)
+                .add("swapIntoBonds", swapIntoBonds)
+                .add("swapIntoBondsName", swapIntoBondsName)
+                .add("swapIntoBondsVolume", swapIntoBondsVolume)
+                .add("swapOutBonds", swapOutBonds)
+                .add("swapOutBondsName", swapOutBondsName)
+                .add("swapOutBondsVolume", swapOutBondsVolume)
+                .add("origBonds", origBonds)
+                .add("origBondsName", origBondsName)
+                .add("origBondsVolume", origBondsVolume)
+                .add("origRepoAmount", origRepoAmount)
+                .add("transCode", transCode)
+                .add("mIntAmt", mIntAmt)
+                .add("backBalance", backBalance)
+                .add("traderCode", traderCode)
+                .add("memberId", memberId)
+                .add("investorId", investorId)
+                .add("investorType", investorType)
+                .add("cpTraderCode", cpTraderCode)
+                .add("cpMemberId", cpMemberId)
+                .add("cpInvestorId", cpInvestorId)
+                .add("cpInvestorType", cpInvestorType)
+                .add("cpClientName", cpClientName)
+                .add("origSerialNo", origSerialNo)
+                .add("remark", remark)
+                .add("account", account)
+                .add("accountName", accountName)
+                .add("requestTypeStr", requestTypeStr)
+                .add("bsStr", bsStr)
+                .add("tradeMarketStr", tradeMarketStr)
+                .add("pledgeNumberStr", pledgeNumberStr)
+                .add("investorTypeStr", investorTypeStr)
+                .add("cpInvestorTypeStr", cpInvestorTypeStr)
+                .toString();
     }
 }

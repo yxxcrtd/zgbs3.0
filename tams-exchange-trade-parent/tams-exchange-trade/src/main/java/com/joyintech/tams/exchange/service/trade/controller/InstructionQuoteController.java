@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.service.trade.controller;
 
 import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveRequest;
 import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
 import com.joyintech.tams.exchange.common.request.QueryTickRequest;
@@ -159,14 +160,14 @@ public class InstructionQuoteController {
         return new Message(integratedQuoteManagement.queryNegotiateQuoteSend(request));
     }
 
-/*    @ApiOperation(value = "我收到的协议回购行情接口", notes = "我收到的协议回购行情接口")
+    @ApiOperation(value = "我收到的协议回购行情接口", notes = "我收到的协议回购行情接口")
     @RequestMapping(value = "/entrust/integrated/repurchaseQuoteReceive", method = RequestMethod.POST)
-    public Message queryRepurchaseQuoteReceive(@RequestBody @Validated RepurchaseQuoteQueryBean bean) {
+    public Message queryRepurchaseQuoteReceive(@RequestBody @Validated RepurchaseQuoteReceiveRequest bean) {
         if (!MasterUtil.isMaster()) {
             return MasterUtil.postForObject(bean);
         }
         return new Message(integratedQuoteManagement.queryRepurchaseQuoteReceive(bean));
-    }*/
+    }
 
     @ApiOperation(value = "我发起的协议回购行情接口", notes = "我发起的协议回购行情接口")
     @RequestMapping(value = "/entrust/integrated/repurchaseQuoteSend", method = RequestMethod.POST)

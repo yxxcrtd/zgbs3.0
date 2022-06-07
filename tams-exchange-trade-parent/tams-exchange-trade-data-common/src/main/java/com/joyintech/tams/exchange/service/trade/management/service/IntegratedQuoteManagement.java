@@ -3,10 +3,12 @@ package com.joyintech.tams.exchange.service.trade.management.service;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveRequest;
 import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.*;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
@@ -22,6 +24,8 @@ import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.joyintech.tams.exchange.common.constant.EntrustStatus.*;
 
@@ -44,6 +49,10 @@ import static com.joyintech.tams.exchange.common.constant.EntrustStatus.*;
 @Component
 public class IntegratedQuoteManagement {
     public static final String ROOT = "root";
+    /**
+     * 日志对象
+     */
+    private static final Logger log = LoggerFactory.getLogger(IntegratedQuoteManagement.class);
     @Autowired
     private TerminalHelper terminalHelper;
     @Autowired
@@ -184,9 +193,97 @@ public class IntegratedQuoteManagement {
     }
 
     /**
+     * 我收到的协议回购行情
+     *
+     * @param request 查询条件对象
+     * @return 我收到的协议回购行情
+     */
+    public ResultBean queryRepurchaseQuoteReceive(RepurchaseQuoteReceiveRequest request) {
+        List<RepurchaseQuoteReceiveResponse> list = Lists.newArrayList();
+//        list.addAll(terminalHelper.queryRepurchaseQuoteReceive(request));
+
+        filterRepurchaseQuoteReceive(list, request);
+
+        return ResultBean.success(MapUtil.builder().put(ROOT, list));
+    }
+
+    private void filterRepurchaseQuoteReceive(List<RepurchaseQuoteReceiveResponse> list, RepurchaseQuoteReceiveRequest request) {
+        log.info("filterRepurchaseQuoteReceive() called with parameters => 【list = {}】, 【request = {}】", list, request);
+        if (ObjectUtil.isEmpty(request)) {
+            return;
+        }
+        Stream<RepurchaseQuoteReceiveResponse> stream = list.stream();
+
+        String requestNo = request.getRequestNo();
+        if (ObjectUtil.isNotEmpty(requestNo)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getRequestNo(), requestNo));
+        }
+
+        String origSerialNo = request.getOrigSerialNo();
+        if (ObjectUtil.isNotEmpty(origSerialNo)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getOrigSerialNo(), origSerialNo));
+        }
+
+        String account = request.getAccount();
+        if (ObjectUtil.isNotEmpty(account)) {
+            stream = stream.filter(item -> (ObjectUtil.isNotEmpty(item.getAccount()) && item.getAccount().contains(account))
+                    || (ObjectUtil.isNotEmpty(item.getAccountName()) && item.getAccountName().contains(account)));
+        }
+
+        String requestType = request.getRequestType();
+        if (ObjectUtil.isNotEmpty(requestType)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getRequestType(), requestType));
+        }
+
+        String stockCode = request.getStockCode();
+        if (ObjectUtil.isNotEmpty(stockCode)) {
+            stream = stream.filter(item -> (ObjectUtil.isNotEmpty(item.getStockCode()) && item.getStockCode().contains(stockCode))
+                    || (ObjectUtil.isNotEmpty(item.getStockName()) && item.getStockName().contains(stockCode)));
+        }
+
+        BigDecimal pledgeNumber = request.getPledgeNumber();
+        if (ObjectUtil.isNotEmpty(pledgeNumber)) {
+            stream = stream.filter(item -> NumberUtil.equals(NumberUtil.round(NumberUtil.div(item.getPledgeNumber(), 100), 2), pledgeNumber));
+        }
+
+        BigDecimal repoAmount = request.getRepoAmount();
+        if (ObjectUtil.isNotEmpty(repoAmount)) {
+            stream = stream.filter(item -> NumberUtil.equals(NumberUtil.round(item.getRepoAmount(), 2), repoAmount));
+        }
+
+        Integer compactTerm = request.getCompactTerm();
+        if (ObjectUtil.isNotEmpty(compactTerm)) {
+            stream = stream.filter(item -> NumberUtil.equals(item.getCompactTerm(), compactTerm));
+        }
+
+        BigDecimal repoRate = request.getRepoRate();
+        if (ObjectUtil.isNotEmpty(repoRate)) {
+            stream = stream.filter(item -> NumberUtil.equals(NumberUtil.round(item.getRepoRate(), 3), repoRate));
+        }
+
+        BigDecimal settleAmount = request.getSettleAmount();
+        if (ObjectUtil.isNotEmpty(settleAmount)) {
+            stream = stream.filter(item -> NumberUtil.equals(NumberUtil.round(item.getBackBalance(), 2), settleAmount));
+        }
+
+        String firstSettleDate = request.getFirstSettleDate();
+        if (ObjectUtil.isNotEmpty(firstSettleDate)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getFirstSettleDate(), firstSettleDate));
+        }
+
+        String remark = request.getRemark();
+        if (ObjectUtil.isNotEmpty(remark)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getRemark(), remark));
+        }
+
+        list = stream.collect(Collectors.toList());
+    }
+
+    /**
      * 我发起的协议回购行情
      * 查询本地委托信息，只查询委托状态为 待确认/已成交/已回复/已撤销 的数据
-     * @param request   查询条件对象
+     *
+     * @param request 查询条件对象
      * @return 我发起的协议回购行情
      */
     public ResultBean queryRepurchaseQuoteSend(EntrustQueryRequest request) {
@@ -215,6 +312,11 @@ public class IntegratedQuoteManagement {
             if (EnumUtil.in(entrustStatus, REPORTED, REPORTED_TOBE_CANCEL, CANCELED, PART_TRADED_CANCELED, PART_SUCCESS, PART_TRADED_CANCELED, SUCCEEDED)) {
                 retList.add(sendBean);
             }
+        }
+
+        Integer requestStatus = request.getRequestStatus();
+        if (ObjectUtil.isNotEmpty(requestStatus)) {
+            retList = retList.stream().filter(item -> NumberUtil.equals(item.getRequestStatus(), requestStatus)).collect(Collectors.toList());
         }
 
         return ResultBean.success(MapUtil.builder().put(ROOT, retList).build());
@@ -266,7 +368,7 @@ public class IntegratedQuoteManagement {
 
         if (EnumUtil.notIn(ps, PsEnum.POSITIVE_REPO, PsEnum.REVERSED_REPO)) {
             // 需要查询首期的数据
-            NonFirstBaseRepurchaseQuoteSendResponse nonFirstBaseRepurchaseQuoteSendResponse = (NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse ;
+            NonFirstBaseRepurchaseQuoteSendResponse nonFirstBaseRepurchaseQuoteSendResponse = (NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
             nonFirstBaseRepurchaseQuoteSendResponse.setOrigSerialNo(null);
             nonFirstBaseRepurchaseQuoteSendResponse.setBs(null);
         }
