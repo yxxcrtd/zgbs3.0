@@ -283,10 +283,15 @@ public class CfetsManualSettleQueryService extends BaseService{
                 Arrays.asList(BussinessDictCodeList.共同业务类型_中标结果维护.getValue(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue()));
         //基本信息
         CfetsManualSettleInfoOtherListRespond respond = cfetsManualSettleMapper.findManualSettleInfoBidFirm(pageParam);
-        List<Date> dates = new ArrayList<>();
-        dates.add(respond.getBidDateStart());
-        dates.add(respond.getBidDateEnd());
-        respond.setBidDateList(dates);
+        if (!StringUtil.isNotEmpty(respond)){
+            return null;
+        }
+        if (StringUtil.isNotEmpty(respond) && (StringUtil.isNotEmpty(respond.getBidDateStart()) ||StringUtil.isNotEmpty(respond.getBidDateEnd()))) {
+            List<Date> dates = new ArrayList<>();
+            dates.add(respond.getBidDateStart());
+            dates.add(respond.getBidDateEnd());
+            respond.setBidDateList(dates);
+        }
         String spcdCodeTemp = "01";
         if (StringUtil.equals(respond.getBusiType(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue())) {
             spcdCode = spcdCodeTemp + "FXB";

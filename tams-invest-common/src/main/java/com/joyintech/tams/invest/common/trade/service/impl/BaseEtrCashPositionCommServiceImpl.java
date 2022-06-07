@@ -205,7 +205,9 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
         }
         else if (DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(finprodType)) {
             EtrSecCashPositionDealService.deal信用保护凭证CashPosition(finProductTradeDto, 持仓类型, etrPositionHoldDto);
-
+        }
+        else if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(finprodType)) {
+            EtrSecCashPositionDealService.deal一级投标债CashPosition(finProductTradeDto, 持仓类型, etrPositionHoldDto);
         }
         // 反转金额
         if (needNegative) {
