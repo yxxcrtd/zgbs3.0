@@ -1,7 +1,6 @@
 package com.joyintech.tams.cfets.trdredeem.dto;
 
 import com.joyintech.background.component.common.pack.common.base.BaseEntity;
-import com.joyintech.tams.cfets.bankuplink.bond.dto.CfetsBondRegCheckDetaileRequst;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

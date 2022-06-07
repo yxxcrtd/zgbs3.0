@@ -1,7 +1,9 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.common.bean.TerminalId;
@@ -11,8 +13,10 @@ import com.joyintech.tams.exchange.common.bean.WorkflowBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
+import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestRiskManagement;
@@ -27,9 +31,11 @@ import com.joyintech.tams.exchange.service.trade.processor.delay.DelayController
 import com.joyintech.tams.exchange.service.trade.processor.delay.OrderRateController;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +76,8 @@ public class TradeMsgProcessor {
     private TradeHelper tradeHelper;
     @Autowired
     private InstructionPledgeService instructionPledgeService;
-    @Autowired
-    private MessageSenderService messageSenderService;
+    //    @Autowired
+//    private MessageSenderService messageSenderService;
     @Autowired
     private TransactionHelper transactionHelper;
     @Autowired
@@ -94,6 +100,10 @@ public class TradeMsgProcessor {
     private BondHelper bondHelper;
     @Autowired
     private PositionRequestServiceInstructionRequest positionRequestServiceInstructionRequest;
+    @Autowired
+    private MessageSenderManagement messageSenderManagement;
+    @Autowired
+    private PortfolioTradeMessageHelper portfolioTradeMessageHelper;
 
     @Value("${yali.open:false}")
     private boolean yaliFlag;
@@ -379,52 +389,74 @@ public class TradeMsgProcessor {
                 }
             }
             // 可用数量
-            if (instruction.getEntrustNum() > 0) {
-                if (instruction.getEntrustNum() < instruction.getEntrustLeftAmt().longValue() + instruction.getFrozenQuantity().longValue() + entrustVolume) {
+            if (instruction.volumeInstruction()) {
+                long leftNum = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
+                if (leftNum < entrustVolume) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.value);
-                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+//                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+                    String errorMsg;
+                    if (EntrustProp.isConsultingTrade(orderInterface.getEntrustProp())) {
+                        errorMsg = StrUtil.format("委托数量{}万元>指令剩余数量{}万元", NumberUtil.div(BigDecimal.valueOf(entrustVolume), 100, 2), NumberUtil.div(BigDecimal.valueOf(leftNum), 100, 2));
+                    } else {
+                        errorMsg = StrUtil.format("委托数量{}>指令剩余数量{}", entrustVolume, leftNum);
+                    }
+                    orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
                 instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
-                messageSenderService.pushProgressToMQ(instruction);
+//                messageSenderService.pushProgressToMQ(instruction);
+                messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustNum {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustNum(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
                 return true;
             }
             // 可用额度
             if (instruction.getEntrustAmt().doubleValue() > 0) {
                 // 金额指令全部以净价处理， 需要重新计算指令金额冻结
-                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface.getEntrustProp(), orderInterface.getAssetType(), orderInterface.getEntrustPrice(), orderInterface.getEntrustVolume(), entrustBalance);
+//                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface.getEntrustProp(), orderInterface.getAssetType(), orderInterface.getEntrustPrice(), orderInterface.getEntrustVolume(), entrustBalance);
+                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface, orderInterface.getEntrustVolume(), entrustBalance);
                 if (TradeUtils.lessThan(instruction.getEntrustAmt(), TradeUtils.add(instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), instructionBalance, 2))) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_BALANCE_ERROR.value);
                     orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_BALANCE_ERROR.errorMsg);
                     return false;
                 }
                 instruction.setFrozenQuantity(TradeUtils.add(instruction.getFrozenQuantity(), instructionBalance, 2));
-                messageSenderService.pushProgressToMQ(instruction);
+//                messageSenderService.pushProgressToMQ(instruction);
+                messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustAmt {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustAmt(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
             }
         } else if (!Strings.isNullOrEmpty(ServiceApplication.INSTRUCTION_SERVICE) && EntrustUtils.isIntentionEntrust(orderInterface.getEntrustProp())) {
-            if (instruction.getEntrustNum() > 0) {
-                if (instruction.getEntrustNum() < instruction.getEntrustLeftAmt().longValue() + instruction.getFrozenQuantity().longValue() + entrustVolume) {
+            if (instruction.volumeInstruction()) {
+                long leftNum = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
+                if (leftNum < entrustVolume) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.value);
-                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+//                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+                    String errorMsg;
+                    if (EntrustProp.isConsultingTrade(orderInterface.getEntrustProp())) {
+                        errorMsg = StrUtil.format("委托数量{}万元>指令剩余数量{}万元", NumberUtil.div(BigDecimal.valueOf(entrustVolume), 100, 2), NumberUtil.div(BigDecimal.valueOf(leftNum), 100, 2));
+                    } else {
+                        errorMsg = StrUtil.format("委托数量{}>指令剩余数量{}", entrustVolume, leftNum);
+                    }
+                    orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
                 instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
-                messageSenderService.pushProgressToMQ(instruction);
+//                messageSenderService.pushProgressToMQ(instruction);
+                messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustNum {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustNum(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
                 return true;
             }
             if (instruction.getEntrustAmt().doubleValue() > 0) {
                 // 金额指令全部以净价处理， 需要重新计算指令金额冻结
-                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface.getEntrustProp(), orderInterface.getAssetType(), orderInterface.getEntrustPrice(), orderInterface.getEntrustVolume(), entrustBalance);
+//                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface.getEntrustProp(), orderInterface.getAssetType(), orderInterface.getEntrustPrice(), orderInterface.getEntrustVolume(), entrustBalance);
+                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface, orderInterface.getEntrustVolume(), entrustBalance);
                 if (TradeUtils.lessThan(instruction.getEntrustAmt(), TradeUtils.add(instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), instructionBalance, 2))) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_BALANCE_ERROR.value);
                     orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_BALANCE_ERROR.errorMsg);
                     return false;
                 }
                 instruction.setFrozenQuantity(TradeUtils.add(instruction.getFrozenQuantity(), instructionBalance, 2));
-                messageSenderService.pushProgressToMQ(instruction);
+//                messageSenderService.pushProgressToMQ(instruction);
+                messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustAmt {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustAmt(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
             }
         }
@@ -633,7 +665,7 @@ public class TradeMsgProcessor {
             }
             logger.info("entrustResp success entrustId and entrustStatus {} -- {}", entrustDb.getId(), entrustDb.getEntrustStatus());
             if (EntrustUtils.isNoTrade(entrustDb.getEntrustProp())) {
-                if ((instruction.getEntrustNum() > 0 && instruction.getFrozenQuantity().longValue() == instruction.getEntrustNum())
+                if ((instruction.volumeInstruction() && instruction.getFrozenQuantity().longValue() == instruction.getEntrustNum())
                         || (instruction.getEntrustAmt().doubleValue() > 0 && instruction.getFrozenQuantity().doubleValue() == instruction.getEntrustAmt().doubleValue()))
                     instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
             }
@@ -764,12 +796,18 @@ public class TradeMsgProcessor {
 //        if (instructionClone.getEntrustAmt() == null) {
 //            instructionClone.setEntrustAmt(entrust.getEntrustPrice().multiply(BigDecimal.valueOf(entrust.getEntrustVolume())));
 //        }
+
         if (InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
             logger.info("场内协议回购交易下单头寸检查，指令编号：{}，回购金额：{}", entrust.getInstructionId(), entrust.getEntrustBalance());
             instructionClone.setEntrustAmt(entrust.getEntrustBalance());
-        } else {
+        } else if (InvestmentAssetType.isBond(entrust.getAssetType()) && Objects.nonNull(entrust.getFullPrice()) && entrust.getFullPrice().compareTo(BigDecimal.ZERO) != 0) {
+            //全价金额
+            instructionClone.setEntrustAmt(TradeUtils.multiply(entrust.getFullPrice(), entrust.getEntrustVolume(), 2));
+        } else if (Objects.isNull(entrust.getEntrustBalance()) || entrust.getEntrustBalance().compareTo(BigDecimal.ZERO) == 0) {
             // 计算委托金额
-            instructionClone.setEntrustAmt(entrust.getEntrustPrice().multiply(BigDecimal.valueOf(entrust.getEntrustVolume())));
+            instructionClone.setEntrustAmt(TradeUtils.multiply(entrust.getEntrustPrice(), entrust.getEntrustVolume(), 2));
+        } else {
+            instructionClone.setEntrustAmt(entrust.getEntrustBalance());
         }
 
         instructionClone.setEntrustNum(entrust.getEntrustVolume());
@@ -795,16 +833,38 @@ public class TradeMsgProcessor {
                 instructionClone.setEntrustAmt(entrust.getEntrustPrice().multiply(BigDecimal.valueOf(entrust.getEntrustVolume() - entrust.getTradedVolume())));
             }
             instructionClone.setEntrustNum(entrust.getEntrustVolume() - entrust.getTradedVolume());
+
+            //组装撤单组合分配
+            List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildCancelPortfolioCalculateResponse(entrust, instructionClone);
+            if (CollectionUtils.isEmpty(portfolioCalculateResponses)) {
+                logger.error("【未组装撤单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
+                return;
+            }
+            instructionClone.setPortfolioCalculateResponses(portfolioCalculateResponses);
+
+            logger.error("【委托撤单】发送头寸开始：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
             positionRequestServiceInstructionRequest.sendRequest(instructionClone,
                     业务动作_撤委托.getValue(), 系统动作_新建.getValue(), 系统动作_新建.getValue());
+            logger.error("【委托撤单】发送头寸成功：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
             return;
         }
         //撤销委托，调用头寸引擎---end
         //下单生成委托，调用头寸引擎---start
         if (!(entrustStatus == INVALID.value
                 || entrustStatus == SYSTEM_INVALID.value)) {
+
+            //组装成交组合分配
+            List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildPortfolioCalculateResponse(entrust, instructionClone, PortfolioDetailBusiTypeEnum.ORDER);
+            if (CollectionUtils.isEmpty(portfolioCalculateResponses)) {
+                logger.error("【未组装下单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
+                return;
+            }
+            instructionClone.setPortfolioCalculateResponses(portfolioCalculateResponses);
+
+            logger.error("【委托下单】发送头寸开始：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
             positionRequestServiceInstructionRequest.sendRequest(instructionClone,
                     业务动作_交易下单.getValue(), 系统动作_新建.getValue(), 系统动作_新建.getValue());
+            logger.error("【委托下单】发送头寸成功：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
         }
         //下单生成委托，调用头寸引擎---end
     }

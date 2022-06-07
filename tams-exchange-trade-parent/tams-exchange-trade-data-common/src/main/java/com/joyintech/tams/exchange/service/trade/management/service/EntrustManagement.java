@@ -22,6 +22,8 @@ import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.common.vo.EntrustVo;
+import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgReceiverManager;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
@@ -38,13 +40,14 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
-import static com.joyintech.tams.exchange.common.constant.EntrustProp.ETF_APPLY;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
 
 @Component
 public class EntrustManagement extends BaseService {
@@ -105,7 +108,7 @@ public class EntrustManagement extends BaseService {
             entrustList = entrustList.stream().filter(entrust -> !EntrustType.CANCEL.value.equals(entrust.getEntrustType()) /*&& ptlAuthList.contains(entrust.getPortfolioId())*/)
                     .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
                     .collect(Collectors.toList());
-            List<Entrust> entrusts = fillEntrustPrice(entrustList);
+            List<EntrustVo> entrusts = fillEntrustInfo(entrustList);
             return new ResultBean(ErrorCode.SUCCESS, new OrderAndEntrustQryResult(new ArrayList<>(), entrusts));
         }
         // 查询指令下的订单和委托
@@ -120,7 +123,7 @@ public class EntrustManagement extends BaseService {
                     .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
                     .collect(Collectors.toList());
             setFutureOrderStockCode(orderListWithOutFair);
-            List<Entrust> entrusts = fillEntrustPrice(entrustList);
+            List<EntrustVo> entrusts = fillEntrustInfo(entrustList);
             return new ResultBean(ErrorCode.SUCCESS, new OrderAndEntrustQryResult(orderListWithOutFair, entrusts));
         }
         // 查询用户的委托
@@ -144,7 +147,7 @@ public class EntrustManagement extends BaseService {
         // modify by swwan ZGTFCP-606 只要是交易员下单操作过的都应该能查到 end
         setFutureEntrustStockCode(entrustList);
         setFutureOrderStockCode(orderList);
-        List<Entrust> entrusts = fillEntrustPrice(entrustList);
+        List<EntrustVo> entrusts = fillEntrustInfo(entrustList);
         return new ResultBean(ErrorCode.SUCCESS, new OrderAndEntrustQryResult(orderList, entrusts));
     }
 
@@ -164,13 +167,37 @@ public class EntrustManagement extends BaseService {
         });
     }
 
-    private List<Entrust> fillEntrustPrice(List<Entrust> entrustList) {
-        List<Entrust> entrusts = Lists.newArrayListWithCapacity(entrustList.size());
+    private List<EntrustVo> fillEntrustInfo(List<Entrust> entrustList) {
+        List<EntrustVo> entrusts = Lists.newArrayListWithCapacity(entrustList.size());
         entrustList.forEach(o -> {
-            Entrust entrust = new Entrust();
+            EntrustVo entrust = new EntrustVo();
             BeanUtils.copyProperties(o, entrust);
-            if ("EX005".equals(entrust.getBusiTypeTg())) {
+
+            if (StringUtil.isNotEmpty(o.getIsFullPrice()) && StringUtil.equals(o.getIsFullPrice(), "Y")) {
+                entrust.setEntrustPriceView(o.getFullPrice());
+            } else {
+                entrust.setEntrustPriceView(o.getEntrustPrice());
+            }
+
+            if (投管业务类型_质押券出入库.getValue().equals(entrust.getBusiTypeTg())) {
                 entrust.setEntrustPrice(entrust.getEntrustPrice().multiply(BigDecimal.valueOf(100)));
+
+                entrust.setEntrustVolumeView(BigDecimal.valueOf(entrust.getEntrustVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                entrust.setFrozenVolumeView(BigDecimal.valueOf(entrust.getFrozenVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                entrust.setCancelVolumeView(BigDecimal.valueOf(entrust.getCancelVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+
+                entrust.setBondVolume(entrust.getEntrustBalance().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
+            } else if (投管业务类型_现券交易.getValue().equals(entrust.getBusiTypeTg())) {
+                entrust.setEntrustVolumeView(BigDecimal.valueOf(entrust.getEntrustVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                entrust.setFrozenVolumeView(BigDecimal.valueOf(entrust.getFrozenVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                entrust.setCancelVolumeView(BigDecimal.valueOf(entrust.getCancelVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+            } else if (投管业务类型_通用式质押回购.getValue().equals(entrust.getBusiTypeTg())) {
+                entrust.setEntrustBalance(entrust.getEntrustBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
+                entrust.setTradedBalance(entrust.getTradedBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
+                entrust.setFrozenBalance(entrust.getFrozenBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
+                entrust.setCancelBalance(BigDecimal.valueOf(entrust.getCancelVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
             }
             entrusts.add(entrust);
         });
@@ -192,18 +219,21 @@ public class EntrustManagement extends BaseService {
             entrustList = entrustList.stream().filter(entrust -> !EntrustType.CANCEL.value.equals(entrust.getEntrustType())/* && ptlAuthList.contains(entrust.getPortfolioId())*/)
                     .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
                     .collect(Collectors.toList());
-            return new ResultBean(ErrorCode.SUCCESS, entrustList);
+            List<IntegratedEntrustVo> integratedEntrusts = fillIntegratedEntrustInfo(entrustList);
+            return new ResultBean(ErrorCode.SUCCESS, integratedEntrusts);
         }
         if (!Strings.isNullOrEmpty(instructionId)) {
             List<IntegratedEntrust> entrustList = integratedEntrustService.queryIntegratedEntrustByInstructionId(instructionId);
             entrustList = entrustList.stream().filter(entrust -> !EntrustType.CANCEL.value.equals(entrust.getEntrustType())/* && ptlAuthList.contains(entrust.getPortfolioId())*/)
                     .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
                     .collect(Collectors.toList());
-            return new ResultBean(ErrorCode.SUCCESS, entrustList);
+            List<IntegratedEntrustVo> integratedEntrusts = fillIntegratedEntrustInfo(entrustList);
+            return new ResultBean(ErrorCode.SUCCESS, integratedEntrusts);
         }
         List<IntegratedEntrust> entrustList = integratedEntrustService.queryByUserId(userId);
         if (!Strings.isNullOrEmpty(accountId)) {
-            entrustList = entrustList.stream().filter(entrust -> accountId == entrust.getAccountId() && !EntrustType.CANCEL.value.equals(entrust.getEntrustType()) /*&& ptlAuthList.contains(entrust.getPortfolioId())*/)
+            entrustList = entrustList.stream()
+                    .filter(entrust -> StringUtil.equals(accountId, entrust.getAccountId()) && !EntrustType.CANCEL.value.equals(entrust.getEntrustType()) /*&& ptlAuthList.contains(entrust.getPortfolioId())*/)
                     .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
                     .collect(Collectors.toList());
         } else {
@@ -212,7 +242,36 @@ public class EntrustManagement extends BaseService {
                     .collect(Collectors.toList());
         }
         // modify by swwan ZGTFCP-606 只要是交易员下单操作过的都应该能查到 end
-        return new ResultBean(ErrorCode.SUCCESS, entrustList);
+        List<IntegratedEntrustVo> integratedEntrusts = fillIntegratedEntrustInfo(entrustList);
+        return new ResultBean(ErrorCode.SUCCESS, integratedEntrusts);
+    }
+
+    private List<IntegratedEntrustVo> fillIntegratedEntrustInfo(List<IntegratedEntrust> entrustList) {
+        List<IntegratedEntrustVo> entrusts = Lists.newArrayListWithCapacity(entrustList.size());
+        entrustList.forEach(o -> {
+            IntegratedEntrustVo entrust = new IntegratedEntrustVo();
+            BeanUtils.copyProperties(o, entrust);
+
+            if (StringUtil.isNotEmpty(o.getIsFullPrice()) && StringUtil.equals(o.getIsFullPrice(), "Y")) {
+                entrust.setEntrustPriceView(o.getFullPrice());
+            } else {
+                entrust.setEntrustPriceView(o.getEntrustPrice());
+            }
+
+            if ((投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestmentAssetType.isBond(entrust.getAssetType()))
+                    || 投管业务类型_协议现券.getValue().equals(entrust.getBusiTypeTg())) {
+                //可转债券大宗交易、协议现券 委托价格展示全价
+                entrust.setEntrustPrice(entrust.getFullPrice());
+            } else if (投管业务类型_现券交易.getValue().equals(entrust.getBusiTypeTg())) {
+                entrust.setEntrustVolumeView(BigDecimal.valueOf(entrust.getEntrustVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                entrust.setFrozenVolumeView(BigDecimal.valueOf(entrust.getFrozenVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                entrust.setCancelVolumeView(BigDecimal.valueOf(entrust.getCancelVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+            }
+
+            entrusts.add(entrust);
+        });
+        return entrusts;
     }
 
     public ResultBean cancelEntrust(String userId, String entrustId) {
@@ -649,9 +708,9 @@ public class EntrustManagement extends BaseService {
     /**
      * 查询配股申购等代码
      *
-     * @param entrustProp   委托属性
-     * @param instruction   指令
-     * @return  申报等代码
+     * @param entrustProp 委托属性
+     * @param instruction 指令
+     * @return 申报等代码
      */
     public String getOthCodeFromInvestment(@NotBlank String entrustProp, @NotNull Instruction instruction) {
         String othCode = instruction.getFinprodMarketId();

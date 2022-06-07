@@ -269,7 +269,9 @@ public class TrdPlanInterestDuration002Service extends BaseService<TrdPlanIntere
         baseTradeProductDealDto.setTrdProductDeal(dealExe);
         baseTradeProductDealDto.setTrdProductDealAdd(add);
         StlPayOrdersDto orders = new StlPayOrdersDto();
-        BeanUtils.copyProperties(baseTradeInfoDto.getStlPayOrders(), orders);
+        if(baseTradeInfoDto.getStlPayOrders() != null){
+            BeanUtils.copyProperties(baseTradeInfoDto.getStlPayOrders(), orders);
+        }
         baseTradeProductDealDto.setStlPayOrdersList(Arrays.asList(new StlPayOrdersDto[]{orders}));
         baseTradeProductDealDtos.add(baseTradeProductDealDto);
     }

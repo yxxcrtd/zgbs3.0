@@ -42,14 +42,14 @@ public class FuturesInstrument implements Serializable, KeyMethodInterface<Strin
     @Digits(integer = 8, fraction = 0)
     private int deliveryMonth;
 
-    @Digits(integer = 8, fraction = 0)
-    private int maxMarketOrderVolume;
+    @Digits(integer = 16, fraction = 0)
+    private long maxMarketOrderVolume;
 
     @Digits(integer = 8, fraction = 0)
     private int minMarketOrderVolume;
 
-    @Digits(integer = 8, fraction = 0)
-    private int maxLimitOrderVolume;
+    @Digits(integer = 16, fraction = 0)
+    private long maxLimitOrderVolume;
 
     @Digits(integer = 8, fraction = 0)
     private int minLimitOrderVolume;
@@ -198,11 +198,11 @@ public class FuturesInstrument implements Serializable, KeyMethodInterface<Strin
         this.deliveryMonth = deliveryMonth;
     }
 
-    public int getMaxMarketOrderVolume() {
+    public long getMaxMarketOrderVolume() {
         return maxMarketOrderVolume;
     }
 
-    public void setMaxMarketOrderVolume(int maxMarketOrderVolume) {
+    public void setMaxMarketOrderVolume(long maxMarketOrderVolume) {
         this.maxMarketOrderVolume = maxMarketOrderVolume;
     }
 
@@ -214,11 +214,11 @@ public class FuturesInstrument implements Serializable, KeyMethodInterface<Strin
         this.minMarketOrderVolume = minMarketOrderVolume;
     }
 
-    public int getMaxLimitOrderVolume() {
+    public long getMaxLimitOrderVolume() {
         return maxLimitOrderVolume;
     }
 
-    public void setMaxLimitOrderVolume(int maxLimitOrderVolume) {
+    public void setMaxLimitOrderVolume(long maxLimitOrderVolume) {
         this.maxLimitOrderVolume = maxLimitOrderVolume;
     }
 
@@ -433,12 +433,13 @@ public class FuturesInstrument implements Serializable, KeyMethodInterface<Strin
 
     @Override
     public Integer getMarketLowVolume() {
-        return maxMarketOrderVolume;
+        return minMarketOrderVolume;
+
     }
 
     @Override
-    public Integer getMarketHighVolume() {
-        return minMarketOrderVolume;
+    public Long getMarketHighVolume() {
+        return maxMarketOrderVolume;
     }
 
     public void setBuyUnit(int buyUnit) {

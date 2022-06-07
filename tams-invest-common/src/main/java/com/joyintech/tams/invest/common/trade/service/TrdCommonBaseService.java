@@ -22,6 +22,7 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
@@ -33,12 +34,15 @@ import com.joyintech.tams.invest.common.dto.mock.trade.MockTrdProductDealDto;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTotalTradeInfoDto;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTrade;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTradeInfoDto;
+import com.joyintech.tams.invest.common.trade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.invest.common.trade.dto.OrderInfoDto;
 import com.joyintech.tams.invest.common.trade.dto.PortfolioCalculateDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -48,6 +52,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.INTERF_TYPE_REPO003;
 
 /**
  * 交易基础组件调用Service
@@ -225,9 +232,9 @@ public class TrdCommonBaseService extends BaseService {
         paramMap.put("searchDate", searchDate);
         paramMap.put("isWithInvAim", isWithInvAim);
 
-        paramMap.put("INV_AIM_AC", DictCodeListExt1.投资目的_摊余成本类.getValue());
-        paramMap.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
-        paramMap.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        paramMap.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
+        paramMap.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        paramMap.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
 
         paramMap.put("POSITION_TYPE_04", DictCodeList.持仓类型_质押.getValue());
         paramMap.put("TARGET_BACK_TYPE_H02", DictCodeList.回购类型_质押式竞价回购.getValue());
@@ -1255,6 +1262,7 @@ public class TrdCommonBaseService extends BaseService {
         String dealNo = (String) paraMap.get("dealNo");
         // 关联交易编号
         String fTradeId = (String) paraMap.get("fTradeId");
+
         if(!StringUtil.isEmpty(dealNo)){
             // 查询关联交易编号
             fTradeId = trdCommonBaseMapper.selectFTradeId(dealNo);
@@ -1264,28 +1272,8 @@ public class TrdCommonBaseService extends BaseService {
         }
         // 查询下单对应的委托编号信息
         InfContractDetailfile infContractDetailfile = trdCommonBaseMapper.selectInfContractDetailfile(fTradeId);
-        // 根据委托编号查询下单信息
-        OrderInfoDto orderInfoDto = trdCommonBaseMapper.selectOrderInfo(infContractDetailfile.getOrderId());
-        // ZGTFCP-2165:查询下单信息,查不到睡一秒再查,循环3次，下个版本优化 modify by fuyongsheng 20220330 start
-        if(null == orderInfoDto){
-            try {
-                for(int i=0; i<10; i++){
-                    logger.debug("【查询下单信息为空】OrderId: {}", infContractDetailfile.getOrderId());
-                    Thread.sleep(1000L);
-                    orderInfoDto = trdCommonBaseMapper.selectOrderInfo(infContractDetailfile.getOrderId());
-                    if(orderInfoDto != null){
-                        break;
-                    }
-                }
-            } catch (InterruptedException e) {
-            }
-            if(orderInfoDto == null){
-                return new ArrayList<>();
-            }
-        }
-        // ZGTFCP-2165:查询下单信息,查不到睡一秒再查,循环3次，下个版本优化 modify by fuyongsheng 20220330 end
         // 查询指令信息
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(orderInfoDto.getInstructionId());
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infContractDetailfile.getEntrustId());
         if(etrEntrust == null){
             return new ArrayList<>();
         }
@@ -1300,104 +1288,143 @@ public class TrdCommonBaseService extends BaseService {
         if (百元券面 == null) {
             百元券面 = BigDecimal.valueOf(100);
         }
-        BigDecimal hundred = BigDecimal.valueOf(100);
-        // ZGTFCP-1560:计算标准券面额 modify by fuyongsheng 20220325 end
+        List<InfContractPortfolioDetail> portfolioDetails = this.getInfContractPortfolioDetails(infContractDetailfile.getSeqno());
+        if(CollectionUtils.isEmpty(portfolioDetails)){
+            return new ArrayList<>();
+        }
         if(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(etrEntrust.getEntrustClass())){ // 多组合指令
-            List<EtrEntrustDetail> etrEntrustDetails = trdCommonBaseMapper.selectEtrEntrustDetailByEntrustId(etrEntrust.getEntrustId());
-            if(org.springframework.util.CollectionUtils.isEmpty(etrEntrustDetails)){
-                return new ArrayList<>();
-            }
-            for(EtrEntrustDetail etrEntrustDetail : etrEntrustDetails){
-                PortfolioCalculateDto portfolioDto = new PortfolioCalculateDto();
-                // 组合代码
-                portfolioDto.setPortfolioId(etrEntrustDetail.getPortfolioId());
-                // 资金账户
-                portfolioDto.setCashAcctId(orderInfoDto.getAccountId());
-                // 证券账户
-                portfolioDto.setSecAcctId(orderInfoDto.getSecAcctId());
-                // 下单编号
-                portfolioDto.setOrderId(infContractDetailfile.getOrderId());
-                BigDecimal ratio = new BigDecimal(1);
-                if(DictCodeListExt3.目标类型_数量.getValue().equals(etrEntrustDetail.getTargetType())){
-                    // 指令券面总额
-                    if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())){
-                        portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), new BigDecimal(100)));
-                    }else{
-                        portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum()));
-                    }
-                    ratio = ArithmeticUtil.divide(etrEntrustDetail.getEntrustNum(), etrEntrust.getEntrustNum(), 8, RoundingMode.HALF_UP);
-                }else{
-                    // 指令券面总额
-                    portfolioDto.setEtrSecAmount(etrEntrustDetail.getEntrustAmt());
-                    ratio = ArithmeticUtil.divide(etrEntrustDetail.getEntrustAmt(), etrEntrust.getEntrustAmt(), 8, RoundingMode.HALF_UP);
-                }
-                // 本方券面总额
-                portfolioDto.setOwnSecAmount(portfolioDto.getSecAmount());
-                // 交易金额
-                portfolioDto.setCashAmount(ArithmeticUtil.multiply(infContractDetailfile.getTradeAmt(), ratio));
-                if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())){
-                    // 券面总额
-                    portfolioDto.setSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100), ratio));
-                    // 下单券面总额
-                    portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(orderInfoDto.getEntrustVolume(), new BigDecimal(100), ratio));
-                }else{
-                    // 券面总额
-                    portfolioDto.setSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), ratio));
-                    // 下单券面总额
-                    portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(orderInfoDto.getEntrustVolume(), ratio));
-                }
-                // 标准券券面总额
-                BigDecimal standardSecAmount = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt().multiply(converseRadio)
-                        .multiply(百元券面), ratio);
-                BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
-                portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
-                // 融入券券面总额
-                portfolioDto.setIntegrateSecAmount(BigDecimal.ZERO);
-                portfolioDtos.add(portfolioDto);
-            }
+            portfolioDtos = this.handleMultiPortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
         }else{ // 单组合指令
+            portfolioDtos = this.handleSinglePortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
+        }
+        logger.debug("【组合计算分配结果】portfolioDtos: {}", JSON.toJSONString(portfolioDtos));
+        return portfolioDtos;
+    }
+
+    /**
+     * 处理多组合系列户指令
+     * @param infContractDetailfile
+     * @param portfolioDetails
+     * @param etrEntrust
+     * @param converseRadio
+     * @param 百元券面
+     * @return
+     */
+    private List<PortfolioCalculateDto> handleMultiPortfolioEntrust(InfContractDetailfile infContractDetailfile,
+                                                                    List<InfContractPortfolioDetail> portfolioDetails,
+                                                                    EtrEntrust etrEntrust, BigDecimal converseRadio, BigDecimal 百元券面){
+        List<PortfolioCalculateDto> portfolioDtos = new ArrayList<>();
+        List<EtrEntrustDetail> etrEntrustDetails = trdCommonBaseMapper.selectEtrEntrustDetailByEntrustId(etrEntrust.getEntrustId());
+        Map<String, EtrEntrustDetail> etrPortfolioMap = etrEntrustDetails.stream()
+                .collect(Collectors.toMap(EtrEntrustDetail::getPortfolioId, detail -> detail));
+        for(InfContractPortfolioDetail portfolioDetail : portfolioDetails){
+            EtrEntrustDetail etrEntrustDetail = etrPortfolioMap.get(portfolioDetail.getPortfolioId());
             PortfolioCalculateDto portfolioDto = new PortfolioCalculateDto();
             // 组合代码
-            portfolioDto.setPortfolioId(etrEntrust.getPortfolioId());
+            portfolioDto.setPortfolioId(portfolioDetail.getPortfolioId());
             // 资金账户
-            portfolioDto.setCashAcctId(orderInfoDto.getAccountId());
+            portfolioDto.setCashAcctId(infContractDetailfile.getAcctNo());
             // 证券账户
-            portfolioDto.setSecAcctId(orderInfoDto.getSecAcctId());
+            portfolioDto.setSecAcctId(infContractDetailfile.getBondId());
             // 下单编号
             portfolioDto.setOrderId(infContractDetailfile.getOrderId());
-            // 交易金额
-            portfolioDto.setCashAmount(infContractDetailfile.getTradeAmt());
-            if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())){
+            if(DictCodeListExt3.目标类型_数量.getValue().equals(portfolioDetail.getTargetType())){
                 // 指令券面总额
-                portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), new BigDecimal(100)));
-                // 下单券面总额
-                portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(orderInfoDto.getEntrustVolume(), new BigDecimal(100)));
-                // 券面总额
-                portfolioDto.setSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
-                // 本方券面总额
-                portfolioDto.setOwnSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
+                if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())) {
+                    portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), new BigDecimal(100)));
+                } else {
+                    portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum()));
+                }
             }else{
                 // 指令券面总额
-                portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum()));
-                // 下单券面总额
-                portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(orderInfoDto.getEntrustVolume()));
-                // 券面总额
-                portfolioDto.setSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt()));
-                // 本方券面总额
-                portfolioDto.setOwnSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt()));
+                portfolioDto.setEtrSecAmount(etrEntrustDetail.getEntrustAmt());
             }
+            // 交易金额
+            portfolioDto.setCashAmount(portfolioDetail.getTradeAmt());
+            if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
+                    || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(etrEntrust.getFinprodType2())
+                    || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())) {
+                // 券面总额
+                portfolioDto.setSecAmount(ArithmeticUtil.multiply(portfolioDetail.getShareAmt(), new BigDecimal(100)));
+                // 下单券面总额
+                portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustNum(), new BigDecimal(100)));
+            }else{
+                // 券面总额
+                portfolioDto.setSecAmount(portfolioDetail.getShareAmt());
+                // 下单券面总额
+                portfolioDto.setOrdSecAmount(portfolioDetail.getEntrustNum());
+            }
+            // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 start
+            // 本方券面总额
+            portfolioDto.setOwnSecAmount(portfolioDto.getSecAmount());
+            // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 end
             // 标准券券面总额
-            // ZGTFCP-1560: 修改标准券面额赋值 modify by fuyongsheng 20220327 start
-            // 标准券券面总额
-            BigDecimal standardSecAmount = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt().multiply(converseRadio)
-                    .multiply(百元券面));
+            BigDecimal standardSecAmount = portfolioDetail.getShareAmt().multiply(converseRadio).multiply(百元券面);
             BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
             portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
             // 融入券券面总额
             portfolioDto.setIntegrateSecAmount(BigDecimal.ZERO);
             portfolioDtos.add(portfolioDto);
         }
-        logger.debug("【组合计算分配结果】portfolioDtos: {}", JSON.toJSONString(portfolioDtos));
+        return portfolioDtos;
+    }
+
+    /**
+     * 处理单组合指令
+     * @param infContractDetailfile
+     * @param portfolioDetails
+     * @param etrEntrust
+     * @param converseRadio
+     * @param 百元券面
+     * @return
+     */
+    private List<PortfolioCalculateDto> handleSinglePortfolioEntrust(InfContractDetailfile infContractDetailfile,
+                                                                    List<InfContractPortfolioDetail> portfolioDetails,
+                                                                    EtrEntrust etrEntrust, BigDecimal converseRadio, BigDecimal 百元券面){
+        List<PortfolioCalculateDto> portfolioDtos = new ArrayList<>();
+        InfContractPortfolioDetail portfolioDetail = portfolioDetails.get(0);
+        PortfolioCalculateDto portfolioDto = new PortfolioCalculateDto();
+        // 组合代码
+        portfolioDto.setPortfolioId(etrEntrust.getPortfolioId());
+        // 资金账户
+        portfolioDto.setCashAcctId(infContractDetailfile.getAcctNo());
+        // 证券账户
+        portfolioDto.setSecAcctId(infContractDetailfile.getBondId());
+        // 下单编号
+        portfolioDto.setOrderId(infContractDetailfile.getOrderId());
+        // 交易金额
+        portfolioDto.setCashAmount(infContractDetailfile.getTradeAmt());
+        if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
+                || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(etrEntrust.getFinprodType2())
+                || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())){
+            // 指令券面总额
+            portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), new BigDecimal(100)));
+            // 下单券面总额
+            portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustNum(), new BigDecimal(100)));
+            // 券面总额
+            portfolioDto.setSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
+            // 本方券面总额
+            portfolioDto.setOwnSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
+        }else{
+            // 指令券面总额
+            portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum()));
+            // 下单券面总额
+            portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustNum()));
+            // 券面总额
+            portfolioDto.setSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt()));
+            // 本方券面总额
+            portfolioDto.setOwnSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt()));
+        }
+        // 标准券券面总额
+        // ZGTFCP-1560: 修改标准券面额赋值 modify by fuyongsheng 20220327 start
+        // 标准券券面总额
+        BigDecimal standardSecAmount = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt().multiply(converseRadio)
+                .multiply(百元券面));
+        BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
+        portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
+        // 融入券券面总额
+        portfolioDto.setIntegrateSecAmount(BigDecimal.ZERO);
+        portfolioDtos.add(portfolioDto);
         return portfolioDtos;
     }
 
@@ -1427,4 +1454,117 @@ public class TrdCommonBaseService extends BaseService {
         return null;
     }
 
+    /**
+     * 获取未完全匹配的成交明细汇总数据数量
+     * @return
+     */
+    public Integer getUnFinishMatchSettleTransDataNum(Date executeDate){
+        Map<String, Object> map = new HashMap<>();
+        map.put("executeDate", executeDate);
+        map.put("TRD_MATCH_STATUS_2",DictCodeListExt3.下行交易匹配状态_匹配完成.getValue());
+        map.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+        map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        map.put("PS_T07", DictCodeList.交易方向_到期.getValue());
+        return trdCommonBaseMapper.getUnFinishMatchSettleTransDataNum(map);
+    }
+
+    /**
+     * 查询首期清算数据
+     * @param sqcjbh 首期成交编号
+     * @param seatNumber 席位号 注:seatNumber和secAcctId至少传一个
+     * @param secAcctId 证券账户
+     * @param vdate 起息日
+     * @return
+     */
+    public List<SettleTransData> selectSqSettleTransDatas(String sqcjbh, String seatNumber, String secAcctId, Date vdate){
+        return trdCommonBaseMapper.selectSqSettleTransDatas(sqcjbh, seatNumber, secAcctId, vdate);
+    }
+
+    /**
+     * 获取回购首期交易
+     * @param sqcjbh
+     * @param seatNumber 注:seatNumber和secAcctId至少传一个
+     * @param secAcctId
+     * @param vdate
+     * @return
+     */
+    public TrdProductDeal getFirstRepoTrade(String sqcjbh, String seatNumber, String secAcctId, Date vdate) {
+        // 查询首期清算数据
+        List<SettleTransData> sqSettleTransDatas = trdCommonBaseMapper.selectSqSettleTransDatas(sqcjbh, seatNumber, secAcctId, vdate);
+        if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
+            // 查询首期交易
+            Map<String,Object> queryMap = new HashMap<>();
+            queryMap.put("fCjbh", sqSettleTransDatas.get(0).getTradeId());
+            return trdCommonBaseMapper.getFirstRepoTrade(queryMap);
+        }else{
+            logger.debug("【未查询到首期清算数据】sqcjbh:{}, seatNumber:{}, secAcctId:{}, vdate:{}", sqcjbh, seatNumber,
+                    secAcctId, JSON.toJSONString(vdate));
+            return new TrdProductDeal();
+        }
+    }
+
+    /**
+     * 查询下单组合明细数据
+     * @param seqNo
+     * @return
+     */
+    public List<InfContractPortfolioDetail> getInfContractPortfolioDetails(String seqNo){
+        return trdCommonBaseMapper.getInfContractPortfolioDetails(seqNo);
+    }
+
+
+    /**
+     * 获取最小交易单元
+     * @param finprodId 金融产品代码
+     * @param tradePlat 交易平台
+     * @param assetType 资产大类
+     * @return 获取最小交易单元
+     */
+    public MinTrdUnitLimitDto getMinTrdUnitLimit(String finprodId, String tradePlat, String tradeMarket,
+                                                 String assetType, String ps) {
+        MinTrdUnitLimitDto minTrdUnitLimitDto = null;
+        String PINANAssetType = this.getPAAssetType(assetType);
+        // 质押式回购 没有资产代码，虚拟的资产代码
+        if (StringUtils.equals(PINANAssetType, DictCodeList.平安资产类型_质押式回购.getValue())) {
+            finprodId = null;
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("finprodId", finprodId);
+        map.put("tradeMarket", tradeMarket);
+        map.put("tradePlat", tradePlat);
+        map.put("assetType", PINANAssetType);
+        map.put("ps", ps);
+        Map<String, Object> res = restTemplate.postForObject(
+                ServiceApplication.BASICDATA_SERVICE_NAME + "/InterfSysTrdConfig/getMinTrdUnitLimit", map, Map.class);
+        if (res != null && res.get("data") != null) {
+            List<MinTrdUnitLimitDto> list = (List<MinTrdUnitLimitDto>) res.get("data");
+            if (list != null && list.size() > 0) {
+                minTrdUnitLimitDto = JSON.parseObject(JSON.toJSONString(list.get(0)), MinTrdUnitLimitDto.class);
+            }
+        }
+        return minTrdUnitLimitDto;
+    }
+
+    /**
+     *
+     * @param finprodType2
+     * @return
+     */
+    public String getPAAssetType(String finprodType2) {
+        String assetType = "";
+        if (StringUtils.isNotEmpty(finprodType2)) {
+            if (StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
+                assetType = DictCodeList.平安资产类型_债券.getValue();
+            } else if (StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_基金.getValue())) {
+                assetType = DictCodeList.平安资产类型_基金.getValue();
+            } else if (StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_股票.getValue())) {
+                assetType = DictCodeListExt2.平安资产类型_股票.getValue();
+            } else if (StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                    || StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
+                    || StringUtils.equals(finprodType2, "ZYSHG")) {
+                assetType = DictCodeList.平安资产类型_质押式回购.getValue();
+            }
+        }
+        return assetType;
+    }
 }

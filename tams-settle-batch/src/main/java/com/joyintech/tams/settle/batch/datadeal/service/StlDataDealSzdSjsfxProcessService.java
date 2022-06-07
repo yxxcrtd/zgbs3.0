@@ -304,7 +304,8 @@ public class StlDataDealSzdSjsfxProcessService {
             settleTransData.setAcctNo(accountInfoDtolist.get(0).getAcctNo());
 			// 临时表流水号
 			settleTransData.setSeqNo(szdSjsfx.getSeqno());
-            
+            //交收结果
+            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdSjsfx.getJgdm()));
             // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
             stlDownDataDealService.calc(settleTransData);
 

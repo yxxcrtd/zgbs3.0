@@ -377,5 +377,12 @@ public interface EtrExchangeTradeCommonMapper {
 
 	Map findTandardRate(Map<String, Object> pageParam);
 
+	int deleteRskIsupTrial(String entrustId);
 
+	//查询资产是否进行了SPPI测试
+	SppiImportData queryAssetIsSppiTest(Map<String, Object> param);
+	//是否有行权计划
+	int countBondHasEexrPlan(Map<String, Object> param);
+	//组合持有资产业务模式查询
+	List<BaseMap> selectAllBusModelList(Map<String, Object> param);
 }

@@ -3,7 +3,7 @@
  *
  * @author sjj
  * @version 1.0 2021年10月26日
- * @see CfetsEtrDispatcherController
+ * @see com.joyintech.tams.cfets.etrdispatcher.controller.CfetsEtrDispatcherController
  * @since 1.0
  */
 
@@ -14,6 +14,7 @@ import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -25,19 +26,10 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.dto.CommonSearchInfoRequest;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherAutoRequest;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealRequest;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherExeListInfoResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListRequest;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderAuthListRequest;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderAuthListResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderListRequest;
+import com.joyintech.tams.cfets.etrdispatcher.dto.*;
 import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt3;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.compress.utils.Lists;
@@ -47,12 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -79,6 +66,20 @@ public class CfetsEtrDispatcherController extends BaseController {
         Map<String, Object> initPageParams = new HashMap<>();
         //数据字典初始化数据
         initPageParams.put("PINAN_ASSET_TYPE", this.getSelectDataFromDataDic(DictCode.平安资产类型, null));
+        SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.平安资产类型, null);
+        if (selectDto != null && !StringUtil.isEmptyList(selectDto.getOptions())) {
+            List<SelectOptionDto> options = selectDto.getOptions();
+            for (int index = options.size() - 1; index >= 0; index--) {
+                SelectOptionDto option = options.get(index);
+                // 去除不需要的字典类型
+                if (StringUtil.equals(option.getId(), DictCodeList.平安资产类型_一级市场债.getValue())) {
+                    options.remove(option);
+                }
+            }
+            initPageParams.put("PINAN_ASSET_TYPE_OP", selectDto);
+        }
+
+        initPageParams.put("FIRST_BID_STATUS", this.getSelectDataFromDataDic(DictCode.一级投标中标状态, null));
         SelectDto busiTypePosition = this.getSelectDataFromDataDic(DictCode.头寸业务类型, null);
         SelectDto busiTypeTg = this.getSelectDataFromDataDic(DictCode.投管业务类型, null);
         List<SelectOptionDto> selectOptionDtoList = new ArrayList<>();
@@ -171,7 +172,30 @@ public class CfetsEtrDispatcherController extends BaseController {
             return new Message<Page<CfetsEtrDispatcherExeListInfoResponse>>().success().setData(returnDto);
         } catch (Exception e) {
             logger.error("查询指令管理分页数据异常", e);
-            return new Message<Page<CfetsEtrDispatcherExeListInfoResponse>>().fail().setMessage("查询指令成交异常");
+            return new Message<Page<CfetsEtrDispatcherExeListInfoResponse>>().fail().setMessage("指令执行查询异常");
+        }
+    }
+
+    /**
+     * 一级债券指令执行查询
+     *
+     * @param dto
+     * @return Page<CfetsEtrDispatcherExeListInfoResponse>
+     * @throws Exception Exception
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value = "一级债券指令执行查询", notes = "一级债券指令执行查询")
+    @PostMapping("/getEtrBondFirstExeListInfo")
+    @ResponseBody
+    public Message<Page<CfetsEtrBondFirstExeListInfoResponse>> getEtrBondFirstExeListInfo(@RequestBody CommonSearchInfoRequest dto)
+            throws Exception {
+        try {
+            Page<CfetsEtrBondFirstExeListInfoResponse> returnDto = cfetsEtrDispatcherService.getEtrBondFirstExeListInfo(dto);
+            return new Message<Page<CfetsEtrBondFirstExeListInfoResponse>>().success().setData(returnDto);
+        } catch (Exception e) {
+            logger.error("一级债券指令执行查询异常", e);
+            return new Message<Page<CfetsEtrBondFirstExeListInfoResponse>>().fail().setMessage("一级债券指令执行查询查询异常");
         }
     }
 
@@ -265,6 +289,7 @@ public class CfetsEtrDispatcherController extends BaseController {
 
     }
 
+
     /**
      * 点击分发按钮check
      *
@@ -275,18 +300,46 @@ public class CfetsEtrDispatcherController extends BaseController {
     @ResponseBody
     @ApiOperation(value = "分发check", notes = "分发check")
     @PostMapping("doDispatcherCheck")
-    public Message<AjaxResult> doDispatcherCheck(@RequestBody CommonSearchInfoRequest cfetsDto, BindingResult br)
+    public Message<AjaxResult> doDispatcherCheck(@RequestBody CfetsEtrDispatcherDealRequest cfetsDto)
             throws Exception {
-        //提交check
-        Map<String, Object> pageParam = BeanUtil.object2Map(cfetsDto);
-        AjaxResult ajaxResult = cfetsEtrDispatcherService.doDispatcherCheck(pageParam, br);
-        if (!StringUtil.isEmptyList(ajaxResult.getErrorList())) {
-            return new Message<AjaxResult>().fail().setMessage(ajaxResult.getMessage());
-        } else {
-            //选择交易员
-            List<SelectOptionDto> userList = cfetsEtrDispatcherService.getUsers(pageParam);
-            ajaxResult.setData(userList);
-            return new Message<AjaxResult>().success().setData(ajaxResult);
+        try {
+            //提交check
+            Map<String, Object> pageParam = BeanUtil.object2Map(cfetsDto);
+            AjaxResult ajaxResult = cfetsEtrDispatcherService.doDispatcherCheck(pageParam);
+            if (null != ajaxResult) {
+                return new Message<AjaxResult>().success().setData(ajaxResult);
+            } else {
+                return new Message<AjaxResult>().success();
+            }
+        } catch (Exception e) {
+            logger.error("分发check异常", e);
+            return new Message<AjaxResult>().fail().setMessage("分发check异常");
+        }
+    }
+
+    /**
+     * 一级投标指令分发校验
+     *
+     * @param cfetsDto
+     * @return
+     * @throws Exception
+     */
+    @ApiOperation(value = "一级投标指令分发校验", notes = "一级投标指令分发校验")
+    @PostMapping("/getDispatcherFirstBid")
+    @ResponseBody
+    public Message<AjaxResult> getDispatcherFirstBid(@RequestBody CfetsEtrDispatcherDealRequest cfetsDto)
+            throws Exception {
+        try {
+            //提交check
+            AjaxResult ajaxResult = cfetsEtrDispatcherService.getDispatcherFirstBid(cfetsDto);
+            if (null != ajaxResult) {
+                return new Message<AjaxResult>().success().setData(ajaxResult);
+            } else {
+                return new Message<AjaxResult>().success();
+            }
+        } catch (Exception e) {
+            logger.error("一级投标指令分发check异常", e);
+            return new Message<AjaxResult>().fail().setMessage("一级投标指令分发check异常");
         }
     }
 
@@ -313,6 +366,8 @@ public class CfetsEtrDispatcherController extends BaseController {
                 cfetsEtrDispatcherService.doDispatcherDeal(pageParam);
                 return new Message<AjaxResult>().success().setMessage("分发成功");
             }
+        }catch(BusinessException e1){
+            return new Message<AjaxResult>().fail().setMessage(e1.getMessage());
         } catch (Exception e) {
             logger.error("分发异常", e);
             return new Message<AjaxResult>().fail().setMessage("分发异常");

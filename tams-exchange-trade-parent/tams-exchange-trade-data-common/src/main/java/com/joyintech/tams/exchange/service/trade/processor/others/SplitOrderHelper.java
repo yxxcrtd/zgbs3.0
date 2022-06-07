@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.processor.others;
 
+import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskOccupy;
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
@@ -9,10 +10,7 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
-import com.joyintech.tams.exchange.datacommon.db.service.EntrustService;
-import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
-import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
-import com.joyintech.tams.exchange.datacommon.db.service.OrderService;
+import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.processor.TradeMsgProcessor;
 import com.joyintech.tams.exchange.service.trade.processor.business.common.EntrustCancelProcessor;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
@@ -52,6 +50,8 @@ public class SplitOrderHelper {
     private TradeMsgProcessor tradeMsgProcessor;
     @Autowired
     private TransactionHelper transactionHelper;
+    @Autowired
+    private InstructionService instructionService;
 
     public List<Entrust> spiltOrder(Entrust entrust, int processType) {
         List<Entrust> entrustList = new ArrayList<>();
@@ -88,20 +88,28 @@ public class SplitOrderHelper {
                 logger.info("委托：{} 没有找到对应的合约信息：{}", entrust.getId(), entrust.getStockCode());
                 return entrustList;
             }
+            Instruction instruction = instructionService.findById(entrust.getInstructionId());
+            MinTrdUnitLimit minTrdUnitLimit = instruction.queryMinTrdUnitLimit(entrust.getEntrustProp());
+            if (Objects.isNull(minTrdUnitLimit)) {
+                logger.error("交易上下限数据不存在，不进行拆单操作：instructionId={}", entrust.getInstructionId());
+                return entrustList;
+            }
             long totalVolume = entrust.getEntrustVolume();
             if (EntrustProp.isMarketPrice(entrust.getEntrustProp())) {
-                long marketHighVolume = instrument.getMarketHighVolume();
+//                long marketHighVolume = instrument.getMarketHighVolume();
+                long marketHighVolume = minTrdUnitLimit.getMaxNumMarket();
                 if (marketHighVolume <= 0) {
-                    logger.info("合约中市价最大可交易数量为零，不进行拆单操作：{}", JsonUtils.getJsonFromObject(instrument));
+                    logger.info("合约中市价最大可交易数量为零，不进行拆单操作：{}", JsonUtils.getJsonFromObject(minTrdUnitLimit));
                     return entrustList;
                 }
                 if (totalVolume > marketHighVolume) {
                     return handleSpiltEntrustVolume(entrust, marketHighVolume, totalVolume, processType, null);
                 }
             } else if (EntrustProp.NORMAL.value.equals(entrust.getEntrustProp())) {
-                long highVolume = instrument.getHighVolume();
+//                long highVolume = instrument.getHighVolume();
+                long highVolume = minTrdUnitLimit.getMaxNum();
                 if (highVolume <= 0) {
-                    logger.info("合约中限价最大可交易数量为零，不进行拆单操作：{}", JsonUtils.getJsonFromObject(instrument));
+                    logger.info("合约中限价最大可交易数量为零，不进行拆单操作：{}", JsonUtils.getJsonFromObject(minTrdUnitLimit));
                     return entrustList;
                 }
                 if (totalVolume > highVolume) {

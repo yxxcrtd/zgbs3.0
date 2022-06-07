@@ -117,52 +117,60 @@
     </select>
     <select id="getCustomer" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT
-            CUSTOMER_ID id,
-            CUSTOMER_NAME text
-        FROM MST_CUSTOMER_INFO
+            i.CUSTOMER_ID id,
+            i.CUSTOMER_NAME text
+        FROM MST_CUSTOMER_INFO i
+        LEFT JOIN MST_CUSTOMER_INFO_ADD a on i.CUSTOMER_ID=a.CUSTOMER_ID
         <where>
             <!-- 修改计划类资产相关字段模糊查询  zhuyongkang 20190903 start -->
             <if test="search != null and search != ''">
                 (
-                    CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                    i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
                     OR
-                    CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                    i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
                     OR
-                    CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                    i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                    OR
+                    a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 )
             </if>
             <!-- 修改计划类资产相关字段模糊查询  zhuyongkang 20190903 END -->
             <if test="initValue != null and initValue != ''">
                 (
-                    CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                    i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                     OR
-                    CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                    i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                     OR
-                    CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                    i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                    OR
+                    a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{initValue,jdbcType=VARCHAR}, '%'))
                 )
             </if>
             <if test="IS_ASSTE_MANAGER != null and IS_ASSTE_MANAGER != ''">
-                AND IS_ASSTE_MANAGER = #{IS_ASSTE_MANAGER}
+                AND i.IS_ASSTE_MANAGER = #{IS_ASSTE_MANAGER}
             </if>
             <if test="IS_TRUSTER != null and IS_TRUSTER != ''">
-                AND IS_TRUSTER = #{IS_TRUSTER}
+                AND i.IS_TRUSTER = #{IS_TRUSTER}
             </if>
             <if test="IS_ISSUER != null and IS_ISSUER != ''">
-                AND IS_ISSUER = #{IS_ISSUER}
+                AND i.IS_ISSUER = #{IS_ISSUER}
             </if>
             <if test="IS_FINANCIER != null and IS_FINANCIER != ''">
-                AND IS_FINANCIER = #{IS_FINANCIER}
+                AND i.IS_FINANCIER = #{IS_FINANCIER}
             </if>
             <!-- 增加担保人查询条件 add by renping 20190930 start -->
             <if test="IS_GUARANTEE != null and IS_GUARANTEE != ''">
-                AND IS_GUARANTEE = #{IS_GUARANTEE}
+                AND i.IS_GUARANTEE = #{IS_GUARANTEE}
             </if>
             <!-- 增加担保人查询条件 add by renping 20190930 end -->
             <!-- 增加担保人查询条件 add by zhangnian 20191015 start -->
             <if test="IS_INVEST_ADVISER != null and IS_INVEST_ADVISER != ''">
-                AND IS_INVEST_ADVISER = #{IS_INVEST_ADVISER}
+                AND i.IS_INVEST_ADVISER = #{IS_INVEST_ADVISER}
             </if>
             <!-- 增加担保人查询条件 add by zhangnian 20191015 end -->
+            <if test="IS_ORIGINAL_OWNER != null and IS_ORIGINAL_OWNER != ''">
+                AND i.IS_ORIGINAL_OWNER = #{IS_ORIGINAL_OWNER}
+            </if>
         </where>
     </select>
     <select id="getCalendarId" resultType="com.joyintech.framework.select.SuggestDto">

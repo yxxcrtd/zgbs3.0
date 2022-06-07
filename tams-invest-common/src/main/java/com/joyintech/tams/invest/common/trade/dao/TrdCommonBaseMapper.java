@@ -417,4 +417,34 @@ public interface TrdCommonBaseMapper {
      * @since 1.0
      */
     BigDecimal queryConverseRadio(@Param("finprodId") String finprodId, @Param("vdate") Date vdate);
+
+    /**
+     * 获取未完全匹配的成交明细汇总数据数量
+     * @return
+     */
+    Integer getUnFinishMatchSettleTransDataNum(Map<String, Object> map);
+
+    /**
+     * 查询首期清算数据
+     * @param sqcjbh 首期成交编号
+     * @param seatNumber 席位号
+     * @param secAcctId 证券账户
+     * @param vdate 起息日
+     * @return
+     */
+    List<SettleTransData> selectSqSettleTransDatas(@Param("sqcjbh") String sqcjbh, @Param("seatNumber") String seatNumber,
+                                                   @Param("secAcctId") String secAcctId, @Param("vdate") Date vdate);
+
+    /**
+     * 获取首期委托交易
+     * @return
+     */
+    TrdProductDeal getFirstRepoTrade(Map<String, Object> paraMap);
+
+    /**
+     * 查询下单组合明细数据
+     * @param seqNo
+     * @return
+     */
+    List<InfContractPortfolioDetail> getInfContractPortfolioDetails(String seqNo);
 }

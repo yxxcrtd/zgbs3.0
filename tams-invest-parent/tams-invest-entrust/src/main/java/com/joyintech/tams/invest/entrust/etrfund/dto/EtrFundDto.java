@@ -821,7 +821,7 @@ public class EtrFundDto extends EtrEntrust implements ProcessEntity{
      * 获取 finprodMarketId
      * @return finprodMarketId.
      */
-    //@NotEmpty(fieldName = "EtrFund001.finprodId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "EtrFund001.finprodId", groups = {ValidateGroupEdit.class})
     public String getFinprodMarketId() {
         return finprodMarketId;
     }

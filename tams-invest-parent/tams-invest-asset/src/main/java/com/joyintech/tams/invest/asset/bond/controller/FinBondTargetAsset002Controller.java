@@ -333,7 +333,7 @@ public class FinBondTargetAsset002Controller extends BaseController{
         Map<String,String> map=new HashMap<String,String> ();
         AjaxResult ar = new AjaxResult();
         String isNetSett=StringUtil.EMPTY;
-        String tradePlat=StringUtil.EMPTY;
+        //String tradePlat=StringUtil.EMPTY;
         if(StringUtil.equals(DictCodeListExt1.交易场所_上海证券交易所.getValue(), tradeMarket)){
             // 全额结算 标识
             boolean settleFlag = false;
@@ -353,24 +353,24 @@ public class FinBondTargetAsset002Controller extends BaseController{
             //全额结算 : 私募债 || 139000-139999代码段债券、123000-123499代码段债券 || 资产支持证券
             if(StringUtil.equals(isPpb, "Y") || settleFlag || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
                 isNetSett="N";
-                tradePlat=DictCodeList.交易平台_固定收益平台.getValue();
+                //tradePlat=DictCodeList.交易平台_固定收益平台.getValue();
             }else{
                 //以上情况都不符合则为纳入净额结算标准范围的债券
                 isNetSett="Y";
-                tradePlat=DictCodeList.交易平台_固定收益平台.getValue()+","+DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_大宗交易平台.getValue();
+                //tradePlat=DictCodeList.交易平台_固定收益平台.getValue()+","+DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_大宗交易平台.getValue();
             }
         }else if(StringUtil.equals(DictCodeListExt1.交易场所_深圳证券交易所.getValue(), tradeMarket)){
             //全额结算: 私募债 || 资产支持证券
             if(StringUtil.equals(isPpb, "Y") || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
                 isNetSett="N";
-                tradePlat=DictCodeList.交易平台_综合协议交易平台.getValue();
+                //tradePlat=DictCodeList.交易平台_综合协议交易平台.getValue();
             }else{
                 isNetSett="Y";
-                tradePlat=DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_综合协议交易平台.getValue();
+                //tradePlat=DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_综合协议交易平台.getValue();
             }
         }
         map.put("isNetSett", isNetSett);
-        map.put("tradePlat", tradePlat);
+        //map.put("tradePlat", tradePlat);
 
         ar.setData (map);
         return ar;

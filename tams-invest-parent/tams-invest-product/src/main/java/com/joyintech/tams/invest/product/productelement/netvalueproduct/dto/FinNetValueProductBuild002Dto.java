@@ -334,6 +334,21 @@ public class FinNetValueProductBuild002Dto extends FinProduct implements Process
     
     /********* add by zhangweiqi 主产品需求添加 end**************/
     private String termType;
+
+    /**
+     *
+     * 说明书是否披露风险标志
+     */
+    private String directDisclosureRiskFlag;
+
+    //@NotEmpty(fieldName = "FinProductBuild002.directDisclosureRiskFlag")
+    public String getDirectDisclosureRiskFlag() {
+        return directDisclosureRiskFlag;
+    }
+
+    public void setDirectDisclosureRiskFlag(String directDisclosureRiskFlag) {
+        this.directDisclosureRiskFlag = directDisclosureRiskFlag;
+    }
     
     /**
      * {@linkplain}

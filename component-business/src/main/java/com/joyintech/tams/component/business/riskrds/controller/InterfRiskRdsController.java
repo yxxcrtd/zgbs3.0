@@ -166,8 +166,20 @@ public class InterfRiskRdsController {
                 logger.info("==========调用共通方法sendRiskRdsDataCommon==========");
                 List<String> retList=new ArrayList<>();
                 List<Map<String, Object>> listMap=interfRiskRdsService.getBatchAllocation(dataMap,interfRiskRdsDto);
-                for(Map<String, Object> mapEntry:listMap){
-                    retList.add(JsonUtils.object2Json(interfRiskRdsService.sendRiskRdsDataCommon(mapEntry, interfRiskRdsDto)));
+                if (StringUtil.isEmptyList(listMap)){
+                    logger.info("==========风险试算参数为空==========");
+                    return null;
+                }
+                // 风险批量试算需要调用 RSK011：BussinessDictCodeListRds.接口系统ID_风险试算批量接口，组合包需要累加
+                if (listMap.size() > 1){
+                    interfRiskRdsDto.setEventType(eventType);
+                    interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue());
+                    interfRiskRdsDto.setAssetType(assetType);
+                    ClientData rsp = interfRiskRdsService.sendRiskRdsListData(interfRiskRdsDto, listMap, null);
+                    logger.info("==========批量试算接口<RSK011>事件类型:{} end==========", eventType);
+                    retList.add(JsonUtils.object2Json(rsp));
+                }else {
+                    retList.add(JsonUtils.object2Json(interfRiskRdsService.sendRiskRdsDataCommon(listMap.get(0), interfRiskRdsDto)));
                 }
                 return retList;
             }else {

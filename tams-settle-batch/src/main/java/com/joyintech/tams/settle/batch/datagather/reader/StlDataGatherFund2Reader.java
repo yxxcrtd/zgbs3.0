@@ -16,6 +16,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.SettleBatchPara;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
 import com.joyintech.tams.settle.batch.datagather.dto.InvestTradeReaderDto;
 import com.joyintech.tams.settle.batch.datagather.dto.SettleDelDealDetailDto;
@@ -60,7 +61,8 @@ public class StlDataGatherFund2Reader extends StlDataGatherReader {
         Map<String, Object> searchParam = new HashMap<>();
         searchParam.put("portfolioIdList", portfolioIdList);
         searchParam.put("dealDate", execInfo.getExecuteDate());
-        setSearchParam(searchParam);
+        // 设置公共查询参数
+        this.setSearchParam(searchParam);
         
         List<InvestTradeReaderDto> res = new ArrayList<InvestTradeReaderDto>();
         
@@ -83,6 +85,8 @@ public class StlDataGatherFund2Reader extends StlDataGatherReader {
         if (settleTransDataDelDtos != null && settleTransDataDelDtos.size() > 0) {
 	        investTradeReaderDto.setSettleTransDataDelDtoList(settleTransDataDelDtos);
         }
+        searchParam.put("DELIVERY_RESULT_01", DictCodeListExt4.交收结果_正常交收.getValue());
+        searchParam.put("DELIVERY_RESULT_02", DictCodeListExt4.交收结果_部分交收.getValue());
         List<SettleTransDataDto> tempSettleTransDataDtos = stlDataGatherMapper.selectFundSettleTransData(searchParam);
         if(CollectionUtils.isNotEmpty(tempSettleTransDataDtos)) {
             for (SettleTransDataDto dto : tempSettleTransDataDtos) {

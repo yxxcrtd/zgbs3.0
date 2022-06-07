@@ -41,6 +41,8 @@
 				ELSE '' END
 			WHEN A.TRADE_PLAT='02'   /**交易平台 = 竞价交易平台*/
 				THEN  F.DEAL_MODE
+		    when A.TRADE_PLAT = '06'
+		      THEN F.DEAL_MODE
 			ELSE /**交易平台 = 大宗交易平台 OR 交易平台 = 综合协议平台*/
 				CASE WHEN F.DEAL_MODE='PRM05' THEN '' /*** 交易方式 = 不指定*/
 					WHEN F.DEAL_MODE='PRM06' THEN 'a' /*** 交易方式 = 意向申报*/
@@ -67,8 +69,8 @@
 		  <!--modify by etliu 20220324 end-->
           F.request_id quoterefId,/**交易所请求号*/
 		  A.ENTRUST_DATE tradeDate,/**委托日期*/
-		  A.VDATE,/**委托开始日*/
-		  A.Mdate,/**委托结束日*/
+		  A.VDATE VDATE,/**委托开始日*/
+		  A.Mdate MDATE,/**委托结束日*/
 		  CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0) END entrustAmt, /**委托额度*/
           CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM ELSE DECODE(F.TARGET_TYPE, '01',case when A.PS in ('T93', 'T94') THEN FDP.PLEDGE_NUMBER ELSE A.ENTRUST_NUM END, 0) END entrustNum, /**委托数量*/
 		  A.ENTRUST_STATUS entrustStatus,/**委托状态*/
@@ -77,9 +79,9 @@
 			  ELSE A.PRICE END
 			entrustPrice,/**委托单价*/ -->
 		  nvl(A.PRICE,FTP.INT_RATE) as entrustPrice,/**委托单价*/
-		  A.INV_AIM invAim,/**投资目的*/
+		  nvl(A.BUSINESS_MODEL,A.INV_AIM) invAim,/**投资目的*/
 		  F.FULL_PRICE fullPrice,/**全价*/
-		  A.PRICE_MODEL   priceMode,/**限价模式 */
+		  NVL(A.PRICE_MODEL,'PRM01') priceMode,/**限价模式 */
 		  FS.finishamt entrustLeftAmt,/*已完成数量*/
 		  F.SETTLE_SPREED settleSpeed,/**清算速度*/
 		  F.VDATE valueDate,/**起息日*/
@@ -125,13 +127,18 @@
 		END pledgeeType,
 		F.DERIVATIVE_BS_DIR derivativeBsDir,
 		F.DERIVATIVE_OC_FLAG derivativeOcFlag,
-		A.ENTRUST_CLASS,
-		btm.OUTPUT_VALUE_1 busiTypeTg,
-		A.BUSINESS_MODEL,
-		A.ENTRUST_TYPE entrustBussType
+		A.ENTRUST_CLASS entrustClass,
+		F.BUSI_TYPE_POSITION busiTypeTg,
+		A.ENTRUST_TYPE entrustBussType,
+        F.PRICE_TYPE priceType,
+        F.TARGET_TYPE targetType,
+		FRA.IS_NO_GUARD isNoGuard,
+        decode(F.PRICE_TYPE,'01','Y','02','N','') isNetPrice,
+		nvl(A.BUSINESS_MODEL,A.INV_AIM) businessModel
 		FROM ETR_ENTRUST A
 		LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
+		LEFT JOIN FIN_PRODUCT_ADD FRA ON FRA.FINPROD_ID = A.FINPROD_ID
 		LEFT JOIN ETR_ENTRUST_ADD F ON A.ENTRUST_ID = F.ENTRUST_ID
 		left join TRD_PRODUCT_DEAL tpd on tpd.F_TRADE_ID = F.TRADE_ID
 		LEFT JOIN FIN_DEAL_PLEDGE FDP ON tpd.FINPROD_ID = FDP.FINPROD_ID
@@ -145,10 +152,10 @@
 		LEFT JOIN FIN_PRODUCT_CONVERTIBLE T4 ON A.FINPROD_ID = T4.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT T5 ON T4.CON_FINPROD_ID = T5.FINPROD_ID
 		LEFT JOIN MST_COUNTER_PARTY T6 ON A.COUNTER_ID = T6.COUNTER_ID
-		LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm
-		     ON ( A.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR  btm.INPUT_VALUE_2 IS NULL)
-			AND ( A.Ps = btm.INPUT_VALUE_3 OR  btm.INPUT_VALUE_3 IS NULL)
-			AND ( A.TRADE_PLAT = btm.INPUT_VALUE_1 OR  btm.INPUT_VALUE_1 IS NULL)
+-- 		LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm
+-- 		     ON ( A.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR  btm.INPUT_VALUE_2 IS NULL)
+-- 			AND ( A.Ps = btm.INPUT_VALUE_3 OR  btm.INPUT_VALUE_3 IS NULL)
+-- 			AND ( A.TRADE_PLAT = btm.INPUT_VALUE_1 OR  btm.INPUT_VALUE_1 IS NULL)
 		LEFT JOIN (
 		     select
 		          entrust_id,
@@ -157,7 +164,6 @@
 		     group by entrust_id
 		)FS ON FS.entrust_id = A.ENTRUST_ID
         <where>
-        	1=1
         	AND A.TRADE_MARKET in ('03','04','12')
         	<!-- add by etliu 20210203 可转债网下申购不发送交易端 start -->
         	and (F.PURCH_MODLE is null or F.PURCH_MODLE != '02')
@@ -170,9 +176,9 @@
             </if>
         </where>
     </select>
-   
+
    <select id="queryEtrPledgeListByEtrId" resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePledgeDto">
-   		SELECT 
+   		SELECT
 	        A.ENTRUST_ID entrustId,/*委托代码*/
 	        A.FINPROD_ID finprodId,/*金融产品代码*/
 	        C.FINPROD_ABBR finprodAbbr,/*金融产品简称*/
@@ -190,7 +196,7 @@
             A1.Pledge_Number oldPledgeNumber,/*质押数量*/
             A1.PLEDGE_RATIO  oldPledgeRatio,/*质押率*/
             A1.PLEDGE_AMT oldPledgeAmt/*质押金额*/
-	    FROM 
+	    FROM
 	    ETR_PLEDGE A
 	    LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
         LEFT JOIN ETR_ENTRUST E ON E.ENTRUST_ID =  A.ENTRUST_ID AND E.PS = 'T94'
@@ -212,5 +218,5 @@
 			#{item}
 		</foreach>
 	</select>
-   
+
 </mapper>

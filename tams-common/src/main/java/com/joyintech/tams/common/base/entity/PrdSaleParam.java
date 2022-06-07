@@ -146,6 +146,17 @@ public class PrdSaleParam extends BaseEntity {
     private String sameOrg;
 
     /**
+     * 单一投资者持有上限
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal singleInvestorholdingMax;
+
+    /**
+     * 是否面向单一投资者
+     */
+    private String isFaceSingleInvestor;
+
+    /**
      * 取得 金融产品代码
      * @return 金融产品代码
      */
@@ -545,5 +556,21 @@ public class PrdSaleParam extends BaseEntity {
      */
     public void setSameOrg(String sameOrg) {
         this.sameOrg = sameOrg == null ? null : sameOrg.trim();
+    }
+
+    public BigDecimal getSingleInvestorholdingMax() {
+        return singleInvestorholdingMax;
+    }
+
+    public void setSingleInvestorholdingMax(BigDecimal singleInvestorholdingMax) {
+        this.singleInvestorholdingMax = singleInvestorholdingMax;
+    }
+
+    public String getIsFaceSingleInvestor() {
+        return isFaceSingleInvestor;
+    }
+
+    public void setIsFaceSingleInvestor(String isFaceSingleInvestor) {
+        this.isFaceSingleInvestor = isFaceSingleInvestor;
     }
 }

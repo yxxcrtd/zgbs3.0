@@ -147,9 +147,9 @@ public class TrdStandardBondService extends BaseService<TrdStandardBondSearchDto
      * @param pageParam
      */
     private void setParam(Map<String, Object> pageParam) {
-        pageParam.put("INV_AIM_AC", DictCodeListExt1.投资目的_摊余成本类.getValue());
-        pageParam.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
-        pageParam.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        pageParam.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
+        pageParam.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        pageParam.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
 
         pageParam.put("POSITION_TYPE_01", DictCodeList.持仓类型_可用.getValue());
         pageParam.put("POSITION_TYPE_03", DictCodeList.持仓类型_实际.getValue());

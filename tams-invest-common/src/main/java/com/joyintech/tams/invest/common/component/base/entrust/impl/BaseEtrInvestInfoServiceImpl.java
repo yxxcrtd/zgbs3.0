@@ -553,7 +553,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             }
             etrEntrustMapper.insertSelective(dto.getEtrEntrust());
             // 保存委托指令附属表
-            if (dto.getEtrEntrustAdd() != null) {
+            if (dto.getEtrEntrustAdd() != null&& dto.getEtrEntrustAdd().getTransmitTime()==null) {
                 dto.getEtrEntrustAdd().setTransmitTime(new Date());
             }
             etrEntrustAddMapper.insertSelective(dto.getEtrEntrustAdd());
@@ -582,10 +582,18 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 保存List<委托投标标位表>
             if (dto.getBidPriceList() != null && !dto.getBidPriceList().isEmpty()) {
                 for (EtrEntrustBidPrice etrEntrustBidPrice : dto.getBidPriceList()) {
-                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice().divide(BigDecimal.valueOf(100)));
+                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice());
                     etrEntrustBidPriceMapper.insertSelective(etrEntrustBidPrice);
                 }
             }
+
+            // 保存List<委托明细表>
+            if (CollectionUtils.isNotEmpty(dto.getEtrEntrustDetailList())) {
+                for (EtrEntrustDetail etrEntrustDetail : dto.getEtrEntrustDetailList()) {
+                    etrEntrustDetailMapper.insertSelective(etrEntrustDetail);
+                }
+            }
+
             return true;
         }
         return false;
@@ -635,7 +643,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 保存List<委托投标标位表>
             if (dto.getBidPriceList() != null && !dto.getBidPriceList().isEmpty()) {
                 for (EtrEntrustBidPrice etrEntrustBidPrice : dto.getBidPriceList()) {
-                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice().divide(BigDecimal.valueOf(100)));
+                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice());
                     etrEntrustBidPriceMapper.insertSelective(etrEntrustBidPrice);
                 }
             }
@@ -673,6 +681,8 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             etrInvestInfoMapper.deleteEtrFinishStatusByPrimaryKey(etrFinishStatus);
             // 全删全插委托投标标位表
             etrInvestInfoMapper.deleteBidPrice(entrustId);
+            // 全删全插委托明细表表
+            etrInvestInfoMapper.deleteEntrustDetail(entrustId);
             // 判断删除委托是否全部执行成功
             if (baseEtrCashPositionCommService != null) {
                 baseEtrCashPositionCommService.entrustCloseExecute(entrustId);
@@ -1074,6 +1084,9 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
         if (CollectionUtils.isEmpty(etrFinishStatusList)) {
             return false;
         }
+        // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 start
+        etrFinishStatusList = mergeEtrFinishStatusList(etrFinishStatusList);
+        // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 end
         // 是否日终批处理数据
         boolean isDayEndBatch = etrFinishStatusList.get(0).isDayEndBatch();
         // 遍历List<委托完成状况表Entity>，保存到“委托完成状况表”
@@ -1142,6 +1155,38 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
         }
         return false;
     }
+
+    // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 start
+    /**
+     * 合并EntrustId和TradeId相同的数据
+     * @param etrFinishStatusList
+     * @return
+     */
+    private List<EtrFinishStatusDto> mergeEtrFinishStatusList(List<EtrFinishStatusDto> etrFinishStatusList){
+        List<EtrFinishStatusDto> result = new ArrayList<>();
+        Map<String, List<EtrFinishStatusDto>> mapList = etrFinishStatusList
+                .stream()
+                .collect(Collectors.groupingBy(dto -> dto.getEntrustId() + "_" + dto.getTradeId()));
+        for(String key : mapList.keySet()){
+            List<EtrFinishStatusDto> dtos = mapList.get(key);
+            BigDecimal mergeFinishAmt = BigDecimal.ZERO;
+            BigDecimal mergeEntFinishAmt = BigDecimal.ZERO;
+            BigDecimal mergeOrderFinishAmt = BigDecimal.ZERO;
+            for(EtrFinishStatusDto dto : dtos){
+                mergeFinishAmt = ArithmeticUtil.doAdd(mergeFinishAmt, dto.getFinishAmt());
+                mergeEntFinishAmt = ArithmeticUtil.doAdd(mergeEntFinishAmt, dto.getEntFinishAmt());
+                mergeOrderFinishAmt = ArithmeticUtil.doAdd(mergeOrderFinishAmt, dto.getOrderFinishAmt());
+            }
+            EtrFinishStatusDto mergeEtrFinishStatus = new EtrFinishStatusDto();
+            BeanUtil.copyPropertiesIgnoreNull(mergeEtrFinishStatus, dtos.get(0));
+            mergeEtrFinishStatus.setFinishAmt(mergeFinishAmt);
+            mergeEtrFinishStatus.setEntFinishAmt(mergeEntFinishAmt);
+            mergeEtrFinishStatus.setOrderFinishAmt(mergeOrderFinishAmt);
+            result.add(mergeEtrFinishStatus);
+        }
+        return result;
+    }
+    // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 end
 
     /**
      * 取消完成委托 <一句话功能简述> <功能详细描述>
@@ -1249,7 +1294,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 保存List<委托投标标位表>
             if (dto.getBidPriceList() != null && !dto.getBidPriceList().isEmpty()) {
                 for (EtrEntrustBidPrice etrEntrustBidPrice : dto.getBidPriceList()) {
-                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice().divide(BigDecimal.valueOf(100)));
+                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice());
                     WflEtrEntrustBidPrice wflEtrEntrustBidPrice = new WflEtrEntrustBidPrice();
                     BeanUtil.copyPropertiesIgnoreNull(wflEtrEntrustBidPrice,etrEntrustBidPrice);
                     wflEtrEntrustBidPrice.setWorkflowId(dto.getWorkFlowId());
@@ -1309,7 +1354,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 保存List<委托投标标位表>
             if (dto.getBidPriceList() != null && !dto.getBidPriceList().isEmpty()) {
                 for (EtrEntrustBidPrice etrEntrustBidPrice : dto.getBidPriceList()) {
-                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice().divide(BigDecimal.valueOf(100)));
+                    etrEntrustBidPrice.setBidPrice(etrEntrustBidPrice.getBidPrice());
                     WflEtrEntrustBidPrice wflEtrEntrustBidPrice = new WflEtrEntrustBidPrice();
                     BeanUtil.copyPropertiesIgnoreNull(wflEtrEntrustBidPrice,etrEntrustBidPrice);
                     wflEtrEntrustBidPrice.setWorkflowId(dto.getWorkFlowId());
@@ -1378,10 +1423,16 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 转移至废弃表
             etrEntrustBackupMapper.deleteByPrimaryKey(dto.getEtrEntrust().getEntrustId());
             etrEntrustBackupMapper.deleteAddByPrimaryKey(dto.getEtrEntrust().getEntrustId());
+            etrEntrustBackupMapper.deleteEntrustBidPriceByEntrustId(dto.getEtrEntrust().getEntrustId());
+            etrEntrustBackupMapper.deleteEntrustDetailByEntrustId(dto.getEtrEntrust().getEntrustId());
             etrEntrustBackupMapper.insertFromQuery(dto.getEtrEntrust().getEntrustId());
             etrEntrustBackupMapper.insertAddFromQuery(dto.getEtrEntrust().getEntrustId());
+            etrEntrustBackupMapper.insertBidPriceFromQuery(dto.getEtrEntrust().getEntrustId());
+            etrEntrustBackupMapper.insertDetailFromQuery(dto.getEtrEntrust().getEntrustId());
             etrEntrustMapper.deleteByPrimaryKey(dto.getEtrEntrust().getEntrustId());
             etrEntrustAddMapper.deleteByPrimaryKey(dto.getEtrEntrustAdd().getEntrustId());
+            etrInvestInfoMapper.deleteBidPrice(dto.getEtrEntrust().getEntrustId());
+            etrInvestInfoMapper.deleteEntrustDetail(dto.getEtrEntrust().getEntrustId());
             // 使用退回或撤回状态
             dto.getEtrEntrust().setEntrustStatus(etr.getEntrustStatus());
         }else{

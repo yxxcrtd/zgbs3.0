@@ -43,6 +43,13 @@ public interface TrdStockBonusMapper {
 
 	List<FinAssetIntInfo> findDividDetailInfo(String busiCode);
 
+	/**
+	 * 查询有效分红明细(新头寸)
+	 * @param busiCode
+	 * @return
+	 */
+	List<FinAssetIntInfo> findNewPositionDividDetailInfo(String busiCode);
+
 	List<FinAssetIntInfo> findividInfo(Map<String, Object> param);
 
 	TrdStockBonusDto findEffectiveInfo(Map<String, Object> param);
@@ -51,6 +58,13 @@ public interface TrdStockBonusMapper {
 
 
     List<FinAssetIntInfo> findProcessDividInfo(String busiCode);
+
+	/**
+	 * 查询流程中分红明细(新头寸)
+	 * @param busiCode
+	 * @return
+	 */
+	List<FinAssetIntInfo> findNewPositionProcessDividInfo(String busiCode);
 
     List<String> findTradeId(Map<String, Object> bizCode);
 

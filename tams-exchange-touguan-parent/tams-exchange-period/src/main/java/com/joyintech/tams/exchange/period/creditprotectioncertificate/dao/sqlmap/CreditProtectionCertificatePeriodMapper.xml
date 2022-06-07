@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.exchange.period.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodMapper">
+
+
+    <select id="findPage"
+            resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Response">
+        select *
+        (select
+        case when tfpdl.TRADE_STATUS = '01' then '01'
+            else '03' end validStatus,
+        tfpdl.TOTLE_TRADE_ID busiCode,
+        tfpdl.TG_BUSI_TYPE paBussType,
+        fp.FINPROD_MARKET_ID finprodMarketId,
+        fp.FINPROD_NAME finprodMarketName,
+        fp.VDATE vDateWhole,
+        fp.MDATE mDateWhole,
+        nvl(tfpdl.SHARE_AMT/10000,0) repNomCapi,
+        fpd.REF_ENTITY refEntity,
+        tfpdl.TG_BUSI_TYPE creditEvent,
+        tfpdl.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+        tfpdl.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
+        tfpdl.SETTLE_METHOD settleMethod,
+        tfpdl.DELIVER_BOND deliverBond,
+        tfpdl.TRADE_DATE deliverDate
+        from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+        left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+        left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
+        and tfpdl.P_TOTLE_TRADE_ID is null
+        <if test="busiCodeList.size() > 0">
+            and tfpdl.TOTLE_TRADE_ID IN
+            <foreach collection="busiCodeList" item="busiCode" open="(" close=")" separator=",">
+                #{busiCode,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        <if test="finprodIdList.size() > 0">
+            and fp.FINPROD_ID IN
+            <foreach collection="finprodIdList" item="finprodId" open="(" close=")" separator=",">
+                #{finprodId,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        <if test="busiTypeList.size() > 0">
+            and tfpdl.TG_BUSI_TYPE IN
+            <foreach collection="busiTypeList" item="busiType" open="(" close=")" separator=",">
+                #{busiType,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        <if test="settleMethod != null and settleMethod != ''">
+            and tfpdl.SETTLE_METHOD = #{settleMethod,jdbcType=VARCHAR}
+        </if>
+        union all
+        select
+        '04' validStatus,
+        tfpdl.TOTLE_TRADE_ID busiCode,
+        tfpdl.TG_BUSI_TYPE paBussType,
+        fp.FINPROD_MARKET_ID finprodMarketId,
+        fp.FINPROD_NAME finprodMarketName,
+        fp.VDATE vDateWhole,
+        fp.MDATE mDateWhole,
+        nvl(tfpdl.SHARE_AMT/10000,0) repNomCapi,
+        fpd.REF_ENTITY refEntity,
+        tfpdl.TG_BUSI_TYPE creditEvent,
+        tfpdl.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+        tfpdl.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
+        tfpdl.SETTLE_METHOD settleMethod,
+        tfpdl.DELIVER_BOND deliverBond,
+        tfpdl.TRADE_DATE deliverDate
+        from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+        left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+        left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
+        and tfpdl.TRADE_STATUS = '01'
+        and tfpdl.P_TOTLE_TRADE_ID is null
+        <if test="busiCodeList.size() > 0">
+            and tfpdl.TOTLE_TRADE_ID IN
+            <foreach collection="busiCodeList" item="busiCode" open="(" close=")" separator=",">
+                #{busiCode,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        <if test="finprodIdList.size() > 0">
+            and fp.FINPROD_ID IN
+            <foreach collection="finprodIdList" item="finprodId" open="(" close=")" separator=",">
+                #{finprodId,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        <if test="busiTypeList.size() > 0">
+            and tfpdl.TG_BUSI_TYPE IN
+            <foreach collection="busiTypeList" item="busiType" open="(" close=")" separator=",">
+                #{busiType,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        <if test="settleMethod != null and settleMethod != ''">
+            and tfpdl.SETTLE_METHOD = #{settleMethod,jdbcType=VARCHAR}
+        </if>
+        ) T
+        <if test="validStatusList.size() > 0">
+            and T.validStatus in
+            <foreach collection="validStatusList" item="validStatus" open="(" close=")" separator=",">
+                #{validStatus,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        order by T.FINPROD_MARKET_ID
+    </select>
+    <select id="findBusiCode" resultType="com.joyintech.framework.select.SelectOptionDto">
+        select tfpdl.TOTLE_TRADE_ID id,
+        tfpdl.TOTLE_TRADE_ID text
+        from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
+        and tfpdl.P_TOTLE_TRADE_ID is null
+        <if test="businessCode != null and businessCode != ''">
+            and tfpdl.TOTLE_TRADE_ID like '%'|| #{businessCode,jdbcType=VARCHAR} ||'%'
+        </if>
+        union all
+        select tfpdl.TOTLE_TRADE_ID id,
+        tfpdl.TOTLE_TRADE_ID text
+        from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+        left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+        left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
+        and tfpdl.TRADE_STATUS = '01'
+        and tfpdl.P_TOTLE_TRADE_ID is null
+        <if test="businessCode != null and businessCode != ''">
+            and tfpdl.TOTLE_TRADE_ID like '%'|| #{businessCode,jdbcType=VARCHAR} ||'%'
+        </if>
+    </select>
+    <select id="findFinprodId" resultType="com.joyintech.framework.select.SelectOptionDto">
+        select FINPROD_MARKET_ID id, NVL(FINPROD_ABBR, FINPROD_NAME) text
+        from FIN_PRODUCT
+        <where>
+            <if test="finprodType2 != null and finprodType2 != ''">
+                and FINPROD_TYPE2 = #{finprodType2}
+            </if>
+            <if test="search != null and search != ''">
+                and (instr(FINPROD_MARKET_ID, #{search}) > 0
+                or instr(FINPROD_ID, #{search}) > 0
+                or instr(FINPROD_NAME, #{search}) > 0
+                or instr(FINPROD_ABBR, #{search}) > 0)
+            </if>
+        </where>
+    </select>
+
+</mapper>

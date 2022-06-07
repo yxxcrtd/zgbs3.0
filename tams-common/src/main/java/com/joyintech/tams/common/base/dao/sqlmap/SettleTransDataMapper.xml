@@ -75,6 +75,7 @@
         <result column="IS_MODIFY" property="isModify" jdbcType="VARCHAR" />
         <result column="F_CJBH" property="fCjbh" jdbcType="VARCHAR" />
         <result column="FRAGMENTARY_FUNDS" property="fragmentaryFunds" jdbcType="DECIMAL" />
+        <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         TRADE_ID TRADE_ID, CJBH CJBH, DEAL_DATE DEAL_DATE, SEC_TYPE SEC_TYPE, APPLY_TRADE_ID APPLY_TRADE_ID, 
@@ -94,7 +95,7 @@
         COMMISSION_AMT_RAW COMMISSION_AMT_RAW, TRADE_AMT_RAW TRADE_AMT_RAW, TRADE_ID_RAW TRADE_ID_RAW, 
         SEQ_NO SEQ_NO, IS_PURCH_TYPE_YX IS_PURCH_TYPE_YX, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, 
         CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, IS_MODIFY IS_MODIFY, 
-        F_CJBH F_CJBH, FRAGMENTARY_FUNDS FRAGMENTARY_FUNDS
+        F_CJBH F_CJBH, FRAGMENTARY_FUNDS FRAGMENTARY_FUNDS, DELIVERY_RESULT DELIVERY_RESULT
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -140,7 +141,8 @@
             TRADE_AMT_RAW, TRADE_ID_RAW, SEQ_NO, 
             IS_PURCH_TYPE_YX, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-            IS_MODIFY, F_CJBH, FRAGMENTARY_FUNDS
+            IS_MODIFY, F_CJBH, FRAGMENTARY_FUNDS,
+            DELIVERY_RESULT
             )
         values (#{tradeId,jdbcType=VARCHAR}, #{cjbh,jdbcType=VARCHAR}, #{dealDate,jdbcType=DATE}, 
             #{secType,jdbcType=VARCHAR}, #{applyTradeId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, 
@@ -165,7 +167,8 @@
             #{tradeAmtRaw,jdbcType=DECIMAL}, #{tradeIdRaw,jdbcType=VARCHAR}, #{seqNo,jdbcType=VARCHAR}, 
             #{isPurchTypeYx,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-            #{isModify,jdbcType=VARCHAR}, #{fCjbh,jdbcType=VARCHAR}, #{fragmentaryFunds,jdbcType=DECIMAL}
+            #{isModify,jdbcType=VARCHAR}, #{fCjbh,jdbcType=VARCHAR}, #{fragmentaryFunds,jdbcType=DECIMAL},
+            #{deliveryResult, jdbcType=VARCHAR}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.SettleTransData" >
@@ -390,6 +393,9 @@
             <if test="fragmentaryFunds != null" >
                 FRAGMENTARY_FUNDS,
             </if>
+            <if test="deliveryResult != null" >
+                DELIVERY_RESULT,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="tradeId != null" >
@@ -611,6 +617,9 @@
             <if test="fragmentaryFunds != null" >
                 #{fragmentaryFunds,jdbcType=DECIMAL},
             </if>
+            <if test="deliveryResult != null" >
+                #{deliveryResult,jdbcType=DECIMAL},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.SettleTransData" >
@@ -624,7 +633,7 @@
         INT_RATE, BASIS, BUSI_SCENE_CALSS, SETTLE_MODE, STAMP_FEE_RAW, JSF_AMT_RAW, GHF_AMT_RAW, 
         ZGF_AMT_RAW, SXF_AMT_RAW, SETTLE_FEE_RAW, COMMISSION_AMT_RAW, TRADE_AMT_RAW, TRADE_ID_RAW, 
         SEQ_NO, IS_PURCH_TYPE_YX, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-        IS_MODIFY, F_CJBH, FRAGMENTARY_FUNDS)
+        IS_MODIFY, F_CJBH, FRAGMENTARY_FUNDS, DELIVERY_RESULT)
         select TRADE_ID, CJBH, DEAL_DATE, SEC_TYPE, APPLY_TRADE_ID, 
             FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, BRANCH, BUSI_TYPE, TRADE_DATE, SETTLE_DATE, 
             VDATE, MDATE, VPAY_DATE, MPAY_DATE, TERM_TYPE, SETTLE_SPEED, CCY, UNIT_CPRICE, UNIT_INT, 
@@ -635,7 +644,7 @@
             INT_RATE, BASIS, BUSI_SCENE_CALSS, SETTLE_MODE, STAMP_FEE_RAW, JSF_AMT_RAW, GHF_AMT_RAW, 
             ZGF_AMT_RAW, SXF_AMT_RAW, SETTLE_FEE_RAW, COMMISSION_AMT_RAW, TRADE_AMT_RAW, TRADE_ID_RAW, 
             SEQ_NO, IS_PURCH_TYPE_YX, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, 
-            IS_MODIFY, F_CJBH, FRAGMENTARY_FUNDS
+            IS_MODIFY, F_CJBH, FRAGMENTARY_FUNDS, DELIVERY_RESULT
              from SETTLE_TRANS_DATA
              where 1 = 1 and TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </insert>
@@ -849,6 +858,9 @@
             <if test="fragmentaryFunds != null" >
                 FRAGMENTARY_FUNDS = #{fragmentaryFunds,jdbcType=DECIMAL},
             </if>
+            <if test="deliveryResult != null" >
+                DELIVERY_RESULT = #{deliveryResult,jdbcType=DECIMAL},
+            </if>
         </set>
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>
@@ -922,7 +934,8 @@
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             IS_MODIFY = #{isModify,jdbcType=VARCHAR},
             F_CJBH = #{fCjbh,jdbcType=VARCHAR},
-            FRAGMENTARY_FUNDS = #{fragmentaryFunds,jdbcType=DECIMAL}
+            FRAGMENTARY_FUNDS = #{fragmentaryFunds,jdbcType=DECIMAL},
+            DELIVERY_RESULT = #{deliveryResult,jdbcType=VARCHAR}
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>
 </mapper>

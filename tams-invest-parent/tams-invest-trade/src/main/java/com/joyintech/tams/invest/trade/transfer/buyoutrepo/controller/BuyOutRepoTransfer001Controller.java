@@ -110,7 +110,7 @@ public class BuyOutRepoTransfer001Controller extends BaseController {
         // 交易市场_二级市场
         model.addAttribute("TRADE_PLACE_SEC", DictCodeListExt1.交易市场_二级市场.getValue());
         // 投资目的_摊余成本类
-        model.addAttribute("INV_AIM_TC", DictCodeListExt1.投资目的_摊余成本类.getValue());
+        model.addAttribute("INV_AIM_TC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
         // 监督时分_交易监控
         model.addAttribute("MY_SUP_TIME_TYPE_DEAL", DictCodeListExt1.监督时分_交易监控.getValue());
         // 金融产品类型_正回购

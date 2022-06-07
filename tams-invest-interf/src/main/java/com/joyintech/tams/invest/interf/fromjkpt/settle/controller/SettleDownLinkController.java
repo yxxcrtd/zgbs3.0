@@ -45,7 +45,7 @@ public class SettleDownLinkController {
             if(StringUtil.equals(isRecon,"01")){
                 // modify by fuyongsheng 20211201 接收清算文件消息后新增批处理 start
                 // param.put("beanNames", Arrays.asList("investDealRevokeTask","stlDownDataDealTask","stlDownDataGatherTask"));
-                param.put("beanNames", Arrays.asList("investDealRevokeTask","stlDownDataDealTask","stlDownDataGatherTask","stlSettleTransDataGatherTask"));
+                param.put("beanNames", Arrays.asList("investDealRevokeTask","stlDownDataDealTask","stlDownDataGatherTask","stlSettleTransDataGatherTask","stlDownDurationDataGatherTask"));
                 // modify by fuyongsheng 20211201 接收清算文件消息后新增批处理 end
                 if(!param.containsKey("execDate")){
                     param.put("execDate", DateUtil.format(iPlatformDate.getSysDate(),"yyyyMMdd"));

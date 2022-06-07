@@ -268,6 +268,10 @@ public class EtrExchangeTradeEtrExchangeCommonResponse {
     private String stockId;
     @ApiModelProperty(name="expConNum",value="预计转换股数")
     private BigDecimal expConNum;
+    @ApiModelProperty(name="standardBondVolume",value="标准券数量",example="")
+    private BigDecimal standardBondVolume;
+    @ApiModelProperty(name="discountRate",value="折算率",example="")
+    private BigDecimal discountRate;
 
     public String getFinprodId() {
         return finprodId;
@@ -299,11 +303,11 @@ public class EtrExchangeTradeEtrExchangeCommonResponse {
      * @see
      * @since 1.0
      */
-    public BigDecimal getImplementPercentAge(){
+    public String getImplementPercentAge(){
         if(StringUtil.isNotEmpty(implementPercent)){
-            return implementPercent.multiply(new BigDecimal(100));
+            return (implementPercent.multiply(new BigDecimal(100))).setScale(2, BigDecimal.ROUND_HALF_UP).toString();
         }else{
-            return new BigDecimal(0);
+            return "0";
         }
     }
 
@@ -789,5 +793,21 @@ public class EtrExchangeTradeEtrExchangeCommonResponse {
 
     public void setExpConNum(BigDecimal expConNum) {
         this.expConNum = expConNum;
+    }
+
+    public BigDecimal getStandardBondVolume() {
+        return standardBondVolume;
+    }
+
+    public void setStandardBondVolume(BigDecimal standardBondVolume) {
+        this.standardBondVolume = standardBondVolume;
+    }
+
+    public BigDecimal getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(BigDecimal discountRate) {
+        this.discountRate = discountRate;
     }
 }

@@ -17,4 +17,34 @@ public interface StlDataGatherConstant {
      * 新头寸时间类型T+0
      */
     Integer DATE_TYPE_T_0 = 0;
+
+    /**
+     * 可转债申购确认
+     */
+    String BOND_PURCHASE_CONFIRM = "BondPurchaseConfirm";
+
+    /**
+     * 债券存续期
+     */
+    String BOND_DURATION = "BondDuration";
+
+    /**
+     * 回购存续期
+     */
+    String REPO_DURATION = "RepoDuration";
+
+    /**
+     * 债券股票上市流通
+     */
+    String BOND_SHARES_MARKET_TRADE = "BondSharesMarketTrade";
+
+    /**
+     * 协议回购逆回购到期
+     */
+    String AGRE_ANTI_REPO_EXPIRED = "AgreAntiRepoExpired";
+
+    /**
+     * 一级投标债
+     */
+    String BOND_FIRST_BIDDING = "BondFirstBidding";
 }

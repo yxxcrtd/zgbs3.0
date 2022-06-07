@@ -10,14 +10,8 @@ import com.joyintech.service.bankuplink.common.util.BusinessTypeUtil;
 import com.joyintech.service.bankuplink.common.util.MarketIndicatorUtil;
 import com.joyintech.service.bankuplink.common.util.OrgTypeUtil;
 import com.joyintech.service.bankuplink.common.util.ProdTypeUtil;
-import com.joyintech.tams.common.base.dao.InterfCstpTradeMapper;
-import com.joyintech.tams.common.base.dao.InterfOpicsTradRepoMapper;
-import com.joyintech.tams.common.base.dao.InterfTradRepoasstMapper;
-import com.joyintech.tams.common.base.dao.InterfTradSecdealMapper;
-import com.joyintech.tams.common.base.entity.InterfCstpTrade;
-import com.joyintech.tams.common.base.entity.InterfOpicsTradRepo;
-import com.joyintech.tams.common.base.entity.InterfTradRepoasst;
-import com.joyintech.tams.common.base.entity.InterfTradSecdeal;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -54,6 +48,9 @@ public class CfetsQuotedTradeCommonService{
      */
     @Autowired
     private InterfCstpTradeMapper mapper;
+
+    @Autowired
+    private InterfCstpBjfxjgMapper interfCstpBjfxjgMapper;
 
     /**
      * 接口处理cstp
@@ -117,7 +114,7 @@ public class CfetsQuotedTradeCommonService{
      */
     @Autowired
     private CstpSecAutoTradeService secAutoTradeService;
-    
+
     // 异步方法检查数据库中外部报价编号的最大等待时间（毫秒）
     @Value("${application.quote.resp.maxWaitTime:3000}")
     private int maxWaitTime;
@@ -134,7 +131,7 @@ public class CfetsQuotedTradeCommonService{
         catch (InterruptedException e) {
             e.printStackTrace();
         }
-        
+
         ResultBaseDto resultBaseDto = new ResultBaseDto(true);
         InterfCstpTrade iCstpTrade = new InterfCstpTrade();
         try{
@@ -196,6 +193,114 @@ public class CfetsQuotedTradeCommonService{
             throw new Exception(e);
         }
         return resultBaseDto;
+    }
+
+    /**
+     * 一级申购 cstp交易入库
+     */
+    @Transactional(rollbackFor = { Exception.class })
+    @DTXTransaction
+    public ResultBaseDto insertBidCstpTrade(String trdId) throws Exception {
+        try {
+            Thread.sleep(maxWaitTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        ResultBaseDto resultBaseDto = new ResultBaseDto(true);
+        try {
+            getLogger().info("银行间下行成交处理业务数据线程开启");
+            InterfCstpBjfxjg interfCstpBjfxjg = interfCstpBjfxjgMapper.selectByPrimaryKey(trdId);
+            //单位转化
+            if(StringUtil.isNotEmpty(interfCstpBjfxjg.getSpread())) {
+                interfCstpBjfxjg.setSpread(ArithmeticUtil.divide(interfCstpBjfxjg.getSpread(), new BigDecimal(10000), 12, RoundingMode.HALF_UP));
+            }
+            if(StringUtil.isNotEmpty(interfCstpBjfxjg.getCouponRate())) {
+                interfCstpBjfxjg.setCouponRate(ArithmeticUtil.divide(interfCstpBjfxjg.getCouponRate(), new BigDecimal(100), 12, RoundingMode.HALF_UP));
+            }
+            interfCstpBjfxjg.setRealIssuesize(ArithmeticUtil.multiply(interfCstpBjfxjg.getRealIssuesize(),new BigDecimal(100000000)));
+            interfCstpBjfxjg.setSubscriptionAmount(ArithmeticUtil.multiply(interfCstpBjfxjg.getSubscriptionAmount(),new BigDecimal(100000000)));
+            InterfCstpBjfxjg finalInterfCstpBjfxjg = interfCstpBjfxjg;
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    secAutoTradeService.secAutoBidTrade(finalInterfCstpBjfxjg, resultBaseDto);
+                }
+            });
+            thread.start();
+        } catch (Exception e) {
+            resultBaseDto.setErrMsg(e.getMessage());
+            throw new Exception(e);
+        }
+        return resultBaseDto;
+    }
+
+    /**
+     * 报文---实体封装(一级申购)
+     */
+    private void handleiCstpBidTrade(InterfCstpBjfxjg interfCstpBjfxjg, CfetsQuotedTradeFirstBondDto entity) {
+        BeanUtil.copyPropertiesIgnoreNull(interfCstpBjfxjg, entity);
+//        iCstpTrade.setTrademethod(entity.getTradeMethod());
+//        iCstpTrade.setSettltype(entity.getSettlType());
+//        iCstpTrade.setDealtranstype(entity.getDealTransType());
+//        iCstpTrade.setClordid(entity.getClOrdID());
+//        iCstpTrade.setReference(entity.getReference());
+//        iCstpTrade.setDatacategoryindicator(entity.getDataCategoryIndicator());
+//        iCstpTrade.setContingencyindicator(entity.getContingencyIndicator());
+//        //交易日期
+//        iCstpTrade.setTradedate(entity.getTradeDate());
+//        iCstpTrade.setTradetime(entity.getTradeTime());
+//        iCstpTrade.setSettldate(entity.getSettlDate());
+//        iCstpTrade.setRemarkindicator(entity.getRemarkIndicator());
+//        //行权收益率 到期收益率
+//        if(StringUtil.isNotEmpty(entity.getNoStipulations())){
+//            entity.getNoStipulations().forEach(item -> {
+//                if(StringUtil.equals(item.getStipulationType(),"Yield2")){
+//                    iCstpTrade.setYield2(ArithmeticUtil.divide(item.getStipulationValue(),new BigDecimal(100),6));
+//                }
+//                if(StringUtil.equals(item.getStipulationType(),"StrikeYield")){
+//                    iCstpTrade.setStrikeyield(ArithmeticUtil.divide(item.getStipulationValue(),new BigDecimal(100),6));
+//                }
+//            });
+//        }
+//        if(StringUtil.equals(entity.getMarketIndicator(),MarketIndicatorUtil.MARKETINDICATOR_BOND)){
+//            iCstpTrade.setBusinesstype(BusinessTypeUtil.BUSINESSTYPE_BOND);
+//            if(null!=entity.getPrice()){
+//                iCstpTrade.setPrice(entity.getPrice().setScale(4,RoundingMode.HALF_UP));
+//            }
+//            if(null!=entity.getDirtyPrice()){
+//                iCstpTrade.setDirtyprice(entity.getDirtyPrice().setScale(4,RoundingMode.HALF_UP));
+//            }
+//            iCstpTrade.setTradetype(entity.getTradeType());
+//            iCstpTrade.setTermtomaturity(entity.getTermToMaturity());
+//        }
+//        else if(StringUtil.equals(entity.getMarketIndicator(),MarketIndicatorUtil.MARKETINDICATOR_REPO)){
+//            iCstpTrade.setBusinesstype(BusinessTypeUtil.BUSINESSTYPE_REPO);
+//            iCstpTrade.setCashholdingdays(entity.getCashHoldingDays());
+//            iCstpTrade.setTradelimitdays(entity.getTradeLimitDays());
+//            iCstpTrade.setSettlcurramt2(entity.getSettlCurrAmt2());
+//            iCstpTrade.setUnderlyingsymbol(entity.getUnderlyingSymbol());
+//            iCstpTrade.setUnderlyingsecurityid(entity.getSecurityID());
+//            if(null!=entity.getPrice()){
+//                iCstpTrade.setPrice(ArithmeticUtil.divide(entity.getPrice(),new BigDecimal(100),6));
+//            }
+//            iCstpTrade.setSettldate2(entity.getSettlDate2());
+//            //处理跨托管交易本金
+//            if(!StringUtil.isEmptyList(entity.getNoCrossCustodians())){
+//                entity.setIsKtg("Y");
+//                entity.getNoCrossCustodians().forEach(item -> {
+//                    if(StringUtil.equals(item.getCrossCustodianInstitutionName(), OrgTypeUtil.CB)){
+//                        iCstpTrade.setCbFpriceAmt(item.getCrossCustodianTradeAmt());
+//                        return;
+//                    }
+//                    if(StringUtil.equals(item.getCrossCustodianInstitutionName(),OrgTypeUtil.SC)){
+//                        iCstpTrade.setScFpriceAmt(item.getCrossCustodianTradeAmt());
+//                        return;
+//                    }
+//                });
+//            }
+//        }
+//        //处理交易员信息
+//        处理交易员信息(iCstpTrade,entity);
     }
 
     /**

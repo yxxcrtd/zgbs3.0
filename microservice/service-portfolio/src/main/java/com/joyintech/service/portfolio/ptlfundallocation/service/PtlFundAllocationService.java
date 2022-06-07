@@ -10,6 +10,7 @@
 
 package com.joyintech.service.portfolio.ptlfundallocation.service;
 
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
@@ -20,6 +21,10 @@ import com.joyintech.service.portfolio.position.service.PositionRequestPtlFoundA
 import com.joyintech.service.portfolio.ptlfundallocation.dao.PtlFundAllocationMapper;
 import com.joyintech.service.portfolio.ptlfundallocation.dto.PtlFundAllocation001Dto;
 import com.joyintech.service.portfolio.ptlfundallocation.dto.PtlFundAllocationDto;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -39,14 +44,17 @@ import com.joyintech.tams.invest.common.service.MapperDelegateService;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
-import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 资金划拨管理
@@ -133,8 +141,6 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
     //调用投管接口 add cxq 20200210
     @Autowired
     private InvestInterfCommService investInterfCommService;
-    @Autowired(required = false)
-    private FinProductMapper finProductMapper;
 
     @Autowired
     private PositionRequestPtlFoundAllocation002Request positionRequestService;
@@ -399,7 +405,20 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
         String systemAct = DictCodeListExt3.系统动作_新建.getValue();
         entity.setSoftSkipMode("Y");
         entity.setPositionType("commit");
-        positionRequestService.sendEtrExchangeTradeSaveRequest(entity,decisionAct,systemAct);
+        try {
+            positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct);
+        } catch (PositionException e) {
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            if (StringUtil.isNotBlank(message.getMessage())) {
+                WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+            } else {
+                if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                    BaseMap bm = (BaseMap) message.getData();
+                    StringBuffer messageStr = (StringBuffer) bm.get("message");
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+            }
+        }
         return 1;
     }
 
@@ -654,8 +673,20 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
 
 
         //撤销 头寸
-        positionRequestService.sendRevoke(entity);
-
+        try {
+            positionRequestService.sendRevoke(entity);
+        } catch (PositionException e) {
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            if (StringUtil.isNotBlank(message.getMessage())) {
+                WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+            } else {
+                if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                    BaseMap bm = (BaseMap) message.getData();
+                    StringBuffer messageStr = (StringBuffer) bm.get("message");
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+            }
+        }
         return 1;
     }
 
@@ -667,7 +698,20 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
      */
     public int doDelete(PtlFundAllocationDto entity) {
         if(!StringUtil.equals("save", entity.getPositionType())&&!StringUtil.equals("update", entity.getPositionType())){
-            positionRequestService.sendDelete(entity);
+            try {
+                positionRequestService.sendDelete(entity);
+            } catch (PositionException e) {
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                if (StringUtil.isNotBlank(message.getMessage())) {
+                    WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+                } else {
+                    if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                        BaseMap bm = (BaseMap) message.getData();
+                        StringBuffer messageStr = (StringBuffer) bm.get("message");
+                        WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                    }
+                }
+            }
         }
         return ptlFundAllocationMapper.deleteFlowByOrderId(entity.getOrderId(), DictCodeList.持仓类型_可用.getValue());
     }
@@ -748,7 +792,20 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
             decisionAct = DictCodeListExt3.系统动作_修改.getValue();
         }
         entity.setSoftSkipMode("Y");
-        positionRequestService.sendEtrExchangeTradeSaveRequest(entity,decisionAct,systemAct);
+        try {
+            positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct);
+        } catch (PositionException e) {
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            if (StringUtil.isNotBlank(message.getMessage())) {
+                WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+            } else {
+                if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                    BaseMap bm = (BaseMap) message.getData();
+                    StringBuffer messageStr = (StringBuffer) bm.get("message");
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+            }
+        }
         return "Success";
     }
     
@@ -965,5 +1022,29 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
             etrCashPositionMapper.updateByPrimaryKeySelective(etrCashPosition);
         }
         return 1;
+    }
+    /**
+     * 获取现金实际余额
+     *
+     * @param map 请求参数
+     * @return 现金实际余额
+     * @see
+     * @since 1.0
+     */
+    public BigDecimal getActAmount(Map<String, Object> map) {
+        PtlCashPositionFlowDto ptlCashPositionFlowDto = new PtlCashPositionFlowDto();
+        BigDecimal amount = null;
+        try {
+            ptlCashPositionFlowDto = (PtlCashPositionFlowDto)JsonUtils.map2entity(map, PtlCashPositionFlowDto.class);
+            List<String> acctTypeList = new ArrayList<>();
+            acctTypeList.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+            ptlCashPositionFlowDto.setAcctType(acctTypeList);
+            amount = basePtlCashPositionInfoService.queryActCashPosition(ptlCashPositionFlowDto);
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return amount;
     }
 }

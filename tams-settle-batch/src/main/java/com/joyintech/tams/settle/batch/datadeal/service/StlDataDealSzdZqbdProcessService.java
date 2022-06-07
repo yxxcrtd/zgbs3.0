@@ -310,6 +310,8 @@ public class StlDataDealSzdZqbdProcessService {
             settleTransData.setTradeMarket(DictCodeList.交易流通场所_上海证券交易所.getValue());
             // 交易市场
             settleTransData.setTradeMarketMode(DictCodeListExt1.交易市场_二级市场.getValue());
+            // 交收结果
+            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdZqbd.getJgdm()));
 
             // TODO 佣金计算
 

@@ -139,7 +139,71 @@ public class PaActiveRemind001Dto extends RskSupervisionRiskAnalyzeDto  {
      */
     private String supTrend;
 
-    // add by jiangpeng on 20200728 债券存续期 计息截止日与支付日不同时 交易查询用 start
+
+    /**
+     * 资金账户
+     *
+     */
+    private String trdAcctId;
+
+    /**
+     * 资金账户名称
+     *
+     */
+    private String trdAcctName;
+
+    /**
+     * 交易场所
+     *
+     */
+    private String tradePlace;
+
+
+    /**
+     * 结果日期
+     * @return
+     */
+    private Date cdate;
+
+    public Date getCdate() {
+        return cdate;
+    }
+
+    public String getCdateStr() {
+        return DateUtil.format(cdate);
+    }
+
+    public void setCdate(Date cdate) {
+        this.cdate = cdate;
+    }
+
+
+    public String getTrdAcctId() {
+        return trdAcctId;
+    }
+
+    public void setTrdAcctId(String trdAcctId) {
+        this.trdAcctId = trdAcctId;
+    }
+
+    public String getTradePlace() {
+        return tradePlace;
+    }
+
+    public String getTrdAcctName() {
+        return trdAcctName;
+    }
+
+    public void setTrdAcctName(String trdAcctName) {
+        this.trdAcctName = trdAcctName;
+    }
+
+    public void setTradePlace(String tradePlace) {
+        this.tradePlace = tradePlace;
+    }
+
+
+// add by jiangpeng on 20200728 债券存续期 计息截止日与支付日不同时 交易查询用 start
     /**
      * 计息截止日
      */

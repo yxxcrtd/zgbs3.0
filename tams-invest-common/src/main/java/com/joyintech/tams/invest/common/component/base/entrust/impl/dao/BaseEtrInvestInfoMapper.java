@@ -1,13 +1,20 @@
 package com.joyintech.tams.invest.common.component.base.entrust.impl.dao;
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.entity.EtrDistribute;
+import com.joyintech.tams.common.base.entity.EtrDistributeKey;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
+import com.joyintech.tams.common.base.entity.EtrFinishStatus;
+import com.joyintech.tams.common.base.entity.EtrFinishStatusKey;
+import com.joyintech.tams.common.base.entity.EtrPledge;
+import com.joyintech.tams.common.base.entity.EtrPledgeKey;
 import com.joyintech.tams.invest.common.component.base.entrust.dto.BaseEtrFinishAmtDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -146,4 +153,11 @@ public interface BaseEtrInvestInfoMapper {
     void updatEetrDistribute(EtrEntrust etrEntrust);
 
     void deleteEtrDistributeInterfTmp(@Param("entrustId") String entrustId);
+
+    /**
+     * 根据指令代码删除委托指令明细数据
+     * @param entrustId
+     * @return
+     */
+    int deleteEntrustDetail(@Param("entrustId")String entrustId);
 }

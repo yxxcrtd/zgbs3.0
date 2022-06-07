@@ -152,14 +152,14 @@
     
     <!-- 资产代码联想查询各类资产对应的资产代码  edit by songyawei  共有类资产：债券，基金，股票-->
     <select id="getCommomFinprodMarketIds" resultType="com.joyintech.framework.select.SuggestDto">
-        SELECT 
+        SELECT
         	FIN_PRODUCT.FINPROD_ID finprodId,/* add by songyawei */
             FINPROD_MARKET_ID code,
             FINPROD_ABBR shortName
         FROM FIN_PRODUCT
         LEFT JOIN  FIN_PRODUCT_TYPE ON FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID
         <where>
-            <if test="finprodMarketId !=null and finprodMarketId != ''">    
+            <if test="finprodMarketId !=null and finprodMarketId != ''">
                 (FINPROD_MARKET_ID like CONCAT(CONCAT('%',
                 #{finprodMarketId,jdbcType=VARCHAR}),'%')
                 OR
@@ -168,19 +168,19 @@
             </if>
             AND FIN_PRODUCT_TYPE.TYPE_8 = #{assetType,jdbcType=VARCHAR}
             AND FIN_PRODUCT.FINPROD_TYPE2 in ('F01','F06','F10')
-        </where>    
+        </where>
     </select>
-    
+
     <!-- 资产代码联想查询各类资产对应的资产代码  edit by songyawei  非共有类资产：除债券，基金，股票 -->
     <select id="getFinprodMarketIds" resultType="com.joyintech.framework.select.SuggestDto">
-        SELECT 
+        SELECT
         	FIN_PRODUCT.FINPROD_ID finprodId,/* add by songyawei */
             FINPROD_MARKET_ID code,
             FINPROD_ABBR shortName
         FROM FIN_PRODUCT
         LEFT JOIN  FIN_PRODUCT_TYPE ON FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID
         <where>
-            <if test="finprodMarketId !=null and finprodMarketId != ''">    
+            <if test="finprodMarketId !=null and finprodMarketId != ''">
                 (FINPROD_MARKET_ID like CONCAT(CONCAT('%',
                 #{finprodMarketId,jdbcType=VARCHAR}),'%')
                 OR
@@ -188,8 +188,10 @@
                 #{finprodMarketId,jdbcType=VARCHAR}),'%'))
             </if>
             AND FIN_PRODUCT_TYPE.TYPE_8 = #{assetType,jdbcType=VARCHAR}
-            AND FIN_PRODUCT.FINPROD_TYPE2 not in ('F01','F06','F10')
-        </where>    
+            <!-- TISHKS-567: 【重庆已安排】CLONE - 【交易管理】【交易管理】【指令汇总】债券、基金、股票模块三个资产代码不能进行模糊搜索 modify by huwei 2022/5/7 start-->
+            <!-- AND FIN_PRODUCT.FINPROD_TYPE2 not in ('F01','F06','F10') -->
+            <!-- TISHKS-567: 【重庆已安排】CLONE - 【交易管理】【交易管理】【指令汇总】债券、基金、股票模块三个资产代码不能进行模糊搜索 modify by huwei 2022/5/7 end-->
+        </where>
     </select>
     
     <!-- 查询汇总指令  债券，基金，股票-->

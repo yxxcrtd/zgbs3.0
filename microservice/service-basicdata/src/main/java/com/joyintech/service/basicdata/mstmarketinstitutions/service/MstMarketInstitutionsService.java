@@ -10,10 +10,7 @@
  
 package com.joyintech.service.basicdata.mstmarketinstitutions.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -196,6 +193,9 @@ public class MstMarketInstitutionsService extends BaseService<MstMarketInstituti
             mstCustomerInfo.setCustomerId(entity.getCustomerId());//客户代码
             mstCustomerInfo.setCustomerName(entity.getCustomerName());//客户名称
             mstCustomerInfo.setCustomerType(DictCodeList.客户类型_法人.getValue());
+            if(StringUtil.isNotEmpty(entity.getIsIssuer())) {//是否发行人
+                mstCustomerInfo.setIsIssuer(entity.getIsIssuer());
+            }
             mstCustomerInfoMapper.insert(mstCustomerInfo);
             //客户评级表插入数据
             List<MstBondCreditRating> mstBondCreditRatingList = new ArrayList<MstBondCreditRating>();
@@ -291,5 +291,35 @@ public class MstMarketInstitutionsService extends BaseService<MstMarketInstituti
      */
     public List<MstMarketInstitutionsDto> deleteCheck(List<MstMarketInstitutionsDto> item){
         return mstMarketInstitutionsMapper.deleteCheck(item);
+    }
+
+    /**
+     * 1.判断机构表中是否存在
+     * 存在：则设置为发行人
+     * 不存在：执行第二段逻辑
+     * 2.判断接口表里是否存在,
+     * 不存在：返回null
+     * 存在：判断必填元素是否齐全，齐全则自动添加并设置为发行人
+     * 要素不齐全则返回查询数据回前台
+     *
+     * @param insitituteCode
+     * @return
+     */
+    public MstMarketInstitutionsDto autoAddInstitutions(String insitituteCode) {
+        MstMarketInstitutionsDto mstDto = mstMarketInstitutionsMapper.getByInsitituteCode(insitituteCode);
+        if(Objects.nonNull(mstDto)) {
+            MstCustomerInfo customerInfo = new MstCustomerInfo();
+            customerInfo.setCustomerId(mstDto.getCustomerId());
+            customerInfo.setIsIssuer(DictCodeList.是否_是.getValue());
+            mstCustomerInfoMapper.updateByPrimaryKeySelective(customerInfo);
+            mstDto.setDealFlag(0);//不需要处理
+            return mstDto;
+        }
+        MstMarketInstitutionsDto dto = mstMarketInstitutionsMapper.getInterfCustomerInfo(insitituteCode);
+        if(Objects.nonNull(dto)) {
+            dto.setDealFlag(1);//接口中的需要进行处理
+            dto.setIsIssuer(DictCodeList.是否_是.getValue());
+        }
+        return dto;
     }
 }

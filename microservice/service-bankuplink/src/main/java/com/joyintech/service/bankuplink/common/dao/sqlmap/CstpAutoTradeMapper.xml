@@ -46,4 +46,12 @@
 		select t.trade_id from trd_product_deal t where t.f_trade_id = #{fTradeId,jdbcType=VARCHAR} and t.is_cancel = 'N' and substr(t.trade_id, -1) != 'R'  AND rownum = 1
 	</select>
 
+
+	<select id="selectSecByFinprodMarketId" resultType="com.joyintech.tams.common.base.entity.FinProduct" parameterType="java.lang.String" >
+		select
+		<include refid="com.joyintech.tams.common.base.dao.FinProductMapper.Base_Column_List" />
+		from FIN_PRODUCT
+		where FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR} AND ROWNUM = 1
+	</select>
+
 </mapper>

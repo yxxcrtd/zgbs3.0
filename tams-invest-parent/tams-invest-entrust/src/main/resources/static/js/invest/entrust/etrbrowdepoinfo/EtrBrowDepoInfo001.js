@@ -99,7 +99,7 @@
             ,{field:'finprodName', title: 'EtrBrowDepoInfo001.finprodName', width:'15%',sortField:"finprodName"}
             ,{field:'psStr', title: 'EtrBrowDepoInfo001.ps', width:'10%',sortField:"ps"}
             ,{field:'price',type:'number', title: 'EtrBrowDepoInfo001.price', width:'10%', type:'number',sortField:"price"}
-            ,{field:'payFreq', title: 'EtrBrowDepoInfo001.payFreq', width:'10%',sortField:"payFreq"}
+            ,{field:'payFreqStr', title: 'EtrBrowDepoInfo001.payFreq', width:'10%',sortField:"payFreq"}
             ,{field:'ccyStr', title: 'EtrBrowDepoInfo001.ccy', width:'10%',sortField:"ccy"}
             ,{field:'vdateStr', title: 'EtrBrowDepoInfo001.entrustVDate', type:'date', width:'10%',sortField:"vdate"}
             ,{field:'mdateStr', title: 'EtrBrowDepoInfo001.entrustMDate', type:'date', width:'10%',sortField:"mdate"}

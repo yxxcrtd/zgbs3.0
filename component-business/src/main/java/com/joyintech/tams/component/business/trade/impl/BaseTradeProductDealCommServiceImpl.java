@@ -6,7 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.tams.invest.common.component.base.trade.BaseTradeProductDealService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -97,6 +100,10 @@ import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommSer
  */
 @Service
 public class BaseTradeProductDealCommServiceImpl extends BaseService implements BaseTradeProductDealCommService {
+    /**
+     * 日志
+     */
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 业务共通组件.资产头寸现金持仓共通组件
@@ -193,6 +200,7 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
      */
     @Override
     public CommonResult execute(FinProductTradeDto finProductTradeDto) {
+        logger.debug("【金融产品交易共通业务逻辑处理开始】,finProductTradeDto:{}", JSON.toJSONString(finProductTradeDto));
         if (finProductTradeDto == null) {
             return new CommonResult(CommonResult.FAILD, "没有数据需要处理");
         }
@@ -320,21 +328,21 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
         Map<String, Object> vDateNato = baseAssetCashPositionCommMapper.selectVDateNato(baseTradeDto.getTrdProductDeal().getFinprodId());
         String profitType = vDateNato == null ? null : (String)vDateNato.get("PROFIT_TYPE");//获取收益类型
         List<StlPayOrdersDto> globalStlOrderList=new ArrayList<StlPayOrdersDto>();
+        /*-------------------裴家俊------add------2018/11/23-------------end--------------------*/
         if(认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())
-        		&& DictCodeListExt1.金融产品类型_投管用_基金.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())||
-        		认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
-        		DictCodeList.收益类型_净值型.getValue().equals(profitType)&& DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())||
-        		认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
-                DictCodeList.收益类型_货币型.getValue().equals(profitType)&& DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())
+                && DictCodeListExt1.金融产品类型_投管用_基金.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())||
+                认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
+                        DictCodeList.收益类型_净值型.getValue().equals(profitType)&& DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())||
+                认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
+                        DictCodeList.收益类型_货币型.getValue().equals(profitType)&& DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())
                 // add by etliu 20210421 权益类资产相关代码合并 start
                 || 认购确认_申购确认_赎回确认_除权登记_红利再投.contains(baseTradeDto.getTrdProductDeal().getPs())&&
-                        DictCodeListExt3.金融产品类型_投管用_权益类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())
-                // add by etliu 20210421 权益类资产相关代码合并 end
+                DictCodeListExt3.金融产品类型_投管用_权益类资产.getValue().equals(baseTradeDto.getTrdProductDeal().getFinprodType2())
+            // add by etliu 20210421 权益类资产相关代码合并 end
         ){
-        			globalStlOrderList=baseTradeDto.getStlPayOrdersList();
-        			baseTradeDto.setStlPayOrdersList(new ArrayList<StlPayOrdersDto>());
+            globalStlOrderList=baseTradeDto.getStlPayOrdersList();
+            baseTradeDto.setStlPayOrdersList(new ArrayList<StlPayOrdersDto>());
         }
-        /*-------------------裴家俊------add------2018/11/23-------------end--------------------*/
         if (!finProductTradeDto.isNeedSum()) {
         	//update by wangpeng  20191225 通道费改造 项目类，计划类利率 不需要入库通道信息
             String chlModelType = CacheUtil.getSysParam("CHL_MODEL_TYPE");
@@ -748,6 +756,8 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
             	inputDto.setAssetType2(baseTradeProductDealDto.getAssetType2());
             }
 			inputDto.setTrdProductDealAdd(baseTradeProductDealDto.getTrdProductDealAdd());
+            // 针对新UI添加 用于区分登记/成交/交收/交收失败
+            inputDto.setStage(baseTradeProductDealDto.getStage());
 
             if (是否处理持仓) {
                 List<PtlSecPositionFlowDto> ptlSecPositionFlowDtoss = assetPositionsCashCommServiceImpl.positionDeal(inputDto);//组合持仓
@@ -823,6 +833,9 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
                 // GNS-949:增加是否工作流数据标识 modify by fuyongsheng 20220227 start
                 cashInputDto.setNotWorkflow(finProductTradeDto.isNotWorkflow());
                 // GNS-949:增加是否工作流数据标识 modify by fuyongsheng 20220227 end
+                cashInputDto.setTrdProductDealAdd(baseTradeProductDealDto.getTrdProductDealAdd());
+                // 针对新UI添加 用于区分登记/成交/交收/交收失败
+                cashInputDto.setStage(baseTradeProductDealDto.getStage());
                 if (是否处理持仓) {
                     List<PtlCashPositionFlowDto> resultList = assetPositionsCashCommServiceImpl.cashDeal(cashInputDto);//现金处理详细
 //                    if (持仓类型 == DictCodeList.持仓类型_可用

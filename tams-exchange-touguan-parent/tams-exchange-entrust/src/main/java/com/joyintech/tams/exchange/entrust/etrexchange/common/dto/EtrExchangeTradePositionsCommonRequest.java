@@ -63,6 +63,9 @@ public class EtrExchangeTradePositionsCommonRequest {
     @ApiModelProperty(name="tradePlat",value="交易平台",example="A")
     private String tradePlat;
 
+    @ApiModelProperty(name="queryList",value="导出时传入整个列表",example="A1")
+    private List<EtrExchangeTradePositionsCommonResponse> queryList;
+
     @ApiModelProperty(name="从pageMode获取",value="从pageMode获取")
     public String getSort() {
         return pageMode.getSort();
@@ -166,5 +169,13 @@ public class EtrExchangeTradePositionsCommonRequest {
 
     public void setTradePlat(String tradePlat) {
         this.tradePlat = tradePlat;
+    }
+
+    public List<EtrExchangeTradePositionsCommonResponse> getQueryList() {
+        return queryList;
+    }
+
+    public void setQueryList(List<EtrExchangeTradePositionsCommonResponse> queryList) {
+        this.queryList = queryList;
     }
 }

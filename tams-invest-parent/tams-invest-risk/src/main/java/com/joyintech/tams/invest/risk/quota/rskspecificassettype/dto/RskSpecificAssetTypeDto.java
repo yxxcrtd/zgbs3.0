@@ -3,6 +3,7 @@ package com.joyintech.tams.invest.risk.quota.rskspecificassettype.dto;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
 import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.validation.annotation.Length;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -72,8 +73,8 @@ public class RskSpecificAssetTypeDto extends RskSpecificAssetType implements ITa
 
     @Override
     @PrimaryKey(PrimaryKey.Field.PK_1)
-    public String getSpecificId(){
-        return super.getSpecificId();
+    public String getFinprodId() {
+        return super.getFinprodId();
     }
 
     public String getOperateType() {
@@ -157,5 +158,17 @@ public class RskSpecificAssetTypeDto extends RskSpecificAssetType implements ITa
 
     public String getIsCreditAssetName(){
         return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsCreditAsset());
+    }
+
+    public String getIsLiquidity1Name(){
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsLiquidity1());
+    }
+
+    public String getIsLiquidity2Name(){
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsLiquidity2());
+    }
+
+    public String getIsLiquidity3Name(){
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsLiquidity3());
     }
 }

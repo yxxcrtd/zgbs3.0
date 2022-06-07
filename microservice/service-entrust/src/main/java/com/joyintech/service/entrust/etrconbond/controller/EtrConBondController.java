@@ -14,6 +14,7 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -28,10 +29,14 @@ import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
-import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +76,18 @@ public class EtrConBondController {
 
     @Autowired
     private EtrEntrustBackupMapper etrEntrustBackupMapper;
+
+    @Autowired
+    private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    @Autowired
+    private WflEtrEntrustAddMapper wflEtrEntrustAddMapper;
+
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
+    @Autowired
+    private WflEtrEntrustMapper wflEtrEntrustMapper;
 
     public static final String OPERATE_TYPE_SAVE = "save";
     public static final String OPERATE_TYPE_SUBMIT = "submit";
@@ -226,7 +243,11 @@ public class EtrConBondController {
         if (StringUtil.equals(OPERATE_TYPE_MODIFY, operateType)) {
             systemAct = DictCodeListExt3.系统动作_修改.getValue();
         }
-        positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
+        try {
+            positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
+        }catch (PositionException e){
+            WorkFlowUtil.showMessage(e.getMessage(),MessageType.错误消息);
+        }
     }
 
     @Transactional
@@ -298,15 +319,51 @@ public class EtrConBondController {
     @PostMapping("doBack")
     public void doBack(@RequestBody EtrConBondDto dto) {
         log.info("doBack() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
+        BaseEtrInvestInfoDto baseEtrInvestInfoDto = new BaseEtrInvestInfoDto();
+        baseEtrInvestInfoDto.setWorkFlowId(dto.getWorkflowId());
+
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustId());
+        if(null == etrEntrust) {
+            etrEntrust = new EtrEntrust();
+            etrEntrust.setEntrustId(dto.getEntrustId());
+            WflEtrEntrustKey key = new WflEtrEntrustKey();
+            key.setEntrustId(dto.getEntrustId());
+            key.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+            WflEtrEntrust wflEtrEntrust = wflEtrEntrustMapper.selectByPrimaryKey(key);
+            if(null != wflEtrEntrust) {
+                BeanUtil.copyPropertiesIgnoreNull(etrEntrust, wflEtrEntrust);
+            }
+        }
+
+        etrEntrust.setEntrustStatus(BussinessDictCodeList.委托状态_已退回.getValue());
+
+        baseEtrInvestInfoDto.setEtrEntrust(etrEntrust);
+
+        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(dto.getEntrustId());
+        if(null == etrEntrustAdd) {
+            etrEntrustAdd = new EtrEntrustAdd();
+            etrEntrustAdd.setEntrustId(dto.getEntrustId());
+            WflEtrEntrustAddKey key = new WflEtrEntrustAddKey();
+            key.setEntrustId(dto.getEntrustId());
+            key.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+            WflEtrEntrustAdd wflEtrEntrustAdd = wflEtrEntrustAddMapper.selectByPrimaryKey(key);
+            if(null != wflEtrEntrustAdd) {
+                BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, wflEtrEntrustAdd);
+            }
+        }
+        baseEtrInvestInfoDto.setEtrEntrustAdd(etrEntrustAdd);
+        WFlowCommonService.inserBackuptWithQuery(baseEtrInvestInfoDto);
         WFlowCommonService.doBackFlow(dto.getWorkflowId(), dto.getEntrustId());
+        WFlowCommonService.doInsertFlow(dto.getOperateType(),baseEtrInvestInfoDto);
 //        positionRequestService.sendDelete(dto);
     }
 
     @Transactional
     @DTXTransaction
     @PostMapping("doDelete")
-    public void doDelete(String workflowId) {
-        log.info("doDelete() called with parameters => 【workflowId = {}】", workflowId);
+    public void doDelete(@RequestBody Map<String, Object> param) {
+        log.info("doDelete() called with parameters => 【param = {}】", param);
+        final String workflowId = (String) param.get("workflowId");
         WFlowCommonService.deleteFlow(workflowId);
         EtrConBondDto entity = new EtrConBondDto();
         entity.setWorkflowId(workflowId);

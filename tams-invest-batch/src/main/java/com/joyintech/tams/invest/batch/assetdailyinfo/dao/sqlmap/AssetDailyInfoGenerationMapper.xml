@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.invest.batch.assetdailyinfo.dao.AssetDailyInfoGenerationMapper">
+    
+    <delete id="deleteTodayAssetDailyInfo">
+        delete from ASSET_DAILY_INFO where CDATE = #{batchDate,jdbcType=DATE}
+    </delete>
+
+    <select id="getAssetInfo" resultType="String">
+        SELECT
+            FIN_PRODUCT.FINPROD_ID
+        FROM FIN_PRODUCT
+        LEFT JOIN FIN_PRODUCT_TYPE
+               ON FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID
+        WHERE FINPROD_TYPE2 in ('F01','F06','F10','F32')
+    </select>
+
+    <select id="getSecInfoModel" resultType="com.joyintech.tams.business.common.dto.SecInfoModelDto">
+        SELECT
+        A.VDATE startDate,
+        A.MDATE endDate,
+        (
+        SELECT MIN(C.VDATE) FROM FIN_CASH_PLAN C WHERE C.CASH_ID = B.CASH_ID
+        ) firstPayDate,
+        A.ISSUE_PRICE issuePrice,
+        A.COUPON_SPECIES bondsType,
+        E.BASIS basis,
+        F.INT_TYPE intRateType,
+        G.PAY_CYCLE yearIntRate,
+        G.CALC_RULE calMethod,
+        H.EXERCISE_DATE nextExeDate,
+        H.EXERCISE_PRICE nextExercisePrice,
+        A.TRADE_MARKET tradeMarket,
+        A.IS_RIGHT isRight
+        FROM FIN_PRODUCT A
+        LEFT JOIN FIN_CASH_INFO B
+        ON A.FINPROD_ID = B.FINPROD_ID
+        AND B.FINPROD_TYPE = #{finprodType}
+        AND B.CASH_TYPE_1 = #{cashType1}
+        LEFT JOIN FIN_PRODUCT_TYPE D
+        ON D.FINPROD_ID = A.FINPROD_ID
+        <!-- 可能存在多条规则  20210617 yzg start -->
+        left join (select FINPROD_ID, max(eff_date) as EFF_DATE
+        from FIN_CASH_CALC_RULE
+        where   FINPROD_TYPE2 = #{finprodType2}
+        and IS_INITIAL = #{YES_NO_Y}
+        group by FINPROD_ID) T1
+        on T1.FINPROD_ID = A.FINPROD_ID
+        <!-- 可能存在多条规则  20210617 yzg end -->
+        LEFT JOIN FIN_CASH_CALC_RULE E
+        ON E.FINPROD_ID = A.FINPROD_ID
+        AND E.FINPROD_TYPE2 = #{finprodType2}
+        and E.IS_INITIAL = #{YES_NO_Y}
+        and E.EFF_DATE = T1.EFF_DATE
+        LEFT JOIN FIN_RATE_INFO F
+        ON F.CASH_ID = B.CASH_ID
+        AND F.FINPROD_TYPE2 = #{finprodType2}
+        LEFT JOIN FIN_CASH_PAY_RULE G
+        ON G.CASH_ID = B.CASH_ID
+        AND G.FINPROD_TYPE2 = #{finprodType2}
+        LEFT JOIN (
+        SELECT *
+        FROM FIN_EXERCISE_PLAN
+        WHERE
+        EXERCISE_DATE IN (
+        SELECT MIN(EXERCISE_DATE) FROM FIN_EXERCISE_PLAN WHERE FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 = #{finprodType2} AND EXERCISE_DATE &gt;= #{sysDate}
+        )
+        AND FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 = #{finprodType2}
+        <if test="ps == psT03">AND EXERCISE_TYPE = #{EXEC_MODE02}</if>
+        <if test="ps == psT39">AND EXERCISE_TYPE = #{EXEC_MODE01}</if>
+        and rownum = 1
+        ) H ON 1=1
+        WHERE
+        A.FINPROD_ID = #{finprodId}
+    </select>
+</mapper>

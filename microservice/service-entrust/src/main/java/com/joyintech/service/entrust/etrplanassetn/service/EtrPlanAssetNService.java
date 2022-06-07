@@ -606,4 +606,12 @@ public class EtrPlanAssetNService extends BaseService<EtrPlanAssetNDto> {
         }
         return entity;
     }
+
+    public double getValue(Map map) {
+        Map<String, Double> mapValue = etrPlanAssetNMapper.getValue(map);
+        if (StringUtil.isNotEmpty(mapValue) && StringUtil.isNotEmpty(mapValue.get("value"))){
+            return mapValue.get("value");
+        }
+        return 0;
+    }
 }

@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.common.bean;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @ClassName SysParamBean
  * @Description TODO
@@ -30,5 +32,13 @@ public class SysParamBean {
     public SysParamBean(String paraCode, String systemCode) {
         this.paraCode = paraCode;
         this.systemCode = systemCode;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("paraCode", paraCode)
+                .add("systemCode", systemCode)
+                .toString();
     }
 }

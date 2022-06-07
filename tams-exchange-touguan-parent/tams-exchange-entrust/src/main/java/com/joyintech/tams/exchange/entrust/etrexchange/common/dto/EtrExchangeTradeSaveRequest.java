@@ -31,6 +31,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -106,7 +107,7 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
     private String businessTypeName;
 
     @ApiModelProperty(name="standardBondVolume",value="标准券数量",example="")
-    private Long standardBondVolume;
+    private BigDecimal standardBondVolume;
 
     @ApiModelProperty(name="repoAmt",value="回购金额",example="12")
     private BigDecimal repoAmt;
@@ -262,6 +263,10 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
 
 
     private BigDecimal disRate;
+    /**
+     * 投管业务类型
+     */
+    private String busiTypePosition;
 
     public BigDecimal getDisRate() {
         return disRate;
@@ -597,11 +602,11 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
         this.priceModel = priceModel;
     }
 
-    public Long getStandardBondVolume() {
+    public BigDecimal getStandardBondVolume() {
         return standardBondVolume;
     }
 
-    public void setStandardBondVolume(Long standardBondVolume) {
+    public void setStandardBondVolume(BigDecimal standardBondVolume) {
         this.standardBondVolume = standardBondVolume;
     }
 
@@ -757,6 +762,14 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
         return currentTab;
     }
 
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
     public void setCurrentTab(String currentTab) {
         this.currentTab = currentTab;
     }
@@ -771,4 +784,5 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
         }
         return  tradeMultiPtl001Dtos;
     }
+
 }

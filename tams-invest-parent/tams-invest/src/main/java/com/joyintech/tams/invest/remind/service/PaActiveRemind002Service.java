@@ -15,6 +15,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
@@ -171,6 +172,7 @@ public class PaActiveRemind002Service extends BaseService<PaActiveRemind001Dto> 
         param.put("platDate", iPlatformDate.getSysDate());
         param.put("R10S1", BussinessDictCodeList.提醒类型_小分类_债券上市流通操作.getValue());
         param.put("R10S2", BussinessDictCodeList.提醒类型_小分类_资产要素登记修改.getValue());
+        param.put("R12S1", BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue());
         // 多级法人改造 add by caiqun 20200615
         if(MultilevelDataAuthorityUtil.isEnabled()) {
 			param.put("isEnabled", true);	// add by liupengfei for 多级法人改造
@@ -218,6 +220,11 @@ public class PaActiveRemind002Service extends BaseService<PaActiveRemind001Dto> 
         if (StringUtil.isNotEmpty(mainCategory) && StringUtil.equals(mainCategory, BussinessDictCodeList.提醒类型_大分类_分销缴款提醒.getValue())){
             selramindR11(param, dto);
         }
+         //标准券额度不足提醒
+         if (StringUtil.isNotEmpty(mainCategory) && StringUtil.equals(mainCategory, BussinessDictCodeList.提醒类型_大分类_标准券额度不足提醒.getValue())){
+             param.put("quaryDateStr",DateUtil.format((Date)param.get("quaryDate")));
+             selramindR12(param, dto);
+         }
         //add by chenjiaxing 分销缴款提醒 20210727 end
          //债券上市流通提醒
          if (StringUtil.isNotEmpty(mainCategory) && StringUtil.equals(mainCategory, BussinessDictCodeList.提醒类型_大分类_债券上市流通.getValue())){
@@ -522,6 +529,26 @@ public class PaActiveRemind002Service extends BaseService<PaActiveRemind001Dto> 
         }
     }
     //add by chenjiaxing 分销缴款提醒 20210727 start
+
+
+    /**
+     * 标准券额度不足提醒
+     * @param param
+     * @param dto
+     */
+    public void selramindR12(Map<String, Object> param, List<PaActiveRemind001Dto> dto){
+        String smallCategory = (String)param.get("smallCategory");
+        param.put("R12S1", BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue());
+        param.put("userId", LoginUserUtil.getUserName());
+        com.joyintech.framework.base.intf.Page page = CacheUtil.getPage("EtrExchangeTradeFjyywzl001");
+        String menuId=page.getMenuId();
+        List<PaActiveRemind001Dto> list=paActiveRemind002Mapper.selramindR12S1(param);
+        list.stream().forEach(item->{
+            item.setMenuId(menuId);
+        });
+        dto.addAll(list);
+    }
+
     /**
      * 产品端主动提醒
      * @param param
@@ -802,6 +829,9 @@ public class PaActiveRemind002Service extends BaseService<PaActiveRemind001Dto> 
         sysActivereminderInfo.setMdate(DateUtil.parse((String)param.get("mdate")));
         sysActivereminderInfo.setEffflag(BussinessDictCodeList.是否_否.getValue());
         sysActivereminderInfo.setCloseflag("0");
+        if(BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue().equals((String)param.get("remType"))){
+            sysActivereminderInfo.setBusinessPrimaryKey1((String)param.get("tradePlace"));
+        }
         //当前用户所属机构代码
         String createInst =  MultilevelDataAuthorityUtil.getService().queryOrganizationCode(LoginUserUtil.getUserName());
         sysActivereminderInfo.setInstitutionCode(createInst);

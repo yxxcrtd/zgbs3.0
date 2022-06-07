@@ -12,11 +12,12 @@
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
         <result column="WORKFLOW_ID" property="workflowId" jdbcType="VARCHAR" />
         <result column="WORKFLOW_STATUS" property="workflowStatus" jdbcType="VARCHAR" />
+        <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         ENTRUST_ID ENTRUST_ID, BID_PRICE BID_PRICE, BID_PRIN_AMT BID_PRIN_AMT, CREATE_USER CREATE_USER, 
         CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, 
-        WORKFLOW_ID WORKFLOW_ID, WORKFLOW_STATUS WORKFLOW_STATUS
+        WORKFLOW_ID WORKFLOW_ID, WORKFLOW_STATUS WORKFLOW_STATUS, PORTFOLIO_ID PORTFOLIO_ID
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -130,6 +131,9 @@
             <if test="workflowStatus != null" >
                 WORKFLOW_STATUS,
             </if>
+            <if test="portfolioId != null" >
+                PORTFOLIO_ID,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -161,6 +165,9 @@
             </if>
             <if test="workflowStatus != null" >
                 #{workflowStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="portfolioId != null" >
+                #{portfolioId,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

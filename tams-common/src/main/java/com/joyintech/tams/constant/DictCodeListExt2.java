@@ -1637,6 +1637,8 @@ public enum DictCodeListExt2 implements BaseDictCodeList {
     平安业务类型_债券借贷融出到期(DictCode.平安业务类型,"108","债券借贷融出到期"),
     平安资产类型_期权(DictCode.平安资产类型,"F18","期权"),
     平安资产类型_期货(DictCode.平安资产类型,"F19","期货"),
+    平安资产类型_债券(DictCode.平安资产类型,"F01","债券"),
+    平安资产类型_信用保护凭证(DictCode.平安资产类型,"F37","信用保护凭证"),
     // add by qmh 20190712  利率互换交易  start
     营业日准则_按实际天数调整(DictCode.营业日准则,"05","按实际天数调整"),
     共通业务类型_利率互换交易(DictCode.共通业务类型,"TRD53","利率互换交易"),
@@ -1965,6 +1967,7 @@ public enum DictCodeListExt2 implements BaseDictCodeList {
     共通业务类型_基金投向维护(DictCode.共通业务类型,"RSK51","基金投向维护"),
     共通业务类型_股票分红公告(DictCode.共通业务类型,"MST34","股票分红公告"),
     共通业务类型_基金分红公告(DictCode.共通业务类型,"MST35","基金分红公告"),
+    共通业务类型_银行间基础信息(DictCode.共通业务类型,"MST36","银行间基础信息"),
     /**
      * 2021-04-07 新增报表：理财子公司月度统计表
      */

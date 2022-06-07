@@ -10,6 +10,12 @@
             T1.TRADE_DATE tradeDate,
             T1.SETTLE_DATE settleDate,
             T1.PORTFOLIO_ID portfolioId,
+            <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 start-->
+            CASE
+                WHEN etr.ENTRUST_CLASS = '02' THEN detail.PORTFOLIO_NAME
+                ELSE T3.PORTFOLIO_NAME
+            END portfolioName,
+            <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 end-->
             concat(concat(sci.BUSI_ACCT_NO,':'),sci.ACCT_NAME) acctNo,
             concat(concat(ssai.SEC_ACCT_ID,':'),ssai.SEC_ACCT_NAME) secAcctId,
             T1.TRADE_MARKET tradeMarket,
@@ -43,7 +49,6 @@
             T1.BUSI_TYPE busiType,
             T1.COUNTER_ID counterId,
             T1.ENTRUST_NO entrustNo,
-            T3.PORTFOLIO_NAME portfolioName,
             T4.COUNTER_NAME counterName,
         T1.DEAL_NO dealNo,
         decode( T1.SETTLE_STATUS,'01',1,'02',3,'03',2,'04',4) sort
@@ -57,21 +62,37 @@
         LEFT JOIN  STL_SEC_ACCT_INFO ssai ON T1.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN  FIN_PRODUCT  F1 ON T1.PLEDGE_ID = F1.FINPROD_ID
         LEFT JOIN  FIN_PRODUCT  F2 ON T1.B_PLEDGE_ID = F2.FINPROD_ID
+        <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 start-->
+        LEFT JOIN (
+            SELECT
+                ENTRUST_ID,
+                wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+            FROM
+                ETR_ENTRUST_DETAIL
+            LEFT JOIN
+                PTL_PORTFOLIO
+            ON
+                ETR_ENTRUST_DETAIL.portfolio_id = PTL_PORTFOLIO.portfolio_id
+            GROUP BY
+            ENTRUST_ID
+        ) detail ON T1.ENTRUST_NO = detail.ENTRUST_ID
+        <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 end-->
         <where>
+            <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 start-->
             <if test="userName != null and userName != ''">
-                AND T1.PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userName})
+                AND etr.PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userName})
             </if>
             <if test="portfolioId != null and !portfolioId.isEmpty()">
-                AND (
-                T1.PORTFOLIO_ID IN
-                <foreach collection="portfolioId" item="item" open="(" close=")" separator=",">
-                    #{item}
+                AND
+                <foreach collection="portfolioId" item="item" index = "index" open="(" close=")">
+                    <if test="index== 0">
+                        EXISTS (select 1 from ETR_ENTRUST_DETAIL det where det.ENTRUST_ID = T1.ENTRUST_NO AND det.PORTFOLIO_ID = #{item})
+                    </if>
+                    <if test="index!= 0">
+                        OR  EXISTS (select 1 from ETR_ENTRUST_DETAIL det where det.ENTRUST_ID = T1.ENTRUST_NO AND det.PORTFOLIO_ID = #{item})
+                    </if>
                 </foreach>
-                OR T1.PORTFOLIO_ID IN
-                <foreach collection="portfolioId" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-                )
+                <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 end-->
             </if>
             <if test="tradeMarket != null and tradeMarket != ''">
                 and T1.TRADE_MARKET =#{tradeMarket}
@@ -432,4 +453,11 @@
     <delete id="deleteEtrFinishStatus">
         DELETE FROM ETR_FINISH_STATUS WHERE TRADE_ID = #{tradeId}
     </delete>
+
+    <select id="selectTrdProductTempDeals" resultType="com.joyintech.tams.common.base.entity.TrdProductTempDeal" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.Base_Column_List" />
+        from TRD_PRODUCT_TEMP_DEAL
+        where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
+    </select>
 </mapper>

@@ -8,7 +8,7 @@ import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestRiskManagement;
-import com.joyintech.tams.exchange.service.trade.processor.MessageSenderService;
+import com.joyintech.tams.exchange.service.trade.processor.MessageSenderManagement;
 import com.joyintech.tams.exchange.service.trade.processor.TradeHelper;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.algorithm.AlgorithmHelper;
@@ -41,8 +41,8 @@ public class EntrustCancelProcessor {
     private EntrustService entrustService;
     @Autowired
     private InvestRiskManagement investRiskManagement;
-    @Autowired
-    private MessageSenderService messageSenderService;
+    //    @Autowired
+//    private MessageSenderService messageSenderService;
     @Autowired
     private TransactionHelper transactionHelper;
     @Autowired
@@ -67,6 +67,8 @@ public class EntrustCancelProcessor {
     private AlgorithmHelper algorithmHelper;
     @Autowired
     private BondHelper bondHelper;
+    @Autowired
+    private MessageSenderManagement messageSenderManagement;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -218,12 +220,13 @@ public class EntrustCancelProcessor {
             }
             //非大宗意向申报
             if (!EntrustUtils.isIntentionEntrust(entrust.getEntrustProp())) {
-                if (instruction.getEntrustNum() > 0) {
+                if (instruction.volumeInstruction()) {
                     instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() - unFrozenVolume));
                 } else if (instruction.getEntrustAmt().doubleValue() > 0) {
                     if (instruction.getFrozenQuantity().doubleValue() > 0) {
                         // 金额指令全部以净价处理， 需要重新计算指令金额冻结
-                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust.getEntrustProp(), entrust.getAssetType(), entrust.getEntrustPrice(), unFrozenVolume, unFrozenBalance);
+//                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust.getEntrustProp(), entrust.getAssetType(), entrust.getEntrustPrice(), unFrozenVolume, unFrozenBalance);
+                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust, unFrozenVolume, unFrozenBalance);
                         instruction.setFrozenQuantity(TradeUtils.subtract(instruction.getFrozenQuantity(), (unFrozenBalanceInstructionTrade == null && !isFromTrade) ? unFrozenBalance : unFrozenBalanceInstructionTrade, 2));
                     } else {
                         instruction.setFrozenQuantity(BigDecimal.valueOf(0.00));
@@ -232,19 +235,21 @@ public class EntrustCancelProcessor {
             }
             //大宗意向申报
             else if (EntrustUtils.isIntentionEntrust(entrust.getEntrustProp())) {
-                if (instruction.getEntrustNum() > 0) {
+                if (instruction.volumeInstruction()) {
                     instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() - unFrozenVolume));
                 } else if (instruction.getEntrustAmt().doubleValue() > 0) {
                     if (instruction.getFrozenQuantity().doubleValue() > 0) {
                         // 金额指令全部以净价处理， 需要重新计算指令金额冻结
-                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust.getEntrustProp(), entrust.getAssetType(), entrust.getEntrustPrice(), unFrozenVolume, unFrozenBalance);
+//                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust.getEntrustProp(), entrust.getAssetType(), entrust.getEntrustPrice(), unFrozenVolume, unFrozenBalance);
+                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust, unFrozenVolume, unFrozenBalance);
                         instruction.setFrozenQuantity(TradeUtils.subtract(instruction.getFrozenQuantity(), (unFrozenBalanceInstructionTrade == null && !isFromTrade) ? unFrozenBalance : unFrozenBalanceInstructionTrade, 2));
                     } else {
                         instruction.setFrozenQuantity(BigDecimal.valueOf(0.00));
                     }
                 }
             }
-            messageSenderService.pushProgressToMQ(instruction);
+//            messageSenderService.pushProgressToMQ(instruction);
+            messageSenderManagement.pushProgress(instruction);
 
             logger.info("解冻指令信息成功，指令委托数量为：{} 指令委托金额为：{} 指令已完成数量或者金额为：{} 指令冻结为：{}", instruction.getEntrustNum(), instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
             //解冻时释放风控

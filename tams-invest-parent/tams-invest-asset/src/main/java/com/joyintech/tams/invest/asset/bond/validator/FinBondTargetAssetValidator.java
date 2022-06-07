@@ -105,9 +105,9 @@ public class FinBondTargetAssetValidator implements BeanValidator{
                 if(dto.getIsNetprice () == null || dto.getIsNetprice () == ""){
                     resultList.add(new ValidMessage(getMessage("是否净价交易不能为空")));
                 }
-                if(dto.getTradePlat () == null || dto.getTradePlat () == ""){
-                    resultList.add(new ValidMessage(getMessage("允许交易的平台不能为空")));
-                }
+//                if(dto.getTradePlat () == null || dto.getTradePlat () == ""){
+//                    resultList.add(new ValidMessage(getMessage("允许交易的平台不能为空")));
+//                }
             }
             // 获取对应画面的page
             Page page = CacheUtil.getPage("FinBondTargetAsset002");

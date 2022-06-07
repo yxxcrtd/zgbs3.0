@@ -10,12 +10,14 @@
 
 package com.joyintech.tams.invest.common.riskinfrds.param.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
+import com.joyintech.redis.common.entity.Value;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -63,8 +65,14 @@ public class IndicatorParamValService {
             return new HashMap<>();
         }
         // 从Redis取得参数值
-        Map<String, Map<String, IValue<Object>>> res = valReadSrv.readList(
-            changeKey(paraValList, true));
+        Map<String, Map<String, IValue<Object>>> res=checkBatchKey(paraValList,(list)->{
+            return valReadSrv.readList(
+                    changeKey(list, true));
+        });
+        if(CollectionUtils.isEmpty(res)){
+            res = valReadSrv.readList(
+                    changeKey(paraValList, true));
+        }
         return changeKey(res, false);
     }
     /**
@@ -96,6 +104,48 @@ public class IndicatorParamValService {
         }
         // 更新Redis参数值
         valWriteSrv.writeList(changeKey(paraValMap, true));
+    }
+
+    /**
+     * 检查有无批量redis识别域的结构类型，比如押品参数等
+     * @param paraValList
+     * @param function
+     * 备注：把原识别域用指定分隔符重新切割成List，里面每个进行查询参数值，然后再重新拼接构造成一条
+     * @return
+     */
+    private Map<String, Map<String, IValue<Object>>> checkBatchKey(Map<String, Map<String, IValue<Object>>> paraValList,
+                                                                   Function< Map<String, Map<String, IValue<Object>>>, Map<String, Map<String, IValue<Object>>>> function) {
+        Map<String, Map<String, IValue<Object>>> paramTotalList = new HashMap<>();
+        paraValList.entrySet().forEach(en -> {
+            Map<String, Map<String, IValue<Object>>> paramList = new HashMap<>();
+            String key = en.getKey();
+            Map<String, IValue<Object>> val = en.getValue();
+            for(String k:val.keySet()){
+                //redis识别域
+                if(StringUtil.contains(k, RiskUtil.UP_LINE)){
+                    Map<String, IValue<Object>> valTotal=new HashMap<>();
+                    StringBuilder sb=new StringBuilder();
+                    for(String lk:k.split(RiskUtil.UP_LINE_SPLIT)){
+                        Map<String, IValue<Object>> valSub=new HashMap<>();
+                        IValue<Object> rValue = val.get(k);
+                        valSub.put(lk,rValue);
+                        paramList.put(key, valSub);
+                        Map<String, Map<String, IValue<Object>>> retSub=function.apply(paramList);
+                        IValue<Object> rVal=retSub.get(RedisKeyEnum.指标参数值.key()+key).get(lk);
+                        String values=StringUtil.isNotEmpty(rVal)?(String)rVal.value():null;
+                        if(StringUtil.isNotEmpty(values))
+                            sb.append(values).append(",");
+                    };
+                    if(StringUtil.isNotEmpty(sb)) {
+                        IValue<Object> rValue = new Value<>(str->str);
+                        rValue.value(sb.toString());
+                        valTotal.put(k, rValue);
+                        paramTotalList.put(key,valTotal);
+                    }
+                }
+            };
+        });
+        return paramTotalList;
     }
 
     private Map<String, Map<String, IValue<Object>>> changeKey(Map<String, Map<String, IValue<Object>>> paraValList,

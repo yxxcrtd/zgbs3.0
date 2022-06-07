@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.common.cache.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.google.common.base.Strings;
 import com.joyintech.redis.core.base.PipeReadService;
 import com.joyintech.redis.core.base.PipeWriteService;
@@ -23,22 +24,31 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class RedisCacheServiceImpl<PK extends Serializable, T extends KeyMethodInterface<PK>> implements CacheService<PK, T> {
+    /**
+     * 日志对象
+     */
     protected static final Logger logger = LoggerFactory.getLogger(RedisCacheServiceImpl.class);
-
+    public static AtomicInteger entrustRAMCount = new AtomicInteger(0);
+    public static AtomicInteger entrustRedisCount = new AtomicInteger(0);
+    public static AtomicInteger integratedEntrustRAMCount = new AtomicInteger(0);
+    public static AtomicInteger integratedEntrustRedisCount = new AtomicInteger(0);
+    public static AtomicInteger orderRAMCount = new AtomicInteger(0);
+    public static AtomicInteger orderRedisCount = new AtomicInteger(0);
+    public static AtomicInteger tradeRAMCount = new AtomicInteger(0);
+    public static AtomicInteger tradeRedisCount = new AtomicInteger(0);
+    protected final Map<PK, T> memory_cache = new ConcurrentHashMap<>();
     @Autowired
     protected PipeWriteService<String, PK, T> pipeWriteService;
     @Autowired
     protected PipeReadService<String, PK, T> pipeReadService;
     @Autowired
     protected DataServiceConfig dataServiceConfig;
-
     protected RedisSerializer<String> keySerializer = new FastJsonRedisSerializer<>(String.class);
-
     protected RedisSerializer<T> redisSerializer;
-
-    protected final Map<PK, T> memory_cache = new ConcurrentHashMap<>();
-
     protected String className = null;
+    protected AtomicInteger offset = new AtomicInteger(0);
+    protected ThreadLocal<SimpleDateFormat> formatThreadLocal = ThreadLocal.withInitial(() ->
+            new SimpleDateFormat("yyMMddHHmmss"));
 
     @PostConstruct
     public void coverCache() {
@@ -55,26 +65,12 @@ public abstract class RedisCacheServiceImpl<PK extends Serializable, T extends K
 
     protected abstract void delete(PK PK);
 
-    protected AtomicInteger offset = new AtomicInteger(0);
-
-    public static AtomicInteger entrustRAMCount = new AtomicInteger(0);
-
-    public static AtomicInteger entrustRedisCount = new AtomicInteger(0);
-
-    public static AtomicInteger integratedEntrustRAMCount = new AtomicInteger(0);
-
-    public static AtomicInteger integratedEntrustRedisCount = new AtomicInteger(0);
-
-    public static AtomicInteger orderRAMCount = new AtomicInteger(0);
-
-    public static AtomicInteger orderRedisCount = new AtomicInteger(0);
-
-    public static AtomicInteger tradeRAMCount = new AtomicInteger(0);
-
-    public static AtomicInteger tradeRedisCount = new AtomicInteger(0);
-
-    protected ThreadLocal<SimpleDateFormat> formatThreadLocal = ThreadLocal.withInitial(() ->
-            new SimpleDateFormat("yyMMddHHmmss"));
+    protected String getClassName() {
+        if (Strings.isNullOrEmpty(className)) {
+            className = getTClass().getName();
+        }
+        return className;
+    }
 
     protected String genDbId() {
         //1s处理不能超过3w条
@@ -196,8 +192,9 @@ public abstract class RedisCacheServiceImpl<PK extends Serializable, T extends K
             redisSerializer = new FastJsonRedisSerializer<>(getTClass());
             //            setRedisSerializer();
         }
+        logger.info("getAllFromRedis() called with parameters => 【{}】", className);
         Map<String, Map<PK, T>> resultMap = pipeReadService.readAll(Collections.singletonList(className));
-        if (!CollectionUtils.isEmpty(resultMap)) {
+        if (CollUtil.isNotEmpty(resultMap)) {
             Map<PK, T> beanMap = resultMap.get(className);
             if (Objects.nonNull(beanMap))
                 return new ArrayList<>(beanMap.values());

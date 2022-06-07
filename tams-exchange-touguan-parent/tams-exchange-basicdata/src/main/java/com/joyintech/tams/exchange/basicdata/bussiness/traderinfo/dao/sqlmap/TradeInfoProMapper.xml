@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dao.TradeInfoProMapper">
+    <insert id="insertDealer" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProSaveRequest">
+        insert into MST_DEALER_INFO (CUSTOMER_ID, DEALER_NO, TRADE_MARKET,
+            CREATE_USER, CREATE_DEPT, CREATE_TIME,
+            UPDATE_USER, UPDATE_TIME)
+        values (#{customerId,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR}, #{tradeMarket,jdbcType=VARCHAR},
+            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertDealerDetails" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProSaveRequest">
+        insert into MST_DEALER_DETAIL_INFO (SEQ_NO, CUSTOMER_ID, DEALER_NO,TRADE_MARKET,
+            DEALER_PARTY_NO, DEALER_PARTY_TYPE, DEALER_PARTY_NAME,
+            TRADER_NO, TRADER_NAME, IS_OUR,
+            CREATE_USER, CREATE_DEPT, CREATE_TIME,
+            UPDATE_USER, UPDATE_TIME)
+        values (#{seqNo,jdbcType=VARCHAR}, #{customerId,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR},#{tradeMarket,jdbcType=VARCHAR},
+            #{dealerPartyNo,jdbcType=VARCHAR}, #{dealerPartyType,jdbcType=VARCHAR}, #{dealerPartyName,jdbcType=VARCHAR},
+            #{traderNo,jdbcType=VARCHAR}, #{trader,jdbcType=VARCHAR}, #{isOur,jdbcType=VARCHAR},
+            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <update id="updateByCustomerId" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProSaveRequest">
+        update  MST_DEALER_INFO set DEALER_NO = #{dealerNo,jdbcType=VARCHAR}, TRADE_MARKET = #{tradeMarket,jdbcType=VARCHAR} where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR} and DEALER_NO = #{dealNoPre,jdbcType=VARCHAR}
+    </update>
+    <update id="updateDetails">
+
+          update  MST_DEALER_DETAIL_INFO set  DEALER_PARTY_TYPE = #{dealerPartyType} , DEALER_PARTY_NAME = #{dealerPartyName} ,
+                  DEALER_PARTY_NO = #{dealerPartyNo} ,
+                  TRADER_NAME = #{trader,jdbcType=VARCHAR} ,TRADER_NO = #{traderNo,jdbcType=VARCHAR},IS_OUR = #{isOur,jdbcType=VARCHAR} where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </update>
+    <update id="updateDetailsSJ">
+         update  MST_DEALER_DETAIL_INFO set
+                  TRADER_NAME = #{trader,jdbcType=VARCHAR} ,TRADER_NO = #{traderNo,jdbcType=VARCHAR},IS_OUR = #{isOur,jdbcType=VARCHAR}
+                   where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </update>
+
+
+    <select id="getCustomerName" resultType="com.joyintech.framework.select.SelectOptionDto">
+        select  CUSTOMER_ID id,
+        CUSTOMER_NAME text
+        from MST_CUSTOMER_INFO
+        <where>
+            IS_BROKER is not null
+            <if test="search != null and search != ''">
+                and (CUSTOMER_ID like concat(concat('%',#{search}),'%')
+                or CUSTOMER_NAME like concat(concat('%',#{search}),'%'))
+            </if>
+            <if test="initValue != null and initValue != ''">
+                and CUSTOMER_ID = #{initValue}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getDealerTraderInfo"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProResponse">
+        select
+        distinct
+               mdi.DEALER_NO dealerNo,
+               mdi.TRADE_MARKET tradeMarket,
+               mci.CUSTOMER_ID customerId,
+                mci.CUSTOMER_NAME dealerName
+    from
+               MST_DEALER_INFO mdi
+    left JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
+               and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
+    left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = mdi.CUSTOMER_ID
+
+    <where>
+        <if test="tradeMarket != null and tradeMarket != ''">
+            mdi.TRADE_MARKET = #{tradeMarket}
+        </if>
+        <if test="acctNo != null and acctNo != ''">
+        and  SSAI.TRD_ACCT_ID = #{acctNo}
+        </if>
+        <if test="isOur != null and isOur != ''">
+        and MDDI.IS_OUR = #{isOur}
+        </if>
+        <if test="dealerNo != null and dealerNo != ''">
+        and mdi.CUSTOMER_ID = #{dealerNo}
+        </if>
+        <if test="dealerName != null and dealerName != ''">
+            and mci.CUSTOMER_NAME like concat(concat('%',#{dealerName}),'%')
+        </if>
+        <if test="traderNo != null and traderNo != ''">
+            and MDDI.TRADER_NO like concat(concat('%',#{traderNo}),'%')
+        </if>
+        <if test="traderName != null and traderName != ''">
+        and MDDI.TRADER_NAME like concat(concat('%',#{traderName}),'%')
+        </if>
+        <if test="dealerPartyNo != null and dealerPartyNo != ''">
+            and MDDI.DEALER_PARTY_NO like concat(concat('%',#{dealerPartyNo}),'%')
+        </if>
+        <if test="dealerPartyName != null and dealerPartyName != ''">
+            and MDDI.DEALER_PARTY_NAME like concat(concat('%',#{dealerPartyName}),'%')
+        </if>
+    </where>
+    </select>
+    <select id="findCustomerIdByDealerName" resultType="java.lang.String">
+         select CUSTOMER_ID from MST_CUSTOMER_INFO mci where CUSTOMER_NAME = #{dealerName}
+    </select>
+    <select id="hasDealerDetails" resultType="java.lang.Integer">
+        select count(*) from MST_DEALER_DETAIL_INFO WHERE CUSTOMER_ID = #{customerId}
+    </select>
+    <select id="existsDealer" resultType="java.lang.Integer">
+        select count (*) from MST_DEALER_INFO where CUSTOMER_ID=#{dealerName} and DEALER_NO = #{dealerNo}
+    </select>
+    <select id="existsDealerAndTradeMarket" resultType="java.lang.Integer">
+        select count (*) from MST_DEALER_INFO where CUSTOMER_ID=#{dealerName} and TRADE_MARKET = #{tradeMarket}
+    </select>
+    <select id="findTrader"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TraderInfoDto">
+             select
+               MDDI.SEQ_NO seqNo,
+               MDDI.DEALER_PARTY_NO,
+               MDDI.DEALER_PARTY_TYPE,
+               MDDI.DEALER_PARTY_NAME,
+               MDDI.TRADER_NO ,
+               MDDI.TRADER_NAME trader,
+               MDDI.IS_OUR
+          from
+               MST_DEALER_INFO mdi
+          inner JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
+               and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
+          where mdi.CUSTOMER_ID = #{customerId} and mdi.DEALER_NO = #{dealerNo}
+        <if test="isOur != null and isOur != ''">
+            and MDDI.IS_OUR = #{isOur}
+        </if>
+    </select>
+    <select id="existsTrader" resultType="java.lang.Integer">
+         select count(1) from MST_DEALER_INFO mdi
+         inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+         WHERE mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.TRADER_NO = #{traderNo}
+    </select>
+    <select id="existsOur" resultType="java.lang.Integer">
+        select count(1) from MST_DEALER_INFO mdi
+         inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+         where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.IS_OUR = 'Y'
+    </select>
+    <select id="existsDealerParty" resultType="java.lang.Integer">
+           select count(1) from
+           (select DEALER_PARTY_NO from MST_DEALER_DETAIL_INFO mddi inner JOIN MST_DEALER_INFO mdi on mdi.DEALER_NO = MDDI.DEALER_NO
+           and MDDI.CUSTOMER_ID = mdi.CUSTOMER_ID where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and
+           mdi.TRADE_MARKET = '04' and mddi.DEALER_PARTY_TYPE = #{dealerPartyType}) aa
+    </select>
+    <select id="hasDealerParty" resultType="java.lang.Integer">
+        select count(1) from MST_DEALER_INFO mdi
+         inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+         where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.DEALER_PARTY_NO = #{dealerPartyNo}
+    </select>
+    <select id="hasSameTrader" resultType="java.lang.Integer">
+        select count(1) from MST_DEALER_INFO mdi
+         inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+         where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.DEALER_PARTY_NO = #{dealerPartyNo}
+         and mddi.TRADER_NO = #{traderNo}
+    </select>
+
+
+    <delete id="deleteSelectedItem">
+          delete from  MST_DEALER_DETAIL_INFO mddi
+          <where>
+              mddi.CUSTOMER_ID = #{customerId,jdbcType="VARCHAR"}
+              and mddi.DEALER_PARTY_NO =#{dealerPartyNo,jdbcType="VARCHAR"}
+              and mddi.TRADER_NO = #{traderNo,jdbcType="VARCHAR"}
+          </where>
+    </delete>
+    <delete id="deleteDealer">
+        delete from MST_DEALER_INFO
+        where CUSTOMER_ID = #{customerId}
+        and TRADE_MARKET = #{tradeMarket}
+    </delete>
+    <delete id="deleteDealerDetails">
+        delete from MST_DEALER_DETAIL_INFO where  CUSTOMER_ID = #{customerId} and TRADE_MARKET = #{tradeMarket}
+    </delete>
+    <delete id="deleteTrader">
+        delete from MST_DEALER_DETAIL_INFO where  SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </delete>
+    <delete id="deleteTraderSJ">
+            delete from MST_DEALER_DETAIL_INFO where  SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </delete>
+
+    <select id="hasSameDealerPartyNoDiffType" resultType="java.lang.String">
+        select wm_concat(SEQ_NO) from  MST_DEALER_DETAIL_INFO MDDI
+        where MDDI.CUSTOMER_ID = #{customerId} and MDDI.TRADE_MARKET = #{tradeMarket}
+           and MDDI.DEALER_PARTY_TYPE != #{dealerPartyType} and MDDI.DEALER_PARTY_NO = #{dealerPartyNo}
+    </select>
+
+    <select id="hasSameDealerPartyNoTraderNo" resultType="java.lang.String">
+        select SEQ_NO from  MST_DEALER_DETAIL_INFO MDDI
+        where MDDI.CUSTOMER_ID = #{customerId} and MDDI.TRADE_MARKET = #{tradeMarket}
+          and MDDI.DEALER_PARTY_NO = #{dealerPartyNo}  and MDDI.TRADER_NO = #{traderNo}
+    </select>
+
+    <select id="hasSameTraderSeqNo" resultType="java.lang.String">
+        select SEQ_NO from MST_DEALER_INFO mdi
+                                 inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+        where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.DEALER_PARTY_NO = #{dealerPartyNo}
+          and mddi.TRADER_NO = #{traderNo}
+    </select>
+
+    <select id="existsTraderSingle" resultType="java.lang.String">
+        select wm_concat(DEALER_NO) from MST_DEALER_INFO where  DEALER_NO = #{dealerNo}
+    </select>
+
+</mapper>

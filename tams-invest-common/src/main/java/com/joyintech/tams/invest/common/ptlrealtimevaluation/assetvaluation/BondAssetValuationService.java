@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
@@ -177,7 +176,7 @@ public class BondAssetValuationService extends BaseAssetValuationService {
 		}
 		if (!(StringUtil.equals(资产基本信息.getFinProduct().getCouponSpecies(), DictCodeList.息票品种_零息.getValue())
 				|| StringUtil.equals(资产基本信息.getFinProduct().getCouponSpecies(), DictCodeList.息票品种_贴现.getValue()))
-				|| StringUtil.equals(投资目的, DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
+				|| StringUtil.equals(投资目的, DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())) {
 			BigDecimal 单位面值 = calc债券百元面值(资产基本信息.getMockFinCashPlanDtoList(), DateUtil.parse(测算日期));
 
 			List<MockFinCashPlanDto> 付息列表 = new ArrayList<MockFinCashPlanDto>();
@@ -235,7 +234,7 @@ public class BondAssetValuationService extends BaseAssetValuationService {
 		if (组合资产估值.getDscCostAmt().compareTo(ArithmeticUtil.multiply(单位面值, 组合资产估值.getShareAmt())) == 0) {
 			return;
 		}
-		if (!StringUtil.equals(投资目的, DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
+		if (!StringUtil.equals(投资目的, DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())) {
 			boolean is存在现金流计算规则 = false;
 			for (FinCashCalcRule finCashCalcRule : 资产基本信息.getFinCashCalcRuleList()) {
 				if (DateUtil.compareDate(finCashCalcRule.getEffDate(), DateUtil.parse(测算日期)) == 0) {
@@ -308,7 +307,7 @@ public class BondAssetValuationService extends BaseAssetValuationService {
 	 */
 	private static void 公允价值变动(MockAssetInfoDto 资产基本信息, String 投资目的, String 测算日期, MockPtlSecValuationDto 组合资产估值,
 							   Map<String, MockQuotationInfoDto> 行情map) {
-		if (!StringUtil.equals(投资目的, DictCodeListExt1.投资目的_摊余成本类.getValue())) {
+		if (!StringUtil.equals(投资目的, DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())) {
 			BigDecimal 市价 = null;
 			MockQuotationInfoDto 行情Dto
 //					= 行情map.get(测算日期);
@@ -320,7 +319,7 @@ public class BondAssetValuationService extends BaseAssetValuationService {
 				if ((StringUtil.equals(资产基本信息.getFinProduct().getCouponSpecies(), DictCodeList.息票品种_零息.getValue())
 						|| StringUtil.equals(资产基本信息.getFinProduct().getCouponSpecies(),
 						DictCodeList.息票品种_贴现.getValue()))
-						&& StringUtil.equals(投资目的, DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())) {
+						&& StringUtil.equals(投资目的, DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())) {
 					市价 = 行情Dto.getDirtyPrice();
 				} else {
 					市价 = 行情Dto.getMarketPrice();
@@ -510,7 +509,7 @@ public class BondAssetValuationService extends BaseAssetValuationService {
 					摊销重算map.put(重算日期, true);
 					BigDecimal 交易成本 = BigDecimal.ZERO;
 					// 投资目的 公允价值变动计入当期损益 FVTPL
-					if (!StringUtil.equals(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue(), 资产端交易.getInvAim())) {
+					if (!StringUtil.equals(DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue(), 资产端交易.getInvAim())) {
 						// 交易成本
 						交易成本 = ArithmeticUtil.doAdd(资产端交易.getPrinAmt(), 资产端交易.getFeeAmt());
 					} else {
@@ -799,7 +798,7 @@ public class BondAssetValuationService extends BaseAssetValuationService {
 			// 计提处理
 			if (!(StringUtil.equals(标的信息.getCouponSpecies(), DictCodeList.息票品种_零息.getValue())
 					|| StringUtil.equals(标的信息.getCouponSpecies(), DictCodeList.息票品种_贴现.getValue()))
-					|| StringUtil.equals(投资目的, DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
+					|| StringUtil.equals(投资目的, DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())) {
 				if (百元券面面值 != null && BigDecimal.ZERO.compareTo(百元券面面值) != 0) {
 					BigDecimal temp = result.getInterestBalance();// 应计利息科目余额
 					// 债券应计利息计算
@@ -819,7 +818,7 @@ public class BondAssetValuationService extends BaseAssetValuationService {
 				}
 			}
 			// 摊销处理
-			if (!StringUtil.equals(投资目的, DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
+			if (!StringUtil.equals(投资目的, DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())) {
 				if (BigDecimal.ZERO.compareTo(ArithmeticUtil.doSub(
 						ArithmeticUtil.multiply(百元券面面值, result.getAmountBalance()), result.getCostBalance())) != 0) {
 					if (摊销重算map.get(日期) != null && 摊销重算map.get(日期)) {
@@ -987,7 +986,7 @@ public class BondAssetValuationService extends BaseAssetValuationService {
 					|| StringUtil.equals(mockTrdProductDealDto.getPs(), DictCodeList.交易方向_申购确认.getValue())) {
 				BigDecimal 交易成本 = BigDecimal.ZERO;
 				// 投资目的 公允价值变动计入当期损益 FVTPL
-				if (StringUtil.equals(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue(),
+				if (StringUtil.equals(DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue(),
 						mockTrdProductDealDto.getInvAim())) {
 					// 交易成本
 					交易成本 = ArithmeticUtil.doAdd(mockTrdProductDealDto.getPrinAmt(), mockTrdProductDealDto.getFeeAmt());

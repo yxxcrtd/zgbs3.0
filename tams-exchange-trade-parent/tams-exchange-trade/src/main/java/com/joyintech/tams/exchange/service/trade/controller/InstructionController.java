@@ -76,7 +76,7 @@ public class InstructionController {
     @ApiOperation(value = "查询指令列表", notes = "查询指令列表")
     @RequestMapping(value = "/instruction/users", method = RequestMethod.POST)
     @CrossOrigin
-    public Message<InstructionPage<Instruction, InstructionPledge, InstructionDetail>> queryAllInstruction(@RequestBody InstructionQueryRequest instructionQuery) {
+    public Message<InstructionPage<InstructionExportVo, InstructionPledge, InstructionDetail>> queryAllInstruction(@RequestBody InstructionQueryRequest instructionQuery) {
     	if(!MasterUtil.isMaster()) {
     		return MasterUtil.postForObject(instructionQuery);
     	}
@@ -96,7 +96,7 @@ public class InstructionController {
 
         Map<String, Object> pageParam = JsonUtils.getObjectFromJson(JsonUtils.getJsonFromObject(instructionQuery), Map.class);
         pageParam.remove("entrustStatus");
-        return new Message<InstructionPage<Instruction, InstructionPledge, InstructionDetail>>(investmentManagement.queryInstructionsFromCache(pageParam));
+        return new Message<>(investmentManagement.queryInstructions(pageParam));
     }
 
     @PostMapping(value = "/instruction/export")
@@ -104,7 +104,7 @@ public class InstructionController {
     @ApiOperation(value = "导出指令列表", notes = "导出指令列表")
     public void exportInstruction(@RequestBody InstructionExportRequest request, HttpServletResponse response) {
         if (Objects.nonNull(request.getData())) {
-            List<Instruction> instructionList = request.getData().stream().map(item -> BeanUtil.toBean(item, Instruction.class)).collect(Collectors.toList());
+            List<InstructionExportVo> instructionList = request.getData().stream().map(item -> BeanUtil.toBean(item, InstructionExportVo.class)).collect(Collectors.toList());
             List<InstructionExportVo> instructionExportVoList = investmentManagement.convertFieldValue(instructionList);
 
             List<BaseMap> newList = Lists.newArrayList();

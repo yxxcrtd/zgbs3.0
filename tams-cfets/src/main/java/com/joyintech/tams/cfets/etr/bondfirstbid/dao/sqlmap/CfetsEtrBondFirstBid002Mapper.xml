@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid002Mapper">
+
+    <delete id="deleteEntrustBidPriceByEntrustId" parameterType="java.lang.String" >
+        DELETE FROM ETR_ENTRUST_BID_PRICE
+        WHERE ENTRUST_ID  = #{workflowId, jdbcType=VARCHAR}
+    </delete>
+    <delete id="deleteEntrustDetailByEntrustId" parameterType="java.lang.String" >
+        DELETE FROM ETR_ENTRUST_DETAIL
+        WHERE ENTRUST_ID  = #{workflowId, jdbcType=VARCHAR}
+    </delete>
+
+    <select id="getFirstBidBusinessInfo" resultType="com.joyintech.framework.base.entity.ProcessMark" parameterType="java.lang.String" >
+        select
+            SEQ_NO SEQ_NO,
+            PAGE_ID PAGE_ID,
+            BUSINESS_DATA_PK1 BUSINESS_DATA_PK1,
+            BUSINESS_DATA_PK2 BUSINESS_DATA_PK2,
+            BUSINESS_DATA_PK3 BUSINESS_DATA_PK3,
+            BUSINESS_DATA_PK4 BUSINESS_DATA_PK4,
+            BUSINESS_DATA_PK5 BUSINESS_DATA_PK5,
+            BUSINESS_DATA_PK6 BUSINESS_DATA_PK6,
+            BUSINESS_DATA_PK7 BUSINESS_DATA_PK7,
+            BUSINESS_DATA_PK8 BUSINESS_DATA_PK8,
+            BUSINESS_DATA_PK9 BUSINESS_DATA_PK9,
+            BUSINESS_DATA_PK10 BUSINESS_DATA_PK10,
+            HIS_NO HIS_NO,
+            WORKFLOW_ID WORKFLOW_ID,
+            STATUS STATUS,
+            CREATE_USER CREATE_USER,
+            CREATE_DEPT CREATE_DEPT,
+            CREATE_TIME CREATE_TIME,
+            UPDATE_USER UPDATE_USER,
+            UPDATE_TIME UPDATE_TIME ,
+            BUSINESS_DATA
+        from SYS_DATA_PROCESS_MARK
+        where
+        WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
+        and HIS_NO = (select Max(HIS_NO) from SYS_DATA_PROCESS_MARK where WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR})
+    </select>
+</mapper>

@@ -14,7 +14,7 @@ public class Message<T> implements Serializable {
 
     private static final long serialVersionUID = 8909160204700409989L;
 
-    private static final String SUCCESS = "000";
+    public static final String SUCCESS = "000";
     private static final String FAIL = "001";
 
     @ApiModelProperty(required = true, name = "code", value = "响应码", example = "000")
@@ -46,6 +46,11 @@ public class Message<T> implements Serializable {
                 this.data = (T) resultBean.getData();
             }
         }
+    }
+
+    public Message(String code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
     public Message(String code, String message, T data) {

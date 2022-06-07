@@ -128,9 +128,25 @@ public class RskSupervisionIndicator002Service extends CommonExportService<RskSu
     }
 
     /**
+     * 根据监督指标编号查询指标信息
+     *
+     * @param indId 指标编号
+     * @return 指标信息
+     * @see
+     * @since 1.0
+     */
+    public RskSupervisionIndicator002Dto getBussinessEntityByIndId_RULE(String indId) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("indId", indId);
+        return simpleRestTemplate.postForObject(
+                ServiceApplication.RISK_RDS_SERVICE_NAME + "/RskSupervisionIndicator/querySuperIndicatorInfoByIndId_RULE",
+                map, RskSupervisionIndicator002Dto.class);
+    }
+
+    /**
      * 新建场合时查询监督指标名称是否重复
      * 
-     * @param name
+     * @param indId
      */
     public int searchRepeatByIndName(String indId, String indName) {
         return restTemplate.getForObject(ServiceApplication.RISK_RDS_SERVICE_NAME
@@ -142,7 +158,7 @@ public class RskSupervisionIndicator002Service extends CommonExportService<RskSu
     /**
      * 删除时查询指标是否跟组合关联
      * 
-     * @param paramMap
+     * @param indId
      */
     public int searchReleteCountByIndId(String indId) {
         return restTemplate.getForObject(ServiceApplication.RISK_RDS_SERVICE_NAME

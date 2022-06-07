@@ -9,6 +9,9 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
 import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangeCommonRequest;
+import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangePortfolioAllocationRequest;
+import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangePortfolioAllocationResponse;
+import com.joyintech.tams.exchange.entrust.common.service.EtrExchangeCommonService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +37,9 @@ public class EtrExchangeCommonController extends BaseController {
      */
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
+
+    @Autowired
+    EtrExchangeCommonService etrExchangeCommonService;
 
     /**
      * 流程中数据校验
@@ -61,5 +67,25 @@ public class EtrExchangeCommonController extends BaseController {
             return new Message<AjaxResult>().success().setData(ajax);
         }
         return new Message<AjaxResult>().success().setData(ajax);
+    }
+
+    /**
+     * 查询指令组合分配列表
+     *
+     * @param dto dto
+     * @return 处理结果
+     * @throws Exception
+     *             异常
+     */
+    @ApiOperation(value = "查询指令组合分配列表", notes = "查询指令组合分配列表")
+    @PostMapping("/selectEtrPortfolioAllocationList")
+    @ResponseBody
+    public Message<EtrExchangePortfolioAllocationResponse>  selectEtrPortfolioAllocationList(@RequestBody EtrExchangePortfolioAllocationRequest dto )  {
+        try{
+            EtrExchangePortfolioAllocationResponse response=etrExchangeCommonService.selectEtrPortfolioAllocationList(dto);
+            return new Message<EtrExchangePortfolioAllocationResponse>().success().setData(response);
+        }catch (Exception e){
+            return new Message<EtrExchangePortfolioAllocationResponse>().fail().setData(null);
+        }
     }
 }

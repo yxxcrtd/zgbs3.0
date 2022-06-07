@@ -847,7 +847,7 @@
 		PTL_PARAM_POOL_CONFIG ORDER BY PARAM_NUM desc
 	</select>
 
-	<select id="selectPtlRuleAll" resultType="com.joyintech.tams.common.base.entity.RskRulePoolConfig">
+	<select id="selectPtlRuleAll" resultType="com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig">
 		SELECT
 		     RULE_ID as ruleId,
 		 	 LINK_SIGN as linkSign,
@@ -859,8 +859,11 @@
 	</select>
 
 	<select id="getMatchPortData" parameterType="java.lang.String" resultType="java.lang.String">
-		select m.PORTFOLIO_ID from PTL_PORTFOLIO m LEFT JOIN PA_PTL_PORTFOLIO n ON m.PORTFOLIO_ID=n.PORTFOLIO_ID
-		where m.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR} and ${sqlWhere} AND PORTFOLIO_TYPE IN ('01','02')
+		select PTL_PORTFOLIO.PORTFOLIO_ID from PTL_PORTFOLIO
+	   	LEFT JOIN PA_PTL_PORTFOLIO  ON PTL_PORTFOLIO.PORTFOLIO_ID=PA_PTL_PORTFOLIO.PORTFOLIO_ID
+	   	LEFT JOIN PRD_SALE_PARAM ON 'F16_'||PTL_PORTFOLIO.PORTFOLIO_ID=PRD_SALE_PARAM.FINPROD_ID
+	   	LEFT JOIN FIN_PRODUCT_ADD ON 'F16_'||PTL_PORTFOLIO.PORTFOLIO_ID=FIN_PRODUCT_ADD.FINPROD_ID
+		where PTL_PORTFOLIO.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR} and ${sqlWhere} AND PORTFOLIO_TYPE IN ('01','02')
 	</select>
 
 	<select id="selectRuleRelInd" parameterType="java.util.List" resultType="java.lang.String">
@@ -1274,4 +1277,8 @@
 		</where>
 	</select>
 
+	<delete id="deleteByPortfolioId" parameterType="java.lang.String" >
+		delete from IBU_PORTFOLIO_ACCT_RELA
+		where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+	</delete>
 </mapper>

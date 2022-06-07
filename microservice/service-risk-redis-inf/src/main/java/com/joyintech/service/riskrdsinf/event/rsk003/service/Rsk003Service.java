@@ -11,12 +11,7 @@
 package com.joyintech.service.riskrdsinf.event.rsk003.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.service.riskrdsinf.event.rsk004.service.Rsk004Service;
@@ -156,7 +151,9 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
                 //----update by zxjjpei 20190318 若发现调用实占释放 end--------
             }
             // 触发的风险事件不计算指标
-            if (!isCalcIndicator(eveList)) {
+            List<IEvent> eveList1 = new ArrayList<>();
+            eveList1.addAll(eveList);
+            if (!isCalcIndicator(eveList1)) {
                 getLogger().info("触发的风控事项不计算指标");
                 // 取得组合关联指标信息
                 IPtlIndicator ptlInd = getPtlIndicator(mapData);
@@ -612,7 +609,9 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
                 setAllOcpVal(ocpRelParam);
                 BeanUtil.copyPropertiesIgnoreNull(ocpRelParamBk, ocpRelParam);
                 Map<String, IOcpRelParamItem> allItems = new HashMap<>();
-                allItems.putAll(ocpRelParam.getItems());
+                if(ocpRelParam.getItems() != null){
+                    allItems.putAll(ocpRelParam.getItems());
+                }
                 ocpRelParamBk.setItems(allItems);
                 ocpRelParamBk.addOcpCode(occupyCode + GlobalConstant.COLON + REL_OCCUPY);
             }
@@ -625,7 +624,9 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
             // throw new InterfException("实占金额超过预占金额");
             // }
             // 预占参数信息
-            ocpPmItem.putAll(ocpRelParam.getItems());
+            if(ocpRelParam.getItems() != null){
+                ocpPmItem.putAll(ocpRelParam.getItems());
+            }
             // add by zhangrui1 start
             calcMixAmount(mapData, false, false,
                 ocpRelParam != null ? ocpRelParam.getOcpCodeList() : null);
@@ -642,6 +643,9 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
             newOcpRelParam.setOccupyType(REL_OCCUPY);
             // 预占/实占参数信息列表
             Map<String, IOcpRelParamItem> temp = ocpRelParam == null ? new HashMap<>() : ocpRelParam.getItems();
+            if(temp == null ){
+                temp = new HashMap<>();
+            }
             if (!CollectionUtils.isEmpty(ocpPmItem) && !CollectionUtils.isEmpty(temp) 
             		&& ocpPmItem.entrySet() != null && !StringUtil.isEmpty(preCode)) {
             	Set<String> keys = new HashSet<>();

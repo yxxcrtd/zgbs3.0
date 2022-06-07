@@ -86,17 +86,17 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 			if (!StringUtil.isNotEmpty(dto.getAcctNo())) {
 				errorList.add(new ValidMessage("acctNo", this.getMessage("ETR_ERROR_0020")));
 			}
-			if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
+//			if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
 				if(!StringUtil.isNotEmpty(dto.getBusinessModel())
 				         &&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
 					errorList.add(new ValidMessage("businessModel", "请输入业务模式"));
 				}
-			}else{
-				if(!StringUtil.isNotEmpty(dto.getInvAim())
-						&&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-					errorList.add(new ValidMessage("invAim", this.getMessage("ETR_ERROR_0060")));
-				}
-			}
+//			}else{
+//				if(!StringUtil.isNotEmpty(dto.getInvAim())
+//						&&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
+//					errorList.add(new ValidMessage("invAim", this.getMessage("ETR_ERROR_0060")));
+//				}
+//			}
 			if (!StringUtil.isNotEmpty(dto.getStockId())&&!StringUtil.isNotEmpty(dto.getFinprodId())) {
 				errorList.add(new ValidMessage("stockId", this.getMessage("ETR_ERROR_0016")));
 			}
@@ -131,6 +131,9 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 				Map<String, Object> resultMap  = etrExchangeTrade001Service.findQuotations(map);
 				if (resultMap != null){
 					BigDecimal price = dto.getEntrustPrice();
+					if(price == null){
+						price = dto.getPrice();
+					}
 					if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_股票.getValue())
 							|| dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_基金.getValue())){
 						// 涨停

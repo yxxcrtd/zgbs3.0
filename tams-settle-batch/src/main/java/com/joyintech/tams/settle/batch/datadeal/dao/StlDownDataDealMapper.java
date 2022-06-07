@@ -111,7 +111,8 @@ public interface StlDownDataDealMapper {
     
     /**
      * 根据资产申报代码检索股票代码
-     * @param approvalNo 
+     * @param othCodeType
+     * @param othCode
      * @return List<String>
      */
     List<String> getFinproductIdByApprovalNo(@Param("othCodeType") String othCodeType, @Param("othCode") String othCode);
@@ -161,32 +162,14 @@ public interface StlDownDataDealMapper {
    List<String> getZzgFinprodId(@Param("zqdm1") String zqdm1);
 
     /**
-     * 查询首期清算数据
-     * @param sqcjbh
-     * @param seatNumber
-     * @param secAcctId
-     * @return
-     */
-   List<SettleTransData> selectSqSettleTransDatas(@Param("sqcjbh") String sqcjbh, @Param("seatNumber") String seatNumber, @Param("secAcctId") String secAcctId);
-
-    /**
-     * 查询首期清算数据
-     * @param sqcjbh
-     * @param seatNumber
-     * @param secAcctId
-     * @return
-     */
-    List<SettleTransData> selectShSqSettleTransDatas(@Param("sqcjbh") String sqcjbh, @Param("seatNumber") String seatNumber, @Param("secAcctId") String secAcctId, @Param("vdate") Date vdate);
-
-
-    /**
      * 查询首期质押券信息
      * @param sqcjbh
      * @param seatNumber
      * @param secAcctId
      * @return
      */
-    List<SettleTransDataPledge> selectSqSettleTransDataPledges(@Param("sqcjbh") String sqcjbh, @Param("seatNumber") String seatNumber, @Param("secAcctId") String secAcctId);
+    List<SettleTransDataPledge> selectSqSettleTransDataPledges(@Param("sqcjbh") String sqcjbh, @Param("seatNumber") String seatNumber,
+                                                               @Param("secAcctId") String secAcctId, @Param("vdate") Date vdate);
 
     /**
      * 根据市场代码查询标的

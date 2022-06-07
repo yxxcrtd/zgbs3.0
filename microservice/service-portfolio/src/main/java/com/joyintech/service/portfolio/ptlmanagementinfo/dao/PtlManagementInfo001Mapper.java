@@ -12,6 +12,7 @@ package com.joyintech.service.portfolio.ptlmanagementinfo.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.service.portfolio.ptlmanagementinfo.dto.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -375,7 +376,7 @@ public interface PtlManagementInfo001Mapper {
      * 查询所有的规则包
      * @return
      */
-    List<RskRulePoolConfig> selectPtlRuleAll();
+    List<IRskRulePoolConfig> selectPtlRuleAll();
 
     /**
      * 查询是否匹配当前组合
@@ -530,4 +531,12 @@ public interface PtlManagementInfo001Mapper {
 
     List<PtlAuthInfoDto> getPtlAuthInfo(Map<String, Object> param);
 
+    /**
+     * 删除组合时同步删除银行间账户组合关系（IBU_PORTFOLIO_ACCT_RELA）
+     * @param portfolioId 组合管理实体类
+     * @return 是否
+     * @see
+     * @since 1.0
+     */
+    int deleteByPortfolioId(String portfolioId);
 }

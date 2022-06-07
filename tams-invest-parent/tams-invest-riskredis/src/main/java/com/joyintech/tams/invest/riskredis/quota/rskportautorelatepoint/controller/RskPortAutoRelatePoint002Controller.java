@@ -112,6 +112,21 @@ public class RskPortAutoRelatePoint002Controller extends BaseController {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
         }
+        SelectDto selectDto5 = this.getSelectDataFromDataDic(BussinessDictCodeRds.开放周期, null);
+        for (SelectOptionDto dto : selectDto5.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
+        SelectDto selectDto6 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否面向单一投资者, null);
+        for (SelectOptionDto dto : selectDto6.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
+        SelectDto selectDto7 = this.getSelectDataFromDataDic(BussinessDictCodeRds.说明书是否披露风险标志, null);
+        for (SelectOptionDto dto : selectDto7.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
         return listFloatRate;
 	}
 	
@@ -172,8 +187,7 @@ public class RskPortAutoRelatePoint002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@RequestBody @Validated({
-        ValidateGroupEdit.class}) RskPortAutoRelatePoint002Dto dto, BindingResult result) {
+    public AjaxResult check(@RequestBody @Validated({ValidateGroupEdit.class}) RskPortAutoRelatePoint002Dto dto, BindingResult result) {
         return commonCheck(result, dto.getOperateType());
     }
     /**
@@ -196,7 +210,7 @@ public class RskPortAutoRelatePoint002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
       //修改时为画面所选记录的规则编号。
-        params.setBusinessCode(dto.getRuleId());
+        params.setBusinessCode(dto.getRuleName());
         params.setBusinessType(BussinessDictCodeListRds.共同业务类型_组合自动关联指标.getValue());
      // 设置流程业务说明, entity即传入的dto
         // 业务说明：“规则编号：”+画面.规则编号t

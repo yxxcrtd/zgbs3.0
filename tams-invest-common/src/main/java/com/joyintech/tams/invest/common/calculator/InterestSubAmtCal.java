@@ -66,9 +66,9 @@ public class InterestSubAmtCal {
         // 分段区间总天数
         BigDecimal dayCount = CalendarUtil.calendarDays(isd.getVdate(), isd.getMdate());
         // 计息基础
-        String basis = scai.getBasis();
+        String basis = StringUtil.isNotEmpty(is.getBasis())?is.getBasis():scai.getBasis();
         // 计息基础天数计算
-        BigDecimal basisDayCount = BasisDaysCal.cal(scai.getBasis(),
+        BigDecimal basisDayCount = BasisDaysCal.cal(basis,
             isr == null ? null : isr.getCalcRule(),
             new Date[] {is == null ? null : is.getVdate(), scai.getVdate(), scai.getMdate(),
                 isr == null ? null : isr.getFirstPayDate()});

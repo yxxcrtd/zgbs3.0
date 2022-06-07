@@ -116,6 +116,7 @@ public class EtrExchangeTradeCommon002Controller extends BaseController{
         initPageParams.put("PS_ETR", JsonUtils.objectArray2Json(optionsGradeResult.toArray()));
         initPageParams.put("ETR_CHECK_POS_SWITCH",CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_POS_SWITCH));
         initPageParams.put("noTradeBusiness", TempConstant.NO_TRADE_BUSINESS_ETR);
+        initPageParams.put("SHARES_TRADE_PLATFORM_99", DictCodeList.交易平台_其它.getValue());
         /*add by chenjiaxing 更改交易方向枚举值 end*/
         return new Message<Map<String, Object>>(initPageParams).success();
     }
@@ -309,7 +310,8 @@ public class EtrExchangeTradeCommon002Controller extends BaseController{
         // 导出
         ExcelUitl.doExport(requestDto, response, "持仓列表", () -> {
             EtrExchangeTradePositionsCommonRequest dto = requestDto.getDto(EtrExchangeTradePositionsCommonRequest.class);
-            List dataList = etrExchangeTradeCommon002Service.findPositionsPage(dto).getRoot();
+            //List dataList = etrExchangeTradeCommon002Service.findPositionsPage(dto).getRoot();
+            List dataList=dto.getQueryList();
             return dataList;
         });
     }

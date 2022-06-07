@@ -261,19 +261,26 @@ public class PtlManagementInfo001Validator implements BeanValidator{
 
             //银行间or商业银行柜台同一登记托管机构只能最多绑定一个证券账户 add by chenkang 20220104 start
             List<SecuritiesAccountInfoDto> secLists = Lists.newArrayList();
+            List<SecuritiesAccountInfoDto> secTwoLists = Lists.newArrayList();
             dto.getSecuritiesAccountInfoDto().stream().forEach(x -> {
                 if (StringUtil.isNotEmpty(x.getSecAcctId())) {
                     SecuritiesAccountInfoDto secDto = securitiesAccountInfoService.getSecAcctInfo(x.getSecAcctId());
-                    if (secDto != null && (DictCodeListExt1.交易场所_银行间.getValue().equals(secDto.getTradePlace())
-                    || DictCodeListExt1.交易场所_商业银行柜台.getValue().equals(secDto.getTradePlace()))) {
+                    if (secDto != null && (DictCodeListExt1.交易场所_银行间.getValue().equals(secDto.getTradePlace()))) {
                         secLists.add(secDto);
+                    }
+                    if (secDto != null && DictCodeListExt1.交易场所_商业银行柜台.getValue().equals(secDto.getTradePlace())) {
+                        secTwoLists.add(secDto);
                     }
                 }
             });
-
             List<String> stringList = secLists.stream().map(SecuritiesAccountInfoDto::getRegistOrg)
                     .distinct().collect(Collectors.toList());
+            List<String> stringTwoList = secTwoLists.stream().map(SecuritiesAccountInfoDto::getRegistOrg)
+                    .distinct().collect(Collectors.toList());
             if (stringList.size() != secLists.size()) {
+                errorList.add(new ValidMessage("银行间or商业银行柜台同一登记托管机构只能最多绑定一个证券账户！"));
+            }
+            if (stringTwoList.size() != secTwoLists.size()) {
                 errorList.add(new ValidMessage("银行间or商业银行柜台同一登记托管机构只能最多绑定一个证券账户！"));
             }
             //银行间or商业银行柜台同一登记托管机构只能最多绑定一个证券账户 add by chenkang 20220104 end

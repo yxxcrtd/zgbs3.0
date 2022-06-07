@@ -38,9 +38,9 @@ import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.cfets.bankuplink.bond.service.CfetsBondDealQuotedPrice004Service;
-import com.joyintech.tams.cfets.cfetsmanualsettle.dao.CfetsManualSettleMapper;
-import com.joyintech.tams.cfets.cfetsmanualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
+import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
+import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmMatchDto;
 import com.joyintech.tams.cfets.trdquery.dao.CfetsTrdQueryMapper;
@@ -1842,19 +1842,19 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             validMessageList.add(validMessage);
         }
         // 投资目的
-        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
+//        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
             if (StringUtil.isBlank(dto.getInvAim())) {
                 ValidMessage validMessage = new ValidMessage("invAim",
                         getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.businessModel")));
                 validMessageList.add(validMessage);
             }
-        }else{
-            if (StringUtil.isBlank(dto.getInvAim())) {
-                ValidMessage validMessage = new ValidMessage("invAim",
-                        getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.invAim")));
-                validMessageList.add(validMessage);
-            }
-        }
+//        }else{
+//            if (StringUtil.isBlank(dto.getInvAim())) {
+//                ValidMessage validMessage = new ValidMessage("invAim",
+//                        getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.invAim")));
+//                validMessageList.add(validMessage);
+//            }
+//        }
         // 3.劵面总额
         if (dto.getTradeAmt() == null) {
             ValidMessage validMessage = new ValidMessage("tradeAmt",

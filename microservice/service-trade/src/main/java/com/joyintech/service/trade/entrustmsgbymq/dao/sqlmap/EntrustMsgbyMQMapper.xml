@@ -192,10 +192,11 @@
 		select FINPROD_ID from INF_CONTRACT_DETAILFILE where DEAL_NO=#{getvTradeId}
 	</select>
 
-	<select id="getTrdProductDealByFTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
-		select
-		<include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Base_Column_List" />
-		from TRD_PRODUCT_DEAL
-		where F_TRADE_ID = #{fTradeId,jdbcType=VARCHAR}
-	</select>
+<!--	<select id="getTrdProductDealByFTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">-->
+<!--		select-->
+<!--		<include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Base_Column_List" />-->
+<!--		from TRD_PRODUCT_DEAL-->
+<!--		where F_TRADE_ID = #{fTradeId,jdbcType=VARCHAR}-->
+<!--	</select>-->
+
 </mapper>

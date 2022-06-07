@@ -72,7 +72,16 @@ $(function() {
         ],[
             {field:'busiAcctNo',sortable: false, title: 'DayEndAccount001.busiAcctNo',width:120}
             ,{field:'settleDate', type:'date',sortable: false, title: 'DayEndAccount001.settleDate',width:120}
-            ,{field:'finprodMarketId',sortable: false, title: 'DayEndAccount001.finprodId',width:120}
+            // ZGCPCN-260:资产代码后缀去掉 modify by fuyongsheng 20220516 start
+            //,{field:'finprodMarketId',sortable: false, title: 'DayEndAccount001.finprodId',width:120}
+            ,{field:'finprodMarketId',sortable: false, title: 'DayEndAccount001.finprodId',width:120,render : function(data, type, row, meta) {
+                if(data.indexOf(".SZ") > -1){
+                    return data.replace(".SZ","");
+                }else if(data.indexOf(".SH") > -1){
+                    return data.replace(".SH","");
+                }}
+            }
+            // ZGCPCN-260:资产代码后缀去掉 modify by fuyongsheng 20220516 end
             ,{field:'tradeMarketStr',sortable: false, title: 'DayEndAccount001.tradeMarket',width:120}
             ,{field:'accountStatusStr',sortable: false, title: 'DayEndAccount001.accountStatus',width:120}
             ,{field:'finprodTypeStr',sortable: false, title: 'DayEndAccount001.finprodType',width:120}
@@ -144,7 +153,16 @@ $(function() {
             ,{field:'acctName',sortable: false, title: '资金账户名称',width:150}
             ,{field:'settleDate', type:'date',sortable: false, title: '清算日期',width:120}
             ,{field:'accountStatusStr', type:'money',sortable: false, title: '对账状态',width:120}
-            ,{field:'finprodMarketId',sortable: false, title: '资产代码',width:120}
+            // ZGCPCN-260:资产代码后缀去掉 modify by fuyongsheng 20220509 start
+            //,{field:'finprodMarketId',sortable: false, title: '资产代码',width:120}
+            ,{field:'finprodMarketId',sortable: false, title: '资产代码',width:120,render : function(data, type, row, meta) {
+                    if(data.indexOf(".SZ") > -1){
+                        return data.replace(".SZ","");
+                    }else if(data.indexOf(".SH") > -1){
+                        return data.replace(".SH","");
+                    }}
+            }
+            // ZGCPCN-260:资产代码后缀去掉 modify by fuyongsheng 20220509 end
             ,{field:'finprodName',sortable: false, title: '资产名称',width:120}
             ,{field:'tradeMarketStr', sortable: false, title: '交易市场',width:120}
             ,{field:'finprodTypeStr1', sortable: false, title: '类型',width:120}

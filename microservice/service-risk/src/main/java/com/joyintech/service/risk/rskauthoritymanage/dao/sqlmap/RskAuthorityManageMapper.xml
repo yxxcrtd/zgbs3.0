@@ -51,6 +51,11 @@
 		  and (B.USER_NAME LIKE CONCAT('%',CONCAT(#{search,jdbcType=VARCHAR},'%'))
 		  or (B.REAL_NAME LIKE CONCAT('%',CONCAT(#{search,jdbcType=VARCHAR},'%'))))
 		  </if>
+		  <!--TISHKS-820:CLONE - 【风险管理】【授权管理】【授权】授权页面，点击修改进入修改页面，用户数据没有带出，导致不能提交 start-->
+		  <if test="initValue != null and initValue != ''">
+			  and B.USER_NAME = #{initValue,jdbcType=VARCHAR}
+		  </if>
+		  <!--TISHKS-820:CLONE - 【风险管理】【授权管理】【授权】授权页面，点击修改进入修改页面，用户数据没有带出，导致不能提交 end-->
 	  </where>
 	 </select>
 	 <!-- 

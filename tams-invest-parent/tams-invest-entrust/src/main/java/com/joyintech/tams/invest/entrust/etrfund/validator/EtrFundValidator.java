@@ -124,9 +124,9 @@ public class EtrFundValidator implements EtrCommonValidator {
                     errorList.add(new ValidMessage("vdate", getMessage("ETR_X_005")));
                 }
             }
-            if(!StringUtil.isNotEmpty(etrFundDto.getBussEtrInvestPersonInfoDto().getCounterId())){
-                errorList.add(new ValidMessage("bussEtrInvestPersonInfoDto.counterId", "请输入交易对手"));
-            }
+//            if(!StringUtil.isNotEmpty(etrFundDto.getBussEtrInvestPersonInfoDto().getCounterId())){
+//                errorList.add(new ValidMessage("bussEtrInvestPersonInfoDto.counterId", "请输入交易对手"));
+//            }
             /*if(!StringUtil.isNotEmpty(etrFundDto.getCcy())){
                 errorList.add(new ValidMessage("ccy", "请输入币种"));
             }*/
@@ -176,9 +176,9 @@ public class EtrFundValidator implements EtrCommonValidator {
                 if(!StringUtil.isNotEmpty(etrFundDto.getEntrustAmt())){
                     errorList.add(new ValidMessage("entrustAmt", getMessage("ETR_X_012", getMessage("EtrFund001.entrustAmt"))));
                 }
-                if(!StringUtil.isNotEmpty(etrFundDto.getEntrustNum())){
-                    errorList.add(new ValidMessage("entrustNum", getMessage("ETR_X_012", getMessage("EtrFund001.entrustNum"))));
-                }
+//                if(!StringUtil.isNotEmpty(etrFundDto.getEntrustNum())){
+//                    errorList.add(new ValidMessage("entrustNum", getMessage("ETR_X_012", getMessage("EtrFund001.entrustNum"))));
+//                }
                 //委托价格，当交易方向为买入/卖出，且交易场所和交易对手都是交易所时显示，且必填
                 if(!StringUtil.isNotEmpty(etrFundDto.getPrice())){
                 	if(!StringUtil.equals(etrFundDto.getCounterType(), DictCodeList.是否_否.getValue())){
@@ -210,12 +210,12 @@ public class EtrFundValidator implements EtrCommonValidator {
                 }
             }
             else if(etrFundDto.getPs().equals(DictCodeList.交易方向_卖出.getValue())){
-                if(!StringUtil.isNotEmpty(etrFundDto.getEntrustAmt())){
-                    errorList.add(new ValidMessage("entrustAmt", getMessage("ETR_X_012", getMessage("EtrFund001.entrustAmt"))));
+                if(!StringUtil.isNotEmpty(etrFundDto.getEntrustNum())){
+                    errorList.add(new ValidMessage("entrustNum", getMessage("ETR_X_012", getMessage("EtrFund001.entrustNum"))));
                 }
-                if(StringUtil.isNotEmpty(etrFundDto.getEntrustAmt())){
-                    if(etrFundDto.getEntrustAmt().compareTo(new BigDecimal(0)) != 1){
-                        errorList.add(new ValidMessage("entrustAmt", getMessage("ETR_X_008",getMessage("EtrFund001.entrustAmt"))));
+                if(StringUtil.isNotEmpty(etrFundDto.getEntrustNum())){
+                    if(etrFundDto.getEntrustNum().compareTo(new BigDecimal(0)) != 1){
+                        errorList.add(new ValidMessage("entrustNum", getMessage("ETR_X_008",getMessage("EtrFund001.entrustNum"))));
                     }
                 }
             }
@@ -269,9 +269,9 @@ public class EtrFundValidator implements EtrCommonValidator {
                     errorList.add(new ValidMessage("vdate", getMessage("ETR_X_005")));
                 }
             }
-            if(!StringUtil.isNotEmpty(etrFundDto.getBussEtrInvestPersonInfoDto().getCounterId())){
-                errorList.add(new ValidMessage("bussEtrInvestPersonInfoDto.counterId", "请输入交易对手"));
-            }
+//            if(!StringUtil.isNotEmpty(etrFundDto.getBussEtrInvestPersonInfoDto().getCounterId())){
+//                errorList.add(new ValidMessage("bussEtrInvestPersonInfoDto.counterId", "请输入交易对手"));
+//            }
             if(!StringUtil.isNotEmpty(etrFundDto.getCcy())){
                 errorList.add(new ValidMessage("ccy", getMessage("ETR_X_012", getMessage("EtrFund001.ccy"))));
             }
@@ -380,12 +380,12 @@ public class EtrFundValidator implements EtrCommonValidator {
                 }
             }
             else if(etrFundDto.getPs().equals(DictCodeList.交易方向_卖出.getValue())){
-                if(!StringUtil.isNotEmpty(etrFundDto.getEntrustAmt())){
-                    errorList.add(new ValidMessage("entrustAmt", getMessage("ETR_X_012", getMessage("EtrFund001.entrustAmt"))));
+                if(!StringUtil.isNotEmpty(etrFundDto.getEntrustNum())){
+                    errorList.add(new ValidMessage("entrustNum", getMessage("ETR_X_012", getMessage("EtrFund001.entrustNum"))));
                 }
-                if(StringUtil.isNotEmpty(etrFundDto.getEntrustAmt())){
-                    if(etrFundDto.getEntrustAmt().compareTo(new BigDecimal(0)) != 1){
-                        errorList.add(new ValidMessage("entrustAmt", getMessage("ETR_X_008",getMessage("EtrFund001.entrustAmt"))));
+                if(StringUtil.isNotEmpty(etrFundDto.getEntrustNum())){
+                    if(etrFundDto.getEntrustNum().compareTo(new BigDecimal(0)) != 1){
+                        errorList.add(new ValidMessage("entrustNum", getMessage("ETR_X_008",getMessage("EtrFund001.entrustNum"))));
                     }
                 }
             }

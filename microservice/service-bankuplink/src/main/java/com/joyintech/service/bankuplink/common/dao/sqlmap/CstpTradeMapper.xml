@@ -209,6 +209,12 @@
         from trdquto_match_info t
         where t.exe_id=#{execid,jdbcType=VARCHAR} and  t.match_status ='01' and rownum=1
     </select>
+
+    <select id="selectMatchDtoByCstpTradeId" parameterType="String"  resultType="com.joyintech.service.bankuplink.common.dto.TrdConfirmMatchDto">
+        select t.pre_trade_id as preTradeId
+        from trdquto_match_info t
+        where t.CSTP_TRADE_ID=#{cstpTradeId,jdbcType=VARCHAR} and  t.match_status ='01' and rownum=1
+    </select>
     <select id="selectRegDtoByPrimaryKey"  resultType="com.joyintech.service.bankuplink.common.dto.TrdConfirmRegAndIbuInfoDto">
         select reg.trade_date as tradeDate,
         reg.finprod_id as finprodId,

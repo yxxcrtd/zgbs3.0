@@ -1,6 +1,11 @@
 package com.joyintech.tams.exchange.common.constant;
 
-public enum InvestmentAssetType {
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
+/**
+ * 投管资产分类
+ */
+public enum InvestmentAssetType implements IEnum<String> {
 
     BOND("债券", "F01"),
     FUND("基金", "F02"),
@@ -33,7 +38,21 @@ public enum InvestmentAssetType {
         return InvestmentAssetType.BOND.value.equals(assetType);
     }
 
+    public static boolean isPledgeRepurchase(String assetType) {
+        return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType);
+    }
+
     public static boolean isFutures(String assetType) {
         return InvestmentAssetType.FUTURES.value.equals(assetType);
+    }
+
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
     }
 }

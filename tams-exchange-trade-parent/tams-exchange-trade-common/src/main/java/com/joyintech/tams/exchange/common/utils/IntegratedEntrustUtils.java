@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.common.utils;
 
 import com.google.common.base.Strings;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.constant.BSFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
@@ -362,5 +363,45 @@ public class IntegratedEntrustUtils {
 
     public static String formatFinprodId(String assetType, String stockCode) {
         return assetType + "_" + stockCode;
+    }
+
+    /***
+     * 是否现券交易协商成交
+     */
+    public static boolean isNegotiatedTrade(String entrustProp) {
+        if (Strings.isNullOrEmpty(entrustProp)) {
+            return false;
+        }
+        return StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_XD.value)
+                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JS.value)
+                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JJ.value);
+    }
+    
+    /***
+     * 新债 深交所 协商成交下单
+     * @param entrustProp
+     * @return
+     */
+    public static boolean isNegotiateXD_SZ(String entrustProp) {
+        if (!Strings.isNullOrEmpty(entrustProp)) {
+            if (EntrustProp.SZ_XSCJ_XD.value.equals(entrustProp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+ 	/**
+ 	 * 新债 深交所 协商成交回复
+ 	 * @param entrustProp
+ 	 * @return
+ 	 */
+    public static boolean isNegotiateHF_SZ(String entrustProp) {
+        if (!Strings.isNullOrEmpty(entrustProp)) {
+            if (EntrustProp.SZ_XSCJ_JS.value.equals(entrustProp)
+                    || EntrustProp.SZ_XSCJ_JJ.value.equals(entrustProp)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub002Mapper">
+    <!--一级申购交易MAP-->
+    <resultMap id="subInfoMap" type="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto">
+        <id property="finprodId" column="FINPROD_ID"/>
+        <id property="finprodMarketId" column="FINPROD_MARKET_ID"/>
+        <id property="finprodAbbr" column="FINPROD_ABBR"/>
+        <id property="ouPartyId" column="OU_PARTY_ID"/>
+        <id property="ouPartyIdAbbr" column="ouPartyIdAbbr"/>
+        <id property="ourTrader" column="OUR_TRADER"/>
+        <id property="ourTraderName" column="ourTraderName"/>
+        <id property="issuePrice" column="ISSUE_PRICE"/>
+        <id property="referenceRate" column="referenceRate"/>
+        <id property="referenceRateStr" column="referenceRateStr"/>
+        <id property="rate" column="rate"/>
+        <id property="remark" column="remark"/>
+        <id property="subscriptionAmount" column="subscriptionAmount"/>
+        <id property="payableAmount" column="payableAmount" />
+        <id property="settFeeAmt" column="settFeeAmt"/>
+        <id property="dipType" column="dipType"/>
+        <collection property="productDtos" ofType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto"
+                    javaType="java.util.ArrayList" >
+            <result column="ENTRUST_ID" property="entrustId" jdbcType="VARCHAR" />
+            <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="VARCHAR" />
+            <result column="PORTFOLIO_NAME" property="portfolioName" jdbcType="VARCHAR" />
+            <result column="avaNum" property="avaNum" jdbcType="DECIMAL" />
+            <result column="SUBSCRIPTION_AMOUNT" property="subscriptionAmount" jdbcType="DECIMAL" />
+            <result column="PAYABLE_AMOUNT" property="payableAmount" jdbcType="DECIMAL" />
+            <result column="SETT_FEE_AMT" property="settFeeAmt" jdbcType="DECIMAL" />
+            <result column="INV_AIM" property="businessModel" jdbcType="VARCHAR" />
+            <result column="SEC_ACCT_ID" property="secManageAcctId" jdbcType="VARCHAR" />
+            <result column="SEC_ACCT_NAME" property="secAcctName" jdbcType="VARCHAR" />
+            <result column="PARTY_ID" property="partyId" jdbcType="VARCHAR" />
+            <result column="rn" property="index" jdbcType="VARCHAR" />
+        </collection>
+    </resultMap>
+
+    <!--根据指令代码查询申购产品列表-->
+    <select id="selectSubProducts" resultMap="subInfoMap">
+    select fp.FINPROD_ID,
+           fp.FINPROD_MARKET_ID,
+           fp.FINPROD_ABBR,
+           fpi.ISSUE_PRICE,
+           fp.COUPON_SPECIES,
+           fpi.INT_TYPE,
+           case
+               when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                   then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+           case
+               when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/,
+           case
+               when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                   then fpi.REFER_YIELD end                                    rate/*当带入资产的息票品种为利随本清/附息-固定利率时，显示字段票面利率*/,
+           eed.ENTRUST_ID,
+           eed.PORTFOLIO_ID,
+           pp.PORTFOLIO_NAME,
+           nvl(eed.ENTRUST_NUM*100, 0) - nvl(bobp.SUBSCRIPTION_AMOUNT,0)             avaNum,
+           nvl(eed.ENTRUST_NUM*100, 0) - nvl(bobp.SUBSCRIPTION_AMOUNT,0)             SUBSCRIPTION_AMOUNT,
+           eed.INV_AIM,
+           eed.SEC_ACCT_ID,
+           ssai.SEC_ACCT_NAME,
+           IPAR.PARTY_ID,
+           #{loginUserId} OUR_TRADER
+        from FIN_PRODUCT fp
+             left join FIN_PRODUCT_ISSUE fpi
+                       on fp.FINPROD_ID = fpi.FINPROD_ID
+             left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
+             left join ETR_ENTRUST ee on ee.FINPROD_ID = fp.FINPROD_ID
+             left join ETR_ENTRUST_DETAIL eed on eed.ENTRUST_ID = ee.ENTRUST_ID
+             left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+             LEFT JOIN IBU_PORTFOLIO_ACCT_RELA IPAR ON eed.PORTFOLIO_ID = IPAR.PORTFOLIO_ID AND IPAR.CFETS_ACCT_TYPE = '01'
+             left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+             left join (select sum(SUBSCRIPTION_AMOUNT) SUBSCRIPTION_AMOUNT, ENTRUST_ID, PORTFOLIO_ID
+                        from BID_ORDER_BID_PRICE
+                        where IS_CANCEL = 'N'
+                        and TRADE_STATUS != '03' and BID_PRICE = 99999999
+                        group by ENTRUST_ID, PORTFOLIO_ID) bobp
+                       on bobp.ENTRUST_ID = eed.ENTRUST_ID and eed.PORTFOLIO_ID = bobp.PORTFOLIO_ID
+        <where>
+            <if test="entrustIdList != null and entrustIdList.size()>0">
+                <foreach collection="entrustIdList" open=" eed.ENTRUST_ID in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+                /*指令代码查询*/
+            </if>
+            <if test="existEntrustIds != null and existEntrustIds.size()>0">
+                <foreach collection="entrustIdList" open=" eed.ENTRUST_ID not in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+                /*指令代码查询*/
+            </if>
+        </where>
+    </select>
+
+    <!--根据指令代码查询申购交易信息-->
+    <select id="viewPage" resultMap="subInfoMap">
+        select bo.FINPROD_ID,
+               fp.FINPROD_MARKET_ID,
+               fp.FINPROD_ABBR,
+               bo.OU_PARTY_ID,
+               mcci.PARTY_ABBR                                                     ouPartyIdAbbr,
+               bo.OUR_TRADER,
+               mcct.real_name                                                    ourTraderName,
+               fpi.ISSUE_PRICE,
+               case
+                   when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+               case
+                   when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/,
+               case
+                   when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                       then fpi.REFER_YIELD end                                    rate/*当带入资产的息票品种为利随本清/附息-固定利率时，显示字段票面利率*/,
+               bo.SUBSCRIPTION_AMOUNT                                              subscriptionAmount,
+               bo.PAYABLE_AMOUNT                                                   payableAmount,
+               bo.SETT_FEE_AMT                                                     settFeeAmt,
+               bobp.ENTRUST_ID,
+               bobp.PORTFOLIO_ID,
+               pp.PORTFOLIO_NAME,
+               bobp.SUBSCRIPTION_AMOUNT,
+               nvl(eed.ENTRUST_NUM*100, 0) - nvl(bobp1.SUBSCRIPTION_AMOUNT, 0)         avaNum,
+               bobp.PAYABLE_AMOUNT,
+               bobp.SETT_FEE_AMT,
+               eed.INV_AIM,
+               eed.SEC_ACCT_ID,
+               ssai.SEC_ACCT_NAME,
+               bo.dip_Type dipType,
+               ROWNUM rn
+        from BID_ORDER bo
+                 left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                 left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 left join ETR_ENTRUST_DETAIL eed on bobp.ENTRUST_ID = eed.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
+                 left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
+                 left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                 left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+                 left join (select sum(SUBSCRIPTION_AMOUNT) SUBSCRIPTION_AMOUNT, ENTRUST_ID, PORTFOLIO_ID
+                            from BID_ORDER_BID_PRICE
+                            where IS_CANCEL = 'N'
+                              and TRADE_STATUS != '03'
+                            group by ENTRUST_ID, PORTFOLIO_ID) bobp1
+                           on bobp1.ENTRUST_ID = bobp.ENTRUST_ID and bobp1.PORTFOLIO_ID = bobp.PORTFOLIO_ID
+        where bo.BID_ID = #{bidId}
+        union all
+        select bo.FINPROD_ID,
+               fp.FINPROD_MARKET_ID,
+               fp.FINPROD_ABBR,
+               bo.OU_PARTY_ID,
+               mcci.PARTY_ABBR                                                     ouPartyIdAbbr,
+               bo.OUR_TRADER,
+               mcct.real_name                                                    ourTraderName,
+               fpi.ISSUE_PRICE,
+               case
+                   when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+               case
+                   when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/,
+               case
+                   when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                       then fpi.REFER_YIELD end                                    rate/*当带入资产的息票品种为利随本清/附息-固定利率时，显示字段票面利率*/,
+               bo.SUBSCRIPTION_AMOUNT                                              subscriptionAmount,
+               bo.PAYABLE_AMOUNT                                                   payableAmount,
+               bo.SETT_FEE_AMT                                                     settFeeAmt,
+               bobp.ENTRUST_ID,
+               bobp.PORTFOLIO_ID,
+               pp.PORTFOLIO_NAME,
+               bobp.SUBSCRIPTION_AMOUNT,
+               nvl(eed.ENTRUST_NUM*100, 0) - nvl(bobp1.SUBSCRIPTION_AMOUNT, 0)         avaNum,
+               bobp.PAYABLE_AMOUNT,
+               bobp.SETT_FEE_AMT,
+               eed.INV_AIM,
+               eed.SEC_ACCT_ID,
+               ssai.SEC_ACCT_NAME,
+               bo.dip_Type dipType,
+               ROWNUM rn
+        from WFL_BID_ORDER bo
+                 left join WFL_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                 left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 left join ETR_ENTRUST_DETAIL eed on bobp.ENTRUST_ID = eed.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
+                 left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
+                 left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                 left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+                 left join (select sum(SUBSCRIPTION_AMOUNT) SUBSCRIPTION_AMOUNT, ENTRUST_ID, PORTFOLIO_ID
+                            from BID_ORDER_BID_PRICE
+                            where IS_CANCEL = 'N'
+                              and TRADE_STATUS != '03'
+                            group by ENTRUST_ID, PORTFOLIO_ID) bobp1
+                           on bobp1.ENTRUST_ID = bobp.ENTRUST_ID and bobp1.PORTFOLIO_ID = bobp.PORTFOLIO_ID
+        where bo.BID_ID = #{bidId}
+    </select>
+
+    <update id="updateBidOrder">
+        UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark} WHERE BID_ID = #{bidId}
+    </update>
+
+    <update id="updateBidOrderBidPrice">
+        UPDATE BID_ORDER_BID_PRICE SET IS_CANCEL  = 'Y' WHERE BID_ID  = #{bidId}
+    </update>
+
+    <select id="selectSumSubAmtBySecAcctIdAndFin" resultType="java.math.BigDecimal">
+        select sum(T.subAmt) sumSubAmt
+        from (
+                 select sum(nvl(bobp.SUBSCRIPTION_AMOUNT,0)) subAmt, bo.FINPROD_ID, eed.SEC_ACCT_ID
+                 from BID_ORDER bo
+                          left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                          left join ETR_ENTRUST_DETAIL eed
+                                    on bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID and
+                                       bobp.ENTRUST_ID = eed.ENTRUST_ID
+                 where bo.IS_CANCEL = 'N'
+                   and bo.TRADE_STATUS != '03'
+                 group by bo.FINPROD_ID, eed.SEC_ACCT_ID
+                 union all
+                 select sum(nvl(wbobp.SUBSCRIPTION_AMOUNT,0)) subAmt, wbo.FINPROD_ID, eed.SEC_ACCT_ID
+                 from Wfl_BID_ORDER wbo
+                          left join Wfl_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID
+                          left join ETR_ENTRUST_DETAIL eed
+                                    on wbobp.PORTFOLIO_ID = eed.PORTFOLIO_ID and
+                                       wbobp.ENTRUST_ID = eed.ENTRUST_ID
+                 group by wbo.FINPROD_ID, eed.SEC_ACCT_ID
+             ) T
+        where T.FINPROD_ID = #{finprodId} and T.SEC_ACCT_ID = #{secManageAcctId}
+    </select>
+
+    <select id="selectEtrAvaNum" resultType="java.math.BigDecimal">
+        select eed.ENTRUST_NUM*100 - nvl(T1.sumSubAmt,0)
+        from ETR_ENTRUST_DETAIL eed
+        left join(
+            select sum(T.subAmt) sumSubAmt,T.ENTRUST_ID, T.PORTFOLIO_ID
+            from (
+                     select nvl(bobp.SUBSCRIPTION_AMOUNT,0) subAmt, bobp.ENTRUST_ID, bobp.PORTFOLIO_ID
+                     from BID_ORDER bo
+                              left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                     where bo.IS_CANCEL = 'N'
+                       and bo.TRADE_STATUS != '03'
+                     union all
+                     select nvl(wbobp.SUBSCRIPTION_AMOUNT,0) subAmt, wbobp.ENTRUST_ID, wbobp.PORTFOLIO_ID
+                     from Wfl_BID_ORDER wbo
+                              left join Wfl_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID
+                 ) T
+                     group by T.ENTRUST_ID, T.PORTFOLIO_ID
+        )T1 on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
+        where eed.ENTRUST_ID = #{entrustId} and eed.PORTFOLIO_ID = #{protfolioId}
+    </select>
+
+    <delete id="deleteByPreTradeId" parameterType="java.lang.String" >
+        delete from TRDQUTO_MATCH_INFO
+        where PRE_TRADE_ID = #{preTradeId,jdbcType=VARCHAR}
+    </delete>
+
+    <select id="getIssuer" resultType="java.lang.String">
+        select mci.CUSTOMER_NAME
+        from FIN_PRODUCT fp
+                 left join MST_CUSTOMER_INFO mci on fp.ISSUER = mci.CUSTOMER_ID
+        where ROWNUM = 1 and fp.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

@@ -1,14 +1,18 @@
 package com.joyintech.tams.invest.trade.manualsettle.dto;
 
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.TrdManualSettleInfo;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 
@@ -154,6 +158,39 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
     public String getSettleStatusStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.交收状态, this.getSettleStatus());
     }
+
+    // ZGCPCN-998: 债券的数量单位改为万元,数量*100/10000,其余不变 modify by fuyongsheng 20220601 start
+    public String getPledgeNumberStr(){
+        if(this.getPledgeNumber() == null){
+            return StringUtil.EMPTY;
+        }
+        if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(this.getFinprodType2())){
+            return String.valueOf(ArithmeticUtil.divide(this.getPledgeNumber(), new BigDecimal(100), 2, RoundingMode.HALF_UP));
+        }else{
+            return String.valueOf(this.getPledgeNumber());
+        }
+    }
+
+    public String getSettleNumStr() {
+        if(this.getSettleNum() == null){
+            return StringUtil.EMPTY;
+        }
+        if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(this.getFinprodType2())){
+            return String.valueOf(ArithmeticUtil.divide(this.getSettleNum(), new BigDecimal(100), 2, RoundingMode.HALF_UP));
+        }else{
+            return String.valueOf(this.getSettleNum());
+        }
+    }
+    // ZGCPCN-998: 债券的数量单位改为万元,数量*100/10000,其余不变 modify by fuyongsheng 20220601 end
+
+    // ZGCPCN-998: 回购金额单位改为万元,金额*100/10000 modify by fuyongsheng 20220601 start
+    public String getPrinStr() {
+        if(null == this.getPrin()){
+            return StringUtil.EMPTY;
+        }
+        return String.valueOf(ArithmeticUtil.divide(this.getPrin(), new BigDecimal(100), 2, RoundingMode.HALF_UP));
+    }
+    // ZGCPCN-998: 回购金额单位改为万元,数量*100/10000 modify by fuyongsheng 20220601 end
 
     public String getBusiTypeStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.交收业务类别, this.getBusiType());

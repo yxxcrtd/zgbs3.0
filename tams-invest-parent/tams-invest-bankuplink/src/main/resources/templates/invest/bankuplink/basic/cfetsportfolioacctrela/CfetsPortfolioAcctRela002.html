@@ -31,7 +31,7 @@
                                                     <label class="layui-form-label form-label-wrap" data-th-text="#{CfetsPortfolioAcctRela001.portfolioId}">组合代码<i class="must">*</i></label>
                                                     <div class="layui-input-inline input-inline">
                                                         <select type="text" id="portfolioId" name="portfolioId" class="layui-input form-input input-select" required multiple="true"
-                                                            data-th-data-url="@{/invest/bankuplink/common/CfetsQuotedCommon/selectPortfolioId}" data-th-initvalue="${entity?.portfolioId}">
+                                                                data-th-data-url="@{/invest/bankuplink/common/CfetsQuotedCommon/selectPortfolioId}" th:initvalue="${entity?.portfolioId}">
                                                         </select>
                                                     </div>
                                                 </div>

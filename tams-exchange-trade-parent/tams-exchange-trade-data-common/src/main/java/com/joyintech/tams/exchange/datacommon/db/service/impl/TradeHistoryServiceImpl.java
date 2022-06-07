@@ -98,7 +98,7 @@ public class TradeHistoryServiceImpl implements TradeHistoryService {
 
         TradeQryBean tradeQryBean = new TradeQryBean(accountId, market, stockCode, entrustProp, ptlAuthList, startDay, endDay);
         PageHelper.startPage(pageMode.getPageNo(), pageMode.getPageSize());
-        List<TradeQueryBean> tradeHistories = tradeHistoryMapper.selectTradeByPage(tradeQryBean);
+        List<TradeQueryBean> tradeHistories = tradeHistoryMapper.selectHistoryTradeByPage(tradeQryBean);
         tradeHistories.forEach(tradeHistory -> {
             if (InvestmentAssetType.isFutures(tradeHistory.getAssetType())) {
                 tradeHistory.setStockCode(StockCodeUtils.getStockCode(tradeHistory.getStockCode()));

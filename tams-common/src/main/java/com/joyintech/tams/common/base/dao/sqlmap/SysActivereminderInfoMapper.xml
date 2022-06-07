@@ -12,10 +12,11 @@
         <result column="CLOSEFLAG" property="closeflag" jdbcType="CHAR" />
         <result column="FEE_ID" property="feeId" jdbcType="VARCHAR" />
         <result column="MDATE" property="mdate" jdbcType="DATE" />
+        <result column="BUSINESS_PRIMARY_KEY1" property="businessPrimaryKey1" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         SEQNO SEQNO, CDATE CDATE, REM_TYPE REM_TYPE, FINPROD_ID FINPROD_ID, FINPROD_NAME FINPROD_NAME, 
-        REMARK REMARK, EFFFLAG EFFFLAG, CLOSEFLAG CLOSEFLAG, FEE_ID FEE_ID, MDATE MDATE
+        REMARK REMARK, EFFFLAG EFFFLAG, CLOSEFLAG CLOSEFLAG, FEE_ID FEE_ID, MDATE MDATE, BUSINESS_PRIMARY_KEY1
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -41,11 +42,11 @@
         insert into SYS_ACTIVEREMINDER_INFO (SEQNO, CDATE, REM_TYPE, 
             FINPROD_ID, FINPROD_NAME, REMARK, 
             EFFFLAG, CLOSEFLAG, FEE_ID, 
-            MDATE,INSTITUTION_CODE)
+            MDATE,INSTITUTION_CODE,BUSINESS_PRIMARY_KEY1)
         values (#{seqno,jdbcType=VARCHAR}, #{cdate,jdbcType=DATE}, #{remType,jdbcType=VARCHAR}, 
             #{finprodId,jdbcType=VARCHAR}, #{finprodName,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
             #{effflag,jdbcType=CHAR}, #{closeflag,jdbcType=CHAR}, #{feeId,jdbcType=VARCHAR}, 
-            #{mdate,jdbcType=DATE},#{institutionCode,jdbcType=VARCHAR})
+            #{mdate,jdbcType=DATE},#{institutionCode,jdbcType=VARCHAR},#{businessPrimaryKey1,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.SysActivereminderInfo" >
         insert into SYS_ACTIVEREMINDER_INFO
@@ -83,6 +84,9 @@
             <if test="institutionCode != null" >
                 INSTITUTION_CODE,
             </if>
+            <if test="businessPrimaryKey1 != null" >
+                BUSINESS_PRIMARY_KEY1,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="seqno != null" >
@@ -117,6 +121,9 @@
             </if>
             <if test="institutionCode != null" >
                 #{institutionCode,jdbcType=VARCHAR},
+            </if>
+            <if test="businessPrimaryKey1 != null" >
+                #{businessPrimaryKey1,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -158,6 +165,9 @@
             <if test="mdate != null" >
                 MDATE = #{mdate,jdbcType=DATE},
             </if>
+            <if test="businessPrimaryKey1 != null" >
+                BUSINESS_PRIMARY_KEY1 = #{businessPrimaryKey1,jdbcType=VARCHAR},
+            </if>
         </set>
         where SEQNO = #{seqno,jdbcType=VARCHAR}
     </update>
@@ -171,7 +181,8 @@
             EFFFLAG = #{effflag,jdbcType=CHAR},
             CLOSEFLAG = #{closeflag,jdbcType=CHAR},
             FEE_ID = #{feeId,jdbcType=VARCHAR},
-            MDATE = #{mdate,jdbcType=DATE}
+            MDATE = #{mdate,jdbcType=DATE},
+            BUSINESS_PRIMARY_KEY1 = #{businessPrimaryKey1,jdbcType=VARCHAR}
         where SEQNO = #{seqno,jdbcType=VARCHAR}
     </update>
 </mapper>

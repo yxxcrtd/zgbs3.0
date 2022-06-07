@@ -1,229 +1,358 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.joyintech.tams.common.base.dao.BidOrderBidPriceMapper" >
-    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.BidOrderBidPrice" >
-        <id column="BID_ID" property="bidId" jdbcType="VARCHAR" />
-        <id column="ENTRUST_ID" property="entrustId" jdbcType="VARCHAR" />
-        <id column="BID_PRICE" property="bidPrice" jdbcType="DECIMAL" />
-        <result column="IS_WIN" property="isWin" jdbcType="VARCHAR" />
-        <result column="WIN_PRICE" property="winPrice" jdbcType="DECIMAL" />
-        <result column="WIN_CPRICE" property="winCprice" jdbcType="DECIMAL" />
-        <result column="THE_WIN_PRIN_AMT" property="theWinPrinAmt" jdbcType="DECIMAL" />
-        <result column="WIN_PRIN_AMT" property="winPrinAmt" jdbcType="DECIMAL" />
-        <result column="TRADE_ID" property="tradeId" jdbcType="VARCHAR" />
-        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
-        <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
-        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
-        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
-        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
-        <result column="IS_FROZEN_POSITION" property="isFrozenPosition" jdbcType="VARCHAR" />
-    </resultMap>
-    <sql id="Base_Column_List" >
-        BID_ID BID_ID, ENTRUST_ID ENTRUST_ID, BID_PRICE BID_PRICE, IS_WIN IS_WIN, WIN_PRICE WIN_PRICE, 
-        WIN_CPRICE WIN_CPRICE, THE_WIN_PRIN_AMT THE_WIN_PRIN_AMT, WIN_PRIN_AMT WIN_PRIN_AMT, 
-        TRADE_ID TRADE_ID, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
-        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, IS_FROZEN_POSITION IS_FROZEN_POSITION
-    </sql>
-    <sql id="Sql_All_Data" >
-        select 
-        <include refid="com.joyintech.tams.common.base.dao.BidOrderBidPriceMapper.Base_Column_List" />
-        from BID_ORDER_BID_PRICE
-    </sql>
-    <sql id="Sql_All_Effective_Data" >
-        select 
-        <include refid="com.joyintech.tams.common.base.dao.BidOrderBidPriceMapper.Base_Column_List" />
-        from BID_ORDER_BID_PRICE
-    </sql>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPriceKey" >
-        select 
-        <include refid="com.joyintech.tams.common.base.dao.BidOrderBidPriceMapper.Base_Column_List" />
-        from BID_ORDER_BID_PRICE
-        where BID_ID = #{bidId,jdbcType=VARCHAR}
-          and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
-          and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPriceKey" >
-        delete from BID_ORDER_BID_PRICE
-        where BID_ID = #{bidId,jdbcType=VARCHAR}
-          and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
-          and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
-    </delete>
-    <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice" >
-        insert into BID_ORDER_BID_PRICE (BID_ID, ENTRUST_ID, BID_PRICE, 
-            IS_WIN, WIN_PRICE, WIN_CPRICE, 
-            THE_WIN_PRIN_AMT, WIN_PRIN_AMT, TRADE_ID, 
-            CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-            UPDATE_USER, UPDATE_TIME, IS_FROZEN_POSITION)
-        values (#{bidId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{bidPrice,jdbcType=DECIMAL}, 
-            #{isWin,jdbcType=VARCHAR}, #{winPrice,jdbcType=DECIMAL}, #{winCprice,jdbcType=DECIMAL}, 
-            #{theWinPrinAmt,jdbcType=DECIMAL}, #{winPrinAmt,jdbcType=DECIMAL}, #{tradeId,jdbcType=VARCHAR}, 
-            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{isFrozenPosition,jdbcType=VARCHAR})
-    </insert>
-    <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice" >
-        insert into BID_ORDER_BID_PRICE
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="bidId != null" >
-                BID_ID,
-            </if>
-            <if test="entrustId != null" >
-                ENTRUST_ID,
-            </if>
-            <if test="bidPrice != null" >
-                BID_PRICE,
-            </if>
-            <if test="isWin != null" >
-                IS_WIN,
-            </if>
-            <if test="winPrice != null" >
-                WIN_PRICE,
-            </if>
-            <if test="winCprice != null" >
-                WIN_CPRICE,
-            </if>
-            <if test="theWinPrinAmt != null" >
-                THE_WIN_PRIN_AMT,
-            </if>
-            <if test="winPrinAmt != null" >
-                WIN_PRIN_AMT,
-            </if>
-            <if test="tradeId != null" >
-                TRADE_ID,
-            </if>
-            <if test="createUser != null" >
-                CREATE_USER,
-            </if>
-            <if test="createDept != null" >
-                CREATE_DEPT,
-            </if>
-            <if test="createTime != null" >
-                CREATE_TIME,
-            </if>
-            <if test="updateUser != null" >
-                UPDATE_USER,
-            </if>
-            <if test="updateTime != null" >
-                UPDATE_TIME,
-            </if>
-            <if test="isFrozenPosition != null" >
-                IS_FROZEN_POSITION,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
-            <if test="bidId != null" >
-                #{bidId,jdbcType=VARCHAR},
-            </if>
-            <if test="entrustId != null" >
-                #{entrustId,jdbcType=VARCHAR},
-            </if>
-            <if test="bidPrice != null" >
-                #{bidPrice,jdbcType=DECIMAL},
-            </if>
-            <if test="isWin != null" >
-                #{isWin,jdbcType=VARCHAR},
-            </if>
-            <if test="winPrice != null" >
-                #{winPrice,jdbcType=DECIMAL},
-            </if>
-            <if test="winCprice != null" >
-                #{winCprice,jdbcType=DECIMAL},
-            </if>
-            <if test="theWinPrinAmt != null" >
-                #{theWinPrinAmt,jdbcType=DECIMAL},
-            </if>
-            <if test="winPrinAmt != null" >
-                #{winPrinAmt,jdbcType=DECIMAL},
-            </if>
-            <if test="tradeId != null" >
-                #{tradeId,jdbcType=VARCHAR},
-            </if>
-            <if test="createUser != null" >
-                #{createUser,jdbcType=VARCHAR},
-            </if>
-            <if test="createDept != null" >
-                #{createDept,jdbcType=VARCHAR},
-            </if>
-            <if test="createTime != null" >
-                #{createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateUser != null" >
-                #{updateUser,jdbcType=VARCHAR},
-            </if>
-            <if test="updateTime != null" >
-                #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="isFrozenPosition != null" >
-                #{isFrozenPosition,jdbcType=VARCHAR},
-            </if>
-        </trim>
-    </insert>
-    <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice" >
-        insert into BID_ORDER_BID_PRICE(BID_ID, ENTRUST_ID, BID_PRICE, IS_WIN, WIN_PRICE, 
-        WIN_CPRICE, THE_WIN_PRIN_AMT, WIN_PRIN_AMT, TRADE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-        UPDATE_USER, UPDATE_TIME, IS_FROZEN_POSITION)
-        select BID_ID, ENTRUST_ID, BID_PRICE, IS_WIN, WIN_PRICE, 
-            WIN_CPRICE, THE_WIN_PRIN_AMT, WIN_PRIN_AMT, TRADE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-            #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, IS_FROZEN_POSITION
-             from BID_ORDER_BID_PRICE
-             where 1 = 1 and BID_ID = #{bidId,jdbcType=VARCHAR} and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR} and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
-    </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice" >
-        update BID_ORDER_BID_PRICE
-        <set >
-            <if test="isWin != null" >
-                IS_WIN = #{isWin,jdbcType=VARCHAR},
-            </if>
-            <if test="winPrice != null" >
-                WIN_PRICE = #{winPrice,jdbcType=DECIMAL},
-            </if>
-            <if test="winCprice != null" >
-                WIN_CPRICE = #{winCprice,jdbcType=DECIMAL},
-            </if>
-            <if test="theWinPrinAmt != null" >
-                THE_WIN_PRIN_AMT = #{theWinPrinAmt,jdbcType=DECIMAL},
-            </if>
-            <if test="winPrinAmt != null" >
-                WIN_PRIN_AMT = #{winPrinAmt,jdbcType=DECIMAL},
-            </if>
-            <if test="tradeId != null" >
-                TRADE_ID = #{tradeId,jdbcType=VARCHAR},
-            </if>
-            <if test="updateUser != null" >
-                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-            </if>
-            <if test="updateTime != null" >
-                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="isFrozenPosition != null" >
-                IS_FROZEN_POSITION = #{isFrozenPosition,jdbcType=VARCHAR},
-            </if>
-        </set>
-        where BID_ID = #{bidId,jdbcType=VARCHAR}
-          and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
-          and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice" >
-        update BID_ORDER_BID_PRICE
-        set IS_WIN = #{isWin,jdbcType=VARCHAR},
-            WIN_PRICE = #{winPrice,jdbcType=DECIMAL},
-            WIN_CPRICE = #{winCprice,jdbcType=DECIMAL},
-            THE_WIN_PRIN_AMT = #{theWinPrinAmt,jdbcType=DECIMAL},
-            WIN_PRIN_AMT = #{winPrinAmt,jdbcType=DECIMAL},
-            TRADE_ID = #{tradeId,jdbcType=VARCHAR},
-            IS_FROZEN_POSITION = #{isFrozenPosition,jdbcType=VARCHAR},
-            UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
-        where BID_ID = #{bidId,jdbcType=VARCHAR}
-          and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
-          and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
-    </update>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.common.base.dao.BidOrderBidPriceMapper">
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
+    <id column="BID_ID" jdbcType="VARCHAR" property="bidId" />
+    <id column="ENTRUST_ID" jdbcType="VARCHAR" property="entrustId" />
+    <id column="BID_PRICE" jdbcType="DECIMAL" property="bidPrice" />
+    <id column="PORTFOLIO_ID" jdbcType="VARCHAR" property="portfolioId" />
+    <result column="IS_WIN" jdbcType="VARCHAR" property="isWin" />
+    <result column="WIN_PRICE" jdbcType="DECIMAL" property="winPrice" />
+    <result column="WIN_CPRICE" jdbcType="DECIMAL" property="winCprice" />
+    <result column="THE_WIN_PRIN_AMT" jdbcType="DECIMAL" property="theWinPrinAmt" />
+    <result column="WIN_PRIN_AMT" jdbcType="DECIMAL" property="winPrinAmt" />
+    <result column="TRADE_ID" jdbcType="VARCHAR" property="tradeId" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="CREATE_DEPT" jdbcType="VARCHAR" property="createDept" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="IS_FROZEN_POSITION" jdbcType="VARCHAR" property="isFrozenPosition" />
+    <result column="SUBSCRIPTION_AMOUNT" jdbcType="DECIMAL" property="subscriptionAmount" />
+    <result column="PAYABLE_AMOUNT" jdbcType="DECIMAL" property="payableAmount" />
+    <result column="SETT_FEE_AMT" jdbcType="DECIMAL" property="settFeeAmt" />
+    <result column="P_BID_ID" jdbcType="VARCHAR" property="pBidId" />
+    <result column="IS_CANCEL" jdbcType="VARCHAR" property="isCancel" />
+    <result column="TRADE_STATUS" jdbcType="VARCHAR" property="tradeStatus" />
+    <result column="INV_AIM" jdbcType="VARCHAR" property="invAim" />
+    <result column="SEC_ACCT_ID" jdbcType="VARCHAR" property="secAcctId" />
+    <result column="ACCT_NO" jdbcType="VARCHAR" property="acctNo" />
+    <result column="TRADE_AMT" jdbcType="DECIMAL" property="tradeAmt" />
+    <result column="INT_AMT" jdbcType="DECIMAL" property="intAmt" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    BID_ID, ENTRUST_ID, BID_PRICE, PORTFOLIO_ID, IS_WIN, WIN_PRICE, WIN_CPRICE, THE_WIN_PRIN_AMT,
+    WIN_PRIN_AMT, TRADE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,
+    IS_FROZEN_POSITION, SUBSCRIPTION_AMOUNT, PAYABLE_AMOUNT, SETT_FEE_AMT, P_BID_ID,
+    IS_CANCEL, TRADE_STATUS,INV_AIM ,SEC_ACCT_ID ,ACCT_NO,TRADE_AMT,INT_AMT
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPriceKey" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from BID_ORDER_BID_PRICE
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+      and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+      and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
+      and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+  </select>
 
-
-    <update id="updateWinByBidId" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
-            UPDATE BID_ORDER_BID_PRICE set is_win = #{isWin} where bid_id = #{bidId}
-    </update>
-
-    <select id="selectByBidId" resultType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
-        SELECT * from BID_ORDER_BID_PRICE T1 where T1.bid_Id = #{bidId}
-    </select>
+  <select id="selectListByPrimaryKey" parameterType="java.lang.String" resultType="com.joyintech.tams.common.base.entity.BidOrderBidPriceKey">
+    select
+    <include refid="Base_Column_List" />
+    from BID_ORDER_BID_PRICE
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPriceKey">
+    delete from BID_ORDER_BID_PRICE
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+      and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+      and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
+      and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
+    insert into BID_ORDER_BID_PRICE (BID_ID, ENTRUST_ID, BID_PRICE,
+      PORTFOLIO_ID, IS_WIN, WIN_PRICE,
+      WIN_CPRICE, THE_WIN_PRIN_AMT, WIN_PRIN_AMT,
+      TRADE_ID, CREATE_USER, CREATE_DEPT,
+      CREATE_TIME, UPDATE_USER, UPDATE_TIME,
+      IS_FROZEN_POSITION, SUBSCRIPTION_AMOUNT, PAYABLE_AMOUNT,
+      SETT_FEE_AMT, P_BID_ID, IS_CANCEL,
+      TRADE_STATUS,INV_AIM ,SEC_ACCT_ID ,ACCT_NO,TRADE_AMT,INT_AMT)
+    values (#{bidId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{bidPrice,jdbcType=DECIMAL},
+      #{portfolioId,jdbcType=VARCHAR}, #{isWin,jdbcType=VARCHAR}, #{winPrice,jdbcType=DECIMAL},
+      #{winCprice,jdbcType=DECIMAL}, #{theWinPrinAmt,jdbcType=DECIMAL}, #{winPrinAmt,jdbcType=DECIMAL},
+      #{tradeId,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
+      #{isFrozenPosition,jdbcType=VARCHAR}, #{subscriptionAmount,jdbcType=DECIMAL}, #{payableAmount,jdbcType=DECIMAL},
+      #{settFeeAmt,jdbcType=DECIMAL}, #{pBidId,jdbcType=VARCHAR}, #{isCancel,jdbcType=VARCHAR},
+      #{tradeStatus,jdbcType=VARCHAR},
+      #{invAim,jdbcType=VARCHAR}, #{secAcctId,jdbcType=VARCHAR}, #{acctNo,jdbcType=VARCHAR}, #{tradeAmt,jdbcType=DECIMAL}, #{intAmt,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
+    insert into BID_ORDER_BID_PRICE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="bidId != null">
+        BID_ID,
+      </if>
+      <if test="entrustId != null">
+        ENTRUST_ID,
+      </if>
+      <if test="bidPrice != null">
+        BID_PRICE,
+      </if>
+      <if test="portfolioId != null">
+        PORTFOLIO_ID,
+      </if>
+      <if test="isWin != null">
+        IS_WIN,
+      </if>
+      <if test="winPrice != null">
+        WIN_PRICE,
+      </if>
+      <if test="winCprice != null">
+        WIN_CPRICE,
+      </if>
+      <if test="theWinPrinAmt != null">
+        THE_WIN_PRIN_AMT,
+      </if>
+      <if test="winPrinAmt != null">
+        WIN_PRIN_AMT,
+      </if>
+      <if test="tradeId != null">
+        TRADE_ID,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="createDept != null">
+        CREATE_DEPT,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="isFrozenPosition != null">
+        IS_FROZEN_POSITION,
+      </if>
+      <if test="subscriptionAmount != null">
+        SUBSCRIPTION_AMOUNT,
+      </if>
+      <if test="payableAmount != null">
+        PAYABLE_AMOUNT,
+      </if>
+      <if test="settFeeAmt != null">
+        SETT_FEE_AMT,
+      </if>
+      <if test="pBidId != null">
+        P_BID_ID,
+      </if>
+      <if test="isCancel != null">
+        IS_CANCEL,
+      </if>
+      <if test="tradeStatus != null">
+        TRADE_STATUS,
+      </if>
+      <if test="invAim != null">
+        INV_AIM,
+      </if>
+      <if test="secAcctId != null">
+        SEC_ACCT_ID,
+      </if>
+      <if test="acctNo != null">
+        ACCT_NO,
+      </if>
+      <if test="tradeAmt != null">
+        TRADE_AMT,
+      </if>
+      <if test="intAmt != null">
+        INT_AMT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="bidId != null">
+        #{bidId,jdbcType=VARCHAR},
+      </if>
+      <if test="entrustId != null">
+        #{entrustId,jdbcType=VARCHAR},
+      </if>
+      <if test="bidPrice != null">
+        #{bidPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="portfolioId != null">
+        #{portfolioId,jdbcType=VARCHAR},
+      </if>
+      <if test="isWin != null">
+        #{isWin,jdbcType=VARCHAR},
+      </if>
+      <if test="winPrice != null">
+        #{winPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="winCprice != null">
+        #{winCprice,jdbcType=DECIMAL},
+      </if>
+      <if test="theWinPrinAmt != null">
+        #{theWinPrinAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="winPrinAmt != null">
+        #{winPrinAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="tradeId != null">
+        #{tradeId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null">
+        #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isFrozenPosition != null">
+        #{isFrozenPosition,jdbcType=VARCHAR},
+      </if>
+      <if test="subscriptionAmount != null">
+        #{subscriptionAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="payableAmount != null">
+        #{payableAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="settFeeAmt != null">
+        #{settFeeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="pBidId != null">
+        #{pBidId,jdbcType=VARCHAR},
+      </if>
+      <if test="isCancel != null">
+        #{isCancel,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeStatus != null">
+        #{tradeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="invAim != null">
+        #{invAim,jdbcType=VARCHAR},
+      </if>
+      <if test="secAcctId != null">
+        #{secAcctId,jdbcType=VARCHAR},
+      </if>
+      <if test="acctNo != null">
+        #{acctNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeAmt != null">
+        #{tradeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="intAmt != null">
+        #{intAmt,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
+    update BID_ORDER_BID_PRICE
+    <set>
+      <if test="isWin != null">
+        IS_WIN = #{isWin,jdbcType=VARCHAR},
+      </if>
+      <if test="winPrice != null">
+        WIN_PRICE = #{winPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="winCprice != null">
+        WIN_CPRICE = #{winCprice,jdbcType=DECIMAL},
+      </if>
+      <if test="theWinPrinAmt != null">
+        THE_WIN_PRIN_AMT = #{theWinPrinAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="winPrinAmt != null">
+        WIN_PRIN_AMT = #{winPrinAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="tradeId != null">
+        TRADE_ID = #{tradeId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null">
+        CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isFrozenPosition != null">
+        IS_FROZEN_POSITION = #{isFrozenPosition,jdbcType=VARCHAR},
+      </if>
+      <if test="subscriptionAmount != null">
+        SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="payableAmount != null">
+        PAYABLE_AMOUNT = #{payableAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="settFeeAmt != null">
+        SETT_FEE_AMT = #{settFeeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="pBidId != null">
+        P_BID_ID = #{pBidId,jdbcType=VARCHAR},
+      </if>
+      <if test="isCancel != null">
+        IS_CANCEL = #{isCancel,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeStatus != null">
+        TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="invAim != null">
+        INV_AIM = #{invAim,jdbcType=VARCHAR},
+      </if>
+      <if test="secAcctId != null">
+        SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR},
+      </if>
+      <if test="acctNo != null">
+        ACCT_NO = #{acctNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeAmt != null">
+        TRADE_AMT = #{tradeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="intAmt != null">
+        INT_AMT = #{intAmt,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+      and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+      and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
+      and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
+    update BID_ORDER_BID_PRICE
+    set IS_WIN = #{isWin,jdbcType=VARCHAR},
+      WIN_PRICE = #{winPrice,jdbcType=DECIMAL},
+      WIN_CPRICE = #{winCprice,jdbcType=DECIMAL},
+      THE_WIN_PRIN_AMT = #{theWinPrinAmt,jdbcType=DECIMAL},
+      WIN_PRIN_AMT = #{winPrinAmt,jdbcType=DECIMAL},
+      TRADE_ID = #{tradeId,jdbcType=VARCHAR},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      IS_FROZEN_POSITION = #{isFrozenPosition,jdbcType=VARCHAR},
+      SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL},
+      PAYABLE_AMOUNT = #{payableAmount,jdbcType=DECIMAL},
+      SETT_FEE_AMT = #{settFeeAmt,jdbcType=DECIMAL},
+      P_BID_ID = #{pBidId,jdbcType=VARCHAR},
+      IS_CANCEL = #{isCancel,jdbcType=VARCHAR},
+      TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR},
+      INV_AIM = #{invAim,jdbcType=VARCHAR},
+      SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR},
+      ACCT_NO = #{acctNo,jdbcType=VARCHAR},
+      TRADE_AMT = #{tradeAmt,jdbcType=DECIMAL},
+      INT_AMT = #{intAmt,jdbcType=DECIMAL}
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+      and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+      and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
+      and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+  </update>
 </mapper>

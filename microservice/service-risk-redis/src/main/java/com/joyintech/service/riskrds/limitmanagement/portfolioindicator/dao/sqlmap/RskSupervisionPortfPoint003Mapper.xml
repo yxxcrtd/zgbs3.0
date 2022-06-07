@@ -77,16 +77,32 @@
 		 y.OPEN_TYPE openType ,
 		 y.RAISE_TYPE raiseType ,
 		 y.INVEST_NATURE investNature
-		 FROM RSK_PORTFOLIO_PACKAGE_DTL m
+		 FROM
+		 <choose>
+			 <when test="isRule != null and isRule == 'Y'.toString()">
+				 RSK_RULE_PORTFOLIO m
+			 </when>
+			 <otherwise>
+				 RSK_PORTFOLIO_PACKAGE_DTL m
+			 </otherwise>
+		 </choose>
 		 inner join PTL_PORTFOLIO n on m.PORTFOLIO_ID=n.PORTFOLIO_ID
 		 inner join PA_PTL_PORTFOLIO y on m.PORTFOLIO_ID=y.PORTFOLIO_ID
 	 <where>
-	        m.PTL_BAG_ID=#{ptlBagId}
+		 <choose>
+			 <when test="isRule != null and isRule == 'Y'.toString()">
+				 m.RULE_ID=#{ptlBagId}
+			 </when>
+			 <otherwise>
+				 m.PTL_BAG_ID=#{ptlBagId}
+			 </otherwise>
+		 </choose>
 	        <!-- add by wangshuang 剔除已到期组合 2019-12-05 start -->
 	        and n.MDATE > CURRENT_DATE
 	        <!-- add by wangshuang 剔除已到期组合 2019-12-05 end -->
 	  		<if test="portfolioName != null and portfolioName != ''">
-				and	n.PORTFOLIO_NAME LIKE CONCAT(CONCAT('%',#{portfolioName}),'%')
+				and	(n.PORTFOLIO_NAME LIKE CONCAT(CONCAT('%',#{portfolioName}),'%')
+				or	n.PORTFOLIO_ID LIKE CONCAT(CONCAT('%',#{portfolioName}),'%'))
 			</if>
 			<if test="profitType != null and profitType != ''">
 				and n.PROFIT_TYPE = #{profitType}

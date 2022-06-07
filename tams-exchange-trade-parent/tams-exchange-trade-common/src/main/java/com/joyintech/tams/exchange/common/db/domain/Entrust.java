@@ -17,6 +17,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
+
 @ApiModel(value = "委托报文", description = "委托报文")
 public class Entrust extends BaseEntity implements Serializable, EntrustInterface, Cloneable, KeyMethodInterface<String> {
     private static final long serialVersionUID = 4354102783892014792L;
@@ -155,10 +157,15 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
     @JsonSerialize(using = DoubleSerializerUtils.class)
     private BigDecimal tradedPrice;
 
-    @ApiModelProperty(name = "cancelVolume", value = "撤销数量")
+    @ApiModelProperty(name = "cancelVolume", value = "撤单数量")
     @NotNull
     @Digits(integer = 20, fraction = 0)
     private long cancelVolume;
+
+    @ApiModelProperty(name = "cancelBalance", value = "撤销金额")
+    @NotNull
+    @Digits(integer = 20, fraction = 4)
+    private BigDecimal cancelBalance;
 
     @ApiModelProperty(name = "reportTime", value = "报文时间")
     private String reportTime;
@@ -218,8 +225,7 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
     private int count;
 
     @ApiModelProperty(name = "isFullPrice", value = "全价（Y:是 ， N：否）")
-    @NotNull
-    private String isFullPrice;//Y:是 ， N：否
+    private String isFullPrice;
 
     @ApiModelProperty(name = "reportNo", value = "报文ID 柜台报盘编号")
     @Size(max = 32)
@@ -279,10 +285,17 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
     @ApiModelProperty(name = "entrustClass", value = "委托指令类别：01-单组合，02-多组合")
     private String entrustClass;
 
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+
+    @Override
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
     }
 
+    @Override
     public void setNoCancelEntrust(boolean noCancelEntrust) {
         this.noCancelEntrust = noCancelEntrust;
     }
@@ -512,6 +525,20 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
 
     public void setCancelVolume(long cancelVolume) {
         this.cancelVolume = cancelVolume;
+    }
+
+    public BigDecimal getCancelBalance() {
+        if (投管业务类型_通用式质押回购.getValue().equals(busiTypeTg)) {
+            return BigDecimal.valueOf(cancelVolume * 100);
+        } else if (entrustPrice != null) {
+            return entrustPrice.multiply(BigDecimal.valueOf(cancelVolume));
+        }
+
+        return cancelBalance;
+    }
+
+    public void setCancelBalance(BigDecimal cancelBalance) {
+        this.cancelBalance = cancelBalance;
     }
 
     public String getReportTime() {
@@ -776,6 +803,22 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
     }
 
     public static Entrust getTemplateEntrust() {

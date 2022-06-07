@@ -3,7 +3,10 @@ package com.joyintech.tams.exchange.common.db.domain;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.constant.BatchPriceMode;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,6 +18,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 @ApiModel(value = "综合业务下单响应报文", description = "综合业务下单响应报文")
 public class IntegratedEntrust extends BaseEntity implements Serializable, EntrustInterface, KeyMethodInterface<String> {
@@ -151,7 +155,11 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @Digits(integer = 10, fraction = 4)
     private long pretermYearRate;
 
-    @ApiModelProperty(required = true, name = "liaisonName", value = "联络人姓名")
+    @ApiModelProperty(required = true, name = "sellerNo", value = "本方交易员（上海协议回购），本方交易商（深圳协议回购）")
+    @Size(max = 32)
+    private String sellerNo;
+
+    @ApiModelProperty(required = true, name = "liaisonName", value = "联系人（大宗交易），对手交易员（固收借用）")
     @Size(max = 32)
     private String liaisonName;
 
@@ -163,15 +171,57 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @Size(max = 16)
     private String propSeatNo;
 
-    @ApiModelProperty(required = true, name = "sellerNo", value = "本方交易员ID")
-    @Size(max = 32)
-    private String sellerNo;
-
-    @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称")
+    @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称（上海协议回购借用）")
     @Size(max = 32)
     private String propSeatName;
 
-    @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号")
+    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
+    private String counterId;
+
+    @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
+    private String ownerType;
+
+    @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
+    private String tradeId;
+
+    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员名称")
+    private String tradeName;
+
+    @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
+    private String dealerId;
+
+    @ApiModelProperty(required = true, name = "dealerName", value = "本方交易商名称")
+    private String dealerName;
+
+    @ApiModelProperty(required = true, name = "investorId", value = "本方交易主体ID")
+    private String investorId;
+
+    @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
+    private String investorName;
+
+
+    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员ID")
+    private String propTradeId;
+
+    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员名称")
+    private String propTradeName;
+
+    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商ID")
+    private String propDealerId;
+
+    @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
+    private String propDealerName;
+
+    @ApiModelProperty(required = true, name = "propInvestorId", value = "对手方交易主体ID")
+    private String propInvestorId;
+
+    @ApiModelProperty(required = true, name = "propInvestorName", value = "对手方交易主体名称")
+    private String propInvestorName;
+
+    @ApiModelProperty(required = true, name = "propOwnerType", value = "对手方报价所有者类型")
+    private String propOwnerType;
+
+    @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号，约定号")
     @Size(max = 32)
     private String contractId;
 
@@ -343,18 +393,25 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "entrustClass", value = "委托指令类别：01-单组合，02-多组合")
     private String entrustClass;
 
-	public String getSoftSkipMode() {
-		return softSkipMode;
-	}
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+
+    public String getSoftSkipMode() {
+        return softSkipMode;
+    }
 
 	public void setSoftSkipMode(String softSkipMode) {
 		this.softSkipMode = softSkipMode;
 	} 
 
+    @Override
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
     }
 
+    @Override
     public void setNoCancelEntrust(boolean noCancelEntrust) {
         this.noCancelEntrust = noCancelEntrust;
     }
@@ -516,6 +573,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.entrustVolume = entrustVolume;
     }
 
+
     public BigDecimal getEntrustPrice() {
         return entrustPrice;
     }
@@ -644,6 +702,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.compactTerm = compactTerm;
     }
 
+    @Override
     public BigDecimal getBackBalance() {
         return backBalance;
     }
@@ -989,4 +1048,150 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
     }
+
+    public String getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(String ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getPropInvestorId() {
+        return propInvestorId;
+    }
+
+    public void setPropInvestorId(String propInvestorId) {
+        this.propInvestorId = propInvestorId;
+    }
+
+    public String getPropInvestorName() {
+        return propInvestorName;
+    }
+
+    public void setPropInvestorName(String propInvestorName) {
+        this.propInvestorName = propInvestorName;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getTradeName() {
+        return tradeName;
+    }
+
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+
+    public String getPropTradeId() {
+        return propTradeId;
+    }
+
+    public void setPropTradeId(String propTradeId) {
+        this.propTradeId = propTradeId;
+    }
+
+    public String getPropTradeName() {
+        return propTradeName;
+    }
+
+    public void setPropTradeName(String propTradeName) {
+        this.propTradeName = propTradeName;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getPropDealerName() {
+        return propDealerName;
+    }
+
+    public void setPropDealerName(String propDealerName) {
+        this.propDealerName = propDealerName;
+    }
+
+    public String getPropOwnerType() {
+        return propOwnerType;
+    }
+
+    public void setPropOwnerType(String propOwnerType) {
+        this.propOwnerType = propOwnerType;
+    }
+
+    public String getCounterId() {
+        if(StringUtil.isNotEmpty(counterId)){
+            return counterId;
+        }
+        if (StringUtil.isNotEmpty(extend2) && extend2.contains("counterId")) {
+            Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
+            return (String)map.get("counterId");
+        }
+
+        return "";
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
 }

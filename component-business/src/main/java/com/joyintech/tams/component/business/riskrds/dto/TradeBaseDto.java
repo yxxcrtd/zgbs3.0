@@ -5,6 +5,7 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.invest.common.dto.common.BussRepoSecDto;
 
 import java.math.BigDecimal;
 
@@ -126,6 +127,11 @@ public class TradeBaseDto extends TrdProductDeal {
 	 */
 	private String mDate;
 
+	/**
+	 * 是否锁定(股票交易)
+	 */
+	private String withLockPeriod;
+
 	public String getBusiCode() {
 		return busiCode;
 	}
@@ -187,4 +193,22 @@ public class TradeBaseDto extends TrdProductDeal {
         this.calendarId = calendarId;
     }
     // add by zhangrui1 拆借回购等没有资产的需要传日历代码 end
+
+	private BussRepoSecDto bussRepoSec;
+
+	public BussRepoSecDto getBussRepoSec() {
+		return bussRepoSec;
+	}
+
+	public void setBussRepoSec(BussRepoSecDto bussRepoSec) {
+		this.bussRepoSec = bussRepoSec;
+	}
+
+	public String getWithLockPeriod() {
+		return withLockPeriod;
+	}
+
+	public void setWithLockPeriod(String withLockPeriod) {
+		this.withLockPeriod = withLockPeriod;
+	}
 }

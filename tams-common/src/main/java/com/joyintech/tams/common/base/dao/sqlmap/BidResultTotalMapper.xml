@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.common.base.dao.BidResultTotalMapper" >
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.BidResultTotal" >
+        <id column="TOTAL_WIN_ID" property="totalWinId" jdbcType="VARCHAR" />
+        <result column="BID_ID" property="bidId" jdbcType="VARCHAR" />
+        <result column="WIN_DATE" property="winDate" jdbcType="DATE" />
+        <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+        <result column="IS_WIN" property="isWin" jdbcType="VARCHAR" />
+        <result column="WIN_TYPE" property="winType" jdbcType="VARCHAR" />
+        <result column="WIN_PRINAMT" property="winPrinamt" jdbcType="DECIMAL" />
+        <result column="WIN_PRICE" property="winPrice" jdbcType="DECIMAL" />
+        <result column="SETT_FEE_AMT" property="settFeeAmt" jdbcType="DECIMAL" />
+        <result column="PAY_DATE" property="payDate" jdbcType="DATE" />
+        <result column="CREDITOR_DEBT_DATE" property="creditorDebtDate" jdbcType="DATE" />
+        <result column="COUNTER_ID" property="counterId" jdbcType="VARCHAR" />
+        <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+        <result column="STATUS" property="status" jdbcType="VARCHAR" />
+        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
+        <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        TOTAL_WIN_ID TOTAL_WIN_ID, BID_ID BID_ID, WIN_DATE WIN_DATE, FINPROD_ID FINPROD_ID, IS_WIN IS_WIN,
+        WIN_TYPE WIN_TYPE, WIN_PRINAMT WIN_PRINAMT, WIN_PRICE WIN_PRICE, SETT_FEE_AMT SETT_FEE_AMT, PAY_DATE PAY_DATE,
+        CREDITOR_DEBT_D CREDITOR_DEBT_D, COUNTER_ID COUNTER_ID, REMARK REMARK,STATUS STATUS,
+        CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+    </sql>
+    <sql id="Sql_All_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BidResultTotalMapper.Base_Column_List" />
+        from BID_RESULT_TOTAL
+    </sql>
+    <sql id="Sql_All_Effective_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BidResultTotalMapper.Base_Column_List" />
+        from BID_RESULT_TOTAL
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BidResultTotalMapper.Base_Column_List" />
+        from BID_RESULT_TOTAL
+        where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from BID_RESULT_TOTAL
+        where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.BidResultTotal" >
+        insert into BID_RESULT_TOTAL (TOTAL_WIN_ID, BID_ID, WIN_DATE, FINPROD_ID, IS_WIN, WIN_TYPE,
+            WIN_PRINAMT, WIN_PRICE, SETT_FEE_AMT, PAY_DATE, CREDITOR_DEBT_D, COUNTER_ID, REMARK,STATUS,
+            CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+            )
+        values (#{totalWinId,jdbcType=VARCHAR}, #{bidId,jdbcType=VARCHAR}, #{winDate,jdbcType=DATE}, #{finprodId,jdbcType=VARCHAR},
+            #{isWin,jdbcType=VARCHAR}, #{winType,jdbcType=VARCHAR}, #{winPrinamt,jdbcType=DECIMAL}, #{winPrice,jdbcType=DECIMAL},
+            #{settFeeAmt,jdbcType=DECIMAL}, #{payDate,jdbcType=DATE}, #{creditorDebtDate,jdbcType=DATE}, #{counterId,jdbcType=VARCHAR},
+            #{remark,jdbcType=VARCHAR} ,#{status,jdbcType=VARCHAR} ,#{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+            )
+    </insert>
+    <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.BidResultTotal" >
+        insert into BID_RESULT_TOTAL
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="totalWinId != null" >
+                TOTAL_WIN_ID,
+            </if>
+            <if test="bidId != null" >
+                BID_ID,
+            </if>
+            <if test="winDate != null" >
+                WIN_DATE,
+            </if>
+            <if test="finprodId != null" >
+                FINPROD_ID,
+            </if>
+            <if test="isWin != null" >
+                IS_WIN,
+            </if>
+            <if test="winType != null" >
+                WIN_TYPE,
+            </if>
+            <if test="winPrinamt != null" >
+                WIN_PRINAMT,
+            </if>
+            <if test="winPrice != null" >
+                WIN_PRICE,
+            </if>
+            <if test="settFeeAmt != null" >
+                SETT_FEE_AMT,
+            </if>
+            <if test="payDate != null" >
+                PAY_DATE,
+            </if>
+            <if test="creditorDebtDate != null" >
+                CREDITOR_DEBT_DATE,
+            </if>
+            <if test="counterId != null" >
+                COUNTER_ID,
+            </if>
+            <if test="remark!= null" >
+                REMARK,
+            </if>
+            <if test="status != null" >
+                STATUS,
+            </if>
+            <if test="createUser != null" >
+                CREATE_USER,
+            </if>
+            <if test="createDept != null" >
+                CREATE_DEPT,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="totalWinId != null" >
+                #{totalWinId,jdbcType=VARCHAR},
+            </if>
+            <if test="bidId != null" >
+                #{bidId,jdbcType=VARCHAR},
+            </if>
+            <if test="winDate != null" >
+                #{winDate,jdbcType=DATE},
+            </if>
+            <if test="finprodId != null" >
+                #{finprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="isWin != null" >
+                #{isWin,jdbcType=VARCHAR},
+            </if>
+            <if test="winType != null" >
+                #{winType,jdbcType=VARCHAR},
+            </if>
+            <if test="winPrinamt != null" >
+                #{winPrinamt,jdbcType=DECIMAL},
+            </if>
+            <if test="winPrice != null" >
+                #{winPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="settFeeAmt != null" >
+                #{settFeeAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="payDate != null" >
+                #{payDate,jdbcType=DATE},
+            </if>
+            <if test="creditorDebtDate != null" >
+                #{creditorDebtDate,jdbcType=DATE},
+            </if>
+            <if test="counterId != null" >
+                #{counterId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark  != null" >
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createDept != null" >
+                #{createDept,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.BidResultTotal" >
+        insert into BID_RESULT_TOTAL(TOTAL_WIN_ID, BID_ID, WIN_DATE, FINPROD_ID, IS_WIN, WIN_TYPE,
+        WIN_PRINAMT, WIN_PRICE, SETT_FEE_AMT, PAY_DATE, CREDITOR_DEBT_D, COUNTER_ID, REMARK, STATUS,
+        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+        select TOTAL_WIN_ID, BID_ID, WIN_DATE, FINPROD_ID, IS_WIN, WIN_TYPE,
+               WIN_PRINAMT, WIN_PRICE, SETT_FEE_AMT, PAY_DATE, CREDITOR_DEBT_D, COUNTER_ID, REMARK, STATUS,
+               CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+             from BID_RESULT_TOTAL
+             where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.BidResultTotal" >
+        update BID_RESULT_TOTAL
+        <set >
+            <if test="bidId != null" >
+                BID_ID = #{bidId,jdbcType=VARCHAR},
+            </if>
+            <if test="winDate != null" >
+                WIN_DATE = #{winDate,jdbcType=DATE},
+            </if>
+            <if test="finprodId != null" >
+                FINPROD_ID = #{finprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="isWin != null" >
+                IS_WIN = #{isWin,jdbcType=VARCHAR},
+            </if>
+            <if test="winType != null" >
+                WIN_TYPE = #{winType,jdbcType=VARCHAR},
+            </if>
+            <if test="winPrinamt != null" >
+                WIN_PRINAMT = #{winPrinamt,jdbcType=DECIMAL},
+            </if>
+            <if test="winPrice != null" >
+                WIN_PRICE = #{winPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="settFeeAmt != null" >
+                SETT_FEE_AMT = #{settFeeAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="payDate != null" >
+                PAY_DATE = #{payDate,jdbcType=DATE},
+            </if>
+            <if test="creditorDebtDate != null" >
+                CREDITOR_DEBT_DATE = #{creditorDebtDate,jdbcType=DATE},
+            </if>
+            <if test="counterId != null" >
+                COUNTER_ID = #{counterId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark  != null" >
+                REMARK = #{remark ,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                STATUS = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BidResultTotal" >
+        update BID_RESULT_TOTAL
+        set  BID_ID =  #{bidId,jdbcType=VARCHAR},
+             WIN_DATE =  #{winDate,jdbcType=DATE},
+             FINPROD_ID =  #{finprodId,jdbcType=VARCHAR},
+             IS_WIN =  #{isWin,jdbcType=VARCHAR},
+             WIN_TYPE =  #{winType,jdbcType=VARCHAR},
+             WIN_PRINAMT =  #{winPrinamt,jdbcType=DECIMAL},
+             WIN_PRICE =  #{winPrice,jdbcType=DECIMAL},
+             SETT_FEE_AMT =  #{settFeeAmt,jdbcType=DECIMAL},
+             PAY_DATE =  #{payDate,jdbcType=DATE},
+             CREDITOR_DEBT_DATE = #{creditorDebtDate,jdbcType=DATE},
+             COUNTER_ID =  #{counterId,jdbcType=VARCHAR},
+             REMARK =  #{remark ,jdbcType=VARCHAR},
+             STATUS = #{status,jdbcType=VARCHAR},
+             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+        where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+    </update>
+</mapper>

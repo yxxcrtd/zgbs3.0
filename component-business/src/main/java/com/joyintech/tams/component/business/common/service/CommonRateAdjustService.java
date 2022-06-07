@@ -16,8 +16,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.joyintech.tams.component.business.common.dao.CommonBusinessMapper;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.joyintech.tams.common.base.entity.FinCashPayRule;
@@ -47,7 +49,9 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
  */
 @Service
 public class CommonRateAdjustService extends BaseService<FinPayInterestStdInfoDto>{
-    
+
+    @Autowired
+    private CommonBusinessMapper commonBusinessMapper;
     /**
      * 处理资产报价信息
      * 用于计算支付计划
@@ -140,9 +144,11 @@ public class CommonRateAdjustService extends BaseService<FinPayInterestStdInfoDt
      * @since 1.0
      */
     public List<AssetCommonInvRateAdjustDto> getMstRateInfo(String indexId){
-        return restTemplate.getForList(ServiceApplication.ASSET_SERVICE_NAME
-            + "/FinAssetRateAdj/getMstRateInfo?indexId="
-            + indexId,
-            AssetCommonInvRateAdjustDto.class);
+        return commonBusinessMapper.getMstRateInfo(indexId);
+
+//                restTemplate.getForList(ServiceApplication.ASSET_SERVICE_NAME
+//            + "/FinAssetRateAdj/getMstRateInfo?indexId="
+//            + indexId,
+//            AssetCommonInvRateAdjustDto.class);
     }
 }

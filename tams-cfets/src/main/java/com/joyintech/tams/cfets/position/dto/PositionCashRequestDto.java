@@ -32,6 +32,9 @@ public class PositionCashRequestDto {
     @ApiModelProperty(name="acctTypes",value="账户现金查询账户类型集合",example="['A01','A07']")
     private List<String> acctTypes;
 
+    @ApiModelProperty(name="finprodId",value="资产代码",example="xxx")
+    private String finprodId;
+
     public List<String> getPortfolioIdList() {
         return portfolioIdList;
     }
@@ -86,5 +89,13 @@ public class PositionCashRequestDto {
 
     public void setAcctTypes(List<String> acctTypes) {
         this.acctTypes = acctTypes;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }

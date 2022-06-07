@@ -102,6 +102,11 @@ public class SzdZqbd extends BaseEntity {
     private String by1;
 
     /**
+     * 交收结果
+     */
+    private String jgdm;
+
+    /**
      * 取得 流水号
      * @return 流水号
      */
@@ -404,5 +409,13 @@ public class SzdZqbd extends BaseEntity {
      */
     public void setBy1(String by1) {
         this.by1 = by1 == null ? null : by1.trim();
+    }
+
+    public String getJgdm() {
+        return jgdm;
+    }
+
+    public void setJgdm(String jgdm) {
+        this.jgdm = jgdm;
     }
 }

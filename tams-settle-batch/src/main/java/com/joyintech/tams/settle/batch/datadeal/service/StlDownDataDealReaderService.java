@@ -6,11 +6,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonParamDto;
+import org.apache.commons.collections.MapUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -200,7 +202,19 @@ public class StlDownDataDealReaderService {
     					}
     					szdJsmxList.add(szdJsmxTemp);
     				}
-    				
+
+    				//清算数据List中以<交收编号,成交编号，业务单元1>为key分组
+					Map<String,List<SzdJsmx>> szdJsmxGroupMap =  szdJsmxList.stream().collect(Collectors.groupingBy(ele ->
+							new StringBuffer(null == ele.getJsbh() ? "" : ele.getJsbh()).append("#").append(ele.getCjbh()).append("#").append(ele.getXwh1()).toString()));
+    				if(MapUtils.isNotEmpty(szdJsmxGroupMap)){
+						szdJsmxList.clear();
+    					for(Map.Entry<String,List<SzdJsmx>> entry : szdJsmxGroupMap.entrySet()){
+							List<SzdJsmx> groupItemSzdJsmxList = entry.getValue();
+							groupItemSzdJsmxList.removeIf(ele ->  StlDataDealProcessConstant.JLLX_002.equals(ele.getJllx()));
+							szdJsmxList.addAll(groupItemSzdJsmxList);
+						}
+					}
+
     				for (SzdJsmx szdJsmx : szdJsmxList) {
     					String key = settleDataRulePartitionDto.getFinprodType() + settleDataRulePartitionDto.getTableName() + 
     							settleDataRulePartitionDto.getDataFile() + szdJsmx.getZqzh();

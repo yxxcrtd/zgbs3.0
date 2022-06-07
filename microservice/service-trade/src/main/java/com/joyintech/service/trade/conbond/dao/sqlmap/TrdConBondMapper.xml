@@ -1506,5 +1506,6 @@
     <select id="getAccNo" resultType="java.lang.String">
         select ACCT_NO ACCT_NO from PTL_CAPACCT_INFO
         where PORTFOLIO_ID = #{portfolioId} and CCY = #{ccy} and ACCT_TYPE = #{acctType}
+        and ROWNUM = 1
     </select>
 </mapper>

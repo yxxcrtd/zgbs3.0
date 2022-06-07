@@ -42,8 +42,8 @@ public interface RskSupervisionIndicatorMapper {
     @Select("${sql}")
     List<SelectOptionDto> getForbidEnumInfo(@Param("sql") String sql);
     //----add by jjpei 20190811---end-----
-    List<TreeNode<RskSupervisionIndicatorDto>> getAllPortfolioByProfit(@Param(value = "indId") String indId,@Param(value = "portfLevel") String portfLevel,@Param(value = "portfName") String portfName,@Param(value = "profitType") String profitType,@Param(value = "issueMode") String issueMode,@Param(value = "raiseType") String raiseType,@Param(value = "investType") String investType,@Param(value = "platDate") String platDate);
-    List<TreeNode<RskSupervisionIndicatorDto>> getAllPortfolioByOther(@Param(value = "fields") String fields,@Param(value = "portfLevel") String portfLevel,@Param(value = "indId") String indId,@Param(value = "portfName") String portfName,@Param(value = "profitType") String profitType,@Param(value = "issueMode") String issueMode,@Param(value = "raiseType") String raiseType,@Param(value = "investType") String investType,@Param(value = "platDate") String platDate);
+    List<TreeNode<RskSupervisionIndicatorDto>> getAllPortfolioByProfit(@Param(value = "indId") String indId,@Param(value = "portfLevel") String portfLevel,@Param(value = "portfName") String portfName,@Param(value = "profitType") String profitType,@Param(value = "issueMode") String issueMode,@Param(value = "raiseType") String raiseType,@Param(value = "investType") String investType,@Param(value = "platDate") String platDate,@Param(value = "isFaceSingleInvestor") String isFaceSingleInvestor);
+    List<TreeNode<RskSupervisionIndicatorDto>> getAllPortfolioByOther(@Param(value = "fields") String fields,@Param(value = "portfLevel") String portfLevel,@Param(value = "indId") String indId,@Param(value = "portfName") String portfName,@Param(value = "profitType") String profitType,@Param(value = "issueMode") String issueMode,@Param(value = "raiseType") String raiseType,@Param(value = "investType") String investType,@Param(value = "platDate") String platDate,@Param(value = "isFaceSingleInvestor") String isFaceSingleInvestor);
     
     List<TreeNode<RskPortfolioPackageDto>> getAllPortfolioBag(@Param(value = "bagName") String bagName,@Param(value = "indId") String indId,@Param(value = "portfLevel") String portfLevel);
     int insertSupervisionIndicator(RskSupervisionIndicatorDto rskSupervisionIndicatorDto);
@@ -52,7 +52,9 @@ public interface RskSupervisionIndicatorMapper {
     void updateIsEnabled(RskSupervisionIndicator002Dto dto);
     
     RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId(Map<String, Object> param);
-    
+
+    RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId_RULE(Map<String, Object> param);
+
     List<RskPortfolioIndicatorDto> queryPortfIndicatorInfoByIndId(Map<String, Object> param);
     
     RskSupervisionIndicatorParamDto searchAssetTypeByParam(@Param("indParamId") String indParamId);

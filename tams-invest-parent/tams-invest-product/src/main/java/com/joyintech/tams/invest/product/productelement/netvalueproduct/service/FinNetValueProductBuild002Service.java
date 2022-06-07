@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.base.intf.DataDictItem;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -29,9 +30,15 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.asset.util.AssetCommonUtil;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
+import com.joyintech.tams.invest.common.prodinfo.BussRuleService;
+import com.joyintech.tams.invest.common.redisinit.dto.ImplCond;
+import com.joyintech.tams.invest.common.redisinit.service.RiskRedisInitService;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import com.joyintech.tams.invest.product.productelement.anaplerotic.dto.FinProductAnapleroticInfoDto;
 import com.joyintech.tams.invest.product.productelement.netvalueproduct.dto.FinNetValueProductBuild002Dto;
 import com.joyintech.tams.invest.product.productelement.netvalueproduct.dto.PtlPortfolioInfoDto;
@@ -47,6 +54,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -130,6 +138,21 @@ public class FinNetValueProductBuild002Service extends BaseService<FinNetValuePr
      */
     @Autowired(required = false)
     private WorkFlowService workflowService;
+
+    @Autowired
+    private BussRuleService bussRuleService;
+
+    /**
+     * redis数据初始化
+     */
+    @Autowired
+    private RiskRedisInitService<ImplCond> redisRriter;
+
+    /**
+     * 线程池
+     */
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     /**
      * 处理其他信息（待处理的组合信息、费用信息）
@@ -738,6 +761,38 @@ public class FinNetValueProductBuild002Service extends BaseService<FinNetValuePr
             } 
             // 清除费用添加时的缓存
             CacheUtil.clearAppCache(entity.getFeeNewAddId());
+
+            //---匹配风险规则包来关联指标且装载到redis 20220517 start---
+            if (type == OperationType.MODIFY) {
+                assembleRedis(entity);
+            }
+            //---匹配风险规则包来关联指标且装载到redis 20220517 end---
+        }
+    }
+
+    /**
+     * 装载到redis里
+     * @param entity
+     */
+    private void assembleRedis(FinNetValueProductBuild002Dto entity){
+        if (com.joyintech.tams.invest.common.CommonUtil.isType(CacheUtil.getSysParam(RiskUtil.PAGE_REDIS_FLAG), BussinessDictCodeListRds.是否_是)) {
+            String portfolioId=StringUtil.replace(entity.getFinprodId(),
+                    DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()+ GlobalConstant.UNDER_LINE,StringUtil.EMPTY);
+            //修改产品自动匹配规则包
+            bussRuleService.matchRulePortByPort(AssetCommonUtil.getProdInfo(portfolioId, obj->obj));
+            threadPoolTaskExecutor.execute(()->{
+                try {
+                    Thread.sleep(RiskUtil.getRefreshTime());
+                    ImplCond cond = new ImplCond();
+                    cond.setDel(false);
+                    cond.setPortfIdArray(portfolioId);
+                    logger.info("----------->修改产品基本信息至组合关联指标进入redis开始--------------");
+                    redisRriter.dealRiskPtlIndicator(cond);
+                    logger.info("----------->修改产品基本信息至组合关联指标进入redis结束--------------");
+                } catch (InterruptedException e) {
+                    logger.error("===========修改产品基本信息至组合关联指标进入redis异常=============",e);
+                }
+            });
         }
     }
 

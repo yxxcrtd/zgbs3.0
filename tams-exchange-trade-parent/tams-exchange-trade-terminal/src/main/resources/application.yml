@@ -2,7 +2,7 @@ server:
   port: 8889
 agent:
   servers: 127.0.0.1:9190
-  name: kcbp
+  name: default
   type: mock #mock #ufx #KDGateway #ufx #kcbp
   query:
     interval: 1000
@@ -47,6 +47,8 @@ netty:
       worker: 2
   reconnect:
     delay: 2
+mock:
+  quote-tick-url: http://192.168.10.191:8080/tams/service/joyin/quote/tick
 
 # kcbp config
 kcbp:

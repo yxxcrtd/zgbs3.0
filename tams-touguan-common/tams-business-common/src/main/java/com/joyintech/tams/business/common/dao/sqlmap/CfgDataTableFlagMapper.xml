@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.business.common.dao.CfgDataTableFlagMapper">
+
+    <select id="getByPageCodeAndDtCode" parameterType="String"
+            resultType="com.joyintech.tams.business.common.entity.CfgDataTableShowFlag">
+        select *
+        from CFG_DATATABLE_SHOW_FLAG
+        where PAGECODE = #{pageCode}
+          and DTCODE = #{dtCode}
+          and SPCDCODE = #{spcdCode}
+          and RANGEID = #{rangeId}
+          and EFFERANGE = 1
+    </select>
+
+    <select id="getByPageCodeAndDtCodes" parameterType="String"
+            resultType="com.joyintech.tams.business.common.entity.CfgDataTableShowFlag">
+        select *
+        from CFG_DATATABLE_SHOW_FLAG
+        where PAGECODE = #{pageCode}
+          and DTCODE = #{dtCode}
+            <if test="spcdCodes != null and spcdCodes.size() > 0 ">
+                AND SPCDCODE IN
+                <foreach collection="spcdCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+          and RANGEID = #{rangeId}
+          and EFFERANGE = 1
+          and ROWNUM = 1
+    </select>
+
+    <insert id="insertCfgDataTableFlag" parameterType="com.joyintech.tams.business.common.entity.CfgDataTableShowFlag">
+        insert into CFG_DATATABLE_SHOW_FLAG(PAGECODE, DTCODE, SPCDCODE,EFFERANGE, RANGEID, UPDATETIME)
+        values (#{pageCode ,jdbcType=VARCHAR},
+                #{dtCode,jdbcType=VARCHAR},
+                #{spcdCode,jdbcType=VARCHAR},
+                #{effeRange,jdbcType=INTEGER},
+                #{rangeId,jdbcType=VARCHAR},
+                #{updateTime,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deleteDataTable" parameterType="String">
+        delete
+        from CFG_DATATABLE_SHOW
+        where PAGECODE = #{pageCode}
+          and DTCODE = #{dtCode}
+          and SPCDCODE = #{spcdCode}
+          and RANGEID = #{rangeId}
+          and EFFERANGE = 1
+    </delete>
+
+    <delete id="deleteDataTables" parameterType="String">
+        delete
+        from CFG_DATATABLE_SHOW
+        where PAGECODE = #{pageCode}
+          and DTCODE = #{dtCode}
+        <if test="spcdCodes != null and spcdCodes.size() > 0 ">
+            AND SPCDCODE IN
+            <foreach collection="spcdCodes" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+          and RANGEID = #{rangeId}
+          and EFFERANGE = 1
+    </delete>
+
+
+</mapper>

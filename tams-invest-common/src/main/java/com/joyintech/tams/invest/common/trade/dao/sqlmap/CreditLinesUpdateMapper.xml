@@ -1043,4 +1043,11 @@
 			</if>) a
 		</where>
 	</select>
+
+	<!--TISHKS-947:子期次占用母计划额度 modify by fuyongsheng 20220506 start-->
+	<select id="getJHLFinprodId" resultType="java.lang.String">
+		select nvl(fp.p_finprod_id,fp.finprod_id) finprodId from fin_product fp
+		where fp.finprod_id = #{finprodId}
+	</select>
+	<!--TISHKS-947:子期次占用母计划额度 modify by fuyongsheng 20220506 end-->
 </mapper>

@@ -459,12 +459,18 @@
         <if test="finprodMarketId != null and finprodMarketId !=''">
             AND FP.FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR}
         </if>
-        <if test="finprodId != null and finprodId !=''">
-            AND TEMP.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+<!--        <if test="finprodId != null and finprodId !=''">-->
+<!--            AND TEMP.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}-->
+<!--        </if>-->
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND TEMP.FINPROD_ID in
+            <foreach item="item" index="index" collection="finprodIdList" open="(" separator="," close=")">
+                #{item, jdbcType=VARCHAR}
+            </foreach>
         </if>
         ) a
-        left join SYS_DATADICT_LIST sdl1 on a.tradeMarket=sdl1.ITEM_CODE and sdl1.DICT_CODE='TRADE_PLACE'
-        where 1=1
+--         left join SYS_DATADICT_LIST sdl1 on a.tradeMarket=sdl1.ITEM_CODE and sdl1.DICT_CODE='TRADE_PLACE'
+--         where 1=1
         <!-- 关键字模糊查询 -->
 <!--        <include refid="etrExchangeQueryAnd1"/>-->
 <!--        <if test="sort != null and sort != '' and direction != null and direction != ''">-->

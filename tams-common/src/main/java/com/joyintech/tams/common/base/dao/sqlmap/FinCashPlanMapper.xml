@@ -38,6 +38,7 @@
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
         <result column="REPAY_WITHOUT_INT" property="repayWithoutInt" jdbcType="DECIMAL" />
+        <result column="BASIS" property="basis" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         CASH_ID CASH_ID, MDATE MDATE, CASH_NUM CASH_NUM, CASH_TYPE CASH_TYPE, VDATE_UNADJUST VDATE_UNADJUST, 
@@ -48,7 +49,7 @@
         CALC_FUNCTION CALC_FUNCTION, FREQUENCY FREQUENCY, FINPROD_ID FINPROD_ID, FINPROD_TYPE FINPROD_TYPE, 
         FINPROD_TYPE2 FINPROD_TYPE2, BRANCH BRANCH, PAY_TYPE PAY_TYPE, RANGE_YIELD RANGE_YIELD, 
         REMARK REMARK, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
-        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, REPAY_WITHOUT_INT
+        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, REPAY_WITHOUT_INT,BASIS BASIS
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -85,7 +86,7 @@
             FINPROD_TYPE, FINPROD_TYPE2, BRANCH, 
             PAY_TYPE, RANGE_YIELD, REMARK, 
             CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-            UPDATE_USER, UPDATE_TIME,REPAY_WITHOUT_INT)
+            UPDATE_USER, UPDATE_TIME,REPAY_WITHOUT_INT,BASIS)
         values (#{cashId,jdbcType=VARCHAR}, #{mdate,jdbcType=DATE}, #{cashNum,jdbcType=DECIMAL}, 
             #{cashType,jdbcType=VARCHAR}, #{vdateUnadjust,jdbcType=DATE}, #{mdateUnadjust,jdbcType=DATE}, 
             #{payDateUnadjust,jdbcType=DATE}, #{vdate,jdbcType=DATE}, #{payDate,jdbcType=DATE}, 
@@ -97,7 +98,8 @@
             #{finprodType,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR}, #{branch,jdbcType=DECIMAL}, 
             #{payType,jdbcType=VARCHAR}, #{rangeYield,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
             #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{repayWithoutInt,jdbcType=DECIMAL})
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{repayWithoutInt,jdbcType=DECIMAL}
+            , #{basis,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinCashPlan" >
         insert into FIN_CASH_PLAN
@@ -210,6 +212,9 @@
             <if test="repayWithoutInt != null" >
                 REPAY_WITHOUT_INT,
             </if>
+            <if test="basis != null" >
+                BASIS,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="cashId != null" >
@@ -320,7 +325,9 @@
             <if test="repayWithoutInt != null" >
                 #{repayWithoutInt,jdbcType=DECIMAL},
             </if>
-
+            <if test="basis != null" >
+                #{basis,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.FinCashPlan" >
@@ -328,14 +335,14 @@
         PAY_DATE_UNADJUST, VDATE, PAY_DATE, TERMDAYS, VDATE_Y, VDATE_TERM, MDATE_TERM, TERMDAYS_TERM, 
         PRIN_AMT, INT_PRIN_AMT, INT_AMT, IS_PAY_INT, CASH_AMT, CASH_BASEAMT, CASH_UNIT_TYPE, 
         CALC_FUNCTION, FREQUENCY, FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, BRANCH, PAY_TYPE, 
-        RANGE_YIELD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,REPAY_WITHOUT_INT
+        RANGE_YIELD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,REPAY_WITHOUT_INT,BASIS
         )
         select CASH_ID, MDATE, CASH_NUM, CASH_TYPE, VDATE_UNADJUST, MDATE_UNADJUST, 
             PAY_DATE_UNADJUST, VDATE, PAY_DATE, TERMDAYS, VDATE_Y, VDATE_TERM, MDATE_TERM, TERMDAYS_TERM, 
             PRIN_AMT, INT_PRIN_AMT, INT_AMT, IS_PAY_INT, CASH_AMT, CASH_BASEAMT, CASH_UNIT_TYPE, 
             CALC_FUNCTION, FREQUENCY, FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, BRANCH, PAY_TYPE, 
             RANGE_YIELD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, REPAY_WITHOUT_INT,#{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
-            
+            ,BASIS
              from FIN_CASH_PLAN
              where 1 = 1 and CASH_ID = #{cashId,jdbcType=VARCHAR} and MDATE = #{mdate,jdbcType=DATE}
     </insert>
@@ -435,7 +442,9 @@
             <if test="repayWithoutInt != null" >
                 REPAY_WITHOUT_INT = #{repayWithoutInt,jdbcType=DECIMAL},
             </if>
-
+            <if test="basis != null" >
+                BASIS = #{basis,jdbcType=VARCHAR},
+            </if>
         </set>
         where CASH_ID = #{cashId,jdbcType=VARCHAR}
           and MDATE = #{mdate,jdbcType=DATE}
@@ -472,7 +481,8 @@
             REMARK = #{remark,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
-           REPAY_WITHOUT_INT= #{repayWithoutInt,jdbcType=DECIMAL}
+            REPAY_WITHOUT_INT= #{repayWithoutInt,jdbcType=DECIMAL},
+            BASIS = #{basis,jdbcType=VARCHAR}
         where CASH_ID = #{cashId,jdbcType=VARCHAR}
           and MDATE = #{mdate,jdbcType=DATE}
     </update>

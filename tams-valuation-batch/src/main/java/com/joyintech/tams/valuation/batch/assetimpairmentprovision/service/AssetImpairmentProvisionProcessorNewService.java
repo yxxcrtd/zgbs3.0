@@ -395,13 +395,13 @@ public class AssetImpairmentProvisionProcessorNewService {
 		} else if (targetFinProduct.getFinprodType().equals(DictCodeListExt1.金融产品类型_同业借款.getValue())) {
 			ad.setTableId(DictCodeListTableId.会计场景代码_拆放同业_减值计提.getValue());
 		} else if (targetFinProduct.getFinprodType().equals(DictCodeListExt1.金融产品类型_债券.getValue())) {
-			if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_摊余成本类.getValue())) {
+			if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())) {
 				ad.setTableId(DictCodeListTableId.会计场景代码_摊余成本类债券_减值计提.getValue());
-			} else if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())) {
+			} else if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())) {
 				ad.setTableId(DictCodeListTableId.会计场景代码_综合收益类债券_减值计提.getValue());
 			}
 		} else if (targetFinProduct.getFinprodType().equals(DictCodeListExt1.金融产品类型_计划类资产.getValue())) {
-			if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_摊余成本类.getValue())) {
+			if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())) {
 				/** modify by yanya on 20201222 增加是否其他债券分支处理逻辑 start**/
 				//如果为其他债券
 				if(StringUtil.equals(DictCodeList.是否_是.getValue(), targetFinProduct.getIsQtzq())) {
@@ -411,7 +411,7 @@ public class AssetImpairmentProvisionProcessorNewService {
 					ad.setTableId(DictCodeListTableId.会计场景代码_摊余成本类收益型计划类资产_减值计提.getValue());
 				}
 				/** modify by yanya on 20201222 增加是否其他债券分支处理逻辑 end**/
-			} else if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())) {
+			} else if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())) {
 				/** modify by yanya on 20201222 增加是否其他债券分支处理逻辑 start**/
 				//如果为其他债券
 				if(StringUtil.equals(DictCodeList.是否_是.getValue(), targetFinProduct.getIsQtzq())) {

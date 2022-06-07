@@ -17,10 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.valuation.common.batch.finproduct.service.AccountingCommonBatchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,19 +25,14 @@ import org.springframework.stereotype.Service;
 
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.BokScenesubject;
-import com.joyintech.tams.common.base.entity.BokStatDetPosiiton;
 import com.joyintech.tams.common.base.entity.BokStatLossPosiiton;
 import com.joyintech.tams.common.base.entity.SysBatchTask;
-import com.joyintech.tams.common.base.entity.TrdAssetLoss;
 import com.joyintech.tams.valuation.batch.common.accounting.dao.LossCommonBatchMapper;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.BookLatestInfoDto;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.LossAmtInputDto;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
-import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetFinProduct;
 import com.joyintech.tams.valuation.common.batch.finproduct.service.FinProductCommonBatchService;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
@@ -290,24 +282,24 @@ public class LossCommonBatchService {
                 // 调用账务类共通【凭证最新账务查询】 查询是否发生收息场景
                 String tableId = "";
                 List<String> baseSubjectNatureList = new ArrayList<String>();
-                if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(inputDto.getInvAim())
+                if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(inputDto.getInvAim())
                     && DictCodeListExt1.金融产品类型_债券.getValue().equals(inputDto.getBusiType())) {
                     tableId = DictCodeListTableId.会计场景代码_摊余成本类债券_收息.getValue();
                     baseSubjectNatureList.add(DictCodeBaseSubjectNatrue.摊余成本类债券应计利息.getValue());
                 }
-                else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
+                else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(
                     inputDto.getInvAim())
                          && DictCodeListExt1.金融产品类型_债券.getValue().equals(inputDto.getBusiType())) {
                     tableId = DictCodeListTableId.会计场景代码_综合收益类债券_收息.getValue();
                     baseSubjectNatureList.add(DictCodeBaseSubjectNatrue.综合收益类应计利息.getValue());
                 }
-                else if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(inputDto.getInvAim())
+                else if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(inputDto.getInvAim())
                          && DictCodeListExt1.金融产品类型_计划类资产.getValue().equals(
                              inputDto.getBusiType())) {
                     tableId = DictCodeListTableId.会计场景代码_收益型资产_收息.getValue();
                     baseSubjectNatureList.add(DictCodeBaseSubjectNatrue.应计利息.getValue());
                 }
-                else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
+                else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(
                     inputDto.getInvAim())
                          && DictCodeListExt1.金融产品类型_计划类资产.getValue().equals(
                              inputDto.getBusiType())) {

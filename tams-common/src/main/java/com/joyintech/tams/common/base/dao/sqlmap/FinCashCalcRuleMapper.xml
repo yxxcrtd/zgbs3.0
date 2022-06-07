@@ -20,12 +20,13 @@
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="MARKET_BASIS" property="marketBasis" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         CASH_ID CASH_ID, EFF_DATE EFF_DATE, CALC_TYPE CALC_TYPE, BASE_TYPE BASE_TYPE, BASE_DATE_TYPE BASE_DATE_TYPE, 
         BASIS BASIS, YIELD YIELD, IS_INITIAL IS_INITIAL, FINPROD_ID FINPROD_ID, FINPROD_TYPE FINPROD_TYPE, 
         FINPROD_TYPE2 FINPROD_TYPE2, BRANCH BRANCH, REMARK REMARK, CREATE_USER CREATE_USER, 
-        CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+        CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME,MARKET_BASIS MARKET_BASIS
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -55,14 +56,14 @@
             YIELD, IS_INITIAL, FINPROD_ID, 
             FINPROD_TYPE, FINPROD_TYPE2, BRANCH, 
             REMARK, CREATE_USER, CREATE_DEPT, 
-            CREATE_TIME, UPDATE_USER, UPDATE_TIME
+            CREATE_TIME, UPDATE_USER, UPDATE_TIME,MARKET_BASIS
             )
         values (#{cashId,jdbcType=VARCHAR}, #{effDate,jdbcType=DATE}, #{calcType,jdbcType=VARCHAR}, 
             #{baseType,jdbcType=VARCHAR}, #{baseDateType,jdbcType=VARCHAR}, #{basis,jdbcType=VARCHAR}, 
             #{yield,jdbcType=DECIMAL}, #{isInitial,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, 
             #{finprodType,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR}, #{branch,jdbcType=DECIMAL}, 
             #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
-            #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+            #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{marketBasis,jdbcType=VARCHAR}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinCashCalcRule" >
@@ -122,6 +123,9 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
+            <if test="marketBasis != null" >
+                MARKET_BASIS,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="cashId != null" >
@@ -178,15 +182,18 @@
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="marketBasis != null" >
+                #{marketBasis,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.FinCashCalcRule" >
         insert into FIN_CASH_CALC_RULE(CASH_ID, EFF_DATE, CALC_TYPE, BASE_TYPE, BASE_DATE_TYPE, 
         BASIS, YIELD, IS_INITIAL, FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, BRANCH, REMARK, 
-        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,MARKET_BASIS)
         select CASH_ID, EFF_DATE, CALC_TYPE, BASE_TYPE, BASE_DATE_TYPE, 
             BASIS, YIELD, IS_INITIAL, FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, BRANCH, REMARK, 
-            CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+            CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME,MARKET_BASIS
              from FIN_CASH_CALC_RULE
              where 1 = 1 and CASH_ID = #{cashId,jdbcType=VARCHAR} and EFF_DATE = #{effDate,jdbcType=DATE}
     </insert>
@@ -232,6 +239,9 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="marketBasis != null" >
+                MARKET_BASIS = #{marketBasis,jdbcType=VARCHAR},
+            </if>
         </set>
         where CASH_ID = #{cashId,jdbcType=VARCHAR}
           and EFF_DATE = #{effDate,jdbcType=DATE}
@@ -250,7 +260,8 @@
             BRANCH = #{branch,jdbcType=DECIMAL},
             REMARK = #{remark,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            MARKET_BASIS = #{marketBasis,jdbcType=VARCHAR}
         where CASH_ID = #{cashId,jdbcType=VARCHAR}
           and EFF_DATE = #{effDate,jdbcType=DATE}
     </update>

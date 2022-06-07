@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.common.base.dao.RiskNodeConfigDtlMapper" >
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.RiskNodeConfigDtl" >
+    <id column="NODE_ID" property="nodeId" jdbcType="VARCHAR" />
+    <result column="INDICATOR_PRE_NODE" property="indicatorPreNode" jdbcType="VARCHAR" />
+    <result column="INDICATOR_CONTROL" property="indicatorControl" jdbcType="VARCHAR" />
+    <result column="INDICATOR_APPROVE" property="indicatorApprove" jdbcType="VARCHAR" />
+    <result column="INDICATOR_OCCUPY" property="indicatorOccupy" jdbcType="VARCHAR" />
+    <result column="CREDIT_PRE_NODE" property="creditPreNode" jdbcType="VARCHAR" />
+    <result column="CREDIT_CONTROL" property="creditControl" jdbcType="VARCHAR" />
+    <result column="CREDIT_OCCUPY" property="creditOccupy" jdbcType="VARCHAR" />
+    <result column="AUTHORIZE_CONTROL" property="authorizeControl" jdbcType="VARCHAR" />
+    <result column="AUTHORIZE_APPROVE" property="authorizeApprove" jdbcType="VARCHAR" />
+    <result column="NAME_LIST_CONTROL" property="nameListControl" jdbcType="VARCHAR" />
+    <result column="NAME_LIST_TYPE" property="nameListType" jdbcType="VARCHAR" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+
+  </resultMap>
+  <sql id="Base_Column_List" >
+    NODE_ID, INDICATOR_PRE_NODE, INDICATOR_CONTROL, INDICATOR_APPROVE, INDICATOR_OCCUPY, 
+    CREDIT_PRE_NODE, CREDIT_CONTROL, CREDIT_OCCUPY, AUTHORIZE_CONTROL, AUTHORIZE_APPROVE, 
+    NAME_LIST_CONTROL, NAME_LIST_TYPE, REMARK, UPDATE_USER, CREATE_TIME
+  </sql>
+
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+      NODE_ID, INDICATOR_PRE_NODE, nvl(INDICATOR_CONTROL,'00') as INDICATOR_CONTROL, INDICATOR_APPROVE , INDICATOR_OCCUPY,
+      CREDIT_PRE_NODE, nvl(CREDIT_CONTROL,'00') as CREDIT_CONTROL, CREDIT_OCCUPY, nvl(AUTHORIZE_CONTROL,'00') as AUTHORIZE_CONTROL, AUTHORIZE_APPROVE,
+      nvl(NAME_LIST_CONTROL,'00') as NAME_LIST_CONTROL, NAME_LIST_TYPE, REMARK, UPDATE_USER, CREATE_TIME
+    from RSK_NODE_CONFIG_DTL
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from RSK_NODE_CONFIG_DTL
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.RiskNodeConfigDtl" >
+    insert into RSK_NODE_CONFIG_DTL (NODE_ID, INDICATOR_PRE_NODE, INDICATOR_CONTROL, 
+      INDICATOR_APPROVE, INDICATOR_OCCUPY, CREDIT_PRE_NODE, 
+      CREDIT_CONTROL, CREDIT_OCCUPY, AUTHORIZE_CONTROL, 
+      AUTHORIZE_APPROVE, NAME_LIST_CONTROL, NAME_LIST_TYPE, 
+      REMARK, UPDATE_USER, CREATE_TIME
+      )
+    values (#{nodeId,jdbcType=VARCHAR}, #{indicatorPreNode,jdbcType=VARCHAR}, #{indicatorControl,jdbcType=VARCHAR}, 
+      #{indicatorApprove,jdbcType=VARCHAR}, #{indicatorOccupy,jdbcType=VARCHAR}, #{creditPreNode,jdbcType=VARCHAR}, 
+      #{creditControl,jdbcType=VARCHAR}, #{creditOccupy,jdbcType=VARCHAR}, #{authorizeControl,jdbcType=VARCHAR}, 
+      #{authorizeApprove,jdbcType=VARCHAR}, #{nameListControl,jdbcType=VARCHAR}, #{nameListType,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{updateUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.RiskNodeConfigDtl" >
+    insert into RSK_NODE_CONFIG_DTL
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="nodeId != null" >
+        NODE_ID,
+      </if>
+      <if test="indicatorPreNode != null" >
+        INDICATOR_PRE_NODE,
+      </if>
+      <if test="indicatorControl != null" >
+        INDICATOR_CONTROL,
+      </if>
+      <if test="indicatorApprove != null" >
+        INDICATOR_APPROVE,
+      </if>
+      <if test="indicatorOccupy != null" >
+        INDICATOR_OCCUPY,
+      </if>
+      <if test="creditPreNode != null" >
+        CREDIT_PRE_NODE,
+      </if>
+      <if test="creditControl != null" >
+        CREDIT_CONTROL,
+      </if>
+      <if test="creditOccupy != null" >
+        CREDIT_OCCUPY,
+      </if>
+      <if test="authorizeControl != null" >
+        AUTHORIZE_CONTROL,
+      </if>
+      <if test="authorizeApprove != null" >
+        AUTHORIZE_APPROVE,
+      </if>
+      <if test="nameListControl != null" >
+        NAME_LIST_CONTROL,
+      </if>
+      <if test="nameListType != null" >
+        NAME_LIST_TYPE,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="updateUser != null" >
+        UPDATE_USER,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="nodeId != null" >
+        #{nodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="indicatorPreNode != null" >
+        #{indicatorPreNode,jdbcType=VARCHAR},
+      </if>
+      <if test="indicatorControl != null" >
+        #{indicatorControl,jdbcType=VARCHAR},
+      </if>
+      <if test="indicatorApprove != null" >
+        #{indicatorApprove,jdbcType=VARCHAR},
+      </if>
+      <if test="indicatorOccupy != null" >
+        #{indicatorOccupy,jdbcType=VARCHAR},
+      </if>
+      <if test="creditPreNode != null" >
+        #{creditPreNode,jdbcType=VARCHAR},
+      </if>
+      <if test="creditControl != null" >
+        #{creditControl,jdbcType=VARCHAR},
+      </if>
+      <if test="creditOccupy != null" >
+        #{creditOccupy,jdbcType=VARCHAR},
+      </if>
+      <if test="authorizeControl != null" >
+        #{authorizeControl,jdbcType=VARCHAR},
+      </if>
+      <if test="authorizeApprove != null" >
+        #{authorizeApprove,jdbcType=VARCHAR},
+      </if>
+      <if test="nameListControl != null" >
+        #{nameListControl,jdbcType=VARCHAR},
+      </if>
+      <if test="nameListType != null" >
+        #{nameListType,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="updateUser != null" >
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.RiskNodeConfigDtl" >
+    update RSK_NODE_CONFIG_DTL
+    <set >
+      <if test="indicatorPreNode != null" >
+        INDICATOR_PRE_NODE = #{indicatorPreNode,jdbcType=VARCHAR},
+      </if>
+      <if test="indicatorControl != null" >
+        INDICATOR_CONTROL = #{indicatorControl,jdbcType=VARCHAR},
+      </if>
+      <if test="indicatorApprove != null" >
+        INDICATOR_APPROVE = #{indicatorApprove,jdbcType=VARCHAR},
+      </if>
+      <if test="indicatorOccupy != null" >
+        INDICATOR_OCCUPY = #{indicatorOccupy,jdbcType=VARCHAR},
+      </if>
+      <if test="creditPreNode != null" >
+        CREDIT_PRE_NODE = #{creditPreNode,jdbcType=VARCHAR},
+      </if>
+      <if test="creditControl != null" >
+        CREDIT_CONTROL = #{creditControl,jdbcType=VARCHAR},
+      </if>
+      <if test="creditOccupy != null" >
+        CREDIT_OCCUPY = #{creditOccupy,jdbcType=VARCHAR},
+      </if>
+      <if test="authorizeControl != null" >
+        AUTHORIZE_CONTROL = #{authorizeControl,jdbcType=VARCHAR},
+      </if>
+      <if test="authorizeApprove != null" >
+        AUTHORIZE_APPROVE = #{authorizeApprove,jdbcType=VARCHAR},
+      </if>
+      <if test="nameListControl != null" >
+        NAME_LIST_CONTROL = #{nameListControl,jdbcType=VARCHAR},
+      </if>
+      <if test="nameListType != null" >
+        NAME_LIST_TYPE = #{nameListType,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="updateUser != null" >
+        CREATE_USER = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.RiskNodeConfigDtl" >
+    update RSK_NODE_CONFIG_DTL
+    set INDICATOR_PRE_NODE = #{indicatorPreNode,jdbcType=VARCHAR},
+      INDICATOR_CONTROL = #{indicatorControl,jdbcType=VARCHAR},
+      INDICATOR_APPROVE = #{indicatorApprove,jdbcType=VARCHAR},
+      INDICATOR_OCCUPY = #{indicatorOccupy,jdbcType=VARCHAR},
+      CREDIT_PRE_NODE = #{creditPreNode,jdbcType=VARCHAR},
+      CREDIT_CONTROL = #{creditControl,jdbcType=VARCHAR},
+      CREDIT_OCCUPY = #{creditOccupy,jdbcType=VARCHAR},
+      AUTHORIZE_CONTROL = #{authorizeControl,jdbcType=VARCHAR},
+      AUTHORIZE_APPROVE = #{authorizeApprove,jdbcType=VARCHAR},
+      NAME_LIST_CONTROL = #{nameListControl,jdbcType=VARCHAR},
+      NAME_LIST_TYPE = #{nameListType,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      CREATE_USER = #{updateUser,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </update>
+</mapper>

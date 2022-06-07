@@ -1,6 +1,8 @@
 package com.joyintech.tams.invest.common.trade.dto;
 
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.systemtools.util.SysDatadictUtil;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -71,6 +73,11 @@ public class CreditLinesOutputDto extends BaseEntity {
      * 处理结果，确认信息
      */
     private List<String> confirmMessages;
+
+    /**
+     * 试算结果
+     */
+    private String rskStatus;
 
     public String getTradeId() {
         return tradeId;
@@ -166,5 +173,17 @@ public class CreditLinesOutputDto extends BaseEntity {
 
     public void setConfirmMessages(List<String> confirmMessages) {
         this.confirmMessages = confirmMessages;
+    }
+
+    public String getRskStatusStr() {
+        return SysDatadictUtil.getNameFromDataDict(DictCode.试算结果,rskStatus);
+    }
+
+    public String getRskStatus() {
+        return rskStatus;
+    }
+
+    public void setRskStatus(String rskStatus) {
+        this.rskStatus = rskStatus;
     }
 }

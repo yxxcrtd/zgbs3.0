@@ -445,7 +445,7 @@ public class EtrSharesCashPositionDealService extends EtrCashPositionBaseService
         etrCashPositionFlowDto.setOffsetId(etrEntrust.getEntrustId());
         String acctId = EtrCommonCashPositionDealService.select资金账户(entrustCommonDto.getEtrEntrustAdd().getSecAcctId(),
             etrEntrust.getCcy());
-        if (StringUtil.isNotEmpty(acctId) && (DictCodeList.交易方向_买入.getValue().equals(ps)||DictCodeListExt2.交易方向_新股中签.getValue().equals(ps)
+        if (StringUtil.isNotEmpty(acctId) && (DictCodeList.交易方向_买入.getValue().equals(ps)||DictCodeListExt2.交易方向_新股中签.getValue().equals(ps) || DictCodeList.交易方向_申购.getValue().equals(ps)
                 ||DictCodeListExt2.交易方向_增发.getValue().equals(ps)||DictCodeListExt2.交易方向_配股.getValue().equals(ps))) {
             // 金额委托
             if (委托金额 != null && 委托金额.compareTo(BigDecimal.ZERO) > 0) {

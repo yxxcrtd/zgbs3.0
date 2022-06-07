@@ -2619,8 +2619,11 @@ select #{R7S1} as remType,
 		AND T1.EXERCISE_DATE-T3.CONFIGURATIONDAYS &lt;= #{quaryDate}
 		<!--Modify by jyl end 20200113 OPEX-788 申请开始日改为理论行权日（计划行权日）VDATE改为EXERCISE_DATE -->
 		<!--OPEX-606 【主动提醒-行权】债券行权提醒，目前是只能申请开始日提醒，其他均查询不到，期望按照需求从申请开始日到申请截止日都能查到 guyunfei 20191230 start-->
-		AND T1.MDATE >= #{quaryDate}
+		<!-- AND T1.MDATE >= #{quaryDate} -->
 		<!--OPEX-606 【主动提醒-行权】债券行权提醒，目前是只能申请开始日提醒，其他均查询不到，期望按照需求从申请开始日到申请截止日都能查到 guyunfei 20191230 end-->
+		<!--  CQTZJYUAT-452 主动提醒中，债券行权，在主动提醒界面展示为0条，点进去，展示有1条记录，详见截图-->
+		AND T1.ACT_EXERCISE_DATE &gt;= #{quaryDate}
+		<!--  CQTZJYUAT-452 主动提醒中，债券行权，在主动提醒界面展示为0条，点进去，展示有1条记录，详见截图-->
 		AND T1.EXERCISE_STATUS = #{unauthorized}
 
 		<!-- 过滤配置关闭提醒 -->
@@ -3605,4 +3608,36 @@ select #{R7S1} as remType,
 		<include refid="com.joyintech.tams.invest.remind.dao.PaActiveRemind002Mapper.selramindR10S2_data"/>
 		)
 	</select>
+
+	<select id="searchCountR12S1" resultType="java.util.HashMap">
+		select count(1) R12S1 from (
+		<include refid="com.joyintech.tams.invest.remind.dao.PaActiveRemind002Mapper.selramindR12S1_data"/>
+		)
+	</select>
+
+
+	<select id="searchFinprodId" resultType="java.util.HashMap">
+		SELECT *
+		FROM (
+			SELECT
+			     PTL_SEC_POSITION_RULE.FINPROD_ID
+			FROM
+			     PTL_SEC_POSITION_RULE
+			left join
+			     STL_SEC_ACCT_INFO
+			on   PTL_SEC_POSITION_RULE.sec_acct_id = STL_SEC_ACCT_INFO.Sec_Acct_Id
+			LEFT JOIN FIN_STDSEC_CONVERSE_RADIO
+			ON PTL_SEC_POSITION_RULE.FINPROD_ID = FIN_STDSEC_CONVERSE_RADIO.FINPROD_ID
+			WHERE
+			    PTL_SEC_POSITION_RULE.CDATE =  #{quaryDate}
+			AND STL_SEC_ACCT_INFO.TRADE_PLACE = #{tradePlace}
+			and ptl_sec_position_rule.hoding_type = 'A_064'
+			and ptl_sec_position_rule.date_type = '0'
+			and PTL_SEC_POSITION_RULE.PORTFOLIO_ID = #{portfolioId}
+			AND FIN_STDSEC_CONVERSE_RADIO.MDATE >= #{quaryDate}
+			AND FIN_STDSEC_CONVERSE_RADIO.VDATE &lt;= #{quaryDate}
+			ORDER BY PTL_SEC_POSITION_RULE.AMOUNT DESC)
+		WHERE ROWNUM = 1
+	</select>
+
 </mapper>

@@ -56,6 +56,9 @@
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="CON_NUM" property="conNum" jdbcType="NUMERIC"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
+        <result column="TARGET_TYPE" property="targetType" jdbcType="VARCHAR"/>
+        <result column="IS_NO_GUARD" property="isNoGuard" jdbcType="VARCHAR"/>
+        <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -125,7 +128,7 @@
     TRADED_VOLUME, TRADED_PRICE, CANCEL_VOLUME, ERROR_CODE, ERROR_MSG, TRADING_DAY, IP_MAC, 
     REMARK, CREATE_TIME, UPDATE_TIME, ORDER_ID,  OFFSET_FLAG, HEDGE_FLAG,
     PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
-    EXTEND1, EXTEND2,CON_NUM,ENTRUST_CLASS
+    EXTEND1, EXTEND2,CON_NUM,ENTRUST_CLASS,TARGET_TYPE,IS_NO_GUARD,IS_FULL_PRICE
     </sql>
 
     <select id="queryLastClearDate" resultType="java.lang.String">
@@ -182,7 +185,7 @@
                                     UPDATE_TIME, ORDER_ID, OFFSET_FLAG, HEDGE_FLAG,
                                     PORTFOLIO_NAME, SEC_ACCT_ID, SEC_ACCT_NAME, TRADE_PLAT,
                                     FINPROD_TYPE2, INV_MANAGER_ID, PS, BUSI_TYPE_TG, EXTEND1, EXTEND2,
-                                    CON_NUM, ENTRUST_CLASS)
+                                    CON_NUM, ENTRUST_CLASS, TARGET_TYPE, IS_NO_GUARD, IS_FULL_PRICE)
     </sql>
     <insert id="insert" parameterType="com.joyintech.tams.exchange.common.db.domain.OrderHistory">
         <include refid="orderHistoryFiled"/>
@@ -205,7 +208,8 @@
         #{secAcctName,jdbcType=VARCHAR}, #{tradePlat,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR},
         #{invManagerId,jdbcType=VARCHAR}, #{ps,jdbcType=VARCHAR}, #{busiTypeTg,jdbcType=VARCHAR},
         #{extend1,jdbcType=VARCHAR}, #{extend2,jdbcType=VARCHAR}, #{conNum,jdbcType=NUMERIC},
-        #{entrustClass,jdbcType=VARCHAR})
+        #{entrustClass,jdbcType=VARCHAR}, #{targetType,jdbcType=VARCHAR},
+        #{isNoGuard,jdbcType=VARCHAR}, #{isFullPrice,jdbcType=VARCHAR})
     </insert>
     <insert id="insertBatch" parameterType="com.joyintech.tams.exchange.common.db.domain.OrderHistory">
         <include refid="orderHistoryFiled"/>
@@ -248,7 +252,10 @@
             #{record.extend1,jdbcType=VARCHAR},
             #{record.extend2,jdbcType=VARCHAR},
             #{record.conNum,jdbcType=NUMERIC},
-            #{record.entrustClass,jdbcType=VARCHAR}
+            #{record.entrustClass,jdbcType=VARCHAR},
+            #{record.targetType,jdbcType=VARCHAR},
+            #{record.isNoGuard,jdbcType=VARCHAR},
+            #{record.isFullPrice,jdbcType=VARCHAR}
         </foreach>
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.exchange.common.db.domain.OrderHistory">
@@ -385,6 +392,15 @@
             <if test="entrustClass != null">
                 ENTRUST_CLASS,
             </if>
+            <if test="targetType != null">
+                TARGET_TYPE,
+            </if>
+            <if test="isNoGuard != null">
+                IS_NO_GUARD,
+            </if>
+            <if test="isFullPrice != null">
+                IS_FULL_PRICE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -517,6 +533,15 @@
             </if>
             <if test="entrustClass != null">
                 #{entrustClass,jdbcType=VARCHAR},
+            </if>
+            <if test="targetType != null">
+                #{targetType,jdbcType=VARCHAR},
+            </if>
+            <if test="isNoGuard != null">
+                #{isNoGuard,jdbcType=VARCHAR},
+            </if>
+            <if test="isFullPrice != null">
+                #{isFullPrice,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -689,6 +714,15 @@
             <if test="record.entrustClass != null">
                 ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR},
             </if>
+            <if test="record.targetType != null">
+                TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
+            </if>
+            <if test="record.isNoGuard != null">
+                IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
+            </if>
+            <if test="record.isFullPrice != null">
+                IS_FULL_PRICE = #{record.isFullPrice,jdbcType=VARCHAR},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -748,7 +782,10 @@
         EXTEND1 = #{record.extend1,jdbcType=VARCHAR},
         EXTEND2 = #{record.extend2,jdbcType=VARCHAR},
         CON_NUM = #{record.conNum,jdbcType=NUMERIC},
-        ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR}
+        ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR},
+        TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
+        IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
+        IS_FULL_PRICE = #{record.isFullPrice,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -912,6 +949,15 @@
             <if test="entrustClass != null">
                 ENTRUST_CLASS = #{entrustClass,jdbcType=VARCHAR},
             </if>
+            <if test="targetType != null">
+                TARGET_TYPE = #{targetType,jdbcType=VARCHAR},
+            </if>
+            <if test="isNoGuard != null">
+                IS_NO_GUARD = #{isNoGuard,jdbcType=VARCHAR},
+            </if>
+            <if test="isFullPrice != null">
+                IS_FULL_PRICE = #{isFullPrice,jdbcType=VARCHAR},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
@@ -968,7 +1014,10 @@
             EXTEND1           = #{extend1,jdbcType=VARCHAR},
             EXTEND2           = #{extend2,jdbcType=VARCHAR},
             CON_NUM           = #{conNum,jdbcType=NUMERIC},
-            ENTRUST_CLASS     = #{entrustClass,jdbcType=VARCHAR}
+            ENTRUST_CLASS     = #{entrustClass,jdbcType=VARCHAR},
+            TARGET_TYPE       = #{targetType, jdbcType= VARCHAR},
+            IS_NO_GUARD       = #{isNoGuard,jdbcType=VARCHAR},
+            IS_FULL_PRICE      = #{isFullPrice,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
 </mapper>

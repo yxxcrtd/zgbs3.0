@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper">
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.exchange.common.db.domain.PortfolioDetail">
+        <!--@mbg.generated-->
+        <!--@Table T_PORTFOLIO_DETAIL-->
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="BUSI_TYPE" jdbcType="VARCHAR" property="busiType"/>
+        <result column="BUSI_ID" jdbcType="VARCHAR" property="busiId"/>
+        <result column="INSTRUCTION_ID" jdbcType="VARCHAR" property="instructionId"/>
+        <result column="BUSI_STATUS" jdbcType="VARCHAR" property="busiStatus"/>
+        <result column="PORTFOLIO_ID" jdbcType="VARCHAR" property="portfolioId"/>
+        <result column="PORTFOLIO_NAME" jdbcType="VARCHAR" property="portfolioName"/>
+        <result column="TARGET_AMT" jdbcType="DECIMAL" property="targetAmt"/>
+        <result column="TARGET_NUM" jdbcType="DECIMAL" property="targetNum"/>
+        <result column="TARGET_TYPE" jdbcType="VARCHAR" property="targetType"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID, BUSI_TYPE, BUSI_ID, INSTRUCTION_ID, BUSI_STATUS, PORTFOLIO_ID, PORTFOLIO_NAME, TARGET_AMT, TARGET_NUM,
+        TARGET_TYPE
+    </sql>
+
+    <select id="selectSummaryByInstructionAndBusiType" resultMap="BaseResultMap">
+        select BUSI_TYPE,
+               PORTFOLIO_ID,
+               PORTFOLIO_NAME,
+               SUM(TARGET_AMT),
+               SUM(TARGET_NUM),
+               INSTRUCTION_ID,
+               TARGET_TYPE
+        from T_PORTFOLIO_DETAIL
+        where INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+          and BUSI_TYPE = #{busiType, jdbcType=VARCHAR}
+          and BUSI_STATUS = '2'
+        group by INSTRUCTION_ID, BUSI_TYPE, PORTFOLIO_ID, PORTFOLIO_NAME, TARGET_TYPE
+    </select>
+
+    <update id="updateBusiStatusByBusiId">
+        update T_PORTFOLIO_DETAIL
+        set BUSI_TYPE = '2'
+        where BUSI_ID = #{busiId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectListByInstructionAndBusiType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from T_PORTFOLIO_DETAIL
+        where INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+          and BUSI_TYPE = #{busiType, jdbcType=VARCHAR}
+          and BUSI_STATUS = '2'
+    </select>
+
+    <select id="selectListByBusiIdAndBusiType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from T_PORTFOLIO_DETAIL
+        where BUSI_ID = #{busiId,jdbcType=VARCHAR}
+        and BUSI_TYPE = #{busiType, jdbcType=VARCHAR}
+        and BUSI_STATUS = '2'
+    </select>
+</mapper>

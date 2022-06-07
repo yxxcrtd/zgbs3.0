@@ -70,6 +70,8 @@ public class EntrustStatusService {
             params.put("ENTRUST_STATUS_03", DictCodeList.委托状态_已接收.getValue());
             params.put("ENTRUST_STATUS_05", DictCodeList.委托状态_已退回.getValue());
             params.put("ENTRUST_STATUS_07", DictCodeList.委托状态_已撤回.getValue());
+            params.put("PS_T03", DictCodeList.交易方向_行权_回售.getValue());
+            params.put("FINPROD_TYPE2_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
 
             // 处理对接了头寸引擎的指令关闭 start
             List<EntrustClosePosEtrReqDto> etrReqDtoList = entrustStatusMapper.selectEntrustList(params);
@@ -144,7 +146,11 @@ public class EntrustStatusService {
             } else {
                 closeItem.setBusiType(busiTypePosition);
             }
-            closeItem.setPs(t.getPs());
+            if (StringUtil.isNotEmpty(t.getPs())){
+                closeItem.setPs(t.getPs());
+            }else{
+                closeItem.setPs(DictCodeList.交易方向_买入.getValue());
+            }
             closeItem.setCloseId(t.getCloseId());
             closeItem.setSystemAct(DictCodeListExt3.系统动作_关闭.getValue());
             closeItem.setBusiAct(DictCodeListExt3.业务动作_指令日终关闭.getValue());

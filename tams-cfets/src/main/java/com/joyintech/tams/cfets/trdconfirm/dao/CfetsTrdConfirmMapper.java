@@ -1,14 +1,16 @@
 package com.joyintech.tams.cfets.trdconfirm.dao;
 
 
-
-import com.joyintech.service.bankuplink.common.dto.TrdConfirmRegAndIbuInfoDto;
-import com.joyintech.tams.cfets.etrib.bond.dto.CfetsEtrIbBondinfoDto;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
+import com.joyintech.tams.common.base.entity.BidOrder;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.FinProductAdd;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,13 @@ public interface CfetsTrdConfirmMapper {
      * @return
      */
     CfetsTrdConfirmRegInfoListResponse selectRegInfoByKey(String totleTradeId);
+
+    /**
+     * 根据主键查询一级申购登记信息
+     * @param pageParam
+     * @return
+     */
+    CfetsTrdConfirmRegInfoListResponse selecBidInfoByKey(String totleTradeId);
     /**
      * 根据主键查询债券报价信息
      * @param pageParam
@@ -61,6 +70,13 @@ public interface CfetsTrdConfirmMapper {
      */
 
     List<CfetsRegFinProductDealDto> findAllRegDealList(String totleTradeId);
+
+    /**
+     * 查询所有一级申购明细数据
+     * @param pageParam
+     * @return
+     */
+    List<CfetsRegFinProductDealDto> findAllBidDealList(String totleTradeId);
 
     /**
      * 查询所以报价明细数据
@@ -113,6 +129,12 @@ public interface CfetsTrdConfirmMapper {
      */
     List<CfetsTrdConfirmExecBondInfoResponse> findAllTrdBondList(Map<String, Object> pageParam);
     /**
+     * 查询所有匹配确认-执行一级申购数据
+     * @param pageParam
+     * @return
+     */
+    List<CfetsTrdConfirmExecFirstBondInfoResponse> findAllTrdBidList(Map<String, Object> pageParam);
+    /**
      * 查询所有匹配确认-执行质押式数据
      * @param pageParam
      * @return
@@ -124,6 +146,12 @@ public interface CfetsTrdConfirmMapper {
      * @return
      */
     List<CfetsTrdConfirmCstpBondInfoResponse> findAllCstpBondList(Map<String, Object> pageParam);
+    /**
+     * 匹配确认列表-cstp成交一级申购数据分页查询
+     * @param pageParam
+     * @return
+     */
+    List<CfetsTrdConfirmExecFirstBondInfoResponse> findAllCstpBidList(Map<String, Object> pageParam);
     /**
      * 匹配确认列表-cstp成交质押式分页查询
      * @param pageParam
@@ -194,6 +222,17 @@ public interface CfetsTrdConfirmMapper {
      * 根据成交编号，查询下行成交匹配关系
      */
     CfetsTrdConfirmMatchDto selectMatchDtoByExecId(@Param("execid") String execid);
+
+
+    /**
+     * 根据下行交易编号，查询下行成交匹配关系
+     *
+     * @param cstpTradeId 下行交易编号
+     * @return com.joyintech.service.bankuplink.common.dto.TrdConfirmMatchDto
+     * @author jiangpeng
+     * @date 2022/5/7 9:19
+     */
+    CfetsTrdConfirmMatchDto selectMatchDtoByCstpTradeId(@Param("cstpTradeId") String cstpTradeId);
     /**
      * 根据登记编号，查询登记信息
      */
@@ -211,4 +250,37 @@ public interface CfetsTrdConfirmMapper {
      * @return
      */
     List<CfetsTrdConfirmCstpInfoListResponse> findAllCstpPledgesList(@Param("execid") String execid);
+
+    /**
+     * 根据交易编号,查询一级申购交易数据
+     */
+    List<CfetsTrdConfirmRegInfoListResponse> selectBidDtoByPrimaryKey(Map<String, Object> map);
+    /**
+     * 根据资产代码查询指令/申购流程中数据
+     * @author jiangpeng
+     * @date 2022/5/7 19:10
+     * @param finprodId
+     * @return java.util.List<java.lang.String>
+     */
+    List<String> selectWflBidDataByFinprodId(@Param("finprodId") String finprodId);
+    /**
+     * 根据资产代码查询资产发行状态
+     * @author jiangpeng
+     * @date 2022/5/7 19:10
+     * @param finprodId 资产代码
+     * @return java.util.List<java.lang.String>
+     */
+    FinProductAdd selectIssueInfoByFinprodId(@Param("finprodId") String finprodId);
+
+    /**
+     * 根据资产代码查询指令信息
+     * @author jiangpeng
+     * @date 2022/5/7 19:52
+     * @param finprodIds 资产代码列表
+     * @return int
+     */
+    List<EtrEntrust> selectEtrEntrustEByFinprodId(@Param("finprodIds") List<String> finprodIds);
+
+
+    BigDecimal selectEtrNum(@Param("portfolioId") String finprodId,@Param("entrustId") String entrustId);
 }

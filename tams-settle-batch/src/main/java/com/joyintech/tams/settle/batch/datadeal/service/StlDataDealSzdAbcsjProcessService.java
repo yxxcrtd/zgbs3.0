@@ -132,7 +132,8 @@ public class StlDataDealSzdAbcsjProcessService {
             settleTransData.setIntRate(new BigDecimal(szdAbcsj.getBl1()));
             // 业务场景分类
             settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_股票_股息红利税_补缴.getValue());
-
+            // 交收结果
+            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdAbcsj.getJgdm()));
             // TODO 佣金，佣金是否随交易支付，佣金_原始
 
             StlDownDataDealWriteBaseDto stlDownDataDealWriteBaseDto = new StlDownDataDealWriteBaseDto();

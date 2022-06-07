@@ -150,6 +150,27 @@ public class IntegratedEntrustHistory implements Serializable {
     private String createDateTime;
     private String entrustClass;
 
+    private String targetType;
+    private String isNoGuard;
+    private String isFullPrice;
+
+
+    private String tradeId;
+    private String tradeName;
+    private String dealerId;
+    private String dealerName;
+    private String ownerType;
+    private String investorId;
+    private String investorName;
+    private String counterId;
+    private String propTradeId;
+    private String propTradeName;
+    private String propDealerId;
+    private String propDealerName;
+    private String propInvestorId;
+    private String propInvestorName;
+    private String propOwnerType;
+
     @Id
     public String getId() {
         return id;
@@ -733,5 +754,149 @@ public class IntegratedEntrustHistory implements Serializable {
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsFullPrice() {
+        return isFullPrice;
+    }
+
+    public void setIsFullPrice(String isFullPrice) {
+        this.isFullPrice = isFullPrice;
+    }
+
+    public String getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(String ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getPropInvestorId() {
+        return propInvestorId;
+    }
+
+    public void setPropInvestorId(String propInvestorId) {
+        this.propInvestorId = propInvestorId;
+    }
+
+    public String getPropInvestorName() {
+        return propInvestorName;
+    }
+
+    public void setPropInvestorName(String propInvestorName) {
+        this.propInvestorName = propInvestorName;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getPropTradeId() {
+        return propTradeId;
+    }
+
+    public void setPropTradeId(String propTradeId) {
+        this.propTradeId = propTradeId;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getPropDealerName() {
+        return propDealerName;
+    }
+
+    public void setPropDealerName(String propDealerName) {
+        this.propDealerName = propDealerName;
+    }
+
+    public String getPropOwnerType() {
+        return propOwnerType;
+    }
+
+    public void setPropOwnerType(String propOwnerType) {
+        this.propOwnerType = propOwnerType;
+    }
+
+    public String getTradeName() {
+        return tradeName;
+    }
+
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
+    public String getPropTradeName() {
+        return propTradeName;
+    }
+
+    public void setPropTradeName(String propTradeName) {
+        this.propTradeName = propTradeName;
     }
 }

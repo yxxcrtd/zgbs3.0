@@ -367,7 +367,7 @@ public class ValSchemeHZLayerService extends CommonExportService<ValSchemeBatchD
                     bokAssetMarketInfo.setMarketCode(finProduct.getFinprodMarketId());
                 }
                 // 变量.资产行情信息DTO.投资目的 = 摊余成本类
-                bokAssetMarketInfo.setInvAim(DictCodeListExt1.投资目的_摊余成本类.getValue());
+                bokAssetMarketInfo.setInvAim(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
                 // 变量.资产行情信息DTO.市价 = 变量.市价
                 bokAssetMarketInfo.setMarketPrice(行情价格);
                 // 变量.资产行情信息DTO.是否来源于行情数据

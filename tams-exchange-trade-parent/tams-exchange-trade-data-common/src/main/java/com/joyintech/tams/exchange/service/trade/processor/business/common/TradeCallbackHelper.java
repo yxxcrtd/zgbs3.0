@@ -1,15 +1,25 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
 import com.google.common.base.Strings;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
 import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
+import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
-import com.joyintech.tams.exchange.service.trade.processor.MessageSenderService;
+import com.joyintech.tams.exchange.service.trade.processor.MessageSenderManagement;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +28,9 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.utils.TradeUtils.multiply;
 
@@ -40,8 +52,8 @@ public class TradeCallbackHelper {
     private OrderService orderService;
     @Autowired
     private InstructionService instructionService;
-    @Autowired
-    private MessageSenderService messageSenderService;
+    //    @Autowired
+//    private MessageSenderService messageSenderService;
     @Autowired
     private FuturesInstrumentService futuresInstrumentService;
     @Autowired
@@ -52,6 +64,10 @@ public class TradeCallbackHelper {
     private BondHelper bondHelper;
     @Autowired
     private InstrumentService instrumentService;
+    @Autowired
+    private MessageSenderManagement messageSenderManagement;
+    @Autowired
+    private PortfolioTradeMessageHelper portfolioTradeMessageHelper;
 
     public void onTrade(Trade tradeRecord) {
         logger.info("成交回报信息 {}", JsonUtils.getJsonFromObject(tradeRecord));
@@ -61,7 +77,8 @@ public class TradeCallbackHelper {
         if (Objects.isNull(tradeDb)) {
             EntrustInterface entrust = null;
             //处理大宗成交回报
-            if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())) {
+            if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())
+                    || IntegratedEntrustUtils.isNegotiatedTrade(tradeRecord.getEntrustProp())) {
                 if (!Strings.isNullOrEmpty(tradeRecord.getEntrustId())) {
                     entrust = integratedEntrustService.findById(tradeRecord.getEntrustId());
                 } else if (!Strings.isNullOrEmpty(tradeRecord.getBrokerEntrustId())) {
@@ -220,7 +237,7 @@ public class TradeCallbackHelper {
         tradeRecord.setTransCode(entrust.getBrokerEntrustId());
         tradeRecord.setCreateTime(now);
         tradeRecord.setUpdateTime(now);
-        tradeRecord.setFullPrice(bondHelper.getFullPriceByTradePrice(tradeRecord, entrust.getIsFullPrice(), instruction));
+//        tradeRecord.setFullPrice(bondHelper.getFullPriceByTradePrice(tradeRecord, entrust.getIsFullPrice(), instruction));
         tradeRecord.setPortfolioName(instruction.getPortfolioName());
         tradeRecord.setSecAcctId(instruction.getSecAcctId());
         tradeRecord.setSecAcctName(instruction.getSecAcctName());
@@ -230,15 +247,20 @@ public class TradeCallbackHelper {
         tradeRecord.setPs(instruction.getTradeSide());
         tradeRecord.setBusiTypeTg(instruction.getBusiTypeTg());
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
-        if (tradeRecord.getClearBalance() == null) {
-            if (IntegratedEntrustUtils.isProtocolBack_SH(entrust.getEntrustProp())
-                    || IntegratedEntrustUtils.isProtocolBack_SZ(entrust.getEntrustProp())) {
-                //到期结算金额
-                tradeRecord.setClearBalance(entrust.getBackBalance());
-            } else if (InvestmentAssetType.isBond(tradeRecord.getFinprodType2()) && tradeRecord.getFullPrice() != null) {
-                //成交全价金额
-                tradeRecord.setClearBalance(tradeRecord.getFullPrice().multiply(BigDecimal.valueOf(tradeRecord.getTradedVolume())));
-            }
+
+        //债券交易处理
+        if (InvestmentAssetType.isBond(entrust.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+            //是否全价交易
+            tradeRecord.setIsFullPrice(entrust.getIsFullPrice());
+            //成交全价
+            tradeRecord.setFullPrice(bondHelper.getFullPriceByTradePrice(tradeRecord, entrust.getIsFullPrice(), instruction));
+            //成交净价
+            tradeRecord.setNetPrice(bondHelper.getNetPriceByFullPrice(tradeRecord, instruction));
+            //成交净价金额
+            tradeRecord.setNetBalance(multiply(tradeRecord.getNetPrice(), tradeRecord.getTradedVolume(), 2));
+            //成交全价金额
+            tradeRecord.setClearBalance(multiply(tradeRecord.getFullPrice(), tradeRecord.getTradedVolume(), 2));
         }
 
         //获取BusinessFlag
@@ -249,6 +271,7 @@ public class TradeCallbackHelper {
                 tradeRecord.setBusinessFlag(BusinessFlag.BULK.value);
             } else if (IntegratedEntrustUtils.isProtocolBack_SH(tradeRecord.getEntrustProp()) || IntegratedEntrustUtils.isProtocolBack_SZ(tradeRecord.getEntrustProp())) {
                 tradeRecord.setBusinessFlag(BusinessFlag.PROTOCOL_BACK.value);
+                tradeRecord.setClearBalance(entrust.getBackBalance());
             } else {
                 logger.info("tradeRecord has not found businessFlag brokerEntrustId is {}", tradeRecord.getBrokerEntrustId());
             }
@@ -271,20 +294,34 @@ public class TradeCallbackHelper {
             }
             // 若指令全部完成，则更新指令状态为已完成
             updateInstructionStatus(instruction);
-            // 是否需要手工交手
-            if (IntegratedEntrustUtils.isProtocolBack(tradeRecord.getEntrustProp())) {//协议回购
-                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
+
+            //组装成交组合分配
+            List<PortfolioTradeMessage> portfolioTradeMessages = portfolioTradeMessageHelper.buildPortfolioTradeMessage(entrust, tradeRecord, instruction);
+            if (CollectionUtils.isEmpty(portfolioTradeMessages)) {
+                logger.error("【未组装成交组合分配明】，不推送成交数据、不做手动交收：【instructionId={}】,【brokerTradeId={}】,【entrustId={}】",
+                        instruction.getEntrustId(), tradeRecord.getBrokerTradeId(), entrust.getId());
                 return;
-            } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
-                Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
-                if (Objects.nonNull(instrument)) {
-                    if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
-                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                        return;
-                    }
-                }
             }
-            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
+
+            // 是否需要手工交收
+            if (IntegratedEntrustUtils.isProtocolBack(tradeRecord.getEntrustProp())) {//协议回购
+//                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
+                return;
+//            } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
+                //新债需求：判断债券哪些走手工交收，用标的是否非担保 =是 则走手工交收
+            } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && DictCodeList.是否_是.getValue().equals(instruction.getIsNoGuard())) {
+//                Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
+//                if (Objects.nonNull(instrument)) {
+//                    if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
+//                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
+                return;
+//                    }
+//                }
+            }
+//            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
+            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust, portfolioTradeMessages);
         } else if (tradeRecord.getTradeType() == TradeType.INVALID.value) {
             if (entrust.getEntrustStatus() == EntrustStatus.INVALID.value) {
                 logger.info("委托已通过委托回报废单处理，忽略废单成交");
@@ -296,9 +333,14 @@ public class TradeCallbackHelper {
     }
 
     private void updateInstructionStatus(Instruction instruction) {
-        if (Objects.nonNull(instruction)) {
-            if ((instruction.getEntrustLeftAmt().longValue() == (instruction.getEntrustNum()) && instruction.getEntrustNum() > 0) || (instruction.getEntrustLeftAmt().doubleValue() == (instruction.getEntrustAmt().doubleValue()) && instruction.getEntrustAmt().doubleValue() > 0))
-                instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
+        if (Objects.isNull(instruction)) {
+            return;
+        }
+        //数量单比较数量，金额单比较金额
+        if ((instruction.getEntrustNum() > 0 && instruction.getEntrustLeftAmt().longValue() == instruction.getEntrustNum())
+                || (instruction.getEntrustAmt().doubleValue() > 0 && instruction.getEntrustLeftAmt().doubleValue() == instruction.getEntrustAmt().doubleValue())
+        ) {
+            instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
         }
     }
 
@@ -329,10 +371,11 @@ public class TradeCallbackHelper {
         splitOrderHelper.handleSplitOrderByTrade(entrust, tradeRecord.getTradedVolume(), newTrade, unFrozenBalance, tradeRecord);
         BigDecimal unFrozenBalanceInstruction = null;
         if (Objects.nonNull(instruction)) {
-            if (instruction.getEntrustNum() > 0) {
+            if (instruction.volumeInstruction()) {
                 instruction.setEntrustLeftAmt(BigDecimal.valueOf(instruction.getEntrustLeftAmt().longValue() + tradeRecord.getTradedVolume()));
             } else {
-                //可能存在金额指令的委托不是冻结金额的，传入成交金额  ----  对于债券， 现在指令为净价，需要单独处理
+                ////可能存在金额指令的委托不是冻结金额的，传入成交金额  ----  对于债券， 现在指令为净价，需要单独处理
+                //取成交金额（对于债券取全价金额）
                 unFrozenBalanceInstruction = bondHelper.handleTradePriceByFullPrice(tradeRecord, entrust.getIsFullPrice(), instruction);
                 instruction.setEntrustLeftAmt(TradeUtils.add(instruction.getEntrustLeftAmt(), unFrozenBalanceInstruction, 2));
                 //解冻金额判断，最后一笔需要释放所有解冻

@@ -474,10 +474,36 @@ public class CfetsInterfReceiveService {
             ibuQuoteCrepDto.setQuoteDate(transactTime);// 60域-业务发生时间
             ibuQuoteCrepDto.setTransactime((String)param.get("transactTime"));
         }
+
+        if(null!=param.get("settlType")) {
+            String settlType = this.convertCfetsCodeToSystemCode("settlType", String.valueOf(param.get("settlType")));// 63域-清算速度
+            ibuQuoteCrepDto.setSettleSpeed(Long.parseLong(settlType));
+        }
+        if(null!=param.get("deliveryType")) {
+            String deliveryType = this.convertCfetsCodeToSystemCode("deliveryType", String.valueOf(param.get("deliveryType")));// 919域-首期结算方式
+            ibuQuoteCrepDto.setvDeliveryType(deliveryType);
+        }
+        if(null!=param.get("deliveryType2")) {
+            String deliveryType2 = this.convertCfetsCodeToSystemCode("deliveryType", String.valueOf(param.get("deliveryType2")));// 10045域-到期结算方式
+            ibuQuoteCrepDto.setmDeliveryType(deliveryType2); // 10045域-到期结算方式
+        }
+        if(null!=param.get("clearingMethod")) {
+            String clearingMethod = this.convertCfetsCodeToSystemCode("clearingMethod", String.valueOf(param.get("clearingMethod")));// 11143域-清算类型
+            ibuQuoteCrepDto.setSettType(clearingMethod);
+        }
+        if(null!=param.get("settlCurrency")) {
+            ibuQuoteCrepDto.setSettCcy(String.valueOf(param.get("settlCurrency"))); // 120域-结算币种
+        }
         
         // 首期结算日
         if (null != transactTime) {
-            ibuQuoteCrepDto.setvSettleDate(transactTime);// 60域-业务发生时间
+            String dealCalId = CacheUtil.getSysParam("ibuVar_calendarId");
+            if (StringUtil.isBlank(dealCalId) || StringUtil.equals("ibuVar_calendarId", dealCalId)) {
+                dealCalId = "IB";
+            }
+            ibuQuoteCrepDto.setvSettleDate(
+                    dateCalCommonService.getPlusDaysWorkDay(transactTime,
+                            ibuQuoteCrepDto.getSettleSpeed().intValue(), dealCalId));
         }
         
         if(null!=param.get("tradeLimitDays")) {
@@ -494,26 +520,6 @@ public class CfetsInterfReceiveService {
                 dateCalCommonService.getPlusDaysWorkDay(ibuQuoteCrepDto.getvSettleDate(),
                     ibuQuoteCrepDto.getTerm().intValue(), dealCalId));
         }
-        
-    	if(null!=param.get("settlType")) {
-    		String settlType = this.convertCfetsCodeToSystemCode("settlType", String.valueOf(param.get("settlType")));// 63域-清算速度
-    		ibuQuoteCrepDto.setSettleSpeed(Long.parseLong(settlType));
-    	}
-    	if(null!=param.get("deliveryType")) {
-    		String deliveryType = this.convertCfetsCodeToSystemCode("deliveryType", String.valueOf(param.get("deliveryType")));// 919域-首期结算方式
-    		ibuQuoteCrepDto.setvDeliveryType(deliveryType);
-    	}
-    	if(null!=param.get("deliveryType2")) {
-    	    String deliveryType2 = this.convertCfetsCodeToSystemCode("deliveryType", String.valueOf(param.get("deliveryType2")));// 10045域-到期结算方式
-    		ibuQuoteCrepDto.setmDeliveryType(deliveryType2); // 10045域-到期结算方式
-    	}
-    	if(null!=param.get("clearingMethod")) {
-    		String clearingMethod = this.convertCfetsCodeToSystemCode("clearingMethod", String.valueOf(param.get("clearingMethod")));// 11143域-清算类型
-    		ibuQuoteCrepDto.setSettType(clearingMethod); 
-    	}
-    	if(null!=param.get("settlCurrency")) {
-    		ibuQuoteCrepDto.setSettCcy(String.valueOf(param.get("settlCurrency"))); // 120域-结算币种
-    	}
     	// 债券币种:默认人民币
     	ibuQuoteCrepDto.setCcy(com.joyintech.tams.constant.DictCodeList.币种_人民币_CNY.getValue());
     	

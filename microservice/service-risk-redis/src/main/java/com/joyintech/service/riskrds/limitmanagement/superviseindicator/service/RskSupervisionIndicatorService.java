@@ -97,11 +97,12 @@ public class RskSupervisionIndicatorService extends BaseService<RskSupervisionIn
                                                                               String profitType,
                                                                               String issueMode,
                                                                               String raiseType,
-                                                                              String investType) {
+                                                                              String investType,
+                                                                              String isFaceSingleInvestor) {
         String platDate=DateUtil.format(DateUtil.platDateFromCache());
     	return rskSupervisionIndicatorMapper.getAllPortfolioByProfit(indId,
             BussinessDictCodeListRds.组合层次_单组合.getValue(), portfName, profitType, issueMode, raiseType,
-            investType,platDate);
+            investType,platDate,isFaceSingleInvestor);
     }
 
     public List<TreeNode<RskSupervisionIndicatorDto>> getAllPortfolioByOther(String fields,
@@ -110,11 +111,12 @@ public class RskSupervisionIndicatorService extends BaseService<RskSupervisionIn
                                                                              String profitType,
                                                                              String issueMode,
                                                                              String raiseType,
-                                                                             String investType) {
+                                                                             String investType,
+                                                                             String isFaceSingleInvestor) {
         String platDate=DateUtil.format(DateUtil.platDateFromCache());
         return rskSupervisionIndicatorMapper.getAllPortfolioByOther(fields,
             BussinessDictCodeListRds.组合层次_单组合.getValue(), indId, portfName, profitType, issueMode,
-            raiseType, investType,platDate);
+            raiseType, investType,platDate,isFaceSingleInvestor);
     }
 
     public List<TreeNode<RskPortfolioPackageDto>> getAllPortfolioBag(String bagName,
@@ -199,6 +201,17 @@ public class RskSupervisionIndicatorService extends BaseService<RskSupervisionIn
      */
     public RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId(Map<String, Object> map) {
         return rskSupervisionIndicatorMapper.querySuperIndicatorInfoByIndId(map);
+    }
+
+    /**
+     * 查询监督指标
+     *
+     * @param map
+     * @return
+     * @since 1.0
+     */
+    public RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId_RULE(Map<String, Object> map) {
+        return rskSupervisionIndicatorMapper.querySuperIndicatorInfoByIndId_RULE(map);
     }
 
     /**

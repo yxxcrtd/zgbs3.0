@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *
  * 指令分发接口Service
  * 〈功能详细描述〉
  * @author tanxuan
@@ -31,19 +31,19 @@ import java.util.Map;
  */
 @Service
 public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatcherDto>{
-	
+
 	@Autowired
 	private EtrCommandDispatcherMapper etrTradeSysInterfMapper;
-	
+
     /**
      * 指令分发信息推送service
      */
     @Autowired
     private MessageSenderService messageSenderService;
-    
-    
+
+
     private Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	/**
      * 指令分发
      * <功能详细描述>
@@ -78,8 +78,8 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
         		//messageSenderService.pushCommandMsgToMQ(dto);
         		sendMessageByInf(dto);
     		}
-     } 
-	
+     }
+
 	/**
      * 指令接口查询
      * <功能详细描述>
@@ -91,7 +91,7 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
     public List<EtrCommandDispatcherDto> selectList(Map<String, Object> param){
     	return etrTradeSysInterfMapper.selectList(param);
     }
-    
+
     /**
      * 指令回购质押品查询
      * <功能详细描述>
@@ -101,8 +101,8 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
      * @since 1.0
      */
     public List<EtrTradePledgeDto> selectPledgeList(List<EtrCommandDispatcherDto> list){
-    	List<EtrTradePledgeDto> pledgelist = new ArrayList<EtrTradePledgeDto>(); 
-    	
+    	List<EtrTradePledgeDto> pledgelist = new ArrayList<EtrTradePledgeDto>();
+
     	if(list != null && !list.isEmpty()) {
 	    	for(EtrCommandDispatcherDto dto : list) {
 	    		if("F02".equals(dto.getFinprodType2()) || "F03".equals(dto.getFinprodType2()) ) {

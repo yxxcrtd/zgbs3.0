@@ -51,6 +51,9 @@
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
+        <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
+        <result column="NET_PRICE" property="netPrice" jdbcType="NUMERIC"/>
+        <result column="NET_BALANCE" property="netBalance" jdbcType="NUMERIC"/>
     </resultMap>
 
     <resultMap id="QueryResultMap" type="com.joyintech.tams.exchange.common.bean.TradeQueryBean">
@@ -103,6 +106,12 @@
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
+        <result column="BUSI_TYPE_TG_STR" property="busiTypeTgStr" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
+        <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
+        <result column="NET_PRICE" property="netPrice" jdbcType="NUMERIC"/>
+        <result column="NET_BALANCE" property="netBalance" jdbcType="NUMERIC"/>
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -172,7 +181,7 @@
     CLEAR_BALANCE, TRADE_TIME, DISCOUNT, TRANS_CODE, PROP_SEAT_NO, TRADING_DAY, LOCAL_ENTRUST_ID,
     BROKER_ENTRUST_ID, BROKER_TRADE_ID, REPORT_NO, CREATE_TIME, UPDATE_TIME, OFFSET_FLAG, HEDGE_FLAG, PORTFOLIO_ID, FULL_PRICE,
     PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
-    EXTEND1, EXTEND2,ENTRUST_CLASS
+    EXTEND1, EXTEND2,ENTRUST_CLASS,IS_FULL_PRICE,NET_PRICE,NET_BALANCE
     </sql>
 
     <sql id="Query_Column_List">
@@ -183,7 +192,7 @@
     a.BROKER_ENTRUST_ID, a.BROKER_TRADE_ID, a.REPORT_NO, a.CREATE_TIME, a.UPDATE_TIME, a.OFFSET_FLAG,a. HEDGE_FLAG,
     a.PORTFOLIO_ID, a.FULL_PRICE,a.ENTRUST_BS,
     a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME,a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
-    a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2, a.ENTRUST_CLASS
+    a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2, a.ENTRUST_CLASS,a.IS_FULL_PRICE,a.NET_PRICE,a.NET_BALANCE
     </sql>
     <sql id="queryCondition2">
         <where>
@@ -249,6 +258,57 @@
         <include refid="queryCondition2"/>
         order by CREATE_TIME desc
     </select>
+    <select id="selectHistoryTradeByPage" resultMap="QueryResultMap"
+            parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
+        SELECT decode(TT.INSTRUCTION_ID, NULL, A.INSTRUCTION_ID) INSTRUCTION_ID,
+        STD.APPLY_TRADE_ID BROKER_ENTRUST_ID,
+        STD.CJBH BROKER_TRADE_ID,
+        TT.PORTFOLIO_NAME PORTFOLIO_NAME,
+        SCI.ACCT_NAME ACCOUNT_NAME,
+        STD.TRADE_MARKET MARKET_STR,
+        FP.FINPROD_MARKET_ID STOCK_CODE,
+        FP.FINPROD_ABBR STOCK_NAME,
+        EEA.BUSI_TYPE_POSITION BUSI_TYPE_TG_STR,
+        DECODE(TT.PS, NULL, A.PS) ENTRUST_BSSTR,
+        DECODE(TT.TRADED_VOLUME, NULL, A.TRADED_VOLUME) TRADED_VOLUME,
+        DECODE(TT.TRADED_PRICE, NULL, A.TRADED_PRICE) TRADED_PRICE,
+        DECODE(TT.CLEAR_BALANCE, NULL, A.CLEAR_BALANCE) TRADED_BALANCE,
+        DECODE(TT.TRADING_DAY, NULL, A.TRADING_DAY) TRADING_DAY,
+        DECODE(TT.TRADE_TIME, NULL, A.TRADE_TIME) DEAL_TIME,
+        CASE
+        WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
+        WHEN STD.DELIVERY_RESULT = '01' THEN '正常交收'
+        WHEN STD.DELIVERY_RESULT = '02' THEN '部分交收'
+        WHEN STD.DELIVERY_RESULT = '03' THEN '交收失败'
+        WHEN STD.DELIVERY_RESULT = '04' THEN '未交收'
+        END DELIVERY_RESULT,
+        CASE
+        WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
+        WHEN STD.DELIVERY_RESULT = '04' THEN '0'
+        ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
+        END DELIVERY_SCHEDULE
+        FROM SETTLE_TRANS_DATA STD
+        LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.TRADE_ID AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND
+        TT.TRADE_TIME = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
+        LEFT JOIN T_TRADEHISTORY A ON (A.BROKER_TRADE_ID = STD.CJBH AND A.SEC_ACCT_ID = STD.SEC_ACCT_ID AND A.TRADE_TIME
+        = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
+        LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN STL_CAPACCT_INFO SCI ON STD.ACCT_NO = SCI.ACCT_NO
+        LEFT JOIN ETR_ENTRUST EE ON TT.INSTRUCTION_ID = EE.ENTRUST_ID
+        LEFT JOIN ETR_ENTRUST_ADD EEA ON EE.ENTRUST_ID = EEA.ENTRUST_ID
+        LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
+        LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID
+        WHERE STD.DELIVERY_RESULT IN ('01', '02', '03')
+        AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
+        OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
+        <if test="startDay != null and startDay != ''">
+            AND TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') &gt;= #{startDay}
+        </if>
+        <if test="endDay != null and endDay != ''">
+            AND TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') &lt;= #{endDay}
+        </if>
+        order by STD.CREATE_TIME desc
+    </select>
 
     <delete id="deleteByExample" parameterType="com.joyintech.tams.exchange.common.db.domain.TradeHistoryExample">
         delete from T_TRADEHISTORY
@@ -269,7 +329,8 @@
                                     LOCAL_ENTRUST_ID, BROKER_ENTRUST_ID, BROKER_TRADE_ID, REPORT_NO,
                                     CREATE_TIME, UPDATE_TIME, OFFSET_FLAG, HEDGE_FLAG, PORTFOLIO_ID, FULL_PRICE,
                                     PORTFOLIO_NAME, SEC_ACCT_ID, SEC_ACCT_NAME, TRADE_PLAT, FINPROD_TYPE2,
-                                    INV_MANAGER_ID, PS, BUSI_TYPE_TG, EXTEND1, EXTEND2, ENTRUST_CLASS)
+                                    INV_MANAGER_ID, PS, BUSI_TYPE_TG, EXTEND1, EXTEND2, ENTRUST_CLASS,
+                                    IS_FULL_PRICE, NET_PRICE, NET_BALANCE)
     </sql>
     <insert id="insert" parameterType="com.joyintech.tams.exchange.common.db.domain.TradeHistory">
         <include refid="tradeHistoryFiled"/>
@@ -285,11 +346,11 @@
         #{localEntrustId,jdbcType=VARCHAR}, #{brokerEntrustId,jdbcType=VARCHAR}, #{brokerTradeId,jdbcType=VARCHAR},
         #{reportNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
         #{offsetFlag,jdbcType=VARCHAR}, #{hedgeFlag,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR},
-        #{fullPrice,jdbcType=NUMERIC},
-        #{portfolioName,jdbcType=VARCHAR}, #{secAcctId,jdbcType=VARCHAR},
+        #{fullPrice,jdbcType=NUMERIC}, #{portfolioName,jdbcType=VARCHAR}, #{secAcctId,jdbcType=VARCHAR},
         #{secAcctName,jdbcType=VARCHAR}, #{tradePlat,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR},
         #{invManagerId,jdbcType=VARCHAR}, #{ps,jdbcType=VARCHAR}, #{busiTypeTg,jdbcType=VARCHAR},
-        #{extend1,jdbcType=VARCHAR}, #{extend2,jdbcType=VARCHAR}, #{entrustClass,jdbcType=VARCHAR} )
+        #{extend1,jdbcType=VARCHAR}, #{extend2,jdbcType=VARCHAR}, #{entrustClass,jdbcType=VARCHAR},
+        #{isFullPrice,jdbcType=VARCHAR}, #{netPrice,jdbcType=NUMERIC}, #{netBalance,jdbcType=NUMERIC} )
     </insert>
     <insert id="insertBatch">
         <include refid="tradeHistoryFiled"/>
@@ -328,7 +389,10 @@
             #{record.busiTypeTg,jdbcType=VARCHAR},
             #{record.extend1,jdbcType=VARCHAR},
             #{record.extend2,jdbcType=VARCHAR},
-            #{record.entrustClass,jdbcType=VARCHAR}
+            #{record.entrustClass,jdbcType=VARCHAR},
+            #{record.isFullPrice,jdbcType=VARCHAR},
+            #{record.netPrice,jdbcType=NUMERIC},
+            #{record.netBalance,jdbcType=NUMERIC}
         </foreach>
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.exchange.common.db.domain.TradeHistory">
@@ -464,6 +528,15 @@
             <if test="entrustClass != null">
                 ENTRUST_CLASS,
             </if>
+            <if test="isFullPrice != null">
+                IS_FULL_PRICE,
+            </if>
+            <if test="netPrice != null">
+                NET_PRICE,
+            </if>
+            <if test="netBalance != null">
+                NET_BALANCE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -595,6 +668,15 @@
             </if>
             <if test="entrustClass != null">
                 #{entrustClass,jdbcType=VARCHAR},
+            </if>
+            <if test="isFullPrice != null">
+                #{isFullPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="netPrice != null">
+                #{netPrice,jdbcType=NUMERIC},
+            </if>
+            <if test="netBalance != null">
+                #{netBalance,jdbcType=NUMERIC},
             </if>
         </trim>
     </insert>
@@ -752,6 +834,15 @@
             <if test="record.entrustClass != null">
                 ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR},
             </if>
+            <if test="record.isFullPrice != null">
+                IS_FULL_PRICE = #{record.isFullPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="record.netPrice != null">
+                NET_PRICE = #{record.netPrice,jdbcType=NUMERIC},
+            </if>
+            <if test="record.netBalance != null">
+                NET_BALANCE = #{record.netBalance,jdbcType=NUMERIC},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -806,9 +897,10 @@
         BUSI_TYPE_TG = #{record.busiTypeTg,jdbcType=VARCHAR},
         EXTEND1 = #{record.extend1,jdbcType=VARCHAR},
         EXTEND2 = #{record.extend2,jdbcType=VARCHAR},
-        ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR}
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
+        ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR},
+        IS_FULL_PRICE = #{record.isFullPrice,jdbcType=VARCHAR},
+        NET_PRICE = #{record.netPrice,jdbcType=NUMERIC},
+        NET_BALANCE = #{record.netBalance,jdbcType=NUMERIC},
+        <include refid="Update_By_Example_Where_Clause"/>
     </update>
 </mapper>

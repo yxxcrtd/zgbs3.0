@@ -81,6 +81,9 @@ public class EtrExchangeTradeCommonRiskcalDto {
     @ApiModelProperty(name="entrustNum",value="券面总额",example="11")
     private BigDecimal entrustNum;
 
+    @ApiModelProperty(name="entrustNum",value="券面总额",example="11")
+    private BigDecimal entrustAmt;
+
     @ApiModelProperty(name="invAim",value="投资目的",example="AC")
     private String invAim;
 
@@ -374,5 +377,13 @@ public class EtrExchangeTradeCommonRiskcalDto {
 
     public void setAssetType2(String assetType2) {
         this.assetType2 = assetType2;
+    }
+
+    public BigDecimal getEntrustAmt() {
+        return entrustAmt;
+    }
+
+    public void setEntrustAmt(BigDecimal entrustAmt) {
+        this.entrustAmt = entrustAmt;
     }
 }

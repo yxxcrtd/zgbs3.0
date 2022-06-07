@@ -19,6 +19,8 @@ public class KCBPAccount {
     private String fixedIncome_PositionStr_trade;
     private String fixedIncome_PositionStr_entrust;
     private String RTGS_PositionStr;
+    private String bondNegotiate_SZ_PositionStr_Trade;
+    private String bondNegotiate_SZ_PositionStr_Entrust;
 
     public String getEntrustPositionStr() {
         return entrustPositionStr;
@@ -147,4 +149,20 @@ public class KCBPAccount {
     public void setRTGS_PositionStr(String RTGS_PositionStr) {
         this.RTGS_PositionStr = RTGS_PositionStr;
     }
+
+	public String getBondNegotiate_SZ_PositionStr_Trade() {
+		return bondNegotiate_SZ_PositionStr_Trade;
+	}
+
+	public void setBondNegotiate_SZ_PositionStr_Trade(String bondNegotiate_SZ_PositionStr_Trade) {
+		this.bondNegotiate_SZ_PositionStr_Trade = bondNegotiate_SZ_PositionStr_Trade;
+	}
+
+	public String getBondNegotiate_SZ_PositionStr_Entrust() {
+		return bondNegotiate_SZ_PositionStr_Entrust;
+	}
+
+	public void setBondNegotiate_SZ_PositionStr_Entrust(String bondNegotiate_SZ_PositionStr_Entrust) {
+		this.bondNegotiate_SZ_PositionStr_Entrust = bondNegotiate_SZ_PositionStr_Entrust;
+	}
 }

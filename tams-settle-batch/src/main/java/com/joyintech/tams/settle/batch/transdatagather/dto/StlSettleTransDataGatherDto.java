@@ -307,6 +307,11 @@ public class StlSettleTransDataGatherDto extends BaseEntity {
     private String settleMode;
 
     /**
+     * 交收结果
+     */
+    private String deliveryResult;
+
+    /**
      * 印花税_原始
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
@@ -1418,6 +1423,14 @@ public class StlSettleTransDataGatherDto extends BaseEntity {
      */
     public void setSettleMode(String settleMode) {
         this.settleMode = settleMode == null ? null : settleMode.trim();
+    }
+
+    public String getDeliveryResult() {
+        return deliveryResult;
+    }
+
+    public void setDeliveryResult(String deliveryResult) {
+        this.deliveryResult = deliveryResult;
     }
 
     /**

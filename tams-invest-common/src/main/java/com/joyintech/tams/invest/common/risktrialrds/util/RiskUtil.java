@@ -6,8 +6,16 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.jdbc.datasource.DynamicDataSource;
 import com.joyintech.framework.util.*;
 import com.joyintech.redis.common.entity.IValue;
+import com.joyintech.tams.common.base.entity.FinOpenPlan;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.CommonUtil;
+import com.joyintech.tams.invest.common.asset.util.AssetCommonUtil;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeRds;
+import com.joyintech.tams.invest.common.riskinfrds.calendar.entity.ICalendar;
+import com.joyintech.tams.invest.common.risktrialrds.dto.RiskIndividConditionDto;
 import com.joyintech.tams.invest.common.risktrialrds.reflect.PluginClass;
 import com.joyintech.tams.invest.common.risktrialrds.reflect.REF;
 import org.apache.shiro.util.CollectionUtils;
@@ -21,6 +29,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -77,10 +87,33 @@ public class RiskUtil {
 	public static final String RSK_STAGEAST_INFO="RSK_STAGEAST_INFO";
 	public static final String RSK_ASTDEL_INFO="RSK_ASTDEL_INFO";
 	public static final String PAGE_REDIS_FLAG="pageRedisFlag";
+	public static final String RISK_REFRESH_TIEM="riskRefreshTime";
+
+	public static final long riskRefreshTime=8000L;
 	/*合并模拟测算代码 panbin 2020-8-11 end*/
 	public static final String IS_DISPLAY_PEND_PERIOD="IS_DISPLAY_PEND_PERIOD";
-
+	public static final String UP_LINE = "||";
+	public static final String UP_LINE_SPLIT = "\\|\\|";
 	private static Map<String, PluginClass<?>> pluginMap = new HashMap<>();
+
+	private static Map<String,String> classifyDimensionMap= new HashMap<String, String>() {
+		{
+			put(DictCodeListExt1.分类维度_收益类型.getValue(),"PROFIT_TYPE");
+			put(DictCodeListExt1.分类维度_开放类型.getValue(),"PA_PTL_PORTFOLIO.OPEN_TYPE");
+			put(DictCodeListExt1.分类维度_募集方式.getValue(),"RAISE_TYPE");
+			put(DictCodeListExt1.分类维度_投资性质.getValue(),"PA_PTL_PORTFOLIO.INVEST_NATURE");
+			put(BussinessDictCodeListRds.分类维度_是否面向单一投资者.getValue(),"IS_FACE_SINGLEINVESTOR");
+			put(BussinessDictCodeListRds.分类维度_说明书是否披露风险标志.getValue(),"DIRECT_DISCLOSURE_RISK_FLAG");
+			put(BussinessDictCodeListRds.分类维度_开放周期.getValue(),"PTL_PORTFOLIO.PORTFOLIO_ID");
+		}
+	};
+
+	public static Map<String,Integer> openCycleMap= new HashMap<String, Integer>() {
+		{
+			put(BussinessDictCodeListRds.开放周期_小于90天.getValue(),90);
+			put(BussinessDictCodeListRds.开放周期_大于等于90天.getValue(),90);
+		}
+	};
 
 	/**
 	 * 初始化指标参数利用反射类模块Service列表
@@ -572,19 +605,7 @@ public class RiskUtil {
 	 * @return
 	 */
 	public static String getTableColumn(String val){
-		if(val.equals("01")){
-			return "PROFIT_TYPE";
-		}
-		if(val.equals("02")){
-			return "OPEN_TYPE";
-		}
-		if(val.equals("03")){
-			return "RAISE_TYPE";
-		}
-		if(val.equals("04")){
-			return "INVEST_NATURE";
-		}
-		return StringUtil.EMPTY;
+		return StringUtil.isNotEmpty(classifyDimensionMap.get(val))?classifyDimensionMap.get(val):StringUtil.EMPTY;
 	}
 
 	/**
@@ -761,5 +782,84 @@ public class RiskUtil {
 				logger.error(e.getMessage(),e);
 			}
 		}
+	}
+
+	public static Long getRefreshTime(){
+		return getTimeCommon((list)->{
+			return Long.parseLong(list.get(0));
+		});
+	}
+
+	public static Long getRefreshMulTime(){
+		return getTimeCommon((list)->{
+			return list.size()>1?Long.parseLong(list.get(1)):riskRefreshTime;
+		});
+	}
+
+	private static long getTimeCommon(Function<List<String>,Long> function){
+		Object refreshTime=CacheUtil.getSysParam(RiskUtil.RISK_REFRESH_TIEM);
+		if(StringUtil.isNotEmpty(refreshTime)){
+			List<String> timeList=StringUtil.splitToList(",",refreshTime.toString());
+			return function.apply(timeList);
+		}
+		return riskRefreshTime;
+	}
+
+	public static <T> void dealList(List<T> list, List<Long> daysList,Function<List<T>,Long> function,Consumer<List<Long>> consumer){
+		if(list.size()>1) {
+			daysList.add(function.apply(list));
+			list.remove(0);
+			dealList(list,daysList,function,consumer);
+		}else{
+			consumer.accept(daysList);
+		}
+	}
+
+	/**
+	 * 过滤条件设置启用时间逻辑
+	 * @param riskIndividConditionDtoList
+	 * @param riskPtlOpenPlanList
+	 * @param portfolioId
+	 * @param paramIndId
+	 * @return
+	 */
+	public static boolean filterEnableTime(List<RiskIndividConditionDto> riskIndividConditionDtoList, List<FinOpenPlan> riskPtlOpenPlanList, String portfolioId, String paramIndId, Date supDate){
+		List<RiskIndividConditionDto>  riskIndividCondSubList =riskIndividConditionDtoList.stream().filter(item->item.getPrtBagId().equals(portfolioId)
+				&&item.getIndId().equals(paramIndId)&&CommonUtil.isType(item.getConditionItem(),
+				BussinessDictCodeListRds.条件项_启用时间)).collect(Collectors.toList()) ;
+		if(StringUtil.isEmptyList(riskIndividCondSubList)){
+			return true;
+		}
+		List<FinOpenPlan> ptlOpenPlanList=riskPtlOpenPlanList.stream().filter(item->StringUtil.replaceAll(item.getFinprodId(), DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()+GlobalConstant.UNDER_LINE,StringUtil.EMPTY)
+				.equals(portfolioId)).collect(Collectors.toList());
+		//若没有开放计划若归入不在启用时间内
+		if(StringUtil.isEmptyList(ptlOpenPlanList)){
+			return false;
+		}
+		List<FinOpenPlan> purOpenList=ptlOpenPlanList.stream().filter(item->Arrays.asList(DictCodeList.申赎开放类型_申购开放.getValue(),
+				DictCodeList.申赎开放类型_申赎开放.getValue()).contains(item.getOpenType())).collect(Collectors.toList());
+		List<FinOpenPlan> repOpenList=ptlOpenPlanList.stream().filter(item->Arrays.asList(DictCodeList.申赎开放类型_赎回开放.getValue(),
+				DictCodeList.申赎开放类型_申赎开放.getValue()).contains(item.getOpenType())).collect(Collectors.toList());
+		if(StringUtil.isEmptyList(purOpenList)||StringUtil.isEmptyList(repOpenList)){
+			return false;
+		}
+		boolean divQyFlag=true;
+		for(RiskIndividConditionDto dto:riskIndividCondSubList){
+			//从redis里获取日历信息
+			String calendarId=AssetCommonUtil.getAssetInfo(DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()
+					+GlobalConstant.UNDER_LINE+portfolioId,obj->obj.getCalendarCode());
+			ICalendar iCalendar=AssetCommonUtil.getCalendar(calendarId, obj->obj);
+			//在启用期间才计算
+			Date sDate=dto.getEnableStrTime(purOpenList.get(0),repOpenList.get(0),iCalendar);
+			Date eDate=dto.getEnableEndTime(purOpenList.get(0),repOpenList.get(0),iCalendar);
+			if(null!=sDate&&null!=eDate) {
+				divQyFlag=DateUtil.compareDate(sDate, supDate) <= 0&&DateUtil.compareDate(eDate, supDate) >= 0;
+			}else if(null!=sDate){
+				divQyFlag=DateUtil.compareDate(sDate, supDate) <= 0;
+			}else if(null!=eDate){
+				divQyFlag=DateUtil.compareDate(eDate, supDate) >= 0;
+			}
+		}
+		return divQyFlag;
 	}
 }

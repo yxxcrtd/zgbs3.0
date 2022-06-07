@@ -10,23 +10,17 @@
  
 package com.joyintech.tams.invest.asset.bond.dto;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-
-import javax.validation.Valid;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.joyintech.framework.validation.annotation.*;
-import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.validation.annotation.*;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
 import com.joyintech.tams.component.business.asset.dto.FinInterestFactorDto;
 import com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto;
@@ -36,13 +30,18 @@ import com.joyintech.tams.component.business.bond.dto.BusiFinExercisePlanDto;
 import com.joyintech.tams.component.business.core.dto.FileCommonDto;
 import com.joyintech.tams.component.business.report.asset.bond.dto.BussFinBondRepInfoDto;
 import com.joyintech.tams.component.business.report.asset.project.dto.BussRepEquityInfoDto;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.asset.bond.validator.FinBondTargetAssetValidator;
 import com.joyintech.tams.invest.asset.common.dto.*;
-import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
+
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 债券标的信息DTO
@@ -410,6 +409,11 @@ public class FinBondTargetAssetDto extends FinProduct implements ITableRow,Proce
     public String isIssueAsset;
 
     /**
+     * 是否非担保
+     */
+    private String isNoGuard;
+
+    /**
      * 上市代码
      */
     public String appearMarketId;
@@ -442,6 +446,14 @@ public class FinBondTargetAssetDto extends FinProduct implements ITableRow,Proce
      */
     public void setIsIssueAsset(String isIssueAsset) {
         this.isIssueAsset = isIssueAsset;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
     }
 
     /**
@@ -1886,6 +1898,10 @@ public class FinBondTargetAssetDto extends FinProduct implements ITableRow,Proce
 
     public String getIsIssueAssetStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsIssueAsset());
+    }
+
+    public String getIsNoGuardStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsNoGuard());
     }
     
     public String getIndustryStr() {

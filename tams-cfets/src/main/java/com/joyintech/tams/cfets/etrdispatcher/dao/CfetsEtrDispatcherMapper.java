@@ -11,13 +11,22 @@
 package com.joyintech.tams.cfets.etrdispatcher.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.tams.cfets.etrdispatcher.dto.*;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrBondFirstExeListInfoResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherAutoRequest;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherExeListInfoResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInfoExcResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInfoOtcResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInfoResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInvResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderAuthListResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderListRequest;
 import com.joyintech.tams.common.base.entity.EtrDistributeKey;
 import com.joyintech.tams.common.base.entity.User;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -108,7 +117,29 @@ public interface CfetsEtrDispatcherMapper {
 
     List<CfetsEtrDispatcherExeListInfoResponse> getEtrDispatcherExeListInfo(Map<String, Object> pageParam);
 
+    /**
+     * 一级债券指令执行查询
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(Map<String, Object> pageParam);
+
     List<CfetsEtrDispatcherDealListInfoResponse> getEtrDispatcherDealListInfo(Map<String, Object> pageParam);
+
+
+    /**
+     * 一级债券指令成交查询
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrDispatcherDealListInfoResponse> getEtrDispatcherFirstBidDealListInfo(Map<String, Object> pageParam);
+
+    /**
+     * 一级债券指令成交查询  未中标
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrDispatcherDealListInfoResponse> getEtrPrimaryBidDealListInfo(Map<String, Object> pageParam);
 
     /**
      * 指令分发成交信息
@@ -210,4 +241,28 @@ public interface CfetsEtrDispatcherMapper {
     List<CfetsEtrDispatcherDealListInfoResponse> queryTrade2Touguan(Map<String, Object> pageParam);
 
     List<CfetsEtrDispatcherExeListInfoResponse> queryEntrust2Touguan(Map<String, Object> pageParam);
+
+    /**
+     * 查询已分发交易员数据
+     * @param finprodId
+     * @param entrustStatus
+     * @return
+     */
+    List<String> getDispatcherTraderList(@Param("finprodId") String finprodId, @Param("entrustStatus") String entrustStatus);
+
+    /**
+     * 查询未选择指令
+     * @param finprodId
+     * @return
+     */
+    List<String> getDispatcherEntrustIdList(@Param("finprodId") String finprodId, @Param("statusList") List<String> statusList);
+
+    /**
+     * 查询指令执行、成交进度信息
+     * @param entrustId
+     * @return
+     */
+    CfetsEtrDispatcherTradeListResponse getEtrFirstBidInfo(@Param("entrustId") String entrustId);
+
+
 }

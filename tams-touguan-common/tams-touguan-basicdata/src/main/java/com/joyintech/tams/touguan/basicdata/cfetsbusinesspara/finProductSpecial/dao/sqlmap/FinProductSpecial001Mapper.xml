@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dao.FinProductSpecial001Mapper">
+
+    <select id="queryForPage"
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto"
+            parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialQueryRequest">
+        SELECT *
+        FROM (
+        SELECT SPECIAL.FINPROD_MARKET_ID finprodMarketId,
+        SPECIAL.IS_ABS isAbs,
+        SPECIAL.IS_SPECIAL_DEBT isSpecialDebt,
+        SPECIAL.IS_DEFAULT_BOND_INDICATOR isDefaultBondIndicator,
+        SPECIAL.INPUT_TYPE inputType,
+        PRODUCT.FINPROD_ABBR finprodAbbr
+        FROM FIN_PRODUCT_SPECIAL SPECIAL
+        INNER JOIN FIN_PRODUCT PRODUCT ON SPECIAL.FINPROD_MARKET_ID = PRODUCT.FINPROD_MARKET_ID
+        UNION
+        SELECT SPECIAL.FINPROD_MARKET_ID finprodMarketId,
+        SPECIAL.IS_ABS isAbs,
+        SPECIAL.IS_SPECIAL_DEBT isSpecialDebt,
+        SPECIAL.IS_DEFAULT_BOND_INDICATOR isDefaultBondIndicator,
+        SPECIAL.INPUT_TYPE inputType,
+        INTERF.SECNAME finprodAbbr
+        FROM FIN_PRODUCT_SPECIAL SPECIAL
+        INNER JOIN INTERF_PAYHSRCSECINFO INTERF ON SPECIAL.FINPROD_MARKET_ID = INTERF.SECID
+        WHERE INTERF.SECID NOT IN
+        (SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND TRADE_MARKET = '01')
+        )
+        <where>
+            <if test="search !=null and search !=''">
+                AND
+                (
+                FINPRODMARKETID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                OR
+                FINPRODABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                )
+            </if>
+            <if test="finprodMarketId !=null and finprodMarketId !=''">
+                and FINPRODMARKETID = #{finprodMarketId}
+            </if>
+            <if test="isAbs !=null and isAbs !=''">
+                and ISABS = #{isAbs}
+            </if>
+            <if test="isSpecialDebt !=null and isSpecialDebt !=''">
+                and ISSPECIALDEBT = #{isSpecialDebt}
+            </if>
+            <if test="isDefaultBondIndicator !=null and isDefaultBondIndicator !=''">
+                and ISDEFAULTBONDINDICATOR = #{isDefaultBondIndicator}
+            </if>
+        </where>
+        <choose>
+            <when test="pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+                order by ${pageMode.sort}  ${pageMode.direction}
+            </when>
+            <otherwise>
+                ORDER BY FINPRODMARKETID, ISSPECIALDEBT, ISDEFAULTBONDINDICATOR, ISABS
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="queryByFinprodMarketId"
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto">
+        SELECT *
+        FROM (
+                 SELECT SPECIAL.FINPROD_MARKET_ID         finprodMarketId,
+                        SPECIAL.IS_ABS                    isAbs,
+                        SPECIAL.IS_SPECIAL_DEBT           isSpecialDebt,
+                        SPECIAL.IS_DEFAULT_BOND_INDICATOR isDefaultBondIndicator,
+                        SPECIAL.INPUT_TYPE                inputType,
+                        PRODUCT.FINPROD_ABBR              finprodAbbr
+                 FROM FIN_PRODUCT_SPECIAL SPECIAL
+                          INNER JOIN FIN_PRODUCT PRODUCT ON SPECIAL.FINPROD_MARKET_ID = PRODUCT.FINPROD_MARKET_ID
+                 UNION
+                 SELECT SPECIAL.FINPROD_MARKET_ID         finprodMarketId,
+                        SPECIAL.IS_ABS                    isAbs,
+                        SPECIAL.IS_SPECIAL_DEBT           isSpecialDebt,
+                        SPECIAL.IS_DEFAULT_BOND_INDICATOR isDefaultBondIndicator,
+                        SPECIAL.INPUT_TYPE                inputType,
+                        INTERF.SECNAME                    finprodAbbr
+                 FROM FIN_PRODUCT_SPECIAL SPECIAL
+                          INNER JOIN INTERF_PAYHSRCSECINFO INTERF ON SPECIAL.FINPROD_MARKET_ID = INTERF.SECID
+                 WHERE INTERF.SECID NOT IN
+                       (SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND TRADE_MARKET = '01')
+             )
+        where FINPRODMARKETID = #{finprodMarketId}
+    </select>
+
+    <select id="querySelectOption"
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto"
+            parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest">
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        P.FINPROD_MARKET_ID id,
+        P.FINPROD_ABBR text,
+        type.type_10 type
+        FROM
+        FIN_PRODUCT P
+        LEFT JOIN
+        FIN_PRODUCT_TYPE type on p.FINPROD_ID = type.FINPROD_ID
+        WHERE
+        P.FINPROD_MARKET_ID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL WHERE FINPROD_MARKET_ID is NOT NULL)
+        AND P.FINPROD_TYPE2 = 'F01'
+        AND P.TRADE_MARKET = '01'
+        UNION
+        SELECT
+        SECID id,
+        SECNAME text,
+        null type
+        FROM
+        INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+        WHERE
+        PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND
+        TRADE_MARKET = '01' )
+        AND PAYHSRCSECINFO.MARKET = '01'
+        AND PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL WHERE FINPROD_MARKET_ID is NOT NULL)
+        )
+        <where>
+            <if test="search !=null and search !=''">
+                AND
+                (
+                id LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                OR
+                text LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="countFinprodIdInProduct" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1) qst
+        FROM
+            (
+                SELECT
+                    P.FINPROD_MARKET_ID id,
+                    P.FINPROD_ABBR text,
+                    type.type_10 type
+                FROM
+                    FIN_PRODUCT P
+                        LEFT JOIN
+                    FIN_PRODUCT_TYPE type on p.FINPROD_ID = type.FINPROD_ID
+                WHERE
+                 P.FINPROD_TYPE2 = 'F01'
+                  AND P.TRADE_MARKET = '01'
+                  AND ( P.FINPROD_MARKET_ID = #{search} or P.FINPROD_ABBR = #{search}
+                      )
+                UNION
+                SELECT
+                    SECID id,
+                    SECNAME text,
+                    null type
+                FROM
+                    INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+                WHERE
+                        PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND
+                        TRADE_MARKET = '01' )
+                  AND PAYHSRCSECINFO.MARKET = '01'
+                  AND (PAYHSRCSECINFO.SECID = #{search} or PAYHSRCSECINFO.SECNAME = #{search}
+                )
+            )
+    </select>
+
+    <select id="countFinprodIdForSpecial" resultType="java.lang.Integer">
+        SELECT COUNT(1) num FROM FIN_PRODUCT_SPECIAL where FINPROD_MARKET_ID = #{finprodMarketId}
+    </select>
+
+    <select id="countFinprodIdProcessingAndDate" resultType="java.lang.Integer">
+        select sum(qty) qty
+        from (
+                 select count(1) as qty
+                 from ETR_ENTRUST
+                 where FINPROD_ID = #{finprodId}
+                   AND ENTRUST_DATE = to_date(#{iPlatformDate}, 'yyyy-MM-dd')
+                 union all
+                 select count(1) as qty
+                 from WFL_ETR_ENTRUST
+                 where FINPROD_ID = #{finprodId}
+                   AND ENTRUST_DATE = to_date(#{iPlatformDate}, 'yyyy-MM-dd')
+             )
+    </select>
+
+
+    <select id="countFinprodIdProcessing" resultType="java.lang.Integer">
+        select sum(qty) qty
+        from (
+                 select count(1) as qty
+                 from ETR_ENTRUST
+                 where FINPROD_ID = #{finprodId}
+                 union all
+                 select count(1) as qty
+                 from WFL_ETR_ENTRUST
+                 where FINPROD_ID = #{finprodId}
+             )
+    </select>
+
+    <select id="querySampleInterf"
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto"
+            parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest">
+        SELECT SECID id, SECNAME text
+        from INTERF_PAYHSRCSECINFO
+        WHERE SECNAME = #{search}
+    </select>
+
+    <select id="querySampleFinProduct"
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto"
+            parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest">
+        SELECT FINPROD_MARKET_ID id, FINPROD_ABBR text
+        from FIN_PRODUCT
+        where FINPROD_ABBR = #{search}
+    </select>
+
+</mapper>

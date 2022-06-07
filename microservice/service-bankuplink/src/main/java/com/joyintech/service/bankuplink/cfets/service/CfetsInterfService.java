@@ -10,26 +10,7 @@
 
 package com.joyintech.service.bankuplink.cfets.service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.joyintech.background.component.uplink.interbank.business.dto.BondDialogueQuoteDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.BondRequestQuoteDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.GateWayReturnMsgDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.IbuQuoteBondDetDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.IbuQuoteBondDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.IbuQuoteCrepDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.IbuQuoteCrepPledgeDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.QuoteResultDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.RepoDialogueQuoteDto;
+import com.joyintech.background.component.uplink.interbank.business.dto.*;
 import com.joyintech.background.component.uplink.interbank.common.DictCodeList;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
@@ -39,21 +20,18 @@ import com.joyintech.service.bankuplink.cfets.constant.CfetsConstant;
 import com.joyintech.service.bankuplink.cfets.dao.CfetsInterfMapper;
 import com.joyintech.service.bankuplink.cfets.dto.CfetsInputSuppleDto;
 import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.dialogquotation.NoQuoteEntrieDto;
-import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.dialogquotation.NoRelatedSymDto;
-import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.dialogquotation.NoStipulationDto;
 import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.dialogquotation.QuoteBody;
 import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.dialogquotation.QuoteCancelBody;
 import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.dialogquotation.QuoteResponseBody;
+import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.dialogquotation.*;
 import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.requestquotation.NoRelatedSymReqCxlDto;
 import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.requestquotation.QuoteRequestBody;
 import com.joyintech.service.bankuplink.cfets.dto.cashtransaction.requestquotation.QuoteRequestCancelBody;
-import com.joyintech.service.bankuplink.cfets.dto.collateralisedrepo.dialogquotation.NoCrossCustodianDto;
-import com.joyintech.service.bankuplink.cfets.dto.collateralisedrepo.dialogquotation.NoPartyIDDto;
-import com.joyintech.service.bankuplink.cfets.dto.collateralisedrepo.dialogquotation.NoPartySubIDDto;
-import com.joyintech.service.bankuplink.cfets.dto.collateralisedrepo.dialogquotation.NoUnderlyingDto;
-import com.joyintech.service.bankuplink.cfets.dto.collateralisedrepo.dialogquotation.NoUnderlyingStipDto;
+import com.joyintech.service.bankuplink.cfets.dto.collateralisedrepo.dialogquotation.*;
 import com.joyintech.service.bankuplink.cfets.util.CfetsDataConvertUtil;
 import com.joyintech.service.bankuplink.cfets.util.CfetsInterUtil;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
 import com.joyintech.tams.common.base.entity.CfetsDatadictConvert;
@@ -61,6 +39,13 @@ import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.FinProductType;
 import com.joyintech.tams.common.base.entity.FinProductTypeKey;
 import com.joyintech.tools.collectors.JoyinCollectors;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
 
 /**
  * Cfets接口机连接Service
@@ -94,6 +79,9 @@ public class CfetsInterfService {
      */
     @Autowired
     private CfetsInterfMapper cfetsInterfMapper;
+
+    @Autowired
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
     /**
      * 调用接口发送Cfets接口机
@@ -130,6 +118,13 @@ public class CfetsInterfService {
                         if (StringUtil.isBlank(cfetsInputSuppleDto.getSymbol())) {
                             cfetsInputSuppleDto.setSymbol(finProduct.getFinprodName());
                         }
+                    }
+                    // 到期违约债只能传净价 不传应计利息
+                    List<FinProductSpecialDto> finProductSpecialDtos =
+                            joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Collections.singletonList(finProduct.getFinprodId()));
+                    if (CollectionUtils.isNotEmpty(finProductSpecialDtos)
+                            && StringUtil.equals(finProductSpecialDtos.get(0).getIsDefaultBondIndicator(), DictCodeList.是否_是.getValue())) {
+                        bondDialogueQuoteDto.getIbuQuoteBondDetDto().setUnitInt(null);
                     }
                 }
             }
@@ -293,7 +288,10 @@ public class CfetsInterfService {
         quoteBody.setQuoteTransType(this.convertSystemCodeToCfetsCode("quoteTransType",
             ibuQuoteBondDto.getTradeStatus()).charAt(0)); // 10272域-操作类型(N:新增,R:修改)
         quoteBody.setClOrdID(ibuQuoteBondDto.getQuoteId()); // 11域-客户参考编号
-        quoteBody.setOrigClOrdID(ibuQuoteBondDto.getQuoteId()); // 41域-原客户参考编号
+        if(StringUtil.equals(DictCodeList.银行间上行操作类型_本方修改发送,
+                bondDialogueQuoteDto.getIbuQuoteBondDto().getExeType())){
+            quoteBody.setOrigClOrdID(ibuQuoteBondDto.getQuoteId()); // 41域-原客户参考编号
+        }
         if (StringUtil.isNotBlank(ibuQuoteBondDto.getCfetsQuoteId())) {
             quoteBody.setQuoteID(ibuQuoteBondDto.getCfetsQuoteId()); // 117域-报价编号
         }

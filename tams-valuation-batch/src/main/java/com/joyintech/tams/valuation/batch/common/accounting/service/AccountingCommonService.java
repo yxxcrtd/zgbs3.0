@@ -2756,21 +2756,21 @@ public class AccountingCommonService {
         String mrTableId = "";//买入会计场景
         String mcTableId = "";//卖出会计场景
         //if(投资目的 = 数据字典.投资目的_公允价值变动计入当期损益){
-        if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim)) {
+        if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(invAim)) {
             // 变量.成本基础科目性质 = 基础科目性质数据字典.公允价值损益类_成本;
             baseSubjectNature = DictCodeBaseSubjectNatrue.公允价值损益类_成本.getValue();
             mrTableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_买入.getValue();
             mcTableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_卖出.getValue();
         }
         // if(投资目的 = 数据字典.投资目的.投资目的_摊余成本类){
-        else if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(invAim)) {
             //变量.成本基础科目性质 = 基础科目性质数据字典.摊余成本类成本;
             baseSubjectNature = DictCodeBaseSubjectNatrue.摊余成本类成本.getValue();
             mrTableId = DictCodeListTableId.会计场景代码_摊余成本类债券_买入.getValue();
             mcTableId = DictCodeListTableId.会计场景代码_摊余成本类债券_卖出.getValue();
         }
         //if(投资目的 = 数据字典.投资目的_综合收益类成本){
-        else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(invAim)) {
             //变量.成本基础科目性质 = 基础科目性质数据字典.公允价值损益类_成本;
             baseSubjectNature = DictCodeBaseSubjectNatrue.综合收益类成本.getValue();
             mrTableId = DictCodeListTableId.会计场景代码_综合收益类债券_买入.getValue();

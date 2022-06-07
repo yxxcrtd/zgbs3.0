@@ -3,10 +3,9 @@ package com.joyintech.tams.cfets.trdquery.dao;
 
 
 
-import com.joyintech.service.trade.bond.dto.TrdBondInvestTradeDto;
-import com.joyintech.tams.cfets.cfetsmanualsettle.dto.CfetsManualSettleInfoOtherListRespond;
-import com.joyintech.tams.cfets.cfetsmanualsettle.dto.CfetsManualSettleTradeListRespond;
-import com.joyintech.tams.cfets.cfetsmanualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond;
+import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse;
 import com.joyintech.tams.cfets.trdquery.dto.*;
 import com.joyintech.tams.common.base.entity.RegFinProductDealTotal;
 import org.apache.ibatis.annotations.Param;
@@ -43,6 +42,12 @@ public interface CfetsTrdQueryMapper {
      * @return
      */
     CfetsTrdQueryRegInfoListResponse selectRegFormDataByKey(Map<String, Object> pageParam);
+    /**
+     * 根据主键查询一级申购登记信息
+     * @param pageParam
+     * @return
+     */
+    CfetsTrdConfirmExecFirstBondInfoResponse selectBidFormDataByKey(Map<String, Object> pageParam);
 
     /**
      * 组合分配信息List
@@ -169,6 +174,13 @@ public interface CfetsTrdQueryMapper {
     int updateRegTotalByPrimaryKeySelective(RegFinProductDealTotal record);
 
     /**
+     * 根据主键更新一级申购登记数据
+     * @param bidId
+     * @return
+     */
+    int updateRegTotalByPrimaryKeySelective(@Param("bidId") String bidId);
+
+    /**
      * 根据更新报价数据
      * @param paramMap
      * @return
@@ -261,4 +273,28 @@ public interface CfetsTrdQueryMapper {
     List<CfetsPledgeInfoResponse> findRepoPledgeInfo(Map<String, Object> pageParam);
 
     List<String> findEtrEntrustIsForcedFinish(Map<String, Object> pageParam);
+
+    CfetsTrdBidInfoResponse findFxmrManualSettleInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findFxmrPortIntFenPeiInfoList(Map<String, Object> pageParam);
+
+    CfetsTrdBidInfoResponse findZztbManualSettleInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findZztbPortIntFenPeiInfoList(Map<String, Object> pageParam);
+
+    CfetsTrdBidInfoResponse findYjsgManualSettleInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findYjsgPortIntFenPeiInfoList(Map<String, Object> pageParam);
+
+    CfetsTrdQueryCstpInfoListResponse selectCstpBidFormDataByKey(Map<String, Object> pageParam);
+
+
+    CfetsTrdBidInfoResponse findYjtbBidTradeDetailInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findYjtbFenPeiInfoList(Map<String, Object> pageParam);
+
+    CfetsTrdBidInfoResponse findYjsgBidTradeDetailInfo(Map<String, Object> pageParam);
+
+    List<BidPortIntFenPeiInfoDto> findYjsgFenPeiInfoList(Map<String, Object> pageParam);
+
 }

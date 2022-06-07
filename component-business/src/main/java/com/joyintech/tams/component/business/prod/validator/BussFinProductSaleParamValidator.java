@@ -132,6 +132,16 @@ public class BussFinProductSaleParamValidator implements BeanValidator {
                             getMessage("BussFinProductSaleParam.repRaiseAmtPlan"))));
                 } 
             }
+
+            //单一投资者持有上限
+            if(null == bussFinProductSaleParamDto.getSingleInvestorholdingMax()){
+                resultList.add(new ValidMessage("singleInvestorholdingMax", "请输入单一投资者持有上限"));
+            }else{
+                if(bussFinProductSaleParamDto.getSingleInvestorholdingMax().compareTo(BigDecimal.ZERO)<0
+                        ||bussFinProductSaleParamDto.getSingleInvestorholdingMax().compareTo(BigDecimal.valueOf(100))>0){
+                    resultList.add(new ValidMessage("singleInvestorholdingMax", "请输入0-100间数值"));
+                }
+            }
 //            //净值型和货币型的限制
 //           if(StringUtil.equals(bussFinProductSaleParamDto.getPageId(), "FinNetValueProductBuild002")){
 //                //销售渠道

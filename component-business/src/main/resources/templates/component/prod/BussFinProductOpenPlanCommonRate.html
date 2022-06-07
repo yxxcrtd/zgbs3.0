@@ -278,11 +278,11 @@
 						   data-th-text="#{FinProductOpenRule.purSpeed}">申赎确认天数</label>
 					<div class="layui-input-inline input-inline text-number">
 						<span class="input-left-show">T+</span> <input type="text"
-																	   th:id="|${bussFinProductOpenPlanDto}_purSpeed|" th:name="|purSpeed|" min="0"
+																	   th:id="|${bussFinProductOpenPlanDto}_purSpeed|" th:name="${pageId} eq 'FinPlanNetAsset002' or ${pageId} eq 'FinPlanProfitAsset002' or ${pageId} eq 'FinPlanAssetC002'  ? |${bussFinProductOpenPlanDto}.purSpeed|  : |purSpeed|" min="0"
 																	   class="layui-input form-input form-input-left text-number"
 																	   data-textrange="0" placeholder="请输入内容" maxlength="2"
 																	   data-th-placeholder="#{SysCommon.placeholder}" required
-																	   data-th-value='${purSpeed?:1}'>
+																	   data-th-value="${pageId} eq 'FinPlanNetAsset002' or ${pageId} eq 'FinPlanProfitAsset002' or ${pageId} eq 'FinPlanAssetC002'  ? ${entity?.purSpeed?:1} : ${purSpeed?:1}">
 					</div>
 				</div>
 				<div class="form-inline-wrap" id="div1">
@@ -322,7 +322,7 @@
 				</div>
 			</div>
 
-			<div class="layui-form-item" th:if="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002' or ${pageId} eq 'FinOpenPlanMaintenance002'" th:id="|${bussFinProductOpenPlanDto}_tableDiv|">
+			<div class="layui-form-item" th:if="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinPlanNetAsset002' or ${pageId} eq 'FinPlanProfitAsset002' or ${pageId} eq 'FinPlanAssetC002' or ${pageId} eq 'FinNetValueProductBuild002' or ${pageId} eq 'FinOpenPlanMaintenance002'" th:id="|${bussFinProductOpenPlanDto}_tableDiv|">
 				<div style="padding-left: 10px;">
 					<a th:id="|${bussFinProductOpenPlanDto}_btn_preview|"
 					   class="layui-btn layui-btn-sm" data-icon="iconfont icon-search">生成计划</a>
@@ -587,11 +587,11 @@
 						   data-th-text="#{FinProductOpenRule.purSpeed}">确认天数</label>
 					<div class="layui-input-inline input-inline text-number">
 						<span class="input-left-show">T+</span> <input type="text"
-																	   th:id="|${bussFinProductOpenPlanRedDto}_redSpeed|" th:name="|redSpeed|" min="0"
+																	   th:id="|${bussFinProductOpenPlanRedDto}_redSpeed|" th:name="${pageId} eq 'FinPlanNetAsset002' or ${pageId} eq 'FinPlanProfitAsset002' or ${pageId} eq 'FinPlanAssetC002'  ? |${bussFinProductOpenPlanRedDto}.redSpeed|  : |redSpeed|" min="0"
 																	   class="layui-input form-input form-input-left text-number"
 																	   data-textrange="0" placeholder="请输入内容" maxlength="2"
 																	   data-th-placeholder="#{SysCommon.placeholder}" required
-																	   data-th-value='${redSpeed}?:1'>
+																	   data-th-value="${pageId} eq 'FinPlanNetAsset002' or ${pageId} eq 'FinPlanProfitAsset002' or ${pageId} eq 'FinPlanAssetC002'  ? ${redentity?.redSpeed?:1} : ${redSpeed?:1}">
 					</div>
 				</div>
 			</div>
@@ -612,7 +612,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="layui-form-item" th:if="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002' or ${pageId} eq 'FinOpenPlanMaintenance002'" th:id="|${bussFinProductOpenPlanRedDto}_tableDiv|">
+		<div class="layui-form-item" th:if="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002' or ${pageId} eq 'FinPlanNetAsset002' or ${pageId} eq 'FinPlanProfitAsset002' or ${pageId} eq 'FinPlanAssetC002' or ${pageId} eq 'FinOpenPlanMaintenance002'" th:id="|${bussFinProductOpenPlanRedDto}_tableDiv|">
 			<div style="padding-left: 10px;">
 				<a th:id="|${bussFinProductOpenPlanRedDto}_btn_preview|"
 				   class="layui-btn layui-btn-sm" data-icon="iconfont icon-search">生成计划</a>

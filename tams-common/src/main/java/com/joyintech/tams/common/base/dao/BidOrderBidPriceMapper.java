@@ -18,6 +18,8 @@ public interface BidOrderBidPriceMapper {
 
     BidOrderBidPrice selectByPrimaryKey(BidOrderBidPriceKey key);
 
+    List<BidOrderBidPrice> selectListByPrimaryKey(String bidId);
+
     int updateByPrimaryKeySelective(BidOrderBidPrice record);
 
     int updateByPrimaryKey(BidOrderBidPrice record);

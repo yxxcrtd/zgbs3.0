@@ -312,6 +312,10 @@
                     , 'bankLendingType': null
                     , 'portfolioId': finAssetIntInfos[i].portfolioId
                     ,'finprodId' : $('#finAssetInfo_finprodMarketId').val()
+                    // modify by etliu 20220521 start
+                    // 3.0.6场内 ZGCPCN-684:项目类资产到期提交，选择审批人后报错
+                    , 'invAim' : finAssetIntInfos[i].invAim
+                    // modify by etliu 20220521 end
                     , 'deal': {
                         finprodType2: F17,
                         ps: ps,

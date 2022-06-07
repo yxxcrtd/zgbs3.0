@@ -63,7 +63,7 @@ $(function() {
         var object = data;
         object.operateType = "edit";
         Joyin.ajaxJson(basePath + 'invest/basicdata/standardcouponreconversionrate/StandardCouponReConversionRate001/check', object, function(result) {
-            Joyin.dialog(JoyinUtil.getLabel("标准券再折算率新建|修改"),
+            Joyin.dialog(JoyinUtil.getLabel("标准券再折算率修改"),
                 basePath + "invest/basicdata/standardcouponreconversionrate/StandardCouponReConversionRate002/init",
                 "75%", "75%", {
                     pageModel: PAGE_MODEL_EDIT,
@@ -91,7 +91,7 @@ $(function() {
 
     // 新建
     function showDialog() {
-        Joyin.dialog(JoyinUtil.getLabel('标准券再折算率新建|修改'), '../StandardCouponReConversionRate002/init', '98%', '98%')
+        Joyin.dialog(JoyinUtil.getLabel('标准券再折算率新建'), '../StandardCouponReConversionRate002/init', '98%', '98%')
     }
 
 

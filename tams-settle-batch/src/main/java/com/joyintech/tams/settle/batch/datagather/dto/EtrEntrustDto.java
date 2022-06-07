@@ -93,17 +93,20 @@ public class EtrEntrustDto extends EtrEntrust {
     }
 
     public String getBusiKey(){
+        // modify by fuyongsheng 匹配指令忽略交易平台 start
         // GNS-922:质押券出入库不看交易平台 modify by fuyongsheng 20220219 start
-        if(DictCodeListExt3.交易方向_质押券入库.getValue().equals(getPs()) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(getPs())){
-            return StringUtil.joinString(Arrays.asList(getSecAcctId(),getDealCurAcct(),getFinprodId(), DateUtil.format(getEntrustDate()),getPs()),"_");
-        }
-        else if(DictCodeListExt3.交易方向_债转股.getValue().equals(getPs())){
-            return StringUtil.joinString(Arrays.asList(getSecAcctId(),getDealCurAcct(),getFinprodId(), DateUtil.format(getEntrustDate()),getPs()),"_");
-        }
-        else{
-            return StringUtil.joinString(Arrays.asList(getSecAcctId(),getDealCurAcct(),getFinprodId(), DateUtil.format(getEntrustDate()),getTradePlat(),getPs()),"_");
-        }
+//        if(DictCodeListExt3.交易方向_质押券入库.getValue().equals(getPs()) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(getPs())){
+//            return StringUtil.joinString(Arrays.asList(getSecAcctId(),getDealCurAcct(),getFinprodId(), DateUtil.format(getEntrustDate()),getPs()),"_");
+//        }
+//        else if(DictCodeListExt3.交易方向_债转股.getValue().equals(getPs())){
+//            return StringUtil.joinString(Arrays.asList(getSecAcctId(),getDealCurAcct(),getFinprodId(), DateUtil.format(getEntrustDate()),getPs()),"_");
+//        }
+//        else{
+//            return StringUtil.joinString(Arrays.asList(getSecAcctId(),getDealCurAcct(),getFinprodId(), DateUtil.format(getEntrustDate()),getTradePlat(),getPs()),"_");
+//        }
         // GNS-922:质押券出入库不看交易平台 modify by fuyongsheng 20220219 end
+        return StringUtil.joinString(Arrays.asList(getSecAcctId(),getDealCurAcct(),getFinprodId(), DateUtil.format(getEntrustDate()),getPs()),"_");
+        // modify by fuyongsheng 匹配指令忽略交易平台 end
     }
 
     public String getBusiKeyWithoutDate(){

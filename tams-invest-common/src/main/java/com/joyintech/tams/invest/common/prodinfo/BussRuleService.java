@@ -14,6 +14,10 @@ import com.joyintech.tams.common.base.entity.RskRulePoolConfig;
 import com.joyintech.tams.invest.common.prodinfo.dto.IPtlRule;
 
 import java.util.List;
+import com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig;
+import com.joyintech.tams.invest.common.riskinfrds.info.entity.IProdInfo;
+
+import java.util.function.Supplier;
 
 /**
  * 规则信息
@@ -27,17 +31,24 @@ public interface BussRuleService<V extends IPtlRule>{
 
     /**
      * 匹配规则的组合
-     * @param ruleList
+     * @param rule
      * @return
      */
-    List<String> matchRulePort(V ruleList);
+    List<String> matchRulePort(V rule);
 
     /**
      * 匹配规则的组合
      * @param ruleList
      * @return
      */
-   <T extends RskRulePoolConfig> List<String> matchRulePortForPage(List<T> ruleList);
+   <T extends IRskRulePoolConfig> List<String> matchRulePortForPage(List<T> ruleList);
+
+    /**
+     * 匹配组合的规则
+     * @param portEntity
+     * @return
+     */
+    <T extends IProdInfo> void matchRulePortByPort(T portEntity);
 
     /**
      * 查询规则关联指标
@@ -47,6 +58,13 @@ public interface BussRuleService<V extends IPtlRule>{
     List<String> queryRuleRelInd(V ruleList);
 
     /**
+     * 查询规则关联组合
+     * @param ruleList
+     * @return
+     */
+    List<String> queryRuleRelPort(V ruleList);
+
+    /**
      * 组合关联指标
      * @param portList
      * @param indIdList
@@ -54,4 +72,12 @@ public interface BussRuleService<V extends IPtlRule>{
      */
    void relatePortIndicator(List<String> portList, List<String> indIdList);
 
+    /**
+     * 规则匹配组合入库
+     * @param portList 组合
+     * @param ruleList 规则ID
+     * @param supplier 判断是否从组合维度出发匹配，若是则带组合条件去删除
+     * @return
+     */
+    void insertRulePortList(List<String> portList, List<String> ruleList, Supplier<List<String>> supplier);
 }

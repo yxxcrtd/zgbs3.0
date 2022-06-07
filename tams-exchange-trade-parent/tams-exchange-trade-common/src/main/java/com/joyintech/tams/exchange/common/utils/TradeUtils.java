@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.common.utils;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
@@ -15,7 +16,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class TradeUtils {
-    
+
     private TradeUtils() {
         throw new IllegalStateException("Utility class");
     }
@@ -27,6 +28,10 @@ public class TradeUtils {
 
     public static BigDecimal getBigDecimal(Double d, int scale) {
         return BigDecimal.valueOf(d).setScale(scale, RoundingMode.HALF_UP);
+    }
+
+    public static BigDecimal getBigDecimal(Double d, int scale, RoundingMode roundingMode) {
+        return BigDecimal.valueOf(d).setScale(scale, roundingMode);
     }
 
     public static double formatDouble(Double d, int scale) {
@@ -118,8 +123,19 @@ public class TradeUtils {
         return false;
     }
 
+    public static boolean lessThanOrEquals(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) <= 0;
+        }
+        return false;
+    }
+
     public static boolean lessThanZero(BigDecimal value) {
         return lessThan(value, BigDecimal.ZERO);
+    }
+
+    public static boolean lessThanOrEqualsZero(BigDecimal value) {
+        return lessThanOrEquals(value, BigDecimal.ZERO);
     }
 
     public static BigDecimal subtractMod(BigDecimal value, BigDecimal dividend) {
@@ -180,12 +196,41 @@ public class TradeUtils {
         return calculateBalance(null, entrustPrice, entrustVolume, assetType, null, null);
     }
 
+    public static BigDecimal calculateBalance(BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface) {
+        return calculateBalance(null, entrustPrice, entrustVolume, assetType, orderInterface, null);
+    }
+
+    public static BigDecimal calculateBalance(BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface, FuturesInstrument futuresInstrument) {
+        return calculateBalance(null, entrustPrice, entrustVolume, assetType, orderInterface, futuresInstrument);
+    }
+
+    public static BigDecimal calculateBalance(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface) {
+        return calculateBalance(entrustBs, entrustPrice, entrustVolume, assetType, orderInterface, null);
+        /*//协议回购金额计算
+        if (Objects.nonNull(orderInterface) && IntegratedEntrustUtils.isProtocolBack(orderInterface.getEntrustProp())) {
+            return ((IntegratedEntrust) orderInterface).getEntrustBalance();
+        }
+        // 债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
+        // 债券且是交易类
+        if (InvestmentAssetType.BOND.value.equals(assetType)
+                && Objects.nonNull(orderInterface)
+                && EntrustProp.isTrade(orderInterface.getEntrustProp())) {
+            return multiply(orderInterface.getFullPrice(), entrustVolume, 2);
+        }
+        // 质押式竞价回购，金额计算
+        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
+            return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
+        }
+        // TODO ETF计算
+        return multiply(entrustPrice, entrustVolume, 2);*/
+    }
+
     public static BigDecimal calculateBalance(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface, FuturesInstrument futuresInstrument) {
         //协议回购金额计算
         if (Objects.nonNull(orderInterface) && IntegratedEntrustUtils.isProtocolBack(orderInterface.getEntrustProp())) {
             return ((IntegratedEntrust) orderInterface).getEntrustBalance();
         }
-        //债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
+        // 债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
         // 债券且是交易类
         if (InvestmentAssetType.BOND.value.equals(assetType)
                 && Objects.nonNull(orderInterface)
@@ -204,26 +249,6 @@ public class TradeUtils {
         return multiply(entrustPrice, entrustVolume, 2);
     }
 
-    public static BigDecimal calculateBalance(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface) {
-        //协议回购金额计算
-        if (Objects.nonNull(orderInterface) && IntegratedEntrustUtils.isProtocolBack(orderInterface.getEntrustProp())) {
-            return ((IntegratedEntrust) orderInterface).getEntrustBalance();
-        }
-        // 债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
-        // 债券且是交易类
-        if (InvestmentAssetType.BOND.value.equals(assetType)
-                && Objects.nonNull(orderInterface)
-                && EntrustProp.isTrade(orderInterface.getEntrustProp())) {
-            return multiply(orderInterface.getFullPrice(), entrustVolume, 2);
-        }
-        // 质押式竞价回购，金额计算
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
-            return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
-        }
-        // TODO ETF计算
-        return multiply(entrustPrice, entrustVolume, 2);
-    }
-
     //投管风控获取全价总额以及净价总额
     public static BigDecimal calculateBalanceForRisk(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType) {
         // 质押式竞价回购，金额计算
@@ -233,10 +258,23 @@ public class TradeUtils {
         return multiply(entrustPrice, entrustVolume, 2);
     }
 
+    public static BigDecimal calculateBalanceForRisk(BigDecimal fullPrice, BigDecimal entrustPrice, long entrustVolume, String assetType, String ps) {
+        // 质押式竞价回购，金额计算
+        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
+            return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
+        }
+        if (InvestmentAssetType.BOND.value.equals(assetType)
+                && EnumUtil.in(ps, InstructionPs.BUY, InstructionPs.SELL)) {
+            return multiply(fullPrice, entrustVolume, 2);
+        }
+
+        return multiply(entrustPrice, entrustVolume, 2);
+    }
+
     /**
      * 转为百分比格式
      */
-    public static String percentFormat(Double d) {
+    public static String percentFormat(BigDecimal d) {
         NumberFormat percent = NumberFormat.getPercentInstance();
         percent.setMaximumFractionDigits(2);
         return percent.format(d);

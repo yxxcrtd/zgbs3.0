@@ -28,7 +28,7 @@
 											<input type="text" th:id="|${pageId}_indName|"
 												name="rskSupervisionIndicatorDto.indName"
 												class="layui-input form-input" placeholder="请输入内容"
-												data-th-placeholder="#{SysCommon.placeholder}" maxlength="60"
+												data-th-placeholder="#{SysCommon.placeholder}" maxlength="200"
 												data-th-value='${entity?.rskSupervisionIndicatorDto?.indName}' required>
 										</div>
 									</div>
@@ -64,14 +64,14 @@
 									<div class="form-inline-wrap" style="width: 65%">
 										<label class="layui-form-label form-label-wrap"
 											   data-th-text="#{RskSupervisionIndicator002.supDoc}"
-											   style="width: 14% !important">监管文件说明</label>
+											   style="width: 14% !important" title="监管文件说明">监管文件说明</label>
 										<div class="layui-input-inline input-inline"
 											 style="width: 75% !important">
 											<input type="text" th:id="|${pageId}_supDoc|"
 												   name="rskSupervisionIndicatorDto.supDoc"
 												   class="layui-input form-input" placeholder="请输入内容"
 												   data-th-placeholder="#{SysCommon.placeholder}"
-												   data-th-value='${entity?.rskSupervisionIndicatorDto?.supDoc}' maxlength="200">
+												   data-th-value='${entity?.rskSupervisionIndicatorDto?.supDoc}' maxlength="300">
 										</div>
 									</div>
 								</div>
@@ -103,7 +103,7 @@
 									<div class="form-inline-wrap" style="width: 25%;">
 										<label class="layui-form-label form-label-wrap"
 										data-th-text="#{RskSupervisionIndicator002.adjust}"
-											style="width: 26% !important">调整时间</label>
+											style="width: 26% !important"  title="调整时间">调整时间</label>
 										<div class="layui-input-inline input-inline" 
 										style="width: 40.1% !important">
 											<input type="text" th:id="|${pageId}_adjust|" 

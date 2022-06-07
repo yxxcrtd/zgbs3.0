@@ -109,33 +109,33 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 				errorList.add(new ValidMessage("acctNo", this.getMessage("ETR_ERROR_0020")));
 			}
 			// GZYHTZJY-111:放开投资目的的校验逻辑 fuyongshneg 20211030 edit start
-			if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
+//			if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
 				if(!StringUtil.isNotEmpty(dto.getBusinessModel())
 				         &&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
 					errorList.add(new ValidMessage("businessModel", "请输入业务模式"));
 				}
-			}else{
-				if(!StringUtil.isNotEmpty(dto.getInvAim())
-						&& dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())
-						&& !StringUtil.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), dto.getPs())
-						&& !StringUtil.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), dto.getPs())){
-					errorList.add(new ValidMessage("invAim", this.getMessage("ETR_ERROR_0060")));
-				} else {
-					if(StringUtil.isNotEmpty(dto.getInvAim())
-							&& StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())
-							&& !StringUtil.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), dto.getPs())
-							&& !StringUtil.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), dto.getPs())) {
-						Map<String, Object> param = new HashMap<>();
-						param.put("portfolioId",dto.getPortfolioId());
-						param.put("secAcctId",dto.getSecAcctId());
-						param.put("finprodId",dto.getFinprodId());
-						String historyInvAim = etrExchangeTrade001Service.linkInvAim(param);
-						if(StringUtil.isNotEmpty(historyInvAim) && !StringUtil.equals(historyInvAim,dto.getInvAim())) {
-							errorList.add(new ValidMessage("invAim", "已存在交易，投资目的只能为"+SysDataUtil.getNameFromDataDict(DictCode.投资目的, historyInvAim)));
-						}
-					}
-				}
-			}
+//			}else{
+//				if(!StringUtil.isNotEmpty(dto.getInvAim())
+//						&& dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+//						&& !StringUtil.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), dto.getPs())
+//						&& !StringUtil.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), dto.getPs())){
+//					errorList.add(new ValidMessage("invAim", this.getMessage("ETR_ERROR_0060")));
+//				} else {
+//					if(StringUtil.isNotEmpty(dto.getInvAim())
+//							&& StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+//							&& !StringUtil.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), dto.getPs())
+//							&& !StringUtil.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), dto.getPs())) {
+//						Map<String, Object> param = new HashMap<>();
+//						param.put("portfolioId",dto.getPortfolioId());
+//						param.put("secAcctId",dto.getSecAcctId());
+//						param.put("finprodId",dto.getFinprodId());
+//						String historyInvAim = etrExchangeTrade001Service.linkInvAim(param);
+//						if(StringUtil.isNotEmpty(historyInvAim) && !StringUtil.equals(historyInvAim,dto.getInvAim())) {
+//							errorList.add(new ValidMessage("invAim", "已存在交易，投资目的只能为"+SysDataUtil.getNameFromDataDict(DictCode.投资目的, historyInvAim)));
+//						}
+//					}
+//				}
+//			}
 			// GZYHTZJY-111:放开投资目的的校验逻辑 fuyongshneg 20211030 edit end
 			if (!StringUtil.isNotEmpty(dto.getStockId())&&!StringUtil.isNotEmpty(dto.getFinprodId())) {
 				errorList.add(new ValidMessage("stockId", this.getMessage("ETR_ERROR_0016")));

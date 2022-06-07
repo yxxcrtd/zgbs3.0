@@ -94,8 +94,8 @@ public class Instrument implements Serializable, KeyMethodInterface<String>, Ins
     @Digits(integer = 8, fraction = 0)
     private Integer marketLowVolume = 0;//市价单最小可交易数量
 
-    @Digits(integer = 8, fraction = 0)
-    private Integer marketHighVolume = 0;//市价单最大可交易数量
+    @Digits(integer = 16, fraction = 0)
+    private Long marketHighVolume = 0L;//市价单最大可交易数量
 
     private Date updateTime;
 
@@ -320,11 +320,11 @@ public class Instrument implements Serializable, KeyMethodInterface<String>, Ins
         this.marketLowVolume = marketLowVolume;
     }
 
-    public Integer getMarketHighVolume() {
+    public Long getMarketHighVolume() {
         return marketHighVolume;
     }
 
-    public void setMarketHighVolume(Integer marketHighVolume) {
+    public void setMarketHighVolume(Long marketHighVolume) {
         this.marketHighVolume = marketHighVolume;
     }
 

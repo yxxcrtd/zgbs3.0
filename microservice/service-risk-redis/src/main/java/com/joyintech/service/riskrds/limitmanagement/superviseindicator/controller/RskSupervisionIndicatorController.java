@@ -92,12 +92,12 @@ public class RskSupervisionIndicatorController {
 	 * @return
 	 */
 	@GetMapping("/getAllPortfolioByProfit")
-	public List<TreeNode<RskSupervisionIndicatorDto>> getAllPortfolioByProfit(String indId,String portfName,String profitType,String issueMode,String raiseTypeCond,String investTypeCond) {
-	    return rskSupervisionIndicatorService.getAllPortfolioByProfit(indId,portfName,profitType,issueMode,raiseTypeCond,investTypeCond);
+	public List<TreeNode<RskSupervisionIndicatorDto>> getAllPortfolioByProfit(String indId,String portfName,String profitType,String issueMode,String raiseTypeCond,String investTypeCond,String isFaceSingleInvestor) {
+	    return rskSupervisionIndicatorService.getAllPortfolioByProfit(indId,portfName,profitType,issueMode,raiseTypeCond,investTypeCond,isFaceSingleInvestor);
 	}
 	@GetMapping("/getAllPortfolioByOther")
-	public List<TreeNode<RskSupervisionIndicatorDto>> getAllPortfolioByOther(String fields,String indId,String portfName,String profitType,String issueMode,String raiseTypeCond,String investTypeCond) {
-	    return rskSupervisionIndicatorService.getAllPortfolioByOther(fields,indId,portfName,profitType,issueMode,raiseTypeCond,investTypeCond);
+	public List<TreeNode<RskSupervisionIndicatorDto>> getAllPortfolioByOther(String fields,String indId,String portfName,String profitType,String issueMode,String raiseTypeCond,String investTypeCond,String isFaceSingleInvestor) {
+	    return rskSupervisionIndicatorService.getAllPortfolioByOther(fields,indId,portfName,profitType,issueMode,raiseTypeCond,investTypeCond,isFaceSingleInvestor);
 	}
 	
 	/**
@@ -159,6 +159,15 @@ public class RskSupervisionIndicatorController {
     @PostMapping("querySuperIndicatorInfoByIndId")
 	public RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId(@RequestBody Map<String, Object> map) {
 		return rskSupervisionIndicatorService.querySuperIndicatorInfoByIndId(map);
+	}
+	/**
+	 * 监督指标信息获取
+	 * @param indId 指标代码
+	 * @return PrdValParam
+	 */
+	@PostMapping("querySuperIndicatorInfoByIndId_RULE")
+	public RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId_RULE(@RequestBody Map<String, Object> map) {
+		return rskSupervisionIndicatorService.querySuperIndicatorInfoByIndId_RULE(map);
 	}
     /**
 	 * 查询组合关联指标

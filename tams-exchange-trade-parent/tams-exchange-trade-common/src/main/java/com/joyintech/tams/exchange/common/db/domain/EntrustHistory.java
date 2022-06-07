@@ -123,6 +123,10 @@ public class EntrustHistory implements Serializable {
     private BigDecimal conNum;
     private String entrustClass;
 
+    private String targetType;
+    private String isNoGuard;
+    private String isFullPrice;
+
     @Id
     public String getId() {
         return id;
@@ -602,5 +606,29 @@ public class EntrustHistory implements Serializable {
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsFullPrice() {
+        return isFullPrice;
+    }
+
+    public void setIsFullPrice(String isFullPrice) {
+        this.isFullPrice = isFullPrice;
     }
 }

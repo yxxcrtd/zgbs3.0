@@ -1001,11 +1001,15 @@
         WHERE B_TRADE_ID = #{tradeIdL} and TRADE_STATUS = #{JYZT_CS} and IS_CANCEL != #{SF_S}
     </select>
     <select id="queryRTradeId" resultType="java.lang.String">
+        /**原查询条件用的or不走索引,查询奇慢，现改为union all**/
         SELECT NVL(TOTLE_TRADE_ID, R_TRADE_ID) FROM TRD_PRODUCT_DEAL
-        WHERE (R_TRADE_ID IS NOT NULL AND TRADE_ID = #{tradeId})
-        OR (TRADE_ID IN (
+        WHERE R_TRADE_ID IS NOT NULL AND TRADE_ID = #{tradeId}
+        union all
+        SELECT NVL(TOTLE_TRADE_ID, R_TRADE_ID) FROM TRD_PRODUCT_DEAL
+        where
+        TRADE_ID IN (
             SELECT RTRIM(R_TRADE_ID, 'R') FROM TRD_PRODUCT_DEAL WHERE TOTLE_TRADE_ID = #{tradeId} AND R_TRADE_ID IS NOT NULL
-        ))
+        )
     </select>
 
     <select id="selectEntrustInfo" resultMap="com.joyintech.tams.common.base.dao.EtrEntrustMapper.BaseResultMap">
@@ -1286,7 +1290,11 @@
         select
             F_TRADE_ID
         from TRD_PRODUCT_TEMP_DEAL
-        WHERE TRADE_ID =#{tradeId}
+        WHERE
+            (TRADE_ID =#{tradeId} or totle_trade_id =#{tradeId})
+            <!--ZGCPCN-1074:多组合会取到两条相同数据,取第一条 modify by fuyongsheng 20220601 start-->
+            AND ROWNUM = 1
+            <!--ZGCPCN-1074:多组合会取到两条相同数据,取第一条 modify by fuyongsheng 20220601 end-->
     </select>
 
     <select id="selectOrderInfo" resultType="com.joyintech.tams.invest.common.trade.dto.OrderInfoDto">
@@ -1356,5 +1364,66 @@
                 AND FSCRINNER.VDATE &lt;= #{vdate, jdbcType=DATE}
                 AND FSCRINNER.VDATE > FSCR.VDATE
             )
+    </select>
+
+    <select id="getUnFinishMatchSettleTransDataNum" parameterType="map" resultType="java.lang.Integer">
+        select
+            COUNT(1)
+        from
+            SETTLE_TRANS_DATA_TOTAL stdt
+        left join SETTLE_TRANS_DATA_TOTAL_STATUS stdts
+            on stdt.SEQ_ID = stdts.SEQ_NO
+        where
+            stdt.DEAL_DATE = #{executeDate, jdbcType=DATE}
+            AND (stdts.MATCH_STATUS IS NULL OR stdts.MATCH_STATUS != #{TRD_MATCH_STATUS_2})
+            <!--协议回购逆回购到期购回没有指令，不需要成交匹配-->
+            AND NOT EXISTS(
+                select
+                   1
+                from SETTLE_TRANS_DATA_TOTAL A2
+                INNER JOIN SETTLE_TRANS_DATA_TOTAL_ADD B2
+                    ON A2.SEQ_ID = B2.TRADE_ID
+                WHERE A2.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F03})
+                    AND B2.REPO_TYPE = #{TARGET_BACK_TYPE_H01}
+                    AND A2.PS IN (#{PS_T07})
+                    AND A2.DEAL_DATE = #{executeDate, jdbcType=DATE}
+                    AND stdt.SEQ_ID = A2.SEQ_ID
+            )
+    </select>
+
+    <select id="selectSqSettleTransDatas" resultType="com.joyintech.tams.common.base.entity.SettleTransData">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.SettleTransDataMapper.Base_Column_List" />
+        FROM
+        SETTLE_TRANS_DATA
+        WHERE
+        CJBH = #{sqcjbh, jdbcType=VARCHAR}
+        <if test="seatNumber != null and seatNumber != ''">
+            AND SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
+        </if>
+        <if test="secAcctId != null and secAcctId != ''">
+            AND SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+        </if>
+        <if test="vdate != null">
+            AND VDATE = #{vdate, jdbcType=DATE}
+        </if>
+    </select>
+
+    <select id="getFirstRepoTrade" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+        SELECT A.* FROM TRD_PRODUCT_DEAL A
+            INNER JOIN TRD_PRODUCT_DEAL_ADD B
+            ON A.TRADE_ID  = B.TRADE_ID
+        WHERE A.F_TRADE_ID = #{fCjbh}
+          AND A.IS_CANCEL = 'N'
+          AND A.TRADE_STATUS = '01'
+    </select>
+
+    <select id="getInfContractPortfolioDetails" resultType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
+        select
+        <include refid="com.joyintech.tams.common.base.dao.InfContractPortfolioDetailMapper.Base_Column_List" />
+        from
+        INF_CONTRACT_PORTFOLIO_DETAIL
+        where
+        SEQNO = #{seqNo,jdbcType=VARCHAR}
     </select>
 </mapper>

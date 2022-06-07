@@ -34,6 +34,11 @@ public class RiskNamListCommonDto extends FinProduct {
      */
     private String listType;
 
+    /**
+     * 关联名单名称
+     */
+    private String listName;
+
     public String getListId() {
         return listId;
     }
@@ -80,5 +85,13 @@ public class RiskNamListCommonDto extends FinProduct {
 
     public void setListType(String listType) {
         this.listType = listType;
+    }
+
+    public String getListName() {
+        return listName;
+    }
+
+    public void setListName(String listName) {
+        this.listName = listName;
     }
 }

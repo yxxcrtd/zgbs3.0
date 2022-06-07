@@ -18,6 +18,8 @@ import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
@@ -57,6 +59,9 @@ public class EtrPlanAssetC001Controller extends BaseController {
      */
     @Autowired
     private EtrPlanAssetCService etrPlanAssetCService;
+
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
     /**
      * {@inheritDoc}
      */
@@ -152,6 +157,8 @@ public class EtrPlanAssetC001Controller extends BaseController {
         if(dtolist != null && dtolist.size()>0){
             for(EtrPlanAssetCDto entity : dtolist){
                 etrPlanAssetCService.recallDelegate(entity);
+                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
+                entity.setCounterId(etrEntrust.getCounterId());
             }
             // add by yushilong 批量撤销预占 start
             EntrustRdsCommonAop.doListPreOccupy(dtolist, DictCodeList.平安资产类型_计划类资产_货币型.getValue(),

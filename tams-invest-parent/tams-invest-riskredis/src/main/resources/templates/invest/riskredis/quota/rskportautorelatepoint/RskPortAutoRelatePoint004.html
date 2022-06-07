@@ -14,8 +14,9 @@
         <div data-th-each="node,nodeStat : ${list}" class="mixtree-node" data-th-ruleid="${node.id}" data-th-rulename="${node.name}">
             <div data-th-text="|${node.name}|" class="node_div"></div>
             <div class="operate_div">
-                <a class="btn-trans node_modify" data-th-ruleid="${node.id}" data-th-rulename="${node.name}" style="color: #006dd9;"><i class="iconfont icon-edit"></i><span>&nbsp;</span></a>
-                <a class="btn-trans node_delete" data-th-ruleid="${node.id}" data-th-rulename="${node.name}" style="color: red;"><i class="iconfont icon-delete"></i><span>&nbsp;</span></a>
+                <a class="btn-trans node_modify" data-th-ruleid="${node.id}" data-th-rulename="${node.name}" style="color: #006dd9;cursor: pointer;"><i class="iconfont icon-edit"></i><span>&nbsp;</span></a>
+                <a class="btn-trans node_delete" data-th-ruleid="${node.id}" data-th-rulename="${node.name}" style="color: red;cursor: pointer;"><i class="iconfont icon-delete"></i><span>&nbsp;</span></a>
+                <a class="btn-trans node_search" data-th-ruleid="${node.id}" data-th-rulename="${node.name}" style="color: #fff;cursor: pointer;"><em class="iconfont icon-search"></em><span>&nbsp;</span></a>
             </div>
         </div>
     </div>

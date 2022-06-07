@@ -34,6 +34,10 @@ public class ResultBean {
         this.data = data;
     }
 
+    public void setErrorCode(ErrorCode errorCode) {
+        this.errorCode = errorCode.value();
+        this.errorMsg = errorCode.msg();
+    }
 
     public void setErrorCode(int errorCode) {
         this.errorCode = errorCode;
@@ -117,5 +121,13 @@ public class ResultBean {
 
     public static ResultBean error(int errorCode, String errorMsg, Object data) {
         return new ResultBean(errorCode, errorMsg, data);
+    }
+
+    public boolean isSuccess() {
+        return ErrorCode.isSuccess(this.getErrorCode());
+    }
+
+    public boolean isFail() {
+        return !isSuccess();
     }
 }

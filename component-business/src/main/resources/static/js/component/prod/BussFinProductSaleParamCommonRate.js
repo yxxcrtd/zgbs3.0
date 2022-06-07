@@ -71,6 +71,30 @@
 			}
 		}
 	};
+    //控件加载完成后
+    window.componentLoadCallback = function(isDone, pagePath, params){
+        if(isDone){debugger
+            initisFaceSingleInvestorDiv();
+        }
+    }
+
+    var initisFaceSingleInvestorDiv = function (){
+        if(pageId == 'FinNetValueProductBuild002'){
+            $('#holdingMaxDiv').show();
+            if($('#bussFinProductSaleParamDto_issueType').val()=='2'){
+                $('#isFaceSingleInvestorDiv').show();//私募展示是否面向单一投资者字段
+                if($('#bussFinProductSaleParamDto_isFaceSingleInvestor').val() == null || $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val() == ''){
+                    $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('N').trigger('change');
+                }
+            }else{
+                $('#isFaceSingleInvestorDiv').hide();//公募隐藏是否面向单一投资者字段
+                $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('').trigger('change');
+            }
+        }else{
+            $('#holdingMaxDiv').hide();
+            $('#isFaceSingleInvestorDiv').hide();
+        }
+    };
 	
     $(function() {
     	dealModeChange();
@@ -83,5 +107,25 @@
     	/*$('#bussFinProductSaleParamDto_firstSaleVdate').change(function(){
 			FinProductCommon.firstSaleVdateChange();
 		});*/
+        $('#bussFinProductSaleParamDto_issueType').change(function(){
+            if($('#bussFinProductSaleParamDto_issueType').val()=='1'){
+                $('#isFaceSingleInvestorDiv').hide();//公募隐藏是否面向单一投资者字段
+                $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('').trigger('change');
+            }else{
+                $('#isFaceSingleInvestorDiv').show();//私募展示是否面向单一投资者字段
+                if($('#bussFinProductSaleParamDto_isFaceSingleInvestor').val() == null || $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val() == ''){
+                    $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('N').trigger('change');
+                }
+            }
+
+        });
+        $('#bussFinProductSaleParamDto_singleInvestorholdingMax').change(function (){
+            if($('#bussFinProductSaleParamDto_singleInvestorholdingMax').val()){
+                var maxArr = $('#bussFinProductSaleParamDto_singleInvestorholdingMax').val().split('.');
+                if(maxArr.length>1&&maxArr[1].length>2){
+                    $('#bussFinProductSaleParamDto_singleInvestorholdingMax').val(maxArr[0]+'.'+maxArr[1].substring(0,2)).trigger('change');
+                }
+            }
+        })
     });
 }());

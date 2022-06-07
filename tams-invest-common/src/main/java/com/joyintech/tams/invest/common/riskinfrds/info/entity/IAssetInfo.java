@@ -188,10 +188,52 @@ public interface IAssetInfo extends IBusiness {
     String getType9();
 
     /**
+     * 取得 行内二级类型
+     * @return 行内二级类型
+     */
+    String getType10();
+
+    /**
      * 取得 行内三级类型
      * @return 行内三级类型
      */
-    String getType10();
+    String getType11();
+
+    /**
+     * 取得 行内业务类型
+     * @return 行内业务类型
+     */
+    String getType12();
+
+    /**
+     * 取得 股票类型
+     * @return 股票类型
+     */
+    String getStockShareType();
+
+    /**
+     * 取得 股票交易状态(行情)
+     * @return 股票交易状态(行情)
+     */
+    String getStockTradeStatus();
+
+    /**
+     * 取得 计划类资产最新赎回日
+     * @return 计划类资产最新赎回日
+     */
+    Date getAstLastRedempDate();
+
+    /**
+     * 取得 资产最新还本日
+     * @return 计划类资产最新还本日
+     */
+    Date getAstLastRebackDate();
+
+    /**
+     * 取得 资产最新付息日
+     * @return 资产最新付息日
+     */
+    Date getAstLastPayDate();
 
     /**
      * 取得 名单级别
@@ -250,6 +292,42 @@ public interface IAssetInfo extends IBusiness {
      * @return 是否流动性受限.
      */
     String getIsFlowLimited();
+    /**
+     * 获取 是否无活跃交易市场
+     *
+     * @return 是否无活跃交易市场.
+     */
+    String getIsLiquidity1();
+    /**
+     * 获取 是否不具备活跃交易市场
+     *
+     * @return 是否不具备活跃交易市场
+     */
+    String getIsLiquidity2();
+    /**
+     * 获取 是否7个工作日可变现资产
+     *
+     * @return 是否7个工作日可变现资产
+     */
+    String getIsLiquidity3();
+
+    /**
+     * 标的是否7日可变现
+     * @return
+     */
+    String getIsSevenDayCashable();
+
+    /**
+     * 是否每日开放申赎
+     * @return
+     */
+    String getIsOpenEveryDay();
+
+    /**
+     * 是否不良资产
+     * @return
+     */
+    String getIsBadAsset();
     // add by zhangrui1 增加资产属性:是否流动性受限资产 end
     // add by zhangrui1 增加资产属性:机构主体类型 start
     /**
@@ -261,8 +339,14 @@ public interface IAssetInfo extends IBusiness {
     // add by zhangrui1 增加资产属性:机构主体类型 end
 
     /**
-     * 取得 行内三级类型
-     * @return 行内三级类型
+     * 取得 债券风险五级分类
+     * @return 债券风险五级分类
      */
-    String getType11();
+    String getBondRiskType();
+
+    /**
+     * 债券是否存在应收款
+     * @return
+     */
+    public String getIsExistRecAst();
 }

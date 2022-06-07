@@ -18,6 +18,7 @@ import com.joyintech.tams.exchange.common.request.PageMode;
 import com.joyintech.tams.exchange.common.request.PageTradeInfoRequest;
 import com.joyintech.tams.exchange.common.request.TradeInfoRequest;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.common.vo.TradeVo;
 import com.joyintech.tams.exchange.datacommon.db.service.TradeHistoryService;
 import com.joyintech.tams.exchange.datacommon.db.service.TradeService;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
@@ -26,11 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.math.RoundingMode;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
 
 @Component
 public class TradeManagement {
@@ -141,22 +142,27 @@ public class TradeManagement {
                 .collect(Collectors.toList());
         // modify by swwan ZGTFCP-606 只要是交易员下单操作过的都应该能查到 end
         setFutureStockCode(list);
-        List<Trade> trades = fillTradePrice(list);
+        List<TradeVo> trades = fillTradeInfo(list);
         return ResultBean.success(trades);
     }
 
-    private List<Trade> fillTradePrice(List<Trade> tradeList) {
-        List<Trade> entrusts = Lists.newArrayListWithCapacity(tradeList.size());
+    private List<TradeVo> fillTradeInfo(List<Trade> tradeList) {
+        List<TradeVo> tradeVos = Lists.newArrayListWithCapacity(tradeList.size());
         tradeList.forEach(o -> {
-            Trade trade = new Trade();
+            TradeVo trade = new TradeVo();
             BeanUtils.copyProperties(o, trade);
-            if ("EX005".equals(trade.getBusiTypeTg())) {
-                trade.setBondVolume(trade.getTradedPrice().multiply(BigDecimal.valueOf(trade.getTradedVolume())).longValue());
+            if (投管业务类型_质押券出入库.getValue().equals(trade.getBusiTypeTg())) {
+                trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                trade.setBondVolume(trade.getTradedPrice().multiply(BigDecimal.valueOf(trade.getTradedVolume())).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
                 trade.setTradedPrice(trade.getTradedPrice().multiply(BigDecimal.valueOf(100)));
+            } else if (投管业务类型_现券交易.getValue().equals(trade.getBusiTypeTg())) {
+                trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+            } else if (投管业务类型_通用式质押回购.getValue().equals(trade.getBusiTypeTg())) {
+                trade.setTradedBalance(trade.getTradedBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
             }
-            entrusts.add(trade);
+            tradeVos.add(trade);
         });
-        return entrusts;
+        return tradeVos;
     }
 
     /**
@@ -228,7 +234,7 @@ public class TradeManagement {
         } else if (historyType == PresentOrHistoryQryType.HISTORY.value) {
             if (!Strings.isNullOrEmpty(entrustId)) {
                 List<TradeQueryBean> tradeList = tradeHistoryService.queryTradeHistoryByEntrustId(entrustId);
-                tradeList = tradeList.stream().filter(trade -> ptlAuthList.contains(trade.getPortfolioId())).collect(Collectors.toList());
+//                tradeList = tradeList.stream().filter(trade -> ptlAuthList.contains(trade.getPortfolioId())).collect(Collectors.toList());
                 return new Message<PageInfo<TradeQueryBean>>(new PageInfo<TradeQueryBean>(tradeList));
             }
             return new Message<PageInfo<TradeQueryBean>>(tradeHistoryService.queryAllForPage(request, ptlAuthList));
