@@ -26,6 +26,7 @@ import com.joyintech.tams.component.business.riskrds.dao.RiskRdsTrialCommonMappe
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.risktrialrds.util.Const;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -2838,7 +2840,12 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 if((finDto.getPs().equals(DictCodeList.交易方向_现金分红.getValue())
                     ||(finDto.getPs().equals(DictCodeList.交易方向_除权登记.getValue())))
                     &&StringUtil.isNotEmpty(dataMap.get("arriveDate"))){
-                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("arriveDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                    if(StringUtils.isNumeric(dataMap.get("arriveDate").toString())){
+                        infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("arriveDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                    }else {
+                        infRiskRdsDto.setEventDate(dataMap.get("arriveDate").toString());
+                    }
+//                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("arriveDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
                 }
             } 
             else {
@@ -2846,9 +2853,15 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     if(StringUtil.isNotEmpty(dataMap.get("bTradeId"))) {
                         infRiskRdsDto.setEventId(dataMap.get("bTradeId").toString()+ trimInfStr(infRiskRdsDto.getPortfolioCode()));
                     }
+                    //add 20220607修改时间格式 wsz ZGCPCN-1157 start
                     if(StringUtil.isNotEmpty(dataMap.get("arriveDate"))) {
-                        infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("arriveDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                        if(StringUtils.isNumeric(dataMap.get("arriveDate").toString())){
+                            infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("arriveDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                        }else {
+                            infRiskRdsDto.setEventDate(dataMap.get("arriveDate").toString());
+                        }
                     }
+                    //add 20220607修改时间格式 wsz ZGCPCN-1157 end
                 }
             }
 
