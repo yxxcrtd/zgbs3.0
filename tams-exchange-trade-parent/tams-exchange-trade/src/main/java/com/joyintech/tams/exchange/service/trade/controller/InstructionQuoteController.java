@@ -158,4 +158,22 @@ public class InstructionQuoteController {
         }
         return new Message(integratedQuoteManagement.queryNegotiateQuoteSend(request));
     }
+
+/*    @ApiOperation(value = "我收到的协议回购行情接口", notes = "我收到的协议回购行情接口")
+    @RequestMapping(value = "/entrust/integrated/repurchaseQuoteReceive", method = RequestMethod.POST)
+    public Message queryRepurchaseQuoteReceive(@RequestBody @Validated RepurchaseQuoteQueryBean bean) {
+        if (!MasterUtil.isMaster()) {
+            return MasterUtil.postForObject(bean);
+        }
+        return new Message(integratedQuoteManagement.queryRepurchaseQuoteReceive(bean));
+    }*/
+
+    @ApiOperation(value = "我发起的协议回购行情接口", notes = "我发起的协议回购行情接口")
+    @RequestMapping(value = "/entrust/integrated/repurchaseQuoteSend", method = RequestMethod.POST)
+    public Message queryRepurchaseQuoteSend(@RequestBody @Validated EntrustQueryRequest request) {
+        if (!MasterUtil.isMaster()) {
+            return MasterUtil.postForObject(request);
+        }
+        return new Message(integratedQuoteManagement.queryRepurchaseQuoteSend(request));
+    }
 }
