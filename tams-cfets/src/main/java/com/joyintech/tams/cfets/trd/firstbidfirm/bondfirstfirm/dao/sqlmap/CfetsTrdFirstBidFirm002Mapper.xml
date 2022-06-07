@@ -277,7 +277,11 @@
                bobp.ACCT_NO/*资金账户*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
                nvl(eebp.BID_PRIN_AMT*100 - T.finshNum,0) avaNum,
-               bobp.BID_PRICE/*标位*/,
+               case
+                   when fpi.TENDER_TARGET = '01' then bobp.BID_PRICE * 100
+                   when fpi.TENDER_TARGET = '02' then bobp.BID_PRICE
+                   when fpi.TENDER_TARGET = '03' then bobp.BID_PRICE * 10000
+                   end              BID_PRICE/*标位*/,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
                ssai.SEC_ACCT_NAME,
