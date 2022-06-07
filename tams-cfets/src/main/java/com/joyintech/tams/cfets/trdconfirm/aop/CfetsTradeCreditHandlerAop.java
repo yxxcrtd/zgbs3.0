@@ -20,8 +20,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Component
-@Aspect
+//@Component
+//@Aspect
 public class CfetsTradeCreditHandlerAop {
 
     @Autowired
@@ -33,7 +33,7 @@ public class CfetsTradeCreditHandlerAop {
     }
 
     /**
-     * 卖出生效释放授信、买入撤销生效释放授信和卖出撤销生效占用授信
+     * 处理回售操作的占用和释放
      */
     @After("completePoint()")
     public void creditOccupyOrReleaseMethod(JoinPoint joinPoint) throws BusinessException {

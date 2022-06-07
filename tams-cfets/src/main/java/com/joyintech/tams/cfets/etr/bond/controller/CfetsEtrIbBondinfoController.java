@@ -570,7 +570,7 @@ public class CfetsEtrIbBondinfoController  extends BaseController{
     }
 
 
-    @ApiOperation(value = "查询资产是否行权债", notes = "查询资产是否行权债")
+    @ApiOperation(value = "查询资产是否行权债", notes = "查询资产是否行权债且行权净价不为空")
     @PostMapping("/queryAssetIsRight/{secId:.+}")
     @ResponseBody
     public Message<Boolean> queryAssetIsRight(@PathVariable String secId) {

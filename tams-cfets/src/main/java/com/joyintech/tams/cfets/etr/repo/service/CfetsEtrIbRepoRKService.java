@@ -35,18 +35,15 @@ public class CfetsEtrIbRepoRKService extends BaseService<CfetsEtrIbRepoRkDto> {
     
     @Autowired(required = false)
     private BusiProductRatingService busiProductRatingService;
-    
 
-    
-    
-    /**
-     * 
-     * <一句话功能简述>
-     * 插入
-     * @param dto
-     * @see
-     * @since 1.0
-     */
+
+	/**
+	 * 插入 质押券库
+	 *
+	 * @param dto
+	 * @see
+	 * @since 1.0
+	 */
     public void insert( CfetsEtrIbRepoRkDto dto) {
 		//先删后插
 		cfetsEtrIbRepoinfoMapper.deleteByPrimaryKey(dto.getPledgeStockId());
@@ -100,15 +97,14 @@ public class CfetsEtrIbRepoRKService extends BaseService<CfetsEtrIbRepoRkDto> {
     public int checkIsExistDetail( String pledgeStockId) {
         return cfetsEtrIbRepoinfoMapper.checkIsExistDetail(pledgeStockId);
     }
-    
-    /**
-     * 
-     * <一句话功能简述>
-     * 插入
-     * @param dto
-     * @see
-     * @since 1.0
-     */
+
+	/**
+	 * 插入质押券库自动入库配置
+	 *
+	 * @param dto
+	 * @see
+	 * @since 1.0
+	 */
     public void inserttotal( CfetsEtrIbRepoRkDto dto) {
     	//先删
     	List<CfetsEtrRepoZLCXPositionResponse> F01List = new ArrayList<CfetsEtrRepoZLCXPositionResponse>();
@@ -122,6 +118,7 @@ public class CfetsEtrIbRepoRKService extends BaseService<CfetsEtrIbRepoRkDto> {
 			// map.put("pledgeStockId", dd.getPledgeStockId());
 			map.put("windtypeone", dd.getWindtypeone());
 			map.put("windtypetwo", dd.getWindtypetwo());
+			map.put("windtypethree", dd.getWindtypethree());
 			map.put("mGradeResult", dd.getmGradeResult());
 			map.put("secGradeResult", dd.getSecGradeResult());
 			map.put("isSecBond", dd.getIsSecBond());

@@ -19,7 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinCashPlan;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +78,7 @@ public class ResetRateProcessorService extends BaseService{
     
     @Autowired
     private ResetRateMapper resetRateMapper;
-    
+
     /*@Autowired(required = false)
     private PinganBatchPlatformDateImpl platformDateService;*/
     
@@ -98,9 +100,15 @@ public class ResetRateProcessorService extends BaseService{
         // 待处理利率数据参数
         FinRateInfoDto  finRateInfoDto = readerResult.getFinRateInfoDto();
         List<FinCashCalcRuleDto> finCashCalcRuleList = new ArrayList<FinCashCalcRuleDto>();
+        // 首期利率确定日
+        Date changeDate = null;
+        // 起息日
+        if (DateUtil.compareTo(finRateInfoDto.getVdate(), batchExecuteInfo.getExecuteDate()) == 0) {
+            changeDate = finRateInfoDto.getFirstConfirmDate();
+        }
         //债券
         if(StringUtil.equals(finRateInfoDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-            finCashCalcRuleList = encapFinCashCalcRule1(finRateInfoDto,batchExecuteInfo);
+            finCashCalcRuleList = encapFinCashCalcRule1(finRateInfoDto, batchExecuteInfo, changeDate);
         }else{
             if(StringUtil.equals(finRateInfoDto.getResetType(), DictCodeList.重置类型_基准利率调整规则_基准利率变动后固定间隔生效.getValue())){
                 finCashCalcRuleList = encapFinCashCalcRule2(finRateInfoDto,batchExecuteInfo);
@@ -184,16 +192,19 @@ public class ResetRateProcessorService extends BaseService{
      * @see
      * @since 1.0
      */
-    private List<FinCashCalcRuleDto> encapFinCashCalcRule1(FinRateInfoDto  finRateInfoDto,SysBatchExecInfo batchExecuteInfo){
+    private List<FinCashCalcRuleDto> encapFinCashCalcRule1(FinRateInfoDto  finRateInfoDto,SysBatchExecInfo batchExecuteInfo,Date changeDate){
+        if(!StringUtil.isNotEmpty(changeDate)){
+            changeDate = batchExecuteInfo.getExecuteDate();
+        }
         List<FinCashCalcRuleDto> resultList = new ArrayList<FinCashCalcRuleDto>();
         Map<String,Object> paramMap = new HashMap<String, Object>();
         paramMap.put("finprodId", finRateInfoDto.getFinprodId());
-        paramMap.put("sysDate",DateUtil.format(batchExecuteInfo.getExecuteDate()));
+        paramMap.put("sysDate",DateUtil.format(changeDate));
         //paramMap.put("sysDate",DateUtil.formatDate(DateUtil.format(platformDateService.getSysDate())));
         List<InterfFloatingcouponsrate> interfFloatingcouponsrateList = resetRateMapper.selectInterfFloatingcouponsrate(paramMap);
         for(InterfFloatingcouponsrate interfFloatingcouponsrate : interfFloatingcouponsrateList){
             FinCashCalcRuleDto finCashCalcRule = setFinCashCalcRuleEntity(finRateInfoDto,batchExecuteInfo);
-            finCashCalcRule.setEffDate(DateUtil.parse(interfFloatingcouponsrate.getChangeDt()));
+            finCashCalcRule.setEffDate(batchExecuteInfo.getExecuteDate());
             finCashCalcRule.setYield(ArithmeticUtil.divide(interfFloatingcouponsrate.getRate(), new BigDecimal(100)));
             resultList.add(finCashCalcRule);
         }

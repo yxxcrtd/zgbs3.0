@@ -167,14 +167,20 @@ public class CfetsEtrIbRepoAutoRKService extends BaseService {
                                    List<CfetsEtrIbRepoLibDto> pledgeBondList, String portfolioId, String finprodId, String userId) {
         for (CfetsEtrSecStockConfig config : configs) {
             boolean isTrue = true;
-            // 三级分类
+            // 二级分类
             if (StringUtil.isNotEmpty(config.getWindtypeone())
                     && !StringUtil.equals(config.getWindtypeone(), findprodInfo.getWindtypeone())) {
                 isTrue = false;
                 continue;
             }
-            // 四级分类
+            // 三级分类
             if (StringUtil.isNotEmpty(config.getWindtypetwo())
+                    && !StringUtil.equals(config.getWindtypetwo(), findprodInfo.getWindtypetwo())) {
+                isTrue = false;
+                continue;
+            }
+            // 四级分类
+            if (StringUtil.isNotEmpty(config.getWindtypethree())
                     && !StringUtil.equals(config.getWindtypetwo(), findprodInfo.getWindtypetwo())) {
                 isTrue = false;
                 continue;

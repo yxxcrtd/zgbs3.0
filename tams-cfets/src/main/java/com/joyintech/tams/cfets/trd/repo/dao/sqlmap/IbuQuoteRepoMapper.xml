@@ -1085,8 +1085,8 @@
                         group by FINPROD_ID) PA on PA.FINPROD_ID = fp.FINPROD_ID
             <where>
                 fp.VDATE <![CDATA[<=]]>TO_DATE(#{platDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
-                AND fp.MDATE <![CDATA[>=]]>TO_DATE(#{platDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
-                AND fp.TRADE_MARKET = '01'/*银行间*/
+                AND fp.DELISTING_DATE <![CDATA[>=]]>TO_DATE(#{platDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
+                AND fp.TRADE_MARKET in ('01','02')/*银行间 商业银行柜台*/
                 <if test="finprodIdList != null and finprodIdList.size() > 0">
                     AND fp.FINPROD_ID in
                     <foreach  collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -1113,6 +1113,46 @@
                 </if>
                 <if test="repRegistOrgList != null and repRegistOrgList.size() > 0">
                     AND fp.REGIST_ORG in
+                    <foreach  collection="repRegistOrgList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+            union
+            select ip.SECID       bondCode,
+                ip.SECNAME     bondAbbrName,
+                ip.SECID       finprodId,
+                ip.mdate,
+                null        firstNetPrice,
+                ip.INSTITUTION repRegistOrg,
+                100         pledgeRatio
+            from INTERF_PAYHSRCSECINFO ip
+            <where>
+                not exists(select 1 from FIN_PRODUCT where FINPROD_MARKET_ID = ip.SECID)
+                AND ip.MARKET2 in ('01','02')/*银行间 商业银行柜台*/
+                <if test="finprodIdList != null and finprodIdList.size() > 0">
+                    AND ip.SECID in
+                    <foreach  collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="finprodTypeList != null and finprodTypeList.size() > 0">
+                    1 = 2
+                </if>
+                <if test="nofinprodIdList != null and nofinprodIdList.size() > 0">
+                    AND ip.SECID not in
+                    <foreach  collection="nofinprodIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="nofinprodIdList != null and nofinprodIdList.size() > 0">
+                    AND ip.SECID not in
+                    <foreach  collection="nofinprodIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="repRegistOrgList != null and repRegistOrgList.size() > 0">
+                    AND ip.INSTITUTION in
                     <foreach  collection="repRegistOrgList" item="item" open="(" close=")" separator=",">
                         #{item}
                     </foreach>
@@ -1447,6 +1487,17 @@
           AND V.SEC_ACCT_TYPE = 'SEC'
           AND PSA.PORTFOLIO_ID = #{portfolioId}
           AND R.FINPROD_ID = #{finprodId}
+        AND ROWNUM = 1
+        union all
+        SELECT V.SEC_ACCT_ID AS SECACCTID
+        FROM PTL_SEC_ACCT PSA,
+             STL_SEC_ACCT_INFO V
+        LEFT JOIN INTERF_PAYHSRCSECINFO R
+              ON R.INSTITUTION = V.REGIST_ORG and V.TRADE_PLACE = R.MARKET2
+        WHERE PSA.ACCT_NO = V.SEC_ACCT_ID
+          AND V.SEC_ACCT_TYPE = 'SEC'
+          AND PSA.PORTFOLIO_ID = #{portfolioId}
+          AND R.SECID = #{finprodId}
         AND ROWNUM = 1
     </select>
 
@@ -2373,8 +2424,8 @@
 
     <select id="listRepoEntrustPledgeDtos" resultType="com.joyintech.tams.cfets.trd.repo.dto.RepoEntrustPledgeDto">
         select
-            fp.FINPROD_MARKET_ID bondCode/*债券市场代码*/,
-            fp.FINPROD_ABBR bondAbbrName/*债券简称*/,
+            case when fp.FINPROD_MARKET_ID is null then ip.SECID else fp.FINPROD_MARKET_ID end bondCode/*债券市场代码*/,
+            case when fp.FINPROD_ABBR is null then ip.SECNAME else fp.FINPROD_ABBR end bondAbbrName/*债券简称*/,
             pledge.finprodId finprodId/*债券代码*/,
             MBCR.GRADE_RESULT gradeResult/*债券评级*/,
             null period/*代偿期*/,
@@ -2385,7 +2436,7 @@
             pledge.pledgePrin pledgePrin/*质押券面额*/,
             mbvi.NETPRICE firstNetPrice/*首次净价*/,
             pledge.pledgeRatio*100 pledgeRatio/*折算比例*/,
-            fp.REGIST_ORG repRegistOrg/*登记托管机构code*/,
+            case when fp.REGIST_ORG is null then ip.INSTITUTION else fp.REGIST_ORG end repRegistOrg/*登记托管机构code*/,
             pledge.portfolioId portfolioId/*组合代码*/,
             pp.PORTFOLIO_NAME portfolioName/*组合名称*/
         from (
@@ -2454,7 +2505,8 @@
                        PORTFOLIO_ID,FINPROD_ID
                 ) pledgePos
             ON pledgePos.PORTFOLIO_ID = pledge.portfolioId AND pledgePos.FINPROD_ID = pledge.finprodId
-        INNER JOIN FIN_PRODUCT fp ON  fp.FINPROD_ID = pledge.finprodId
+        left JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = pledge.finprodId
+        left JOIN INTERF_PAYHSRCSECINFO ip ON ip.SECID = pledge.finprodId
         LEFT JOIN (SELECT RANK() OVER(PARTITION BY O_CODE ORDER BY  GRADE_DATE DESC,CAST(GRADE_RESULT AS DECIMAL) DESC) NUM,
             O_CODE,
             GRADE_RESULT

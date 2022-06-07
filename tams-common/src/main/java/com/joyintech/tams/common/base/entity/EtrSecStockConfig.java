@@ -24,6 +24,11 @@ public class EtrSecStockConfig extends BaseEntity {
     private String windtypetwo;
 
     /**
+     * 资产三级分类
+     */
+    private String windtypethree;
+
+    /**
      * 主体评级
      */
     private String mGradeResult;
@@ -110,6 +115,14 @@ public class EtrSecStockConfig extends BaseEntity {
      */
     public void setWindtypetwo(String windtypetwo) {
         this.windtypetwo = windtypetwo == null ? null : windtypetwo.trim();
+    }
+
+    public String getWindtypethree() {
+        return windtypethree;
+    }
+
+    public void setWindtypethree(String windtypethree) {
+        this.windtypethree = windtypethree;
     }
 
     /**
