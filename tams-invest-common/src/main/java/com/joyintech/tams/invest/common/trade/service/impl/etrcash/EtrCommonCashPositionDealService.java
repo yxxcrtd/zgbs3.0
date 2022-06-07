@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.joyintech.tams.constant.DictCodeListExt3;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -1452,6 +1453,11 @@ public class EtrCommonCashPositionDealService extends BaseService {
         return flows;
     }
 
+    public static List<EtrCashPositionFlowDto> selectAllCashPositionByTotle(String tradeId) {
+        List<EtrCashPositionFlowDto> flows = etrCommonCashPositionMapper.selectAllCashPositionByTotle(tradeId);
+        return flows;
+    }
+
     public List<PtlSecPositionFlow> selectSecFlow(Map<String, Object> params) {
         return etrCommonCashPositionMapper.selectSecFlow(params);
     }
@@ -1641,4 +1647,12 @@ public class EtrCommonCashPositionDealService extends BaseService {
         return etrCommonCashPositionMapper.queryEtrAvailableCashNew(dto);
     }
 
+    /**
+     * 根据汇总交易编号查询交易
+     * @param totleTradeId
+     * @return
+     */
+    public static List<TrdProductDeal> selectTrdProductDealByTotleTradeId(String totleTradeId){
+        return etrCommonCashPositionMapper.selectTrdProductDealByTotleTradeId(totleTradeId);
+    }
 }
