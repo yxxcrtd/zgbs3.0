@@ -9,8 +9,11 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.SpringContextUtil;
+import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
 import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
+import com.joyintech.tams.common.base.entity.FinProductType;
 import com.joyintech.tams.common.base.entity.FinProductTypeConfig;
+import com.joyintech.tams.common.base.entity.FinProductTypeKey;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.riskall.dao.RiskCommonMapper;
@@ -77,6 +80,9 @@ public class RiskCommonService {
 
     @Autowired
     private RiskCommonMapper riskCommonMapper;
+
+    @Autowired
+    private FinProductTypeMapper finProductTypeMapper;
 
     @Autowired(required = false)
     @Qualifier("loadBalancedRestTemplate")
@@ -431,7 +437,7 @@ public class RiskCommonService {
                 return new RiskAuthorizeDto();
             }
         }
-        FinProductTypeConfig finProductTypeConfig = getRskAuthorizeType(riskCommonInputDto.getAssetType(),riskCommonInputDto.getAssetType());
+        FinProductTypeConfig finProductTypeConfig = getRskAuthorizeType(riskCommonInputDto.getAssetType(),riskCommonInputDto.getFinprodId());
         Map<String,Object> params = new HashMap<>();
         params.put("userName", LoginUserUtil.getUserName());
         params.put("assetType", riskCommonInputDto.getAssetType());
@@ -470,17 +476,27 @@ public class RiskCommonService {
         return riskAuthorizeDto;
     }
 
-    private FinProductTypeConfig getRskAuthorizeType(String assetType, String assetSecType) {
-        if (StringUtil.isEmpty(assetType)){
-            return null;
+    private FinProductTypeConfig getRskAuthorizeType(String assetType, String assetId) {
+        if (assetId != null && assetId.length() > 0) {
+            FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
+            finProductTypeKey.setFinprodId(assetId);
+            finProductTypeKey.setBranch(0L);
+            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+            FinProductTypeConfig finProductTypeConfig = new FinProductTypeConfig();
+            finProductTypeConfig.setConfigType(DictCodeListExt2.配置类型_授权分类.getValue());
+            finProductTypeConfig.setInputValue1(finProductType.getType8());
+            finProductTypeConfig.setInputValue2(finProductType.getType9());
+            finProductTypeConfig.setInputValue3(finProductType.getType10());
+            finProductTypeConfig.setInputValue4(finProductType.getType11());
+            finProductTypeConfig.setInputValue5(finProductType.getType12());
+            return restTemplate.postForObject(ServiceApplication.COMMON_SERVICE_NAME + "/core/getAssetFiveType",finProductTypeConfig, FinProductTypeConfig.class);
+        } else if (com.joyintech.framework.util.StringUtil.isNotEmpty(assetType)) {
+            FinProductTypeConfig finProductTypeConfig = new FinProductTypeConfig();
+            finProductTypeConfig.setConfigType(DictCodeListExt2.配置类型_授权分类.getValue());
+            finProductTypeConfig.setInputValue1(assetType);
+            return restTemplate.postForObject(ServiceApplication.COMMON_SERVICE_NAME + "/core/getAssetFiveType", finProductTypeConfig, FinProductTypeConfig.class);
         }
-        FinProductTypeConfig finProductTypeConfig = new FinProductTypeConfig();
-        finProductTypeConfig.setConfigType(DictCodeListExt2.配置类型_授权分类.getValue());
-        finProductTypeConfig.setInputValue1(assetType);
-        finProductTypeConfig.setInputValue2(assetSecType);
-
-        return restTemplate.postForObject(ServiceApplication.COMMON_SERVICE_NAME + "/core/getAssetFiveType",
-                finProductTypeConfig, FinProductTypeConfig.class);
+        return null;
 
     }
 

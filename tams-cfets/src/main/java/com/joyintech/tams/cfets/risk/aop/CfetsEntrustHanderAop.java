@@ -2,6 +2,7 @@ package com.joyintech.tams.cfets.risk.aop;
 
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.exception.BusinessException;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 
@@ -73,6 +75,13 @@ public class CfetsEntrustHanderAop {
     }
 
     /**
+     * 不保存至代办，提交到流程中，需要执行风险占用
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.etr..*.*.doComplete(..))")
+    protected void completePoint() {
+    }
+
+    /**
      * 执行指令关闭操作需要释放授信
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.etr..service.*.closeDelegate(..))")
@@ -100,21 +109,10 @@ public class CfetsEntrustHanderAop {
             return;
         }
         Object[] args = joinPoint.getArgs();
-        if (args[0] instanceof CfetsEtribSaveRequest) {
-            CfetsEtribSaveRequest allDto = (CfetsEtribSaveRequest) args[0];
-            CfetsEtribBondInfo003Dto dto = cfetsEtrIbBondinfoService.packageEquity(allDto);
-            if (StringUtil.isNotEmpty(dto.getOperateType()) && (StringUtil.equals("submit", dto.getOperateType()) || StringUtil.equals("SUBMIT", dto.getOperateType()))) {
-                BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                        .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
-                        .put(NodeConfigConstant.DECISION_ACT, 系统动作_新建.getValue())
-                        .put(NodeConfigConstant.FLOW_STATUS, 流程节点_流程提交.getValue())
-                        .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
-                        .put("tradePlace", 交易场所_银行间.getValue())
-                        .put("ps", dto.getPs())
-                        .put("isCheck", true)
-                        .put("data", dto);
-                RiskCommonOutputDto outputDto = inputParamSerivce.doRisk(map);
-            }
+        Map<String,Object> map = JsonUtils.object2Map(args[0]);
+        String operateType = String.valueOf(map.get("operateType"));
+        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0],系统动作_新建.getValue(),流程节点_流程提交.getValue(),true);
         }
     }
 
@@ -125,23 +123,13 @@ public class CfetsEntrustHanderAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning("insertPoint()")
+    @AfterReturning(pointcut = "insertPoint()")
     public void occupyOnInsert(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        if (args[0] instanceof CfetsEtribBondInfo003Dto) {
-            CfetsEtribBondInfo003Dto dto = (CfetsEtribBondInfo003Dto) args[0];
-            if (StringUtil.isNotEmpty(dto.getOperateType()) && (StringUtil.equals("submit", dto.getOperateType()) || StringUtil.equals("SUBMIT", dto.getOperateType()))) {
-                BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                        .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
-                        .put(NodeConfigConstant.DECISION_ACT, 系统动作_新建.getValue())
-                        .put(NodeConfigConstant.FLOW_STATUS, 流程节点_流程提交.getValue())
-                        .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
-                        .put("tradePlace", 交易场所_银行间.getValue())
-                        .put("ps", dto.getPs())
-                        .put("isCheck", false)
-                        .put("data", dto);
-                inputParamSerivce.doOccupy(map);
-            }
+        Map<String,Object> map = JsonUtils.object2Map(args[0]);
+        String operateType = String.valueOf(map.get("operateType"));
+        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+            inputParamSerivce.buildParamThenOccupy(args[0],系统动作_新建.getValue(),流程节点_流程提交.getValue(),false);
         }
     }
 
@@ -154,23 +142,28 @@ public class CfetsEntrustHanderAop {
     @AfterReturning("updatePoint()")
     public void occupyOnUpdate(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        if (args[0] instanceof CfetsEtribBondInfo003Dto) {
-            CfetsEtribBondInfo003Dto dto = (CfetsEtribBondInfo003Dto) args[0];
-            if (StringUtil.isNotEmpty(dto.getOperateType()) && (StringUtil.equals("submit", dto.getOperateType()) || StringUtil.equals("SUBMIT", dto.getOperateType()))) {
-                BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                        .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
-                        .put(NodeConfigConstant.DECISION_ACT, 系统动作_修改.getValue())
-                        .put(NodeConfigConstant.FLOW_STATUS, 流程节点_流程提交.getValue())
-                        .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
-                        .put("tradePlace", 交易场所_银行间.getValue())
-                        .put("ps", dto.getPs())
-                        .put("isCheck", false)
-                        .put("data", dto);
-                inputParamSerivce.doOccupy(map);
-            }
+        Map<String,Object> map = JsonUtils.object2Map(args[0]);
+        String operateType = String.valueOf(map.get("operateType"));
+        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+            inputParamSerivce.buildParamThenOccupy(args[0],系统动作_修改.getValue(),流程节点_流程提交.getValue(),false);
         }
     }
 
+    /**
+     * 流程生效时，风险处理
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning("completePoint()")
+    public void occupyOnComplete(JoinPoint joinPoint) throws BusinessException {
+        Object[] args = joinPoint.getArgs();
+        Map<String,Object> map = JsonUtils.object2Map(args[0]);
+        String operateType = String.valueOf(map.get("operateType"));
+        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+            inputParamSerivce.buildParamThenOccupy(args[0],系统动作_新建.getValue(), 流程节点_审批生效.getValue(),false);
+        }
+    }
     /**
      * 作废时处理风险
      *
@@ -180,22 +173,9 @@ public class CfetsEntrustHanderAop {
     @AfterReturning("deletePoint()")
     public void occupyOnDelete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        String typeName = joinPoint.getSignature().getDeclaringTypeName();
-        if (typeName.equals(CfetsEtribBondInfo003Service.class.getName())) {
-            SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String)args[0]);
-            if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
-                CfetsEtribBondInfo003Dto dto = cfetsEtribBondInfo003Service.getBussinessEntityByWorkflowId((String) args[0]);
-                BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                        .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
-                        .put(NodeConfigConstant.DECISION_ACT, 系统动作_作废.getValue())
-                        .put(NodeConfigConstant.FLOW_STATUS, 流程节点_流程提交.getValue())
-                        .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
-                        .put("tradePlace", 交易场所_银行间.getValue())
-                        .put("ps", dto.getPs())
-                        .put("isCheck", false)
-                        .put("data", dto);
-                inputParamSerivce.doOccupy(map);
-            }
+        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String)args[0]);
+        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+            inputParamSerivce.buildParamThenOccupy(args[0],系统动作_作废.getValue(),流程节点_流程提交.getValue(),false);
         }
 
     }
@@ -209,23 +189,7 @@ public class CfetsEntrustHanderAop {
     @AfterReturning("closePoint()")
     public void occupyOnClose(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        if (args[0] instanceof CfetsEtribBondInfo003Dto) {
-            CfetsEtribBondInfo003Dto dto = (CfetsEtribBondInfo003Dto) args[0];
-            List<CfetsEtribBondInfo003Dto> list = dto.getSelectedItem();
-            if(StringUtil.isEmpty(dto.getPs()) && CollectionUtils.isNotEmpty(list)) {
-                dto = list.get(0);
-            }
-            BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
-                    .put(NodeConfigConstant.DECISION_ACT, 系统动作_关闭.getValue())
-                    .put(NodeConfigConstant.FLOW_STATUS, 流程节点_流程提交.getValue())
-                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
-                    .put("tradePlace", 交易场所_银行间.getValue())
-                    .put("ps", dto.getPs())
-                    .put("isCheck", false)
-                    .put("data", dto);
-            inputParamSerivce.doOccupy(map);
-        }
+        inputParamSerivce.buildParamThenOccupy(args[0],系统动作_关闭.getValue(), 流程节点_流程提交.getValue(),false);
     }
 
 }
