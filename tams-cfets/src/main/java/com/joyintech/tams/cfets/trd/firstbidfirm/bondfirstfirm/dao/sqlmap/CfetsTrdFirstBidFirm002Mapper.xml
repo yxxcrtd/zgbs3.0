@@ -129,7 +129,7 @@
                     ssai.SEC_ACCT_NAME/*证券账户*/,
                     ee.INV_MANAGER_ID/*投资经理ID*/,
                     SU.REAL_NAME INV_MANAGER_NAME/*投资经理*/,
-                    nvl(eebp.BID_PRIN_AMT*100 - T.finshNum,0) avaNum /*剩余券面总额*/,
+                    nvl(nvl(eebp.BID_PRIN_AMT,0)*100 - nvl(T.finshNum,0),0) avaNum /*剩余券面总额*/,
                     eebp.BID_PRIN_AMT*100 ENTRUST_NUM /*委托投标券面*/
         from ETR_ENTRUST ee
                  left join ETR_ENTRUST_DETAIL eed on ee.ENTRUST_ID = eed.ENTRUST_ID
@@ -276,8 +276,12 @@
                bobp.INT_AMT/*应计利息总额*/,
                bobp.ACCT_NO/*资金账户*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
-               nvl(eebp.BID_PRIN_AMT*100 - T.finshNum,0) avaNum,
-               bobp.BID_PRICE/*标位*/,
+               nvl(nvl(eebp.BID_PRIN_AMT,0)*100 - nvl(T.finshNum,0),0) avaNum /*剩余券面总额*/,
+               case
+                   when fpi.TENDER_TARGET = '01' then bobp.BID_PRICE * 100
+                   when fpi.TENDER_TARGET = '02' then bobp.BID_PRICE
+                   when fpi.TENDER_TARGET = '03' then bobp.BID_PRICE * 10000
+                   end              BID_PRICE/*标位*/,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
                ssai.SEC_ACCT_NAME,
@@ -357,7 +361,7 @@
                bobp.INT_AMT/*应计利息总额*/,
                bobp.ACCT_NO/*资金账户*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
-               nvl(eebp.BID_PRIN_AMT*100 - T.finshNum,0) avaNum,
+               nvl(nvl(eebp.BID_PRIN_AMT,0)*100 - nvl(T.finshNum,0),0) avaNum /*剩余券面总额*/,
                bobp.BID_PRICE/*标位*/,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
