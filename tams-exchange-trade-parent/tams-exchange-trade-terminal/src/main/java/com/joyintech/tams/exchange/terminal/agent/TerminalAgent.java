@@ -361,6 +361,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
             integratedEntrust.setLocalEntrustId(genLocalId());
             integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
             integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
+            requestIdEntrustMap.put(integratedEntrust.getId(),requestId);
             tradeResponse.resIntegratedEntrust(integratedEntrust);
 
             integratedEntrust.setEntrustStatus(EntrustStatus.SUCCEEDED.value);
