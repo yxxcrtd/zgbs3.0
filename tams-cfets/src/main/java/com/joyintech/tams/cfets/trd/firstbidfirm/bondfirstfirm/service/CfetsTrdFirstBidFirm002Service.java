@@ -1788,6 +1788,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
                 entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                 this.sendPositionMethod(entity, true, null);
+            } else {
+                entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+                this.sendPositionMethodOther(entity, true, null);
             }
             // 老头寸处理
 //            this.dealOldPosition(entity, false);
@@ -3265,6 +3268,82 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         req.setBusiAct(DictCodeListExt3.业务动作_汇总确认.getValue());
         req.setPs(DictCodeList.交易方向_买入.getValue());
         req.setPurchModle(DictCodeListExt4.头寸申购方式_分销买入.getValue());
+        if (isSubmit) {
+            req.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
+            req.setSystemAct(entity.getSystemAct());
+        } else {
+            req.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
+            req.setSystemAct(entity.getSystemAct());
+            req.setbTotalTradeId(entity.getBidId());
+        }
+        req.setCdate(entity.getTradeDate());
+        req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+        req.setPtlList(ptlList);
+        PositionHttpRequest.send(req);
+    }
+
+    /**
+     * 自主投标 代投代缴 头寸处理
+     *
+     * @param entity
+     * @param isSubmit
+     * @param confirmOk
+     * @author jiangpeng
+     * @date 2021/12/24 10:12
+     */
+    private void sendPositionMethodOther(CfetsTrdFirstBidFirmInfoDto entity, boolean isSubmit, String confirmOk) {
+        List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
+        for (CfetsTrdFirstBidFirmProductDto productDto : entity.getProductDtos()) {
+            //调用头寸
+            CfetsBondPortfolioCashRequest posport = new CfetsBondPortfolioCashRequest();
+            posport.setPortfolioId(productDto.getPortfolioId());
+            posport.setEtrId(productDto.getEntrustId());
+            posport.setTradeId(entity.getBidId());
+            if (StringUtil.isNotEmpty(productDto.getSecManageAcctId())) {
+                posport.setSecAcctId(productDto.getSecManageAcctId()); // 证券户
+            }
+            if (StringUtil.isNotEmpty(productDto.getPortfolioId())) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("portfolioId", productDto.getPortfolioId());
+                map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+                String cashAcctId = joyinbusinessCommonService.qryPortfolioCashAcctId(map);
+                if (StringUtil.isNotEmpty(cashAcctId)) {
+                    posport.setCashAcctId(cashAcctId); // 托管户
+                }
+            }
+            posport.setCashAmount(productDto.getTotalBiddingNum());
+            posport.setSecAmount(productDto.getTotalBiddingNum());
+            posport.setOwnSecAmount(productDto.getTotalBiddingNum().toPlainString());
+            ptlList.add(posport);
+        }
+        //调用头寸
+        CfetsBondPositionRequest req = new CfetsBondPositionRequest();
+        req.setInterfaceType("Bond001");//报文类型
+        req.setFinprodId(entity.getFinprodId());
+        req.setUserId(SecurityUtil.getLoginUser().getUserName());
+        req.setTotalTradeId(entity.getBidId());
+        req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
+        req.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
+        req.setWorkFlowId(entity.getWorkflowId());
+        String balanceCheck = DictCodeList.是否_是.getValue();
+        if ((StringUtil.isNotEmpty(entity.getSoftSkipMode())
+                && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))
+                || StringUtil.isNotEmpty(confirmOk)) {
+            balanceCheck = DictCodeList.是否_否.getValue();
+        }
+        req.setBalanceCheck(balanceCheck);
+        req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
+        if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
+            req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
+        }
+        req.setBusiAct(DictCodeListExt3.业务动作_汇总确认.getValue());
+        req.setPs(DictCodeList.交易方向_买入.getValue());
+        if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), entity.getBiddingMethod())) {
+            req.setPurchModle(DictCodeListExt4.头寸申购方式_自主投标.getValue());
+        } else {
+            req.setPurchModle(DictCodeListExt4.头寸申购方式_代投代缴.getValue());
+        }
         if (isSubmit) {
             req.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
             req.setSystemAct(entity.getSystemAct());
