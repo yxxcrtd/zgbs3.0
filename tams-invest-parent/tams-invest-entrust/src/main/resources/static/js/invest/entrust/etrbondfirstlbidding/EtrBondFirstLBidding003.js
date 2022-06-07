@@ -267,7 +267,7 @@
                     item.data.finprodId = object[index].finprodId;
                     item.data.assetCode = object[index].finprodId;
                     item.data.entrustAmt = item.data.tradeAmount;
-                    item.data.counterId = item.data.counterId;
+                    //item.data.counterId = item.data.counterId;
                     param.push(item.data);
                 }
             }
