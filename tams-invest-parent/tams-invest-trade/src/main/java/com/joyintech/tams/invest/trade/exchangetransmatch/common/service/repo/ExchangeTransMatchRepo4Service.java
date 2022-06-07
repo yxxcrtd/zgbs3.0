@@ -96,6 +96,11 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                 exchangeTransMatchBaseTradeDto.setFinTradeProduct(this.genFinTradeProduct(settleTransData, trdProductDeal));
                 exchangeTransMatchBaseTradeDto.setFinProductType(this.genFinProductType(dealDto,trdProductDeal));
                 exchangeTransMatchBaseTradeDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,trdProductDeal));
+                BigDecimal finDealPledgeTotalNum = exchangeTransMatchBaseTradeDto.getFinDealPledgeList().stream()
+                        .map(FinDealPledge::getPledgeNumber)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                // 汇总交易表的交易份额 = SUM(回购质押品的质押数量)
+                trdFinProductDealTotal.setShareAmt(finDealPledgeTotalNum);
             }
 
             exchangeTransMatchBaseTradeDtoList.add(exchangeTransMatchBaseTradeDto);
