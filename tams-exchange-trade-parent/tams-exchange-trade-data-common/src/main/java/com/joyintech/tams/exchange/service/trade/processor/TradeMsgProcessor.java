@@ -163,7 +163,6 @@ public class TradeMsgProcessor {
     private PortfolioTradeMessageHelper portfolioTradeMessageHelper;
     @Lazy
     @Autowired
-    @Lazy
     private TradeMsgReceiver tradeMsgReceiver;
 
     @Value("${yali.open:false}")
