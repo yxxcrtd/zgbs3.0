@@ -5932,6 +5932,12 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             dto.setCreateDept(LoginUserUtil.getDeptCode());// 用户部门
             dto.setCreateTime(new Date());// 创建时间
             dto.setPortfolioId(item.getPortfolioId()); //让指令分发能查出来
+            String entrustId=dto.getEntrustId();
+            dto.getPortfolioList().stream().forEach(itemTemp->{
+                itemTemp.setEntrustId(entrustId);
+                itemTemp.setIsMulti(DictCodeList.是否_是.getValue());
+            });
+
         }
         //多组合指令
         else {

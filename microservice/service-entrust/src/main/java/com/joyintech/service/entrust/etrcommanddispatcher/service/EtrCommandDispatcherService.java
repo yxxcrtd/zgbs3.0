@@ -1,26 +1,24 @@
 package com.joyintech.service.entrust.etrcommanddispatcher.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSON;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
+import com.joyintech.framework.base.BaseService;
+import com.joyintech.service.entrust.etrcommanddispatcher.dao.EtrCommandDispatcherMapper;
+import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherDto;
+import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherTotalDto;
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrEntrustDetailDto;
-import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrTradePledgeDto;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
-import com.joyintech.framework.base.BaseService;
-import com.joyintech.service.entrust.etrcommanddispatcher.dao.EtrCommandDispatcherMapper;
-import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherDto;
-import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherTotalDto;
-import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrTradePledgeDto;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.invest.common.constant.ServiceApplication;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -120,14 +118,20 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 
 
 	@SuppressWarnings("unchecked")
-	public void sendMessageByInf(EtrCommandDispatcherTotalDto dto) {
+	public String sendMessageByInf(EtrCommandDispatcherTotalDto dto) {
+		String msg = "";
 		logger.info("调用交易系统指令分发接口【{}】  接口URL：" + ServiceApplication.EXCHANGE_SERVICE_NAME + "/joyin/instruction/distribute");
 		logger.info("请求报文【{}】", "message = " + JSON.toJSONString(dto));
 		Map<String, Object> result = restTemplate.postForObject(ServiceApplication.EXCHANGE_SERVICE_NAME + "/joyin/instruction/distribute", dto, Map.class);
 		if (result != null) {
-			logger.info("应答报文【{}】","errorCode:" + (Integer) result.get("errorCode") + ";errorMsg:" + (String) result.get("errorMsg"));
-			System.out.println(result);
+			String errorMsg = String.valueOf(result.get("errorMsg"));
+			int errorCode = Integer.parseInt(result.get("errorCode").toString());
+			logger.info("应答报文【{}】","errorCode:" + errorCode + ";errorMsg:" + errorMsg);
+			if(errorCode != 0){
+				msg = errorMsg;
+			}
 		}
+		return msg;
 	}
 	/**
 	 * 委托指令明细列表查询
