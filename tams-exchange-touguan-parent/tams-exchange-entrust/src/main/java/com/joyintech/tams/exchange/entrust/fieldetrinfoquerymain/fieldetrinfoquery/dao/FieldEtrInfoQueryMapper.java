@@ -58,4 +58,11 @@ public interface FieldEtrInfoQueryMapper {
      * @return
      */
     List<FieldEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(Map<String, Object> pageParam);
+
+    /**
+     * 查询指令执行、成交进度信息
+     * @param entrustId
+     * @return
+     */
+    FieldEtrInfoQueryListResponse getEtrFirstBidInfo(String entrustId);
 }

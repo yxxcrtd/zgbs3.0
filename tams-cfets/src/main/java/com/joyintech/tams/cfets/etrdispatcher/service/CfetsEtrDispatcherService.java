@@ -822,8 +822,7 @@ public class CfetsEtrDispatcherService extends BaseService {
             return new Page<CfetsEtrDispatcherDealListInfoResponse>();
         }
         Page<CfetsEtrDispatcherDealListInfoResponse> page = null;
-        if(StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
-                StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+        if(StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
             //这里处理一级投标
 //            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherBidDealListInfo(pageParam));
 //            for(CfetsEtrDispatcherDealListInfoResponse response : page.getRoot()) {
@@ -837,11 +836,15 @@ public class CfetsEtrDispatcherService extends BaseService {
             if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_自主投标.getValue()) && StringUtil.equals(dto.getIsWin(), DictCodeList.是否_是)) {
                 //未中标查询中标结果明细
                 page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrPrimaryBidDealListInfo(pageParam));
+            }else if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_分销买入.getValue())) {
+                page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrFxmrBidDealListInfo(pageParam));
             }else {
                 page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherFirstBidDealListInfo(pageParam));
             }
 
 
+        }else if (StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrSubBidDealListInfo(pageParam));
         }else {
             page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherDealListInfo(pageParam));
         }
@@ -1788,7 +1791,10 @@ public class CfetsEtrDispatcherService extends BaseService {
         if (CollectionUtils.isNotEmpty(infoData.getBiddingProductList()) &&
                 StringUtil.isNotEmpty(infoData.getBiddingProductList().get(0).getSecAcctId())) {
             infoData.setSecAcctId(infoData.getBiddingProductList().get(0).getSecAcctId());
+            Integer i = 1;
             for (CfetsBiddingProductDto bidDto : infoData.getBiddingProductList()) {
+                bidDto.setRownum(i.toString());
+                i++;
                 //处理标位信息
                 if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
                     bidDto.setBidPriceStr(ArithmeticUtil.multiply(bidDto.getBidPrice(),new BigDecimal(100)).setScale(4,RoundingMode.HALF_UP).toString()+"%");

@@ -1817,4 +1817,29 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         GROUP BY T9.ENTRUST_ID, T10.BID_ID, T10.IS_WIN,T10.TRADE_ID
     </select>
 
+    <select id="getEtrFirstBidInfo" resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListResponse">
+        SELECT ee.ENTRUST_ID entrustId,
+               trunc(nvl(efs.ENT_FINISH_AMT, 0), 2)               execFinishAmt,
+               trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0)),2) execRemainderAmt,
+               trunc(nvl(efs.ENT_FINISH_AMT, 0) /
+                     case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+               100                                      exeProgress,
+               trunc(nvl(tpd.SHARE_AMT * 100, 0),2)                   transFinishAmt,
+               trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0)),2) transRemainderAmt,
+               trunc(nvl(tpd.SHARE_AMT * 100, 0) /
+                     case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+               100                                      dealProgress
+        FROM ETR_ENTRUST ee
+                 left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
+                            from ETR_FINISH_STATUS
+                            group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
+                 left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
+                            from TRD_PRODUCT_DEAL t1
+                                     left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+                            where t1.IS_CANCEL = 'N'
+                              and t1.TRADE_STATUS != '03'
+                            group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
+        where ee.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

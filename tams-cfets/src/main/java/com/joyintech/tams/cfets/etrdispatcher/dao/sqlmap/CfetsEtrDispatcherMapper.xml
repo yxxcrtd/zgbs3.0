@@ -8,6 +8,8 @@
         SELECT distinct
         ETR_ENTRUST_ADD.TARGET_TYPE,
         #{effectFlag} effectFlag,
+        bobrt.BID_MODLE bidModle,
+        bobrt.IS_WIN isWin,
         ETR_ENTRUST_ADD.ASSET_TYPE1  assetType1,
         ETR_ENTRUST_ADD.ASSET_TYPE_10  assetType10,
         ETR_ENTRUST_ADD.ASSET_TYPE_11  assetType11,
@@ -345,6 +347,14 @@
         ) SECT ON SECT.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
 
         LEFT JOIN ETR_FINISH_STATUS T9 ON T9.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID  AND ETR_ENTRUST.ENTRUST_ID = T9.TRADE_ID
+        LEFT JOIN (
+        SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
+        LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+        LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+        AND brt.FINPROD_ID = bo.FINPROD_ID
+        WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+        GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
+        ) bobrt ON 	bobrt.FINPROD_ID = FIN_PRODUCT.FINPROD_ID AND bobrt.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
         <where>
             AND ETR_ENTRUST.ENTRUST_STATUS IN(#{entrustAwait},#{entrustDistribute},#{entrustReceive},#{entrustUntread},#{entrustClose},#{entrustReturn},#{entrustRecall})
             <if test="entrustStatusList != null and entrustStatusList.size() > 0">
@@ -994,6 +1004,298 @@
         OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
     </select>
 
+    <select id="getEtrFxmrBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
+        SELECT
+            decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            '02' firstBidStatus /*中标状态*/,
+            BO.BID_ID   bidId,
+            FP.FINPROD_ID finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
+            FP.FINPROD_ABBR  finprodAbbr,
+            FPI.TENDER_TARGET tenderTarget,
+            CASE
+                WHEN fpi.ISSUE_CLASS = '01' THEN fpi.ISSUE_DATE
+                WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                    THEN fpi.ISSUE_DATE
+                WHEN (fpi.ISSUE_CLASS = '02' AND
+                      (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                    OR fpi.ISSUE_CLASS = '03'
+                    THEN fpi.TENDER_SDATE
+                END           AS issueDateStart/*投标日 开始*/,
+            CASE
+                WHEN fpi.ISSUE_CLASS = '01' THEN null
+                WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                    THEN null
+                WHEN (fpi.ISSUE_CLASS = '02' AND
+                      (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                    OR fpi.ISSUE_CLASS = '03'
+                    THEN fpi.TENDER_EDATE
+                END           AS issueDateEnd/*投标日 结束*/,
+            EEBP.BID_PRIN_AMT etrBidPriceTotal,
+            TFPDT.PRIN_AMT  totalBiddingNum,
+            BO.BID_MODLE biddingMethod,
+            BO.PAY_TYPE payType,
+            bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+            CASE
+                WHEN fpi.TENDER_TARGET = '01' THEN to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                WHEN fpi.TENDER_TARGET = '02' THEN to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+                WHEN fpi.TENDER_TARGET = '03' THEN to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                END winPrice /*中标标位*/,
+            TFPDT.UNIT_CPRICE price,
+            TFPDT.TRADE_AMT payableAmount,
+            TFPDT.FEE_AMT settFeeAmt,
+            BO.PAY_DATE payDate,
+            BO.ASSIGN_REGDATE assignRegdate,
+            bo.ONMARKET_DATE     listingDate/*上市日*/,
+            bo.BID_DATE       AS bidConfirmDate/*中标日期*/,
+            to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
+            TFPDT.COUNTER_ID counterId,
+            mcci.counter_name as counterName,
+            TFPDT.REMARK remark
+        FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
+                 LEFT JOIN TRD_PRODUCT_DEAL TPD
+                           ON TPD.TOTLE_TRADE_ID = TFPDT.TOTLE_TRADE_ID
+                 LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+                           ON TPDA.TRADE_ID = TPD.TRADE_ID
+                 LEFT JOIN FIN_PRODUCT FP
+                           ON		FP.FINPROD_ID = TFPDT.FINPROD_ID
+                 LEFT JOIN FIN_PRODUCT_ISSUE FPI
+                           ON		FPI.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN BID_ORDER BO
+                           ON		BO.TRADE_STATUS = '01'
+                               AND		BO.BID_ID = TFPDT.P_TOTLE_TRADE_ID
+                               AND		BO.BID_MODLE = '03'
+                 LEFT JOIN ( select  TPD.TOTLE_TRADE_ID, SUM(EEBP.BID_PRIN_AMT)  BID_PRIN_AMT
+                             from TRD_PRODUCT_DEAL TPD
+                                      LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+                                                ON TPD.TRADE_ID = TPDA.TRADE_ID
+                                      LEFT JOIN ETR_ENTRUST EE
+                                                ON EE.ENTRUST_ID = TPDA.ENTRUST_ID
+                                      LEFT JOIN  ETR_ENTRUST_BID_PRICE EEBP
+                                                 ON  EEBP.ENTRUST_ID = EE.ENTRUST_ID
+                                                     AND EEBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
+                             GROUP BY TPD.TOTLE_TRADE_ID
+        ) EEBP ON TFPDT.TOTLE_TRADE_ID = EEBP.TOTLE_TRADE_ID
+                 LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on TFPDT.TRADER=m1.PARTY_ID
+                 LEFT JOIN MST_COUNTER_PARTY mcci ON TFPDT.COUNTER_ID = mcci.counter_id
+                 LEFT JOIN (select listagg(case
+                                               when t3.TENDER_TARGET = '01'
+                                                   then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                                               when t3.TENDER_TARGET = '02'
+                                                   then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+                                               when t3.TENDER_TARGET = '03'
+                                                   then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                                               end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
+            t0.BID_ID
+                            from BID_ORDER_BID_PRICE t0
+                                LEFT JOIN BID_ORDER t1 on t1.BID_ID = t0.BID_ID
+                                LEFT JOIN FIN_PRODUCT t2
+                                ON t2.FINPROD_ID = t1.FINPROD_ID
+                                LEFT JOIN
+                                FIN_PRODUCT_ISSUE t3
+                                ON t3.FINPROD_ID = t2.FINPROD_ID
+                            group by t0.BID_ID) bobp
+                           ON bobp.BID_ID = bo.BID_ID
+        WHERE TFPDT.TRADE_STATUS = '01'
+        <if test="entrustId != null and entrustId != ''">
+            AND tpda.entrust_id = #{entrustId}
+        </if>
+        UNION ALL
+        SELECT
+        #{TRADE_FLOW_STATUS01} effectFlag,
+        '02' firstBidStatus /*中标状态*/,
+        BO.BID_ID   bidId,
+        FP.FINPROD_ID finprodId,
+        FP.FINPROD_MARKET_ID finprodMarketId,
+        FP.FINPROD_ABBR  finprodAbbr,
+        FPI.TENDER_TARGET tenderTarget,
+        CASE
+        WHEN fpi.ISSUE_CLASS = '01' THEN fpi.ISSUE_DATE
+        WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+        THEN fpi.ISSUE_DATE
+        WHEN (fpi.ISSUE_CLASS = '02' AND
+        (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+        OR fpi.ISSUE_CLASS = '03'
+        THEN fpi.TENDER_SDATE
+        END           AS issueDateStart/*投标日 开始*/,
+        CASE
+        WHEN fpi.ISSUE_CLASS = '01' THEN null
+        WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+        THEN null
+        WHEN (fpi.ISSUE_CLASS = '02' AND
+        (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+        OR fpi.ISSUE_CLASS = '03'
+        THEN fpi.TENDER_EDATE
+        END           AS issueDateEnd/*投标日 结束*/,
+        EEBP.BID_PRIN_AMT etrBidPriceTotal,
+        TFPDT.PRIN_AMT  totalBiddingNum,
+        BO.BID_MODLE biddingMethod,
+        BO.PAY_TYPE payType,
+        bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+        CASE
+        WHEN fpi.TENDER_TARGET = '01' THEN to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        WHEN fpi.TENDER_TARGET = '02' THEN to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+        WHEN fpi.TENDER_TARGET = '03' THEN to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        END winPrice /*中标标位*/,
+        TFPDT.UNIT_CPRICE price,
+        TFPDT.TRADE_AMT payableAmount,
+        TFPDT.FEE_AMT settFeeAmt,
+        BO.PAY_DATE payDate,
+        BO.ASSIGN_REGDATE assignRegdate,
+        bo.ONMARKET_DATE     listingDate/*上市日*/,
+        bo.BID_DATE       AS bidConfirmDate/*中标日期*/,
+        to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
+        TFPDT.COUNTER_ID counterId,
+        mcci.counter_name as counterName,
+        TFPDT.REMARK remark
+        FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
+        LEFT JOIN WFL_TRD_PRODUCT_DEAL TPD
+        ON TPD.TOTLE_TRADE_ID = TFPDT.TOTLE_TRADE_ID
+        LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD TPDA
+        ON TPDA.TRADE_ID = TPD.TRADE_ID
+        LEFT JOIN FIN_PRODUCT FP
+        ON		FP.FINPROD_ID = TFPDT.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI
+        ON		FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN BID_ORDER BO
+        ON		BO.TRADE_STATUS = '01'
+        AND		BO.BID_ID = TFPDT.P_TOTLE_TRADE_ID
+        AND		BO.BID_MODLE = '03'
+        LEFT JOIN ( select  TPD.TOTLE_TRADE_ID, SUM(EEBP.BID_PRIN_AMT)  BID_PRIN_AMT
+        from TRD_PRODUCT_DEAL TPD
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+        ON TPD.TRADE_ID = TPDA.TRADE_ID
+        LEFT JOIN ETR_ENTRUST EE
+        ON EE.ENTRUST_ID = TPDA.ENTRUST_ID
+        LEFT JOIN  ETR_ENTRUST_BID_PRICE EEBP
+        ON  EEBP.ENTRUST_ID = EE.ENTRUST_ID
+        AND EEBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
+        GROUP BY TPD.TOTLE_TRADE_ID
+        ) EEBP ON TFPDT.TOTLE_TRADE_ID = EEBP.TOTLE_TRADE_ID
+        LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on TFPDT.TRADER=m1.PARTY_ID
+        LEFT JOIN MST_COUNTER_PARTY mcci ON TFPDT.COUNTER_ID = mcci.counter_id
+        LEFT JOIN (select listagg(case
+        when t3.TENDER_TARGET = '01'
+        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        when t3.TENDER_TARGET = '02'
+        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+        when t3.TENDER_TARGET = '03'
+        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
+        t0.BID_ID
+        from BID_ORDER_BID_PRICE t0
+        LEFT JOIN BID_ORDER t1 on t1.BID_ID = t0.BID_ID
+        LEFT JOIN FIN_PRODUCT t2
+        ON t2.FINPROD_ID = t1.FINPROD_ID
+        LEFT JOIN
+        FIN_PRODUCT_ISSUE t3
+        ON t3.FINPROD_ID = t2.FINPROD_ID
+        group by t0.BID_ID) bobp
+        ON bobp.BID_ID = bo.BID_ID
+        WHERE TFPDT.TRADE_STATUS = '01'
+        <if test="entrustId != null and entrustId != ''">
+            AND tpda.entrust_id = #{entrustId}
+        </if>
+    </select>
+    <select id="getEtrSubBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
+        SELECT
+            decode(TFPDT.IS_CANCEL,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            tpd.totle_trade_id totleTradeId,
+            tpd.trade_id tradeId,
+            FP.FINPROD_ID finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
+            FP.FINPROD_ABBR finprodAbbr,
+            TPD.SEC_MANAGE_ACCT_ID secAcctId,
+            STLINFO.SEC_ACCT_NAME secAcctName,
+            fpt.TYPE_11          secType/*资产分类*/,
+            PP.PORTFOLIO_ID  portfolioId,
+            PP.PORTFOLIO_NAME  portfolioName,
+            TPD.SHARE_AMT*100 subscriptionAmount,
+            TFPDT.TRADE_AMT payableAmount,
+            TFPDT.FEE_AMT settFeeAmt,
+            fp.ISSUER    issuer,
+            mci.CUSTOMER_NAME  issuerName,
+            BO.OU_PARTY_ID  ouPartyId,
+            mcci.PARTY_ABBR   ouPartyIdAbbr/*本方名称*/,
+            bo.OUR_TRADER ourTrader,
+            mcct.real_name as ourTraderName,
+            TFPDT.REMARK remark
+        FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
+                 LEFT JOIN TRD_PRODUCT_DEAL TPD
+                           ON TPD.TOTLE_TRADE_ID = TFPDT.TOTLE_TRADE_ID
+                 LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+                           ON TPDA.TRADE_ID = TPD.TRADE_ID
+                 LEFT JOIN FIN_PRODUCT FP
+                           ON FP.FINPROD_ID = TFPDT.FINPROD_ID
+                 LEFT JOIN  FIN_PRODUCT_ISSUE FPI
+                            ON FPI.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN  PTL_PORTFOLIO  PP
+                            ON PP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
+                 LEFT JOIN TRDQUTO_MATCH_INFO TMI
+                           ON TMI.TRD_ID = TFPDT.TOTLE_TRADE_ID
+                 LEFT JOIN BID_ORDER BO
+                           ON BO.TRADE_STATUS = '01'
+                               AND BO.BID_ID=TMI.PRE_TRADE_ID
+                 LEFT JOIN STL_SEC_ACCT_INFO STLINFO
+                           ON TPD.SEC_MANAGE_ACCT_ID=STLINFO.SEC_ACCT_ID
+                 left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
+                 left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                 left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
+                 left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
+        WHERE 1=1
+        <if test="entrustId != null and entrustId != ''">
+            AND tpda.entrust_id = #{entrustId}
+        </if>
+        UNION ALL
+        SELECT
+        #{TRADE_FLOW_STATUS01} effectFlag,
+        tpd.totle_trade_id totleTradeId,
+        tpd.trade_id tradeId,
+        FP.FINPROD_ID finprodId,
+        FP.FINPROD_MARKET_ID finprodMarketId,
+        FP.FINPROD_ABBR finprodAbbr,
+        TPD.SEC_MANAGE_ACCT_ID secAcctId,
+        STLINFO.SEC_ACCT_NAME secAcctName,
+        fpt.TYPE_11          secType/*资产分类*/,
+        PP.PORTFOLIO_ID  portfolioId,
+        PP.PORTFOLIO_NAME  portfolioName,
+        TPD.SHARE_AMT*100 subscriptionAmount,
+        TFPDT.TRADE_AMT payableAmount,
+        TFPDT.FEE_AMT settFeeAmt,
+        fp.ISSUER    issuer,
+        mci.CUSTOMER_NAME  issuerName,
+        BO.OU_PARTY_ID  ouPartyId,
+        mcci.PARTY_ABBR   ouPartyIdAbbr/*本方名称*/,
+        bo.OUR_TRADER ourTrader,
+        mcct.real_name as ourTraderName,
+        TFPDT.REMARK remark
+        FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
+        LEFT JOIN WFL_TRD_PRODUCT_DEAL TPD
+        ON TPD.TOTLE_TRADE_ID = TFPDT.TOTLE_TRADE_ID
+        LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD TPDA
+        ON TPDA.TRADE_ID = TPD.TRADE_ID
+        LEFT JOIN FIN_PRODUCT FP
+        ON FP.FINPROD_ID = TFPDT.FINPROD_ID
+        LEFT JOIN  FIN_PRODUCT_ISSUE FPI
+        ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN  PTL_PORTFOLIO  PP
+        ON PP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
+        LEFT JOIN TRDQUTO_MATCH_INFO TMI
+        ON TMI.TRD_ID = TFPDT.TOTLE_TRADE_ID
+        LEFT JOIN BID_ORDER BO
+        ON BO.TRADE_STATUS = '01'
+        AND BO.BID_ID=TMI.PRE_TRADE_ID
+        LEFT JOIN STL_SEC_ACCT_INFO STLINFO
+        ON TPD.SEC_MANAGE_ACCT_ID=STLINFO.SEC_ACCT_ID
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
+        left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+        left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
+        left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
+        WHERE 1=1
+        <if test="entrustId != null and entrustId != ''">
+            AND tpda.entrust_id = #{entrustId}
+        </if>
+    </select>
     <select id="getEtrPrimaryBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(bo.IS_CANCEL,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
@@ -1227,21 +1529,12 @@
             to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
             tpd.counter_id counterId,
             mcp.counter_name counterName,
-            ssai.SEC_ACCT_NAME   secAcctName/*证券账户*/,
-            fpt.TYPE_11          secType/*资产分类*/,
-            bo.SUBSCRIPTION_AMOUNT  subscriptionAmount/*认购量*/,
-            bo.OU_PARTY_ID                                       ouPartyId/*本方id*/,
-            mcci.PARTY_ABBR                                      ouPartyIdAbbr/*本方名称*/,
-            bo.OUR_TRADER                                        ourTrader/*本方交易员id*/,
-            mcct.real_name                                     ourTraderName/*本方交易员名称*/,
-            fp.ISSUER                                            issuer/*发行人id*/,
-            mci.CUSTOMER_NAME                                    issuerName/*发行人名称*/,
             tpd.remark remark
         FROM
             TRD_PRODUCT_DEAL tpd
-                LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPD.TRADE_ID = TPDA.TRADE_ID
-                LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON tpd.TOTLE_TRADE_ID=tfpdt.TOTLE_TRADE_ID
-             LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = TFPDT.B_TRADE_ID
+            LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPD.TRADE_ID = TPDA.TRADE_ID
+            LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON tpd.TOTLE_TRADE_ID=tfpdt.TOTLE_TRADE_ID
+            LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = TFPDT.B_TRADE_ID
             AND BRT.STATUS ='01'
             LEFT JOIN BID_RESULT_DETAIL BRD ON	BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
             AND	BRD.ENTRUST_ID = TPDA.ENTRUST_ID
@@ -1286,14 +1579,9 @@
             left join ETR_ENTRUST_DETAIL eed
             on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
             left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
-            where t0.BID_PRICE = 99999999
             group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
             on bo.BID_ID = bobp2.BID_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
-            left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
-            left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
-            left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
-            left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         WHERE tpda.entrust_id = #{entrustId}
         union all
         SELECT
@@ -1355,15 +1643,6 @@
             to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
             tpd.counter_id counterId,
             mcp.counter_name counterName,
-            ssai.SEC_ACCT_NAME   secAcctName/*证券账户*/,
-            fpt.TYPE_11          secType/*资产分类*/,
-            bo.SUBSCRIPTION_AMOUNT  subscriptionAmount/*认购量*/,
-            bo.OU_PARTY_ID                                       ouPartyId/*本方id*/,
-            mcci.PARTY_ABBR                                      ouPartyIdAbbr/*本方名称*/,
-            bo.OUR_TRADER                                        ourTrader/*本方交易员id*/,
-            mcct.real_name                                     ourTraderName/*本方交易员名称*/,
-            fp.ISSUER                                            issuer/*发行人id*/,
-            mci.CUSTOMER_NAME                                    issuerName/*发行人名称*/,
             tpd.remark remark
         FROM
             WFL_TRD_PRODUCT_DEAL tpd
@@ -1414,14 +1693,9 @@
             left join ETR_ENTRUST_DETAIL eed
             on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
             left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
-            where t0.BID_PRICE = 99999999
             group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
             on bo.BID_ID = bobp2.BID_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
-            left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
-            left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
-            left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
-            left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         WHERE tpda.entrust_id = #{entrustId}
 
     </select>
@@ -2014,7 +2288,6 @@
         left join ETR_ENTRUST_DETAIL eed
         on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
         left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
-        where t0.BID_PRICE = 99999999
         group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
         on bo.BID_ID = bobp2.BID_ID
         left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
@@ -2139,7 +2412,6 @@
         left join ETR_ENTRUST_DETAIL eed
         on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
         left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
-        where t0.BID_PRICE = 99999999
         group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
         on bo.BID_ID = bobp2.BID_ID
         left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
