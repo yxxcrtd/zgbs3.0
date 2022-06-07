@@ -1388,20 +1388,93 @@
     </select>
 
     <select id="selectSqSettleTransDatas" resultType="com.joyintech.tams.common.base.entity.SettleTransData">
-        SELECT
-        <include refid="com.joyintech.tams.common.base.dao.SettleTransDataMapper.Base_Column_List" />
-        FROM
-        SETTLE_TRANS_DATA
-        WHERE
-        CJBH = #{sqcjbh, jdbcType=VARCHAR}
+        SELECT  STD.TRADE_ID          TRADE_ID,
+                STD.CJBH              CJBH,
+                STD.DEAL_DATE         DEAL_DATE,
+                STD.SEC_TYPE          SEC_TYPE,
+                STD.APPLY_TRADE_ID    APPLY_TRADE_ID,
+                STD.FINPROD_TYPE      FINPROD_TYPE,
+                STD.BRANCH            BRANCH,
+                STD.BUSI_TYPE         BUSI_TYPE,
+                STD.TRADE_DATE        TRADE_DATE,
+                STD.SETTLE_DATE       SETTLE_DATE,
+                STD.VDATE             VDATE,
+                STD.MDATE             MDATE,
+                STD.VPAY_DATE         VPAY_DATE,
+                STD.MPAY_DATE         MPAY_DATE,
+                STD.TERM_TYPE         TERM_TYPE,
+                STD.SETTLE_SPEED      SETTLE_SPEED,
+                STD.CCY               CCY,
+                STD.UNIT_CPRICE       UNIT_CPRICE,
+                STD.UNIT_INT          UNIT_INT,
+                STD.UNIT_FPRICE       UNIT_FPRICE,
+                STD.PAR_VALUE         PAR_VALUE,
+                STD.CPRICE_AMT        CPRICE_AMT,
+                STD.SHARE_AMT         SHARE_AMT,
+                STD.PRIN_AMT          PRIN_AMT,
+                STD.INT_AMT           INT_AMT,
+                STD.FPRICE_AMT        FPRICE_AMT,
+                STD.STAMP_FEE         STAMP_FEE,
+                STD.JSF_AMT           JSF_AMT,
+                STD.GHF_AMT           GHF_AMT,
+                STD.ZGF_AMT           ZGF_AMT,
+                STD.SXF_AMT           SXF_AMT,
+                STD.SETTLE_FEE        SETTLE_FEE,
+                STD.COMMISSION_AMT    COMMISSION_AMT,
+                STD.IS_PAY_WITH_TRADE IS_PAY_WITH_TRADE,
+                STD.TRADE_AMT         TRADE_AMT,
+                STD.PS                PS,
+                STD.TRADE_MARKET      TRADE_MARKET,
+                STD.TRADE_MARKET_MODE TRADE_MARKET_MODE,
+                STD.TRADE_PLAT        TRADE_PLAT,
+                STD.PLEDGE_SEC_NUM    PLEDGE_SEC_NUM,
+                STD.SEAT_NUMBER       SEAT_NUMBER,
+                STD.PORTFOLIO_ID      PORTFOLIO_ID,
+                STD.SEC_ACCT_ID       SEC_ACCT_ID,
+                STD.ACCT_NO           ACCT_NO,
+                STD.BATCH_NUMBER      BATCH_NUMBER,
+                STD.M_PRIN_AMT        M_PRIN_AMT,
+                STD.M_INT_AMT         M_INT_AMT,
+                STD.M_TRADE_AMT       M_TRADE_AMT,
+                STD.INT_RATE          INT_RATE,
+                STD.BASIS             BASIS,
+                STD.BUSI_SCENE_CALSS  BUSI_SCENE_CALSS,
+                STD.SETTLE_MODE       SETTLE_MODE,
+                STD.STAMP_FEE_RAW     STAMP_FEE_RAW,
+                STD.JSF_AMT_RAW       JSF_AMT_RAW,
+                STD.GHF_AMT_RAW       GHF_AMT_RAW,
+                STD.ZGF_AMT_RAW       ZGF_AMT_RAW,
+                STD.SXF_AMT_RAW       SXF_AMT_RAW,
+                STD.SETTLE_FEE_RAW    SETTLE_FEE_RAW,
+                STD.COMMISSION_AMT_RAW COMMISSION_AMT_RAW,
+                STD.TRADE_AMT_RAW     TRADE_AMT_RAW,
+                STD.TRADE_ID_RAW      TRADE_ID_RAW,
+                STD.SEQ_NO            SEQ_NO,
+                STD.IS_PURCH_TYPE_YX  IS_PURCH_TYPE_YX,
+                STD.CREATE_USER       CREATE_USER,
+                STD.CREATE_DEPT       CREATE_DEPT,
+                STD.CREATE_TIME       CREATE_TIME,
+                STD.UPDATE_USER       UPDATE_USER,
+                STD.UPDATE_TIME       UPDATE_TIME,
+                STD.IS_MODIFY         IS_MODIFY,
+                STD.F_CJBH            F_CJBH,
+                STD.FRAGMENTARY_FUNDS FRAGMENTARY_FUNDS,
+                STD.DELIVERY_RESULT   DELIVERY_RESULT,
+                STTM.TRADE_ID_TG      FINPROD_ID,
+                TRD.FINPROD_TYPE2     FINPROD_TYPE2
+           FROM SETTLE_TRANS_DATA STD
+           LEFT JOIN SETTLE_TRANS_TG_MAPPING STTM ON STD.TRADE_ID = STTM.TRADE_ID
+           LEFT JOIN TRD_PRODUCT_DEAL TRD ON STTM.TRADE_ID = TRD.TRADE_ID AND TRD.TRADE_STATUS = '01' AND TRD.IS_CANCEL = 'N'
+          WHERE STD.CJBH = #{sqcjbh, jdbcType=VARCHAR}
+            AND STD.PS = 'T01'
         <if test="seatNumber != null and seatNumber != ''">
-            AND SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
+            AND STD.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
         </if>
         <if test="secAcctId != null and secAcctId != ''">
-            AND SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+            AND STD.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
         </if>
         <if test="vdate != null">
-            AND VDATE = #{vdate, jdbcType=DATE}
+            AND STD.VDATE = #{vdate, jdbcType=DATE}
         </if>
     </select>
 

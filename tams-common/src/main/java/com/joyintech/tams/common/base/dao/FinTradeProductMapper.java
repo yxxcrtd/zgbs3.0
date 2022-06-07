@@ -5,6 +5,8 @@ import com.joyintech.tams.common.base.entity.FinTradeProductKey;
 
 import java.util.List;
 
+import com.joyintech.tams.common.base.pojo.OriPledgeInfo;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
@@ -35,4 +37,9 @@ public interface FinTradeProductMapper {
      * @return 委托编号
      */
     String findEntrustIdByTradeId(String tradeId);
+
+    /**
+     * 原质押品信息查询
+     */
+    List<OriPledgeInfo> getOriFinDealPledgeList(@Param("finprodId") String finprodId);
 }
