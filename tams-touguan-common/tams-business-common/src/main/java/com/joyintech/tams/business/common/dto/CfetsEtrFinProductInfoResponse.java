@@ -238,16 +238,22 @@ public class CfetsEtrFinProductInfoResponse {
     private BigDecimal maxTotalTender;
 
     /**
-     * 投标日
+     * 增发投标日
      */
     @ApiModelProperty(name = "settleDate", value = "增发投标日")
-    private Date settleDate;
+    private String settleDate;
 
     /**
      * 投标日
      */
     @ApiModelProperty(name = "bidDate", value = "投标日")
     private Date bidDate;
+
+    /**
+     * 投标日
+     */
+    @ApiModelProperty(name = "bidDateStr", value = "投标日")
+    private String bidDateStr;
 
     /**
      * 投标起始日
@@ -546,12 +552,11 @@ public class CfetsEtrFinProductInfoResponse {
         this.maxPamt = maxPamt;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    public Date getSettleDate() {
+    public String getSettleDate() {
         return settleDate;
     }
 
-    public void setSettleDate(Date settleDate) {
+    public void setSettleDate(String settleDate) {
         this.settleDate = settleDate;
     }
 
@@ -1046,5 +1051,13 @@ public class CfetsEtrFinProductInfoResponse {
 
     public void setBidDate(Date bidDate) {
         this.bidDate = bidDate;
+    }
+
+    public String getBidDateStr() {
+        return bidDateStr;
+    }
+
+    public void setBidDateStr(String bidDateStr) {
+        this.bidDateStr = bidDateStr;
     }
 }
