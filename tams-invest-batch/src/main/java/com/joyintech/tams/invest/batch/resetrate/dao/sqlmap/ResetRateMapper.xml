@@ -65,7 +65,7 @@ WHERE
 	AND T1.CASH_ID = T3.CASH_ID 
 	AND T1.INT_TYPE = #{rateType02}
 	AND T1.FINPROD_ID = T4.FINPROD_ID 
-	AND <![CDATA[T4.VDATE < TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	AND <![CDATA[T4.VDATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
 	AND <![CDATA[T4.MDATE > TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
 	<if test="productIdList != null and !productIdList.isEmpty()">
 	AND T1.FINPROD_ID in
@@ -133,6 +133,24 @@ WHERE
 	WHERE T1.S_INFO_WINDCODE = T2.FINPROD_MARKET_ID
 	AND T2.FINPROD_ID = #{finprodId}
 	AND T1.CHANGE_DT = #{sysDate}
+</select>
+
+	<!-- wind接口利率行情 -->
+<select id="selectInterfIntRateInfo" resultType="com.joyintech.tams.common.base.entity.MstIntRateInfo">
+	select INT_RATE_ID,
+		   EFF_DATE,
+		   RELAESE_DATE,
+		   INT_RATE,
+		   CCY,
+		   CREATE_USER,
+		   CREATE_DEPT,
+		   CREATE_TIME,
+		   UPDATE_USER,
+		   UPDATE_TIME,
+		   SOURCE
+	from INTERF_INT_RATE_INFO iiri
+	where INT_RATE_ID = #{benchmarkId}
+	and EFF_DATE = to_date(#{sysDate},'yyyy-MM-dd')
 </select>
 
 <select id="getMstIntRateInfo" resultType="com.joyintech.tams.invest.batch.resetbaseruleinfo.dto.MstIntRateInfoDto">
