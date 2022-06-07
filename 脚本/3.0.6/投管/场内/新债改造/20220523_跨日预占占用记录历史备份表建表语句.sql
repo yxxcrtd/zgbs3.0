@@ -135,6 +135,7 @@ comment on column RSK_PRE_OCCUPY_INFO_HIS.SEQ_NO is '报文流水号'
 /
 
 -- auto-generated definition
+DROP TABLE RSK_OCCUPY_INFO_HIS;
 create table RSK_OCCUPY_INFO_HIS
 (
     UUID          VARCHAR2(32)  not null
