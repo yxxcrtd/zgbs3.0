@@ -531,6 +531,7 @@
 			cad.PLEDGE_STOCK_ID pledgeStockId,
 			cad.WINDTYPEONE windtypeone,
 			cad.WINDTYPETWO windtypetwo,
+			cad.WINDTYPETHREE windtypethree,
 			cad.M_GRADE_RESULT mGradeResult,
 			cad.SEC_GRADE_RESULT secGradeResult,
 			cad.IS_SEC_BOND isSecBond,
@@ -778,11 +779,14 @@
 			)
 		</if>
 		<if test="windtypeone !=null and windtypeone !=''">
-			AND T4.TYPE_10 = #{windtypeone,jdbcType=VARCHAR}
+			AND T4.TYPE_9 = #{windtypeone,jdbcType=VARCHAR}
 		</if>
 		<if test="windtypetwo !=null and windtypetwo !=''">
-			AND T4.TYPE_11 = #{windtypetwo,jdbcType=VARCHAR}
+			AND T4.TYPE_10 = #{windtypetwo,jdbcType=VARCHAR}
 		</if>
+        <if test="windtypethree !=null and windtypethree !=''">
+            AND T4.TYPE_11 = #{windtypethree,jdbcType=VARCHAR}
+        </if>
 		<if test="isSecBond !=null and isSecBond !=''">
 			AND FPA.IS_SEC_BOND = #{isSecBond,jdbcType=VARCHAR}
 		</if>
@@ -1156,6 +1160,7 @@
             <result column="pledge_stock_id" property="pledgeStockId" jdbcType="VARCHAR"/>
             <result column="windtypeone" property="windtypeone" jdbcType="VARCHAR"/>
             <result column="windtypetwo" property="windtypetwo" jdbcType="VARCHAR"/>
+            <result column="windtypethree" property="windtypethree" jdbcType="VARCHAR"/>
             <result column="m_grade_result" property="mGradeResult" jdbcType="VARCHAR"/>
             <result column="sec_grade_result" property="secGradeResult" jdbcType="VARCHAR"/>
             <result column="is_sec_bond" property="isSecBond" jdbcType="VARCHAR"/>
@@ -1172,6 +1177,7 @@
                essc.pledge_stock_id,
                essc.windtypeone,
                essc.windtypetwo,
+               essc.windtypethree,
                essc.m_grade_result,
                essc.sec_grade_result,
                essc.is_sec_bond,
@@ -1197,8 +1203,9 @@
         case when ISSUE_TYPE != '01' then 'Y' else 'N' end IS_PPB/*是否私募债*/,
         IS_RIGHT/*是否含权债*/,
         fpa.IS_SEC_BOND,
-        fpt.TYPE_10                                        Windtypeone,
-        fpt.TYPE_11                                        Windtypetwo,
+        fpt.TYPE_9                                        Windtypeone,
+        fpt.TYPE_10                                        Windtypetwo,
+        fpt.TYPE_11                                        windtypethree,
         mRating.GRADE_RESULT                               mGradeResult,
         sRating.GRADE_RESULT                               secGradeResult
         from FIN_PRODUCT fp

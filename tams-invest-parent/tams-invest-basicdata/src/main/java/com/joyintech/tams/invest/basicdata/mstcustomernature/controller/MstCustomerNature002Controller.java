@@ -351,11 +351,11 @@ public class MstCustomerNature002Controller extends BaseController {
                     && StringUtil.equals(entity.getCustomerType(), DictCodeList.客户类型_自然人.getValue())) {
                 return new AjaxResult("客户性质为发行人时，选择数据的客户类型不能为自然人！", MessageType.错误消息);
             }
-	    	String isFinLicenceStr =  mstCustomerNatureService.checkIsFinLicenceStr(entity.getCustomerId());
+//	    	String isFinLicenceStr =  mstCustomerNatureService.checkIsFinLicenceStr(entity.getCustomerId());
 
-	    	if( customerCharater.equals(entity.getCustomerCharater()) && (isFinLicenceStr == null || " ".equals(isFinLicenceStr))){
-	    		 return new AjaxResult("客户性质为发行人时，机构信息中的“是否持有金融牌照”字段不可以为空！", MessageType.错误消息);
-	    	}
+//	    	if( customerCharater.equals(entity.getCustomerCharater()) && (isFinLicenceStr == null || " ".equals(isFinLicenceStr))){
+//	    		 return new AjaxResult("客户性质为发行人时，机构信息中的“是否持有金融牌照”字段不可以为空！", MessageType.错误消息);
+//	    	}
 	    	//校验是否存在待确认的流程
 	    	Map<String, Object> param = RequestUtil.getPageParam();
 	        WflValidInputParameter parameter = new WflValidInputParameter();

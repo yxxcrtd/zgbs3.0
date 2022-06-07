@@ -1344,14 +1344,22 @@ from
     select
         <include refid="com.joyintech.tams.common.base.dao.FinExercisePlanMapper.Base_Column_List" />
     from FIN_EXERCISE_PLAN pd
-    where pd.exercise_date <![CDATA[>]]>#{platDate} and pd.FINPROD_ID = #{finprodId}
+    where ROWNUM = 1
+        <if test="platDate != null">
+            and pd.exercise_date <![CDATA[>]]>#{platDate}
+        </if>
+        <if test="finprodId != null and finprodId != ''">
+            and pd.FINPROD_ID = #{finprodId}
+        </if>
         <if test="ps != null and ps.equals('T03')">
             and pd.exercise_type='02'
         </if>
         <if test="ps != null and ps.equals('T39')">
             and pd.exercise_type='01'
         </if>
-    and ROWNUM = 1
+        <if test="isNull != null and isNull != ''">
+            and pd.EXERCISE_PRICE is null
+        </if>
     order by pd.exercise_date desc
     </select>
     <select id="queryPositionByEtrInfo" parameterType="Map" resultType="map">

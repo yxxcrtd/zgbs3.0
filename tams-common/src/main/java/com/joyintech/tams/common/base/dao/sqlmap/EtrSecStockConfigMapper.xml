@@ -6,6 +6,7 @@
         <result column="PLEDGE_STOCK_ID" property="pledgeStockId" jdbcType="VARCHAR" />
         <result column="WINDTYPEONE" property="windtypeone" jdbcType="VARCHAR" />
         <result column="WINDTYPETWO" property="windtypetwo" jdbcType="VARCHAR" />
+        <result column="WINDTYPETHREE" property="windtypethree" jdbcType="VARCHAR" />
         <result column="M_GRADE_RESULT" property="mGradeResult" jdbcType="VARCHAR" />
         <result column="SEC_GRADE_RESULT" property="secGradeResult" jdbcType="VARCHAR" />
         <result column="IS_SEC_BOND" property="isSecBond" jdbcType="VARCHAR" />
@@ -18,7 +19,7 @@
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
     </resultMap>
     <sql id="Base_Column_List" >
-        CONFIG_ID CONFIG_ID, PLEDGE_STOCK_ID PLEDGE_STOCK_ID, WINDTYPEONE WINDTYPEONE, WINDTYPETWO WINDTYPETWO, 
+        CONFIG_ID CONFIG_ID, PLEDGE_STOCK_ID PLEDGE_STOCK_ID, WINDTYPEONE WINDTYPEONE, WINDTYPETWO WINDTYPETWO, WINDTYPETHREE WINDTYPETHREE,
         M_GRADE_RESULT M_GRADE_RESULT, SEC_GRADE_RESULT SEC_GRADE_RESULT, IS_SEC_BOND IS_SEC_BOND, 
         IS_RIGHT IS_RIGHT, IS_PPB IS_PPB, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, 
         CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
@@ -45,12 +46,12 @@
     </delete>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.EtrSecStockConfig" >
         insert into ETR_SEC_STOCK_CONFIG (CONFIG_ID, PLEDGE_STOCK_ID, WINDTYPEONE, 
-            WINDTYPETWO, M_GRADE_RESULT, SEC_GRADE_RESULT, 
+            WINDTYPETWO,WINDTYPETHREE, M_GRADE_RESULT, SEC_GRADE_RESULT,
             IS_SEC_BOND, IS_RIGHT, IS_PPB, 
             CREATE_USER, CREATE_DEPT, CREATE_TIME, 
             UPDATE_USER, UPDATE_TIME)
         values (#{configId,jdbcType=VARCHAR}, #{pledgeStockId,jdbcType=VARCHAR}, #{windtypeone,jdbcType=VARCHAR}, 
-            #{windtypetwo,jdbcType=VARCHAR}, #{mGradeResult,jdbcType=VARCHAR}, #{secGradeResult,jdbcType=VARCHAR}, 
+            #{windtypetwo,jdbcType=VARCHAR},#{windtypethree,jdbcType=VARCHAR}, #{mGradeResult,jdbcType=VARCHAR}, #{secGradeResult,jdbcType=VARCHAR},
             #{isSecBond,jdbcType=VARCHAR}, #{isRight,jdbcType=VARCHAR}, #{isPpb,jdbcType=VARCHAR}, 
             #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
             #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
@@ -69,6 +70,9 @@
             </if>
             <if test="windtypetwo != null" >
                 WINDTYPETWO,
+            </if>
+            <if test="windtypethree != null" >
+                WINDTYPETHREE,
             </if>
             <if test="mGradeResult != null" >
                 M_GRADE_RESULT,
@@ -114,6 +118,9 @@
             <if test="windtypetwo != null" >
                 #{windtypetwo,jdbcType=VARCHAR},
             </if>
+            <if test="windtypethree != null" >
+                #{windtypethree,jdbcType=VARCHAR},
+            </if>
             <if test="mGradeResult != null" >
                 #{mGradeResult,jdbcType=VARCHAR},
             </if>
@@ -147,10 +154,10 @@
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.EtrSecStockConfig" >
-        insert into ETR_SEC_STOCK_CONFIG(CONFIG_ID, PLEDGE_STOCK_ID, WINDTYPEONE, WINDTYPETWO, 
+        insert into ETR_SEC_STOCK_CONFIG(CONFIG_ID, PLEDGE_STOCK_ID, WINDTYPEONE, WINDTYPETWO, WINDTYPETHREE,
         M_GRADE_RESULT, SEC_GRADE_RESULT, IS_SEC_BOND, IS_RIGHT, IS_PPB, CREATE_USER, CREATE_DEPT, 
         CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-        select CONFIG_ID, PLEDGE_STOCK_ID, WINDTYPEONE, WINDTYPETWO, 
+        select CONFIG_ID, PLEDGE_STOCK_ID, WINDTYPEONE, WINDTYPETWO, WINDTYPETHREE,
             M_GRADE_RESULT, SEC_GRADE_RESULT, IS_SEC_BOND, IS_RIGHT, IS_PPB, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
              from ETR_SEC_STOCK_CONFIG
@@ -167,6 +174,9 @@
             </if>
             <if test="windtypetwo != null" >
                 WINDTYPETWO = #{windtypetwo,jdbcType=VARCHAR},
+            </if>
+            <if test="windtypethree != null" >
+                WINDTYPETHREE = #{windtypethree,jdbcType=VARCHAR},
             </if>
             <if test="mGradeResult != null" >
                 M_GRADE_RESULT = #{mGradeResult,jdbcType=VARCHAR},
@@ -197,6 +207,7 @@
         set PLEDGE_STOCK_ID = #{pledgeStockId,jdbcType=VARCHAR},
             WINDTYPEONE = #{windtypeone,jdbcType=VARCHAR},
             WINDTYPETWO = #{windtypetwo,jdbcType=VARCHAR},
+            WINDTYPETHREE = #{windtypethree,jdbcType=VARCHAR},
             M_GRADE_RESULT = #{mGradeResult,jdbcType=VARCHAR},
             SEC_GRADE_RESULT = #{secGradeResult,jdbcType=VARCHAR},
             IS_SEC_BOND = #{isSecBond,jdbcType=VARCHAR},

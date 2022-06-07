@@ -154,7 +154,8 @@
     <select id="getFinExercisePlan" resultType="com.joyintech.tams.common.base.entity.FinExercisePlan">
         SELECT
             EXERCISE_DATE ,
-            ACT_EXERCISE_DATE
+            ACT_EXERCISE_DATE,
+            EXERCISE_PRICE
         FROM
             FIN_EXERCISE_PLAN T1
         WHERE

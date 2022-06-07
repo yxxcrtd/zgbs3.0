@@ -3,6 +3,7 @@ package com.joyintech.tams.business.common.dao;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.business.common.dto.*;
 import com.joyintech.tams.common.base.entity.FinCashCalcRule;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
