@@ -3137,6 +3137,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 券面总额
         if (!StringUtil.isNotEmpty(dto.getBidPriceTotal())) {
             errorList.add(new ValidMessage(errorInfo + "券面总额不可为空!"));
+        } else if (BigDecimalUtil.ACompareToB(dto.getBidPriceTotal(), BigDecimal.ZERO, 4) <= 0
+                || BigDecimalUtil.ACompareToB(dto.getBidPriceTotal(), dto.getEtrBidPriceTotal(), 4) > 0) {
+            errorList.add(new ValidMessage("券面总额必须大于0，小于等于指令投标券面总额!"));
         }
         // 中标标位
         if (!StringUtil.isNotEmpty(dto.getWinPrice())) {
@@ -3177,7 +3180,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 errorList.add(new ValidMessage("投标产品列表中券面总额不可为空!"));
             } else if (BigDecimalUtil.ACompareToB(item.getBidPriceTotal(), BigDecimal.ZERO, 4) <= 0
                     || BigDecimalUtil.ACompareToB(item.getBidPriceTotal(), item.getAvaNum(), 4) > 0) {
-                errorList.add(new ValidMessage("投标产品列表中券面总额总额必须大于0，小于等于剩余指令额度!"));
+                errorList.add(new ValidMessage("投标产品列表中券面总额必须大于0，小于等于剩余指令额度!"));
             }
             // 结算服务费
             if (StringUtil.isNotEmpty(item.getSettFeeAmt())
