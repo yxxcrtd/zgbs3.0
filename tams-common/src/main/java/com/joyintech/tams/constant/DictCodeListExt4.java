@@ -144,7 +144,6 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     头寸申购方式_代投代缴(DictCode.头寸申购方式,"06","代投代缴"),
     共通业务类型_中标结果维护自主投标(DictCode.共通业务类型,"TRD102","共通业务类型_中标结果维护-自主投标"),
     共通业务类型_中标结果维护代投代缴(DictCode.共通业务类型,"TRD103","共通业务类型_中标结果维护-代投代缴"),
-            ;
 
     /** add by weipeng on 20220410：现金管理类产品改造升级 start **/
     利息收入备抵科目_利息收入备抵(DictCode.增值税缴纳利息收入备抵科目,"01","利息收入增值税备抵"),
