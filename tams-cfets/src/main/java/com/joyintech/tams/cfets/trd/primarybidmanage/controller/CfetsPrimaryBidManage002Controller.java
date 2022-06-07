@@ -6,10 +6,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ValidUtils;
@@ -235,16 +232,20 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(CfetsPrimaryBidManageSaveRequest::getTotalWinId);
-        params.setBusinessType(DictCodeListExt3.共通业务类型_一级市场债中标结果维护.getValue());
+        params.setBusinessCode(CfetsPrimaryBidManageSaveRequest::getBidId);
+        if (StringUtil.equals(dto.getBidModle(),DictCodeListExt4.投标方式_自主投标.getValue())) {
+            params.setBusinessType(DictCodeListExt4.共通业务类型_中标结果维护自主投标.getValue());
+        }else{
+            params.setBusinessType(DictCodeListExt4.共通业务类型_中标结果维护代投代缴.getValue());
+        }
         // 设置流程业务说明
         params.setComment(entity -> {
             return WorkFlowUtil.concatComment("中标日期"+
                     GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
                     "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
                     +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidTypeStr()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidPrice()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+dto.getWinPrinamt()+GlobalConstant.CLOSE_PARENTHESIS);
+                    +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+ArithmeticUtil.multiply(dto.getAllocationDetails().get(0).getBidPrice(),BigDecimal.valueOf(100))+"%"+GlobalConstant.CLOSE_PARENTHESIS
+                    +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.divide(dto.getWinPrinamt(),BigDecimal.valueOf(10000),2)+"万元"+GlobalConstant.CLOSE_PARENTHESIS);
         });
         ProcessParameter<CfetsPrimaryBidManageSaveRequest> parameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
         parameter.setOperationType(OperationType.NEW);
