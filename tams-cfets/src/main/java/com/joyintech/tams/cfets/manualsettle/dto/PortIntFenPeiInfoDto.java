@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 //组合分配信息共通DTO
 public class PortIntFenPeiInfoDto {
 
+    @ApiModelProperty(name = "tradeId", value = "交易编号")
+    private String tradeId;
+
     @ApiModelProperty(name = "portfolioId", value = "组合代码", example = "A1")
     private String portfolioId;
 

@@ -3987,6 +3987,7 @@
     <select id="findPortIntFenPeiInfoList"
             resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
         SELECT ROWNUM rowNums,
+        TPD.TRADE_ID tradeId,
         TPDA.PORTFOLIO_ID portfolioId,
         pp.PORTFOLIO_NAME portfolioName,
         TPD.SHARE_AMT/100 QTYD,
