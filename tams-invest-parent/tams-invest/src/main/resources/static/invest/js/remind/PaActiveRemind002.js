@@ -928,7 +928,6 @@ $(function() {
             Joyin.confirm(JoyinUtil.getMessage('FIN_E_0001'), function(){
                 Joyin.ajax(JoyinUtil.getRealPath('/invest/remind/PaActiveRemind002/closeRemind'),
                     {
-                        cdate : $('#quaryDate').val(),
                         remType : remType,
                         finprodId : finprodId,
                         tradePlace : tradePlace,
