@@ -354,7 +354,7 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
      public void setAllocationDetails(List<CfetsPrimaryBidManageSaveDetailDto> allocationDetails) {
          this.allocationDetails = allocationDetails;
      }
-     @PrimaryKey(PrimaryKey.Field.PK_1)
+
      public String getTotalWinId() {
          return totalWinId;
      }
@@ -390,6 +390,7 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
      @ApiModelProperty(name="bidId",value="投标编号")
      private String bidId;
 
+     @PrimaryKey(PrimaryKey.Field.PK_1)
      public String getBidId() {
          return bidId;
      }

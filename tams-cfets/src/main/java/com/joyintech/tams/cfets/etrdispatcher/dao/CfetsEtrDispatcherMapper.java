@@ -135,6 +135,13 @@ public interface CfetsEtrDispatcherMapper {
     List<CfetsEtrDispatcherDealListInfoResponse> getEtrDispatcherFirstBidDealListInfo(Map<String, Object> pageParam);
 
     /**
+     * 一级债券指令成交查询  未中标
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrDispatcherDealListInfoResponse> getEtrPrimaryBidDealListInfo(Map<String, Object> pageParam);
+
+    /**
      * 指令分发成交信息
      * @param pageParam
      * @return

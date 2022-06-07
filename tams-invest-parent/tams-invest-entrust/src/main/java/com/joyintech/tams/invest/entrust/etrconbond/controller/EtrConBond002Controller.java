@@ -311,10 +311,9 @@ public class EtrConBond002Controller extends BaseController {
                     String b=a.replaceAll("&quot;","\"");
                     BaseMap data = JsonUtils.json2Object(b, BaseMap.class);
 
-                    StringBuffer strb = null;
+                    StringBuffer strb = new StringBuffer("【<br/>");
                     Map responseMap_data = (Map) data.get("data");
                     if (responseMap_data != null) {
-                        strb = new StringBuffer("【<br/>");
                         List checkResults = (List) responseMap_data.get("checkResults");
                         if (checkResults != null) {
                             for (int i = 0; i < checkResults.size(); i++) {

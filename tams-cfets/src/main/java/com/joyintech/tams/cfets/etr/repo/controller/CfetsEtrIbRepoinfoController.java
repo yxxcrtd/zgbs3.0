@@ -144,6 +144,7 @@ public class CfetsEtrIbRepoinfoController extends BaseController{
         //数据字典初始化数据
         initPageParams.put("FINPROD_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
         initPageParams.put("FINPROD_TYPE_THREE", this.getSelectDataFromDataDic(DictCode.行内资产三级分类, null));
+        initPageParams.put("FINPROD_TYPE_TWO", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
         initPageParams.put("PRICE_MODEL", this.getSelectDataFromDataDic(DictCode.价格模式, null));
         initPageParams.put("ACCOUNT_SPEED", this.getSelectDataFromDataDic(DictCode.清算速度, null));
         initPageParams.put("REGIST_ORG", this.getSelectDataFromDataDic(DictCode.登记托管机构, null));

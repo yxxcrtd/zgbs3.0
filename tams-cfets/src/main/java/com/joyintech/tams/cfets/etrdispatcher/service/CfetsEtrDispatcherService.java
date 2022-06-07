@@ -45,6 +45,7 @@ import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid001Service;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
@@ -452,10 +453,16 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(),new BigDecimal("10000"),2,RoundingMode.HALF_UP));
                         response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("10000"),2,RoundingMode.HALF_UP));
                     }
+                } else if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())) {
+                    DecimalFormat df = new DecimalFormat("0.##");
+                    response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getTransRemainderAmt(), new BigDecimal("100"), 4))));
+                    response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("10000"), 4))));
+                    response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
+                    response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
+                    response.setDealProgress(ArithmeticUtil.divide(response.getTransFinishAmt(),ArithmeticUtil.doAdd(response.getTransFinishAmt(),response.getTransRemainderAmt()),4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")));
                 }
                 if(StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
                         StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
-
                     CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
                     if(dto2 != null) {
                         response.setExecFinishAmt(dto2.getExecFinishAmt());
@@ -464,20 +471,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setTransFinishAmt(dto2.getTransFinishAmt());
                         response.setTransRemainderAmt(dto2.getTransRemainderAmt());
                         response.setDealProgress(dto2.getDealProgress());
-                        //ZGCPCN-995
-                        if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
-                            if (StringUtil.equals(response.getTargetType(), DictCodeListExt3.目标类型_数量.getValue())) {
-                                DecimalFormat df = new DecimalFormat("0.##");
-                                response.setDealProgress(dto2.getDealProgress());
-                                response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(dto2.getTransRemainderAmt(), new BigDecimal("10000"), 4))));
-                                response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(dto2.getTransFinishAmt(), new BigDecimal("10000"), 4))));
-                                response.setExecFinishAmt(ArithmeticUtil.divide(dto2.getExecFinishAmt(), new BigDecimal("10000"), 2, RoundingMode.HALF_UP));
-                                response.setExecRemainderAmt(ArithmeticUtil.divide(dto2.getExecRemainderAmt(), new BigDecimal("10000"), 2, RoundingMode.HALF_UP));
-                            }
-                        }
                     }
                 }
-
             }
         }
         return pageLimit;
@@ -776,7 +771,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                 () -> cfetsEtrDispatcherMapper.queryEntrust2Touguan(pageParam));
         if (!CollectionUtils.isEmpty(page.getRoot())) {
             for (CfetsEtrDispatcherExeListInfoResponse response : page.getRoot()) {
-                if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
+                if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue()) ||
+                        StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())) {
                     response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     response.setEntrustVolume(ArithmeticUtil.divide(response.getEntrustVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                 }
@@ -838,8 +834,15 @@ public class CfetsEtrDispatcherService extends BaseService {
 //                    response.setBidprice(dto2.getEtrPrice());
 //                }
 //            }
-            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherFirstBidDealListInfo(pageParam));
-        //中标结果明细
+
+            if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_自主投标.getValue()) && StringUtil.equals(dto.getIsWin(), DictCodeList.是否_是)) {
+                //未中标查询中标结果明细
+                page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrPrimaryBidDealListInfo(pageParam));
+            }else {
+                page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherFirstBidDealListInfo(pageParam));
+            }
+
+
         }else {
             page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherDealListInfo(pageParam));
         }
@@ -1786,6 +1789,18 @@ public class CfetsEtrDispatcherService extends BaseService {
         if (CollectionUtils.isNotEmpty(infoData.getBiddingProductList()) &&
                 StringUtil.isNotEmpty(infoData.getBiddingProductList().get(0).getSecAcctId())) {
             infoData.setSecAcctId(infoData.getBiddingProductList().get(0).getSecAcctId());
+            for (CfetsBiddingProductDto bidDto : infoData.getBiddingProductList()) {
+                //处理标位信息
+                if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
+                    bidDto.setBidPriceStr(ArithmeticUtil.multiply(bidDto.getBidPrice(),new BigDecimal(100)).setScale(4,RoundingMode.HALF_UP).toString()+"%");
+                }
+                if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())) {
+                    bidDto.setBidPriceStr(bidDto.getBidPrice().setScale(4,RoundingMode.HALF_UP).toString()+"元");
+                }
+                if (StringUtil.equals(infoData.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                    bidDto.setBidPriceStr(ArithmeticUtil.multiply(bidDto.getBidPrice(),new BigDecimal(10000)).setScale(2,RoundingMode.HALF_UP).toString()+"BP");
+                }
+            }
         }
 
         resultData.put(dtCode + "_infoForm",infoForm);

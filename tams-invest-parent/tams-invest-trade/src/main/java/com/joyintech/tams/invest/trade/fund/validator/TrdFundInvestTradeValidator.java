@@ -242,7 +242,7 @@ public class TrdFundInvestTradeValidator implements TradeCommonValidator {
                     if (prinAmt != null) {
                         entrustAmt = entrustAmt.subtract(prinAmt);
                     }
-                    if (tradeAmt.compareTo(entrustAmt) == 1) {
+                    if (tradeAmt.compareTo(entrustAmt) > 0) {
                         errorList.add(new ValidMessage("tradeAmt", this.getMessage("TRD_X_0004") + entrustAmt));
                     }
                 }

@@ -409,6 +409,8 @@ public class TrdBondInvestTradeService extends BaseService {
         param.put("defaultTradeMarketList", PageMenuSplitUtil.getTradeMarketList((String) param.get("parentPageId")));
         // add by etliu 20210501 银行间场内场外拆分 end
 
+        param.put("platDate", pPlatformDate.getSysDate());
+
         return this.queryForPage(page, length,
                 () -> trdBondInvestTradeMapper.getFinprodId(param));
 

@@ -76,7 +76,7 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
                 logger.info("请求用户【{}】", "userId = " + userId);
                 map.put("userId", SecurityUtil.getLoginUser().getUserName());
                 getZqzyPositionParam(map);
-                Page<EtrExchangeTradeFjyywzlZqzyDto> result = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
+                Page<EtrExchangeTradeFjyywzlZqzyDto> result = super.queryForPage(request.getPageMode().getPageNo(), 1000,
                         () -> etrExchangeTradeFjyywzl001Mapper.findZqzyPositionsPageNew(map));
                 List<EtrExchangeTradeFjyywzlZqzyDto> returnList=new ArrayList<>();
                 if(result!=null&&!CollectionUtils.isEmpty(result.getRoot())){
@@ -180,26 +180,27 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
         if(StringUtil.isNotEmpty(dto.getPortfolioId())&&StringUtil.isNotEmpty(dto.getAcctId())){
             Map<String,Object> map=new HashMap<>();
             map.put("portfolioId",dto.getPortfolioId());
-            map.put("acctNo",dto.getAcctId());
+            //map.put("acctNo",dto.getAcctId());
             List<SelectOptionDto> ptlSecAcctInfoList=
             restTemplate.postForList(
                     ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getPtlSecAcctInfo", map,
                     SelectOptionDto.class);
             if(!CollectionUtils.isEmpty(ptlSecAcctInfoList)){
-                SelectOptionDto selectOptionDto=ptlSecAcctInfoList.get(0);
-                List<LinkedHashMap<String,String>>  acctSecList = (List<LinkedHashMap<String,String>>) selectOptionDto.getObject();
                 List<PositionCashSecDto> shProList=new ArrayList<>();
                 List<PositionCashSecDto> szProList=new ArrayList<>();
-                for(LinkedHashMap<String,String> linkedHashMap:acctSecList){
-                    PositionCashSecDto cashSecDto=new PositionCashSecDto();
-                    cashSecDto.setPortfolioId(dto.getPortfolioId());
-                    cashSecDto.setFinprodId("XN_PRODID999");
-                    if(StringUtil.equals(BussinessDictCodeList.交易场所_上海证券交易所.getValue(),linkedHashMap.get("tradeMarket"))){
-                        cashSecDto.setSecAcctId(linkedHashMap.get("secAcctId"));
-                        shProList.add(cashSecDto);
-                    }else   if(StringUtil.equals(BussinessDictCodeList.交易场所_深圳证券交易所.getValue(),linkedHashMap.get("tradeMarket"))){
-                        cashSecDto.setSecAcctId(linkedHashMap.get("secAcctId"));
-                        szProList.add(cashSecDto);
+                for(SelectOptionDto selectOptionDto:ptlSecAcctInfoList) {
+                    List<LinkedHashMap<String, String>> acctSecList = (List<LinkedHashMap<String, String>>) selectOptionDto.getObject();
+                    for (LinkedHashMap<String, String> linkedHashMap : acctSecList) {
+                        PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                        cashSecDto.setPortfolioId(dto.getPortfolioId());
+                        cashSecDto.setFinprodId("XN_PRODID999");
+                        if (StringUtil.equals(BussinessDictCodeList.交易场所_上海证券交易所.getValue(), linkedHashMap.get("tradeMarket"))) {
+                            cashSecDto.setSecAcctId(linkedHashMap.get("secAcctId"));
+                            shProList.add(cashSecDto);
+                        } else if (StringUtil.equals(BussinessDictCodeList.交易场所_深圳证券交易所.getValue(), linkedHashMap.get("tradeMarket"))) {
+                            cashSecDto.setSecAcctId(linkedHashMap.get("secAcctId"));
+                            szProList.add(cashSecDto);
+                        }
                     }
                 }
                 //筛选出当前组合下所有持仓

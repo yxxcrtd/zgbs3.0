@@ -77,13 +77,6 @@ public class CfetsTrdRedeem001Controller extends BaseController {
     private BaseGetBusinessId baseGetBusinessId;
 
     @Autowired
-    private IPlatformDate iPlatformDate;
-
-    @Autowired
-    private IbuQuoteBondService ibuQuoteBondService;
-    @Autowired
-    private CfetsQuotedCommonService cfetsQuotedCommonService;
-    @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
     @Override
     public String init(Model model) {
@@ -170,7 +163,7 @@ public class CfetsTrdRedeem001Controller extends BaseController {
 
     /**
      * 待办事项页面,保存校验
-     * @param CfetsTrdRedeemDealCommonDto
+     * @param cfetsTrdRedeemDealCommonDto
      * @return
      */
     @PostMapping("/checkByHome")

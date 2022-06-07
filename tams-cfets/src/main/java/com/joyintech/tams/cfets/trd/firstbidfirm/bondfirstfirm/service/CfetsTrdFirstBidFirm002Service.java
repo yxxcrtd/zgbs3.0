@@ -286,16 +286,17 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 if (StringUtil.isEmpty(counterId)) {
                     counterId = entrustDto.getCounterId();
                 }
-                if (!StringUtil.equals(counterId, entrustDto.getCounterId())) {
+                if (StringUtil.isNotEmpty(entrustDto.getCounterId())
+                        && !StringUtil.equals(counterId, entrustDto.getCounterId())) {
                     if (StringUtil.isNotEmpty(msg)) {
                         msg += "OR";
                     }
                     msg += "交易对手";
                 }
                 if (StringUtil.isNotEmpty(msg)) {
-//                    msg = "【" + msg + "】不同";
+                    msg = "【" + msg + "】不同";
                     errorList.add(new ValidMessage(msg));
-                    errorList.add(new ValidMessage(getMessage("COMMON_NOTSAME_001", msg)));
+//                    errorList.add(new ValidMessage(getMessage("COMMON_NOTSAME_001", msg)));
                     break;
                 }
                 entrustIdList.add(entrustDto.getEntrustId());
@@ -386,9 +387,19 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         List<CfetsTrdFirstBidFirmInfoDto> list = cfetsTrdFirstBidFirm002Mapper.selectProductsInit(param);
         if (CollectionUtils.isEmpty(list) || list.size() > 1) {
             logger.error("初始化结果数不为1 " + JsonUtils.object2Json(list));
-            return null;
+        }
+        String counterId = null;
+        List<CfetsTrdFirstBidFirmProductDto> productDtos = new ArrayList<>();
+        for(CfetsTrdFirstBidFirmInfoDto item:list) {
+            // 交易对手
+            if (StringUtil.isEmpty(counterId)) {
+                counterId = item.getCounterId();
+            }
+            productDtos.addAll(item.getProductDtos());
         }
         cfetsTrdFirstBidFirmInfoDto = list.get(0);
+        cfetsTrdFirstBidFirmInfoDto.setProductDtos(productDtos);
+        cfetsTrdFirstBidFirmInfoDto.setCounterId(counterId);
         if (StringUtil.isEmpty(bidModel)) {
             bidModel = cfetsTrdFirstBidFirm002Mapper.selectBidModelInData(param);
         }
@@ -637,19 +648,31 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             });
             entrustDtolist = listTemp;
         }
-        //1.查询申购产品列表(获取资产信息,及剩余指令额度)
-        entrustDtolist.forEach(item -> {
-            entrustIdList.add(item.getEntrustId());
-        });
-        param.put("entrustIdList", entrustIdList);
-        this.setParam(param);
-        List<CfetsTrdFirstBidFirmInfoDto> list = cfetsTrdFirstBidFirm002Mapper.selectProductsInit(param);
-        if (CollectionUtils.isEmpty(list) || list.size() > 1 || CollectionUtils.isEmpty(entrustIdList)) {
-            logger.error("初始化结果数不为1 " + JsonUtils.object2Json(list));
-            return request;
+        if(CollectionUtils.isNotEmpty(entrustDtolist)) {
+            //1.查询申购产品列表(获取资产信息,及剩余指令额度)
+            entrustDtolist.forEach(item -> {
+                entrustIdList.add(item.getEntrustId());
+            });
+            param.put("entrustIdList", entrustIdList);
+            this.setParam(param);
+            List<CfetsTrdFirstBidFirmInfoDto> list = cfetsTrdFirstBidFirm002Mapper.selectProductsInit(param);
+            if (CollectionUtils.isEmpty(list) || list.size() > 1) {
+                logger.error("初始化结果数不为1 " + JsonUtils.object2Json(list));
+            }
+            String counterId = null;
+            List<CfetsTrdFirstBidFirmProductDto> productDtos = new ArrayList<>();
+            for (CfetsTrdFirstBidFirmInfoDto item : list) {
+                // 交易对手
+                if (StringUtil.isEmpty(counterId)) {
+                    counterId = item.getCounterId();
+                }
+                productDtos.addAll(item.getProductDtos());
+            }
+            cfetsTrdFirstBidFirmInfoDto = list.get(0);
+            cfetsTrdFirstBidFirmInfoDto.setProductDtos(productDtos);
+            cfetsTrdFirstBidFirmInfoDto.setCounterId(counterId);
+            request.getProductDtos().addAll(cfetsTrdFirstBidFirmInfoDto.getProductDtos());
         }
-        cfetsTrdFirstBidFirmInfoDto = list.get(0);
-        request.getProductDtos().addAll(cfetsTrdFirstBidFirmInfoDto.getProductDtos());
         //  自主投标和代投代缴
         if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), request.getBiddingMethod())
                 || StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), request.getBiddingMethod())) {
@@ -1777,6 +1800,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
                 entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                 this.sendPositionMethod(entity, true, null);
+            } else {
+                entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+                this.sendPositionMethodOther(entity, true, null);
             }
             // 老头寸处理
 //            this.dealOldPosition(entity, false);
@@ -3111,6 +3137,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 券面总额
         if (!StringUtil.isNotEmpty(dto.getBidPriceTotal())) {
             errorList.add(new ValidMessage(errorInfo + "券面总额不可为空!"));
+        } else if (BigDecimalUtil.ACompareToB(dto.getBidPriceTotal(), BigDecimal.ZERO, 4) <= 0
+                || BigDecimalUtil.ACompareToB(dto.getBidPriceTotal(), dto.getEtrBidPriceTotal(), 4) > 0) {
+            errorList.add(new ValidMessage("券面总额必须大于0，小于等于指令投标券面总额!"));
         }
         // 中标标位
         if (!StringUtil.isNotEmpty(dto.getWinPrice())) {
@@ -3151,7 +3180,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 errorList.add(new ValidMessage("投标产品列表中券面总额不可为空!"));
             } else if (BigDecimalUtil.ACompareToB(item.getBidPriceTotal(), BigDecimal.ZERO, 4) <= 0
                     || BigDecimalUtil.ACompareToB(item.getBidPriceTotal(), item.getAvaNum(), 4) > 0) {
-                errorList.add(new ValidMessage("投标产品列表中券面总额总额必须大于0，小于等于剩余指令额度!"));
+                errorList.add(new ValidMessage("投标产品列表中券面总额必须大于0，小于等于剩余指令额度!"));
             }
             // 结算服务费
             if (StringUtil.isNotEmpty(item.getSettFeeAmt())
@@ -3269,7 +3298,83 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
     }
 
     /**
-     * TODO 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
+     * 自主投标 代投代缴 头寸处理
+     *
+     * @param entity
+     * @param isSubmit
+     * @param confirmOk
+     * @author jiangpeng
+     * @date 2021/12/24 10:12
+     */
+    private void sendPositionMethodOther(CfetsTrdFirstBidFirmInfoDto entity, boolean isSubmit, String confirmOk) {
+        List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
+        for (CfetsTrdFirstBidFirmProductDto productDto : entity.getProductDtos()) {
+            //调用头寸
+            CfetsBondPortfolioCashRequest posport = new CfetsBondPortfolioCashRequest();
+            posport.setPortfolioId(productDto.getPortfolioId());
+            posport.setEtrId(productDto.getEntrustId());
+            posport.setTradeId(entity.getBidId());
+            if (StringUtil.isNotEmpty(productDto.getSecManageAcctId())) {
+                posport.setSecAcctId(productDto.getSecManageAcctId()); // 证券户
+            }
+            if (StringUtil.isNotEmpty(productDto.getPortfolioId())) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("portfolioId", productDto.getPortfolioId());
+                map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+                String cashAcctId = joyinbusinessCommonService.qryPortfolioCashAcctId(map);
+                if (StringUtil.isNotEmpty(cashAcctId)) {
+                    posport.setCashAcctId(cashAcctId); // 托管户
+                }
+            }
+            posport.setCashAmount(productDto.getTotalBiddingNum());
+            posport.setSecAmount(productDto.getTotalBiddingNum());
+            posport.setOwnSecAmount(productDto.getTotalBiddingNum().toPlainString());
+            ptlList.add(posport);
+        }
+        //调用头寸
+        CfetsBondPositionRequest req = new CfetsBondPositionRequest();
+        req.setInterfaceType("Bond001");//报文类型
+        req.setFinprodId(entity.getFinprodId());
+        req.setUserId(SecurityUtil.getLoginUser().getUserName());
+        req.setTotalTradeId(entity.getBidId());
+        req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
+        req.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
+        req.setWorkFlowId(entity.getWorkflowId());
+        String balanceCheck = DictCodeList.是否_是.getValue();
+        if ((StringUtil.isNotEmpty(entity.getSoftSkipMode())
+                && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))
+                || StringUtil.isNotEmpty(confirmOk)) {
+            balanceCheck = DictCodeList.是否_否.getValue();
+        }
+        req.setBalanceCheck(balanceCheck);
+        req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
+        if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
+            req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
+        }
+        req.setBusiAct(DictCodeListExt3.业务动作_汇总确认.getValue());
+        req.setPs(DictCodeList.交易方向_买入.getValue());
+        if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), entity.getBiddingMethod())) {
+            req.setPurchModle(DictCodeListExt4.头寸申购方式_自主投标.getValue());
+        } else {
+            req.setPurchModle(DictCodeListExt4.头寸申购方式_代投代缴.getValue());
+        }
+        if (isSubmit) {
+            req.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
+            req.setSystemAct(entity.getSystemAct());
+        } else {
+            req.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
+            req.setSystemAct(entity.getSystemAct());
+            req.setbTotalTradeId(entity.getBidId());
+        }
+        req.setCdate(entity.getTradeDate());
+        req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+        req.setPtlList(ptlList);
+        PositionHttpRequest.send(req);
+    }
+
+    /**
+     * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
      * @param entity         页面元素
      * @param isRevokeOrBack 交易流程状态 参数字典 TRADE_FLOW_STATUS

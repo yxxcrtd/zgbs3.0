@@ -994,6 +994,8 @@
         OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
     </select>
 
+    <select id="getEtrPrimaryBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
+    </select>
     <select id="getEtrDispatcherFirstBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
@@ -1979,12 +1981,46 @@
         </where>
 
         ) T
-        group by T.effectiveStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId, T.finprodAbbr,T.tenderTarget,T.issueDateStart,
-        T.issueDateEnd, T.etrBidPriceTotal, T.tradeMarket, T.totalBiddingNum, T.bidprice,
+        group by
+        T.effectiveStatus,
+        T.firstBidStatus,
+        T.bidId,
+        T.finprodId,
+        T.finprodMarketId,
+        T.finprodAbbr,
+        T.tenderTarget,
+        T.issueDateStart,
+        T.issueDateEnd,
+        T.etrBidPriceTotal,
+        T.tradeMarket,
+        T.totalBiddingNum,
+        T.bidprice,
         T.biddingMethod,
-        T.payType, T.winPrice, T.price, T.payableAmount, T.settFeeAmt, T.payDate, T.assignRegdate, T.listingDate,
-        T.bidConfirmDate, T.counterId, T.counterName,
-        T.remark, T.dealDate
+        T.payType,
+        T.winPrice,
+        T.price,
+        T.payableAmount,
+        T.settFeeAmt,
+        T.payDate,
+        T.assignRegdate,
+        T.listingDate,
+        T.bidConfirmDate,
+        T.counterId,
+        T.counterName,
+        T.remark,
+        T.purchaseDate,
+        T.secAcctName,
+        T.secType,
+        T.portfolioId,
+        T.portfolioName,
+        T.subscriptionAmount,
+        T.ouPartyId,
+        T.ouPartyIdAbbr,
+        T.ourTrader,
+        T.ourTraderName,
+        T.issuer,
+        T.issuerName,
+        T.dealDate
     </select>
     <!-- 根据用户名得到真实姓名 -->
     <select id="getRealNameByUserName" resultType="com.joyintech.tams.common.base.entity.User">
@@ -2142,7 +2178,9 @@
         to_char(eted.MPAY_DATE,'yyyy-MM-dd') mpayDate,
         eted.M_INT_AMT mIntAmt,
         eted.M_TRADE_AMT mTradeAmt,
-        nvl(decode( eted.ASSET_TYPE, 'F07' , ee.Pledge_Ratio , fscr.SCALE ), 0 ) * 100 pledgeRatio, /** 折算率 **/
+        case when ete.PS in ('T68','T69') then ete.price * 100
+        else nvl(decode( eted.ASSET_TYPE, 'F07' , ee.Pledge_Ratio , fscr.SCALE ), 0 ) * 100
+            end as pledgeRatio, /** 折算率 **/
         ee.PLEDGE_NUMBER pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
         eted.TRADE_ID tradeId,
@@ -2247,7 +2285,9 @@
         to_char(eted.MPAY_DATE,'yyyy-MM-dd') mpayDate,
         eted.M_INT_AMT mIntAmt,
         eted.M_TRADE_AMT mTradeAmt,
-        nvl(decode( eted.ASSET_TYPE, 'F07' , ee.Pledge_Ratio , fscr.SCALE ), 0 ) * 100 pledgeRatio, /** 折算率 **/
+        case when ete.PS in ('T68','T69') then ete.price * 100
+        else nvl(decode( eted.ASSET_TYPE, 'F07' , ee.Pledge_Ratio , fscr.SCALE ), 0 ) * 100
+        end as pledgeRatio, /** 折算率 **/
         ee.PLEDGE_NUMBER pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
         eted.TRADE_ID tradeId,

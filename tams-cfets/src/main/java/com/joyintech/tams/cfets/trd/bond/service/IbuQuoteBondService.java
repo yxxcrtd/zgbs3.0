@@ -345,6 +345,13 @@ public class IbuQuoteBondService extends BaseService {
             paramExer.put("finprodId",cfetsBondDealQuoteCommonDto.getFinprodId());
             Boolean flag=cfetsetrIbBondinfoMapper.queryAssetIsRight(paramExer);
             cfetsBondDealQuoteCommonDto.setExercisePlan(flag);
+            boolean priceIsNull = true;
+            // 行权净价为空的数据
+            if (!StringUtil.isNotEmpty(finExercisePlan)
+                    || !StringUtil.isNotEmpty(finExercisePlan.getExercisePrice())) {
+                priceIsNull = false;
+            }
+            cfetsBondDealQuoteCommonDto.setIsExercisePlanPrice(priceIsNull);
             // 特殊债券信息查询
             List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(cfetsBondDealQuoteCommonDto.getFinprodId()));
             if (CollectionUtils.isNotEmpty(list)) {
@@ -848,7 +855,12 @@ public class IbuQuoteBondService extends BaseService {
             }
         }else{
             FinProduct finProduct = finProductMapper.selectByPrimaryKey(entrustDtos.get(0).getFinprodId());
-            if(StringUtil.equals(finProduct.getIsRight(), com.joyintech.tams.constant.DictCodeList.是否_是.getValue())){
+            // 查询行权净价为空的数据
+            Map<String, Object> param = new HashMap<>();
+            param.put("finprodId", entrustDtos.get(0).getFinprodId());
+            param.put("isNull", DictCodeList.是否_是.getValue());
+            FinExercisePlan finExercisePlan = cfetsetrIbBondinfoMapper.findAssetExercise(param);
+            if (StringUtil.equals(finProduct.getIsRight(), DictCodeList.是否_是.getValue()) && !StringUtil.isNotEmpty(finExercisePlan)) {
                 //锚定值非行权收益率，在交易执行面板，应该默认选择到期收益率
                 if(!groupByCalculateField.containsKey("03")){
                     translateKey = "02";

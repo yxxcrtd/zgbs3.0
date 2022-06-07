@@ -33,6 +33,12 @@ public class FieldEtrBiddingProductDto {
     private BigDecimal bidPrice;
 
     /**
+     * 投标标位字符串
+     */
+    @ApiModelProperty(name="bidPriceStr",value="投标标位字符串，前端展示用",example="1")
+    private String bidPriceStr;
+
+    /**
      * 投标券面总额
      */
     @ApiModelProperty(name="bidPrinAmt",value="投标券面总额",example="1")
@@ -206,5 +212,13 @@ public class FieldEtrBiddingProductDto {
 
     public void setRownum(String rownum) {
         this.rownum = rownum;
+    }
+
+    public String getBidPriceStr() {
+        return bidPriceStr;
+    }
+
+    public void setBidPriceStr(String bidPriceStr) {
+        this.bidPriceStr = bidPriceStr;
     }
 }

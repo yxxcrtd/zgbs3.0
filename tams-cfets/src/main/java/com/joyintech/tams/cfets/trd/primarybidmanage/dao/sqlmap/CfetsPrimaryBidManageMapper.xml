@@ -221,6 +221,9 @@
         INNER JOIN
         ETR_ENTRUST etr
         ON etr.ENTRUST_ID = etr_add.ENTRUST_ID
+        UNION
+        SELECT BID_ORDER.OUR_TRADER  TRADER
+          FROM BID_ORDER
         ) t
         <where>
             <if test="search != null and !search.equals('')">
@@ -634,6 +637,7 @@
             BRT.CREDITOR_DEBT_DATE   creditorDebtDate,
             FPA.LISTING_DATE listingDate,
             BRT.WIN_TYPE   winType,
+            BO.BID_MODLE     bidModle,
             BO.WIN_PRIN_AMT/10000 totalBiddingNum,
             BRT.WIN_PRINAMT   winPrinAmt,
             BRT.WIN_PRICE       winPrice,

@@ -28,8 +28,10 @@
 
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
-    <include refid="Base_Column_List" />
+    select
+      NODE_ID, INDICATOR_PRE_NODE, nvl(INDICATOR_CONTROL,'00') as INDICATOR_CONTROL, INDICATOR_APPROVE , INDICATOR_OCCUPY,
+      CREDIT_PRE_NODE, nvl(CREDIT_CONTROL,'00') as CREDIT_CONTROL, CREDIT_OCCUPY, nvl(AUTHORIZE_CONTROL,'00') as AUTHORIZE_CONTROL, AUTHORIZE_APPROVE,
+      nvl(NAME_LIST_CONTROL,'00') as NAME_LIST_CONTROL, NAME_LIST_TYPE, REMARK, UPDATE_USER, CREATE_TIME
     from RSK_NODE_CONFIG_DTL
     where NODE_ID = #{nodeId,jdbcType=VARCHAR}
   </select>

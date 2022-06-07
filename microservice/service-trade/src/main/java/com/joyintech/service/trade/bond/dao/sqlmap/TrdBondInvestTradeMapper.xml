@@ -869,6 +869,10 @@
                     </foreach>
                 </if>
                 <!-- add by etliu 20210501 银行间场内场外拆分 end -->
+                <if test="platDate != null">
+                    /* 添加摘牌日判断 */
+                    AND A.DELISTING_DATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+                </if>
 		AND Q.IS_ISSUE_ASSET = 'Y'
                 <if test="pageModel != null and pageModel != '2'.toString() and pageModel != ''">
                     AND Q.APPEAR_MARKET_ID IS NULL
@@ -967,6 +971,10 @@
                     </foreach>
                 </if>
                 <!-- add by sunhui 20210721 银行间场内场外拆分 end -->
+                <if test="platDate != null">
+                    /* 添加摘牌日判断 */
+                    AND A.DELISTING_DATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+                </if>
                 AND (Q.IS_ISSUE_ASSET IS NULL OR Q.IS_ISSUE_ASSET = 'N')
             </where>
         <if test="isautobond != null and isautobond == 'true'">

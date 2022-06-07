@@ -11,12 +11,7 @@
 package com.joyintech.service.riskrdsinf.event.rsk003.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.service.riskrdsinf.event.rsk004.service.Rsk004Service;
@@ -156,7 +151,9 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
                 //----update by zxjjpei 20190318 若发现调用实占释放 end--------
             }
             // 触发的风险事件不计算指标
-            if (!isCalcIndicator(eveList)) {
+            List<IEvent> eveList1 = new ArrayList<>();
+            eveList1.addAll(eveList);
+            if (!isCalcIndicator(eveList1)) {
                 getLogger().info("触发的风控事项不计算指标");
                 // 取得组合关联指标信息
                 IPtlIndicator ptlInd = getPtlIndicator(mapData);

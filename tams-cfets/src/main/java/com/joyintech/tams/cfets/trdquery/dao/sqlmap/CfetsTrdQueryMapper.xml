@@ -1954,7 +1954,7 @@
         left join MST_CFETS_CUSTOMER_TRADER su on ic.cp_trader_id=su.TRADER_ID
 
         where ic.quote_id= #{quoteId,jdbcType=VARCHAR}
-        and decode(ic.trade_status,'15',#{STATUS_VALID_03},#{STATUS_VALID_01})= #{effectiveStatus,jdbcType=VARCHAR}
+        and decode(ic.trade_status,'15',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02})= #{effectiveStatus,jdbcType=VARCHAR}
         union all
         select distinct
         ic.ou_party_id as traderid,
@@ -2000,7 +2000,7 @@
         left join MST_CFETS_CUSTOMER_TRADER su1 on ic.ou_trader_id=su1.TRADER_ID
         LEFT JOIN MST_CFETS_CUSTOMER_INFO mccic ON ic.cp_party_id= mccic.party_id
         left join MST_CFETS_CUSTOMER_TRADER su on ic.cp_trader_id=su.TRADER_ID
-        where ic.quote_id= #{quoteId,jdbcType=VARCHAR}   and #{STATUS_VALID_04}= #{effectiveStatus,jdbcType=VARCHAR}
+        where ic.quote_id= #{quoteId,jdbcType=VARCHAR}   and #{TRADE_FLOW_STATUS01}= #{effectiveStatus,jdbcType=VARCHAR}
     </select>
     <select id="selectIbuBondTableFenPeiInfoList"
             resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsPortfolioIdFenPeiInfoResponse">
@@ -2216,7 +2216,7 @@
         LEFT JOIN ETR_ENTRUST ee ON ir.entrust_id = ee.entrust_id
         left join ibu_quote_crep ic on ir.quote_id=ic.quote_id
         where ir.quote_id=#{quoteId,jdbcType=VARCHAR}
-        and decode(ic.trade_status,'15',#{STATUS_VALID_03},#{STATUS_VALID_01})= #{effectiveStatus,jdbcType=VARCHAR}
+        and decode(ic.trade_status,'15',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02})= #{effectiveStatus,jdbcType=VARCHAR}
         union all
         select ir.entrust_id as entrustId,
         ir.portfolio_id as portfolioId,
@@ -2240,7 +2240,7 @@
         LEFT JOIN ETR_ENTRUST ee ON ir.entrust_id = ee.entrust_id
         left join wfl_ibu_quote_crep ic on ir.quote_id=ic.quote_id
         where ir.quote_id=#{quoteId,jdbcType=VARCHAR}
-        and #{STATUS_VALID_04}= #{effectiveStatus,jdbcType=VARCHAR}
+        and #{TRADE_FLOW_STATUS01}= #{effectiveStatus,jdbcType=VARCHAR}
 
     </select>
     <select id="selectIbuTablePledgeInfoList"
@@ -3987,6 +3987,7 @@
     <select id="findPortIntFenPeiInfoList"
             resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
         SELECT ROWNUM rowNums,
+        TPD.TRADE_ID tradeId,
         TPDA.PORTFOLIO_ID portfolioId,
         pp.PORTFOLIO_NAME portfolioName,
         TPD.SHARE_AMT/100 QTYD,
