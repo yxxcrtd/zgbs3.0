@@ -453,10 +453,16 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(),new BigDecimal("10000"),2,RoundingMode.HALF_UP));
                         response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("10000"),2,RoundingMode.HALF_UP));
                     }
+                } else if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())) {
+                    DecimalFormat df = new DecimalFormat("0.##");
+                    response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getTransRemainderAmt(), new BigDecimal("100"), 4))));
+                    response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("10000"), 4))));
+                    response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
+                    response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
+                    response.setDealProgress(ArithmeticUtil.divide(response.getTransFinishAmt(),ArithmeticUtil.doAdd(response.getTransFinishAmt(),response.getTransRemainderAmt()),4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")));
                 }
                 if(StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
                         StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
-
                     CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
                     if(dto2 != null) {
                         response.setExecFinishAmt(dto2.getExecFinishAmt());
@@ -465,20 +471,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setTransFinishAmt(dto2.getTransFinishAmt());
                         response.setTransRemainderAmt(dto2.getTransRemainderAmt());
                         response.setDealProgress(dto2.getDealProgress());
-                        //ZGCPCN-995
-                        if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
-                            if (StringUtil.equals(response.getTargetType(), DictCodeListExt3.目标类型_数量.getValue())) {
-                                DecimalFormat df = new DecimalFormat("0.##");
-                                response.setDealProgress(dto2.getDealProgress());
-                                response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(dto2.getTransRemainderAmt(), new BigDecimal("10000"), 4))));
-                                response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(dto2.getTransFinishAmt(), new BigDecimal("10000"), 4))));
-                                response.setExecFinishAmt(ArithmeticUtil.divide(dto2.getExecFinishAmt(), new BigDecimal("10000"), 2, RoundingMode.HALF_UP));
-                                response.setExecRemainderAmt(ArithmeticUtil.divide(dto2.getExecRemainderAmt(), new BigDecimal("10000"), 2, RoundingMode.HALF_UP));
-                            }
-                        }
                     }
                 }
-
             }
         }
         return pageLimit;

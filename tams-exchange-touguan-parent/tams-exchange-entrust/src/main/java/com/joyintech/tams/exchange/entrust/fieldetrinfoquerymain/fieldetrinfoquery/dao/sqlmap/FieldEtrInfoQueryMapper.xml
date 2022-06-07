@@ -4,7 +4,7 @@
     <select id="findAllData"
             parameterType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListRequest"
             resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListResponse">
-        SELECT * FROM (SELECT T.* FROM(
+        SELECT DISTINCT * FROM (SELECT T.* FROM(
         SELECT
         ETR_ENTRUST_ADD.ASSET_TYPE1 as assetType1,
         #{effectFlag} effectFlag,

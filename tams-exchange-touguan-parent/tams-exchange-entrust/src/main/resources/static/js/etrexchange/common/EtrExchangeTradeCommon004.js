@@ -970,7 +970,7 @@
             }
             var param1 = {};
             var finprodId = $("#finprodId_" + currentTab).val();
-            param1.secId = finprodId;
+            param1.secId = secId;
             Joyin.ajaxSync(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/IsBondAsset', param1, function(result) {
                 if(result.data=='2') {     //2 返回2代表所选资产是债券且中债sppi通过
                     $("#businessModelDiv_"+ currentTab).show();
