@@ -238,10 +238,16 @@ public class CfetsEtrFinProductInfoResponse {
     private BigDecimal maxTotalTender;
 
     /**
-     * 增发投标日
+     * 投标日
      */
     @ApiModelProperty(name = "settleDate", value = "增发投标日")
     private Date settleDate;
+
+    /**
+     * 投标日
+     */
+    @ApiModelProperty(name = "bidDate", value = "投标日")
+    private Date bidDate;
 
     /**
      * 投标起始日
@@ -1032,5 +1038,13 @@ public class CfetsEtrFinProductInfoResponse {
 
     public void setZxGradeOrgId(String zxGradeOrgId) {
         this.zxGradeOrgId = zxGradeOrgId;
+    }
+
+    public Date getBidDate() {
+        return bidDate;
+    }
+
+    public void setBidDate(Date bidDate) {
+        this.bidDate = bidDate;
     }
 }
