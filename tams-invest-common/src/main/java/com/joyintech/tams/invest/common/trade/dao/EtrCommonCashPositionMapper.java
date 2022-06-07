@@ -428,4 +428,11 @@ public interface EtrCommonCashPositionMapper {
     // 广农商二阶段 GNS-947:【广农商场内清算】场内债券存续交易生成的时候，指令现金流水处理有误
     int selectEtrCashPositionFlowCount(Map<String, Object> map);
     // modify by etliu 20220226 end
+
+    /**
+     * 根据汇总交易编号查询交易
+     * @param totleTradeId
+     * @return
+     */
+    List<TrdProductDeal> selectTrdProductDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
 }

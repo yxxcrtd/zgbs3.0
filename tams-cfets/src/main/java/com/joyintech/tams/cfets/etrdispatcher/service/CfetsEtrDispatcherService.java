@@ -771,7 +771,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                 () -> cfetsEtrDispatcherMapper.queryEntrust2Touguan(pageParam));
         if (!CollectionUtils.isEmpty(page.getRoot())) {
             for (CfetsEtrDispatcherExeListInfoResponse response : page.getRoot()) {
-                if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
+                if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue()) ||
+                        StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())) {
                     response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     response.setEntrustVolume(ArithmeticUtil.divide(response.getEntrustVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                 }

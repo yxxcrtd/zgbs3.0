@@ -36,6 +36,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.cfets.position.dto.PositionCashSecDto;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfo002Mapper;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
@@ -864,8 +865,11 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         BigDecimal cashT = BigDecimal.ZERO; // 指令t日可用
         BigDecimal cashT1 = BigDecimal.ZERO; // 指令t1日可用
         BigDecimal realCash = BigDecimal.ZERO; // 账户现金
+        BigDecimal secDesirableCash = BigDecimal.ZERO; // 证券户可取现金
         List<String> list = requestDto.getPortfolioIdList();
+        List<PositionCashSecDto> sumAcctNoList = new ArrayList<>();
         if (list != null) {
+            String flowType = "01";// 01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
             for (String portfolioId : list){
                 BaseMap paramMap = BaseMap.newMap()
                         .put("finprodId", requestDto.getFinprodId())
@@ -885,6 +889,25 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 positionQueryDto.setCdate(iPlatformDate.getSysDate());
                 // 实际现金（账户现金）
                 realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto));
+                Map<String, String> secIdMap = new HashMap<>();
+                Map<String, String> map = new HashMap<>();
+                map.put("portfolioId", portfolioId);
+                List<String> secAcctIds = positionInfoService.qryPortfolioSecAcctIdAll(map);// 证券账户
+                String finalCcy = DictCodeList.币种_人民币_CNY.getValue();
+                String finalCdate = requestDto.getCdate();
+                secAcctIds.forEach(secAcctId -> {
+                    PositionCashSecDto positionCashSecDto = new PositionCashSecDto();
+                    positionCashSecDto.setCcy(finalCcy);
+                    positionCashSecDto.setPortfolioId(portfolioId);
+                    positionCashSecDto.setCdate(finalCdate);
+                    positionCashSecDto.setAcctId(secAcctId);
+                    sumAcctNoList.add(positionCashSecDto);
+                });
+            }
+            //资金可用金额
+            if (!CollectionUtils.isEmpty(sumAcctNoList) && sumAcctNoList.size() > 0) {
+                BigDecimal newRealCashAmount = positionInfoService.queryPosition(sumAcctNoList, flowType, DictCodeListExt3.资产类型_证券户可取资金.getValue());
+                secDesirableCash = ArithmeticUtil.doAdd(secDesirableCash, newRealCashAmount);
             }
         }
         
@@ -902,7 +925,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         // 查询头寸信息
         Map map = cfetsetrIbBondinfoMapper.queryPositionInfo(bm);
         
-        return assemble(sellFlag, map, cashT, cashT1, realCash);
+        return assemble(sellFlag, map, cashT, cashT1, realCash,secDesirableCash);
     }
 
     private void posiInfoCheckCondition(CfetsEtrIbBondPosiInfoRequestDto requestDto) {
@@ -1030,14 +1053,15 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         return df1.format(b);
     }
     
-    private List<BaseMap> assemble(String flag, Map map, BigDecimal cashT, BigDecimal cashT1, BigDecimal realCash) {
-        String T0KYXJ="T0KYXJ",T1KYXJ="T1KYXJ",ZHXJ="ZHXJ",RRQMKDGHCC="RRQMKDGHCC",ZCTRKYCC="ZCTRKYCC";
+    private List<BaseMap> assemble(String flag, Map map, BigDecimal cashT, BigDecimal cashT1, BigDecimal realCash,BigDecimal secDesirableCash) {
+        String T0KYXJ="T0KYXJ",T1KYXJ="T1KYXJ",ZHXJ="ZHXJ",ZQHKQXJ="ZQHKQXJ",RRQMKDGHCC="RRQMKDGHCC",ZCTRKYCC="ZCTRKYCC";
         String ZCT1RKYCC="ZCT1RKYCC",BFQTRKYCC="BFQTRKYCC",BFQT1RKYCC="BFQT1RKYCC",RRQTRKYCC="RRQTRKYCC",RRQT1RKYCC="RRQT1RKYCC";
         if (map == null) {
             map = new HashMap();
             map.put(T0KYXJ, "0");
             map.put(T1KYXJ, "0");
             map.put(ZHXJ, "0");
+            map.put(ZQHKQXJ, "0");
 //            map.put(RRQMKDGHCC, "0");
 //            map.put(ZCTRKYCC, "0");
 //            map.put(ZCT1RKYCC, "0");
@@ -1063,7 +1087,9 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         if (realCash != null){
             bm.put(ZHXJ, addToStr(bm.getBigDecimal(ZHXJ), realCash));
         }
-        
+        if (secDesirableCash != null){
+            bm.put(ZQHKQXJ, secDesirableCash);
+        }
         /*T日可用现金*/
         resp.add(BaseMap.newMap()
                 .put("field", T0KYXJ)
@@ -1079,8 +1105,14 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         /*账户现金*/
         resp.add(BaseMap.newMap()
                 .put("field", ZHXJ)
-                .put("name", "账户现金（元）")
+                .put("name", "托管户账户现金（元）")
                 .put("amount", bm.get(ZHXJ))
+                .put("type", "xj"));
+        /*证券户可取现金*/
+        resp.add(BaseMap.newMap()
+                .put("field", ZQHKQXJ)
+                .put("name", "券商户可取现金（元）")
+                .put("amount", bm.get(ZQHKQXJ))
                 .put("type", "xj"));
 
         if (StringUtil.equals(flag, "01") || StringUtil.equals(flag, "02")){
@@ -1088,7 +1120,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", RRQMKDGHCC)
-                    .put("name", "融入券卖空待购回持仓（元）")
+                    .put("name", "卖空待回购持仓（元）")
                     .put("amount", decimalToStr(bm.getBigDecimal(RRQMKDGHCC), "0.00"))
                     .put("type", "cc"));
         }
@@ -2495,18 +2527,28 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         }
 
     }
+
     /**
-     * 查询资产是否行权债
-     * @return
+     * 查询资产是否行权债 且行权净价是否为空
+     *
+     * @return 行权债且行权净价不为空时返回 true
      */
     public Boolean queryAssetIsRight(String secId) {
-        if(!StringUtil.isNotEmpty(secId)){
+        if (!StringUtil.isNotEmpty(secId)) {
             return false;
         }
-        Map<String, Object> param =new HashMap<>();
-        param.put("platDate",DateUtil.platDateFromCache());
-        param.put("finprodId",secId);
-        return cfetsetrIbBondinfoMapper.queryAssetIsRight(param);
+        Map<String, Object> param = new HashMap<>();
+        param.put("platDate", DateUtil.platDateFromCache());
+        param.put("finprodId", secId);
+        boolean assetIsRight = cfetsetrIbBondinfoMapper.queryAssetIsRight(param);
+        boolean priceIsNull = true;
+        // 查询行权净价为空的数据
+        param.put("isNull", DictCodeList.是否_是.getValue());
+        FinExercisePlan finExercisePlan = cfetsetrIbBondinfoMapper.findAssetExercise(param);
+        if (StringUtil.isNotEmpty(finExercisePlan)) {
+            priceIsNull = false;
+        }
+        return assetIsRight && priceIsNull;
     }
 
     public Message<AjaxResult> recallCheckDelegate( CfetsEtribBondInfo003Dto dto) throws Exception {

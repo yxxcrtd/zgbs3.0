@@ -8,6 +8,7 @@ package com.joyintech.tams.invest.common.trade.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -116,4 +117,10 @@ public interface BaseAssetCashPositionCommMapper {
      */
     String queryAccountNo(@Param("secAcctId") String secAcctId);
 
+    /**
+     * 根据汇总交易编号查询交易
+     * @param totleTradeId
+     * @return
+     */
+    List<TrdProductDeal> selectTrdProductDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
 }

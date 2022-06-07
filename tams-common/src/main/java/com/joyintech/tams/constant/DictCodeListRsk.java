@@ -201,6 +201,7 @@ public enum DictCodeListRsk implements BaseDictCodeList {
 
     试算结果_通过(DictCode.试算结果,"0","通过"),
     试算结果_不通过(DictCode.试算结果,"1","通过"),
+    试算结果_风险审批(DictCode.试算结果,"2","风险审批"),
     ;
     /**
      * 对应于数据字典code

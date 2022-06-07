@@ -5,6 +5,7 @@ import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.cfets.trdredeem.dto.CfetsTrdRedeemDealRegisterQuoteDto;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.workflow.engine.constant.OperationType;
 import org.apache.commons.collections.CollectionUtils;
@@ -33,10 +34,10 @@ public class CfetsCommonOprHisHandlerAopService extends BaseService {
     public List<CfetsOprHisInfoRequest> getCfetsOprHisInfo(Object object, OperationType operationType) {
         Map<String, Object> resultMap = new HashMap<>();
         List<CfetsOprHisInfoRequest> cfetsOprHisInfoRequests = new ArrayList<>();
-        String trdId = null;
-        String busiDes = null;
+        String trdId;
+        String busiDes;
         String type = null;
-        String workflowId = null;
+        String workflowId;
         if (object != null) {
             // 一级申购
             if (object instanceof CfetsTrdBondFirstSubInfoDto) {
@@ -81,12 +82,31 @@ public class CfetsCommonOprHisHandlerAopService extends BaseService {
                         cfetsOprHisInfoRequests.add(oprHisReq);
                     }
                 }
-
             }
             // 一级投标确认
             else if (object instanceof CfetsTrdFirstBidFirmInfoDto) {
                 CfetsTrdFirstBidFirmInfoDto entity = (CfetsTrdFirstBidFirmInfoDto) object;
                 trdId = entity.getBidId();
+                busiDes = entity.getRemark();
+                workflowId = entity.getWorkflowId();
+                if (operationType.equals(OperationType.NEW)) {
+                    type = DictCodeListExt3.操作类型_新建.getValue();
+                } else if (operationType.equals(OperationType.REVOKE)) {
+                    type = DictCodeListExt3.操作类型_撤回.getValue();
+                } else if (operationType.equals(OperationType.MODIFY)) {
+                    type = DictCodeListExt3.操作类型_修改.getValue();
+                }
+                CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+                oprHisReq.setEntrustId(trdId);
+                oprHisReq.setBusiDes(busiDes);
+                oprHisReq.setOperType(type);
+                oprHisReq.setWorkflowId(workflowId);
+                cfetsOprHisInfoRequests.add(oprHisReq);
+            }
+            // 赎回登记
+            else if (object instanceof CfetsTrdRedeemDealRegisterQuoteDto) {
+                CfetsTrdRedeemDealRegisterQuoteDto entity = (CfetsTrdRedeemDealRegisterQuoteDto) object;
+                trdId = entity.getTotleTradeId();
                 busiDes = entity.getRemark();
                 workflowId = entity.getWorkflowId();
                 if (operationType.equals(OperationType.NEW)) {

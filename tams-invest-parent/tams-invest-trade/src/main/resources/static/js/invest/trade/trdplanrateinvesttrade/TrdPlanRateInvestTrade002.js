@@ -778,7 +778,7 @@ var etrAmt = '';
        	}else{
        	$('#selector5').hide();
        	}
-        initFlag -false;
+        initFlag = false;
     });
     
     /**

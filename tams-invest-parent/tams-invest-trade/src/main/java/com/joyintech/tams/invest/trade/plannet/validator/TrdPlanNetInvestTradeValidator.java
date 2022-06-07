@@ -211,7 +211,7 @@ public class TrdPlanNetInvestTradeValidator implements TradeCommonValidator {
                 BigDecimal accCash = new BigDecimal((String)para.get("cashT2"));
                 //交易对手没有足够的现金
                 //add wsz ZGCPCN-1127 修改交易验证软控 start
-                if(accCash.compareTo(dto.getTradeAmt())==-1 && CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_CASH_SWITCH).equals(DictCodeListExt1.是或否_否.getValue())){
+                if(accCash.compareTo(dto.getTradeAmt())<0 && CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_CASH_SWITCH).equals(DictCodeListExt1.是或否_否.getValue())){
                     errorList.add(new ValidMessage("",
                         getMessage("BUSS_COM_E_0003", 
                         param.get("portfolioId")+"  "+getMessage("TrdPlanNetInvestTrade002.tradeAmt"),
@@ -387,7 +387,7 @@ public class TrdPlanNetInvestTradeValidator implements TradeCommonValidator {
                 BigDecimal accCash = new BigDecimal((String) para.get("cashT2"));
                 //交易对手没有足够的现金
                 //add wsz ZGCPCN-1127 修改交易验证软控 start
-                if (accCash.compareTo(dto.getTradeAmt()) == -1 && CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_CASH_SWITCH).equals(DictCodeListExt1.是或否_是.getValue())) {
+                if (accCash.compareTo(dto.getTradeAmt()) < 0 && CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_CASH_SWITCH).equals(DictCodeListExt1.是或否_是.getValue())) {
                     errorList.add(new ValidMessage("",
                             getMessage("BUSS_COM_E_0003",
                                     param.get("portfolioId") + "  " + getMessage("TrdPlanNetInvestTrade002.tradeAmt"),

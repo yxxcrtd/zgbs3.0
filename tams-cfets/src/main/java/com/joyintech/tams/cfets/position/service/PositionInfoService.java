@@ -232,7 +232,7 @@ public class PositionInfoService {
      * @param map
      * @return
      */
-    private List<String> qryPortfolioSecAcctIdAll(Map<String, String> map) {
+    public List<String> qryPortfolioSecAcctIdAll(Map<String, String> map) {
         return positionInfoMapper.qryPortfolioSecAcctIdAll(map);
     }
 
@@ -582,7 +582,7 @@ public class PositionInfoService {
         /*账户现金*/
         resp.add(BaseMap.newMap()
                 .put("field", "ZHXJ")
-                .put("name", "账户现金（元）")
+                .put("name", "托管户账户现金（元）")
                 .put("amount", formatStr(cashMap.getBigDecimal("realCash")))
                 .put("type", "xj"));
         /*证券户可取现金*/
@@ -690,7 +690,7 @@ public class PositionInfoService {
      * @return
      */
     public List<BaseMap> assemble(String flag, BaseMap bm, BaseMap cashMap) {
-        String T0KYXJ = "T0KYXJ", T1KYXJ = "T1KYXJ", ZHXJ = "ZHXJ", RRQMKDGHCC = "RRQMKDGHCC", ZCTRKYCC = "ZCTRKYCC";
+        String T0KYXJ = "T0KYXJ", T1KYXJ = "T1KYXJ", ZHXJ = "ZHXJ",ZQHKQXJ="ZQHKQXJ", RRQMKDGHCC = "RRQMKDGHCC", ZCTRKYCC = "ZCTRKYCC";
         String ZCT1RKYCC = "ZCT1RKYCC", BFQTRKYCC = "BFQTRKYCC", BFQT1RKYCC = "BFQT1RKYCC", RRQTRKYCC = "RRQTRKYCC", RRQT1RKYCC = "RRQT1RKYCC";
         if (bm == null) {
             bm = BaseMap.newMap();
@@ -713,8 +713,14 @@ public class PositionInfoService {
         /*账户现金*/
         resp.add(BaseMap.newMap()
                 .put("field", ZHXJ)
-                .put("name", "账户现金（元）")
+                .put("name", "托管户账户现金（元）")
                 .put("amount", formatStr(cashMap.getBigDecimal("realCash")))
+                .put("type", "xj"));
+        /*证券户可取现金*/
+        resp.add(BaseMap.newMap()
+                .put("field", ZQHKQXJ)
+                .put("name", "券商户可取现金（元）")
+                .put("amount", formatStr(cashMap.getBigDecimal("secDesirableCash")))
                 .put("type", "xj"));
 
         if (StringUtil.equals(flag, "01") || StringUtil.equals(flag, "02")) {
@@ -722,7 +728,7 @@ public class PositionInfoService {
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", RRQMKDGHCC)
-                    .put("name", "融入券卖空待购回持仓（元）")
+                    .put("name", "卖空待回购持仓（元）")
                     .put("amount", formatStr(bm.getBigDecimal(RRQMKDGHCC)))
                     .put("type", "cc"));
         }
