@@ -454,10 +454,13 @@ public class RiskCommonService {
         }
         // 查询授权信息（全量信息，包括资产类型、交易场所、交易方向、授权类型、授权金额）
         List<RiskAuthorizeDto> riskAuthorizeDtoList = riskCommonMapper.findRiskAuthorize(params);
-        RiskAuthorizeDto riskAuthorizeDto = null;
-        if (!StringUtil.isEmptyList(riskAuthorizeDtoList)){
-            riskAuthorizeDto = riskAuthorizeDtoList.get(0);
+        RiskAuthorizeDto riskAuthorizeDto;
+        if (StringUtil.isEmptyList(riskAuthorizeDtoList)){
+            riskAuthorizeDto = new RiskAuthorizeDto();
+            riskAuthorizeDto.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
+            return riskAuthorizeDto;
         }
+        riskAuthorizeDto = riskAuthorizeDtoList.get(0);
         BigDecimal authorizeLimitAmt = BigDecimal.ZERO;
         BigDecimal prinAmt = riskCommonInputDto.getPrinAmt();
         if(Objects.nonNull(riskAuthorizeDto)){
@@ -465,7 +468,7 @@ public class RiskCommonService {
             riskAuthorizeDto.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
         }
         // 业务金额为空
-        if (prinAmt == null || prinAmt.compareTo(BigDecimal.ZERO) == 0 || Objects.isNull(riskAuthorizeDto)){
+        if (prinAmt == null || prinAmt.compareTo(BigDecimal.ZERO) == 0){
             return riskAuthorizeDto;
         }
         // 无授权数据 或者 授权额度不足
