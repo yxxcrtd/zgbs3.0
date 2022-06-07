@@ -648,19 +648,31 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             });
             entrustDtolist = listTemp;
         }
-        //1.查询申购产品列表(获取资产信息,及剩余指令额度)
-        entrustDtolist.forEach(item -> {
-            entrustIdList.add(item.getEntrustId());
-        });
-        param.put("entrustIdList", entrustIdList);
-        this.setParam(param);
-        List<CfetsTrdFirstBidFirmInfoDto> list = cfetsTrdFirstBidFirm002Mapper.selectProductsInit(param);
-        if (CollectionUtils.isEmpty(list) || list.size() > 1 || CollectionUtils.isEmpty(entrustIdList)) {
-            logger.error("初始化结果数不为1 " + JsonUtils.object2Json(list));
-            return request;
+        if(CollectionUtils.isNotEmpty(entrustDtolist)) {
+            //1.查询申购产品列表(获取资产信息,及剩余指令额度)
+            entrustDtolist.forEach(item -> {
+                entrustIdList.add(item.getEntrustId());
+            });
+            param.put("entrustIdList", entrustIdList);
+            this.setParam(param);
+            List<CfetsTrdFirstBidFirmInfoDto> list = cfetsTrdFirstBidFirm002Mapper.selectProductsInit(param);
+            if (CollectionUtils.isEmpty(list) || list.size() > 1) {
+                logger.error("初始化结果数不为1 " + JsonUtils.object2Json(list));
+            }
+            String counterId = null;
+            List<CfetsTrdFirstBidFirmProductDto> productDtos = new ArrayList<>();
+            for (CfetsTrdFirstBidFirmInfoDto item : list) {
+                // 交易对手
+                if (StringUtil.isEmpty(counterId)) {
+                    counterId = item.getCounterId();
+                }
+                productDtos.addAll(item.getProductDtos());
+            }
+            cfetsTrdFirstBidFirmInfoDto = list.get(0);
+            cfetsTrdFirstBidFirmInfoDto.setProductDtos(productDtos);
+            cfetsTrdFirstBidFirmInfoDto.setCounterId(counterId);
+            request.getProductDtos().addAll(cfetsTrdFirstBidFirmInfoDto.getProductDtos());
         }
-        cfetsTrdFirstBidFirmInfoDto = list.get(0);
-        request.getProductDtos().addAll(cfetsTrdFirstBidFirmInfoDto.getProductDtos());
         //  自主投标和代投代缴
         if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), request.getBiddingMethod())
                 || StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), request.getBiddingMethod())) {
