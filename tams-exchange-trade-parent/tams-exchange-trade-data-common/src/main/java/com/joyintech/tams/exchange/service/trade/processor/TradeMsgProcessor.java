@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -160,6 +161,7 @@ public class TradeMsgProcessor {
     private MessageSenderManagement messageSenderManagement;
     @Autowired
     private PortfolioTradeMessageHelper portfolioTradeMessageHelper;
+    @Lazy
     @Autowired
     private TradeMsgReceiver tradeMsgReceiver;
 
