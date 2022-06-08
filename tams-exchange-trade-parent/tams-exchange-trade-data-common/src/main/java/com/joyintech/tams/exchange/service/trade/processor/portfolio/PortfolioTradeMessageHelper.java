@@ -60,7 +60,7 @@ public class PortfolioTradeMessageHelper {
         List<PortfolioTradeMessage> portfolioTradeMessages = Lists.newArrayList();
 
         BigDecimal tradedPrice = trade.getTradedPrice();
-        if(InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+        if(InvestmentAssetType.BOND.value.equals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)){
             tradedPrice = trade.getFullPrice();
         }
@@ -122,7 +122,7 @@ public class PortfolioTradeMessageHelper {
 
         List<PortfolioCalculateResponse> calculateResponses = Lists.newArrayList();
         BigDecimal tradedPrice = entrust.getEntrustPrice();
-        if(InvestmentAssetType.BOND.codeEquals(instructionClone.getAssetType())
+        if(InvestmentAssetType.BOND.value.equals(instructionClone.getAssetType())
                 && EnumUtil.in(instructionClone.getPs(), InstructionPs.BUY, InstructionPs.SELL)){
             tradedPrice = entrust.getFullPrice();
         }
