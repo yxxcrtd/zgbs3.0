@@ -5,6 +5,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
@@ -20,6 +21,7 @@ import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
 import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
@@ -41,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,31 +65,36 @@ public class CfetsTradeHandlerAop {
     private SysWflBusinessListMapper sysWflBusinessListMapper;
 
 
+
     /**
      * 回售登记check
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond.controller.IbuQuoteBond004Controller.check(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond.controller.IbuQuoteBond004Controller.check(..))" +
+            " || execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage002Controller.check(..))")
     protected void doCheck() {
     }
 
     /**
      * 交收/回溯/失败
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService.doComplete(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService.doComplete(..)) " +
+            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService.doComplete(..))")
     protected void doCompleteSettle() {
     }
 
     /**
      * 回售登记更新
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doUpdate(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doUpdate(..))" +
+            "|| execution(* com.joyintech.tams.cfets..trd.primarybidmanage..*.*.doUpdate(..)) ")
     protected void updatePoint() {
     }
 
     /**
      * 回售登记新增
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doInsert(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doInsert(..))" +
+            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage..*.*.doInsert(..))")
     protected void insertPoint() {
     }
 
@@ -102,8 +110,6 @@ public class CfetsTradeHandlerAop {
 
     @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doCompleteRevoke(..))")
     protected void doCompleteRevoke() {}
-
-
 
     /**
      * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
@@ -211,5 +217,41 @@ public class CfetsTradeHandlerAop {
         }
         Object[] args = joinPoint.getArgs();
         inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    }
+    /**
+     * 风险试算
+     *
+     * @param dto 委托指令内容
+     * @param infCode 接口代码
+     * @param busiType 业务类型
+     * @return 执行结果
+     * @throws Exception 异常
+     */
+    public static final <T> AjaxResult doRiskcal(T dto, String infCode, String busiType) throws Exception {
+        //风险试算check
+        RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
+        //风险试算组装dto
+        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        return getAjaxResult(riskCommonOutput,null,null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static RiskInputParamSerivce getRiskInputParamSerivce() {
+        return SpringContextUtil.getApplicationContext().getBean(RiskInputParamSerivce.class);
+    }
+
+    /**
+     * 获取返回的信息
+     * @param message
+     * @return
+     */
+    public static AjaxResult getAjaxResult(Object data,String message, MessageType messageType){
+        AjaxResult ar = new AjaxResult();
+        ar.setData(data);
+        List<ValidMessage> warnList = new ArrayList<>();
+        warnList.add(new ValidMessage(message));
+        ar.setErrorList(warnList);
+        ar.setMessageType(messageType);
+        return ar;
     }
 }

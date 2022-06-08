@@ -350,10 +350,10 @@ public class CfetsTrdQueryService extends BaseService{
         String spcdCodeTemp = spcdCode;
         if (StringUtil.equals(spcdCode, DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
             //基本信息表单
-            spcdCode = spcdCodeTemp + ",B";
+            spcdCode = spcdCodeTemp + ",BB";
             List<CfgReadonlyFormShow> infoFormb = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             //其它表单
-            spcdCode = spcdCodeTemp + ",O";
+            spcdCode = spcdCodeTemp + ",BO";
             List<CfgReadonlyFormShow> infoFormo = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             //组合表格
             List<CfgDataTableShow> infoTableP;
