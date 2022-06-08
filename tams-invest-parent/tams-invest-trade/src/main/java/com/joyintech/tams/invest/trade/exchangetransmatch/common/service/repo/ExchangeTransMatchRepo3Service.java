@@ -240,7 +240,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         if(DictCodeListExt3.交易方向_解除质押.getValue().equals(entrustDto.getPs())){
             TrdProductDealDto trdProductDeal = createTrdProductDealCommon(dealDto, entrustDto, trdFinProductDealTotal);
             //交易方向
-            trdProductDeal.setPs(DictCodeList.交易方向_到期续做.getValue());
+            trdProductDeal.setPs(DictCodeList.交易方向_到期.getValue());
             //全价总额
             trdProductDeal.setFpriceAmt(trdFinProductDealTotal.getFpriceAmt());
             //交易总额
