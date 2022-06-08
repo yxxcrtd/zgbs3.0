@@ -259,50 +259,51 @@ public class ComInterestRateQuotationInfoService extends CommonExportService<Com
         if (null == list || list.size() != 5) {
             ExcelValidDto dto = new ExcelValidDto(StringUtil.EMPTY, String.valueOf(i+2), "数据列数错误");
             excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(0))) {
-            // 验证导入发布日是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "发布日为空");
-            excelValidDtolist.add(dto);
         }else{
-            // 验证导入发布日格式是否正确
-            if(ComBasicDataExcelUtil.isErrorDate(list.get(0))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "日期格式错误");
+            if (StringUtil.isEmpty(list.get(0))) {
+                // 验证导入发布日是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "发布日为空");
+                excelValidDtolist.add(dto);
+            }else{
+                // 验证导入发布日格式是否正确
+                if(ComBasicDataExcelUtil.isErrorDate(list.get(0))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "日期格式错误");
+                    excelValidDtolist.add(dto);
+                }
+            }
+            if (StringUtil.isEmpty(list.get(1))) {
+                // 验证导入利率名称是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "利率名称为空");
                 excelValidDtolist.add(dto);
             }
-        }
-        if (StringUtil.isEmpty(list.get(1))) {
-            // 验证导入利率名称是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "利率名称为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(2))) {
-            // 验证导入币种是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "币种为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(3))) {
-            // 验证导入利率值是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "利率值为空");
-            excelValidDtolist.add(dto);
-        }else{
-            // TISHKS-61:增加利率值格式校验 fuyongsheng 20211112 edit start
-            if(!checkFigure(list.get(3))){
-                // 验证导入利率值是否为数字
-                ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "利率值格式错误");
+            if (StringUtil.isEmpty(list.get(2))) {
+                // 验证导入币种是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "币种为空");
                 excelValidDtolist.add(dto);
             }
-            // TISHKS-61:增加利率值格式校验 fuyongsheng 20211112 edit end
-        }
-        if (StringUtil.isEmpty(list.get(4))) {
-            // 验证导入生效日是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "生效日为空");
-            excelValidDtolist.add(dto);
-        }else{
-            // 验证导入生效日格式是否正确
-            if(ComBasicDataExcelUtil.isErrorDate(list.get(4))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "日期格式错误");
+            if (StringUtil.isEmpty(list.get(3))) {
+                // 验证导入利率值是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "利率值为空");
                 excelValidDtolist.add(dto);
+            }else{
+                // TISHKS-61:增加利率值格式校验 fuyongsheng 20211112 edit start
+                if(!checkFigure(list.get(3))){
+                    // 验证导入利率值是否为数字
+                    ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "利率值格式错误");
+                    excelValidDtolist.add(dto);
+                }
+                // TISHKS-61:增加利率值格式校验 fuyongsheng 20211112 edit end
+            }
+            if (StringUtil.isEmpty(list.get(4))) {
+                // 验证导入生效日是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "生效日为空");
+                excelValidDtolist.add(dto);
+            }else{
+                // 验证导入生效日格式是否正确
+                if(ComBasicDataExcelUtil.isErrorDate(list.get(4))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "日期格式错误");
+                    excelValidDtolist.add(dto);
+                }
             }
         }
         return excelValidDtolist;
