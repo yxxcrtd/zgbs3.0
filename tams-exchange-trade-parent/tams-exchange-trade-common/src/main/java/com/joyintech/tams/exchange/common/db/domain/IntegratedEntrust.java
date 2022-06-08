@@ -398,6 +398,9 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
 
+    @ApiModelProperty( name = "execId", value = "执行编号")
+    private String execId;
+
     public String getSoftSkipMode() {
         return softSkipMode;
     }
@@ -1194,4 +1197,11 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.counterId = counterId;
     }
 
+    public String getExecId() {
+        return execId;
+    }
+
+    public void setExecId(String execId) {
+        this.execId = execId;
+    }
 }

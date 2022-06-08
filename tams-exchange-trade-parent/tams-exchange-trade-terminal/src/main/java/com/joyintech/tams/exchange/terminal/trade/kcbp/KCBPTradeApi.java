@@ -71,6 +71,8 @@ public class KCBPTradeApi {
     public static final String KCBP_FUNCTION_CODE_QRY_FINANCE = "410502";
     //债券协议回购委托申报 -- 深证
     public static final String KCBP_FUNCTION_CODE_PROTOCOL_BACK_SZ = "411000";
+    public static final String KCBP_FUNCTION_CODE_PROTOCOL_BACK_SZ_CHENGJIAO = "411050";
+
     //债券协议回购委托申报 -- 上海
     //意向
     public static final String KCBP_FUNCTION_CODE_PROTOCOL_BACK_SH = "411031";
@@ -510,11 +512,12 @@ public class KCBPTradeApi {
             //深证债券质押式协议回购
             if (IntegratedEntrustUtils.isProtocolBack_SZ(integratedEntrust.getEntrustProp())) {
                 processProtocolBack_SZ(integratedEntrust, parameters);
-            }else if(EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())) {
-            	processBondXscjBS(integratedEntrust, parameters);
-            }else if(EntrustProp.SZ_XSCJ_JS.value.equals(integratedEntrust.getEntrustProp())
-            		|| EntrustProp.SZ_XSCJ_JJ.value.equals(integratedEntrust.getEntrustProp())) {
-            	processBondXscjHF(integratedEntrust, parameters);
+            } else if (EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())) {
+                processProtocolBack_SZ_ChengJiao(integratedEntrust, parameters);
+            } else if (EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())) {
+                processBondXscjBS(integratedEntrust, parameters);
+            } else if (EntrustProp.SZ_XSCJ_JS.value.equals(integratedEntrust.getEntrustProp()) || EntrustProp.SZ_XSCJ_JJ.value.equals(integratedEntrust.getEntrustProp())) {
+                processBondXscjHF(integratedEntrust, parameters);
             }
         } else {
             logger.info("unknown market {}", integratedEntrust.getMarket());
@@ -581,13 +584,18 @@ public class KCBPTradeApi {
         logger.info("start isProtocolBack_SZ {}", integratedEntrust.getBsFlag());
         parameters.put("funcid", KCBP_FUNCTION_CODE_PROTOCOL_BACK_SZ);
         parameters.put("stkcode", StockCodeUtils.getStockCode(integratedEntrust.getStockCode()));
-        parameters.put("orderqty", String.valueOf(integratedEntrust.getEntrustVolume()));//委托数量
-        if (EntrustProp.SZ_REPURCHASE_RENEWAL.value.equals(integratedEntrust.getEntrustProp())) {//深到期续做为续做利息
+
+        String bsFlag = integratedEntrust.getBsFlag();
+        if (!StringUtil.equals(bsFlag, "2E") && !StringUtil.equals(bsFlag, "2F")) {
+            parameters.put("orderqty", String.valueOf(integratedEntrust.getEntrustVolume()));//委托数量 对于购回交易2E、2F无意义
+        }
+
+        if (StringUtil.equals(bsFlag, "2C")) {
+            parameters.put("orderamt", String.valueOf(integratedEntrust.getEntrustBalance()));//融资金额 2C初始交易和2K到期续做
+        } else if (StringUtil.equals(bsFlag, "2K")) {//深到期续做为续做利息
             //利息按照回购金额*回购利率*占款天数÷365计算得到
             double orderamt = integratedEntrust.getEntrustBalance().doubleValue() * integratedEntrust.getEntrustPrice().doubleValue() * integratedEntrust.getCompactTerm() / 365.0000;
-            parameters.put("orderamt", String.valueOf(orderamt));
-        } else {
-            parameters.put("orderamt", String.valueOf(integratedEntrust.getEntrustBalance()));//融资金额
+            parameters.put("orderamt", String.valueOf(orderamt)); //融资金额 2C初始交易和2K到期续做
         }
         // 借用字段
         parameters.put("ghdays", String.valueOf(integratedEntrust.getCompactTerm()));//产品期限
@@ -595,13 +603,66 @@ public class KCBPTradeApi {
         parameters.put("targetseat", String.valueOf(integratedEntrust.getPropSeatNo()));//对方交易单元
         parameters.put("confernum", String.valueOf(integratedEntrust.getContractId()));//约定号
         parameters.put("zqzysno", "");//初始合约号
-        if (EntrustProp.SZ_REPURCHASE_RENEWAL.value.equals(integratedEntrust.getEntrustProp())
-                || EntrustProp.SZ_REPURCHASE_BUYBACK.value.equals(integratedEntrust.getEntrustProp())) {
-            parameters.put("zqzysno", integratedEntrust.getOrigSerialNo());//初始合约号
+        if (!StringUtil.equals(bsFlag, "2C")) {
+            parameters.put("zqzysno", integratedEntrust.getOrigSerialNo());//初始合约号 2C初始交易不填写
         }
+
+        parameters.put("ownertype", integratedEntrust.getOwnerType());//订单所有者类型
+
+        if (StringUtil.equals(bsFlag, "2C") || StringUtil.equals(bsFlag, "2Q")) {
+            parameters.put("stkcodein", integratedEntrust.getStockCode());//质押证券代码 2C初始交易和2Q换券申报换入质押券
+            parameters.put("orderqtyin", String.valueOf(integratedEntrust.getEntrustVolume()));//质押委托数量 2C初始交易和2Q换券申报换入质押券
+        }
+        if (StringUtil.equals(bsFlag, "2Q")) {
+            parameters.put("stkcodeout", integratedEntrust.getStockCode());//解押证券代码 2Q换券申报换出质押券
+            parameters.put("orderqtyout", String.valueOf(integratedEntrust.getEntrustVolume()));//解押委托数量 2Q换券申报换出质押券
+        }
+
+        parameters.put("stkpropin", "");//质押股份性质 2C初始交易和2Q换券申报换入质押券 00:无限售流通股 01:首发后限售股
+        parameters.put("stkpropout", "");//解押股份性质 2C初始交易和2Q换券申报换入质押券 00:无限售流通股 01:首发后限售股
+
+        parameters.put("xzflag", "");//到期续做类型 2K到期续做
+        if (StringUtil.equals(bsFlag, "2K")) {
+            parameters.put("xzflag", integratedEntrust.getTransCode());//到期续做类型 2K到期续做
+        }
+        parameters.put("tradercode", integratedEntrust.getTradeId());//交易员代码
+        parameters.put("investorid", integratedEntrust.getInvestorId());//交易主体
+        parameters.put("cpmemberid", integratedEntrust.getPropDealerId());//对手方交易商
+        parameters.put("cptradercode", integratedEntrust.getPropTradeId());//对手方交易员
+        parameters.put("cpinvestorid", integratedEntrust.getPropInvestorId());//对手方交易主体
+
+        parameters.put("custfullname", "");//本方客户姓名 2C初始交易和2K到期续 可选填写
+
         parameters.put("risksignsno", "");//风险揭示签署流水号
     }
-    
+
+    private void processProtocolBack_SZ_ChengJiao(IntegratedEntrust integratedEntrust, Map<String, String> parameters) {
+        logger.info("start processProtocolBack_SZ_ChengJiao {}", integratedEntrust.getBsFlag());
+        parameters.put("funcid", KCBP_FUNCTION_CODE_PROTOCOL_BACK_SZ_CHENGJIAO);
+        parameters.put("ownertype", integratedEntrust.getOwnerType());//订单所有者类型
+        parameters.put("execid", integratedEntrust.getExecId());//执行编号
+        parameters.put("investorid", integratedEntrust.getInvestorId());//交易主体
+
+        String bsFlag = integratedEntrust.getBsFlag();
+        if (StringUtil.equals(bsFlag, "2V") || StringUtil.equals(bsFlag, "2L")) {
+            parameters.put("cpmemberid", integratedEntrust.getPropDealerId());//对手方交易商 初始交易和到期续做新对手方必送
+            parameters.put("cptradercode", integratedEntrust.getPropTradeId());//对手方交易员 初始交易和到期续做新对手方必送
+            parameters.put("cpinvestorid", integratedEntrust.getPropInvestorId());//对手方交易主体 初始交易和到期续做新对手方必送
+            if (EntrustProp.SZ_REPURCHASE_RENEWAL.value.equals(integratedEntrust.getEntrustProp())) {//深到期续做为续做利息
+                //利息按照回购金额*回购利率*占款天数÷365计算得到
+                double orderamt = integratedEntrust.getEntrustBalance().doubleValue() * integratedEntrust.getEntrustPrice().doubleValue() * integratedEntrust.getCompactTerm() / 365.0000;
+                parameters.put("orderamt", String.valueOf(orderamt)); //融资金额 初始交易和到期续做新对手方必送
+            } else {
+                parameters.put("orderamt", String.valueOf(integratedEntrust.getEntrustBalance()));//融资金额 初始交易和到期续做新对手方必送
+            }
+            parameters.put("ghdays", String.valueOf(integratedEntrust.getCompactTerm()));//产品期限 初始交易和到期续做新对手方必送
+            parameters.put("duerate", String.valueOf(integratedEntrust.getEntrustPrice()));//年利率 初始交易和到期续做新对手方必送
+            parameters.put("cpcustfullname", "");//对手方客户名称 初始交易和到期续做新对手方必送
+        }
+        parameters.put("custfullname", "");//本方客户姓名 2V初始交易确认和2L到期续做确认时可选填写
+        parameters.put("risksignsno", "");//风险揭示签署流水号
+    }
+
     private void processBondXscjBS(IntegratedEntrust integratedEntrust, Map<String, String> parameters) {
         logger.info("start xscj_BS  {}", integratedEntrust.getBsFlag());
         parameters.put("funcid", "410677"); //深圳现券协商成交申报--- 功能： 新债协商成交买卖交易
@@ -618,7 +679,7 @@ public class KCBPTradeApi {
         parameters.put("memo", integratedEntrust.getRemark());//备注
         parameters.put("risksignsno", "");//风险揭示签署流水号
     }
-    
+
     private void processBondXscjHF(IntegratedEntrust integratedEntrust, Map<String, String> parameters) {
         logger.info("start xscj_HF  {}", integratedEntrust.getBsFlag());
         parameters.put("funcid", "410678"); //深圳现券协商成交申报回复--- 功能： 新债协商成交买卖交易
@@ -782,7 +843,7 @@ public class KCBPTradeApi {
         parameters.put("supplemental", "");//补充协议
         parameters.put("risksignsno", "");//风险揭示签署流水号
     }
-    
+
     public void cancelEntrust(CancelEntrustBean cancelEntrustBean, Long requestId) {
         cancelEntrustBean.setAgentType(AgentType.KINGDOM_KCBP.value);
         KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(cancelEntrustBean.getAccountId());
@@ -1039,7 +1100,7 @@ public class KCBPTradeApi {
         }
         return new ArrayList<>();
     }
-    
+
     private List<IntegratedEntrust> queryProtocolBackAndFixedIncomeEntrust(List<List<String>> data, KCBPAccount kcbpAccount, boolean reissueFlag) {
         List<IntegratedEntrust> integratedEntrusts = new ArrayList<>();
         List<Entrust> entrustList = KCBPConverter.convertToEntrust(kcbpAccount.getAccountId(), data, entrustIdManager);
@@ -1054,7 +1115,7 @@ public class KCBPTradeApi {
         logger.debug("queryProtocolBackAndFixedIncomeEntrust entrustList:{}", JSONArray.toJSONString(entrustList));
         return integratedEntrusts;
     }
-    
+
     //深圳现券协商成交、竞买发起、竞买应价成交查询
     public void queryBondNegotiate_SZ_Trade(KCBPAccount kcbpAccount) {
     	queryBondNegotiate_SZ_Trade(kcbpAccount, false);
@@ -1080,12 +1141,12 @@ public class KCBPTradeApi {
         }
         return new ArrayList<>();
     }
-    
+
     //深圳现券协商成交、竞买发起、竞买应价委托查询
     public void queryBondNegotiate_SZ_Entrust(KCBPAccount kcbpAccount) {
     	queryBondNegotiate_SZ_Entrust(kcbpAccount, false);
     }
-    
+
     public List<IntegratedEntrust> queryBondNegotiate_SZ_Entrust(KCBPAccount kcbpAccount, boolean reissueFlag) {
         Map<String, String> parameters = composeOrderTradeQuery(kcbpAccount, "410680", kcbpAccount.getAccountId(),
                 kcbpAccount.getBondNegotiate_SZ_PositionStr_Entrust(), "1", "");
@@ -1103,7 +1164,7 @@ public class KCBPTradeApi {
         }
         return new ArrayList<>();
     }
-    
+
     private List<IntegratedEntrust> queryBondNegotiateEntrust(List<List<String>> data, KCBPAccount kcbpAccount, boolean reissueFlag) {
         List<IntegratedEntrust> integratedEntrusts = new ArrayList<>();
         List<Entrust> entrustList = KCBPConverter.convertToEntrust(kcbpAccount.getAccountId(), data, entrustIdManager);
@@ -1117,7 +1178,7 @@ public class KCBPTradeApi {
         });
         logger.debug("queryBondNegotiateEntrust entrustList:{}", JSONArray.toJSONString(entrustList));
         return integratedEntrusts;
-    } 
+    }
 
     public void queryIntegratedBulkQuote(IntegratedBulkQuoteQryBean integratedBulkQuoteQryBean, long requestId) {
         KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(integratedBulkQuoteQryBean.getAccountId());
@@ -1191,10 +1252,10 @@ public class KCBPTradeApi {
         KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(integratedRepurchaseQuoteQryBean.getAccountId());
         Map<String, String> parameters = Maps.newHashMap(kcbpAccount.getHeadMessages());
 		/*
-		 * orderType 字段取值(字母上交所，数字深交所) 
-		 * 首期-F-1031 
-		 * 到期续做-X-1033 
-		 * 解除质押-C-1035 
+		 * orderType 字段取值(字母上交所，数字深交所)
+		 * 首期-F-1031
+		 * 到期续做-X-1033
+		 * 解除质押-C-1035
 		 * 中途换券-H-1036
 		 * 提前购回-Z-1034
 		 */
@@ -1258,7 +1319,7 @@ public class KCBPTradeApi {
             logger.info("queryIntegratedRepurchaseQuote fail {}", resultBean.getErrorMsg());
         kcbpTradeResponse.resQueryIntegratedRepurchaseQuote(integratedRepurchaseQuoteBeans, requestId);
     }
-    
+
     private Map<String,IntegratedRepurchaseQuotePledgeBean> getPledgeMap(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean){
     	Map<String,IntegratedRepurchaseQuotePledgeBean> retMap = null;
     	KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(integratedRepurchaseQuoteQryBean.getAccountId());
