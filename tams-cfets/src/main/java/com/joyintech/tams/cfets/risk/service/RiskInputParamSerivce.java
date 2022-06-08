@@ -18,8 +18,10 @@ import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmProductDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
@@ -86,8 +88,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @param isCheck
      * @return
      */
-    private BaseMap generateBusinessDto(Object obj, String decisionAct, String flowStatus, boolean isCheck) {
-        String pageId = "";
+    private BaseMap generateBusinessDto(Object obj, String decisionAct, String flowStatus, boolean isCheck,String pageId) {
         ProcessMark processMark;
         String businessJson = JsonUtils.object2Json(obj);
         // 入参为 workflowId 时 ，需要从流程中获取业务参数
@@ -153,7 +154,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         if (obj instanceof CfetsTrdFirstBidFirmInfoDto || StringUtil.equals(pageId,"CfetsTrdFirstBidFirm002")) {
             CfetsTrdFirstBidFirmInfoDto dto = JsonUtils.json2Object(businessJson,CfetsTrdFirstBidFirmInfoDto.class);
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustDtos().get(0).getEntrustId());
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getProductDtos().get(0).getEntrustId());
             String ps = etrEntrust.getPs();
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
@@ -167,7 +168,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         if (obj instanceof CfetsTrdBondFirstSubInfoDto || StringUtil.equals(pageId,"TenderBondSub002")) {
             CfetsTrdBondFirstSubInfoDto dto = JsonUtils.json2Object(businessJson,CfetsTrdBondFirstSubInfoDto.class);
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustDtos().get(0).getEntrustId());
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getProductDtos().get(0).getEntrustId());
             String ps = etrEntrust.getPs();
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
@@ -202,8 +203,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
     /**
      * 指标、授信、名单、授权check
      **/
-    public RiskCommonOutputDto buildParamThenRisk(Object obj, String decisionAct, String flowStatus, boolean isCheck) {
-        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, isCheck);
+    public RiskCommonOutputDto buildParamThenRisk(Object obj, String decisionAct, String flowStatus, String pageId) {
+        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, true,pageId);
         RiskCommonInputDto inputDto = getRiskInputParam(map);
         if (inputDto == null) return null;
         return doRisk(inputDto);
@@ -212,8 +213,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
     /**
      * 指标和授信占用
      **/
-    public void buildParamThenOccupy(Object obj, String decisionAct, String flowStatus, boolean isCheck) {
-        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, isCheck);
+    public void buildParamThenOccupy(Object obj, String decisionAct, String flowStatus, String pageId) {
+        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, false,pageId);
         RiskCommonInputDto inputDto = getRiskInputParam(map);
         if (inputDto == null) return;
         doOccupy(inputDto);
@@ -259,12 +260,12 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
-            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsTrdFirstBidFirmInfoDto) data).getEntrustDtos(), null);
+            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsTrdFirstBidFirmInfoDto) data).getProductDtos(), null);
         }
         if (data instanceof CfetsTrdBondFirstSubInfoDto) {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
-            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsTrdBondFirstSubInfoDto) data).getEntrustDtos(), null);
+            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsTrdBondFirstSubInfoDto) data).getProductDtos(), null);
         }
         if (data instanceof CfetsTrdBondInvestTradeDto) {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
@@ -333,7 +334,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             result.add(inputDto);
         }
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
-            List<CfetsTrdFirstBidFirmEntrustDto> list = ((CfetsTrdFirstBidFirmInfoDto) data).getEntrustDtos();
+            List<CfetsTrdFirstBidFirmProductDto> list = ((CfetsTrdFirstBidFirmInfoDto) data).getProductDtos();
             //这里处理授信
             list.forEach(e -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
@@ -343,7 +344,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
 
         }
         if (data instanceof CfetsTrdBondFirstSubInfoDto) {
-            List<CfetsTrdBondFirstSubEntrustDto> list = ((CfetsTrdBondFirstSubInfoDto) data).getEntrustDtos();
+            List<CfetsTrdBondFirstSubProductDto> list = ((CfetsTrdBondFirstSubInfoDto) data).getProductDtos();
             //这里处理授信
             list.forEach(e -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
@@ -380,7 +381,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         else if (data instanceof CfetsTrdBondFirstSubInfoDto) {
             CfetsTrdBondFirstSubInfoDto dto = (CfetsTrdBondFirstSubInfoDto)data;
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustDtos().get(0).getEntrustId());
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getProductDtos().get(0).getEntrustId());
             listDto.setFinprodId(dto.getFinprodId());
             listDto.setCounterId(etrEntrust.getCounterId());
         }else {
@@ -421,7 +422,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
        else if (data instanceof CfetsTrdBondFirstSubInfoDto) {
             CfetsTrdBondFirstSubInfoDto infoDto =(CfetsTrdBondFirstSubInfoDto)data;
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infoDto.getEntrustDtos().get(0).getEntrustId());
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infoDto.getProductDtos().get(0).getEntrustId());
             Map<String, Object> map = BeanUtil.object2Map(data);
             dto.setCounterId(etrEntrust.getCounterId());
             dto.setPrinAmt(etrEntrust.getEntrustAmt());

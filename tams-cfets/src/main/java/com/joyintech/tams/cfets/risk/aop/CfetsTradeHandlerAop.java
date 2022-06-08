@@ -60,10 +60,7 @@ public class CfetsTradeHandlerAop {
     private RiskInputParamSerivce inputParamSerivce;
     @Resource
     private SysWflBusinessListMapper sysWflBusinessListMapper;
-    @Autowired
-    private CfetsBondDealQuotedPrice004Service quotedPrice004Service;
-    @Autowired
-    private CfetsManualSettleService cfetsManualSettleService;
+
 
     /**
      * 回售登记check
@@ -123,7 +120,7 @@ public class CfetsTradeHandlerAop {
         Object[] args = joinPoint.getArgs();
         AjaxResult result = new AjaxResult();
         try {
-            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), true);
+            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
             if (StringUtil.isNotEmpty(outputDto.getErrorMsg())) {
                 result.setErrorList(Lists.newArrayList(new ValidMessage(outputDto.getErrorMsg())));
                 ajaxResultMessage.setData(result);
@@ -149,7 +146,7 @@ public class CfetsTradeHandlerAop {
     public void doCompleteSettle(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         CfetsManualSettleDto dto = (CfetsManualSettleDto) args[0];
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
 
@@ -162,7 +159,7 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("insertPoint()")
     public void occupyOnInsert(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
@@ -174,7 +171,7 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("updatePoint()")
     public void occupyOnUpdate(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
@@ -188,7 +185,7 @@ public class CfetsTradeHandlerAop {
         Object[] args = joinPoint.getArgs();
         SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String)args[0]);
         if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue()) ) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), false);
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
         }
     }
 
@@ -199,7 +196,7 @@ public class CfetsTradeHandlerAop {
             return;
         }
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
@@ -213,6 +210,6 @@ public class CfetsTradeHandlerAop {
             return;
         }
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
     }
 }

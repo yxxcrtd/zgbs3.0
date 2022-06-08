@@ -292,6 +292,31 @@ public class FinBondAsset002Controller extends BaseController{
         }
         return new Message<AjaxResult>().success().setData(commonCheck(result, dto.getOperateType()));
     }
+
+    /**
+     * check--保存
+     * @param dto
+     * @param result
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value = "保存check", notes = "保存check")
+    @PostMapping("/saveCheck")
+    @ResponseBody
+    public Message<AjaxResult> saveCheck(@RequestBody FinBondAssetSaveRequest dto, BindingResult result) {
+        AjaxResult ajax = new AjaxResult();
+        List<ValidMessage> validList = new ArrayList<>();
+        String finProdId = commonBusinessService.getFinProdId(dto.getFinprodMarketId() + dto.getTradeMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
+        if (finBondAssetService.selectCountByfinprodId(finProdId) > 0) {
+            validList.add(new ValidMessage("",
+                    getMessage("资产代码不能重复!")));
+            ajax.setErrorList(validList);
+            ajax.setMessageType(MessageType.错误消息);
+            return new Message<AjaxResult>().success().setData(ajax);
+        }
+        return new Message<AjaxResult>().success().setData(commonCheck(result, dto.getOperateType()));
+    }
     
     /**
      * 
@@ -664,6 +689,30 @@ public class FinBondAsset002Controller extends BaseController{
         }catch (Exception e){
             logger.error("文件上传异常", e);
             return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
+        }
+        return null;
+    }
+
+    /**
+     * 附件下载
+     * @param seqNo  入参
+     * @return 处理结果
+     * @throws IOException 异常信息
+     */
+    @ApiOperation(value = "附件下载", notes = "附件下载")
+    @ResponseBody
+    @PostMapping( "/downloadFile")
+    public Message<MultipartFile> downloadFile(String seqNo) {
+        try {
+            logger.info("文件下载开始");
+            if (StringUtil.isNotEmpty(seqNo)) {
+                MultipartFile fileInfo = finBondAssetService.downloadFileInfo(seqNo);
+                return new Message<MultipartFile>().success().setData(fileInfo);
+            }
+            logger.info("文件下载结束");
+        }catch (Exception e){
+            logger.error("文件下载异常", e);
+            return new Message<MultipartFile>().fail().setMessage("文件下载异常");
         }
         return null;
     }
