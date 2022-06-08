@@ -2847,6 +2847,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     }else {
                         infRiskRdsDto.setEventDate(dataMap.get("arriveDate").toString());
                     }
+                    infRiskRdsDto.setEventId(infRiskRdsDto.getEventId()+ trimInfStr(infRiskRdsDto.getPortfolioCode()));
+
 //                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("arriveDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
                 }
             } 
