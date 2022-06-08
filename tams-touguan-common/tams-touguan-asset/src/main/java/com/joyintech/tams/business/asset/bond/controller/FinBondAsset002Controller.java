@@ -292,6 +292,31 @@ public class FinBondAsset002Controller extends BaseController{
         }
         return new Message<AjaxResult>().success().setData(commonCheck(result, dto.getOperateType()));
     }
+
+    /**
+     * check--保存
+     * @param dto
+     * @param result
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value = "保存check", notes = "保存check")
+    @PostMapping("/saveCheck")
+    @ResponseBody
+    public Message<AjaxResult> saveCheck(@RequestBody FinBondAssetSaveRequest dto, BindingResult result) {
+        AjaxResult ajax = new AjaxResult();
+        List<ValidMessage> validList = new ArrayList<>();
+        String finProdId = commonBusinessService.getFinProdId(dto.getFinprodMarketId() + dto.getTradeMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
+        if (finBondAssetService.selectCountByfinprodId(finProdId) > 0) {
+            validList.add(new ValidMessage("",
+                    getMessage("资产代码不能重复!")));
+            ajax.setErrorList(validList);
+            ajax.setMessageType(MessageType.错误消息);
+            return new Message<AjaxResult>().success().setData(ajax);
+        }
+        return new Message<AjaxResult>().success().setData(commonCheck(result, dto.getOperateType()));
+    }
     
     /**
      * 
