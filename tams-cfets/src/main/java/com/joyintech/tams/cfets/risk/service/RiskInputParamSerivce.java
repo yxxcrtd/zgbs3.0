@@ -88,8 +88,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @param isCheck
      * @return
      */
-    private BaseMap generateBusinessDto(Object obj, String decisionAct, String flowStatus, boolean isCheck) {
-        String pageId = "";
+    private BaseMap generateBusinessDto(Object obj, String decisionAct, String flowStatus, boolean isCheck,String pageId) {
         ProcessMark processMark;
         String businessJson = JsonUtils.object2Json(obj);
         // 入参为 workflowId 时 ，需要从流程中获取业务参数
@@ -204,8 +203,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
     /**
      * 指标、授信、名单、授权check
      **/
-    public RiskCommonOutputDto buildParamThenRisk(Object obj, String decisionAct, String flowStatus, boolean isCheck) {
-        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, isCheck);
+    public RiskCommonOutputDto buildParamThenRisk(Object obj, String decisionAct, String flowStatus, String pageId) {
+        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, true,pageId);
         RiskCommonInputDto inputDto = getRiskInputParam(map);
         if (inputDto == null) return null;
         return doRisk(inputDto);
@@ -214,8 +213,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
     /**
      * 指标和授信占用
      **/
-    public void buildParamThenOccupy(Object obj, String decisionAct, String flowStatus, boolean isCheck) {
-        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, isCheck);
+    public void buildParamThenOccupy(Object obj, String decisionAct, String flowStatus, String pageId) {
+        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, false,pageId);
         RiskCommonInputDto inputDto = getRiskInputParam(map);
         if (inputDto == null) return;
         doOccupy(inputDto);
