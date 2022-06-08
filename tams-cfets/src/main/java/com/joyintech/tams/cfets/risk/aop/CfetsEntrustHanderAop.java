@@ -66,8 +66,7 @@ public class CfetsEntrustHanderAop {
      * 不保存至代办，提交到流程中，需要执行风险占用
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.etr..*.*.doInsert(..))")
-    protected void insertPoint() {
-    }
+    protected void insertPoint() {}
 
     /**
      * 不保存至代办，提交到流程中，需要执行风险占用
@@ -118,12 +117,11 @@ public class CfetsEntrustHanderAop {
             result.setErrorList(Lists.newArrayList(new ValidMessage("风险校验异常")));
             ajaxResultMessage.setData(result);
         }
-
     }
 
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 指令新建,操作类型submit
      *
      * @param joinPoint
      * @throws BusinessException
@@ -139,7 +137,7 @@ public class CfetsEntrustHanderAop {
     }
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 指令修改,操作类型submit
      *
      * @param joinPoint
      * @throws BusinessException

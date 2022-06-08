@@ -4,49 +4,26 @@ import com.google.common.collect.Lists;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.exception.BusinessException;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribSaveRequest;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
-import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInsertDto;
-import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
-import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
-import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
-import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListRsk;
-import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
-import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
-import com.joyintech.workflow.engine.constant.OperationType;
-import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
-import static com.joyintech.tams.constant.DictCodeListExt3.交易场所_银行间;
-import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.*;
 
 //@Component
 //@Aspect
@@ -63,32 +40,29 @@ public class CfetsTradeHandlerAop {
 
 
     /**
-     * 回售登记check
+     * 交易登记check
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond.controller.IbuQuoteBond004Controller.check(..))")
-    protected void doCheck() {
-    }
+    protected void doCheck() {}
 
     /**
      * 交收/回溯/失败
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService.doComplete(..))")
-    protected void doCompleteSettle() {
-    }
+    protected void doCompleteSettle() {}
 
     /**
-     * 回售登记更新
+     * 交易登记更新
      */
     @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doUpdate(..))")
     protected void updatePoint() {
     }
 
     /**
-     * 回售登记新增
+     * 交易登记新增
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doInsert(..))")
-    protected void insertPoint() {
-    }
+    protected void insertPoint() {}
 
     /**
      * 作废操作,释放占用
@@ -97,16 +71,28 @@ public class CfetsTradeHandlerAop {
     protected void deletePoint() {
     }
 
+    /**
+     * 成交确认
+     */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteMethod(..))")
     protected void completePoint() {}
 
+    /**
+     * 交易撤销
+     */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doCompleteRevoke(..))")
     protected void doCompleteRevoke() {}
+
+    /**
+     * 交易撤销
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doForcedFinish(..))")
+    protected void doForcedFinish(){}
 
 
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 交易新建/修改时提交check
      *
      * @param joinPoint
      * @throws BusinessException
@@ -137,7 +123,7 @@ public class CfetsTradeHandlerAop {
 
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 交收/回溯/交收失败
      *
      * @param joinPoint
      * @throws BusinessException
@@ -151,7 +137,7 @@ public class CfetsTradeHandlerAop {
 
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 交易新建
      *
      * @param joinPoint
      * @throws BusinessException
@@ -163,7 +149,7 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 交易更新
      *
      * @param joinPoint
      * @throws BusinessException
@@ -192,9 +178,6 @@ public class CfetsTradeHandlerAop {
 
     @AfterReturning("completePoint()")
     public void occupyOnComplete(JoinPoint joinPoint) throws BusinessException {
-        if(!StringUtil.isNotEmpty(joinPoint.getArgs())){
-            return;
-        }
         Object[] args = joinPoint.getArgs();
         inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
     }
@@ -206,10 +189,18 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning("doCompleteRevoke()")
     public void revokeComplete(JoinPoint joinPoint) throws BusinessException {
-        if(!StringUtil.isNotEmpty(joinPoint.getArgs())){
-            return;
-        }
         Object[] args = joinPoint.getArgs();
         inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    }
+
+    /**
+     * 指令强制完成
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning(pointcut = "doForcedFinish()", returning = "bondInfo003Dto")
+    public void doForcedFinish(JoinPoint joinPoint, CfetsEtribBondInfo003Dto bondInfo003Dto) throws BusinessException {
+        inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
     }
 }
