@@ -68,8 +68,8 @@
         case
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01' THEN
             case when FIN_PRODUCT.COUPON_SPECIES = '01' AND  FIN_PRODUCT_ISSUE.INT_TYPE = '02' THEN
-            SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
-            else to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+            SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
+            else to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM999,999,999,999,990.9990') || ' %'
             END
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02','03')  THEN
             CASE  WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
@@ -77,14 +77,14 @@
             WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
             ELSE bobp.BID_PRICE
             END
-            when ETR_ENTRUST.PS in ('T68', 'T69') or ETR_ENTRUST_ADD.ASSET_TYPE = 'F07' then to_char(ETR_ENTRUST.PRICE*100, 'FM9999999999999990.9000')
-            when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then to_char(decode(ETR_ENTRUST_ADD.PRICE_TYPE,#{PRICE_CLASS_01,jdbcType=VARCHAR},ROUND(ETR_ENTRUST.PRICE,4),#{PRICE_CLASS_02,jdbcType=VARCHAR},ROUND(ETR_ENTRUST_ADD.FULL_PRICE,4)), 'FM9999999999999990.9000')
+            when ETR_ENTRUST.PS in ('T68', 'T69') or ETR_ENTRUST_ADD.ASSET_TYPE = 'F07' then to_char(ETR_ENTRUST.PRICE*100, 'FM999,999,999,999,990.9990')
+            when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then to_char(decode(ETR_ENTRUST_ADD.PRICE_TYPE,#{PRICE_CLASS_01,jdbcType=VARCHAR},ROUND(ETR_ENTRUST.PRICE,4),#{PRICE_CLASS_02,jdbcType=VARCHAR},ROUND(ETR_ENTRUST_ADD.FULL_PRICE,4)), 'FM999,999,999,999,990.9990')
             when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' and ETR_ENTRUST.PRICE_MODEL = #{PRICE_MODEL_PRM03} then NULL
             WHEN ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = 'EX0005' THEN NULL
             WHEN ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = 'F02' AND ETR_ENTRUST.PRICE_MODEL = #{PRICE_MODEL_PRM03} THEN '0.00'
-            when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then to_char(ROUND(ETR_ENTRUST.price,3), 'FM9999999999999990.900')
+            when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then to_char(ROUND(ETR_ENTRUST.price,3), 'FM999,999,999,999,990.990')
          else to_char(round(decode(btm.OUTPUT_VALUE_1,#{busiTypePosition02},decode(ETR_ENTRUST_ADD.CALCULATE_FIELD,'price',ETR_ENTRUST.PRICE,'exerYield',ETR_ENTRUST_ADD.EXER_YIELD*100,'matureYield',ETR_ENTRUST_ADD.MATURE_YIELD*100),#{busiTypePosition03},ETR_ENTRUST.PRICE,NVL(ETR_ENTRUST.PRICE,
-            0.00)),4), 'FM9999999999999990.9000')
+            0.00)),4), 'FM999,999,999,999,990.9990')
             end as etrPrice,
         CASE
 
@@ -188,10 +188,10 @@
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
-        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
+        then to_char(t0.BID_PRICE * 100, 'FM999,999,999,999,990.9990')
+        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM999,999,999,999,990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
+        then to_char(t0.BID_PRICE * 10000, 'FM999,999,999,999,990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.ENTRUST_ID
         from ETR_ENTRUST_BID_PRICE t0
@@ -357,8 +357,8 @@
         case
             WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01' THEN
             case when FIN_PRODUCT.COUPON_SPECIES = '01' AND  FIN_PRODUCT_ISSUE.INT_TYPE = '02' THEN
-            SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
-            else to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+            SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
+            else to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM999,999,999,999,990.9990') || ' %'
             END
             WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02','03')  THEN
             CASE  WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
@@ -366,14 +366,14 @@
             WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
             ELSE bobp.BID_PRICE
             END
-            when WFL_ETR_ENTRUST.PS in ('T68', 'T69') or WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F07' then to_char(WFL_ETR_ENTRUST.PRICE*100,'FM9999999999999990.9000')
-            when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then to_char(decode(WFL_ETR_ENTRUST_ADD.PRICE_TYPE,#{PRICE_CLASS_01,jdbcType=VARCHAR},ROUND(WFL_ETR_ENTRUST.PRICE,4),#{PRICE_CLASS_02,jdbcType=VARCHAR},ROUND(WFL_ETR_ENTRUST_ADD.FULL_PRICE,4)),'FM9999999999999990.9000')
+            when WFL_ETR_ENTRUST.PS in ('T68', 'T69') or WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F07' then to_char(WFL_ETR_ENTRUST.PRICE*100,'FM999,999,999,999,990.9990')
+            when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then to_char(decode(WFL_ETR_ENTRUST_ADD.PRICE_TYPE,#{PRICE_CLASS_01,jdbcType=VARCHAR},ROUND(WFL_ETR_ENTRUST.PRICE,4),#{PRICE_CLASS_02,jdbcType=VARCHAR},ROUND(WFL_ETR_ENTRUST_ADD.FULL_PRICE,4)),'FM999,999,999,999,990.9990')
             when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' and WFL_ETR_ENTRUST.PRICE_MODEL = #{PRICE_MODEL_PRM03} then NULL
             WHEN WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = 'EX0005' THEN NULL
             WHEN WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = 'F02' AND WFL_ETR_ENTRUST.PRICE_MODEL = #{PRICE_MODEL_PRM03} THEN '0.00'
-            when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then to_char(ROUND(WFL_ETR_ENTRUST.price,3),'FM9999999999999990.900')
+            when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then to_char(ROUND(WFL_ETR_ENTRUST.price,3),'FM999,999,999,999,990.990')
             else to_char(round(decode(btm.OUTPUT_VALUE_1,#{busiTypePosition02},decode(WFL_ETR_ENTRUST_ADD.CALCULATE_FIELD,'price',WFL_ETR_ENTRUST.PRICE,'exerYield',WFL_ETR_ENTRUST_ADD.EXER_YIELD*100,'matureYield',WFL_ETR_ENTRUST_ADD.MATURE_YIELD*100),#{busiTypePosition03},WFL_ETR_ENTRUST.PRICE,NVL(WFL_ETR_ENTRUST.PRICE,
-            0.00)),4),'FM9999999999999990.9000')
+            0.00)),4),'FM999,999,999,999,990.9990')
             end as etrPrice,
         /*CASE
 
@@ -484,10 +484,10 @@
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
-        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
+        then to_char(t0.BID_PRICE * 100, 'FM999,999,999,999,990.9990')
+        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM999,999,999,999,990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
+        then to_char(t0.BID_PRICE * 10000, 'FM999,999,999,999,990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.ENTRUST_ID
         from WFL_ETR_ENTRUST_BID_PRICE t0
@@ -1815,6 +1815,31 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN BID_ORDER_BID_PRICE T10  ON T10.ENTRUST_ID = T9.ENTRUST_ID AND T10.BID_PRICE = T9.BID_PRICE
         where T9.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
         GROUP BY T9.ENTRUST_ID, T10.BID_ID, T10.IS_WIN,T10.TRADE_ID
+    </select>
+
+    <select id="getEtrFirstBidInfo" resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListResponse">
+        SELECT ee.ENTRUST_ID entrustId,
+               trunc(nvl(efs.ENT_FINISH_AMT, 0), 2)               execFinishAmt,
+               trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0)),2) execRemainderAmt,
+               trunc(nvl(efs.ENT_FINISH_AMT, 0) /
+                     case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+               100                                      exeProgress,
+               trunc(nvl(tpd.SHARE_AMT * 100, 0),2)                   transFinishAmt,
+               trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0)),2) transRemainderAmt,
+               trunc(nvl(tpd.SHARE_AMT * 100, 0) /
+                     case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+               100                                      dealProgress
+        FROM ETR_ENTRUST ee
+                 left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
+                            from ETR_FINISH_STATUS
+                            group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
+                 left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
+                            from TRD_PRODUCT_DEAL t1
+                                     left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+                            where t1.IS_CANCEL = 'N'
+                              and t1.TRADE_STATUS != '03'
+                            group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
+        where ee.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
     </select>
 
 </mapper>

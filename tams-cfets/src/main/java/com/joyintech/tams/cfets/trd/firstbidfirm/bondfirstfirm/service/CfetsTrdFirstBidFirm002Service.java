@@ -4,6 +4,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
@@ -29,6 +30,7 @@ import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm002Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.*;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmService;
@@ -3491,6 +3493,30 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             productDto.setRealCash(cashMap.getBigDecimal("realCash"));
             productDto.setSecDesirableCash(cashMap.getBigDecimal("secDesirableCash"));
         }
+    }
+
+    public String doRiskcalCheckMethod(CfetsTrdFirstBidFirmInfoDto dto) {
+        if (StringUtil.isEmptyList(dto.getEntrustDtos())) {
+            return "组合分配列表不能为空";
+        }
+        List<String> messages = new ArrayList<>();
+        if (StringUtil.isNotEmpty(dto.getEntrustDtos())) {
+            for (CfetsTrdFirstBidFirmEntrustDto item : dto.getEntrustDtos()) {
+                if (!StringUtil.isNotEmpty(item.getPortfolioId())) {
+                    messages.add("请输入组合名称。");
+                }
+                if (!StringUtil.isNotEmpty(item.getEntrustNum())) {
+                    messages.add("请输入券面总额。");
+                }
+            }
+        }
+        if (!StringUtil.isNotEmpty(dto.getFinprodId())) {
+            messages.add("请输入资产代码。");
+        }
+        if (messages.size() > 0) {
+            return StringUtil.joinString(messages, GlobalConstant.VERTICAL_LINE);
+        }
+        return null;
     }
 }
 

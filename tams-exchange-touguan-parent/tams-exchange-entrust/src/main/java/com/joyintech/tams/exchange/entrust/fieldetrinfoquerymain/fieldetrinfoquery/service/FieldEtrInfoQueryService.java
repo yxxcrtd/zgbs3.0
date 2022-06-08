@@ -192,6 +192,30 @@ public class FieldEtrInfoQueryService extends BaseService {
         } else {
             return pageLimit;
         }
+
+        List<FieldEtrInfoQueryListResponse> list = pageLimit.getRoot();
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(list)) {
+
+            for (FieldEtrInfoQueryListResponse response : list) {
+                //一级投标债券 重新计算执行进度和成交进度
+                if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
+                        StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+                    FieldEtrInfoQueryListResponse dto2 = fieldEtrInfoQueryMapper.getEtrFirstBidInfo(response.getEntrustId());
+                    if (dto2 != null) {
+                        response.setExecFinishAmt(dto2.getExecFinishAmt());
+                        response.setExecRemainderAmt(dto2.getExecRemainderAmt());
+                        response.setExeProgress(dto2.getExeProgress());
+                        response.setTransFinishAmt(dto2.getTransFinishAmt());
+                        response.setTransRemainderAmt(dto2.getTransRemainderAmt());
+                        response.setDealProgress(dto2.getDealProgress());
+                    }
+                }
+            }
+
+        }
+
+        pageLimit.setRoot(list);
+
         return pageLimit;
     }
 

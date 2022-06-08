@@ -47,7 +47,17 @@
         ISSUE.ISSUE_SDATE issueSdate,
         ISSUE.ISSUE_EDATE issueEdate,
         PRODUCT_ADD.BID_DATE bidDate,
-        case when ISSUE.ISSUE_STYLE = '02'then PRODUCT_ADD.BID_DATE else null end as settleDate,
+
+        case
+        when ISSUE.ISSUE_CLASS ='01' THEN to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        else to_char(ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+        end as bidDateStr,
+        case
+        when ISSUE.ISSUE_CLASS ='01' THEN to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        else to_char(ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+        end as settleDate,
         PRODUCT_ADD.LISTING_DATE listingDate,
         ISSUE.ISSUE_CLASS issueClass,
         ISSUE.TENDER_TYPE tenderType,

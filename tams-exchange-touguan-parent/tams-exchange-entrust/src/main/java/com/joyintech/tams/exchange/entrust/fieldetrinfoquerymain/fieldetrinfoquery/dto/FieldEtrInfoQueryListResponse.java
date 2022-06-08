@@ -149,7 +149,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
      */
     public String getOtherFinprodType2() {
         if (StringUtil.equals(super.getFinprodType2(), BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue())){
-            return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, BussinessDictCodeList.平安资产类型_一级投标债券.getValue());
+            return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, BussinessDictCodeList.平安资产类型_债券.getValue());
         }
         else if (StringUtil.equals(getAssetType(), BussinessDictCodeList.平安资产类型_回购.getValue())
                 && StringUtil.equals(getAssetType1(), DictCodeList.回购类型_质押式协议回购.getValue())) {
@@ -399,7 +399,11 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getOtherBusiTypePosition() {
-        return SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
+        String busiTypePosition = SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
+        if (StringUtil.isEmpty(busiTypePosition)) {
+            return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
+        }
+        return busiTypePosition;
     }
 
 //    public BigDecimal getEtrPrice() {

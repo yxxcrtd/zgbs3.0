@@ -131,7 +131,7 @@ public class SftpFileSystemMethod implements JoyinFileSystemMethod {
             sshSession = jsch.getSession(username, ip, Integer.valueOf(port));
             com.jcraft.jsch.Logger jschLogger = new SettleLogger();
             JSch.setLogger(jschLogger);
-            if (LOGIN_TYPE_NOPASSWORD == logintype) {
+            if (LOGIN_TYPE_NOPASSWORD.equals(logintype)) {
                 jsch.addIdentity(password);
             } else {
                 sshSession.setPassword(password);

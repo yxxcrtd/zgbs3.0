@@ -17,6 +17,7 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,8 @@ public class FxSecrepoQuote001Service extends BaseService<FxSecrepoQuote001Dto> 
         FxSecrepoQuote entity = new FxSecrepoQuote();
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
         String businessType = entity.getBusinessType();
-        if(null ==  businessType || "".equals("")){
+        // Sonar Fix modify by huwei 220607
+        if(StringUtils.isEmpty(businessType)) {
             return "未获取到接口业务类型！";
         }
         CallReturn callReturn= clientService.send(entity,businessType,businessType);
