@@ -112,6 +112,16 @@ public class EtrExchangeTradePositionsSecRepoResponse {
 
     private String tradePlat;
 
+    private String isNetprice;
+
+    public String getIsNetprice() {
+        return isNetprice;
+    }
+
+    public void setIsNetprice(String isNetprice) {
+        this.isNetprice = isNetprice;
+    }
+
     public String getDealCurAcctName() {
         return dealCurAcctName;
     }
