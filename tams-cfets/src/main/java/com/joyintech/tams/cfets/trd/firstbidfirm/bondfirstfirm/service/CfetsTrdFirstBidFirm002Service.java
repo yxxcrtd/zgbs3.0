@@ -3530,12 +3530,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
     }
 
     public String doRiskcalCheckMethod(CfetsTrdFirstBidFirmInfoDto dto) {
-        if (StringUtil.isEmptyList(dto.getEntrustDtos())) {
+        if (StringUtil.isEmptyList(dto.getProductDtos())) {
             return "组合分配列表不能为空";
         }
         List<String> messages = new ArrayList<>();
-        if (StringUtil.isNotEmpty(dto.getEntrustDtos())) {
-            for (CfetsTrdFirstBidFirmEntrustDto item : dto.getEntrustDtos()) {
+        if (StringUtil.isNotEmpty(dto.getProductDtos())) {
+            for (CfetsTrdFirstBidFirmProductDto item : dto.getProductDtos()) {
                 if (!StringUtil.isNotEmpty(item.getPortfolioId())) {
                     messages.add("请输入组合名称。");
                 }
