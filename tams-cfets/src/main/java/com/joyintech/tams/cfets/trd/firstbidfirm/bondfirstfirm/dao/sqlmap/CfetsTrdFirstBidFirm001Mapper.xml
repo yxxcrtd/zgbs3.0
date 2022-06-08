@@ -307,11 +307,13 @@
             ee.ENTRUST_DATE                          entrustDate,
             ee.COUNTER_ID                            counterId,
             mcp.COUNTER_NAME                         counterName,
-            ee.REMARK            remark
+            hisInfo.REMARK            remark
         FROM ETR_ENTRUST ee
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = ee.FINPROD_ID
                  left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
                  LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+                 left join ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+                 on ee.ENTRUST_ID = hisInfo.ENTRUST_ID
         WHERE ee.ENTRUST_ID  = #{entrustId}
     </select>
 
