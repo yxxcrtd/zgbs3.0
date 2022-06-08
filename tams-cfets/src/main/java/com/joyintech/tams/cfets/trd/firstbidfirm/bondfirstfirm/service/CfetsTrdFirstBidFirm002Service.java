@@ -220,6 +220,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
     @Autowired
     private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
 
+    @Autowired
+    private FinProductTypeMapper finProductTypeMapper;
+
     /**
      * <投标确认>界面初始化检查
      *
@@ -335,7 +338,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             param.put("ISSUE_CLASS_03", DictCodeListExt4.新债_发行方式_簿记建档.getValue());
             param.put("bidModles", Arrays.asList(DictCodeListExt4.投标方式_自主投标.getValue(), DictCodeListExt4.投标方式_代投代缴.getValue()));
             List<CfetsTrdFirstBidFirmEntrustDto> entrustDtos = cfetsTrdFirstBidFirm002Mapper.selectEntInfoByIdAndDate(param);
-            if(CollectionUtils.isEmpty(entrustDtos)){
+            if (CollectionUtils.isEmpty(entrustDtos)) {
                 return ajaxResult;
             }
             List<Map<String, Object>> massageMapList = new ArrayList<>();
@@ -404,7 +407,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 map.put("massege", "该资产存在未接收指令待处理，是否现在进行投标确认？");
                 massageMapList.add(map);
             }
-            if(CollectionUtils.isNotEmpty(massageMapList)) {
+            if (CollectionUtils.isNotEmpty(massageMapList)) {
                 ajaxResult.setData(massageMapList);
                 ajaxResult.setMessageType(MessageType.确认消息);
             }
@@ -845,18 +848,18 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             });
         }
         // 【交易金额】 =基本信息.券面总额*金额信息.净价/100
-        dto.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getBidPriceTotal(), dto.getPrice()), new BigDecimal(100), 4));
-        // 【应计利息总额】 =基本信息.券面总额*金额信息.应计利息/100
-        if (StringUtil.isNotEmpty(dto.getIntAmt())) {
-            dto.setIntAmtTatol(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getBidPriceTotal(), dto.getIntAmt()), new BigDecimal(100), 4));
+        if (StringUtil.isNotEmpty(dto.getBidPriceTotal()) && StringUtil.isNotEmpty(dto.getPrice())) {
+            dto.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getBidPriceTotal(), dto.getPrice()), new BigDecimal(100), 4));
         } else {
-            dto.setIntAmtTatol(BigDecimal.ZERO);
+            dto.setTradeAmt(null);
+        }
+        // 【应计利息总额】 =基本信息.券面总额*金额信息.应计利息/100
+        if (StringUtil.isNotEmpty(dto.getBidPriceTotal())) {
+            dto.setIntAmtTatol(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getBidPriceTotal(), dto.getIntAmt()), new BigDecimal(100), 4));
         }
         // 【全价】 =金额信息.净价+金额信息.应计利息
-        if (StringUtil.isNotEmpty(dto.getIntAmt())) {
+        if (StringUtil.isNotEmpty(dto.getPrice())) {
             dto.setFullPrice(ArithmeticUtil.doAdd(dto.getPrice(), dto.getIntAmt()));
-        } else {
-            dto.setFullPrice(dto.getPrice());
         }
         // 【缴款金额】 ==金额信息.交易金额+金额信息.应计利息总额（元）
         if (StringUtil.isNotEmpty(dto.getIntAmtTatol())) {
@@ -1899,11 +1902,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 });
             }
             // 发送头寸
+            entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
-                entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                 this.sendPositionMethod(entity, true, null);
             } else {
-                entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                 this.sendPositionMethodOther(entity, true, null);
             }
             // 老头寸处理
@@ -2407,17 +2409,17 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
 //            this.insertEtrFinishStatus(entity, OperationType.NEW);
             // 发头寸
             try {
-                if (StringUtil.isNotEmpty(entity.getWorkflowId())
-                        && StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
+                if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
                     boolean isSubmit = true;
                     SysWflBusinessList sysWflBusinessList = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
                     if (StringUtil.equals(sysWflBusinessList.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
                         isSubmit = false;
-                        entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+                    }
+                    entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+                    if(StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())){
                         this.sendPositionMethod(entity, isSubmit, confirmOk);
-                    } else {
-                        entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
-                        this.sendPositionMethod(entity, isSubmit, confirmOk);
+                    }else {
+                        this.sendPositionMethodOther(entity, isSubmit, confirmOk);
                     }
                 }
             } catch (PositionException e) {
@@ -3374,7 +3376,27 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         //调用头寸
         CfetsBondPositionRequest req = new CfetsBondPositionRequest();
-        req.setInterfaceType("Bond001");//报文类型
+        if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
+            req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
+            req.setInterfaceType("Bond001");//报文类型
+        } else {
+            req.setInterfaceType("Bond002");//报文类型-
+            req.setPayType(entity.getPayType());//缴款方式
+            FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
+            finProductTypeKey.setFinprodId(entity.getFinprodId());
+            finProductTypeKey.setBranch(0L);
+            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+            String[] arrzqtype = {BussinessDictCodeList.行内资产三级分类_国债.getValue(),
+                    BussinessDictCodeList.行内资产三级分类_地方政府债.getValue(), BussinessDictCodeList.行内资产三级分类_政策性金融债.getValue()};
+            // 交易所分销买入且缴款方式为一级分销时，国债、地方政府债、政策性金融债采用净额结算，其他的采用逐笔全额结算。
+            if (StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue())
+                    && Arrays.asList(arrzqtype).contains(finProductType.getType10())) {
+                req.setDeliveryType(DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue());//结算方式
+            } else {
+                req.setDeliveryType(DictCodeListExt3.结算方式_头寸引擎_逐笔全额结算.getValue());//结算方式
+            }
+        }
         req.setFinprodId(entity.getFinprodId());
         req.setUserId(SecurityUtil.getLoginUser().getUserName());
         req.setTotalTradeId(entity.getBidId());
@@ -3389,10 +3411,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         req.setBalanceCheck(balanceCheck);
         req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
-        if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
-                || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
-            req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
-        }
         req.setBusiAct(DictCodeListExt3.业务动作_汇总确认.getValue());
         req.setPs(DictCodeList.交易方向_买入.getValue());
         req.setPurchModle(DictCodeListExt4.头寸申购方式_分销买入.getValue());
@@ -3446,7 +3464,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         //调用头寸
         CfetsBondPositionRequest req = new CfetsBondPositionRequest();
-        req.setInterfaceType("Bond001");//报文类型
+        if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
+            req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
+            req.setInterfaceType("Bond001");//报文类型
+        } else {
+            req.setInterfaceType("Bond002");//报文类型-
+            req.setPayType(entity.getPayType());//缴款方式
+        }
         req.setFinprodId(entity.getFinprodId());
         req.setUserId(SecurityUtil.getLoginUser().getUserName());
         req.setTotalTradeId(entity.getBidId());
@@ -3461,10 +3486,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         req.setBalanceCheck(balanceCheck);
         req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
-        if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
-                || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
-            req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
-        }
         req.setBusiAct(DictCodeListExt3.业务动作_汇总确认.getValue());
         req.setPs(DictCodeList.交易方向_买入.getValue());
         if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), entity.getBiddingMethod())) {
