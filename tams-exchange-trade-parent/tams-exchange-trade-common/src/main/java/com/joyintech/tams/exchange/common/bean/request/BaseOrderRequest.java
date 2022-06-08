@@ -28,12 +28,12 @@ public class BaseOrderRequest implements Serializable {
     protected String entrustProp;
 
     @Digits(integer = 20, fraction = 0)
-    @ApiModelProperty(required = false, name = "entrustVolume", value = "委托数量", example = "1000")
+    @ApiModelProperty(required = false, name = "entrustVolume", value = "委托数量|质押数量", example = "1000")
     protected long entrustVolume;
 
     @Digits(integer = 20, fraction = 4)
     @JsonSerialize(using = DoubleSerializerUtils.class)
-    @ApiModelProperty(required = false, name = "entrustPrice", value = "净价价格", example = "2.34")
+    @ApiModelProperty(required = false, name = "entrustPrice", value = "净价价格|委托价格|回购利率", example = "2.34")
     protected BigDecimal entrustPrice;
 
     @Digits(integer = 20, fraction = 4)
@@ -41,7 +41,7 @@ public class BaseOrderRequest implements Serializable {
     @ApiModelProperty(required = false, name = "fullPrice", value = "全价价格", example = "2.34")
     protected BigDecimal fullPrice;
 
-    @ApiModelProperty(required = true, name = "entrustBalance", value = "委托金额")
+    @ApiModelProperty(required = true, name = "entrustBalance", value = "委托金额|回购金额")
     @Digits(integer = 20, fraction = 4)
     @JsonSerialize(using = DoubleSerializerUtils.class)
     protected BigDecimal entrustBalance;
