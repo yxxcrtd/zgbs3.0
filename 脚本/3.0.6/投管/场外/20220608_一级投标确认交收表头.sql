@@ -1,0 +1,8 @@
+UPDATE CFG_READONLY_FORM_SHOW SET  EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"5","unit":"yuan"}' WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01ZBA' AND COLCODE = 'unitInt';
+UPDATE CFG_DATATABLE_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"5"}' WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01ZBP' AND COLCODE = 'intAmt';
+UPDATE CFG_DATATABLE_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"4"}' WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01ZBP' AND COLCODE = 'unitPrice';
+UPDATE CFG_DATATABLE_SHOW SET MAXLEN = 160 WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01ZBP' AND COLCODE = 'actWinPrinamt' ;
+UPDATE CFG_DATATABLE_SHOW SET MAXLEN = 160 WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01ZBP' AND COLCODE = 'theWinPrinamt' ;
+UPDATE CFG_DATATABLE_SHOW SET MAXLEN = 150 WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01ZBP' AND COLCODE = 'totalBiddingNum' ;
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"4","unit":"yuan"}' WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01ZBA' AND COLCODE = 'allPrice';
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"4","unit":"yuan"}' WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01ZBA' AND COLCODE = 'price';
