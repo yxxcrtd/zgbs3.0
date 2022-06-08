@@ -255,7 +255,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     @ResponseBody
     public Message<CfetsTrdFirstBidFirmInfoDto> bidPriceTotalLink(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
         try {
-            CfetsTrdFirstBidFirmInfoDto result = cfetsTrdFirstBidFirm002Service.calAmtAndAutoAllocation(request, null);
+            CfetsTrdFirstBidFirmInfoDto result = cfetsTrdFirstBidFirm002Service.calAmtAndAutoAllocation(request, request.getPrice());
             return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(result);
         } catch (Exception e) {
             logger.error("券面总额联动异常", e);
@@ -495,26 +495,26 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
     }
 
-    @ResponseBody
-    @ApiOperation(value = "风险试算", notes = "风险试算")
-    @PostMapping("doRiskcal")
-    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
-        try {
-            String message = cfetsTrdFirstBidFirm002Service.doRiskcalCheckMethod(dto);
-            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
-                AjaxResult ar = new AjaxResult();
-                List<ValidMessage> warnList = new ArrayList<>();
-                warnList.add(new ValidMessage(message));
-                ar.setErrorList(warnList);
-                ar.setMessageType(MessageType.错误消息);
-                return new Message<AjaxResult>().setData(ar);
-            }
-            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,
-                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
-            return new Message<AjaxResult>().setData(ajaxResult);
-        } catch (Exception e) {
-            logger.error("风险试算", e);
-            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-        }
-    }
+//    @ResponseBody
+//    @ApiOperation(value = "风险试算", notes = "风险试算")
+//    @PostMapping("doRiskcal")
+//    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
+//        try {
+//            String message = cfetsTrdFirstBidFirm002Service.doRiskcalCheckMethod(dto);
+//            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
+//                AjaxResult ar = new AjaxResult();
+//                List<ValidMessage> warnList = new ArrayList<>();
+//                warnList.add(new ValidMessage(message));
+//                ar.setErrorList(warnList);
+//                ar.setMessageType(MessageType.错误消息);
+//                return new Message<AjaxResult>().setData(ar);
+//            }
+//            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,
+//                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
+//            return new Message<AjaxResult>().setData(ajaxResult);
+//        } catch (Exception e) {
+//            logger.error("风险试算", e);
+//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
+//        }
+//    }
 }

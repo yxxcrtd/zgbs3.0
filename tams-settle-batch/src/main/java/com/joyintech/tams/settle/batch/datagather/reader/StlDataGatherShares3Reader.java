@@ -67,7 +67,7 @@ public class StlDataGatherShares3Reader extends StlDataGatherReader {
         searchParam.put("IS_CANCEL_N", BussinessDictCodeList.是否_否.getValue());
         searchParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
         searchParam.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
-        searchParam.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+       // searchParam.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
         searchParam.put("DELIVERY_RESULT_01", DictCodeListExt4.交收结果_正常交收.getValue());
         searchParam.put("DELIVERY_RESULT_02", DictCodeListExt4.交收结果_部分交收.getValue());
         //申购确认

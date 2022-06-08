@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -830,7 +831,11 @@ public class CommonBusinessService extends BaseService {
 
         // 获取配置映射
         FinProductTypeConfig finProductTypeConfig = getRskAuthorizeType(null, assetType);
-        
+
+        // Sonar Fix modify by huwei 220608
+        if (StringUtils.isEmpty(finProductTypeConfig)) {
+            finProductTypeConfig = new FinProductTypeConfig();
+        }
         Map<String, Object> authorizeLimitAmtMap = getAuthorizeLimitAmt(LoginUserUtil.getUserName()
                 , finProductTypeConfig.getOutputValue1(), finProductTypeConfig.getOutputValue2(),
             tradeMarket, tradeDirection, "01");

@@ -49,6 +49,9 @@ public class CalRequest {
     @ApiModelProperty(name="cpriceAmt",value="净价总额")
     private BigDecimal cpriceAmt;
 
+    @ApiModelProperty(name="tradeMarketMode",value="交易市场 一级市场 二级市场")
+    private String tradeMarketMode;
+
 
     public String getCalculateField() {
         return calculateField;
@@ -144,6 +147,14 @@ public class CalRequest {
 
     public void setCpriceAmt(BigDecimal cpriceAmt) {
         this.cpriceAmt = cpriceAmt;
+    }
+
+    public String getTradeMarketMode() {
+        return tradeMarketMode;
+    }
+
+    public void setTradeMarketMode(String tradeMarketMode) {
+        this.tradeMarketMode = tradeMarketMode;
     }
 }
 

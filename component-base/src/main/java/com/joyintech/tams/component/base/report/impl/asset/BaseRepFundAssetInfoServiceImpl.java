@@ -74,9 +74,9 @@ public class BaseRepFundAssetInfoServiceImpl extends BaseService<RepFund> implem
             for(RepFund repFund:entityList){
                 i+=repFundMapper.insert(repFund);
             }
-            
+            return i==entityList.size();
         }
-        return i==entityList.size();
+        return false;
     }
 
     /**
