@@ -238,11 +238,11 @@
             <if test="counterId != null and counterId != '' ">
                 AND T.counterId = #{counterId}
             </if>
-            <if test="issueDateStart != null and !issueDateStart.isEmpty() ">
-                AND T.issueDate >= to_date(#{issueDateStart}, 'yyyy-MM-dd')
-            </if>
-            <if test="issueDateEnd != null and !issueDateEnd.isEmpty() ">
-                AND T.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
+            <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
+                AND  (
+                (T.issueDateStart <![CDATA[<=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd') and to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> T.issueDateEnd)
+                OR (T.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')  and to_date(#{issueDateEnd}, 'yyyy-MM-dd') <![CDATA[<=]]> T.issueDateEnd )
+                )
             </if>
             <if test="entrustDateStart != null and !entrustDateStart.isEmpty() ">
                 AND T.entrustDate >= to_date(#{entrustDateStart}, 'yyyy-MM-dd')
