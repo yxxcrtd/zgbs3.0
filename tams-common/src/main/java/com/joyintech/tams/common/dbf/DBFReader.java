@@ -35,7 +35,8 @@ public final class DBFReader {
 
     private DBFReader(File file) {
         if(null == file || !file.exists()) {
-            throw new RuntimeException(String.format("文件%s不存在", file.getPath()));
+            //throw new RuntimeException(String.format("文件%s不存在", file.getPath()));
+            throw new RuntimeException("文件不存在");
         }
         this.file = file;
     }
