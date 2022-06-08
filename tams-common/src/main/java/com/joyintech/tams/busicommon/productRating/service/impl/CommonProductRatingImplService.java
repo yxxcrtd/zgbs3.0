@@ -313,7 +313,8 @@ public class CommonProductRatingImplService extends BaseService<CommonProductRat
 	
 	@Override
 	public void insert(Object entity,int type) {
-		if(type==1 && entity.getClass().getName().equals(MstBondCreditRating.class.getName())) {
+		//if(type==1 && entity.getClass().getName().equals(MstBondCreditRating.class.getName())) {
+		if(type==1 && entity instanceof MstBondCreditRating) {
 			mstBondCreditRatingMapper.insert((MstBondCreditRating) entity);
 		}else if (type==2) {
 			mstInnerCreditRatingMapper.insert((MstInnerCreditRating) entity);
