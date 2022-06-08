@@ -574,17 +574,4 @@ public class RiskInputParamSerivce extends RiskCommonService {
             creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         }
     }
-
-    /**
-     * 风险试算和校验
-     *
-     * @param param
-     * @return
-     */
-    public RiskCommonOutputDto doRisk(BaseMap param) {
-        WorkflowContext.getProcessMarkService().getBusinessInfo("").getPageId();
-        RiskCommonInputDto inputDto = getRiskInputParam(param);
-        if (inputDto == null) return null;
-        return doRisk(inputDto);
-    }
 }

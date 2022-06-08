@@ -233,7 +233,7 @@ public class CfetsEntrustHanderAop {
         }
         //风险试算组装dto
         Map<String, Object> dataMap=cfetsEtrRdsCommonService.doRiskcalPackageEquity(dto);
-        RiskCommonOutputDto riskCommonOutput= riskInputParamSerivce.doRisk(BaseMap.newMap(dataMap));
+        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), true);
         return getAjaxResult(riskCommonOutput,null,null);
     }
 
