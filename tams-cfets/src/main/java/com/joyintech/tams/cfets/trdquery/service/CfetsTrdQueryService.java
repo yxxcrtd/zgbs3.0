@@ -350,10 +350,10 @@ public class CfetsTrdQueryService extends BaseService{
         String spcdCodeTemp = spcdCode;
         if (StringUtil.equals(spcdCode, DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
             //基本信息表单
-            spcdCode = spcdCodeTemp + ",B";
+            spcdCode = spcdCodeTemp + ",BB";
             List<CfgReadonlyFormShow> infoFormb = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             //其它表单
-            spcdCode = spcdCodeTemp + ",O";
+            spcdCode = spcdCodeTemp + ",BO";
             List<CfgReadonlyFormShow> infoFormo = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             //组合表格
             List<CfgDataTableShow> infoTableP;
@@ -771,7 +771,6 @@ public class CfetsTrdQueryService extends BaseService{
             pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             pageParam.put("TRADE_PLACE_01", DictCodeListExt3.交易场所_银行间.getValue());
             pageParam.put("TRADE_PLACE_02", DictCodeListExt3.交易场所_商业银行柜台.getValue());
-            pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //成交编号
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdQueryMapper.queryAllCstpInfoList(pageParam));
 
@@ -1009,7 +1008,6 @@ public class CfetsTrdQueryService extends BaseService{
         pageParam.put("WIN_TYPE_01",DictCodeListExt4.投标方式_自主投标.getValue());
         pageParam.put("WIN_TYPE_02",DictCodeListExt4.投标方式_代投代缴.getValue());
         pageParam.put("WIN_TYPE_03",DictCodeListExt4.投标方式_分销买入.getValue());
-        pageParam.put("TRADE_STATUS_01",DictCodeListExt1.交易状态_初始.getValue());
         pageParam.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
         pageParam.put("TRADE_PLACE_02",DictCodeListExt1.交易场所_商业银行柜台.getValue());
         pageParam.put("STATUS_VALID_01",DictCodeListExt1.有效状态_有效.getValue());
@@ -1132,11 +1130,9 @@ public class CfetsTrdQueryService extends BaseService{
         pageParam.put("ISSUE_CLASS_02", DictCodeListExt4.新债_发行方式_招标发行.getValue());
         pageParam.put("ISSUE_CLASS_03",DictCodeListExt4.新债_发行方式_簿记建档.getValue());
         pageParam.put("ISSUE_CLASS_01",DictCodeListExt4.新债_发行方式_报价发行.getValue());
-        pageParam.put("PS_T01",DictCodeList.交易方向_买入.getValue());
         pageParam.put("WIN_TYPE_01",DictCodeListExt4.投标方式_自主投标.getValue());
         pageParam.put("WIN_TYPE_02",DictCodeListExt4.投标方式_代投代缴.getValue());
         pageParam.put("WIN_TYPE_03",DictCodeListExt4.投标方式_分销买入.getValue());
-        pageParam.put("TRADE_STATUS_01",DictCodeListExt1.交易状态_初始.getValue());
         pageParam.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
         pageParam.put("TRADE_PLACE_02",DictCodeListExt1.交易场所_商业银行柜台.getValue());
         pageParam.put("STATUS_VALID_01",DictCodeListExt1.有效状态_有效.getValue());

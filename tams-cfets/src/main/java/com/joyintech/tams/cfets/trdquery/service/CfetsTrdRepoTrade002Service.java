@@ -389,7 +389,7 @@ public class CfetsTrdRepoTrade002Service extends BaseService<CfetsTrdRepoTrade00
                 BigDecimal prinamt = interfOpicsTradRepo.getRepoamt();
                 BigDecimal subtract = com.joyintech.calculation.util.ArithmeticUtil.doAdd(prinamt,
                         inputDto.getTrdProductDeal().getPrinAmt());
-                if(subtract.compareTo(BigDecimal.ZERO)==-1||subtract.compareTo(BigDecimal.ZERO)==0){//小于0的话
+                if(subtract.compareTo(BigDecimal.ZERO) < 0 ||subtract.compareTo(BigDecimal.ZERO)==0){//小于0的话
                     record.setRepoamt(BigDecimal.ZERO);
                 }else{
                     record.setRepoamt(subtract);

@@ -4,49 +4,32 @@ import com.google.common.collect.Lists;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.exception.BusinessException;
-import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribSaveRequest;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
-import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInsertDto;
-import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
-import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
-import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
-import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListRsk;
-import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
-import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
-import com.joyintech.workflow.engine.constant.OperationType;
-import org.apache.commons.collections.CollectionUtils;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+
+import static com.joyintech.tams.constant.DictCodeList.交易方向_赎回;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
-import static com.joyintech.tams.constant.DictCodeListExt3.交易场所_银行间;
-import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.*;
 
 //@Component
 //@Aspect
@@ -60,13 +43,10 @@ public class CfetsTradeHandlerAop {
     private RiskInputParamSerivce inputParamSerivce;
     @Resource
     private SysWflBusinessListMapper sysWflBusinessListMapper;
-    @Autowired
-    private CfetsBondDealQuotedPrice004Service quotedPrice004Service;
-    @Autowired
-    private CfetsManualSettleService cfetsManualSettleService;
+
 
     /**
-     * 回售登记check
+     * 交易登记check
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond.controller.IbuQuoteBond004Controller.check(..))")
     protected void doCheck() {
@@ -80,14 +60,14 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 回售登记更新
+     * 交易登记更新
      */
     @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doUpdate(..))")
     protected void updatePoint() {
     }
 
     /**
-     * 回售登记新增
+     * 交易登记新增
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doInsert(..))")
     protected void insertPoint() {
@@ -100,30 +80,50 @@ public class CfetsTradeHandlerAop {
     protected void deletePoint() {
     }
 
+    /**
+     * 成交确认
+     */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteMethod(..))")
-    protected void completePoint() {}
+    protected void completePoint() {
+    }
 
+    /**
+     * 交易撤销
+     */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doCompleteRevoke(..))")
-    protected void doCompleteRevoke() {}
+    protected void doCompleteRevoke() {
+    }
 
+    /**
+     * 交易撤销
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doForcedFinish(..))")
+    protected void doForcedFinish() {
+    }
+
+    /**
+     * 交收失败，关闭指令
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.manualsettle.service..*.*.closeDelegate(..))")
+    protected void closeDelegate(){}
 
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 交易新建/修改时提交check
      *
      * @param joinPoint
      * @throws BusinessException
      */
     @AfterReturning(pointcut = "doCheck()", returning = "ajaxResultMessage")
     public void doCheck(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
-        AjaxResult ajaxResult=ajaxResultMessage.getData();
-        if (ajaxResult != null && !StringUtil.isEmptyList(ajaxResult.getErrorList())){
+        AjaxResult ajaxResult = ajaxResultMessage.getData();
+        if (ajaxResult != null && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
             return;
         }
         Object[] args = joinPoint.getArgs();
         AjaxResult result = new AjaxResult();
         try {
-            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), true);
+            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
             if (StringUtil.isNotEmpty(outputDto.getErrorMsg())) {
                 result.setErrorList(Lists.newArrayList(new ValidMessage(outputDto.getErrorMsg())));
                 ajaxResultMessage.setData(result);
@@ -140,7 +140,7 @@ public class CfetsTradeHandlerAop {
 
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 交收/回溯/交收失败
      *
      * @param joinPoint
      * @throws BusinessException
@@ -149,12 +149,20 @@ public class CfetsTradeHandlerAop {
     public void doCompleteSettle(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         CfetsManualSettleDto dto = (CfetsManualSettleDto) args[0];
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), false);
+        if (StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue()) || StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
+            if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_赎回.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_还本.getValue())
+                    || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_付息.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+            }
+        }
+        if (StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_交收失败.getValue())) {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+        }
     }
 
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 交易新建
      *
      * @param joinPoint
      * @throws BusinessException
@@ -162,11 +170,11 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("insertPoint()")
     public void occupyOnInsert(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 交易更新
      *
      * @param joinPoint
      * @throws BusinessException
@@ -174,7 +182,7 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("updatePoint()")
     public void occupyOnUpdate(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
@@ -186,33 +194,87 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("deletePoint()")
     public void occupyOnDelete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String)args[0]);
-        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue()) ) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), false);
+        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String) args[0]);
+        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
         }
     }
 
 
     @AfterReturning("completePoint()")
     public void occupyOnComplete(JoinPoint joinPoint) throws BusinessException {
-        if(!StringUtil.isNotEmpty(joinPoint.getArgs())){
-            return;
-        }
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
      * 交易撤销
+     *
      * @param joinPoint
      * @throws BusinessException
      */
     @AfterReturning("doCompleteRevoke()")
     public void revokeComplete(JoinPoint joinPoint) throws BusinessException {
-        if(!StringUtil.isNotEmpty(joinPoint.getArgs())){
-            return;
-        }
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    }
+
+    /**
+     * 指令强制完成
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning(pointcut = "doForcedFinish()", returning = "bondInfo003Dto")
+    public void doForcedFinish(JoinPoint joinPoint, CfetsEtribBondInfo003Dto bondInfo003Dto) throws BusinessException {
+        inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    }
+
+    /**
+     * 交收失败
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning(pointcut = "closeDelegate()")
+    public void closeDelegate(JoinPoint joinPoint, CfetsEtribBondInfo003Dto bondInfo003Dto) throws BusinessException {
+        inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    }
+
+    /**
+     * 风险试算
+     *
+     * @param dto 委托指令内容
+     * @param infCode 接口代码
+     * @param busiType 业务类型
+     * @return 执行结果
+     * @throws Exception 异常
+     */
+    public static final <T> AjaxResult doRiskcal(T dto, String infCode, String busiType) throws Exception {
+        //风险试算check
+        RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
+        //风险试算组装dto
+        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        return getAjaxResult(riskCommonOutput,null,null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static RiskInputParamSerivce getRiskInputParamSerivce() {
+        return SpringContextUtil.getApplicationContext().getBean(RiskInputParamSerivce.class);
+    }
+
+    /**
+     * 获取返回的信息
+     * @param message
+     * @return
+     */
+    public static AjaxResult getAjaxResult(Object data,String message, MessageType messageType){
+        AjaxResult ar = new AjaxResult();
+        ar.setData(data);
+        List<ValidMessage> warnList = new ArrayList<>();
+        warnList.add(new ValidMessage(message));
+        ar.setErrorList(warnList);
+        ar.setMessageType(messageType);
+        return ar;
     }
 }

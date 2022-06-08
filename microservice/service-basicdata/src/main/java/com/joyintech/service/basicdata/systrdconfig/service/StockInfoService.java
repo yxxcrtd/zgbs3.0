@@ -35,6 +35,7 @@ public class StockInfoService extends BaseService<StockInfoDto> {
         params.put("ASSET_TYPE_F02", DictCodeList.平安资产类型_基金.getValue());
         params.put("ASSET_TYPE_F11", DictCodeListExt2.平安资产类型_股票.getValue());
         params.put("ASSET_TYPE_F20", DictCodeListExt3.平安资产类型_期货.getValue());
+        params.put("ASSET_TYPE_F37", DictCodeList.平安资产类型_信用保护凭证.getValue());
         params.put("FINPROD_TYPE_F02",DictCodeListExt1.金融产品类型_债券质押式正回购.getValue());
         params.put("FINPROD_TYPE_F03",DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue());
         params.put("platDate",iPlatformDateImpl.getSysDate());

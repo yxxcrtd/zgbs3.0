@@ -698,7 +698,7 @@ public class CfetsTrdBondInvestTrade002Controller extends BaseController {
         }*/
 
         // 确认提醒
-        if (result.getErrorCount() == 0) {
+        if (null != result && result.getErrorCount() == 0) {
             AjaxResult ajaxResult = trdBondInvestTrade002Service.checkConfirmInfo(dto, result);
             String confirmMsg = "";
             if (null != ajaxResult) {

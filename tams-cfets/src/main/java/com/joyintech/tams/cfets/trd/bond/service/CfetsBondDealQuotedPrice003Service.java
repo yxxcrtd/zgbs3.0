@@ -763,7 +763,8 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
                 BussinessDictCodeList.交易方向_买入.getValue())) {
                 if (etrEntrustAdd != null && StringUtil.equals(etrEntrustAdd.getCalMode(),
                     BussinessDictCodeList.计算选择方式_净价.getValue())) {
-                    if (counterInfoDto.getUnitCprice() != null
+                    // Sonar Fix modify by huwei 220608
+                    if (counterInfoDto.getUnitCprice() != null && etrEntrust != null
                         && etrEntrust.getPrice() != null
                         && counterInfoDto.getUnitCprice().compareTo(
                             etrEntrust.getPrice()) > 0) {
@@ -811,7 +812,8 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
                 BussinessDictCodeList.交易方向_卖出.getValue())) {
                 if (etrEntrustAdd != null && StringUtil.equals(etrEntrustAdd.getCalMode(),
                     BussinessDictCodeList.计算选择方式_净价.getValue())) {
-                    if (counterInfoDto.getUnitCprice() != null
+                    // Sonar Fix modify by huwei 220608
+                    if (counterInfoDto.getUnitCprice() != null && etrEntrust != null
                         && etrEntrust.getPrice() != null
                         && counterInfoDto.getUnitCprice().compareTo(
                             etrEntrust.getPrice()) < 0) {

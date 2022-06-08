@@ -1412,7 +1412,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                             //根据标的信息校验标位
                             //最低标位 最低标位的大于等于该字段值
                             if (finProductInfo.getMinTamt() != null) {
-                                if (bidPriceSort.get(0).compareTo(finProductInfo.getMinTamt()) == -1) {
+                                // Sonar Fix modify by huwei 220608
+                                if (bidPriceSort.get(0).compareTo(finProductInfo.getMinTamt()) < 0) {
                                    // messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
                                     errorMessageList.add("最低标位");
                                 }

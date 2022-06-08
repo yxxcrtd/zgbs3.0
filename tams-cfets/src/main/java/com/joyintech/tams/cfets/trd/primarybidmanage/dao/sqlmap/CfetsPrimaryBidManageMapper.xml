@@ -40,9 +40,12 @@
         group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
-        WHERE FPI.ISSUE_CLASS = '02' AND BO.BID_MODLE !='03' AND BO.IS_CANCEL = 'N' AND
+        WHERE FPI.ISSUE_CLASS = '02' AND BO.BID_MODLE !='03'  AND BO.IS_CANCEL = 'N' AND
         BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE =#{COMMON_BUSINESS_TYPE_TRD97} and
         TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL='N')
+        <if test="userId != null and userId != ''">
+            AND BO.OUR_TRADER = #{userId}
+        </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND FP.FINPROD_MARKET_ID IN
             <foreach
@@ -396,8 +399,13 @@
         <if test="bidId != null and bidId != ''">
             AND BO.BID_ID = #{bidId}
         </if>
-        <if test="isWin != null and isWin != ''">
-            AND BO.IS_WIN = #{isWin}
+        <if test="isWinList != null and isWinList.size() > 0">
+            AND (CASE WHEN BO.IS_WIN = 'Y' THEN '04'
+            WHEN BO.IS_WIN = 'N' THEN '03'
+            ELSE '02' END) IN
+            <foreach collection="isWinList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
         </if>
         ) ss
         left join SYS_DATADICT_LIST sdl_status on ss.status=sdl_status.ITEM_CODE and sdl_status.DICT_CODE='STATUS_VALID'

@@ -34,6 +34,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
@@ -56,6 +57,8 @@ import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
+import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
+import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
 import com.joyintech.tams.component.business.settle.dto.BussSettleOrderParameterDto;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.component.business.trade.BussTrdAvailableCashQueryService;
@@ -75,6 +78,7 @@ import com.joyintech.tams.invest.common.component.business.basicdata.dto.BasicTr
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.cstp.service.CstpCommonService;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -1072,7 +1076,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
      * @see
      * @since 1.0
      */
-    public void doCompleteRevoke(CfetsTrdBondInvestTradeDto entity,String settleRemark,Boolean isNeedDealPosition) {
+    public List<TrdBondInvestTradeDto> doCompleteRevoke(CfetsTrdBondInvestTradeDto entity,String settleRemark,Boolean isNeedDealPosition) {
         // 调用基础组合.【金融产品交易组件.查询金融产品交易信息】获取原交易信息
         if (entity.getTotleTradeId().lastIndexOf('R') == entity.getTotleTradeId().length() - 1) {
             entity.setTotleTradeId(entity.getTotleTradeId().substring(0, entity.getTotleTradeId().length() - 1));
@@ -1082,6 +1086,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         List<String> totleIdList = new ArrayList(totleIdList1);
 
         List<BaseTradeProductDealDto> baseTradeProductDealDtos = baseTradeProductDealService.selectTotalDeal(totleIdList);
+        List<TrdBondInvestTradeDto> list = new ArrayList<>();
 
         FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
         for (BaseTradeProductDealDto baseTradeProductDealDto : baseTradeProductDealDtos) {
@@ -1154,8 +1159,11 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 }
 
             }
+            TrdBondInvestTradeDto bondDto=new  TrdBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(bondDto, baseTradeProductDealDto);
+            bondDto.setTotleTradeId(cetradeid);
+            list.add(bondDto);
         }
-
         // add by etliu 20210927 start
         if (entity != null) {
             if (StringUtil.isBlank(entity.getoFinprodId())
@@ -1233,6 +1241,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             paramMap.put("remark", DictCodeListExt3.交收状态_交收失败.getCodeName());
             cfetsTrdQueryMapper.updateInterfTradSecdealByTradeId(paramMap);
         }
+        return list;
     }
 
     /**
@@ -1472,7 +1481,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 BigDecimal prinamt = interfTradSecdeal.getPrinamt();
                 BigDecimal subtract = ArithmeticUtil.doAdd(prinamt,
                     ArithmeticUtil.multiply(inputDto.getTrdProductDeal().getShareAmt(), new BigDecimal(100)));
-                if (subtract.compareTo(BigDecimal.ZERO) == -1 || subtract.compareTo(BigDecimal.ZERO) == 0) {// 小于0的话
+                if (subtract.compareTo(BigDecimal.ZERO) < 0 || subtract.compareTo(BigDecimal.ZERO) == 0) {// 小于0的话
                     record.setPrinamt(BigDecimal.ZERO);
                 }
                 else {

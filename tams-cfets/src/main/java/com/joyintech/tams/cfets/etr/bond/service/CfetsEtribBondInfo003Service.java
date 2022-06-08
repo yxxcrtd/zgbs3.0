@@ -36,11 +36,9 @@ import com.joyintech.calculation.shell.param.SecInfoModel;
 import com.joyintech.calculation.shell.param.YieldPriceInParameter;
 import com.joyintech.calculation.shell.param.YieldPriceOutParameter;
 import com.joyintech.calculation.util.BasicUtil;
-import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
@@ -102,7 +100,6 @@ import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionI
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
@@ -153,18 +150,12 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
      */
     @Autowired
     private DateCalService dateCalService;
-    
-    @Autowired
-    private FinProductMapper finProductMapper;
 
     @Autowired
     private PtlPortfolioMapper ptlPortfolioMapper;
 
     @Autowired(required = false)
     private BaseEtrCashPositionCommService baseEtrCashPositionCommService;
-
-    @Autowired(required = false)
-    private FinProductAddMapper finProductAddMapper;
 
     @Autowired
     private EtrCommonService etrCommonService;
@@ -174,13 +165,6 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
 
     @Autowired(required = false)
     private BasRiskMathCommService basRiskMathCommService;
-
-    /**
-     * 组合可用现金和实际现金查询更新组件
-     */
-    @Autowired(required = false)
-    private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
-
     /**
      * IPlatformDate
      */
@@ -191,11 +175,7 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
      */
     @Autowired(required = false)
     private MstFileCommonService mstFileCommonService;
-    /**
-     *  投资委托基础组件调用
-     */
-    @Autowired(required = false)
-    private EntrustCommonBaseController entrustCommonBaseController;
+
     /**
      * 委托自动分发
      */
@@ -212,10 +192,6 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
     private CfetsEtrIbBondinfo002Mapper cfetsEtrIbBondinfo002Mapper;
     @Autowired
     private JoyinbusinessCommonService joyinbusinessCommonService;
-
-
-    @Autowired(required = false)
-    private WflEtrEntrustMapper wflEtrEntrustMapper;
     @Autowired(required = false)
     private SysWflBusinessListMapper sysWflBusinessListMapper;
     /**
@@ -227,8 +203,6 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
     private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
     @Autowired
     private CfetsEtrIbBondinfoService cfetsEtrIbBondinfoService;
-    @Autowired
-    private BaseGetBusinessId bussGetBussinessIdService;
     @Autowired
     private CfetsEtrIbBondinfo002Service cfetsEtrIbBondinfo002Service;
 
@@ -400,31 +374,18 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
                 cfetsEtrIbBondinfoService.packageEquityForSubmit(entity);
                 List<CfetsEtribBondInfo003Dto> dataList = new ArrayList<>();
                 for (CfetsEtribBondInfo003Dto dto : entity.getEtrInvestBondInfoDtos()) {
-                    //默认证券账户
-//                    if (StringUtil.isNotEmpty(dto.getPortfolioId())) {
-//                        String acctId = EtrCommonCashPositionDealService.select组合托管户(dto.getPortfolioId(), dto.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
-//                        dto.setSecAcctId(acctId);
-//                    }
                     if (StringUtil.isNotEmpty(dto.getPortfolioId()) && StringUtil.isNotEmpty(dto.getFinprodId())) {
                         Map<String, Object> map = new HashMap<String, Object>();
                         map.put("portfolioId", dto.getPortfolioId());
                         map.put("finprodId", dto.getFinprodId());
                         String secAcctId = cfetsEtrIbBondinfo002Service.qryPortfolioSecAcctId(map);
-                        if (com.joyintech.framework.util.StringUtil.isNotEmpty(secAcctId)) {
+                        if (StringUtil.isNotEmpty(secAcctId)) {
                             dto.setSecAcctId(secAcctId); // 证券账户
                         }
                     }
                     if (StringUtil.isNotEmpty(dto.getEntrustId())) {
                         dataList.add(dto);
                     }
-                }
-                try {
-                    AjaxResult ar = EntrustRdsCommonAop.doListPreOccupy(dataList, DictCodeList.平安资产类型_债券.getValue(), BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue(), true, null);
-                    if (StringUtil.isNotEmpty(ar)) {
-                        throw new BusinessException(ar.getMessage());
-                    }
-                }catch (Exception e) {
-                    throw new BusinessException(e.getMessage());
                 }
                 EntrustRdsCommonAop.riskListToChildren(entity.getRiskTrialRetDto(), entity.getEtrInvestBondInfoDtos(),(dto, list) -> dto.setRiskTrialRetDto(list));
             }

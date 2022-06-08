@@ -220,7 +220,7 @@
     </select>
 
     <select id="selectEntInfoByIdAndDate" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto">
-        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId, entrustId
+        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId,counterName , entrustId
         from (
                  select ee.ENTRUST_STATUS entrustStatus,
                         CASE
@@ -247,6 +247,7 @@
                                 THEN fpi.TENDER_EDATE
                             END AS        issueDateEnd/*投标日 结束*/,
                         ee.COUNTER_ID     counterId,
+                        mcp.COUNTER_NAME                         counterName,
                         ee.ENTRUST_ID     entrustId
                  from ETR_ENTRUST ee
                           left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID = ee.COUNTER_ID
@@ -261,8 +262,28 @@
                      GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID, bobp.ENTRUST_ID
                  ) bobrt ON bobrt.FINPROD_ID = ee.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
                           left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
-                 where fpi.ISSUE_CLASS in ('02', '01')
+                 where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
                    and ee.FINPROD_ID = #{finprodId}
+                   and not exists(
+                                    select 1
+                                    from BID_ORDER bo
+                                    left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                                    where bo.IS_CANCEL = 'N'
+                                    and bo.TRADE_STATUS = '01'
+                                    and bobp.ENTRUST_ID = ee.ENTRUST_ID
+                                    <if test="bidModles != null and bidModles.size()>0">
+                                        and bo.BID_MODLE in
+                                        <foreach collection="bidModles" open=" (" close=") " separator="," item="item">
+                                            #{item}
+                                        </foreach>
+                                    </if>
+                                    )
+                   and not exists(
+                                    select 1
+                                    from  Wfl_BID_ORDER_BID_PRICE bobp
+                                    where
+                                    bobp.ENTRUST_ID = ee.ENTRUST_ID
+                                    )
                    <if test="counterId != null and counterId != ''">
                        and ee.COUNTER_ID = #{counterId}
                    </if>
@@ -465,5 +486,26 @@
     <select id="findDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.BaseResultMap">
         <include refid="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.Sql_All_Data" />
         WHERE TOTLE_TRADE_ID = #{totleTradeId}
+    </select>
+
+    <select id="selectEtrAvaNum" resultType="java.math.BigDecimal">
+        select eed.ENTRUST_NUM*100 - nvl(T1.sumSubAmt,0)
+        from ETR_ENTRUST_DETAIL eed
+        left join(
+            select sum(T.subAmt) sumSubAmt,T.ENTRUST_ID, T.PORTFOLIO_ID
+            from (
+                     select nvl(bobp.SUBSCRIPTION_AMOUNT,0) subAmt, bobp.ENTRUST_ID, bobp.PORTFOLIO_ID
+                     from BID_ORDER bo
+                              left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                     where bo.IS_CANCEL = 'N'
+                       and bo.TRADE_STATUS != '03'
+                     union all
+                     select nvl(wbobp.SUBSCRIPTION_AMOUNT,0) subAmt, wbobp.ENTRUST_ID, wbobp.PORTFOLIO_ID
+                     from Wfl_BID_ORDER wbo
+                              left join Wfl_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID
+                 ) T
+                     group by T.ENTRUST_ID, T.PORTFOLIO_ID
+        )T1 on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
+        where eed.ENTRUST_ID = #{entrustId} and eed.PORTFOLIO_ID = #{protfolioId}
     </select>
 </mapper>

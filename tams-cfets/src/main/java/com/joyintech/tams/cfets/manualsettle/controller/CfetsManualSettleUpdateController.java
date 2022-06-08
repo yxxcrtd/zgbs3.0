@@ -59,7 +59,8 @@ public class CfetsManualSettleUpdateController extends BaseController {
                     workflowId);
         }
         model.addAttribute(GlobalConstant.ENTITY, entity);
-        model.addAttribute("portSettleinfoDtoList", entity.getPortSettleinfoDtoList());
+        // Sonar Fix modify by huwei 220608
+        model.addAttribute("portSettleinfoDtoList", null == entity.getPortSettleinfoDtoList() ? null : entity.getPortSettleinfoDtoList());
         return super.init(model);
     }
 
