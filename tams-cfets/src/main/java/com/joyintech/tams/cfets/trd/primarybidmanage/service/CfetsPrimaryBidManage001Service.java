@@ -188,6 +188,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         pageParam.put("winTypeList", StringUtil.splitToList(null, request.getWinType()));
         pageParam.put("payTypeList", StringUtil.splitToList(null, request.getPayType()));
         pageParam.put("bidTypeList", StringUtil.splitToList(null, request.getBidType()));
+        pageParam.put("isWinList", StringUtil.splitToList(null, request.getIsWin()));
         pageParam.put("platDate", DateUtil.format(DateUtil.platDateFromCache()));
         pageParam.put("sort",request.getPageMode().getSort());
         pageParam.put("direction",request.getPageMode().getDirection());
