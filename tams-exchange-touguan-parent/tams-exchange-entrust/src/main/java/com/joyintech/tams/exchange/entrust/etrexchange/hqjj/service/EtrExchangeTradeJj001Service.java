@@ -155,7 +155,7 @@ public class EtrExchangeTradeJj001Service extends CommonExportService<EtrExchang
 
 					//价格（净价） / 回购利率
 					if((Double)tmp.get("entrustPrice") !=null) {
-						dto.setEntrustPrice(new BigDecimal((Double)tmp.get("entrustPrice")));
+						dto.setEntrustPrice(BigDecimal.valueOf((Double)tmp.get("entrustPrice")));
 					}
 
 					//对手方交易席位
@@ -210,16 +210,16 @@ public class EtrExchangeTradeJj001Service extends CommonExportService<EtrExchang
                     }
                     //价格（净价） / 回购利率
                     if(tmp.get("entrustPrice") !=null) {
-                        dto.setnPrice(new BigDecimal((Double)tmp.get("entrustPrice")));
+                        dto.setnPrice(BigDecimal.valueOf((Double)tmp.get("entrustPrice")));
                     }
                     //全价
                     if(tmp.get("fullPrice") !=null) {
-                        dto.setfPrice(new BigDecimal((Double)tmp.get("fullPrice")));
+                        dto.setfPrice(BigDecimal.valueOf((Double)tmp.get("fullPrice")));
                     }
 
                     //收益率
                     if(tmp.get("expireIncomeRate") !=null) {
-                        dto.setYield(new BigDecimal((Double)tmp.get("expireIncomeRate")));
+                        dto.setYield(BigDecimal.valueOf((Double)tmp.get("expireIncomeRate")));
                     }
 
                     //订单编号
@@ -251,11 +251,11 @@ public class EtrExchangeTradeJj001Service extends CommonExportService<EtrExchang
                     dto.setMarket((String)tmp.get("market"));
 					//收盘价
 					if(tmp.get("entrustPrice") !=null) {
-						dto.setClosingPrice(new BigDecimal((Double)tmp.get("entrustPrice")));
+						dto.setClosingPrice(BigDecimal.valueOf((Double)tmp.get("entrustPrice")));
 					}
 					//日均价
 					if(tmp.get("fullPrice") !=null) {
-						dto.setDailyAvgPrice(new BigDecimal((Double)tmp.get("fullPrice")));
+						dto.setDailyAvgPrice(BigDecimal.valueOf((Double)tmp.get("fullPrice")));
 					}
 					list.add(dto);
 				});
@@ -910,7 +910,7 @@ public class EtrExchangeTradeJj001Service extends CommonExportService<EtrExchang
 		setAssetTypeById(entity);
 
 		//设置默认最小价差、最小交易单位；否则指令组件抛异常；
-		paraDto.setMinDiffPrice(new BigDecimal(0.001).setScale(3,BigDecimal.ROUND_HALF_UP));
+		paraDto.setMinDiffPrice(BigDecimal.valueOf(0.001).setScale(3,BigDecimal.ROUND_HALF_UP));
 		paraDto.setMinDealUnit(new BigDecimal(1));
 /*        BigDecimal minPrice = getInterfSysMinPrice(entity.getFinprodId(), entity.getTradePlat(),
         		entity.getTradeMarket(), entity.getFinprodType2());

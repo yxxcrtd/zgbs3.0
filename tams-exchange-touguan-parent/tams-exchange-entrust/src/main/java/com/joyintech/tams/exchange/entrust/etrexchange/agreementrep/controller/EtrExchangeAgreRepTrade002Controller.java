@@ -144,17 +144,18 @@ public class EtrExchangeAgreRepTrade002Controller extends BaseController {
                     && entity.getTerm() != null && StringUtil.isNotBlank(entity.getFristSettleDate())) {
                 entity.setHgMDate(DateUtil.addDay(entity.getFristSettleDate(), entity.getTerm().intValue()));
             }
+            if(entity != null){
+                model.addAttribute(GlobalConstant.ENTITY, entity);
+                model.addAttribute("workflowId", workflowId);
+                model.addAttribute("riskTrialSpan", entity.getRiskTrialSpan());
 
-            model.addAttribute(GlobalConstant.ENTITY, entity);
-            model.addAttribute("workflowId", workflowId);
-            model.addAttribute("riskTrialSpan", entity.getRiskTrialSpan());
-
-            if (StringUtil.isNotEmpty(entity.getRiskTrialRetDto())){
-                model.addAttribute("entity_RiskTrialRetList", entity.getRiskTrialRetDto());
-            } else {
-                String entrustIdWfl = entity.getEntrustId();
-                List<RiskTrialRetDto> riskTrialRetList = basRiskMathCommService.select(entrustIdWfl);
-                model.addAttribute("entity_RiskTrialRetList", riskTrialRetList);
+                if (StringUtil.isNotEmpty(entity.getRiskTrialRetDto())){
+                    model.addAttribute("entity_RiskTrialRetList", entity.getRiskTrialRetDto());
+                } else {
+                    String entrustIdWfl = entity.getEntrustId();
+                    List<RiskTrialRetDto> riskTrialRetList = basRiskMathCommService.select(entrustIdWfl);
+                    model.addAttribute("entity_RiskTrialRetList", riskTrialRetList);
+                }
             }
         }
         else if(StringUtil.isNotEmpty(entrustId)){
@@ -553,7 +554,7 @@ public class EtrExchangeAgreRepTrade002Controller extends BaseController {
             Map<String,Object> cashAmountMap =  etrExchangeAgreRepTrade001Service.getCashAmount(dto.getPortfolioId(),dto.getAcctNo(),dto.getVdate());
             BigDecimal accAvailableCash = (BigDecimal)cashAmountMap.get("cashUse");
             if (StringUtil.isNotEmpty(accAvailableCash) && StringUtil.isNotEmpty(dto.getTradeAmt())) {
-                if (accAvailableCash.compareTo(dto.getTradeAmt()) == -1) {
+                if (accAvailableCash.compareTo(dto.getTradeAmt()) < 0) {
                     if(CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_CASH_SWITCH).equals(DictCodeListExt1.是或否_否.getValue())) {
                         errorList.add(new ValidMessage("tradeAmt", this.getMessage("ETR_ERROR_0019")));
                     }
