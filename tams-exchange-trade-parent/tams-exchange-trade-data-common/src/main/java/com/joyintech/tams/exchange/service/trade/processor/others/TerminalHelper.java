@@ -355,6 +355,22 @@ public class TerminalHelper {
         }
     }
 
+    public List<IntegratedRepurchaseQuoteBean> queryRepurchaseQuoteReceive(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean) {
+        int pageSize = integratedRepurchaseQuoteQryBean.getPageSize();
+        if (pageSize > 1000) {
+            pageSize = 1000;
+        }
+        String accountId = integratedRepurchaseQuoteQryBean.getAccountId();
+        int actionIn = integratedRepurchaseQuoteQryBean.getActionIn();
+        String entrustProp = integratedRepurchaseQuoteQryBean.getEntrustProp();
+        // 投管查询行情时，不会传入账户信息，需要查询到所有券商的行情信息， 故选择当前已连接券商，并选择其中一个账户进行查询
+        if (Strings.isNullOrEmpty(accountId)) {
+            return quoteJob.getIntegratedRepurchaseQuoteBeanList(actionIn, entrustProp);
+        } else {
+            return sendIntegratedRepurchaseQuote(actionIn, entrustProp, accountId, pageSize);
+        }
+    }
+
     public List<IntegratedRepurchaseQuoteBean> sendIntegratedRepurchaseQuote(int actionIn, String entrustProp, String accountId, int pageSize) {
 
         List<IntegratedRepurchaseQuoteBean> list = new ArrayList<>();

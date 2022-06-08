@@ -4,11 +4,15 @@ package com.joyintech.tams.exchange.common.bean.request;
 import com.google.common.base.MoreObjects;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
 import java.math.BigDecimal;
 
 @ApiModel(value = "我收到的协议回购行情请求报文", description = "我收到的协议回购行情请求报文")
 public class RepurchaseQuoteReceiveRequest {
+    @ApiModelProperty(required = true, name = "instructionId", value = "指令编号", example = "FUND000121")
+    @NotBlank(message = "指令编号不能为空")
+    private String instructionId;
 
     @ApiModelProperty(name = "requestNo", value = "请求编号")
     private String requestNo;
@@ -34,6 +38,14 @@ public class RepurchaseQuoteReceiveRequest {
     private String firstSettleDate;
     @ApiModelProperty(name = "remark", value = "补充协议")
     private String remark;
+
+    public String getInstructionId() {
+        return instructionId;
+    }
+
+    public void setInstructionId(String instructionId) {
+        this.instructionId = instructionId;
+    }
 
     public String getRequestNo() {
         return requestNo;

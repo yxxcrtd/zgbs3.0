@@ -13,17 +13,21 @@ import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.*;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.enums.exchange.QuoteStatusEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.RepoTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
+import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TickConverter;
 import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +68,8 @@ public class IntegratedQuoteManagement {
     private FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private EntrustManagement entrustManagement;
+    @Autowired
+    private InstructionService instructionService;
 
     public ResultBean getTick(String stockCode) {
         if ("*".equals(stockCode)) {
@@ -200,12 +206,78 @@ public class IntegratedQuoteManagement {
      */
     public ResultBean queryRepurchaseQuoteReceive(RepurchaseQuoteReceiveRequest request) {
         List<RepurchaseQuoteReceiveResponse> list = Lists.newArrayList();
+
+        IntegratedRepurchaseQuoteQryBean quoteQryBean = new IntegratedRepurchaseQuoteQryBean();
+        Instruction instruction = instructionService.findById(request.getInstructionId());
+        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, quoteQryBean.getEntrustProp());
+        quoteQryBean.setEntrustProp(entrustProp);
+        quoteQryBean.setAccountId(instruction.getAcctNo());
+
 //        list.addAll(terminalHelper.queryRepurchaseQuoteReceive(request));
 
-        filterRepurchaseQuoteReceive(list, request);
+        List<IntegratedRepurchaseQuoteBean> beanList = terminalHelper.queryRepurchaseQuoteReceive(quoteQryBean);
+        if (CollectionUtils.isNotEmpty(beanList)) {
+            RepurchaseQuoteReceiveResponse response = null;
+            for (IntegratedRepurchaseQuoteBean bean : beanList) {
+                response = new RepurchaseQuoteReceiveResponse();
+                filterRepurchaseQuoteReceive(response, bean);
+
+                list.add(response);
+            }
+
+            filterRepurchaseQuoteReceive(list, request);
+        }
 
         return ResultBean.success(MapUtil.builder().put(ROOT, list));
     }
+
+    private void filterRepurchaseQuoteReceive(RepurchaseQuoteReceiveResponse response, IntegratedRepurchaseQuoteBean bean) {
+        response.setRequestNo(bean.getEntrustNo() + "");
+        response.setRequestType(bean.getExchangeType());
+        response.setBs(bean.getEntrustBs());
+        response.setTradeMarket(null);
+        response.setStockCode(bean.getStockCode());
+        response.setStockName(bean.getStockName());
+        response.setPledgeNumber(BigDecimal.valueOf(bean.getImpawnAmount()));
+        response.setRepoAmount(null);
+        response.setRepoRate(null);
+        response.setDiscount(BigDecimal.valueOf(bean.getFunderRatio()));
+        response.setFirstSettleDate(bean.getFirstExchdate() + "");
+        response.setCompactTerm(bean.getRepoTerm());
+        response.setBackDate(bean.getSettleEndDate() + "");
+        response.setRepoMdate(bean.getRepurchaseDate() + "");
+        response.setCapDays(bean.getFundUsedDays());
+        response.setSwapIntoBonds(bean.getStockCode());
+        response.setSwapIntoBondsName(bean.getStockName());
+        response.setSwapIntoBondsVolume(null);
+        response.setSwapOutBonds(null);
+        response.setSwapOutBondsName(null);
+        response.setSwapOutBondsVolume(null);
+        response.setOrigBonds(bean.getOldImpawnCode());
+        response.setOrigBondsName(null);
+        response.setOrigBondsVolume(null);
+        response.setOrigRepoAmount(BigDecimal.valueOf(bean.getPrevImpawnBalance()));
+        response.setTransCode("");
+        response.setmIntAmt(BigDecimal.valueOf(bean.getProfit()));
+        response.setBackBalance(BigDecimal.valueOf(bean.getSettleBalance()));
+
+        response.setTraderCode(bean.getTraderId());
+        response.setMemberId(bean.getAgencyNo());
+        response.setInvestorId(null);
+        response.setInvestorType(null);
+
+        response.setCpTraderCode(bean.getOppoTraderId());
+        response.setCpMemberId(bean.getOppoAgency());
+        response.setCpInvestorId(null);
+        response.setCpInvestorType(null);
+
+        response.setCpClientName(null);
+        response.setOrigSerialNo(null);
+        response.setRemark(bean.getRemark());
+        response.setAccount(bean.getFundAccount());
+        response.setAccountName(null);
+    }
+
 
     private void filterRepurchaseQuoteReceive(List<RepurchaseQuoteReceiveResponse> list, RepurchaseQuoteReceiveRequest request) {
         log.info("filterRepurchaseQuoteReceive() called with parameters => 【list = {}】, 【request = {}】", list, request);
