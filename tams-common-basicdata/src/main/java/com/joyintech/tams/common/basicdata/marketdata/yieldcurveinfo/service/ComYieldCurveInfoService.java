@@ -313,31 +313,32 @@ public class ComYieldCurveInfoService extends CommonExportService<ComYieldCurveI
         if (null == list || list.size() != 8) {
             ExcelValidDto dto = new ExcelValidDto(StringUtil.EMPTY, String.valueOf(i), "数据列数错误");
             excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(0))) {
-            // 验证导入曲线日期是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "曲线日期为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(1))) {
-            // 验证导入曲线名称是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "曲线代码为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(3))) {
-            // 验证导入关键年限是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+3), "关键年限为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(4))) {
-            // 验证导入收益率%是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+4), "收益率%为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(5))) {
-            // 验证导入曲线类型是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+5), "曲线类型为空");
-            excelValidDtolist.add(dto);
+        }else{
+            if (StringUtil.isEmpty(list.get(0))) {
+                // 验证导入曲线日期是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "曲线日期为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(1))) {
+                // 验证导入曲线名称是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "曲线代码为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(3))) {
+                // 验证导入关键年限是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+3), "关键年限为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(4))) {
+                // 验证导入收益率%是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+4), "收益率%为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(5))) {
+                // 验证导入曲线类型是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+5), "曲线类型为空");
+                excelValidDtolist.add(dto);
+            }
         }
         return excelValidDtolist;
     }

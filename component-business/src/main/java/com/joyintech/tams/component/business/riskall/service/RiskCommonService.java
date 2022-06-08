@@ -471,8 +471,10 @@ public class RiskCommonService {
         if (prinAmt == null || prinAmt.compareTo(BigDecimal.ZERO) == 0){
             return riskAuthorizeDto;
         }
-        // 无授权数据 或者 授权额度不足
-        if (StringUtil.equals(riskAuthorizeDto.getAuthorizeType(),DictCodeList.授权类型_授权.getValue()) && prinAmt.compareTo(authorizeLimitAmt) > 0){
+        // 无授权数据 或者 授权额度不足  // Sonar Fix modify by huwei 220608
+        if (StringUtil.isNotEmpty(riskAuthorizeDto)
+                && StringUtil.equals(riskAuthorizeDto.getAuthorizeType(),DictCodeList.授权类型_授权.getValue())
+                && prinAmt.compareTo(authorizeLimitAmt) > 0){
             riskAuthorizeDto.setAuthorizeLimit(true);
             riskAuthorizeDto.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
         }

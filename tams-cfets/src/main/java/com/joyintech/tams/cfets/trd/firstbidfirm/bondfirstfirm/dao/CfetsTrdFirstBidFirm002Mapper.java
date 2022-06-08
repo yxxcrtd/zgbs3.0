@@ -1,5 +1,6 @@
 package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao;
 
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.common.base.entity.WflTrdFinProductDealTotal;
 import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
@@ -48,6 +49,16 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/5/17 16:27
      */
     int selectBidFirmCountByEntrustId(Map<String, Object> param);
+
+    /**
+     * 按同资产+同一投标日+同一交易对手维度查询指令数据
+     *
+     * @param param
+     * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto>
+     * @author jiangpeng
+     * @date 2022/6/8 11:35
+     */
+    List<CfetsTrdFirstBidFirmEntrustDto> selectEntInfoByIdAndDate(Map<String, Object> param);
 
     /**
      * 投标确认表撤销时根据投标编号 更新的原始数据撤销状态及备注

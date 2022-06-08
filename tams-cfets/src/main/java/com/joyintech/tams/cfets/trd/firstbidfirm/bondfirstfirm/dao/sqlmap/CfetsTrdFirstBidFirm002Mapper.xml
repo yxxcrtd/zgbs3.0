@@ -219,6 +219,57 @@
         )
     </select>
 
+    <select id="selectEntInfoByIdAndDate" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto">
+        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId, entrustId
+        from (
+                 select ee.ENTRUST_STATUS entrustStatus,
+                        CASE
+                            WHEN (bobrt.BID_MODLE IS NOT NULL AND bobrt.BID_MODLE = '03') OR bobrt.IS_WIN = 'Y' THEN '04'
+                            WHEN bobrt.BID_MODLE IS NULL THEN '01'
+                            WHEN bobrt.IS_WIN = 'N' THEN '03'
+                            WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
+                            ELSE '05'
+                            END AS        firstBidStatus,
+                        CASE
+                            WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                                THEN fpi.ISSUE_DATE
+                            WHEN (fpi.ISSUE_CLASS = '02' AND
+                                  (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                                OR fpi.ISSUE_CLASS = '03'
+                                THEN fpi.TENDER_SDATE
+                            END AS        issueDateStart/*投标日 开始*/,
+                        CASE
+                            WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                                THEN null
+                            WHEN (fpi.ISSUE_CLASS = '02' AND
+                                  (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                                OR fpi.ISSUE_CLASS = '03'
+                                THEN fpi.TENDER_EDATE
+                            END AS        issueDateEnd/*投标日 结束*/,
+                        ee.COUNTER_ID     counterId,
+                        ee.ENTRUST_ID     entrustId
+                 from ETR_ENTRUST ee
+                          left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID = ee.COUNTER_ID
+                          LEFT JOIN (
+                     SELECT bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID, bobp.ENTRUST_ID
+                     FROM BID_ORDER bo
+                              LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+                              LEFT JOIN BID_RESULT_TOTAL brt ON brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+                         AND brt.FINPROD_ID = bo.FINPROD_ID
+                     WHERE bo.IS_CANCEL = 'N'
+                       AND bo.TRADE_STATUS = '01'
+                     GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID, bobp.ENTRUST_ID
+                 ) bobrt ON bobrt.FINPROD_ID = ee.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
+                          left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
+                 where fpi.ISSUE_CLASS in ('02', '01')
+                   and ee.FINPROD_ID = #{finprodId}
+                   <if test="counterId != null and counterId != ''">
+                       and ee.COUNTER_ID = #{counterId}
+                   </if>
+                   )
+        where issueDateEnd = #{issueDateEnd} and issueDateStart = #{issueDateStart}
+    </select>
+
     <update id="updateBidOrder">
         UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark} WHERE BID_ID = #{bidId}
     </update>

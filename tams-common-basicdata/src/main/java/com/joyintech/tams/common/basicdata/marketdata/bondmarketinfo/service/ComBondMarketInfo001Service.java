@@ -340,180 +340,181 @@ public class ComBondMarketInfo001Service  extends CommonExportService<ComBondMar
         if (null == list || list.size() != 16) {
             ExcelValidDto dto = new ExcelValidDto(StringUtil.EMPTY, String.valueOf(i), "数据列数错误");
             excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(0))) {
-            // 验证导入债券代码是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "债券代码为空");
-            excelValidDtolist.add(dto);
         }else{
-            //基金标的是否存在
-            Map<String, Object> params=new HashMap<>();
-            params.put("finprodType", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-            params.put("initValue",list.get(0));
-            try {
-                Page<SelectOptionDto> page=getFinProductList(params);
-                if(page.getTotal()==0){
-                    ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "标的信息 不存在！");
-                    excelValidDtolist.add(dto);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if (StringUtil.isEmpty(list.get(1))) {
-            // 验证导入估值来源是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "债券简称为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(2))) {
-            // 验证导入估值日期是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "估值日期为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(ComBasicDataExcelUtil.isErrorDate(list.get(2))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "估值日期格式不对");
+            if (StringUtil.isEmpty(list.get(0))) {
+                // 验证导入债券代码是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "债券代码为空");
                 excelValidDtolist.add(dto);
             }else{
-                //导入已存在的债券信息
+                //基金标的是否存在
                 Map<String, Object> params=new HashMap<>();
-                params.put("secId", list.get(0).substring(4,list.get(0).length()));
-                params.put("valueDate",list.get(2));
-                List<ComBondMarketInfo001Dto> keyList=queryDtoByKey(params);
-                if(keyList!=null&&keyList.size()>0){
-                    ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "债券信息已存在");
+                params.put("finprodType", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                params.put("initValue",list.get(0));
+                try {
+                    Page<SelectOptionDto> page=getFinProductList(params);
+                    if(page.getTotal()==0){
+                        ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "标的信息 不存在！");
+                        excelValidDtolist.add(dto);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (StringUtil.isEmpty(list.get(1))) {
+                // 验证导入估值来源是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "债券简称为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(2))) {
+                // 验证导入估值日期是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "估值日期为空");
+                excelValidDtolist.add(dto);
+            }else{
+                if(ComBasicDataExcelUtil.isErrorDate(list.get(2))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "估值日期格式不对");
+                    excelValidDtolist.add(dto);
+                }else{
+                    //导入已存在的债券信息
+                    Map<String, Object> params=new HashMap<>();
+                    params.put("secId", list.get(0).substring(4,list.get(0).length()));
+                    params.put("valueDate",list.get(2));
+                    List<ComBondMarketInfo001Dto> keyList=queryDtoByKey(params);
+                    if(keyList!=null&&keyList.size()>0){
+                        ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "债券信息已存在");
+                        excelValidDtolist.add(dto);
+                    }
+                }
+
+            }
+            if (StringUtil.isEmpty(list.get(3))) {
+                // 验证导入收盘价净价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "收盘价净价为空");
+                excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(3))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "收盘价净价不为数字");
                     excelValidDtolist.add(dto);
                 }
             }
-
-        }
-        if (StringUtil.isEmpty(list.get(3))) {
-            // 验证导入收盘价净价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "收盘价净价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(3))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "收盘价净价不为数字");
+            if (StringUtil.isEmpty(list.get(4))) {
+                // 验证导入平均价净价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "平均价净价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(4))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "平均价净价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(4))) {
-            // 验证导入平均价净价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "平均价净价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(4))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "平均价净价不为数字");
+            if (StringUtil.isEmpty(list.get(5))) {
+                // 验证导入买一价净价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(5), String.valueOf(i+2), "买一价净价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(5))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(5), String.valueOf(i+2), "买一价净价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(5))) {
-            // 验证导入买一价净价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(5), String.valueOf(i+2), "买一价净价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(5))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(5), String.valueOf(i+2), "买一价净价不为数字");
+            if (StringUtil.isEmpty(list.get(6))) {
+                // 验证导入卖一价净价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(6), String.valueOf(i+2), "卖一价净价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(6))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(6), String.valueOf(i+2), "卖一价净价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(6))) {
-            // 验证导入卖一价净价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(6), String.valueOf(i+2), "卖一价净价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(6))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(6), String.valueOf(i+2), "卖一价净价不为数字");
+            if (StringUtil.isEmpty(list.get(7))) {
+                // 验证导入最高价净价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(7), String.valueOf(i+2), "最高价净价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(7))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(7), String.valueOf(i+2), "最高价净价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(7))) {
-            // 验证导入最高价净价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(7), String.valueOf(i+2), "最高价净价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(7))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(7), String.valueOf(i+2), "最高价净价不为数字");
+            if (StringUtil.isEmpty(list.get(8))) {
+                // 验证导入最低价净价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(8), String.valueOf(i+2), "最低价净价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(8))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(8), String.valueOf(i+2), "最低价净价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(8))) {
-            // 验证导入最低价净价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(8), String.valueOf(i+2), "最低价净价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(8))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(8), String.valueOf(i+2), "最低价净价不为数字");
+            if (StringUtil.isEmpty(list.get(9))) {
+                // 验证导入收盘价全价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(9), String.valueOf(i+2), "收盘价全价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(9))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(9), String.valueOf(i+2), "收盘价全价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(9))) {
-            // 验证导入收盘价全价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(9), String.valueOf(i+2), "收盘价全价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(9))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(9), String.valueOf(i+2), "收盘价全价不为数字");
+            if (StringUtil.isEmpty(list.get(10))) {
+                // 验证导入平均价全价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(10), String.valueOf(i+2), "平均价全价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(10))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(10), String.valueOf(i+2), "平均价全价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(10))) {
-            // 验证导入平均价全价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(10), String.valueOf(i+2), "平均价全价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(10))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(10), String.valueOf(i+2), "平均价全价不为数字");
+            if (StringUtil.isEmpty(list.get(11))) {
+                // 验证导入买一价全价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(10), String.valueOf(i+2), "买一价全价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(11))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(11), String.valueOf(i+2), "买一价全价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(11))) {
-            // 验证导入买一价全价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(10), String.valueOf(i+2), "买一价全价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(11))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(11), String.valueOf(i+2), "买一价全价不为数字");
+            if (StringUtil.isEmpty(list.get(12))) {
+                // 验证导入卖一价全价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(12), String.valueOf(i+2), "卖一价全价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(12))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(12), String.valueOf(i+2), "卖一价全价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(12))) {
-            // 验证导入卖一价全价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(12), String.valueOf(i+2), "卖一价全价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(12))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(12), String.valueOf(i+2), "卖一价全价不为数字");
+            if (StringUtil.isEmpty(list.get(13))) {
+                // 验证导入最高价全价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(13), String.valueOf(i+2), "最高价全价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(13))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(13), String.valueOf(i+2), "最高价全不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(13))) {
-            // 验证导入最高价全价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(13), String.valueOf(i+2), "最高价全价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(13))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(13), String.valueOf(i+2), "最高价全不为数字");
+            if (StringUtil.isEmpty(list.get(14))) {
+                // 验证导入最低价全价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(14), String.valueOf(i+2), "最低价全价为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(14))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(14), String.valueOf(i+2), "最低价全价不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
-        }
-        if (StringUtil.isEmpty(list.get(14))) {
-            // 验证导入最低价全价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(14), String.valueOf(i+2), "最低价全价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(14))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(14), String.valueOf(i+2), "最低价全价不为数字");
+            if (StringUtil.isEmpty(list.get(15))) {
+                // 验证导入债券市场余额是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(15), String.valueOf(i+2), "债券市场余额为空");
                 excelValidDtolist.add(dto);
-            }
-        }
-        if (StringUtil.isEmpty(list.get(15))) {
-            // 验证导入债券市场余额是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(15), String.valueOf(i+2), "债券市场余额为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isFloatNumeric(list.get(15))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(15), String.valueOf(i+2), "债券市场余额不为数字");
-                excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isFloatNumeric(list.get(15))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(15), String.valueOf(i+2), "债券市场余额不为数字");
+                    excelValidDtolist.add(dto);
+                }
             }
         }
         return excelValidDtolist;

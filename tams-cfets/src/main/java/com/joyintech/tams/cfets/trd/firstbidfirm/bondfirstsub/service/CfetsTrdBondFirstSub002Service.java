@@ -412,6 +412,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         calRequest.setSecManageAcctId(dto.getProductDtos().get(0).getSecManageAcctId());
         calRequest.setShareAmt(dto.getSubscriptionAmount());
         calRequest.setFinprodId(dto.getFinprodId());
+        calRequest.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
         List<TrdTradeFeeDetail> trdTradeFeeDetails = ibuQuoteBondCalService.calFee(calRequest);
         if (CollectionUtils.isNotEmpty(trdTradeFeeDetails)) {
             trdTradeFeeDetails.forEach(item -> {
@@ -1740,11 +1741,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     }
 
     public String doRiskcalCheckMethod(CfetsTrdBondFirstSubInfoDto dto) {
-        if (StringUtil.isEmptyList(dto.getEntrustDtos())) {
+        if (StringUtil.isEmptyList(dto.getProductDtos())) {
             return "组合分配列表不能为空";
         }
         List<String> messages = new ArrayList<>();
-        if (StringUtil.isNotEmpty(dto.getEntrustDtos())) {
+        if (StringUtil.isNotEmpty(dto.getProductDtos())) {
             for (CfetsTrdBondFirstSubEntrustDto item : dto.getEntrustDtos()) {
                 if (!StringUtil.isNotEmpty(item.getPortfolioId())) {
                     messages.add("请输入组合名称。");

@@ -51,6 +51,9 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,9 +63,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -1682,4 +1688,34 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         return finBondAssetMapper.isTransInAssetTwo(finprodId);
     }
 
+    public MultipartFile downloadFileInfo(String seqNo) {
+        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
+        File pathFile = new SafelyFile(file.getPath());
+        FileItem fileItem = createFileItem(pathFile, pathFile.getName());
+        MultipartFile multipartFile = null;
+        //  生成文件夹
+        if (pathFile.exists()){
+            multipartFile = new CommonsMultipartFile(fileItem);
+        }
+        return multipartFile;
+    }
+
+    private FileItem createFileItem(File file, String fieldName) {
+        FileItemFactory factory = new DiskFileItemFactory(16, null);
+        FileItem item = factory.createItem(fieldName, "text/plain", true, file.getName());
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            OutputStream os = item.getOutputStream();
+            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+            os.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return item;
+    }
 }

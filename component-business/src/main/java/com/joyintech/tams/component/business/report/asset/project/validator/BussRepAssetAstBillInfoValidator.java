@@ -28,7 +28,6 @@ import com.joyintech.tams.constant.DictCodeList;
  * 〈功能详细描述〉
  * @author zhangnian
  * @version 1.0 2018年11月2日
- * @see BussRepAssetAstBillValidator
  * @since 1.0
  */
 @Component
@@ -82,20 +81,21 @@ public class BussRepAssetAstBillInfoValidator implements BeanValidator{
                                     getMessage("COMMON_E_0057", getMessage("BussRepAssetAstBillInfo.repRemark"))));
                         }
                     }
+                    // Sonar Fix modify by huwei 220608
                     if(null!=dto.getRepMaxRemainTerm()&&null!=dto.getRepMinRemainTerm()&&null!=dto.getRepRemainTerm()){
-                        if(dto.getRepMinRemainTerm().compareTo(dto.getRepMaxRemainTerm())==1){
+                        if(dto.getRepMinRemainTerm().compareTo(dto.getRepMaxRemainTerm()) > 0){
                             resultList.add(new ValidMessage("",
                                     getMessage("BUSS_COM_E_0003",
                                             getMessage("BussRepAssetAstBillInfo.repMinRemainTerm"),
                                             getMessage("BussRepAssetAstBillInfo.repMaxRemainTerm"))));
                         }
-                        if(dto.getRepRemainTerm().compareTo(new BigDecimal(dto.getRepMaxRemainTerm()))==1){
+                        if(dto.getRepRemainTerm().compareTo(new BigDecimal(dto.getRepMaxRemainTerm())) > 0){
                             resultList.add(new ValidMessage("",
                                     getMessage("BUSS_COM_E_0003",
                                             getMessage("BussRepAssetAstBillInfo.repRemainTerm"),
                                             getMessage("BussRepAssetAstBillInfo.repMaxRemainTerm"))));
                         }
-                        if(new BigDecimal(dto.getRepMinRemainTerm()).compareTo(dto.getRepRemainTerm())==1){
+                        if(new BigDecimal(dto.getRepMinRemainTerm()).compareTo(dto.getRepRemainTerm()) > 0){
                             resultList.add(new ValidMessage("",
                                     getMessage("BUSS_COM_E_0003",
                                             getMessage("BussRepAssetAstBillInfo.repMinRemainTerm"),

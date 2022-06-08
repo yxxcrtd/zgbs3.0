@@ -72,8 +72,9 @@ public class BaseRepTrustInvestModeInfoServiceImpl extends BaseService<RepTrustI
             for(RepTrustInvestMode entity:repTrustInvestModeList){
                 i+=repTrustInvestModeMapper.insert(entity);
             }
+            return i==repTrustInvestModeList.size();
         }
-        return i==repTrustInvestModeList.size();
+        return false;
     }
 
     /**
@@ -87,8 +88,9 @@ public class BaseRepTrustInvestModeInfoServiceImpl extends BaseService<RepTrustI
             for(String repFinprodId:repFinprodIdList){
                 i+=repTrustInvestModeMapper.deleteByPrimaryKey(repFinprodId);
             }
+            return i==repFinprodIdList.size();
         }
-        return i==repFinprodIdList.size();
+        return false;
     }
 
     /**

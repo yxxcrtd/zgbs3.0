@@ -55,7 +55,13 @@ public class EtrCommonFinProductInfoService extends BaseService {
      * @return
      */
     public CfetsEtrFinProductInfoResponse findFinProductInfo(String pageCode, String dtCode, CfetsEtrFinProductInfoRequest request) {
-        CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoMapper.findFinProductInfo(request);
+        String finprodId = request.getFinprodId();
+        CfetsEtrFinProductInfoResponse finProductInfo = new CfetsEtrFinProductInfoResponse();
+        if (StringUtil.isBlank(finprodId)) {
+            finProductInfo.setTitle("标的信息未维护");
+            return finProductInfo;
+        }
+        finProductInfo = etrCommonFinProductInfoMapper.findFinProductInfo(request);
         if (Objects.nonNull(finProductInfo)) {
             //评级信息
             setGrade(finProductInfo);
@@ -91,6 +97,8 @@ public class EtrCommonFinProductInfoService extends BaseService {
                     finProductInfo.setTableShows(byPageCodeAndDtCodes);
                 }
             }
+        } else {
+            finProductInfo.setTitle("标的信息未维护");
         }
         return finProductInfo;
     }
@@ -154,7 +162,7 @@ public class EtrCommonFinProductInfoService extends BaseService {
     private void setGrade(CfetsEtrFinProductInfoResponse finProductInfo) {
         Map<String, Object> param = new HashMap<>();
         param.put("oCode", finProductInfo.getIssuer());
-        param.put("baseDataType","01");
+        param.put("baseDataType", "01");
         //查询评级类型为主体评级的数据
         List<CommonProductRatingDto> ztList = commonProductRatingService.getProductOrgRating(param);
         List<CommonProductRatingDto> ztListNew = ztList.stream().sorted(Comparator.comparing(CommonProductRatingDto::getGradeDate).reversed()).collect(Collectors.toList());
@@ -165,7 +173,7 @@ public class EtrCommonFinProductInfoService extends BaseService {
         }
         Map<String, Object> zxparam = new HashMap<>();
         zxparam.put("oCode", finProductInfo.getFinprodMarketId());
-        zxparam.put("baseDataType","01");
+        zxparam.put("baseDataType", "01");
         //查询评级类型是债项评级的数据
         List<CommonProductRatingDto> zxList = commonProductRatingService.getProductMarketRating(zxparam);
         List<CommonProductRatingDto> zxListNew = zxList.stream().sorted(Comparator.comparing(CommonProductRatingDto::getGradeDate).reversed()).collect(Collectors.toList());
