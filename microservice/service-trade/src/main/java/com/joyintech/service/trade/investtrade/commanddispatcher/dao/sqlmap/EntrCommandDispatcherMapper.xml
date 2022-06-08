@@ -165,6 +165,9 @@
 		)FS ON FS.entrust_id = A.ENTRUST_ID
         <where>
         	AND A.TRADE_MARKET in ('03','04','12')
+			<!-- add by kchen 20220608 过滤一级债券 start -->
+		    AND C.FINPROD_TYPE2 != 'F32'
+			<!-- add by kchen 20220608 过滤一级债券 end -->
         	<!-- add by etliu 20210203 可转债网下申购不发送交易端 start -->
         	and (F.PURCH_MODLE is null or F.PURCH_MODLE != '02')
         	<!-- add by etliu 20210203 可转债网下申购不发送交易端 end -->
