@@ -867,7 +867,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             dto.setFullPrice(ArithmeticUtil.doAdd(dto.getPrice(), dto.getIntAmt()));
         }
         // 【缴款金额】 ==金额信息.交易金额+金额信息.应计利息总额（元）
-        if (StringUtil.isNotEmpty(dto.getIntAmtTatol())) {
+        if (StringUtil.isNotEmpty(dto.getTradeAmt())) {
             dto.setPayableAmount(ArithmeticUtil.doAdd(dto.getTradeAmt(), dto.getIntAmtTatol()));
         }
         logger.debug("计算 金额信息,结果:" + JsonUtils.object2Json(dto));
