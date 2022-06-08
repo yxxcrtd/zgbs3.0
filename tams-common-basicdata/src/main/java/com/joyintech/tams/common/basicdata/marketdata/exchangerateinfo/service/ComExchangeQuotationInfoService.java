@@ -255,63 +255,64 @@ public class ComExchangeQuotationInfoService extends CommonExportService<ComExch
         if (null == list || list.size() != 11) {
             ExcelValidDto dto = new ExcelValidDto(StringUtil.EMPTY, String.valueOf(i+2), "数据列数错误");
             excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(0))) {
-            // 验证导入货币对是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "货币对为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(1))) {
-            // 验证导入交易日期是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "交易日期为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(2))) {
-            // 验证导入开盘价（元）是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "开盘价（元）为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(3))) {
-            // 验证导入收盘价（元）是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "收盘价（元）为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(4))) {
-            // 验证导入中间价（元）是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "中间价（元）为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(5))) {
-            // 验证导入最高价（元）是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(5), String.valueOf(i+2), "最高价（元）为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(6))) {
-            // 验证导入最低价（元）是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(6), String.valueOf(i+2), "最低价（元）为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(7))) {
-            // 验证导入报价单位是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(7), String.valueOf(i+2), "报价单位为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(8))) {
-            // 验证导入数据来源是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(8), String.valueOf(i+2), "数据来源为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(9))) {
-            // 验证导入行情类型是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(9), String.valueOf(i+2), "行情类型为空");
-            excelValidDtolist.add(dto);
-        }
-        /** modify by yanya on 20210326 去除期限校验**/
+        }else{
+            if (StringUtil.isEmpty(list.get(0))) {
+                // 验证导入货币对是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "货币对为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(1))) {
+                // 验证导入交易日期是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "交易日期为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(2))) {
+                // 验证导入开盘价（元）是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(2), String.valueOf(i+2), "开盘价（元）为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(3))) {
+                // 验证导入收盘价（元）是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(3), String.valueOf(i+2), "收盘价（元）为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(4))) {
+                // 验证导入中间价（元）是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(4), String.valueOf(i+2), "中间价（元）为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(5))) {
+                // 验证导入最高价（元）是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(5), String.valueOf(i+2), "最高价（元）为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(6))) {
+                // 验证导入最低价（元）是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(6), String.valueOf(i+2), "最低价（元）为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(7))) {
+                // 验证导入报价单位是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(7), String.valueOf(i+2), "报价单位为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(8))) {
+                // 验证导入数据来源是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(8), String.valueOf(i+2), "数据来源为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(9))) {
+                // 验证导入行情类型是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(9), String.valueOf(i+2), "行情类型为空");
+                excelValidDtolist.add(dto);
+            }
+            /** modify by yanya on 20210326 去除期限校验**/
 //        if (StringUtil.isEmpty(list.get(10))) {
 //            // 验证导入期限是否为空
 //            ExcelValidDto dto = new ExcelValidDto(list.get(10), String.valueOf(i+2), "期限为空");
 //            excelValidDtolist.add(dto);
 //        }
+        }
         return excelValidDtolist;
     }
     // add by zwq 20210222  end
