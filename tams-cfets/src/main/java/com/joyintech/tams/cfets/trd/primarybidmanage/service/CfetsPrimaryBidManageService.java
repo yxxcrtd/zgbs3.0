@@ -557,7 +557,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             request.setAllocationDetails(allocationListMap.get(secAcctId));
             CfetsBidManageCalcAmountResponse calAmountResponse = this.calAmountData(request);
             trdFinProductDealTotal.setCpriceAmt(calAmountResponse.getTradeAmt());
-            trdFinProductDealTotal.setShareAmt(ArithmeticUtil.multiply(winPrinamt,BigDecimal.valueOf(100)));
+            trdFinProductDealTotal.setShareAmt(ArithmeticUtil.divide(winPrinamt,BigDecimal.valueOf(100),4));
             trdFinProductDealTotal.setPrinAmt(ArithmeticUtil.multiply(winPrinamt,BigDecimal.valueOf(10000)));
             trdFinProductDealTotal.setIntAmt(intAmt);
             //画面.金额信息.交易金额（元）+画面.金额信息.应计利息总额（元）
@@ -665,7 +665,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 invAim = detailDto.getInvAim();
             }
             trdProductDeal.setCpriceAmt(cpriceAmt);
-            trdProductDeal.setShareAmt(ArithmeticUtil.multiply(winPrinamt,BigDecimal.valueOf(100)));
+            trdProductDeal.setShareAmt(ArithmeticUtil.divide(winPrinamt,BigDecimal.valueOf(100),4));
             trdProductDeal.setPrinAmt(ArithmeticUtil.multiply(winPrinamt,BigDecimal.valueOf(10000)));
             trdProductDeal.setIntAmt(intAmt);
             trdProductDeal.setFpriceAmt(fpriceAmt);
