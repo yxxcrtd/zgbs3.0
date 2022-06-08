@@ -174,13 +174,6 @@ public class CfetsEtribRepoInfo003Controller extends BaseController {
         RepoInfoDto.setAssetType1(DictCodeList.回购类型_质押式回购.getValue());
         List<CfetsEtribRepoInfo003Dto> dataList = new ArrayList<>();
         cfetsEtrIbRepoinfo003Service.packageEquity(RepoInfoDto,dataList);
-        if (StringUtil.equals(BussinessConstant.SUBMIT, RepoInfoDto.getOperateType())) {
-            AjaxResult ar = EntrustRdsCommonAop.doListPreOccupy(dataList, DictCodeList.平安资产类型_质押式回购.getValue(),BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue(),
-                    true, RepoInfoDto.getEtrInvestPersonInfo());
-            if (StringUtil.isNotEmpty(ar)) {
-                return new Message<AjaxResult>().setData(ar);
-            }
-        }
         EntrustRdsCommonAop.riskListToChildren(RepoInfoDto.getRiskTrialRetDto(), RepoInfoDto.getEtrInvestRepoInfoDtos(),(dto, list) -> dto.setRiskTrialRetDto(list));
         // 临时主键
         if(!StringUtil.isNotEmpty(RepoInfoDto.getEntrustId())) {
