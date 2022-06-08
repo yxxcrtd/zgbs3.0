@@ -15,17 +15,23 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.entrust.etrexchangetrade.dto.EtrExchangeTrade002Dto;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.pojo.BaseMap;
-import com.joyintech.tams.constant.*;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeUnitCostDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.SelectOptionRequestDto;
-import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dao.EtrExchangeTradeSecRepoMapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.dto.EtrExchangeTradeQuotationHqResponse;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.service.EtrExchangeTradeJj001Service;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dao.EtrExchangeTradeSecRepoMapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeEtrExchangeSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeEtrExchangeSecRepoResponse;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePositionsSecRepoRequest;
@@ -72,6 +78,8 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
     private EtrTradeCommonervice etrTradeCommonervice;
     @Autowired
     private EtrExchangeTradeJj001Service exchangeTradeJj001Service;
+    @Autowired
+    private EtrExchangeTradeSecRepo001Service etrExchangeTradeSecRepo001Service;
 
     /**
      * 分页查询持仓信息
@@ -171,6 +179,23 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         }
                     });
                 }
+                //add 设置 ZGCPCN-1158 【场内债券指令】持仓栏中最新价，应根据计价方式转化成净价展示 start
+                returnList.forEach(v->{
+                    if(v.getIsNetprice().equals("N") && v.getFinprodId() != null){
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("ps", "T02");
+                        map.put("calculateField", "02");
+                        map.put("finprodId", v.getFinprodId());
+                        map.put("prinAmt", new BigDecimal(100));
+                        map.put("fprice", v.getPrice());
+                        map.put("tradeMarket", v.getTradeMarket());
+                        Map<String, BigDecimal> returnMap = etrExchangeTradeSecRepo001Service.calcPriceAndYield(map);
+                        if(!Objects.isNull(returnMap) && !Objects.isNull(returnMap.get("cprice"))){
+                            v.setPrice(returnMap.get("cprice"));
+                        }
+                    };
+                });
+                //add 设置 ZGCPCN-1158 【场内债券指令】持仓栏中最新价，应根据计价方式转化成净价展示 end
                 result.setRoot(returnList);
                 // 查询单位成本数据
                 Map<String, EtrExchangeUnitCostDto> unitCostMap = calcEachCostAmtMap(DateUtil.parse(platDate), pList, fList, "");

@@ -117,6 +117,11 @@ public class CfetsPrimaryBidManageResponse {
     @ApiModelProperty(name="remark",value="备注")
     private String remark ;
 
+    @ApiModelProperty(name="bidModle",value="投标方式")
+    private String bidModle;
+
+    @ApiModelProperty(name="bidModleStr",value="投标方式Str")
+    private String bidModleStr;
 
     public String getIsWin() {
         return isWin;
@@ -373,5 +378,21 @@ public class CfetsPrimaryBidManageResponse {
 
     public void setTotalWinId(String totalWinId) {
         this.totalWinId = totalWinId;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
+    public String getBidModleStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, this.getBidModle());
+    }
+
+    public void setBidModleStr(String bidModleStr) {
+        this.bidModleStr = bidModleStr;
     }
 }

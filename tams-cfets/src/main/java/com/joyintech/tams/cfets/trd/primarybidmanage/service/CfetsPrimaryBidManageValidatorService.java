@@ -77,11 +77,11 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                     }
                 });
                 if ((finProductIssue.getMinTamt() != null) && (dto.getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0
-                        || dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMinTamt()) < 0)) {
+                        || dto.getAllocationDetails().get(0).getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0)) {
                     checkFlag = true;
                 }
                 if ((finProductIssue.getMaxTamt() != null) &&(dto.getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0
-                        || dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinCprice().compareTo(finProductIssue.getMaxTamt()) > 0)) {
+                        || dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0)) {
                     checkFlag = true;
                 }
                 if ((finProductIssue.getTenderUnit() != null) &&(dto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0)) {
@@ -94,19 +94,20 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                         }
                     }
                 }
-                if ((finProductIssue.getMaxTenderUnit() != null) && (BigDecimal.valueOf(dto.getAllocationDetails().size()).compareTo(finProductIssue.getMaxTenderUnit()) < 0)) {
+                if ((finProductIssue.getMaxTenderUnit() != null) && (BigDecimal.valueOf(dto.getAllocationDetails().size()).compareTo(finProductIssue.getMaxTenderUnit()) > 0)) {
                     checkFlag = true;
                 }
                 if (dto.getAllocationDetails().size() > 1) {
-                    BigDecimal subtract = ArithmeticUtil.subtract(dto.getAllocationDetails().get(0).getWinCprice(), dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinCprice());
-                    if (subtract.compareTo(finProductIssue.getMaxTenderPlus()) < 0) {
-                        checkFlag = true;
-                    }
-                } else {
-                    if ((finProductIssue.getMaxTenderPlus() != null) && (dto.getAllocationDetails().get(0).getWinCprice().compareTo(finProductIssue.getMaxTenderPlus()) < 0)) {
+                    BigDecimal subtract = ArithmeticUtil.subtract(dto.getAllocationDetails().get(0).getWinPrice(), dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinPrice());
+                    if (subtract.compareTo(finProductIssue.getMaxTenderPlus()) > 0) {
                         checkFlag = true;
                     }
                 }
+//                else {
+//                    if ((finProductIssue.getMaxTenderPlus() != null) && (dto.getAllocationDetails().get(0).getWinPrice().compareTo(finProductIssue.getMaxTenderPlus()) < 0)) {
+//                        checkFlag = true;
+//                    }
+//                }
                 if (checkFlag) {
                     resultList.add(new ValidMessage(getMessage("中标标位不满足该资产发行要求！")));
                 }
