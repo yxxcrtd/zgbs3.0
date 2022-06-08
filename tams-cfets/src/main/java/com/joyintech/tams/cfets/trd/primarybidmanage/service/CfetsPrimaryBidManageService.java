@@ -233,9 +233,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         totalBidPrinamt = ArithmeticUtil.doAdd(totalBidPrinamt, bidProductDto.getTotalBidPrinamt());
                         winPrinAmt = ArithmeticUtil.doAdd(winPrinAmt, bidProductDto.getWinPrinAmt());
                     }
-                    summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
-                    summaryBidDto.setWinPrinAmt(winPrinAmt);
-                    summaryBidDto.setWinPrice(winPrice);
+                    summaryBidDto.setTotalBidPrinamt(ArithmeticUtil.divide(totalBidPrinamt,BigDecimal.valueOf(10000),2));
+                    summaryBidDto.setWinPrinAmt(ArithmeticUtil.divide(winPrinAmt,BigDecimal.valueOf(10000),2));
+                    summaryBidDto.setWinPrice(ArithmeticUtil.multiply(winPrice,BigDecimal.valueOf(100)));
                     summaryBidList.add(summaryBidDto);
                 }
                 resultData.put(dtCode + "_formList", listTable);

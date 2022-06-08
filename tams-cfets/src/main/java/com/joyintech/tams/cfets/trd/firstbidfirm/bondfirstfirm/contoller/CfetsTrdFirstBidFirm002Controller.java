@@ -12,7 +12,7 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
+import com.joyintech.tams.cfets.risk.aop.CfetsEntrustHanderAop;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.*;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm001Service;
@@ -23,6 +23,7 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -333,19 +334,19 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
-    @ResponseBody
-    @ApiOperation(value = "风险试算", notes = "风险试算")
-    @PostMapping("doRiskcal")
-    public Message<AjaxResult> doRiskcal(@RequestBody RiskCalRequest riskCalRequest) {
-        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
-        try {
-            AjaxResult m = new AjaxResult();
-            m.setData(result);
-            return new Message<AjaxResult>().success().setData(m);
-        } catch (Exception e) {
-            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-        }
-    }
+//    @ResponseBody
+//    @ApiOperation(value = "风险试算", notes = "风险试算")
+//    @PostMapping("doRiskcal")
+//    public Message<AjaxResult> doRiskcal(@RequestBody RiskCalRequest riskCalRequest) {
+//        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
+//        try {
+//            AjaxResult m = new AjaxResult();
+//            m.setData(result);
+//            return new Message<AjaxResult>().success().setData(m);
+//        } catch (Exception e) {
+//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
+//        }
+//    }
 
     /**
      * 投标确认提交检查
@@ -490,5 +491,19 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         String msg = cfetsTrdFirstBidFirm002Service.start(processParameter,
                 dtos.toArray(new CfetsTrdFirstBidFirmInfoDto[dtos.size()]));
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+    }
+
+    @ResponseBody
+    @ApiOperation(value = "风险试算", notes = "风险试算")
+    @PostMapping("doRiskcal")
+    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
+        try {
+            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,
+                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
+            return new Message<AjaxResult>().setData(ajaxResult);
+        } catch (Exception e) {
+            logger.error("风险试算", e);
+            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
+        }
     }
 }
