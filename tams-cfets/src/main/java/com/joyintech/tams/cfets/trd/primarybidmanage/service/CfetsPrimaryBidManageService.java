@@ -982,28 +982,25 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      */
     public void beforeWorkFlow(CfetsPrimaryBidManageSaveRequest request) {
         if (request.getOperateType().equals("revoke")) {
-            List<CfetsPrimaryBidManageSaveRequest> selectedItem = request.getSelectedItem();
-            for (CfetsPrimaryBidManageSaveRequest dto : selectedItem) {
-                WflBidResultTotal wflBidResultTotal = new WflBidResultTotal();
-                BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, dto);
-                wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
-                wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
-                wflBidResultTotal.setWorkflowId(dto.getWorkflowId());
-                wflBidResultTotal.setWinDate(iplatformDate.getSysDate());
+            WflBidResultTotal wflBidResultTotal = new WflBidResultTotal();
+            BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, request);
+            wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
+            wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
+            wflBidResultTotal.setWorkflowId(request.getWorkflowId());
+            wflBidResultTotal.setWinDate(iplatformDate.getSysDate());
 //                wflBidResultTotal.setpTotalWinId(wflBidResultTotal.getTotalWinId());
-                wflBidResultTotal.setTotalWinId(wflBidResultTotal.getTotalWinId() + "R");
-                wflBidResultTotalMapper.insertSelective(wflBidResultTotal);
-                if (dto.getAllocationDetails() != null && dto.getAllocationDetails().size() > 0) {
-                    for (CfetsPrimaryBidManageSaveDetailDto detail : dto.getAllocationDetails()) {
-                        WflBidResultDetail wflBidResultDetail = new WflBidResultDetail();
-                        BeanUtil.copyPropertiesIgnoreNull(wflBidResultDetail, detail);
-                        wflBidResultDetail.setDetailWinId(IDGenerator.generate());
-                        wflBidResultDetail.setWorkflowId(dto.getWorkflowId());
-                        wflBidResultDetail.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
-                        wflBidResultDetail.setTotalWinId(dto.getTotalWinId() + "R");
-                        wflBidResultDetail.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
-                        wflBidResultDetailMapper.insertSelective(wflBidResultDetail);
-                    }
+            wflBidResultTotal.setTotalWinId(request.getTotalWinId() + "R");
+            wflBidResultTotalMapper.insertSelective(wflBidResultTotal);
+            if (request.getAllocationDetails() != null && request.getAllocationDetails().size() > 0) {
+                for (CfetsPrimaryBidManageSaveDetailDto detail : request.getAllocationDetails()) {
+                    WflBidResultDetail wflBidResultDetail = new WflBidResultDetail();
+                    BeanUtil.copyPropertiesIgnoreNull(wflBidResultDetail, detail);
+                    wflBidResultDetail.setDetailWinId(IDGenerator.generate());
+                    wflBidResultDetail.setWorkflowId(request.getWorkflowId());
+                    wflBidResultDetail.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
+                    wflBidResultDetail.setTotalWinId(request.getTotalWinId() + "R");
+                    wflBidResultDetail.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
+                    wflBidResultDetailMapper.insertSelective(wflBidResultDetail);
                 }
             }
         }
