@@ -1,7 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.check.business.impl;
 
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.service.trade.check.business.Check;
@@ -31,10 +31,10 @@ public class BusinessCheckEx005 implements IBusinessCheck {
         if (!DictCodeListExt2.交易方向_质押券入库.getValue().equals(ps) && !DictCodeListExt2.交易方向_质押券出库.getValue().equals(ps)) {
             checkRsp.put("ps", "质押券出入库交易方向只支持质押入库或质押出库");
         }
-        if (DictCodeListExt2.交易方向_质押券入库.getValue().equals(ps) && !StringUtil.equals(InvestmentAssetType.BOND.value, instruction.getAssetType())) {
+        if (DictCodeListExt2.交易方向_质押券入库.getValue().equals(ps) && !StringUtil.equals(InvestAssetTypeEnum.BOND.value, instruction.getAssetType())) {
             checkRsp.put("assetType", "质押入库只支持债券资产[F01]");
         }
-        if (DictCodeListExt2.交易方向_质押券出库.getValue().equals(ps) && !StringUtil.equals(InvestmentAssetType.PLEDGE_REPURCHASE.value, instruction.getAssetType())) {
+        if (DictCodeListExt2.交易方向_质押券出库.getValue().equals(ps) && !StringUtil.equals(InvestAssetTypeEnum.PLEDGE_REPURCHASE.value, instruction.getAssetType())) {
             checkRsp.put("assetType", "质押出库只支持质押式回购资产[F07]");
         }
         if (instruction.getEntrustNum() == 0) {

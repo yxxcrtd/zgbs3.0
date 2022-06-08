@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ import com.joyintech.tams.exchange.common.bean.PositionQueryBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.constant.CompareType;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.Account;
 import com.joyintech.tams.exchange.common.db.domain.Entrust;
 import com.joyintech.tams.exchange.common.db.domain.PositionBean;
@@ -120,7 +120,7 @@ public class AccountManagement {
                     entrust.setPortfolioId("");
                     entrust.setUserId("");
                     entrust.setUsername("system_compare");
-                    entrust.setAssetType(InvestmentAssetType.STOCK.value);
+                    entrust.setAssetType(InvestAssetTypeEnum.STOCK.value);
                     entrustService.asyncUpdate(entrust);
                 }
             }
@@ -151,7 +151,7 @@ public class AccountManagement {
                     trade.setAccountName(account.getAccountName());
                     trade.setFinanceAccount(account.getFinanceAccount());
                     trade.setInstructionId("");
-                    trade.setAssetType(InvestmentAssetType.STOCK.value);
+                    trade.setAssetType(InvestAssetTypeEnum.STOCK.value);
                     tradeService.asyncUpdate(trade);
                 }
             }

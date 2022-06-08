@@ -12,7 +12,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.investment.*;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
@@ -83,7 +83,7 @@ public class InvestRiskManagement extends BaseService {
     public RiskOccupyBean riskCheck(Collection<EntrustInterface> entrusts, List<ReqRiskTrigger> parameterList) {
         for (OrderInterface order : entrusts) {
             if (EntrustProp.isSkipRisk(order.getEntrustProp())
-                    || InvestmentAssetType.FUTURES.value.equals(order.getAssetType())) {//期货跳过风控
+                    || InvestAssetTypeEnum.FUTURES.value.equals(order.getAssetType())) {//期货跳过风控
                 logger.info(order.getEntrustProp() + "，跳过风控");
                 RiskOccupyBean repRiskManagement = new RiskOccupyBean();
                 repRiskManagement.setRskStatus("0");
@@ -141,7 +141,7 @@ public class InvestRiskManagement extends BaseService {
             reqRiskExamine.setConPrice(instruction.getConPrice());
             reqRiskExamine.setConNum(instruction.getConNum());
         }
-        if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())
+        if (InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType())
                 && EntrustUtils.isEntrustPropFullPrice(entrust.getEntrustProp())) {
             reqRiskExamine.setAmount(TradeUtils.calculateBalanceForRisk(entrust.getBsFlag(), entrust.getFullPrice(), entrust.getEntrustVolume(), entrust.getAssetType()));
             reqRiskExamine.setPriceAmt(entrust.getFullPrice());
@@ -183,7 +183,7 @@ public class InvestRiskManagement extends BaseService {
             }
             reqRiskExamine.setAssetRate(entrust.getEntrustPrice());
         }
-        if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
+        if (InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType())) {
             reqRiskExamine.setNetPrice(entrust.getEntrustPrice());
             reqRiskExamine.setAllPrice(entrust.getFullPrice());
         }
@@ -263,7 +263,7 @@ public class InvestRiskManagement extends BaseService {
             reqRiskExamine.setConNum(instruction.getConNum());
         }
 
-        if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())
+        if (InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType())
                 && EntrustUtils.isEntrustPropFullPrice(entrustProp)) {
             reqRiskExamine.setPriceAmt(fullPrice);
             reqRiskExamine.setNetPrice(entrustPrice);
@@ -333,7 +333,7 @@ public class InvestRiskManagement extends BaseService {
         }
 
         reqRiskOccupy.setAssetType(instruction.getAssetType());
-        if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())
+        if (InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType())
                 && EntrustUtils.isEntrustPropFullPrice(entrust.getEntrustProp())) {
             reqRiskOccupy.setAmount(TradeUtils.calculateBalanceForRisk(entrust.getBsFlag(), entrust.getFullPrice(), entrust.getEntrustVolume(), entrust.getAssetType()));
             reqRiskOccupy.setPriceAmt(entrust.getFullPrice());
@@ -380,7 +380,7 @@ public class InvestRiskManagement extends BaseService {
             }
             reqRiskOccupy.setAssetRate(entrust.getEntrustPrice());
         }
-        if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
+        if (InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType())) {
             reqRiskOccupy.setNetPrice(entrust.getEntrustPrice());
             reqRiskOccupy.setAllPrice(entrust.getFullPrice());
         }
@@ -466,7 +466,7 @@ public class InvestRiskManagement extends BaseService {
             reqRiskOccupy.setConNum(instruction.getConNum());
         }
 
-        if (InvestmentAssetType.BOND.value.equals(assetType)
+        if (InvestAssetTypeEnum.BOND.value.equals(assetType)
                 && EntrustUtils.isEntrustPropFullPrice(entrustProp)) {
             reqRiskOccupy.setPriceAmt(fullPrice);
             reqRiskOccupy.setAmount(TradeUtils.calculateBalanceForRisk(entrust.getBsFlag(), fullPrice, entrustNum, assetType));
@@ -657,7 +657,7 @@ public class InvestRiskManagement extends BaseService {
                     reqRiskOccupy.setConPrice(instruction.getConPrice());
                     reqRiskOccupy.setConNum(instruction.getConNum());
                 }
-                if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())
+                if (InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType())
                         && EntrustUtils.isEntrustPropFullPrice(order.getEntrustProp())) {
                     reqRiskOccupy.setAmount(TradeUtils.calculateBalanceForRisk(order.getBsFlag(), order.getFullPrice(), order.getCancelVolume(), order.getAssetType()));
                     reqRiskOccupy.setPriceAmt(order.getFullPrice());
@@ -672,7 +672,7 @@ public class InvestRiskManagement extends BaseService {
                     reqRiskOccupy.setPriceAmt(order.getEntrustPrice());
                 }
                 reqRiskOccupy.setTradeNum(order.getCancelVolume());
-                if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
+                if (InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType())) {
                     reqRiskOccupy.setNetPrice(order.getEntrustPrice());
                     reqRiskOccupy.setAllPrice(order.getFullPrice());
                 }

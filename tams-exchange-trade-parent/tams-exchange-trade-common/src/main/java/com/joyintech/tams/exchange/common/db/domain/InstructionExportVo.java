@@ -5,11 +5,9 @@ import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.tams.exchange.common.bean.instrument.MinPriceAndMinTrdUnitLimitBean;
-import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
-import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
@@ -1237,7 +1235,7 @@ public class InstructionExportVo {
      * 新债-非可转债
      */
     public boolean newBond() {
-        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
+        return InvestAssetTypeEnum.BOND.codeEquals(this.getAssetType())
                 && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
                 && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
     }
