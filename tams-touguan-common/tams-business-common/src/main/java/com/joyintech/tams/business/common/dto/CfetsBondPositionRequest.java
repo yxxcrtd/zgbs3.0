@@ -24,6 +24,9 @@ public class CfetsBondPositionRequest {
     @ApiModelProperty(name = "interfaceType", value = "报文类型 必填", example = "BOND001")
     private String interfaceType;
 
+    @ApiModelProperty(name = "payType", value = "缴款方式,参数字典 PAY_TYPE", example = "01")
+    private String payType;
+
     @ApiModelProperty(name = "bidResult", value = "投标结果,参数字典 YES_OR_NO", example = "Y")
     private String bidResult;
 
@@ -57,6 +60,9 @@ public class CfetsBondPositionRequest {
     @ApiModelProperty(name = "systemAct", value = "系统动作  必填,参数字典 SYSTEM_ACT", example = "01")
     private String systemAct;
 
+    @ApiModelProperty(name = "deliveryType", value = "结算方式,参数字典 DELIVERY_TYPE", example = "01")
+    private String deliveryType;
+
     @ApiModelProperty(name = "computerId", value = "应答队列  必填", example = "1")
     private String computerId;
 
@@ -65,6 +71,9 @@ public class CfetsBondPositionRequest {
 
     @ApiModelProperty(name = "tradePlace", value = "交易场所,参数字典 TRADE_PLACE", example = "01")
     private String tradePlace;
+
+    @ApiModelProperty(name = "sharesTradePlatform", value = "交易系统,参数字典 SHARES_TRADE_SYSTEM", example = "01")
+    private String sharesTradePlatform;
 
     @ApiModelProperty(name = "finprodId", value = "债券代码  必填", example = "F01_001.IB")
     private String finprodId;
@@ -108,6 +117,14 @@ public class CfetsBondPositionRequest {
 
     public void setInterfaceType(String interfaceType) {
         this.interfaceType = interfaceType;
+    }
+
+    public String getPayType() {
+        return payType;
+    }
+
+    public void setPayType(String payType) {
+        this.payType = payType;
     }
 
     public String getBidResult() {
@@ -198,6 +215,14 @@ public class CfetsBondPositionRequest {
         this.systemAct = systemAct;
     }
 
+    public String getDeliveryType() {
+        return deliveryType;
+    }
+
+    public void setDeliveryType(String deliveryType) {
+        this.deliveryType = deliveryType;
+    }
+
     public String getComputerId() {
         return computerId;
     }
@@ -220,6 +245,14 @@ public class CfetsBondPositionRequest {
 
     public void setTradePlace(String tradePlace) {
         this.tradePlace = tradePlace;
+    }
+
+    public String getSharesTradePlatform() {
+        return sharesTradePlatform;
+    }
+
+    public void setSharesTradePlatform(String sharesTradePlatform) {
+        this.sharesTradePlatform = sharesTradePlatform;
     }
 
     public String getFinprodId() {
