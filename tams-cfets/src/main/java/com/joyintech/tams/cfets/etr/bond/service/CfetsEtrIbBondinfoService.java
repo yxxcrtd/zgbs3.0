@@ -692,7 +692,10 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             if (index > 0){
                 portfolioIdList = Arrays.asList(requestDto.getPortfolioId().split(","));
                 if (portfolioIdList != null && !portfolioIdList.isEmpty()){
-                    portfolioIdList.stream().map(s -> {return StringUtil.trim(s.trim());});
+                    // Sonar Fix modify by huwei 220608
+                    for (int i = 0; i < portfolioIdList.size(); i++) {
+                        portfolioIdList.set(i, portfolioIdList.get(i).trim());
+                    }
                     req.put("portfolioIdList", portfolioIdList).remove("portfolioId");
                 }
             }
@@ -704,7 +707,10 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             if (index > 0){
                 finprodIdList = Arrays.asList(requestDto.getFinprodId().split(","));
                 if (finprodIdList != null && !finprodIdList.isEmpty()){
-                    finprodIdList.stream().map(s -> {return StringUtil.trim(s.trim());});
+                    // Sonar Fix modify by huwei 220608
+                    for (int i = 0; i < finprodIdList.size(); i++) {
+                        finprodIdList.set(i, finprodIdList.get(i).trim());
+                    }
                     req.put("finprodIdList", finprodIdList).remove("finprodId");
                 }
             }

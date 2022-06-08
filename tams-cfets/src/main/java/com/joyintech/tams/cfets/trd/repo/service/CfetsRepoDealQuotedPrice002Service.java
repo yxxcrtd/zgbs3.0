@@ -2761,7 +2761,8 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         repoDialogueQuoteDto.setIbuQuoteCrepPledgeDtoList(ibuQuoteRepo003Mapper.selectWflQuoteCrepPledgeByKey(quoteId));
         repoDialogueQuoteDto.setIbuQuoteEtrReDtoList(ibuQuoteRepo003Mapper.selectWflQuoteEtrReDataByQuoteId(quoteId));
         repoDialogueQuoteDto.setIbuQuoteEntCrepPledgeDtoList(ibuQuoteRepo003Mapper.selectWflQuoteEntCrepPledgeDataByQuoteId(quoteId));
-        return repoDialogueQuoteDto == null ? null : ibuComponentCommonService.convertRepoDialogueQuoteDto(repoDialogueQuoteDto);
+        // Sonar Fix modify by huwei 220608 new的对象不会为null
+        return ibuComponentCommonService.convertRepoDialogueQuoteDto(repoDialogueQuoteDto);
     }
 
     /**

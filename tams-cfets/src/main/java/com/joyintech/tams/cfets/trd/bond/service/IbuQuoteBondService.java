@@ -449,10 +449,11 @@ public class IbuQuoteBondService extends BaseService {
         Map<String,Object> anchoringValueMap = handcalAnchoringValue(entrustDtos,"02");
         Set<String> set = anchoringValueMap.keySet();
         String calculateField = StringUtil.EMPTY;BigDecimal comparValue = null;
-        for (String key : set) {
+        // Sonar Fix modify by huwei 220608
+        if (set.iterator().hasNext()) {
+            String key = set.iterator().next();
             calculateField = key;
             comparValue = (BigDecimal)anchoringValueMap.get(key);
-            break;
         }
         for (CfetsBondDealEntrustOrderDto item : entrustDtos) {
             comparValue = ArithmeticUtil.round(comparValue,4, RoundingMode.HALF_UP);
@@ -1348,9 +1349,10 @@ public class IbuQuoteBondService extends BaseService {
             if(item.getStatisticalTimes()!=0){
                 quoteIds.add(item.getQuoteId());
             }
+            // Sonar Fix modify by huwei 220608
             if(StringUtil.isEmpty(item.getFinprodMarketId())||StringUtil.isEmpty(item.getFinprodName())||StringUtil.isEmpty(item.getPsStr())||StringUtil.isEmpty(item.getOuPartyName())
             ||StringUtil.isEmpty(item.getCpPartyName())||StringUtil.isEmpty(item.getCpTraderName())||null==item.getShareAmt()||null==item.getPrice()||null==item.getMatureYield()||StringUtil.isEmpty(item.getSettleTypeStr())
-            ||StringUtil.isEmpty(item.getSettleMethodStr())||StringUtil.isEmpty(item.getSettleTypeStr())){
+            ||StringUtil.isEmpty(item.getSettleMethodStr())){
                 result.put("messagesoft","存在必填项为空值");
                 break;
             }

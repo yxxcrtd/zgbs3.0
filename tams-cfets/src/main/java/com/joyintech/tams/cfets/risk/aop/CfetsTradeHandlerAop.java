@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.exception.BusinessException;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
@@ -25,6 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.Resource;
 
 import static com.joyintech.tams.constant.DictCodeList.交易方向_赎回;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 
 //@Component
@@ -235,5 +239,42 @@ public class CfetsTradeHandlerAop {
     @AfterReturning(pointcut = "closeDelegate()")
     public void closeDelegate(JoinPoint joinPoint, CfetsEtribBondInfo003Dto bondInfo003Dto) throws BusinessException {
         inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    }
+
+    /**
+     * 风险试算
+     *
+     * @param dto 委托指令内容
+     * @param infCode 接口代码
+     * @param busiType 业务类型
+     * @return 执行结果
+     * @throws Exception 异常
+     */
+    public static final <T> AjaxResult doRiskcal(T dto, String infCode, String busiType) throws Exception {
+        //风险试算check
+        RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
+        //风险试算组装dto
+        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        return getAjaxResult(riskCommonOutput,null,null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static RiskInputParamSerivce getRiskInputParamSerivce() {
+        return SpringContextUtil.getApplicationContext().getBean(RiskInputParamSerivce.class);
+    }
+
+    /**
+     * 获取返回的信息
+     * @param message
+     * @return
+     */
+    public static AjaxResult getAjaxResult(Object data,String message, MessageType messageType){
+        AjaxResult ar = new AjaxResult();
+        ar.setData(data);
+        List<ValidMessage> warnList = new ArrayList<>();
+        warnList.add(new ValidMessage(message));
+        ar.setErrorList(warnList);
+        ar.setMessageType(messageType);
+        return ar;
     }
 }

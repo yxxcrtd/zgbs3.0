@@ -922,8 +922,8 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
                 }
             }
 
-            // 债券到期日<=交割日时
-            if (StringUtil.isNotEmpty(cfetsBondDealDialogueQuoteDto.getSettleDate())
+            // 债券到期日<=交割日时 // Sonar Fix modify by huwei 220608
+            if (StringUtil.isNotEmpty(cfetsBondDealDialogueQuoteDto.getSettleDate()) && StringUtil.isNotEmpty(secInfoModelDto)
                 && StringUtil.isNotEmpty(secInfoModelDto.getEndDate())) {
                 if (DateUtil.compareDate(secInfoModelDto.getEndDate(),
                     cfetsBondDealDialogueQuoteDto.getSettleDate()) <= 0) {
@@ -933,8 +933,8 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
                             this.getMessage("CfetsBondDealQuotedPrice002.assetMdate"))));
                 }
             }
-            // 画面.交割日<债券起息日
-            if (StringUtil.isNotEmpty(secInfoModelDto.getStartDate())
+            // 画面.交割日<债券起息日 // Sonar Fix modify by huwei 220608
+            if (StringUtil.isNotEmpty(secInfoModelDto) && StringUtil.isNotEmpty(secInfoModelDto.getStartDate())
                 && StringUtil.isNotEmpty(cfetsBondDealDialogueQuoteDto.getSettleDate())) {
                 if (DateUtil.compareDate(cfetsBondDealDialogueQuoteDto.getSettleDate(),
                     secInfoModelDto.getStartDate()) < 0) {
@@ -1214,7 +1214,8 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
         
         // 尾差处理
         BigDecimal dValue = ArithmeticUtil.subtract(sumFpriceAmt, tempSumFpriceAmt);
-        maxDataDto.setFpriceAmt(ArithmeticUtil.doAdd(maxDataDto.getFpriceAmt(), dValue));
+        // Sonar Fix modify by huwei 220608
+        maxDataDto.setFpriceAmt(ArithmeticUtil.doAdd(null == maxDataDto ? new BigDecimal(0) : maxDataDto.getFpriceAmt(), dValue));
     }
     // add by etliu 20210309 银行间上下行多组合 end
     

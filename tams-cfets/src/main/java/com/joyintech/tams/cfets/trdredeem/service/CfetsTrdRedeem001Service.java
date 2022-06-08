@@ -186,7 +186,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
      * @return
      */
     public CfetsTrdRedeemDealCommonDto initReg(CfetsTrdRedeemDealCommonDto cfetsBondDealQuoteCommonDto){
-        String quoteId = cfetsBondDealQuoteCommonDto.getQuoteId();
+        /*String quoteId = cfetsBondDealQuoteCommonDto.getQuoteId();
         if(StringUtil.equals(cfetsBondDealQuoteCommonDto.getValidStatus(), BussinessDictCodeList.有效状态_流程中.getValue())){
             cfetsBondDealQuoteCommonDto = null;//cfetsIbuQuoteBondMapper.getWflCfetsBondDealQuoteCommonDto(quoteId);
             if(null!=cfetsBondDealQuoteCommonDto){
@@ -197,7 +197,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
             if(null!=cfetsBondDealQuoteCommonDto){
                 cfetsBondDealQuoteCommonDto.setPtlAllocatios(cfetsIbuQuoteBondMapper.listPtlAllocationDto(quoteId));
             }
-        }
+        }*/
         return cfetsBondDealQuoteCommonDto;
     }
 

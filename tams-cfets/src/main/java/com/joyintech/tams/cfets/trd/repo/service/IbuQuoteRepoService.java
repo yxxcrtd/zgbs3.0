@@ -63,6 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -1402,7 +1403,9 @@ public class IbuQuoteRepoService extends BaseService {
                         + ")】摘牌日为" + DateUtil.format(finProduct.getDelistingDate(), DateUtil.DEFAULT_DATE_FORMAT_CN) + "，不可小于等于回购到期结算日", MessageType.错误消息);
                 return result;
             }
-            for (FinExercisePlan finExercisePlan : finExercisePlans) {
+            // Sonar Fix modify by huwei 220608
+            if (StringUtil.isNotEmpty(finExercisePlans)) {
+                FinExercisePlan finExercisePlan = finExercisePlans.get(0);
                 if (DateUtil.compareTo(finExercisePlan.getExerciseDate(), request.getSettlementEndDate()) < 0) {
                     result.setMessage("债券" + repoEntrustPledgeDto.getBondCode() +
                             repoEntrustPledgeDto.getBondAbbrName() + "已做赎回登记，是否确认继续质押", MessageType.确认消息);
@@ -1601,8 +1604,7 @@ public class IbuQuoteRepoService extends BaseService {
             param.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
             param.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             param.put("TRADEPLACE01", DictCodeListExt1.交易场所_银行间.getValue());
-            param.put("TRADEPLACE03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
-            param.put("TRADEPLACE04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            // Sonar Fix modify by huwei 220608
             param.put("TRADEPLACE03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
             param.put("TRADEPLACE04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
         }

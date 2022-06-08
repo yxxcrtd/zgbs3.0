@@ -293,21 +293,19 @@ public class CfetsManualSettleQueryService extends BaseService{
             respond.setBidDateList(dates);
         }
         String spcdCodeTemp = "01";
+        // Sonar Fix modify by huwei 220608
         if (StringUtil.equals(respond.getBusiType(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue())) {
-            spcdCode = spcdCodeTemp + "FXB";
             // 基本信息
-            List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+            List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "FXB");
             resultData.put("infoForm", infoForm);
             // 金额信息
-            spcdCode = spcdCodeTemp + "FXA";
-            List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+            List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "FXA");
             resultData.put("infoForm1", infoForm1);
             // 投标产品列表
-            spcdCode = spcdCodeTemp + "FXP";
-            List<CfgReadonlyFormShow> infoForm2 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+            List<CfgReadonlyFormShow> infoForm2 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "FXP");
             resultData.put("infoForm2", infoForm2);
             // 查看页面表格不可编辑,不会有个性化配置
-            List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, EFFERANGE_NO, USER_ID);
+            List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCodeTemp + "FXP", EFFERANGE_NO, USER_ID);
             List<PortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsManualSettleMapper.findBidFirmPortIntFenPeiInfoList(pageParam);
             BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
             for (PortIntFenPeiInfoDto item : portIntFenPeiInfoDtoList) {
@@ -320,25 +318,21 @@ public class CfetsManualSettleQueryService extends BaseService{
             resultData.put("infoData2", SysDataUtil.getNameFromDataDict(DictCode.组合分配方式, respond.getSpanTextOne()));
             resultData.put("talbeData", portIntFenPeiInfoDtoList);
             // 金额信息
-            spcdCode = spcdCodeTemp + "FXR";
-            List<CfgReadonlyFormShow> infoForm3 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+            List<CfgReadonlyFormShow> infoForm3 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "FXR");
             resultData.put("infoForm3", infoForm3);
             resultData.put("infoData3", respond.getRemark());
         } else {
-            spcdCode = spcdCodeTemp + "ZBB";
             // 基本信息
-            List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+            List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "ZBB");
             resultData.put("infoForm", infoForm);
             // 金额信息
-            spcdCode = spcdCodeTemp + "ZBA";
-            List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+            List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "ZBA");
             resultData.put("infoForm1", infoForm1);
             // 投标产品列表
-            spcdCode = spcdCodeTemp + "ZBP";
-            List<CfgReadonlyFormShow> infoForm2 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+            List<CfgReadonlyFormShow> infoForm2 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "ZBP");
             resultData.put("infoForm2", infoForm2);
             // 查看页面表格不可编辑,不会有个性化配置
-            List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCode, EFFERANGE_NO, USER_ID);
+            List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCodeTemp + "ZBP", EFFERANGE_NO, USER_ID);
             List<PortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsManualSettleMapper.findBidFirmPortIntFenPeiInfoList(pageParam);
             BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
             for (PortIntFenPeiInfoDto item : portIntFenPeiInfoDtoList) {
@@ -351,8 +345,7 @@ public class CfetsManualSettleQueryService extends BaseService{
             resultData.put("infoData2", SysDataUtil.getNameFromDataDict(DictCode.中标方式, respond.getSpanTextOne()));
             resultData.put("talbeData", portIntFenPeiInfoDtoList);
             // 金额信息
-            spcdCode = spcdCodeTemp + "ZBR";
-            List<CfgReadonlyFormShow> infoForm3 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
+            List<CfgReadonlyFormShow> infoForm3 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "ZBR");
             resultData.put("infoForm3", infoForm3);
             resultData.put("infoData3", respond.getRemark());
         }
