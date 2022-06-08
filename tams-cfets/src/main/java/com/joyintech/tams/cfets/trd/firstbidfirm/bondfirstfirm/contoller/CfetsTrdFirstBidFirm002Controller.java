@@ -495,10 +495,10 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
     }
 
-    @ResponseBody
-    @ApiOperation(value = "风险试算", notes = "风险试算")
-    @PostMapping("doRiskcal")
-    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
+//    @ResponseBody
+//    @ApiOperation(value = "风险试算", notes = "风险试算")
+//    @PostMapping("doRiskcal")
+//    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
 //        try {
 //            String message = cfetsTrdFirstBidFirm002Service.doRiskcalCheckMethod(dto);
 //            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
@@ -516,6 +516,5 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
 //            logger.error("风险试算", e);
 //            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
 //        }
-        return new Message<AjaxResult>();
-    }
+//    }
 }

@@ -412,6 +412,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         calRequest.setSecManageAcctId(dto.getProductDtos().get(0).getSecManageAcctId());
         calRequest.setShareAmt(dto.getSubscriptionAmount());
         calRequest.setFinprodId(dto.getFinprodId());
+        calRequest.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
         List<TrdTradeFeeDetail> trdTradeFeeDetails = ibuQuoteBondCalService.calFee(calRequest);
         if (CollectionUtils.isNotEmpty(trdTradeFeeDetails)) {
             trdTradeFeeDetails.forEach(item -> {
