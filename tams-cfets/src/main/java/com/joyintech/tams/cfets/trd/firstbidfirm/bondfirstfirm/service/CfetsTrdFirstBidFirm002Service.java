@@ -2908,13 +2908,19 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      */
     private void handleTailDifferenceSubscriptionAmount(List<CfetsTrdFirstBidFirmProductDto> productDtos,
                                                         BigDecimal tailDifference, BigDecimal minChangeUnit) {
-        // 最大循环次数
-        int maxCycle = productDtos.size() * 30;
+        int size = productDtos.size();
+        //委托维度 已经完全分配的集合
+        Set<String> set = new HashSet<>();
+        //递增维度
+        BigDecimal addDimension = minChangeUnit;
         // 降序
         productDtos.sort(Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getAvaNum).reversed());
-        while (tailDifference.compareTo(BigDecimal.ZERO) > 0 && maxCycle != 0) {
+        while (tailDifference.compareTo(BigDecimal.ZERO) > 0 && size > 0) {
+            if (tailDifference.compareTo(minChangeUnit) > 0) {
+                addDimension = ArithmeticUtil.divide(tailDifference, new BigDecimal(size), 2, RoundingMode.HALF_UP);
+                addDimension = ArithmeticUtil.multiply(ArithmeticUtil.divide(addDimension, minChangeUnit, 0, RoundingMode.DOWN), minChangeUnit);
+            }
             for (CfetsTrdFirstBidFirmProductDto item : productDtos) {
-                maxCycle--;
                 // 分配值
                 BigDecimal assign = BigDecimal.ZERO;
                 // 尾差等于0,循环结束
@@ -2923,10 +2929,15 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 }
                 //指令剩余额度为0时,处理下一条数据
                 if (BigDecimalUtil.isZero(item.getAvaNumTemp())) {
-                    continue;
+                    if (set.add(item.getEntrustId())) {
+                        size--;
+                        continue;
+                    }
                 }
                 // 处理尾差值的不同
-                if (BigDecimalUtil.ACompareToB(item.getAvaNumTemp(), minChangeUnit, 4) >= 0
+                if (BigDecimalUtil.ACompareToB(addDimension, minChangeUnit, 2) > 0) {
+                    assign = addDimension;
+                } else if (BigDecimalUtil.ACompareToB(item.getAvaNumTemp(), minChangeUnit, 4) >= 0
                         && BigDecimalUtil.ACompareToB(tailDifference, minChangeUnit, 4) >= 0) {
                     // 剩余指令额度大于等于最小分配单位 尾差大于等于最小变动单位 时,分配最小变动单位
                     assign = minChangeUnit;
