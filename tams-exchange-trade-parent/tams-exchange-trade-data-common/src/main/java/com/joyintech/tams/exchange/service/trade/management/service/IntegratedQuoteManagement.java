@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
 import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveRequest;
 import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.*;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
@@ -134,7 +135,7 @@ public class IntegratedQuoteManagement {
     public ResultBean queryNegotiateQuoteSend(EntrustQueryRequest request) {
         ResultBean resultBean = entrustManagement.queryIntegratedEntrust(request.getUserId(), request.getInstructionId(), request.getAccountId(), request.getOrderId());
         if (null != resultBean && null != resultBean.getData()) {
-            List<NegotiateQuoteSendBean> retList = new ArrayList<NegotiateQuoteSendBean>();
+            List<NegotiateQuoteSendBean> retList = new ArrayList<>();
             List<IntegratedEntrustVo> entrustList = (List<IntegratedEntrustVo>) resultBean.getData();
             for (IntegratedEntrustVo integratedEntrust : entrustList) {
                 if (integratedEntrust.getEntrustStatus() == EntrustStatus.REPORTED.value
@@ -198,6 +199,15 @@ public class IntegratedQuoteManagement {
         negotiateQuoteSendBean.setCpInvestorTypeStr(cpInvestorTypeName);
     }
 
+    public ResultBean addIntegratedRepurchaseQuoteReceive(RepurchaseQuoteReceiveResponse bean) {
+        if (ObjectUtil.isNull(bean)) {
+            return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
+        }
+
+        quoteJob.addIntegratedRepurchaseQuoteReceive(bean);
+        return ResultBean.success();
+    }
+
     /**
      * 我收到的协议回购行情
      *
@@ -207,24 +217,22 @@ public class IntegratedQuoteManagement {
     public ResultBean queryRepurchaseQuoteReceive(RepurchaseQuoteReceiveRequest request) {
         List<RepurchaseQuoteReceiveResponse> list = Lists.newArrayList();
 
-        IntegratedRepurchaseQuoteQryBean quoteQryBean = new IntegratedRepurchaseQuoteQryBean();
+        RepurchaseQuoteReceiveQryRequest quoteQryBean = new RepurchaseQuoteReceiveQryRequest();
         Instruction instruction = instructionService.findById(request.getInstructionId());
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, quoteQryBean.getEntrustProp());
         quoteQryBean.setEntrustProp(entrustProp);
         quoteQryBean.setAccountId(instruction.getAcctNo());
 
-//        list.addAll(terminalHelper.queryRepurchaseQuoteReceive(request));
-
-        List<IntegratedRepurchaseQuoteBean> beanList = terminalHelper.queryRepurchaseQuoteReceive(quoteQryBean);
+        List<RepurchaseQuoteReceiveResponse> beanList = terminalHelper.queryRepurchaseQuoteReceive(quoteQryBean);
         if (CollectionUtils.isNotEmpty(beanList)) {
-            RepurchaseQuoteReceiveResponse response = null;
-            for (IntegratedRepurchaseQuoteBean bean : beanList) {
-                response = new RepurchaseQuoteReceiveResponse();
-                filterRepurchaseQuoteReceive(response, bean);
-
-                list.add(response);
-            }
-
+//            RepurchaseQuoteReceiveResponse response = null;
+//            for (RepurchaseQuoteReceiveResponse bean : beanList) {
+//                response = new RepurchaseQuoteReceiveResponse();
+//                filterRepurchaseQuoteReceive(response, bean);
+//
+//                list.add(response);
+//            }
+            list.addAll(beanList);
             filterRepurchaseQuoteReceive(list, request);
         }
 

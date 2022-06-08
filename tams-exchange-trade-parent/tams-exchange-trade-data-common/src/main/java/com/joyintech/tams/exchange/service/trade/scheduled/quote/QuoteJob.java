@@ -1,7 +1,12 @@
 package com.joyintech.tams.exchange.service.trade.scheduled.quote;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
+import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
 import com.joyintech.tams.exchange.common.constant.ActionIn;
 import com.joyintech.tams.exchange.common.db.domain.Account;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
@@ -16,7 +21,6 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -27,6 +31,9 @@ import java.util.stream.Collectors;
  */
 @Component
 public class QuoteJob {
+    /**
+     * 日志对象
+     */
     private static final Logger logger = LoggerFactory.getLogger(QuoteJob.class);
 
     @Autowired
@@ -38,45 +45,91 @@ public class QuoteJob {
 
     private List<IntegratedRepurchaseQuoteBean> integratedRepurchaseQuoteForMock = new ArrayList<>();// 手动录入行情信息保存
 
+    private List<RepurchaseQuoteReceiveResponse> receiveQuoteList = Lists.newArrayList();// 查询的我收到的协议回购行情信息
+    private List<RepurchaseQuoteReceiveResponse> receiveQuoteForMock = Lists.newArrayList();// 手动录入我收到的协议回购行情信息保存
+
     @PostConstruct
     public void clearQuoteMap() {
         quoteMap.clear();
         integratedRepurchaseQuoteForMock.clear();
+
+        receiveQuoteList.clear();
+        receiveQuoteForMock.clear();
     }
 
+    // region 缓存公开、非公开、我收到的行情
     @Scheduled(fixedRateString = "${scheduled.quote.fixedRate:120000}")
     private void cacheIntegratedQuote() {
+        cachePublicQuote();
+        cacheNonPublicQuote();
+        cacheReceiveQuote();
+    }
+
+    private void cachePublicQuote() {
         List<Account> accounts = accountManager.getAccounts();
-        if (accounts.isEmpty()) {
+        if (CollUtil.isEmpty(accounts)) {
             logger.info("无已登录资金账户信息，不能查询行情");
             return;
         }
+        List<IntegratedRepurchaseQuoteBean> integratedRepurchaseQuoteBeanListPublic = queryRepurchaseQuote(accounts.iterator().next(), ActionIn.PUBLIC_QUOTE.value);
+        quoteMap.put(ActionIn.PUBLIC_QUOTE.value, integratedRepurchaseQuoteBeanListPublic);
+    }
+
+    private void cacheNonPublicQuote() {
         Map<String, Account> brokerAccountMap = accountManager.getBrokerAccountMap();
+        if (CollUtil.isEmpty(brokerAccountMap)) {
+            logger.info("无已登录资金账户信息，不能查询行情");
+            return;
+        }
         List<IntegratedRepurchaseQuoteBean> integratedRepurchaseQuoteBeanList = new ArrayList<>();
         brokerAccountMap.forEach((brokerId, account) -> {
             logger.debug("查询协议回购非公开报价行情 brokerId {}  brokerName {} accountId {}", brokerId, account.getBrokerName(), account.getId());
             List<IntegratedRepurchaseQuoteBean> integratedRepurchaseQuoteBeanBrokerList = queryRepurchaseQuote(account, ActionIn.NON_PUBLIC_QUOTE.value);
             integratedRepurchaseQuoteBeanList.addAll(integratedRepurchaseQuoteBeanBrokerList);
         });
-        // mock数据添加到非公开行情 --
-        if (!integratedRepurchaseQuoteForMock.isEmpty()) {
-            integratedRepurchaseQuoteBeanList.addAll(integratedRepurchaseQuoteForMock);
-        }
-        //
+        // mock数据添加到非公开行情
+        integratedRepurchaseQuoteBeanList.addAll(integratedRepurchaseQuoteForMock);
         quoteMap.put(ActionIn.NON_PUBLIC_QUOTE.value, integratedRepurchaseQuoteBeanList);
-        List<IntegratedRepurchaseQuoteBean> integratedRepurchaseQuoteBeanListPublic = queryRepurchaseQuote(accounts.iterator().next(), ActionIn.PUBLIC_QUOTE.value);
-        quoteMap.put(ActionIn.PUBLIC_QUOTE.value, integratedRepurchaseQuoteBeanListPublic);
     }
 
-    private List<IntegratedRepurchaseQuoteBean> queryRepurchaseQuote(Account account, int actionIn) {
-        List<IntegratedRepurchaseQuoteBean> integratedRepurchaseQuoteBeans = terminalHelper.sendIntegratedRepurchaseQuote(actionIn, null, account.getId(), 1000);
-        if (Objects.isNull(integratedRepurchaseQuoteBeans)) return new ArrayList<>();
-        integratedRepurchaseQuoteBeans.forEach(integratedRepurchaseQuoteBean -> {
-            integratedRepurchaseQuoteBean.setBrokerId(account.getBrokerId());
-            integratedRepurchaseQuoteBean.setBrokerName(account.getBrokerName());
+    private void cacheReceiveQuote() {
+        Map<String, Account> brokerAccountMap = accountManager.getBrokerAccountMap();
+        if (CollUtil.isEmpty(brokerAccountMap)) {
+            logger.info("无已登录资金账户信息，不能查询行情");
+            return;
+        }
+        List<RepurchaseQuoteReceiveResponse> receiveQuotes = ListUtil.list(false);
+        brokerAccountMap.forEach((brokerId, account) -> {
+            logger.debug("查询协议回购非公开报价行情 brokerId {}  brokerName {} accountId {}", brokerId, account.getBrokerName(), account.getId());
+            List<RepurchaseQuoteReceiveResponse> list = queryRepurchaseQuoteReceive(account);
+            receiveQuotes.addAll(list);
         });
-        return integratedRepurchaseQuoteBeans;
+        // mock数据添加到非公开行情
+        receiveQuotes.addAll(receiveQuoteForMock);
     }
+    private List<IntegratedRepurchaseQuoteBean> queryRepurchaseQuote(Account account, int actionIn) {
+        logger.debug("查询协议回购{}公开报价行情 ==> 【accountId = {}】", actionIn == 0 ? StrUtil.EMPTY : "非", account.getId());
+
+        List<IntegratedRepurchaseQuoteBean> repurchaseQuotes = terminalHelper.sendIntegratedRepurchaseQuote(actionIn, null, account.getId(), 1000);
+        repurchaseQuotes.forEach(item -> {
+            item.setBrokerId(account.getBrokerId());
+            item.setBrokerName(account.getBrokerName());
+        });
+        return repurchaseQuotes;
+    }
+
+    private List<RepurchaseQuoteReceiveResponse> queryRepurchaseQuoteReceive(Account account) {
+        logger.debug("查询我收到的协议回购报价行情 ==> 【accountId = {}】", account.getId());
+
+        List<RepurchaseQuoteReceiveResponse> list = terminalHelper.sendRepurchaseQuoteReceive( null, account.getId(), 1000);
+        list.forEach(item -> {
+            item.setBrokerId(account.getBrokerId());
+            item.setBrokerName(account.getBrokerName());
+        });
+        return list;
+    }
+
+// endregion
 
     public List<IntegratedRepurchaseQuoteBean> getIntegratedRepurchaseQuoteBeanList(int actionIn, String entrustProp) {
         List<IntegratedRepurchaseQuoteBean> integratedRepurchaseQuoteBeanList = quoteMap.getOrDefault(actionIn, new ArrayList<>());
@@ -94,5 +147,23 @@ public class QuoteJob {
         List<IntegratedRepurchaseQuoteBean> integratedRepurchaseQuoteBeanList = quoteMap.getOrDefault(ActionIn.NON_PUBLIC_QUOTE.value, new ArrayList<>());
         integratedRepurchaseQuoteBeanList.add(repurchaseQuoteBean);
         quoteMap.put(ActionIn.NON_PUBLIC_QUOTE.value, integratedRepurchaseQuoteBeanList);
+    }
+
+    public List<RepurchaseQuoteReceiveResponse> getRepurchaseQuoteReceiveList(String entrustProp) {
+
+        if (StrUtil.isNotEmpty(entrustProp)) {
+            logger.info("我收到的协议回购行情信息查询成功 => 【entrustProp = {}】", entrustProp);
+            return receiveQuoteList.stream()
+                    .filter(item -> entrustProp.equals(item.getRequestType()))
+                    .collect(Collectors.toList());
+        }
+
+        logger.info("我收到的协议回购行情信息查询成功 => 【size = {}】", receiveQuoteList.size());
+        return receiveQuoteList;
+    }
+
+    public void addIntegratedRepurchaseQuoteReceive(RepurchaseQuoteReceiveResponse bean) {
+        receiveQuoteForMock.add(bean);
+        receiveQuoteList.add(bean);
     }
 }

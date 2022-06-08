@@ -1,11 +1,14 @@
 package com.joyintech.tams.exchange.service.trade.server.agent.ufx;
 
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
+import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
@@ -811,6 +814,12 @@ public class UfxTradeAgent extends TradeAgentDsp {
         }
 
         return UfxMsgParseHelper.parseIntegratedRepurchaseQuote(resultBean);
+    }
+
+    @Override
+    public List<RepurchaseQuoteReceiveResponse> reqIntegratedRepurchaseQuoteReceive(RepurchaseQuoteReceiveQryRequest bean) throws Exception {
+        //待处理
+        return ListUtil.list(false);
     }
 
     /**

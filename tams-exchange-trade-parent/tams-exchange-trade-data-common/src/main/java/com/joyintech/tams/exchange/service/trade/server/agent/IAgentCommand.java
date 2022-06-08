@@ -1,47 +1,12 @@
 package com.joyintech.tams.exchange.service.trade.server.agent;
 
-import java.util.List;
-
-import com.joyintech.tams.exchange.common.bean.AccountFinance;
-import com.joyintech.tams.exchange.common.bean.AccountLoginReqBean;
-import com.joyintech.tams.exchange.common.bean.EnableQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesInstrumentCommissionRateQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesInstrumentMarginRateQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesInstrumentQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesPositionBean;
-import com.joyintech.tams.exchange.common.bean.FuturesPositionDetailBean;
-import com.joyintech.tams.exchange.common.bean.FuturesPositionDetailQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesPositionQryBean;
-import com.joyintech.tams.exchange.common.bean.HistoryQryBean;
-import com.joyintech.tams.exchange.common.bean.HistoryTrade;
-import com.joyintech.tams.exchange.common.bean.InstrumentQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
-import com.joyintech.tams.exchange.common.bean.PledgeDiscount;
-import com.joyintech.tams.exchange.common.bean.PositionQueryBean;
-import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.ReissueEntrustQryBean;
-import com.joyintech.tams.exchange.common.bean.ReissueTradeQryBean;
-import com.joyintech.tams.exchange.common.bean.ResultBean;
-import com.joyintech.tams.exchange.common.bean.StandardBonds;
+import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
-import com.joyintech.tams.exchange.common.db.domain.Account;
-import com.joyintech.tams.exchange.common.db.domain.Entrust;
-import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
-import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
-import com.joyintech.tams.exchange.common.db.domain.Instrument;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
-import com.joyintech.tams.exchange.common.db.domain.PositionBean;
-import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
+import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
+import com.joyintech.tams.exchange.common.db.domain.*;
+
+import java.util.List;
 
 public interface IAgentCommand {
 
@@ -181,33 +146,42 @@ public interface IAgentCommand {
     List<StandardBonds> reqStandardBonds(StandardBondQryBean standardBondQryBean) throws Exception;
 
     /**
-     * @description: 大宗行情
      * @param integratedBulkQuoteQryBean
      * @return
+     * @description: 大宗行情
      * @date: 2020/9/22 9:31
      */
     List<IntegratedBulkQuoteBean> reqIntegratedBulkQuote(IntegratedBulkQuoteQryBean integratedBulkQuoteQryBean) throws Exception;
 
     /**
-     * @description: 盘后大宗行情
      * @param integratedBulkCloseQuoteQryBean
      * @return
+     * @description: 盘后大宗行情
      * @date: 2020/9/22 9:31
      */
     List<IntegratedBulkCloseQuoteBean> reqIntegratedBulkCloseQuote(IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean) throws Exception;
 
     /**
-     * @description: 回购行情
      * @param integratedRepurchaseQuoteQryBean
      * @return
+     * @description: 回购行情
      * @date: 2020/9/22 9:31
      */
     List<IntegratedRepurchaseQuoteBean> reqIntegratedRepurchaseQuote(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean) throws Exception;
 
     /**
-     * @description: 固收行情
+     * 我收到的协议回购行情
+     *
+     * @param bean 查询对象
+     * @return 我收到的协议回购行情
+     * @throws Exception 异常
+     */
+    List<RepurchaseQuoteReceiveResponse> reqIntegratedRepurchaseQuoteReceive(RepurchaseQuoteReceiveQryRequest bean) throws Exception;
+
+    /**
      * @param integratedFixedIncomeQuoteQryBean
      * @return
+     * @description: 固收行情
      * @date: 2020/9/22 9:31
      */
     List<IntegratedFixedIncomeQuoteBean> reqIntegratedFixedIncomeQuote(IntegratedFixedIncomeQuoteQryBean integratedFixedIncomeQuoteQryBean) throws Exception;
@@ -271,12 +245,12 @@ public interface IAgentCommand {
      * @Date: 2020/11/23
      **/
     void reqAccountFuturesCommissionRate(FuturesInstrumentCommissionRateQryBean futuresInstrumentCommissionRateQryBean) throws Exception;
-    
+
     /**
-     * @description: 新债协商成交我收到的行情
-     * @param integratedFixedIncomeQuoteQryBean
+     * @param negotiateQuoteQueryBean
      * @return
      * @throws Exception
+     * @description: 新债协商成交我收到的行情
      */
     List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean) throws Exception;
 

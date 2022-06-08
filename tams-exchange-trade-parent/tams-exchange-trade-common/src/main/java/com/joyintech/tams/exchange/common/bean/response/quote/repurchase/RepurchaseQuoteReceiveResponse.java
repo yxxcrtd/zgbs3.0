@@ -126,6 +126,12 @@ public class RepurchaseQuoteReceiveResponse {
     @ApiModelProperty(name = "accountName", value = "本方资金账号名称")
     private String accountName;
 
+    @ApiModelProperty(name = "brokerId", value = "柜台代码")
+    private String brokerId;
+
+    @ApiModelProperty(name = "brokerName", value = "柜台名称")
+    private String brokerName;
+
     @ApiModelProperty(name = "requestTypeStr", value = "对手方请求类型（首期、提前购回、中途换券、到期续做、解除质押、到期购回）")
     private String requestTypeStr;
     @ApiModelProperty(name = "bsStr", value = "对手方委托方向（1：正回购 2：逆回购）")
@@ -516,6 +522,22 @@ public class RepurchaseQuoteReceiveResponse {
         this.cpInvestorTypeStr = cpInvestorTypeStr;
     }
 
+    public String getBrokerId() {
+        return brokerId;
+    }
+
+    public void setBrokerId(String brokerId) {
+        this.brokerId = brokerId;
+    }
+
+    public String getBrokerName() {
+        return brokerName;
+    }
+
+    public void setBrokerName(String brokerName) {
+        this.brokerName = brokerName;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -566,6 +588,8 @@ public class RepurchaseQuoteReceiveResponse {
                 .add("pledgeNumberStr", pledgeNumberStr)
                 .add("investorTypeStr", investorTypeStr)
                 .add("cpInvestorTypeStr", cpInvestorTypeStr)
+                .add("brokerId", brokerId)
+                .add("brokerName", brokerName)
                 .toString();
     }
 }

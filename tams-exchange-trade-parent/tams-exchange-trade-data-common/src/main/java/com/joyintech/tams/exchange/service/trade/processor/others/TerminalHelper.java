@@ -1,13 +1,19 @@
 package com.joyintech.tams.exchange.service.trade.processor.others;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondBean;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.bean.investment.CapitalAccountBean;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
 import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
+import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
 import com.joyintech.tams.exchange.common.constant.AgentType;
 import com.joyintech.tams.exchange.common.constant.EntrustSide;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
@@ -355,20 +361,41 @@ public class TerminalHelper {
         }
     }
 
-    public List<IntegratedRepurchaseQuoteBean> queryRepurchaseQuoteReceive(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean) {
-        int pageSize = integratedRepurchaseQuoteQryBean.getPageSize();
+    public List<RepurchaseQuoteReceiveResponse> queryRepurchaseQuoteReceive(RepurchaseQuoteReceiveQryRequest request) {
+        int pageSize = request.getPageSize();
         if (pageSize > 1000) {
             pageSize = 1000;
         }
-        String accountId = integratedRepurchaseQuoteQryBean.getAccountId();
-        int actionIn = integratedRepurchaseQuoteQryBean.getActionIn();
-        String entrustProp = integratedRepurchaseQuoteQryBean.getEntrustProp();
+        String accountId = request.getAccountId();
+        String entrustProp = request.getEntrustProp();
         // 投管查询行情时，不会传入账户信息，需要查询到所有券商的行情信息， 故选择当前已连接券商，并选择其中一个账户进行查询
-        if (Strings.isNullOrEmpty(accountId)) {
-            return quoteJob.getIntegratedRepurchaseQuoteBeanList(actionIn, entrustProp);
-        } else {
-            return sendIntegratedRepurchaseQuote(actionIn, entrustProp, accountId, pageSize);
+        if (StrUtil.isEmpty(accountId)) {
+            return quoteJob.getRepurchaseQuoteReceiveList(entrustProp);
         }
+        return sendRepurchaseQuoteReceive(entrustProp, accountId, pageSize);
+    }
+
+    @SuppressWarnings("all")
+    public List<RepurchaseQuoteReceiveResponse> sendRepurchaseQuoteReceive(String entrustProp, String accountId, int pageSize) {
+
+        List<RepurchaseQuoteReceiveResponse> list = ListUtil.list(false);
+
+        TradeAgent tradeAgent = getAgent(accountId);
+        if (ObjectUtil.isNull(tradeAgent)) {
+            logger.warn("未获取到资金账号对应的终端 => 【account = {}】", accountId);
+            return list;
+        }
+
+        try {
+            RepurchaseQuoteReceiveQryRequest request = new RepurchaseQuoteReceiveQryRequest(entrustProp, accountId, pageSize);
+            List<RepurchaseQuoteReceiveResponse> beanList = tradeAgent.reqIntegratedRepurchaseQuoteReceive(request);
+            if (CollUtil.isNotEmpty(beanList)) {
+                list.addAll(beanList);
+            }
+        } catch (Exception e) {
+            logger.error("reqIntegratedRepurchaseQuote error {}", "\r\n" + e);
+        }
+        return list;
     }
 
     public List<IntegratedRepurchaseQuoteBean> sendIntegratedRepurchaseQuote(int actionIn, String entrustProp, String accountId, int pageSize) {

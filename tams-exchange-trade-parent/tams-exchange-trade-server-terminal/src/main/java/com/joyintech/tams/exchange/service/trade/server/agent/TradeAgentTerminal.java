@@ -1,10 +1,13 @@
 package com.joyintech.tams.exchange.service.trade.server.agent;
 
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
+import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
 import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.*;
@@ -555,6 +558,12 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
     @Override
     public List<IntegratedRepurchaseQuoteBean> reqIntegratedRepurchaseQuote(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean) throws Exception {
         return (List<IntegratedRepurchaseQuoteBean>) syncWrite(FunctionCode.REQ_QRY_INTEGRATED_REPURCHASE_QUOTE, integratedRepurchaseQuoteQryBean);
+    }
+
+    @Override
+    public List<RepurchaseQuoteReceiveResponse> reqIntegratedRepurchaseQuoteReceive(RepurchaseQuoteReceiveQryRequest bean) throws Exception {
+        //待处理
+        return ListUtil.list(false);
     }
 
     @Override
