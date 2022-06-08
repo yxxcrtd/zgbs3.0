@@ -316,11 +316,11 @@ public class FinBondAsset002Controller extends BaseController{
             dto = finBondAssetService.getFinprodId(dto);
         }
         //文件信息
-        if (CollectionUtils.isNotEmpty(dto.getFileArray())
+        if (StringUtil.isNotEmpty(dto.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(dto.getMstFileInputParameter().getFileList())
             && StringUtil.isNotEmpty(dto.getFinprodId())) {
             // 将附件和当前业务对象绑定（更新附件的业务代码）
             fileAttachmentProcess.updateBussinessNo(
-                dto.getFileArray().stream().map(UploadFile::getFileNo).collect(
+                dto.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
                     Collectors.toList()),
                 dto.getFinprodId());
         }
@@ -664,6 +664,30 @@ public class FinBondAsset002Controller extends BaseController{
         }catch (Exception e){
             logger.error("文件上传异常", e);
             return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
+        }
+        return null;
+    }
+
+    /**
+     * 附件下载
+     * @param seqNo  入参
+     * @return 处理结果
+     * @throws IOException 异常信息
+     */
+    @ApiOperation(value = "附件下载", notes = "附件下载")
+    @ResponseBody
+    @PostMapping( "/downloadFile")
+    public Message<MultipartFile> downloadFile(String seqNo) {
+        try {
+            logger.info("文件下载开始");
+            if (StringUtil.isNotEmpty(seqNo)) {
+                MultipartFile fileInfo = finBondAssetService.downloadFileInfo(seqNo);
+                return new Message<MultipartFile>().success().setData(fileInfo);
+            }
+            logger.info("文件下载结束");
+        }catch (Exception e){
+            logger.error("文件下载异常", e);
+            return new Message<MultipartFile>().fail().setMessage("文件下载异常");
         }
         return null;
     }

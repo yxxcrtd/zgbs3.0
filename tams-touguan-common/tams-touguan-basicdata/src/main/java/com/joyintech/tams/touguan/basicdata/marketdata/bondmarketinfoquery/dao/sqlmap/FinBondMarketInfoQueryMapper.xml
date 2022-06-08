@@ -539,7 +539,7 @@
         T1.VDATE VDATE,
         T1.MDATE MDATE,
         T1.DELISTING_DATE,
-        NVl(T1.ISSUE_AMT,0) issueAmt,
+        NVl(T1.ISSUE_AMT,0)/100000000 issueAmt,
         T1.ISSUER,
         T8.CUSTOMER_NAME issuerName,
         T3.TYPE_9 secType,

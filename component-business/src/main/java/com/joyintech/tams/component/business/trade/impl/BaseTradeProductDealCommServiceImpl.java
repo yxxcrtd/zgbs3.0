@@ -630,7 +630,7 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
                 record.setDealno(trdProductDeal.getfTradeId());
                 BigDecimal prinamt = interfTradSecdeal.getPrinamt();
                 BigDecimal subtract = ArithmeticUtil.doAdd(prinamt, finProductTradeDto.getTotalFaceValue());
-                if(subtract.compareTo(BigDecimal.ZERO)==-1||subtract.compareTo(BigDecimal.ZERO)==0){//小于0的话
+                if(subtract.compareTo(BigDecimal.ZERO) <= 0){//小于0的话
                     record.setPrinamt(BigDecimal.ZERO);
                 }else{
                     record.setPrinamt(subtract);
@@ -643,7 +643,7 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
                 record.setDealno(trdProductDeal.getfTradeId());
                 BigDecimal prinamt = interfTradSecdeal.getPrinamt();
                 BigDecimal subtract = ArithmeticUtil.subtract(prinamt, finProductTradeDto.getTotalFaceValue());
-               if(subtract.compareTo(BigDecimal.ZERO)==-1||subtract.compareTo(BigDecimal.ZERO)==0){//小于0的话
+               if(subtract.compareTo(BigDecimal.ZERO) <= 0){//小于0的话
                    record.setPrinamt(BigDecimal.ZERO);
                }else{
                    record.setPrinamt(subtract);
@@ -672,7 +672,7 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
                 record.setTradeid(trdProductDeal.getfTradeId());
                 BigDecimal prinamt = interfOpicsTradRepo.getRepoamt();
                 BigDecimal subtract = ArithmeticUtil.doAdd(prinamt, trdProductDeal.getPrinAmt());
-                if(subtract.compareTo(BigDecimal.ZERO)==-1||subtract.compareTo(BigDecimal.ZERO)==0){//小于0的话
+                if(subtract.compareTo(BigDecimal.ZERO) <= 0){//小于0的话
                     record.setRepoamt(BigDecimal.ZERO);
                 }else{
                     record.setRepoamt(subtract);
@@ -686,7 +686,7 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
                 record.setTradeid(trdProductDeal.getfTradeId());
                 BigDecimal prinamt = interfOpicsTradRepo.getRepoamt();
                 BigDecimal subtract = ArithmeticUtil.subtract(prinamt, trdProductDeal.getPrinAmt());
-                if(subtract.compareTo(BigDecimal.ZERO)==-1||subtract.compareTo(BigDecimal.ZERO)==0){//小于0的话
+                if(subtract.compareTo(BigDecimal.ZERO) <= 0){//小于0的话
                     record.setRepoamt(BigDecimal.ZERO);
                 }else{
                     record.setRepoamt(subtract);

@@ -974,8 +974,8 @@
             Joyin.ajaxSync(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/IsBondAsset', param1, function(result) {
                 if(result.data=='2') {     //2 返回2代表所选资产是债券且中债sppi通过
                     $("#businessModelDiv_"+ currentTab).show();
-                    $("#businessModel_" + currentTab).val("").trigger('change');
-                    $("#businessModel_" + currentTab).prop("disabled", false);
+                    //$("#businessModel_" + currentTab).val("").trigger('change');
+                    $("#businessModel_" + currentTab).prop("disabled", true);
                 }else if(result.data=='3'){ //3 返回3代表所选资产是债券且中债sppi不通过
                     $("#businessModelDiv_"+ currentTab).show();
                     $("#businessModel_" + currentTab).val("FVTPL").trigger('change');

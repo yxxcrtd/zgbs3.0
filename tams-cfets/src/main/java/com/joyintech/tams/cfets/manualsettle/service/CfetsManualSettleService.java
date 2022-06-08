@@ -318,7 +318,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
      * @param cfetsManualSettleDto
      * @return List<CfetsManualSettleInsertDto>
      */
-    private List<CfetsManualSettleInsertDto> handleSettleData(CfetsManualSettleDto cfetsManualSettleDto) {
+    public List<CfetsManualSettleInsertDto> handleSettleData(CfetsManualSettleDto cfetsManualSettleDto) {
 
         List<CfetsManualSettleInsertDto> empList = new ArrayList<CfetsManualSettleInsertDto>();
         //手工交收入库dto

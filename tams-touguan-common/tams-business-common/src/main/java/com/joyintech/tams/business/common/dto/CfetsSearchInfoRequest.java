@@ -28,6 +28,9 @@ public class CfetsSearchInfoRequest {
     @ApiModelProperty(name="initValue",value="初始化值",example="历史：01")
     private String initValue;
 
+    @ApiModelProperty(name="isNewBond",value="是否查询新债",example="Y")
+    private String isNewBond;
+
     @ApiModelProperty(name="finProductId",value="产品代码",example="历史：01")
     private String finprodId;
 
@@ -132,5 +135,13 @@ public class CfetsSearchInfoRequest {
 
     public void setCounterId(String counterId) {
         this.counterId = counterId;
+    }
+
+    public String getIsNewBond() {
+        return isNewBond;
+    }
+
+    public void setIsNewBond(String isNewBond) {
+        this.isNewBond = isNewBond;
     }
 }

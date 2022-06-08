@@ -1562,17 +1562,17 @@
                 bo.PAY_TYPE                                                                          payType,
                 null                                                                                 etrBidPriceTotal,
                 bo.WIN_PRIN_AMT                                                                      qty,
-                null                                                                                 price,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then brd.price else null end                     price,
                 tfpdt.UNIT_INT                                                                       unitInt,
                 tfpdt.FEE_AMT_UNPAY                                                                  jsFeeAmt,
                 bo.BID_ID                                                                            tradeId,
-                tfpdt.UNIT_FPRICE                                                                    allPrice,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then brd.allPrice else tfpdt.UNIT_FPRICE end     allPrice,
                 tfpdt.FPRICE_AMT                                                                     tradeAmt,
                 tfpdt.INT_AMT                                                                        intAmt,
                 tfpdt.TRADE_AMT                                                                      payAmt,
-                case when tfpdt.BUSI_TYPE = 'TRD61' then brt.WIN_TYPE else bo.DIP_TYPE end                 spanTextOne,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then brt.WIN_TYPE else bo.DIP_TYPE end           spanTextOne,
                 tfpdt.REMARK                                                                         remark,
-                null totalBidPrinamt,
+                bo.WIN_PRIN_AMT totalBidPrinamt,
                 brt.WIN_PRINAMT winPrinamt,
                 case
                     when brt.WIN_PRICE is null then null
@@ -1587,6 +1587,8 @@
         left join MST_COUNTER_PARTY mcp on mcp.COUNTER_ID = tfpdt.COUNTER_ID
         left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = tfpdt.FINPROD_ID
         left join BID_RESULT_TOTAL brt on brt.TOTAL_WIN_ID = tfpdt.B_TRADE_ID
+        left join ( select distinct nvl(WIN_CPRICE, 0) price, nvl(WIN_CPRICE, 0) + nvl(INT_AMT, 0) allPrice, TOTAL_WIN_ID
+                        from BID_RESULT_DETAIL ) brd on brd.TOTAL_WIN_ID = tfpdt.B_TRADE_ID
         left join BID_ORDER bo on tfpdt.P_TOTLE_TRADE_ID = bo.BID_ID or brt.BID_ID = bo.BID_ID
         where tfpdt.IS_CANCEL = 'N' and tfpdt.TRADE_STATUS = #{TRADE_STATUS01} AND tfpdt.TOTLE_TRADE_ID = #{tradeId}
         <if test="busiTypes != null and busiTypes.size()>0">

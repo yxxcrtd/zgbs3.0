@@ -71,6 +71,7 @@ public class HttpRequest {
         return result;
     }
 
+
     /**
      * 向指定 URL 发送POST方法的请求
      *
@@ -130,7 +131,6 @@ public class HttpRequest {
         }
         return result;
     }
-
 //    public static void main(String[] args) throws UnsupportedEncodingException {
 //
 //        //发送 POST 请求

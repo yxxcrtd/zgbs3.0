@@ -420,45 +420,46 @@ public class ComBondQuotationInfoService extends CommonExportService<ComBondQuot
         if (null == list || list.size() != 15) {
             ExcelValidDto dto = new ExcelValidDto(StringUtil.EMPTY, String.valueOf(i), "数据列数错误");
             excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(0))) {
-            // 验证导入债券代码是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "债券代码为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(2))) {
-            // 验证导入估值来源是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估值来源为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(3))) {
-            // 验证导入估值日期是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估值日期为空");
-            excelValidDtolist.add(dto);
         }else{
-            if(ComBasicDataExcelUtil.isErrorDate(list.get(3))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估值日期格式错误");
+            if (StringUtil.isEmpty(list.get(0))) {
+                // 验证导入债券代码是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "债券代码为空");
                 excelValidDtolist.add(dto);
             }
-        }
-        if (StringUtil.isEmpty(list.get(5))) {
-            // 验证导入市价全价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估价全价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isNumeric(list.get(5))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估价全价格式错误");
+            if (StringUtil.isEmpty(list.get(2))) {
+                // 验证导入估值来源是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估值来源为空");
                 excelValidDtolist.add(dto);
             }
-        }
-        if (StringUtil.isEmpty(list.get(6))) {
-            // 验证导入市价净价是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估价净价为空");
-            excelValidDtolist.add(dto);
-        }else{
-            if(!CommonUtil.isNumeric(list.get(6))){
-                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估价净价格式错误");
+            if (StringUtil.isEmpty(list.get(3))) {
+                // 验证导入估值日期是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估值日期为空");
                 excelValidDtolist.add(dto);
+            }else{
+                if(ComBasicDataExcelUtil.isErrorDate(list.get(3))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估值日期格式错误");
+                    excelValidDtolist.add(dto);
+                }
+            }
+            if (StringUtil.isEmpty(list.get(5))) {
+                // 验证导入市价全价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估价全价为空");
+                excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isNumeric(list.get(5))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估价全价格式错误");
+                    excelValidDtolist.add(dto);
+                }
+            }
+            if (StringUtil.isEmpty(list.get(6))) {
+                // 验证导入市价净价是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估价净价为空");
+                excelValidDtolist.add(dto);
+            }else{
+                if(!CommonUtil.isNumeric(list.get(6))){
+                    ExcelValidDto dto = new ExcelValidDto(list.get(1), String.valueOf(i+2), "估价净价格式错误");
+                    excelValidDtolist.add(dto);
+                }
             }
         }
         return excelValidDtolist;
