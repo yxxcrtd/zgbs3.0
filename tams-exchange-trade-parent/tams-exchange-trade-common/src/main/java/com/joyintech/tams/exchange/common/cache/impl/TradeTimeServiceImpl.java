@@ -10,15 +10,13 @@ import com.joyintech.tams.exchange.common.bean.dto.OpenCloseTime;
 import com.joyintech.tams.exchange.common.bean.investment.TradeTimeBean;
 import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.joyin.DeclarationType;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.enums.invest.BoardTypeEnum;
-import com.joyintech.tams.exchange.common.enums.invest.FinprodTypeTgEnum;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
-import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -108,7 +106,7 @@ public class TradeTimeServiceImpl implements TradeTimeService {
     public List<OpenCloseTime> getTradePeriod(Instruction instruction, BaseOrderRequest order, Instrument instrument) {
         log.info("getTradePeriod() called with parameters => 【instruction = {}】, 【order = {}】",instruction, order);
         String assetType = instruction.complexAssertTypeWhenConvertibleBond();
-        if (InvestmentAssetType.STOCK.codeEquals(assetType)
+        if (InvestAssetTypeEnum.STOCK.codeEquals(assetType)
                 && EnumUtil.in(instrument.getSubStockType(), BoardTypeEnum.KCB, BoardTypeEnum.CYB)) {
             assetType = assetType + instrument.getSubStockType();
         }

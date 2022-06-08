@@ -5,11 +5,12 @@ import com.google.common.base.Strings;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Order;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 
 public class InvestmentUtils {
 
     public static boolean hasSameDir(Instruction instruction, Order order) {
-        if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
             if (EntrustBs.BUY.value.equals(order.getEntrustBs())) {
                 return DerivativeBsDir.BUY.value.equals(instruction.getDerivativeBsDir());
             } else if (EntrustBs.SELL.value.equals(order.getEntrustBs())) {
@@ -22,7 +23,7 @@ public class InvestmentUtils {
     }
 
     public static boolean hasSameDir(Instruction instruction, String entrustBs) {
-        if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
             if (EntrustBs.BUY.value.equals(entrustBs)) {
                 return DerivativeBsDir.BUY.value.equals(instruction.getDerivativeBsDir());
             } else if (EntrustBs.SELL.value.equals(entrustBs)) {
@@ -35,9 +36,9 @@ public class InvestmentUtils {
     }
 
     public static String getInstructionBs(String assetType, String entrustBS) {
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType) && EntrustBs.BUY.value.equals(entrustBS)) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType) && EntrustBs.BUY.value.equals(entrustBS)) {
             return InstructionPs.POSITIVEREPO.value;
-        } else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType) && EntrustBs.SELL.value.equals(entrustBS)) {
+        } else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType) && EntrustBs.SELL.value.equals(entrustBS)) {
             return InstructionPs.REVERSEDREPO.value;
         } else if (EntrustBs.BUY.value.equals(entrustBS)) {
             return InstructionPs.BUY.value;

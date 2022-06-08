@@ -47,6 +47,9 @@
         <result column="TERM" property="term" jdbcType="DECIMAL" />
         <result column="PENALTY_INTAMT" property="penaltyIntamt" jdbcType="DECIMAL" />
         <result column="PS_PAYMENT" property="psPayment" jdbcType="VARCHAR" />
+        <result column="CREDIT_EVENT_HAPPENED_DATE" property="creditEventHappenedDate" jdbcType="TIMESTAMP"/>
+        <result column="CREDIT_EVENT_RESOLVE_DATE" property="creditEventResolveDate" jdbcType="TIMESTAMP"/>
+        <result column="DELIVER_BOND" property="deliverBond" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List" >
         TOTLE_TRADE_ID TOTLE_TRADE_ID, ENTRUST_ID ENTRUST_ID, OUR_SHARE_AMT OUR_SHARE_AMT, 
@@ -61,7 +64,9 @@
         IS_CASHSET IS_CASHSET, GEN_TYPE GEN_TYPE, WORKFLOW_STATUS WORKFLOW_STATUS, WORKFLOW_ID WORKFLOW_ID, 
         CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, 
         UPDATE_TIME UPDATE_TIME, CONTRACT_TYPE CONTRACT_TYPE, TARGET_ID TARGET_ID, EXERCISE_TYPE EXERCISE_TYPE, 
-        TERM TERM, PENALTY_INTAMT PENALTY_INTAMT, PS_PAYMENT PS_PAYMENT
+        TERM TERM, PENALTY_INTAMT PENALTY_INTAMT, PS_PAYMENT PS_PAYMENT,
+        CREDIT_EVENT_HAPPENED_DATE CREDIT_EVENT_HAPPENED_DATE,CREDIT_EVENT_RESOLVE_DATE CREDIT_EVENT_RESOLVE_DATE,
+        DELIVER_BOND DELIVER_BOND
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -233,6 +238,15 @@
             <if test="psPayment != null" >
                 PS_PAYMENT = #{psPayment,jdbcType=VARCHAR},
             </if>
+            <if test="creditEventHappenedDate != null" >
+                CREDIT_EVENT_HAPPENED_DATE = #{creditEventHappenedDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="creditEventResolveDate != null" >
+                CREDIT_EVENT_RESOLVE_DATE = #{creditEventResolveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deliverBond != null" >
+                DELIVER_BOND = #{deliverBond,jdbcType=VARCHAR},
+            </if>
         </set>
         where WORKFLOW_ID = #{workflowId, jdbcType=VARCHAR}
     </update>
@@ -279,7 +293,10 @@
         EXERCISE_TYPE = #{exerciseType,jdbcType=VARCHAR},
         TERM = #{term,jdbcType=DECIMAL},
         PENALTY_INTAMT = #{penaltyIntamt,jdbcType=DECIMAL},
-        PS_PAYMENT = #{psPayment,jdbcType=VARCHAR}
+        PS_PAYMENT = #{psPayment,jdbcType=VARCHAR},
+        CREDIT_EVENT_HAPPENED_DATE = #{creditEventHappenedDate,jdbcType=TIMESTAMP},
+        CREDIT_EVENT_RESOLVE_DATE = #{creditEventResolveDate,jdbcType=TIMESTAMP},
+        DELIVER_BOND = #{deliverBond,jdbcType=VARCHAR}
         where WORKFLOW_ID = #{workflowId, jdbcType=VARCHAR}
     </update>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.WflTrdDealTotalAdd" >
@@ -297,8 +314,9 @@
             WORKFLOW_ID, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
             CONTRACT_TYPE, TARGET_ID, EXERCISE_TYPE, 
-            TERM, PENALTY_INTAMT, PS_PAYMENT
-            )
+            TERM, PENALTY_INTAMT, PS_PAYMENT,
+            CREDIT_EVENT_HAPPENED_DATE,CREDIT_EVENT_RESOLVE_DATE,
+            DELIVER_BOND)
         values (#{totleTradeId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{ourShareAmt,jdbcType=DECIMAL}, 
             #{lendinShareAmt,jdbcType=DECIMAL}, #{ourCpriceAmt,jdbcType=DECIMAL}, #{lendinCpriceAmt,jdbcType=DECIMAL}, 
             #{ourFpriceAmt,jdbcType=DECIMAL}, #{lendinFpriceAmt,jdbcType=DECIMAL}, #{ourFpriceAmt2,jdbcType=DECIMAL}, 
@@ -313,7 +331,9 @@
             #{workflowId,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
             #{contractType,jdbcType=VARCHAR}, #{targetId,jdbcType=VARCHAR}, #{exerciseType,jdbcType=VARCHAR}, 
-            #{term,jdbcType=DECIMAL}, #{penaltyIntamt,jdbcType=DECIMAL}, #{psPayment,jdbcType=VARCHAR}
+            #{term,jdbcType=DECIMAL}, #{penaltyIntamt,jdbcType=DECIMAL}, #{psPayment,jdbcType=VARCHAR},
+            #{creditEventHappenedDate,jdbcType=TIMESTAMP},#{creditEventResolveDate,jdbcType=TIMESTAMP},
+            #{deliverBond,jdbcType=VARCHAR}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.WflTrdDealTotalAdd" >
@@ -454,6 +474,15 @@
             <if test="psPayment != null" >
                 PS_PAYMENT,
             </if>
+            <if test="creditEventHappenedDate != null" >
+                CREDIT_EVENT_HAPPENED_DATE,
+            </if>
+            <if test="creditEventResolveDate != null" >
+                CREDIT_EVENT_RESOLVE_DATE,
+            </if>
+            <if test="deliverBond != null" >
+                DELIVER_BOND,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="totleTradeId != null" >
@@ -590,6 +619,15 @@
             </if>
             <if test="psPayment != null" >
                 #{psPayment,jdbcType=VARCHAR},
+            </if>
+            <if test="creditEventHappenedDate != null" >
+                #{creditEventHappenedDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="creditEventResolveDate != null" >
+                #{creditEventResolveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deliverBond != null" >
+                #{deliverBond,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -739,6 +777,15 @@
             <if test="psPayment != null" >
                 PS_PAYMENT = #{psPayment,jdbcType=VARCHAR},
             </if>
+            <if test="creditEventHappenedDate != null" >
+                CREDIT_EVENT_HAPPENED_DATE = #{creditEventHappenedDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="creditEventResolveDate != null" >
+                CREDIT_EVENT_RESOLVE_DATE = #{creditEventResolveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deliverBond != null" >
+                DELIVER_BOND = #{deliverBond,jdbcType=VARCHAR},
+            </if>
         </set>
         where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </update>
@@ -784,7 +831,10 @@
             EXERCISE_TYPE = #{exerciseType,jdbcType=VARCHAR},
             TERM = #{term,jdbcType=DECIMAL},
             PENALTY_INTAMT = #{penaltyIntamt,jdbcType=DECIMAL},
-            PS_PAYMENT = #{psPayment,jdbcType=VARCHAR}
+            PS_PAYMENT = #{psPayment,jdbcType=VARCHAR},
+            CREDIT_EVENT_HAPPENED_DATE = #{creditEventHappenedDate,jdbcType=TIMESTAMP},
+            CREDIT_EVENT_RESOLVE_DATE = #{creditEventResolveDate,jdbcType=TIMESTAMP},
+            DELIVER_BOND = #{deliverBond,jdbcType=VARCHAR}
         where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </update>
 </mapper>

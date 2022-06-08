@@ -97,6 +97,8 @@ public class PositionRequestServiceInstructionRequest {
             this.repo002(entity, resultMap);
         } else if (INTERF_TYPE_STOCK001.equals(interType)) {
             this.stock001(entity, resultMap);
+        } else if (INTERF_TYPE_CERTIFICATE001.equals(interType)) {
+            this.certificate001(entity, resultMap);
         } else {
             return;
         }
@@ -580,6 +582,54 @@ public class PositionRequestServiceInstructionRequest {
             }
         }
 
+    }
+
+    /**
+     * 信息保护凭证-下单    certificate001
+     */
+    private void certificate001(PositionInstructionRequest entity, Map<String, Object> resultMap) {
+        resultMap.put(INTERFACE_TYPE, INTERF_TYPE_CERTIFICATE001);
+        // 清算速度
+        resultMap.put(SETTLE_SPEED, null);
+        //信用事件结算方式
+        resultMap.put("ceSettleType", null);
+
+        // 调用组合计算接口，获取分配信息
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
+        if (CollectionUtils.isNotEmpty(calculates)) {
+            int calculateSize = calculates.size();
+            PositionRequestBaseBean bean;
+
+            // 组合数据集
+            List<Map<String, Object>> ptlList = new ArrayList<>(calculateSize);
+            for (PortfolioCalculateResponse item : calculates) {
+                bean = new PositionRequestBaseBean(entity);
+                bean.setPortfolioId(item.getPortfolioId());
+                bean.setCashAmount(item.getEntrustAmt());
+                bean.setSecAmount(BigDecimal.valueOf(item.getEntrustNum()));
+
+                Map<String, Object> map = BeanUtil.object2Map(bean);
+                map.put("etrSecAmount", item.getInstructionTotalAmt());
+                ptlList.add(map);
+            }
+            resultMap.put(PTL_LIST, ptlList);
+
+            // 组合附属数据集（交付物债券）	ptlSubList
+//            List<Map<String, Object>> ptlSubList = new ArrayList<>(calculateSize);
+//            for (PortfolioCalculateResponse item : calculates) {
+//                Map<String, Object> map = Maps.newHashMap();
+//                map.put("portfolioId", null);
+//                map.put("finprodId", null);
+//                map.put("tradeId", null);
+//                map.put("secAcctId", null);
+//                map.put("secAmount", null);
+//                ptlSubList.add(map);
+//            }
+            resultMap.put("ptlSubList", Lists.newArrayList());
+        }
     }
 
     /**

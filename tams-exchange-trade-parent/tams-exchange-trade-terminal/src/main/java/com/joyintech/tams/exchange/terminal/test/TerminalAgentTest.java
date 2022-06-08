@@ -30,6 +30,7 @@ public class TerminalAgentTest extends TerminalAgent implements ITerminalMsgHand
     private static Map<String, Long> requestIdAccountMap = Maps.newConcurrentMap();//AccountId-requestId
     private static Map<String, Long> requestIdEntrustMap = Maps.newConcurrentMap();//EntrustId-requestId
 
+    @Override
     public Long getRequestIdByEntrustId(String id) {
         return requestIdEntrustMap.get(id);
     }
