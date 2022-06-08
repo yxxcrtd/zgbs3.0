@@ -80,14 +80,30 @@ public class JoyinbusinessCommonService extends BaseService {
         return super.queryForPage(entrustIdRequestDto.getPageMode().getPageNo(), entrustIdRequestDto.getPageMode().getPageSize(),
                 () ->joyinbusinessCommonMapper.getEntrustId(pageParam));
     }
+
+    /**
+     * 查询债券基本信息
+     *
+     * @param dto
+     * @return com.joyintech.framework.grid.Page<com.joyintech.framework.select.SelectOptionDto>
+     * @author jiangpeng
+     * @date 2022/6/8 10:05
+     */
     public Page<SelectOptionDto> getfinprodIdForAdd(CfetsSearchInfoRequest dto) {
-        Map<String, Object> param =new HashMap<>();
-        param.put("search",dto.getSearch());
-        param.put("assestType", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue()));
-        param.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
-        param.put("TRADE_PLACE_02",DictCodeListExt1.交易场所_商业银行柜台.getValue());
-        param.put("platDate",DateUtil.platDateFromCache());
-        param.put("initValue",dto.getInitValue());
+        Map<String, Object> param = new HashMap<>();
+        param.put("search", dto.getSearch());
+        List<String> assestTypes = new ArrayList<>();
+        assestTypes.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        // 部分接口不需要查询新债信息
+        if (!StringUtil.isNotEmpty(dto.getIsNewBond())
+                && StringUtil.equals(dto.getIsNewBond(), DictCodeList.是否_否.getValue())) {
+            assestTypes.add(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        }
+        param.put("assestType", assestTypes);
+        param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
+        param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("platDate", DateUtil.platDateFromCache());
+        param.put("initValue", dto.getInitValue());
         if (StringUtil.isNotEmpty(dto.getDealType()) && StringUtil.equals(dto.getDealType(), "01")) {
             //需要查询债券资产和回购期限
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdOfBondAndRepo(param));
@@ -99,17 +115,16 @@ public class JoyinbusinessCommonService extends BaseService {
             //需要查询债券资产、回购期限、项目类资产、公募基金、计划类净值型、计划类利率型、计划类货币型、存款
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdForAll(param));
         }
-        if(StringUtil.isNotEmpty(dto.getPs()) && (StringUtil.equals(dto.getPs(),DictCodeList.交易方向_行权_回售.getValue())
-                                                   ||StringUtil.equals(dto.getPs(),DictCodeList.交易方向_行权_赎回.getValue()))){
-            param.put("ps",dto.getPs());
+        if (StringUtil.isNotEmpty(dto.getPs()) && (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue())
+                || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_赎回.getValue()))) {
+            param.put("ps", dto.getPs());
             String userId = SecurityUtil.getLoginUser().getUserName();
-            if (StringUtil.equals(dto.getPs(),DictCodeList.交易方向_行权_回售.getValue()) && StringUtils.isNotEmpty(userId)) {
+            if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue()) && StringUtils.isNotEmpty(userId)) {
                 param.put("userId", SecurityUtil.getLoginUser().getUserName());
             }
-            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.getRightfinprodIdForAdd(param));
-
-        }else{
-            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.getfinprodIdForAdd(param));
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getRightfinprodIdForAdd(param));
+        } else {
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdForAdd(param));
         }
     }
 
