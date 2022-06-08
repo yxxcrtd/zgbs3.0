@@ -118,4 +118,13 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/5/26 16:06
      */
     List<WflTrdProductDeal> findDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+
+    /**
+     * 按组合维度查询指令剩余额度,含流程中
+     *
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/4/26 14:02
+     */
+    BigDecimal selectEtrAvaNum(Map<String, Object> param);
 }

@@ -6,6 +6,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
@@ -114,6 +115,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
 
     @Autowired
     private CfetsTrdFirstBidFirm002Mapper cfetsTrdFirstBidFirm002Mapper;
+
+    @Autowired
+    CfetsTrdFirstBidFirm001Service cfetsTrdFirstBidFirm001Service;
 
     @Autowired
     BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
@@ -784,6 +788,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         request = this.autoAllocation(request);
         request.setEntrustDtos(null);
+        request = this.winPriceLink(request);
         logger.debug("添加或删除产品列表数据,结果:" + JsonUtils.object2Json(request));
         return request;
     }
@@ -3335,6 +3340,13 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 errorList.add(new ValidMessage("投标产品列表中投资经理不可为空!"));
             }
             // 投标方式为分销买入时，投标产品列表中存在券面总额(万元)>剩余指令额度(万元)-流程汇总券面总额时
+            Map<String, Object> params = new HashMap<>();
+            params.put("entrustId", item.getEntrustId());
+            params.put("protfolioId", item.getPortfolioId());
+            BigDecimal etrAvaNum = cfetsTrdFirstBidFirm002Mapper.selectEtrAvaNum(params);
+            if (BigDecimalUtil.ACompareToB(etrAvaNum, item.getBidPriceTotal(), 6) < 0) {
+                errorList.add(new ValidMessage("指令【" + item.getEntrustId() + "】中组合【" + item.getPortfolioName() + "】剩余指令额度不足(存在流程中数据)!"));
+            }
         }
         return errorList;
     }
@@ -3649,6 +3661,17 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             return StringUtil.joinString(messages, GlobalConstant.VERTICAL_LINE);
         }
         return null;
+    }
+
+    /**
+     * 查询指令信息
+     *
+     * @param dto
+     * @return
+     */
+    public Page<CfetsTrdFirstBidFirmEntrustDto> pageEntrust(CfetsTrdBondFirstBidFirmEntrustRequest request) {
+        request.setIsEtrAddSearch(DictCodeList.是否_是.getValue());
+        return cfetsTrdFirstBidFirm001Service.pageEntrust(request);
     }
 }
 

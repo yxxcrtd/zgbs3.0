@@ -487,4 +487,25 @@
         <include refid="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.Sql_All_Data" />
         WHERE TOTLE_TRADE_ID = #{totleTradeId}
     </select>
+
+    <select id="selectEtrAvaNum" resultType="java.math.BigDecimal">
+        select eed.ENTRUST_NUM*100 - nvl(T1.sumSubAmt,0)
+        from ETR_ENTRUST_DETAIL eed
+        left join(
+            select sum(T.subAmt) sumSubAmt,T.ENTRUST_ID, T.PORTFOLIO_ID
+            from (
+                     select nvl(bobp.SUBSCRIPTION_AMOUNT,0) subAmt, bobp.ENTRUST_ID, bobp.PORTFOLIO_ID
+                     from BID_ORDER bo
+                              left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                     where bo.IS_CANCEL = 'N'
+                       and bo.TRADE_STATUS != '03'
+                     union all
+                     select nvl(wbobp.SUBSCRIPTION_AMOUNT,0) subAmt, wbobp.ENTRUST_ID, wbobp.PORTFOLIO_ID
+                     from Wfl_BID_ORDER wbo
+                              left join Wfl_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID
+                 ) T
+                     group by T.ENTRUST_ID, T.PORTFOLIO_ID
+        )T1 on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
+        where eed.ENTRUST_ID = #{entrustId} and eed.PORTFOLIO_ID = #{protfolioId}
+    </select>
 </mapper>
