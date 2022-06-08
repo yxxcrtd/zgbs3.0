@@ -673,9 +673,9 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
     public void updateCfetsOprHis(String entrustId, String optType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
-        if (ENTRUST_RECORD_NEW.equals(optType)) {
+        /*if (ENTRUST_RECORD_NEW.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-        } else if (ENTRUST_RECORD_NEW.equals(optType)) {
+        } else*/ if (ENTRUST_RECORD_NEW.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
         } else if ("close".equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_关闭.getValue());
@@ -780,7 +780,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
     public void setCheckParams(EtrCreditProtectionCertificateApplyRequest entity, EtrParameterDto paraDto) {
         /********************************/
         //设置默认最小价差、最小交易单位；否则指令组件抛异常；
-        paraDto.setMinDiffPrice(new BigDecimal(0.001).setScale(3, BigDecimal.ROUND_HALF_UP));
+        paraDto.setMinDiffPrice(BigDecimal.valueOf(0.001).setScale(3, BigDecimal.ROUND_HALF_UP));
         paraDto.setMinDealUnit(new BigDecimal(1));
 
         Map<String, UnitEnum> numUnit = new HashMap<String, UnitEnum>();

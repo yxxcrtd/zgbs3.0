@@ -151,7 +151,7 @@ public class EtrExchangeBlockTrade001Service extends BaseService<EtrExchangeBloc
 					}
 					//价格（净价） / 回购利率
 					if((Double)tmp.get("entrustPrice") !=null) {
-						dto.setEntrustPrice(ArithmeticUtil.round(new BigDecimal((Double)tmp.get("entrustPrice")),4,null));
+						dto.setEntrustPrice(ArithmeticUtil.round(BigDecimal.valueOf((Double)tmp.get("entrustPrice")),4,null));
 					}
 					//对手方交易席位
 					dto.setOppositeSeat((String)tmp.get("propSeatNo"));
@@ -191,11 +191,11 @@ public class EtrExchangeBlockTrade001Service extends BaseService<EtrExchangeBloc
                     dto.setMarket((String)tmp.get("market"));
 					//收盘价
 					if(tmp.get("entrustPrice") !=null) {
-						dto.setClosingPrice(ArithmeticUtil.round(new BigDecimal((Double)tmp.get("entrustPrice")),4,null));
+						dto.setClosingPrice(ArithmeticUtil.round(BigDecimal.valueOf((Double)tmp.get("entrustPrice")),4,null));
 					}
 					//日均价
 					if(tmp.get("fullPrice") !=null) {
-						dto.setDailyAvgPrice(ArithmeticUtil.round(new BigDecimal((Double)tmp.get("fullPrice")),4,null));
+						dto.setDailyAvgPrice(ArithmeticUtil.round(BigDecimal.valueOf((Double)tmp.get("fullPrice")),4,null));
 					}
 					list.add(dto);
 				});
