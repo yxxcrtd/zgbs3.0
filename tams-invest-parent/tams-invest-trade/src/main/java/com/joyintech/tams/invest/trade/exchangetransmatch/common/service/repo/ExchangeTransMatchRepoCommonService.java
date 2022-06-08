@@ -799,9 +799,6 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         EtrEntrustAddDto etrEntrustAddDto = new EtrEntrustAddDto();
         if (etrEntrustAdd != null){
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAddDto,etrEntrustAdd);
-//            if (etrEntrustAdd.getTradeId() != null) {
-//                finprodId = etrEntrustAdd.getTradeId();
-//            }
         }
         etrEntrustAddDto.setmTradeAmt(trdTempDto.getTradeAmt());
         positionBaseData.setEtrEntrustAddDto(etrEntrustAddDto);
@@ -809,8 +806,6 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         if (StringUtil.isEmpty(finprodId)) {
             return;
         }
-        // 首期信息
-//        trdTempDto.setFinprodId(finprodId);
         // 查询首期交易类金融产品数据
         FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
         finTradeProductKey.setFinprodId(finprodId);
@@ -818,27 +813,9 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         FinTradeProduct firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
         FinTradeProductDto finTradeProductDto = new FinTradeProductDto();
 
-//        String hgsqFinprodId = null;
-
         if (firstFinTradeProduct != null){
             BeanUtil.copyPropertiesIgnoreNull(finTradeProductDto,firstFinTradeProduct);
         }
-//        else {
-//            // 根据首期成交编号，查询首期交易的交易编号
-//            Map<String, Object> paramMap = new HashMap<>();
-//            paramMap.put("fTradeId", finprodId);
-//            hgsqFinprodId = exchangeTransMatchCommonMapper.selectHgsqFinprodId(paramMap);
-//            if (StringUtil.isNotBlank(hgsqFinprodId)) {
-//                trdTempDto.setFinprodId(hgsqFinprodId);
-//                finprodId = hgsqFinprodId;
-//
-//                finTradeProductKey.setFinprodId(hgsqFinprodId);
-//                firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
-//                if (firstFinTradeProduct != null){
-//                    BeanUtil.copyPropertiesIgnoreNull(finTradeProductDto,firstFinTradeProduct);
-//                }
-//            }
-//        }
         positionBaseData.setFinTradeProductDto(finTradeProductDto);
         // 质押券信息
         FinDealPledgeKey finDealPledgeKey = new FinDealPledgeKey();

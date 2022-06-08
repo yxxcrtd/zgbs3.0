@@ -35,18 +35,7 @@
                 GROUP BY
                     ENTRUNST_TRADE_ID
             ) S ON S.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
-            LEFT JOIN (
-                SELECT
-                    ENTRUNST_TRADE_ID,
-                    ifnull(SUM(MARCH_QTY_EN), 0) MARCH_QTY_EN,
-                    ifnull(SUM(MARCH_AMT_EN), 0) MARCH_AMT_EN
-                FROM
-                    SETTLE_DATA_TOTAL_PLEDGE_MATCH
-                WHERE
-                    DISPLACE_DIRECTION = #{DISPLACE_DIRECTION_01}
-                GROUP BY
-                    ENTRUNST_TRADE_ID
-            ) ST93 ON ST93.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
+            <!--协议回购解除质押T93-->
             LEFT JOIN (
                 SELECT
                     ENTRUNST_TRADE_ID,
@@ -56,6 +45,19 @@
                     SETTLE_DATA_TOTAL_PLEDGE_MATCH
                 WHERE
                     DISPLACE_DIRECTION = #{DISPLACE_DIRECTION_02}
+                GROUP BY
+                    ENTRUNST_TRADE_ID
+            ) ST93 ON ST93.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
+            <!--协议回购中途换券T94-->
+            LEFT JOIN (
+                SELECT
+                    ENTRUNST_TRADE_ID,
+                    ifnull(SUM(MARCH_QTY_EN), 0) MARCH_QTY_EN,
+                    ifnull(SUM(MARCH_AMT_EN), 0) MARCH_AMT_EN
+                FROM
+                    SETTLE_DATA_TOTAL_PLEDGE_MATCH
+                WHERE
+                    DISPLACE_DIRECTION = #{DISPLACE_DIRECTION_01}
                 GROUP BY
                     ENTRUNST_TRADE_ID
             ) ST94 ON ST94.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
