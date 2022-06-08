@@ -57,6 +57,7 @@ import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.币种_人民币;
 import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.是否_否;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
 
 /**
@@ -480,10 +481,19 @@ public class PortfolioManager extends BaseService {
             return ResultBean.success(result);
         }
 
+        if (!isGuardBond(instruction)) {
+            log.error("非担保债券，不应进入公平交易: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails(ErrorCode.getStr(ErrorCode.INSTRUCTIONS_NO_GUARD_BOND_ERROR));
+            return ResultBean.success(result);
+        }
+
         // 过滤公平相关指令
         // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
         // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
-        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                .collect(Collectors.toList());
         log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
 
         List<FairPortfolioResponse> list = Lists.newArrayList();
@@ -521,7 +531,9 @@ public class PortfolioManager extends BaseService {
             02 忽略未接收的部分指令
          */
         if (EntrustUtils.isfairModeWithUnacceptInstructionForbid()) {
-            List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.WAIT_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), instruction.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+            List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                    .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.WAIT_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), instruction.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                    .collect(Collectors.toList());
 
             if (waitReceiveList.size() > 0) {
                 log.warn("未接收且影响公平交易的相关指令: {}", JsonUtils.getJsonFromObject(waitReceiveList));
@@ -1764,6 +1776,12 @@ public class PortfolioManager extends BaseService {
             result.setInfoDetails(ErrorCode.getStr(ErrorCode.INSTRUCTIONS_NOT_EXIST));
             return ResultBean.success(result);
         }
+        if (!isGuardBond(instruction)) {
+            log.error("非担保债券，不应进入公平交易: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails(ErrorCode.getStr(ErrorCode.INSTRUCTIONS_NO_GUARD_BOND_ERROR));
+            return ResultBean.success(result);
+        }
 
         // 判断进入公平交易
         if (!EntrustUtils.isFairOrder(orderPlaceBean, instruction)) {
@@ -1824,7 +1842,9 @@ public class PortfolioManager extends BaseService {
         // 过滤公平相关指令
         // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
         // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
-        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                .collect(Collectors.toList());
         log.info("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
         if (CollectionUtils.isEmpty(simpleFiltingList)) {
             log.error("不满足公平交易: InstructionId [{}]", instructionId);
@@ -1835,7 +1855,9 @@ public class PortfolioManager extends BaseService {
 
         // 系统参数：未接收指令的公平处理模式 01：是；02：否
         if (EntrustUtils.isfairModeWithUnacceptInstructionForbid()) {
-            List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.WAIT_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), instruction.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+            List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                    .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.WAIT_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), instruction.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                    .collect(Collectors.toList());
             if (waitReceiveList.size() > 0) {
                 log.error("未接收且影响公平交易的相关指令: {}", JsonUtils.getJsonFromObject(waitReceiveList));
                 result.setInfoLevel("2");
@@ -1855,6 +1877,16 @@ public class PortfolioManager extends BaseService {
         result.setInfoLevel("0");
         return ResultBean.success(result);
 
+    }
+
+    private boolean isGuardBond(Instruction instruction) {
+        if (InvestmentAssetType.isBond(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)
+                && 投管业务类型_现券交易.getValue().equals(instruction.getBusiTypeTg())
+                && StringUtil.equals(instruction.getIsNoGuard(), "Y")) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -1887,7 +1919,9 @@ public class PortfolioManager extends BaseService {
         // 过滤公平相关指令
         // 1. 同交易员 2. 同证券编码 3. 同交易方向
         // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
-        List<Instruction> questList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+        List<Instruction> questList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                .collect(Collectors.toList());
         log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(questList));
 
         // questList 是从内存拿出的数据，不能直接使用
@@ -2015,7 +2049,7 @@ public class PortfolioManager extends BaseService {
         // 如果是市价指令+限价订单时，委托价格不为0
         if (
 //                EntrustUtils.isMarketPrice(instruction) &&
-                        TradeUtils.isZero(entrustPrice)) {
+                TradeUtils.isZero(entrustPrice)) {
             adjustedPrice = this.getMarketPrice(tick, entrustBs);
         }
 

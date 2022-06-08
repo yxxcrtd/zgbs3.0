@@ -74,7 +74,8 @@ public class FxSecRequestQuoteService
      * 获取系统日期
      * @return
      */
-    public String getSysDate() {
+    // Sonar Fix modify by huwei 220607
+    /*public String getSysDate() {
         // 加载平台日期
         Date dt = null;
               //  fxSecRequestQuoteMapper.getSysDate();
@@ -82,7 +83,7 @@ public class FxSecRequestQuoteService
             return DateUtil.format(dt, DateUtil.DEFAULT_DATE_FORMAT_EN);
         }
         return StringUtil.EMPTY;
-    }
+    }*/
 
     public AjaxResult save(FxSecRequestQuoteDto dto){
         ProcessParameter<FxSecRequestQuoteDto> processParameter = new ProcessParameter<>();

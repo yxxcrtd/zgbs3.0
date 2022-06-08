@@ -316,11 +316,11 @@ public class FinBondAsset002Controller extends BaseController{
             dto = finBondAssetService.getFinprodId(dto);
         }
         //文件信息
-        if (CollectionUtils.isNotEmpty(dto.getFileArray())
+        if (StringUtil.isNotEmpty(dto.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(dto.getMstFileInputParameter().getFileList())
             && StringUtil.isNotEmpty(dto.getFinprodId())) {
             // 将附件和当前业务对象绑定（更新附件的业务代码）
             fileAttachmentProcess.updateBussinessNo(
-                dto.getFileArray().stream().map(UploadFile::getFileNo).collect(
+                dto.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
                     Collectors.toList()),
                 dto.getFinprodId());
         }

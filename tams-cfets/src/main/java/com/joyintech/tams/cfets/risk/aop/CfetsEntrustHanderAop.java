@@ -5,6 +5,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
@@ -15,9 +16,13 @@ import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribSaveRequest;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfoService;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtribBondInfo003Service;
+import com.joyintech.tams.cfets.risk.dto.CfetsEtrRiskcalResponse;
+import com.joyintech.tams.cfets.risk.service.CfetsEtrRdsCommonService;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
+import com.joyintech.tams.component.business.riskall.dto.RiskCommonInputDto;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
+import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
@@ -30,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +64,8 @@ public class CfetsEntrustHanderAop {
     /**
      * 保存至代办，从代办中提交到流程中，需要执行风险占用
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.etr..*.*.checkSaveError(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.etr..*.*.checkSaveError(..)) " +
+            " || execution(* com.joyintech.tams.cfets.etr..*.*.check(..))")
     protected void checkSaveError() {
     }
 
@@ -206,4 +213,57 @@ public class CfetsEntrustHanderAop {
         inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_关闭.getValue(), 流程节点_流程提交.getValue(), false);
     }
 
+    /**
+     * 风险试算
+     *
+     * @param dto 委托指令内容
+     * @param infCode 接口代码
+     * @param busiType 业务类型
+     * @return 执行结果
+     * @throws Exception 异常
+     */
+    public static final <T> AjaxResult doRiskcal(T dto, String infCode, String busiType) throws Exception {
+        //风险试算check
+        CfetsEtrRdsCommonService cfetsEtrRdsCommonService = getCfetsEtrRdsCommonService();
+        RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
+        String message = cfetsEtrRdsCommonService.doRiskcalCheckMethod(dto);
+        CfetsEtrRiskcalResponse result=new CfetsEtrRiskcalResponse();
+        if (StringUtil.isNotEmpty(message)) {
+            return getAjaxResult(result,message,MessageType.错误消息);
+        }
+        //风险试算组装dto
+        Map<String, Object> dataMap=cfetsEtrRdsCommonService.doRiskcalPackageEquity(dto);
+        RiskCommonOutputDto riskCommonOutput= riskInputParamSerivce.doRisk(BaseMap.newMap(dataMap));
+        return getAjaxResult(riskCommonOutput,null,null);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public static CfetsEtrRdsCommonService getCfetsEtrRdsCommonService() {
+        return SpringContextUtil.getApplicationContext().getBean(CfetsEtrRdsCommonService.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static RiskInputParamSerivce getRiskInputParamSerivce() {
+        return SpringContextUtil.getApplicationContext().getBean(RiskInputParamSerivce.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static RiskCommonService getRiskCommonService() {
+        return SpringContextUtil.getApplicationContext().getBean(RiskCommonService.class);
+    }
+    /**
+     * 获取返回的信息
+     * @param message
+     * @return
+     */
+    public static AjaxResult getAjaxResult(Object data,String message, MessageType messageType){
+        AjaxResult ar = new AjaxResult();
+        ar.setData(data);
+        List<ValidMessage> warnList = new ArrayList<>();
+        warnList.add(new ValidMessage(message));
+        ar.setErrorList(warnList);
+        ar.setMessageType(messageType);
+        return ar;
+    }
 }
