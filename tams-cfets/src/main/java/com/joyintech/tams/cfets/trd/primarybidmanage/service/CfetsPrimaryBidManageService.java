@@ -815,6 +815,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             posport.setCashAmount(productDto.getTotalBidPrinamt());
             posport.setSecAmount(productDto.getTotalBidPrinamt());
+            if (StringUtil.isNotEmpty(productDto.getTotalBidPrinamt())) {
+                posport.setOwnSecAmount(productDto.getTotalBidPrinamt().toString());
+                posport.setIntegrateSecAmount("0");
+            }
             ptlList.add(posport);
         }
         //调用头寸
@@ -900,7 +904,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     stlPayOrder.setMyAcctNo(acctId);
                     stlPayOrder.setOrderId(entity.getBidId());
                     stlPayOrder.setCcy(finProduct.getCcy());
-                    stlPayOrder.setSettleAmt(deal.getTradeAmt());
+                    stlPayOrder.setSettleAmt(deal.getSettFeeAmt());
                     stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
                     stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
                     stlPayOrder.setSettleDate(iplatformDate.getSysDate());
