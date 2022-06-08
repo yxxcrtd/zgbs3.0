@@ -316,9 +316,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      * @param confirmOk
      */
     private void sendPositionMethod(CfetsEtrBondFirstBid002Dto dto, boolean isSubmit, String confirmOk) {
-
+        List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
         for (CfetsEtrBondFirstBid002Dto entity : dto.getEtrInvestBondFirstBidDtos()) {
-            List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
             for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {
                 //调用头寸
                 CfetsBondPortfolioCashRequest posport = new CfetsBondPortfolioCashRequest();
@@ -359,47 +358,47 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 posport.setOwnSecAmount(productDto.getBidPrinAmt().toString());
                 ptlList.add(posport);
             }
-            //调用头寸
-            CfetsBondPositionRequest req = new CfetsBondPositionRequest();
-            req.setInterfaceType("Bond001");//报文类型
-            req.setUserId(SecurityUtil.getLoginUser().getUserName());
-            req.setTotalTradeId(dto.getTotalEtrustId());
-            req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
-            req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-            req.setWorkFlowId(entity.getWorkflowId());
-            String balanceCheck = DictCodeList.是否_是.getValue();
-            if ((StringUtil.isNotEmpty(entity.getSoftSkipMode())
-                    && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))
-                    || StringUtil.isNotEmpty(confirmOk)) {
-                balanceCheck = DictCodeList.是否_否.getValue();
-            }
-            req.setBalanceCheck(balanceCheck);
-            if (StringUtil.equals(entity.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
-                req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
-            } else {
-                req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
-            }
 
-            //兼容场内场外
-            req.setTradePlace(entity.getTradeMarket());
-            req.setSettleSpeed(DictCodeList.清算速度_T_0.getValue());
-            req.setBusiAct(DictCodeListExt3.业务动作_投资指令.getValue());
-            req.setPs(DictCodeList.交易方向_买入.getValue());
-            if (isSubmit) {
-                req.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
-                req.setSystemAct(entity.getSystemAct());
-            } else {
-                req.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
-                req.setSystemAct(entity.getSystemAct());
-                req.setbTotalTradeId(dto.getTotalEtrustId());
-            }
-            req.setCdate(entity.getEntrustDate());
-            req.setFinprodId(entity.getFinprodId());
-            req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
-            req.setPtlList(ptlList);
-            PositionHttpRequest.send(req);
+        }
+        //调用头寸
+        CfetsBondPositionRequest req = new CfetsBondPositionRequest();
+        req.setInterfaceType("Bond001");//报文类型
+        req.setUserId(SecurityUtil.getLoginUser().getUserName());
+        req.setTotalTradeId(dto.getTotalEtrustId());
+        req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
+        req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
+        req.setWorkFlowId(dto.getWorkflowId());
+        String balanceCheck = DictCodeList.是否_是.getValue();
+        if ((StringUtil.isNotEmpty(dto.getSoftSkipMode())
+                && StringUtil.equals(dto.getSoftSkipMode(), DictCodeList.是否_是.getValue()))
+                || StringUtil.isNotEmpty(confirmOk)) {
+            balanceCheck = DictCodeList.是否_否.getValue();
+        }
+        req.setBalanceCheck(balanceCheck);
+        if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+            req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
+        } else {
+            req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
         }
 
+        //兼容场内场外
+        req.setTradePlace(dto.getTradeMarket());
+        req.setSettleSpeed(DictCodeList.清算速度_T_0.getValue());
+        req.setBusiAct(DictCodeListExt3.业务动作_投资指令.getValue());
+        req.setPs(DictCodeList.交易方向_买入.getValue());
+        if (isSubmit) {
+            req.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
+            req.setSystemAct(dto.getSystemAct());
+        } else {
+            req.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
+            req.setSystemAct(dto.getSystemAct());
+            req.setbTotalTradeId(dto.getTotalEtrustId());
+        }
+        req.setCdate(dto.getEntrustDate());
+        req.setFinprodId(dto.getFinprodId());
+        req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+        req.setPtlList(ptlList);
+        PositionHttpRequest.send(req);
 
     }
 

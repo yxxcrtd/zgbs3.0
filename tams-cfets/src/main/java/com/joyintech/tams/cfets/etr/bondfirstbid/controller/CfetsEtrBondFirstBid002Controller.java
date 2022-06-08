@@ -17,6 +17,7 @@ import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid002Service;
+import com.joyintech.tams.cfets.position.dto.PositionCashRequestDetailDto;
 import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
@@ -101,10 +102,13 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
             entity = cfetsEtrBondFirstBid002Service.getBussinessEntityByWorkflowId(workflowId);
             if (CollectionUtils.isNotEmpty(entity.getBiddingProductList())) {
                 for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {
-                    List<String> portfolioIdList = new ArrayList<>();
-                    portfolioIdList.add(productDto.getPortfolioId());
+                    List<PositionCashRequestDetailDto> ptlList = new ArrayList<>();
+                    PositionCashRequestDetailDto positionDto = new PositionCashRequestDetailDto();
+                    positionDto.setPortfolioId(productDto.getPortfolioId());
+                    positionDto.setAcctId(productDto.getAcctNo());
+                    ptlList.add(positionDto);
                     BaseMap cashMap = positionInfoService.queryEtrAvailableCash(
-                            portfolioIdList,
+                            ptlList,
                             null,
                             null,
                             entity.getCcy(),
