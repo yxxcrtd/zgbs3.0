@@ -240,18 +240,19 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"))) {
             List<CfetsTrdFirstBidFirmEntrustDto> listTemp = new ArrayList<>();
             request.getEntrustDtos().forEach(entrustDto -> {
-                if(CollectionUtils.isEmpty(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos())){
+                if (CollectionUtils.isEmpty(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos())) {
                     listTemp.add(entrustDto);
-                }else {
+                } else {
                     listTemp.addAll(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos());
                 }
             });
             list = listTemp;
         }
+        String finprodId = null;
+        String counterId = null;
+        Date issueDateStart = null;
+        Date issueDateEnd = null;
         if (StringUtil.isNotEmpty(request) && StringUtil.isNotEmpty(list)) {
-            String finprodId = null;
-            String counterId = null;
-            Date issueDate = null;
             for (CfetsTrdFirstBidFirmEntrustDto entrustDto : list) {
                 ValidMessage error = new ValidMessage();
                 // 资产代码+证券账户必须一致提示信息
@@ -274,11 +275,20 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 if (!StringUtil.equals(finprodId, entrustDto.getFinprodId())) {
                     msg = "新债标的";
                 }
-                // 投标日
-                if (issueDate == null) {
-                    issueDate = entrustDto.getIssueDate();
+                // 投标日开始
+                if (issueDateStart == null) {
+                    issueDateStart = entrustDto.getIssueDateStart();
                 }
-                if (DateUtil.compareTo(issueDate, entrustDto.getIssueDate()) != 0) {
+                // 投标日结束
+                if (issueDateEnd == null) {
+                    issueDateEnd = entrustDto.getIssueDateEnd();
+                }
+                if (DateUtil.compareTo(issueDateStart, entrustDto.getIssueDateStart()) != 0) {
+                    if (StringUtil.isNotEmpty(msg)) {
+                        msg += "OR";
+                    }
+                    msg += "投标日";
+                } else if (DateUtil.compareTo(issueDateEnd, entrustDto.getIssueDateEnd()) != 0) {
                     if (StringUtil.isNotEmpty(msg)) {
                         msg += "OR";
                     }
@@ -317,6 +327,25 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         if (StringUtil.isNotEmpty(errorList)) {
             ajaxResult.setErrorList(errorList);
+        } else {
+            Map<String, Object> param = new HashMap<>();
+            param.put("finprodId", finprodId);
+            param.put("counterId", counterId);
+            param.put("issueDateEnd", issueDateEnd);
+            param.put("issueDateStart", issueDateStart);
+            List<CfetsTrdFirstBidFirmEntrustDto> entrustDtos = cfetsTrdFirstBidFirm002Mapper.selectEntInfoByIdAndDate(param);
+            List<Map<String,Object>> massageMapList = new ArrayList<>();
+            // 1.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的已接收待投标且不存在过程中投标确认数据的指令，
+            boolean flag1 = false;
+            // 1.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的已接收待投标且不存在过程中投标确认数据的指令，
+            boolean flag2 = false;
+            // 1.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的已接收待投标且不存在过程中投标确认数据的指令，
+            boolean flag3 = false;
+            for (CfetsTrdFirstBidFirmEntrustDto entrustDto : entrustDtos) {
+                // 如存在，则提示：存在未勾选的已接收指令，是否自动选择一并投标确认？
+                // 用户选择确认，则将对应未选择的指令默认勾选并带入到投标确认面板，用户选择取消，则仅带入用户勾选指令数据到投标确认面板
+            }
+            ajaxResult.setData(massageMapList);
         }
         return ajaxResult;
     }
@@ -754,10 +783,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 【应计利息总额】 =基本信息.券面总额*金额信息.应计利息/100
         if (StringUtil.isNotEmpty(dto.getIntAmt())) {
             dto.setIntAmtTatol(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getBidPriceTotal(), dto.getIntAmt()), new BigDecimal(100), 4));
+        } else {
+            dto.setIntAmtTatol(BigDecimal.ZERO);
         }
         // 【全价】 =金额信息.净价+金额信息.应计利息
         if (StringUtil.isNotEmpty(dto.getIntAmt())) {
             dto.setFullPrice(ArithmeticUtil.doAdd(dto.getPrice(), dto.getIntAmt()));
+        }else{
+            dto.setFullPrice(dto.getPrice());
         }
         // 【缴款金额】 ==金额信息.交易金额+金额信息.应计利息总额（元）
         if (StringUtil.isNotEmpty(dto.getIntAmtTatol())) {
@@ -845,6 +878,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         inputDto.setTradeAmt(calRequest.getFpriceAmt());
         inputDto.setTradeDate(calRequest.getSettleDate());
         inputDto.setTradeMarket(tradeMarket);
+        inputDto.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
         inputDto.setFinprodType2(finprodType2);
         inputDto.setPs(calRequest.getPs());// 交易方向
         inputDto.setFpriceAmt(calRequest.getFpriceAmt());// 全价总额
