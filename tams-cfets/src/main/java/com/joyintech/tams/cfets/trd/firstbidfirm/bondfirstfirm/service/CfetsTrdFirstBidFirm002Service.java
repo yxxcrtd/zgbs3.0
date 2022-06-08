@@ -648,6 +648,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         Comparator<CfetsTrdFirstBidFirmProductDto> byEntIdDESC = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getEntrustId, String.CASE_INSENSITIVE_ORDER);
         // 组合名称升序
         Comparator<CfetsTrdFirstBidFirmProductDto> byPNameDESC = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getPortfolioName, String.CASE_INSENSITIVE_ORDER);
+        // Sonar Fix modify by huwei 220608  byBidPrice 为空时，会报错。
+        if (null == byBidPrice) {
+            return list.stream().sorted(byEntIdDESC).collect(Collectors.toList());
+        }
         // 联合排序
         Comparator<CfetsTrdFirstBidFirmProductDto> finalComparator = byBidPrice.thenComparing(byEntIdDESC).thenComparing(byPNameDESC);
         // 排序

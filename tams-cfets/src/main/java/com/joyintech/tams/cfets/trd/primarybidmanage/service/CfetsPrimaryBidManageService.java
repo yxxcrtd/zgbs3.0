@@ -1637,7 +1637,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         result.put("cpriceAmt", cpriceAmt);
         result.put("fprice", fprice);
         result.put("fpriceAmt", fpriceAmt);
-        result.put("yield", yield == null ? new BigDecimal(0.00) : yield);
+        // Sonar Fix modify by huwei 220608  使用 String 构造函数将产生精确的值
+        result.put("yield", yield == null ? new BigDecimal("0.00") : yield);
         result.put("exerYield", exerYield);
         return result;
     }

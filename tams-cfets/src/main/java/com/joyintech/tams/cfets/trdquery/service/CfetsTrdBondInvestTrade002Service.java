@@ -1472,7 +1472,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 BigDecimal prinamt = interfTradSecdeal.getPrinamt();
                 BigDecimal subtract = ArithmeticUtil.doAdd(prinamt,
                     ArithmeticUtil.multiply(inputDto.getTrdProductDeal().getShareAmt(), new BigDecimal(100)));
-                if (subtract.compareTo(BigDecimal.ZERO) == -1 || subtract.compareTo(BigDecimal.ZERO) == 0) {// 小于0的话
+                if (subtract.compareTo(BigDecimal.ZERO) < 0 || subtract.compareTo(BigDecimal.ZERO) == 0) {// 小于0的话
                     record.setPrinamt(BigDecimal.ZERO);
                 }
                 else {

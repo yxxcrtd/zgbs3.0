@@ -847,7 +847,8 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
                             + ")】】摘牌日", MessageType.错误消息);
                     return result;
                 }
-                for (FinExercisePlan finExercisePlan : finExercisePlans) {
+                FinExercisePlan finExercisePlan = finExercisePlans.get(0);
+                if (StringUtil.isNotEmpty(finExercisePlan)) {
                     if (DateUtil.compareTo(finExercisePlan.getExerciseDate(), SettlementEndDate) < 0) {
                         result.setMessage("债券" + response.getFinprodMarketId() +
                                 response.getFinprodAbbr() + "已做赎回登记，是否确认继续质押", MessageType.确认消息);
