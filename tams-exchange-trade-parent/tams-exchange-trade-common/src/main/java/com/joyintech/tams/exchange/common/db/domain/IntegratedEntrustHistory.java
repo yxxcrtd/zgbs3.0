@@ -171,6 +171,12 @@ public class IntegratedEntrustHistory implements Serializable {
     private String propInvestorName;
     private String propOwnerType;
 
+    // 信用保护凭证使用 --start
+    private String counterName;
+    private String propAcctNo;
+    private String propAcctName;
+    // 信用保护凭证使用 --end
+
     @Id
     public String getId() {
         return id;
@@ -898,5 +904,29 @@ public class IntegratedEntrustHistory implements Serializable {
 
     public void setPropTradeName(String propTradeName) {
         this.propTradeName = propTradeName;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
+    }
+
+    public String getPropAcctNo() {
+        return propAcctNo;
+    }
+
+    public void setPropAcctNo(String propAcctNo) {
+        this.propAcctNo = propAcctNo;
+    }
+
+    public String getPropAcctName() {
+        return propAcctName;
+    }
+
+    public void setPropAcctName(String propAcctName) {
+        this.propAcctName = propAcctName;
     }
 }

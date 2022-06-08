@@ -8,7 +8,7 @@ import com.joyintech.tams.exchange.common.bean.HistoryTrade;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.PresentOrHistoryQryType;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.db.domain.TradeHistory;
@@ -184,7 +184,7 @@ public class TradeManagement {
 
     private void setFutureStockCode(List<Trade> list) {
         list.forEach(trade -> {
-            if (InvestmentAssetType.isFutures(trade.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(trade.getAssetType())) {
                 trade.setStockCode(StockCodeUtils.getStockCode(trade.getStockCode()));
             }
         });

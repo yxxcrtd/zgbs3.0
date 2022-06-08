@@ -4,7 +4,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.investment.TradeMessage;
-import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.constant.BusinessFlag;
+import com.joyintech.tams.exchange.common.constant.EntrustBs;
+import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.instruction.BusinessType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
@@ -38,7 +41,7 @@ public class MessageSenderHelper {
         if (Objects.nonNull(instruction) && Objects.nonNull(tradeMessage)) {
             createTradeMsg(trade, instruction, entrust, tradeMessage);
             //todo 期货保证金
-            if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+            if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
                 tradeMessage.setDealMargin(TradeUtils.multiply(trade.getTradedBalance(), BigDecimal.valueOf(0.1), 0));
             }
         } else {
@@ -59,7 +62,7 @@ public class MessageSenderHelper {
         if (InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1())) {
             //投管要求质押式回购这里传入期限品种
             tradeMessage.setFinprodMarketId(trade.getStockName());
-        } else if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
+        } else if (InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType())) {
             //投管要求债券买卖，成交价格统一填净价价格
             tradeMessage.setDealPrice(entrust.getEntrustPrice());
         }
@@ -124,7 +127,7 @@ public class MessageSenderHelper {
         if (InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1())) {
             //投管要求质押式回购这里传入期限品种
             tradeMessage.setFinprodMarketId(trade.getStockName());
-        } else if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
+        } else if (InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType())) {
             //投管要求债券买卖，成交价格统一填净价价格
             tradeMessage.setDealPrice(entrust.getEntrustPrice());
         }
@@ -168,10 +171,15 @@ public class MessageSenderHelper {
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
             //到期结算金额
             tradeMessage.setDealBalance(entrust.getBackBalance());
-        } else if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
-                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+        } else if (InvestAssetTypeEnum.isBond(trade.getAssetType())
+                && EntrustProp.isTrade(entrust.getEntrustProp())
+                && Objects.nonNull(tradeMessage.getFullPrice())
+                && tradeMessage.getFullPrice() != 0) {
             //成交全价金额
             tradeMessage.setDealBalance(trade.getClearBalance());
+        } else if (InvestAssetTypeEnum.isCreditProtectionCertificate(trade.getAssetType())) { //信用保护凭证
+            tradeMessage.setCounterId(((IntegratedEntrust) entrust).getCounterId());//交易对手
+            tradeMessage.setPropAcctNo(((IntegratedEntrust) entrust).getPropAcctNo());//对手资金账户
         }
 
         // 业务类型（手工交收用）
@@ -204,7 +212,7 @@ public class MessageSenderHelper {
 
         // add by etliu 20220531 start
         // 3.0.6场内 ZGCPCN-973:【手工交收管理】债券是否非担保为“是”时，成交回报后，手工交收管理查询不到数据
-        if (DictCodeList.交易平台_现券交易平台.getValue().equals(tradePlat) && InvestmentAssetType.isBond(assetType)) {
+        if (DictCodeList.交易平台_现券交易平台.getValue().equals(tradePlat) && InvestAssetTypeEnum.isBond(assetType)) {
             if (EntrustBs.BUY.value.equals(entrustBs)) {
                 return BusinessType.BOND_BUY.value;
             } else if (EntrustBs.SELL.value.equals(entrustBs)) {
@@ -238,6 +246,21 @@ public class MessageSenderHelper {
 //            }
 //        }
         // ZGCPCN-1166:去除深交所综合协议平台债券、上交所固定收益平台债券 modify by fuyongsheng 20220608 end
+
+        // 上交所固定收益平台债券
+        if (DictCodeList.交易平台_固定收益平台.getValue().equals(tradePlat) && InvestAssetTypeEnum.isBond(assetType)
+                // GNS-952:更换判断固定收益平台方法 modify by fuyongsheng 20220224 start
+                // && BusinessFlag.FIXED_INCOME.value.equals(bsFlag)
+                && IntegratedEntrustUtils.isFixedIncome(trade.getEntrustProp())
+            // GNS-952:更换判断固定收益平台方法 modify by fuyongsheng 20220224 end
+        ) {
+            // 上海固收
+            if (EntrustBs.BUY.value.equals(entrustBs)) {
+                return BusinessType.FIXED_INCOME_BUY.value;
+            } else if (EntrustBs.SELL.value.equals(entrustBs)) {
+                return BusinessType.FIXED_INCOME_SELL.value;
+            }
+        }
 
         return null;
     }

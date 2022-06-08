@@ -191,6 +191,17 @@ public class EntrustQueryBean implements Serializable {
     @ApiModelProperty(required = true, name = "propOwnerType", value = "对手方报价所有者类型")
     private String propOwnerType;
 
+    // 信用保护凭证使用 --start
+    @ApiModelProperty(name = "counterName", value = "交易对手名称")
+    private String counterName;
+
+    @ApiModelProperty(name = "propAcctNo", value = "对手资金账户")
+    private String propAcctNo;
+
+    @ApiModelProperty(name = "propAcctName", value = "对手资金账户名称")
+    private String propAcctName;
+    // 信用保护凭证使用 --end
+
     /**
      * ////////////////////////////查询无用字段
      */

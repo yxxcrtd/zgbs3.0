@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -11,6 +12,14 @@ import java.util.Date;
 
 public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
 
+    @ApiModelProperty(name="operateType",value="操作类型",example="submit/save", required = true)
+    private String operateType;
+
+    @ApiModelProperty(name="elementId",value="按钮id",example="EtrExchangeTradeJj_btn_submit/EtrExchangeTradeJj_btn_save")
+    private String elementId;
+
+    @ApiModelProperty(name="pageId",value="d",example="EtrExchangeTradeJj")
+    private String pageId;
 
     /**
      * 有效状态
@@ -93,12 +102,14 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     /**
      * 信用事件发生时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "creditEventHappenedDate",value = "信用事件发生时间")
     private Date creditEventHappenedDate;
 
     /**
      * 信用事件决定日
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "creditEventResolveDate",value = "信用事件决定日")
     private Date creditEventResolveDate;
 
@@ -109,6 +120,12 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     private String settleMethod;
 
     /**
+     * 结算方式
+     */
+    @ApiModelProperty(name = "settleMethod",value = "结算方式")
+    private String settleMethodStr;
+
+    /**
      * 交付债券
      */
     @ApiModelProperty(name = "deliverBond",value = "交付债券")
@@ -117,8 +134,20 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     /**
      * 交付时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "deliverDate",value = "交付时间")
-    private String deliverDate;
+    private Date deliverDate;
+
+    @ApiModelProperty(name="revokeReason",value="撤销原因")
+    private String revokeReason;
+
+    public String getRevokeReason() {
+        return revokeReason;
+    }
+
+    public void setRevokeReason(String revokeReason) {
+        this.revokeReason = revokeReason;
+    }
 
     public String getValidStatus() {
         return validStatus;
@@ -232,11 +261,11 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
         this.deliverBond = deliverBond;
     }
 
-    public String getDeliverDate() {
+    public Date getDeliverDate() {
         return deliverDate;
     }
 
-    public void setDeliverDate(String deliverDate) {
+    public void setDeliverDate(Date deliverDate) {
         this.deliverDate = deliverDate;
     }
 
@@ -262,5 +291,37 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
 
     public void setCreditEventStr(String creditEventStr) {
         this.creditEventStr = creditEventStr;
+    }
+
+    public String getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(String operateType) {
+        this.operateType = operateType;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
+    public String getPageId() {
+        return pageId;
+    }
+
+    public void setPageId(String pageId) {
+        this.pageId = pageId;
+    }
+
+    public String getSettleMethodStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.结算方式_标的, this.settleMethod);
+    }
+
+    public void setSettleMethodStr(String settleMethodStr) {
+        this.settleMethodStr = settleMethodStr;
     }
 }

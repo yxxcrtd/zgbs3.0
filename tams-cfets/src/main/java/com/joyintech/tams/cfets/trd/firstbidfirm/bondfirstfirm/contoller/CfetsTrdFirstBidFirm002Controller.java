@@ -2,7 +2,6 @@ package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.contoller;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
-import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
@@ -11,13 +10,10 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.risk.aop.CfetsEntrustHanderAop;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.*;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm001Service;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm002Service;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.contoller.CfetsTrdBondFirstSub002Controller;
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
@@ -25,7 +21,6 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -67,9 +62,6 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
 
     @Autowired
     CfetsTrdFirstBidFirm002Service cfetsTrdFirstBidFirm002Service;
-
-    @Autowired
-    CfetsTrdFirstBidFirm001Service cfetsTrdFirstBidFirm001Service;
 
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
@@ -204,7 +196,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     @ResponseBody
     public Message<Page<CfetsTrdFirstBidFirmEntrustDto>> etrAddSearch(@RequestBody CfetsTrdBondFirstBidFirmEntrustRequest request) {
         try {
-            Page<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm001Service.pageEntrust(request);
+            Page<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm002Service.pageEntrust(request);
             return new Message<Page<CfetsTrdFirstBidFirmEntrustDto>>().success().setData(list);
         } catch (Exception e) {
             logger.error("指令查询明细添加异常", e);

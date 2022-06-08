@@ -11,7 +11,7 @@ import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.instrument.MinPriceAndMinTrdUnitLimitBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.InstrumentExample;
@@ -256,7 +256,7 @@ public class InstrumentServiceImpl extends AsyncServiceImpl<String, Instrument> 
 
     private String createKey(String tradePlat, String market, Instrument instrument, int type, String ps) {
         List<String> list = Lists.newArrayList(market, tradePlat);
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instrument.getAssetType())) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instrument.getAssetType())) {
             ps = InstructionPs.POSITIVEREPO.value;
         }
         list.add(ps);
@@ -275,7 +275,7 @@ public class InstrumentServiceImpl extends AsyncServiceImpl<String, Instrument> 
         return Joiner.on(GlobalConstant.VERTICAL_LINE).useForNull(StringUtils.EMPTY).join(list);
 //        String marketKey = market + "|" + tradePlat + "|";
 //        if (ps != null) {
-//            if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instrument.getAssetType())) {
+//            if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instrument.getAssetType())) {
 //                ps = InstructionPs.POSITIVEREPO.value;
 //            }
 //            marketKey += ps + "|";

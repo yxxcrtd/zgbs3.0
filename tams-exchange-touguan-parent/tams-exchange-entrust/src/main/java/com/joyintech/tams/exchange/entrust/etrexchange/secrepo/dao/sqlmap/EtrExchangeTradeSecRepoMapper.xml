@@ -359,7 +359,8 @@
             FP.TRADE_MARKET                           AS tradeMarket,
             c1.acctNo1                          AS acctNo,
             c1.acctName as dealCurAcctName,
-            FPT.TYPE_10 assetType
+            FPT.TYPE_10 assetType,
+            fpa.IS_NETPRICE
         FROM
             (
             SELECT
@@ -438,6 +439,7 @@
             FIN_PRODUCT FP
         ON
             TEMP.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
         LEFT JOIN
             PTL_PORTFOLIO PP
         ON

@@ -150,6 +150,7 @@
         fp.financier
         when fp.finprod_type2 = 'F06' or fp.finprod_type2 = 'F17' then
         fp.manager
+            else  fp.issuer
         end) as issuerMsg, <!--发行主体-->
 
         (case
@@ -465,6 +466,7 @@
         fp.financier
         when fp.finprod_type2 = 'F06' or fp.finprod_type2 = 'F17' then
         fp.manager
+            else fp.issuer
         end) as issuerMsg, <!--发行主体-->
 
         (case

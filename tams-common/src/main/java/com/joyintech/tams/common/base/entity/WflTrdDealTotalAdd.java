@@ -871,4 +871,44 @@ public class WflTrdDealTotalAdd extends BaseEntity {
     public void setPsPayment(String psPayment) {
         this.psPayment = psPayment == null ? null : psPayment.trim();
     }
+
+    /**
+     * 信用事件发生时间
+     */
+    private Date creditEventHappenedDate;
+
+    /**
+     * 信用事件决定日
+     */
+    private Date creditEventResolveDate;
+
+
+    /**
+     * 交付债券
+     */
+    private String deliverBond;
+
+    public Date getCreditEventResolveDate() {
+        return creditEventResolveDate;
+    }
+
+    public void setCreditEventResolveDate(Date creditEventResolveDate) {
+        this.creditEventResolveDate = creditEventResolveDate;
+    }
+
+    public String getDeliverBond() {
+        return deliverBond;
+    }
+
+    public void setDeliverBond(String deliverBond) {
+        this.deliverBond = deliverBond;
+    }
+
+    public Date getCreditEventHappenedDate() {
+        return creditEventHappenedDate;
+    }
+
+    public void setCreditEventHappenedDate(Date creditEventHappenedDate) {
+        this.creditEventHappenedDate = creditEventHappenedDate;
+    }
 }
