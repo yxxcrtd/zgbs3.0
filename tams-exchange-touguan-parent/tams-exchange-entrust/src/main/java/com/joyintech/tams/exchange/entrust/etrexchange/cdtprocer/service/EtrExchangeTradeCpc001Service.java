@@ -439,7 +439,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         etrSinglePortfolioDto.setEntrustAmt(dto.getEntrustAmt());// 指令金额
         etrSinglePortfolioDto.setInvAim(dto.getInvAim());// 投资目的
         etrSinglePortfolioDto.setTradeMarket(dto.getTradeMarket());// 交易场所
-        etrSinglePortfolioDto.setTradePlat(DictCodeListExt3.交易平台_新债平台.getValue());// 交易平台
+        etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_其它.getValue());// 交易平台
         etrSinglePortfolioDto.setBusinessModel(dto.getBusinessModel());
         /***********************************************************************/
         etrSinglePortfolioDto.setFinprodType2(dto.getFinprodType2());// 金融产品分类
