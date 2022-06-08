@@ -180,6 +180,7 @@ public class IbuQuoteBondCalService extends BaseService {
         BasicTradeFeeInputDto inputDto = new BasicTradeFeeInputDto();
         inputDto.setTradeAmt(calRequest.getFpriceAmt());
         inputDto.setTradeDate(calRequest.getSettleDate());
+        inputDto.setTradeMarketMode(calRequest.getTradeMarketMode());
         inputDto.setTradeMarket(BussinessDictCodeList.交易场所_银行间.getValue());
         inputDto.setFinprodType2(BussinessDictCodeList.平安资产类型_债券.getValue());
         inputDto.setPs(calRequest.getPs());// 交易方向
