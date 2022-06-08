@@ -330,6 +330,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         //根据投资目的与业务模式的对应关系入库时赋值
         dto.setInvAim("FVTPL");
         etrEntrust.setInvAim("FVTPL");
+        etrEntrust.setTradePlat(DictCodeList.交易平台_其它.getValue());
         baseDto.setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());// 指令状态
         etrSinglePortfolioDto.setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());// 指令状态
 
