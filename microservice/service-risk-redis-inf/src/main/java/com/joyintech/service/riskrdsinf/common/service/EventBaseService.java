@@ -1435,7 +1435,7 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
         // add by zhangrui1 start
         boolean isDiffOcp = null != mapData && isDiffOcp(mapData);
         // add by zhangrui1 end
-        Map<String, IOcpRelParamItem> ocpPmItemMap = ocpRelParamObj == null ? new HashMap<>() : ocpRelParamObj.getItems();
+        Map<String, IOcpRelParamItem> ocpPmItemMap = ocpRelParamObj == null || ocpRelParamObj.getItems() == null ? new HashMap<>() : ocpRelParamObj.getItems();
         // 预占过的指标参数列表
         Set<String> indSet = CollectionUtils.isEmpty(
             ocpPmItemMap) ? new HashSet<>() : ocpPmItemMap.keySet();
