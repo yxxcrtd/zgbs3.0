@@ -680,7 +680,7 @@ public class FinBondAsset002Controller extends BaseController{
     public Message<MultipartFile> downloadFile(String seqNo) {
         try {
             logger.info("文件下载开始");
-            if (StringUtil.isNotEmpty(file)) {
+            if (StringUtil.isNotEmpty(seqNo)) {
                 MultipartFile fileInfo = finBondAssetService.downloadFileInfo(seqNo);
                 return new Message<MultipartFile>().success().setData(fileInfo);
             }
