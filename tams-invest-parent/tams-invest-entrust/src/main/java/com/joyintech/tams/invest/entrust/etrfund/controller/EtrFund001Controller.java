@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
@@ -177,7 +178,19 @@ public class EtrFund001Controller extends BaseController{
         }
         // add by yushilong 批量撤销预占 start
         if (CollectionUtils.isEmpty(ajaxResult.getErrorList())) {
-            EntrustRdsCommonAop.doListPreOccupy(list, DictCodeList.平安资产类型_基金.getValue(),
+            List<EtrFundDto> oriList = new ArrayList<>();
+            for (EtrFundDto etrFundDto : list) {
+                ProcessMark param = new ProcessMark();
+                param.setPageId("EtrFund002");
+                param.setBusinessDataPk1(etrFundDto.getEntrustId());
+                EtrFundDto bussinessEntityByPk = eteFundService.getBussinessEntityByPk(param);
+                if(null != bussinessEntityByPk){
+                    oriList.add(bussinessEntityByPk);
+                }else {
+                    oriList.add(etrFundDto);
+                }
+            }
+            EntrustRdsCommonAop.doListPreOccupy(oriList, DictCodeList.平安资产类型_基金.getValue(),
                     BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);
         }
         // add by yushilong 批量撤销预占 end
