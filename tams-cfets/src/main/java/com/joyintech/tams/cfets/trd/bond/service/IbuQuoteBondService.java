@@ -98,7 +98,7 @@ public class IbuQuoteBondService extends BaseService {
     @Autowired
     private CfetsEtrDispatcherService cfetsEtrDispatcherService;
 
-    @Autowired
+    @Autowired(required = false)
     private CfetsBondDealQuotedPriceService cfetsBondDealQuotedPriceService;
 
     @Autowired
@@ -118,7 +118,7 @@ public class IbuQuoteBondService extends BaseService {
     @Autowired
     private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private IbuComponentCommonService ibuComponentCommonService;
 
     @Autowired
@@ -1008,7 +1008,7 @@ public class IbuQuoteBondService extends BaseService {
         return cfetsEtrDispatcherService.refuseEntrust(param);
     }
 
-    public void doForcedFinish(Map<String,Object> param) throws Exception{
+    public CfetsEtribBondInfo003Dto doForcedFinish(Map<String,Object> param) throws Exception{
         setParam(param);
         List<CfetsBondDealEntrustOrderDto> entrustDtos = cfetsIbuQuoteBondMapper.listEntrust(param);
         if(entrustDtos != null && entrustDtos.size()>0){
@@ -1059,26 +1059,13 @@ public class IbuQuoteBondService extends BaseService {
                         recallEntrustIdList.add(etrDto);
                     }
                 }
-
-                //没有做过交易，直接关闭的
-                if(!com.joyintech.background.component.common.pack.common.util.StringUtil.isEmptyList(recallEntrustIdList)) {
-                    // add by yushilong 批量撤销预占 start
-                    EntrustRdsCommonAop.doListPreOccupy(recallEntrustIdList, com.joyintech.tams.constant.DictCodeList.平安资产类型_债券.getValue(),
-                            BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);
-                    // add by yushilong 批量撤销预占 end
-                }
-
-                //已经有委托完成度的
-                if(!com.joyintech.background.component.common.pack.common.util.StringUtil.isEmptyList(closeEntrustIdList)) {
-                    EntrustCompleteUtil.doComplete(closeEntrustIdList);
-                }
             }
             // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit end
             // add by zhangrui1 批量委托关闭 end
-            if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
+            if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                 //插入旧头寸
                 dtolist.forEach(item ->{
-                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), com.joyintech.tams.constant.DictCodeList.是否_是.getValue());
+                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), DictCodeList.是否_是.getValue());
                 });
             }
 
@@ -1088,7 +1075,11 @@ public class IbuQuoteBondService extends BaseService {
             dtolist.forEach(item ->{
                 cfetsEtrIbBondinfoService.forcedFinishOprHisMethod(item);
             });
+            CfetsEtribBondInfo003Dto info003Dto = new CfetsEtribBondInfo003Dto();
+            info003Dto.setSelectedItem(dtolist);
+            return info003Dto;
         }
+        return null;
     }
     /**
      * 强制完成check

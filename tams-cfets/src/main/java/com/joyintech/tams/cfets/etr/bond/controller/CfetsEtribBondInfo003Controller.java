@@ -59,20 +59,6 @@ public class CfetsEtribBondInfo003Controller extends BaseController {
     @Autowired
     private CfetsEtribBondInfo003Service cfetsetribBondInfo003Service;
 
-    @Autowired
-    private EtribBondInfo003Validator etribBondInfo003Validator;
-
-    /**
-     * 债券投资委托service
-     */
-    @Autowired
-    private EtrIbBondinfo002Service etrIbBondinfo002Service;
-    /**
-     * 附件处理接口
-     */
-    @Autowired(required = false)
-    private FileAttachmentProcess fileAttachmentProcess;
-
     @Autowired(required=false)
     private BaseGetBusinessId bussGetBussinessIdService;
     /**

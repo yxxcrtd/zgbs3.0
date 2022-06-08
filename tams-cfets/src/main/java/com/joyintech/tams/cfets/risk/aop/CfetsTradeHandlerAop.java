@@ -14,6 +14,7 @@ import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Pointcut;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 
+import static com.joyintech.tams.constant.DictCodeList.交易方向_赎回;
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 
 //@Component
@@ -43,13 +45,15 @@ public class CfetsTradeHandlerAop {
      * 交易登记check
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond.controller.IbuQuoteBond004Controller.check(..))")
-    protected void doCheck() {}
+    protected void doCheck() {
+    }
 
     /**
      * 交收/回溯/失败
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService.doComplete(..))")
-    protected void doCompleteSettle() {}
+    protected void doCompleteSettle() {
+    }
 
     /**
      * 交易登记更新
@@ -62,7 +66,8 @@ public class CfetsTradeHandlerAop {
      * 交易登记新增
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doInsert(..))")
-    protected void insertPoint() {}
+    protected void insertPoint() {
+    }
 
     /**
      * 作废操作,释放占用
@@ -75,20 +80,28 @@ public class CfetsTradeHandlerAop {
      * 成交确认
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteMethod(..))")
-    protected void completePoint() {}
+    protected void completePoint() {
+    }
 
     /**
      * 交易撤销
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doCompleteRevoke(..))")
-    protected void doCompleteRevoke() {}
+    protected void doCompleteRevoke() {
+    }
 
     /**
      * 交易撤销
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doForcedFinish(..))")
-    protected void doForcedFinish(){}
+    protected void doForcedFinish() {
+    }
 
+    /**
+     * 交收失败，关闭指令
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.manualsettle.service..*.*.closeDelegate(..))")
+    protected void closeDelegate(){}
 
 
     /**
@@ -99,8 +112,8 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning(pointcut = "doCheck()", returning = "ajaxResultMessage")
     public void doCheck(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
-        AjaxResult ajaxResult=ajaxResultMessage.getData();
-        if (ajaxResult != null && !StringUtil.isEmptyList(ajaxResult.getErrorList())){
+        AjaxResult ajaxResult = ajaxResultMessage.getData();
+        if (ajaxResult != null && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
             return;
         }
         Object[] args = joinPoint.getArgs();
@@ -132,7 +145,15 @@ public class CfetsTradeHandlerAop {
     public void doCompleteSettle(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         CfetsManualSettleDto dto = (CfetsManualSettleDto) args[0];
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        if (StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue()) || StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
+            if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_赎回.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_还本.getValue())
+                    || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_付息.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+            }
+        }
+        if (StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_交收失败.getValue())) {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+        }
     }
 
 
@@ -169,8 +190,8 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("deletePoint()")
     public void occupyOnDelete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String)args[0]);
-        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue()) ) {
+        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String) args[0]);
+        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
             inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
         }
     }
@@ -184,6 +205,7 @@ public class CfetsTradeHandlerAop {
 
     /**
      * 交易撤销
+     *
      * @param joinPoint
      * @throws BusinessException
      */
@@ -201,6 +223,17 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning(pointcut = "doForcedFinish()", returning = "bondInfo003Dto")
     public void doForcedFinish(JoinPoint joinPoint, CfetsEtribBondInfo003Dto bondInfo003Dto) throws BusinessException {
+        inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    }
+
+    /**
+     * 交收失败
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning(pointcut = "closeDelegate()")
+    public void closeDelegate(JoinPoint joinPoint, CfetsEtribBondInfo003Dto bondInfo003Dto) throws BusinessException {
         inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
     }
 }

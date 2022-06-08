@@ -305,6 +305,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     list1.add(bondDto);
                 }
             }
+            if (CollectionUtils.isEmpty(entity.getTradeDtoList())) {
+                list1.addAll(entity.getTradeDtoList());
+            }
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
         }
         if (data instanceof CfetsManualSettleInsertDto) {

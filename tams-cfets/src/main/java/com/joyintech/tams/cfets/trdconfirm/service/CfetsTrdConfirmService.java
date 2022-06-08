@@ -860,6 +860,8 @@ public class CfetsTrdConfirmService extends BaseService{
                 dto.setTradeAmt(regDeal.getTradeAmt());
                 dto.setCpriceAmt(regDeal.getCpriceAmt());
                 dto.setFpriceAmt(regDeal.getFpriceAmt());
+                dto.setEntrustId(regDeal.getEntrustId());
+                dto.setTotleTradeId(deal.getTradeId());
                 dtoList.add(dto);
             }
         }
