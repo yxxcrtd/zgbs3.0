@@ -10,29 +10,19 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribSaveRequest;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfoService;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtribBondInfo003Service;
-import com.joyintech.tams.cfets.risk.dto.CfetsEtrRiskcalResponse;
-import com.joyintech.tams.cfets.risk.service.CfetsEtrRdsCommonService;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
-import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
-import com.joyintech.tams.component.business.riskall.dto.RiskCommonInputDto;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
 import com.joyintech.tams.constant.DictCodeList;
-import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -224,34 +214,17 @@ public class CfetsEntrustHanderAop {
      */
     public static final <T> AjaxResult doRiskcal(T dto, String infCode, String busiType) throws Exception {
         //风险试算check
-        CfetsEtrRdsCommonService cfetsEtrRdsCommonService = getCfetsEtrRdsCommonService();
         RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
-        String message = cfetsEtrRdsCommonService.doRiskcalCheckMethod(dto);
-        CfetsEtrRiskcalResponse result=new CfetsEtrRiskcalResponse();
-        if (StringUtil.isNotEmpty(message)) {
-            return getAjaxResult(result,message,MessageType.错误消息);
-        }
         //风险试算组装dto
-        Map<String, Object> dataMap=cfetsEtrRdsCommonService.doRiskcalPackageEquity(dto);
         RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), true);
         return getAjaxResult(riskCommonOutput,null,null);
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public static CfetsEtrRdsCommonService getCfetsEtrRdsCommonService() {
-        return SpringContextUtil.getApplicationContext().getBean(CfetsEtrRdsCommonService.class);
     }
 
     @SuppressWarnings("unchecked")
     public static RiskInputParamSerivce getRiskInputParamSerivce() {
         return SpringContextUtil.getApplicationContext().getBean(RiskInputParamSerivce.class);
     }
-
-    @SuppressWarnings("unchecked")
-    public static RiskCommonService getRiskCommonService() {
-        return SpringContextUtil.getApplicationContext().getBean(RiskCommonService.class);
-    }
+ 
     /**
      * 获取返回的信息
      * @param message

@@ -4,6 +4,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
@@ -1736,6 +1737,30 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         str += StringUtil.isNotEmpty(issuer) ? "-" + issuer : "";
         str += StringUtil.isNotEmpty(SubscriptionAmount) ? "-" + SubscriptionAmount : "";
         return str;
+    }
+
+    public String doRiskcalCheckMethod(CfetsTrdBondFirstSubInfoDto dto) {
+        if (StringUtil.isEmptyList(dto.getEntrustDtos())) {
+            return "组合分配列表不能为空";
+        }
+        List<String> messages = new ArrayList<>();
+        if (StringUtil.isNotEmpty(dto.getEntrustDtos())) {
+            for (CfetsTrdBondFirstSubEntrustDto item : dto.getEntrustDtos()) {
+                if (!StringUtil.isNotEmpty(item.getPortfolioId())) {
+                    messages.add("请输入组合名称。");
+                }
+                if (!StringUtil.isNotEmpty(item.getEntrustNum())) {
+                    messages.add("请输入券面总额。");
+                }
+            }
+        }
+        if (!StringUtil.isNotEmpty(dto.getFinprodId())) {
+            messages.add("请输入资产代码。");
+        }
+        if (messages.size() > 0) {
+            return StringUtil.joinString(messages, GlobalConstant.VERTICAL_LINE);
+        }
+        return null;
     }
 }
 
