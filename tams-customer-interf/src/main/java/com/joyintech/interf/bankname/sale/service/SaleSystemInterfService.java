@@ -75,11 +75,10 @@ public class SaleSystemInterfService {
      * 适配器或者定时任务调动，按日期发送
      * @return
      */
-	public void sendProductInfoToSaleByDate(String saledate) {
+	public Map<String, Object> sendProductInfoToSaleByDate(String saledate) {
 		//适配器信息
 		int adapterID = SaleCodeList.销售接口_产品信息接口_按日期;
 		
-		Map<String, Object> res = new HashMap<>();
 		// 根据产品代码查询产品要素信息
         List<ProdBaseInfoDto> lstProdBaseInfoDto = saleSystemInterfMapper.queryProdInfoByDate(saledate);
     	 
@@ -93,7 +92,7 @@ public class SaleSystemInterfService {
 //	        }
         }
         //调用适配器生成文件
-        res = toSaleService.sendToSaleByDate(adapterID, saledate);
+        return toSaleService.sendToSaleByDate(adapterID, saledate);
     }
 
 	
@@ -115,12 +114,11 @@ public class SaleSystemInterfService {
         
 	}
 	
-	public void sendBonusPlanToSaleByDate(String date) {
+	public Map<String, Object> sendBonusPlanToSaleByDate(String date) {
 		
 		//适配器信息
 		int adapterID = SaleCodeList.销售接口_分红方案接口_按日期;
-		Map<String, Object> res = new HashMap<>();
-		
+
 		// 根据产品代码查询分红方案
         List<BonusPlanDto> lstBonusPlan = saleSystemInterfMapper.queryBonusPlanByDate(date);
     	
@@ -129,17 +127,16 @@ public class SaleSystemInterfService {
         	saleSystemInterfMapper.insertBonusPlanToTemp(bonusPlanDto);
         }
         //调用适配器生成文件
-        res = toSaleService.sendToSaleByDate(adapterID, date);
+        return toSaleService.sendToSaleByDate(adapterID, date);
         
 	}
 
 	
-	public void sendMarketIssueToSale(String date) {
+	public Map<String, Object> sendMarketIssueToSale(String date) {
 		
 		//适配器信息
 		int adapterID = SaleCodeList.销售接口_行情下发口_按日期;
-		Map<String, Object> res = new HashMap<>();
-		
+
 		List<MarketIssueDto> lstMarketIssue = saleSystemInterfMapper.queryMarketIssueByDate(date);
 		
 		// 将行情信息插入临时表
@@ -147,8 +144,8 @@ public class SaleSystemInterfService {
         	saleSystemInterfMapper.insertMarketIssueToTemp(marketIssueDto);
         }
 		//调用适配器生成文件
-		res = toSaleService.sendToSaleByDate(adapterID, date);
-	
+		Map<String, Object> res = toSaleService.sendToSaleByDate(adapterID, date);
+		return res;
 	}
 
 

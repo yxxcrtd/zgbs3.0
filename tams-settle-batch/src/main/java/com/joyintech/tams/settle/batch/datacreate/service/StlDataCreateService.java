@@ -98,7 +98,10 @@ public class StlDataCreateService {
 		// 判断文件是否存在，存在的话删除文件重新生成
 		File file = new File(dir.getPath() + File.separator + fileName);
 		if (file.exists()) {
-			file.delete();
+			//file.delete();
+			if (!file.delete()) {
+				// file delete failed; take appropriate action
+			}
 		}
 		OutputStream fos = null;
 		try {
@@ -476,7 +479,10 @@ public class StlDataCreateService {
 		// 判断文件是否存在，存在的话删除文件重新生成
 		File file = new File(dir.getPath() + File.separator + fileName);
 		if (file.exists()) {
-			file.delete();
+			//file.delete();
+			if (!file.delete()) {
+				// file delete failed; take appropriate action
+			}
 		}
 		OutputStream fos = null;
 		try {
@@ -869,7 +875,10 @@ public class StlDataCreateService {
 		// 判断文件是否存在，存在的话删除文件重新生成
 		File file = new File(dir.getPath() + File.separator + fileName);
 		if (file.exists()) {
-			file.delete();
+			//file.delete();
+			if (!file.delete()) {
+				// file delete failed; take appropriate action
+			}
 		}
 		OutputStream fos = null;
 		try {

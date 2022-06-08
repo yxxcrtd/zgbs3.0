@@ -48,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -129,7 +130,8 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
         List<InterfRiskRdsDto> requestList = new ArrayList<InterfRiskRdsDto>();
         for (Map<String, Object> entity : listMap) {
             InterfRiskRdsDto interfRiskRdsDto = this.prepareRiskEntity(entity, v);
-            if (!StringUtil.isNotEmpty(interfRiskRdsDto)) {
+            // Sonar Fix modify by huwei 220608
+            if (StringUtils.isEmpty(interfRiskRdsDto)) {
                 continue;
             }
             String assetType = interfRiskRdsDto.getAssetType();
@@ -216,7 +218,8 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
 		List<InterfRiskRdsDto> requestList = new ArrayList<InterfRiskRdsDto>();
 		for (Map<String, Object> entity : dataMap) {
 			InterfRiskRdsDto interfRiskRdsDto = this.prepareRiskEntity(entity, v);
-			if (!StringUtil.isNotEmpty(interfRiskRdsDto)) {
+            // Sonar Fix modify by huwei 220608
+			if (StringUtils.isEmpty(interfRiskRdsDto)) {
 				continue;
 			}
             String assetType = interfRiskRdsDto.getAssetType();

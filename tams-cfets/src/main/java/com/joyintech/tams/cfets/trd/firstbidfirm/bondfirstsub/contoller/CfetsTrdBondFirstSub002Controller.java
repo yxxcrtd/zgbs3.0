@@ -2,17 +2,19 @@ package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.contoller;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
+import com.joyintech.tams.cfets.risk.aop.CfetsEntrustHanderAop;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
@@ -22,25 +24,20 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.riskrds.controller.InterfRiskRdsController;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.invest.common.client.ClientData;
-import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
-import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -289,12 +286,12 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
-    @ResponseBody
-    @ApiOperation(value = "风险试算", notes = "风险试算")
-    @PostMapping("doRiskcal")
-    public Message<AjaxResult> doRiskcal(@RequestBody RiskCalRequest riskCalRequest) {
-        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
-        try {
+//    @ResponseBody
+//    @ApiOperation(value = "风险试算", notes = "风险试算")
+//    @PostMapping("doRiskcal")
+//    public Message<AjaxResult> doRiskcal(@RequestBody RiskCalRequest riskCalRequest) {
+//        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
+//        try {
 //            AjaxResult ajaxResult = cfetsTrdBondFirstSub002Service.riskCheckNotEmpty(riskCalRequest);
 //            if (CollectionUtils.isNotEmpty(ajaxResult.getErrorList())) {
 //                return new Message<AjaxResult>().success().setData(ajaxResult);
@@ -358,13 +355,13 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
 //                }
 //
 //            }
-            AjaxResult m = new AjaxResult();
-            m.setData(result);
-            return new Message<AjaxResult>().success().setData(m);
-        } catch (Exception e) {
-            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-        }
-    }
+//            AjaxResult m = new AjaxResult();
+//            m.setData(result);
+//            return new Message<AjaxResult>().success().setData(m);
+//        } catch (Exception e) {
+//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
+//        }
+//    }
 
     /**
      * 申购提交检查
@@ -486,5 +483,28 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         String msg = cfetsTrdBondFirstSub002Service.start(processParameter,
                 cfetsTrdBondFirstSubInfoDtos.toArray(new CfetsTrdBondFirstSubInfoDto[cfetsTrdBondFirstSubInfoDtos.size()]));
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+    }
+
+    @ResponseBody
+    @ApiOperation(value = "风险试算", notes = "风险试算")
+    @PostMapping("doRiskcal")
+    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdBondFirstSubInfoDto dto){
+        try {
+            String message = cfetsTrdBondFirstSub002Service.doRiskcalCheckMethod(dto);
+            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
+                AjaxResult ar = new AjaxResult();
+                List<ValidMessage> warnList = new ArrayList<>();
+                warnList.add(new ValidMessage(message));
+                ar.setErrorList(warnList);
+                ar.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().setData(ar);
+            }
+            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,
+                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
+            return new Message<AjaxResult>().setData(ajaxResult);
+        } catch (Exception e) {
+            logger.error("风险试算", e);
+            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
+        }
     }
 }
