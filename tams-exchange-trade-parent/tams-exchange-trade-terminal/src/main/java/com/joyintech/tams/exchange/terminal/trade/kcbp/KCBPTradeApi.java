@@ -1190,14 +1190,44 @@ public class KCBPTradeApi {
     public void queryIntegratedRepurchaseQuote(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean, long requestId) {
         KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(integratedRepurchaseQuoteQryBean.getAccountId());
         Map<String, String> parameters = Maps.newHashMap(kcbpAccount.getHeadMessages());
-        // 上海债券协议回购非公开报价行情
-        if (ActionIn.NON_PUBLIC_QUOTE.value == integratedRepurchaseQuoteQryBean.getActionIn()) {
-            parameters.put("funcid", "411027");
-            String orderType = integratedRepurchaseQuoteQryBean.getEntrustProp();
-            parameters.put("ordtype", KCBPConverter.getOrdtype(orderType));
-        }
-        if (ActionIn.PUBLIC_QUOTE.value == integratedRepurchaseQuoteQryBean.getActionIn()) {
-            parameters.put("funcid", "411029");
+		/*
+		 * orderType 字段取值(字母上交所，数字深交所) 
+		 * 首期-F-1031 
+		 * 到期续做-X-1033 
+		 * 解除质押-C-1035 
+		 * 中途换券-H-1036
+		 * 提前购回-Z-1034
+		 */
+        if(Market.isSzMarket(integratedRepurchaseQuoteQryBean.getMarket())) {
+        	if (ActionIn.NON_PUBLIC_QUOTE.value == integratedRepurchaseQuoteQryBean.getActionIn()) {
+        		parameters.put("funcid", "411051");
+        		String orderType = integratedRepurchaseQuoteQryBean.getOrderType();
+        		if("F".equals(orderType)) {
+        			orderType="1031";
+        		}else if("X".equals(orderType)) {
+        			orderType="1033";
+        		}else if("C".equals(orderType)) {
+        			orderType="1035";
+        		}else if("H".equals(orderType)) {
+        			orderType="1036";
+        		}else if("Z".equals(orderType)) {
+        			orderType="1034";
+        		}else {
+        			orderType="";
+        		}
+        		parameters.put("ordtype", integratedRepurchaseQuoteQryBean.getOrderType());
+        	}
+        }else {
+        	// 上海债券协议回购非公开报价行情
+        	if (ActionIn.NON_PUBLIC_QUOTE.value == integratedRepurchaseQuoteQryBean.getActionIn()) {
+        		parameters.put("funcid", "411027");
+//        		String orderType = integratedRepurchaseQuoteQryBean.getEntrustProp();
+//        		parameters.put("ordtype", KCBPConverter.getOrdtype(orderType));
+        		parameters.put("ordtype", integratedRepurchaseQuoteQryBean.getOrderType());
+        	}
+        	if (ActionIn.PUBLIC_QUOTE.value == integratedRepurchaseQuoteQryBean.getActionIn()) {
+        		parameters.put("funcid", "411029");
+        	}
         }
         parameters.put("qryrec", String.valueOf(integratedRepurchaseQuoteQryBean.getPageSize()));
         logger.info("parameters {}", JsonUtils.getJsonFromObject(parameters));
@@ -1206,11 +1236,45 @@ public class KCBPTradeApi {
         List<IntegratedRepurchaseQuoteBean> integratedRepurchaseQuoteBeans = null;
         if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
             List<List<String>> data = (List<List<String>>) resultBean.getData();
-            if (data.size() > 0)
-                integratedRepurchaseQuoteBeans = KCBPConverter.convertToIntegratedRepurchaseQuoteResponse(integratedRepurchaseQuoteQryBean, data);
+            if (data.size() > 0) {
+            	if(Market.isSzMarket(integratedRepurchaseQuoteQryBean.getMarket())) {
+            		integratedRepurchaseQuoteBeans = KCBPConverter.convertToIntegratedRepurchaseQuoteResponseSZ(integratedRepurchaseQuoteQryBean, data);
+            		Map<String,IntegratedRepurchaseQuotePledgeBean> pledgeMap = this.getPledgeMap(integratedRepurchaseQuoteQryBean);
+            		for(IntegratedRepurchaseQuoteBean integratedRepurchaseQuoteBean:integratedRepurchaseQuoteBeans) {
+            			String execid = integratedRepurchaseQuoteBean.getExecid();
+            			IntegratedRepurchaseQuotePledgeBean integratedRepurchaseQuotePledgeBean = pledgeMap.get(execid);
+            			if(integratedRepurchaseQuotePledgeBean!=null) {
+            				integratedRepurchaseQuoteBean.setDeliverySide(integratedRepurchaseQuotePledgeBean.getDeliverySide());
+            				integratedRepurchaseQuoteBean.setStockCode(integratedRepurchaseQuotePledgeBean.getStkcode());
+            				integratedRepurchaseQuoteBean.setImpawnAmount(Integer.parseInt(integratedRepurchaseQuotePledgeBean.getOrderqty()));
+            				integratedRepurchaseQuoteBean.setStkprop(integratedRepurchaseQuotePledgeBean.getStkprop());
+            			}
+            		}
+            	}else {
+            		integratedRepurchaseQuoteBeans = KCBPConverter.convertToIntegratedRepurchaseQuoteResponse(integratedRepurchaseQuoteQryBean, data);
+            	}
+            }
         } else
             logger.info("queryIntegratedRepurchaseQuote fail {}", resultBean.getErrorMsg());
         kcbpTradeResponse.resQueryIntegratedRepurchaseQuote(integratedRepurchaseQuoteBeans, requestId);
+    }
+    
+    private Map<String,IntegratedRepurchaseQuotePledgeBean> getPledgeMap(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean){
+    	Map<String,IntegratedRepurchaseQuotePledgeBean> retMap = null;
+    	KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(integratedRepurchaseQuoteQryBean.getAccountId());
+        Map<String, String> parameters = Maps.newHashMap(kcbpAccount.getHeadMessages());
+        parameters.put("funcid", "411055");
+        parameters.put("qryrec", String.valueOf(integratedRepurchaseQuoteQryBean.getPageSize()));
+        logger.info("parameters {}", JsonUtils.getJsonFromObject(parameters));
+        ResultBean resultBean = sendCommand(parameters.get("funcid"), parameters);
+        logger.info("queryIntegratedRepurchaseQuote result {}", JsonUtils.getJsonFromObject(resultBean));
+        if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+            List<List<String>> data = (List<List<String>>) resultBean.getData();
+            if (data.size() > 0) {
+            	retMap = KCBPConverter.convertToIntegratedRepurchaseQuoteResponsePledgeMap(data);
+            }
+        }
+    	return retMap;
     }
 
     public void queryIntegratedFixedIncomeQuote(IntegratedFixedIncomeQuoteQryBean integratedFixedIncomeQuoteQryBean, long requestId) {

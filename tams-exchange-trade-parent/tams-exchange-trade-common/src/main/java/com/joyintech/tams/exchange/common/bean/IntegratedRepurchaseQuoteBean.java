@@ -99,8 +99,38 @@ public class IntegratedRepurchaseQuoteBean {
     private int realDateBack;
     @ApiModelProperty(name = "pledgeeName", value = "质权人")
     private String pledgeeName;
+    @ApiModelProperty(name = "execid", value = "执行编号")
+    private String execid;
+    @ApiModelProperty(name = "deliverySide", value = "质押方向")
+    private String deliverySide;
+    @ApiModelProperty(name = "stkprop", value = "股份性质")
+    private String stkprop;
 
-    public String getBrokerId() {
+    public String getStkprop() {
+		return stkprop;
+	}
+
+	public void setStkprop(String stkprop) {
+		this.stkprop = stkprop;
+	}
+
+	public String getDeliverySide() {
+		return deliverySide;
+	}
+
+	public void setDeliverySide(String deliverySide) {
+		this.deliverySide = deliverySide;
+	}
+
+	public String getExecid() {
+		return execid;
+	}
+
+	public void setExecid(String execid) {
+		this.execid = execid;
+	}
+
+	public String getBrokerId() {
         return brokerId;
     }
 
