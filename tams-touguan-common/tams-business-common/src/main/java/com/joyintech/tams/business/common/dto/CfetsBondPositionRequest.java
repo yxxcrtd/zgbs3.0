@@ -78,9 +78,6 @@ public class CfetsBondPositionRequest {
     @ApiModelProperty(name = "workFlowId", value = "流程编号", example = "01")
     private String workFlowId;
 
-    @ApiModelProperty(name = "isWin", value = "是否中标", example = "01")
-    private String isWin;
-
     public String getPs() {
         return ps;
     }
@@ -255,13 +252,5 @@ public class CfetsBondPositionRequest {
 
     public void setWorkFlowId(String workFlowId) {
         this.workFlowId = workFlowId;
-    }
-
-    public String getIsWin() {
-        return isWin;
-    }
-
-    public void setIsWin(String isWin) {
-        this.isWin = isWin;
     }
 }
