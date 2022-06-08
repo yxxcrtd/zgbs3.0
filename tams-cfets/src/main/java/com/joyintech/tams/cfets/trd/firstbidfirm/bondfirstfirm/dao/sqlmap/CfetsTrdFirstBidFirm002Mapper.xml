@@ -327,7 +327,7 @@
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                bo.PAY_TYPE       AS payType/*缴款方式*/,
-               ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+               ee.ENTRUST_NUM*100    AS etrBidPriceTotal/*指令投标券面总额*/,
                bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
                case
@@ -354,6 +354,7 @@
                    when fpi.TENDER_TARGET = '02' then bobp.BID_PRICE
                    when fpi.TENDER_TARGET = '03' then bobp.BID_PRICE * 10000
                    end              BID_PRICE/*标位*/,
+               eebp.BID_PRIN_AMT*100 ENTRUST_NUM,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
                ssai.SEC_ACCT_NAME,
@@ -412,7 +413,7 @@
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                bo.PAY_TYPE       AS payType/*缴款方式*/,
-               ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+               ee.ENTRUST_NUM*100    AS etrBidPriceTotal/*指令投标券面总额*/,
                bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
                case
@@ -435,6 +436,7 @@
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
                nvl(nvl(eebp.BID_PRIN_AMT,0)*100 - nvl(T.finshNum,0),0) avaNum /*剩余券面总额*/,
                bobp.BID_PRICE/*标位*/,
+               eebp.BID_PRIN_AMT*100 ENTRUST_NUM,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
                ssai.SEC_ACCT_NAME,
