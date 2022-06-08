@@ -102,7 +102,6 @@ public class BaseRepFinProductInfoServiceImpl  implements BaseRepFinProductInfoS
             for (List<String> repFinprodIdLists : list) {
                 baseRepFinProductInfoMapper.deleteRepProdDeclare(repFinprodIdLists);
                 baseRepFinProductInfoMapper.deleteRepProdIssue(repFinprodIdLists);
-                return true;
             }
             return true;
         }
