@@ -513,9 +513,9 @@
     </select>
 
     <select id="QueryForTestStatus" resultType="java.lang.String">
-        select nvl(IS_SPPI_PASS,fp.SPPI_TEST_STATUS ) IS_SPPI_PASS
+        select nvl(TEST_STATUS,fp.SPPI_TEST_STATUS ) IS_SPPI_PASS
         from fin_product fp
-        left join SPPI_IMPORT_DATA sid on fp.finprod_id = sid.BOND_ID
+        left join SPPI_TEST sid on fp.finprod_id = sid.finprod_id
         where  fp.finprod_Market_id = #{secId}
     </select>
 
