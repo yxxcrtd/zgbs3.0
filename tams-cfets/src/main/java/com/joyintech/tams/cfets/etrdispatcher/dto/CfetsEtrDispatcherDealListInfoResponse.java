@@ -1272,6 +1272,9 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     @ApiModelProperty(name = "totalBiddingNum", value = "汇总投标券面总额")
     private BigDecimal totalBiddingNum;
 
+    @ApiModelProperty(name="winPrinAmt",value="中标券面总额（万元）")
+    private BigDecimal winPrinAmt;
+
     @ApiModelProperty(name = "bidPrinAmt", value = "投标券面总额", example = "1")
     private BigDecimal bidPrinAmt;
 
@@ -1779,5 +1782,13 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     @Override
     public void setFinprodAbbr(String finprodAbbr) {
         this.finprodAbbr = finprodAbbr;
+    }
+
+    public BigDecimal getWinPrinAmt() {
+        return winPrinAmt;
+    }
+
+    public void setWinPrinAmt(BigDecimal winPrinAmt) {
+        this.winPrinAmt = winPrinAmt;
     }
 }
