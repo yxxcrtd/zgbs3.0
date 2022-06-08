@@ -20,7 +20,6 @@ import com.joyintech.tams.cfets.etr.bond.dto.CfetsBussCombDistribtBaseDto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalDto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalRequest;
 import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
-import com.joyintech.tams.cfets.risk.dto.CfetsEtrRiskcalRequest;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondRegCheckRequst;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub001Mapper;

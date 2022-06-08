@@ -2,12 +2,16 @@ package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.contoller;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.risk.aop.CfetsEntrustHanderAop;
@@ -486,6 +490,15 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
     @PostMapping("doRiskcal")
     public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdBondFirstSubInfoDto dto){
         try {
+            String message = cfetsTrdBondFirstSub002Service.doRiskcalCheckMethod(dto);
+            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
+                AjaxResult ar = new AjaxResult();
+                List<ValidMessage> warnList = new ArrayList<>();
+                warnList.add(new ValidMessage(message));
+                ar.setErrorList(warnList);
+                ar.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().setData(ar);
+            }
             AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,
                     BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
             return new Message<AjaxResult>().setData(ajaxResult);
