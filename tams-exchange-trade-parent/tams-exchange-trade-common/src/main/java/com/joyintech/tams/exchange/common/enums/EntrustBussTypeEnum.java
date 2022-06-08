@@ -29,7 +29,9 @@ public enum EntrustBussTypeEnum {
     REPO_TO_HALFWAY_EXCHANGE("协议回购中途换券指令", "21"),
     REPO_TO_RELEASE_PLEDGE("协议回购解除质押指令", "22"),
     FUTURES("期货指令", "23"),
-    ETF_PURCHASE_AND_RANSOM("ETF申购赎回指令", "24");
+    ETF_PURCHASE_AND_RANSOM("ETF申购赎回指令", "24"),
+    CREDIT_PROTECTION_CERTIFICATE("信用保护凭证指令", "30"),
+    ;
 
     public final String name;
     public final String value;

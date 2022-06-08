@@ -150,6 +150,7 @@ public enum DictCodeList implements BaseDictCodeList {
 	共通业务类型_产品要素设计(DictCode.共通业务类型,"REQ04","产品要素设计"),
 	共通业务类型_新发产品风险等级评定(DictCode.共通业务类型,"REQ06","新发产品风险等级评定"),
 	共通业务类型_新研发产品模拟试算(DictCode.共通业务类型,"MNSX01","新研发产品模拟试算"),
+    共通业务类型_信用保护凭证标的(DictCode.共通业务类型,"SM10","信用保护凭证标的"),
 	// add by yujiaping 20210115 start
 	共通业务类型_产品登记编码管理(DictCode.共通业务类型,"PRORC01","产品登记编码管理"),
 	共通业务类型_信用保护凭证标的(DictCode.共通业务类型,"SM10","信用保护凭证标的"),
@@ -1995,6 +1996,7 @@ public enum DictCodeList implements BaseDictCodeList {
 	共通业务类型_手工凭证(DictCode.共通业务类型,"V03","手工凭证"),
 	共通业务类型_计划类资产净值信息(DictCode.共通业务类型,"V04","计划类资产净值信息"),
 	共通业务类型_债券重分类(DictCode.共通业务类型,"V05","债券重分类"),
+	共通业务类型_信用保护凭证存续期(DictCode.共通业务类型,"TRD802","信用保护凭证存续期"),
 	频率_每半年等额还本(DictCode.频率,"11","每半年等额还本"),
 	频率_每月等额还本(DictCode.频率,"12","每月等额还本"),
 	频率_每季等额还本(DictCode.频率,"13","每季等额还本"),

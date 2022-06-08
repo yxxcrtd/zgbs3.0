@@ -4,7 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Strings;
 import com.joyintech.tams.exchange.common.constant.EntrustType;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.EntrustHistory;
 import com.joyintech.tams.exchange.common.db.domain.EntrustHistoryExample;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
@@ -73,7 +73,7 @@ public class EntrustHistoryServerImpl implements EntrustHistoryService {
         PageHelper.startPage(pageNum, pageSize);
         List<EntrustHistory> entrustHistoryList = entrustHistoryMapper.selectByExample(entrustHistoryExample);
         entrustHistoryList.forEach(entrustHistory -> {
-            if (InvestmentAssetType.isFutures(entrustHistory.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(entrustHistory.getAssetType())) {
                 entrustHistory.setStockCode(StockCodeUtils.getStockCode(entrustHistory.getStockCode()));
             }
         });

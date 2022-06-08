@@ -12,7 +12,7 @@ import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.Algorithm;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -116,7 +116,7 @@ public class OrderManagement extends BaseService {
     private ResultBean checkSPPI(OrderPlaceBean orderPlaceBean) {
 
         Instruction instruction = instructionService.findById(orderPlaceBean.getInstructionId());
-        if (InvestmentAssetType.isBond(instruction.getAssetType()) && InstructionPs.BUY.codeEquals(instruction.getPs())) {
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) && InstructionPs.BUY.codeEquals(instruction.getPs())) {
             BidPriceConInfoRequest request = new BidPriceConInfoRequest();
             request.setPs(InstructionPs.BUY.getCode());
             request.setFinprodId(instruction.getFinprodId());
@@ -159,7 +159,7 @@ public class OrderManagement extends BaseService {
             logger.info("未找到相关指令信息：assetTypeCheckForFutures instructionId [{}] ", orderPlaceBean.getInstructionId());
             return false;
         }
-        if (InvestmentAssetType.isFutures(instruction.getAssetType())) {
+        if (InvestAssetTypeEnum.isFutures(instruction.getAssetType())) {
             String stockCode = orderPlaceBean.getStockCode();
             orderPlaceBean.setStockCode(instruction.getFinprodMarketId());
             logger.info("重新填充期货下单参数stockCode信息， old：{}   new： {}", stockCode, instruction.getFinprodMarketId());

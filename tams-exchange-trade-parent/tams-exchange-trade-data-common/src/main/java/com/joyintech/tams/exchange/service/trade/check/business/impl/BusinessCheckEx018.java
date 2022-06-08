@@ -1,7 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.check.business.impl;
 
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
@@ -28,7 +28,7 @@ public class BusinessCheckEx018 implements IBusinessCheck {
     public void check(CheckChainBean chainBean) {
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
-        if (!StringUtil.equals(InvestmentAssetType.PLEDGE_REPURCHASE.value, instruction.getAssetType())) {
+        if (!StringUtil.equals(InvestAssetTypeEnum.PLEDGE_REPURCHASE.value, instruction.getAssetType())) {
             checkRsp.put("assetType", "资产类型非质押式回购");
         }
         if (!StringUtil.equals(InvestmentAssetType1.BIDDING_REPO.value, instruction.getAssetType1())) {

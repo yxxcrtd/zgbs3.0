@@ -19,6 +19,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
@@ -365,10 +366,10 @@ public class TradeHelper {
             //期货合约
             if (Objects.nonNull(futuresInstrument)) {
                 logger.info("futuresInstrument {} is futures contract", futuresInstrument.getInnerCode());
-                order.setAssetType(InvestmentAssetType.FUTURES.value);
+                order.setAssetType(InvestAssetTypeEnum.FUTURES.value);
                 order.setStockName(futuresInstrument.getInstrumentName());
             } else {
-                order.setAssetType(InvestmentAssetType.FUTURES.value);
+                order.setAssetType(InvestAssetTypeEnum.FUTURES.value);
                 order.setStockName(order.getStockCode());
                 order.setErrorCode(ErrorCode.DERIVATIVE_INSTRUMENT_ERROR.value);
                 order.setErrorMsg(ErrorCode.DERIVATIVE_INSTRUMENT_ERROR.msg());
@@ -381,7 +382,7 @@ public class TradeHelper {
                 order.setStockName(instrument.getStockName());
             } else {
                 order.setStockName(order.getStockCode());
-                order.setAssetType(InvestmentAssetType.STOCK.value);
+                order.setAssetType(InvestAssetTypeEnum.STOCK.value);
                 logger.warn("未找到相关合约信息 {}", order.getStockCode());
             }
         }
@@ -469,7 +470,7 @@ public class TradeHelper {
 
     public boolean checkCommonParam(BigDecimal fullPrice, BigDecimal entrustPrice, long entrustVolume, OrderInterface orderInterface, Instruction instruction) {
         /*if (Objects.nonNull(instruction)) {
-            if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+            if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
                 return futuresHelper.checkCommonParam(entrustPrice, entrustVolume, orderInterface, instruction);
             }
             Instrument instrument = instrumentService.queryByInnerCode(orderInterface.getStockCode());
@@ -487,11 +488,11 @@ public class TradeHelper {
                     if (IntegratedEntrustUtils.isBulk(entrustProp)) {
                         return bulkTradeHelper.checkCommonParam(entrustPrice, entrustVolume, orderInterface, instrument, market, entrustBalance, instruction);
                     } else {
-                        if (InvestmentAssetType.STOCK.value.equals(orderInterface.getAssetType())) {
+                        if (InvestAssetTypeEnum.STOCK.value.equals(orderInterface.getAssetType())) {
                             return stockHelper.checkCommonParam(entrustPrice, entrustVolume, orderInterface, instrument, instruction.getTradePlat(), instruction.getPs(), entrustBalance, instruction.getEntrustBussType(), instruction.getPriceMode());
-                        } else if (InvestmentAssetType.BOND.value.equals(orderInterface.getAssetType())) {
+                        } else if (InvestAssetTypeEnum.BOND.value.equals(orderInterface.getAssetType())) {
                             return bondHelper.checkCommonParam(fullPrice, entrustPrice, entrustVolume, orderInterface, instrument, instruction.getTradePlat(), instruction.getPs(), entrustBalance, instruction.getEntrustBussType(), instruction.getPriceMode());
-                        } else if (InvestmentAssetType.FUND.value.equals(orderInterface.getAssetType())) {
+                        } else if (InvestAssetTypeEnum.FUND.value.equals(orderInterface.getAssetType())) {
                             return fundHelper.checkCommonParam(entrustPrice, entrustVolume, orderInterface, instrument, instruction.getTradePlat(), instruction.getPs(), entrustBalance, instruction.getEntrustBussType(), instruction.getPriceMode());
                         } else {
                             return commonCheckHelper.checkCommonParam(entrustPrice, entrustVolume, orderInterface, instrument, instruction.getTradePlat(), instruction.getPs(), entrustBalance, instruction.getEntrustBussType(), instruction.getPriceMode());
@@ -526,13 +527,13 @@ public class TradeHelper {
             int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
             double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
             double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
-            if (InvestmentAssetType.STOCK.value.equals(entrust.getAssetType())) {
+            if (InvestAssetTypeEnum.STOCK.value.equals(entrust.getAssetType())) {
                 logger.info("检查【股票】涨停价格。。。");
                 fillEntrustPrice(entrust, lowerLimitPrice, upperLimitPrice, entrustPrice);
-            } else if (InvestmentAssetType.BOND.value.equals(entrust.getAssetType())) {
+            } else if (InvestAssetTypeEnum.BOND.value.equals(entrust.getAssetType())) {
                 logger.info("检查【债券】涨停价格。。。");
                 fillEntrustPrice(entrust, lowerLimitPrice, upperLimitPrice, entrustPrice);
-            } else if (InvestmentAssetType.FUND.value.equals(entrust.getAssetType())) {
+            } else if (InvestAssetTypeEnum.FUND.value.equals(entrust.getAssetType())) {
                 logger.info("检查【基金】涨停价格。。。");
                 fillEntrustPrice(entrust, lowerLimitPrice, upperLimitPrice, entrustPrice);
             } else {
@@ -679,7 +680,7 @@ public class TradeHelper {
         String tradingDay = commonManagement.getTradingDay();
 
         BigDecimal orderPrice = order.getOrderPrice();
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
                 order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
@@ -925,6 +926,21 @@ public class TradeHelper {
                 logger.info("batch {} entrust price {} less than lowlimit {}, cover to lowlimit", batchInfo.getOrderId(), entrust.getEntrustPrice(), tick.getLowerLimitPrice());
                 entrust.setEntrustPrice(TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), round));
             }
+
+            //资产类型是债券，处理净价、全价
+            if (InvestAssetTypeEnum.isBond(order.getAssetType())) {
+                EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
+                dto.setPrice(entrust.getEntrustPrice());
+                dto.setEntrustVolume(entrust.getEntrustVolume());
+                dto.setRound(round);
+
+                //判断是否全价交易
+                boolean isFullPrice = FullPriceConst.FULL_PRICE.value.equals(order.getIsFullPrice());
+                investmentManagement.getAllPriceAndYield(instruction, dto, isFullPrice);
+                entrust.setEntrustPrice(dto.getNetPrice());
+                entrust.setFullPrice(dto.getFullPrice());
+                entrust.setExpireYearRate(dto.getYield());
+            }
         }
     }
 
@@ -983,7 +999,7 @@ public class TradeHelper {
         checkPrice(entrust, instruction);
 
         //资产类型是债券，处理净价、全价
-        if (InvestmentAssetType.isBond(order.getAssetType())) {
+        if (InvestAssetTypeEnum.isBond(order.getAssetType())) {
             EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
             dto.setPrice(entrust.getEntrustPrice());
             dto.setEntrustVolume(entrust.getEntrustVolume());
@@ -1009,7 +1025,7 @@ public class TradeHelper {
         order.setOrderBalance(order.getEntrustBalance());
         order.setEntrustVolume(order.getEntrustVolume() + entrust.getEntrustVolume());
         //order上取平均委托价格
-        if (InvestmentAssetType.isBond(order.getAssetType()) && FullPriceConst.FULL_PRICE.value.equals(order.getIsFullPrice())) {
+        if (InvestAssetTypeEnum.isBond(order.getAssetType()) && FullPriceConst.FULL_PRICE.value.equals(order.getIsFullPrice())) {
             order.setEntrustPrice(TradeUtils.divide(oldBalance.add(TradeUtils.multiply(entrust.getFullPrice(), entrust.getEntrustVolume(), 4)), order.getEntrustVolume(), 4));
         } else {
             order.setEntrustPrice(TradeUtils.divide(oldBalance.add(TradeUtils.multiply(entrust.getEntrustPrice(), entrust.getEntrustVolume(), 4)), order.getEntrustVolume(), 4));
@@ -1059,7 +1075,7 @@ public class TradeHelper {
 //                }
 
                 //资产类型是债券，处理净价、全价
-                if (InvestmentAssetType.isBond(order.getAssetType())) {
+                if (InvestAssetTypeEnum.isBond(order.getAssetType())) {
                     EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
                     dto.setPrice(entrust.getEntrustPrice());
                     dto.setEntrustVolume(entrust.getEntrustVolume());
@@ -1083,7 +1099,7 @@ public class TradeHelper {
                 order.setOrderBalance(order.getEntrustBalance());
                 order.setEntrustVolume(order.getEntrustVolume() + entrust.getEntrustVolume());
                 //order上取平均委托价格
-                if (InvestmentAssetType.isBond(order.getAssetType()) && FullPriceConst.FULL_PRICE.value.equals(order.getIsFullPrice())) {
+                if (InvestAssetTypeEnum.isBond(order.getAssetType()) && FullPriceConst.FULL_PRICE.value.equals(order.getIsFullPrice())) {
                     order.setEntrustPrice(TradeUtils.divide(oldBalance.add(TradeUtils.multiply(entrust.getFullPrice(), entrust.getEntrustVolume(), 4)), order.getEntrustVolume(), 4));
                 } else {
                     order.setEntrustPrice(TradeUtils.divide(oldBalance.add(TradeUtils.multiply(entrust.getEntrustPrice(), entrust.getEntrustVolume(), 4)), order.getEntrustVolume(), 4));
@@ -1214,7 +1230,7 @@ public class TradeHelper {
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
 
         BigDecimal entrustPrice = integratedEntrust.getEntrustPrice();
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
                 integratedEntrust.setIsFullPrice(FullPriceConst.NET_PRICE.value);
@@ -1466,7 +1482,7 @@ public class TradeHelper {
         }
 
         //资产类型是债券
-        if (InvestmentAssetType.isBond(instructionClone.getAssetType())) {
+        if (InvestAssetTypeEnum.isBond(instructionClone.getAssetType())) {
             EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
             dto.setPrice(instructionClone.getEntrustPrice());
             dto.setEntrustVolume(instructionClone.getEntrustNum());
@@ -1600,7 +1616,7 @@ public class TradeHelper {
             return;
         }
         //资产类型是债券
-        if (InvestmentAssetType.isBond(instruction.getAssetType())
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
             int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;

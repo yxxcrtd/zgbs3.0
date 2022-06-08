@@ -17,6 +17,8 @@ import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.Order;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestRepoTypeEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
@@ -78,7 +80,7 @@ public class PriceHelper {
                 checkPriceForKCB(entrustPrice, orderInterface, instrument, tick, priceMode, tradeTimeStage);
             } else if (DictCodeList.回购类型_质押式竞价回购.getValue().equals(instruction.getAssetType1())) {//债券质押式回购竞价指令
                 checkPriceForBondRepurchase(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);
-            } else if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())) {
+            } else if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())) {
                 checkPriceForBond(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);//沪深竞价平台债券交易
             }
         }
@@ -99,10 +101,11 @@ public class PriceHelper {
             if (Market.SHSE.value.equals(instrument.getMarket()) && SubStockType.KCB.value.equals(instrument.getSubStockType())) {
                 return checkPriceForKCB(entrustPrice, orderInterface, instrument, tick, priceMode, tradeTimeStage);
             }
-            if (InstructionBusiType.REPO_BIDDING.value.equals(entrustBussType)) {//债券质押式回购竞价指令
+            if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.codeEquals(instrument.getAssetType())
+                    && InvestRepoTypeEnum.BIDDING_REPO.codeEquals(instrument.getAssetType1())) {//债券质押式回购竞价指令
                 return checkPriceForBondRepurchase(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);
             }
-            if (InvestmentAssetType.BOND.value.equals(instrument.getAssetType())) {
+            if (InvestAssetTypeEnum.BOND.codeEquals(instrument.getAssetType())) {
                 return checkPriceForBond(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);//沪深竞价平台债券交易
             }
         } else if (IntegratedEntrustUtils.isBulk(orderInterface.getEntrustProp())) {//沪深大宗交易
