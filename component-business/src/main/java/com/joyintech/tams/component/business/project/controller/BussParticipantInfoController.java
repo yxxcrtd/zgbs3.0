@@ -72,8 +72,8 @@ public class BussParticipantInfoController extends BaseController{
         }else {
             finprodId = this.getParam("finprodId");
         }
-        //判断该资产代码是否已经做过交易
-        if(null != commonBusinessService && null!=this.getPageModel() && this.getPageModel().equals("1") && null!=finprodId && ""!=finprodId){
+        //判断该资产代码是否已经做过交易  // Sonar Fix modify by huwei 220608
+        if(null != commonBusinessService && null!=this.getPageModel() && this.getPageModel().equals("1") && StringUtil.isNotEmpty(finprodId)){
             if(commonBusinessService.isTransInAsset(finprodId)>0){
             	  model.addAttribute("isTransInAsset", "Y");
             }
