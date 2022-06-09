@@ -1396,13 +1396,24 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
             if (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
                     StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue())) {
-                //校验标位信息
-                if (StringUtil.isNotEmpty(cfetsDto.getFinprodId())) {
-                    //查询债券信息
-                    CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
-                    dto.setFinprodId(cfetsDto.getFinprodId());
-                    CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
+                //查询债券信息
+                CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
+                dto.setFinprodId(cfetsDto.getFinprodId());
+                CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
 
+                if (finProductInfo != null) {
+                    //校验投标量
+                    if (finProductInfo.getMinPerTamt() != null) {
+                        BigDecimal minPerTamt = ArithmeticUtil.multiply(new BigDecimal(finProductInfo.getMinPerTamt()),BigDecimal.valueOf(100000000));
+                        for (CfetsBiddingProductDto bidDto : cfetsDto.getBiddingProductList()) {
+                            if (bidDto.getBidPrinAmt().compareTo(minPerTamt) < 0) {
+                                messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],投标券面总额不能小于每标位最低投标量！"));
+                            }
+                        }
+                    }
+
+
+                    //校验标位信息
                     Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = cfetsDto.getBiddingProductList().stream()
                             .collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
                     List<String> errorMessageList = new ArrayList<>();
