@@ -489,23 +489,6 @@ public class PortfolioManager extends BaseService {
             return ResultBean.success(result);
         }
 
-        // 过滤公平相关指令
-        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
-        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
-        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
-                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
-                .collect(Collectors.toList());
-        log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
-
-        List<FairPortfolioResponse> list = Lists.newArrayList();
-        simpleFiltingList.forEach(o -> {
-            FairPortfolioResponse response = new FairPortfolioResponse();
-            BeanUtils.copyProperties(o, response);
-
-            list.add(response);
-        });
-        result.setList(list);
-
         // 判断进入公平交易
         if (!EntrustUtils.isFairOrder(bean, instruction)) {
             log.warn("非公平交易模式，无法进行公平交易！param = {}", JSONUtil.toJsonStr(bean));
@@ -513,7 +496,6 @@ public class PortfolioManager extends BaseService {
             result.setInfoDetails(ErrorCode.getStr(ErrorCode.NOT_FAIR_INSTRUCTION_ERROR));
             return ResultBean.success(result);
         }
-
         // 行情数据
         ResultBean tickBean = quoteService.getTick(bean.getStockCode());
         if (ErrorCode.isFail(tickBean.getErrorCode())) {
@@ -543,6 +525,31 @@ public class PortfolioManager extends BaseService {
                 return ResultBean.success(result);
             }
         }
+
+        // 过滤公平相关指令
+        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
+        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
+        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(simpleFiltingList) || simpleFiltingList.size() < 2) {
+            log.error("不满足公平交易: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails("不满足公平交易");
+            return ResultBean.success(result);
+        }
+        log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
+
+        List<FairPortfolioResponse> list = Lists.newArrayList();
+        simpleFiltingList.forEach(o -> {
+            FairPortfolioResponse response = new FairPortfolioResponse();
+            BeanUtils.copyProperties(o, response);
+
+            list.add(response);
+        });
+        result.setList(list);
+
 
         // 获取公平交易相关指令
         TickBean tick = (TickBean) tickBean.getData();
@@ -1840,20 +1847,6 @@ public class PortfolioManager extends BaseService {
             return ResultBean.success(result);
         }
 
-        // 过滤公平相关指令
-        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
-        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
-        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
-                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
-                .collect(Collectors.toList());
-        log.info("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
-        if (CollectionUtils.isEmpty(simpleFiltingList)) {
-            log.error("不满足公平交易: InstructionId [{}]", instructionId);
-            result.setInfoLevel("1");
-            result.setInfoDetails("不满足公平交易");
-            return ResultBean.success(result);
-        }
-
         // 系统参数：未接收指令的公平处理模式 01：是；02：否
         if (EntrustUtils.isfairModeWithUnacceptInstructionForbid()) {
             List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
@@ -1865,6 +1858,20 @@ public class PortfolioManager extends BaseService {
                 result.setInfoDetails(ErrorCode.getStr(ErrorCode.FAIR_INSTRUCTIONS_UNACCEPT_ERROR));
                 return ResultBean.success(result);
             }
+        }
+
+        // 过滤公平相关指令
+        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
+        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
+        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                .collect(Collectors.toList());
+        log.info("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
+        if (CollectionUtils.isEmpty(simpleFiltingList) || simpleFiltingList.size() < 2) {
+            log.error("不满足公平交易: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails("不满足公平交易");
+            return ResultBean.success(result);
         }
 
         Long fairTotalLeftVolume;
