@@ -64,11 +64,37 @@ public class BaseGetBussinessIdimpl implements BaseGetBussinessId{
         if (!StringUtil.isEmptyList(ruleList)) {
             rule = ruleList.get(0);
         }
+        if(StringUtil.isNotEmpty(rule) || null != rule ){
+            if(StringUtil.isNotEmpty(rule.getBusinessIdRuleType())){
+                switch (rule.getBusinessIdRuleType()) {
+                    case "01":
+                        // 直接获取
+                        bussinessCode = IDGenerator.generate();
+                        break;
+                    case "02":
+                        // 通过序列号获取
+                        bussinessCode = buildCodeByType2(rule);
+                        break;
+                    case "03":
+                        // 前缀+后缀
+                        bussinessCode = buildCodeByType3(rule);
+                        break;
+                    case "04":
+                        // 前缀+日期+后缀
+                        bussinessCode = buildCodeByType4(rule);
+                        break;
+                    case "05":
+                        // 自定义
+                        bussinessCode = buildCodeByType5(rule);
+                        break;
+                }
+            }
+        }
         // 多条规则时直接取第一条 modify by renping 20190924 end
-        if (StringUtil.isNotEmpty(rule) && StringUtil.isNotEmpty(rule.getBusinessIdRuleType())) {
-            /*
+       /* if (StringUtil.isNotEmpty(rule) && StringUtil.isNotEmpty(rule.getBusinessIdRuleType())) {
+            *//*
              * 01:UUID 02:序列号 03:前缀+后缀 04:前缀+日期+后缀 05:独特规则
-             */
+             *//*
             switch (rule.getBusinessIdRuleType()) {
                 case "01":
                     // 直接获取
@@ -91,7 +117,7 @@ public class BaseGetBussinessIdimpl implements BaseGetBussinessId{
                     bussinessCode = buildCodeByType5(rule);
                     break;
             }
-        }
+        }*/
         return bussinessCode == null ? IDGenerator.generate(20) : bussinessCode;
     }
 

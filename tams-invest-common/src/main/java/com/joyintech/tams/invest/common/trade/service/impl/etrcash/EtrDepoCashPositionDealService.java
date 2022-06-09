@@ -60,7 +60,7 @@ public class EtrDepoCashPositionDealService extends EtrCashPositionBaseService {
             }
             else if (DictCodeList.交易方向_卖出.getValue().equals(ps)) {
                 if (DictCodeList.持仓类型_实际.equals(持仓类型)) { // 有效
-                    if (StringUtil.isEmpty(entrustId)) { // 无委托
+                    /*if (StringUtil.isEmpty(entrustId)) { // 无委托
                         // 可用现金 托管户 交易日增加交易金额
                         etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
                         etrCashPositionFlowDto.setAcctId(acctId);
@@ -71,7 +71,10 @@ public class EtrDepoCashPositionDealService extends EtrCashPositionBaseService {
                         etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
                         etrCashPositionFlowDto.setAcctId(acctId);
                         etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
-                    }
+                    }*/
+                    etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
+                    etrCashPositionFlowDto.setAcctId(acctId);
+                    etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
                 }
                 if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) { // 提交
                     if (StringUtil.isEmpty(entrustId)) {
@@ -102,7 +105,7 @@ public class EtrDepoCashPositionDealService extends EtrCashPositionBaseService {
                 }
                 else if (DictCodeList.交易方向_卖出.getValue().equals(ps)) {
                     if (DictCodeList.持仓类型_实际.equals(持仓类型)) { // 有效
-                        if (StringUtil.isEmpty(entrustId)) { // 无委托
+                       /* if (StringUtil.isEmpty(entrustId)) { // 无委托
                             // 可用现金 托管户 交易日增加交易金额
                             etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
                             etrCashPositionFlowDto.setAcctId(acctId);
@@ -113,7 +116,11 @@ public class EtrDepoCashPositionDealService extends EtrCashPositionBaseService {
                             etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
                             etrCashPositionFlowDto.setAcctId(acctId);
                             etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
-                        }
+                        }*/
+
+                        etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
+                        etrCashPositionFlowDto.setAcctId(acctId);
+                        etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
                     }
                     if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) { // 提交
                         if (StringUtil.isEmpty(entrustId)) {
@@ -169,7 +176,7 @@ public class EtrDepoCashPositionDealService extends EtrCashPositionBaseService {
                 }
                 else if (DictCodeList.交易方向_卖出.getValue().equals(ps)) {
                     if (DictCodeList.持仓类型_实际.equals(持仓类型)) { // 有效
-                        if (StringUtil.isEmpty(entrustId)) { // 无委托
+                        /*if (StringUtil.isEmpty(entrustId)) { // 无委托
                             // 可用现金 通道 交易日增加交易金额
                             etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
                             etrCashPositionFlowDto.setAcctId(acctId);
@@ -180,7 +187,10 @@ public class EtrDepoCashPositionDealService extends EtrCashPositionBaseService {
                             etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
                             etrCashPositionFlowDto.setAcctId(acctId);
                             etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
-                        }
+                        }*/
+                        etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
+                        etrCashPositionFlowDto.setAcctId(acctId);
+                        etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
                     }
                     if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) { // 提交
                         if (StringUtil.isEmpty(entrustId)) {

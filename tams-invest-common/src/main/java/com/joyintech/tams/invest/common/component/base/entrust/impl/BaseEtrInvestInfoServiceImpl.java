@@ -1046,17 +1046,28 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
                     }
                 }
                 else {
-                	// 如果是期货 则按数量来判断  add by lijie2 20201120 start
+                    if(etrEntrustAdd != null){
+                        if (StringUtils.equals(DictCodeListExt3.平安资产类型_期货.getValue(), etrEntrustAdd.getAssetType())) {
+                            if (StringUtils.equals(DictCodeListExt3.平安资产类型_期货.getValue(), etrEntrustAdd.getAssetType())) {
+                                委托额度 = etrEntrust.getEntrustNum();
+                            } else {
+                                委托额度 = etrEntrust.getEntrustAmt();
+                            }
+                        }
+                    }else{
+                        委托额度 = etrEntrust.getEntrustAmt();
+                    }
+                	/*// 如果是期货 则按数量来判断  add by lijie2 20201120 start
 					if (StringUtils.equals(DictCodeListExt3.平安资产类型_期货.getValue(), etrEntrustAdd.getAssetType())) {
 						委托额度 = etrEntrust.getEntrustNum();
 					} else {
 						//add by lijie2 20201120 end
 						// 如果不存在目标类型，则按照原来的逻辑获取委托额度
 						委托额度 = etrEntrust.getEntrustAmt();
-					}
-                    if (委托额度 == null) {
+					}*/
+                  /*  if (委托额度 == null) {
                         委托额度 = etrEntrust.getEntrustNum();
-                    }
+                    }*/
                 }
                 // 指令已完成状态更新逻辑修改 modify by yufei 20200807 end
                 BigDecimal 总交易完成度 = ArithmeticUtil.divide(etrFinishAmtDto.getSumFinishAmt(),
