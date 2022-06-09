@@ -283,7 +283,7 @@
             var acctNo = '';
             if(list && list.length > 0) {
                 var acctNo = list[0].id;
-                if(list && list.length == 1) {
+                /*if(list && list.length == 1) {
                     // $("#acctNo_div").hide();
                     if(!init) {
                         $("#acctNo").textSelect('setValue', acctNo);
@@ -294,6 +294,9 @@
                         $("#acctNo").textSelect('setValue', acctNo);
                     }
                     // $("#acctNo_div").show();
+                }*/
+                if(!init) {
+                    $("#acctNo").textSelect('setValue', acctNo);
                 }
             }
             else {

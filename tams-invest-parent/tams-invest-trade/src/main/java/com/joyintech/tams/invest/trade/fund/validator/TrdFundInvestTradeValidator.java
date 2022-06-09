@@ -421,7 +421,7 @@ public class TrdFundInvestTradeValidator implements TradeCommonValidator {
                     if (prinAmt != null && entrustAmt != null) {
                         entrustAmt = entrustAmt.subtract(prinAmt);
                     }
-                    if (entrustAmt != null && tradeAmt.compareTo(entrustAmt) == 1) {
+                    if (entrustAmt != null && tradeAmt.compareTo(entrustAmt) == 0) {
                         errorList.add(new ValidMessage("tradeAmt", this.getMessage("TRD_X_0004") + entrustAmt));
                     }
                     //add  wsz 修改数据为空判定失败问题 ZGCPCN-1139 end

@@ -744,7 +744,7 @@
             var jJHQXX = queryJJHQXX(secId, secName, finprodType2);
             var ps = $("#ps_" + currentTab).val();
             if (finprodType2 == FINPROD_TYPE_TG_F06 || finprodType2 == FINPROD_TYPE_TG_F10) {
-                if (ps == PS_T01) {
+                /*if (ps == PS_T01) {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#limitUp_jj");
                     return jJHQXX.ceiling.toFixed(2);
                 } else if (ps == PS_T02) {
@@ -753,7 +753,8 @@
                 } else {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
                     return jJHQXX.ceiling.toFixed(2);
-                }
+                }*/
+                return jJHQXX.ceiling.toFixed(2);
             } else {
                 // rent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
                 return jJHQXX.latest.toFixed(2);
@@ -766,7 +767,7 @@
 
             var ps = $("#ps_" + currentTab).val();
             if (finprodType2 == FINPROD_TYPE_TG_F06 || finprodType2 == FINPROD_TYPE_TG_F10) {
-                if (ps == PS_T01) {
+               /* if (ps == PS_T01) {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#limitUp_jj");
                     return jJHQXX.ceiling.toFixed(2);
                 } else if (ps == PS_T02) {
@@ -775,7 +776,8 @@
                 } else {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
                     return jJHQXX.ceiling.toFixed(2);
-                }
+                }*/
+                return jJHQXX.ceiling.toFixed(2);
             } else {
                 //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
                 return jJHQXX.latest.toFixed(2);
@@ -899,7 +901,7 @@
                     if (ps == PS_T04) {
                         $("#portfolioId_div_" + currentTab).show();
                     }
-                    if (secId) {
+                    //if (secId) {
                         // if(parent.EtrExchangeTradeJjHq) {
                         //     if (useInterfQuoteFlag) {
                         //         parent.EtrExchangeTradeJjHq.queryJJHQXXByWS(secId, object.finprodName, object.finprodType2);
@@ -916,11 +918,11 @@
                         }else if(ps == PS_T04){
                         	linkToBondSubscribe();
                         }   */
-                    } else {
+                  //  } else {
                         // if(parent.EtrExchangeTradeJjHq) {
                         //     parent.EtrExchangeTradeJjHq.updateLevel2();
                         // }
-                    }
+                   // }
                 }
             }
         } else if (currentTab == 'dz') {
@@ -2404,11 +2406,12 @@
         }
         // if 画面.金融产品类型（债券） = 质押式回购
         else if (finprodType2 == FINPROD_TYPE_TG_ZYSHG || finprodType2 == FINPROD_TYPE_TG_F02 || finprodType2 == FINPROD_TYPE_TG_F03) {
-            if (currentTab == 'dz' && tradeMarket == TRADE_PLACE_03) {
+           /* if (currentTab == 'dz' && tradeMarket == TRADE_PLACE_03) {
                 $("#entrustNumUnit_" + currentTab).text("张");
             } else {
                 $("#entrustNumUnit_" + currentTab).text("张");
-            }
+            }*/
+            $("#entrustNumUnit_" + currentTab).text("张");
         }
         if (currentTab == 'dz') {
             if (finprodType2 == FINPROD_TYPE_TG_ZYSHG) {//大宗质押式回购 指令价格单位 % 特殊处理
