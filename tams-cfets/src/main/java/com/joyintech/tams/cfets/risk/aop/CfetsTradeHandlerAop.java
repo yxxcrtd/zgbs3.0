@@ -50,13 +50,41 @@ public class CfetsTradeHandlerAop {
 
 
     /**
-     * 交易登记check
+     * 风险试算
+     *
+     * @param dto 委托指令内容
+     * @param infCode 接口代码
+     * @param busiType 业务类型
+     * @return 执行结果
+     * @throws Exception 异常
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond.controller.IbuQuoteBond004Controller.check(..))" +
-            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage002Controller.check(..))" +
-            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage001Controller.check(..))" +
-            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage001Controller.unWinCheck(..))")
-    protected void doCheck() {
+    public static <T> AjaxResult doRiskcal(T dto, String pageId) throws Exception {
+        //风险试算check
+        RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
+        //风险试算组装dto
+        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), pageId);
+        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
+        result.setRiskMathFlag("02");
+        if (riskCommonOutput != null && CollectionUtils.isNotEmpty(riskCommonOutput.getRiskTrialRetDto())) {
+            List<CfetsEtribdoRiskcalResponse> resultList = new ArrayList<>();
+            result.setRskStatus(riskCommonOutput.getRskTrialStatus());
+            if (com.joyintech.background.component.common.pack.common.util.StringUtil.equals(riskCommonOutput.getRskTrialStatus(), "3")) {
+                result.setRiskTrialSpan(DictCodeListRsk.试算结果_不通过.getCodeName());
+            }else {
+                result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
+            }
+            riskCommonOutput.getRiskTrialRetDto().forEach(e->{
+                CfetsEtribdoRiskcalResponse riskcalResponse = new CfetsEtribdoRiskcalResponse();
+                BeanUtil.copyPropertiesIgnoreNull(riskcalResponse,e);
+                resultList.add(riskcalResponse);
+            });
+            result.setRiskcalReturnList(resultList);
+            return getAjaxResult(result,null,null);
+        } else {
+            result.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
+            result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
+            return getAjaxResult(result,null,null);
+        }
     }
 
     /**
@@ -67,27 +95,25 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
+     * 交易登记check
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.check(..))"+
+        "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage001Controller.unWinCheck(..))")
+    protected void doCheck() {
+    }
+
+    /**
      * 交易登记更新
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doUpdate(..))" +
-            "|| execution(* com.joyintech.tams.cfets..trd.primarybidmanage..*.*.doUpdate(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.doUpdate(..))")
     protected void updatePoint() {
     }
 
     /**
      * 交易登记新增
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doInsert(..))" +
-            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage..*.*.doInsert(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.doInsert(..))")
     protected void insertPoint() {
-    }
-
-    /**
-     * 作废操作,释放占用
-     */
-    @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doDelete(..))" +
-            "execution(* com.joyintech.tams.cfets..trd.primarybidmanage..*.*.doDelete(..))")
-    protected void deletePoint() {
     }
 
     /**
@@ -252,41 +278,10 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 风险试算
-     *
-     * @param dto 委托指令内容
-     * @param infCode 接口代码
-     * @param busiType 业务类型
-     * @return 执行结果
-     * @throws Exception 异常
+     * 作废操作,释放占用
      */
-    public static final <T> AjaxResult doRiskcal(T dto, String pageId) throws Exception {
-        //风险试算check
-        RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
-        //风险试算组装dto
-        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), pageId);
-        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
-        result.setRiskMathFlag("02");
-        if (riskCommonOutput != null && CollectionUtils.isNotEmpty(riskCommonOutput.getRiskTrialRetDto())) {
-            List<CfetsEtribdoRiskcalResponse> resultList = new ArrayList<>();
-            result.setRskStatus(riskCommonOutput.getRskTrialStatus());
-            if (com.joyintech.background.component.common.pack.common.util.StringUtil.equals(riskCommonOutput.getRskTrialStatus(), "3")) {
-                result.setRiskTrialSpan(DictCodeListRsk.试算结果_不通过.getCodeName());
-            }else {
-                result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
-            }
-            riskCommonOutput.getRiskTrialRetDto().forEach(e->{
-                CfetsEtribdoRiskcalResponse riskcalResponse = new CfetsEtribdoRiskcalResponse();
-                BeanUtil.copyPropertiesIgnoreNull(riskcalResponse,e);
-                resultList.add(riskcalResponse);
-            });
-            result.setRiskcalReturnList(resultList);
-            return getAjaxResult(result,null,null);
-        } else {
-            result.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
-            result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
-            return getAjaxResult(result,null,null);
-        }
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.doDelete(..))")
+    protected void deletePoint() {
     }
 
     @SuppressWarnings("unchecked")
