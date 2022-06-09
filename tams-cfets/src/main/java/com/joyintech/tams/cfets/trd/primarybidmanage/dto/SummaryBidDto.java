@@ -23,7 +23,7 @@ public class SummaryBidDto {
     private BigDecimal winPrinAmt;
 
     @ApiModelProperty(name="winPrice",value="投标标位")
-    private BigDecimal winPrice;
+    private String winPrice;
 
     public BigDecimal getTotalBidPrinamt() {
         return totalBidPrinamt;
@@ -41,11 +41,11 @@ public class SummaryBidDto {
         this.winPrinAmt = winPrinAmt;
     }
 
-    public BigDecimal getWinPrice() {
+    public String getWinPrice() {
         return winPrice;
     }
 
-    public void setWinPrice(BigDecimal winPrice) {
+    public void setWinPrice(String winPrice) {
         this.winPrice = winPrice;
     }
 }

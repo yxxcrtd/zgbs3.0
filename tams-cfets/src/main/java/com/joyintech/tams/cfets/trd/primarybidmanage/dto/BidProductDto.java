@@ -37,7 +37,7 @@ public class BidProductDto {
     private BigDecimal winPrinAmt;
 
     @ApiModelProperty(name="winPrice",value="投标标位")
-    private BigDecimal winPrice;
+    private String winPrice;
 
     @ApiModelProperty(name="invAim",value="业务模式Id")
     private String invAim;
@@ -85,11 +85,11 @@ public class BidProductDto {
         this.winPrinAmt = winPrinAmt;
     }
 
-    public BigDecimal getWinPrice() {
+    public String getWinPrice() {
         return winPrice;
     }
 
-    public void setWinPrice(BigDecimal winPrice) {
+    public void setWinPrice(String winPrice) {
         this.winPrice = winPrice;
     }
 
