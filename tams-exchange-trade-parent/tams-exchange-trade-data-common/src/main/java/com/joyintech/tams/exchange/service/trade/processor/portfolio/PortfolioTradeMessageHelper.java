@@ -8,12 +8,12 @@ import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
@@ -52,6 +52,8 @@ public class PortfolioTradeMessageHelper {
     private PortfolioDetailByManualMapper portfolioDetailByManualMapper;
     @Autowired
     private PortfolioDetailMapper portfolioDetailMapper;
+    @Autowired
+    private TradeService tradeService;
 
     /**
      * 组装成交组合分配
@@ -60,7 +62,7 @@ public class PortfolioTradeMessageHelper {
         List<PortfolioTradeMessage> portfolioTradeMessages = Lists.newArrayList();
 
         BigDecimal tradedPrice = trade.getTradedPrice();
-        if(InvestmentAssetType.BOND.value.equals(instruction.getAssetType())
+        if(InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)){
             tradedPrice = trade.getFullPrice();
         }
@@ -122,7 +124,7 @@ public class PortfolioTradeMessageHelper {
 
         List<PortfolioCalculateResponse> calculateResponses = Lists.newArrayList();
         BigDecimal tradedPrice = entrust.getEntrustPrice();
-        if(InvestmentAssetType.BOND.value.equals(instructionClone.getAssetType())
+        if(InvestAssetTypeEnum.BOND.codeEquals(instructionClone.getAssetType())
                 && EnumUtil.in(instructionClone.getPs(), InstructionPs.BUY, InstructionPs.SELL)){
             tradedPrice = entrust.getFullPrice();
         }
@@ -177,9 +179,6 @@ public class PortfolioTradeMessageHelper {
 
         return calculateResponses;
     }
-
-    @Autowired
-    private TradeService tradeService;
 
     /**
      * 组装撤单组合分配
