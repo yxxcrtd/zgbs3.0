@@ -159,7 +159,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         //最新价从行情取
                         EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
                         if (hqResponse != null) {
-                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : new BigDecimal(0.00);
+                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
                             entity.setPrice(lastPrice);
                         }
                         returnList.add(entity);
