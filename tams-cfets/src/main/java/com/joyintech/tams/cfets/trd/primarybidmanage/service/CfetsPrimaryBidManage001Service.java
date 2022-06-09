@@ -2,6 +2,7 @@ package com.joyintech.tams.cfets.trd.primarybidmanage.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
@@ -95,6 +96,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
             pageParam.put("sort",request.getPageMode().getSort());
         }
         pageParam.put("direction",request.getPageMode().getDirection());
+        pageParam.put("userId",SecurityUtil.getLoginUser().getUserName());
         Page<CfetsPrimaryBidManageCfmResponse> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> cfetsPrimaryBidManageMapper.selectCfmForPage(pageParam));
@@ -188,6 +190,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         pageParam.put("winTypeList", StringUtil.splitToList(null, request.getWinType()));
         pageParam.put("payTypeList", StringUtil.splitToList(null, request.getPayType()));
         pageParam.put("bidTypeList", StringUtil.splitToList(null, request.getBidType()));
+        pageParam.put("isWinList", StringUtil.splitToList(null, request.getIsWin()));
         pageParam.put("platDate", DateUtil.format(DateUtil.platDateFromCache()));
         pageParam.put("sort",request.getPageMode().getSort());
         pageParam.put("direction",request.getPageMode().getDirection());

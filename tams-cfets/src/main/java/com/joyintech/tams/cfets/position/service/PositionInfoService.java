@@ -8,6 +8,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.position.dao.PositionInfoMapper;
+import com.joyintech.tams.cfets.position.dto.PositionCashRequestDetailDto;
 import com.joyintech.tams.cfets.position.dto.PositionCashSecDto;
 import com.joyintech.tams.cfets.position.dto.PositionInfoRequestDto;
 import com.joyintech.tams.component.business.common.service.DateCalService;
@@ -84,14 +85,14 @@ public class PositionInfoService {
     /**
      * 查询指令t0、t1、账户现金
      *
-     * @param portfolioIdList 组合列表
+     * @param ptlList 组合列表
      * @param ccy
      * @param cdate
      * @param calId           默认使用03银行间，其它交易日历需指定
      * @param acctId          指定账户查询，非必填
      * @return map.cashT、map.cashT1、map.realCash
      */
-    public BaseMap queryEtrAvailableCash(List<String> portfolioIdList, String cdate, String acctId, String ccy, String calId, String finprodId) {
+    public BaseMap queryEtrAvailableCash(List<PositionCashRequestDetailDto> ptlList, String cdate, String acctId, String ccy, String calId, String finprodId) {
         BaseMap rs = new BaseMap();
 
         BigDecimal cashT = BigDecimal.ZERO; // 指令t日可用
@@ -99,8 +100,10 @@ public class PositionInfoService {
         BigDecimal realCash = BigDecimal.ZERO; // 账户现金
         BigDecimal secDesirableCash = BigDecimal.ZERO; // 证券户可取现金
 
-        if (CollectionUtils.isEmpty(portfolioIdList)) {
-            return rs;
+        for (PositionCashRequestDetailDto list : ptlList){
+            if (StringUtil.isEmpty(list.getPortfolioId())) {
+                return rs;
+            }
         }
         if (StringUtil.isEmpty(ccy)) {
             ccy = DictCodeList.币种_人民币_CNY.getValue();
@@ -145,11 +148,11 @@ public class PositionInfoService {
 
         // 从原投管系统取
 
-        if (portfolioIdList != null) {
-            for (String portfolioId : portfolioIdList){
+        if (CollectionUtils.isNotEmpty(ptlList)) {
+            for (PositionCashRequestDetailDto list : ptlList){
                 BaseMap paramMap = BaseMap.newMap()
                         .put("finprodId", finprodId)
-                        .put("portfolioId", portfolioId)
+                        .put("portfolioId", list.getPortfolioId())
                         .put("ccy", ccy)
                         .put("vdate", cdate)
                         .put("calId", calId) // 银行间
@@ -160,7 +163,7 @@ public class PositionInfoService {
                     cashT1 = ArithmeticUtil.doAdd(cashT1, BaseMap.newMap(mapRst).getBigDecimal("cashT1"));
                 }
                 PtlCashPositionFlowDto positionQueryDto = new PtlCashPositionFlowDto();
-                positionQueryDto.setPortfolioId(portfolioId);
+                positionQueryDto.setPortfolioId(list.getPortfolioId());
                 positionQueryDto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 positionQueryDto.setCdate(iPlatformDate.getSysDate());
                 // 实际现金（账户现金）
@@ -168,31 +171,36 @@ public class PositionInfoService {
             }
         }
 
-        BaseMap inMap = BaseMap.newMap()
-                .put("S_004", DictCodeListExt3.资产类型_汇总可用现金.getValue())
-                .put("C_01", DictCodeListExt3.资产类型_现金账户持仓.getValue())
-                .put("portfolioIdList", portfolioIdList)
-                .put("cdate", cdate)
-                .put("acctId", acctId);
-        Map map = positionInfoMapper.queryEtrAvailableCash(inMap);
-        BaseMap outMap = BaseMap.newMap(map);
+//        BaseMap inMap = BaseMap.newMap()
+//                .put("S_004", DictCodeListExt3.资产类型_汇总可用现金.getValue())
+//                .put("C_01", DictCodeListExt3.资产类型_现金账户持仓.getValue())
+//                .put("portfolioIdList", portfolioIdList)
+//                .put("cdate", cdate)
+//                .put("acctId", acctId);
+//        Map map = positionInfoMapper.queryEtrAvailableCash(inMap);
+//        BaseMap outMap = BaseMap.newMap(map);
 
         //调用新头寸引擎查询证券户可取现金
-        if (StringUtil.isNotEmpty(finprodId)) {
+        if (CollectionUtils.isNotEmpty(ptlList)) {
             String flowType = "01";// 01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
             //筛选出有资金账户的组合
             List<PositionCashSecDto> sumAcctNoList = new ArrayList<>();
-            for (String portfolioId : portfolioIdList) {
+            for (PositionCashRequestDetailDto list : ptlList) {
                 Map<String, String> secIdMap = new HashMap<String, String>();
-                secIdMap.put("portfolioId", portfolioId);
-                secIdMap.put("finprodId", finprodId);
-                List<String> secAcctIds = this.qryPortfolioSecAcctIdAll(map);// 证券账户
+                List<String> secAcctIds = new ArrayList<>();
+                if (StringUtil.isNotEmpty(list.getAcctId())) {
+                    secAcctIds.add(acctId);
+                }else {
+                    secIdMap.put("portfolioId", list.getPortfolioId());
+                    secAcctIds = this.qryPortfolioSecAcctIdAll(secIdMap);// 证券账户
+                }
+
                 String finalCcy = ccy;
                 String finalCdate = cdate;
                 secAcctIds.forEach(secAcctId -> {
                     PositionCashSecDto positionCashSecDto = new PositionCashSecDto();
                     positionCashSecDto.setCcy(finalCcy);
-                    positionCashSecDto.setPortfolioId(portfolioId);
+                    positionCashSecDto.setPortfolioId(list.getPortfolioId());
                     positionCashSecDto.setCdate(finalCdate);
                     positionCashSecDto.setAcctId(secAcctId);
                     sumAcctNoList.add(positionCashSecDto);

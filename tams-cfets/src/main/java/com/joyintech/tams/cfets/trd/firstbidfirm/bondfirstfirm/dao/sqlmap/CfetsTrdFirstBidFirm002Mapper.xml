@@ -219,6 +219,78 @@
         )
     </select>
 
+    <select id="selectEntInfoByIdAndDate" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto">
+        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId,counterName , entrustId
+        from (
+                 select ee.ENTRUST_STATUS entrustStatus,
+                        CASE
+                            WHEN (bobrt.BID_MODLE IS NOT NULL AND bobrt.BID_MODLE = '03') OR bobrt.IS_WIN = 'Y' THEN '04'
+                            WHEN bobrt.BID_MODLE IS NULL THEN '01'
+                            WHEN bobrt.IS_WIN = 'N' THEN '03'
+                            WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
+                            ELSE '05'
+                            END AS        firstBidStatus,
+                        CASE
+                            WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                                THEN fpi.ISSUE_DATE
+                            WHEN (fpi.ISSUE_CLASS = '02' AND
+                                  (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                                OR fpi.ISSUE_CLASS = '03'
+                                THEN fpi.TENDER_SDATE
+                            END AS        issueDateStart/*投标日 开始*/,
+                        CASE
+                            WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                                THEN null
+                            WHEN (fpi.ISSUE_CLASS = '02' AND
+                                  (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                                OR fpi.ISSUE_CLASS = '03'
+                                THEN fpi.TENDER_EDATE
+                            END AS        issueDateEnd/*投标日 结束*/,
+                        ee.COUNTER_ID     counterId,
+                        mcp.COUNTER_NAME                         counterName,
+                        ee.ENTRUST_ID     entrustId
+                 from ETR_ENTRUST ee
+                          left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID = ee.COUNTER_ID
+                          LEFT JOIN (
+                     SELECT bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID, bobp.ENTRUST_ID
+                     FROM BID_ORDER bo
+                              LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+                              LEFT JOIN BID_RESULT_TOTAL brt ON brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+                         AND brt.FINPROD_ID = bo.FINPROD_ID
+                     WHERE bo.IS_CANCEL = 'N'
+                       AND bo.TRADE_STATUS = '01'
+                     GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID, bobp.ENTRUST_ID
+                 ) bobrt ON bobrt.FINPROD_ID = ee.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
+                          left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
+                 where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
+                   and ee.FINPROD_ID = #{finprodId}
+                   and not exists(
+                                    select 1
+                                    from BID_ORDER bo
+                                    left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                                    where bo.IS_CANCEL = 'N'
+                                    and bo.TRADE_STATUS = '01'
+                                    and bobp.ENTRUST_ID = ee.ENTRUST_ID
+                                    <if test="bidModles != null and bidModles.size()>0">
+                                        and bo.BID_MODLE in
+                                        <foreach collection="bidModles" open=" (" close=") " separator="," item="item">
+                                            #{item}
+                                        </foreach>
+                                    </if>
+                                    )
+                   and not exists(
+                                    select 1
+                                    from  Wfl_BID_ORDER_BID_PRICE bobp
+                                    where
+                                    bobp.ENTRUST_ID = ee.ENTRUST_ID
+                                    )
+                   <if test="counterId != null and counterId != ''">
+                       and ee.COUNTER_ID = #{counterId}
+                   </if>
+                   )
+        where issueDateEnd = #{issueDateEnd} and issueDateStart = #{issueDateStart}
+    </select>
+
     <update id="updateBidOrder">
         UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark} WHERE BID_ID = #{bidId}
     </update>
@@ -255,7 +327,7 @@
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                bo.PAY_TYPE       AS payType/*缴款方式*/,
-               ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+               ee.ENTRUST_NUM*100    AS etrBidPriceTotal/*指令投标券面总额*/,
                bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
                case
@@ -282,6 +354,7 @@
                    when fpi.TENDER_TARGET = '02' then bobp.BID_PRICE
                    when fpi.TENDER_TARGET = '03' then bobp.BID_PRICE * 10000
                    end              BID_PRICE/*标位*/,
+               eebp.BID_PRIN_AMT*100 ENTRUST_NUM,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
                ssai.SEC_ACCT_NAME,
@@ -340,7 +413,7 @@
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                bo.PAY_TYPE       AS payType/*缴款方式*/,
-               ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+               ee.ENTRUST_NUM*100    AS etrBidPriceTotal/*指令投标券面总额*/,
                bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
                case
@@ -363,6 +436,7 @@
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
                nvl(nvl(eebp.BID_PRIN_AMT,0)*100 - nvl(T.finshNum,0),0) avaNum /*剩余券面总额*/,
                bobp.BID_PRICE/*标位*/,
+               eebp.BID_PRIN_AMT*100 ENTRUST_NUM,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
                ssai.SEC_ACCT_NAME,
@@ -414,5 +488,26 @@
     <select id="findDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.BaseResultMap">
         <include refid="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.Sql_All_Data" />
         WHERE TOTLE_TRADE_ID = #{totleTradeId}
+    </select>
+
+    <select id="selectEtrAvaNum" resultType="java.math.BigDecimal">
+        select eed.ENTRUST_NUM*100 - nvl(T1.sumSubAmt,0)
+        from ETR_ENTRUST_DETAIL eed
+        left join(
+            select sum(T.subAmt) sumSubAmt,T.ENTRUST_ID, T.PORTFOLIO_ID
+            from (
+                     select nvl(bobp.SUBSCRIPTION_AMOUNT,0) subAmt, bobp.ENTRUST_ID, bobp.PORTFOLIO_ID
+                     from BID_ORDER bo
+                              left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                     where bo.IS_CANCEL = 'N'
+                       and bo.TRADE_STATUS != '03'
+                     union all
+                     select nvl(wbobp.SUBSCRIPTION_AMOUNT,0) subAmt, wbobp.ENTRUST_ID, wbobp.PORTFOLIO_ID
+                     from Wfl_BID_ORDER wbo
+                              left join Wfl_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID
+                 ) T
+                     group by T.ENTRUST_ID, T.PORTFOLIO_ID
+        )T1 on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
+        where eed.ENTRUST_ID = #{entrustId} and eed.PORTFOLIO_ID = #{protfolioId}
     </select>
 </mapper>

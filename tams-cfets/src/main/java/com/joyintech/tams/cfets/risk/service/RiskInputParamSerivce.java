@@ -11,15 +11,20 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribSaveRequest;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfoService;
+import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrRepoSaveRequest;
+import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInsertDto;
 import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
+import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmProductDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
@@ -78,16 +83,17 @@ public class RiskInputParamSerivce extends RiskCommonService {
 
     @Autowired
     private FinProductTypeMapper finProductTypeMapper;
+
     /**
      * 构造入参
+     *
      * @param obj
      * @param decisionAct
      * @param flowStatus
      * @param isCheck
      * @return
      */
-    private BaseMap generateBusinessDto(Object obj, String decisionAct, String flowStatus, boolean isCheck) {
-        String pageId = "";
+    private BaseMap generateBusinessDto(Object obj, String decisionAct, String flowStatus, boolean isCheck, String pageId) {
         ProcessMark processMark;
         String businessJson = JsonUtils.object2Json(obj);
         // 入参为 workflowId 时 ，需要从流程中获取业务参数
@@ -135,6 +141,18 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("isCheck", isCheck)
                     .put("data", dto);
         }
+        if (obj instanceof CfetsBondDealRegisterQuoteDto || StringUtil.equals(pageId, "IbuQuoteBond004")) {
+            CfetsBondDealRegisterQuoteDto dto = JsonUtils.json2Object(businessJson, CfetsBondDealRegisterQuoteDto.class);
+            return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
+                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_交易登记.getValue())
+                    .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                    .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
+                    .put("tradePlace", 交易场所_银行间.getValue())
+                    .put("ps", dto.getPs())
+                    .put("isCheck", isCheck)
+                    .put("data", dto);
+        }
         if (obj instanceof CfetsManualSettleDto || StringUtil.equals(pageId, "CfetsManualSettle")) {
             CfetsManualSettleDto allDto = JsonUtils.json2Object(businessJson, CfetsManualSettleDto.class);
             List<CfetsManualSettleInsertDto> list = cfetsManualSettleService.handleSettleData(allDto);
@@ -147,13 +165,13 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("ps", allDto.getPs())
                     .put("isCheck", isCheck)
                     .put("data", list.get(0));
-            if(StringUtil.equals(allDto.getPs(),交易方向_行权回售.getValue())) {
+            if (StringUtil.equals(allDto.getPs(), 交易方向_行权回售.getValue())) {
                 map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易);
             }
         }
-        if (obj instanceof CfetsTrdFirstBidFirmInfoDto || StringUtil.equals(pageId,"CfetsTrdFirstBidFirm002")) {
-            CfetsTrdFirstBidFirmInfoDto dto = JsonUtils.json2Object(businessJson,CfetsTrdFirstBidFirmInfoDto.class);
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustDtos().get(0).getEntrustId());
+        if (obj instanceof CfetsTrdFirstBidFirmInfoDto || StringUtil.equals(pageId, "CfetsTrdFirstBidFirm002")) {
+            CfetsTrdFirstBidFirmInfoDto dto = JsonUtils.json2Object(businessJson, CfetsTrdFirstBidFirmInfoDto.class);
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getProductDtos().get(0).getEntrustId());
             String ps = etrEntrust.getPs();
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
@@ -165,9 +183,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("isCheck", isCheck)
                     .put("data", dto);
         }
-        if (obj instanceof CfetsTrdBondFirstSubInfoDto || StringUtil.equals(pageId,"TenderBondSub002")) {
-            CfetsTrdBondFirstSubInfoDto dto = JsonUtils.json2Object(businessJson,CfetsTrdBondFirstSubInfoDto.class);
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustDtos().get(0).getEntrustId());
+        if (obj instanceof CfetsTrdBondFirstSubInfoDto || StringUtil.equals(pageId, "TenderBondSub002")) {
+            CfetsTrdBondFirstSubInfoDto dto = JsonUtils.json2Object(businessJson, CfetsTrdBondFirstSubInfoDto.class);
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getProductDtos().get(0).getEntrustId());
             String ps = etrEntrust.getPs();
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
@@ -179,7 +197,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("isCheck", isCheck)
                     .put("data", dto);
         }
-        if (obj instanceof CfetsTrdBondInvestTradeDto ) {
+        if (obj instanceof CfetsTrdBondInvestTradeDto) {
             CfetsTrdBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, CfetsTrdBondInvestTradeDto.class);
             BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_交收确认.getValue())
@@ -190,20 +208,32 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("ps", dto.getPs())
                     .put("isCheck", isCheck)
                     .put("data", dto);
-            if(StringUtil.equals(dto.getPs(),交易方向_行权回售.getValue())) {
+            if (StringUtil.equals(dto.getPs(), 交易方向_行权回售.getValue())) {
                 map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易);
             }
             return map;
         }
-
+        // 银行间回购指令
+        if (obj instanceof CfetsEtribRepoInfo003Dto || obj instanceof CfetsEtrRepoSaveRequest || StringUtil.equals(pageId, "CfetsEtrIbRepoinfo003")){
+            CfetsEtribRepoInfo003Dto dto = JsonUtils.json2Object(businessJson, CfetsEtribRepoInfo003Dto.class);
+            return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, "REPO001")
+                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
+                    .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                    .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_质押式回购首期.getValue())
+                    .put("tradePlace", 交易场所_银行间.getValue())
+                    .put("ps", dto.getPs())
+                    .put("isCheck", isCheck)
+                    .put("data", dto);
+        }
         return null;
     }
 
     /**
      * 指标、授信、名单、授权check
      **/
-    public RiskCommonOutputDto buildParamThenRisk(Object obj, String decisionAct, String flowStatus, boolean isCheck) {
-        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, isCheck);
+    public RiskCommonOutputDto buildParamThenRisk(Object obj, String decisionAct, String flowStatus, String pageId) {
+        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, true, pageId);
         RiskCommonInputDto inputDto = getRiskInputParam(map);
         if (inputDto == null) return null;
         return doRisk(inputDto);
@@ -212,8 +242,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
     /**
      * 指标和授信占用
      **/
-    public void buildParamThenOccupy(Object obj, String decisionAct, String flowStatus, boolean isCheck) {
-        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, isCheck);
+    public void buildParamThenOccupy(Object obj, String decisionAct, String flowStatus, String pageId) {
+        BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, false, pageId);
         RiskCommonInputDto inputDto = getRiskInputParam(map);
         if (inputDto == null) return;
         doOccupy(inputDto);
@@ -254,17 +284,22 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (data instanceof CfetsEtribBondInfo003Dto) {//银行间债券指令
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
-            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsEtribBondInfo003Dto) data).getEtrInvestBondInfoDtos(), null);
+            CfetsEtribBondInfo003Dto dto = (CfetsEtribBondInfo003Dto) data;
+            if (CollectionUtils.isNotEmpty(dto.getEtrInvestBondInfoDtos())) {
+                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsEtribBondInfo003Dto) data).getEtrInvestBondInfoDtos(), null);
+            } else if (CollectionUtils.isNotEmpty(dto.getSelectedItem())) {
+                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsEtribBondInfo003Dto) data).getSelectedItem(), null);
+            }
         }
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
-            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsTrdFirstBidFirmInfoDto) data).getEntrustDtos(), null);
+            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsTrdFirstBidFirmInfoDto) data).getProductDtos(), null);
         }
         if (data instanceof CfetsTrdBondFirstSubInfoDto) {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
-            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsTrdBondFirstSubInfoDto) data).getEntrustDtos(), null);
+            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsTrdBondFirstSubInfoDto) data).getProductDtos(), null);
         }
         if (data instanceof CfetsTrdBondInvestTradeDto) {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
@@ -284,6 +319,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     list1.add(bondDto);
                 }
             }
+            if (CollectionUtils.isEmpty(entity.getTradeDtoList())) {
+                list1.addAll(entity.getTradeDtoList());
+            }
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
         }
         if (data instanceof CfetsManualSettleInsertDto) {
@@ -299,7 +337,26 @@ public class RiskInputParamSerivce extends RiskCommonService {
             }
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
         }
-
+        if(data instanceof CfetsBondDealRegisterQuoteDto) {
+            InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
+            riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
+            CfetsBondDealRegisterQuoteDto dto = (CfetsBondDealRegisterQuoteDto) data;
+            List<TrdBondInvestTradeDto> list1 = new ArrayList<>();
+            for (PtlAllocationDto item : dto.getPtlAllocatios()) {
+                TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
+                BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
+                bondDto.setTotleTradeId(item.getEntrustId());
+                list1.add(bondDto);
+            }
+            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
+        }
+        // 银行间回购指令
+        if (data instanceof CfetsEtribRepoInfo003Dto){
+            CfetsEtribRepoInfo003Dto businessDto = (CfetsEtribRepoInfo003Dto) data;
+            InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
+            riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, businessDto.getEtrInvestRepoInfoDtos(), null);
+        }
         if (CollectionUtils.isNotEmpty(list)) {
             List<InterfRiskRdsDto> result = new ArrayList<>();
             list.forEach(e -> result.add(BeanUtil.mapToObject(e, InterfRiskRdsDto.class)));
@@ -322,18 +379,18 @@ public class RiskInputParamSerivce extends RiskCommonService {
             //这里处理授信
             list.forEach(e -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
-                this.generateInputDto(inputDto, data,e);
+                this.generateInputDto(inputDto, data, e);
                 result.add(inputDto);
             });
 
         }
         if (data instanceof CfetsTrdBondInvestTradeDto) {
             CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
-            this.generateInputDto(inputDto, data,null);
+            this.generateInputDto(inputDto, data, null);
             result.add(inputDto);
         }
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
-            List<CfetsTrdFirstBidFirmEntrustDto> list = ((CfetsTrdFirstBidFirmInfoDto) data).getEntrustDtos();
+            List<CfetsTrdFirstBidFirmProductDto> list = ((CfetsTrdFirstBidFirmInfoDto) data).getProductDtos();
             //这里处理授信
             list.forEach(e -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
@@ -343,7 +400,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
 
         }
         if (data instanceof CfetsTrdBondFirstSubInfoDto) {
-            List<CfetsTrdBondFirstSubEntrustDto> list = ((CfetsTrdBondFirstSubInfoDto) data).getEntrustDtos();
+            List<CfetsTrdBondFirstSubProductDto> list = ((CfetsTrdBondFirstSubInfoDto) data).getProductDtos();
             //这里处理授信
             list.forEach(e -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
@@ -354,11 +411,24 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         if (data instanceof CfetsManualSettleInsertDto) {
             CfetsManualSettleInsertDto dto = (CfetsManualSettleInsertDto) data;
-            for (TrdBankManualSetDetail item : dto.getListTrdBnakSetDetails()) {
+            CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
+            this.generateInputDto(inputDto, dto.getTrdBankManualSettleInfo(), dto.getTrdBankManualSettleInfo());
+            result.add(inputDto);
+        }
+        if (data instanceof CfetsManualSettleInsertDto) {
+
+        }
+        // 银行间回购指令
+        if (data instanceof CfetsEtribRepoInfo003Dto){
+            CfetsEtribRepoInfo003Dto businessDto = (CfetsEtribRepoInfo003Dto) data;
+            // 组合分配信息
+            List<CfetsEtribRepoInfo003Dto> list = businessDto.getEtrInvestRepoInfoDtos();
+            //这里处理授信
+            list.forEach(item -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
-                this.generateInputDto(inputDto, data,null);
+                this.generateInputDto(inputDto, businessDto,item);
                 result.add(inputDto);
-            }
+            });
         }
         return result;
     }
@@ -377,13 +447,19 @@ public class RiskInputParamSerivce extends RiskCommonService {
             Map<String, Object> map = BeanUtil.object2Map(data);
             listDto.setFinprodId((String) map.get("finprodId"));
             listDto.setCounterId((String) map.get("counterId"));
-        }
-        else if (data instanceof CfetsTrdBondFirstSubInfoDto) {
-            CfetsTrdBondFirstSubInfoDto dto = (CfetsTrdBondFirstSubInfoDto)data;
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustDtos().get(0).getEntrustId());
+        } else if (data instanceof CfetsTrdBondFirstSubInfoDto) {
+            CfetsTrdBondFirstSubInfoDto dto = (CfetsTrdBondFirstSubInfoDto) data;
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getProductDtos().get(0).getEntrustId());
             listDto.setFinprodId(dto.getFinprodId());
             listDto.setCounterId(etrEntrust.getCounterId());
-        }else {
+        } else if (data instanceof CfetsEtribRepoInfo003Dto){
+            // 银行间回购指令
+            CfetsEtribRepoInfo003Dto businessDto = (CfetsEtribRepoInfo003Dto) data;
+            listDto.setCounterId(businessDto.getCounterId());
+            listDto.setInputValue1(DictCodeList.平安资产类型_质押式回购.getValue());
+            listDto.setInputValue2(DictCodeList.回购类型_质押式回购.getValue());
+            listDto.setInputValue3(businessDto.getPs());
+        } else {
             Map<String, Object> map = BeanUtil.object2Map(data);
             listDto.setFinprodId((String) map.get("finprodId"));
             listDto.setCounterId((String) map.get("counterId"));
@@ -405,7 +481,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
     public void buildAuthorizeParam(RiskCommonInputDto dto, Object data, RiskNodeConfigDtl dtl) {
         if (this.isControl(dtl.getNameListControl())) return;
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
-            CfetsTrdFirstBidFirmInfoDto infoDto =(CfetsTrdFirstBidFirmInfoDto)data;
+            CfetsTrdFirstBidFirmInfoDto infoDto = (CfetsTrdFirstBidFirmInfoDto) data;
             Map<String, Object> map = BeanUtil.object2Map(data);
             dto.setCounterId(infoDto.getCounterId());
             dto.setPrinAmt(infoDto.getTradeAmt());
@@ -418,10 +494,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
             FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
             dto.setAssetSecType(finProductType.getType9());
             dto.setFinprodId(infoDto.getFinprodId());
-        }
-       else if (data instanceof CfetsTrdBondFirstSubInfoDto) {
-            CfetsTrdBondFirstSubInfoDto infoDto =(CfetsTrdBondFirstSubInfoDto)data;
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infoDto.getEntrustDtos().get(0).getEntrustId());
+        } else if (data instanceof CfetsTrdBondFirstSubInfoDto) {
+            CfetsTrdBondFirstSubInfoDto infoDto = (CfetsTrdBondFirstSubInfoDto) data;
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infoDto.getProductDtos().get(0).getEntrustId());
             Map<String, Object> map = BeanUtil.object2Map(data);
             dto.setCounterId(etrEntrust.getCounterId());
             dto.setPrinAmt(etrEntrust.getEntrustAmt());
@@ -434,7 +509,15 @@ public class RiskInputParamSerivce extends RiskCommonService {
             FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
             dto.setAssetSecType(finProductType.getType9());
             dto.setFinprodId(infoDto.getFinprodId());
-        }else {
+        } else if (data instanceof CfetsEtribRepoInfo003Dto){
+            // 银行间回购指令
+            CfetsEtribRepoInfo003Dto businessDto = (CfetsEtribRepoInfo003Dto) data;
+            dto.setCounterId(businessDto.getCounterId());
+            dto.setPrinAmt(businessDto.getEntrustAmt());
+            dto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+            dto.setTradeMarket(交易场所_银行间.getValue());
+            dto.setPs(businessDto.getPs());
+        } else {
             Map<String, Object> map = BeanUtil.object2Map(data);
             dto.setCounterId((String) map.get("counterId"));
             dto.setPrinAmt((BigDecimal) map.get("tradeAmt"));
@@ -517,7 +600,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         if (obj instanceof CfetsTrdFirstBidFirmInfoDto) {
             CfetsTrdFirstBidFirmInfoDto inputDto = (CfetsTrdFirstBidFirmInfoDto) obj;
-            CfetsTrdFirstBidFirmEntrustDto  detailDto = (CfetsTrdFirstBidFirmEntrustDto) detailObj;
+            CfetsTrdFirstBidFirmEntrustDto detailDto = (CfetsTrdFirstBidFirmEntrustDto) detailObj;
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(detailDto.getEntrustId());
             creditLinesInputDto.setTradeId(detailDto.getEntrustId());
             creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
@@ -542,7 +625,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         if (obj instanceof CfetsTrdBondFirstSubInfoDto) {//银行间债券指令
             CfetsTrdBondFirstSubInfoDto inputDto = (CfetsTrdBondFirstSubInfoDto) obj;
-            CfetsTrdBondFirstSubEntrustDto  detailDto = (CfetsTrdBondFirstSubEntrustDto) detailObj;
+            CfetsTrdBondFirstSubEntrustDto detailDto = (CfetsTrdBondFirstSubEntrustDto) detailObj;
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(detailDto.getEntrustId());
             creditLinesInputDto.setTradeId(detailDto.getEntrustId());
             creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
@@ -565,13 +648,32 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 creditLinesInputDto.setTradeAmt(newFaceValue.multiply(ArithmeticUtil.divide(creditLinesInputDto.getTradeAmt(), 100, 2)));
             }
         }
-        if (obj instanceof TrdBankManualSetDetail) {
-            TrdBankManualSetDetail inputDto = (TrdBankManualSetDetail) obj;
+        if (obj instanceof TrdBankManualSettleInfo) {
+            TrdBankManualSettleInfo inputDto = (TrdBankManualSettleInfo) obj;
             BeanUtil.copyPropertiesIgnoreNull(creditLinesInputDto, inputDto);
             creditLinesInputDto.setTradeId(inputDto.getTradeId());
             creditLinesInputDto.setTradeAmt(inputDto.getSettleAmt());
             creditLinesInputDto.setTradeDate(inputDto.getSettleDate());
             creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        }
+        // 银行间回购指令
+        if (obj instanceof CfetsEtribRepoInfo003Dto){
+            CfetsEtribRepoInfo003Dto inputDto = (CfetsEtribRepoInfo003Dto) obj;
+            CfetsEtribRepoInfo003Dto item = (CfetsEtribRepoInfo003Dto) detailObj;
+            if (StringUtil.equals(DictCodeList.回购拆借方向_逆回购.getValue(),inputDto.getPs())){
+                creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
+                // 指令编号+组合代码
+                creditLinesInputDto.setTradeId(inputDto.getEntrustId()+"-"+item.getPortfolioId());
+                creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
+                creditLinesInputDto.setTradeDate(inputDto.getVdate());
+                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+                creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
+                creditLinesInputDto.setPsPayment(inputDto.getAssetType1());
+                creditLinesInputDto.setSaleCode(inputDto.getPs());
+                creditLinesInputDto.setPs(DictCodeList.交易方向_买入.getValue());
+                creditLinesInputDto.setCounterId(inputDto.getCounterId());
+                creditLinesInputDto.setTradeAmt(inputDto.getEntrustAmt());
+            }
         }
     }
 }

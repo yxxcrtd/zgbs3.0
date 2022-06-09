@@ -10,7 +10,7 @@ import com.joyintech.tams.exchange.common.bean.EntrustQueryDto;
 import com.joyintech.tams.exchange.common.bean.risk.EntrustCountBean;
 import com.joyintech.tams.exchange.common.constant.EntrustStatus;
 import com.joyintech.tams.exchange.common.constant.EntrustType;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.Entrust;
 import com.joyintech.tams.exchange.common.db.domain.EntrustExample;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
@@ -277,7 +277,7 @@ public class EntrustServiceImpl extends AsyncServiceImpl<String, Entrust> implem
         PageHelper.startPage(pageNum, pageSize);
         List<Entrust> entrustList = entrustMapper.selectByExample(entrustExample);
         entrustList.forEach(entrust -> {
-            if (InvestmentAssetType.isFutures(entrust.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(entrust.getAssetType())) {
                 entrust.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
             }
         });

@@ -32,7 +32,7 @@
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
@@ -40,9 +40,12 @@
         group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
-        WHERE FPI.ISSUE_CLASS = '02' AND BO.BID_MODLE !='03' AND BO.IS_CANCEL = 'N' AND
+        WHERE FPI.ISSUE_CLASS = '02' AND BO.BID_MODLE !='03'  AND BO.IS_CANCEL = 'N' AND
         BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE =#{COMMON_BUSINESS_TYPE_TRD97} and
         TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL='N')
+        <if test="userId != null and userId != ''">
+            AND BO.OUR_TRADER = #{userId}
+        </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND FP.FINPROD_MARKET_ID IN
             <foreach
@@ -290,14 +293,16 @@
             FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR  finprodAbbr,
             FPI.TENDER_TARGET  tenderTarget,
-            BO.BID_DATE        bidDate,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,
+            BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
-            BRT.WIN_PRICE           winPrice,
+            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP'))            winPrice,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -307,6 +312,7 @@
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
             BRT.COUNTER_ID          counterId,
+            MCP.COUNTER_NAME        counterName,
             BRT.REMARK              remark
         FROM BID_ORDER BO
         INNER JOIN (SELECT * FROM (SELECT BRT.*
@@ -316,11 +322,14 @@
         ) BRT ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
+        LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BRT.COUNTER_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
+        LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
@@ -396,8 +405,13 @@
         <if test="bidId != null and bidId != ''">
             AND BO.BID_ID = #{bidId}
         </if>
-        <if test="isWin != null and isWin != ''">
-            AND BO.IS_WIN = #{isWin}
+        <if test="isWinList != null and isWinList.size() > 0">
+            AND (CASE WHEN BO.IS_WIN = 'Y' THEN '04'
+            WHEN BO.IS_WIN = 'N' THEN '03'
+            ELSE '02' END) IN
+            <foreach collection="isWinList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
         </if>
         ) ss
         left join SYS_DATADICT_LIST sdl_status on ss.status=sdl_status.ITEM_CODE and sdl_status.DICT_CODE='STATUS_VALID'
@@ -447,14 +461,15 @@
             FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR  finprodAbbr,
             FPI.TENDER_TARGET  tenderTarget,
-            BO.BID_DATE        bidDate,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
-            BRT.WIN_PRICE           winPrice,
+        decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP'))            winPrice,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -464,16 +479,20 @@
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
             BRT.COUNTER_ID          counterId,
+            MCP.COUNTER_NAME        counterName,
             BRT.REMARK              remark
         FROM BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
+        LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BRT.COUNTER_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
+        LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
@@ -500,14 +519,15 @@
             FP.FINPROD_MARKET_ID finprodMarketId,
             FP.FINPROD_ABBR  finprodAbbr,
             FPI.TENDER_TARGET  tenderTarget,
-            BO.BID_DATE        bidDate,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
-            BRT.WIN_PRICE           winPrice,
+            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP'))           winPrice,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -516,17 +536,21 @@
             BRT.WIN_DATE            winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
-            BRT.COUNTER_ID          counterId,
+            BO.COUNTER_ID          counterId,
+            MCP.COUNTER_NAME        counterName,
             BRT.REMARK              remark
         FROM WFL_BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
+        LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BRT.COUNTER_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(to_char(BID_PRICE,'fm999999990.99999')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
+        LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE

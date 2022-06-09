@@ -17,6 +17,7 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.domain.Message;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
@@ -153,7 +154,7 @@ public class EntrustManagement extends BaseService {
 
     private void setFutureOrderStockCode(List<Order> orderListWithOutFair) {
         orderListWithOutFair.forEach(order -> {
-            if (InvestmentAssetType.isFutures(order.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(order.getAssetType())) {
                 order.setStockCode(StockCodeUtils.getStockCode(order.getStockCode()));
             }
         });
@@ -161,7 +162,7 @@ public class EntrustManagement extends BaseService {
 
     private void setFutureEntrustStockCode(List<Entrust> entrustList) {
         entrustList.forEach(entrust -> {
-            if (InvestmentAssetType.isFutures(entrust.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(entrust.getAssetType())) {
                 entrust.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
             }
         });
@@ -258,7 +259,7 @@ public class EntrustManagement extends BaseService {
                 entrust.setEntrustPriceView(o.getEntrustPrice());
             }
 
-            if ((投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestmentAssetType.isBond(entrust.getAssetType()))
+            if ((投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestAssetTypeEnum.isBond(entrust.getAssetType()))
                     || 投管业务类型_协议现券.getValue().equals(entrust.getBusiTypeTg())) {
                 //可转债券大宗交易、协议现券 委托价格展示全价
                 entrust.setEntrustPrice(entrust.getFullPrice());

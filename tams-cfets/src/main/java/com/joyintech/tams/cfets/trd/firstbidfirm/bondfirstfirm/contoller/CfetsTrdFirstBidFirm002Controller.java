@@ -2,7 +2,6 @@ package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.contoller;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
-import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
@@ -11,13 +10,10 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.risk.aop.CfetsEntrustHanderAop;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.*;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm001Service;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm002Service;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.contoller.CfetsTrdBondFirstSub002Controller;
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
@@ -25,7 +21,6 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -67,9 +62,6 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
 
     @Autowired
     CfetsTrdFirstBidFirm002Service cfetsTrdFirstBidFirm002Service;
-
-    @Autowired
-    CfetsTrdFirstBidFirm001Service cfetsTrdFirstBidFirm001Service;
 
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
@@ -204,7 +196,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     @ResponseBody
     public Message<Page<CfetsTrdFirstBidFirmEntrustDto>> etrAddSearch(@RequestBody CfetsTrdBondFirstBidFirmEntrustRequest request) {
         try {
-            Page<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm001Service.pageEntrust(request);
+            Page<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm002Service.pageEntrust(request);
             return new Message<Page<CfetsTrdFirstBidFirmEntrustDto>>().success().setData(list);
         } catch (Exception e) {
             logger.error("指令查询明细添加异常", e);
@@ -255,7 +247,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     @ResponseBody
     public Message<CfetsTrdFirstBidFirmInfoDto> bidPriceTotalLink(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
         try {
-            CfetsTrdFirstBidFirmInfoDto result = cfetsTrdFirstBidFirm002Service.calAmtAndAutoAllocation(request, null);
+            CfetsTrdFirstBidFirmInfoDto result = cfetsTrdFirstBidFirm002Service.calAmtAndAutoAllocation(request, request.getPrice());
             return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(result);
         } catch (Exception e) {
             logger.error("券面总额联动异常", e);
@@ -495,26 +487,26 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
     }
 
-    @ResponseBody
-    @ApiOperation(value = "风险试算", notes = "风险试算")
-    @PostMapping("doRiskcal")
-    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
-        try {
-            String message = cfetsTrdFirstBidFirm002Service.doRiskcalCheckMethod(dto);
-            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
-                AjaxResult ar = new AjaxResult();
-                List<ValidMessage> warnList = new ArrayList<>();
-                warnList.add(new ValidMessage(message));
-                ar.setErrorList(warnList);
-                ar.setMessageType(MessageType.错误消息);
-                return new Message<AjaxResult>().setData(ar);
-            }
-            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,
-                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
-            return new Message<AjaxResult>().setData(ajaxResult);
-        } catch (Exception e) {
-            logger.error("风险试算", e);
-            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-        }
-    }
+//    @ResponseBody
+//    @ApiOperation(value = "风险试算", notes = "风险试算")
+//    @PostMapping("doRiskcal")
+//    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
+//        try {
+//            String message = cfetsTrdFirstBidFirm002Service.doRiskcalCheckMethod(dto);
+//            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
+//                AjaxResult ar = new AjaxResult();
+//                List<ValidMessage> warnList = new ArrayList<>();
+//                warnList.add(new ValidMessage(message));
+//                ar.setErrorList(warnList);
+//                ar.setMessageType(MessageType.错误消息);
+//                return new Message<AjaxResult>().setData(ar);
+//            }
+//            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,
+//                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
+//            return new Message<AjaxResult>().setData(ajaxResult);
+//        } catch (Exception e) {
+//            logger.error("风险试算", e);
+//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
+//        }
+//    }
 }

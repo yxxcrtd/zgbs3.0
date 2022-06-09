@@ -1073,9 +1073,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
                 OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
         <!-- 信用保护凭证新家逻辑-->
-        AND ( STD.SETTLE_SPEED = '0' OR STD.SETTLE_SPEED IS NULL )
-        WHERE TT.TRADE_TYPE = '0'
-        UNION
+        AND ( STD.SETTLE_SPEED = '0' OR STD.SETTLE_SPEED IS NULL ) UNION
         SELECT
             tpda.ENTRUST_ID INSTRUCTION_ID,
             NULL ENTRUST_ID,
@@ -1128,6 +1126,98 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
                   std1.TRADE_ID ENTRUST_ID,
                   std1.CJBH BROKER_TRADE_ID,
                   CASE
+
+                WHEN std1.TRADE_MARKET = '03' THEN
+                '上海证券交易所'
+                WHEN std1.TRADE_MARKET = '04' THEN
+                '深圳证券交易所' ELSE NULL
+                END MARKET,
+                fp.FINPROD_ID STOCK_CODE,
+                fp.FINPROD_ABBR STOCK_NAME,
+                std1.PS ENTRUST_BS,
+                std1.SHARE_AMT TRADED_VOLUME,
+                std1.UNIT_FPRICE TRADED_PRICE,
+                std1.FPRICE_AMT TRADED_BALANCE,
+                std1.DEAL_DATE TRADING_DAY,
+                TO_CHAR( std1.CREATE_TIME, 'HH24:Mi:ss' ) TRADE_TIME,
+                CASE
+
+                WHEN std1.DELIVERY_RESULT = '05'
+                AND std2.DELIVERY_RESULT IS NULL THEN
+                '未交收'
+                WHEN std1.DELIVERY_RESULT = '05'
+                AND std2.DELIVERY_RESULT IS NOT NULL THEN
+                (
+                CASE
+
+                WHEN std2.DELIVERY_RESULT IS NULL THEN
+                '未交收'
+                WHEN std2.DELIVERY_RESULT = '01' THEN
+                '正常交收'
+                WHEN std2.DELIVERY_RESULT = '02' THEN
+                '部分交收'
+                WHEN std2.DELIVERY_RESULT = '03' THEN
+                '交收失败'
+                WHEN std2.DELIVERY_RESULT = '04' THEN
+                '未交收'
+                WHEN std2.DELIVERY_RESULT = '05' THEN
+                '交收通知'
+                END
+                ) ELSE (
+                CASE
+
+                WHEN std1.DELIVERY_RESULT IS NULL THEN
+                '未交收'
+                WHEN std1.DELIVERY_RESULT = '01' THEN
+                '正常交收'
+                WHEN std1.DELIVERY_RESULT = '02' THEN
+                '部分交收'
+                WHEN std1.DELIVERY_RESULT = '03' THEN
+                '交收失败'
+                WHEN std1.DELIVERY_RESULT = '04' THEN
+                '未交收'
+                WHEN std1.DELIVERY_RESULT = '05' THEN
+                '交收通知'
+                END
+                )
+                END DELIVERY_RESULT,
+                CASE
+
+                WHEN std1.DELIVERY_RESULT != '05' THEN
+                100 || '%' ELSE DECODE( std1.SHARE_AMT, std2.SHARE_AMT, 0 ) / DECODE( std1.SHARE_AMT, std1.SHARE_AMT, 1 ) * 100 || '%'
+                END DELIVERY_SCHEDULE
+            FROM
+                SETTLE_TRANS_DATA std1
+                LEFT JOIN SETTLE_TRANS_DATA std2 ON std1.TRADE_ID = std2.TRADE_ID
+                    AND std1.CJBH = std2.CJBH
+                    AND std1.SEC_ACCT_ID = std2.SEC_ACCT_ID
+                    AND std1.SETTLE_DATE = std2.SETTLE_DATE
+                    AND std1.SEAT_NUMBER = std2.SEAT_NUMBER
+                LEFT JOIN FIN_PRODUCT fp ON std1.FINPROD_ID = fp.FINPROD_ID
+                WHERE
+                    std1.DELIVERY_RESULT = '05'
+                    AND std2.DELIVERY_RESULT != '05'
+            ) B
+            LEFT JOIN SETTLE_TRANS_TG_MAPPING sttm ON B.ENTRUST_ID = sttm.TRADE_ID
+            LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON sttm.TRADE_ID_TG = tfpdt.TOTLE_TRADE_ID
+            LEFT JOIN TRD_DEAL_TOTAL_ADD tdta ON tfpdt.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
+            LEFT JOIN STL_CAPACCT_INFO sci ON B.STOCK_CODE = sci.ACCT_NO
+            LEFT JOIN PTL_PORTFOLIO pp ON pp.PORTFOLIO_ID = tfpdt.PORTFOLIO_ID
+            LEFT JOIN ETR_ENTRUST EE ON tdta.ENTRUST_ID = EE.ENTRUST_ID
+        WHERE tdta.ENTRUST_ID = #{instructionId,jdbcType=VARCHAR} -->
+        <!-- union
+        SELECT
+            tdta.ENTRUST_ID INSTRUCTION_ID,
+            B.* ,
+            EE.ENTRUST_TYPE,
+            PP.PORTFOLIO_NAME,
+            SCI.ACCT_NAME FINANCE_ACCOUNT
+        FROM
+            (
+            SELECT
+                std1.TRADE_ID ENTRUST_ID,
+                std1.CJBH BROKER_TRADE_ID,
+                CASE
 
                 WHEN std1.TRADE_MARKET = '03' THEN
                 '上海证券交易所'

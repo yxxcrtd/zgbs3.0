@@ -346,6 +346,12 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             if (br.hasErrors()) {
                 return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
             }
+            List<CfetsPrimaryBidManageSaveRequest> selectedItem = new ArrayList<>();
+            for (CfetsPrimaryBidManageSaveRequest requestDto: dto.getSelectedItem()) {
+                CfetsPrimaryBidManageSaveRequest saveRequest = cfetsPrimaryBidManageService.selectBasicInfo(requestDto);
+                selectedItem.add(saveRequest);
+            }
+            dto.setSelectedItem(selectedItem);
             ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
             WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
             params.setPageId("CfetsPrimaryBidManage002");
@@ -362,9 +368,9 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                 return WorkFlowUtil.concatComment("中标日期"+
                         GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
                         "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
-                        +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidTypeStr()+GlobalConstant.CLOSE_PARENTHESIS
-                        +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.multiply(dto.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100))+"%"+GlobalConstant.CLOSE_PARENTHESIS
-                        +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.divide(dto.getWinPrinamt(),BigDecimal.valueOf(10000),2)+"万元"+GlobalConstant.CLOSE_PARENTHESIS);
+                        +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+entity.getAllocationDetails().get(0).getBidTypeStr()+GlobalConstant.CLOSE_PARENTHESIS
+                        +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.multiply(entity.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100))+"%"+GlobalConstant.CLOSE_PARENTHESIS
+                        +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.divide(entity.getWinPrinamt(),BigDecimal.valueOf(10000),2)+"万元"+GlobalConstant.CLOSE_PARENTHESIS);
             });
             processParameter.setOperationType(OperationType.DELETE);
             processParameter.setWorkFlowParameter(params);

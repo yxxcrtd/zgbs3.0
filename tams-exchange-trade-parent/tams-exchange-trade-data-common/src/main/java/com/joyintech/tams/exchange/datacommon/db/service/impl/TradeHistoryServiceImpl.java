@@ -6,7 +6,7 @@ import com.google.common.base.Strings;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.TradeQryBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.TradeHistory;
 import com.joyintech.tams.exchange.common.db.domain.TradeHistoryExample;
 import com.joyintech.tams.exchange.common.request.PageMode;
@@ -79,7 +79,7 @@ public class TradeHistoryServiceImpl implements TradeHistoryService {
         PageHelper.startPage(pageNum, pageSize);
         List<TradeHistory> tradeHistories = tradeHistoryMapper.selectByExample(tradeHistoryExample);
         tradeHistories.forEach(tradeHistory -> {
-            if (InvestmentAssetType.isFutures(tradeHistory.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(tradeHistory.getAssetType())) {
                 tradeHistory.setStockCode(StockCodeUtils.getStockCode(tradeHistory.getStockCode()));
             }
         });
@@ -100,7 +100,7 @@ public class TradeHistoryServiceImpl implements TradeHistoryService {
         PageHelper.startPage(pageMode.getPageNo(), pageMode.getPageSize());
         List<TradeQueryBean> tradeHistories = tradeHistoryMapper.selectHistoryTradeByPage(tradeQryBean);
         tradeHistories.forEach(tradeHistory -> {
-            if (InvestmentAssetType.isFutures(tradeHistory.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(tradeHistory.getAssetType())) {
                 tradeHistory.setStockCode(StockCodeUtils.getStockCode(tradeHistory.getStockCode()));
             }
             if("EX005".equals(tradeHistory.getBusiTypeTg())){

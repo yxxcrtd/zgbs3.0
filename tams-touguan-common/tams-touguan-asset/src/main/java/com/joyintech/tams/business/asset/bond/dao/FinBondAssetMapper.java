@@ -43,6 +43,8 @@ public interface FinBondAssetMapper {
 
 	FinBondAssetSaveRequest getBasicInfo(Map<String, Object> param);
 
+    FinBondAssetSaveRequest getBasicInfoByInterf(Map<String, Object> param);
+
 	// 债券新建新增快捷录入功能 add by renping 20191010 end
 	int selectCountByfinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
 

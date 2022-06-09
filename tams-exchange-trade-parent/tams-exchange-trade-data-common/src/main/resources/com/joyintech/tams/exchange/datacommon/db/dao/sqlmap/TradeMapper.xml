@@ -53,6 +53,10 @@
         <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
         <result column="NET_PRICE" property="netPrice" jdbcType="NUMERIC"/>
         <result column="NET_BALANCE" property="netBalance" jdbcType="NUMERIC"/>
+        <result column="COUNTER_ID" property="counterId" jdbcType="VARCHAR"/>
+        <result column="COUNTER_NAME" property="counterName" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NAME" property="propAcctName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="QueryResultMap" type="com.joyintech.tams.exchange.common.bean.TradeQueryBean">
@@ -110,6 +114,10 @@
         <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
         <result column="NET_PRICE" property="netPrice" jdbcType="NUMERIC"/>
         <result column="NET_BALANCE" property="netBalance" jdbcType="NUMERIC"/>
+        <result column="COUNTER_ID" property="counterId" jdbcType="VARCHAR"/>
+        <result column="COUNTER_NAME" property="counterName" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NAME" property="propAcctName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="TradeResultMap" type="com.joyintech.tams.exchange.common.bean.TradeQueryDto">
@@ -164,6 +172,10 @@
         <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
         <result column="NET_PRICE" property="netPrice" jdbcType="NUMERIC"/>
         <result column="NET_BALANCE" property="netBalance" jdbcType="NUMERIC"/>
+        <result column="COUNTER_ID" property="counterId" jdbcType="VARCHAR"/>
+        <result column="COUNTER_NAME" property="counterName" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NAME" property="propAcctName" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -232,7 +244,8 @@
     TRADE_TIME, DISCOUNT, TRANS_CODE, PROP_SEAT_NO, TRADING_DAY, LOCAL_ENTRUST_ID, BROKER_ENTRUST_ID, 
     BROKER_TRADE_ID, REPORT_NO, CREATE_TIME, UPDATE_TIME, OFFSET_FLAG, HEDGE_FLAG, PORTFOLIO_ID, FULL_PRICE,
     PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
-    EXTEND1,EXTEND2,ENTRUST_CLASS,IS_FULL_PRICE,NET_PRICE,NET_BALANCE
+    EXTEND1,EXTEND2,ENTRUST_CLASS,IS_FULL_PRICE,NET_PRICE,NET_BALANCE,
+    COUNTER_ID,COUNTER_NAME,PROP_ACCT_NO,PROP_ACCT_NAME
     </sql>
 
     <sql id="Query_Column_List">
@@ -244,6 +257,7 @@
         a.ENTRUST_BS,a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME, a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
         a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2, a.ENTRUST_CLASS,a.IS_FULL_PRICE,a.NET_PRICE,a.NET_BALANCE,
         a.BUSI_TYPE_TG    BUSI_TYPE_TG_STR,
+        a.COUNTER_ID,a.COUNTER_NAME,a.PROP_ACCT_NO,a.PROP_ACCT_NAME,
 		CASE
 		   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 		   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
@@ -347,7 +361,11 @@
         a.ENTRUST_CLASS,
         a.IS_FULL_PRICE,
         a.NET_PRICE,
-        a.NET_BALANCE
+        a.NET_BALANCE,
+        a.COUNTER_ID,
+        a.COUNTER_NAME,
+        a.PROP_ACCT_NO,
+        a.PROP_ACCT_NAME
         FROM
         T_TRADE a
         LEFT JOIN
@@ -427,7 +445,8 @@
                              UPDATE_TIME, OFFSET_FLAG, HEDGE_FLAG, PORTFOLIO_ID, FULL_PRICE,
                              PORTFOLIO_NAME, SEC_ACCT_ID, SEC_ACCT_NAME, TRADE_PLAT, FINPROD_TYPE2,
                              INV_MANAGER_ID, PS, BUSI_TYPE_TG, EXTEND1, EXTEND2, ENTRUST_CLASS,
-                             IS_FULL_PRICE, NET_PRICE, NET_BALANCE)
+                             IS_FULL_PRICE, NET_PRICE, NET_BALANCE,
+                             COUNTER_ID, COUNTER_NAME, PROP_ACCT_NO, PROP_ACCT_NAME)
         values (#{id,jdbcType=VARCHAR}, #{instructionId,jdbcType=VARCHAR}, #{parentOrderId,jdbcType=VARCHAR},
                 #{entrustId,jdbcType=VARCHAR}, #{accountId,jdbcType=VARCHAR}, #{financeAccount,jdbcType=VARCHAR},
                 #{accountName,jdbcType=VARCHAR}, #{market,jdbcType=VARCHAR}, #{assetType,jdbcType=VARCHAR},
@@ -445,7 +464,9 @@
                 #{secAcctName,jdbcType=VARCHAR}, #{tradePlat,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR},
                 #{invManagerId,jdbcType=VARCHAR}, #{ps,jdbcType=VARCHAR}, #{busiTypeTg,jdbcType=VARCHAR},
                 #{extend1,jdbcType=VARCHAR}, #{extend2,jdbcType=VARCHAR}, #{entrustClass,jdbcType=VARCHAR},
-                #{isFullPrice,jdbcType=VARCHAR}, #{netPrice,jdbcType=NUMERIC}, #{netBalance,jdbcType=NUMERIC})
+                #{isFullPrice,jdbcType=VARCHAR}, #{netPrice,jdbcType=NUMERIC}, #{netBalance,jdbcType=NUMERIC},
+                #{counterId,jdbcType=VARCHAR}, #{counterName,jdbcType=VARCHAR},
+                #{propAcctNo,jdbcType=VARCHAR}, #{propAcctName,jdbcType=VARCHAR})
     </insert>
     <sql id="update">
         update T_TRADE
@@ -597,6 +618,18 @@
             <if test="netBalance != null">
                 NET_BALANCE = #{netBalance,jdbcType=NUMERIC},
             </if>
+            <if test="counterId != null">
+                COUNTER_ID = #{counterId,jdbcType=VARCHAR},
+            </if>
+            <if test="counterName != null">
+                COUNTER_NAME = #{counterName,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctNo != null">
+                PROP_ACCT_NO = #{propAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctName != null">
+                PROP_ACCT_NAME = #{propAcctName,jdbcType=VARCHAR},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </sql>
@@ -739,6 +772,18 @@
             <if test="netBalance != null">
                 NET_BALANCE,
             </if>
+            <if test="counterId != null">
+                COUNTER_ID,
+            </if>
+            <if test="counterName != null">
+                COUNTER_NAME,
+            </if>
+            <if test="propAcctNo != null">
+                PROP_ACCT_NO,
+            </if>
+            <if test="propAcctName != null">
+                PROP_ACCT_NAME,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -877,6 +922,18 @@
             <if test="netBalance != null">
                 #{netBalance,jdbcType=NUMERIC},
             </if>
+            <if test="counterId != null">
+                #{counterId,jdbcType=VARCHAR},
+            </if>
+            <if test="counterName != null">
+                #{counterName,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctNo != null">
+                #{propAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctName != null">
+                #{propAcctName,jdbcType=VARCHAR},
+            </if>
         </trim>
     </sql>
     <insert id="updateOrInsertSelective" parameterType="com.joyintech.tams.exchange.common.db.domain.Trade">
@@ -960,7 +1017,11 @@
         ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR},
         IS_FULL_PRICE = #{isFullPrice,jdbcType=VARCHAR},
         NET_PRICE = #{netPrice,jdbcType=NUMERIC},
-        NET_BALANCE = #{netBalance,jdbcType=NUMERIC}
+        NET_BALANCE = #{netBalance,jdbcType=NUMERIC},
+        COUNTER_ID = #{record.counterId,jdbcType=VARCHAR},
+        COUNTER_NAME = #{record.counterName,jdbcType=VARCHAR},
+        PROP_ACCT_NO = #{record.propAcctNo,jdbcType=VARCHAR},
+        PROP_ACCT_NAME = #{record.propAcctName,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -1018,7 +1079,11 @@
             ENTRUST_CLASS     = #{entrustClass,jdbcType=VARCHAR},
             IS_FULL_PRICE     = #{isFullPrice,jdbcType=VARCHAR},
             NET_PRICE         = #{netPrice,jdbcType=NUMERIC},
-            NET_BALANCE       = #{netBalance,jdbcType=NUMERIC}
+            NET_BALANCE       = #{netBalance,jdbcType=NUMERIC},
+            COUNTER_ID        = #{counterId,jdbcType=VARCHAR},
+            COUNTER_NAME      = #{counterName,jdbcType=VARCHAR},
+            PROP_ACCT_NO      = #{propAcctNo,jdbcType=VARCHAR},
+            PROP_ACCT_NAME    = #{propAcctName,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
 

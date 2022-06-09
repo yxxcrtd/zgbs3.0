@@ -6,8 +6,8 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.trade.buyoutrepo.dao.TrdOutRightRepoTradeMapper;
-import com.joyintech.service.trade.buyoutrepo.service.TrdOutRightRepoTradeService;
 import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
@@ -16,7 +16,6 @@ import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo004Mapper;
-import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.manualsettle.dto.*;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
@@ -137,24 +136,12 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
     private CfetsEtrIbRepoAutoRKService cfetsEtrIbRepoAutoRKService;
     @Autowired(required = false)
     private BaseTradeProductDealCommServiceImpl baseTradeProductDealCommServiceImpl;
-
-    @Autowired
-    private TrdOutRightRepoTradeService trdOutRightRepoTradeService;
-
-    @Autowired
-    private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
-
     @Autowired
     private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
     @Autowired
     private TrdProductTempDealTotalMapper trdProductTempDealTotalMapper;
-
     @Autowired
     BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
-
-    @Autowired(required = false)
-    private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
-
     @Autowired
     private RegFinProductDealMapper regFinProductDealMapper;
 
@@ -176,7 +163,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
     /**
      * {@linkplain}
      */
-    @Autowired
+    @Autowired(required = false)
     private TrdOutRightRepoTradeMapper trdOutRightRepoTradeMapper;
 
     @Autowired
@@ -187,9 +174,6 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
 
     @Autowired(required = false)
     private BaseTradeProductDealCommService baseTradeProductDealCommService;
-
-    @Autowired(required = false)
-    private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
 
 
     /**
@@ -1251,8 +1235,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
      * @see
      * @since 1.0
      */
-    private void closeDelegate(List<CfetsManualSettleDealInfo> listTemp,String remark,String tgBusiType) throws Exception {
+    public com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto closeDelegate(List<CfetsManualSettleDealInfo> listTemp,String remark,String tgBusiType) throws Exception {
         List<String> entrustIdList = listTemp.stream().map(CfetsManualSettleDealInfo::getEntrustId).collect(Collectors.toList());
+        List<TrdBondInvestTradeDto> dtoList = new ArrayList<>();
         // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit start
         if(CollectionUtils.isNotEmpty(entrustIdList)){
             Map<String, BigDecimal> etrFinishMap = EntrustCompleteUtil.getEtrFinishAmtList(entrustIdList);
@@ -1268,6 +1253,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 else if(entrustIdList.contains(etrDto.getEntrustId())){
                     recallEntrustIdList.add(etrDto);
                 }
+                TrdBondInvestTradeDto tradeDto = new TrdBondInvestTradeDto();
+                BeanUtil.copyPropertiesIgnoreNull(tradeDto,etrDto);
+                dtoList.add(tradeDto);
             }
 
             //没有做过交易，直接关闭的
@@ -1289,6 +1277,10 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         this.closeDelegatePositionMethod(listTemp,tgBusiType);
         //更新操作日志
         this.closeDelegatOprHisMethod(listTemp,remark);
+
+        com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto tradeDto = new com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto();
+        tradeDto.setTradeDtoList(dtoList);
+        return tradeDto;
     }
 
     /**

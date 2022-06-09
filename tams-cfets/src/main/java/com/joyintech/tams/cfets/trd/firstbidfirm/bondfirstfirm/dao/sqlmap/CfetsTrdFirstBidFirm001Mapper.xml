@@ -235,8 +235,11 @@
                     #{item}
                 </foreach>
             </if>
-            <if test="counterId != null and counterId != '' ">
+            <if test="counterId != null and counterId != '' and isEtrAddSearch == null">
                 AND T.counterId = #{counterId}
+            </if>
+            <if test="isEtrAddSearch != null and isEtrAddSearch != '' and counterId != null and counterId != '' ">
+                AND ( T.counterId = #{counterId} OR T.counterId is null )
             </if>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
                 AND  (

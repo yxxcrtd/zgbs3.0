@@ -16,7 +16,6 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
-import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -28,7 +27,6 @@ import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashReque
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioSecRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPositionRequest;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
@@ -99,7 +97,7 @@ import java.util.stream.Collectors;
  */
 @Transactional
 @Service("CfetsTrdConfirm001Service")
-public class CfetsTrdConfirm001Service extends BaseService{
+public class CfetsTrdConfirm001Service extends BaseService {
 
     /**
      * 日志
@@ -371,7 +369,6 @@ public class CfetsTrdConfirm001Service extends BaseService{
                 trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
                 trdProductDealMapper.insertSelective(trdProductDeal);
 
-                AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
 
                 // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[可用]的组合持仓流水及现金流水
                 FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
@@ -420,20 +417,23 @@ public class CfetsTrdConfirm001Service extends BaseService{
         }
 
         // 选择的成交编号存在对应的报价，则不影响风险
-        if (!StringUtil.isEmptyList(entity.getDtoList()) && !StringUtil.isNotBlank(entity.getfTradeId())) {
+        /*if (!StringUtil.isEmptyList(entity.getDtoList()) && !StringUtil.isNotBlank(entity.getfTradeId())) {
             try {
+                List<TrdBondInvestTradeDto> list = new ArrayList<>();
                 for (CfetsTrdBondInvestTradeDto item : entity.getDtoList()) {
                     TrdBondInvestTradeDto bondDto=new  TrdBondInvestTradeDto();
                     BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
-                    interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
-                            BussinessDictCodeListRds.接口系统ID_实占接口.getValue(), DictCodeList.平安资产类型_债券.getValue(),
-                            (en) -> interfRiskRdsService.sendRiskRdsData(bondDto, en));
+                    //bondDto.setTotleTradeId(bondDto.getTotleTradeId()+":"+bondDto.getPortfolioId());
+                    list.add(bondDto);
                 }
+                interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
+                        BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue(),
+                        (en) -> interfRiskRdsService.sendRiskRdsListData(en,list,null));
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-        }
+        }*/
         //更新操作记录日志
         CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entity.getTotleTradeId());
@@ -639,13 +639,15 @@ public class CfetsTrdConfirm001Service extends BaseService{
         // 选择的成交编号存在对应的报价，则不影响风险
         if (!StringUtil.isEmptyList(entity.getDtoList()) && !StringUtil.isNotBlank(entity.getfTradeId())) {
             try {
+                List<TrdRepoTrade002Dto> list = new ArrayList<>();
                 for (CfetsTrdRepoTrade003Dto item : entity.getDtoList()) {
                     TrdRepoTrade002Dto repoDto=new  TrdRepoTrade002Dto();
                     BeanUtil.copyPropertiesIgnoreNull(repoDto, item);
-                    interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
-                            BussinessDictCodeListRds.接口系统ID_实占接口.getValue(), DictCodeList.平安资产类型_质押式回购.getValue(),
-                            (en) -> interfRiskRdsService.sendRiskRdsData(repoDto, en));
+                    list.add(repoDto);
                 }
+                interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
+                        BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue(), DictCodeList.平安资产类型_质押式回购.getValue(),
+                        (en) -> interfRiskRdsService.sendRiskRdsListData( en,list,null));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -851,13 +853,15 @@ public class CfetsTrdConfirm001Service extends BaseService{
         // TODO 选择的成交编号存在对应的报价，则不影响风险
         if (!StringUtil.isEmptyList(entity.getDtoList()) && !StringUtil.isNotBlank(entity.getfTradeId())) {
             try {
+                List<CfetsTrdFirstBondInvestTradeDto> list = new ArrayList<>();
                 for (CfetsTrdFirstBondInvestTradeDto item : entity.getDtoList()) {
                     CfetsTrdFirstBondInvestTradeDto bondDto = new CfetsTrdFirstBondInvestTradeDto();
                     BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
-                    interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
-                            BussinessDictCodeListRds.接口系统ID_实占接口.getValue(), DictCodeList.平安资产类型_债券.getValue(),
-                            (en) -> interfRiskRdsService.sendRiskRdsData(bondDto, en));
+                    list.add(bondDto);
                 }
+                interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
+                        BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue(),
+                        (en) -> interfRiskRdsService.sendRiskRdsListData(en,list,null));
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -298,7 +298,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
         params.setBusinessCode(CreditProtectionCertificate002Dto::getFinprodMarketId);
-        params.setBusinessType(DictCodeList.共通业务类型_基金类资产信息.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证标的.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {
             return WorkFlowUtil.concatComment("资产代码"+

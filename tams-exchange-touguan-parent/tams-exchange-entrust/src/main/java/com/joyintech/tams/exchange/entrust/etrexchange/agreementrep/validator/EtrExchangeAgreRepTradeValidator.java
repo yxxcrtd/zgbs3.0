@@ -45,15 +45,13 @@ public class EtrExchangeAgreRepTradeValidator implements EtrCommonValidator {
         EtrExchangeAgreRepTrade001Dto dto = (EtrExchangeAgreRepTrade001Dto)value;
 
         //交易方向Map
-        Map<String,DictCodeListExt3> psMap = new HashMap<String,DictCodeListExt3>() {
-            {
-                put(DictCodeListExt3.交易方向_提前购回.getValue(),DictCodeListExt3.交易方向_提前购回);
-                put(DictCodeListExt3.交易方向_到期购回.getValue(),DictCodeListExt3.交易方向_到期购回);
+        Map<String,DictCodeListExt3> psMap = new HashMap<String,DictCodeListExt3>();
+        psMap.put(DictCodeListExt3.交易方向_提前购回.getValue(),DictCodeListExt3.交易方向_提前购回);
+        psMap.put(DictCodeListExt3.交易方向_到期购回.getValue(),DictCodeListExt3.交易方向_到期购回);
 //                put(DictCodeListExt3.交易方向_中途换券.getValue(),DictCodeListExt3.交易方向_中途换券);
-                put(DictCodeListExt3.交易方向_解除质押.getValue(),DictCodeListExt3.交易方向_解除质押);
-                put(DictCodeListExt3.交易方向_到期续做.getValue(),DictCodeListExt3.交易方向_到期续做);
-            }
-        };
+        psMap.put(DictCodeListExt3.交易方向_解除质押.getValue(),DictCodeListExt3.交易方向_解除质押);
+        psMap.put(DictCodeListExt3.交易方向_到期续做.getValue(),DictCodeListExt3.交易方向_到期续做);
+
 
         FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
         if(StringUtil.isNotEmpty(finProduct) && DateUtil.compareTo(DateUtil.parse(dto.getExpireSettleDate()),finProduct.getMdate())>0) {

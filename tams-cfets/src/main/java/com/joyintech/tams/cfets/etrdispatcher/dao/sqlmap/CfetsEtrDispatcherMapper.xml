@@ -402,7 +402,9 @@
                 AND fpt.TYPE_9  = #{TYPE_9}
             </if>
             <if test="busiTypePosition != null and busiTypePosition!='' ">
-                AND (btm.busi_type = #{busiTypePosition} OR btm1.OUTPUT_VALUE_1 = #{busiTypePosition})
+                AND (btm.busi_type = #{busiTypePosition} OR btm1.OUTPUT_VALUE_1 = #{busiTypePosition}
+                    or ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = #{busiTypePosition}
+                )
             </if>
             <if test="finprodMarketIdList != null and finprodMarketIdList.size()>0">
                 AND FIN_PRODUCT.FINPROD_MARKET_ID IN(
@@ -2965,6 +2967,7 @@
     </sql>
 
     <select id="queryEntrust2Touguan" resultMap="QueryResultMap" parameterType="java.lang.String">
+        select * from (
         SELECT
         <include refid="query_entrust"/>
         FROM T_ENTRUST a left join T_INSTRUCTION b on a.INSTRUCTION_ID =b.ENTRUST_ID
@@ -2984,5 +2987,7 @@
         <include refid="query_integrated_entrust_history"/>
         FROM T_INTEGRATED_ENTRUSTHISTORY a left join T_INSTRUCTION b on a.INSTRUCTION_ID =b.ENTRUST_ID
         where a.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+        ) T
+        order by T.CREATE_TIME desc
     </select>
 </mapper>

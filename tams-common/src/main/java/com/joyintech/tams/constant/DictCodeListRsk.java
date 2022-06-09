@@ -199,8 +199,8 @@ public enum DictCodeListRsk implements BaseDictCodeList {
     名单控制类别_机构(DictCode.名单控制类别,"02","机构"),
     名单控制类别_资产和机构(DictCode.名单控制类别,"03","资产和机构"),
 
-    试算结果_通过(DictCode.试算结果,"0","通过"),
-    试算结果_不通过(DictCode.试算结果,"1","通过"),
+    试算结果_通过(DictCode.试算结果,"0","试算通过"),
+    试算结果_不通过(DictCode.试算结果,"1","试算不通过"),
     试算结果_风险审批(DictCode.试算结果,"2","风险审批"),
     ;
     /**

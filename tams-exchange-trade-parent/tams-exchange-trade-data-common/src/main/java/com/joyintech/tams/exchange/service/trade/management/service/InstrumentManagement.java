@@ -84,7 +84,7 @@ public class InstrumentManagement extends BaseService {
                 }
                 instrumentListFromInvest.forEach(instrumentFromInvest -> {
                     String assetType = instrumentFromInvest.getAssetType();
-                    if (InvestmentAssetType.isFutures(assetType)) {
+                    if (InvestAssetTypeEnum.isFutures(assetType)) {
                         FuturesInstrument futuresInstrument = new FuturesInstrument();
                         futuresHelper.setFuturesInstrumentData(instrumentFromInvest, futuresInstrument);
                         futuresInstrumentList.add(futuresInstrument);

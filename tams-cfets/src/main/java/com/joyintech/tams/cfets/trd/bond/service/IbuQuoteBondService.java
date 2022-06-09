@@ -98,7 +98,7 @@ public class IbuQuoteBondService extends BaseService {
     @Autowired
     private CfetsEtrDispatcherService cfetsEtrDispatcherService;
 
-    @Autowired
+    @Autowired(required = false)
     private CfetsBondDealQuotedPriceService cfetsBondDealQuotedPriceService;
 
     @Autowired
@@ -118,7 +118,7 @@ public class IbuQuoteBondService extends BaseService {
     @Autowired
     private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private IbuComponentCommonService ibuComponentCommonService;
 
     @Autowired
@@ -449,10 +449,11 @@ public class IbuQuoteBondService extends BaseService {
         Map<String,Object> anchoringValueMap = handcalAnchoringValue(entrustDtos,"02");
         Set<String> set = anchoringValueMap.keySet();
         String calculateField = StringUtil.EMPTY;BigDecimal comparValue = null;
-        for (String key : set) {
+        // Sonar Fix modify by huwei 220608
+        if (set.iterator().hasNext()) {
+            String key = set.iterator().next();
             calculateField = key;
             comparValue = (BigDecimal)anchoringValueMap.get(key);
-            break;
         }
         for (CfetsBondDealEntrustOrderDto item : entrustDtos) {
             comparValue = ArithmeticUtil.round(comparValue,4, RoundingMode.HALF_UP);
@@ -1008,7 +1009,7 @@ public class IbuQuoteBondService extends BaseService {
         return cfetsEtrDispatcherService.refuseEntrust(param);
     }
 
-    public void doForcedFinish(Map<String,Object> param) throws Exception{
+    public CfetsEtribBondInfo003Dto doForcedFinish(Map<String,Object> param) throws Exception{
         setParam(param);
         List<CfetsBondDealEntrustOrderDto> entrustDtos = cfetsIbuQuoteBondMapper.listEntrust(param);
         if(entrustDtos != null && entrustDtos.size()>0){
@@ -1059,26 +1060,13 @@ public class IbuQuoteBondService extends BaseService {
                         recallEntrustIdList.add(etrDto);
                     }
                 }
-
-                //没有做过交易，直接关闭的
-                if(!com.joyintech.background.component.common.pack.common.util.StringUtil.isEmptyList(recallEntrustIdList)) {
-                    // add by yushilong 批量撤销预占 start
-                    EntrustRdsCommonAop.doListPreOccupy(recallEntrustIdList, com.joyintech.tams.constant.DictCodeList.平安资产类型_债券.getValue(),
-                            BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);
-                    // add by yushilong 批量撤销预占 end
-                }
-
-                //已经有委托完成度的
-                if(!com.joyintech.background.component.common.pack.common.util.StringUtil.isEmptyList(closeEntrustIdList)) {
-                    EntrustCompleteUtil.doComplete(closeEntrustIdList);
-                }
             }
             // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit end
             // add by zhangrui1 批量委托关闭 end
-            if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
+            if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                 //插入旧头寸
                 dtolist.forEach(item ->{
-                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), com.joyintech.tams.constant.DictCodeList.是否_是.getValue());
+                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), DictCodeList.是否_是.getValue());
                 });
             }
 
@@ -1088,7 +1076,11 @@ public class IbuQuoteBondService extends BaseService {
             dtolist.forEach(item ->{
                 cfetsEtrIbBondinfoService.forcedFinishOprHisMethod(item);
             });
+            CfetsEtribBondInfo003Dto info003Dto = new CfetsEtribBondInfo003Dto();
+            info003Dto.setSelectedItem(dtolist);
+            return info003Dto;
         }
+        return null;
     }
     /**
      * 强制完成check
@@ -1357,9 +1349,10 @@ public class IbuQuoteBondService extends BaseService {
             if(item.getStatisticalTimes()!=0){
                 quoteIds.add(item.getQuoteId());
             }
+            // Sonar Fix modify by huwei 220608
             if(StringUtil.isEmpty(item.getFinprodMarketId())||StringUtil.isEmpty(item.getFinprodName())||StringUtil.isEmpty(item.getPsStr())||StringUtil.isEmpty(item.getOuPartyName())
             ||StringUtil.isEmpty(item.getCpPartyName())||StringUtil.isEmpty(item.getCpTraderName())||null==item.getShareAmt()||null==item.getPrice()||null==item.getMatureYield()||StringUtil.isEmpty(item.getSettleTypeStr())
-            ||StringUtil.isEmpty(item.getSettleMethodStr())||StringUtil.isEmpty(item.getSettleTypeStr())){
+            ||StringUtil.isEmpty(item.getSettleMethodStr())){
                 result.put("messagesoft","存在必填项为空值");
                 break;
             }

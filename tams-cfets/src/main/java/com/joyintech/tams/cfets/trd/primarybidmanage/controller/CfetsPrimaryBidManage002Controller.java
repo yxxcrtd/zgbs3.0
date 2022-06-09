@@ -1,6 +1,7 @@
 package com.joyintech.tams.cfets.trd.primarybidmanage.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
@@ -10,6 +11,8 @@ import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ValidUtils;
+import com.joyintech.tams.cfets.risk.aop.CfetsEntrustHanderAop;
+import com.joyintech.tams.cfets.risk.aop.CfetsTradeHandlerAop;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService;
@@ -17,6 +20,7 @@ import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidMana
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.constant.*;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -344,6 +348,30 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         }catch (Exception e){
             e.printStackTrace();
             return new Message<BigDecimal>().fail().setData(null);
+        }
+    }
+
+
+    @ResponseBody
+    @ApiOperation(value = "风险试算", notes = "风险试算")
+    @PostMapping("doRiskcal")
+    public Message<AjaxResult> doRiskcal(@RequestBody CfetsPrimaryBidManageSaveRequest dto){
+        try {
+            String message = cfetsPrimaryBidManageService.doRiskcalCheckMethod(dto);
+            if (StringUtil.isNotEmpty(message)) {
+                AjaxResult ar = new AjaxResult();
+                List<ValidMessage> warnList = new ArrayList<>();
+                warnList.add(new ValidMessage(message));
+                ar.setErrorList(warnList);
+                ar.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().setData(ar);
+            }
+            AjaxResult ajaxResult = CfetsTradeHandlerAop.doRiskcal(dto,
+                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
+            return new Message<AjaxResult>().setData(ajaxResult);
+        } catch (Exception e) {
+            logger.error("风险试算", e);
+            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
         }
     }
 }

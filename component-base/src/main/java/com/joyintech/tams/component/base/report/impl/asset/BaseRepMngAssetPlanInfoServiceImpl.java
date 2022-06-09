@@ -72,8 +72,9 @@ public class BaseRepMngAssetPlanInfoServiceImpl extends BaseService<RepAssetMngP
             for(RepAssetMngPlan entity:repAssetMngPlanList){
                 i+=repAssetMngPlanMapper.insert(entity);
             }
+            return i==repAssetMngPlanList.size();
         }
-        return i==repAssetMngPlanList.size();
+        return false;
     }
 
     /**
@@ -87,8 +88,9 @@ public class BaseRepMngAssetPlanInfoServiceImpl extends BaseService<RepAssetMngP
             for(String repFinprodId:repFinprodIdList){
                 i+=repAssetMngPlanMapper.deleteByPrimaryKey(repFinprodId);
             }
+            return i==repFinprodIdList.size();
         }
-        return i==repFinprodIdList.size();
+        return false;
     }
 
     /**

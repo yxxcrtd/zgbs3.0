@@ -1484,5 +1484,5 @@ public class WflTrdFinProductDealTotal extends WflTrdFinProductDealTotalKey {
     public void setReplacePrice(BigDecimal replacePrice) {
         this.replacePrice = replacePrice;
     }
-	
+
 }
