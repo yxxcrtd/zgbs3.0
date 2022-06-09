@@ -23,7 +23,7 @@ public class CfetsTrdFirstBidFirmRevokeCheckRequst extends BaseEntity implements
     @ApiModelProperty(name = "details", value = "入参明细", required = true)
     private List<CfetsTrdFirstBidFirmCheckDetaileRequst> details;
 
-    @ApiModelProperty(name = "type", value = "业务类型 : 01 投标 02 分销买入", example = "Y")
+    @ApiModelProperty(name = "type", value = "业务类型 : 01 投标 02 分销买入", example = "01")
     private String type;
 
     public String getRemark() {

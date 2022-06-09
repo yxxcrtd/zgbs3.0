@@ -224,9 +224,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             CfetsPrimaryBidManageCfmResponse response = cfetsPrimaryBidManageMapper.getBidManageCfmInfo(param);
             List<BidProductDto> bidProductList = cfetsPrimaryBidManageMapper.getBidProductList(param);
             if(StringUtil.isNotEmpty(response.getBidModle()) && response.getBidModle().equals(DictCodeListExt4.投标方式_自主投标.getValue())) {
-                Map<BigDecimal, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
+                Map<String, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
                 List<SummaryBidDto> summaryBidList = new ArrayList<>();
-                for (BigDecimal winPrice : summaryBidMap.keySet()) {
+                for (String winPrice : summaryBidMap.keySet()) {
                     SummaryBidDto summaryBidDto = new SummaryBidDto();
                     BigDecimal totalBidPrinamt = null;
                     BigDecimal winPrinAmt = null;
@@ -234,9 +234,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         totalBidPrinamt = ArithmeticUtil.doAdd(totalBidPrinamt, bidProductDto.getTotalBidPrinamt());
                         winPrinAmt = ArithmeticUtil.doAdd(winPrinAmt, bidProductDto.getWinPrinAmt());
                     }
-                    summaryBidDto.setTotalBidPrinamt(ArithmeticUtil.divide(totalBidPrinamt,BigDecimal.valueOf(10000),2));
-                    summaryBidDto.setWinPrinAmt(ArithmeticUtil.divide(winPrinAmt,BigDecimal.valueOf(10000),2));
-                    summaryBidDto.setWinPrice(ArithmeticUtil.multiply(winPrice,BigDecimal.valueOf(100)));
+                    summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
+                    summaryBidDto.setWinPrinAmt(winPrinAmt);
+                    summaryBidDto.setWinPrice(winPrice);
                     summaryBidList.add(summaryBidDto);
                 }
                 resultData.put(dtCode + "_formList", listTable);

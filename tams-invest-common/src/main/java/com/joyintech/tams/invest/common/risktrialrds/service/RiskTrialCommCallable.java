@@ -151,27 +151,28 @@ public class RiskTrialCommCallable {
 					PointDetail pointDetail = new PointDetail(rskTaskDto.getFoulCond(),rskTaskDto.getApproveCond(),rskTaskDto.getWarnCond(),rskTaskDto.getIndType());
 					 supStat = pointDetail.check(indicatorValue);
 				}
-	
-				//构造结果实体
-				RiskTrialRetDto riskTrialRetDto = new RiskTrialRetDto();
-				//----modify by 裴家俊  2019/03/18-------start---
-				riskTrialRetDto.setPortfolioId(rskTaskDto.getPortfolioId());
-				//----modify by 裴家俊  2019/03/18-------end---
-				riskTrialRetDto.setIndName(rskTaskDto.getIndName());
-				riskTrialRetDto.setIndId(rskTaskDto.getIndId());
-				riskTrialRetDto.setIndType(rskTaskDto.getIndType());
-				riskTrialRetDto.setSupDate(DateUtil.parse(sysParam.getValDate()));
-				//---add by 裴家俊  2019/03/18--------start----------
-				riskTrialRetDto.setPortfolioLevel(rskTaskDto.getPortfolioLevel());
-				//---add by 裴家俊  2019/03/18--------end----------
-				if(StringUtil.isNotEmpty(indicatorValue))
-					riskTrialRetDto.setSupVal(indicatorValue.toString());
-				riskTrialRetDto.setSupStat(supStat.name());
-				//riskTrialRetDto.setWarnCond(pointDetail.showWThreshold());
-				//riskTrialRetDto.setFoulCond(pointDetail.showVThreshold());
-				riskTrialRetDto.setWarnCond(rskTaskDto.getWarnCond());
-				riskTrialRetDto.setFoulCond(rskTaskDto.getFoulCond());
-				riskTrialRetList.add(riskTrialRetDto);
+	            if(null != indicatorValue ){
+					//构造结果实体
+					RiskTrialRetDto riskTrialRetDto = new RiskTrialRetDto();
+					//----modify by 裴家俊  2019/03/18-------start---
+					riskTrialRetDto.setPortfolioId(rskTaskDto.getPortfolioId());
+					//----modify by 裴家俊  2019/03/18-------end---
+					riskTrialRetDto.setIndName(rskTaskDto.getIndName());
+					riskTrialRetDto.setIndId(rskTaskDto.getIndId());
+					riskTrialRetDto.setIndType(rskTaskDto.getIndType());
+					riskTrialRetDto.setSupDate(DateUtil.parse(sysParam.getValDate()));
+					//---add by 裴家俊  2019/03/18--------start----------
+					riskTrialRetDto.setPortfolioLevel(rskTaskDto.getPortfolioLevel());
+					//---add by 裴家俊  2019/03/18--------end----------
+					if(StringUtil.isNotEmpty(indicatorValue))
+						riskTrialRetDto.setSupVal(indicatorValue.toString());
+					riskTrialRetDto.setSupStat(supStat.name());
+					//riskTrialRetDto.setWarnCond(pointDetail.showWThreshold());
+					//riskTrialRetDto.setFoulCond(pointDetail.showVThreshold());
+					riskTrialRetDto.setWarnCond(rskTaskDto.getWarnCond());
+					riskTrialRetDto.setFoulCond(rskTaskDto.getFoulCond());
+					riskTrialRetList.add(riskTrialRetDto);
+				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);
 			}

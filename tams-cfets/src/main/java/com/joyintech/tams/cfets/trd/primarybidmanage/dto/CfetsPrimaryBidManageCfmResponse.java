@@ -371,7 +371,7 @@ public class CfetsPrimaryBidManageCfmResponse {
     }
 
     public String getTraderStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, this.getTrader());
+        return traderStr;
     }
 
     public void setTraderStr(String traderStr) {
