@@ -68,10 +68,12 @@ public class CreditExtendsTask extends BatchBaseService{
         synchronized (lock1) {
             if(isRunning) {
                 while (isRunning) {
+                    // Sonar Fix modify by huwei 220609
                     try {
-                        Thread.sleep(30000);
+                        lock1.wait(30000);
                     } catch (InterruptedException e) {
                         logger.error(e.getMessage(),e);
+                        Thread.currentThread().interrupt();
                     }
                 }
                 isRunning = true;
@@ -88,7 +90,8 @@ public class CreditExtendsTask extends BatchBaseService{
         		supDate=batchExecuteInfo.getExecuteDate();
         	}
         	else{
-        		supDate = platformDateService.getSysDate(batchExecuteInfo.getCreateUser());
+                // Sonar Fix modify by huwei 220609
+        		supDate = platformDateService.getSysDate(null == batchExecuteInfo ? null : batchExecuteInfo.getCreateUser());
         	}
             if(CacheUtil.getSysParam("IS_EXTEND_CREDIT").equals("true")) {
                 creditExtendsService.run(supDate);

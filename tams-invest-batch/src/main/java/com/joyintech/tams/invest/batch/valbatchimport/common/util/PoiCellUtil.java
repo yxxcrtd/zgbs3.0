@@ -3,15 +3,17 @@ package com.joyintech.tams.invest.batch.valbatchimport.common.util;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.RichTextString;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PoiCellUtil {
 
 	private PoiCellUtil() {}
-	
-	private static final SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-	
+	// Sonar Fix modify by huwei 220609  SimpleDateFormat -> Non-thread-safe fields should not be static
+	private static final ThreadLocal<DateFormat> threadLocalDateFmt =
+			ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+
 	/**
 	 * 
 	 * @param cell POI cell
@@ -50,7 +52,7 @@ public class PoiCellUtil {
 		if(!succ) {
 			try {
 				Date v = cell.getDateCellValue();
-				contents = dateFmt.format(v);
+				contents = threadLocalDateFmt.get().format(v);
 				succ = true;
 			} catch(Exception e) { }
 		}

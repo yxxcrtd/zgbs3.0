@@ -100,8 +100,8 @@ public class AssetDailyInfoGenerationService {
             String isRight = dto.getIsRight();
             String pendingPeriodStr1 = "";
             String pendingPeriodStr2 = "";
-            // 到期展示--
-            if (cDate.compareTo(tDate) == 1) {
+            // 到期展示-- // Sonar Fix modify by huwei 220608
+            if (cDate.compareTo(tDate) > 0) {
             } else {
                 // 含权债TDTAE取值时，如当前计算日以后存在回售或赎回行权计划的且理论行权日不为到期日的，
                 // 则TDATE取2个值计算2个结果，即TDATE分别为最近一个理论行权日、到期日，否则取到期日计算1个结果；
