@@ -345,9 +345,14 @@
         ) GROUP BY FINPROD_ID, PORTFOLIO_ID
         ) invaim on invaim.FINPROD_ID=TEMP.FINPROD_ID and invaim.PORTFOLIO_ID=TEMP.PORTFOLIO_ID
         LEFT JOIN SYS_DATADICT_LIST SDL ON SDL.DICT_CODE = 'TRADE_PLACE' AND FP.TRADE_MARKET = SDL.ITEM_CODE
+        lEFT JOIN FIN_PRODUCT_TYPE FPT
+        on FP.FINPROD_ID = FPT.FINPROD_ID
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
         AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}
+        <if test="assetType != null and assetType !=''">
+            AND FPT.TYPE_10 = #{assetType,jdbcType=VARCHAR}
+        </if>
         <if test="portfolioName != null and portfolioName !=''">
             AND TEMP.PORTFOLIO_ID = #{portfolioName,jdbcType=VARCHAR}
         </if>
