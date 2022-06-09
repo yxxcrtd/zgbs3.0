@@ -63,6 +63,9 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
     @ApiModelProperty(name = "existEntrustIds", value = "etrAddSearch接口,已存在的指令代码,用于过滤申购产品列表中已添加的指令", example = "[WTBOND2022041801,WTBOND2022041802]")
     private List<String> existEntrustIds;
 
+    @ApiModelProperty(name="isEtrAddSearch",value="是否指令查询明细 etrAddSearch接口传值",example="Y")
+    private String isEtrAddSearch;
+
     public PageMode getPageMode() {
         return pageMode;
     }
@@ -208,5 +211,13 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     public void setExistEntrustIds(List<String> existEntrustIds) {
         this.existEntrustIds = existEntrustIds;
+    }
+
+    public String getIsEtrAddSearch() {
+        return isEtrAddSearch;
+    }
+
+    public void setIsEtrAddSearch(String isEtrAddSearch) {
+        this.isEtrAddSearch = isEtrAddSearch;
     }
 }

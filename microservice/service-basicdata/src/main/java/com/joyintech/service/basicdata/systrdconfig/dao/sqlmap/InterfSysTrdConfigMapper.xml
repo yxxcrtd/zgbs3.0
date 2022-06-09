@@ -410,7 +410,7 @@
         ) T3
         ON T.FINPROD_ID = T3.FINPROD_ID
         WHERE T.TRADE_MARKET IN (#{TRADE_MARKET_03,jdbcType=VARCHAR},#{TRADE_MARKET_04,jdbcType=VARCHAR})
-        AND T2.TYPE_8 IN (#{ASSET_TYPE_F01,jdbcType=VARCHAR},#{ASSET_TYPE_F02,jdbcType=VARCHAR},#{ASSET_TYPE_F11,jdbcType=VARCHAR},#{ASSET_TYPE_F20,jdbcType=VARCHAR})
+        AND T2.TYPE_8 IN (#{ASSET_TYPE_F01,jdbcType=VARCHAR},#{ASSET_TYPE_F02,jdbcType=VARCHAR},#{ASSET_TYPE_F11,jdbcType=VARCHAR},#{ASSET_TYPE_F20,jdbcType=VARCHAR},#{ASSET_TYPE_F37,jdbcType=VARCHAR})
         <if test="market != null and market != ''">
             AND T.TRADE_MARKET = #{market,jdbcType=VARCHAR}
         </if>

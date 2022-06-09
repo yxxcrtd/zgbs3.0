@@ -1516,7 +1516,9 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 || (CommonUtil.isType(dto.getInfCode(), BussinessDictCodeListRds.接口系统ID_实占释放批量接口)
                     && StringUtil.equals(CommonUtil.findValue(dataMap, "operateType"),
                         "revoke"))) {
-                return result;
+                if(!StringUtil.equals(map.get("isInnerTrd"),BussinessDictCodeListRds.是否_是.getValue())){
+                    return result;
+                }
             }
             // 一笔买入交易
             InterfRiskRdsDto dtoBy = new InterfRiskRdsDto();
@@ -2845,6 +2847,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     }else {
                         infRiskRdsDto.setEventDate(dataMap.get("arriveDate").toString());
                     }
+                    infRiskRdsDto.setEventId(infRiskRdsDto.getEventId()+ trimInfStr(infRiskRdsDto.getPortfolioCode()));
+
 //                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("arriveDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
                 }
             } 

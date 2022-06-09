@@ -362,6 +362,9 @@ public class SecPosAutoGenerationService {
                     item.setRate(null);
                     item.setBshareFaceValue(null);
                 }
+                if(StringUtil.equals(item.getPinanAssetType(),DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+                    item.setPrin(item.getPosAmount());
+                }
                 try{
                     assetTargetDbMapper.insert(item);
                 }

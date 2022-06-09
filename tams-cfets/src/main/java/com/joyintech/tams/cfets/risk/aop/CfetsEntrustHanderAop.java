@@ -42,14 +42,9 @@ public class CfetsEntrustHanderAop {
     @Autowired
     private RiskInputParamSerivce inputParamSerivce;
 
-    @Autowired
-    private CfetsEtribBondInfo003Service cfetsEtribBondInfo003Service;
-
     @Resource
     private SysWflBusinessListMapper sysWflBusinessListMapper;
 
-    @Autowired
-    private CfetsEtrIbBondinfoService cfetsEtrIbBondinfoService;
 
     /**
      * 保存至代办，从代办中提交到流程中，需要执行风险占用
@@ -71,8 +66,7 @@ public class CfetsEntrustHanderAop {
      * 不保存至代办，提交到流程中，需要执行风险占用
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.etr..*.*.doInsert(..))")
-    protected void insertPoint() {
-    }
+    protected void insertPoint() {}
 
     /**
      * 不保存至代办，提交到流程中，需要执行风险占用
@@ -110,7 +104,7 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         AjaxResult result = new AjaxResult();
         try {
-            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), true);
+            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
             if (StringUtil.isNotEmpty(outputDto.getErrorMsg())) {
                 result.setErrorList(Lists.newArrayList(new ValidMessage(outputDto.getErrorMsg())));
                 ajaxResultMessage.setData(result);
@@ -123,12 +117,11 @@ public class CfetsEntrustHanderAop {
             result.setErrorList(Lists.newArrayList(new ValidMessage("风险校验异常")));
             ajaxResultMessage.setData(result);
         }
-
     }
 
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 指令新建,操作类型submit
      *
      * @param joinPoint
      * @throws BusinessException
@@ -139,12 +132,12 @@ public class CfetsEntrustHanderAop {
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
         if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), false);
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
         }
     }
 
     /**
-     * 买入、申购等交易方向提交时需要处理风险占用，操作类型submit
+     * 指令修改,操作类型submit
      *
      * @param joinPoint
      * @throws BusinessException
@@ -155,7 +148,7 @@ public class CfetsEntrustHanderAop {
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
         if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), false);
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
         }
     }
 
@@ -171,7 +164,7 @@ public class CfetsEntrustHanderAop {
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
         if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), false);
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
         }
     }
 
@@ -186,7 +179,7 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String) args[0]);
         if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), false);
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
         }
 
     }
@@ -200,7 +193,7 @@ public class CfetsEntrustHanderAop {
     @AfterReturning("closePoint()")
     public void occupyOnClose(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_关闭.getValue(), 流程节点_流程提交.getValue(), false);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_关闭.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
@@ -216,7 +209,7 @@ public class CfetsEntrustHanderAop {
         //风险试算check
         RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
         //风险试算组装dto
-        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), true);
+        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
         return getAjaxResult(riskCommonOutput,null,null);
     }
 

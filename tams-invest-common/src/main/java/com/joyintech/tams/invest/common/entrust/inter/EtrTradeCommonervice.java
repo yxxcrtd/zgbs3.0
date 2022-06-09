@@ -433,6 +433,7 @@ public class EtrTradeCommonervice extends BaseService {
                 .put("name", "账户资金可取（元）")
                 .put("type", "xj")
                 .put("amount", bm.get(acctNoCanCash)));
+        //修改 add  页面 头寸单位显示问题 start
         String unit = "张";
         String usableAmountText="可用数量（";
         String usableSecText="持仓数量（";
@@ -453,8 +454,11 @@ public class EtrTradeCommonervice extends BaseService {
                 unit = "股";
             } else if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_基金.getValue())) {
                 unit = "份";
+            } else if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())) {
+                unit = "万元";
             }
         }
+        //修改 add  页面 头寸单位显示问题 end
         /*可用数量*/
         resp.add(BaseMap.newMap()
                 .put("field", "usableAmount")

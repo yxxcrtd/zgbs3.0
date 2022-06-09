@@ -2,7 +2,7 @@ package com.joyintech.tams.exchange.service.trade.check.business.impl;
 
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCode;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
@@ -29,7 +29,7 @@ public class BusinessCheckEx017 implements IBusinessCheck {
     public void check(CheckChainBean chainBean) {
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
-        if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
+        if (!InvestAssetTypeEnum.isBond(instruction.getAssetType())) {
             checkRsp.put("assetType", "现券交易只支持债券");
         }
         if (SubStockType.KZZ.value.trim().equals(instruction.getAssetType1())) {

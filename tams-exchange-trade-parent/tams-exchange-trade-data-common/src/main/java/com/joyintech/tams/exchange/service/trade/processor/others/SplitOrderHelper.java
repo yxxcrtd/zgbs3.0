@@ -4,7 +4,7 @@ import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskOccupy;
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.OrderStatus;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
@@ -56,7 +56,7 @@ public class SplitOrderHelper {
     public List<Entrust> spiltOrder(Entrust entrust, int processType) {
         List<Entrust> entrustList = new ArrayList<>();
         entrustList.add(entrust);
-        if (InvestmentAssetType.FUTURES.value.equals(entrust.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(entrust.getAssetType())) {
             FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(entrust.getStockCode());
             if (Objects.isNull(futuresInstrument)) {
                 logger.info("委托：{} 没有找到对应的期货合约信息：{}", entrust.getId(), entrust.getStockCode());

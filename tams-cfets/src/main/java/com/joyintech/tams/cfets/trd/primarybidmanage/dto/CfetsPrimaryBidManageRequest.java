@@ -103,7 +103,6 @@ public class CfetsPrimaryBidManageRequest {
     @ApiModelProperty(name="tradeMarket",value="交易场所code")
     private String tradeMarket;
 
-
     public String getSearch() {
         return search;
     }

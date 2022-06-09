@@ -79,7 +79,7 @@
         to_char(total.trade_date,'yyyy-MM-dd') as confirmTradeDate,
         reg.counter_id as counterId,
         mcci.counter_name as counterIdStr,
-        deal.portfolioId as portfolioIds,
+        deal.portfolioId as portfolioId,
         deal.portfolioName as portfolioNames,
         reg.quote_type as quoteType,
         nvl(match.match_status,'02') as matchStatus,
@@ -239,7 +239,7 @@
             to_char(BO.BID_DATE,'yyyy-MM-dd')	AS	confirmTradeDate,
             BO.COUNTER_ID  AS	counterId,
             MCCI.COUNTER_NAME AS counterIdStr,
-            BRBP.PORTFOLIO_ID  AS portfolioIds,
+            BRBP.PORTFOLIO_ID  AS portfolioId,
             BRBP.PORTFOLIO_NAME AS	portfolioNames,
             ''									AS	quoteType,
             ''									AS	matchStatus,
@@ -384,7 +384,7 @@
             null	AS	confirmTradeDate,
             WBO.COUNTER_ID		AS	counterId,
             MCCI.COUNTER_NAME AS counterIdStr,
-            WBRBP.PORTFOLIO_ID	AS portfolioIds,
+            WBRBP.PORTFOLIO_ID	AS portfolioId,
             WBRBP.PORTFOLIO_NAME AS	portfolioNames,
             ''	    AS	quoteType,
             ''		AS	matchStatus,
@@ -509,7 +509,7 @@
         null as confirmTradeDate,
         reg.counter_id as counterId,
         mcci.counter_name as counterIdStr,
-        deal.portfolioId as portfolioIds,
+        deal.portfolioId as portfolioId,
         deal.portfolioName as portfolioNames,
         reg.quote_type as quoteType,
         nvl(match.match_status,'02') as matchStatus,
@@ -641,7 +641,7 @@
                 and ((aaa.effectiveStatusStr || '|' || sdl.ITEM_VALUE || '|' || '|' || sdlbusiTypePosition.ITEM_VALUE || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr
                 || '|' || dictps.ITEM_VALUE || '|' || dicttradeMarket.ITEM_VALUE || '|' || dictsp.ITEM_VALUE
                 || '|' || aaa.secManageAcctIdStr || '|' || aaa.busiCode || '|' || aaa.trader
-                || '|' || aaa.counterId  || '|' || aaa.counterIdStr || '|' || aaa.portfolioIds  || '|' || aaa.portfolioNames
+                || '|' || aaa.counterId  || '|' || aaa.counterIdStr || '|' || aaa.portfolioId  || '|' || aaa.portfolioNames
                 || '|' || dictquote.ITEM_VALUE  || '|' || dictms.ITEM_VALUE || '|' || aaa.remark
                 like '%' || #{search} || '%')
                 or to_char(aaa.faceValue,'FM9999999999999990.90')=#{search} or to_char(aaa.faceValue)=#{search}
@@ -1125,7 +1125,7 @@
         ib.fprice_amt as tradeAmt,
         ib.quote_id as quoteId,
         ibd.execid as execid,
-        deal.portfolioId as portfolioIds,
+        deal.portfolioId as portfolioId,
         deal.portfolioName as portfolioNames,
         deal.entrustId as entrustId,
         to_char(ib.quote_date,'yyyy-MM-dd') as quoteDate,
@@ -1283,7 +1283,7 @@
         ic.fprice_amt as tradeAmt,
         ic.quote_id as quoteId,
         ic.execid as execid,
-        deal.portfolioId as portfolioIds,
+        deal.portfolioId as portfolioId,
         deal.portfolioName as portfolioNames,
         deal.entrustId as entrustId,
         to_char(ic.quote_date,'yyyy-MM-dd')  as quoteDate,
@@ -1399,7 +1399,7 @@
         ib.fprice_amt as tradeAmt,
         ib.quote_id as quoteId,
         ibd.execid as execid,
-        deal.portfolioId as portfolioIds,
+        deal.portfolioId as portfolioId,
         deal.portfolioName as portfolioNames,
         deal.entrustId as entrustId,
         to_char(ib.quote_date,'yyyy-MM-dd') as quoteDate,
@@ -1565,7 +1565,7 @@
         ic.fprice_amt as tradeAmt,
         ic.quote_id as quoteId,
         ic.execid as execid,
-        deal.portfolioId as portfolioIds,
+        deal.portfolioId as portfolioId,
         deal.portfolioName as portfolioNames,
         deal.entrustId as entrustId,
         to_char(ic.quote_date,'yyyy-MM-dd') as quoteDate,
@@ -1671,7 +1671,7 @@
                     || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr   || '|' || dictquote.ITEM_VALUE
                     || '|' ||  aaa.traderidStr || '|' ||  aaa.trader  || '|' ||  aaa.counterIdStr || '|' ||  aaa.counterTrader
                     || '|' || dictsp.ITEM_VALUE || '|' || aaa.secManageAcctIdStr || '|' || aaa.quoteId
-                    || '|' || aaa.execid  || '|' || aaa.portfolioIds  || '|' || aaa.portfolioNames
+                    || '|' || aaa.execid  || '|' || aaa.portfolioId  || '|' || aaa.portfolioNames
                     || '|' || aaa.entrustId || '|' || aaa.remark
                     like '%' || #{search} || '%')
                     or to_char(aaa.faceValue,'FM9999999999999990.90')=#{search} or to_char(aaa.faceValue)=#{search}

@@ -142,17 +142,11 @@ public class CfetsEtrIbBondinfoService extends BaseService{
      */
     @Autowired
     private WflEtrEntrustAddMapper wflEtrEntrustAddMapper;
-
-
-
     /**
      * 平台日期
      */
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
-    @Autowired
-    private CfetsEtrIbBondinfo002Mapper cfetsEtrIbBondinfo002Mapper;
-
     /**
      * 产品评级
      **/
@@ -698,7 +692,10 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             if (index > 0){
                 portfolioIdList = Arrays.asList(requestDto.getPortfolioId().split(","));
                 if (portfolioIdList != null && !portfolioIdList.isEmpty()){
-                    portfolioIdList.stream().map(s -> {return StringUtil.trim(s.trim());});
+                    // Sonar Fix modify by huwei 220608
+                    for (int i = 0; i < portfolioIdList.size(); i++) {
+                        portfolioIdList.set(i, portfolioIdList.get(i).trim());
+                    }
                     req.put("portfolioIdList", portfolioIdList).remove("portfolioId");
                 }
             }
@@ -710,7 +707,10 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             if (index > 0){
                 finprodIdList = Arrays.asList(requestDto.getFinprodId().split(","));
                 if (finprodIdList != null && !finprodIdList.isEmpty()){
-                    finprodIdList.stream().map(s -> {return StringUtil.trim(s.trim());});
+                    // Sonar Fix modify by huwei 220608
+                    for (int i = 0; i < finprodIdList.size(); i++) {
+                        finprodIdList.set(i, finprodIdList.get(i).trim());
+                    }
                     req.put("finprodIdList", finprodIdList).remove("finprodId");
                 }
             }
@@ -2019,36 +2019,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
 
             }
         }
-        boolean isAuthorizationSoftcontrol = Boolean.parseBoolean(CacheUtil.getSysParam("IS_AUTHORIZATION_SOFTCONTROL"));
-        // 授权额度检查（当本金金额高于副总裁/总裁助理相应资产的授权额度时，提示消息） 且不等于赎回
-        if (StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH),"01") && StringUtil.isEmptyList(messages)
-                && (!StringUtil.equals(allDto.getPs()==null? "":allDto.getPs(), DictCodeList.交易方向_赎回.getValue()))) {
-            if (!isAuthorizationSoftcontrol){
-                /*if(StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH_IS_TOTAL), "Y")){*/
-                    String mess=getEtrLimitSwitch(allDto);
-                    if(StringUtil.isNotEmpty(mess)){
-                        messages.add(new ValidMessage(mess));
 
-                    }
-              /*  }else{
-                    List<CfetsBussCombDistribtDto> etribComDistribtDtoList =allDto.getBussCombDistribtList();
-                    for(CfetsBussCombDistribtDto distribt:etribComDistribtDtoList){
-                        CfetsEtribSaveRequest itemDto=new CfetsEtribSaveRequest();
-                        BeanUtil.copyPropertiesIgnoreNull(itemDto,allDto);
-                        itemDto.setTradeAmt(distribt.getEntrustNum());
-                        String mess=getEtrLimitSwitch(itemDto);
-                        if(StringUtil.isNotEmpty(mess)){
-                            //根据组合id查询组合信息
-                            PtlPortfolio pp=cfetsetrIbBondinfoMapper.findPtlInfo(distribt.getPortfolioId());
-                            if(null!=pp){
-                                mess=pp.getPortfolioName().toString()+"组合下"+mess;
-                                messages.add(mess);
-                            }
-                        }
-                    }
-                }*/
-            }
-        }
        //SPPI测试
         if(StringUtil.isNotEmpty(allDto.getPs()) && StringUtil.isNotEmpty(allDto.getFinprodId())
                 || StringUtil.equals(allDto.getPs(),DictCodeList.交易方向_买入.getValue())) {
@@ -2095,64 +2066,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         }
         return null;
     }
-    private String getEtrLimitSwitch(CfetsEtribSaveRequest allDto){
-        String message=null;
 
-        TrdProductDeal trdProductDeal = null;
-        String repType = null;
-
-        // 副总裁/总裁助理授权额度检查相关处理
-        String counterId = null;
-        BigDecimal prinAmt = null;
-        String 平安资产类型 = null;
-        String windtypeone = null;
-        String tradeMarket = null;
-        String ps = null;
-        // 资产类型改为授权类型 add by renping 2019-08-06  start
-        String finprodId = null;
-        // 资产类型改为授权类型 add by renping 2019-08-06  end
-        // 资产类型改为授权类型 add by zhangnian 2020-03-04  start
-        String 无标的投管资产类型映射行内资产分类 = null;
-        // 资产类型改为授权类型 add by zhangnian 2019-03-04  end
-        // 无标的投管资产类型映射行内资产分类 inputValue1 inputValue2 inputValue3 add by zhangnian 2020-03-04  start
-        String inputValue1 = null;String inputValue2 = null;String inputValue3 = null;
-        // 无标的投管资产类型映射行内资产分类 inputValue1 inputValue2 inputValue3 add by zhangnian 2019-03-04  end
-        // 债券投资交易
-        if (allDto instanceof CfetsEtribSaveRequest) {
-            CfetsEtribSaveRequest inputDto = (CfetsEtribSaveRequest)allDto;
-            // 修改债券获取金额by赵东东 2019.9.4 start
-            prinAmt = inputDto.getTradeAmt();
-            // 修改债券获取金额by赵东东 2019.9.4 end
-            平安资产类型 = DictCodeList.平安资产类型_债券.getValue();
-            windtypeone = DictCodeList.平安资产类型_债券.getValue();
-            tradeMarket = BussinessDictCodeList.交易场所_银行间.getValue();
-            trdProductDeal = new TrdProductDeal();
-            BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
-            ps = inputDto.getPs();
-            finprodId = inputDto.getFinprodId();
-        }
-        boolean isAuthorizationSoftcontrol = Boolean.parseBoolean(CacheUtil.getSysParam("IS_AUTHORIZATION_SOFTCONTROL"));
-
-        if (StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH),"01")
-                && prinAmt != null
-                && (!StringUtil.equals(allDto.getPs()==null? "":allDto.getPs(), DictCodeList.交易方向_赎回.getValue()))) {
-            if (!isAuthorizationSoftcontrol){
-                CommonBusinessService commonBusinessService = SpringContextUtil.getBean(CommonBusinessService.class);
-                Map<String, Object> params = CommonBusinessService.setParams(counterId, prinAmt, LoginUserUtil.getUserName(),
-                        平安资产类型, windtypeone, tradeMarket, ps, finprodId, null);
-                if (commonBusinessService != null && commonBusinessService.是否超过副总额额度_委托用(params)) {
-                    // 交易本金金额超过副总裁/总裁助理授权额度，无法发起交易!
-                    ValidMessage validMessage = new ValidMessage(
-                            // 修改超过副总裁的授权额度时报出的message 赵东东 2019.8.27 start
-                            getMessage("TRD_E_0016","领导"));
-                    // 修改超过副总裁的授权额度时报出的message 赵东东 2019.8.27 end
-                    // validMessageList.add(validMessage);
-                    message="交易本金金额超过领导授权额度，无法发起交易。";
-                }
-            }
-        }
-        return  message;
-    }
     /**
      * 保存提交时check检查
      * @param allDto
@@ -2595,7 +2509,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
     }
 
     @Transactional
-    public Message<AjaxResult> closeDelegate( CfetsEtribBondInfo003Dto dto) throws Exception{
+    public Message<AjaxResult> closeDelegate( CfetsEtribBondInfo003Dto dto) throws Exception {
 
         List<CfetsEtribBondInfo003Dto> dtolist = dto.getSelectedItem();
 
@@ -2624,7 +2538,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                     }
                 }
 
-                //没有做过交易，直接关闭的
+                /*//没有做过交易，直接关闭的
                 if(!StringUtil.isEmptyList(recallEntrustIdList)) {
                     if(StringUtil.equals(dto.getAssetType(),DictCodeList.平安资产类型_质押式回购.getValue())){
                         EntrustRdsCommonAop.doListPreOccupy(
@@ -2647,7 +2561,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 //已经有委托完成度的
                 if(!StringUtil.isEmptyList(closeEntrustIdList)) {
                     EntrustCompleteUtil.doComplete(closeEntrustIdList);
-                }
+                }*/
             }
             // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit end
             // add by zhangrui1 批量委托关闭 end

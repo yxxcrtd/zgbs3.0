@@ -135,8 +135,8 @@ public class CfetsTrdQueryIbuInfoListResponse {
     private String execid;
 
 
-    @ApiModelProperty(name="portfolioIds",value="组合代码",example="字符串1")
-    private String portfolioIds;
+    @ApiModelProperty(name="portfolioId",value="组合代码",example="字符串1")
+    private String portfolioId;
 
     @ApiModelProperty(name="portfolioNames",value="组合名称",example="字符串1")
     private String portfolioNames;
@@ -520,12 +520,12 @@ public class CfetsTrdQueryIbuInfoListResponse {
         this.execid = execid;
     }
 
-    public String getPortfolioIds() {
-        return portfolioIds;
+    public String getPortfolioId() {
+        return portfolioId;
     }
 
-    public void setPortfolioIds(String portfolioIds) {
-        this.portfolioIds = portfolioIds;
+    public void setPortfolioId(String portfolioId) {
+        this.portfolioId = portfolioId;
     }
 
     public String getPortfolioNames() {

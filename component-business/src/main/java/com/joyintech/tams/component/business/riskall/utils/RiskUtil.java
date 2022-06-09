@@ -58,14 +58,14 @@ public class RiskUtil {
             inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
             if (StringUtil.equals(DictCodeListRsk.风险占用类型_预占释放.getValue(), dtl.getCreditOccupy())
                     || StringUtil.equals(DictCodeListRsk.风险占用类型_预占释放再预占.getValue(), dtl.getCreditOccupy())) {
-                inputDto.setStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                inputDto.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
             }
         }
         if (list.contains(dtl.getCreditOccupy())) {
             inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
             if (StringUtil.equals(DictCodeListRsk.风险占用类型_实占释放.getValue(), dtl.getCreditOccupy())
                     || StringUtil.equals(DictCodeListRsk.风险占用类型_实占释放再实占.getValue(), dtl.getCreditOccupy())) {
-                inputDto.setStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                inputDto.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
             }
         }
         return inputDto;

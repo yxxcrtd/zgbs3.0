@@ -7,7 +7,7 @@ var etrAmt = '';
     var isHoliday = '';
     var calendarId = '';
     // add ZGCPCN-1007 wsz 20220602 控制页面加载次数只加载一次 start
-    var initFlag =true;
+    var initFlag =false;
     // add ZGCPCN-1007 wsz 20220602 控制页面加载次数只加载一次 end
     var getriskdata = function(){
         var obj = {timePoint:MY_SUP_TIME_TYPE_02,valDate:$('#settleDate').val(),portfolioCode:$('#portfolioId').val(),tradeAmount:$('#tradeAmt').val(),assetType:FINPROD_TYPE_F17,isEnabled:'01',assetCode:$('#finprodMarketId').select2("data")[0].object,tradeDirection:$('#ps').val()}
@@ -778,7 +778,7 @@ var etrAmt = '';
        	}else{
        	$('#selector5').hide();
        	}
-        initFlag = false;
+         initFlag = true;
     });
     
     /**

@@ -7,7 +7,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.EntrustQryBean;
 import com.joyintech.tams.exchange.common.bean.EntrustQueryBean;
 import com.joyintech.tams.exchange.common.constant.EntrustType;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrustHistory;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrustHistoryExample;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
@@ -113,7 +113,7 @@ public class IntegratedEntrustHistoryServiceImpl implements IntegratedEntrustHis
         EntrustQryBean entrustQryBean = new EntrustQryBean(userId, startDay, endDay, accountId, "", portfolioId, market, stockCode, entrustProp, entrustStatus, EntrustType.CANCEL.value, ptlAuthList);
         List<IntegratedEntrustHistory> integratedEntrustHistoryList = integratedEntrustHistoryMapper.selectEntrustsPageInfo(entrustQryBean);
         integratedEntrustHistoryList.forEach(integratedEntrustHistory -> {
-            if (InvestmentAssetType.isFutures(integratedEntrustHistory.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(integratedEntrustHistory.getAssetType())) {
                 integratedEntrustHistory.setStockCode(StockCodeUtils.getStockCode(integratedEntrustHistory.getStockCode()));
             }
         });
@@ -138,7 +138,7 @@ public class IntegratedEntrustHistoryServiceImpl implements IntegratedEntrustHis
         EntrustQryBean entrustQryBean = new EntrustQryBean(userId, startDay, endDay, accountId, "", portfolioId, market, stockCode, entrustProp, entrustStatus, EntrustType.CANCEL.value, ptlAuthList);
         List<EntrustQueryBean> entrustQueryBeanList = integratedEntrustHistoryMapper.selectEntrustsByPage(entrustQryBean);
         entrustQueryBeanList.forEach(entrustQueryBean -> {
-            if (InvestmentAssetType.isFutures(entrustQueryBean.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(entrustQueryBean.getAssetType())) {
                 entrustQueryBean.setStockCode(StockCodeUtils.getStockCode(entrustQueryBean.getStockCode()));
             }
             if("EX005".equals(entrustQueryBean.getBusiTypeTg())){
