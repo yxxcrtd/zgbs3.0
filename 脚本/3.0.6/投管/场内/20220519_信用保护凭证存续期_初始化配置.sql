@@ -23,7 +23,7 @@ WHERE SEQ_NO = 'TRD802_01'
 
 DELETE
 FROM CFG_DATATABLE_SHOW
-WHERE PAGECODE = 'CreditProtectionCertificatePeriod002';
+WHERE PAGECODE = 'CreditProtectionCertificatePeriod001';
 
 
 
