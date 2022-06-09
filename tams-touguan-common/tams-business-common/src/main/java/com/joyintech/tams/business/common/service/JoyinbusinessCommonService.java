@@ -152,10 +152,15 @@ public class JoyinbusinessCommonService extends BaseService {
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.selectPortfolioIdList(param));
         }
         String userId = SecurityUtil.getLoginUser().getUserName();
-        if (StringUtils.isNotEmpty(userId)) {
+        if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(dto.getFinprodId()) && StringUtils.isNotEmpty(dto.getPortfolioId())) {
+            param.put("userId", userId);
+            param.put("finprodId", dto.getFinprodId());
+            param.put("portfolioId", dto.getPortfolioId());
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.selectPortfolioIdList(param));
+        } else if (StringUtils.isNotEmpty(userId)) {
             param.put("userId", SecurityUtil.getLoginUser().getUserName());
-            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.selectPortfolioIdList(param));
-        }else{
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.selectPortfolioIdList(param));
+        } else {
             return null;
         }
     }

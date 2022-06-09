@@ -14,6 +14,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.cfets.etr.bondfirstbid.controller.CfetsEtrBondFirstBid001Controller;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEtrRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmUndoSumRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoRequest;
@@ -40,7 +41,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 一级投标确认 初始化页面
@@ -226,6 +230,18 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         }
     }
 
+    @ApiOperation(value = "接收指令(批量)检查", notes = "接收指令(批量,key=entrustIds 传字符串用逗号隔开)")
+    @PostMapping("receiveEntrustCheck")
+    @ResponseBody
+    public Message<AjaxResult> receiveEntrustCheck(@RequestBody List<CfetsTrdBondFirstBidFirmEtrRequest> requestList) {
+        try {
+            AjaxResult result = cfetsTrdFirstBidFirm001Service.receiveEntrustCheck(requestList);
+            return new Message<AjaxResult>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("接收指令(批量)检查异常", e);
+            return new Message<AjaxResult>().fail().setMessage("接收指令(批量)检查异常");
+        }
+    }
 
     @ApiOperation(value = "接收指令(批量)", notes = "接收指令(批量,key=entrustIds 传字符串用逗号隔开)")
     @PostMapping("receiveEntrust")
@@ -239,6 +255,19 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         } catch (Exception e) {
             logger.error("接收指令(批量)异常", e);
             return new Message<AjaxResult>().fail().setMessage("接收指令(批量)异常");
+        }
+    }
+
+    @ApiOperation(value = "放弃委托(批量)检查", notes = "放弃委托(批量,key=entrustIds 传字符串用逗号隔开)")
+    @PostMapping("entrustGiveUpHandleCheck")
+    @ResponseBody
+    public Message<AjaxResult> entrustGiveUpHandleCheck(@RequestBody List<CfetsTrdBondFirstBidFirmEtrRequest> requestList) {
+        try {
+            AjaxResult result = cfetsTrdFirstBidFirm001Service.entrustGiveUpHandleCheck(requestList);
+            return new Message<AjaxResult>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("放弃委托(批量)检查异常", e);
+            return new Message<AjaxResult>().fail().setMessage("放弃委托(批量)检查异常");
         }
     }
 
