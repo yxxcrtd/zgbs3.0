@@ -92,7 +92,10 @@ public class CfetsPrimaryBidManageResponse {
     private BigDecimal winPrinamt;
 
     @ApiModelProperty(name="winPrice",value="中标标位")
-    private String winPrice;
+    private BigDecimal winPrice;
+
+    @ApiModelProperty(name="winPriceStr",value="中标标位")
+    private String winPriceStr;
 
     @ApiModelProperty(name="payAmt",value="缴款金额（元）")
     private BigDecimal payAmt;
@@ -323,12 +326,20 @@ public class CfetsPrimaryBidManageResponse {
         this.winPrinamt = winPrinamt;
     }
 
-    public String getWinPrice() {
+    public BigDecimal getWinPrice() {
         return winPrice;
     }
 
-    public void setWinPrice(String winPrice) {
+    public void setWinPrice(BigDecimal winPrice) {
         this.winPrice = winPrice;
+    }
+
+    public String getWinPriceStr() {
+        return winPriceStr;
+    }
+
+    public void setWinPriceStr(String winPriceStr) {
+        this.winPriceStr = winPriceStr;
     }
 
     public BigDecimal getPayAmt() {

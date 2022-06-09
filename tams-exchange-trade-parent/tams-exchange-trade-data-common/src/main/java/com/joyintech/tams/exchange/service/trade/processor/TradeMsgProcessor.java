@@ -401,7 +401,7 @@ public class TradeMsgProcessor {
             integratedEntrust.setEntrustStatus(EntrustStatus.TOBE_REPORTED.value);
             
           //信用保护凭证不走交易直连，走交易登记逻辑
-            if(StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), integratedEntrust.getBusiTypeTg())) {
+            if(StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), integratedEntrust.getBusiTypeTg())) {
             	this.integratedEntrustNonAgent(integratedEntrust);
             	return;
             }
