@@ -287,7 +287,7 @@ public class RealTimeValMainService {
                             mockPtlSecValuationDto.getAssetValue()));
 
                     if(StringUtil.equals(DictCodeList.平安资产类型_买断式回购.getValue(),mockPtlSecValuationDto.getTgAssetType())
-                            ||StringUtil.equals(DictCodeList.平安资产类型_买断式回购.getValue(),mockPtlSecValuationDto.getTgAssetType())
+                            /*||StringUtil.equals(DictCodeList.平安资产类型_买断式回购.getValue(),mockPtlSecValuationDto.getTgAssetType())*/
                     ){
                         资产负债合计Map.get(cdate).setAssetSumNoFeeamt(
                                 ArithmeticUtil.doAdd(资产负债合计Map.get(cdate).getAssetSumNoFeeamt(),
