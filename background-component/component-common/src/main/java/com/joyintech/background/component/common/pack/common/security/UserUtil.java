@@ -34,4 +34,8 @@ public final class UserUtil {
     public static void clear() {
         USER_THREAD_LOCAL.remove();
     }
+
+    public void unload() {
+        USER_THREAD_LOCAL.remove(); // Compliant
+    }
 }
