@@ -20,7 +20,7 @@ public class RepurchaseQuoteReceiveRequest {
     private String origSerialNo;
     @ApiModelProperty(name = "account", value = "本方资金账户")
     private String account;
-    @ApiModelProperty(name = "requestType", value = "请求类型")
+    @ApiModelProperty(name = "requestType", value = "请求类型： 首期-F,到期续做-X,解除质押-C,中途换券-H,提前购回-Z")
     private String requestType;
     @ApiModelProperty(name = "stockCode", value = "质押券")
     private String stockCode;
