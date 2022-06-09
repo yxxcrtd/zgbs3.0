@@ -72,6 +72,8 @@ public class ThreadPoolTool<T,K> {
             end.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            // Sonar Fix modify by huwei 220608
+            Thread.currentThread().interrupt();
         }
         //关闭线程池
         executorService.shutdown();
@@ -104,6 +106,8 @@ public class ThreadPoolTool<T,K> {
                 e.printStackTrace();
                 //计数器减一
                 end.countDown();
+                // Sonar Fix modify by huwei 220608
+                Thread.currentThread().interrupt();
                 return null;
             }
         }

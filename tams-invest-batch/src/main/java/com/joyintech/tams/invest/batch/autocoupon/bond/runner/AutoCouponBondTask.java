@@ -72,6 +72,8 @@ public class AutoCouponBondTask extends BatchBaseService {
                     logs.addAll((List<AutoCouponErrLog>)future.get());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    // Sonar Fix modify by huwei 220608
+                    Thread.currentThread().interrupt();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
