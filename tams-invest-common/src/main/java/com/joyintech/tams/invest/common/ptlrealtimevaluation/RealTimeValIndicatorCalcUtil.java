@@ -270,12 +270,13 @@ public class RealTimeValIndicatorCalcUtil {
                 mockPtlPortfolioDto.getBasis())) {
             basisNum = 360;
         }
-
-        // 循环：指标名称列表
-        for (IndicatorName indicatorName : indicatorNameList) {
-            if (IndicatorName.区间收益率.equals(indicatorName)) {
-                calcResultMap.put(indicatorName, calc区间收益率(basisNum,mockPtlPortfolioDto.getProfitType(),
-                    calcDateStart, calcDateEnd, ptlValuationDtoMap));
+        if (mockPtlPortfolioDto != null){
+            // 循环：指标名称列表
+            for (IndicatorName indicatorName : indicatorNameList) {
+                if (IndicatorName.区间收益率.equals(indicatorName)) {
+                    calcResultMap.put(indicatorName, calc区间收益率(basisNum,mockPtlPortfolioDto.getProfitType(),
+                            calcDateStart, calcDateEnd, ptlValuationDtoMap));
+                }
             }
         }
         return calcResultMap;
@@ -598,7 +599,7 @@ public class RealTimeValIndicatorCalcUtil {
                 }
             }
             // 无固定期限资本债 TODO
-            else if (StringUtil.equals(DictCodeList.是否_是.getValue(),
+            else if (StringUtil.equals(DictCodeList.是否_否.getValue(),
                 assetInfo.getFinProduct().getIsSus())) {
                 // 无固定期限资本债的久期计算方式为1/r，r为当期票面利率
                 计算结果 = ArithmeticUtil.divide(BigDecimal.ONE, 当期票面利率, scale);
@@ -1202,11 +1203,12 @@ public class RealTimeValIndicatorCalcUtil {
                             ArithmeticUtil.divide(区间终点累计单位净值, 区间起点累计单位净值, 12), BigDecimal.ONE);
 
                     计算结果 = ArithmeticUtil.multiply(计算结果, BigDecimal.valueOf(basisNum));
-                    if(StringUtil.equals(DictCodeListExt3.组合开放类型_封闭式.getValue(), openType)){
+                    /*if(StringUtil.equals(DictCodeListExt3.组合开放类型_封闭式.getValue(), openType)){
                         计算结果 = ArithmeticUtil.divide(计算结果, BigDecimal.valueOf(DateUtil.getBetweenDayNumber(calcDate_1,periodList.get(1))), 6);
                     }else{
                         计算结果 = ArithmeticUtil.divide(计算结果, BigDecimal.valueOf(DateUtil.getBetweenDayNumber(calcDate_1,periodList.get(1))), 6);
-                    }
+                    }*/
+                    计算结果 = ArithmeticUtil.divide(计算结果, BigDecimal.valueOf(DateUtil.getBetweenDayNumber(calcDate_1,periodList.get(1))), 6);
                 }
 
                return 计算结果;
