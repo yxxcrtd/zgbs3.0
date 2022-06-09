@@ -1334,7 +1334,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         result.put("fprice", fprice == null ? BigDecimal.ZERO : fprice);
         // modify by fuyongsheng 20220606 end
         result.put("fpriceAmt", fpriceAmt);
-        result.put("yield", yield == null ? new BigDecimal(0.00) : yield);
+        result.put("yield", yield == null ? BigDecimal.valueOf(0.00) : yield);
         result.put("exerYield", exerYield);
         return result;
     }
@@ -1593,9 +1593,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         else if(StringUtil.equals(trdPriceTimeConfig.getPriceTimeType(),DictCodeListExt3.价格申报范围类型_开盘集合竞价.getValue())){
             if(StringUtil.equals(finprodType,DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
                 if(quotation!=null&&quotation.getPreClosePrice()!=null
-                        &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice()))>0
-                            ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice()))<0)){
-                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice())+"]之外"));
+                        &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.3),quotation.getPreClosePrice()))>0
+                            ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.7),quotation.getPreClosePrice()))<0)){
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(BigDecimal.valueOf(0.7),quotation.getPreClosePrice())+","+ArithmeticUtil.multiply(BigDecimal.valueOf(1.3),quotation.getPreClosePrice())+"]之外"));
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
@@ -1615,27 +1615,27 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         ||(StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())
                             &&StringUtil.equals(finProductType.getType7(), DictCodeList.WIND二级分类_含债券二级分类等_政策银行债.getValue()))){
                     if(quotation!=null&&quotation.getLastPrice()!=null
-                            &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice()))>0
-                            ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice())+"]之外"));
+                            &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.1),quotation.getLastPrice()))>0
+                            ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.9),quotation.getLastPrice()))<0)){
+                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(BigDecimal.valueOf(0.9),quotation.getLastPrice())+","+ArithmeticUtil.multiply(BigDecimal.valueOf(1.1),quotation.getLastPrice())+"]之外"));
                     }
                 }else{
                     if(quotation!=null&&quotation.getLastPrice()!=null
-                            &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()))>0
-                            ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()))<0)){
+                            &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.2),quotation.getLastPrice()))>0
+                            ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.8),quotation.getLastPrice()))<0)){
                         if(quotation.getLastPrice().compareTo(BigDecimal.ZERO)==0){
                             validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+BigDecimal.ZERO+"]之外"));
                         }else{
-                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ ArithmeticUtil.round(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()), NumberEnum.MONEY)+","+ArithmeticUtil.round(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()),NumberEnum.MONEY)+"]之外"));
+                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ ArithmeticUtil.round(ArithmeticUtil.multiply(BigDecimal.valueOf(0.8),quotation.getLastPrice()), NumberEnum.MONEY)+","+ArithmeticUtil.round(ArithmeticUtil.multiply(BigDecimal.valueOf(1.2),quotation.getLastPrice()),NumberEnum.MONEY)+"]之外"));
                         }
                     }
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
                 if(quotation!=null&&quotation.getLastPrice()!=null
-                        &&(checkPrice.compareTo(ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice()))>0
+                        &&(checkPrice.compareTo(ArithmeticUtil.doAdd(BigDecimal.valueOf(0.01),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.round(ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice()),NumberEnum.MONEY)+"]之外"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.round(ArithmeticUtil.doAdd(BigDecimal.valueOf(0.01),quotation.getLastPrice()),NumberEnum.MONEY)+"]之外"));
                 }
             }
         }
@@ -1685,7 +1685,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         /********************************/
         setAssetTypeById(entity);
         //设置默认最小价差、最小交易单位；否则指令组件抛异常；
-        paraDto.setMinDiffPrice(new BigDecimal(0.001).setScale(3, BigDecimal.ROUND_HALF_UP));
+        paraDto.setMinDiffPrice(BigDecimal.valueOf(0.001).setScale(3, BigDecimal.ROUND_HALF_UP));
         paraDto.setMinDealUnit(new BigDecimal(1));
 
         Map<String, UnitEnum> numUnit = new HashMap<String, UnitEnum>();
@@ -2419,9 +2419,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
     public void updateCfetsOprHis(String entrustId, String optType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
-        if (ENTRUST_RECORD_NEW.equals(optType)) {
+        /*if (ENTRUST_RECORD_NEW.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-        } else if (ENTRUST_RECORD_NEW.equals(optType)) {
+        } else*/ if (ENTRUST_RECORD_NEW.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
         } else if ("close".equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_关闭.getValue());
