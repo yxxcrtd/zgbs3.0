@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.exception.BusinessException;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -11,12 +12,15 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfoService;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtribBondInfo003Service;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListRsk;
+import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Pointcut;
@@ -210,7 +214,28 @@ public class CfetsEntrustHanderAop {
         RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
         //风险试算组装dto
         RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
-        return getAjaxResult(riskCommonOutput,null,null);
+        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
+        result.setRiskMathFlag("02");
+        if (riskCommonOutput != null && CollectionUtils.isNotEmpty(riskCommonOutput.getRiskTrialRetDto())) {
+            List<CfetsEtribdoRiskcalResponse> resultList = new ArrayList<>();
+            result.setRskStatus(riskCommonOutput.getRskTrialStatus());
+            if (com.joyintech.background.component.common.pack.common.util.StringUtil.equals(riskCommonOutput.getRskTrialStatus(), "3")) {
+                result.setRiskTrialSpan(DictCodeListRsk.试算结果_不通过.getCodeName());
+            }else {
+                result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
+            }
+            riskCommonOutput.getRiskTrialRetDto().forEach(e->{
+                CfetsEtribdoRiskcalResponse riskcalResponse = new CfetsEtribdoRiskcalResponse();
+                BeanUtil.copyPropertiesIgnoreNull(riskcalResponse,e);
+                resultList.add(riskcalResponse);
+            });
+            result.setRiskcalReturnList(resultList);
+            return getAjaxResult(result,null,null);
+        } else {
+            result.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
+            result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
+            return getAjaxResult(result,null,null);
+        }
     }
 
     @SuppressWarnings("unchecked")
