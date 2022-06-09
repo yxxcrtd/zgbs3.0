@@ -257,7 +257,7 @@ public class EtrFundCashPositionDealService extends EtrCashPositionBaseService {
                 EtrSecPositionFlowDto etrSecPositionFlowDto = EtrCommonCashPositionDealService.getEtrSecPositionFlowDtoFromEtr(
                     entrustCommonDto);
                 /** 场外基金 **/
-                if (StringUtil.equals(tradePlace, BussinessDictCodeList.交易场所_场外.getValue())) {
+              /*  if (StringUtil.equals(tradePlace, BussinessDictCodeList.交易场所_场外.getValue())) {
                     // 1.直投
                     // 可用持仓(组合):减少委托份额
                     // 2.通道一次性划款
@@ -269,7 +269,7 @@ public class EtrFundCashPositionDealService extends EtrCashPositionBaseService {
                     etrSecPositionFlowDto.setAmount(etrEntrust.getEntrustNum().negate());
                     etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
                 }
-                /** 场内基金 **/
+                *//** 场内基金 **//*
                 else {
                     // 1.直投
                     // 可用持仓(组合、证券账户):减少委托份额
@@ -279,7 +279,10 @@ public class EtrFundCashPositionDealService extends EtrCashPositionBaseService {
                     // 可用持仓(组合、通道):减少委托份额
                     etrSecPositionFlowDto.setAmount(etrEntrust.getEntrustNum().negate());
                     etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
-                }
+                }*/
+
+                etrSecPositionFlowDto.setAmount(etrEntrust.getEntrustNum().negate());
+                etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
 
             }
         }

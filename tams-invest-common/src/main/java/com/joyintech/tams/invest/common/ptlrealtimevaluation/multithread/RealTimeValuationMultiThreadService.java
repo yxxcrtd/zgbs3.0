@@ -36,13 +36,16 @@ public class RealTimeValuationMultiThreadService {
             futures = fixedThreadPool.invokeAll(realTimeValuationTasks);
         } catch (InterruptedException e) {
             logger.error("试算失败", e);
+            Thread.currentThread().interrupt();
         }
+        if(null != futures)
         futures.forEach(batchExecuteResultFuture -> {
             String result = null;
             try {
                 result = batchExecuteResultFuture.get();
             } catch (InterruptedException | ExecutionException e) {
                 logger.error("试算失败", e);
+                Thread.currentThread().interrupt();
             }
         });
 
