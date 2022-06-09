@@ -1,6 +1,7 @@
 package com.joyintech.tams.cfets.trd.bond.dto;
 
 import com.joyintech.background.component.common.pack.common.base.BaseEntity;
+import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -230,6 +231,14 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
     private String isSpecial;
 
     private List<String> counterIdList;
+
+
+    private String rskApproval;
+
+    /**
+     * 风险试算实体类
+     */
+    private List<RiskTrialRetDto> riskTrialRetDto;
 
     public String getQuoteId() {
         return quoteId;
@@ -805,6 +814,30 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
 
     public void setIsSpecial(String isSpecial) {
         this.isSpecial = isSpecial;
+    }
+
+    public List<RiskTrialRetDto> getRiskTrialRetDto() {
+        return riskTrialRetDto;
+    }
+
+    public void setRiskTrialRetDto(List<RiskTrialRetDto> riskTrialRetDto) {
+        this.riskTrialRetDto = riskTrialRetDto;
+    }
+
+    public boolean isExercisePlanPrice() {
+        return isExercisePlanPrice;
+    }
+
+    public void setExercisePlanPrice(boolean exercisePlanPrice) {
+        isExercisePlanPrice = exercisePlanPrice;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
     }
 }
 
