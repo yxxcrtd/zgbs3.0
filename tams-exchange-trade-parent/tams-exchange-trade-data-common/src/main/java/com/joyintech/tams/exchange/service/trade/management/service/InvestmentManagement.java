@@ -52,6 +52,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -600,7 +601,31 @@ public class InvestmentManagement extends BaseService {
         for (String id : ids) {
             List<InstructionPledge> instructionPledges = instructionPledgeService.queryInstructionPledgesByInstructionId(id);
             if (CollUtil.isNotEmpty(instructionPledges)) {
-                pledges.addAll(instructionPledges);
+                InstructionPledge instructionPledge = instructionPledges.get(0);
+                String market = StockCodeUtils.getMarket(instructionPledge.getFinprodMarketId());
+                if (Market.isShMarket(market)) {
+                    pledges.addAll(instructionPledges);
+                } else {
+                    Optional<InstructionPledge> pledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
+                    Optional<InstructionPledge> oldPledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "02")).findFirst();
+                    if (!pledgeOptional.isPresent() && !oldPledgeOptional.isPresent()) {
+                        pledges.addAll(instructionPledges);
+                    } else {
+                        InstructionPledge pledge = new InstructionPledge();
+                        BeanUtils.copyProperties(pledgeOptional.get(), pledge);
+                        InstructionPledge oldPledge = oldPledgeOptional.get();
+                        pledge.setOldFinprodId(oldPledge.getFinprodId());
+                        pledge.setOldFinprodAbbr(oldPledge.getFinprodAbbr());
+                        pledge.setOldFinprodMarketId(oldPledge.getFinprodMarketId());
+                        pledge.setOldTradeMarket(oldPledge.getTradeMarket());
+                        pledge.setOldPledgeFaceValue(oldPledge.getPledgeFaceValue());
+                        pledge.setOldPledgeAmt(oldPledge.getPledgeAmt());
+                        pledge.setOldPledgeNumber(oldPledge.getPledgeNumber());
+                        pledge.setOldPledgeRatio(oldPledge.getPledgeRatio());
+
+                        pledges.add(pledge);
+                    }
+                }
             }
         }
         return pledges;
