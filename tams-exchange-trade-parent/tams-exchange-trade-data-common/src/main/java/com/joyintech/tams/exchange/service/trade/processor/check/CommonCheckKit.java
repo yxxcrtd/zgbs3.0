@@ -320,8 +320,11 @@ public class CommonCheckKit extends BaseCheckKit {
 
         BigDecimal minAmt = minTrdUnitLimit.getMinAmt();
 
-        if (!(entrustVolume < minNum) || !(entrustBalance.compareTo(minAmt) < 0)) {
-            return;
+        //大宗交易委托数量和交易金额至少满足一个就行
+        if(EntrustUtils.isBulk(instruction.getBusiTypeTg())){
+            if (!(entrustVolume < minNum) || !(entrustBalance.compareTo(minAmt) < 0 || minAmt.compareTo(BigDecimal.ZERO) == 0)) {
+                return;
+            }
         }
 
         if (entrustVolume < minNum) {

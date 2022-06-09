@@ -252,7 +252,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
         if(StringUtil.isNotEmpty(dto.getBidId())) {
             WflValidInputParameter parameter = new WflValidInputParameter();
             parameter.setPageId("CfetsPrimaryBidManage002");
-            parameter.setBusinessDataPk2(dto.getBidId());
+            parameter.setBusinessDataPk1(dto.getBidId());
             if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
                 errorList.add(new ValidMessage("存在流程中中标结果维护数据，请重新选择！"));
             }
@@ -285,7 +285,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             if(StringUtil.isNotEmpty(dto.getBidId())) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("CfetsPrimaryBidManage002");
-                parameter.setBusinessDataPk2(dto.getBidId());
+                parameter.setBusinessDataPk1(dto.getBidId());
                 if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
                     errorList.add(new ValidMessage("存在流程中数据，不可进行中标结果维护！"));
                 }
