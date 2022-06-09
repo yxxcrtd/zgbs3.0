@@ -24,7 +24,7 @@ public enum PsEnum implements IEnum<String> {
 
     REPO_RENEW("T56", "到期续做"),
     REPO_UNSTAKE("T93", "解除质押"),
-    REPO_EXCHANGE_COUPONS_MIDWAY("T94", "中途换券"),
+    REPO_EXCHANGE("T94", "中途换券"),
     REPO_MATURITY("T95", "到期购回"),
     REPO_ADVANCE("T96", "提前购回"),
 

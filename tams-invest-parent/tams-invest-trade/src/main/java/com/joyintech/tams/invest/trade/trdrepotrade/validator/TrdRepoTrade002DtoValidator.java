@@ -11,6 +11,7 @@
 package com.joyintech.tams.invest.trade.trdrepotrade.validator;
 
 import com.joyintech.calculation.util.ArithmeticUtil;
+import com.joyintech.framework.base.intf.Page;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.CacheUtil;
@@ -319,12 +320,15 @@ public class TrdRepoTrade002DtoValidator implements TradeCommonValidator {
                 errorList.add(new ValidMessage("chlId","添加的质押券已无数量可用："));
             }
         }
-
-        
-        if (StringUtil.isEmpty(inputDto.getChlId()) && StringUtil.isEmpty(inputDto.getSecAcctId())) {
-            errorList.add(new ValidMessage("chlId","通道代码和证券账户不能同时为空。"));
+        //修改不显示 通道 by wsz 20220607 start
+        Page page = CacheUtil.getPage("TrdRepoTrade002");
+        if(!Objects.equals(page,null) && ((null != page.getElementcontrol("chlId") && page.getElementcontrol("chlId").getIsShow())
+                || page.getElementcontrol("chlId") == null)){
+            if (StringUtil.isEmpty(inputDto.getChlId()) && StringUtil.isEmpty(inputDto.getSecAcctId())) {
+                errorList.add(new ValidMessage("chlId","通道代码和证券账户不能同时为空。"));
+            }
         }
-
+        //修改不显示 通道 by wsz 20220607 start
         // 1、  交易场所：银行间，必须上传成交单
 //        if (DictCodeListExt1.交易场所_银行间.getValue().equals(inputDto.getTradeMarket())
 ////                && StringUtil.isEmptyList(inputDto.getUploadFileList())) {
@@ -414,18 +418,22 @@ public class TrdRepoTrade002DtoValidator implements TradeCommonValidator {
 
         }
         // end
-
         //add by msk TISHKBS-1038 新增一次性划款通道交易前是否划款判断 start
-        if(!"".equals(inputDto.getChlId())&&inputDto.getChlId()!=null){
-            Map<String,Object> sMap= new HashMap<String ,Object>();
-            sMap.put("chlId",inputDto.getChlId());
-            sMap.put("finprodId",inputDto.getPortfolioId());
-            Integer count = trdRepoTrade002Service.selectchlTrade(sMap);
-            if(count <= 0){
-                ValidMessage validMessage = new ValidMessage(getMessage("通过一次性通道投资请先进行划款！",getMessage("invest.channelId")));
-                errorList.add(validMessage);
+        //修改不显示 通道 by wsz 20220607 start
+        if(!Objects.equals(page,null) && ((null != page.getElementcontrol("chlId") && page.getElementcontrol("chlId").getIsShow())
+                || page.getElementcontrol("chlId") == null)) {
+            if (!"".equals(inputDto.getChlId()) && inputDto.getChlId() != null) {
+                Map<String, Object> sMap = new HashMap<String, Object>();
+                sMap.put("chlId", inputDto.getChlId());
+                sMap.put("finprodId", inputDto.getPortfolioId());
+                Integer count = trdRepoTrade002Service.selectchlTrade(sMap);
+                if (count <= 0) {
+                    ValidMessage validMessage = new ValidMessage(getMessage("通过一次性通道投资请先进行划款！", getMessage("invest.channelId")));
+                    errorList.add(validMessage);
+                }
             }
         }
+        //修改不显示 通道 by wsz 20220607 end
         //add by msk TISHKBS-1038 新增一次性划款通道交易前是否划款判断 end
         if (null!=inputDto.getRemark() && !inputDto.getRemark().matches(whitePattern)){
             ValidMessage validMessage = new ValidMessage("",getMessage("备注必须填写白名单中的文字"));

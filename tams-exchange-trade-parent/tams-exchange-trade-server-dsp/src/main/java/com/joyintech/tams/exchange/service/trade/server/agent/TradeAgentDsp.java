@@ -141,7 +141,7 @@ public abstract class TradeAgentDsp implements TradeAgent {
 
     public String genLocalId() {
         int tempOffSet = localOffset.incrementAndGet();
-        if (tempOffSet > 9999) {
+        if (tempOffSet > 8999) {
             tempOffSet = 0;
             localOffset.set(0);
         }

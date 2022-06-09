@@ -665,7 +665,9 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
                 CREDIT_SOFT_SKIP_MODE = DictCodeList.是否_否.getValue();
             }
             // check时无业务编号，生成随机编号，用作占用记录和输出结果做对应
-            inputDto.setTradeId(IDGenerator.generate());
+            if(StringUtil.isEmpty(inputDto.getTradeId())) {
+                inputDto.setTradeId(IDGenerator.generate());
+            }
             CreditLinesOutputDto outputDto = dealEachTradeInfo(inputDto,occupyType);
             if (Objects.nonNull(outputDto)){
                 outputDto.setTradeId(inputDto.getTradeId());

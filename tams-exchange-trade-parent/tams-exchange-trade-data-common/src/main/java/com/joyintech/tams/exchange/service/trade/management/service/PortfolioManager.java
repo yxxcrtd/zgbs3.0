@@ -27,6 +27,7 @@ import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import com.joyintech.tams.exchange.common.dto.PortfolioInstructionContextDto;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PortfolioInfoRequest;
@@ -444,7 +445,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void coverPrice(Instruction instruction, OrderPlaceBean order) {
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             BigDecimal fullPrice = order.getFullPrice();
             if (ObjectUtil.isNull(fullPrice) || fullPrice.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, StrUtil.format("全价不正确 =>【fullPrice = {}】", fullPrice));
@@ -454,7 +455,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price) {
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             list.forEach(item -> item.setEntrustPrice(price));
         }
         if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
@@ -546,7 +547,7 @@ public class PortfolioManager extends BaseService {
         // 获取公平交易相关指令
         TickBean tick = (TickBean) tickBean.getData();
         List<PortfolioInstructionContextDto> fairList;
-        if (InvestmentAssetType.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
             fairList = getBondFairList(bean, instruction, tick, result);
         } else {
             fairList = getFairList(bean, instruction, tick, result);
@@ -1812,7 +1813,7 @@ public class PortfolioManager extends BaseService {
         }
         // 最新价
         BigDecimal lastPrice = TradeUtils.getBigDecimal(tick.getLastPrice(), 4);
-        if (InvestmentAssetType.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
             if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)) {
                 entrustPrice = lastPrice;
             }
@@ -1867,7 +1868,7 @@ public class PortfolioManager extends BaseService {
         }
 
         Long fairTotalLeftVolume;
-        if (InvestmentAssetType.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
             fairTotalLeftVolume = getBondFairTotalLeftVolume(orderPlaceBean, instruction, tick);
         } else {
             fairTotalLeftVolume = getFairTotalLeftVolume(orderPlaceBean, instruction, tick);
@@ -1880,7 +1881,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private boolean isGuardBond(Instruction instruction) {
-        if (InvestmentAssetType.isBond(instruction.getAssetType())
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)
                 && 投管业务类型_现券交易.getValue().equals(instruction.getBusiTypeTg())
                 && StringUtil.equals(instruction.getIsNoGuard(), "Y")) {

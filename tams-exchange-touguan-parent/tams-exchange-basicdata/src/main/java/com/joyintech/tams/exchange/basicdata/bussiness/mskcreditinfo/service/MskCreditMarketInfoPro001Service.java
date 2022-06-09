@@ -6,6 +6,7 @@ import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
@@ -44,6 +45,7 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
         pageParam.put("secIdList", StringUtil.splitToList(null, request.getSecid()));
         pageParam.put("valueSourceStr", request.getValueSource());
         pageParam.put("search_isNumberFlag", BaseMap.isNumeric(request.getSearch()));
+        Date sysDate = DateUtil.platDateFromCache();// 获取平台日期
         if (CollectionUtils.isNotEmpty(request.getDate())) {
             String cdateStart = request.getDate().get(0);
             if (StringUtil.isNotEmpty(cdateStart)){
@@ -53,6 +55,9 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
             if (StringUtil.isNotEmpty(cdateEnd)){
                 pageParam.put("cdateEnd",cdateEnd);
             }
+        }else{
+            pageParam.put("cdateEnd",DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN));
+            pageParam.put("cdateStart",DateUtil.addDay(DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN), -1));
         }
         Page<MskCreditInfoProSaveRequest> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),

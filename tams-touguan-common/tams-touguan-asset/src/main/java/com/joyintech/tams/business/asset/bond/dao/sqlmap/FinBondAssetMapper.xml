@@ -398,6 +398,36 @@
         </where>
     </select>
 
+    <select id="getBasicInfoByInterf" parameterType="Map" resultType="com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest">
+        SELECT
+            PAYHSRCSECINFO.SECID finprodMarketId,
+            PAYHSRCSECINFO.SECFULLNAME FINPROD_NAME,
+            PAYHSRCSECINFO.SECNAME FINPROD_ABBR,
+            PAYHSRCSECINFO.MARKET TRADE_MARKET,
+            PAYHSRCSECINFO.INSTITUTION REGIST_ORG,
+            PAYHSRCSECINFO.ISSUEPRICE ISSUE_PRICE,
+            PAYHSRCSECINFO.VDATE,
+            PAYHSRCSECINFO.MDATE,
+            PAYHSRCSECINFO.PUBENDDATE IDATE,
+            PAYHSRCSECINFO.DELISTING_DATE delistingDate,
+            PAYHSRCSECINFO.ISSUEAMT ISSUE_AMT,
+            PAYHSRCSECINFO.ISSUERSHORT ISSUER,
+            TYPE_CONFIG.INPUT_VALUE_2 TYPE_9,
+            TYPE_CONFIG.INPUT_VALUE_3 TYPE_10,
+            TYPE_CONFIG.INPUT_VALUE_4 TYPE_11,
+            PAYHSRCSECINFO.ISSUETYPE ISSUE_TYPE,
+            PAYHSRCSECINFO.ISSUS IS_SUS,
+            PAYHSRCSECINFO.IS_DEBT_WITH_RIGTHS IS_RIGHT,
+            'Y' IS_ALLOW_OVERWRITE
+
+        FROM
+            INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+                LEFT JOIN FIN_PRODUCT_TYPE_CONFIG TYPE_CONFIG ON TYPE_CONFIG.INPUT_VALUE_1 = 'F01'
+                AND TYPE_CONFIG.INPUT_VALUE_2 = PAYHSRCSECINFO.SECTYPE
+                AND TYPE_CONFIG.INPUT_VALUE_3 = PAYHSRCSECINFO.SECTYPE2
+        WHERE SECID =  #{finprodId})
+    </select>
+
     <select id = "selectCountByfinprodMarketId" resultType="java.lang.Integer">
         SELECT
             count( * )

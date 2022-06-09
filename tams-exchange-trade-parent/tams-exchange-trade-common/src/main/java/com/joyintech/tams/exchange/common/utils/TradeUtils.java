@@ -4,10 +4,10 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -149,47 +149,39 @@ public class TradeUtils {
     // 卖出冻结数量
     public static boolean isFrozenVolume(String entrustProp, String entrustBs, String investmentAssetType) {
         // 意向申报，不需要冻结
-        if (EntrustProp.INTENTION.value.equals(entrustProp))
-            return false;
+        if (EntrustProp.INTENTION.value.equals(entrustProp)) return false;
             // 协议回购首期报价申报，正回购 冻结数量
-        else if (EntrustProp.SH_REPURCHASE_TRADE.value.equals(entrustProp))
-            return true;
-        else if (EntrustProp.SH_REPURCHASE_TRADE_CONFIRM.value.equals(entrustProp))
-            return false;
+        else if (EntrustProp.SH_REPURCHASE_TRADE.value.equals(entrustProp)) return true;
+        else if (EntrustProp.SH_REPURCHASE_TRADE_CONFIRM.value.equals(entrustProp)) return false;
         else if (EntrustProp.SZ_REPURCHASE_BEGIN.value.equals(entrustProp) && EntrustBs.BUY.value.equals(entrustBs))
             return true;
         else if (EntrustProp.SZ_REPURCHASE_BEGIN.value.equals(entrustProp) && EntrustBs.SELL.value.equals(entrustBs))
             return false;
             // 质押式竞价回购，正回购 冻结数量
-        else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(investmentAssetType) && EntrustBs.BUY.value.equals(entrustBs))
+        else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(investmentAssetType) && EntrustBs.BUY.value.equals(entrustBs))
             return true;
-        else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(investmentAssetType) && EntrustBs.SELL.value.equals(entrustBs))
+        else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(investmentAssetType) && EntrustBs.SELL.value.equals(entrustBs))
             return false;
-        else
-            return EntrustBs.SELL.value.equals(entrustBs);
+        else return EntrustBs.SELL.value.equals(entrustBs);
     }
 
     // 买入冻结金额
     public static boolean isFrozenBalance(String entrustProp, String entrustBs, String investmentAssetType) {
         // 意向申报，不需要冻结
-        if (EntrustProp.INTENTION.value.equals(entrustProp))
-            return false;
+        if (EntrustProp.INTENTION.value.equals(entrustProp)) return false;
             // 协议回购首期成交确认，逆回购 冻结金额
-        else if (EntrustProp.SH_REPURCHASE_TRADE_CONFIRM.value.equals(entrustProp))
-            return true;
-        else if (EntrustProp.SH_REPURCHASE_TRADE.value.equals(entrustProp))
-            return false;
+        else if (EntrustProp.SH_REPURCHASE_TRADE_CONFIRM.value.equals(entrustProp)) return true;
+        else if (EntrustProp.SH_REPURCHASE_TRADE.value.equals(entrustProp)) return false;
         else if (EntrustProp.SZ_REPURCHASE_BEGIN.value.equals(entrustProp) && EntrustBs.SELL.value.equals(entrustBs))
             return true;
         else if (EntrustProp.SZ_REPURCHASE_BEGIN.value.equals(entrustProp) && EntrustBs.BUY.value.equals(entrustBs))
             return false;
             // 质押式竞价回购，逆回购 冻结金额
-        else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(investmentAssetType) && EntrustBs.SELL.value.equals(entrustBs))
+        else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(investmentAssetType) && EntrustBs.SELL.value.equals(entrustBs))
             return true;
-        else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(investmentAssetType) && EntrustBs.BUY.value.equals(entrustBs))
+        else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(investmentAssetType) && EntrustBs.BUY.value.equals(entrustBs))
             return false;
-        else
-            return EntrustBs.BUY.value.equals(entrustBs);
+        else return EntrustBs.BUY.value.equals(entrustBs);
     }
 
     public static BigDecimal calculateBalance(BigDecimal entrustPrice, long entrustVolume, String assetType) {
@@ -212,13 +204,13 @@ public class TradeUtils {
         }
         // 债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
         // 债券且是交易类
-        if (InvestmentAssetType.BOND.value.equals(assetType)
+        if (InvestAssetTypeEnum.BOND.value.equals(assetType)
                 && Objects.nonNull(orderInterface)
                 && EntrustProp.isTrade(orderInterface.getEntrustProp())) {
             return multiply(orderInterface.getFullPrice(), entrustVolume, 2);
         }
         // 质押式竞价回购，金额计算
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
         }
         // TODO ETF计算
@@ -232,16 +224,14 @@ public class TradeUtils {
         }
         // 债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
         // 债券且是交易类
-        if (InvestmentAssetType.BOND.value.equals(assetType)
-                && Objects.nonNull(orderInterface)
-                && EntrustProp.isTrade(orderInterface.getEntrustProp())) {
+        if (InvestAssetTypeEnum.BOND.value.equals(assetType) && Objects.nonNull(orderInterface) && EntrustProp.isTrade(orderInterface.getEntrustProp())) {
             return multiply(orderInterface.getFullPrice(), entrustVolume, 2);
         }
         // 质押式竞价回购，金额计算
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
         }
-        if (InvestmentAssetType.FUTURES.value.equals(assetType)) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(assetType)) {
             BigDecimal res = multiply(entrustPrice, entrustVolume, 2);
             return multiply(res, BigDecimal.valueOf(Objects.nonNull(futuresInstrument) ? futuresInstrument.getVolumeMultiple() : 1), 2);
         }
@@ -252,7 +242,7 @@ public class TradeUtils {
     //投管风控获取全价总额以及净价总额
     public static BigDecimal calculateBalanceForRisk(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType) {
         // 质押式竞价回购，金额计算
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
         }
         return multiply(entrustPrice, entrustVolume, 2);
@@ -260,11 +250,10 @@ public class TradeUtils {
 
     public static BigDecimal calculateBalanceForRisk(BigDecimal fullPrice, BigDecimal entrustPrice, long entrustVolume, String assetType, String ps) {
         // 质押式竞价回购，金额计算
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
         }
-        if (InvestmentAssetType.BOND.value.equals(assetType)
-                && EnumUtil.in(ps, InstructionPs.BUY, InstructionPs.SELL)) {
+        if (InvestAssetTypeEnum.BOND.value.equals(assetType) && EnumUtil.in(ps, InstructionPs.BUY, InstructionPs.SELL)) {
             return multiply(fullPrice, entrustVolume, 2);
         }
 

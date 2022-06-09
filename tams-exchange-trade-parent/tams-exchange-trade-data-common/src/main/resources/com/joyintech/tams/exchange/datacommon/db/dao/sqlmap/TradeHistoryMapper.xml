@@ -54,6 +54,10 @@
         <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
         <result column="NET_PRICE" property="netPrice" jdbcType="NUMERIC"/>
         <result column="NET_BALANCE" property="netBalance" jdbcType="NUMERIC"/>
+        <result column="COUNTER_ID" property="counterId" jdbcType="VARCHAR"/>
+        <result column="COUNTER_NAME" property="counterName" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NAME" property="propAcctName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="QueryResultMap" type="com.joyintech.tams.exchange.common.bean.TradeQueryBean">
@@ -112,6 +116,10 @@
         <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
         <result column="NET_PRICE" property="netPrice" jdbcType="NUMERIC"/>
         <result column="NET_BALANCE" property="netBalance" jdbcType="NUMERIC"/>
+        <result column="COUNTER_ID" property="counterId" jdbcType="VARCHAR"/>
+        <result column="COUNTER_NAME" property="counterName" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NAME" property="propAcctName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -181,7 +189,8 @@
     CLEAR_BALANCE, TRADE_TIME, DISCOUNT, TRANS_CODE, PROP_SEAT_NO, TRADING_DAY, LOCAL_ENTRUST_ID,
     BROKER_ENTRUST_ID, BROKER_TRADE_ID, REPORT_NO, CREATE_TIME, UPDATE_TIME, OFFSET_FLAG, HEDGE_FLAG, PORTFOLIO_ID, FULL_PRICE,
     PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
-    EXTEND1, EXTEND2,ENTRUST_CLASS,IS_FULL_PRICE,NET_PRICE,NET_BALANCE
+    EXTEND1, EXTEND2,ENTRUST_CLASS,IS_FULL_PRICE,NET_PRICE,NET_BALANCE,
+    COUNTER_ID,COUNTER_NAME,PROP_ACCT_NO,PROP_ACCT_NAME
     </sql>
 
     <sql id="Query_Column_List">
@@ -192,7 +201,8 @@
     a.BROKER_ENTRUST_ID, a.BROKER_TRADE_ID, a.REPORT_NO, a.CREATE_TIME, a.UPDATE_TIME, a.OFFSET_FLAG,a. HEDGE_FLAG,
     a.PORTFOLIO_ID, a.FULL_PRICE,a.ENTRUST_BS,
     a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME,a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
-    a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2, a.ENTRUST_CLASS,a.IS_FULL_PRICE,a.NET_PRICE,a.NET_BALANCE
+    a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2, a.ENTRUST_CLASS,a.IS_FULL_PRICE,a.NET_PRICE,a.NET_BALANCE,
+        a.COUNTER_ID,a.COUNTER_NAME,a.PROP_ACCT_NO,a.PROP_ACCT_NAME
     </sql>
     <sql id="queryCondition2">
         <where>
@@ -330,7 +340,8 @@
                                     CREATE_TIME, UPDATE_TIME, OFFSET_FLAG, HEDGE_FLAG, PORTFOLIO_ID, FULL_PRICE,
                                     PORTFOLIO_NAME, SEC_ACCT_ID, SEC_ACCT_NAME, TRADE_PLAT, FINPROD_TYPE2,
                                     INV_MANAGER_ID, PS, BUSI_TYPE_TG, EXTEND1, EXTEND2, ENTRUST_CLASS,
-                                    IS_FULL_PRICE, NET_PRICE, NET_BALANCE)
+                                    IS_FULL_PRICE, NET_PRICE, NET_BALANCE,
+                                    COUNTER_ID, COUNTER_NAME, PROP_ACCT_NO, PROP_ACCT_NAME)
     </sql>
     <insert id="insert" parameterType="com.joyintech.tams.exchange.common.db.domain.TradeHistory">
         <include refid="tradeHistoryFiled"/>
@@ -350,7 +361,9 @@
         #{secAcctName,jdbcType=VARCHAR}, #{tradePlat,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR},
         #{invManagerId,jdbcType=VARCHAR}, #{ps,jdbcType=VARCHAR}, #{busiTypeTg,jdbcType=VARCHAR},
         #{extend1,jdbcType=VARCHAR}, #{extend2,jdbcType=VARCHAR}, #{entrustClass,jdbcType=VARCHAR},
-        #{isFullPrice,jdbcType=VARCHAR}, #{netPrice,jdbcType=NUMERIC}, #{netBalance,jdbcType=NUMERIC} )
+        #{isFullPrice,jdbcType=VARCHAR}, #{netPrice,jdbcType=NUMERIC}, #{netBalance,jdbcType=NUMERIC},
+        #{counterId,jdbcType=VARCHAR}, #{counterName,jdbcType=VARCHAR},
+        #{propAcctNo,jdbcType=VARCHAR}, #{propAcctName,jdbcType=VARCHAR})
     </insert>
     <insert id="insertBatch">
         <include refid="tradeHistoryFiled"/>
@@ -392,7 +405,11 @@
             #{record.entrustClass,jdbcType=VARCHAR},
             #{record.isFullPrice,jdbcType=VARCHAR},
             #{record.netPrice,jdbcType=NUMERIC},
-            #{record.netBalance,jdbcType=NUMERIC}
+            #{record.netBalance,jdbcType=NUMERIC},
+            #{record.counterId,jdbcType=VARCHAR},
+            #{record.counterName,jdbcType=VARCHAR},
+            #{record.propAcctNo,jdbcType=VARCHAR},
+            #{record.propAcctName,jdbcType=VARCHAR}
         </foreach>
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.exchange.common.db.domain.TradeHistory">
@@ -537,6 +554,18 @@
             <if test="netBalance != null">
                 NET_BALANCE,
             </if>
+            <if test="counterId != null">
+                COUNTER_ID,
+            </if>
+            <if test="counterName != null">
+                COUNTER_NAME,
+            </if>
+            <if test="propAcctNo != null">
+                PROP_ACCT_NO,
+            </if>
+            <if test="propAcctName != null">
+                PROP_ACCT_NAME,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -677,6 +706,18 @@
             </if>
             <if test="netBalance != null">
                 #{netBalance,jdbcType=NUMERIC},
+            </if>
+            <if test="counterId != null">
+                #{counterId,jdbcType=VARCHAR},
+            </if>
+            <if test="counterName != null">
+                #{counterName,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctNo != null">
+                #{propAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctName != null">
+                #{propAcctName,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -843,6 +884,18 @@
             <if test="record.netBalance != null">
                 NET_BALANCE = #{record.netBalance,jdbcType=NUMERIC},
             </if>
+            <if test="record.counterId != null">
+                COUNTER_ID = #{record.counterId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.counterName != null">
+                COUNTER_NAME = #{record.counterName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.propAcctNo != null">
+                PROP_ACCT_NO = #{record.propAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.propAcctName != null">
+                PROP_ACCT_NAME = #{record.propAcctName,jdbcType=VARCHAR},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -901,6 +954,10 @@
         IS_FULL_PRICE = #{record.isFullPrice,jdbcType=VARCHAR},
         NET_PRICE = #{record.netPrice,jdbcType=NUMERIC},
         NET_BALANCE = #{record.netBalance,jdbcType=NUMERIC},
+        COUNTER_ID = #{record.counterId,jdbcType=VARCHAR},
+        COUNTER_NAME = #{record.counterName,jdbcType=VARCHAR},
+        PROP_ACCT_NO = #{record.propAcctNo,jdbcType=VARCHAR},
+        PROP_ACCT_NAME = #{record.propAcctName,jdbcType=VARCHAR}
         <include refid="Update_By_Example_Where_Clause"/>
     </update>
 </mapper>

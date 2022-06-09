@@ -548,7 +548,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 //                dto.setFinProductConvertible(finProductConvertibleDto);
 //            }
         } else {
-            return new FinBondAssetSaveRequest();
+            dto = finBondAssetMapper.getBasicInfoByInterf(map);
+            if(Objects.isNull(dto)){
+                return new FinBondAssetSaveRequest();
+            }
         }
         return dto;
     }

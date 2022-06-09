@@ -520,14 +520,6 @@ public class CfetsEtrIbRepoinfo003Service extends CommonExportService<CfetsEtrib
                 if("submit".equals(entity.getOperateType()) && isSubmit) {
                     List<CfetsEtribRepoInfo003Dto> dataList = new ArrayList<>();
                     cfetsEtrIbRepoinfo003Service.packageEquity(entity,dataList);
-                    try {
-                        AjaxResult ar = EntrustRdsCommonAop.doListPreOccupy(dataList, DictCodeList.平安资产类型_质押式回购.getValue(), BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue(),true, entity.getEtrInvestPersonInfo());
-                        if (StringUtil.isNotEmpty(ar)) {
-                            throw new BusinessException(ar.getMessage());
-                        }
-                    }catch (Exception e) {
-                        throw new BusinessException(e.getMessage());
-                    }
                     EntrustRdsCommonAop.riskListToChildren(entity.getRiskTrialRetDto(), entity.getEtrInvestRepoInfoDtos(),(dto, list) -> dto.setRiskTrialRetDto(list));
 
                     if(!StringUtil.isNotEmpty(entity.getEntrustId())) {

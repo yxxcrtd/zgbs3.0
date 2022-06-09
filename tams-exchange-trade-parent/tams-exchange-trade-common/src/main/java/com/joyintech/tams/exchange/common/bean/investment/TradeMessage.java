@@ -2,7 +2,7 @@ package com.joyintech.tams.exchange.common.bean.investment;
 
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
@@ -41,6 +41,8 @@ public class TradeMessage extends BasicMessage {
     private String counterId;     // 交易对手
     private BigDecimal pledgeRatio;     // 折算比例%
     private Double entrustVolume;      // 委托数量
+    private String propAcctNo; //对手资金账户
+
 
     /**
      * 下单组合明细数据消息
@@ -263,6 +265,14 @@ public class TradeMessage extends BasicMessage {
         this.entrustVolume = entrustVolume;
     }
 
+    public String getPropAcctNo() {
+        return propAcctNo;
+    }
+
+    public void setPropAcctNo(String propAcctNo) {
+        this.propAcctNo = propAcctNo;
+    }
+
     public List<PortfolioTradeMessage> getPortfolioTradeMessages() {
         return portfolioTradeMessages;
     }
@@ -297,12 +307,15 @@ public class TradeMessage extends BasicMessage {
             if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 //到期结算金额
                 tradeMessage.setDealBalance(entrust.getBackBalance());
-            } else if (InvestmentAssetType.isBond(trade.getAssetType())
+            } else if (InvestAssetTypeEnum.isBond(trade.getAssetType())
                     && EntrustProp.isTrade(entrust.getEntrustProp())
                     && Objects.nonNull(tradeMessage.getFullPrice())
                     && tradeMessage.getFullPrice() != 0) {
                 //成交全价金额
                 tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
+            }else if(InvestAssetTypeEnum.isCreditProtectionCertificate(trade.getAssetType())) { //信用保护凭证
+                tradeMessage.setCounterId(trade.getCounterId());//交易对手
+                tradeMessage.setPropAcctNo(trade.getPropAcctNo());//对手资金账户
             }
             tradeMessage.setTradingDay(trade.getTradingDay());
         } catch (CloneNotSupportedException e) {
