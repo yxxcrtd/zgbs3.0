@@ -153,7 +153,12 @@ public class PositionHttpRequest {
             String jsonStr = JsonUtils.object2Json(req);
             logger.info("发送头寸报文:"+jsonStr);
             BaseMap reqMap = JsonUtils.json2Object(jsonStr, BaseMap.class);
-            String errorMsg = message != null?message.get("message") + "":"头寸返回数据为空";
+            String errorMsg = "";
+            if(message != null){
+                errorMsg= (String) message.get("message");
+            }else{
+                errorMsg = "头寸返回数据为空";
+            }
             roll(reqMap.getString("seqno"), reqMap.getString("modelType"), errorMsg);
         }
     }

@@ -115,7 +115,7 @@ public class AssetCommonUtil {
     private static void isOverSeasBondDb(String finProdId){
         List<AssetGenerateEntry> astEntryList=assetGenerateMapper.qryFaceOrOtherInf(Arrays.asList(finProdId));
         AssetGenerateEntry astEntry=StringUtil.isEmptyList(astEntryList)?null:astEntryList.get(0);
-        if(StringUtil.isNotEmpty(astEntry)){
+        if(StringUtil.isNotEmpty(astEntry) || null != astEntry){
             if(astTypeList.contains(astEntry.getFinprodType2())&&StringUtil.equals(astEntry.getBlnArea(),境外)){
                 isOverBondMap.put(finProdId,true);
             }
@@ -129,10 +129,10 @@ public class AssetCommonUtil {
      */
     public static BigDecimal getFaceValRds(String finProdId){
         Map<String, IAssetInfo> mapAsset = assetInfoSrc.getMapFromRedis(RedisKeyEnum.资产基本信息.key(), Arrays.asList(finProdId));
-        for(IAssetInfo iAst:mapAsset.values()){
+        /*for(IAssetInfo iAst:mapAsset.values()){
             //return StringUtil.isNotEmpty(iAst.getFaceValue())?iAst.getFaceValue():new BigDecimal(100);
             return new BigDecimal(100);
-        }
+        }*/
         return getFaceVal(finProdId);
     }
 
@@ -347,7 +347,7 @@ public class AssetCommonUtil {
         if((Objects.isNull(purRule)&&Objects.isNull(repRule))||null==compare||null==prodInfo){
             return null;
         }
-        if(!checkNull(purPlanList,purRule)||!checkNull(purPlanList,purRule)){
+        if(!checkNull(purPlanList,purRule)){
             return null;
         }
         //按产品需求以赎回计划优先处理,若是申赎同频，则就以申购计划为准
@@ -357,12 +357,14 @@ public class AssetCommonUtil {
             repRule=purRule;
         }
         //若为封闭式退出
-        if(!openTypeList.contains(repRule.getOpenMode())){
-            return null;
-        }
-        //若是高频开放的产品默认日开
-        if(CommonUtil.isType(repRule.getOpenMode(),DictCodeList.开放模式_高频开放)){
-            return BigDecimal.ONE.compareTo(new BigDecimal(compare));
+        if(!Objects.isNull(repRule)){
+            if(!openTypeList.contains(repRule.getOpenMode())){
+                return null;
+            }
+            //若是高频开放的产品默认日开
+            if(CommonUtil.isType(repRule.getOpenMode(),DictCodeList.开放模式_高频开放)){
+                return BigDecimal.ONE.compareTo(new BigDecimal(compare));
+            }
         }
         //获取投资周期
         Long days=getPtlInvestPeriod(repPlanList,()->prodInfo.getVdate());

@@ -109,19 +109,19 @@ public class RiskCommonService {
             && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())){
             String occupyType = "";
             List<CreditLinesInputDto> list = new ArrayList<>();
-            if (StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险占用类型_预占.getValue())) {
+            if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占.getValue())) {
                 occupyType = DictCodeListRsk.授信占用类别_预占.getValue();
                 list.addAll(riskCommonInputDto.getCreditInputList());
-            }else if (StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险占用类型_实占.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占.getValue())) {
                 occupyType = DictCodeListRsk.授信占用类别_实占.getValue();
                 list.addAll(riskCommonInputDto.getCreditInputList());
-            }else if (StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险占用类型_预占释放.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占释放.getValue())) {
                 occupyType = DictCodeListRsk.授信占用类别_预占.getValue();
                 list.addAll(riskCommonInputDto.getCreditInputList());
-            }else if (StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险占用类型_实占释放.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占释放.getValue())) {
                 occupyType = DictCodeListRsk.授信占用类别_实占.getValue();
                 list.addAll(riskCommonInputDto.getCreditInputList());
-            }else if (StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险占用类型_预占释放再预占.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占释放再预占.getValue())) {
                 occupyType = DictCodeListRsk.授信占用类别_预占.getValue();
                 // 处理差分预占参数，接口支持程度待确认
                 riskCommonInputDto.getCreditInputList().forEach(item -> {
@@ -134,7 +134,7 @@ public class RiskCommonService {
                     // 再预占
                     list.add(item);
                 });
-            }else if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占释放再实占.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占释放再实占.getValue())) {
                 occupyType = DictCodeListRsk.授信占用类别_实占.getValue();
                 // 处理差分预占参数，接口支持程度待确认
                 riskCommonInputDto.getCreditInputList().forEach(item -> {
@@ -147,7 +147,7 @@ public class RiskCommonService {
                     // 再实占
                     list.add(item);
                 });
-            }else if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占预占释放.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占预占释放.getValue())) {
                 // 接口调用方式待梳理
             }
 
@@ -233,16 +233,16 @@ public class RiskCommonService {
         if (!StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险控制类别_不控.getValue())
             && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())){
             List<CreditLinesInputDto> list = new ArrayList<>();
-            if (StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险占用类型_预占.getValue())) {
+            if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占.getValue())) {
                 list.addAll(riskCommonInputDto.getCreditInputList());
-            }else if (StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险占用类型_实占.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占.getValue())) {
                 list.addAll(riskCommonInputDto.getCreditInputList());
-            }else if (StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险占用类型_预占释放.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占释放.getValue())) {
                 list.addAll(riskCommonInputDto.getCreditInputList());
-            }else if (StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险占用类型_实占释放.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占释放.getValue())) {
                 list.addAll(riskCommonInputDto.getCreditInputList());
-            }else if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_预占释放再预占.getValue())
-                || StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占释放再实占.getValue())) {
+            }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占释放再预占.getValue())
+                || StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占释放再实占.getValue())) {
                 // 处理差分预占参数，接口支持程度待确认
                 riskCommonInputDto.getCreditInputList().forEach(item -> {
                     // 预占释放再预占场景，针对每一笔报文构造对应的释放报文

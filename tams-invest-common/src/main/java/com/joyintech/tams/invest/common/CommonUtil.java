@@ -336,7 +336,9 @@ public static final BigDecimal getBigDecimal(Map<String, Object> map, String key
         else if (StringUtil.contains(unitInStr, BussinessDictCodeListRds.单位_日.getValue())) {
             unit = RiskUtil.convertValueToUnit(BussinessDictCodeListRds.单位_日.getValue());
         }
-        resVal = resVal.setScale(4,BigDecimal.ROUND_HALF_UP);
+        if(null != resVal){
+            resVal = resVal.setScale(4,BigDecimal.ROUND_HALF_UP);
+        }
         return StringUtil.numberToString(resVal) + unit;
     }
     /**

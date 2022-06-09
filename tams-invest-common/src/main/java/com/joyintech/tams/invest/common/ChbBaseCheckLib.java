@@ -994,25 +994,27 @@ public class ChbBaseCheckLib {
                 }else{
                     //单元切割后是2个部分，获取数值和文字
                     //数值
-                    String  pattenOne=invTaypePatten.get(0);
-                    if(pattenOne.contains(GlobalConstant.SPLIT)){
-                        //表示为区间
-                        List<String>  pattenOneSection=Arrays.asList(pattenOne.split(GlobalConstant.SPLIT));
-                        //校验区间
-                        if(!pattenOneSection.get(0).matches(regex)||
-                                !pattenOneSection.get(1).matches(regex)){
-                            flag=false;
-                            break;
+                    if(invTaypePatten!=null){
+                        String  pattenOne=invTaypePatten.get(0);
+                        if(pattenOne.contains(GlobalConstant.SPLIT)){
+                            //表示为区间
+                            List<String>  pattenOneSection=Arrays.asList(pattenOne.split(GlobalConstant.SPLIT));
+                            //校验区间
+                            if(!pattenOneSection.get(0).matches(regex)||
+                                    !pattenOneSection.get(1).matches(regex)){
+                                flag=false;
+                                break;
+                            }
+                        }else{
+                            //不是区间，单个数字百分号
+                            if(!pattenOne.matches(regex)){
+                                flag=false;
+                                break;
+                            }
                         }
-                    }else{
-                        //不是区间，单个数字百分号
-                        if(!pattenOne.matches(regex)){
-                            flag=false;
-                            break;
-                        }
+                        //文字
+                        //String  pattenTwo=invTaypePatten.get(1);
                     }
-                    //文字
-                    //String  pattenTwo=invTaypePatten.get(1);
                 }
             }
         }

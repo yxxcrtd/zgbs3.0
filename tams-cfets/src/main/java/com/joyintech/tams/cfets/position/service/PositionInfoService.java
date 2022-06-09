@@ -189,7 +189,7 @@ public class PositionInfoService {
                 Map<String, String> secIdMap = new HashMap<String, String>();
                 List<String> secAcctIds = new ArrayList<>();
                 if (StringUtil.isNotEmpty(list.getAcctNo())) {
-                    secAcctIds.add(acctId);
+                    secAcctIds.add(list.getAcctNo());
                 }else {
                     secIdMap.put("portfolioId", list.getPortfolioId());
                     secAcctIds = this.qryPortfolioSecAcctIdAll(secIdMap);// 证券账户

@@ -498,7 +498,9 @@ public class CommonExportPdfService<T> {
     public void deleteTempConfigFile(String tempConfigFilePath){
         File tempFile = new File(tempConfigFilePath);
         if(tempFile.exists()){
-            tempFile.delete();
+            if (!tempFile.delete()) {
+                // file delete failed; take appropriate action
+            }
         }
     }
 
