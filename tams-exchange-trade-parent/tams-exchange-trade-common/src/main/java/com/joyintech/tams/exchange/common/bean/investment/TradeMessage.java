@@ -4,6 +4,7 @@ import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 
@@ -41,11 +42,20 @@ public class TradeMessage extends BasicMessage {
     private String counterId;     // 交易对手
     private BigDecimal pledgeRatio;     // 折算比例%
     private Double entrustVolume;      // 委托数量
-
+    private String tradeId;//	 本方交易员ID
+    private String investorId;// 本方交易主体ID
+    private String dealerId;//	 本方交易商ID
+    private String propDealerId;// 对手方交易商ID
+    private String propInvestorId;//对手方交易主体ID
     /**
      * 下单组合明细数据消息
      */
     private List<PortfolioTradeMessage> portfolioTradeMessages;
+    /**
+     * 质押品列表
+     */
+    private List<PledgeTradeMessage> pledgeTradeMessages;
+
 
     public String getEntrustId() {
         return entrustId;
@@ -263,12 +273,60 @@ public class TradeMessage extends BasicMessage {
         this.entrustVolume = entrustVolume;
     }
 
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getPropInvestorId() {
+        return propInvestorId;
+    }
+
+    public void setPropInvestorId(String propInvestorId) {
+        this.propInvestorId = propInvestorId;
+    }
+
     public List<PortfolioTradeMessage> getPortfolioTradeMessages() {
         return portfolioTradeMessages;
     }
 
     public void setPortfolioTradeMessages(List<PortfolioTradeMessage> portfolioTradeMessages) {
         this.portfolioTradeMessages = portfolioTradeMessages;
+    }
+
+    public List<PledgeTradeMessage> getPledgeTradeMessages() {
+        return pledgeTradeMessages;
+    }
+
+    public void setPledgeTradeMessages(List<PledgeTradeMessage> pledgeTradeMessages) {
+        this.pledgeTradeMessages = pledgeTradeMessages;
     }
 
     private static TradeMessage templateMessage = new TradeMessage();
@@ -297,6 +355,13 @@ public class TradeMessage extends BasicMessage {
             if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 //到期结算金额
                 tradeMessage.setDealBalance(entrust.getBackBalance());
+
+                IntegratedEntrust integratedEntrust = (IntegratedEntrust)entrust;
+                tradeMessage.setTradeId(integratedEntrust.getTradeId());
+                tradeMessage.setInvestorId(integratedEntrust.getInvestorId());
+                tradeMessage.setDealerId(integratedEntrust.getDealerId());
+                tradeMessage.setPropDealerId(integratedEntrust.getPropDealerId());
+                tradeMessage.setPropInvestorId(integratedEntrust.getPropInvestorId());
             } else if (InvestmentAssetType.isBond(trade.getAssetType())
                     && EntrustProp.isTrade(entrust.getEntrustProp())
                     && Objects.nonNull(tradeMessage.getFullPrice())

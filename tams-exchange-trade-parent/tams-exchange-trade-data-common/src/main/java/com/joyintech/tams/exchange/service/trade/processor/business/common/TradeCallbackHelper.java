@@ -1,25 +1,22 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
+import cn.hutool.core.collection.ListUtil;
 import com.google.common.base.Strings;
-import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.investment.PledgeTradeMessage;
 import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.utils.*;
-import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
-import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.processor.MessageSenderManagement;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
-import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
 import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +25,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.utils.TradeUtils.multiply;
 
@@ -52,6 +47,8 @@ public class TradeCallbackHelper {
     private OrderService orderService;
     @Autowired
     private InstructionService instructionService;
+    @Autowired
+    private InstructionPledgeService instructionPledgeService;
     //    @Autowired
 //    private MessageSenderService messageSenderService;
     @Autowired
@@ -281,7 +278,9 @@ public class TradeCallbackHelper {
         Order order = null;
         if (Objects.nonNull(entrust.getParentOrderId())) {
             order = orderService.findById(entrust.getParentOrderId());
-            if (Objects.nonNull(order)) transactionHelper.addOrder(order);
+            if (Objects.nonNull(order)) {
+                transactionHelper.addOrder(order);
+            }
         }
         //确保成交记录的成交金额、数量、价格在terminal端已经处理
         if (tradeRecord.getTradeType() == TradeType.NORMAL.value) {
@@ -303,10 +302,14 @@ public class TradeCallbackHelper {
                 return;
             }
 
+            // TODO 调用终端接口，查询成交质押数据
+            // 组装质押品列表
+            List<PledgeTradeMessage> pledgeTradeMessages = assemblePledgeList(instruction.getEntrustId());
+
             // 是否需要手工交收
-            if (IntegratedEntrustUtils.isProtocolBack(tradeRecord.getEntrustProp())) {//协议回购
+            if (needSGJSWithRepurchase(instruction, tradeRecord)) {//协议回购
 //                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages, pledgeTradeMessages);
                 return;
 //            } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
                 //新债需求：判断债券哪些走手工交收，用标的是否非担保 =是 则走手工交收
@@ -315,13 +318,13 @@ public class TradeCallbackHelper {
 //                if (Objects.nonNull(instrument)) {
 //                    if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
 //                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages, pledgeTradeMessages);
                 return;
 //                    }
 //                }
             }
 //            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
-            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust, portfolioTradeMessages);
+            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust, portfolioTradeMessages, pledgeTradeMessages);
         } else if (tradeRecord.getTradeType() == TradeType.INVALID.value) {
             if (entrust.getEntrustStatus() == EntrustStatus.INVALID.value) {
                 logger.info("委托已通过委托回报废单处理，忽略废单成交");
@@ -330,6 +333,39 @@ public class TradeCallbackHelper {
             transactionHelper.setTradeRecord(tradeRecord);
             entrustCancelProcessor.processCancelByTrade(entrust, tradeRecord, order, instruction);
         }
+    }
+
+    private List<PledgeTradeMessage> assemblePledgeList(String instructionId) {
+        List<PledgeTradeMessage> pledgeTradeMessages = ListUtil.list(false);
+        PledgeTradeMessage message;
+        List<InstructionPledge> instructionPledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instructionId);
+        for (InstructionPledge pledge : instructionPledges) {
+            message = new PledgeTradeMessage();
+            message.setFinprodMarketId(pledge.getFinprodMarketId());
+            message.setPledgeNumber(pledge.getPledgeNumber());
+            message.setDisplaceDir(pledge.getDisplaceDir());
+            pledgeTradeMessages.add(message);
+        }
+        return pledgeTradeMessages;
+    }
+
+    /**
+     * 判断协议回购是否需要手工交收
+     * 除 深圳的中途换券和解除质押，其余的协议回购需要进行手工交收
+     *
+     * @param instruction 指令对象
+     * @param trade       成交对象
+     * @return 是否进行手工交收
+     */
+    private boolean needSGJSWithRepurchase(Instruction instruction, Trade trade) {
+        if (Market.isSzMarket(trade.getMarket())
+                && EnumUtil.in(instruction.getPs(), PsEnum.REPO_EXCHANGE_COUPONS_MIDWAY, PsEnum.REPO_UNSTAKE)) {
+            return false;
+        }
+        if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp())) {
+            return true;
+        }
+        return false;
     }
 
     private void updateInstructionStatus(Instruction instruction) {
