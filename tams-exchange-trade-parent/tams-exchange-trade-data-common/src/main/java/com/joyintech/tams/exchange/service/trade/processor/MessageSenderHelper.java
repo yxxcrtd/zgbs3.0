@@ -221,6 +221,14 @@ public class MessageSenderHelper {
         }
         // add by etliu 20220531 end
 
+        if (InvestAssetTypeEnum.isCreditProtectionCertificate(assetType)) {
+            if (EntrustBs.BUY.value.equals(entrustBs)) {
+                return BusinessType.CREDIT_PROTECTION_CERTIFICATE_BUY.value;
+            } else if (EntrustBs.SELL.value.equals(entrustBs)) {
+                return BusinessType.CREDIT_PROTECTION_CERTIFICATE_SELL.value;
+            }
+        }
+
         // ZGCPCN-1166:去除深交所综合协议平台债券、上交所固定收益平台债券 modify by fuyongsheng 20220608 start
         // 深交所综合协议平台债券
 //        if (DictCodeList.交易平台_综合协议交易平台.getValue().equals(tradePlat) && InvestmentAssetType.isBond(assetType)) {

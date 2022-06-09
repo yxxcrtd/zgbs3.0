@@ -443,7 +443,7 @@
                 or to_char(ss.payAmt)=#{search}
                 or to_char(ss.settFeeAmt)=#{search}
                 or to_char(ss.totalBiddingNum)=#{search}
-                or to_char(ss.bidDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.bidDateStart,'YYYY-MM-DD')||'-'||to_char(ss.bidDateEnd,'YYYY-MM-DD')=#{search}
                 or to_char(ss.payDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.creditorDebtDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.listingDate,'YYYY-MM-DD')=#{search}
