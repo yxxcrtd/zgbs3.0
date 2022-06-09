@@ -499,8 +499,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
                 ar.setMessageType(MessageType.错误消息);
                 return new Message<AjaxResult>().setData(ar);
             }
-            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,
-                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
+            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,this.getPageId());
             return new Message<AjaxResult>().setData(ajaxResult);
         } catch (Exception e) {
             logger.error("风险试算", e);
