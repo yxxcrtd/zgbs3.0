@@ -38,7 +38,7 @@
                 aaa.remark,
                 aaa.payEdateStr,
                 aaa.etrDateStr,
-                TO_CHAR(aaa.issueDateStart, 'yyyy-MM-dd')  || '~' || TO_CHAR(aaa.issueDateEnd, 'yyyy-MM-dd')  issueDateStr
+                aaa.issueDateStr
 
         from (
         <choose>
@@ -183,7 +183,12 @@
             TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
-            TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr
+            TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
+            case
+            when fpi.ISSUE_CLASS ='01' THEN to_char(fpi.ISSUE_DATE,'yyyy-MM-dd')
+            when fpi.ISSUE_DATE is not  null then to_char(fpi.ISSUE_DATE,'yyyy-MM-dd')
+            else to_char(fpi.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(fpi.TENDER_EDATE,'yyyy-MM-dd')
+            end as issueDateStr
 
         FROM ETR_ENTRUST ee
         LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
@@ -301,7 +306,10 @@
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
-            '01' AS firstBidStatus,
+            CASE
+            WHEN fpi.ISSUE_CLASS = '01' THEN NULL
+            ELSE '01'
+            END AS firstBidStatus,
             ee.FINPROD_ID finprodId,
             fp.FINPROD_MARKET_ID finprodMarketId,
             fp.FINPROD_ABBR finprodAbbr,
@@ -349,7 +357,12 @@
             TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
-            TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr
+            TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
+            case
+            when fpi.ISSUE_CLASS ='01' THEN to_char(fpi.ISSUE_DATE,'yyyy-MM-dd')
+            when fpi.ISSUE_DATE is not  null then to_char(fpi.ISSUE_DATE,'yyyy-MM-dd')
+            else to_char(fpi.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(fpi.TENDER_EDATE,'yyyy-MM-dd')
+            end as issueDateStr
 
         FROM WFL_ETR_ENTRUST ee
         LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
@@ -730,7 +743,7 @@
             ISSUE.ISSUE_STYLE as issueStyle,
             case
             when ISSUE.ISSUE_CLASS ='01' THEN to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
-            when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+            when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
             else to_char(ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-MM-dd')
             end as issueDateStr,
             nvl(TO_CHAR(ISSUE.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(ISSUE.PAY_DATE, 'yyyy-MM-dd')) AS payEdateStr,

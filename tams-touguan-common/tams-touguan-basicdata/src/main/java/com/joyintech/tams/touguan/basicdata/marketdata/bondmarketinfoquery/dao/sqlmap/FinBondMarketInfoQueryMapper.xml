@@ -368,7 +368,7 @@
         ACCRUEINTAMT,
         DAILYACCRUEINT,
         PRINAMTPAY,
-        CASHPAY,
+        CASHPAY cashAmt,
         PRINAMT,
         SOURCE
         from
