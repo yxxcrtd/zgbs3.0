@@ -166,7 +166,9 @@ public class ExcelTplUitl {
         copyFileUsingFileStreams(tplfilename,copytplfile);
         exportAllData(excelFile, sheetName , columns, dataList, styleMap,copytplfile);
         if(copytplfile.exists()){
-            copytplfile.delete();
+            if (! copytplfile.delete()) {
+                // file delete failed; take appropriate action
+            }
         }
         return excelFile;
     }
@@ -230,7 +232,9 @@ public class ExcelTplUitl {
                     e.printStackTrace();
                 }
                 finally {
-                    item.delete();
+                    if (!item.delete()) {
+                        // file delete failed; take appropriate action
+                    }
                 }
             });
             out.closeEntry();

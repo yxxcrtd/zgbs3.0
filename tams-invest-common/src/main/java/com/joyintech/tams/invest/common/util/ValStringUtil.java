@@ -86,7 +86,7 @@ public class ValStringUtil extends StringUtil {
         boolean ret = false;
         if (thisValue == null) {
             for (String other : others) {
-                if (thisValue == other) {
+                if (thisValue.equals(other) ) {
                     ret = true;
                     break;
                 }

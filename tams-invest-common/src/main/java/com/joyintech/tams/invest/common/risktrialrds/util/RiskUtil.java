@@ -193,10 +193,10 @@ public class RiskUtil {
 			return value * 10000;
 		}
 		if (BussinessDictCodeListRds.单位_PERCENT.getValue().equals(unit)) {
-			return ArithmeticUtil.divide(new BigDecimal(value),new BigDecimal(100),10).doubleValue() ;
+			return ArithmeticUtil.divide(BigDecimal.valueOf(value),new BigDecimal(100),10).doubleValue() ;
 		}
 		if (BussinessDictCodeListRds.单位_BP.getValue().equals(unit)) {
-			return ArithmeticUtil.divide(new BigDecimal(value),new BigDecimal(10000),10).doubleValue() ;
+			return ArithmeticUtil.divide(BigDecimal.valueOf(value),new BigDecimal(10000),10).doubleValue() ;
 		}
 		return value;
 	}

@@ -118,7 +118,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-//            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue());
+            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue());
         }
     }
 
@@ -135,7 +135,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-//            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
+            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
 
@@ -152,7 +152,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-//            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
+            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
 //
@@ -182,7 +182,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         CreditProtectionCertificatePeriodSaveDto dto = getBussinessEntityByWorkflowId(entity.getWorkflowId());
         doOldPositionSubmit(dto, true);
         doOldPositionConfirm(dto, true);
-//        positionRequestService.sendRevokeCreditProtectionCertificatePeriod(entity);
+        positionRequestService.sendRevokeCreditProtectionCertificatePeriod(entity);
     }
 
     private void insertFlow(BaseBussinessDto baseBussinessDto, CreditProtectionCertificatePeriodSaveDto entity) {

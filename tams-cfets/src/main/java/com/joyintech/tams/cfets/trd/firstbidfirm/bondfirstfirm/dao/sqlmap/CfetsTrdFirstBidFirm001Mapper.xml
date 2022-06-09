@@ -153,9 +153,19 @@
         LEFT JOIN
         FIN_PRODUCT_ISSUE t3
         ON t3.FINPROD_ID = t2.FINPROD_ID
+        <where>
+            <if test="tenderTarget != null and tenderTarget != '' and winPrice != null ">
+                (#{tenderTarget} = '01' and t0.BID_PRICE*100 <![CDATA[<=]]> #{winPrice} ) or
+                (#{tenderTarget} = '02' and t0.BID_PRICE <![CDATA[>=]]> #{winPrice} ) or
+                (#{tenderTarget} = '03' and t0.BID_PRICE*10000 <![CDATA[<=]]> #{winPrice} )
+            </if>
+        </where>
         group by t0.ENTRUST_ID) bobp
         ON bobp.ENTRUST_ID = ee.ENTRUST_ID
         where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
+        <if test="isEtrAddSearch != null and isEtrAddSearch != ''">
+            and bobp.BID_PRICE is not null
+        </if>
         order by decode(ee.ENTRUST_STATUS, '04', 2, '05', 3, '06', 4, 1) asc,fpi.ISSUE_DATE,ee.ENTRUST_DATE,eea.TRANSMIT_TIME
     </sql>
 
@@ -855,6 +865,9 @@
     group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId, T.finprodAbbr, T.tenderTarget, T.bidDateStart,
              T.bidDateEnd, T.etrBidPriceTotal, T.totalBiddingNum, T.bidprice,T.bidPriceNum,T.bidPriceAndUntil, T.biddingMethod, T.payType, T.bidCfmDate, T.tradeMarket,
              T.counterId, T.counterName, T.remark
+    <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+        order by ${pageMode.sort} ${pageMode.direction}
+    </if>
     </select>
 
     <!-- 投标 关键字 -->
@@ -1214,6 +1227,9 @@
              T.finprodAbbr, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice,T.bidPriceAndUntil,T.bidPriceNum, T.biddingMethod,
              T.payType, T.winPrice, T.price, T.payableAmount, T.settFeeAmt, T.payDate, T.assignRegdate, T.listingDate,
              T.bidCfmDate, T.counterName,T.remark, T.dealDate,T.tradeMarket,T.tenderTarget,T.counterId
+    <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+        order by ${pageMode.sort} ${pageMode.direction}
+    </if>
     </select>
 
     <!-- 分销买入 关键字 -->

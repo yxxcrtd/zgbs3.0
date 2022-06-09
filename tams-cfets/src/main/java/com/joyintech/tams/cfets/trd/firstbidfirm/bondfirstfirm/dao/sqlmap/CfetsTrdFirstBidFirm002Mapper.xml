@@ -480,13 +480,23 @@
         order by fri.EFF_DATE desc ,miri.EFF_DATE desc
     </select>
 
-    <select id="findTotalByPTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper.BaseResultMap">
+    <select id="findWflTotalByPTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper.BaseResultMap">
         <include refid="com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper.Sql_All_Data" />
         WHERE P_TOTLE_TRADE_ID = #{PTotleTradeId}
     </select>
 
-    <select id="findDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.BaseResultMap">
+    <select id="findTotalByPTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper.BaseResultMap">
+        <include refid="com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper.Sql_All_Data" />
+        WHERE P_TOTLE_TRADE_ID = #{PTotleTradeId}
+    </select>
+
+    <select id="findWflDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.BaseResultMap">
         <include refid="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.Sql_All_Data" />
+        WHERE TOTLE_TRADE_ID = #{totleTradeId}
+    </select>
+
+    <select id="findDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductDealMapper.BaseResultMap">
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Sql_All_Data" />
         WHERE TOTLE_TRADE_ID = #{totleTradeId}
     </select>
 

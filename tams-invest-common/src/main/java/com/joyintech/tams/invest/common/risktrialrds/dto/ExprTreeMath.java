@@ -68,7 +68,7 @@ public class ExprTreeMath {
     	for(String paramKey:paramList){
     		Object obj = params.get(paramKey);
 		    String valueStr = obj == null ? "0" : obj.toString();
-		    if(StringUtil.isNotEmpty(obj)&&(indType.indexOf(RiskUtil.LIMIT)!=-1||indType.indexOf(RiskUtil.INNER)!=-1)){
+		    if(null !=obj && StringUtil.isNotEmpty(obj)&&(indType.indexOf(RiskUtil.LIMIT)!=-1 ||indType.indexOf(RiskUtil.INNER)!=-1)){
 				if(RiskUtil.isInvalidDate(valueStr)) {
 					long days = DateUtil.parse(valueStr).getTime() / 1000 / 3600 / 24;
 					valueStr=String.valueOf(days);
@@ -214,7 +214,7 @@ public class ExprTreeMath {
 				  if(!Pattern.compile("[0-9]*").matcher(expression).matches()) {
 					  return expression;
 				  }
-        		  return expression.replaceAll("(", "").replaceAll(")", "");
+        		  return expression.replace("(", "").replace(")", "");
         	  }
 		}
         else{

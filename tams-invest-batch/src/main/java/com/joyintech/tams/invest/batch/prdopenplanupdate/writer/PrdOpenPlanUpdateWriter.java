@@ -358,7 +358,8 @@ public class PrdOpenPlanUpdateWriter extends BaseWriter<NeedToWriteEntity>{
 	                            finCashPlan.setBranch(0L);
 	                    	}else{
 	                    		finCashPlan.setCashId(finOpenPlan.getCashId());
-	                    		finCashPlan.setCashNum(new Long(i+1));
+								// Sonar Fix modify by huwei 220609
+	                    		finCashPlan.setCashNum((long)i+1);
 	                            finCashPlan.setCashType(DictCodeList.现金流类型_中间收息.getValue());
 	                            finCashPlan.setVdateUnadjust(openPlanList.get(i - 1).getOpenDateEnd());
 	                            finCashPlan.setMdateUnadjust(finOpenPlan.getOpenDateEnd());
@@ -387,7 +388,7 @@ public class PrdOpenPlanUpdateWriter extends BaseWriter<NeedToWriteEntity>{
 		}							
 			
 	}
-	
+
 	/**
 	 * 若付息计划与申购同频时，当新的开放计划生成时生成新的付息计划 
 	 */
@@ -425,7 +426,8 @@ public class PrdOpenPlanUpdateWriter extends BaseWriter<NeedToWriteEntity>{
 	                            finCashPlan.setBranch(0L);
 	                    	}else{
 	                    		finCashPlan.setCashId(finOpenPlan.getCashId());
-	                    		finCashPlan.setCashNum(new Long(i+1));
+								// Sonar Fix modify by huwei 220609
+	                    		finCashPlan.setCashNum((long)i + 1);
 	                            finCashPlan.setCashType(DictCodeList.现金流类型_中间收息.getValue());
 	                            finCashPlan.setVdateUnadjust(openPlanList.get(i - 1).getOpenVdate());
 	                            finCashPlan.setMdateUnadjust(finOpenPlan.getOpenVdate());

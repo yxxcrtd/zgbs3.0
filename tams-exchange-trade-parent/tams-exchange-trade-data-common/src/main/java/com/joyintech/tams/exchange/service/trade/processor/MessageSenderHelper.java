@@ -246,22 +246,6 @@ public class MessageSenderHelper {
 //            }
 //        }
         // ZGCPCN-1166:去除深交所综合协议平台债券、上交所固定收益平台债券 modify by fuyongsheng 20220608 end
-
-        // 上交所固定收益平台债券
-        if (DictCodeList.交易平台_固定收益平台.getValue().equals(tradePlat) && InvestAssetTypeEnum.isBond(assetType)
-                // GNS-952:更换判断固定收益平台方法 modify by fuyongsheng 20220224 start
-                // && BusinessFlag.FIXED_INCOME.value.equals(bsFlag)
-                && IntegratedEntrustUtils.isFixedIncome(trade.getEntrustProp())
-            // GNS-952:更换判断固定收益平台方法 modify by fuyongsheng 20220224 end
-        ) {
-            // 上海固收
-            if (EntrustBs.BUY.value.equals(entrustBs)) {
-                return BusinessType.FIXED_INCOME_BUY.value;
-            } else if (EntrustBs.SELL.value.equals(entrustBs)) {
-                return BusinessType.FIXED_INCOME_SELL.value;
-            }
-        }
-
         return null;
     }
 

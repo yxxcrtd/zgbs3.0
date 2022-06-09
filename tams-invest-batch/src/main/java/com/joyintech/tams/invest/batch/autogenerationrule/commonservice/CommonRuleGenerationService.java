@@ -81,6 +81,8 @@ public class CommonRuleGenerationService {
                             Thread.sleep(sleepTime);
                         } catch (InterruptedException e) {
                             logger.error(e.getMessage());
+                            // Sonar Fix modify by huwei 220609
+                            Thread.currentThread().interrupt();
                         }
                         continue;
                     }

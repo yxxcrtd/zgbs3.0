@@ -88,7 +88,8 @@ public class DelayController implements ApplicationListener<ContextRefreshedEven
                     Object o = delayMsg.getItem();
                     if (o instanceof BatchInfo) {
                         BatchInfo batchInfo = (BatchInfo) o;
-                        tradeHelper.handleBatchOrder(batchInfo, null);
+                        Order order = orderService.findById(batchInfo.getOrderId());
+                        tradeHelper.handleBatchOrder(batchInfo, order);
                     } else {
                         logger.warn("DelayMessage type not found: {}", JsonUtils.getJsonFromObject(o));
                     }
