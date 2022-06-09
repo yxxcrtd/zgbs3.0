@@ -98,6 +98,7 @@ public class EtrCommonFinProductInfoService extends BaseService {
                 }
             }
         } else {
+            finProductInfo = new CfetsEtrFinProductInfoResponse();
             finProductInfo.setTitle("标的信息未维护");
         }
         return finProductInfo;
