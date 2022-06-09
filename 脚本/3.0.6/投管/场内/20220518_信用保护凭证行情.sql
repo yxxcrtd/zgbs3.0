@@ -62,6 +62,7 @@ INSERT INTO SYS_MENU (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER
 
 delete from SYS_PAGE where PAGE_ID = 'MstCreditMarketInfo001';
 INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('MstCreditMarketInfo001', 'FIN', '/home.html#/bondmaintain/mskcredit?a=a', 'vue', 'ASSET_MANAGEMENT_001_003_024', null, null, '02', '01', '信用保护凭证行情信息', 'system', null, sysdate, 'system', sysdate);
+delete from SYS_PAGE where PAGE_ID = 'MstCreditMarketInfo002';
 INSERT INTO SYS_PAGE ("PAGE_ID", "SYSTEM_CODE", "PAGE_URL", "PAGE_FILE", "MENU_ID", "HEIGHT", "WIDTH", "IS_HP_SELECT", "IS_NEED_WORKFLOW", "REMARK", "CREATE_USER", "CREATE_DEPT", "CREATE_TIME", "UPDATE_USER", "UPDATE_TIME") VALUES ('MstCreditMarketInfo002', 'FIN', '/home.html?a=a#/approve/mskcredit?a=a', 'vue', NULL, NULL, NULL, '02', '01', '信用保护凭证行情新建', 'system', NULL, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2021-09-16 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
 
 delete from SYS_WFL_BUSINESS_MODULE  where PAGE_ID='MstCreditMarketInfo002';
