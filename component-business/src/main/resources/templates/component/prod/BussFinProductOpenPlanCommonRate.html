@@ -209,7 +209,8 @@
 									class="layui-input form-input input-select" placeholder="请输入内容"
 									data-th-placeholder="#{SysCommon.placeholder}"
 									data-th-data-result="${CALC_RULE}"
-									data-th-required="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002' or ${pageId} eq 'FinOpenPlanMaintenance002'">
+							        data-th-required="true">
+								<!--data-th-required="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002' or ${pageId} eq 'FinOpenPlanMaintenance002'"-->
 							</select>
 						</div>
 					</div>
@@ -237,7 +238,8 @@
 								searchable="false" class="layui-input form-input input-select"
 								placeholder="请输入内容"
 								data-th-placeholder="#{SysCommon.placeholder}"
-								data-th-data-result="${TDAY_RULE}">
+								data-th-data-result="${TDAY_RULE}"
+							    data-th-required="true">
 						</select>
 					</div>
 				</div>
@@ -257,7 +259,8 @@
 								searchable="false" class="layui-input form-input input-select"
 								placeholder="请输入内容" th:initValue="${entity?.calcRule}"
 								data-th-placeholder="#{SysCommon.placeholder}" data-th-data-result="${CALC_METHOD}"
-								data-th-required="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002'" >
+								data-th-required="true">
+							<!--data-th-required="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002'"-->
 						</select>
 					</div>
 				</div>
@@ -316,7 +319,8 @@
 								searchable="false" class="layui-input form-input input-select"
 								placeholder="请输入内容"
 								data-th-placeholder="#{SysCommon.placeholder}"
-								data-th-data-result="${CPRICE_RULE}">
+								data-th-data-result="${CPRICE_RULE}"
+								data-th-required="true" >
 						</select>
 					</div>
 				</div>
