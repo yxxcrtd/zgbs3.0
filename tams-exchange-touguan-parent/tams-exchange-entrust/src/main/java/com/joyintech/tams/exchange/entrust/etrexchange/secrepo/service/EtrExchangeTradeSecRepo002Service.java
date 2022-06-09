@@ -461,8 +461,9 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                                     ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(),
-                                ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100"))), 2);
+//                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(),
+//                                ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100"))), 4).multiply(new BigDecimal("100"));
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd,r.getPositionsAmt(),4).multiply(new BigDecimal("100"));
                 r.setFloatingPL(floatPL);
 
             });
