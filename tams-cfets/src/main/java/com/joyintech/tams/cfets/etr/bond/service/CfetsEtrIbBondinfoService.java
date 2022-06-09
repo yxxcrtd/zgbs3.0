@@ -2489,15 +2489,15 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             //更新操作日志
             // cfetsEtrIbBondinfoService.recallDelegateOprHisMethod(dto);
             // add by zhangrui1 批量撤销预占 start
-            String assetType = DictCodeList.平安资产类型_债券.getValue();
+        /*     String assetType = DictCodeList.平安资产类型_债券.getValue();
             if(StringUtil.equals(dto.getAssetType(),DictCodeList.平安资产类型_质押式回购.getValue())){
                 assetType = DictCodeList.平安资产类型_质押式回购.getValue();
             }
             if(StringUtil.equals(dto.getAssetType(),DictCodeListExt2.平安资产类型_一级市场债.getValue())){
                 assetType = DictCodeListExt2.平安资产类型_一级市场债.getValue();
             }
-            EntrustRdsCommonAop.doListPreOccupy(dtolist, assetType,
-                    BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);
+           EntrustRdsCommonAop.doListPreOccupy(dtolist, assetType,
+                    BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);*/
             // add by zhangrui1 批量撤销预占 end
             return new Message<AjaxResult>().success().setData(new AjaxResult(this.getMessage("ETR_X_001")));
 

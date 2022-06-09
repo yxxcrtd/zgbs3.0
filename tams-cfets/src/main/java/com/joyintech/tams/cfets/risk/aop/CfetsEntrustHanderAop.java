@@ -50,9 +50,6 @@ public class CfetsEntrustHanderAop {
     @Autowired
     private RiskInputParamSerivce inputParamSerivce;
 
-    @Resource
-    private SysWflBusinessListMapper sysWflBusinessListMapper;
-
 
     /**
      * 保存至代办，从代办中提交到流程中，需要执行风险占用

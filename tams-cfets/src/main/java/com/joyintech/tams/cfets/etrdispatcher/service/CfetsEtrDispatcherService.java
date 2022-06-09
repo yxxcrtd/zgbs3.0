@@ -66,22 +66,8 @@ import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListReq
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListResponse;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderAuthListResponse;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderListRequest;
-import com.joyintech.tams.common.base.dao.AutoDispenseRightMapper;
-import com.joyintech.tams.common.base.dao.EtrAutoDispenseRuleDetailMapper;
-import com.joyintech.tams.common.base.dao.EtrAutoDispenseRuleMapper;
-import com.joyintech.tams.common.base.dao.EtrDistributeMapper;
-import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
-import com.joyintech.tams.common.base.dao.FinProductMapper;
-import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
-import com.joyintech.tams.common.base.entity.AutoDispenseRight;
-import com.joyintech.tams.common.base.entity.EtrAutoDispenseRule;
-import com.joyintech.tams.common.base.entity.EtrAutoDispenseRuleDetail;
-import com.joyintech.tams.common.base.entity.EtrDistribute;
-import com.joyintech.tams.common.base.entity.EtrDistributeKey;
-import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.PtlPortfolio;
-import com.joyintech.tams.common.base.entity.User;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.riskrds.constant.InterfUtil;
 import com.joyintech.tams.component.business.riskrds.constant.PageFieldToInterfFactory;
@@ -181,6 +167,12 @@ public class CfetsEtrDispatcherService extends BaseService {
      */
     @Autowired
     private EtrEntrustMapper etrEntrustMapper;
+
+    /**
+     * 委托指令Mapper
+     */
+    @Autowired
+    private EtrEntrustAddMapper etrEntrustAddMapper;
 
     /**
      * 委托指令分发信息保存的mapper
@@ -1360,7 +1352,7 @@ public class CfetsEtrDispatcherService extends BaseService {
      */
     private Boolean returnEntrust(Map<String, Object> pageParam) {
         List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
-        List<String> busiTypeList = StringUtil.splitToList(",", (String) pageParam.get("busiTypePosition"));
+        boolean b = true;
         if (entrustIdList != null && entrustIdList.size() > 0) {
             for (String entrustId : entrustIdList) {
                 EtrDistributeKey key = new EtrDistributeKey();
@@ -1395,15 +1387,28 @@ public class CfetsEtrDispatcherService extends BaseService {
                             + "/EtrCommandDispatcher/pushCommandMsg", msgdto, String.class);
                 }
                 // modify by etliu 20210203 可转债网下申购不发送交易端 end
+
+                EtrEntrust entrust = etrEntrustMapper.selectByPrimaryKey(entrustId);
+                if(Objects.nonNull(entrust)) {
+                    if(((StringUtil.equals(entrust.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue()) || StringUtil.equals(entrust.getTradeMarket(),DictCodeListExt1.交易场所_商业银行柜台.getValue()))
+                        && (StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())|| StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购)
+                            || StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())))
+                        ) {
+                        b = false;
+                    }
+                }
+                if(b) {
+                    EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
+                    if(Objects.nonNull(etrEntrustAdd)) {
+                        if (StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级投标.getValue()) || StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级申购.getValue())) {
+                            b = false;
+                        }
+                    }
+                }
             }
-            if(busiTypeList.contains(头寸业务类型_现券交易.getValue()) || busiTypeList.contains(头寸业务类型_质押式回购首期.getValue())
-               || busiTypeList.contains(头寸业务类型_质押式回购到期.getValue()) || busiTypeList.contains(头寸业务类型_债券一级投标.getValue())
-               || busiTypeList.contains(头寸业务类型_债券一级申购.getValue())) {
-                return false;
-            }
-            return true;
+            return b;
         }
-        return false;
+        return !b;
     }
 
     private AjaxResult returnRsk(Map<String, Object> pageParam) {
