@@ -90,7 +90,7 @@ public class InterestDaysCal30T365 {
         // else if (d1 == 30 && d2 == 31) {
         // d2 = 30;
         // }
-        BigDecimal res = BigDecimal.valueOf(360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1))
+        BigDecimal res = BigDecimal.valueOf(360 * (y2 - y1) + 30 * (m2 - m1) + (long)(d2 - d1))
             .divide(BigDecimal.valueOf(360.0), 12, RoundingMode.HALF_UP);
         return res;
     }

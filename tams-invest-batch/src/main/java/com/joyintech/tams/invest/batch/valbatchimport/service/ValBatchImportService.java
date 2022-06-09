@@ -470,7 +470,8 @@ public class ValBatchImportService {
         if (StringUtil.isEmpty(subjCode)) {
             return null;
         } else {
-            subjCode.replaceAll(" ", "");
+            // Sonar Fix modify by huwei 220609
+            subjCode = subjCode.replaceAll(" ", "");
         }
         //根据科目代码列 判断是资产科目还是汇总科目
         if (subjCode.length() >= 4) {
@@ -547,7 +548,8 @@ public class ValBatchImportService {
                     val.setSubName(subjName);
                     break;
                 case SUM:
-                    if (ValDataType.NULL == sumNameCodeEntry.getNextColType()) break;
+                    // Sonar Fix modify by huwei 220609
+                    if (null == sumNameCodeEntry || ValDataType.NULL == sumNameCodeEntry.getNextColType()) break;
                     Double cellNum = null;
                     if (StringUtil.isNotEmpty(subjName)) {
                         subjName = subjName.replaceAll(",", "");
@@ -556,9 +558,9 @@ public class ValBatchImportService {
                         } else {
                             if (subjName.contains("%")) {
                                 subjName = subjName.replaceAll("%", "");
-                                cellNum = (new BigDecimal(Double.valueOf(subjName) / 100)).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
+                                cellNum = (BigDecimal.valueOf(Double.valueOf(subjName) / 100)).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
                             } else {
-                                cellNum = (new BigDecimal(Double.valueOf(subjName))).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
+                                cellNum = (BigDecimal.valueOf(Double.valueOf(subjName))).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
                             }
                         }
                     } else {
@@ -566,9 +568,9 @@ public class ValBatchImportService {
                     }
                     if (cellNum != null) {
                         if (ValDataType.PERCENT == sumNameCodeEntry.getNextColType()) {
-                            cellNum = (new BigDecimal(cellNum / 100)).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
+                            cellNum = (BigDecimal.valueOf(cellNum / 100)).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
                         }
-                        val.setSecurityCost(new BigDecimal(cellNum));
+                        val.setSecurityCost(BigDecimal.valueOf(cellNum));
                     }
                     break;
             }
@@ -603,9 +605,9 @@ public class ValBatchImportService {
                     } else {
                         if (cellVlaue.contains("%")) {
                             cellStr = cellStr.replaceAll("%", "");
-                            cellNum = (new BigDecimal(Double.valueOf(cellStr) / 100)).setScale(6, BigDecimal.ROUND_HALF_UP);
+                            cellNum = (BigDecimal.valueOf(Double.valueOf(cellStr) / 100)).setScale(6, BigDecimal.ROUND_HALF_UP);
                         } else {
-                            cellNum = (new BigDecimal(Double.valueOf(cellStr))).setScale(6, BigDecimal.ROUND_HALF_UP);
+                            cellNum = (BigDecimal.valueOf(Double.valueOf(cellStr))).setScale(6, BigDecimal.ROUND_HALF_UP);
                         }
                     }
                 } else {
@@ -1071,7 +1073,8 @@ public class ValBatchImportService {
                         }else if (StringUtil.equals(entity2.getSubCode().substring(0, 4), KEY_NHGB_STR)) {
                             rskValtblPrtBotassetMapDto2.setSubClass(DictCodeListExt1.资产科目类型_逆回购.getValue());
                             String code=StringUtil.substring(entity2.getSubCode(),0,8);
-                            String finprodType= null;
+                            // Sonar Fix modify by huwei 220609
+                            String finprodType= "";
                             if(StringUtil.equals(code,"12020101") || StringUtil.equals(code,"12020201") || StringUtil.equals(code,"12020301")){
                                 finprodType=DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue();
                             }else if(StringUtil.equals(code,"12020102") || StringUtil.equals(code,"12020202") || StringUtil.equals(code,"12020302")){
@@ -1088,7 +1091,7 @@ public class ValBatchImportService {
                         } else if (StringUtil.equals(entity2.getSubCode().substring(0, 4),KEY_ZHGB_STR)){
                             rskValtblPrtBotassetMapDto2.setSubClass(DictCodeListExt1.资产科目类型_正回购.getValue());
                             String code=entity2.getSubCode().substring(0, 8);
-                            String finprodType= null;
+                            String finprodType= "";
                             if(StringUtil.equals(code,"22020101") || StringUtil.equals(code,"22020201") || StringUtil.equals(code,"22020301")){
                                 finprodType=DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue();
                             }else if(StringUtil.equals(code,"22020102") || StringUtil.equals(code,"22020202") || StringUtil.equals(code,"22020302")){
@@ -1613,7 +1616,6 @@ public class ValBatchImportService {
                                 in.close();
                             } catch (Exception e) {
                                 logger.info(String.format("估值表导关闭流失败..., %s", e.getMessage()));
-                                return;
                             }
                         }
                     }

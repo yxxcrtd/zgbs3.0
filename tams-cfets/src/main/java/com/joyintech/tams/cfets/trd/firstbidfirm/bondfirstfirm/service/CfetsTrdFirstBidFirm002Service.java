@@ -360,6 +360,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 3.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的待接收指令
             boolean flag3 = false;
             for (CfetsTrdFirstBidFirmEntrustDto entrustDto : entrustDtos) {
+                if (entrustIdList.contains(entrustDto.getEntrustId())) {
+                    continue;
+                }
                 // 1.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的已接收待投标且不存在过程中投标确认数据的指令
                 if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue())
                         && StringUtil.equals(entrustDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue())
@@ -2174,8 +2177,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             result.setWflTrdFinProductDealTotal(total);
             // 金融产品交易汇总附属表
             WflTrdDealTotalAdd trdDealTotalAdd = new WflTrdDealTotalAdd();
-            // TODO 本方
-//            trdDealTotalAdd.setOuPartyId(dto.getOurTrader());
             trdDealTotalAdd.setTotleTradeId(total.getTotleTradeId());
             trdDealTotalAdd.setWorkflowId(dto.getWorkflowId());
             trdDealTotalAdd.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
@@ -2282,6 +2283,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             WflTrdDealTotalAdd wflTotalAdd = wflTrdDealTotalAddMapper.selectByPrimaryKey(total.getTotleTradeId());
             TrdDealTotalAdd totalAdd = new TrdDealTotalAdd();
             BeanUtil.copyPropertiesIgnoreNull(totalAdd, wflTotalAdd);
+            totalAdd.setOuPartyId(dto.getOurTrader());
             tradeDto.setTrdDealTotalAdd(totalAdd);
             tradeDto.setWflTrdDealTotalAdd(wflTotalAdd);
             // 汇总费用
@@ -3351,6 +3353,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      * @date 2022/5/21 11:31
      */
     private List<ValidMessage> checkFXNotEmpty(CfetsTrdFirstBidFirmInfoDto dto) {
+        // 是否交易所
+        boolean isJys = true;
+        if (StringUtil.equals(dto.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                || StringUtil.equals(dto.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
+            isJys =false;
+        }
         List<ValidMessage> errorList = new ArrayList<>();
         String errorInfo = "分销买入时";
         // 缴款日
@@ -3358,7 +3366,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             errorList.add(new ValidMessage(errorInfo + "缴款日不可为空!"));
         }
         // 债权债务登记日
-        if (!StringUtil.isNotEmpty(dto.getAssignRegdate())) {
+        if (!StringUtil.isNotEmpty(dto.getAssignRegdate()) && !isJys) {
             errorList.add(new ValidMessage(errorInfo + "债权债务登记日不可为空!"));
         }
         // 上市日
@@ -3389,7 +3397,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             errorList.add(new ValidMessage(errorInfo + "分配方式不可为空!"));
         }
         // 缴款金额
-        if (!StringUtil.isNotEmpty(dto.getPayableAmount())) {
+        if (!StringUtil.isNotEmpty(dto.getPayableAmount()) && !isJys) {
             errorList.add(new ValidMessage("缴款金额不可为空!"));
         }
         // 结算服务费
@@ -3427,7 +3435,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 errorList.add(new ValidMessage("投标产品列表中应计利息总额不可为空!"));
             }
             // 缴款金额
-            if (!StringUtil.isNotEmpty(item.getPayAmt())) {
+            if (!StringUtil.isNotEmpty(item.getPayAmt()) && !isJys) {
                 errorList.add(new ValidMessage("投标产品列表中缴款金额不可为空!"));
             }
             // 投标标位
@@ -3439,7 +3447,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 errorList.add(new ValidMessage("投标产品列表中业务模式不可为空!"));
             }
             // 证券账户
-            if (!StringUtil.isNotEmpty(item.getSecManageAcctId())) {
+            if (!StringUtil.isNotEmpty(item.getSecManageAcctId()) && !isJys) {
                 errorList.add(new ValidMessage("投标产品列表中证券账户不可为空!"));
             }
             // 投资经理

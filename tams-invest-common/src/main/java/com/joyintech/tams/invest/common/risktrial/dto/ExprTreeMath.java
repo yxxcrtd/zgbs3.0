@@ -202,7 +202,7 @@ public class ExprTreeMath {
         		  return expression;
         	  }
         	  else{
-        		  return expression.replaceAll("(", "").replaceAll(")", "");
+        		  return expression.replace("(", "").replace(")", "");
         	  }
 		}
         else{
