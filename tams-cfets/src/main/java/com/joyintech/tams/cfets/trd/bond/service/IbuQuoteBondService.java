@@ -392,6 +392,9 @@ public class IbuQuoteBondService extends BaseService {
                 calRequest.setFpriceAmt(cfetsBondDealQuoteCommonDto.getFpriceAmt());
                 calRequest.setSecManageAcctId(cfetsBondDealQuoteCommonDto.getSecManageAcctId());
                 calRequest.setShareAmt(cfetsBondDealQuoteCommonDto.getShareAmt());
+                // TISHKS-1393:增加FinprodId赋值 modify by fuyongsheng start
+                calRequest.setFinprodId(cfetsBondDealQuoteCommonDto.getFinprodId());
+                // TISHKS-1393:增加FinprodId赋值 modify by fuyongsheng end
                 List<TrdTradeFeeDetail> trdTradeFeeDetails = ibuQuoteBondCalService.calFee(calRequest);
                 if(CollectionUtils.isNotEmpty(trdTradeFeeDetails)){
                     trdTradeFeeDetails.forEach(item ->{
