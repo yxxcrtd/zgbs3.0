@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 @ApiModel(value = "我收到的协议回购行情请求报文", description = "我收到的协议回购行情请求报文")
 public class RepurchaseQuoteReceiveRequest {
     @ApiModelProperty(required = true, name = "instructionId", value = "指令编号", example = "FUND000121")
-    @NotBlank(message = "指令编号不能为空")
     private String instructionId;
 
     @ApiModelProperty(name = "requestNo", value = "请求编号")

@@ -218,10 +218,10 @@ public class IntegratedQuoteManagement {
         List<RepurchaseQuoteReceiveResponse> list = Lists.newArrayList();
 
         RepurchaseQuoteReceiveQryRequest quoteQryBean = new RepurchaseQuoteReceiveQryRequest();
-        Instruction instruction = instructionService.findById(request.getInstructionId());
-        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, quoteQryBean.getEntrustProp());
-        quoteQryBean.setEntrustProp(entrustProp);
-        quoteQryBean.setAccountId(instruction.getAcctNo());
+//        Instruction instruction = instructionService.findById(request.getInstructionId());
+//        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, quoteQryBean.getEntrustProp());
+//        quoteQryBean.setEntrustProp(entrustProp);
+//        quoteQryBean.setAccountId(instruction.getAcctNo());
 
         List<RepurchaseQuoteReceiveResponse> beanList = terminalHelper.queryRepurchaseQuoteReceive(quoteQryBean);
         if (CollectionUtils.isNotEmpty(beanList)) {
@@ -236,7 +236,7 @@ public class IntegratedQuoteManagement {
             filterRepurchaseQuoteReceive(list, request);
         }
 
-        return ResultBean.success(MapUtil.builder().put(ROOT, list));
+        return ResultBean.success(MapUtil.builder().put(ROOT, list).build());
     }
 
     private void filterRepurchaseQuoteReceive(RepurchaseQuoteReceiveResponse response, IntegratedRepurchaseQuoteBean bean) {
