@@ -90,7 +90,7 @@ $(function() {
             ,{field:'zgfAmt2', type:'money',sortable: false, title: 'DayEndAccount001.zgfAmt',width:120}
             ,{field:'stampFee2', type:'money',sortable: false, title: 'DayEndAccount001.stampFee',width:120}
             ,{field:'settleFee2', type:'money',sortable: false, title: 'DayEndAccount001.settleFee',width:120}
-            //,{field:'ghfAmt2', type:'money',sortable: false, title: 'DayEndAccount001.ghfAmt',width:120}
+            ,{field:'ghfAmt2', type:'money',sortable: false, title: 'DayEndAccount001.ghfAmt',width:120}
             ,{field:'tradeAmt2', type:'money',sortable: false, title: 'DayEndAccount001.tradeAmt',width:120}
             ,{field:'tradeNum2', type:'money',sortable: false, title: 'DayEndAccount001.tradeNum',width:120}
             ,{field:'commissionAmt', type:'money',sortable: false, title: 'DayEndAccount001.commissionAmt',width:120}
@@ -98,7 +98,7 @@ $(function() {
             ,{field:'zgfAmt', type:'money',sortable: false, title: 'DayEndAccount001.zgfAmt',width:120}
             ,{field:'stampFee', type:'money',sortable: false, title: 'DayEndAccount001.stampFee',width:120}
             ,{field:'settleFee', type:'money',sortable: false, title: 'DayEndAccount001.settleFee',width:120}
-            //,{field:'ghfAmt', type:'money',sortable: false, title: 'DayEndAccount001.ghfAmt',width:120}
+            ,{field:'ghfAmt', type:'money',sortable: false, title: 'DayEndAccount001.ghfAmt',width:120}
             ,{field:'tradeAmt', type:'money',sortable: false, title: 'DayEndAccount001.tradeAmt',width:120}
             ,{field:'tradeNum', type:'money',sortable: false, title: 'DayEndAccount001.tradeNum',width:120}
         ]]

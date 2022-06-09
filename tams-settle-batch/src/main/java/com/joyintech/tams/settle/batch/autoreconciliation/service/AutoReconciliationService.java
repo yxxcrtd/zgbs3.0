@@ -84,6 +84,8 @@ public class AutoReconciliationService {
         param.put("prodType2_F07", DictCodeList.平安资产类型_质押式回购.getValue());
         param.put("prodType2_F02", DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
         param.put("prodType2_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+        param.put("prodType2_F32", BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+        param.put("prodType2_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         param.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
         param.put("BUSI_SCENE_CALSS_0902RS03", DictCodeListStl.业务场景分类明细_债券协议正回购_到期.getValue());
         param.put("BUSI_SCENE_CALSS_0902RB01", DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue());

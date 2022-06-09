@@ -502,10 +502,11 @@
 				AND (stda.REPO_TYPE IS NULL OR stda.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
 				AND (
 					std.PS NOT IN (#{PS_T68},#{PS_T69},#{PS_T94},#{PS_T04},#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T49},#{PS_T46},#{PS_T97})
-				AND (
-					(std.FINPROD_TYPE2 = #{prodType2_F01} AND std.PS NOT IN (#{PS_T39},#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T49},#{PS_T97}))
-					OR ((std.FINPROD_TYPE2 = #{prodType2_F02} OR std.FINPROD_TYPE2 = #{prodType2_F03}) AND std.PS NOT IN (#{PS_T07},#{PS_T49}))
-					OR ((std.FINPROD_TYPE2 = #{prodType2_F06} OR std.FINPROD_TYPE2 = #{prodType2_F10}) AND std.PS NOT IN (#{PS_T04},#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T49},#{PS_T46}))
+					AND std.FINPROD_TYPE2 NOT IN (#{prodType2_F32}, #{prodType2_F37})
+					AND (
+						(std.FINPROD_TYPE2 = #{prodType2_F01} AND std.PS NOT IN (#{PS_T39},#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T49},#{PS_T97}))
+						OR ((std.FINPROD_TYPE2 = #{prodType2_F02} OR std.FINPROD_TYPE2 = #{prodType2_F03}) AND std.PS NOT IN (#{PS_T07},#{PS_T49}))
+						OR ((std.FINPROD_TYPE2 = #{prodType2_F06} OR std.FINPROD_TYPE2 = #{prodType2_F10}) AND std.PS NOT IN (#{PS_T04},#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T49},#{PS_T46}))
 					)
 				)
 				AND NOT EXISTS (SELECT 1 FROM STL_SEC_RECON_DETAIL detail WHERE detail.TRADE_ID = std.TRADE_ID)
@@ -592,6 +593,7 @@
 					AND (stda.REPO_TYPE IS NULL OR stda.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
 					AND (
 						std.PS NOT IN (#{PS_T68},#{PS_T69},#{PS_T94},#{PS_T04},#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T49})
+						AND std.FINPROD_TYPE2 NOT IN (#{prodType2_F32}, #{prodType2_F37})
 						AND (
 							(std.FINPROD_TYPE2 = #{prodType2_F01} AND std.PS NOT IN (#{PS_T39},#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T49}))
 							OR ((std.FINPROD_TYPE2 = #{prodType2_F02} OR std.FINPROD_TYPE2 = #{prodType2_F03}) AND std.PS NOT IN (#{PS_T07},#{PS_T49}))
@@ -683,6 +685,7 @@
 					AND (stda.REPO_TYPE IS NULL OR stda.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
 					AND (
 						std.PS NOT IN (#{PS_T68},#{PS_T69},#{PS_T94},#{PS_T04},#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T49})
+						AND std.FINPROD_TYPE2 NOT IN (#{prodType2_F32}, #{prodType2_F37})
 						AND (
 							(std.FINPROD_TYPE2 = #{prodType2_F01} AND std.PS NOT IN (#{PS_T39},#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T49}))
 							OR ((std.FINPROD_TYPE2 = #{prodType2_F02} OR std.FINPROD_TYPE2 = #{prodType2_F03}) AND std.PS NOT IN (#{PS_T07},#{PS_T49}))
