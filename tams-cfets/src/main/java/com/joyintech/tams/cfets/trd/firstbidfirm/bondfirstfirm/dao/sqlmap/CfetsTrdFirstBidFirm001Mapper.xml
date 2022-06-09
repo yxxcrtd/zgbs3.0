@@ -96,6 +96,7 @@
         to_char(eea.TRANSMIT_TIME, 'hh24:mi')    transmitTimeSer,
         ee.UPDATE_TIME                           lastModifiedDate,
         ee.ENTRUST_ID                            entrustId,
+        teer.TOTLE_ID                            totleId,
         hisInfo.REMARK                                remark
         from ETR_ENTRUST ee
         left join (select listagg(t0.PORTFOLIO_ID, ',') within group (order by t0.ENTRUST_ID)   AS PORTFOLIO_ID,
@@ -162,6 +163,7 @@
         </where>
         group by t0.ENTRUST_ID) bobp
         ON bobp.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN TOTAL_ETR_ENTRUST_REL teer ON teer.ENTRUST_ID  = ee.ENTRUST_ID
         where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
         <if test="isEtrAddSearch != null and isEtrAddSearch != ''">
             and bobp.BID_PRICE is not null
@@ -199,6 +201,7 @@
         T.transmitTimeSer,
         T.lastModifiedDate,
         T.entrustId,
+        T.totleId,
         T.remark,
         (nvl(T.entrustNum,0) - nvl(T.finishAmt,0)) avaNum,
         (nvl(T.entrustNum,0) - nvl(T.finishDealAmt,0)) avaDealAmt

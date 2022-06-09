@@ -1,7 +1,3 @@
--- 是否进行指令汇总(Y:是，N:否)_一级投标
-DELETE FROM SYS_PARA WHERE SYSTEM_CODE = 'INV' AND PARA_CODE = 'IS_ENTRUST_SUM_FLAG_BID';
-INSERT INTO SYS_PARA(SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG)
-VALUES('INV', 'IS_ENTRUST_SUM_FLAG_BID', 'TRUE', NULL, NULL, '是否进行指令汇总(Y:是，N:否)_一级投标', 'system', NULL, SYSDATE, 'system', SYSDATE, NULL, '01');
 -- 一级投标确认指令列表页面刷新参数
 delete from sys_para where SYSTEM_CODE = 'INV' and PARA_CODE in ('cfetsTrdFirstBidFirm_etrTable_refresh_period');
 insert into sys_para (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG) values ('INV', 'cfetsTrdFirstBidFirm_etrTable_refresh_period', '120000', '01', null, '一级投标确认指令列表画面自动刷新时间(ms)', 'system', null, sysdate, 'system', sysdate, null, '01');

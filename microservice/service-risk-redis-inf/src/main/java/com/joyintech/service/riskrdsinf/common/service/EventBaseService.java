@@ -1949,7 +1949,10 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
                     allItems.put(en.getKey(), temp);
                 }
                 else {
-                    item.setOccupyVal(item.getOccupyVal().add(temp.getOccupyVal()));
+                    // ZGCPCN-1150:使用计算工具类对计算做null保护 modify by fuyongsheng 20220609 start
+                    // item.setOccupyVal(item.getOccupyVal().add(temp.getOccupyVal()));
+                    item.setOccupyVal(ArithmeticUtil.doAdd(item.getOccupyVal(), temp.getOccupyVal()));
+                    // ZGCPCN-1150:使用计算工具类对计算做null保护 modify by fuyongsheng 20220609 end
                 }
             });
         });

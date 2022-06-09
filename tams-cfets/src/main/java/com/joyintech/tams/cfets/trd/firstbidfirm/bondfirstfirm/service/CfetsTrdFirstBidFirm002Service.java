@@ -9,12 +9,14 @@ import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
+import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
@@ -820,6 +822,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             viewInfo = listTmp.get(0);
             viewInfo.setBidTotalList(this.createBidTotalList(viewInfo));
         }
+        BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
+        for(CfetsTrdFirstBidFirmProductDto productDto : viewInfo.getProductDtos()){
+            etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal,productDto.getEtrBidPriceTotal());
+        }
+        viewInfo.setEtrBidPriceTotal(etrBidPriceTotal);
         logger.debug("初始化一级投标确认交易查看页面,结果:" + JsonUtils.object2Json(viewInfo));
         return viewInfo;
     }
@@ -3721,8 +3728,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (StringUtil.isNotEmpty(dto.getFinprodAbbr())) {
             finprodAbbr = "资产简称:" + dto.getFinprodAbbr();
         }
-        if (StringUtil.isNotEmpty(dto.getCounterName())) {
-            counterName = "对手方:" + dto.getCounterName();
+        if (StringUtil.isNotEmpty(dto.getCounterId())) {
+            CfetsSearchInfoRequest item = new CfetsSearchInfoRequest();
+            item.setDealType("01");
+            item.setInitValue(dto.getCounterId());
+            List<SelectOptionDto> list = joyinbusinessCommonService.queryMySideOrCount(item);
+            if (CollectionUtils.isNotEmpty(list)) {
+                counterName = "对手方:" + list.get(0).getText();
+            }
         }
         if (StringUtil.isNotEmpty(dto.getTotalBiddingNum())) {
             tradeAmt = "汇总投标券面总额:" +

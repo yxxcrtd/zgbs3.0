@@ -1140,7 +1140,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())) {
                     resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
                 }
-                if (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())) {
+                if (DictCodeList.交易方向_买入.getValue().equals(deal.getPs()) || DictCodeList.交易方向_申购.getValue().equals(deal.getPs())) {
                     resultDto.setAmount(deal.getShareAmt());
                 }
                 result.add(resultDto);

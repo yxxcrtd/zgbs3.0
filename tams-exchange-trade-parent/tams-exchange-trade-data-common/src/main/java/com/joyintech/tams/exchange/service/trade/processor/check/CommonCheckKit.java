@@ -302,7 +302,7 @@ public class CommonCheckKit extends BaseCheckKit {
         long entrustVolume = order.getEntrustVolume();
         BigDecimal entrustBalance = NumberUtil.mul(entrustVolume, order.getEntrustPrice());
 
-        if (!EntrustBs.isBuy(entrustBs)) {
+        if (!EntrustBs.isBuy(entrustBs) && EntrustUtils.isOddLotsTrade(instruction.getBusiTypeTg(), order.getEntrustProp())) {
             return;
         }
         long minNum;
@@ -319,11 +319,11 @@ public class CommonCheckKit extends BaseCheckKit {
         }
 
         BigDecimal minAmt = minTrdUnitLimit.getMinAmt();
-        
+
         if (!(entrustVolume < minNum) || !(entrustBalance.compareTo(minAmt) < 0)) {
-        	return ;
+            return;
         }
-        
+
         if (entrustVolume < minNum) {
             String busiTypeTg = instruction.getBusiTypeTg();
             String errorMsg = "";
