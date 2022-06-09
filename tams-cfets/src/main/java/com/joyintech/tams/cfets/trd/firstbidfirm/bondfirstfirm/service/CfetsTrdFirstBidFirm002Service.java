@@ -820,6 +820,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             viewInfo = listTmp.get(0);
             viewInfo.setBidTotalList(this.createBidTotalList(viewInfo));
         }
+        BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
+        for(CfetsTrdFirstBidFirmProductDto productDto : viewInfo.getProductDtos()){
+            etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal,productDto.getEtrBidPriceTotal());
+        }
+        viewInfo.setEtrBidPriceTotal(etrBidPriceTotal);
         logger.debug("初始化一级投标确认交易查看页面,结果:" + JsonUtils.object2Json(viewInfo));
         return viewInfo;
     }
