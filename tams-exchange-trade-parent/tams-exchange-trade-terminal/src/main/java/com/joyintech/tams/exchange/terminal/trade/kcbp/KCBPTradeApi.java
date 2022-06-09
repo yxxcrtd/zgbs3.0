@@ -509,14 +509,20 @@ public class KCBPTradeApi {
         } else if (integratedEntrust.getMarket().equals(Market.SZSE.value)) {
             parameters.put("secuid", kcbpAccount.getSecuIds().get("0"));
             parameters.put("market", "0");
-            //深证债券质押式协议回购
-            if (IntegratedEntrustUtils.isProtocolBack_SZ(integratedEntrust.getEntrustProp())) {
+            //深证债券质押式协议回购委托申报
+            if (IntegratedEntrustUtils.isProtocolBack_SZ0(integratedEntrust.getBsFlag())) {
                 processProtocolBack_SZ(integratedEntrust, parameters);
-            } else if (EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())) {
+            }
+            //深证债券质押式协议回购 成交确认/拒绝
+            else if (IntegratedEntrustUtils.isProtocolBack_SZ_Chengjiao(integratedEntrust.getBsFlag())) {
                 processProtocolBack_SZ_ChengJiao(integratedEntrust, parameters);
-            } else if (EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())) {
+            }
+            //深证现券交易协商成交委托
+            else if (EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())) {
                 processBondXscjBS(integratedEntrust, parameters);
-            } else if (EntrustProp.SZ_XSCJ_JS.value.equals(integratedEntrust.getEntrustProp()) || EntrustProp.SZ_XSCJ_JJ.value.equals(integratedEntrust.getEntrustProp())) {
+            }
+            //深证现券协商成交接收
+            else if (EntrustProp.SZ_XSCJ_JS.value.equals(integratedEntrust.getEntrustProp()) || EntrustProp.SZ_XSCJ_JJ.value.equals(integratedEntrust.getEntrustProp())) {
                 processBondXscjHF(integratedEntrust, parameters);
             }
         } else {

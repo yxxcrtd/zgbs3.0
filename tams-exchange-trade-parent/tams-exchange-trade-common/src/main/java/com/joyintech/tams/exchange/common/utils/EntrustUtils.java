@@ -20,6 +20,8 @@ import org.apache.commons.lang.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
+
 public class EntrustUtils {
     private static final Set<String> buyBsFlag = new HashSet<>();
     private static final Set<String> sellBsFlag = new HashSet<>();
@@ -403,6 +405,180 @@ public class EntrustUtils {
             return BSFlag.XSCJHFJJMC.value;
         }
         return BSFlag.ZQMR.value;
+    }
+
+    private static final String CONFORM = "conform";
+    private static final String REFUSE = "refuse";
+
+    /**
+     * 协议回购BsFlag解析
+     *
+     * @param busiTypeTg      业务类型
+     * @param market          市场
+     * @param entrustBs       交易方向
+     * @param conformOrRefuse 确认或拒绝
+     */
+    public static String getPledgeAgreementBsFlag(String busiTypeTg, String market, String entrustBs, String conformOrRefuse) {
+        //上交所
+        if (StringUtil.equals(market, Market.SHSE.value)) {
+            return getSHPledgeAgreementBsFlag(busiTypeTg, entrustBs, conformOrRefuse);
+        }
+        //深交所
+        else {
+            return getSZPledgeAgreementBsFlag(busiTypeTg, conformOrRefuse);
+        }
+    }
+
+    private static String getSHPledgeAgreementBsFlag(String busiTypeTg, String entrustBs, String conformOrRefuse) {
+        if (StringUtil.isEmpty(conformOrRefuse)) {
+            //首期 2C:初始交易
+            if (投管业务类型_首期.getValue().equals(busiTypeTg)) {
+                return BSFlag.CSJYRRZJ.value;
+            }
+            //提前购回 2M:提前终止融入资金
+            if (投管业务类型_提前购回.getValue().equals(busiTypeTg) && entrustBs.equals(EntrustBs.BUY.value)) {
+                return BSFlag.TQZZRRZJ.value;
+            }
+            //提前购回 2N:提前终止融出资金
+            if (投管业务类型_提前购回.getValue().equals(busiTypeTg) && entrustBs.equals(EntrustBs.SELL.value)) {
+                return BSFlag.TQZZRCZJ.value;
+            }
+            //到期购回 2E:到期结算
+            if (投管业务类型_到期购回.getValue().equals(busiTypeTg)) {
+                return BSFlag.GHJYFHZJ.value;
+            }
+            //到期续做  2K:到期续做
+            if (投管业务类型_到期续做.getValue().equals(busiTypeTg)) {
+                return BSFlag.DQXZ.value;
+            }
+            //中途换券  2Q:换券申报
+            if (投管业务类型_中途换券.getValue().equals(busiTypeTg)) {
+                return BSFlag.HQSB.value;
+            }
+            //解除质押  2O:解除质押
+            if (投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+                return BSFlag.JCZY.value;
+            }
+        } else if (StringUtil.equals(conformOrRefuse, CONFORM)) {
+            //首期 2V: 成交申报确认
+            if (投管业务类型_首期.getValue().equals(busiTypeTg)) {
+                return BSFlag.CJSBQR.value;
+            }
+            //提前购回  3c: 提前终止融入确认
+            if (投管业务类型_提前购回.getValue().equals(busiTypeTg) && entrustBs.equals(EntrustBs.BUY.value)) {
+                return BSFlag.TQZZRRQR.value;
+            }
+            //提前购回  3b:提前终止融出确认
+            if (投管业务类型_提前购回.getValue().equals(busiTypeTg) && entrustBs.equals(EntrustBs.SELL.value)) {
+                return BSFlag.TQZZRCQR.value;
+            }
+            //到期续做  2L: 到期续做申报确认
+            if (投管业务类型_到期续做.getValue().equals(busiTypeTg)) {
+                return BSFlag.DQXZSBQR.value;
+            }
+            //中途换券   2Z:换券申报确认
+            if (投管业务类型_中途换券.getValue().equals(busiTypeTg)) {
+                return BSFlag.HQSBQR.value;
+            }
+            //解除质押  3e: 解除质押申报确认
+            if (投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+                return BSFlag.JCZYSBQR.value;
+            }
+        } else if (StringUtil.equals(conformOrRefuse, REFUSE)) {
+            //首期 2U: 成交申报拒绝
+            if (投管业务类型_首期.getValue().equals(busiTypeTg)) {
+                return BSFlag.CJSBJJ.value;
+            }
+            //提前购回 3d:提前终止申报拒绝
+            if (投管业务类型_提前购回.getValue().equals(busiTypeTg)) {
+                return BSFlag.TQZZSBJJ.value;
+            }
+            //到期续做  2W: 到期续做申报拒绝
+            if (投管业务类型_到期续做.getValue().equals(busiTypeTg)) {
+                return BSFlag.DQXZSBJJ.value;
+            }
+            //中途换券   3a:换券申报拒绝
+            if (投管业务类型_中途换券.getValue().equals(busiTypeTg)) {
+                return BSFlag.HQSBJJ.value;
+            }
+            //解除质押 3f: 解除质押申报拒绝
+            if (投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+                return BSFlag.JCZYSBJJ.value;
+            }
+        }
+        return null;
+    }
+
+    private static String getSZPledgeAgreementBsFlag(String busiTypeTg, String conformOrRefuse) {
+        if (StringUtil.isEmpty(conformOrRefuse)) {
+            //首期  2C:初始交易
+            if (投管业务类型_首期.getValue().equals(busiTypeTg)) {
+                return BSFlag.CSJYRRZJ.value;
+            }
+            //提前购回 2M:提前终止
+            if (投管业务类型_提前购回.getValue().equals(busiTypeTg)) {
+                return BSFlag.TQZZRRZJ.value;
+            }
+            //到期购回  2E:到期结算
+            if (投管业务类型_到期购回.getValue().equals(busiTypeTg)) {
+                return BSFlag.GHJYFHZJ.value;
+            }
+            //到期续做   2K:到期续做
+            if (投管业务类型_到期续做.getValue().equals(busiTypeTg)) {
+                return BSFlag.DQXZ.value;
+            }
+            //中途换券   2Q:换券申报
+            if (投管业务类型_中途换券.getValue().equals(busiTypeTg)) {
+                return BSFlag.HQSB.value;
+            }
+            //解除质押   2O:解除质押
+            if (投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+                return BSFlag.JCZY.value;
+            }
+        } else if (StringUtil.equals(conformOrRefuse, CONFORM)) {
+            //首期  2V:初始交易确认
+            if (投管业务类型_首期.getValue().equals(busiTypeTg)) {
+                return BSFlag.CJSBQR.value;
+            }
+            //提前购回  3b:提前终止确认
+            if (投管业务类型_提前购回.getValue().equals(busiTypeTg)) {
+                return BSFlag.TQZZRCQR.value;
+            }
+            //到期续做   2L:到期续做确认
+            if (投管业务类型_到期续做.getValue().equals(busiTypeTg)) {
+                return BSFlag.DQXZSBQR.value;
+            }
+            //中途换券   2Z:换券申报确认
+            if (投管业务类型_中途换券.getValue().equals(busiTypeTg)) {
+                return BSFlag.HQSBQR.value;
+            }
+            //解除质押  3e:解除质押确认
+            if (投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+                return BSFlag.JCZYSBQR.value;
+            }
+        } else if (StringUtil.equals(conformOrRefuse, REFUSE)) {
+            //首期 2U:初始交易拒绝
+            if (投管业务类型_首期.getValue().equals(busiTypeTg)) {
+                return BSFlag.CJSBJJ.value;
+            }
+            //提前购回  3d:提前终止拒绝
+            if (投管业务类型_提前购回.getValue().equals(busiTypeTg)) {
+                return BSFlag.TQZZSBJJ.value;
+            }
+            //到期续做  2W:到期续做拒绝
+            if (投管业务类型_到期续做.getValue().equals(busiTypeTg)) {
+                return BSFlag.DQXZSBJJ.value;
+            }
+            //中途换券  3a:换券申报拒绝
+            if (投管业务类型_中途换券.getValue().equals(busiTypeTg)) {
+                return BSFlag.HQSBJJ.value;
+            }
+            //解除质押 3f:解除质押拒绝
+            if (投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+                return BSFlag.JCZYSBJJ.value;
+            }
+        }
+        return null;
     }
 
     public static String getBsFlagForNormal(String entrustProp, String entrustBs, String assetType) {
@@ -991,11 +1167,11 @@ public class EntrustUtils {
      * 判断是否协议回购
      */
     public static boolean isPledgeAgreementRepurchase(String busiTypeTg) {
-        return StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), busiTypeTg)
-                || StringUtil.equals(DictCodeListExt3.投管业务类型_提前购回.getValue(), busiTypeTg)
-                || StringUtil.equals(DictCodeListExt3.投管业务类型_到期购回.getValue(), busiTypeTg)
-                || StringUtil.equals(DictCodeListExt3.投管业务类型_到期续做.getValue(), busiTypeTg)
-                || StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), busiTypeTg)
-                || StringUtil.equals(DictCodeListExt3.投管业务类型_解除质押.getValue(), busiTypeTg);
+        return StringUtil.equals(投管业务类型_首期.getValue(), busiTypeTg)
+                || StringUtil.equals(投管业务类型_提前购回.getValue(), busiTypeTg)
+                || StringUtil.equals(投管业务类型_到期购回.getValue(), busiTypeTg)
+                || StringUtil.equals(投管业务类型_到期续做.getValue(), busiTypeTg)
+                || StringUtil.equals(投管业务类型_中途换券.getValue(), busiTypeTg)
+                || StringUtil.equals(投管业务类型_解除质押.getValue(), busiTypeTg);
     }
 }

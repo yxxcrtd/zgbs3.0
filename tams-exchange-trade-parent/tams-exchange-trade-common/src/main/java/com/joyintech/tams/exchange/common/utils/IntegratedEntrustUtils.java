@@ -8,13 +8,66 @@ import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.Market;
 
 public class IntegratedEntrustUtils {
-    // 协议回购
-    // 深证债券质押式协议回购
+
+    //深证债券质押式协议回购
     public static boolean isProtocolBack_SZ(String entrustProp) {
         if (!Strings.isNullOrEmpty(entrustProp)) {
             if (EntrustProp.SZ_REPURCHASE_BEGIN.value.equals(entrustProp)
                     || EntrustProp.SZ_REPURCHASE_RENEWAL.value.equals(entrustProp)
                     || EntrustProp.SZ_REPURCHASE_BUYBACK.value.equals(entrustProp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 深证债券质押式协议回购
+     * 2C:初始交易
+     * 2E:到期结算
+     * 2K:到期续做
+     * 2O:解除质押
+     * 2Q:换券申报
+     * 2M:提前终止
+     */
+    public static boolean isProtocolBack_SZ0(String bsFlag) {
+        if (!Strings.isNullOrEmpty(bsFlag)) {
+            if (BSFlag.CSJYRRZJ.value.equals(bsFlag)
+                    || BSFlag.GHJYFHZJ.value.equals(bsFlag)
+                    || BSFlag.DQXZ.value.equals(bsFlag)
+                    || BSFlag.JCZY.value.equals(bsFlag)
+                    || BSFlag.HQSB.value.equals(bsFlag)
+                    || BSFlag.TQZZRRZJ.value.equals(bsFlag)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 2V:初始交易确认
+     * 2U:初始交易拒绝
+     * 2L:到期续做确认
+     * 2W:到期续做拒绝
+     * 3e:解除质押确认
+     * 3f:解除质押拒绝
+     * 2Z:换券申报确认
+     * 3a:换券申报拒绝
+     * 3b:提前终止确认
+     * 3d:提前终止拒绝
+     */
+    public static boolean isProtocolBack_SZ_Chengjiao(String bsFlag) {
+        if (!Strings.isNullOrEmpty(bsFlag)) {
+            if (BSFlag.CJSBQR.value.equals(bsFlag)
+                    || BSFlag.CJSBJJ.value.equals(bsFlag)
+                    || BSFlag.DQXZSBQR.value.equals(bsFlag)
+                    || BSFlag.DQXZSBJJ.value.equals(bsFlag)
+                    || BSFlag.JCZYSBQR.value.equals(bsFlag)
+                    || BSFlag.JCZYSBJJ.value.equals(bsFlag)
+                    || BSFlag.HQSBQR.value.equals(bsFlag)
+                    || BSFlag.HQSBJJ.value.equals(bsFlag)
+                    || BSFlag.TQZZRCQR.value.equals(bsFlag)
+                    || BSFlag.TQZZSBJJ.value.equals(bsFlag)) {
                 return true;
             }
         }
@@ -376,7 +429,7 @@ public class IntegratedEntrustUtils {
                 || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JS.value)
                 || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JJ.value);
     }
-    
+
     /***
      * 新债 深交所 协商成交下单
      * @param entrustProp
@@ -390,11 +443,13 @@ public class IntegratedEntrustUtils {
         }
         return false;
     }
- 	/**
- 	 * 新债 深交所 协商成交回复
- 	 * @param entrustProp
- 	 * @return
- 	 */
+
+    /**
+     * 新债 深交所 协商成交回复
+     *
+     * @param entrustProp
+     * @return
+     */
     public static boolean isNegotiateHF_SZ(String entrustProp) {
         if (!Strings.isNullOrEmpty(entrustProp)) {
             if (EntrustProp.SZ_XSCJ_JS.value.equals(entrustProp)

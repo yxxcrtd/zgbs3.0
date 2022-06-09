@@ -59,6 +59,7 @@ import java.util.stream.Collectors;
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券入库;
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
+import static com.joyintech.tams.exchange.common.constant.ErrorCode.ENTRUST_BSFLAG_PARSE_ERROR;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
 import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.NEGOTIATED_REPO;
@@ -1235,7 +1236,20 @@ public class TradeHelper {
             integratedEntrust.setEntrustStatus(EntrustStatus.CREATED.value);
             integratedEntrust.setEntrustType(EntrustType.LARGE.value);
             integratedEntrust.setTransCode(instruction.getPledgeeType());
-            integratedEntrust.setBsFlag(EntrustUtils.getBsFlag(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs()));
+            String busiTypeTg = instruction.getBusiTypeTg();
+            //协议回购
+            if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
+                integratedEntrust.setBsFlag(EntrustUtils.getPledgeAgreementBsFlag(busiTypeTg, integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs(), integratedEntrust.getConformOrRefuse()));
+            } else {
+                integratedEntrust.setBsFlag(EntrustUtils.getBsFlag(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs()));
+            }
+            if (StringUtil.isEmpty(integratedEntrust.getBsFlag())) {
+                logger.info("handIntegratedEntrust 委托买卖类别解析异常：[{}]", integratedEntrust.getInstructionId());
+                integratedEntrust.setErrorCode(ENTRUST_BSFLAG_PARSE_ERROR.value);
+                integratedEntrust.setErrorMsg(ENTRUST_BSFLAG_PARSE_ERROR.errorMsg);
+                return integratedEntrust;
+            }
+
             integratedEntrust.setReductionType("0");
             if (Objects.nonNull(integratedEntrust.getStockCode())) {
                 integratedEntrust.setMarket(StockCodeUtils.getMarket(integratedEntrust.getStockCode()));
@@ -1260,7 +1274,7 @@ public class TradeHelper {
             integratedEntrust.setFinprodType2(instruction.getFinprodType2());
             integratedEntrust.setInvManagerId(instruction.getInvManagerId());
             integratedEntrust.setPs(instruction.getTradeSide());
-            integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
+            integratedEntrust.setBusiTypeTg(busiTypeTg);
             integratedEntrust.setEntrustClass(instruction.getEntrustClass());
             integratedEntrust.setAccountName(instruction.getAcctName());
 
@@ -1583,7 +1597,7 @@ public class TradeHelper {
         if (Objects.nonNull(order.getFullPrice()) && order.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
             return;
         }
-        
+
         BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
         int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
 

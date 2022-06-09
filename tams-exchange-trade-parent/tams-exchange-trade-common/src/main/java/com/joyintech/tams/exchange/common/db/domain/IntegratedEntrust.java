@@ -400,6 +400,8 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     @ApiModelProperty( name = "execId", value = "执行编号")
     private String execId;
+    @ApiModelProperty( name = "conformOrRefuse", value = "确认或拒绝：conform-确认，refuse-拒绝")
+    private String conformOrRefuse;
 
     public String getSoftSkipMode() {
         return softSkipMode;
@@ -1203,5 +1205,13 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setExecId(String execId) {
         this.execId = execId;
+    }
+
+    public String getConformOrRefuse() {
+        return conformOrRefuse;
+    }
+
+    public void setConformOrRefuse(String conformOrRefuse) {
+        this.conformOrRefuse = conformOrRefuse;
     }
 }
