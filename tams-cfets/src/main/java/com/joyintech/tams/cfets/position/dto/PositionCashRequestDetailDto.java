@@ -9,7 +9,7 @@ public class PositionCashRequestDetailDto {
 
     private String portfolioId; // 组合代码
 
-    private String acctId ; // 资金账号
+    private String acctNo ; // 资金账号
 
     public String getPortfolioId() {
         return portfolioId;
@@ -19,11 +19,11 @@ public class PositionCashRequestDetailDto {
         this.portfolioId = portfolioId;
     }
 
-    public String getAcctId() {
-        return acctId;
+    public String getAcctNo() {
+        return acctNo;
     }
 
-    public void setAcctId(String acctId) {
-        this.acctId = acctId;
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
     }
 }
