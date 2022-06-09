@@ -46,6 +46,8 @@ import com.joyintech.tams.invest.common.trade.dao.CreditLinesDealsMapper;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.workflow.engine.WorkflowContext;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,6 +68,9 @@ import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.�
  */
 @Service
 public class RiskInputParamSerivce extends RiskCommonService {
+
+    private static Logger logger = LoggerFactory.getLogger(RiskInputParamSerivce.class);
+
 
     @Autowired
     private RiskNodeConfigService riskNodeConfigService;
@@ -268,6 +273,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         inputDto.setCreditInputList(this.buildCreditParam(data, dtl));
         inputDto.setRiskRdsDtoList(this.buildRiskRdsParam(data, dtl, isCheck));
         inputDto.setRiskNameList(this.buildRiskNameParam(data, dtl));
+        logger.error("{}",JsonUtils.object2Json(inputDto));
         return inputDto;
     }
 
@@ -379,7 +385,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             //这里处理授信
             list.forEach(e -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
-                this.generateInputDto(inputDto, data, e);
+                this.generateInputDto(inputDto, e, e);
                 result.add(inputDto);
             });
 
