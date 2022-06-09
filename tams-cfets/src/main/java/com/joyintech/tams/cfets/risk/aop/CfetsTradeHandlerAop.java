@@ -52,7 +52,10 @@ public class CfetsTradeHandlerAop {
     /**
      * 交易登记check
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond.controller.IbuQuoteBond004Controller.check(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond.controller.IbuQuoteBond004Controller.check(..))" +
+            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage002Controller.check(..))" +
+            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage001Controller.check(..))" +
+            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage001Controller.unWinCheck(..))")
     protected void doCheck() {
     }
 
@@ -66,21 +69,24 @@ public class CfetsTradeHandlerAop {
     /**
      * 交易登记更新
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doUpdate(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doUpdate(..))" +
+            "|| execution(* com.joyintech.tams.cfets..trd.primarybidmanage..*.*.doUpdate(..))")
     protected void updatePoint() {
     }
 
     /**
      * 交易登记新增
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doInsert(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doInsert(..))" +
+            "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage..*.*.doInsert(..))")
     protected void insertPoint() {
     }
 
     /**
      * 作废操作,释放占用
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doDelete(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets..trd.bond..*.*.doDelete(..))" +
+            "execution(* com.joyintech.tams.cfets..trd.primarybidmanage..*.*.doDelete(..))")
     protected void deletePoint() {
     }
 
