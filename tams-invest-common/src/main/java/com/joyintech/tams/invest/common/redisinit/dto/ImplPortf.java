@@ -58,7 +58,7 @@ public class ImplPortf extends PtlPortfolio implements IProdInfo {
 
     @Override
     public String getOpenType() {
-        return this.openMode;//开放频率
+        return this.openType;//开放频率
     }
 
     public void setOpenType(String openType) {

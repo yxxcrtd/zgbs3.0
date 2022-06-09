@@ -41,7 +41,9 @@ public class ValBatchImportTask extends BatchBaseService{
     * 日志
     */
     private Logger logger = LoggerFactory.getLogger(getClass());
-    
+
+    private static final Object lock1 = new Object();
+
     @Autowired
     private ValBatchImportService valBatchImportService;
     
@@ -55,7 +57,8 @@ public class ValBatchImportTask extends BatchBaseService{
         JobExecution result = new JobExecution(1l);
         result.setStatus(BatchStatus.FAILED);
         SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
-        synchronized (isRunning) {
+        // Sonar Fix modify by huwei 220609
+        synchronized (lock1) {
             if(isRunning) return result;
             else isRunning = true;
         }

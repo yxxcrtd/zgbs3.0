@@ -1649,6 +1649,9 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             dd.setEntrustOwnNum(item.getEntrustOwnNum());
             dd.setEntrustIntegrateNum(item.getEntrustIntegrateNum());
             dd.setElementId(item.getElementId());
+            if(StringUtil.isNotEmpty(item.getEntrustId())) {
+                dd.setEntrustId(item.getEntrustId());
+            }
             //根据卖空模式对本方券和融入券/卖空购回券面总额进行赋值
             String shortSellingSupported=CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED");
             if(StringUtil.equals(shortSellingSupported,"01")){

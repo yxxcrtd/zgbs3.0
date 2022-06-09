@@ -31,7 +31,6 @@ public class EtrAgreRepDelayService {
 		map.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
 		map.put("YES_OR_NO_N", DictCodeListExt1.是否_否.getValue());
 		map.put("PS_T07", DictCodeList.交易方向_到期.getValue());
-		map.put("PS_T56", DictCodeList.交易方向_到期续做.getValue());
 		map.put("PS_C20", DictCodeList.交易方向_提前终止.getValue());
 		map.put("PS_T56", DictCodeListExt3.交易方向_到期续做.getValue());
 		map.put("PS_T93", DictCodeListExt3.交易方向_解除质押.getValue());

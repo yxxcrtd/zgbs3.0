@@ -4,6 +4,7 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @ApiModel(value = "一级投标确认指令查询条件", description = "一级投标确认指令查询条件")
@@ -29,6 +30,9 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     @ApiModelProperty(name="tenderTarget",value="招标标的")
     private String tenderTarget;
+
+    @ApiModelProperty(name = "winPrice", value = "中标标位,etrAddSearch接口传值需要", example = "100.0000")
+    private BigDecimal winPrice;
 
     @ApiModelProperty(name = "entrustDateStart", value = "指令开始日期,字符串", example = "2021-12-21")
     private String entrustDateStart;
@@ -187,6 +191,14 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     public void setTenderTarget(String tenderTarget) {
         this.tenderTarget = tenderTarget;
+    }
+
+    public BigDecimal getWinPrice() {
+        return winPrice;
+    }
+
+    public void setWinPrice(BigDecimal winPrice) {
+        this.winPrice = winPrice;
     }
 
     public String getCounterId() {

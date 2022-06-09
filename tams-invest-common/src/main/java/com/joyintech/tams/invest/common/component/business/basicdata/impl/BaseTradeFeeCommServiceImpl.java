@@ -213,11 +213,13 @@ public class BaseTradeFeeCommServiceImpl implements BaseTradeFeeCommService {
 					singleFee=ArithmeticUtil.round(ArithmeticUtil.multiply(inputDto.getPrinAmt(),retFeeDetailDto.getChargeRate()),2,RoundingMode.HALF_UP);
 				}
 			}
-			if(StringUtil.isNotEmpty(retFeeDetailDto.getFeeMini())&&singleFee.compareTo(retFeeDetailDto.getFeeMini())<=0){
-				singleFee=retFeeDetailDto.getFeeMini();
-			}
-			if(StringUtil.isNotEmpty(retFeeDetailDto.getFeeMaxi())&&singleFee.compareTo(retFeeDetailDto.getFeeMaxi())>0){
-				singleFee=retFeeDetailDto.getFeeMaxi();
+			if(null !=singleFee){
+				if(StringUtil.isNotEmpty(retFeeDetailDto.getFeeMini())&&singleFee.compareTo(retFeeDetailDto.getFeeMini())<=0){
+					singleFee=retFeeDetailDto.getFeeMini();
+				}
+				if(StringUtil.isNotEmpty(retFeeDetailDto.getFeeMaxi())&&singleFee.compareTo(retFeeDetailDto.getFeeMaxi())>0){
+					singleFee=retFeeDetailDto.getFeeMaxi();
+				}
 			}
 		}
 		feeCofigDetail.setFeeType(feeType);

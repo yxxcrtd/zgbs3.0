@@ -267,6 +267,7 @@ public class JoyinbusinessCommonService extends BaseService {
     public List<SelectOptionDto> queryMySideOrCount(CfetsSearchInfoRequest dto) {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("search", dto.getSearch());
+        param.put("initValue", dto.getInitValue());
         param.put("sysDate", iPlatformDate.getSysDate());
         if (StringUtil.isNotEmpty(dto.getDateType()) && StringUtil.equals(dto.getDateType(), "01")) {
             //查询历史数据，不需要当日日期

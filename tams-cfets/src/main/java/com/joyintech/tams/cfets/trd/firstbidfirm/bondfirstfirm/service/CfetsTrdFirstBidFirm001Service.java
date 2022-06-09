@@ -410,6 +410,18 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     }
 
     /**
+     * 查询指令信息
+     *
+     * @param dto
+     * @return
+     */
+    public List<CfetsTrdFirstBidFirmEntrustDto> listEntrust(CfetsTrdBondFirstBidFirmEntrustRequest dto) {
+        Map<String, Object> param = BeanUtil.object2Map(dto);
+        this.setParam(param);
+        return cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
+    }
+
+    /**
      * 指令查询参数初始化
      *
      * @param param

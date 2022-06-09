@@ -127,13 +127,13 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
     @ApiOperation(value = "查询指令列表分页数据", notes = "查询指令列表分页数据")
     @PostMapping("/pageEntrust")
     @ResponseBody
-    public Message<Page<CfetsTrdFirstBidFirmEntrustDto>> pageEntrust(@RequestBody CfetsTrdBondFirstBidFirmEntrustRequest dto) {
+    public Message<List<CfetsTrdFirstBidFirmEntrustDto>> pageEntrust(@RequestBody CfetsTrdBondFirstBidFirmEntrustRequest dto) {
         try {
-            Page<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm001Service.pageEntrust(dto);
-            return new Message<Page<CfetsTrdFirstBidFirmEntrustDto>>().success().setData(list);
+            List<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm001Service.listEntrust(dto);
+            return new Message<List<CfetsTrdFirstBidFirmEntrustDto>>().success().setData(list);
         } catch (Exception e) {
             logger.error("查询指令列表分页数据异常", e);
-            return new Message<Page<CfetsTrdFirstBidFirmEntrustDto>>().fail().setMessage("查询指令列表分页数据异常");
+            return new Message<List<CfetsTrdFirstBidFirmEntrustDto>>().fail().setMessage("查询指令列表分页数据异常");
         }
     }
 

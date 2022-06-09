@@ -349,7 +349,7 @@
       /*  B.TRADER trader,
         B.realName realName,*/
         WFL_ETR_ENTRUST.REMARK remark,
-        ETR_ENTRUST_ADD.BUSI_TYPE_POSITION busiTypePosition,
+        WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION busiTypePosition,
         ssai.sec_acct_name secAcctId,
         DECODE(WFL_ETR_ENTRUST_ADD.SETTLE_SPREED,0,'01',1,'02','2','03') settleSpeed,
         decode(WFL_ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F10',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F12',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F16',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'')
@@ -522,7 +522,7 @@
                 AND WFL_ETR_ENTRUST_ADD.ASSET_TYPE = #{finprodType2}
             </if>
             <if test="busiTypePosition != null and busiTypePosition!='' ">
-                AND ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = #{busiTypePosition}
+                AND WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = #{busiTypePosition}
             </if>
             <if test="finprodMarketIdList != null and finprodMarketIdList.size()>0">
                 AND FIN_PRODUCT.FINPROD_MARKET_ID IN(

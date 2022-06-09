@@ -645,7 +645,7 @@
     <select id="findBidFirmPortIntFenPeiInfoList" resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
         select tpda.ENTRUST_ID                           entrustId,
                pp.PORTFOLIO_NAME                         portfolioName,
-               tpd.SHARE_AMT                             qtyd,
+               tpd.SHARE_AMT*100                         qtyd,
                tpd.FEE_AMT_UNPAY                         jsFeeAmt,
                tpd.CPRICE_AMT                            tradeAmt,
                tpd.INT_AMT                               intAmt,
@@ -664,7 +664,7 @@
                null                     actWinPrinamt,
                null                           winPrice,
                null                          unitPrice,
-               eed.ENTRUST_NUM                           unFinshAmt
+               eed.ENTRUST_NUM*100           unFinshAmt
         from TRD_PRODUCT_DEAL tpd
                  left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
                  left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tpd.TOTLE_TRADE_ID = tfpdt.TOTLE_TRADE_ID
@@ -681,7 +681,7 @@
         union all
         select tpda.ENTRUST_ID                          entrustId,
                pp.PORTFOLIO_NAME                        portfolioName,
-               tpd.SHARE_AMT                            qtyd,
+               tpd.SHARE_AMT*100                            qtyd,
                tpd.FEE_AMT_UNPAY                        jsFeeAmt,
                tpd.CPRICE_AMT                           tradeAmt,
                tpd.INT_AMT                              intAmt,
@@ -705,7 +705,7 @@
                     when fpi.TENDER_TARGET = '03' then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
                 end              winPrice/*中标标位*/,
                brd.WIN_CPRICE                           unitPrice,
-               eed.ENTRUST_NUM                           unFinshAmt
+               eed.ENTRUST_NUM*100                      unFinshAmt
         from TRD_PRODUCT_DEAL tpd
                  left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
                  left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tpd.TOTLE_TRADE_ID = tfpdt.TOTLE_TRADE_ID
@@ -1553,7 +1553,7 @@
                     THEN fpi.ISSUE_DATE
                     WHEN (fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN (#{TENDER_TYPE_03}, #{TENDER_TYPE_04})))
                     OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
-                    THEN fpi.TENDER_SDATE
+                    THEN fpi.TENDER_EDATE
                 END                       AS bidDateEnd/*投标日 结束*/,
                 case when tfpdt.BUSI_TYPE = 'TRD61' then brt.PAY_DATE else bo.PAY_DATE end                 payDate,
                 case when tfpdt.BUSI_TYPE = 'TRD61' then brt.CREDITOR_DEBT_DATE else bo.ASSIGN_REGDATE end assignRegdate,
@@ -1562,7 +1562,7 @@
                 bo.PAY_TYPE                                                                          payType,
                 null                                                                                 etrBidPriceTotal,
                 bo.WIN_PRIN_AMT                                                                      qty,
-                case when tfpdt.BUSI_TYPE = 'TRD61' then brd.price else null end                     price,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then brd.price else tfpdt.UNIT_CPRICE end        price,
                 tfpdt.UNIT_INT                                                                       unitInt,
                 tfpdt.FEE_AMT_UNPAY                                                                  jsFeeAmt,
                 bo.BID_ID                                                                            tradeId,
@@ -1575,10 +1575,13 @@
                 bo.WIN_PRIN_AMT totalBidPrinamt,
                 brt.WIN_PRINAMT winPrinamt,
                 case
-                    when brt.WIN_PRICE is null then null
-                    when fpi.TENDER_TARGET = '01' then to_char(brt.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-                    when fpi.TENDER_TARGET = '02' then to_char(brt.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-                    when fpi.TENDER_TARGET = '03' then to_char(brt.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                    when brt.WIN_PRICE is null and bo.WIN_PRICE is null then null
+                    when fpi.TENDER_TARGET = '01' then to_char(
+                            (case when tfpdt.BUSI_TYPE = 'TRD61' then brt.WIN_PRICE else bo.WIN_PRICE end) * 100, 'FM9999999999999990.9990') || '%'
+                    when fpi.TENDER_TARGET = '02' then to_char(
+                            (case when tfpdt.BUSI_TYPE = 'TRD61' then brt.WIN_PRICE else bo.WIN_PRICE end), 'FM9999999999999990.9990') || '元'
+                    when fpi.TENDER_TARGET = '03' then to_char(
+                            (case when tfpdt.BUSI_TYPE = 'TRD61' then brt.WIN_PRICE else bo.WIN_PRICE end) * 10000, 'FM9999999999999990.90') || 'BP'
                 end              winPrice/*中标标位*/,
                 tfpdt.BUSI_TYPE busiType
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt

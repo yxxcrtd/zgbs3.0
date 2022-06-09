@@ -153,9 +153,19 @@
         LEFT JOIN
         FIN_PRODUCT_ISSUE t3
         ON t3.FINPROD_ID = t2.FINPROD_ID
+        <where>
+            <if test="tenderTarget != null and tenderTarget != '' and winPrice != null ">
+                (#{tenderTarget} = '01' and t0.BID_PRICE*100 <![CDATA[<=]]> #{winPrice} ) or
+                (#{tenderTarget} = '02' and t0.BID_PRICE <![CDATA[>=]]> #{winPrice} ) or
+                (#{tenderTarget} = '03' and t0.BID_PRICE*10000 <![CDATA[<=]]> #{winPrice} )
+            </if>
+        </where>
         group by t0.ENTRUST_ID) bobp
         ON bobp.ENTRUST_ID = ee.ENTRUST_ID
         where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
+        <if test="isEtrAddSearch != null and isEtrAddSearch != ''">
+            and bobp.BID_PRICE is not null
+        </if>
         order by decode(ee.ENTRUST_STATUS, '04', 2, '05', 3, '06', 4, 1) asc,fpi.ISSUE_DATE,ee.ENTRUST_DATE,eea.TRANSMIT_TIME
     </sql>
 

@@ -43,21 +43,23 @@ public class DateEditor extends CustomDateEditor {
                                                + this.exactDateLength + "characters long");
         }
         else {
-            try {
-                if (text.matches("^\\d{13}$")) {
-                    setValue(new Date(Long.parseLong(text)));
-                }
-                else {
-                    setValue(this.dateFormat.parse(text));
-                }
-            }
-            catch (ParseException ex) {
+            if(text != null){
                 try {
-                    setValue(this.otherDateFormat.parse(text));
+                    if (text.matches("^\\d{13}$")) {
+                        setValue(new Date(Long.parseLong(text)));
+                    }
+                    else {
+                        setValue(this.dateFormat.parse(text));
+                    }
                 }
-                catch (ParseException e) {
-                    throw new IllegalArgumentException("Could not parse date: " + e.getMessage(),
-                        e);
+                catch (ParseException ex) {
+                    try {
+                        setValue(this.otherDateFormat.parse(text));
+                    }
+                    catch (ParseException e) {
+                        throw new IllegalArgumentException("Could not parse date: " + e.getMessage(),
+                                e);
+                    }
                 }
             }
         }

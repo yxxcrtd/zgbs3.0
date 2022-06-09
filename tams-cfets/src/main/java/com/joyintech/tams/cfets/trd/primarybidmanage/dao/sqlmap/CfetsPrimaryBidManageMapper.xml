@@ -166,6 +166,7 @@
         FP.TRADE_MARKET  tradeMarket,
         BO.PAY_DATE      payDate,
         BO.OUR_TRADER   trader,
+        su.REAL_NAME    traderStr,
         BO.REMARK        remark,
         BO.COUNTER_ID    counterId,
         MCP.COUNTER_NAME   counterName,
@@ -180,6 +181,7 @@
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
+        LEFT JOIN SYS_USER su ON su.USER_NAME = BO.OUR_TRADER
         WHERE BO.BID_ID = #{bidId}
      </select>
     <select id="getBidProductList" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.BidProductDto" parameterType="Map">
@@ -188,10 +190,11 @@
             BOBP.ENTRUST_ID   entrustId,
             BOBP.PORTFOLIO_ID   portfolioId,
             pp.PORTFOLIO_NAME portfolioName,
-            NVL(BOBP.THE_WIN_PRIN_AMT,TPD.SHARE_AMT) totalBidPrinamt,
-            NVL(BOBP.WIN_PRIN_AMT,TPD.SHARE_AMT) winPrinAmt,
-            BOBP.BID_PRICE        winPrice,
-            BOBP.INV_AIM   invAim
+            NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) totalBidPrinamt,
+            NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) winPrinAmt,
+            decode(FPI.TENDER_TARGET,'01',to_char(BOBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BOBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BOBP.BID_PRICE*10000,'fm999999990.90')||'BP')   winPrice,
+            BOBP.INV_AIM   invAim,
+            BO.DIP_TYPE  dipType
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN (
              select  BO.BID_ID,TPDA.ENTRUST_ID ,SUM(TPD.SHARE_AMT)/100  SHARE_AMT
@@ -206,6 +209,7 @@
             ) TPD  ON TPD.ENTRUST_ID = BOBP.ENTRUST_ID
             AND BOBP.BID_ID = TPD.BID_ID
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO pp on BOBP.PORTFOLIO_ID = pp.PORTFOLIO_ID
         WHERE BOBP.BID_ID = #{bidId}
     </select>
@@ -302,7 +306,8 @@
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
-            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')         winPrice,
+            BRT.WIN_PRICE           winPrice,
+            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')         winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -466,10 +471,12 @@
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,
+            BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
-            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')           winPrice,
+            BRT.WIN_PRICE           winPrice,
+            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')           winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -524,10 +531,12 @@
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,
+            BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
-            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')         winPrice,
+            BRT.WIN_PRICE           winPrice,
+            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')    winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
