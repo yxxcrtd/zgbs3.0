@@ -224,10 +224,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
     private EtrEntrustAddMapper etrEntrustAddMapper;
 
     @Autowired
-    private CfetsTrdFirstBidFirm002Mapper cfetsTrdFirstBidFirm002Mapper;
+    private SysWflBusinessListMapper sysWflBusinessListMapper;
 
     @Autowired
-    private SysWflBusinessListMapper sysWflBusinessListMapper;
+    private CfetsTrdFirstBidFirm002Mapper cfetsTrdFirstBidFirm002Mapper;
 
     /**
      * <投标确认>界面初始化检查
@@ -2807,6 +2807,18 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 errorList.add(
                         new ValidMessage("存在流程中数据，不可撤销，请重新选择!"));
             }
+            Map<String, Object> param = new HashMap<>();
+            param.put("bidId", item.getBidId());
+            //中标结果维护
+            if (StringUtil.equals("01", requst.getType())
+                    && cfetsTrdFirstBidFirm002Mapper.selectResultCount(param) > 0) {
+                errorList.add(new ValidMessage("投标所选数据已做中标结果维护不支持撤销!业务编号:" + item.getBidId()));
+            }
+            //是否已交收
+            if (StringUtil.equals("02", requst.getType())
+                    && cfetsTrdFirstBidFirm002Mapper.selectManualCount(param) > 0) {
+                errorList.add(new ValidMessage("分销买入所选数据已做交收不支持撤销!业务编号:" + item.getBidId()));
+            }
             if ((!StringUtil.equals(item.getValidStatus(), DictCodeListExt1.交易流程状态_有效.getValue())
                     || !StringUtil.equals(item.getFirstBidStatus(), DictCodeList.一级投标中标状态_已投标.getValue()))
                     && StringUtil.equals("01", requst.getType())) {
@@ -2815,7 +2827,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // TODO 清算成功?
             if ((!StringUtil.equals(item.getValidStatus(), DictCodeListExt1.交易流程状态_有效.getValue())
                     /*|| !StringUtil.equals(item.getFirstBidStatus(), DictCodeList.一级投标中标状态_已投标.getValue())*/)
-                    && StringUtil.equals("03", requst.getType())) {
+                    && StringUtil.equals("02", requst.getType())) {
                 errorList.add(new ValidMessage("仅可对有效未清算成功的数据进行撤销，请重新选择!"));
             }
         }
@@ -3357,7 +3369,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         boolean isJys = true;
         if (StringUtil.equals(dto.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
                 || StringUtil.equals(dto.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
-            isJys =false;
+            isJys = false;
         }
         List<ValidMessage> errorList = new ArrayList<>();
         String errorInfo = "分销买入时";
