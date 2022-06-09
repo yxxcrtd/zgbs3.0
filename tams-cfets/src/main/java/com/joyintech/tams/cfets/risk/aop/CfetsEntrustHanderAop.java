@@ -204,8 +204,7 @@ public class CfetsEntrustHanderAop {
      * 风险试算
      *
      * @param dto 委托指令内容
-     * @param infCode 接口代码
-     * @param busiType 业务类型
+     * @param pageId 画面代码
      * @return 执行结果
      * @throws Exception 异常
      */
