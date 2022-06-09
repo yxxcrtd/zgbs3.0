@@ -1536,7 +1536,8 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(StringUtil.equals(entity.getPriceModel(),DictCodeListExt2.价格模式_市价指令.getValue())){
                     checkPrice = BigDecimal.ZERO;
                 }else if(entity.getRepoRate() != null && StringUtil.equals(entity.getPriceModel(),DictCodeListExt2.价格模式_限价指令.getValue())){
-                    checkPrice = ArithmeticUtil.divide(entity.getRepoRate(),new BigDecimal("100"),2,RoundingMode.HALF_UP);
+                   // checkPrice = ArithmeticUtil.divide(entity.getRepoRate(),new BigDecimal("100"),2,RoundingMode.HALF_UP);
+                    checkPrice = entity.getRepoRate();
                 }
             }
             //
