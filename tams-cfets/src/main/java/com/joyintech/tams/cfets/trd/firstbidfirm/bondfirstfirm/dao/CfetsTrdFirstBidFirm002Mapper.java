@@ -2,6 +2,8 @@ package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao;
 
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
+import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.common.base.entity.WflTrdFinProductDealTotal;
 import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
 import org.apache.ibatis.annotations.Param;
@@ -107,7 +109,17 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @author jiangpeng
      * @date 2022/5/26 16:03
      */
-    List<WflTrdFinProductDealTotal> findTotalByPTotleTradeId(@Param("PTotleTradeId") String PTotleTradeId);
+    List<WflTrdFinProductDealTotal> findWflTotalByPTotleTradeId(@Param("PTotleTradeId") String PTotleTradeId);
+
+    /**
+     * 根据前置编号查询有效汇总信息表
+     *
+     * @param PTotleTradeId 前置编号
+     * @return java.util.List<com.joyintech.tams.common.base.entity.WflTrdFinProductDealTotal>
+     * @author jiangpeng
+     * @date 2022/5/26 16:03
+     */
+    List<TrdFinProductDealTotal> findTotalByPTotleTradeId(@Param("PTotleTradeId") String PTotleTradeId);
 
     /**
      * 根据汇总编号查询流程中汇总信息表
@@ -117,7 +129,17 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @author jiangpeng
      * @date 2022/5/26 16:06
      */
-    List<WflTrdProductDeal> findDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+    List<WflTrdProductDeal> findWflDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+
+    /**
+     * 根据汇总编号查询流程中汇总信息表
+     *
+     * @param totleTradeId 汇总编号
+     * @return java.util.List<com.joyintech.tams.common.base.entity.WflTrdProductDeal>
+     * @author jiangpeng
+     * @date 2022/5/26 16:06
+     */
+    List<TrdProductDeal> findDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
 
     /**
      * 按组合维度查询指令剩余额度,含流程中
