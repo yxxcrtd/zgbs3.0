@@ -434,7 +434,7 @@ public class PortfolioManager extends BaseService {
             item.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
 
             // 处理分配比例
-            item.setDisRate(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? BigDecimal.ZERO : NumberUtil.div(item.getEntrustNum(), orderVolume));
+            item.setDisRate(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? BigDecimal.ZERO : NumberUtil.mul(NumberUtil.div(item.getEntrustNum(), orderVolume), 100));
         }
 
         // 恢复委托价格
