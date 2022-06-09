@@ -205,6 +205,8 @@ public class CfetsQuotedTradeCommonService{
             Thread.sleep(maxWaitTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            // Sonar Fix modify by huwei 220608
+            Thread.currentThread().interrupt();
         }
         ResultBaseDto resultBaseDto = new ResultBaseDto(true);
         try {
