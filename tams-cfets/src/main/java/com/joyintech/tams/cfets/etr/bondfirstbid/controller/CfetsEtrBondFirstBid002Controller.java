@@ -105,7 +105,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
                     List<PositionCashRequestDetailDto> ptlList = new ArrayList<>();
                     PositionCashRequestDetailDto positionDto = new PositionCashRequestDetailDto();
                     positionDto.setPortfolioId(productDto.getPortfolioId());
-                    positionDto.setAcctId(productDto.getAcctNo());
+                    positionDto.setAcctNo(productDto.getAcctNo());
                     ptlList.add(positionDto);
                     BaseMap cashMap = positionInfoService.queryEtrAvailableCash(
                             ptlList,
