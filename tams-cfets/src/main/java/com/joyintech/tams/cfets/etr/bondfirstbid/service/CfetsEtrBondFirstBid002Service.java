@@ -1330,7 +1330,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
                 //大于0.1(万元)
                 if (bidDto.getBidPrinAmt() != null) {
-                    if (bidDto.getBidPrinAmt().compareTo(BigDecimal.valueOf(1000)) < 0) {
+                    if (bidDto.getBidPrinAmt().compareTo(BigDecimal.valueOf(1000)) <= 0) {
                         messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],投标券面总额不能小于【0.1(万元)】！"));
                     }
 
