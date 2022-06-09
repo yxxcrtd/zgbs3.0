@@ -13,21 +13,20 @@
             <Cell order="9" name="资金账户">acctNo</Cell>
             <Cell order="10" name="证券账户">secAcctId</Cell>
             <Cell order="11" name="交易市场">tradeMarketStr</Cell>
-            <Cell order="12" name="交易平台">tradePlatStr</Cell>
-            <Cell order="13" name="资产代码">finprodMarketId</Cell>
-            <Cell order="14" name="资产名称">finprodName</Cell>
-            <Cell order="15" name="交收数量">settleNum</Cell>
-            <Cell order="16" name="交收金额">settleAmt</Cell>
-            <Cell order="17" name="回购金额">prin</Cell>
-            <Cell order="18" name="到期结算金额">mTradeAmt</Cell>
-            <Cell order="19" name="质押券代码">pledgeIdAbbr</Cell>
-            <Cell order="20" name="质押券名称">pledgeName</Cell>
-            <Cell order="21" name="质押数量">pledgeNumber</Cell>
-            <Cell order="22" name="原质押券代码">bPledgeIdAbbr</Cell>
-            <Cell order="23" name="业务类别">busiTypeStr</Cell>
-            <Cell order="24" name="交易对手">counterName</Cell>
-            <Cell order="25" name="操作类型">operTypeStr</Cell>
-            <Cell order="26" name="操作员">operator</Cell>
+            <Cell order="12" name="资产代码">finprodMarketId</Cell>
+            <Cell order="13" name="资产名称">finprodName</Cell>
+            <Cell order="14" name="交收数量">settleNum</Cell>
+            <Cell order="15" name="交收金额">settleAmt</Cell>
+            <Cell order="16" name="回购金额">prin</Cell>
+            <Cell order="17" name="到期结算金额">mTradeAmt</Cell>
+            <Cell order="18" name="质押券代码">pledgeIdAbbr</Cell>
+            <Cell order="19" name="质押券名称">pledgeName</Cell>
+            <Cell order="20" name="质押数量">pledgeNumber</Cell>
+            <Cell order="21" name="原质押券代码">bPledgeIdAbbr</Cell>
+            <Cell order="22" name="业务类别">busiTypeStr</Cell>
+            <Cell order="23" name="交易对手">counterName</Cell>
+            <Cell order="24" name="操作类型">operTypeStr</Cell>
+            <Cell order="25" name="操作员">operator</Cell>
         </Row>
     </Worksheet>
 </Workbook>
