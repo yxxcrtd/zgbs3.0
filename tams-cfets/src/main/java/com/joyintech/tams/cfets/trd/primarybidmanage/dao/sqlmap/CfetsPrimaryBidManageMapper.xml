@@ -193,7 +193,8 @@
             NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) totalBidPrinamt,
             NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) winPrinAmt,
             decode(FPI.TENDER_TARGET,'01',to_char(BOBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BOBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BOBP.BID_PRICE*10000,'fm999999990.90')||'BP')   winPrice,
-            BOBP.INV_AIM   invAim
+            BOBP.INV_AIM   invAim,
+            BO.DIP_TYPE  dipType
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN (
              select  BO.BID_ID,TPDA.ENTRUST_ID ,SUM(TPD.SHARE_AMT)/100  SHARE_AMT

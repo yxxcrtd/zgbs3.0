@@ -45,6 +45,12 @@ public class BidProductDto {
     @ApiModelProperty(name="invAimStr",value="业务模式")
     private String invAimStr;
 
+    @ApiModelProperty(name="dipType",value="分配方式")
+    private String dipType;
+
+    @ApiModelProperty(name="dipTypeStr",value="分配方式")
+    private String dipTypeStr;
+
     public String getBidId() {
         return bidId;
     }
@@ -109,11 +115,27 @@ public class BidProductDto {
         this.invAimStr = invAimStr;
     }
 
+    public String getDipTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.调整策略, this.getDipType());
+    }
+
+    public void setDipTypeStr(String dipTypeStr) {
+        this.dipTypeStr = dipTypeStr;
+    }
+
     public String getPortfolioName() {
         return portfolioName;
     }
 
     public void setPortfolioName(String portfolioName) {
         this.portfolioName = portfolioName;
+    }
+
+    public String getDipType() {
+        return dipType;
+    }
+
+    public void setDipType(String dipType) {
+        this.dipType = dipType;
     }
 }
