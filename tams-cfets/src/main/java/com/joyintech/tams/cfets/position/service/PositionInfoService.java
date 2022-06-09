@@ -188,7 +188,7 @@ public class PositionInfoService {
             for (PositionCashRequestDetailDto list : ptlList) {
                 Map<String, String> secIdMap = new HashMap<String, String>();
                 List<String> secAcctIds = new ArrayList<>();
-                if (StringUtil.isNotEmpty(list.getAcctId())) {
+                if (StringUtil.isNotEmpty(list.getAcctNo())) {
                     secAcctIds.add(acctId);
                 }else {
                     secIdMap.put("portfolioId", list.getPortfolioId());
