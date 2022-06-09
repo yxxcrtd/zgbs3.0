@@ -209,11 +209,11 @@ public class CfetsEntrustHanderAop {
      * @return 执行结果
      * @throws Exception 异常
      */
-    public static final <T> AjaxResult doRiskcal(T dto, String infCode, String busiType) throws Exception {
+    public static final <T> AjaxResult doRiskcal(T dto, String pageId) throws Exception {
         //风险试算check
         RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
         //风险试算组装dto
-        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), pageId);
         CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
         result.setRiskMathFlag("02");
         if (riskCommonOutput != null && CollectionUtils.isNotEmpty(riskCommonOutput.getRiskTrialRetDto())) {
