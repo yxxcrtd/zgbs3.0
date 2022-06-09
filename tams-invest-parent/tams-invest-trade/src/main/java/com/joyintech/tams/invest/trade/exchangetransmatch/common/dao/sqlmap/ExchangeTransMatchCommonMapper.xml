@@ -396,6 +396,14 @@
         and BRANCH = #{branch,jdbcType=DECIMAL}
     </select>
 
+    <select id="selectFinDealPledges" resultType="com.joyintech.tams.common.base.entity.FinDealPledge" parameterType="com.joyintech.tams.common.base.entity.FinDealPledgeKey" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.FinDealPledgeMapper.Base_Column_List" />
+        from FIN_DEAL_PLEDGE
+        where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+        and BRANCH = #{branch,jdbcType=DECIMAL}
+    </select>
+
 <!--    <select id="selectHgsqFinprodId" resultType="string">-->
 <!--        select max(FINPROD_ID) from TRD_PRODUCT_DEAL where F_TRADE_ID = #{fTradeId,jdbcType=VARCHAR}-->
 <!--    </select>-->
