@@ -134,6 +134,8 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
+
 
 /**
  * 场外指令分发
@@ -426,7 +428,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                         BussinessDictCodeList.平安资产类型_计划类资产_货币型,BussinessDictCodeList.平安资产类型_计划类资产_净值型,BussinessDictCodeList.平安资产类型_拆借,BussinessDictCodeList.平安资产类型_买断式回购,
                         BussinessDictCodeList.平安资产类型_存款,BussinessDictCodeList.平安资产类型_项目类资产)
                         || (DictCodeUtil.equals(response.getFinprodType2(),DictCodeList.平安资产类型_质押式回购)
-                            && (StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_质押式回购首期.getValue()) || StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_质押式回购到期.getValue())))
+                            && (StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_质押式回购首期.getValue()) || StringUtil.equals(response.getBusiTypePosition(), 头寸业务类型_质押式回购到期.getValue())))
                         || StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_现券交易.getValue())
                         || (StringUtil.equals(response.getFinprodType2(),BussinessDictCodeList.平安资产类型_基金.getValue()) && StringUtil.isEmpty(response.getBusiTypePosition()))) {
                     DecimalFormat df = new DecimalFormat("0.##");
@@ -1358,6 +1360,7 @@ public class CfetsEtrDispatcherService extends BaseService {
      */
     private Boolean returnEntrust(Map<String, Object> pageParam) {
         List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
+        List<String> busiTypeList = StringUtil.splitToList(",", (String) pageParam.get("busiTypePosition"));
         if (entrustIdList != null && entrustIdList.size() > 0) {
             for (String entrustId : entrustIdList) {
                 EtrDistributeKey key = new EtrDistributeKey();
@@ -1392,6 +1395,11 @@ public class CfetsEtrDispatcherService extends BaseService {
                             + "/EtrCommandDispatcher/pushCommandMsg", msgdto, String.class);
                 }
                 // modify by etliu 20210203 可转债网下申购不发送交易端 end
+            }
+            if(busiTypeList.contains(头寸业务类型_现券交易.getValue()) || busiTypeList.contains(头寸业务类型_质押式回购首期.getValue())
+               || busiTypeList.contains(头寸业务类型_质押式回购到期.getValue()) || busiTypeList.contains(头寸业务类型_债券一级投标.getValue())
+               || busiTypeList.contains(头寸业务类型_债券一级申购.getValue())) {
+                return false;
             }
             return true;
         }

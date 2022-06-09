@@ -112,6 +112,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         if (obj instanceof CfetsEtribBondInfo003Dto || StringUtil.equals(pageId, "CfetsEtrIbBondinfo003")) {
             CfetsEtribBondInfo003Dto dto = JsonUtils.json2Object(businessJson, CfetsEtribBondInfo003Dto.class);
+            if(StringUtil.isEmpty(dto.getPs()) && CollectionUtils.isNotEmpty(dto.getSelectedItem())) {
+                dto.setPs(dto.getSelectedItem().get(0).getPs());
+            }
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
@@ -307,9 +310,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             CfetsEtribBondInfo003Dto dto = (CfetsEtribBondInfo003Dto) data;
             if (CollectionUtils.isNotEmpty(dto.getEtrInvestBondInfoDtos())) {
-                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsEtribBondInfo003Dto) data).getEtrInvestBondInfoDtos(), null);
+                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getEtrInvestBondInfoDtos(), null);
             } else if (CollectionUtils.isNotEmpty(dto.getSelectedItem())) {
-                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, ((CfetsEtribBondInfo003Dto) data).getSelectedItem(), null);
+                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getSelectedItem(), null);
             }
         }
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
@@ -403,6 +406,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
         List<CreditLinesInputDto> result = new ArrayList<>();
         if (data instanceof CfetsEtribBondInfo003Dto) {//银行间债券指令
             List<CfetsEtribBondInfo003Dto> list = ((CfetsEtribBondInfo003Dto) data).getEtrInvestBondInfoDtos();
+            if(CollectionUtils.isEmpty(list)) {
+                list = ((CfetsEtribBondInfo003Dto) data).getSelectedItem();
+            }
             //这里处理授信
             list.forEach(e -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);

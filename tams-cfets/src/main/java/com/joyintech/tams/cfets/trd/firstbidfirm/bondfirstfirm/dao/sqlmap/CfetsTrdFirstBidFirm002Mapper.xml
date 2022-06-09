@@ -520,4 +520,18 @@
         )T1 on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
         where eed.ENTRUST_ID = #{entrustId} and eed.PORTFOLIO_ID = #{protfolioId}
     </select>
+
+    <select id="selectManualCount" resultType="java.lang.Integer">
+        select count(*) num
+        from TRD_BANK_MANUAL_SETTLE_INFO tbmsi
+                 left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tbmsi.TRADE_ID = tfpdt.TOTLE_TRADE_ID
+                 left join BID_ORDER bo on bo.BID_ID = tfpdt.P_TOTLE_TRADE_ID
+        where bo.BID_ID = #{bidId} and tbmsi.SETTLE_STATUS = '02' and tfpdt.IS_CANCEL = 'N' and tfpdt.TRADE_STATUS = '01'
+    </select>
+
+    <select id="selectResultCount" resultType="java.lang.Integer">
+        select count(*) num
+        from BID_RESULT_TOTAL
+        where BID_ID = #{bidId}
+    </select>
 </mapper>

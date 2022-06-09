@@ -20,13 +20,16 @@ import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListRsk;
+import com.joyintech.workflow.engine.constant.OperationType;
 import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
+import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
 
 //@Component
 //@Aspect
@@ -108,12 +112,15 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         AjaxResult result = new AjaxResult();
         try {
-            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
             if (StringUtil.isNotEmpty(outputDto.getErrorMsg())) {
                 result.setErrorList(Lists.newArrayList(new ValidMessage(outputDto.getErrorMsg())));
                 ajaxResultMessage.setData(result);
             } else if (StringUtil.isNotEmpty(outputDto.getConfirmMsg())) {
                 result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
+                if(StringUtil.equals(outputDto.getRskStatus(),试算结果_风险审批.getValue())) {
+                    result.setData(是否_是);
+                }
                 ajaxResultMessage.setData(result);
             }
         } catch (Exception e) {
@@ -136,7 +143,11 @@ public class CfetsEntrustHanderAop {
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
         if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+            if(StringUtil.equals(args[1], OperationType.NEW)) {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+            }else {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
+            }
         }
     }
 
@@ -181,11 +192,7 @@ public class CfetsEntrustHanderAop {
     @AfterReturning("deletePoint()")
     public void occupyOnDelete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String) args[0]);
-        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
-        }
-
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
