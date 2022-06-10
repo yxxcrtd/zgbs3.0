@@ -364,13 +364,13 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                 params.setBusinessType(DictCodeListExt4.共通业务类型_中标结果维护代投代缴.getValue());
             }
             // 设置流程业务说明, entity即传入的dto
-            //中标日期+资产简称+中标方式+中标标位+中标券面总额
+            //中标日期+资产简称+中标方式+中标标位+中标券面总额 ArithmeticUtil.multiply(entity.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100))+"%"
             params.setComment(entity -> {
                 return WorkFlowUtil.concatComment("中标日期"+
                         GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
                         "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
                         +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType())+GlobalConstant.CLOSE_PARENTHESIS
-                        +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.multiply(entity.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100))+"%"+GlobalConstant.CLOSE_PARENTHESIS
+                        +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+cfetsPrimaryBidManageService.getBidPriceStr(entity)+GlobalConstant.CLOSE_PARENTHESIS
                         +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.divide(entity.getWinPrinamt(),BigDecimal.valueOf(10000),2)+"万元"+GlobalConstant.CLOSE_PARENTHESIS);
             });
             processParameter.setOperationType(OperationType.DELETE);
