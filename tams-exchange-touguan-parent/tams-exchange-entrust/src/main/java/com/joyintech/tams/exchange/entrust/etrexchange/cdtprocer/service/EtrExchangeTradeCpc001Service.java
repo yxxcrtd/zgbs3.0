@@ -972,10 +972,11 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
                                                      String assetType, String ps) {
         MinTrdUnitLimitDto minTrdUnitLimitDto = null;
         String PINANAssetType = DictCodeListExt1.金融产品类型_信用保护凭证.getValue();
+        String tradePlats = Objects.isNull(tradePlat)? DictCodeListExt3.对手方类型_其他.getValue() : tradePlat;
         Map<String, Object> map = new HashMap<>();
         map.put("finprodId", finprodId);
         map.put("tradeMarket", tradeMarket);
-        map.put("tradePlat", tradePlat);
+        map.put("tradePlat", tradePlats);
         map.put("assetType", PINANAssetType);
         map.put("ps", ps);
         Map<String, Object> res = restTemplate.postForObject(
@@ -987,6 +988,27 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             }
         }
         return minTrdUnitLimitDto;
+    }
+
+    /**
+     * 查询最小交易单元
+     *
+     * @param param
+     * @return
+     */
+    public BigDecimal getMinNumStep(Map<String, Object> param) {
+        String ps = !StringUtil.isNotEmpty(param.get("ps")) ? "T01" : param.get("ps").toString();
+//        String currentTab = param.get("currentTab") == null ? null : param.get("currentTab").toString();
+        String currentTab = StringUtil.isNotEmpty(param.get("currentTab")) ? param.get("currentTab").toString():DictCodeListExt3.对手方类型_其他.getValue() ;
+        String finprodId = (String) param.get("finprodId");
+        String finprodType2 = (String) param.get("finprodType2");
+        String tradeMarket = (String) param.get("tradeMarket");
+        BigDecimal minNum = new BigDecimal(1);
+        MinTrdUnitLimitDto minTrdUnitLimitDto = getInterfSysMinTrdUnit(finprodId, currentTab, tradeMarket, finprodType2, ps);
+        if (null != minTrdUnitLimitDto && null != minTrdUnitLimitDto.getMinStep()) {
+            minNum = minTrdUnitLimitDto.getMinStep();
+        }
+        return minNum;
     }
 
 }

@@ -21,6 +21,7 @@ import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditPr
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.service.EtrExchangeTradeCpc001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeMiniLimitPriceRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.FinprodMarketInfoRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.MinNumStepRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.controller.EtrExchangeTradeSec001Controller;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -761,7 +762,28 @@ public class EtrExchangeTradeCpc001Controller extends BaseController {
         }
     }
 
-
+    /**
+     * 获取最小交易单元
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "获取最小交易单元", notes = "获取最小交易单元")
+    @ResponseBody
+    @PostMapping("/getMinNumStep")
+    public Message<String> getMinNumStep(@RequestBody MinNumStepRequest request){
+        try{
+            Map<String, Object> param = BeanUtil.object2Map(request);
+            BigDecimal minNum = etrExchangeTradeCpc001Service.getMinNumStep(param);
+            if(minNum == null) {
+                minNum= BigDecimal.ZERO;
+            }
+            String minNumStr=minNum.setScale(2).toString();
+            return new Message<>(minNumStr);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<String>().fail().setMessage("查询异常");
+        }
+    }
 
 
 }
