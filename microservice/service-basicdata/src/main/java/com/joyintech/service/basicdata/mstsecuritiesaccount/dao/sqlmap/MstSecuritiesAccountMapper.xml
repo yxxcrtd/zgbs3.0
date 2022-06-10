@@ -848,6 +848,7 @@
         from (
         select a.finprod_market_id,
         a.finprod_market_id || '|' || a.finprod_abbr as finprod_name,
+        a.FINPROD_NAME name,
         null as oth_code_type,
         a.finprod_type2,
         a.finprod_id,
@@ -877,6 +878,7 @@
         union
         select distinct a.MARKET_ID as finprod_market_id,
         concat(concat(a.MARKET_ID,'|'),a.TERM_TYPE) as finprod_name,
+        null as name,
         null as oth_code_type,
         null as finprod_type2,
         a.TERM_TYPE as finprod_id,
@@ -909,8 +911,11 @@
                 and t.FINPROD_MARKET_ID = #{initValue}
             </if>
             <if test="search != null and !search.equals('')">
-                AND (t.finprod_market_id like concat('%',concat(#{search},'%')) OR t.finprod_name like
-                concat('%',concat(#{search},'%')))
+                AND (
+                    t.finprod_market_id like concat('%',concat(#{search},'%'))
+                OR t.finprod_name like concat('%',concat(#{search},'%'))
+                or t.name like concat('%',concat(#{search},'%'))
+                )
             </if>
         </where>
         ) aaa order by aaa.TRADE_MARKET,aaa.termType asc
