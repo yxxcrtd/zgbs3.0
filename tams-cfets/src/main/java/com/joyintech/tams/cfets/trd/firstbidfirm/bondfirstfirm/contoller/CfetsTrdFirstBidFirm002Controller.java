@@ -494,9 +494,14 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         processParameter.setPageId(workFlowParameter.getPageId());
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setOperationType(OperationType.REVOKE);
-        String msg = cfetsTrdFirstBidFirm002Service.start(processParameter,
-                dtos.toArray(new CfetsTrdFirstBidFirmInfoDto[dtos.size()]));
-        return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        try {
+            String msg = cfetsTrdFirstBidFirm002Service.start(processParameter,
+                    dtos.toArray(new CfetsTrdFirstBidFirmInfoDto[dtos.size()]));
+            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        } catch (Exception e) {
+            logger.error("撤销失败", e);
+            return PositionUtil.ajaxErrorReturn(e);
+        }
     }
 
 //    @ResponseBody
