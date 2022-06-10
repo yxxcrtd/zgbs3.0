@@ -114,12 +114,22 @@ public class EtrExchangeTradePositionsSecRepoResponse {
 
     private String isNetprice;
 
+    private BigDecimal cPrice;
+
     public String getIsNetprice() {
         return isNetprice;
     }
 
     public void setIsNetprice(String isNetprice) {
         this.isNetprice = isNetprice;
+    }
+
+    public BigDecimal getcPrice() {
+        return cPrice;
+    }
+
+    public void setcPrice(BigDecimal cPrice) {
+        this.cPrice = cPrice;
     }
 
     public String getDealCurAcctName() {

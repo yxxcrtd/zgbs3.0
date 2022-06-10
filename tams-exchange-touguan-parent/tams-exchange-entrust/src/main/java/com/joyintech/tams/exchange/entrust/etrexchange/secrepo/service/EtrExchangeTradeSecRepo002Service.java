@@ -191,7 +191,9 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         map.put("tradeMarket", v.getTradeMarket());
                         Map<String, BigDecimal> returnMap = etrExchangeTradeSecRepo001Service.calcPriceAndYield(map);
                         if(!Objects.isNull(returnMap) && !Objects.isNull(returnMap.get("cprice"))){
+                            BigDecimal cPrice = v.getPrice();
                             v.setPrice(returnMap.get("cprice"));
+                            v.setcPrice(cPrice);
                         }
                     };
                 });
