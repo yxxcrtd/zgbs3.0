@@ -398,34 +398,68 @@ public class PositionRequestServiceInstructionRequest {
         String ps = entity.getPs();
         String firstRepoPs = entity.getFirstRepoPs();
         resultMap.put(PS, firstRepoPs);
+
+        //IF 下单.交易方向 = 中途换券
+        //IF 下单对应的指令.指令业务类型 = 数据字典.指令业务类型.协议回购中途换券指令-换钱 THEN 数据字典.换券方式.02 换钱 ELSE 数据字典.换券方式.01 换券
+        if (交易方向_中途换券.getValue().equals(ps)) {
+            if (上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType())) {
+                resultMap.put(BOND_EXCHANGE_TYPE, "02");
+            } else {
+                resultMap.put(BOND_EXCHANGE_TYPE, "01");
+            }
+        } else {
+            resultMap.put(BOND_EXCHANGE_TYPE, null);
+        }
+
         // 首期组合现金数据集，IF 交易方向 = 正回购、逆回购、提前购回、到期购回、解除质押 传值 否则为空
         if (交易方向_正回购.getValue().equals(ps)
                 || 交易方向_逆回购.getValue().equals(ps)
                 || 交易方向_提前购回.getValue().equals(ps)
                 || 交易方向_到期购回.getValue().equals(ps)
-                || 交易方向_解除质押.getValue().equals(ps)) {
+                || 交易方向_解除质押.getValue().equals(ps)
+                || (交易方向_中途换券.getValue().equals(ps) && 上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType()))) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             bean = new PositionRequestBaseBean(entity);
 //            bean.setCashAmount(NumberUtil.sub(entity.getmTradeAmt(), entity.getmIntAmt()));
             bean.setSecAmount(BigDecimal.ZERO);
 
-            if (交易方向_解除质押.getValue().equals(ps)) {
+            /*if (交易方向_解除质押.getValue().equals(ps)) {
                 // 解除质押走线下划款，扣托管户现金
                 bean.setCashAcctId(tamsBusinessCommonService.selectProdTghCapacctNo(entity.getPortfolioId()));
             } else {
                 // 其他走券商资金账户
                 bean.setCashAcctId(entity.getAcctNo());
-            }
+            }*/
+            bean.setCashAcctId(entity.getAcctNo());
 
             // 交易金额
             // 交易方向= 首期 取回购金额，其他取到期结算金额
-            if (交易方向_提前购回.getValue().equals(ps)
+            /*if (交易方向_提前购回.getValue().equals(ps)
                     || 交易方向_到期购回.getValue().equals(ps)
                     || 交易方向_解除质押.getValue().equals(ps)) {
                 bean.setCashAmount(entity.getmTradeAmt());
             } else {
                 bean.setCashAmount(entity.getEntrustAmt());
+            }*/
+
+            //if 交易方向= 首期 then 回购金额
+            //else if 交易方向=解除质押 and 交易场所 = 深交所 then 下单.结算金额
+            //else if 交易方向=解除质押 and 交易场所 = 上交所 then 0
+            //else if 交易方向=中途换券 and and 指令业务类型 = 数据字典.指令业务类型.协议回购中途换券指令-换钱
+            //else 到期结算金额
+            //end if
+            if (交易方向_提前购回.getValue().equals(ps)
+                    || 交易方向_到期购回.getValue().equals(ps)
+                    || 交易方向_解除质押.getValue().equals(ps)) {
+                if (交易方向_解除质押.getValue().equals(ps) && 交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())) {
+                    bean.setCashAmount(BigDecimal.ZERO);
+                } else {
+                    bean.setCashAmount(entity.getmTradeAmt());
+                }
+            } else {
+                bean.setCashAmount(entity.getEntrustAmt());
             }
+
 
             Map<String, Object> map = BeanUtil.object2Map(bean);
             list.add(map);
