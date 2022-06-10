@@ -147,6 +147,10 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                     if (subtract.compareTo(new BigDecimal(bidMinUnit))==0){
                         resultList.add(new ValidMessage(getMessage("中标券面总额/中标标位不满足该资产发行要求！")));
                     }
+                    BigDecimal[] remainder = dto.getAllocationDetails().get(0).getActWinPrinamt().divideAndRemainder(new BigDecimal(bidMinUnit));
+                    if (remainder[0].compareTo(BigDecimal.ONE)!=0){
+                        resultList.add(new ValidMessage(getMessage("中标券面总额不满足该资产发行要求，请确认")));
+                    }
                 }
             }
         }
