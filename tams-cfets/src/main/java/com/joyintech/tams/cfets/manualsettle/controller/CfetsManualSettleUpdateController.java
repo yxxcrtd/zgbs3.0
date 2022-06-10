@@ -60,7 +60,7 @@ public class CfetsManualSettleUpdateController extends BaseController {
         }
         model.addAttribute(GlobalConstant.ENTITY, entity);
         // Sonar Fix modify by huwei 220608
-        model.addAttribute("portSettleinfoDtoList", null == entity.getPortSettleinfoDtoList() ? null : entity.getPortSettleinfoDtoList());
+        model.addAttribute("portSettleinfoDtoList", null == entity ? null : entity.getPortSettleinfoDtoList());
         return super.init(model);
     }
 

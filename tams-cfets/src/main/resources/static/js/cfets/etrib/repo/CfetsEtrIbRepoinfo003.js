@@ -665,7 +665,7 @@
         var param = JSON.parse(JSON.stringify(object))
         $.ajax({
             type: "POST",
-            url: basePath + '/riskTrial/doRiskcal/CfetsEtrBondInfo',
+            url: basePath + 'riskTrial/doRiskcal/CfetsEtrRepoInfo',
             dataType: "json",
             contentType: "application/json",
             async: false,
@@ -673,15 +673,17 @@
             success: function (result) {
                 if(result.code === '000') {
                     var data = result.data.data;
-                    if(data.riskTrialSpan) {
+                    if(data && data.riskTrialSpan) {
                         $("#riskTrialSpan").html("&nbsp;&nbsp;" + data.riskTrialSpan);
                     }
-                    riskResultResponse = data;;
-                    entity_RiskTrialRetList = data.riskcalReturnList;
-                    if(entity_RiskTrialRetList) {
-                        $.each(entity_RiskTrialRetList, function (index, item) {
-                            item.conclusion = data.riskTrialSpan;
-                        })
+                    if(data){
+                        riskResultResponse = data;
+                        entity_RiskTrialRetList = data.riskcalReturnList;
+                        if(entity_RiskTrialRetList) {
+                            $.each(entity_RiskTrialRetList, function (index, item) {
+                                item.conclusion = data.riskTrialSpan;
+                            })
+                        }
                     }
                     tableRisk.clear();
                     tableRisk.addRow(entity_RiskTrialRetList);

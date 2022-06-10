@@ -1,6 +1,8 @@
 package com.joyintech.tams.business.asset.protect.dto;
 
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -219,6 +221,11 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
     }
 
     public String getCalendarId() {
+        if(StringUtil.equals(this.calendarId, "04")) {
+            return "上交所";
+        }else if(StringUtil.equals(this.calendarId, "05")) {
+            return "深交所";
+        }
         return calendarId;
     }
 

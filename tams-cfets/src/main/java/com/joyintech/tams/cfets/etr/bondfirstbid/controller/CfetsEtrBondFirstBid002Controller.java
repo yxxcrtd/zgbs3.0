@@ -10,14 +10,11 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid002Service;
-import com.joyintech.tams.cfets.position.dto.PositionCashRequestDetailDto;
 import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
@@ -35,7 +32,6 @@ import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,40 +85,13 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @ApiOperation(value = "新建/修改/查看页面初始化", notes = "新建/修改/查看页面初始化")
     public Message<Map<String, Object>> init(@RequestBody Map<String, Object> map) {
         Map<String, Object> params = new HashMap<>();
-       // String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
-        //String workflowId = "00000000000000000000000000059700";
         String workflowId = "null".equals(map.get(GlobalConstant.WORKFLOW_ID)) ? null : (String) map.get(GlobalConstant.WORKFLOW_ID);
         boolean todoList = false;
         CfetsEtrBondFirstBid002Dto entity = new CfetsEtrBondFirstBid002Dto();
         // 待办中过来
         if (StringUtil.isNotEmpty(workflowId)) {
             todoList = true;
-//            ProcessMark processMark = cfetsEtrBondFirstBid002Service.getFirstBidBusinessInfo(workflowId);
-//            entity = cfetsEtrBondFirstBid002Service.getBussinessEntity(processMark);
             entity = cfetsEtrBondFirstBid002Service.getBussinessEntityByWorkflowId(workflowId);
-            if (CollectionUtils.isNotEmpty(entity.getBiddingProductList())) {
-                for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {
-                    List<PositionCashRequestDetailDto> ptlList = new ArrayList<>();
-                    PositionCashRequestDetailDto positionDto = new PositionCashRequestDetailDto();
-                    positionDto.setPortfolioId(productDto.getPortfolioId());
-                    positionDto.setAcctNo(productDto.getAcctNo());
-                    ptlList.add(positionDto);
-                    BaseMap cashMap = positionInfoService.queryEtrAvailableCash(
-                            ptlList,
-                            null,
-                            null,
-                            entity.getCcy(),
-                            null,
-                           entity.getFinprodId()
-                    );
-
-                    //添加头寸信息
-                    productDto.setCashT(cashMap.getBigDecimal("cashT"));
-                    productDto.setCashT1(cashMap.getBigDecimal("cashT1"));
-                    productDto.setRealCash(cashMap.getBigDecimal("realCash"));
-                    productDto.setSecDesirableCash(cashMap.getBigDecimal("secDesirableCash"));
-                }
-            }
 
         }
         //数据字典初始化数据

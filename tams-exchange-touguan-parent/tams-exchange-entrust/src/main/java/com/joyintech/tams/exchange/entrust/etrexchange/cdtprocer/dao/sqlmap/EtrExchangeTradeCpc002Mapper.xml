@@ -587,7 +587,7 @@
         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID
-        WHERE a.TRADE_DATE =#{cdate} AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
+        WHERE a.TRADE_DATE =#{cdate} AND c.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F37} AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
         AND a.PS IN (#{PS_T01},#{PS_T02},#{PS_T04})
         AND a.IS_CANCEL=#{YN_N}
         <if test="portfolioIdList != null">
@@ -617,7 +617,11 @@
         LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID
-        WHERE a.TRADE_DATE =#{cdate} AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
+        WHERE a.TRADE_DATE =#{cdate}
+        <!--add wsz ZGCPCN-1249 修改持仓查询信息 start-->
+        AND c.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F37}
+        <!--add wsz ZGCPCN-1249 修改持仓查询信息 end-->
+        AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
         AND a.PS IN (#{PS_T01},#{PS_T02},#{PS_T04})
         AND a.IS_CANCEL=#{YN_N}
         <if test="portfolioIdList != null">

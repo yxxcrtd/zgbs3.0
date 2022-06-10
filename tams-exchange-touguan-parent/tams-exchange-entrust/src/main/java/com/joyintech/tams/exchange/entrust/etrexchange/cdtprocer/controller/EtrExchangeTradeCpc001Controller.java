@@ -19,6 +19,7 @@ import com.joyintech.tams.constant.*;
 import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAop;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateApplyRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.service.EtrExchangeTradeCpc001Service;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeMiniLimitPriceRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.FinprodMarketInfoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.controller.EtrExchangeTradeSec001Controller;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
@@ -27,6 +28,7 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinPirceDto;
+import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -744,6 +746,21 @@ public class EtrExchangeTradeCpc001Controller extends BaseController {
         }
 
     }
+
+    //add wsz 20220610 添加方法查询最小交易额
+    @ApiOperation(value = "最小价格", notes = "最小价格")
+    @PostMapping("/getMinTrdUnitLimit")
+    @ResponseBody
+    public Message<MinTrdUnitLimitDto> getMinTrdUnitLimit(@RequestBody EtrExchangeMiniLimitPriceRequest request){
+        try {
+            MinTrdUnitLimitDto minNum= etrExchangeTradeCpc001Service.getMinTrdUnitLimitPrice(request);
+            return new Message<MinTrdUnitLimitDto>().success().setData(minNum);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Message<MinTrdUnitLimitDto>().fail().setMessage("查询失败");
+        }
+    }
+
 
 
 

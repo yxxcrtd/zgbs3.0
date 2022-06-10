@@ -7,7 +7,12 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
@@ -48,6 +53,7 @@ import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInves
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -201,11 +207,14 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
         }
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("massege", errorList);
-        map.put("ids", entrustIdListAll);
-        ajaxResult.setData(map);
-        ajaxResult.setMessageType(MessageType.确认消息);
+        if (CollectionUtils.isNotEmpty(errorList)) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("massege", errorList);
+            map.put("ids", entrustIdListAll);
+            ajaxResult.setData(map);
+            ajaxResult.setMessageType(MessageType.确认消息);
+        }
+
         return ajaxResult;
     }
 
@@ -333,11 +342,13 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             }
 
         }
-        Map<String, Object> map = new HashMap<>();
-        map.put("massege", errorList);
-        map.put("ids", entrustIdListAll);
-        ajaxResult.setData(map);
-        ajaxResult.setMessageType(MessageType.确认消息);
+        if (CollectionUtils.isNotEmpty(errorList)) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("massege", errorList);
+            map.put("ids", entrustIdListAll);
+            ajaxResult.setData(map);
+            ajaxResult.setMessageType(MessageType.确认消息);
+        }
         return ajaxResult;
     }
 
@@ -591,6 +602,29 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             handSumMap = bidFirmSumDtoListHand.stream().collect(Collectors.groupingBy(o -> o.getTotleId()));
         }
 
+        //筛选出手动汇总交易对手不为空的数据
+        Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> handSumMapCounterIsNull = new HashMap<>();
+        Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> handSumMapCounterIsNotNull = new HashMap<>();
+        for (Map.Entry<String, List<CfetsTrdFirstBidFirmEntrustDto>> map : handSumMap.entrySet()) {
+            Boolean counterIdFlag = Boolean.FALSE;
+            String  entrustKey = "";
+            if (CollectionUtils.isNotEmpty(map.getValue())) {
+                for (CfetsTrdFirstBidFirmEntrustDto entrustDto : map.getValue()) {
+                    if (StringUtil.isNotEmpty(entrustDto.getCounterId())) {
+                        entrustKey = entrustDto.getFinprodId() + "_" + entrustDto.getIssueDateStr() + "_" + entrustDto.getCounterId() + "_" + entrustDto.getEntrustStatus();
+                        counterIdFlag = Boolean.TRUE;
+                    }
+                }
+            }
+
+            if (counterIdFlag) {
+                handSumMapCounterIsNotNull.put(entrustKey, map.getValue());
+            }else {
+                handSumMapCounterIsNull.put(map.getKey(), map.getValue());
+            }
+
+        }
+
         //交易对手为空
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmCounterIsNull = bidFirmDtos.stream()
                 .filter(x -> StringUtil.isEmpty(x.getCounterId())).collect(Collectors.toList());
@@ -605,9 +639,27 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNotNullMap = bidFirmCounterIsNotNull.stream()
                 .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getCounterId() + "_" + o.getEntrustStatus()));
 
+        //将指令数据汇总到手动汇总中含有交易对手的数据
+        //相同的key，value值合并
+        if (!handSumMapCounterIsNotNull.isEmpty()) {
+            handSumMapCounterIsNotNull.forEach((k, v) -> counterIsNotNullMap.merge(k, v, (v1, v2) -> {
+                if (!CollectionUtils.isEmpty(v1) && !CollectionUtils.isEmpty(v2)) {
+                    List<CfetsTrdFirstBidFirmEntrustDto> li = Lists.newArrayList();
+                    li.addAll(v1);
+                    li.addAll(v2);
+                    return li;
+                } else if (!CollectionUtils.isEmpty(v1) && CollectionUtils.isEmpty(v2)) {
+                    return v1;
+                } else if (CollectionUtils.isEmpty(v1) && !CollectionUtils.isEmpty(v2)) {
+                    return v2;
+                }
+                return v1;
+            }));
+        }
+
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumIsNullList = getSumListInfo(counterIsNullMapSel);
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumIsNotNullList = getSumListInfo(counterIsNotNullMap);
-        List<CfetsTrdFirstBidFirmEntrustDto> handSumList = getSumListInfo(handSumMap);
+        List<CfetsTrdFirstBidFirmEntrustDto> handSumList = getSumListInfo(handSumMapCounterIsNull);
         if (CollectionUtils.isNotEmpty(bidFirmSumIsNullList)) {
             bidFirmSumDtoList.addAll(bidFirmSumIsNullList);
         }
@@ -741,6 +793,8 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             if (bidFirmDetail.size() == 1) {
                 bidFirmDetail.stream().forEach(item -> {
                     item.setSumFlag(Boolean.TRUE);
+                    //唯一标识 前端用
+                    item.setEntrustIdKey(item.getEntrustId() + "KEY");
                 });
                 bidFirmSumDtoList.addAll(bidFirmDetail);
             } else {
@@ -901,6 +955,10 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             result.put("table", getBySpcdCodes(this.PAGECODE, this.TABLE_DTCODE_BID, spcdCodeList));
             // 表单数据
             result.put("tableData", tableData);
+        }else {
+            List<String> spcdCodeList = new ArrayList<>();
+            spcdCodeList.add("01");
+            result.put("table", getBySpcdCodes(this.PAGECODE, this.TABLE_DTCODE_BID, spcdCodeList));
         }
 
 
@@ -995,10 +1053,10 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             //汇总数据维度（新债标的OR投标日OR指令状态）
             Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMap = inList.stream()
                     .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getEntrustStatus()));
-            if (!counterIsNullMap.isEmpty() && counterIsNullMap.size() > 1) {
-                errorList.add(new ValidMessage("所选指令不满足汇总条件：【新债标的OR投标日OR交易对手OR指令状态】不同"));
-                return errorList;
-            }
+//            if (!counterIsNullMap.isEmpty() && counterIsNullMap.size() > 1) {
+//                errorList.add(new ValidMessage("所选指令不满足汇总条件：【新债标的OR投标日OR交易对手OR指令状态】不同"));
+//                return errorList;
+//            }
 
             List<CfetsTrdFirstBidFirmEntrustDto> counterIdList = inList.stream().filter(x -> StringUtil.isNotEmpty(x.getCounterId()))
                     .collect(Collectors.toList());
@@ -1013,7 +1071,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
                 if (CollectionUtils.isNotEmpty(counterIdIsNullList)) {
                     String loginUserId = LoginUserUtil.getUserName();
                     for (CfetsTrdFirstBidFirmEntrustDto dto : counterIdIsNullList) {
-                        cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(dto.getEntrustId(), loginUserId);
+                        undoSumSave(dto, this.SUM_FLAG_02);
                     }
                 }
             }

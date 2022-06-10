@@ -96,11 +96,19 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 交易登记check
+     * 交易登记check、对话报价提交check
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.check(..))"+
         "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage001Controller.unWinCheck(..))")
     protected void doCheck() {
+    }
+
+    /**
+     * 对话报价 报价成交提交check
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.checkRepoDeal(..))")
+    protected void checkRepoDeal() {
+
     }
 
     /**
@@ -153,6 +161,29 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning(pointcut = "doCheck()", returning = "ajaxResultMessage")
     public void doCheck(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
+        checkCommon(joinPoint,ajaxResultMessage,系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+    }
+
+    /**
+     * 报价成交提交检查
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning(pointcut = "checkRepoDeal()", returning = "ajaxResultMessage")
+    public void checkRepoDeal(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
+        checkCommon(joinPoint,ajaxResultMessage,系统动作_成交.getValue(), 流程节点_流程提交.getValue(), null);
+    }
+
+    /**
+     * check共通方法
+     * @param joinPoint
+     * @param ajaxResultMessage
+     * @param decisionAct
+     * @param flowStatus
+     * @param pageId
+     */
+    private void checkCommon(JoinPoint joinPoint,Message<AjaxResult> ajaxResultMessage,String decisionAct, String flowStatus, String pageId){
         AjaxResult ajaxResult = ajaxResultMessage.getData();
         if (ajaxResult != null && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
             return;
@@ -160,12 +191,11 @@ public class CfetsTradeHandlerAop {
         Object[] args = joinPoint.getArgs();
         AjaxResult result = new AjaxResult();
         try {
-            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], decisionAct, flowStatus, null);
             if (StringUtil.isNotEmpty(outputDto.getErrorMsg())) {
                 result.setErrorList(Lists.newArrayList(new ValidMessage(outputDto.getErrorMsg())));
                 ajaxResultMessage.setData(result);
             } else if (StringUtil.isNotEmpty(outputDto.getConfirmMsg())) {
-                result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
                 result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
                 if(StringUtil.equals(outputDto.getRskStatus(),试算结果_风险审批.getValue())) {
                     result.setData(是否_是);
@@ -178,7 +208,6 @@ public class CfetsTradeHandlerAop {
             ajaxResultMessage.setData(result);
         }
     }
-
 
     /**
      * 交收/回溯/交收失败
@@ -235,10 +264,7 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("deletePoint()")
     public void occupyOnDelete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String) args[0]);
-        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
-        }
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
 

@@ -726,14 +726,15 @@ public class ValItemValueGenUtil {
             // 资产二级分类
             assetSecondType = finProductType.getType7();
         }
-        
-        // 存款类资产需要机构核算分类维度，特殊处理
-        if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(), finprodType2)) {
-            // 机构核算分类(默认01，根据存/借款机构配置的机构核算分类)
-            String ISSUER_HS_TYPE = genIssuerHsTypeOrgCode(finProduct.getIssuer());
-            String FINPROD_TYPE = genFinprodTypeByItemValue(finprodType2, assetFirstType, assetSecondType, tradeMarket, blnArea, ISSUER_HS_TYPE);
-            finProduct.setFinprodType(FINPROD_TYPE);
-            return FINPROD_TYPE;
+        if (finProductType != null) {
+            // 存款类资产需要机构核算分类维度，特殊处理
+            if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(), finprodType2)) {
+                // 机构核算分类(默认01，根据存/借款机构配置的机构核算分类)
+                String ISSUER_HS_TYPE = genIssuerHsTypeOrgCode(finProduct.getIssuer());
+                String FINPROD_TYPE = genFinprodTypeByItemValue(finprodType2, assetFirstType, assetSecondType, tradeMarket, blnArea, ISSUER_HS_TYPE);
+                finProduct.setFinprodType(FINPROD_TYPE);
+                return FINPROD_TYPE;
+            }
         }
         
         String FINPROD_TYPE = genFinprodTypeByItemValue(finprodType2, assetFirstType, assetSecondType, tradeMarket, blnArea);

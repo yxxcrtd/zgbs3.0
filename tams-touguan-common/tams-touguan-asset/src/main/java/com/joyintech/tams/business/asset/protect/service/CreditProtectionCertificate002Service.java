@@ -358,7 +358,13 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         param.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
-        param.put("finprodMarketId", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue()+"_"+finprodId);
+        //add wsz 修改bug ZGCPCN-1211 20220610 【信用保护凭证标的】信用保护凭证指令资产代码输入资产代码，点击查看，无法查看标的详情 start
+        if(!Objects.isNull(finprodId) && !finprodId.contains(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+            param.put("finprodMarketId", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue()+"_"+finprodId);
+        } else {
+            param.put("finprodMarketId", finprodId);
+        }
+        //add wsz 修改bug ZGCPCN-1211 20220610 【信用保护凭证标的】信用保护凭证指令资产代码输入资产代码，点击查看，无法查看标的详情 end
         entity = creditProtectionCertificateMapper.getByFinProdId(param);
         BigDecimal cash = StringUtil.isNotEmpty(entity.getNomCapi())? entity.getNomCapi().divide(new BigDecimal(10000)):new BigDecimal(0.00);
         entity.setNomCapi(cash);

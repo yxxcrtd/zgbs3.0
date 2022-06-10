@@ -961,7 +961,7 @@ public class CfetsTrdQueryService extends BaseService{
         }
 
         //有效状态
-        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
+//        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_03", DictCodeListExt1.有效状态_撤销.getValue());
 
         //平安业务类型
@@ -1085,7 +1085,7 @@ public class CfetsTrdQueryService extends BaseService{
         }
 
         //有效状态
-        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
+//        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_03", DictCodeListExt1.有效状态_撤销.getValue());
 
 
