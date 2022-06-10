@@ -68,7 +68,7 @@ public class PositionRequestBaseBean {
         this.etrId = request.getEntrustId();
         this.secAmount = request.getEntrustNum();
         BigDecimal entrustAmt = request.getEntrustAmt();
-        if (Objects.isNull(entrustAmt) || BigDecimal.ZERO.compareTo(entrustAmt) < 0 || BigDecimal.ZERO.compareTo(entrustAmt) == 0) {
+        if (Objects.isNull(entrustAmt) || BigDecimal.ZERO.compareTo(entrustAmt) > 0 || BigDecimal.ZERO.compareTo(entrustAmt) == 0) {
             BigDecimal entrustPrice= Objects.isNull(request.getEntrustPrice())?new BigDecimal(0):request.getEntrustPrice();
             this.cashAmount = this.secAmount.multiply(entrustPrice);
         } else {

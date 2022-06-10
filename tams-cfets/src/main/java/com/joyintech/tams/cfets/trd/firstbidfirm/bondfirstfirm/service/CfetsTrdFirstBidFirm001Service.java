@@ -607,7 +607,8 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> handSumMapCounterIsNotNull = new HashMap<>();
         for (Map.Entry<String, List<CfetsTrdFirstBidFirmEntrustDto>> map : handSumMap.entrySet()) {
             Boolean counterIdFlag = Boolean.FALSE;
-            String  entrustKey = "";
+            String entrustKey = "";
+            Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> entrustKeyMap = new HashMap<>();
             if (CollectionUtils.isNotEmpty(map.getValue())) {
                 for (CfetsTrdFirstBidFirmEntrustDto entrustDto : map.getValue()) {
                     if (StringUtil.isNotEmpty(entrustDto.getCounterId())) {
@@ -618,8 +619,24 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             }
 
             if (counterIdFlag) {
-                handSumMapCounterIsNotNull.put(entrustKey, map.getValue());
-            }else {
+                entrustKeyMap.put(entrustKey, map.getValue());
+                //相同的交易对手数据合并
+                if (!entrustKeyMap.isEmpty()) {
+                    entrustKeyMap.forEach((k, v) -> handSumMapCounterIsNotNull.merge(k, v, (v1, v2) -> {
+                        if (!CollectionUtils.isEmpty(v1) && !CollectionUtils.isEmpty(v2)) {
+                            List<CfetsTrdFirstBidFirmEntrustDto> li = Lists.newArrayList();
+                            li.addAll(v1);
+                            li.addAll(v2);
+                            return li;
+                        } else if (!CollectionUtils.isEmpty(v1) && CollectionUtils.isEmpty(v2)) {
+                            return v1;
+                        } else if (CollectionUtils.isEmpty(v1) && !CollectionUtils.isEmpty(v2)) {
+                            return v2;
+                        }
+                        return v1;
+                    }));
+                }
+            } else {
                 handSumMapCounterIsNull.put(map.getKey(), map.getValue());
             }
 

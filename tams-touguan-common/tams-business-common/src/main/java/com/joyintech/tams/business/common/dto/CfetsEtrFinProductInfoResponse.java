@@ -436,6 +436,9 @@ public class CfetsEtrFinProductInfoResponse {
     private String couponSpecies;
 
     public String getTitle() {
+        if (StringUtil.isBlank(getFinprodMarketId()) && StringUtil.isBlank(getFinprodAbbr())) {
+            return title;
+        }
         return getFinprodMarketId() + getFinprodAbbr();
     }
 

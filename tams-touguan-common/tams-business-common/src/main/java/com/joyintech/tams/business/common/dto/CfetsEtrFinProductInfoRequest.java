@@ -37,6 +37,11 @@ public class CfetsEtrFinProductInfoRequest {
      */
     private List<String> tradeMarketList;
 
+    /**
+     * 是否显示表头
+     */
+    private String isShowTable;
+
     public String getFinprodId() {
         return finprodId;
     }
@@ -75,5 +80,13 @@ public class CfetsEtrFinProductInfoRequest {
 
     public void setTradeMarketList(List<String> tradeMarketList) {
         this.tradeMarketList = tradeMarketList;
+    }
+
+    public String getIsShowTable() {
+        return isShowTable;
+    }
+
+    public void setIsShowTable(String isShowTable) {
+        this.isShowTable = isShowTable;
     }
 }

@@ -1685,4 +1685,21 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
         return null;
     }
+
+    public String getBidPriceStr(CfetsPrimaryBidManageSaveRequest request){
+        String bidPriceStr = null;
+        if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利率.getValue())){
+            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100));
+            bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"%";
+        }
+        if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利差.getValue())){
+            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(10000));
+            bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"BP";
+        }
+        if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())){
+            BigDecimal bidPrice = request.getAllocationDetails().get(0).getBidPrice();
+            bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"BP";
+        }
+        return bidPriceStr;
+    }
 }

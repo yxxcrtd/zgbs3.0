@@ -4954,7 +4954,7 @@
                 FP.FINPROD_MARKET_ID   AS	finprodMarketId,
                 FP.FINPROD_ABBR	  AS	finprodAbbr,
                 BO.OUR_TRADER AS	trader,
-                m1.PARTY_ABBR as traderidStr,
+                su.REAL_NAME as traderidStr,
                 BO.COUNTER_ID  AS	counterId,
                 MCCI.COUNTER_NAME AS counterIdStr,
                 FPI.TENDER_TARGET tenderTarget,
@@ -4966,7 +4966,7 @@
                 BO.ONMARKET_DATE onmarketDate,
                 BO.BID_MODLE  bidModle,
                 BO.PAY_TYPE payType,
-                BRBP.ENTRUST_NUM/10000  bidPrinAmt,
+                BRBP.ENTRUST_NUM/100  bidPrinAmt,
                 BRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
                 BRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
                 BO.WIN_PRICE  winPrice,
@@ -4987,6 +4987,8 @@
             LEFT JOIN MST_COUNTER_PARTY MCCI
             ON BO.COUNTER_ID= MCCI.COUNTER_ID
             LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on BO.OUR_TRADER=m1.PARTY_ID
+            LEFT JOIN SYS_USER su
+                      ON su.USER_NAME = BO.OUR_TRADER
             WHERE  BO.TRADE_STATUS = #{TRADE_STATUS_01}
             AND  BO.BID_ID = #{bidId}
             UNION ALL
@@ -4994,7 +4996,7 @@
                 FP.FINPROD_MARKET_ID  AS finprodMarketId,
                 FP.finprod_abbr as finprodAbbr,
                 WBO.OUR_TRADER AS	trader,
-                m1.PARTY_ABBR as traderidStr,
+                su.REAL_NAME as traderidStr,
                 WBO.COUNTER_ID  AS	counterId,
                 MCCI.COUNTER_NAME AS counterIdStr,
                 FPI.TENDER_TARGET tenderTarget,
@@ -5006,7 +5008,7 @@
                 WBO.ONMARKET_DATE onmarketDate,
                 WBO.BID_MODLE  bidModle,
                 WBO.PAY_TYPE payType,
-                WBRBP.ENTRUST_NUM/10000  bidPrinAmt,
+                WBRBP.ENTRUST_NUM/100  bidPrinAmt,
                 WBRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
                 WBRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
                 WBO.WIN_PRICE  winPrice,
@@ -5026,24 +5028,26 @@
             ON FPI.FINPROD_ID = FP.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_TYPE FPT
             ON FPT.FINPROD_ID = FP.FINPROD_ID
+            LEFT JOIN SYS_USER su ON su.USER_NAME = WBO.OUR_TRADER
             LEFT JOIN MST_COUNTER_PARTY mcci ON WBO.COUNTER_ID= mcci.COUNTER_ID
             LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on WBO.OUR_TRADER=m1.PARTY_ID
             WHERE WBO.BID_ID = #{bidId}
     </select>
 
     <select id="findYjtbFenPeiInfoList" resultType="com.joyintech.tams.cfets.trdquery.dto.BidPortIntFenPeiInfoDto">
+        select DISTINCT * FROM (
         SELECT  BO.DIP_TYPE as dipType,
                 BRBP.ENTRUST_ID   AS	entrustId,
                 PP.PORTFOLIO_NAME  portfolioName,
-                EE.ENTRUST_NUM/10000  bidPrinAmt,
+                EE.ENTRUST_NUM/100  bidPrinAmt,
                 BRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
                 BRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
-                EEBP.BID_PRIN_AMT-BRBP.WIN_PRIN_AMT avaNum,
+                nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(BRBP.THE_WIN_PRIN_AMT,0) avaNum,
                 BRBP.SETT_FEE_AMT settleFeeAmt,
                 BRBP.TRADE_AMT  tradeAmt,
                 BRBP.INT_AMT intAmt,
                 BRBP.PAYABLE_AMOUNT payAmt,
-                BRBP.BID_PRICE bidPrice,
+                decode(FPI.TENDER_TARGET,'01',to_char(BRBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BRBP.BID_PRICE*10000,'fm999999990.90')||'BP') bidPrice,
                 BRBP.INV_AIM invAim,
                 BRBP.SEC_ACCT_ID secManageAcctId,
                 STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
@@ -5051,6 +5055,8 @@
             FROM BID_ORDER_BID_PRICE BRBP
             LEFT JOIN BID_ORDER BO
                    ON BRBP.BID_ID = BO.BID_ID
+            LEFT JOIN FIN_PRODUCT_ISSUE FPI
+                   ON FPI.FINPROD_ID = BO.FINPROD_ID
             LEFT JOIN ETR_ENTRUST EE
                    ON EE.ENTRUST_ID = BRBP.ENTRUST_ID
             LEFT JOIN  PTL_PORTFOLIO  PP
@@ -5070,15 +5076,15 @@
         SELECT  WBO.DIP_TYPE as dipType,
                 WBRBP.ENTRUST_ID   AS	entrustId,
                 PP.PORTFOLIO_NAME  portfolioName,
-                EE.ENTRUST_NUM/10000  bidPrinAmt,
+                EE.ENTRUST_NUM/100  bidPrinAmt,
                 WBRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
                 WBRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
-                EEBP.BID_PRIN_AMT-WBRBP.WIN_PRIN_AMT avaNum,
+                nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(WBRBP.THE_WIN_PRIN_AMT,0) avaNum,
                 WBRBP.SETT_FEE_AMT settleFeeAmt,
                 WBRBP.TRADE_AMT  tradeAmt,
                 WBRBP.INT_AMT intAmt,
                 WBRBP.PAYABLE_AMOUNT payAmt,
-                WBRBP.BID_PRICE bidPrice,
+                decode(FPI.TENDER_TARGET,'01',to_char(WBRBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(WBRBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(WBRBP.BID_PRICE*10000,'fm999999990.90')||'BP') bidPrice,
                 WBRBP.INV_AIM invAim,
                 WBRBP.SEC_ACCT_ID secManageAcctId,
                 STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
@@ -5086,6 +5092,8 @@
          FROM BID_ORDER_BID_PRICE WBRBP
          LEFT JOIN BID_ORDER WBO
                    ON WBRBP.BID_ID = WBO.BID_ID
+         LEFT JOIN FIN_PRODUCT_ISSUE FPI
+                   ON FPI.FINPROD_ID = WBO.FINPROD_ID
          LEFT JOIN ETR_ENTRUST EE
                    ON EE.ENTRUST_ID = WBRBP.ENTRUST_ID
          LEFT JOIN  PTL_PORTFOLIO  PP
@@ -5099,7 +5107,7 @@
                 ON WBRBP.PORTFOLIO_ID = EEBP.PORTFOLIO_ID
                AND WBRBP.ENTRUST_ID = EEBP.ENTRUST_ID
          LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
-        WHERE WBO.BID_ID = #{bidId}
+        WHERE WBO.BID_ID = #{bidId})
     </select>
 
 

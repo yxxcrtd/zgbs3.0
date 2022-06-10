@@ -1360,8 +1360,11 @@ public class TrdCommonBaseService extends BaseService {
             // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 end
             // 标准券券面总额
             BigDecimal standardSecAmount = portfolioDetail.getShareAmt().multiply(converseRadio).multiply(百元券面);
-            BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
-            portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
+            // ZGCPCN-1193:修改标准券券面总额赋值 modify by fuyongsheng 20220610 start
+            // BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
+            // portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
+            portfolioDto.setStandardSecAmount(standardSecAmount);
+            // ZGCPCN-1193:修改标准券券面总额赋值 modify by fuyongsheng 20220610 end
             // 融入券券面总额
             portfolioDto.setIntegrateSecAmount(BigDecimal.ZERO);
             portfolioDtos.add(portfolioDto);
@@ -1420,8 +1423,11 @@ public class TrdCommonBaseService extends BaseService {
         // 标准券券面总额
         BigDecimal standardSecAmount = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt().multiply(converseRadio)
                 .multiply(百元券面));
-        BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
-        portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
+        // ZGCPCN-1193:修改标准券券面总额赋值 modify by fuyongsheng 20220610 start
+//        BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
+//        portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
+        portfolioDto.setStandardSecAmount(standardSecAmount);
+        // ZGCPCN-1193:修改标准券券面总额赋值 modify by fuyongsheng 20220610 end
         // 融入券券面总额
         portfolioDto.setIntegrateSecAmount(BigDecimal.ZERO);
         portfolioDtos.add(portfolioDto);
