@@ -541,8 +541,11 @@
     <select id = "selectIsIssueAsset" resultType="java.lang.Integer">
         SELECT count(1)
         FROM FIN_PRODUCT FP
-  INNER JOIN FIN_PRODUCT_ADD FPA
+        INNER JOIN FIN_PRODUCT_ADD FPA
           ON FPA.APPEAR_MARKET_ID = FP.FINPROD_MARKET_ID
+        INNER JOIN FIN_PRODUCT FPB
+                ON FPA.FINPROD_ID = FPB.FINPROD_ID
+               AND FPB.ISSUE_TYPE = '01'
         WHERE FP.FINPROD_ID = #{finprodId}
     </select>
 

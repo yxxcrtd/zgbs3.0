@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d224ad2"],{e0c4:function(n,t,e){"use strict";e.r(t),e.d(t,"genFinalsByItemData",(function(){return i}));var i=function(){var n=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},t=n.settleMethod;return{isMoney:"02"===t,isEntity:"01"===t}}}}]);
