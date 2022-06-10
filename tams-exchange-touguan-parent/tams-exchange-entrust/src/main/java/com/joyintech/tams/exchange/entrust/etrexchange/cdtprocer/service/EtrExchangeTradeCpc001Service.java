@@ -40,6 +40,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dao.EtrExchangeTradeCpc002Mapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateApplyRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeMiniLimitPriceRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.position.service.PositionRequestServiceTradSaveCpcRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeOperateSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
@@ -57,6 +58,7 @@ import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinPirceDto;
+import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -958,6 +960,33 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         }
         //处理履历
         updateCfetsOprHis(entity.getEntrustId(), "revoke");
+    }
+
+
+    public MinTrdUnitLimitDto getMinTrdUnitLimitPrice(EtrExchangeMiniLimitPriceRequest request) {
+        MinTrdUnitLimitDto minTrdUnitLimitDto = getInterfSysMinTrdUnit(request.getFinprodId(), StringUtil.isNotEmpty(request.getTradePlat())?request.getTradePlat():DictCodeListExt3.对手方类型_其他.getValue(), request.getTradeMarket(), request.getFinprodType2(), request.getPs());
+        return minTrdUnitLimitDto;
+    }
+
+    public MinTrdUnitLimitDto getInterfSysMinTrdUnit(String finprodId, String tradePlat, String tradeMarket,
+                                                     String assetType, String ps) {
+        MinTrdUnitLimitDto minTrdUnitLimitDto = null;
+        String PINANAssetType = DictCodeListExt1.金融产品类型_信用保护凭证.getValue();
+        Map<String, Object> map = new HashMap<>();
+        map.put("finprodId", finprodId);
+        map.put("tradeMarket", tradeMarket);
+        map.put("tradePlat", tradePlat);
+        map.put("assetType", PINANAssetType);
+        map.put("ps", ps);
+        Map<String, Object> res = restTemplate.postForObject(
+                ServiceApplication.BASICDATA_SERVICE_NAME + "/InterfSysTrdConfig/getMinTrdUnitLimit", map, Map.class);
+        if (res != null && res.get("data") != null) {
+            List<MinTrdUnitLimitDto> list = (List<MinTrdUnitLimitDto>) res.get("data");
+            if (list != null && list.size() > 0) {
+                minTrdUnitLimitDto = JSON.parseObject(JSON.toJSONString(list.get(0)), MinTrdUnitLimitDto.class);
+            }
+        }
+        return minTrdUnitLimitDto;
     }
 
 }
