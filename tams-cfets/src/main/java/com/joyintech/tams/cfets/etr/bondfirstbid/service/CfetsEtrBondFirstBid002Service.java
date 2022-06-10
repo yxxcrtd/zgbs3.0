@@ -44,6 +44,8 @@ import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.EtrSinglePortfolioDto;
+import com.joyintech.tams.cfets.position.dto.PositionCashRequestDetailDto;
+import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustBidPriceMapper;
@@ -195,6 +197,12 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      */
     @Autowired
     private BaseGetBusinessId bussGetBussinessIdService;
+
+    /**
+     * 头寸信息
+     */
+    @Autowired
+    private PositionInfoService positionInfoService;
 
 
     @Override
@@ -1067,6 +1075,31 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         dto.setVdate(cfetsDto.getEtrDate());
 
         List<CfetsBiddingProductDto> biddingProductList = cfetsDto.getBiddingProductList();
+
+        //头寸信息
+        if (CollectionUtils.isNotEmpty(biddingProductList)) {
+            for (CfetsBiddingProductDto productDto : biddingProductList) {
+                List<PositionCashRequestDetailDto> ptlList = new ArrayList<>();
+                PositionCashRequestDetailDto positionDto = new PositionCashRequestDetailDto();
+                positionDto.setPortfolioId(productDto.getPortfolioId());
+                positionDto.setAcctNo(productDto.getAcctNo());
+                ptlList.add(positionDto);
+                BaseMap cashMap = positionInfoService.queryEtrAvailableCash(
+                        ptlList,
+                        null,
+                        null,
+                        dto.getCcy(),
+                        null,
+                        dto.getFinprodId()
+                );
+
+                //添加头寸信息
+                productDto.setCashT(cashMap.getBigDecimal("cashT"));
+                productDto.setCashT1(cashMap.getBigDecimal("cashT1"));
+                productDto.setRealCash(cashMap.getBigDecimal("realCash"));
+                productDto.setSecDesirableCash(cashMap.getBigDecimal("secDesirableCash"));
+            }
+        }
         List<CfetsEtrBondFirstBid002Dto> etrInvestBondFirstBidList = new ArrayList<>();
         //场外
         if (StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())
