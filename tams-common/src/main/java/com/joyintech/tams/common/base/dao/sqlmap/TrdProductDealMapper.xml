@@ -166,7 +166,7 @@
             #{hkMarket,jdbcType=VARCHAR}, #{buySettleRate,jdbcType=DECIMAL}, #{sellSettleRate,jdbcType=DECIMAL},
             #{dealAmt,jdbcType=DECIMAL}, #{commission,jdbcType=DECIMAL}, #{stampDuty,jdbcType=DECIMAL}, #{transactionLevy,jdbcType=DECIMAL},
             #{transactionFee,jdbcType=DECIMAL}, #{transactionSystemFee,jdbcType=DECIMAL}, #{sharePaymentFee,jdbcType=DECIMAL}, 
-            #{yesterdayPosition,jdbcType=DECIMAL}, #{issueType,jdbcType=VARCHAR},
+            #{yesterdayPosition,jdbcType=DECIMAL}, #{issueType,jdbcType=VARCHAR}
                )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.TrdProductDeal" >
