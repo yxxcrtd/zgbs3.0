@@ -458,6 +458,7 @@ public class RiskRedisInitServiceImpl extends BaseService implements RiskRedisIn
                 }
             } catch (InterruptedException e) {
                 logger.error("线程池获取错误信息对象超时！", e);
+                Thread.currentThread().interrupt();
             } catch (ExecutionException e) {
                 logger.error("线程池获取错误信息对象执行异常！", e);
             }

@@ -93,7 +93,7 @@ public class JsonUtils {
                     gen.close();
                 }
                 catch (IOException e) {
-                    throw new RuntimeException("不能序列化对象为Json", e);
+                    //throw new RuntimeException("不能序列化对象为Json", e);
                 }
             }
         }
@@ -126,8 +126,10 @@ public class JsonUtils {
         if(JsonNodeType.ARRAY.equals(jsonNode.getNodeType())) {
             List<Object> list = new ArrayList<>();
             ArrayNode arrayNode = toArrayNode(jsonNode);
-            for(int i=0; i < arrayNode.size(); i++) {
-                list.add(jsonToObject(arrayNode.get(i)));
+            if(null != arrayNode){
+                for(int i=0; i < arrayNode.size(); i++) {
+                    list.add(jsonToObject(arrayNode.get(i)));
+                }
             }
             return list;
         }
