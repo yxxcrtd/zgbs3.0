@@ -1156,10 +1156,12 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         Instruction that = (Instruction) o;
         return entrustNum == that.entrustNum &&
                 count == that.count &&
@@ -1304,11 +1306,12 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         if (ObjectUtil.isEmpty(minTrdUnitLimitList)) {
             return null;
         }
-        if (minTrdUnitLimitList.size() == 1) {
+        if (minTrdUnitLimitList.size() == 1 || StrUtil.isEmpty(entrustProp)) {
             return minTrdUnitLimitList.get(0);
         } else {
+            String entrustPropWithoutSuffix = entrustProp.split(StrUtil.DASHED)[0];
             return minTrdUnitLimitList.stream()
-                    .filter(item -> item.getTradePlat().equals(entrustProp))
+                    .filter(item -> item.getTradePlat().equals(entrustPropWithoutSuffix))
                     .findFirst()
                     .orElse(minTrdUnitLimitList.get(0));
         }
@@ -1324,11 +1327,12 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         if (ObjectUtil.isEmpty(minPriceList)) {
             return null;
         }
-        if (minPriceList.size() == 1) {
+        if (minPriceList.size() == 1 || StrUtil.isEmpty(entrustProp)) {
             return minPriceList.get(0).getMinPrice();
         } else {
+            String entrustPropWithoutSuffix = entrustProp.split(StrUtil.DASHED)[0];
             return minPriceList.stream()
-                    .filter(item -> item.getTradePlat().equals(entrustProp))
+                    .filter(item -> item.getTradePlat().equals(entrustPropWithoutSuffix))
                     .map(MinPrice::getMinPrice)
                     .findFirst()
                     .orElse(minPriceList.get(0).getMinPrice());

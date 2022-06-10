@@ -435,7 +435,9 @@ public class FtpUtil {
                 })) {
                     File localFile = new File(localPath + separator + ff.getName());
                     if (!localFile.exists()) {
-                        localFile.createNewFile();
+                        if( !localFile.createNewFile()){
+
+                        }
                         try {
 							out = new FileOutputStream(localFile);
 							ftpClient.retrieveFile(ff.getName(), out);
