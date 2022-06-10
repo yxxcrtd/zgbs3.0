@@ -759,6 +759,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
             CfetsTrdFirstBidFirmInfoDto inputDto = (CfetsTrdFirstBidFirmInfoDto) obj;
             CfetsTrdFirstBidFirmEntrustDto detailDto = (CfetsTrdFirstBidFirmEntrustDto) detailObj;
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(detailDto.getEntrustId());
+            creditLinesInputDto = new CreditLinesInputDto();
+            BeanUtil.copyPropertiesIgnoreNull(creditLinesInputDto, inputDto);
+            creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
             creditLinesInputDto.setTradeId(detailDto.getEntrustId());
             creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
             creditLinesInputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
@@ -784,6 +787,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
             CfetsTrdBondFirstSubInfoDto inputDto = (CfetsTrdBondFirstSubInfoDto) obj;
             CfetsTrdBondFirstSubEntrustDto detailDto = (CfetsTrdBondFirstSubEntrustDto) detailObj;
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(detailDto.getEntrustId());
+            creditLinesInputDto = new CreditLinesInputDto();
+            BeanUtil.copyPropertiesIgnoreNull(creditLinesInputDto, inputDto);
+            creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
             creditLinesInputDto.setTradeId(detailDto.getEntrustId());
             creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
             creditLinesInputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
