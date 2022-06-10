@@ -402,14 +402,22 @@ public class RiskInputParamSerivce extends RiskCommonService {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             CfetsBondDealRegisterQuoteDto dto = (CfetsBondDealRegisterQuoteDto) data;
-            List<TrdBondInvestTradeDto> list1 = new ArrayList<>();
-            for (PtlAllocationDto item : dto.getPtlAllocatios()) {
-                TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
-                BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
-                bondDto.setTotleTradeId(item.getEntrustId());
-                list1.add(bondDto);
+            List<Map> bussTrdTransfenpeiDto = new ArrayList<>();
+            for(PtlAllocationDto ptlAllocationDto:dto.getPtlAllocatios()){
+                Map<String, Object> stringObjectMap = BeanUtil.object2Map(ptlAllocationDto);
+                stringObjectMap.put("tradeAmount",ptlAllocationDto.getShareAmt());
+                stringObjectMap.put("entrustNum",ptlAllocationDto.getShareAmt());
+                stringObjectMap.put("fpriceAmt",ptlAllocationDto.getShareAmt());
+                stringObjectMap.put("portfolioCode",ptlAllocationDto.getPortfolioId());
+                stringObjectMap.put("finprodId",dto.getFinprodId());
+                stringObjectMap.put("finprodType2",DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                stringObjectMap.put("ps",dto.getPs());
+                stringObjectMap.put("ccy","CNY");
+                stringObjectMap.put("tradeMarket",交易场所_银行间);
+                stringObjectMap.put("mdate",dto.getActSetteDate());
+                bussTrdTransfenpeiDto.add(stringObjectMap);
             }
-            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
+            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, bussTrdTransfenpeiDto, null);
         }
         // 银行间回购指令
         if (data instanceof CfetsEtribRepoInfo003Dto){
@@ -583,7 +591,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @return
      */
     public void buildAuthorizeParam(RiskCommonInputDto dto, Object data, RiskNodeConfigDtl dtl) {
-        if (this.isControl(dtl.getNameListControl())) return;
+        if (this.isControl(dtl.getAuthorizeControl())) return;
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
             CfetsTrdFirstBidFirmInfoDto infoDto = (CfetsTrdFirstBidFirmInfoDto) data;
             Map<String, Object> map = BeanUtil.object2Map(data);
