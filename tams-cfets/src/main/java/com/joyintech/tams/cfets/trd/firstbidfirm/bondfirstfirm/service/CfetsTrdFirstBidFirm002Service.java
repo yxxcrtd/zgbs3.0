@@ -246,7 +246,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         List<String> entrustIdList = new ArrayList<>();
         logger.debug("<投标确认>界面初始化检查,入参:" + JsonUtils.object2Json(request));
         List<CfetsTrdFirstBidFirmEntrustDto> list = request.getEntrustDtos();
-        if (StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"))) {
+        boolean isEntrustSumFlagBid = StringUtil.equals("TRUE", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"));
+        if (isEntrustSumFlagBid) {
             List<CfetsTrdFirstBidFirmEntrustDto> listTemp = new ArrayList<>();
             request.getEntrustDtos().forEach(entrustDto -> {
                 if (CollectionUtils.isEmpty(entrustDto.getCfetsTrdFirstBidFirmEntrustDtos())) {
@@ -261,6 +262,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         String counterId = null;
         Date issueDateStart = null;
         Date issueDateEnd = null;
+        Map<String, List<String>> entrustIdsMap = new HashMap<>();
         if (StringUtil.isNotEmpty(request) && StringUtil.isNotEmpty(list)) {
             for (CfetsTrdFirstBidFirmEntrustDto entrustDto : list) {
                 ValidMessage error = new ValidMessage();
@@ -349,6 +351,37 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             if (CollectionUtils.isEmpty(entrustDtos)) {
                 return ajaxResult;
             }
+            if(isEntrustSumFlagBid) {
+                Map<String, CfetsTrdFirstBidFirmEntrustDto> entrustDtoMap = new HashMap<>();
+                List<CfetsTrdFirstBidFirmEntrustDto> entrustDtosTemp = new ArrayList<>();
+                entrustDtos.forEach(entrustDto -> {
+                    if (StringUtil.isEmpty(entrustDto.getEntrustIdKey())) {
+                        // 没有手动汇总记录不处理
+                        entrustDtosTemp.add(entrustDto);
+                    } else if (entrustDtoMap.get(entrustDto.getEntrustIdKey()) == null) {
+                        //只处理未处理的数据
+                        param.put("totleId", entrustDto.getEntrustIdKey());
+                        param.remove("counterId");
+                        // 根据汇总编号查询其他数据
+                        List<CfetsTrdFirstBidFirmEntrustDto> listTemp = cfetsTrdFirstBidFirm002Mapper.selectEntInfoByIdAndDate(param);
+                        // 记录指令代码
+                        List<String> entrustIds = new ArrayList<>();
+                        for (CfetsTrdFirstBidFirmEntrustDto item : listTemp) {
+                            entrustIds.add(item.getEntrustId() + "KEY");
+                            if (StringUtil.isNotEmpty(item.getCounterName())
+                                    || entrustDtoMap.get(entrustDto.getEntrustIdKey()) == null) {
+                                entrustDtoMap.put(entrustDto.getEntrustIdKey(), item);
+                            }
+                        }
+                        entrustIdsMap.put(entrustDto.getEntrustIdKey(), entrustIds);
+                    }
+                });
+                for (CfetsTrdFirstBidFirmEntrustDto entrustDto : entrustDtoMap.values()) {
+                    entrustDtosTemp.add(entrustDto);
+                }
+                entrustDtos = entrustDtosTemp;
+            }
+
             List<Map<String, Object>> massageMapList = new ArrayList<>();
             List<String> entrustIdList1 = new ArrayList<>();// 情况1的指令代码列表
             List<String> entrustIdList2 = new ArrayList<>();// 情况2的指令代码列表
@@ -371,7 +404,15 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                         && (StringUtil.equals(counterId, entrustDto.getCounterId())
                         || (StringUtil.isEmpty(counterId) && StringUtil.isEmpty(entrustDto.getCounterId())))) {
                     flag1 = true;
-                    entrustIdList1.add(entrustDto.getEntrustId());
+                    if (isEntrustSumFlagBid) {
+                        if(StringUtil.isNotEmpty(entrustDto.getEntrustIdKey())){
+                            entrustIdList1.addAll(entrustIdsMap.get(entrustDto.getEntrustIdKey()));
+                        }else {
+                            entrustIdList1.add(entrustDto.getEntrustId() + "KEY");
+                        }
+                    } else {
+                        entrustIdList1.add(entrustDto.getEntrustId());
+                    }
                 }
                 // 2.勾选指令时，如勾选指令交易对手为空，判断与勾选指令是否存在同资产+同一投标日的已接收待投标且不存在过程中投标确认数据的指令
                 if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue())
@@ -385,7 +426,15 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                         counterName = entrustDto.getCounterName();
                     }
                     flag2 = true;
-                    entrustIdList2.add(entrustDto.getEntrustId());
+                    if (isEntrustSumFlagBid) {
+                        if(StringUtil.isNotEmpty(entrustDto.getEntrustIdKey())){
+                            entrustIdList2.addAll(entrustIdsMap.get(entrustDto.getEntrustIdKey()));
+                        }else {
+                            entrustIdList2.add(entrustDto.getEntrustId() + "KEY");
+                        }
+                    } else {
+                        entrustIdList2.add(entrustDto.getEntrustId());
+                    }
                 }
                 // 3.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的待接收指令
                 if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_待接收.getValue())
@@ -823,8 +872,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             viewInfo.setBidTotalList(this.createBidTotalList(viewInfo));
         }
         BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
-        for(CfetsTrdFirstBidFirmProductDto productDto : viewInfo.getProductDtos()){
-            etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal,productDto.getEtrBidPriceTotal());
+        for (CfetsTrdFirstBidFirmProductDto productDto : viewInfo.getProductDtos()) {
+            etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, productDto.getEtrBidPriceTotal());
         }
         viewInfo.setEtrBidPriceTotal(etrBidPriceTotal);
         logger.debug("初始化一级投标确认交易查看页面,结果:" + JsonUtils.object2Json(viewInfo));
