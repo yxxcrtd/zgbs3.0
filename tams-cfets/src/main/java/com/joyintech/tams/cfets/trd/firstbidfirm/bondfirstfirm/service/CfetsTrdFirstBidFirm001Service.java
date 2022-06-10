@@ -207,11 +207,14 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
         }
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("massege", errorList);
-        map.put("ids", entrustIdListAll);
-        ajaxResult.setData(map);
-        ajaxResult.setMessageType(MessageType.确认消息);
+        if (CollectionUtils.isNotEmpty(errorList)) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("massege", errorList);
+            map.put("ids", entrustIdListAll);
+            ajaxResult.setData(map);
+            ajaxResult.setMessageType(MessageType.确认消息);
+        }
+
         return ajaxResult;
     }
 
@@ -339,11 +342,13 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             }
 
         }
-        Map<String, Object> map = new HashMap<>();
-        map.put("massege", errorList);
-        map.put("ids", entrustIdListAll);
-        ajaxResult.setData(map);
-        ajaxResult.setMessageType(MessageType.确认消息);
+        if (CollectionUtils.isNotEmpty(errorList)) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("massege", errorList);
+            map.put("ids", entrustIdListAll);
+            ajaxResult.setData(map);
+            ajaxResult.setMessageType(MessageType.确认消息);
+        }
         return ajaxResult;
     }
 
