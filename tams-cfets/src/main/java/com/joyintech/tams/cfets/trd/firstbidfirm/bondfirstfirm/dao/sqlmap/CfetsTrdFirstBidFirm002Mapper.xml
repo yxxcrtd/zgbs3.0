@@ -23,11 +23,15 @@
         <result property="payType" column="payType" jdbcType="VARCHAR"/>
         <result property="etrBidPriceTotal" column="etrBidPriceTotal" jdbcType="DECIMAL"/>
         <result property="totalBiddingNum" column="totalBiddingNum" jdbcType="DECIMAL"/>
+        <result property="fullPrice" column="fullPrice" jdbcType="DECIMAL"/>
+        <result property="intAmtTatol" column="intAmtTatol" jdbcType="DECIMAL"/>
+        <result property="payableAmount" column="payableAmount" jdbcType="DECIMAL"/>
         <result property="bidPriceTotal" column="bidPriceTotal" jdbcType="DECIMAL"/>
         <result property="payType" column="payType" jdbcType="VARCHAR"/>
         <result property="winPrice" column="winPrice" jdbcType="DECIMAL"/>
         <result property="price" column="price" jdbcType="DECIMAL"/>
         <result property="intAmt" column="intAmt" jdbcType="DECIMAL"/>
+        <result property="tradeAmt" column="tradeAmt" jdbcType="DECIMAL"/>
         <result property="settFeeAmt" column="settFeeAmt" jdbcType="DECIMAL"/>
         <result property="remark" column="remark" jdbcType="VARCHAR"/>
         <result property="adjustStrategy" column="adjustStrategy" jdbcType="VARCHAR"/>
@@ -220,7 +224,7 @@
     </select>
 
     <select id="selectEntInfoByIdAndDate" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto">
-        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId,counterName , entrustId
+        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId,counterName , entrustId , entrustIdKey
         from (
                  select ee.ENTRUST_STATUS entrustStatus,
                         CASE
@@ -248,7 +252,8 @@
                             END AS        issueDateEnd/*投标日 结束*/,
                         ee.COUNTER_ID     counterId,
                         mcp.COUNTER_NAME                         counterName,
-                        ee.ENTRUST_ID     entrustId
+                        ee.ENTRUST_ID     entrustId,
+                        teer.TOTLE_ID entrustIdKey
                  from ETR_ENTRUST ee
                           left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID = ee.COUNTER_ID
                           LEFT JOIN (
@@ -262,6 +267,7 @@
                      GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID, bobp.ENTRUST_ID
                  ) bobrt ON bobrt.FINPROD_ID = ee.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
                           left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
+                          left join TOTAL_ETR_ENTRUST_REL teer on ee.ENTRUST_ID = teer.ENTRUST_ID
                  where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
                    and ee.FINPROD_ID = #{finprodId}
                    and not exists(
@@ -287,6 +293,9 @@
                    <if test="counterId != null and counterId != ''">
                        and ee.COUNTER_ID = #{counterId}
                    </if>
+                    <if test="totleId != null and totleId != ''">
+                        and teer.TOTLE_ID = #{totleId}
+                    </if>
                    )
         where issueDateEnd = #{issueDateEnd} and issueDateStart = #{issueDateStart}
     </select>
@@ -327,9 +336,9 @@
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                bo.PAY_TYPE       AS payType/*缴款方式*/,
-               ee.ENTRUST_NUM*100    AS etrBidPriceTotal/*指令投标券面总额*/,
                bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
+               bo.TRADE_AMT   AS tradeAmt/*交易金额*/,
                case
                    when fpi.TENDER_TARGET = '01' then bo.WIN_PRICE * 100
                    when fpi.TENDER_TARGET = '02' then bo.WIN_PRICE
@@ -337,6 +346,9 @@
                    end              winPrice/*中标标位*/,
                bo.UNIT_INT  intAmt /*应计利息*/,
                bo.UNIT_CPRICE  price /*净价*/,
+               nvl(bo.UNIT_INT,0)+ nvl(bo.UNIT_CPRICE,0) fullPrice/*全价*/,
+               bo.INT_AMT intAmtTatol/*应计利息总额*/,
+               bo.PAYABLE_AMOUNT payableAmount/*缴款金额*/,
                bo.SETT_FEE_AMT    settFeeAmt/*结算服务费*/,
                bo.REMARK       AS remark/*备注*/,
                bobp.ENTRUST_ID,
@@ -413,9 +425,9 @@
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                bo.PAY_TYPE       AS payType/*缴款方式*/,
-               ee.ENTRUST_NUM*100    AS etrBidPriceTotal/*指令投标券面总额*/,
                bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
+               bo.TRADE_AMT   AS tradeAmt/*交易金额*/,
                case
                    when fpi.TENDER_TARGET = '01' then bo.WIN_PRICE * 100
                    when fpi.TENDER_TARGET = '02' then bo.WIN_PRICE
@@ -423,6 +435,9 @@
                    end              winPrice/*中标标位*/,
                bo.UNIT_INT  intAmt /*应计利息*/,
                bo.UNIT_CPRICE  price /*净价*/,
+               nvl(bo.UNIT_INT,0)+ nvl(bo.UNIT_CPRICE,0) fullPrice/*全价*/,
+               bo.INT_AMT intAmtTatol/*应计利息总额*/,
+               bo.PAYABLE_AMOUNT payableAmount/*缴款金额*/,
                bo.SETT_FEE_AMT    settFeeAmt/*结算服务费*/,
                bo.REMARK       AS remark/*备注*/,
                bobp.ENTRUST_ID,
@@ -480,13 +495,23 @@
         order by fri.EFF_DATE desc ,miri.EFF_DATE desc
     </select>
 
-    <select id="findTotalByPTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper.BaseResultMap">
+    <select id="findWflTotalByPTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper.BaseResultMap">
         <include refid="com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper.Sql_All_Data" />
         WHERE P_TOTLE_TRADE_ID = #{PTotleTradeId}
     </select>
 
-    <select id="findDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.BaseResultMap">
+    <select id="findTotalByPTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper.BaseResultMap">
+        <include refid="com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper.Sql_All_Data" />
+        WHERE P_TOTLE_TRADE_ID = #{PTotleTradeId}
+    </select>
+
+    <select id="findWflDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.BaseResultMap">
         <include refid="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.Sql_All_Data" />
+        WHERE TOTLE_TRADE_ID = #{totleTradeId}
+    </select>
+
+    <select id="findDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductDealMapper.BaseResultMap">
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Sql_All_Data" />
         WHERE TOTLE_TRADE_ID = #{totleTradeId}
     </select>
 
@@ -509,5 +534,19 @@
                      group by T.ENTRUST_ID, T.PORTFOLIO_ID
         )T1 on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
         where eed.ENTRUST_ID = #{entrustId} and eed.PORTFOLIO_ID = #{protfolioId}
+    </select>
+
+    <select id="selectManualCount" resultType="java.lang.Integer">
+        select count(*) num
+        from TRD_BANK_MANUAL_SETTLE_INFO tbmsi
+                 left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tbmsi.TRADE_ID = tfpdt.TOTLE_TRADE_ID
+                 left join BID_ORDER bo on bo.BID_ID = tfpdt.P_TOTLE_TRADE_ID
+        where bo.BID_ID = #{bidId} and tbmsi.SETTLE_STATUS = '02' and tfpdt.IS_CANCEL = 'N' and tfpdt.TRADE_STATUS = '01'
+    </select>
+
+    <select id="selectResultCount" resultType="java.lang.Integer">
+        select count(*) num
+        from BID_RESULT_TOTAL
+        where BID_ID = #{bidId}
     </select>
 </mapper>

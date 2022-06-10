@@ -11,6 +11,8 @@ import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.constant.DictCodeListRsk;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,8 @@ import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 @RestController
 @RequestMapping("/riskTrial")
 public class RiskTrialController {
+
+    private static final Logger logger = LoggerFactory.getLogger(RiskTrialController.class);
 
     @Autowired
     private RiskInputParamSerivce paramSerivce;
@@ -46,12 +50,12 @@ public class RiskTrialController {
                 result.setRskStatus(outputDto.getRskTrialStatus());
                 if (StringUtil.equals(outputDto.getRskTrialStatus(), "3")) {
                     result.setRiskTrialSpan(DictCodeListRsk.试算结果_不通过.getCodeName());
-                }else {
+                } else {
                     result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
                 }
-                outputDto.getRiskTrialRetDto().forEach(e->{
+                outputDto.getRiskTrialRetDto().forEach(e -> {
                     CfetsEtribdoRiskcalResponse riskcalResponse = new CfetsEtribdoRiskcalResponse();
-                    BeanUtil.copyPropertiesIgnoreNull(riskcalResponse,e);
+                    BeanUtil.copyPropertiesIgnoreNull(riskcalResponse, e);
                     resultList.add(riskcalResponse);
                 });
                 result.setRiskcalReturnList(resultList);
@@ -63,6 +67,7 @@ public class RiskTrialController {
                 return new Message<AjaxResult>().success().setData(m);
             }
         } catch (Exception e) {
+            logger.error("风险试算异常", e);
             return new Message<AjaxResult>().fail().setMessage("风险试算异常");
         }
 

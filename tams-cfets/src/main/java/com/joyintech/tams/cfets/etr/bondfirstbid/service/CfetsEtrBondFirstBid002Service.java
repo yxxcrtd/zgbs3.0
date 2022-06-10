@@ -44,6 +44,8 @@ import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.EtrSinglePortfolioDto;
+import com.joyintech.tams.cfets.position.dto.PositionCashRequestDetailDto;
+import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustBidPriceMapper;
@@ -195,6 +197,12 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      */
     @Autowired
     private BaseGetBusinessId bussGetBussinessIdService;
+
+    /**
+     * 头寸信息
+     */
+    @Autowired
+    private PositionInfoService positionInfoService;
 
 
     @Override
@@ -1067,6 +1075,31 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         dto.setVdate(cfetsDto.getEtrDate());
 
         List<CfetsBiddingProductDto> biddingProductList = cfetsDto.getBiddingProductList();
+
+        //头寸信息
+        if (CollectionUtils.isNotEmpty(biddingProductList)) {
+            for (CfetsBiddingProductDto productDto : biddingProductList) {
+                List<PositionCashRequestDetailDto> ptlList = new ArrayList<>();
+                PositionCashRequestDetailDto positionDto = new PositionCashRequestDetailDto();
+                positionDto.setPortfolioId(productDto.getPortfolioId());
+                positionDto.setAcctNo(productDto.getAcctNo());
+                ptlList.add(positionDto);
+                BaseMap cashMap = positionInfoService.queryEtrAvailableCash(
+                        ptlList,
+                        null,
+                        null,
+                        dto.getCcy(),
+                        null,
+                        dto.getFinprodId()
+                );
+
+                //添加头寸信息
+                productDto.setCashT(cashMap.getBigDecimal("cashT"));
+                productDto.setCashT1(cashMap.getBigDecimal("cashT1"));
+                productDto.setRealCash(cashMap.getBigDecimal("realCash"));
+                productDto.setSecDesirableCash(cashMap.getBigDecimal("secDesirableCash"));
+            }
+        }
         List<CfetsEtrBondFirstBid002Dto> etrInvestBondFirstBidList = new ArrayList<>();
         //场外
         if (StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())
@@ -1330,8 +1363,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
                 //大于0.1(万元)
                 if (bidDto.getBidPrinAmt() != null) {
-                    if (bidDto.getBidPrinAmt().compareTo(BigDecimal.valueOf(1000)) < 0) {
-                        messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],投标券面总额不能小于【0.1(万元)】！"));
+                    if (bidDto.getBidPrinAmt().compareTo(BigDecimal.valueOf(1000)) <= 0) {
+                        messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],投标券面总额必须大于【0.1(万元)】！"));
                     }
 
                 }
@@ -1396,13 +1429,24 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
             if (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
                     StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue())) {
-                //校验标位信息
-                if (StringUtil.isNotEmpty(cfetsDto.getFinprodId())) {
-                    //查询债券信息
-                    CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
-                    dto.setFinprodId(cfetsDto.getFinprodId());
-                    CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
+                //查询债券信息
+                CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
+                dto.setFinprodId(cfetsDto.getFinprodId());
+                CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
 
+                if (finProductInfo != null) {
+                    //校验投标量
+                    if (finProductInfo.getMinPerTamt() != null) {
+                        BigDecimal minPerTamt = ArithmeticUtil.multiply(new BigDecimal(finProductInfo.getMinPerTamt()),BigDecimal.valueOf(100000000));
+                        for (CfetsBiddingProductDto bidDto : cfetsDto.getBiddingProductList()) {
+                            if (bidDto.getBidPrinAmt().compareTo(minPerTamt) < 0) {
+                                messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],投标券面总额不能小于每标位最低投标量！"));
+                            }
+                        }
+                    }
+
+
+                    //校验标位信息
                     Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = cfetsDto.getBiddingProductList().stream()
                             .collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
                     List<String> errorMessageList = new ArrayList<>();

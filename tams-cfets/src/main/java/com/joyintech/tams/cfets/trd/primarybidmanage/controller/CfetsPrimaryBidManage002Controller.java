@@ -247,8 +247,8 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
             return WorkFlowUtil.concatComment("中标日期"+
                     GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
                     "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidTypeStr()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+ArithmeticUtil.multiply(dto.getAllocationDetails().get(0).getBidPrice(),BigDecimal.valueOf(100))+"%"+GlobalConstant.CLOSE_PARENTHESIS
+                    +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType())+GlobalConstant.CLOSE_PARENTHESIS
+                    +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+cfetsPrimaryBidManageService.getBidPriceStr(entity)+GlobalConstant.CLOSE_PARENTHESIS
                     +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.divide(dto.getWinPrinamt(),BigDecimal.valueOf(10000),2)+"万元"+GlobalConstant.CLOSE_PARENTHESIS);
         });
         ProcessParameter<CfetsPrimaryBidManageSaveRequest> parameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
@@ -366,8 +366,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
                 ar.setMessageType(MessageType.错误消息);
                 return new Message<AjaxResult>().setData(ar);
             }
-            AjaxResult ajaxResult = CfetsTradeHandlerAop.doRiskcal(dto,
-                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
+            AjaxResult ajaxResult = CfetsTradeHandlerAop.doRiskcal(dto, this.getPageId());
             return new Message<AjaxResult>().setData(ajaxResult);
         } catch (Exception e) {
             logger.error("风险试算", e);

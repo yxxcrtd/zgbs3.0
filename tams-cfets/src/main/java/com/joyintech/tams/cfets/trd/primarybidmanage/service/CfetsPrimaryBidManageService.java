@@ -224,9 +224,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             CfetsPrimaryBidManageCfmResponse response = cfetsPrimaryBidManageMapper.getBidManageCfmInfo(param);
             List<BidProductDto> bidProductList = cfetsPrimaryBidManageMapper.getBidProductList(param);
             if(StringUtil.isNotEmpty(response.getBidModle()) && response.getBidModle().equals(DictCodeListExt4.投标方式_自主投标.getValue())) {
-                Map<BigDecimal, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
+                Map<String, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
                 List<SummaryBidDto> summaryBidList = new ArrayList<>();
-                for (BigDecimal winPrice : summaryBidMap.keySet()) {
+                for (String winPrice : summaryBidMap.keySet()) {
                     SummaryBidDto summaryBidDto = new SummaryBidDto();
                     BigDecimal totalBidPrinamt = null;
                     BigDecimal winPrinAmt = null;
@@ -234,9 +234,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         totalBidPrinamt = ArithmeticUtil.doAdd(totalBidPrinamt, bidProductDto.getTotalBidPrinamt());
                         winPrinAmt = ArithmeticUtil.doAdd(winPrinAmt, bidProductDto.getWinPrinAmt());
                     }
-                    summaryBidDto.setTotalBidPrinamt(ArithmeticUtil.divide(totalBidPrinamt,BigDecimal.valueOf(10000),2));
-                    summaryBidDto.setWinPrinAmt(ArithmeticUtil.divide(winPrinAmt,BigDecimal.valueOf(10000),2));
-                    summaryBidDto.setWinPrice(ArithmeticUtil.multiply(winPrice,BigDecimal.valueOf(100)));
+                    summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
+                    summaryBidDto.setWinPrinAmt(winPrinAmt);
+                    summaryBidDto.setWinPrice(winPrice);
                     summaryBidList.add(summaryBidDto);
                 }
                 resultData.put(dtCode + "_formList", listTable);
@@ -355,7 +355,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     if (StringUtil.isNotEmpty(trdFinProductDealTotalR)) {
                         trdFinProductDealTotalMapper.updateByPrimaryKey(trdFinProductDealTotal);
                     } else {
-                        trdFinProductDealTotalMapper.insert(trdFinProductDealTotal);
+                        trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
                     }
                     // 根据汇总交易编号查询金融产品交易
                     List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
@@ -1684,5 +1684,22 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             return StringUtil.joinString(messages, GlobalConstant.VERTICAL_LINE);
         }
         return null;
+    }
+
+    public String getBidPriceStr(CfetsPrimaryBidManageSaveRequest request){
+        String bidPriceStr = null;
+        if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利率.getValue())){
+            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100));
+            bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"%";
+        }
+        if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利差.getValue())){
+            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(10000));
+            bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"BP";
+        }
+        if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())){
+            BigDecimal bidPrice = request.getAllocationDetails().get(0).getBidPrice();
+            bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"BP";
+        }
+        return bidPriceStr;
     }
 }

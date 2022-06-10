@@ -513,12 +513,13 @@ public class TradeHelper {
      */
     private void checkPrice(OrderInterface entrust, Instruction instruction) {
         BigDecimal entrustPrice = entrust.getEntrustPrice();
-        BigDecimal price = instruction.getEntrustPrice();
+        BigDecimal instructionPrice = instruction.getEntrustPrice();
         //检查指令价格限定
-        if ((instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(entrustPrice, price))
-                || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(entrust, price, entrustPrice))) {
-            logger.info("检查【指令价格限定】，指令价格：[{}]，委托价格：[{}]", price, entrustPrice);
-            entrust.setEntrustPrice(price);
+        if ((instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(entrustPrice, instructionPrice))
+                || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(entrust, instructionPrice, entrustPrice))) {
+            logger.info("检查【指令价格限定】，指令价格：[{}]，委托价格：[{}]", instructionPrice, entrustPrice);
+            entrust.setEntrustPrice(instructionPrice);
+            entrustPrice = instructionPrice;
         }
         ResultBean tickBean = quoteService.getTick(entrust.getStockCode());
         if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
@@ -983,7 +984,7 @@ public class TradeHelper {
         return entrust;
     }
 
-    public Entrust convertOrderToEntrust(Order order, BatchInfo batchInfo, WorkflowBean workflow) {
+    public Entrust convertBatchOrderToEntrust(Order order, BatchInfo batchInfo, WorkflowBean workflow) {
         Entrust entrust = new Entrust();
         BeanUtils.copyProperties(order, entrust, "id", "entrustStatus", "frozenBalance", "frozenVolume", "tradedBalance", "tradedPrice", "tradedVolume", "createTime");
         entrust.setCreateTime(new Date(System.currentTimeMillis()));
@@ -1185,7 +1186,11 @@ public class TradeHelper {
 
     public void handleBatchOrder(BatchInfo batchInfo, Order order, WorkflowBean workflow) {
         String orderId = batchInfo.getOrderId();
-        logger.info("order :{}, bach entrust, entrustTimes: {}, has completeTimes: {}", orderId, batchInfo.getEntrustTimes(), batchInfo.getCompleteTimes());
+        if (Objects.isNull(order)) {
+            order = orderService.findById(orderId);
+        }
+        logger.info("handle batch order => 【orderId = {}】, 【entrustTimes = {}】, 【completeTimes = {}】", orderId, batchInfo.getEntrustTimes(), batchInfo.getCompleteTimes());
+
         if (ObjectUtil.isNotNull(workflow) && batchInfo.getCompleteTimes() == 0) {
             ReviewManagement.putReviewMap(orderId, workflow);
         }
@@ -1193,17 +1198,16 @@ public class TradeHelper {
             workflow = ReviewManagement.getReviewMap(orderId);
         }
         transactionHelper.setBatchInfo(batchInfo);
-        if (Objects.isNull(order)) {
-            order = orderService.findById(batchInfo.getOrderId());
-        }
         if (OrderStatus.isFinished(order.getOrderStatus())) {
-            logger.info("orderStatus[{}] is finished status, shutdown batch order", order.getOrderStatus());
+            logger.info("order is finished, shutdown batch order => 【orderId = {}】, 【orderStatus = {}】", orderId, order.getOrderStatus());
             return;
         }
-        Entrust entrust = convertOrderToEntrust(order, batchInfo, workflow);
+
+        Entrust entrust = convertBatchOrderToEntrust(order, batchInfo, workflow);
         entrust.setParentOrderId(order.getId());
-        Instruction instructionBean = instructionService.findById(order.getInstructionId());
-        if (batchInfo.getEntrustTimes() > batchInfo.getCompleteTimes() && entrust.getEntrustVolume() > 0) {
+
+        long entrustVolume = entrust.getEntrustVolume();
+        if (batchInfo.getEntrustTimes() > batchInfo.getCompleteTimes() && entrustVolume > 0) {
             delayController.put(batchInfo);
             order.setOrderStatus(OrderStatus.PROGRESSING.value);
         } else { // 判断委托是否已经下完
@@ -1211,7 +1215,9 @@ public class TradeHelper {
             ReviewManagement.removeReviewMap(orderId);
         }
         orderService.asyncUpdate(order);
-        if (entrust.getEntrustVolume() > 0) {
+
+        if (entrustVolume > 0) {
+            Instruction instructionBean = instructionService.findById(order.getInstructionId());
 //            handleEntrust(entrust, instructionBean, Constants.PROCESS_TYPE_ENTRUST);
             handleBatchEntrust(entrust, instructionBean, Constants.PROCESS_TYPE_ENTRUST);
         }

@@ -340,9 +340,9 @@ public class PositionRequestServiceInstructionRequest {
                     params.put("finprodId", entity.getFinprodId());
                     BigDecimal faceValue = etrTradeOtherCommonService.selectFaceValue(params);
                     // 标准券总额=质押券数量*折算率*最新面值
-                    BigDecimal standardSecAmount = item.getEntrustAmt().multiply(faceValue).divide(BigDecimal.valueOf(100));
+                    BigDecimal standardSecAmount = item.getEntrustAmt().multiply(faceValue);
                     //向下取整
-                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.setScale(0, BigDecimal.ROUND_DOWN).longValue() * 100);
+                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.longValue());
                 } else {
                     // 标准券总额=标准券数量*100
                     map.put(STANDARD_SEC_AMOUNT, item.getEntrustNum() * 100);

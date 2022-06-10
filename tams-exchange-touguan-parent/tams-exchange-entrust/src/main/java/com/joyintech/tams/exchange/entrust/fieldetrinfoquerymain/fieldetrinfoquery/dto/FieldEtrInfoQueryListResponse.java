@@ -270,11 +270,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
                 StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
             return tips + numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(100),2)) + "(万元)";
         }
-        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())){
-            return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
-        }else {
-            return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
-        }
+        return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
     }
     public BigDecimal getEntrustNum() {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){

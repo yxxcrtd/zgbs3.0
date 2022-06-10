@@ -353,7 +353,7 @@ public class SusPrdFutureOpenPlanGenWriter extends BaseWriter<NeedToWriteEntity>
 	                            finCashPlan.setBranch(0L);
 	                    	}else{
 	                    		finCashPlan.setCashId(finOpenPlan.getCashId());
-	                    		finCashPlan.setCashNum(new Long(i+1));
+	                    		finCashPlan.setCashNum((long)i+1);
 	                            finCashPlan.setCashType(DictCodeList.现金流类型_中间收息.getValue());
 	                            finCashPlan.setVdateUnadjust(openPlanList.get(i - 1).getOpenDateEnd());
 	                            finCashPlan.setMdateUnadjust(finOpenPlan.getOpenDateEnd());
@@ -413,7 +413,7 @@ public class SusPrdFutureOpenPlanGenWriter extends BaseWriter<NeedToWriteEntity>
 	                            finCashPlan.setBranch(0L);
 	                    	}else{
 	                    		finCashPlan.setCashId(finOpenPlan.getCashId());
-	                    		finCashPlan.setCashNum(new Long(i+1));
+	                    		finCashPlan.setCashNum((long)i+1);
 	                            finCashPlan.setCashType(DictCodeList.现金流类型_中间收息.getValue());
 	                            finCashPlan.setVdateUnadjust(openPlanList.get(i - 1).getOpenVdate());
 	                            finCashPlan.setMdateUnadjust(finOpenPlan.getOpenVdate());

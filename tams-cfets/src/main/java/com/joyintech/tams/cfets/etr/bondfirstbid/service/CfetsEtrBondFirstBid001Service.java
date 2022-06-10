@@ -5,6 +5,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
@@ -126,7 +127,19 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
     @Autowired(required = false)
     private BusiProductRatingService busiProductRatingService;
 
-
+    /**
+     * 指令查询参数初始化
+     *
+     * @param param
+     */
+    private void setParam(Map<String, Object> param) {
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
+        param.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("ENTRUST_STATUS_08", DictCodeListExt3.委托状态_流程中.getValue());
+        param.put("FINPROD_TYPE2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        String loginUserId = LoginUserUtil.getUserName();
+        param.put("loginUserId", loginUserId);
+    }
 
     /**
      * 指令信息查询
@@ -530,15 +543,46 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
                 return res;
             }
             for(CfetsEtrBondFirstBidReqDto Item:selectedItem){
-                if(!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托接收状态_已撤回.getValue())
-                        && !StringUtil.equals(Item.getEntrustStatus(),BussinessDictCodeList.委托状态_已退回.getValue())
-                ){
-                    AjaxResult res=new AjaxResult();
-                    ValidMessage  validMessage= new ValidMessage();
-                    validMessage.setMessage("只有指令状态为已撤回、已退回的指令允许修改");
+                AjaxResult res=new AjaxResult();
+                ValidMessage  validMessage= new ValidMessage();
+                //查询指令信息
+                Map<String, Object> params = new HashMap<>();
+                params.put("entrustId", Item.getEntrustId());
+                this.setParam(params);
+                CfetsEtrIBondFirstBidFindEtrInfoDto etrInfoDto = cfetsEtrBondFirstBid001Mapper.
+                        findEtrInfoPage(params).stream().findFirst().orElse(null);
+                if (etrInfoDto == null) {
+                    validMessage.setMessage("该指令信息不存在");
                     res.setErrorList(Arrays.asList(validMessage));
                     return res;
                 }
+                //报价发行
+                if (StringUtil.isNotEmpty(etrInfoDto.getIssueClass())
+                        && StringUtil.equals(DictCodeListExt4.新债_发行方式_报价发行.getValue(),etrInfoDto.getIssueClass())) {
+                    if(!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已撤回.getValue())
+                            && !StringUtil.equals(Item.getEntrustStatus(),BussinessDictCodeList.委托状态_已退回.getValue())
+                    ){
+                        validMessage.setMessage("只有指令状态为已撤回、已退回的指令允许修改");
+                        res.setErrorList(Arrays.asList(validMessage));
+                        return res;
+                    }
+                }else {
+                    if (StringUtil.equals(DictCodeList.一级投标中标状态_已投标, etrInfoDto.getFirstBidStatus())) {
+                        validMessage.setMessage("债券已投标，不可修改指令");
+                        res.setErrorList(Arrays.asList(validMessage));
+                        return res;
+                    }
+                    if (!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_待分发.getValue())
+                            && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_待接收.getValue())
+                            && (!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue()) &&
+                            !StringUtil.equals(etrInfoDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue()))) {
+                        validMessage.setMessage("只可对未投标债券已接收指令和待分发、待接收、已退回、已撤回的指令进行修改操作");
+                        res.setErrorList(Arrays.asList(validMessage));
+                        return res;
+                    }
+
+                }
+
             };
         }
         return new AjaxResult();

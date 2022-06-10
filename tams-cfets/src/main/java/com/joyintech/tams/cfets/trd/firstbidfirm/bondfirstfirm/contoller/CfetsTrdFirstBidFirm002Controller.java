@@ -7,10 +7,13 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.*;
@@ -74,6 +77,9 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
 
     @Autowired
     private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private JoyinbusinessCommonService joyinbusinessCommonService;
 
     /**
      * 初始化页面
@@ -391,8 +397,14 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         if (StringUtil.isNotEmpty(dto.getFinprodAbbr())) {
             finprodAbbr = "资产简称:" + dto.getFinprodAbbr();
         }
-        if (StringUtil.isNotEmpty(dto.getCounterName())) {
-            counterName = "对手方:" + dto.getCounterName();
+        if (StringUtil.isNotEmpty(dto.getCounterId())) {
+            CfetsSearchInfoRequest item = new CfetsSearchInfoRequest();
+            item.setDealType("01");
+            item.setInitValue(dto.getCounterId());
+            List<SelectOptionDto> list = joyinbusinessCommonService.queryMySideOrCount(item);
+            if (CollectionUtils.isNotEmpty(list)) {
+                counterName = "对手方:" + list.get(0).getText();
+            }
         }
         if (StringUtil.isNotEmpty(dto.getTotalBiddingNum())) {
             tradeAmt = "汇总投标券面总额:" + ArithmeticUtil.divide(dto.getTotalBiddingNum(), new BigDecimal(10000), 2, RoundingMode.HALF_UP) + "万元";
@@ -482,9 +494,14 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         processParameter.setPageId(workFlowParameter.getPageId());
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setOperationType(OperationType.REVOKE);
-        String msg = cfetsTrdFirstBidFirm002Service.start(processParameter,
-                dtos.toArray(new CfetsTrdFirstBidFirmInfoDto[dtos.size()]));
-        return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        try {
+            String msg = cfetsTrdFirstBidFirm002Service.start(processParameter,
+                    dtos.toArray(new CfetsTrdFirstBidFirmInfoDto[dtos.size()]));
+            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        } catch (Exception e) {
+            logger.error("撤销失败", e);
+            return PositionUtil.ajaxErrorReturn(e);
+        }
     }
 
 //    @ResponseBody
@@ -501,8 +518,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
 //                ar.setMessageType(MessageType.错误消息);
 //                return new Message<AjaxResult>().setData(ar);
 //            }
-//            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,
-//                    BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue());
+//            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,this.getPageId());
 //            return new Message<AjaxResult>().setData(ajaxResult);
 //        } catch (Exception e) {
 //            logger.error("风险试算", e);

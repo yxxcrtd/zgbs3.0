@@ -1068,7 +1068,7 @@ public class TrdCommonBaseService extends BaseService {
      * 金融产品交易查询
      */
     public List<MockTrdProductDealDto> selectTradedealz(Map<String, Object> map) {
-    	map.put("psList", "T01,T02,T03,T04,T05,T06,T07,T08,T09,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39,T40,T41,T42,T43,T44,T45,T46,T47,T48,T49,T50,T51,T52,T53,T54,T55,T56,T58,T59,T60,T61,T62,T63,T64,T65,T66,T98,T99");
+    	//map.put("psList", "T01,T02,T03,T04,T05,T06,T07,T08,T09,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39,T40,T41,T42,T43,T44,T45,T46,T47,T48,T49,T50,T51,T52,T53,T54,T55,T56,T58,T59,T60,T61,T62,T63,T64,T65,T66,T98,T99");
     	map.put("psList", StringUtil.splitToList(GlobalConstant.COMMA,(String)map.get("psList")));
     	map.put("isyesorno", "N");
     	return trdCommonBaseMapper.selectTradedeal(map);
@@ -1079,7 +1079,7 @@ public class TrdCommonBaseService extends BaseService {
      * 金融产品交易查询
      */
     public List<MockTrdProductDealDto> selectTradedealf(Map<String, Object> map) {
-    	map.put("psList", "C1,C10,C14,C15,C16,C17,C18,C2,C20,C3,C4,C5,C6,C7,C8,C9");
+    	//map.put("psList", "C1,C10,C14,C15,C16,C17,C18,C2,C20,C3,C4,C5,C6,C7,C8,C9");
     	map.put("psList", StringUtil.splitToList(GlobalConstant.COMMA,(String)map.get("psList")));
     	map.put("isyesorno", "N");
         return trdCommonBaseMapper.selectTradedeal(map);
@@ -1090,7 +1090,7 @@ public class TrdCommonBaseService extends BaseService {
      * 金融产品交易查询
      */
     public List<MockTrdProductDealDto> selectTradedealztn(Map<String, Object> map) {
-    	map.put("psList", "T01,T02,T03,T04,T05,T06,T07,T08,T09,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39,T40,T41,T42,T43,T44,T45,T46,T47,T48,T49,T50,T51,T52,T53,T54,T55,T56,T58,T59,T60,T61,T62,T63,T64,T65,T66,T98,T99");
+    	//map.put("psList", "T01,T02,T03,T04,T05,T06,T07,T08,T09,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39,T40,T41,T42,T43,T44,T45,T46,T47,T48,T49,T50,T51,T52,T53,T54,T55,T56,T58,T59,T60,T61,T62,T63,T64,T65,T66,T98,T99");
     	map.put("psList", StringUtil.splitToList(GlobalConstant.COMMA,(String)map.get("psList")));
     	map.put("isyesorno", "Y");
         return trdCommonBaseMapper.selectTradedeal(map);
@@ -1101,7 +1101,7 @@ public class TrdCommonBaseService extends BaseService {
      * 金融产品交易查询
      */
     public List<MockTrdProductDealDto> selectTradedealftn(Map<String, Object> map) {
-    	map.put("psList", "C1,C10,C14,C15,C16,C17,C18,C2,C20,C3,C4,C5,C6,C7,C8,C9");
+    	//map.put("psList", "C1,C10,C14,C15,C16,C17,C18,C2,C20,C3,C4,C5,C6,C7,C8,C9");
     	map.put("psList", StringUtil.splitToList(GlobalConstant.COMMA,(String)map.get("psList")));
     	map.put("isyesorno", "Y");
         return trdCommonBaseMapper.selectTradedeal(map);
@@ -1360,8 +1360,11 @@ public class TrdCommonBaseService extends BaseService {
             // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 end
             // 标准券券面总额
             BigDecimal standardSecAmount = portfolioDetail.getShareAmt().multiply(converseRadio).multiply(百元券面);
-            BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
-            portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
+            // ZGCPCN-1193:修改标准券券面总额赋值 modify by fuyongsheng 20220610 start
+            // BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
+            // portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
+            portfolioDto.setStandardSecAmount(standardSecAmount);
+            // ZGCPCN-1193:修改标准券券面总额赋值 modify by fuyongsheng 20220610 end
             // 融入券券面总额
             portfolioDto.setIntegrateSecAmount(BigDecimal.ZERO);
             portfolioDtos.add(portfolioDto);
@@ -1420,8 +1423,11 @@ public class TrdCommonBaseService extends BaseService {
         // 标准券券面总额
         BigDecimal standardSecAmount = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt().multiply(converseRadio)
                 .multiply(百元券面));
-        BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
-        portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
+        // ZGCPCN-1193:修改标准券券面总额赋值 modify by fuyongsheng 20220610 start
+//        BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
+//        portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
+        portfolioDto.setStandardSecAmount(standardSecAmount);
+        // ZGCPCN-1193:修改标准券券面总额赋值 modify by fuyongsheng 20220610 end
         // 融入券券面总额
         portfolioDto.setIntegrateSecAmount(BigDecimal.ZERO);
         portfolioDtos.add(portfolioDto);

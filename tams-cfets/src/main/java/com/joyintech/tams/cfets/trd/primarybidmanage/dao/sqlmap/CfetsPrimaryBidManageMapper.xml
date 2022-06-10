@@ -27,16 +27,20 @@
         FP.TRADE_MARKET tradeMarket,
         BO.COUNTER_ID counterId,
         MCP.COUNTER_NAME counterName,
-        BO.REMARK remark
+        BOBP.REMARK remark
         FROM BID_ORDER BO
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BOBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BOBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BOBP.BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,
+               SUM(EEBP.BID_PRIN_AMT) ENTRUST_NUM,wm_concat(hisInfo.remark) REMARK
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
+        LEFT JOIN ETR_ENTRUST_BID_PRICE EEBP ON EEBP.ENTRUST_ID = BOBP.ENTRUST_ID AND BOBP.BID_PRICE = EEBP.BID_PRICE
+        LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+        ON ee.ENTRUST_ID = hisInfo.ENTRUST_ID
         group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
@@ -166,6 +170,7 @@
         FP.TRADE_MARKET  tradeMarket,
         BO.PAY_DATE      payDate,
         BO.OUR_TRADER   trader,
+        su.REAL_NAME    traderStr,
         BO.REMARK        remark,
         BO.COUNTER_ID    counterId,
         MCP.COUNTER_NAME   counterName,
@@ -180,6 +185,7 @@
         group by BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
+        LEFT JOIN SYS_USER su ON su.USER_NAME = BO.OUR_TRADER
         WHERE BO.BID_ID = #{bidId}
      </select>
     <select id="getBidProductList" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.BidProductDto" parameterType="Map">
@@ -188,10 +194,11 @@
             BOBP.ENTRUST_ID   entrustId,
             BOBP.PORTFOLIO_ID   portfolioId,
             pp.PORTFOLIO_NAME portfolioName,
-            NVL(BOBP.THE_WIN_PRIN_AMT,TPD.SHARE_AMT) totalBidPrinamt,
-            NVL(BOBP.WIN_PRIN_AMT,TPD.SHARE_AMT) winPrinAmt,
-            BOBP.BID_PRICE        winPrice,
-            BOBP.INV_AIM   invAim
+            NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) totalBidPrinamt,
+            NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) winPrinAmt,
+            decode(FPI.TENDER_TARGET,'01',to_char(BOBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BOBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BOBP.BID_PRICE*10000,'fm999999990.90')||'BP')   winPrice,
+            BOBP.INV_AIM   invAim,
+            BO.DIP_TYPE  dipType
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN (
              select  BO.BID_ID,TPDA.ENTRUST_ID ,SUM(TPD.SHARE_AMT)/100  SHARE_AMT
@@ -206,6 +213,7 @@
             ) TPD  ON TPD.ENTRUST_ID = BOBP.ENTRUST_ID
             AND BOBP.BID_ID = TPD.BID_ID
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO pp on BOBP.PORTFOLIO_ID = pp.PORTFOLIO_ID
         WHERE BOBP.BID_ID = #{bidId}
     </select>
@@ -302,7 +310,8 @@
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
-            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP'))            winPrice,
+            BRT.WIN_PRICE           winPrice,
+            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')         winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -325,12 +334,12 @@
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BRT.COUNTER_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
-        group by BID_ID
+        group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
           FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT GROUP BY B_TRADE_ID
@@ -438,7 +447,7 @@
                 or to_char(ss.payAmt)=#{search}
                 or to_char(ss.settFeeAmt)=#{search}
                 or to_char(ss.totalBiddingNum)=#{search}
-                or to_char(ss.bidDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.bidDateStart,'YYYY-MM-DD')||'-'||to_char(ss.bidDateEnd,'YYYY-MM-DD')=#{search}
                 or to_char(ss.payDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.creditorDebtDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.listingDate,'YYYY-MM-DD')=#{search}
@@ -466,10 +475,12 @@
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,
+            BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
-        decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP'))            winPrice,
+            BRT.WIN_PRICE           winPrice,
+            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')           winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -488,12 +499,12 @@
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BRT.COUNTER_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
-        group by BID_ID
+        group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT GROUP BY B_TRADE_ID
@@ -524,10 +535,12 @@
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,
+            BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
-            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP'))           winPrice,
+            BRT.WIN_PRICE           winPrice,
+            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')    winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -546,12 +559,12 @@
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BRT.COUNTER_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
-        SELECT BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
-        group by BID_ID
+        group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
                 FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT GROUP BY B_TRADE_ID
@@ -884,7 +897,7 @@
     </select>
 
     <select id="getTrdFinProductDealTotal" resultType="com.joyintech.tams.common.base.entity.TrdFinProductDealTotal">
-        SELECT TOTLE_TRADE_ID totleTradeId
+        SELECT <include refid="com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper.Base_Column_List" />
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL
         WHERE B_TRADE_ID = #{bTradeId}
     </select>
@@ -899,6 +912,11 @@
     <select id="queryStlOrdersByTradeId" resultMap="com.joyintech.tams.common.base.dao.StlOrdersMapper.BaseResultMap">
         select <include refid="com.joyintech.tams.common.base.dao.StlOrdersMapper.Base_Column_List" />
         from STL_RDERS where TRADE_ID = #{tradeId}
+    </select>
+
+    <select id="queryStlPayOrdersByTradeId" resultMap="com.joyintech.tams.common.base.dao.StlPayOrdersMapper.BaseResultMap">
+        select <include refid="com.joyintech.tams.common.base.dao.StlPayOrdersMapper.Base_Column_List" />
+        from STL_PAY_ORDERS where TRADE_ID = #{tradeId}
     </select>
 
     <select id="queryPtlTradeByTradeId" resultMap="com.joyintech.tams.common.base.dao.PtlTradeMapper.BaseResultMap">

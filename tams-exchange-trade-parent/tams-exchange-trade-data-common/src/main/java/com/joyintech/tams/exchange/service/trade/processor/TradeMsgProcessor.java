@@ -169,10 +169,11 @@ public class TradeMsgProcessor {
     private boolean yaliFlag;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-    
+
     private AtomicInteger brokerTradeId = new AtomicInteger(0);
     private AtomicInteger localOffset = new AtomicInteger(9000);
     private static int timeZoneOffset = 0;
+
     static {
         timeZoneOffset = TimeZone.getDefault().getRawOffset();
     }
@@ -399,36 +400,34 @@ public class TradeMsgProcessor {
         // 区分委托是否是通过风控审批通过后调回的，若是则不需要再次冻结，不是则重新冻结
         if (MsgType.EXAMINE_SUCCESS == processType || frozenInstructionAndIntegratedEntrust(integratedEntrust, entrustBalance, instruction)) {
             integratedEntrust.setEntrustStatus(EntrustStatus.TOBE_REPORTED.value);
-            
-          //信用保护凭证不走交易直连，走交易登记逻辑
-            if(StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), integratedEntrust.getBusiTypeTg())) {
-            	this.integratedEntrustNonAgent(integratedEntrust);
-            	return;
+
+            //信用保护凭证不走交易直连，走交易登记逻辑
+            if (StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), integratedEntrust.getBusiTypeTg())) {
+                this.integratedEntrustNonAgent(integratedEntrust);
+                return;
             }
-            
+
             agent.integratedEntrust(integratedEntrust);
         }
     }
-    
+
     private void integratedEntrustNonAgent(IntegratedEntrust integratedEntrust) {
-    	integratedEntrust.setLocalEntrustId(genLocalId());
-    	integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
-    	int dbSaveType =  DBSaveType.SINGLE.value ;//同步更新委托状态
-    	integratedEntrustService.asyncUpdate(integratedEntrust, dbSaveType);
-    	TerminalId terminalId = new TerminalId();
+        integratedEntrust.setLocalEntrustId(genLocalId());
+        integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
+//    	int dbSaveType =  DBSaveType.SINGLE.value ;//同步更新委托状态
+//    	integratedEntrustService.asyncUpdate(integratedEntrust, dbSaveType);
+
+        TerminalId terminalId = new TerminalId();
         BeanUtils.copyProperties(integratedEntrust, terminalId);
-    	terminalId.setId(integratedEntrust.getId());
-    	integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
-    	tradeMsgReceiver.addMsg(MsgType.RESP_INTEGRATED,terminalId);
-//    	this.onRspIntegratedEntrust(terminalId);
-    	integratedEntrust.setEntrustStatus(EntrustStatus.SUCCEEDED.value);
-    	integratedEntrust.setTradedVolume(integratedEntrust.getEntrustVolume());
-    	tradeMsgReceiver.addMsg(MsgType.NOTIFY_INTEGRATED,integratedEntrust);
-//    	this.onRtnIntegratedEntrust(integratedEntrust);
-    	Trade trade = getTrade(integratedEntrust, Calendar.getInstance(), TradeType.NORMAL.value);
-    	tradeMsgReceiver.addMsg(MsgType.NOTIFY_TRADE_RECORD,trade);
-//    	this.onTrade(trade);
-    	return;
+        terminalId.setId(integratedEntrust.getId());
+        integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
+        tradeMsgReceiver.addMsg(MsgType.RESP_INTEGRATED, terminalId);
+
+        integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
+        tradeMsgReceiver.addMsg(MsgType.NOTIFY_INTEGRATED, integratedEntrust);
+
+        Trade trade = getTrade(integratedEntrust, Calendar.getInstance(), TradeType.NORMAL.value);
+        tradeMsgReceiver.addMsg(MsgType.NOTIFY_TRADE_RECORD, trade);
     }
 
     private Trade getTrade(EntrustInterface entrust, Calendar now, int tradeType) {
@@ -441,22 +440,15 @@ public class TradeMsgProcessor {
         trade.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
         trade.setEntrustBs(entrust.getEntrustBs());
         trade.setIsFullPrice(entrust.getIsFullPrice());
-        //全价
-        if (FullPriceConst.FULL_PRICE.value.equals(entrust.getIsFullPrice())) {
-            trade.setTradedPrice(entrust.getFullPrice());
-        } else {
-            trade.setTradedPrice(entrust.getEntrustPrice());
-        }
+        trade.setTradedPrice(entrust.getEntrustPrice());
+        trade.setTradedBalance(entrust.getEntrustBalance());
+        trade.setTradedVolume(entrust.getEntrustVolume());
         trade.setBsFlag(entrust.getBsFlag());
         trade.setAssetType(entrust.getAssetType());
         trade.setTradeType(tradeType);
         trade.setBrokerEntrustId(entrust.getBrokerEntrustId());
         trade.setStockName(entrust.getStockName());
         trade.setEntrustProp(entrust.getEntrustProp());
-        if (InvestAssetTypeEnum.FUTURES.value.equals(entrust.getAssetType())) {
-            trade.setOffsetFlag(entrust.getOffsetFlag());
-            trade.setHedgeFlag(entrust.getHedgeFlag());
-        }
         trade.setLocalEntrustId(entrust.getLocalEntrustId());
         trade.setEntrustId(entrust.getId());
         trade.setTradeTime(now.get(Calendar.HOUR_OF_DAY) + "" + now.get(Calendar.MINUTE) + "" + now.get(Calendar.SECOND));

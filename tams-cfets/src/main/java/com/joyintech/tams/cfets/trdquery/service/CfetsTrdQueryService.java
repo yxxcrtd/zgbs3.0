@@ -404,18 +404,17 @@ public class CfetsTrdQueryService extends BaseService{
             List<BidPortIntFenPeiInfoDto> datalist = cfetsTrdQueryMapper.findYjtbFenPeiInfoList(pageParam);
             List<BidPortIntFenPeiInfoDto> datahlist = new ArrayList<>();
             BidPortIntFenPeiInfoDto bidPortIntFenPeiInfoDto = new BidPortIntFenPeiInfoDto();
-            BigDecimal winPrice = null;
-            BigDecimal totalWinPrinAmt = null;
-            BigDecimal bidPrinAmt = null;
-            for(BidPortIntFenPeiInfoDto fenPeiInfoDto:datalist){
-                if (null!=fenPeiInfoDto.getTotalWinPrinAmt() && fenPeiInfoDto.getTotalWinPrinAmt().compareTo(BigDecimal.ONE)!=0){
-                    winPrice = ArithmeticUtil.doAdd(winPrice,fenPeiInfoDto.getWinPrice());
-                    totalWinPrinAmt= ArithmeticUtil.doAdd(totalWinPrinAmt,fenPeiInfoDto.getTotalWinPrinAmt());
-                    bidPrinAmt= ArithmeticUtil.doAdd(bidPrinAmt,fenPeiInfoDto.getBidPrinAmt());
+            Map<String, List<BidPortIntFenPeiInfoDto>> collect = datalist.stream().collect(JoyinCollectors.groupingBy(item -> item.getBidPrice()));
+            for(String bidPrice : collect.keySet()) {
+                BigDecimal totalWinPrinAmt = null;
+                BigDecimal bidPrinAmt = null;
+                for (BidPortIntFenPeiInfoDto fenPeiInfoDto : collect.get(bidPrice)) {
+                    if (null != fenPeiInfoDto.getTotalWinPrinAmt() && fenPeiInfoDto.getTotalWinPrinAmt().compareTo(BigDecimal.ONE) != 0) {
+                        totalWinPrinAmt = ArithmeticUtil.doAdd(totalWinPrinAmt, fenPeiInfoDto.getTotalWinPrinAmt());
+                        bidPrinAmt = ArithmeticUtil.doAdd(bidPrinAmt, fenPeiInfoDto.getBidPrinAmt());
+                    }
                 }
-            }
-            if (StringUtil.isNotEmpty(winPrice)){
-                bidPortIntFenPeiInfoDto.setWinPrice(winPrice);
+                bidPortIntFenPeiInfoDto.setBidPrice(bidPrice);
                 bidPortIntFenPeiInfoDto.setTotalWinPrinAmt(totalWinPrinAmt);
                 bidPortIntFenPeiInfoDto.setBidPrinAmt(bidPrinAmt);
                 datahlist.add(bidPortIntFenPeiInfoDto);
@@ -961,7 +960,7 @@ public class CfetsTrdQueryService extends BaseService{
         }
 
         //有效状态
-        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
+//        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_03", DictCodeListExt1.有效状态_撤销.getValue());
 
         //平安业务类型
@@ -1085,7 +1084,7 @@ public class CfetsTrdQueryService extends BaseService{
         }
 
         //有效状态
-        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
+//        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_03", DictCodeListExt1.有效状态_撤销.getValue());
 
 

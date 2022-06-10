@@ -1584,39 +1584,41 @@ public class EtrCommonCashPositionDealService extends BaseService {
                 BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd,wflEtrEntrustAdd );
             }
         }
-        if(StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass())&&
-                CollectionUtils.isEmpty(etrEntrustDetailList)) {
-            WflEtrEntrustDetailKey wflEtrEntrustDetailKey = new WflEtrEntrustDetailKey();
-            wflEtrEntrustDetailKey.setEntrustId(entrustId);
-            wflEtrEntrustDetailKey.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
-            List<WflEtrEntrustDetail> wflEtrEntrustDetailList = wflEtrEntrustDetailMapper.selectList(wflEtrEntrustDetailKey);
-            if(!CollectionUtils.isEmpty(etrEntrustDetailList)) {
-                etrEntrustDetailList=new ArrayList<>();
-                for(int i=0;i<wflEtrEntrustDetailList.size();i++) {
-                    EtrEntrustDetail etrEntrustDetail = new EtrEntrustDetail();
-                    BeanUtil.copyPropertiesIgnoreNull(etrEntrustDetail, wflEtrEntrustDetailList.get(i));
-                    etrEntrustDetailList.add(etrEntrustDetail);
+        if(null != etrEntrust){
+            if(StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass())&&
+                    CollectionUtils.isEmpty(etrEntrustDetailList)) {
+                WflEtrEntrustDetailKey wflEtrEntrustDetailKey = new WflEtrEntrustDetailKey();
+                wflEtrEntrustDetailKey.setEntrustId(entrustId);
+                wflEtrEntrustDetailKey.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+                List<WflEtrEntrustDetail> wflEtrEntrustDetailList = wflEtrEntrustDetailMapper.selectList(wflEtrEntrustDetailKey);
+                if(!CollectionUtils.isEmpty(etrEntrustDetailList)) {
+                    etrEntrustDetailList=new ArrayList<>();
+                    for(int i=0;i<wflEtrEntrustDetailList.size();i++) {
+                        EtrEntrustDetail etrEntrustDetail = new EtrEntrustDetail();
+                        BeanUtil.copyPropertiesIgnoreNull(etrEntrustDetail, wflEtrEntrustDetailList.get(i));
+                        etrEntrustDetailList.add(etrEntrustDetail);
+                    }
                 }
             }
-        }
-        if(StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass())){
-            for(int i=0;i<etrEntrustDetailList.size();i++) {
-                EtrEntrustDetail etrEntrustDetail =etrEntrustDetailList.get(i);
-                EtrEntrust newEtrEntrust=new EtrEntrust();
-                BeanUtil.copyPropertiesIgnoreNull(newEtrEntrust,etrEntrust);
-                etrEntrust.setPortfolioId(etrEntrustDetail.getPortfolioId());
-                etrEntrust.setEntrustNum(etrEntrustDetail.getEntrustNum());
-                etrEntrust.setEntrustAmt(etrEntrustDetail.getEntrustAmt());
+            if(StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass())){
+                for(int i=0;i<etrEntrustDetailList.size();i++) {
+                    EtrEntrustDetail etrEntrustDetail =etrEntrustDetailList.get(i);
+                    EtrEntrust newEtrEntrust=new EtrEntrust();
+                    BeanUtil.copyPropertiesIgnoreNull(newEtrEntrust,etrEntrust);
+                    etrEntrust.setPortfolioId(etrEntrustDetail.getPortfolioId());
+                    etrEntrust.setEntrustNum(etrEntrustDetail.getEntrustNum());
+                    etrEntrust.setEntrustAmt(etrEntrustDetail.getEntrustAmt());
+                    EntrustCommonDto result = new EntrustCommonDto();
+                    result.setEtrEntrust(etrEntrust);
+                    result.setEtrEntrustAdd(etrEntrustAdd);
+                    entrustCommonDtoList.add(result);
+                }
+            }else{
                 EntrustCommonDto result = new EntrustCommonDto();
                 result.setEtrEntrust(etrEntrust);
                 result.setEtrEntrustAdd(etrEntrustAdd);
                 entrustCommonDtoList.add(result);
             }
-        }else{
-            EntrustCommonDto result = new EntrustCommonDto();
-            result.setEtrEntrust(etrEntrust);
-            result.setEtrEntrustAdd(etrEntrustAdd);
-            entrustCommonDtoList.add(result);
         }
         return entrustCommonDtoList;
     }

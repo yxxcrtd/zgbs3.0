@@ -537,7 +537,8 @@ public class SecPosAutoGenerationService {
      */
     public   List<FinExercisePlan>  calculationSurplusExercise(String finprodId, String seachDate, String finprodType, String execMode, String exDate)
     {
-        String nextExDate="";//下一行权日
+        // Sonar Fix modify by huwei 220609   Introduce a new variable
+        /*String nextExDate="";//下一行权日
         if(StringUtil.equals(exDate,DictCodeList.含权债摊销日_最近赎回行权日.getValue()))
         {
             execMode=DictCodeList.行权方式_赎回.getValue();
@@ -545,7 +546,7 @@ public class SecPosAutoGenerationService {
         if(StringUtil.equals(exDate,DictCodeList.含权债摊销日_最近回售行权日.getValue()))
         {
             execMode=DictCodeList.行权方式_回售.getValue();
-        }
+        }*/
         Map<String, Object> map=new HashMap<>();
         map.put("finprodId",finprodId);
         map.put("exerciseDate",seachDate);

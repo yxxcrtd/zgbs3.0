@@ -376,6 +376,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 			return new Message<AjaxResult>().success().setData(m);
 		}
 		catch (Exception e){
+            logger.error("风险试算异常",e);
 			return new Message<AjaxResult>().fail().setMessage("风险试算异常");
 		}
 	}

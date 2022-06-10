@@ -96,6 +96,7 @@
         to_char(eea.TRANSMIT_TIME, 'hh24:mi')    transmitTimeSer,
         ee.UPDATE_TIME                           lastModifiedDate,
         ee.ENTRUST_ID                            entrustId,
+        teer.TOTLE_ID                            totleId,
         hisInfo.REMARK                                remark
         from ETR_ENTRUST ee
         left join (select listagg(t0.PORTFOLIO_ID, ',') within group (order by t0.ENTRUST_ID)   AS PORTFOLIO_ID,
@@ -153,9 +154,20 @@
         LEFT JOIN
         FIN_PRODUCT_ISSUE t3
         ON t3.FINPROD_ID = t2.FINPROD_ID
+        <where>
+            <if test="tenderTarget != null and tenderTarget != '' and winPrice != null ">
+                (#{tenderTarget} = '01' and t0.BID_PRICE*100 <![CDATA[<=]]> #{winPrice} ) or
+                (#{tenderTarget} = '02' and t0.BID_PRICE <![CDATA[>=]]> #{winPrice} ) or
+                (#{tenderTarget} = '03' and t0.BID_PRICE*10000 <![CDATA[<=]]> #{winPrice} )
+            </if>
+        </where>
         group by t0.ENTRUST_ID) bobp
         ON bobp.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN TOTAL_ETR_ENTRUST_REL teer ON teer.ENTRUST_ID  = ee.ENTRUST_ID
         where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
+        <if test="isEtrAddSearch != null and isEtrAddSearch != ''">
+            and bobp.BID_PRICE is not null
+        </if>
         order by decode(ee.ENTRUST_STATUS, '04', 2, '05', 3, '06', 4, 1) asc,fpi.ISSUE_DATE,ee.ENTRUST_DATE,eea.TRANSMIT_TIME
     </sql>
 
@@ -189,6 +201,7 @@
         T.transmitTimeSer,
         T.lastModifiedDate,
         T.entrustId,
+        T.totleId,
         T.remark,
         (nvl(T.entrustNum,0) - nvl(T.finishAmt,0)) avaNum,
         (nvl(T.entrustNum,0) - nvl(T.finishDealAmt,0)) avaDealAmt
@@ -373,10 +386,12 @@
                             WHEN bo.IS_CANCEL = 'Y' THEN '03'
                             ELSE '02' END AS effectiveStatus/*有效状态*/,
                         CASE
-                            WHEN brt.IS_WIN = 'Y' THEN '04'
-                            WHEN brt.IS_WIN = 'N' THEN '03'
-                            WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
-                            END           AS firstBidStatus/*中标状态*/,
+                        WHEN (bobrt.BID_MODLE IS NOT NULL AND bobrt.BID_MODLE = '03') OR bobrt.IS_WIN = 'Y' THEN '04'
+                        WHEN bobrt.BID_MODLE IS NULL THEN '01'
+                        WHEN bobrt.IS_WIN = 'N' THEN '03'
+                        WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
+                        ELSE '05'
+                        END AS firstBidStatus,
                         bo.BID_ID         AS bidId/*投标编号*/,
                         fp.FINPROD_ID  finprodId,
                         fp.FINPROD_MARKET_ID finprodMarketId,
@@ -457,6 +472,14 @@
                       ETR_ENTRUST ee
                       ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
                     left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
+                    LEFT JOIN (
+                    SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
+                    LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+                    LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+                    AND brt.FINPROD_ID = bo.FINPROD_ID
+                    WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+                    GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
+                    ) bobrt ON 	bobrt.FINPROD_ID = fp.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
                 <where>
                     bo.TRADE_STATUS = '01'
                     <if test="entrustId != null and entrustId != '' ">
@@ -466,11 +489,7 @@
                 </where>
                  union all
                  SELECT '01'            AS effectiveStatus/*有效状态*/,
-                        CASE
-                            WHEN brt.IS_WIN = 'Y' THEN '04'
-                            WHEN brt.IS_WIN = 'N' THEN '03'
-                            WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
-                            END         AS firstBidStatus/*中标状态*/,
+                        '01'            AS firstBidStatus/*中标状态*/,
                         bo.BID_ID       AS bidId/*投标编号*/,
                         fp.FINPROD_ID  finprodId,
                         fp.FINPROD_MARKET_ID finprodMarketId,
@@ -855,6 +874,9 @@
     group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId, T.finprodAbbr, T.tenderTarget, T.bidDateStart,
              T.bidDateEnd, T.etrBidPriceTotal, T.totalBiddingNum, T.bidprice,T.bidPriceNum,T.bidPriceAndUntil, T.biddingMethod, T.payType, T.bidCfmDate, T.tradeMarket,
              T.counterId, T.counterName, T.remark
+    <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+        order by ${pageMode.sort} ${pageMode.direction}
+    </if>
     </select>
 
     <!-- 投标 关键字 -->
@@ -919,11 +941,7 @@
              SELECT CASE
                         WHEN bo.IS_CANCEL = 'Y' THEN '03'
                         ELSE '02' END AS validStatus/*有效状态*/,
-                    CASE
-                        WHEN brt.IS_WIN = 'Y' THEN '04'
-                        WHEN brt.IS_WIN = 'N' THEN '03'
-                        WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
-                        END           AS firstBidStatus/*中标状态*/,
+                    '04'              AS firstBidStatus/*中标状态*/,
                     bo.BID_ID         AS bidId/*投标编号*/,
                      fp.FINPROD_ID finprodId,
                      fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
@@ -1052,11 +1070,7 @@
                 </if>
              union all
              SELECT '01'            AS validStatus/*有效状态*/,
-                    CASE
-                        WHEN brt.IS_WIN = 'Y' THEN '04'
-                        WHEN brt.IS_WIN = 'N' THEN '03'
-                        WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
-                        END         AS firstBidStatus/*中标状态*/,
+                    '01'            AS firstBidStatus/*中标状态*/,
                     bo.BID_ID       AS bidId/*投标编号*/,
                      fp.FINPROD_ID finprodId,
                      fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
@@ -1214,6 +1228,9 @@
              T.finprodAbbr, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice,T.bidPriceAndUntil,T.bidPriceNum, T.biddingMethod,
              T.payType, T.winPrice, T.price, T.payableAmount, T.settFeeAmt, T.payDate, T.assignRegdate, T.listingDate,
              T.bidCfmDate, T.counterName,T.remark, T.dealDate,T.tradeMarket,T.tenderTarget,T.counterId
+    <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+        order by ${pageMode.sort} ${pageMode.direction}
+    </if>
     </select>
 
     <!-- 分销买入 关键字 -->

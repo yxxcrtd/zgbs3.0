@@ -121,4 +121,9 @@ public class BatchListService<V> {
     public void setBatchListMapper(BatchListMapper<V> batchListMapper) {
         this.batchListMapper.set(batchListMapper);
     }
+
+
+    public void unload() {
+        this.batchListMapper.remove(); // Compliant
+    }
 }

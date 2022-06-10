@@ -43,10 +43,12 @@ public class ResaleRegAutoDealTask extends BatchBaseService{
         synchronized (lock1) {
             if(isRunning) {
                 while (isRunning) {
+                    // Sonar Fix modify by huwei 220609
                     try {
-                        Thread.sleep(30000);
+                        lock1.wait(30000);
                     } catch (InterruptedException e) {
                         logger.error(e.getMessage(),e);
+                        Thread.currentThread().interrupt();
                     }
                 }
                 isRunning = true;

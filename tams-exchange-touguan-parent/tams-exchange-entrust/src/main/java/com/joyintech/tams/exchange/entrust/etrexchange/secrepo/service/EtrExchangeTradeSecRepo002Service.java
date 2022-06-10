@@ -159,7 +159,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         //最新价从行情取
                         EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
                         if (hqResponse != null) {
-                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : new BigDecimal(0.00);
+                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
                             entity.setPrice(lastPrice);
                         }
                         returnList.add(entity);
@@ -191,7 +191,9 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         map.put("tradeMarket", v.getTradeMarket());
                         Map<String, BigDecimal> returnMap = etrExchangeTradeSecRepo001Service.calcPriceAndYield(map);
                         if(!Objects.isNull(returnMap) && !Objects.isNull(returnMap.get("cprice"))){
+                            BigDecimal cPrice = v.getPrice();
                             v.setPrice(returnMap.get("cprice"));
+                            v.setcPrice(cPrice);
                         }
                     };
                 });
@@ -461,8 +463,9 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                                     ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(),
-                                ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100"))), 2);
+//                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(),
+//                                ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100"))), 4).multiply(new BigDecimal("100"));
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd,r.getPositionsAmt(),4).multiply(new BigDecimal("100"));
                 r.setFloatingPL(floatPL);
 
             });

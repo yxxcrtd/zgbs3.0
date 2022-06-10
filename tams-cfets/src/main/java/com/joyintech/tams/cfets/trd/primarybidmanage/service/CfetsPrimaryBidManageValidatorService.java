@@ -115,9 +115,9 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
 //            分配明细中指令维度【实际中标券面总额】汇总>分配明细.【汇总投标券面总额】
             Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> entrustIdListMap = dto.getAllocationDetails().stream().collect(JoyinCollectors.groupingBy(CfetsPrimaryBidManageSaveDetailDto::getEntrustId));
             for (String entrustId: entrustIdListMap.keySet()){
-                BigDecimal sumActWinPrinamt = entrustIdListMap.get(entrustId).stream().map(item -> item.getActWinPrinamt()).reduce(BigDecimal.ZERO, BigDecimal::add);
+//                BigDecimal sumActWinPrinamt = entrustIdListMap.get(entrustId).stream().map(item -> item.getTheWinPrinamt()).reduce(BigDecimal.ZERO, BigDecimal::add);
                 for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()){
-                    if (sumActWinPrinamt.compareTo(detailDto.getTotalBidPrinamt())>0){
+                    if (detailDto.getActWinPrinamt().compareTo(detailDto.getTotalBidPrinamt())>0){
                         resultList.add(new ValidMessage(getMessage("中标券面总额不能大于汇总投标券面总额！")));
                         break;
                     }
@@ -146,6 +146,10 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                     BigDecimal subtract = ArithmeticUtil.subtract(dto.getAllocationDetails().get(i+1).getWinPrice(), dto.getAllocationDetails().get(i).getWinPrice());
                     if (subtract.compareTo(new BigDecimal(bidMinUnit))==0){
                         resultList.add(new ValidMessage(getMessage("中标券面总额/中标标位不满足该资产发行要求！")));
+                    }
+                    BigDecimal[] remainder = dto.getAllocationDetails().get(0).getActWinPrinamt().divideAndRemainder(new BigDecimal(bidMinUnit));
+                    if (remainder[0].compareTo(BigDecimal.ONE)!=0){
+                        resultList.add(new ValidMessage(getMessage("中标券面总额不满足该资产发行要求，请确认")));
                     }
                 }
             }

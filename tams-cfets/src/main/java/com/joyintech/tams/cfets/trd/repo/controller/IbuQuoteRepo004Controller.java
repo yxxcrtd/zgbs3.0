@@ -102,6 +102,7 @@ public class IbuQuoteRepo004Controller extends BaseController {
         model.addAttribute("PRICE_MODEL_PRM01", DictCodeListExt2.价格模式_指定价格.getValue());
         model.addAttribute("PS_03", DictCodeListExt3.交易方向_正回购.getValue());
         model.addAttribute("PS_04", DictCodeListExt3.交易方向_逆回购.getValue());
+        model.addAttribute("PS_T03", DictCodeList.交易方向_行权_回售.getValue());
         model.addAttribute("quotaPageModel", "new");
         model.addAttribute("ptlAllocations", cfetsRepoDealRegisterQuoteDto.getPtlAllocations());
         model.addAttribute("repoEntrustPledgeDtos", cfetsRepoDealRegisterQuoteDto.getRepoEntrustPledgeDtos());

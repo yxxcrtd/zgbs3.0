@@ -152,7 +152,7 @@ public class ReconciliationCommonService {
                     && ArithmeticUtil.subtract(dto.getTradeNum(), dto.getTradeNum2()).abs().compareTo(wuChaZhi) <= 0
                     && ArithmeticUtil.subtract(dto.getStampFee(), dto.getStampFee2()).abs().compareTo(wuChaZhi) <= 0
 //                        && ArithmeticUtil.subtract(dto.getOtherFeeamt(), otherFee).abs().compareTo(wuChaZhi) <= 0
-//                    && ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()).abs().compareTo(wuChaZhi) <= 0
+                    && ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()).abs().compareTo(wuChaZhi) <= 0
 //                    && ArithmeticUtil.subtract(dto.getSxfAmt(), dto.getSxfAmt2()).abs().compareTo(wuChaZhi) <= 0
                     && ArithmeticUtil.subtract(dto.getJsfAmt(), dto.getJsfAmt2()).abs().compareTo(wuChaZhi) <= 0
                     && ArithmeticUtil.subtract(dto.getZgfAmt(), dto.getZgfAmt2()).abs().compareTo(wuChaZhi) <= 0

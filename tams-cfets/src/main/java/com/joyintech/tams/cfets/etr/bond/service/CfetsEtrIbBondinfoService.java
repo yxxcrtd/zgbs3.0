@@ -1649,6 +1649,9 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             dd.setEntrustOwnNum(item.getEntrustOwnNum());
             dd.setEntrustIntegrateNum(item.getEntrustIntegrateNum());
             dd.setElementId(item.getElementId());
+            if(StringUtil.isNotEmpty(item.getEntrustId())) {
+                dd.setEntrustId(item.getEntrustId());
+            }
             //根据卖空模式对本方券和融入券/卖空购回券面总额进行赋值
             String shortSellingSupported=CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED");
             if(StringUtil.equals(shortSellingSupported,"01")){
@@ -2486,15 +2489,15 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             //更新操作日志
             // cfetsEtrIbBondinfoService.recallDelegateOprHisMethod(dto);
             // add by zhangrui1 批量撤销预占 start
-            String assetType = DictCodeList.平安资产类型_债券.getValue();
+        /*     String assetType = DictCodeList.平安资产类型_债券.getValue();
             if(StringUtil.equals(dto.getAssetType(),DictCodeList.平安资产类型_质押式回购.getValue())){
                 assetType = DictCodeList.平安资产类型_质押式回购.getValue();
             }
             if(StringUtil.equals(dto.getAssetType(),DictCodeListExt2.平安资产类型_一级市场债.getValue())){
                 assetType = DictCodeListExt2.平安资产类型_一级市场债.getValue();
             }
-            EntrustRdsCommonAop.doListPreOccupy(dtolist, assetType,
-                    BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);
+           EntrustRdsCommonAop.doListPreOccupy(dtolist, assetType,
+                    BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);*/
             // add by zhangrui1 批量撤销预占 end
             return new Message<AjaxResult>().success().setData(new AjaxResult(this.getMessage("ETR_X_001")));
 

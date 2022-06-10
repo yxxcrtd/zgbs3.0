@@ -221,7 +221,7 @@ public class DateCalForBatchService {
                 }
             }
         }
-        else if (calcMethod != null && calcMethod.equals(DictCodeList.营业日准则_向后调整.getValue())) {
+        else if (calcMethod != null && calcMethod.equals(DictCodeList.营业日准则_向前调整.getValue())) {
             startDateTemp = startDate;
             while (DateUtil.compareDate(startDateTemp, endDate) > 0) {
                 Date calcDate = naturalDateCalc(startDateTemp, periodUnit,

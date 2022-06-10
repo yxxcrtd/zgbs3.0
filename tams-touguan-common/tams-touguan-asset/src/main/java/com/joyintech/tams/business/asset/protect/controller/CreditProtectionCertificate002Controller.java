@@ -140,6 +140,14 @@ public class CreditProtectionCertificate002Controller extends BaseController {
                 if (StringUtil.isNotEmpty(entity)){
                     entity.setFinprodMarketId(entity.getFinprodMarketId()+entity.getTradeMarketId());
                 }
+            } else {
+                String finprodId = null;
+                if (StringUtil.isNotEmpty(request.getFinprodId())){
+                    finprodId = request.getFinprodId();
+                }else{
+                    finprodId = request.getFinprodMarketId();
+                }
+                entity = creditProtectionCertificate002Service.getById(finprodId);
             }
             return new Message<CreditProtectionCertificate002Dto>().success().setData(entity);
         } catch(Exception e){
