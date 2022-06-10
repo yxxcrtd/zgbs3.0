@@ -11,6 +11,7 @@
 package com.joyintech.tams.cfets.trd.bond.dto;
 
 import com.joyintech.tams.common.base.entity.RegFinProductDealTotal;
+import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
@@ -129,6 +130,13 @@ public class CfetsBondDealRegisterQuoteDto extends RegFinProductDealTotal implem
     private String finprodMarketId;
 
     private String softSkipMode;
+
+    private String rskApproval;
+
+    /**
+     * 风险试算实体类
+     */
+    private List<RiskTrialRetDto> riskTrialRetDto;
 
     public String getOperatorType() {
         return operatorType;
@@ -394,5 +402,21 @@ public class CfetsBondDealRegisterQuoteDto extends RegFinProductDealTotal implem
 
     public void setSoftSkipMode(String softSkipMode) {
         this.softSkipMode = softSkipMode;
+    }
+
+    public List<RiskTrialRetDto> getRiskTrialRetDto() {
+        return riskTrialRetDto;
+    }
+
+    public void setRiskTrialRetDto(List<RiskTrialRetDto> riskTrialRetDto) {
+        this.riskTrialRetDto = riskTrialRetDto;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
     }
 }

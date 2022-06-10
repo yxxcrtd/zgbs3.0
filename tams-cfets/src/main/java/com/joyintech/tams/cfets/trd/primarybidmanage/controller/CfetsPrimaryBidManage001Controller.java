@@ -252,7 +252,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
         if(StringUtil.isNotEmpty(dto.getBidId())) {
             WflValidInputParameter parameter = new WflValidInputParameter();
             parameter.setPageId("CfetsPrimaryBidManage002");
-            parameter.setBusinessDataPk2(dto.getBidId());
+            parameter.setBusinessDataPk1(dto.getBidId());
             if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
                 errorList.add(new ValidMessage("存在流程中中标结果维护数据，请重新选择！"));
             }
@@ -285,7 +285,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             if(StringUtil.isNotEmpty(dto.getBidId())) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("CfetsPrimaryBidManage002");
-                parameter.setBusinessDataPk2(dto.getBidId());
+                parameter.setBusinessDataPk1(dto.getBidId());
                 if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
                     errorList.add(new ValidMessage("存在流程中数据，不可进行中标结果维护！"));
                 }
@@ -349,6 +349,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             List<CfetsPrimaryBidManageSaveRequest> selectedItem = new ArrayList<>();
             for (CfetsPrimaryBidManageSaveRequest requestDto: dto.getSelectedItem()) {
                 CfetsPrimaryBidManageSaveRequest saveRequest = cfetsPrimaryBidManageService.selectBasicInfo(requestDto);
+                saveRequest.setRemark(dto.getRemark());
                 selectedItem.add(saveRequest);
             }
             dto.setSelectedItem(selectedItem);
@@ -368,7 +369,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                 return WorkFlowUtil.concatComment("中标日期"+
                         GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
                         "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
-                        +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+entity.getAllocationDetails().get(0).getBidTypeStr()+GlobalConstant.CLOSE_PARENTHESIS
+                        +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType())+GlobalConstant.CLOSE_PARENTHESIS
                         +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.multiply(entity.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100))+"%"+GlobalConstant.CLOSE_PARENTHESIS
                         +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.divide(entity.getWinPrinamt(),BigDecimal.valueOf(10000),2)+"万元"+GlobalConstant.CLOSE_PARENTHESIS);
             });

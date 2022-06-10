@@ -159,6 +159,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     @ApiModelProperty(name = "cfetsTrdFirstBidFirmEntrustDtos", value = "指令明细信息")
     private List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtos;
 
+    @ApiModelProperty(name = "totleId", value = "汇总代码：汇总指令关系表，用于指令汇总", example = "true/fasle")
+    private String totleId;
+
     public String getEntrustStatus() {
         return entrustStatus;
     }
@@ -550,5 +553,13 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     public void setOperateSide(String operateSide) {
         this.operateSide = operateSide;
+    }
+
+    public String getTotleId() {
+        return totleId;
+    }
+
+    public void setTotleId(String totleId) {
+        this.totleId = totleId;
     }
 }

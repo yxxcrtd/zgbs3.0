@@ -152,10 +152,15 @@ public class JoyinbusinessCommonService extends BaseService {
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.selectPortfolioIdList(param));
         }
         String userId = SecurityUtil.getLoginUser().getUserName();
-        if (StringUtils.isNotEmpty(userId)) {
+        if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(dto.getFinprodId()) && StringUtils.isNotEmpty(dto.getPortfolioId())) {
+            param.put("userId", userId);
+            param.put("finprodId", dto.getFinprodId());
+            param.put("portfolioId", dto.getPortfolioId());
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.selectPortfolioIdList(param));
+        } else if (StringUtils.isNotEmpty(userId)) {
             param.put("userId", SecurityUtil.getLoginUser().getUserName());
-            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.selectPortfolioIdList(param));
-        }else{
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.selectPortfolioIdList(param));
+        } else {
             return null;
         }
     }
@@ -262,6 +267,7 @@ public class JoyinbusinessCommonService extends BaseService {
     public List<SelectOptionDto> queryMySideOrCount(CfetsSearchInfoRequest dto) {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("search", dto.getSearch());
+        param.put("initValue", dto.getInitValue());
         param.put("sysDate", iPlatformDate.getSysDate());
         if (StringUtil.isNotEmpty(dto.getDateType()) && StringUtil.equals(dto.getDateType(), "01")) {
             //查询历史数据，不需要当日日期

@@ -953,6 +953,21 @@ public class EntrustUtils {
     }
 
     /**
+     * 判断是否支持零碎股交易
+     */
+    public static boolean isOddLotsTrade(String busiTypeTg, String entrustProp) {
+        //竞价交易
+        if (isNormalTrade(busiTypeTg)) {
+            return true;
+        }
+        //现券交易-匹配成交
+        if (isNewBond(busiTypeTg) && StringUtil.equals(EntrustProp.NORMAL.value, entrustProp)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 判断是否新债业务
      */
     public static boolean isNewBond(String busiTypeTg) {

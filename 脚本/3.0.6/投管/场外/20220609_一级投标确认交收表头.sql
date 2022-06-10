@@ -1,0 +1,2 @@
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"4","unit":"yuan"}' WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01FXA' AND COLCODE = 'price';
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "right","dataType":"amount","precision":"4","unit":"yuan"}' WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '01FXB' AND COLCODE = 'price';

@@ -6,14 +6,19 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalRequest;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.etr.bondfirstbid.controller.CfetsEtrBondFirstBid001Controller;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEtrRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmUndoSumRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoRequest;
@@ -21,9 +26,11 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirst
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm001Service;
+import com.joyintech.tams.component.business.riskrds.controller.InterfRiskRdsController;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.invest.common.client.ClientData;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import io.swagger.annotations.Api;
@@ -33,11 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -57,6 +60,11 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
 
     @Autowired
     private CfetsTrdFirstBidFirm001Service cfetsTrdFirstBidFirm001Service;
+    /**
+     * 风险接口组件Controller
+     */
+    @Autowired
+    private InterfRiskRdsController interfRiskRdsController;
 
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
@@ -226,6 +234,18 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         }
     }
 
+    @ApiOperation(value = "接收指令(批量)检查", notes = "接收指令(批量,key=entrustIds 传字符串用逗号隔开)")
+    @PostMapping("receiveEntrustCheck")
+    @ResponseBody
+    public Message<AjaxResult> receiveEntrustCheck(@RequestBody List<CfetsTrdBondFirstBidFirmEtrRequest> requestList) {
+        try {
+            AjaxResult result = cfetsTrdFirstBidFirm001Service.receiveEntrustCheck(requestList);
+            return new Message<AjaxResult>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("接收指令(批量)检查异常", e);
+            return new Message<AjaxResult>().fail().setMessage("接收指令(批量)检查异常");
+        }
+    }
 
     @ApiOperation(value = "接收指令(批量)", notes = "接收指令(批量,key=entrustIds 传字符串用逗号隔开)")
     @PostMapping("receiveEntrust")
@@ -239,6 +259,19 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         } catch (Exception e) {
             logger.error("接收指令(批量)异常", e);
             return new Message<AjaxResult>().fail().setMessage("接收指令(批量)异常");
+        }
+    }
+
+    @ApiOperation(value = "放弃委托(批量)检查", notes = "放弃委托(批量,key=entrustIds 传字符串用逗号隔开)")
+    @PostMapping("entrustGiveUpHandleCheck")
+    @ResponseBody
+    public Message<AjaxResult> entrustGiveUpHandleCheck(@RequestBody List<CfetsTrdBondFirstBidFirmEtrRequest> requestList) {
+        try {
+            AjaxResult result = cfetsTrdFirstBidFirm001Service.entrustGiveUpHandleCheck(requestList);
+            return new Message<AjaxResult>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("放弃委托(批量)检查异常", e);
+            return new Message<AjaxResult>().fail().setMessage("放弃委托(批量)检查异常");
         }
     }
 
@@ -307,6 +340,77 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         } catch (Exception e) {
             logger.error("分销买入查询异常", e);
             return new Message<Page<CfetsTrdFirstBidFirmDistributionInfoDto>>().fail().setMessage("分销买入查询异常");
+        }
+    }
+
+    @ResponseBody
+    @ApiOperation(value = "风险试算", notes = "风险试算")
+    @PostMapping("doRiskcal")
+    public Message<AjaxResult> doRiskcal(@RequestBody CfetsEtrIbdoRiskcalRequest dto) throws Exception {
+        try {
+            //风险试算check
+            String message = cfetsTrdFirstBidFirm001Service.doRiskcalCheckMethod(dto);
+            if (StringUtil.isNotEmpty(message)) {
+                return new Message<AjaxResult>().fail().setMessage(message);
+            }
+            CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
+            //风险试算组装dto
+            Map<String, Object> dataMap = cfetsTrdFirstBidFirm001Service.doRiskcalPackageEquity(dto);
+            List<String> resultArrList = interfRiskRdsController.doInfBatchData(dataMap, "0", "RSK002", "F01");
+            result.setRiskMathFlag("02");
+            Boolean forbidFlag = false;
+            Boolean cluflag = true;
+            List<CfetsEtribdoRiskcalResponse> resultlist = new ArrayList<>();
+            if (!StringUtil.isEmptyList(resultArrList)) {
+                for (String row : resultArrList) {
+                    ClientData resultArr = JsonUtils.json2Object(row, ClientData.class);
+                    if (StringUtil.isNotEmpty(resultArr) && StringUtil.isNotEmpty(resultArr.getHead())
+                            && StringUtil.isNotEmpty(resultArr.getHead().get("std400msgt"))
+                    ) {
+                        if (StringUtil.equals(resultArr.getHead().get("std400msgt"), "E")) {
+                            return new Message<AjaxResult>().fail().setMessage(resultArr.getHead().get("stdrtninfo").toString());
+                        }
+                    }
+                    if (!StringUtil.isNotEmpty(resultArr) || !StringUtil.isNotEmpty(resultArr.getBody())
+                            || !StringUtil.isNotEmpty(resultArr.getBody().get("RSK_LIST"))
+                            || !StringUtil.isNotEmpty(resultArr.getBody().get("rskStatus"))) {
+                        return new Message<AjaxResult>().success().setMessage("无");
+                    }
+                    List<Map<String, Object>> riskList = (List<Map<String, Object>>) resultArr.getBody().get("RSK_LIST");
+                    for (Map<String, Object> map : riskList) {
+                        if (StringUtil.equals(map.get("kriStatus"), "0") && !StringUtil.equals(map.get("kriTrend"), "向好")) {
+                            forbidFlag = true;
+                        }
+                        map.put("kriStatusCn", cfetsTrdFirstBidFirm001Service.getKriStatusCnByKriStatus(map.get("kriStatus").toString()));
+                        resultlist.add(BeanUtil.mapToObject(map, CfetsEtribdoRiskcalResponse.class));
+                    }
+                    result.setRiskcalReturnList(resultlist);
+                    result.setStdrtninfo(resultArr.getHead().get("stdrtninfo").toString());
+                    //当置为不通过时就不再进来了
+                    if (cluflag) {
+                        if (!StringUtil.equals(resultArr.getBody().get("rskStatus"), "3")) {
+                            if (StringUtil.equals(resultArr.getBody().get("rskStatus"), "4") && forbidFlag) {
+                                cluflag = false;
+                                resultArr.getBody().put("rskStatus", "3");
+                                result.setRskStatus("3");
+                            }
+                        } else {
+                            cluflag = false;
+                        }
+                        if (!cluflag) {
+                            result.setRiskTrialSpan("试算不通过");
+                        } else {
+                            result.setRiskTrialSpan("试算通过");
+                        }
+                    }
+                }
+            }
+            AjaxResult m = new AjaxResult();
+            m.setData(result);
+            return new Message<AjaxResult>().success().setData(m);
+        } catch (Exception e) {
+            logger.error("风险试算异常", e);
+            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
         }
     }
 
