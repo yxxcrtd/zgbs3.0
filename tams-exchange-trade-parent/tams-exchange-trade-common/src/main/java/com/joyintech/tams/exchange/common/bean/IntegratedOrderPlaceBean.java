@@ -68,35 +68,13 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     @ApiModelProperty(required = true, name = "entrustType", value = "委托类型")
     private String entrustType;
 
-//    @ApiModelProperty(required = true, name = "entrustProp", value = "委托属性")
-//    private String entrustProp;
-
     @ApiModelProperty(required = true, name = "entrustBs", value = "交易方向")
     private String entrustBs;
 
     @ApiModelProperty(required = true, name = "bsFlag", value = "买卖标志")
     private String bsFlag;
 
-//    @ApiModelProperty(required = true, name = "entrustVolume", value = "委托数量")
-//    @Digits(integer = 20, fraction = 0)
-//    private long entrustVolume;
-
-//    @ApiModelProperty(required = true, name = "entrustPrice", value = "委托价格")
-//    @Digits(integer = 20, fraction = 4)
-//    @JsonSerialize(using = DoubleSerializerUtils.class)
-//    private BigDecimal entrustPrice;
-
-//    @ApiModelProperty(required = true, name = "fullPrice", value = "全价价格")
-//    @Digits(integer = 20, fraction = 4)
-//    @JsonSerialize(using = DoubleSerializerUtils.class)
-//    private BigDecimal fullPrice;
-
-//    @ApiModelProperty(required = true, name = "entrustBalance", value = "委托金额")
-//    @Digits(integer = 20, fraction = 4)
-//    @JsonSerialize(using = DoubleSerializerUtils.class)
-//    private BigDecimal entrustBalance;
-
-    @ApiModelProperty(required = true, name = "discount", value = "质押券折算比例")
+    @ApiModelProperty(required = true, name = "discount", value = "质押券折算比例（协议回购）")
     @Digits(integer = 10, fraction = 4)
     @JsonSerialize(using = DoubleSerializerUtils.class)
     private BigDecimal discount;
@@ -128,7 +106,7 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称")
     private String propSeatName;
 
-    // 协商成交使用 --start
+    // 协商成交、协议回购使用 --start
     @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
     @Size(max = 32)
     private String tradeId;
@@ -167,7 +145,7 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
 
     @ApiModelProperty(required = true, name = "propOwnerType", value = "对手方报价所有者类型")
     private String propOwnerType;
-    // 协商成交使用 --end
+    // 协商成交、协议回购使用 --end
 
     @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号")
     private String contractId;
@@ -277,8 +255,12 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     @ApiModelProperty(required = true, name = "operateUser", value = "操作人员ID 执行撤销异常委托操作人员ID")
     private String operateUser;
 
-//    @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
-//    private String softSkipMode;
+    @ApiModelProperty( name = "execId", value = "执行编号")
+    private String execId;
+
+    @ApiModelProperty( name = "conformOrRefuse", value = "确认或拒绝：conform-确认，refuse-拒绝")
+    private String conformOrRefuse;
+
 
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
@@ -308,14 +290,6 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
         this.id = id == null ? null : id.trim();
     }
 
-//    public String getSoftSkipMode() {
-//		return softSkipMode;
-//	}
-//
-//	public void setSoftSkipMode(String softSkipMode) {
-//		this.softSkipMode = softSkipMode;
-//	}
-
     public String getParentOrderId() {
         return parentOrderId;
     }
@@ -323,14 +297,6 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     public void setParentOrderId(String parentOrderId) {
         this.parentOrderId = parentOrderId == null ? null : parentOrderId.trim();
     }
-
-//    public String getInstructionId() {
-//        return instructionId;
-//    }
-//
-//    public void setInstructionId(String instructionId) {
-//        this.instructionId = instructionId == null ? null : instructionId.trim();
-//    }
 
     public String getPortfolioId() {
         return portfolioId;
@@ -420,14 +386,6 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
         this.entrustType = entrustType == null ? null : entrustType.trim();
     }
 
-//    public String getEntrustProp() {
-//        return entrustProp;
-//    }
-//
-//    public void setEntrustProp(String entrustProp) {
-//        this.entrustProp = entrustProp == null ? null : entrustProp.trim();
-//    }
-
     public String getEntrustBs() {
         return entrustBs;
     }
@@ -443,38 +401,6 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     public void setBsFlag(String bsFlag) {
         this.bsFlag = bsFlag == null ? null : bsFlag.trim();
     }
-
-//    public long getEntrustVolume() {
-//        return entrustVolume;
-//    }
-//
-//    public void setEntrustVolume(long entrustVolume) {
-//        this.entrustVolume = entrustVolume;
-//    }
-//
-//    public BigDecimal getEntrustPrice() {
-//        return entrustPrice;
-//    }
-//
-//    public void setEntrustPrice(BigDecimal entrustPrice) {
-//        this.entrustPrice = entrustPrice;
-//    }
-//
-//    public BigDecimal getFullPrice() {
-//        return fullPrice;
-//    }
-//
-//    public void setFullPrice(BigDecimal fullPrice) {
-//        this.fullPrice = fullPrice;
-//    }
-//
-//    public BigDecimal getEntrustBalance() {
-//        return entrustBalance;
-//    }
-//
-//    public void setEntrustBalance(BigDecimal entrustBalance) {
-//        this.entrustBalance = entrustBalance;
-//    }
 
     public BigDecimal getDiscount() {
         return discount;
@@ -914,5 +840,21 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
 
     public void setPropOwnerType(String propOwnerType) {
         this.propOwnerType = propOwnerType;
+    }
+
+    public String getExecId() {
+        return execId;
+    }
+
+    public void setExecId(String execId) {
+        this.execId = execId;
+    }
+
+    public String getConformOrRefuse() {
+        return conformOrRefuse;
+    }
+
+    public void setConformOrRefuse(String conformOrRefuse) {
+        this.conformOrRefuse = conformOrRefuse;
     }
 }

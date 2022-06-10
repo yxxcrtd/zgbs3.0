@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 @ApiModel(value = "我收到的协议回购行情请求报文", description = "我收到的协议回购行情请求报文")
 public class RepurchaseQuoteReceiveRequest {
     @ApiModelProperty(required = true, name = "instructionId", value = "指令编号", example = "FUND000121")
-    @NotBlank(message = "指令编号不能为空")
     private String instructionId;
 
     @ApiModelProperty(name = "requestNo", value = "请求编号")
@@ -20,7 +19,7 @@ public class RepurchaseQuoteReceiveRequest {
     private String origSerialNo;
     @ApiModelProperty(name = "account", value = "本方资金账户")
     private String account;
-    @ApiModelProperty(name = "requestType", value = "请求类型")
+    @ApiModelProperty(name = "requestType", value = "请求类型： 首期-F,到期续做-X,解除质押-C,中途换券-H,提前购回-Z")
     private String requestType;
     @ApiModelProperty(name = "stockCode", value = "质押券")
     private String stockCode;

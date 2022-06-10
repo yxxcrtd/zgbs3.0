@@ -54,6 +54,11 @@ public class PositionRequestBaseBean {
      */
     private BigDecimal cashAmount;
 
+    /**
+     * 融入券券面总额
+     */
+    private BigDecimal integrateSecAmount;
+
 
     public PositionRequestBaseBean() {
     }
@@ -128,5 +133,13 @@ public class PositionRequestBaseBean {
 
     public void setOwnSecAmount(BigDecimal ownSecAmount) {
         this.ownSecAmount = ownSecAmount;
+    }
+
+    public BigDecimal getIntegrateSecAmount() {
+        return integrateSecAmount;
+    }
+
+    public void setIntegrateSecAmount(BigDecimal integrateSecAmount) {
+        this.integrateSecAmount = integrateSecAmount;
     }
 }
