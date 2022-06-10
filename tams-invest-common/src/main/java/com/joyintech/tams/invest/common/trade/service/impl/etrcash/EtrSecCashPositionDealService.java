@@ -465,7 +465,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         if (DictCodeList.持仓类型_实际.equals(持仓类型)) {
             etrCashPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
             // 有委托
-            if (StringUtil.isNotEmpty(entrustId)) {
+            /*if (StringUtil.isNotEmpty(entrustId)) {
                 // 现金流水dto处理
                 // 交割日增加交易金额
                 etrCashPositionFlowDto.setAmount(交割日增加交易金额);
@@ -481,7 +481,11 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 etrCashPositionFlowDto.setAmount(交割日增加交易金额);
                 // 添加现金流水到目标dto
                 etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
-            }
+            }*/
+            // 交割日增加交易金额
+            etrCashPositionFlowDto.setAmount(交割日增加交易金额);
+            // 添加现金流水到目标dto
+            etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
         }
         // 交易提交
         if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) {
@@ -617,7 +621,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         if (DictCodeList.持仓类型_实际.equals(持仓类型)) {
             etrCashPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
             // 有委托
-            if (StringUtil.isNotEmpty(entrustId)) {
+           /* if (StringUtil.isNotEmpty(entrustId)) {
                 // 现金流水dto处理
                 // 交割日增加交易金额
                 etrCashPositionFlowDto.setAmount(交割日增加交易金额);
@@ -633,7 +637,11 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 etrCashPositionFlowDto.setAmount(交割日增加交易金额);
                 // 添加现金流水到目标dto
                 etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
-            }
+            }*/
+            // 交割日增加交易金额
+            etrCashPositionFlowDto.setAmount(交割日增加交易金额);
+            // 添加现金流水到目标dto
+            etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
         }
         // 交易提交
         if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) {

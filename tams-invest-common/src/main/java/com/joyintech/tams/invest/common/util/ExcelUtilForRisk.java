@@ -211,7 +211,7 @@ public class ExcelUtilForRisk {
         int index = 0;
         char[] chars = column.toUpperCase().toCharArray();
         for (int i = 0; i < chars.length; i++ ) {
-            index += (chars[i] - 'A' + 1) * (int)Math.pow(26, chars.length - i - 1);
+            index += (chars[i] - 'A' + 1) * (int)Math.pow(26, chars.length - i - (double)1);
         }
         return index;
     }
@@ -329,9 +329,9 @@ public class ExcelUtilForRisk {
         File newfile = new File(newFilePath);
         try {
             if (newfile.exists()){
-                newfile.delete();
+                if(!newfile.delete()){}
             }
-            file.renameTo(newfile); // 修改文件名
+            if(file.renameTo(newfile)){} // 修改文件名
         } catch (Exception err) {
             err.printStackTrace();
             return false;
