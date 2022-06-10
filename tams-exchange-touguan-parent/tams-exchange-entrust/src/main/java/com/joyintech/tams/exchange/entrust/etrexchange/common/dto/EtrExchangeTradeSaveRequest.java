@@ -778,7 +778,7 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
         if(!CollectionUtils.isEmpty(tradeMultiPtl001Dtos)){
             tradeMultiPtl001Dtos.stream().forEach(item->{
                 if(StringUtil.equals(item.getIsMulti(), DictCodeList.是否_是.getValue())) {
-                    item.setEntrustId(item.getEntrustId()+"-"+item.getPortfolioId());
+                    item.setEntrustId(this.getEntrustId()+"-"+item.getPortfolioId());
                 }
             });
         }
