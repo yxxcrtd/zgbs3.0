@@ -541,8 +541,11 @@
     <select id = "selectIsIssueAsset" resultType="java.lang.Integer">
         SELECT count(1)
         FROM FIN_PRODUCT FP
-  INNER JOIN FIN_PRODUCT_ADD FPA
+        INNER JOIN FIN_PRODUCT_ADD FPA
           ON FPA.APPEAR_MARKET_ID = FP.FINPROD_MARKET_ID
+        INNER JOIN FIN_PRODUCT FPB
+                ON FPA.FINPROD_ID = FPB.FINPROD_ID
+               AND FPB.ISSUE_TYPE = '01'
         WHERE FP.FINPROD_ID = #{finprodId}
     </select>
 
@@ -1091,13 +1094,13 @@
     </select>
 
     <select id="getSearchTabInfoQueryOperate" resultType="com.joyintech.tams.business.asset.bond.dto.SearchInfoOperateListResponse">
-        SELECT distinct rownum SEQ_NO,t.* from (select
+        SELECT distinct row_number() over( order by ORDER_TIME) SEQ_NO,t.* from (select
                his.ENTRUST_ID,
                FP.FINPROD_ABBR,
                his.OPER_TYPE,
                to_char( his.OPER_DATE, 'yyyy-MM-dd' ) OPER_DATE,
                to_char( his.OPER_TIME, 'hh24:mi:ss' ) OPER_TIME,
-               his.BUSI_DES,
+               his.BUSI_DES, his.OPER_TIME ORDER_TIME,
                CASE WHEN his.OPER_TYPE = '01' THEN
                         nvl(SU2.real_name,nvl(SUR.REAL_NAME,SUB.REAL_NAME))
                     ELSE SU.real_name
@@ -1112,7 +1115,7 @@
                     LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
            WHERE his.entrust_id = #{entrustId}
              AND his.BUSINESS_TYPE = #{busiType}
-             AND FP.FINPROD_TYPE = 'F01') t order by t.OPER_TIME desc
+             AND FP.FINPROD_TYPE = 'F01') t order by t.ORDER_TIME desc
     </select>
 
     <select id="getfinAssetRateAdjByProductId"   resultType="com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse">
