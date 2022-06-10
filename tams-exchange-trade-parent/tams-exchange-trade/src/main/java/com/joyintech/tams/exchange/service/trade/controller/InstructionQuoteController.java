@@ -7,6 +7,7 @@ import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.Repurch
 import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
 import com.joyintech.tams.exchange.common.request.QueryTickRequest;
+import com.joyintech.tams.exchange.common.request.RepurchaseQuoteSendRequest;
 import com.joyintech.tams.exchange.service.trade.management.service.IntegratedQuoteManagement;
 import com.joyintech.tams.exchange.util.MasterUtil;
 import io.swagger.annotations.Api;
@@ -166,11 +167,11 @@ public class InstructionQuoteController {
 
     @ApiOperation(value = "我收到的协议回购行情接口", notes = "我收到的协议回购行情接口")
     @PostMapping(value = "/entrust/integrated/repurchaseQuoteReceive")
-    public Message queryRepurchaseQuoteReceive(@RequestBody @Validated RepurchaseQuoteReceiveRequest bean) {
+    public Message queryRepurchaseQuoteReceive(@RequestBody @Validated RepurchaseQuoteReceiveRequest request) {
         if (!MasterUtil.isMaster()) {
-            return MasterUtil.postForObject(bean);
+            return MasterUtil.postForObject(request);
         }
-        return new Message(integratedQuoteManagement.queryRepurchaseQuoteReceive(bean));
+        return new Message(integratedQuoteManagement.queryRepurchaseQuoteReceive(request));
     }
 
     /**
@@ -187,7 +188,7 @@ public class InstructionQuoteController {
 
     @ApiOperation(value = "我发起的协议回购行情接口", notes = "我发起的协议回购行情接口")
     @PostMapping(value = "/entrust/integrated/repurchaseQuoteSend")
-    public Message queryRepurchaseQuoteSend(@RequestBody @Validated EntrustQueryRequest request) {
+    public Message queryRepurchaseQuoteSend(@RequestBody @Validated RepurchaseQuoteSendRequest request) {
         if (!MasterUtil.isMaster()) {
             return MasterUtil.postForObject(request);
         }

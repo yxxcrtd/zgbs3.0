@@ -6,8 +6,10 @@ import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
 import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
 import com.joyintech.tams.exchange.common.constant.ActionIn;
+import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.db.domain.Account;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
@@ -121,7 +123,21 @@ public class QuoteJob {
     private List<RepurchaseQuoteReceiveResponse> queryRepurchaseQuoteReceive(Account account) {
         logger.debug("查询我收到的协议回购报价行情 ==> 【accountId = {}】", account.getId());
 
-        List<RepurchaseQuoteReceiveResponse> list = terminalHelper.sendRepurchaseQuoteReceive( null, account.getId(), 1000);
+        RepurchaseQuoteReceiveQryRequest request = new RepurchaseQuoteReceiveQryRequest();
+        request.setAccountId(account.getId());
+        request.setPageSize(1000);
+
+        List<RepurchaseQuoteReceiveResponse> list = ListUtil.list(false);
+        if (StrUtil.isEmpty(request.getMarket())) {
+            // 未指定交易场所时，需分别请求上海和深圳
+            request.setMarket(Market.SHSE.getCode());
+            list.addAll(terminalHelper.sendRepurchaseQuoteReceive(request));
+
+            request.setMarket(Market.SZSE.getCode());
+            list.addAll(terminalHelper.sendRepurchaseQuoteReceive(request));
+        } else {
+            list.addAll(terminalHelper.sendRepurchaseQuoteReceive(request));
+        }
         list.forEach(item -> {
             item.setBrokerId(account.getBrokerId());
             item.setBrokerName(account.getBrokerName());

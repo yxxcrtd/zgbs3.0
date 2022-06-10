@@ -20,6 +20,7 @@ import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.RepoTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
+import com.joyintech.tams.exchange.common.request.RepurchaseQuoteSendRequest;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TickConverter;
@@ -366,7 +367,7 @@ public class IntegratedQuoteManagement {
      * @param request 查询条件对象
      * @return 我发起的协议回购行情
      */
-    public ResultBean queryRepurchaseQuoteSend(EntrustQueryRequest request) {
+    public ResultBean queryRepurchaseQuoteSend(RepurchaseQuoteSendRequest request) {
         ResultBean resultBean = entrustManagement.queryIntegratedEntrust(request.getUserId(),
                 request.getInstructionId(), request.getAccountId(), request.getOrderId());
         if (ErrorCode.isFail(resultBean.getErrorCode()) || ObjectUtil.isEmpty(resultBean.getData())) {

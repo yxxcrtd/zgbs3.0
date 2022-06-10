@@ -7,7 +7,6 @@ import org.hibernate.validator.constraints.NotBlank;
 @ApiModel(value = "质押式协议回购行情请求报文", description = "质押式协议回购行情请求报文")
 public class IntegratedRepurchaseQuoteQryBean {
     @ApiModelProperty(required = true, name = "instructionId", value = "指令编号", example = "FUND000121")
-    @NotBlank(message = "指令编号不能为空")
     private String instructionId;
 
     @ApiModelProperty(required = true, name = "actionIn", value = "行情类别（0-公开行情，1-非公开行情）", example = "1")
