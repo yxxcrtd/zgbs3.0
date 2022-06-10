@@ -255,6 +255,12 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     @ApiModelProperty(required = true, name = "operateUser", value = "操作人员ID 执行撤销异常委托操作人员ID")
     private String operateUser;
 
+    @ApiModelProperty( name = "origStockCode", value = "换出债券")
+    private String origStockCode;
+
+    @ApiModelProperty( name = "origEntrustVolume", value = "换出债券数量")
+    private long origEntrustVolume;
+
     @ApiModelProperty( name = "execId", value = "执行编号")
     private String execId;
 
@@ -856,5 +862,21 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
 
     public void setConformOrRefuse(String conformOrRefuse) {
         this.conformOrRefuse = conformOrRefuse;
+    }
+
+    public String getOrigStockCode() {
+        return origStockCode;
+    }
+
+    public void setOrigStockCode(String origStockCode) {
+        this.origStockCode = origStockCode;
+    }
+
+    public long getOrigEntrustVolume() {
+        return origEntrustVolume;
+    }
+
+    public void setOrigEntrustVolume(long origEntrustVolume) {
+        this.origEntrustVolume = origEntrustVolume;
     }
 }

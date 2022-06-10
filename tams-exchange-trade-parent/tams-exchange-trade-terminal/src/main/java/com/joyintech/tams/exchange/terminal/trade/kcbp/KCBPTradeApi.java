@@ -620,8 +620,8 @@ public class KCBPTradeApi {
             parameters.put("orderqtyin", String.valueOf(integratedEntrust.getEntrustVolume()));//质押委托数量 2C初始交易和2Q换券申报换入质押券
         }
         if (StringUtil.equals(bsFlag, "2Q")) {
-            parameters.put("stkcodeout", integratedEntrust.getStockCode());//解押证券代码 2Q换券申报换出质押券
-            parameters.put("orderqtyout", String.valueOf(integratedEntrust.getEntrustVolume()));//解押委托数量 2Q换券申报换出质押券
+            parameters.put("stkcodeout", integratedEntrust.getOrigStockCode());//解押证券代码 2Q换券申报换出质押券
+            parameters.put("orderqtyout", String.valueOf(integratedEntrust.getOrigEntrustVolume()));//解押委托数量 2Q换券申报换出质押券
         }
 
         parameters.put("stkpropin", "");//质押股份性质 2C初始交易和2Q换券申报换入质押券 00:无限售流通股 01:首发后限售股
@@ -717,10 +717,9 @@ public class KCBPTradeApi {
                 parameters.put("orderRestrictions", "Y");//到期续作类型 N:非第三方续做  Y:第三方续做
             }
         }
-        parameters.put("companyoperid", integratedEntrust.getSellerNo());//本方交易员代码
-        // 借用字段
-        parameters.put("taroperid", integratedEntrust.getLiaisonTel());//对手方交易员代码
-        parameters.put("tarcompany", integratedEntrust.getPropSeatNo());//对手方交易商代码
+        parameters.put("companyoperid", integratedEntrust.getTradeId());//本方交易员代码
+        parameters.put("taroperid", integratedEntrust.getPropTradeId());//对手方交易员代码
+        parameters.put("tarcompany", integratedEntrust.getPropDealerId());//对手方交易商代码
         parameters.put("tradedate", integratedEntrust.getFirstSettleDate());//初始交易日期
         if (StringUtil.isNotEmpty(integratedEntrust.getOrigSerialNo())) {
             parameters.put("tradematchcode", integratedEntrust.getOrigSerialNo());//成交编号
@@ -741,7 +740,6 @@ public class KCBPTradeApi {
         // 初始交易2C 换券申报2Q 填写
         parameters.put("orderqty", String.valueOf(integratedEntrust.getEntrustVolume()));//委托数量
         //初始交易2C、到期续做2K 填写
-        //
         parameters.put("orderamt", String.valueOf(integratedEntrust.getEntrustBalance()));//融资金额
         // 初始交易2C、到期续做2K 填写
         parameters.put("ghdays", String.valueOf(integratedEntrust.getCompactTerm()));//回购天数
@@ -755,15 +753,10 @@ public class KCBPTradeApi {
                 parameters.put("orderRestrictions", "Y");//到期续作类型 N:非第三方续做  Y:第三方续做
             }
         }
-        // 借用liaisonTel
-        parameters.put("companyoperid", integratedEntrust.getSellerNo());//本方交易员代码
-        // ContractId
-        parameters.put("taroperid", integratedEntrust.getLiaisonTel());//对手方交易员代码
-        // PropSeatNo
-        parameters.put("tarcompany", integratedEntrust.getPropSeatNo());//对手方交易商代码
-        // FirstSettleDate
+        parameters.put("companyoperid", integratedEntrust.getTradeId());//本方交易员代码
+        parameters.put("taroperid", integratedEntrust.getPropTradeId());//对手方交易员代码
+        parameters.put("tarcompany", integratedEntrust.getPropDealerId());//对手方交易商代码
         parameters.put("tradedate", integratedEntrust.getFirstSettleDate());//初始交易日期
-        // OrigSerialNo
         if (!Strings.isNullOrEmpty(integratedEntrust.getOrigSerialNo())) {
             parameters.put("tradematchcode", integratedEntrust.getOrigSerialNo());//成交编号
         }
