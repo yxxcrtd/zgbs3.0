@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 中标结果维护分配明细
@@ -264,5 +265,25 @@ public class CfetsPrimaryBidManageSaveDetailDto {
 
     public void setBobpId(String bobpId) {
         this.bobpId = bobpId;
+    }
+
+    private Date bidDate;
+
+    private String bidId;
+
+    public Date getBidDate() {
+        return bidDate;
+    }
+
+    public void setBidDate(Date bidDate) {
+        this.bidDate = bidDate;
+    }
+
+    public String getBidId() {
+        return bidId;
+    }
+
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
     }
 }
