@@ -921,7 +921,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     @PostMapping("findUnOpenQuotaPage")
     public Message<Page<EtrExchangeUnOpenQuota002Dto>> findUnOpenQuotaPage(@RequestBody EtrExchangeUnOpenQuotaRequestDto request) {
 
-        return new Message<Page<EtrExchangeUnOpenQuota002Dto>>(etrExchangeAgreRepTrade002Service.findUnOpenQuotaPage(request));
+        return new Message<Page<EtrExchangeUnOpenQuota002Dto>>(etrExchangeAgreRepTrade002Service.findUnOpenQuotaPageNew(request));
     }
 
     /**

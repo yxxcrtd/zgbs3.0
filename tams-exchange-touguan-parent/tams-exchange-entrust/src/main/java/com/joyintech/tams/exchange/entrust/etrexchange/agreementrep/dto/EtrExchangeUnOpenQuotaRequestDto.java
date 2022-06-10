@@ -34,8 +34,6 @@ public class EtrExchangeUnOpenQuotaRequestDto {
 
     @ApiModelProperty(name="pageMode",value="分页对象",example="{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
-
-    @ApiModelProperty(name="requestId",value="请求编号",example="A1")
     private String requestId;
 
     @ApiModelProperty(name="bussType",value="业务类型",example="A1")
@@ -46,6 +44,32 @@ public class EtrExchangeUnOpenQuotaRequestDto {
 
     @ApiModelProperty(name="search",value="关键字",example="A1")
     private String search;
+
+
+    @ApiModelProperty(name = "requestNo", value = "请求编号")
+    private String requestNo;
+    @ApiModelProperty(name = "origSerialNo", value = "初始交易编号")
+    private String origSerialNo;
+    @ApiModelProperty(name = "account", value = "本方资金账户")
+    private String account;
+    @ApiModelProperty(name = "requestType", value = "请求类型： 首期-F,到期续做-X,解除质押-C,中途换券-H,提前购回-Z")
+    private String requestType;
+    @ApiModelProperty(name = "stockCode", value = "质押券")
+    private String stockCode;
+    @ApiModelProperty(name = "pledgeNumber", value = "质押数量")
+    private BigDecimal pledgeNumber;
+    @ApiModelProperty(name = "repoAmount", value = "回购金额")
+    private BigDecimal repoAmount;
+    @ApiModelProperty(name = "compactTerm", value = "回购期限")
+    private Integer compactTerm;
+    @ApiModelProperty(name = "repoRate", value = "回购利率")
+    private BigDecimal repoRate;
+    @ApiModelProperty(name = "settleAmount", value = "结算金额")
+    private BigDecimal settleAmount;
+    @ApiModelProperty(name = "firstSettleDate", value = "首次结算日")
+    private String firstSettleDate;
+    @ApiModelProperty(name = "remark", value = "补充协议")
+    private String remark;
 
     public String getBussType() {
         return bussType;
@@ -63,13 +87,6 @@ public class EtrExchangeUnOpenQuotaRequestDto {
         this.zyj = zyj;
     }
 
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
 
     public PageMode getPageMode() {
         return pageMode;
@@ -85,5 +102,111 @@ public class EtrExchangeUnOpenQuotaRequestDto {
 
     public void setSearch(String search) {
         this.search = search;
+    }
+
+
+    public String getRequestNo() {
+        return requestNo;
+    }
+
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
+    }
+
+    public String getOrigSerialNo() {
+        return origSerialNo;
+    }
+
+    public void setOrigSerialNo(String origSerialNo) {
+        this.origSerialNo = origSerialNo;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
+    }
+
+    public String getStockCode() {
+        return stockCode;
+    }
+
+    public void setStockCode(String stockCode) {
+        this.stockCode = stockCode;
+    }
+
+    public BigDecimal getPledgeNumber() {
+        return pledgeNumber;
+    }
+
+    public void setPledgeNumber(BigDecimal pledgeNumber) {
+        this.pledgeNumber = pledgeNumber;
+    }
+
+    public BigDecimal getRepoAmount() {
+        return repoAmount;
+    }
+
+    public void setRepoAmount(BigDecimal repoAmount) {
+        this.repoAmount = repoAmount;
+    }
+
+    public Integer getCompactTerm() {
+        return compactTerm;
+    }
+
+    public void setCompactTerm(Integer compactTerm) {
+        this.compactTerm = compactTerm;
+    }
+
+    public BigDecimal getRepoRate() {
+        return repoRate;
+    }
+
+    public void setRepoRate(BigDecimal repoRate) {
+        this.repoRate = repoRate;
+    }
+
+    public BigDecimal getSettleAmount() {
+        return settleAmount;
+    }
+
+    public void setSettleAmount(BigDecimal settleAmount) {
+        this.settleAmount = settleAmount;
+    }
+
+    public String getFirstSettleDate() {
+        return firstSettleDate;
+    }
+
+    public void setFirstSettleDate(String firstSettleDate) {
+        this.firstSettleDate = firstSettleDate;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

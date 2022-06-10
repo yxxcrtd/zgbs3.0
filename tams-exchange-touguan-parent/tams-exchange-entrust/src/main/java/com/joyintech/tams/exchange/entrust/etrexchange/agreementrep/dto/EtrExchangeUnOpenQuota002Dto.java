@@ -14,6 +14,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.systemtools.util.SysDatadictUtil;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 
@@ -122,18 +123,33 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      */
     private String tradeId;
     /**
-     * 发起方交易员代码
+     * 本方交易员代码
      */
     private String sponsorTraderCode;
 
     /**
-     * 发起方交易商代码
+     * 本方方交易商代码
      */
     private String sponsorDealerCode;
-    /**
-     * 本方交易员
-     */
+    @ApiModelProperty(name = "traderCode", value = "本方交易员")
     private String traderCode;
+    @ApiModelProperty(name = "memberId", value = "本方交易商")
+    private String memberId;
+    @ApiModelProperty(name = "investorId", value = "本方交易主体（深交所展示，否则为空）")
+    private String investorId;
+    @ApiModelProperty(name = "investorType", value = "本方交易主体类型（深交所展示，否则为空）")
+    private String investorType;
+
+    @ApiModelProperty(name = "cpTraderCode", value = "对手方交易员")
+    private String cpTraderCode;
+    @ApiModelProperty(name = "cpMemberId", value = "对手方交易商")
+    private String cpMemberId;
+    @ApiModelProperty(name = "cpInvestorId", value = "对手方交易主体（深交所展示，否则为空）")
+    private String cpInvestorId;
+    @ApiModelProperty(name = "cpInvestorType", value = "对手方交易主体类型（深交所展示，否则为空）")
+    private String cpInvestorType;
+    @ApiModelProperty(name = "cpClientName", value = "对手方客户名称")
+    private String cpClientName;
     /**
      * 补充协议
      */
@@ -388,5 +404,69 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
 
     public void setOrigPledgeStampName(String origPledgeStampName) {
         this.origPledgeStampName = origPledgeStampName;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorType() {
+        return investorType;
+    }
+
+    public void setInvestorType(String investorType) {
+        this.investorType = investorType;
+    }
+
+    public String getCpTraderCode() {
+        return cpTraderCode;
+    }
+
+    public void setCpTraderCode(String cpTraderCode) {
+        this.cpTraderCode = cpTraderCode;
+    }
+
+    public String getCpMemberId() {
+        return cpMemberId;
+    }
+
+    public void setCpMemberId(String cpMemberId) {
+        this.cpMemberId = cpMemberId;
+    }
+
+    public String getCpInvestorId() {
+        return cpInvestorId;
+    }
+
+    public void setCpInvestorId(String cpInvestorId) {
+        this.cpInvestorId = cpInvestorId;
+    }
+
+    public String getCpInvestorType() {
+        return cpInvestorType;
+    }
+
+    public void setCpInvestorType(String cpInvestorType) {
+        this.cpInvestorType = cpInvestorType;
+    }
+
+    public String getCpClientName() {
+        return cpClientName;
+    }
+
+    public void setCpClientName(String cpClientName) {
+        this.cpClientName = cpClientName;
     }
 }
