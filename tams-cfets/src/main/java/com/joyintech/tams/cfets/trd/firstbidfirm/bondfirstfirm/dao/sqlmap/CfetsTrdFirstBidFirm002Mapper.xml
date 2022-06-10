@@ -31,6 +31,7 @@
         <result property="winPrice" column="winPrice" jdbcType="DECIMAL"/>
         <result property="price" column="price" jdbcType="DECIMAL"/>
         <result property="intAmt" column="intAmt" jdbcType="DECIMAL"/>
+        <result property="tradeAmt" column="tradeAmt" jdbcType="DECIMAL"/>
         <result property="settFeeAmt" column="settFeeAmt" jdbcType="DECIMAL"/>
         <result property="remark" column="remark" jdbcType="VARCHAR"/>
         <result property="adjustStrategy" column="adjustStrategy" jdbcType="VARCHAR"/>
@@ -332,6 +333,7 @@
                bo.PAY_TYPE       AS payType/*缴款方式*/,
                bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
+               bo.TRADE_AMT   AS tradeAmt/*交易金额*/,
                case
                    when fpi.TENDER_TARGET = '01' then bo.WIN_PRICE * 100
                    when fpi.TENDER_TARGET = '02' then bo.WIN_PRICE
@@ -420,6 +422,7 @@
                bo.PAY_TYPE       AS payType/*缴款方式*/,
                bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
+               bo.TRADE_AMT   AS tradeAmt/*交易金额*/,
                case
                    when fpi.TENDER_TARGET = '01' then bo.WIN_PRICE * 100
                    when fpi.TENDER_TARGET = '02' then bo.WIN_PRICE
