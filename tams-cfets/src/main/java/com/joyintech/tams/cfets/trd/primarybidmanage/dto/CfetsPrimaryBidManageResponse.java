@@ -188,7 +188,7 @@ public class CfetsPrimaryBidManageResponse {
     }
 
     public String getBidDate() {
-        return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) + "-"
+        return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) + "~"
               +DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN);
     }
 

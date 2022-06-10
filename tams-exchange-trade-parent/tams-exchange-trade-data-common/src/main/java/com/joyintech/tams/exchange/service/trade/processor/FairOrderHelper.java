@@ -172,7 +172,7 @@ public class FairOrderHelper {
     }
 
     public boolean createFairOrder(Order order, Instruction instruction) {
-        // 判断order是否要做公平交易
+        logger.info("{createFairOrder()】 判断order是否要做公平交易：instructionId", instruction.getEntrustId());
         if (!Strings.isNullOrEmpty(order.getAlgorithmId())
                 || !EntrustUtils.isFairOrder(order.getEntrustProp())
                 || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
@@ -183,18 +183,21 @@ public class FairOrderHelper {
         ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
 
         PortfolioAllocationResponse portfolioAllocationResponse = Convert.convert(PortfolioAllocationResponse.class, resultBean.getData());
-        List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
-        Map<String, List<Instruction>> instructionMap = instructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
-        if (instructionMap.size() <= 1) {
-            // 走普通委托
-            return false;
-        }
-
         if (StrUtil.isNotEmpty(portfolioAllocationResponse.getInfoLevel())
                 && portfolioAllocationResponse.getInfoLevel().equals("1")) {
             logger.info("fair order failed");
             order.setOrderStatus(OrderStatus.STOP.value);
             return true;
+        }
+
+        List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
+        if (CollectionUtils.isEmpty(instructions)) {
+            return false;
+        }
+        Map<String, List<Instruction>> instructionMap = instructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
+        if (instructionMap.size() <= 1) {
+            // 走普通委托
+            return false;
         }
 
         long totoleNum = instructions.stream().map(Instruction::getTermDays).reduce(BigDecimal.ZERO, BigDecimal::add).longValue();
