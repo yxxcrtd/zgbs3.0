@@ -418,7 +418,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue())
                         && StringUtil.equals(entrustDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue())
                         && StringUtil.isEmpty(counterId)) {
-                    if (StringUtil.isEmpty(counterName) && StringUtil.isNotEmpty(entrustDto.getCounterName())
+                    if (StringUtil.isNotEmpty(counterName) && StringUtil.isNotEmpty(entrustDto.getCounterName())
                             && !StringUtil.equals(counterName, entrustDto.getCounterName())) {
                         counterOnlyFlag = false;
                     }
