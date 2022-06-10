@@ -995,10 +995,10 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             //汇总数据维度（新债标的OR投标日OR指令状态）
             Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMap = inList.stream()
                     .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getEntrustStatus()));
-            if (!counterIsNullMap.isEmpty() && counterIsNullMap.size() > 1) {
-                errorList.add(new ValidMessage("所选指令不满足汇总条件：【新债标的OR投标日OR交易对手OR指令状态】不同"));
-                return errorList;
-            }
+//            if (!counterIsNullMap.isEmpty() && counterIsNullMap.size() > 1) {
+//                errorList.add(new ValidMessage("所选指令不满足汇总条件：【新债标的OR投标日OR交易对手OR指令状态】不同"));
+//                return errorList;
+//            }
 
             List<CfetsTrdFirstBidFirmEntrustDto> counterIdList = inList.stream().filter(x -> StringUtil.isNotEmpty(x.getCounterId()))
                     .collect(Collectors.toList());
@@ -1013,7 +1013,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
                 if (CollectionUtils.isNotEmpty(counterIdIsNullList)) {
                     String loginUserId = LoginUserUtil.getUserName();
                     for (CfetsTrdFirstBidFirmEntrustDto dto : counterIdIsNullList) {
-                        cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(dto.getEntrustId(), loginUserId);
+                        undoSumSave(dto, this.SUM_FLAG_02);
                     }
                 }
             }
