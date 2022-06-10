@@ -256,6 +256,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
      * @throws Exception
      */
     private void handleTradeInfo(TrdTempDto trdTempDto,InfContractDetailfile infContractDetailfile) throws Exception{
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infContractDetailfile.getEntrustId());
+        if(etrEntrust != null){
+            trdTempDto.setEntrustBussType(etrEntrust.getEntrustType());
+        }
         if(DictCodeListExt3.交易方向_质押券入库.getValue().equals(infContractDetailfile.getPs())
                 || DictCodeListExt3.交易方向_质押券出库.getValue().equals(infContractDetailfile.getPs())) {
             //标准券入出库成交数据接入：
@@ -280,7 +284,6 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 logger.info("【成交数据预清算-基金结束】tradePreClearing entrustId: {}, seqno: {}",
                         infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
             } else {
-                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infContractDetailfile.getEntrustId());
                 // TrdTempDto trdTempDto = null;
                 if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())
                         || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {

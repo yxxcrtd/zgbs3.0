@@ -17,8 +17,11 @@ import com.joyintech.tams.component.business.trade.dto.BussTrdTransfenpeiDto;
 import com.joyintech.tams.component.business.trade.dto.TrdInvestPersonInfo002Dto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.position.dto.PositionBaseData;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -1172,5 +1175,16 @@ public class TrdTempDto extends TrdProductDeal{
 
 	public void setFinDealPledgeList(List<FinDealPledge> finDealPledgeList) {
 		this.finDealPledgeList = finDealPledgeList;
+	}
+
+	@ApiModelProperty(required = false, name = "entrustBussType", value = "指令业务类型")
+	private String entrustBussType;
+
+	public String getEntrustBussType() {
+		return entrustBussType;
+	}
+
+	public void setEntrustBussType(String entrustBussType) {
+		this.entrustBussType = entrustBussType;
 	}
 }

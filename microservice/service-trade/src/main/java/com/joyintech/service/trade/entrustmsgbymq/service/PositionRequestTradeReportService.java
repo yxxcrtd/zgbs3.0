@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeList.是否_否;
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
 /**
@@ -319,6 +320,17 @@ public class PositionRequestTradeReportService {
         // resultMap.put("totalTradeId", null);
         resultMap.put("bTotalTradeId", null);
 
+        //IF 下单对应的指令.指令业务类型 = 数据字典.指令业务类型.协议回购中途换券指令-换钱 THEN 数据字典.换券方式.02 换钱 ELSE 数据字典.换券方式.01 换券
+        if (交易方向_中途换券.getValue().equals(entity.getPs())) {
+            if (上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType())) {
+                resultMap.put(BOND_EXCHANGE_TYPE, "02");
+            } else {
+                resultMap.put(BOND_EXCHANGE_TYPE, "01");
+            }
+        } else {
+            resultMap.put(BOND_EXCHANGE_TYPE, null);
+        }
+
         Map<String,Object> paraMap = new HashMap<>();
         paraMap.put("fTradeId", entity.getfTradeId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
@@ -345,12 +357,18 @@ public class PositionRequestTradeReportService {
                     || DictCodeListExt3.交易方向_提前购回.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_到期购回.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())
+                    || (交易方向_中途换券.getValue().equals(entity.getPs()) && 上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType()))
             ){
                 Map<String, Object> ptlCash = new HashMap<>();
                 ptlCash.put("portfolioId", dto.getPortfolioId());
                 if(DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())){
-                    ptlCash.put("cashAcctId", this.getPtlCapAcctNo(etrEntrust));
-                    ptlCash.put("cashAmount", entity.getPositionBaseData().getFinTradeProductDto().getmTradeAmt());
+//                    ptlCash.put("cashAcctId", this.getPtlCapAcctNo(etrEntrust));
+                    ptlCash.put("cashAcctId", dto.getCashAcctId());
+                    if(StringUtil.equals(entity.getTradeMarket(),交易场所_上海证券交易所.getValue())){
+                        ptlCash.put("cashAmount", BigDecimal.ZERO);
+                    }else {
+                        ptlCash.put("cashAmount", entity.getPositionBaseData().getFinTradeProductDto().getmTradeAmt());
+                    }
                 }
                 // ZGTFCP-2114:到期购回、提前购回登录当前交易的到期结算金额 modify by fuyongsheng 20220327 start
                 else if(DictCodeListExt3.交易方向_到期购回.getValue().equals(entity.getPs()) || DictCodeListExt3.交易方向_提前购回.getValue().equals(entity.getPs())){

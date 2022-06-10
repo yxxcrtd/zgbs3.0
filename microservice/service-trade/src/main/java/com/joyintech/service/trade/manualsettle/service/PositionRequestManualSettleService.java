@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeList.是否_否;
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
 @Service
@@ -339,17 +340,23 @@ public class PositionRequestManualSettleService {
                 || DictCodeListExt3.交易方向_首期.getValue().equals(infContractDetailfile.getPs())
                 || DictCodeListExt3.交易方向_提前购回.getValue().equals(infContractDetailfile.getPs())
                 || (DictCodeListExt3.交易方向_到期购回.getValue().equals(infContractDetailfile.getPs()))
-                || (DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs()))) {
+                || (DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs()))
+                || (交易方向_中途换券.getValue().equals(infContractDetailfile.getPs()) && 上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrEntrust.getEntrustType()))) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             Map<String, Object> map = new HashMap<>();
             map.put("portfolioId", entity.getPortfolioId());
             if(DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())){
-                map.put("cashAcctId", getPtlCapAcctNo(infContractDetailfile));
+//                map.put("cashAcctId", getPtlCapAcctNo(infContractDetailfile));
+                map.put("cashAcctId", infContractDetailfile.getAcctNo());
                 // 查询首期交易信息
                 // ZGTFCP-2097:需要查询首期 modif by fuyongsheng 20220329 start
                 FinTradeProduct finTradeProduct = getSqFinTradeProduct(infContractDetailfile);
                 // ZGTFCP-2097:需要查询首期 modif by fuyongsheng 20220329 end
-                map.put("cashAmount", finTradeProduct != null ? finTradeProduct.getmTradeAmt() : new BigDecimal(0));
+                if(StringUtil.equals(entity.getTradeMarket(),交易场所_上海证券交易所.getValue())){
+                    map.put("cashAmount", BigDecimal.ZERO);
+                }else {
+                    map.put("cashAmount", finTradeProduct != null ? finTradeProduct.getmTradeAmt() : new BigDecimal(0));
+                }
             }
             // ZGTFCP-2045:到期购回需要登录首期的到期结算金额 modify by fuyongsheng 20220327 start
             else if(DictCodeListExt3.交易方向_到期购回.getValue().equals(infContractDetailfile.getPs())
