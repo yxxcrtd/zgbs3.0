@@ -202,19 +202,21 @@ public class Rsk011Service extends EventBaseService<Rsk002InEntity> {
                 occupyCodeStr + GlobalConstant.COLON + PRE_OCCUPY);
             setAllOcpVal(preOcpParam);
             // add by zhangrui 有预占的实占试算 end
-          // 取得日历信息
-          ICalendar calendar = getCalendar((String)mapData.get(CALENDAR_ID));
-          // 匹配风险事件
-          List<IEvent> eveList = getEvent(mapData, calendar);
-          // 若风险事件不存在，则试算通过
-          // 触发的风险事件,不计算指标,则试算通过
-          if (StringUtil.isEmptyList(eveList) ||!isCalcIndicator(eveList)) {
-              // 试算通过
-              response.setBodyField(RSKSTATUS, BussinessDictCodeListRds.指标状态_通过.getValue());
-              response.setBodyField(RSK_LIST, new ArrayList<>());
-              getLogger().info(LOG_INFO_EVENT);
-              continue;
-          }
+            // 取得日历信息
+            ICalendar calendar = getCalendar((String) mapData.get(CALENDAR_ID));
+            // 匹配风险事件
+            List<IEvent> eveList = getEvent(mapData, calendar);
+            // 若风险事件不存在，则试算通过
+            // 触发的风险事件,不计算指标,则试算通过
+            List<IEvent> eveList1 = new ArrayList();
+            eveList1.addAll(eveList);
+            if (StringUtil.isEmptyList(eveList1) || !isCalcIndicator(eveList1)) {
+                // 试算通过
+                response.setBodyField(RSKSTATUS, BussinessDictCodeListRds.指标状态_通过.getValue());
+                response.setBodyField(RSK_LIST, new ArrayList<>());
+                getLogger().info(LOG_INFO_EVENT);
+                continue;
+            }
           
           // 从风险事件列表中取出相关的参数列表
           Set<String> paraIdList = getParamIdList(eveList);

@@ -224,7 +224,7 @@
     </select>
 
     <select id="selectEntInfoByIdAndDate" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto">
-        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId,counterName , entrustId
+        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId,counterName , entrustId , entrustIdKey
         from (
                  select ee.ENTRUST_STATUS entrustStatus,
                         CASE
@@ -252,7 +252,8 @@
                             END AS        issueDateEnd/*投标日 结束*/,
                         ee.COUNTER_ID     counterId,
                         mcp.COUNTER_NAME                         counterName,
-                        ee.ENTRUST_ID     entrustId
+                        ee.ENTRUST_ID     entrustId,
+                        teer.TOTLE_ID entrustIdKey
                  from ETR_ENTRUST ee
                           left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID = ee.COUNTER_ID
                           LEFT JOIN (
@@ -266,6 +267,7 @@
                      GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID, bobp.ENTRUST_ID
                  ) bobrt ON bobrt.FINPROD_ID = ee.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
                           left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
+                          left join TOTAL_ETR_ENTRUST_REL teer on ee.ENTRUST_ID = teer.ENTRUST_ID
                  where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
                    and ee.FINPROD_ID = #{finprodId}
                    and not exists(
@@ -291,6 +293,9 @@
                    <if test="counterId != null and counterId != ''">
                        and ee.COUNTER_ID = #{counterId}
                    </if>
+                    <if test="totleId != null and totleId != ''">
+                        and teer.TOTLE_ID = #{totleId}
+                    </if>
                    )
         where issueDateEnd = #{issueDateEnd} and issueDateStart = #{issueDateStart}
     </select>
