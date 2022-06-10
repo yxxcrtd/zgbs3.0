@@ -480,7 +480,7 @@ public class IntegratedQuoteManagement {
         }
 
         // 到期购回
-        else if (PsEnum.REPO_MATURITY.codeEquals(ps)) {
+/*        else if (PsEnum.REPO_MATURITY.codeEquals(ps)) {
             baseRepurchaseQuoteSendResponse.setRequestType(RepoTypeEnum.REPO_MATURITY.getCode());
 
             fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse);
@@ -488,7 +488,7 @@ public class IntegratedQuoteManagement {
             DQGHRepurchaseQuoteSendResponse sendResponse = (DQGHRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
 
             sendResponse.setCompactTerm(entrust.getCompactTerm());
-        }
+        }*/
 
         // 到期续做
         else if (PsEnum.REPO_RENEW.codeEquals(ps)) {
