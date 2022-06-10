@@ -480,9 +480,14 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         processParameter.setPageId(workFlowParameter.getPageId());
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setOperationType(OperationType.REVOKE);
-        String msg = cfetsTrdBondFirstSub002Service.start(processParameter,
-                cfetsTrdBondFirstSubInfoDtos.toArray(new CfetsTrdBondFirstSubInfoDto[cfetsTrdBondFirstSubInfoDtos.size()]));
-        return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        try {
+            String msg = cfetsTrdBondFirstSub002Service.start(processParameter,
+                    cfetsTrdBondFirstSubInfoDtos.toArray(new CfetsTrdBondFirstSubInfoDto[cfetsTrdBondFirstSubInfoDtos.size()]));
+            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        } catch (Exception e) {
+            logger.error("当日申购撤销失败", e);
+            return PositionUtil.ajaxErrorReturn(e);
+        }
     }
 
     @ResponseBody
