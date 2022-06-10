@@ -398,6 +398,10 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
 
+    @ApiModelProperty( name = "origStockCode", value = "换出债券")
+    private String origStockCode;
+    @ApiModelProperty( name = "origEntrustVolume", value = "换出债券数量")
+    private long origEntrustVolume;
     @ApiModelProperty( name = "execId", value = "执行编号")
     private String execId;
     @ApiModelProperty( name = "conformOrRefuse", value = "确认或拒绝：conform-确认，refuse-拒绝")
@@ -1213,5 +1217,21 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setConformOrRefuse(String conformOrRefuse) {
         this.conformOrRefuse = conformOrRefuse;
+    }
+
+    public String getOrigStockCode() {
+        return origStockCode;
+    }
+
+    public void setOrigStockCode(String origStockCode) {
+        this.origStockCode = origStockCode;
+    }
+
+    public long getOrigEntrustVolume() {
+        return origEntrustVolume;
+    }
+
+    public void setOrigEntrustVolume(long origEntrustVolume) {
+        this.origEntrustVolume = origEntrustVolume;
     }
 }
