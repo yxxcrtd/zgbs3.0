@@ -28,6 +28,9 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFi
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
+import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealQuoteCommonDto;
+import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealRegisterQuoteDto;
+import com.joyintech.tams.cfets.trd.repo.dto.RepoPtlAllocationDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
@@ -59,6 +62,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_行权回售;
@@ -244,7 +248,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             }
             return map;
         }
-        // 银行间回购指令
+        // 银行间质押式回购-指令
         if (obj instanceof CfetsEtribRepoInfo003Dto || obj instanceof CfetsEtrRepoSaveRequest || StringUtil.equals(pageId, "CfetsEtrIbRepoinfo003")){
             CfetsEtribRepoInfo003Dto dto = JsonUtils.json2Object(businessJson, CfetsEtribRepoInfo003Dto.class);
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, "REPO001")
@@ -257,6 +261,22 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("isCheck", isCheck)
                     .put("data", dto);
         }
+        // 银行间质押式回购-对话/请求登记、对话报价（上行）check
+        if (obj instanceof CfetsRepoDealQuoteCommonDto || obj instanceof CfetsRepoDealRegisterQuoteDto || StringUtil.equals(pageId, "IbuQuoteRepo004")) {
+            CfetsRepoDealRegisterQuoteDto dto = JsonUtils.json2Object(businessJson, CfetsRepoDealRegisterQuoteDto.class);
+            // 排除对话报价成交check（共用了CfetsRepoDealQuoteCommonDto实体）
+            if (!StringUtil.equals(dto.getOperatorType(),"done")){
+                return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, "REPO001")
+                        .put(NodeConfigConstant.BUSI_ACT, 业务动作_交易登记.getValue())
+                        .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                        .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                        .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_质押式回购首期.getValue())
+                        .put("tradePlace", 交易场所_银行间.getValue())
+                        .put("ps", dto.getPs())
+                        .put("isCheck", isCheck)
+                        .put("data", dto);
+            }
+        }
         return null;
     }
 
@@ -266,7 +286,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
     public RiskCommonOutputDto buildParamThenRisk(Object obj, String decisionAct, String flowStatus, String pageId) {
         BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, true, pageId);
         RiskCommonInputDto inputDto = getRiskInputParam(map);
-        if (inputDto == null) return null;
+        if (inputDto == null) return new RiskCommonOutputDto();
         return doRisk(inputDto);
     }
 
@@ -289,6 +309,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @return
      */
     public RiskCommonInputDto getRiskInputParam(BaseMap param) {
+        if (Objects.isNull(param)){
+            return null;
+        }
         RiskNodeConfigDtl dtl = riskNodeConfigService.getNodeConfig(param);
         if (dtl == null) return null;
         Boolean isCheck = param.get("isCheck") == null ? false : (Boolean) param.get("isCheck");
@@ -395,6 +418,13 @@ public class RiskInputParamSerivce extends RiskCommonService {
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, businessDto.getEtrInvestRepoInfoDtos(), null);
         }
+        // 银行间质押式回购登记
+        if (data instanceof CfetsRepoDealRegisterQuoteDto){
+            CfetsRepoDealRegisterQuoteDto businessDto = (CfetsRepoDealRegisterQuoteDto) data;
+            InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
+            riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, businessDto.getPtlAllocations(), null);
+        }
         if (CollectionUtils.isNotEmpty(list)) {
             List<InterfRiskRdsDto> result = new ArrayList<>();
             list.forEach(e -> result.add(BeanUtil.mapToObject(e, InterfRiskRdsDto.class)));
@@ -481,6 +511,18 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 result.add(inputDto);
             });
         }
+        if (data instanceof CfetsRepoDealRegisterQuoteDto){
+            // 银行间回购登记
+            CfetsRepoDealRegisterQuoteDto businessDto = (CfetsRepoDealRegisterQuoteDto) data;
+            // 组合分配信息
+            List<RepoPtlAllocationDto> list = businessDto.getPtlAllocations();
+            //这里处理授信
+            list.forEach(item -> {
+                CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
+                this.generateInputDto(inputDto, businessDto,item);
+                result.add(inputDto);
+            });
+        }
         return result;
     }
 
@@ -510,6 +552,13 @@ public class RiskInputParamSerivce extends RiskCommonService {
         } else if (data instanceof CfetsEtribRepoInfo003Dto){
             // 银行间回购指令
             CfetsEtribRepoInfo003Dto businessDto = (CfetsEtribRepoInfo003Dto) data;
+            listDto.setCounterId(businessDto.getCounterId());
+            listDto.setInputValue1(DictCodeList.平安资产类型_质押式回购.getValue());
+            listDto.setInputValue2(DictCodeList.回购类型_质押式回购.getValue());
+            listDto.setInputValue3(businessDto.getPs());
+        } else if (data instanceof CfetsRepoDealRegisterQuoteDto){
+            // 银行间回购指令
+            CfetsRepoDealRegisterQuoteDto businessDto = (CfetsRepoDealRegisterQuoteDto) data;
             listDto.setCounterId(businessDto.getCounterId());
             listDto.setInputValue1(DictCodeList.平安资产类型_质押式回购.getValue());
             listDto.setInputValue2(DictCodeList.回购类型_质押式回购.getValue());
@@ -586,7 +635,15 @@ public class RiskInputParamSerivce extends RiskCommonService {
             dto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
             dto.setTradeMarket(交易场所_银行间.getValue());
             dto.setPs(businessDto.getPs());
-        }  else {
+        }  else if (data instanceof CfetsRepoDealRegisterQuoteDto){
+            // 银行间回购指令
+            CfetsRepoDealRegisterQuoteDto businessDto = (CfetsRepoDealRegisterQuoteDto) data;
+            dto.setCounterId(businessDto.getCounterId());
+            dto.setPrinAmt(businessDto.getTradeAmt());
+            dto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+            dto.setTradeMarket(交易场所_银行间.getValue());
+            dto.setPs(businessDto.getPs());
+        } else {
             Map<String, Object> map = BeanUtil.object2Map(data);
             dto.setCounterId((String) map.get("counterId"));
             dto.setPrinAmt((BigDecimal) map.get("tradeAmt"));
@@ -764,7 +821,25 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 creditLinesInputDto.setSaleCode(inputDto.getPs());
                 creditLinesInputDto.setPs(DictCodeList.交易方向_买入.getValue());
                 creditLinesInputDto.setCounterId(inputDto.getCounterId());
-                creditLinesInputDto.setTradeAmt(inputDto.getEntrustAmt());
+                creditLinesInputDto.setTradeAmt(item.getEntrustAmt());
+            }
+        }
+        if (obj instanceof CfetsRepoDealRegisterQuoteDto){
+            CfetsRepoDealRegisterQuoteDto inputDto = (CfetsRepoDealRegisterQuoteDto) obj;
+            RepoPtlAllocationDto item = (RepoPtlAllocationDto) detailObj;
+            if (StringUtil.equals(DictCodeList.回购拆借方向_逆回购.getValue(),inputDto.getPs())) {
+                creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
+                // 指令编号+组合代码
+                creditLinesInputDto.setTradeId(inputDto.getTotleTradeId() + "-" + item.getPortfolioId());
+                creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
+                creditLinesInputDto.setTradeDate(inputDto.getTradeDate());
+                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+                creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
+                creditLinesInputDto.setPsPayment(inputDto.getRepoType());
+                creditLinesInputDto.setSaleCode(inputDto.getPs());
+                creditLinesInputDto.setPs(DictCodeList.交易方向_买入.getValue());
+                creditLinesInputDto.setCounterId(inputDto.getCounterId());
+                creditLinesInputDto.setTradeAmt(item.getTradeAmt());
             }
         }
     }

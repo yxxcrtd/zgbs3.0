@@ -897,7 +897,7 @@
     </select>
 
     <select id="getTrdFinProductDealTotal" resultType="com.joyintech.tams.common.base.entity.TrdFinProductDealTotal">
-        SELECT TOTLE_TRADE_ID totleTradeId
+        SELECT <include refid="com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper.Base_Column_List" />
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL
         WHERE B_TRADE_ID = #{bTradeId}
     </select>
@@ -912,6 +912,11 @@
     <select id="queryStlOrdersByTradeId" resultMap="com.joyintech.tams.common.base.dao.StlOrdersMapper.BaseResultMap">
         select <include refid="com.joyintech.tams.common.base.dao.StlOrdersMapper.Base_Column_List" />
         from STL_RDERS where TRADE_ID = #{tradeId}
+    </select>
+
+    <select id="queryStlPayOrdersByTradeId" resultMap="com.joyintech.tams.common.base.dao.StlPayOrdersMapper.BaseResultMap">
+        select <include refid="com.joyintech.tams.common.base.dao.StlPayOrdersMapper.Base_Column_List" />
+        from STL_PAY_ORDERS where TRADE_ID = #{tradeId}
     </select>
 
     <select id="queryPtlTradeByTradeId" resultMap="com.joyintech.tams.common.base.dao.PtlTradeMapper.BaseResultMap">

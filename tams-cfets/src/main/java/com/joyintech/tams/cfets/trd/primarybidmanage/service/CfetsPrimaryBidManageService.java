@@ -355,7 +355,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     if (StringUtil.isNotEmpty(trdFinProductDealTotalR)) {
                         trdFinProductDealTotalMapper.updateByPrimaryKey(trdFinProductDealTotal);
                     } else {
-                        trdFinProductDealTotalMapper.insert(trdFinProductDealTotal);
+                        trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
                     }
                     // 根据汇总交易编号查询金融产品交易
                     List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
