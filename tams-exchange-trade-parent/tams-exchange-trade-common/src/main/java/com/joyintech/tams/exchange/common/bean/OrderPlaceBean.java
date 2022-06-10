@@ -12,9 +12,6 @@ import java.math.BigDecimal;
 public class OrderPlaceBean extends BaseOrderRequest implements Serializable {
     private static final long serialVersionUID = 5892155368791512437L;
 
-//    @ApiModelProperty(required = true, name = "instructionId", value = "指令编号", example = "W000111")
-//    private String instructionId;
-
     @ApiModelProperty(required = true, name = "portfolioId", value = "组合代码", example = "Z000111")
     private String portfolioId;
 
@@ -36,20 +33,11 @@ public class OrderPlaceBean extends BaseOrderRequest implements Serializable {
     @ApiModelProperty(required = true, name = "stockCode", value = "证券代码", example = "000001.SZ")
     private String stockCode;
 
-//    @ApiModelProperty(required = false, name = "entrustProp", value = "委托属性", example = "0")
-//    private String entrustProp;
-
     @ApiModelProperty(required = true, name = "entrustBs", value = "交易方向", example = "1")
     private String entrustBs;
 
-//    @ApiModelProperty(required = false, name = "entrustVolume", value = "委托数量", example = "1000")
-//    private long entrustVolume;
-
-//    @ApiModelProperty(required = false, name = "entrustPrice", value = "净价价格", example = "2.34")
-//    private BigDecimal entrustPrice;
-
-//    @ApiModelProperty(required = false, name = "fullPrice", value = "全价价格", example = "2.34")
-//    private BigDecimal fullPrice;
+    @ApiModelProperty( name = "entrustNum", value = "试算数量", example = "1000")
+    private long entrustNum;
 
     @ApiModelProperty(required = false, name = "yield", value = "收益率", example = "2.34")
     private BigDecimal yield;
@@ -62,25 +50,6 @@ public class OrderPlaceBean extends BaseOrderRequest implements Serializable {
 
     @ApiModelProperty(required = false, name = "hedgeFlag", value = "套期保值标志", example = "1")
     private String hedgeFlag;
-    
-//    @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
-//    private String softSkipMode;
-
-//    public String getSoftSkipMode() {
-//		return softSkipMode;
-//	}
-//
-//	public void setSoftSkipMode(String softSkipMode) {
-//		this.softSkipMode = softSkipMode;
-//	}
-//
-//	public String getInstructionId() {
-//        return instructionId;
-//    }
-//
-//    public void setInstructionId(String instructionId) {
-//        this.instructionId = instructionId;
-//    }
 
     public String getPortfolioId() {
         return portfolioId;
@@ -138,30 +107,6 @@ public class OrderPlaceBean extends BaseOrderRequest implements Serializable {
         this.stockCode = stockCode;
     }
 
-//    public long getEntrustVolume() {
-//        return entrustVolume;
-//    }
-//
-//    public void setEntrustVolume(long entrustVolume) {
-//        this.entrustVolume = entrustVolume;
-//    }
-//
-//    public BigDecimal getEntrustPrice() {
-//        return entrustPrice;
-//    }
-//
-//    public void setEntrustPrice(BigDecimal entrustPrice) {
-//        this.entrustPrice = entrustPrice;
-//    }
-//
-//    public BigDecimal getFullPrice() {
-//        return fullPrice;
-//    }
-//
-//    public void setFullPrice(BigDecimal fullPrice) {
-//        this.fullPrice = fullPrice;
-//    }
-
     public BigDecimal getYield() {
         return yield;
     }
@@ -169,14 +114,6 @@ public class OrderPlaceBean extends BaseOrderRequest implements Serializable {
     public void setYield(BigDecimal yield) {
         this.yield = yield;
     }
-
-//    public String getEntrustProp() {
-//        return entrustProp;
-//    }
-//
-//    public void setEntrustProp(String entrustProp) {
-//        this.entrustProp = entrustProp;
-//    }
 
     public String getEntrustBs() {
         return entrustBs;
@@ -208,6 +145,14 @@ public class OrderPlaceBean extends BaseOrderRequest implements Serializable {
 
     public void setHedgeFlag(String hedgeFlag) {
         this.hedgeFlag = hedgeFlag;
+    }
+
+    public long getEntrustNum() {
+        return entrustNum;
+    }
+
+    public void setEntrustNum(long entrustNum) {
+        this.entrustNum = entrustNum;
     }
 
     @Override
