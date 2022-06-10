@@ -10,12 +10,12 @@ import com.joyintech.tams.exchange.common.enums.IEnum;
  */
 public enum RepoTypeEnum implements IEnum<String> {
 
-    FIRST_PHASE("01", "首期"),
-    REPO_ADVANCE("02", "提前购回"),
-    REPO_EXCHANGE_COUPONS_MIDWAY("03", "中途换券"),
-    REPO_RENEW("04", "到期续做"),
-    REPO_MATURITY("05", "到期购回"),
-    REPO_UNSTAKE("06", "解除质押"),
+    FIRST_PHASE("F", "首期"),
+    REPO_ADVANCE("Z", "提前购回"),
+    REPO_EXCHANGE_COUPONS_MIDWAY("H", "中途换券"),
+    REPO_RENEW("X", "到期续做"),
+//    REPO_MATURITY("05", "到期购回"),
+    REPO_UNSTAKE("C", "解除质押"),
     ;
 
     private final String code;

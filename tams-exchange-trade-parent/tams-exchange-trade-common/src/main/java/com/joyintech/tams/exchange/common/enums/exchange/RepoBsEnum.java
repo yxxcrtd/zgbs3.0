@@ -3,7 +3,7 @@ package com.joyintech.tams.exchange.common.enums.exchange;
 import com.joyintech.tams.exchange.common.enums.IEnum;
 
 /**
- * 协议回购类型枚举
+ * 协议回购方向枚举
  *
  * @author swwan
  * @date 2022/6/6 - 16:28
