@@ -22,18 +22,20 @@ import com.joyintech.tams.constant.DictCodeListRsk;
 import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
-import static com.joyintech.tams.constant.DictCodeList.交易方向_赎回;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
+import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
 
 //@Component
 //@Aspect
@@ -53,8 +55,7 @@ public class CfetsTradeHandlerAop {
      * 风险试算
      *
      * @param dto 委托指令内容
-     * @param infCode 接口代码
-     * @param busiType 业务类型
+     * @param pageId 接口代码
      * @return 执行结果
      * @throws Exception 异常
      */
@@ -165,6 +166,10 @@ public class CfetsTradeHandlerAop {
                 ajaxResultMessage.setData(result);
             } else if (StringUtil.isNotEmpty(outputDto.getConfirmMsg())) {
                 result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
+                result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
+                if(StringUtil.equals(outputDto.getRskStatus(),试算结果_风险审批.getValue())) {
+                    result.setData(是否_是);
+                }
                 ajaxResultMessage.setData(result);
             }
         } catch (Exception e) {
@@ -273,8 +278,9 @@ public class CfetsTradeHandlerAop {
      * @throws BusinessException
      */
     @AfterReturning(pointcut = "closeDelegate()")
-    public void closeDelegate(JoinPoint joinPoint, CfetsEtribBondInfo003Dto bondInfo003Dto) throws BusinessException {
-        inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    public void closeDelegate(JoinPoint joinPoint) throws BusinessException {
+        Object[] args = joinPoint.getArgs();
+        //inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
     }
 
     /**

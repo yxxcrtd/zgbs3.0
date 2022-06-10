@@ -142,7 +142,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             CfetsBondDealQuoteCommonDto allDto = JsonUtils.json2Object(businessJson, CfetsBondDealQuoteCommonDto.class);
             CfetsBondDealRegisterQuoteDto dto = new CfetsBondDealRegisterQuoteDto();
             BeanUtil.copyPropertiesIgnoreNull(dto, allDto);
-            return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
+            BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_交易登记.getValue())
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                     .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
@@ -151,10 +151,14 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("ps", dto.getPs())
                     .put("isCheck", isCheck)
                     .put("data", dto);
+            if (StringUtil.equals(dto.getPs(), 交易方向_行权回售.getValue())) {
+                map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
+            }
+            return map;
         }
         if (obj instanceof CfetsBondDealRegisterQuoteDto || StringUtil.equals(pageId, "IbuQuoteBond004")) {
             CfetsBondDealRegisterQuoteDto dto = JsonUtils.json2Object(businessJson, CfetsBondDealRegisterQuoteDto.class);
-            return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
+            BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_交易登记.getValue())
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                     .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
@@ -163,6 +167,10 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("ps", dto.getPs())
                     .put("isCheck", isCheck)
                     .put("data", dto);
+            if (StringUtil.equals(dto.getPs(), 交易方向_行权回售.getValue())) {
+                map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
+            }
+            return map;
         }
         if (obj instanceof CfetsManualSettleDto || StringUtil.equals(pageId, "CfetsManualSettle")) {
             CfetsManualSettleDto allDto = JsonUtils.json2Object(businessJson, CfetsManualSettleDto.class);
@@ -177,7 +185,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("isCheck", isCheck)
                     .put("data", list.get(0));
             if (StringUtil.equals(allDto.getPs(), 交易方向_行权回售.getValue())) {
-                map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易);
+                map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
             }
         }
         if (obj instanceof CfetsTrdFirstBidFirmInfoDto || StringUtil.equals(pageId, "CfetsTrdFirstBidFirm002")) {
@@ -232,7 +240,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("isCheck", isCheck)
                     .put("data", dto);
             if (StringUtil.equals(dto.getPs(), 交易方向_行权回售.getValue())) {
-                map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易);
+                map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
             }
             return map;
         }
