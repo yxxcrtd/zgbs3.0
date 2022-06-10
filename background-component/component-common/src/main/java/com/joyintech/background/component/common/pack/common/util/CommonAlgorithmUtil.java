@@ -176,7 +176,7 @@ public class CommonAlgorithmUtil {
             }
             Collections.swap(wrapperList, i - 1, j - 1);
             List<T> reversedSubList = IntStream.iterate(wrapperList.size() - 1,
-                idx -> idx - 1).limit(wrapperList.size() - i).boxed().map(
+                idx -> idx - 1).limit(wrapperList.size() - (long)i).boxed().map(
                     idx -> wrapperList.get(idx)).collect(Collectors.toList());
             for (int k = i; k < wrapperList.size(); k++ ) {
                 wrapperList.set(k, reversedSubList.get(k - i));

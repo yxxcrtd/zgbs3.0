@@ -197,6 +197,9 @@ public class CfetsTradeHandlerAop {
                 ajaxResultMessage.setData(result);
             } else if (StringUtil.isNotEmpty(outputDto.getConfirmMsg())) {
                 result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
+                if(StringUtil.equals(outputDto.getRskStatus(),试算结果_风险审批.getValue())) {
+                    result.setData(是否_是);
+                }
                 ajaxResultMessage.setData(result);
             }
         } catch (Exception e) {
@@ -261,10 +264,7 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("deletePoint()")
     public void occupyOnDelete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey((String) args[0]);
-        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
-        }
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
 
