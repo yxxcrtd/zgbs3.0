@@ -54,7 +54,9 @@ public class PoiCellUtil {
 				Date v = cell.getDateCellValue();
 				contents = threadLocalDateFmt.get().format(v);
 				succ = true;
-			} catch(Exception e) { }
+			} catch(Exception e) { } finally {
+				threadLocalDateFmt.remove();
+			}
 		}
 		if(!succ) {
 			try {
