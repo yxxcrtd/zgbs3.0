@@ -158,7 +158,9 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
                 throw new InterfException(PRE_OCP_FAILED);
             }
             // 触发的风险事件不计算指标
-            if (!isCalcIndicator(eveList)) {
+            List<IEvent> eveList1 = new ArrayList();
+            eveList1.addAll(eveList);
+            if (!isCalcIndicator(eveList1)) {
                 getLogger().info("触发的风控事项不计算指标");
                 // 取得组合关联指标信息
                 IPtlIndicator ptlInd = getPtlIndicator(mapData);
