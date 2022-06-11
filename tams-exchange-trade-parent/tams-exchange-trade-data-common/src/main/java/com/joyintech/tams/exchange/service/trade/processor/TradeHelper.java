@@ -736,7 +736,7 @@ public class TradeHelper {
         order.setIsNoGuard(instruction.getIsNoGuard());
 
         //1.公平下单
-        if (dto.isFairOrder()) {
+        if (dto.isFairOrderFlag()) {
             if (!fairOrderHelper.createFairOrder(order, instruction)) {
                 order.setErrorCode(NOT_FAIR_ORDER_ERROR.value);
                 order.setErrorMsg(NOT_FAIR_ORDER_ERROR.errorMsg);

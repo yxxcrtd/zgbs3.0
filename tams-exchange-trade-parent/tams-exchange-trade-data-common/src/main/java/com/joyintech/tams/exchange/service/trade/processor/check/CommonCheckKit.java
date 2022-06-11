@@ -264,7 +264,7 @@ public class CommonCheckKit extends BaseCheckKit {
     }
 
     private void checkMinStepWithBuy(BaseOrderRequest order, Instruction instruction) {
-        if (order.isFairOrder()) {
+        if (order.isFairOrderFlag()) {
             log.info("【公平交易】不检查委托数量是否符合最小买入单位整数倍");
             return;
         }
