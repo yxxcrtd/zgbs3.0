@@ -594,7 +594,8 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
+//                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd,r.getPositionsAmt(),4).multiply(new BigDecimal("100"));
                 r.setFloatingPL(floatPL);
 
             });
