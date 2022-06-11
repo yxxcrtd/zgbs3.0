@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * 一级投标确认信息 页面展示及提交用
- * workflowParameter 工作流参数  operType|users|roles|submit|pageId|elementId|isTodoList
+ * <p>workflowParameter 工作流参数  operType|users|roles|submit|pageId|elementId|isTodoList
  *
  * @author jiangpeng
  * @date 2022/5/16 10:12
