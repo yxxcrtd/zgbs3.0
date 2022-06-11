@@ -73,7 +73,7 @@
 		<if test="sysDate != null and sysDate != ''">
 			<![CDATA[AND MDATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
 		</if>
-		and finprod_type2 not in ('F01','F02','F03')
+		<!-- and finprod_type2 not in ('F01','F02','F03')-->
 		)
 	</update>
 	<update id="updateDistributeStatus">
@@ -84,7 +84,7 @@
 		<if test="sysDate != null and sysDate != ''">
 			<![CDATA[AND MDATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
 		</if>
-		and finprod_type2 not in ('F01','F02','F03')
+		<!-- and finprod_type2 not in ('F01','F02','F03') -->
 		)
 	</update>
 
