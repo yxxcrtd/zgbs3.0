@@ -316,15 +316,15 @@ public class CommonCheckHelper {
             String isFullPrice = order.getIsFullPrice();
             if (StringUtil.equals(priceMode, InstructionPriceMode.SPECIFIED.value)) {
                 if (StringUtil.equals(FullPriceConst.FULL_PRICE.value, isFullPrice)) {
-                    return !TradeUtils.equals(orderPrice, instruction.getEntrustPrice());
-                } else {
                     return !TradeUtils.equals(orderPrice, instruction.getFullPrice());
+                } else {
+                    return !TradeUtils.equals(orderPrice, instruction.getEntrustPrice());
                 }
             } else if (StringUtil.equals(priceMode, InstructionPriceMode.FIXED.value)) {
                 if (StringUtil.equals(FullPriceConst.FULL_PRICE.value, isFullPrice)) {
-                    return checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice);
-                } else {
                     return checkPriceFixed(order, instruction.getFullPrice(), orderPrice);
+                } else {
+                    return checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice);
                 }
             }
         }
