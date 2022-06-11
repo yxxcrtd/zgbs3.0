@@ -46,7 +46,7 @@ public class BaseOrderRequest implements Serializable {
     @JsonSerialize(using = DoubleSerializerUtils.class)
     protected BigDecimal entrustBalance;
 
-    @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
+    @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续 ",example="Y")
     protected String softSkipMode;
 
     @ApiModelProperty(name="orderSoftControl",value="下单软控是否继续？Y：继续",example="Y")
