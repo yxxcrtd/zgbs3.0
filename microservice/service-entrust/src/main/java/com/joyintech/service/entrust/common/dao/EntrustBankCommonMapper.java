@@ -10,14 +10,12 @@
  
 package com.joyintech.service.entrust.common.dao;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.ibatis.annotations.Param;
+import com.joyintech.service.entrust.common.dto.EtrBondFirstBidInfoDto;
+import com.joyintech.tams.common.base.entity.EtrQuoteFinishStatus;
 import org.springframework.stereotype.Repository;
 
-import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.tams.common.base.entity.EtrQuoteFinishStatus;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 〈一句话功能简述〉
@@ -36,4 +34,13 @@ public interface EntrustBankCommonMapper {
 	int checkDataStatus(Map<String, Object> param);
 
 	int checkRegDataStatus(Map<String, Object> param);
+
+	int checkFirstBidDataStatus(Map<String, Object> param);
+
+	/**
+	 * 查询指令信息
+	 * @param param
+	 * @return
+	 */
+    EtrBondFirstBidInfoDto selectBidInfo(Map<String, Object> param);
 }
