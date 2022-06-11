@@ -133,17 +133,10 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 交易执行-成交确认
+     * 交易执行-成交确认 || 手工匹配
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.trdConfirmSave(..))")
-    protected void confirmSavePoint() {
-    }
-
-    /**
-     * CSTP成交回报-手工匹配
-     */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.cstpManualMatch(..))")
-    protected void manualMatchPoint() {
+    @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteRepoMethod(..))")
+    protected void completeRepoPoint() {
     }
 
     /**
@@ -155,8 +148,8 @@ public class CfetsTradeHandlerAop {
     /**
      * 交易撤销
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doRevoke(..))")
-    protected void doRevoke() {
+    @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doRevokeComplete(..))")
+    protected void doRevokeComplete() {
     }
 
     /**
@@ -288,7 +281,7 @@ public class CfetsTradeHandlerAop {
     }
 
 
-    @AfterReturning("completePoint() || confirmSavePoint() || manualMatchPoint()")
+    @AfterReturning("completePoint() || completeRepoPoint()")
     public void occupyOnComplete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
@@ -300,7 +293,7 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning("doCompleteRevoke() || doRevoke()")
+    @AfterReturning("doCompleteRevoke() || doRevokeComplete()")
     public void revokeComplete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
