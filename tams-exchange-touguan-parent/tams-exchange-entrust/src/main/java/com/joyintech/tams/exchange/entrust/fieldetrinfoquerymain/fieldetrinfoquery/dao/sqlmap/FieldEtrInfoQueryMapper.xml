@@ -608,10 +608,10 @@
                 OR t.finprodAbbr like '%' || #{search} || '%'
                 OR t.remark like '%' || #{search} || '%'
                 OR t.secAcctId like '%' || #{search} || '%'
+                OR t.etrPrice like '%' || #{search} || '%'
             <if test="search_isNumberFlag != null and search_isNumberFlag == true">
                 OR round(t.entrustAmt,2)||'' = round(#{search},2)
                 OR round(t.entrustNum,0)||'' = round(#{search},0)
-                OR round(t.etrPrice,3)||'' = round(#{search},3)
                 OR round(t.termDays,2)||'' = round(#{search},2)
                 OR round(t.exeProgress,2)||'' = round(#{search},2)
                 OR round(t.dealProgress,2)||'' = round(#{search},2)

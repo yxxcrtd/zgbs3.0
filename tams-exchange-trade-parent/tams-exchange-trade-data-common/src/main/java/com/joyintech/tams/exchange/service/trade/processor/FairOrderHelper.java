@@ -172,7 +172,7 @@ public class FairOrderHelper {
     }
 
     public boolean createFairOrder(Order order, Instruction instruction) {
-        logger.info("{createFairOrder()】 判断order是否要做公平交易：instructionId", instruction.getEntrustId());
+        logger.info("{createFairOrder()】 判断order是否要做公平交易：instructionId={}", instruction.getEntrustId());
         if (!Strings.isNullOrEmpty(order.getAlgorithmId())
                 || !EntrustUtils.isFairOrder(order.getEntrustProp())
                 || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
@@ -187,7 +187,7 @@ public class FairOrderHelper {
                 && portfolioAllocationResponse.getInfoLevel().equals("1")) {
             logger.info("fair order failed");
             order.setOrderStatus(OrderStatus.STOP.value);
-            return true;
+            return false;
         }
 
         List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();

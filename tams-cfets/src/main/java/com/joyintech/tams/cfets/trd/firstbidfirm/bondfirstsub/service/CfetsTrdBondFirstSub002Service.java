@@ -847,8 +847,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             String confirmOk = entity.getConfirmOk();
             entity.setConfirmOk(null);
             ProcessMark newEntity;
-            //处理指令执行进度
-            this.insertEtrFinishStatus(entity, OperationType.NEW);
             // 发头寸
             try {
                 if (StringUtil.isNotEmpty(entity.getWorkflowId())) {

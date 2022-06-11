@@ -140,7 +140,7 @@ public class CfetsEntrustHanderAop {
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
         if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-            if(StringUtil.equals(args[1], OperationType.NEW)) {
+            if(StringUtil.equals(args[1].toString(), OperationType.NEW.toString())) {
                 inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
             }else {
                 inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
