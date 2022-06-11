@@ -1339,6 +1339,11 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         }
     }
 
+    public Integer queryScale(String entrustProp) {
+        BigDecimal minPrice = queryMinPrice(entrustProp);
+        return ObjectUtil.isNull(minPrice) ? 4 : minPrice.scale();
+    }
+
     /**
      * 新债-非可转债
      */

@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.invest.batch.entrust.runner;
 
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -76,6 +77,8 @@ public class EntrustStatusTask extends BatchBaseService{
          }
          catch (Exception e) {
              logger.error(e.getMessage());
+             //异常信息记录到批处理的日志详情
+             throw new BatchException(RiskUtil.getLogString(e));
          }
          isRunning=false;
          return result;
