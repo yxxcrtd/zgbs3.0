@@ -47,8 +47,7 @@ public class CfetsTradeHandlerAop {
 
     @Autowired
     private RiskInputParamSerivce inputParamSerivce;
-    @Resource
-    private SysWflBusinessListMapper sysWflBusinessListMapper;
+
 
 
     /**
@@ -126,7 +125,7 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 成交确认
+     * 债券成交确认
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteMethod(..))")
     protected void completePoint() {
@@ -140,7 +139,7 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 交易撤销
+     * 债券交易撤销
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doCompleteRevoke(..))")
     protected void doCompleteRevoke() {
@@ -162,7 +161,7 @@ public class CfetsTradeHandlerAop {
     /**
      * 交收失败，关闭指令
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.manualsettle.service..*.*.closeDelegate(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService.closeDelegate(..))")
     protected void closeDelegate(){}
 
 
@@ -237,9 +236,6 @@ public class CfetsTradeHandlerAop {
                     || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_付息.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())) {
                 inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
             }
-        }
-        if (StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_交收失败.getValue())) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
         }
     }
 
@@ -316,10 +312,9 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning(pointcut = "closeDelegate()")
-    public void closeDelegate(JoinPoint joinPoint) throws BusinessException {
-        Object[] args = joinPoint.getArgs();
-        //inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    @AfterReturning(pointcut = "closeDelegate()",returning = "tradeDto")
+    public void closeDelegate(JoinPoint joinPoint, CfetsEtribBondInfo003Dto tradeDto) throws BusinessException {
+        inputParamSerivce.buildParamThenOccupy(tradeDto, 系统动作_关闭.getValue(), 流程节点_审批生效.getValue(), null);
     }
 
     /**

@@ -183,10 +183,12 @@ public class JoyinbusinessCommonService extends BaseService {
     public Boolean updateCfetsOprHis(CfetsOprHisInfoRequest dto) {
         dto.setSeqNo(IDGenerator.generate(32));
         dto.setOperDate(new Date());
-        dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
-        dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
-        dto.setCreateDept(CommonUtil.getDeptCode());
-        dto.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+        if (StringUtil.isEmpty(dto.getUserId())) {
+            dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+            dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+            dto.setCreateDept(CommonUtil.getDeptCode());
+            dto.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+        }
         List<CfetsOprHisInfoRequest> wflDto = new ArrayList<>();
         if (StringUtil.isNotEmpty(dto.getWorkflowId())) {
             wflDto = joyinbusinessCommonMapper.findCfetsOprHisByWorkflowId(dto.getWorkflowId());

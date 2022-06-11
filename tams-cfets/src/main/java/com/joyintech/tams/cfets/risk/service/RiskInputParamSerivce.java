@@ -531,15 +531,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             TrdBondInvestTradeDto entity = (TrdBondInvestTradeDto) data;
-            List<TrdBondInvestTradeDto> list1 = new ArrayList<>();
-            for (TrdBondInvestTradeDto item : entity.getTrdBondInvestTradeDtoList()) {
-                TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
-                BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
-                bondDto.setTotleTradeId(item.getTradeId());
-                list1.add(bondDto);
-            }
-            if(CollectionUtils.isNotEmpty(list)) {
-                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
+            if(CollectionUtils.isNotEmpty(entity.getTrdBondInvestTradeDtoList())) {
+                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, entity.getTrdBondInvestTradeDtoList(), null);
             }
         }
         if (data instanceof CfetsManualSettleInsertDto) {

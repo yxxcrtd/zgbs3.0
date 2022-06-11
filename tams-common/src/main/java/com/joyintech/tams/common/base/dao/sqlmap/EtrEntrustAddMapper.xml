@@ -100,6 +100,7 @@
         <result column="CALCULATE_FIELD" property="calculateField" jdbcType="VARCHAR" />
         <result column="PORTFOLIO_SERIES" property="portfolioSeries" jdbcType="VARCHAR" />
         <result column="ENTRUST_CREATE_SOURCE" property="entrustCreateSource" jdbcType="VARCHAR" />
+        <result column="BUSI_TYPE_POSITION" property="busiTypePosition" jdbcType="VARCHAR" />
         <result column="FORCED_FINISH_AMT" property="forcedFinishAmt" jdbcType="DECIMAL" />
         <result column="CLOSE_AMT" property="closeAmt" jdbcType="DECIMAL" />
         <result column="PRICE_TYPE" property="priceType" jdbcType="VARCHAR" />
@@ -131,7 +132,7 @@
         TRADE_ID TRADE_ID, REQUEST_ID REQUEST_ID, REDO_TYPE REDO_TYPE, DERIVATIVE_BS_DIR DERIVATIVE_BS_DIR, 
         DERIVATIVE_OC_FLAG DERIVATIVE_OC_FLAG, QUOTE_TYPE QUOTE_TYPE, HK_MARKET HK_MARKET,
         ENTRUST_AMT_TARGET ENTRUST_AMT_TARGET, PLEDGE_STOCK_ID PLEDGE_STOCK_ID, CALCULATE_FIELD CALCULATE_FIELD,
-        PORTFOLIO_SERIES PORTFOLIO_SERIES,ENTRUST_CREATE_SOURCE ENTRUST_CREATE_SOURCE,
+        PORTFOLIO_SERIES PORTFOLIO_SERIES,ENTRUST_CREATE_SOURCE ENTRUST_CREATE_SOURCE,BUSI_TYPE_POSITION BUSI_TYPE_POSITION,
         FORCED_FINISH_AMT FORCED_FINISH_AMT,CLOSE_AMT CLOSE_AMT, PRICE_TYPE PRICE_TYPE
     </sql>
     <sql id="Sql_All_Data" >
