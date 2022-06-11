@@ -176,6 +176,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     NOT_EXIST_FAIR_INSTRUCTION_ERROR(4018, "没有符合公平交易的指令，无法进行公平交易！"),
 
+    NOT_FAIR_ORDER_ERROR(4019, "不符合公平交易条件，无法进行公平交易！"),
+
     INSTRUCTIONS_DERIVATIVE_BS_OC_ERROR(4030, "指令中衍生品买卖方向和开平仓标志不能为空"),
 
     INSTRUCTIONS_DERIVATIVE_BS_OC_NOT_MATCH_ERROR(4031, "指令中衍生品买卖方向和开平标志不匹配"),

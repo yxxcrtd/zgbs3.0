@@ -60,6 +60,8 @@ import java.util.stream.Collectors;
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券入库;
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
+import static com.joyintech.tams.exchange.common.constant.ErrorCode.INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR;
+import static com.joyintech.tams.exchange.common.constant.ErrorCode.NOT_FAIR_ORDER_ERROR;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
 import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.NEGOTIATED_REPO;
@@ -727,7 +729,11 @@ public class TradeHelper {
         order.setIsNoGuard(instruction.getIsNoGuard());
 
         //1.公平下单
-        if (fairOrderHelper.createFairOrder(order, instruction)) {
+        if (dto.isFairOrder()) {
+            if (!fairOrderHelper.createFairOrder(order, instruction)) {
+                order.setErrorCode(NOT_FAIR_ORDER_ERROR.value);
+                order.setErrorMsg(NOT_FAIR_ORDER_ERROR.errorMsg);
+            }
             return order;
         }
 
