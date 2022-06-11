@@ -535,8 +535,8 @@ public class TradeHelper {
             TickBean tick = (TickBean) tickBean.getData();
             BigDecimal minPrice = instruction.queryMinPrice(entrust.getEntrustProp());
             int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
-            double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
-            double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
+            double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), round, RoundingMode.UP);
+            double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), round, RoundingMode.DOWN);
             if (InvestAssetTypeEnum.STOCK.value.equals(entrust.getAssetType())) {
                 logger.info("检查【股票】涨停价格。。。");
                 fillEntrustPrice(entrust, lowerLimitPrice, upperLimitPrice, entrustPrice);
@@ -736,7 +736,7 @@ public class TradeHelper {
         order.setIsNoGuard(instruction.getIsNoGuard());
 
         //1.公平下单
-        if (dto.isFairOrder()) {
+        if (dto.isFairOrderFlag()) {
             if (!fairOrderHelper.createFairOrder(order, instruction)) {
                 order.setErrorCode(NOT_FAIR_ORDER_ERROR.value);
                 order.setErrorMsg(NOT_FAIR_ORDER_ERROR.errorMsg);
