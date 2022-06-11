@@ -1596,7 +1596,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.3),quotation.getPreClosePrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.7),quotation.getPreClosePrice()))<0)){
-                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(BigDecimal.valueOf(0.7),quotation.getPreClosePrice())+","+ArithmeticUtil.multiply(BigDecimal.valueOf(1.3),quotation.getPreClosePrice())+"]之外"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.7),quotation.getPreClosePrice())+","+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(1.3),quotation.getPreClosePrice())+"]之外"));
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
@@ -1618,7 +1618,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                     if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.1),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.9),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(BigDecimal.valueOf(0.9),quotation.getLastPrice())+","+ArithmeticUtil.multiply(BigDecimal.valueOf(1.1),quotation.getLastPrice())+"]之外"));
+                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.9),quotation.getLastPrice())+","+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(1.1),quotation.getLastPrice())+"]之外"));
                     }
                 }else{
                     if(quotation!=null&&quotation.getLastPrice()!=null
