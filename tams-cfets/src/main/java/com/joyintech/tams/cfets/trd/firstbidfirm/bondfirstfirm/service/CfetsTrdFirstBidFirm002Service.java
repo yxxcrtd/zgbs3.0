@@ -3876,6 +3876,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      */
     public Page<CfetsTrdFirstBidFirmEntrustDto> pageEntrust(CfetsTrdBondFirstBidFirmEntrustRequest request) {
         request.setIsEtrAddSearch(DictCodeList.是否_是.getValue());
+        request.setEntrustStatus(Collections.singletonList(DictCodeList.委托状态_已接收.getValue()));
         return cfetsTrdFirstBidFirm001Service.pageEntrust(request);
     }
 
