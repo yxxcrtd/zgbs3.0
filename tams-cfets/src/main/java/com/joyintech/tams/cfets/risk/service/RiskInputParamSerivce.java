@@ -269,7 +269,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                     .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
                     .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
-                    .put("tradePlace", 交易场所_银行间.getValue())
+                    .put("tradePlace", dto.getTradeMarket())
                     .put("ps", dto.getPs())
                     .put("isCheck", isCheck)
                     .put("data", dto);
@@ -506,8 +506,13 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         if (data instanceof CfetsTrdBondInvestTradeDto) {//银行间债券成交确认
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
-            riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             CfetsTrdBondInvestTradeDto entity = (CfetsTrdBondInvestTradeDto) data;
+            if (StringUtil.equals(entity.getTgBusiType(),头寸业务类型_债券一级投标.getValue())
+            || StringUtil.equals(entity.getTgBusiType(),头寸业务类型_债券一级申购.getValue())){
+                riskRdsDto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
+            }else {
+                riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
+            }
             List<TrdBondInvestTradeDto> list1 = new ArrayList<>();
             for (CfetsTrdBondInvestTradeDto item : entity.getDtoList()) {
                 TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
@@ -539,7 +544,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             CfetsManualSettleInsertDto dto = (CfetsManualSettleInsertDto) data;
             if(StringUtil.isNotEmpty(dto.getTrdBankManualSettleInfo())
-                    && StringUtil.equals(dto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级投标.getValue())){
+                    && (StringUtil.equals(dto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级投标.getValue())
+                    || StringUtil.equals(dto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级申购.getValue()))){
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
             } else {
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
@@ -971,7 +977,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
             TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(businessDto.getTradeId());
             dto.setCounterId(trdProductDeal.getCounterId());
             dto.setPrinAmt(businessDto.getTrdBankManualSettleInfo().getSettleAmt());
-            if (StringUtil.equals(businessDto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级投标.getValue())) {
+            if (StringUtil.equals(businessDto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级投标.getValue())
+             || StringUtil.equals(businessDto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级申购.getValue())) {
                 dto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
             }else{
                 dto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
