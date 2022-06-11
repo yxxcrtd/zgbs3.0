@@ -186,13 +186,19 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_交收确认.getValue())
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                     .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
-                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
+                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券存续期交易.getValue())
                     .put("tradePlace", 交易场所_银行间.getValue())
                     .put("ps", allDto.getPs())
                     .put("isCheck", isCheck)
                     .put("data", list.get(0));
             if (StringUtil.equals(allDto.getPs(), 交易方向_行权回售.getValue())) {
                 map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
+            }
+            if (StringUtil.equals(allDto.getButtonType(), 交收操作类型_回溯.getValue())) {
+                map.put(NodeConfigConstant.BUSI_ACT, 业务动作_交收回溯.getValue());
+            }
+            if (StringUtil.equals(allDto.getButtonType(), 交收操作类型_交收失败.getValue())) {
+                map.put(NodeConfigConstant.BUSI_ACT, 业务动作_交收失败.getValue());
             }
         }
         if (obj instanceof CfetsTrdFirstBidFirmInfoDto || StringUtil.equals(pageId, "CfetsTrdFirstBidFirm002")) {
@@ -234,7 +240,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (obj instanceof CfetsTrdBondInvestTradeDto) {
             CfetsTrdBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, CfetsTrdBondInvestTradeDto.class);
             BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_交收确认.getValue())
+                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_成交确认.getValue())
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                     .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
                     .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
@@ -247,6 +253,23 @@ public class RiskInputParamSerivce extends RiskCommonService {
             }
             return map;
         }
+        if(obj instanceof TrdBondInvestTradeDto) {//交易撤销
+            TrdBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, TrdBondInvestTradeDto.class);
+            BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
+                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_成交确认.getValue())
+                    .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                    .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_现券交易.getValue())
+                    .put("tradePlace", 交易场所_银行间.getValue())
+                    .put("ps", dto.getPs())
+                    .put("isCheck", isCheck)
+                    .put("data", dto);
+            if (StringUtil.equals(dto.getPs(), 交易方向_行权回售.getValue())) {
+                map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
+            }
+            return map;
+        }
+
         // 银行间质押式回购-指令
         if (obj instanceof CfetsEtribRepoInfo003Dto || obj instanceof CfetsEtrRepoSaveRequest || StringUtil.equals(pageId, "CfetsEtrIbRepoinfo003")){
             CfetsEtribRepoInfo003Dto dto = JsonUtils.json2Object(businessJson, CfetsEtribRepoInfo003Dto.class);
@@ -385,7 +408,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             });
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getAllocationDetails(), null);
         }
-        if (data instanceof CfetsTrdBondInvestTradeDto) {
+        if (data instanceof CfetsTrdBondInvestTradeDto) {//银行间债券成交确认
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             CfetsTrdBondInvestTradeDto entity = (CfetsTrdBondInvestTradeDto) data;
@@ -403,10 +426,25 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     list1.add(bondDto);
                 }
             }
-            if (CollectionUtils.isEmpty(entity.getTradeDtoList())) {
+            if (CollectionUtils.isNotEmpty(entity.getTradeDtoList())) {
                 list1.addAll(entity.getTradeDtoList());
             }
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
+        }
+        if(data instanceof TrdBondInvestTradeDto) {//银行间债券交易撤销
+            InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
+            riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
+            TrdBondInvestTradeDto entity = (TrdBondInvestTradeDto) data;
+            List<TrdBondInvestTradeDto> list1 = new ArrayList<>();
+            for (TrdBondInvestTradeDto item : entity.getTrdBondInvestTradeDtoList()) {
+                TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
+                BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
+                bondDto.setTotleTradeId(item.getTradeId());
+                list1.add(bondDto);
+            }
+            if(CollectionUtils.isNotEmpty(list)) {
+                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
+            }
         }
         if (data instanceof CfetsManualSettleInsertDto) {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
@@ -417,6 +455,10 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
                 BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
                 bondDto.setTotleTradeId(item.getTradeId());
+                bondDto.setTradeAmt(item.getSettleAmt());
+                bondDto.setShareAmt(item.getSettleNum());
+                bondDto.setFpriceAmt(item.getSettleAmt());
+                bondDto.setPs(dto.getPs());
                 list1.add(bondDto);
             }
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
