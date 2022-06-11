@@ -995,6 +995,19 @@ public class EntrustUtils {
     }
 
     /**
+     * 判断是否非买卖交易
+     */
+    public static boolean isNotBuyOrSellTrade(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_行权.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_债转股.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_质押券出入库.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_配债.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_可转债申购.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_配股.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_新股申购.getValue(), busiTypeTg);
+    }
+
+    /**
      * 判断是否竞价交易业务
      */
     public static boolean isNormalTrade(String busiTypeTg) {
