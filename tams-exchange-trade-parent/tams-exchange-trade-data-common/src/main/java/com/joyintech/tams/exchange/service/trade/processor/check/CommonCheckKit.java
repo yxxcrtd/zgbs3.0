@@ -254,7 +254,16 @@ public class CommonCheckKit extends BaseCheckKit {
         }
 
         if (EntrustBs.isBuy(entrustBs) && entrustVolume % minStep != 0) {
-            String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep);
+            String busiTypeTg = instruction.getBusiTypeTg();
+            String errorMsg;
+            if (DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg)
+                    || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)
+                    || DictCodeListExt3.投管业务类型_信用保护凭证.getValue().equals(busiTypeTg)) {
+                errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入单位[{}]万元整数倍",
+                        (ArithmeticUtil.divide(BigDecimal.valueOf(entrustVolume), new BigDecimal(100), 2)), ArithmeticUtil.divide(BigDecimal.valueOf(minStep), new BigDecimal(100), 2));
+            } else {
+                errorMsg = StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep);
+            }
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
@@ -278,7 +287,7 @@ public class CommonCheckKit extends BaseCheckKit {
 
         if (EntrustUtils.isNotBuyOrSellTrade(instruction.getBusiTypeTg())
                 || EnumUtil.in(instruction.getAssetType(), InvestAssetTypeEnum.BOND)) {
-            log.error("【非买卖交易和债券交易】不需要检查价格是否满足涨跌停价：busiTypeTg={}",instruction.getBusiTypeTg());
+            log.info("【非买卖交易和债券交易】不需要检查价格是否满足涨跌停价：busiTypeTg={}",instruction.getBusiTypeTg());
             return;
         }
         if (lowerLimitPrice.compareTo(entrustPrice) > 0
@@ -340,8 +349,11 @@ public class CommonCheckKit extends BaseCheckKit {
         if (entrustVolume < minNum) {
             String busiTypeTg = instruction.getBusiTypeTg();
             String errorMsg = "";
-            if (DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg) || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)) {
-                errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入数量限制[{}]万元", (ArithmeticUtil.divide(BigDecimal.valueOf(entrustVolume), new BigDecimal(100), 2)), ArithmeticUtil.divide(BigDecimal.valueOf(minNum), new BigDecimal(100), 2));
+            if (DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg)
+                    || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)
+                    || DictCodeListExt3.投管业务类型_信用保护凭证.getValue().equals(busiTypeTg)) {
+                errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入数量限制[{}]万元",
+                        (ArithmeticUtil.divide(BigDecimal.valueOf(entrustVolume), new BigDecimal(100), 2)), ArithmeticUtil.divide(BigDecimal.valueOf(minNum), new BigDecimal(100), 2));
             } else {
                 errorMsg = StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}]", entrustVolume, minNum);
             }
