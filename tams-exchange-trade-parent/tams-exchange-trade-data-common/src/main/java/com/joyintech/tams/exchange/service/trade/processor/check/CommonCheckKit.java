@@ -19,13 +19,16 @@ import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
+import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
@@ -198,6 +201,9 @@ public class CommonCheckKit extends BaseCheckKit {
         // 最低交易金额（元）MIN_AMT （最低申报金额）
         checkMinNum(order, instruction, instrument);
 
+        // 价格模式（固定价格或限价）校验
+        checkPriceWithPriceMode(order, instruction);
+
         // 涨跌停或有效申报价格校验
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
         // 申报类不需要check最小价差和涨跌停
@@ -209,6 +215,32 @@ public class CommonCheckKit extends BaseCheckKit {
             return;
         }
         checkLimitPrice(order, instruction, instrument, tickBean);
+    }
+
+    private void checkPriceWithPriceMode(BaseOrderRequest order, Instruction instruction) {
+        BigDecimal entrustPrice = order.getEntrustPrice();
+        BigDecimal instructionPrice = instruction.getEntrustPrice();
+        if (instruction.convertibleBond() || (instruction.newBond() && instruction.fullPrice())) {
+            entrustPrice = order.getFullPrice();
+            instructionPrice = instruction.getFullPrice();
+        }
+
+        String priceMode = instruction.getPriceMode();
+        String errorMsg = null;
+        if (InstructionPriceMode.SPECIFIED.codeEquals(priceMode) && !TradeUtils.equals(entrustPrice, instructionPrice)) {
+            errorMsg = StrUtil.format("指定价指令，委托价格[{}]不等于指令价格[{}]", entrustPrice, instructionPrice);
+        } else if (InstructionPriceMode.FIXED.codeEquals(priceMode)) {
+            if (PsEnum.SELL.codeEquals(instruction.getPs()) && TradeUtils.bigThan(instructionPrice, entrustPrice)) {
+                errorMsg = StrUtil.format("卖出限价指令，委托价格[{}]小于指令价格[{}]", entrustPrice, instructionPrice);
+            } else if (PsEnum.BUY.codeEquals(instruction.getPs()) && TradeUtils.lessThan(instructionPrice, entrustPrice)) {
+                errorMsg = StrUtil.format("买入限价指令，委托价格[{}]大于指令价格[{}]", entrustPrice, instructionPrice);
+            }
+        }
+
+        if (StrUtil.isNotEmpty(errorMsg)) {
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
+        }
     }
 
     /**
