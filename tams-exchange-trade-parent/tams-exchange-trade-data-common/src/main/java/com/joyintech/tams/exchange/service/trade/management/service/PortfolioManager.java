@@ -2187,6 +2187,7 @@ public class PortfolioManager extends BaseService {
             }
             if (是否_否.getValue().equals(ins.getEntrustClass())) {
                 dto.setLeftVolume(0L);
+                dto.setLeftAmt(BigDecimal.ZERO);
             }
             resultList.add(dto);
         }
