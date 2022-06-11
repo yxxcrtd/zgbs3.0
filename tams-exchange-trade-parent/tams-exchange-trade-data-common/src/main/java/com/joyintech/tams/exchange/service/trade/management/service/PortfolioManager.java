@@ -2038,6 +2038,7 @@ public class PortfolioManager extends BaseService {
             dto = new PortfolioInstructionContextDto();
             if (StringUtil.equals(ins.getEntrustClass(), 是否_否.getValue())) {
                 dto.setLeftVolume(0L);
+                dto.setLeftAmt(BigDecimal.ZERO);
             } else {
                 if (EntrustUtils.isVolume(ins)) {
                     dto.setLeftVolume(ins.getEntrustNum() - ins.getEntrustLeftAmt().longValue() - ins.getFrozenQuantity().longValue());
