@@ -1835,6 +1835,15 @@
                     object.finprodId = tempFinprodData.finprodId;
                 }
             }
+            if(object.repSecNum){
+                object.repSecNum = object.repSecNum * 100;
+            }
+            if(object.newRepSecNum){
+                object.newRepSecNum = object.newRepSecNum * 100;
+            }
+            if(object.outRepSecNum){
+                object.outRepSecNum = object.outRepSecNum * 100;
+            }
 
             if (object.operateType === 'save') {
                 Joyin.confirm("请确认是否要保存？",function() {
@@ -1892,6 +1901,18 @@
 //            entrustNumChange();
 //            psChange();
 //            priceModelChange(true);
+                    var repSecNum = $("#repSecNum").val();
+                    if(repSecNum){
+                        $("#repSecNum").val(repSecNum/100);
+                    }
+                    var newRepSecNum = $("#newRepSecNum").val();
+                    if(newRepSecNum){
+                        $("#newRepSecNum").val(repSecNum/100);
+                    }
+                    var outRepSecNum = $("#outRepSecNum").val();
+                    if(outRepSecNum){
+                        $("#outRepSecNum").val(repSecNum/100);
+                    }
                     var ps =  $("#ps").val();
                     if(ps == 'T93' || ps == 'T94'
                         || ps == 'T95' || ps == 'T96'){

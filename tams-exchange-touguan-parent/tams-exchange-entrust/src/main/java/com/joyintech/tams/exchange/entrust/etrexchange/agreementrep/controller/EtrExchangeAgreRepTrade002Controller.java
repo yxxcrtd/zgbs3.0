@@ -169,6 +169,8 @@ public class EtrExchangeAgreRepTrade002Controller extends BaseController {
 
         model.addAttribute("UNIT_01", DictCodeListExt3.交易单位_张.getValue());
         model.addAttribute("UNIT_04", DictCodeListExt3.交易单位_手.getValue());
+
+        model.addAttribute("PS_T94", DictCodeListExt3.交易方向_中途换券.getValue());
         return super.init(model);
     }
 
