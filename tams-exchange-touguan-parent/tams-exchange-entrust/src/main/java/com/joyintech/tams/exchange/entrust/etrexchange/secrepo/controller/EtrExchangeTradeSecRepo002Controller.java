@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -281,7 +282,12 @@ public class EtrExchangeTradeSecRepo002Controller extends BaseController{
         // 导出
         ExcelUitl.doExport(requestDto, response, "持仓列表", () -> {
             EtrExchangeTradePositionsSecRepoRequest dto = requestDto.getDto(EtrExchangeTradePositionsSecRepoRequest.class);
-            List dataList = etrExchangeTradeSecRepo002Service.findPositionsPage(dto).getRoot();
+            List dataList;
+            if(CollectionUtils.isEmpty(dto.getQueryList())) {
+                dataList = etrExchangeTradeSecRepo002Service.findPositionsPage(dto).getRoot();
+            }else {
+                dataList = dto.getQueryList();
+            }
             return dataList;
         });
     }

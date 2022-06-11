@@ -1,6 +1,7 @@
 package com.joyintech.tams.business.common.service;
 
 
+import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.busicommon.productRating.dto.CommonProductRatingDto;
@@ -59,6 +60,10 @@ public class EtrCommonFinProductInfoService extends BaseService {
         CfetsEtrFinProductInfoResponse finProductInfo = new CfetsEtrFinProductInfoResponse();
         if (StringUtil.isBlank(finprodId)) {
             finProductInfo.setTitle("标的信息未维护");
+            if (StringUtil.isNotBlank(request.getIsShowTable()) && DictCodeList.是否_是.getValue().equals(request.getIsShowTable())) {
+                List<CfgDataTableShow> byPageCodeAndDtCodes = cfgDataTableService.getByPageCodeAndDtCodes(pageCode, dtCode, Lists.newArrayList(BASE_SPCD_CODE));
+                finProductInfo.setTableShows(byPageCodeAndDtCodes);
+            }
             return finProductInfo;
         }
         finProductInfo = etrCommonFinProductInfoMapper.findFinProductInfo(request);

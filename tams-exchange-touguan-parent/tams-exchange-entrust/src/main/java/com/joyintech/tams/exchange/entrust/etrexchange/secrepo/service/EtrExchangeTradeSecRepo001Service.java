@@ -1588,7 +1588,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         TrdPriceTimeConfig trdPriceTimeConfig = getTrdPriceTimeConfig(paraMap);
         // 无匹配交易价格时间配置
         if(trdPriceTimeConfig==null){
-           // validMessageList.add(new ValidMessage("当前时间不在允许范围时间内!"));
+            validMessageList.add(new ValidMessage("当前时间不在允许范围时间内!"));
         }
         // 开盘集合竞价
         else if(StringUtil.equals(trdPriceTimeConfig.getPriceTimeType(),DictCodeListExt3.价格申报范围类型_开盘集合竞价.getValue())){
@@ -1601,9 +1601,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
                 if(quotation!=null&&quotation.getPreClosePrice()!=null
-                        &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice()))>0
+                        &&(checkPrice.compareTo(ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,new BigDecimal(2),quotation.getPreClosePrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.round(ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice()),NumberEnum.MONEY)+"]之外"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,new BigDecimal(2),quotation.getPreClosePrice())+"]之外"));
                 }
             }
         }
@@ -1634,9 +1634,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
                 if(quotation!=null&&quotation.getLastPrice()!=null
-                        &&(checkPrice.compareTo(ArithmeticUtil.doAdd(BigDecimal.valueOf(0.01),quotation.getLastPrice()))>0
+                        &&(checkPrice.compareTo(ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.01),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.round(ArithmeticUtil.doAdd(BigDecimal.valueOf(0.01),quotation.getLastPrice()),NumberEnum.MONEY)+"]之外"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.01),quotation.getLastPrice())+"]之外"));
                 }
             }
         }
