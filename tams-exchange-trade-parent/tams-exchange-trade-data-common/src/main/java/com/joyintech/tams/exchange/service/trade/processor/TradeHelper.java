@@ -515,11 +515,13 @@ public class TradeHelper {
      * 1、是否满足指令价格限定；
      * 2、是否满足行情涨跌停价限制
      */
-    private void checkPrice(OrderInterface entrust, Instruction instruction) {
+    private void checkPrice(BatchInfo batchInfo,OrderInterface entrust, Instruction instruction) {
         BigDecimal entrustPrice = entrust.getEntrustPrice();
         BigDecimal instructionPrice = instruction.getEntrustPrice();
         if (instruction.convertibleBond() || (instruction.newBond() && instruction.fullPrice())) {
-            entrustPrice = entrust.getFullPrice();
+            if (batchInfo.getCompleteTimes() == 0) {
+                entrustPrice = entrust.getFullPrice();
+            }
             instructionPrice = instruction.getFullPrice();
         }
 
@@ -1014,7 +1016,7 @@ public class TradeHelper {
         setBatchEntrustPrice(order, batchInfo, entrust, instruction, round);
 
         //批量委托检查委托价格
-        checkPrice(entrust, instruction);
+        checkPrice(batchInfo, entrust, instruction);
 
         //资产类型是债券，处理净价、全价
         if (InvestAssetTypeEnum.isBond(order.getAssetType())) {
