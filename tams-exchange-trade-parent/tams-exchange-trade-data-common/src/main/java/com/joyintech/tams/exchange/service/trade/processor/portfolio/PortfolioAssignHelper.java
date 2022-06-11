@@ -148,6 +148,9 @@ public class PortfolioAssignHelper {
 
         // 可分配到最小交易数量的组合数量
         int minNumAssignableCount = Math.min(NumberUtil.div(orginVolume, minNum, 2).intValue(), instructionDetails.size());
+        
+        // 剩余待分配数量（去掉最小交易数据量）
+        BigDecimal orginVolumeWithOutMinNum = NumberUtil.sub(orginVolume, NumberUtil.mul(minNumAssignableCount, minNum));
 
         //质押式回购的步长是对金额控制的，因此要转换成数量
         if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
@@ -178,7 +181,9 @@ public class PortfolioAssignHelper {
         // 历史数量
         BigDecimal historyVolume = portfolioDetails.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
         // 订单数量
-        BigDecimal totalVolume = NumberUtil.add(orginVolume, historyVolume);
+//        BigDecimal totalVolume = NumberUtil.add(orginVolume, historyVolume);
+        //考虑最小交易数量修改
+        BigDecimal totalVolume = NumberUtil.add(orginVolumeWithOutMinNum, historyVolume);
         // 指令委托数量
         BigDecimal instructionVolume = instructionDetails.stream().map(InstructionDetail::getEntrustNum).reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -205,7 +210,6 @@ public class PortfolioAssignHelper {
 
             portfolioDetail.setEtrSecAmount(detail.getEntrustAmt());
             list.add(portfolioDetail);
-
             if (i == len - 1) {
                 portfolioDetail.setTargetNum(totalVolume);
                 break;
@@ -213,6 +217,11 @@ public class PortfolioAssignHelper {
             currVolume = detail.getEntrustNum();
             assignVolume = NumberUtil.div(NumberUtil.mul(currVolume, totalVolume), instructionVolume, 0);
             assignVolume = TradeUtils.subtractMod(assignVolume, minStep);
+            
+            if(i+minNum.intValue()<instructionDetails.size()) {//没有分到最小交易数量的不分
+            	assignVolume=BigDecimal.ZERO;
+            }
+            
             portfolioDetail.setTargetNum(assignVolume);
             // 更新指令委托总数
             instructionVolume = instructionVolume.subtract(currVolume);
@@ -276,6 +285,15 @@ public class PortfolioAssignHelper {
             }
             detail.setTargetNum(NumberUtil.sub(detail.getTargetNum(), historyNum));
             detail.setTargetAmt(NumberUtil.round(NumberUtil.mul(detail.getTargetNum(), price), AMT_SCALE));
+        }
+        
+        //----------最小交易数量修改------------
+        for (int i=0;i<list.size();i++) {
+        	if(i+minNumAssignableCount>=list.size()) {
+        		PortfolioDetail detail = list.get(i);
+        		detail.setTargetNum(NumberUtil.add(detail.getTargetNum(), minNum));
+        		detail.setTargetAmt(NumberUtil.round(NumberUtil.mul(detail.getTargetNum(), price), AMT_SCALE));
+        	}
         }
 
         Map<String, PortfolioDetail> portfolioDetailMap = list.stream().collect(Collectors.toMap(PortfolioDetail::getPortfolioId, item -> item, (o1, o2) -> o1));
