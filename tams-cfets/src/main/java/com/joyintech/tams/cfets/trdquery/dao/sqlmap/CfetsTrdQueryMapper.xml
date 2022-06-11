@@ -5115,8 +5115,10 @@
         SELECT  BO.FINPROD_ID as finprodId,
                 FP.FINPROD_MARKET_ID   AS	finprodMarketId,
                 FP.FINPROD_ABBR	  AS	finprodAbbr,
+                BO.OU_PARTY_ID ouPartyId,
+                m1.PARTY_ABBR ouPartyIdStr,
                 bo.OUR_TRADER  AS	trader,
-                mcci.PARTY_ABBR as traderidStr,
+                su.real_name as traderidStr,
                 bo.COUNTER_ID  AS	counterId,
                 mcp.COUNTER_NAME AS counterIdStr,
                 FPI.ISSUE_PRICE issuePrice,
@@ -5135,15 +5137,18 @@
          left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
          left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
          left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
-         LEFT JOIN MST_CFETS_CUSTOMER_INFO mcci on BO.OUR_TRADER=mcci.PARTY_ID
+         LEFT JOIN SYS_USER SU ON BO.OUR_TRADER = SU.USER_NAME
          LEFT JOIN MST_COUNTER_PARTY mcp ON BO.COUNTER_ID= mcp.COUNTER_ID
+         left join MST_CFETS_CUSTOMER_INFO m1 ON BO.OU_PARTY_ID=m1.PARTY_ID
         where bo.BID_ID = #{bidId}
         UNION ALL
         SELECT  wbo.FINPROD_ID as finprodId,
                 FP.FINPROD_MARKET_ID   AS	finprodMarketId,
                 FP.FINPROD_ABBR	  AS	finprodAbbr,
+                wbo.OU_PARTY_ID ouPartyId,
+                m1.PARTY_ABBR ouPartyIdStr,
                 wbo.OUR_TRADER AS	trader,
-                m1.PARTY_ABBR as traderidStr,
+                su.real_name as traderidStr,
                 wbo.OUR_TRADER  AS	counterId,
                 MCCI.COUNTER_NAME AS counterIdStr,
                 FPI.ISSUE_PRICE issuePrice,
@@ -5162,8 +5167,9 @@
          left join FIN_PRODUCT fp on fp.FINPROD_ID = wbo.FINPROD_ID
          left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
          left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
-         LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on wbo.OUR_TRADER=m1.PARTY_ID
+         LEFT JOIN SYS_USER SU ON wbo.OUR_TRADER = SU.USER_NAME
          LEFT JOIN MST_COUNTER_PARTY mcci ON wbo.COUNTER_ID= mcci.COUNTER_ID
+         left join MST_CFETS_CUSTOMER_INFO m1 ON wbo.OU_PARTY_ID=m1.PARTY_ID
         where wbo.BID_ID = #{bidId}
     </select>
 

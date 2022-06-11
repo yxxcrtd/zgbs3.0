@@ -258,11 +258,13 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             });
             list = listTemp;
         }
+        if(CollectionUtils.isEmpty(list)){
+            return ajaxResult;
+        }
         String finprodId = null;
         String counterId = null;
         Date issueDateStart = null;
         Date issueDateEnd = null;
-        Map<String, List<String>> entrustIdsMap = new HashMap<>();
         if (StringUtil.isNotEmpty(request) && StringUtil.isNotEmpty(list)) {
             for (CfetsTrdFirstBidFirmEntrustDto entrustDto : list) {
                 ValidMessage error = new ValidMessage();
@@ -338,139 +340,160 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         if (CollectionUtils.isNotEmpty(errorList)) {
             ajaxResult.setErrorList(errorList);
-        } else {
-            Map<String, Object> param = new HashMap<>();
-            param.put("finprodId", finprodId);
-            param.put("counterId", counterId);
-            param.put("issueDateEnd", issueDateEnd);
-            param.put("issueDateStart", issueDateStart);
-            param.put("ISSUE_CLASS_02", DictCodeListExt4.新债_发行方式_招标发行.getValue());
-            param.put("ISSUE_CLASS_03", DictCodeListExt4.新债_发行方式_簿记建档.getValue());
-            param.put("bidModles", Arrays.asList(DictCodeListExt4.投标方式_自主投标.getValue(), DictCodeListExt4.投标方式_代投代缴.getValue()));
-            List<CfetsTrdFirstBidFirmEntrustDto> entrustDtos = cfetsTrdFirstBidFirm002Mapper.selectEntInfoByIdAndDate(param);
-            if (CollectionUtils.isEmpty(entrustDtos)) {
-                return ajaxResult;
-            }
-            if(isEntrustSumFlagBid) {
-                Map<String, CfetsTrdFirstBidFirmEntrustDto> entrustDtoMap = new HashMap<>();
-                List<CfetsTrdFirstBidFirmEntrustDto> entrustDtosTemp = new ArrayList<>();
-                entrustDtos.forEach(entrustDto -> {
-                    if (StringUtil.isEmpty(entrustDto.getEntrustIdKey())) {
-                        // 没有手动汇总记录不处理
-                        entrustDtosTemp.add(entrustDto);
-                    } else if (entrustDtoMap.get(entrustDto.getEntrustIdKey()) == null) {
-                        //只处理未处理的数据
-                        param.put("totleId", entrustDto.getEntrustIdKey());
-                        param.remove("counterId");
-                        // 根据汇总编号查询其他数据
-                        List<CfetsTrdFirstBidFirmEntrustDto> listTemp = cfetsTrdFirstBidFirm002Mapper.selectEntInfoByIdAndDate(param);
-                        // 记录指令代码
-                        List<String> entrustIds = new ArrayList<>();
-                        for (CfetsTrdFirstBidFirmEntrustDto item : listTemp) {
-                            entrustIds.add(item.getEntrustId() + "KEY");
-                            if (StringUtil.isNotEmpty(item.getCounterName())
-                                    || entrustDtoMap.get(entrustDto.getEntrustIdKey()) == null) {
-                                entrustDtoMap.put(entrustDto.getEntrustIdKey(), item);
-                            }
-                        }
-                        entrustIdsMap.put(entrustDto.getEntrustIdKey(), entrustIds);
-                    }
-                });
-                for (CfetsTrdFirstBidFirmEntrustDto entrustDto : entrustDtoMap.values()) {
-                    entrustDtosTemp.add(entrustDto);
-                }
-                entrustDtos = entrustDtosTemp;
-            }
+        } else if (!StringUtil.equals(request.getIsSearch(), DictCodeList.是否_否.getValue())) {
+            ajaxResult = this.confirmCheck(finprodId, counterId, issueDateStart, issueDateEnd, isEntrustSumFlagBid, entrustIdList);
+        }
+        return ajaxResult;
+    }
 
-            List<Map<String, Object>> massageMapList = new ArrayList<>();
-            List<String> entrustIdList1 = new ArrayList<>();// 情况1的指令代码列表
-            List<String> entrustIdList2 = new ArrayList<>();// 情况2的指令代码列表
-            String counterName = null;
-            //是否仅存在唯一交易对手标记 false 不是 true 是
-            boolean counterOnlyFlag = true;
+    /**
+     * 确认信息校验
+     *
+     * @param finprodId           资产代码
+     * @param counterId           交易对手代码
+     * @param issueDateStart      投标开始日
+     * @param issueDateEnd        投标结束日
+     * @param isEntrustSumFlagBid 系统参数
+     * @param entrustIdList       指令代码列表
+     * @return com.joyintech.framework.ajax.AjaxResult
+     * @author jiangpeng
+     * @date 2022/6/11 14:47
+     */
+    public AjaxResult confirmCheck(String finprodId, String counterId, Date issueDateStart, Date issueDateEnd,
+                                   boolean isEntrustSumFlagBid, List<String> entrustIdList) {
+        AjaxResult ajaxResult = new AjaxResult();
+        Map<String, List<String>> entrustIdsMap = new HashMap<>();
+        Map<String, Object> param = new HashMap<>();
+        param.put("finprodId", finprodId);
+        param.put("counterId", counterId);
+        param.put("issueDateEnd", issueDateEnd);
+        param.put("issueDateStart", issueDateStart);
+        param.put("ISSUE_CLASS_02", DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        param.put("ISSUE_CLASS_03", DictCodeListExt4.新债_发行方式_簿记建档.getValue());
+        param.put("bidModles", Arrays.asList(DictCodeListExt4.投标方式_自主投标.getValue(), DictCodeListExt4.投标方式_代投代缴.getValue()));
+        List<CfetsTrdFirstBidFirmEntrustDto> entrustDtos = cfetsTrdFirstBidFirm002Mapper.selectEntInfoByIdAndDate(param);
+        if (CollectionUtils.isEmpty(entrustDtos)) {
+            return ajaxResult;
+        }
+        if (isEntrustSumFlagBid) {
+            Map<String, CfetsTrdFirstBidFirmEntrustDto> entrustDtoMap = new HashMap<>();
+            List<CfetsTrdFirstBidFirmEntrustDto> entrustDtosTemp = new ArrayList<>();
+            entrustDtos.forEach(entrustDto -> {
+                if (StringUtil.isEmpty(entrustDto.getEntrustIdKey())) {
+                    // 没有手动汇总记录不处理
+                    entrustDtosTemp.add(entrustDto);
+                } else if (entrustDtoMap.get(entrustDto.getEntrustIdKey()) == null) {
+                    //只处理未处理的数据
+                    param.put("totleId", entrustDto.getEntrustIdKey());
+                    param.remove("counterId");
+                    // 根据汇总编号查询其他数据
+                    List<CfetsTrdFirstBidFirmEntrustDto> listTemp = cfetsTrdFirstBidFirm002Mapper.selectEntInfoByIdAndDate(param);
+                    // 记录指令代码
+                    List<String> entrustIds = new ArrayList<>();
+                    for (CfetsTrdFirstBidFirmEntrustDto item : listTemp) {
+                        entrustIds.add(item.getEntrustId() + "KEY");
+                        if (StringUtil.isNotEmpty(item.getCounterName())
+                                || entrustDtoMap.get(entrustDto.getEntrustIdKey()) == null) {
+                            entrustDtoMap.put(entrustDto.getEntrustIdKey(), item);
+                        }
+                    }
+                    entrustIdsMap.put(entrustDto.getEntrustIdKey(), entrustIds);
+                }
+            });
+            for (CfetsTrdFirstBidFirmEntrustDto entrustDto : entrustDtoMap.values()) {
+                entrustDtosTemp.add(entrustDto);
+            }
+            entrustDtos = entrustDtosTemp;
+        }
+
+        List<Map<String, Object>> massageMapList = new ArrayList<>();
+        List<String> entrustIdList1 = new ArrayList<>();// 情况1的指令代码列表
+        List<String> entrustIdList2 = new ArrayList<>();// 情况2的指令代码列表
+        String counterName = null;
+        //是否仅存在唯一交易对手标记 false 不是 true 是
+        boolean counterOnlyFlag = true;
+        // 1.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的已接收待投标且不存在过程中投标确认数据的指令
+        boolean flag1 = false;
+        // 2.勾选指令时，如勾选指令交易对手为空，判断与勾选指令是否存在同资产+同一投标日的已接收待投标且不存在过程中投标确认数据的指令，
+        boolean flag2 = false;
+        // 3.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的待接收指令
+        boolean flag3 = false;
+        for (CfetsTrdFirstBidFirmEntrustDto entrustDto : entrustDtos) {
+            if (entrustIdList.contains(entrustDto.getEntrustId())) {
+                continue;
+            }
             // 1.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的已接收待投标且不存在过程中投标确认数据的指令
-            boolean flag1 = false;
-            // 2.勾选指令时，如勾选指令交易对手为空，判断与勾选指令是否存在同资产+同一投标日的已接收待投标且不存在过程中投标确认数据的指令，
-            boolean flag2 = false;
-            // 3.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的待接收指令
-            boolean flag3 = false;
-            for (CfetsTrdFirstBidFirmEntrustDto entrustDto : entrustDtos) {
-                if (entrustIdList.contains(entrustDto.getEntrustId())) {
-                    continue;
-                }
-                // 1.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的已接收待投标且不存在过程中投标确认数据的指令
-                if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue())
-                        && StringUtil.equals(entrustDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue())
-                        && (StringUtil.equals(counterId, entrustDto.getCounterId())
-                        || (StringUtil.isEmpty(counterId) && StringUtil.isEmpty(entrustDto.getCounterId())))) {
-                    flag1 = true;
-                    if (isEntrustSumFlagBid) {
-                        if(StringUtil.isNotEmpty(entrustDto.getEntrustIdKey())){
-                            entrustIdList1.addAll(entrustIdsMap.get(entrustDto.getEntrustIdKey()));
-                        }else {
-                            entrustIdList1.add(entrustDto.getEntrustId() + "KEY");
-                        }
+            if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue())
+                    && StringUtil.equals(entrustDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue())
+                    && (StringUtil.equals(counterId, entrustDto.getCounterId())
+                    || (StringUtil.isEmpty(counterId) && StringUtil.isEmpty(entrustDto.getCounterId())))) {
+                flag1 = true;
+                if (isEntrustSumFlagBid) {
+                    if (StringUtil.isNotEmpty(entrustDto.getEntrustIdKey())) {
+                        entrustIdList1.addAll(entrustIdsMap.get(entrustDto.getEntrustIdKey()));
                     } else {
-                        entrustIdList1.add(entrustDto.getEntrustId());
+                        entrustIdList1.add(entrustDto.getEntrustId() + "KEY");
                     }
-                }
-                // 2.勾选指令时，如勾选指令交易对手为空，判断与勾选指令是否存在同资产+同一投标日的已接收待投标且不存在过程中投标确认数据的指令
-                if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue())
-                        && StringUtil.equals(entrustDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue())
-                        && StringUtil.isEmpty(counterId)) {
-                    if (StringUtil.isNotEmpty(counterName) && StringUtil.isNotEmpty(entrustDto.getCounterName())
-                            && !StringUtil.equals(counterName, entrustDto.getCounterName())) {
-                        counterOnlyFlag = false;
-                    }
-                    if (StringUtil.isEmpty(counterName) && StringUtil.isNotEmpty(entrustDto.getCounterName())) {
-                        counterName = entrustDto.getCounterName();
-                    }
-                    flag2 = true;
-                    if (isEntrustSumFlagBid) {
-                        if(StringUtil.isNotEmpty(entrustDto.getEntrustIdKey())){
-                            entrustIdList2.addAll(entrustIdsMap.get(entrustDto.getEntrustIdKey()));
-                        }else {
-                            entrustIdList2.add(entrustDto.getEntrustId() + "KEY");
-                        }
-                    } else {
-                        entrustIdList2.add(entrustDto.getEntrustId());
-                    }
-                }
-                // 3.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的待接收指令
-                if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_待接收.getValue())
-                        && (StringUtil.equals(counterId, entrustDto.getCounterId())
-                        || (StringUtil.isEmpty(counterId) && StringUtil.isEmpty(entrustDto.getCounterId())))) {
-                    flag3 = true;
-                }
-            }
-            if (flag1) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("type", "01");
-                map.put("massege", "存在未勾选的已接收指令，是否自动选择一并投标确认？");
-                map.put("ids", entrustIdList1);
-                massageMapList.add(map);
-            }
-            if (flag2) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("type", "02");
-                if (StringUtil.isNotEmpty(counterName) && counterOnlyFlag) {
-                    map.put("massege", "存在交易对手为" + counterName + "的未勾选的已接收指令，是否自动选择一并投标确认？");
-                    map.put("ids", entrustIdList2);
                 } else {
-                    map.put("massege", "存在多个其他交易对手的未勾选的已接收指令，是否仍进行投标确认？");
+                    entrustIdList1.add(entrustDto.getEntrustId());
                 }
-                massageMapList.add(map);
             }
-            if (flag3) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("type", "03");
-                map.put("massege", "该资产存在未接收指令待处理，是否现在进行投标确认？");
-                massageMapList.add(map);
+            // 2.勾选指令时，如勾选指令交易对手为空，判断与勾选指令是否存在同资产+同一投标日的已接收待投标且不存在过程中投标确认数据的指令
+            if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue())
+                    && StringUtil.equals(entrustDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue())
+                    && StringUtil.isEmpty(counterId)) {
+                if (StringUtil.isNotEmpty(counterName) && StringUtil.isNotEmpty(entrustDto.getCounterName())
+                        && !StringUtil.equals(counterName, entrustDto.getCounterName())) {
+                    counterOnlyFlag = false;
+                }
+                if (StringUtil.isEmpty(counterName) && StringUtil.isNotEmpty(entrustDto.getCounterName())) {
+                    counterName = entrustDto.getCounterName();
+                }
+                flag2 = true;
+                if (isEntrustSumFlagBid) {
+                    if (StringUtil.isNotEmpty(entrustDto.getEntrustIdKey())) {
+                        entrustIdList2.addAll(entrustIdsMap.get(entrustDto.getEntrustIdKey()));
+                    } else {
+                        entrustIdList2.add(entrustDto.getEntrustId() + "KEY");
+                    }
+                } else {
+                    entrustIdList2.add(entrustDto.getEntrustId());
+                }
             }
-            if (CollectionUtils.isNotEmpty(massageMapList)) {
-                ajaxResult.setData(massageMapList);
-                ajaxResult.setMessageType(MessageType.确认消息);
+            // 3.勾选指令时，判断与勾选指令是否存在同资产+同一投标日+同一交易对手的待接收指令
+            if (StringUtil.equals(entrustDto.getEntrustStatus(), BussinessDictCodeList.委托状态_待接收.getValue())
+                    && (StringUtil.equals(counterId, entrustDto.getCounterId())
+                    || (StringUtil.isEmpty(counterId) && StringUtil.isEmpty(entrustDto.getCounterId())))) {
+                flag3 = true;
             }
+        }
+        if (flag1) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "01");
+            map.put("massege", "存在未勾选的已接收指令，是否自动选择一并投标确认？");
+            map.put("ids", entrustIdList1);
+            massageMapList.add(map);
+        }
+        if (flag2) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "02");
+            if (StringUtil.isNotEmpty(counterName) && counterOnlyFlag) {
+                map.put("massege", "存在交易对手为" + counterName + "的未勾选的已接收指令，是否自动选择一并投标确认？");
+                map.put("ids", entrustIdList2);
+            } else {
+                map.put("massege", "存在多个其他交易对手的未勾选的已接收指令，是否仍进行投标确认？");
+            }
+            massageMapList.add(map);
+        }
+        if (flag3) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "03");
+            map.put("massege", "该资产存在未接收指令待处理，是否现在进行投标确认？");
+            massageMapList.add(map);
+        }
+        if (CollectionUtils.isNotEmpty(massageMapList)) {
+            ajaxResult.setData(massageMapList);
+            ajaxResult.setMessageType(MessageType.确认消息);
         }
         return ajaxResult;
     }
@@ -1559,9 +1582,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 // 中标标位
                 BigDecimal bidPrice = BigDecimal.ZERO;
                 if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
-                    bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 4);
+                    bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 16);
                 } else if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
-                    bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 4);
+                    bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 16);
                 } else {//价格
                     bidPrice = item.getBidPrice();
                 }
@@ -1972,11 +1995,13 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
                 this.sendPositionMethod(entity, true, null);
+                // 老头寸处理
+                this.dealOldPosition(entity, false);
             } else {
                 this.sendPositionMethodOther(entity, true, null);
+                // 老头寸处理
+                this.dealOldPosition(entity, false);
             }
-            // 老头寸处理
-//            this.dealOldPosition(entity, false);
         }
         // AOP中处理操作履历
     }
@@ -2029,9 +2054,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 wflBidOrderBidPrice.setEntrustId(item.getEntrustId());
                 // 投标标位
                 if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
-                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 4));
+                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 16));
                 } else if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
-                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 4));
+                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 16));
                 } else {//价格
                     wflBidOrderBidPrice.setBidPrice(item.getBidPrice());
                 }
@@ -2059,9 +2084,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             wflBidOrder.setWinPrinAmt(entity.getBidPriceTotal());
             // 中标标位
             if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
-                wflBidOrder.setWinPrice(ArithmeticUtil.divide(entity.getWinPrice(), new BigDecimal(100), 4));
+                wflBidOrder.setWinPrice(ArithmeticUtil.divide(entity.getWinPrice(), new BigDecimal(100), 16));
             } else if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
-                wflBidOrder.setWinPrice(ArithmeticUtil.divide(entity.getWinPrice(), new BigDecimal(10000), 4));
+                wflBidOrder.setWinPrice(ArithmeticUtil.divide(entity.getWinPrice(), new BigDecimal(10000), 16));
             } else {//价格
                 wflBidOrder.setWinPrice(entity.getWinPrice());
             }
@@ -2091,9 +2116,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 wflBidOrderBidPrice.setEntrustId(item.getEntrustId());
                 // 投标标位
                 if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
-                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 4));
+                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 16));
                 } else if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
-                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 4));
+                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 16));
                 } else {//价格
                     wflBidOrderBidPrice.setBidPrice(item.getBidPrice());
                 }
@@ -2573,8 +2598,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             }
             String confirmOk = RequestUtil.getParam("confirmOk");
             ProcessMark newEntity;
-            //处理指令执行进度
-//            this.insertEtrFinishStatus(entity, OperationType.NEW);
             // 发头寸
             try {
                 if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
@@ -3530,6 +3553,16 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             Map<String, Object> params = new HashMap<>();
             params.put("entrustId", item.getEntrustId());
             params.put("protfolioId", item.getPortfolioId());
+            BigDecimal bidPrice = BigDecimal.ZERO;
+            // 中标标位
+            if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
+                bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 16);
+            } else if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 16);
+            } else {//价格
+                bidPrice = item.getBidPrice();
+            }
+            params.put("bidPrice", bidPrice);
             BigDecimal etrAvaNum = cfetsTrdFirstBidFirm002Mapper.selectEtrAvaNum(params);
             if (BigDecimalUtil.ACompareToB(etrAvaNum, item.getBidPriceTotal(), 6) < 0) {
                 errorList.add(new ValidMessage("指令【" + item.getEntrustId() + "】中组合【" + item.getPortfolioName() + "】剩余指令额度不足(存在流程中数据)!"));
@@ -3754,7 +3787,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     stlPayOrder.setMyAcctNo(deal.getSecManageAcctId());
                     stlPayOrder.setOrderId(entity.getBidId());
                     stlPayOrder.setCcy("CNY");
-//                    stlPayOrder.setSettleAmt(deal.getPayableAmount());
+                    stlPayOrder.setSettleAmt(deal.getTradeAmt());
                     stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
                     stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
                     stlPayOrder.setSettleDate(entity.getTradeDate());
@@ -3866,6 +3899,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      */
     public Page<CfetsTrdFirstBidFirmEntrustDto> pageEntrust(CfetsTrdBondFirstBidFirmEntrustRequest request) {
         request.setIsEtrAddSearch(DictCodeList.是否_是.getValue());
+        request.setEntrustStatus(Collections.singletonList(DictCodeList.委托状态_已接收.getValue()));
         return cfetsTrdFirstBidFirm001Service.pageEntrust(request);
     }
 

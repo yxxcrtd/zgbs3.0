@@ -144,6 +144,9 @@ public class CfetsTrdBidInfoResponse {
     @ApiModelProperty(name="ouPartyId",value="本方")
     private String ouPartyId;
 
+    @ApiModelProperty(name="ouPartyIdStr",value="本方")
+    private String ouPartyIdStr;
+
     @ApiModelProperty(name="trader",value="本方交易员ID")
     private String trader;
 
@@ -671,5 +674,13 @@ public class CfetsTrdBidInfoResponse {
 
     public void setTotalWinPrinAmt(BigDecimal totalWinPrinAmt) {
         this.totalWinPrinAmt = totalWinPrinAmt;
+    }
+
+    public String getOuPartyIdStr() {
+        return ouPartyIdStr;
+    }
+
+    public void setOuPartyIdStr(String ouPartyIdStr) {
+        this.ouPartyIdStr = ouPartyIdStr;
     }
 }

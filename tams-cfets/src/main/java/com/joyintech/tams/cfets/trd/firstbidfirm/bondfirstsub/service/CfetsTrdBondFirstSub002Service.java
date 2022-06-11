@@ -847,8 +847,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             String confirmOk = entity.getConfirmOk();
             entity.setConfirmOk(null);
             ProcessMark newEntity;
-            //处理指令执行进度
-            this.insertEtrFinishStatus(entity, OperationType.NEW);
             // 发头寸
             try {
                 if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
@@ -988,8 +986,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     public void doBack(CfetsTrdBondFirstSubInfoDto entity) {
         // 删除流程中表数据
         this.deleteWflDataByWorkflowId(entity.getWorkflowId());
-        // 老头寸处理
-        this.dealOldPosition(entity, true);
+        if (cfetsTrdBondFirstSub002Mapper.selectBidOrders(entity.getBidId()) == 0) {
+            // 老头寸处理
+            this.dealOldPosition(entity, true);
+        }
     }
 
 

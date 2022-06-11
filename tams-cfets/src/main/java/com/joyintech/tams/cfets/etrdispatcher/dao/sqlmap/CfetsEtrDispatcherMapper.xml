@@ -2811,6 +2811,8 @@
         <result column="SEC_ACCT_ID" property="secAcctId" jdbcType="VARCHAR"/>
         <result column="TRADE_PLAT" property="tradePlat" jdbcType="VARCHAR"/>
         <result column="FINPROD_TYPE2" property="finprodType2" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Query_Column_List">
@@ -2825,7 +2827,7 @@
         b.PORTFOLIO_NAME,b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.PS as ENTRUST_BS
     </sql>
 
-    <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
+    <!--<select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
         select * from (select
         <include refid="Query_Column_List"/>
         FROM T_TRADE a left join T_INSTRUCTION b on a.INSTRUCTION_ID =b.ENTRUST_ID
@@ -2838,6 +2840,128 @@
         where a.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
         AND a.TRADE_TYPE = '0') T
         order by T.CREATE_TIME DESC
+    </select>-->
+
+    <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
+ 	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, <!--PP.PORTFOLIO_NAME,--> SCI.ACCT_NAME  ACCOUNT_NAME
+	  FROM (
+	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
+			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
+			 STD.CJBH                                              BROKER_TRADE_ID,
+			 STD.TRADE_MARKET                                      MARKET,
+			 FP.FINPROD_MARKET_ID                                  STOCK_CODE,
+			 FP.FINPROD_ABBR                                       STOCK_NAME,
+			 DECODE(TT.PS, NULL, TTH.PS)                           ENTRUST_BS,
+			 DECODE(TT.TRADED_VOLUME, NULL, TTH.TRADED_VOLUME)     TRADED_VOLUME,
+			 DECODE(TT.TRADED_PRICE, NULL, TTH.TRADED_PRICE)       TRADED_PRICE,
+			 DECODE(TT.TRADED_BALANCE, NULL, TTH.TRADED_BALANCE)   TRADED_BALANCE,
+			 DECODE(TT.TRADING_DAY, NULL, TTH.TRADING_DAY)         TRADING_DAY,
+             TO_CHAR(DECODE(TT.CREATE_TIME, NULL, TTH.CREATE_TIME),'HH24:Mi:ss')                  TRADE_TIME,
+             TT.CREATE_TIME CREATE_TIME,
+			 CASE
+			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
+			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
+               WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
+             END                                                   DELIVERY_RESULT,
+			 CASE
+			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
+			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
+			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
+			 END                                                   DELIVERY_SCHEDULE,
+			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT
+		FROM SETTLE_TRANS_DATA STD
+		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') AND TT.TRADE_TYPE = '0')
+		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
+		LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
+	   WHERE STD.DELIVERY_RESULT IN ('01', '02', '03', '05')
+		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
+                OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
+	  UNION
+	  SELECT TT.INSTRUCTION_ID                                     INSTRUCTION_ID,
+			 TT.BROKER_ENTRUST_ID                                  ENTRUST_ID,
+			 TT.BROKER_TRADE_ID                                    BROKER_TRADE_ID,
+			 CASE
+			   WHEN TT.MARKET = 'SH' THEN '上海证券交易所'
+			   WHEN TT.MARKET = 'SZ' THEN '深圳证券交易所'
+			   ELSE NULL
+			 END                                                   MARKET,
+			 TT.STOCK_CODE                                         STOCK_CODE,
+			 TT.STOCK_NAME                                         STOCK_NAME,
+			 TT.PS                                                 ENTRUST_BS,
+			 TT.TRADED_VOLUME                                      TRADED_VOLUME,
+			 TT.TRADED_PRICE                                       TRADED_PRICE,
+			 TT.TRADED_BALANCE                                     TRADED_BALANCE,
+			 TT.TRADING_DAY                                        TRADING_DAY,
+             TO_CHAR(TT.CREATE_TIME,'HH24:Mi:ss')                  TRADE_TIME,
+             TT.CREATE_TIME CREATE_TIME,
+			 CASE
+			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
+			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
+               WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
+			 END                                                   DELIVERY_RESULT,
+			 CASE
+			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
+			   WHEN STD.DELIVERY_RESULT = '04' THEN '0'
+			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
+			 END                                                   DELIVERY_SCHEDULE,
+			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT
+		FROM T_TRADE TT
+		LEFT JOIN SETTLE_TRANS_DATA STD
+		  ON TT.BROKER_TRADE_ID = STD.CJBH
+		 AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID
+		 AND STD.DELIVERY_RESULT IN ('01', '02', '03')
+		 AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD')
+		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
+                OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
+        <!-- 信用保护凭证新家逻辑-->
+        AND ( STD.SETTLE_SPEED = '0' OR STD.SETTLE_SPEED IS NULL ) UNION
+        SELECT
+            tpda.ENTRUST_ID INSTRUCTION_ID,
+            NULL ENTRUST_ID,
+            tpd.TOTLE_TRADE_ID BROKER_TRADE_ID,
+            CASE
+
+            WHEN tpd.TRADE_MARKET = '03' THEN
+            '上海证券交易所'
+            WHEN tpd.TRADE_MARKET = '04' THEN
+            '深圳证券交易所' ELSE NULL
+            END MARKET,
+            fp.FINPROD_MARKET_ID STOCK_CODE,
+            fp.FINPROD_ABBR STOCK_NAME,
+            tpd.PS ENTRUST_BS,
+            tpd.SHARE_AMT TRADED_VOLUME,
+            tpd.CPRICE_AMT TRADED_PRICE,
+            tpd.FPRICE_AMT TRADED_BALANCE,
+            TO_CHAR( tpd.TRADE_DATE, 'YYYY-MM-DD' ) TRADING_DAY,
+            TO_CHAR( tpd.CREATE_TIME, 'HH24:Mi:ss' ) TRADE_TIME,
+            tpd.CREATE_TIME CREATE_TIME,
+            '正常交收' DELIVERY_RESULT,
+            '100' DELIVERY_SCHEDULE,
+            ssai.SEC_ACCT_ID ACCT_ACCOUNT
+        FROM
+            TRD_FIN_PRODUCT_DEAL_TOTAL tpd
+            LEFT JOIN TRD_DEAL_TOTAL_ADD tpda ON tpd.TOTLE_TRADE_ID = tpda.TOTLE_TRADE_ID
+            LEFT JOIN FIN_PRODUCT fp ON tpd.FINPROD_ID = fp.FINPROD_ID
+            LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.SEC_MANAGE_ACCT_ID = ssai.SEC_ACCT_ID
+        WHERE
+            tpd.IS_CANCEL = 'N'
+            AND tpd.TRADE_STATUS = '01'
+            AND tpd.FINPROD_TYPE2 = 'F37'
+            AND tpd.PS = 'T04'
+            AND tpd.TRADE_DATE &lt; to_date(#{sysDate},'yyyy-mm-dd')
+        ) A
+	  LEFT JOIN STL_CAPACCT_INFO SCI ON A.ACCT_ACCOUNT = SCI.ACCT_NO
+	  LEFT JOIN ETR_ENTRUST EE ON A.INSTRUCTION_ID = EE.ENTRUST_ID
+        <!-- LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
+        LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID -->
+      WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+      ORDER BY A.CREATE_TIME DESC
     </select>
 
     <resultMap id="QueryResultMap" type="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherExeListInfoResponse">
@@ -2910,7 +3034,7 @@
     <sql id="query_integrated_entrust">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
         a.FINANCE_ACCOUNT, a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET, a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,
-        a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, a.FULL_PRICE ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
+        a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, a.ENTRUST_PRICE ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
         a.DISCOUNT, a.TRANS_CODE, a.EXPIRE_YEAR_RATE, a.PRETERM_YEAR_RATE, a.LIAISON_NAME, a.LIAISON_TEL,
         a.PROP_SEAT_NO,a.PROP_SEAT_NAME, a.SELLER_NO, a.CONTRACT_ID, a.FIRST_SETTLE_DATE, a.BACK_DATE,
         a.COMPACT_TERM, a.BACK_BALANCE, a.ORIG_SERIAL_NO,a.REDUCTION_TYPE, a.FROZEN_BALANCE, a.FROZEN_VOLUME,
@@ -2924,7 +3048,7 @@
     <sql id="query_entrust">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
         a.FINANCE_ACCOUNT, a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET, a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,
-        a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, a.FULL_PRICE ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
+        a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, a.ENTRUST_PRICE ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
         NULL AS DISCOUNT, NULL AS TRANS_CODE, NULL AS EXPIRE_YEAR_RATE, NULL AS PRETERM_YEAR_RATE, NULL AS LIAISON_NAME,
         NULL AS LIAISON_TEL, NULL AS PROP_SEAT_NO, NULL AS PROP_SEAT_NAME, NULL AS SELLER_NO, NULL AS CONTRACT_ID,
         NULL AS FIRST_SETTLE_DATE, NULL AS BACK_DATE, NULL AS COMPACT_TERM, NULL AS BACK_BALANCE, NULL AS ORIG_SERIAL_NO,
@@ -2939,7 +3063,7 @@
     <sql id="query_entrust_history">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,a.FINANCE_ACCOUNT,
         a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET,a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,a.ENTRUST_PROP,
-        a.BS_FLAG, a.ENTRUST_VOLUME, a.FULL_PRICE ENTRUST_PRICE, a.FULL_PRICE,a. ENTRUST_BALANCE, NULL AS DISCOUNT, NULL AS TRANS_CODE,
+        a.BS_FLAG, a.ENTRUST_VOLUME, a.ENTRUST_PRICE ENTRUST_PRICE, a.FULL_PRICE,a. ENTRUST_BALANCE, NULL AS DISCOUNT, NULL AS TRANS_CODE,
         NULL AS EXPIRE_YEAR_RATE, NULL AS PRETERM_YEAR_RATE, NULL AS LIAISON_NAME, NULL AS LIAISON_TEL,
         NULL AS PROP_SEAT_NO, NULL AS PROP_SEAT_NAME, NULL AS SELLER_NO, NULL AS CONTRACT_ID,
         NULL AS FIRST_SETTLE_DATE, NULL AS BACK_DATE, NULL AS COMPACT_TERM, NULL AS BACK_BALANCE,
@@ -2954,7 +3078,7 @@
     <sql id="query_integrated_entrust_history">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID,a.USER_ID, a.USERNAME,a.ACCOUNT_ID,
         a.FINANCE_ACCOUNT, a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET, a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,
-        a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, a.FULL_PRICE ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
+        a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, a.ENTRUST_PRICE ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
         a.DISCOUNT, a.TRANS_CODE, a.EXPIRE_YEAR_RATE, a.PRETERM_YEAR_RATE, a.LIAISON_NAME, a.LIAISON_TEL,
         a.PROP_SEAT_NO, a.PROP_SEAT_NAME, a.SELLER_NO, a.CONTRACT_ID, a.FIRST_SETTLE_DATE, a.BACK_DATE,
         a.COMPACT_TERM, a.BACK_BALANCE, a.ORIG_SERIAL_NO, a.REDUCTION_TYPE, a.FROZEN_BALANCE, a.FROZEN_VOLUME,
