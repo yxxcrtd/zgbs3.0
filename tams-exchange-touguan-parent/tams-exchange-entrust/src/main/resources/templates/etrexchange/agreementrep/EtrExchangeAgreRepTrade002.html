@@ -307,29 +307,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="origRepSecId_div">
-                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.origRepSecId}">当前质押券</label>
-                    <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
-                        <select  type="text" id="origRepSecId" name="origRepSecId" class="layui-input form-input input-select" placeholder="请输入内容" data-th-data-url="@{'/etrexchange/agreementrep/EtrExchangeAgreRepTrade001/getFinprodMarketInfoWfl'}"
-                                 parentIds="acctTradeMarket" th:initValue="${entity?.origRepSecId}" data-th-placeholder="#{SysCommon.placeholder}"  formatoption=false></select>
-                    </div>
-                </div>
-                <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="origConRatio_div">
-                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.origConRatio}">当前折算比例</label>
-                    <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
-                        <input type="text" id="origConRatio" name="origConRatio" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='2' class="layui-input form-input text-number"
-                               data-th-value="${entity?.origConRatio}"  autocomplete="off" maxlength=9>
-                        <span class="input-right-show">%</span>
-                    </div>
-                </div>
-                <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="origRepSecNum_div">
-                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.origRepSecNum}">当前质押数量</label>
-                    <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
-                        <input type="text" id="origRepSecNum" name="origRepSecNum" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='0' class="layui-input form-input text-number"
-                               data-th-value="${entity?.origRepSecNum}"  autocomplete="off" maxlength=9>
-                        <span id ="origRepSecNumUnit" class="input-right-show">万元</span>
-                    </div>
-                </div>
 <!--                <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="origPrintAmt_div">-->
 <!--                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.origPrintAmt}">当前券面金额</label>-->
 <!--                    <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">-->
@@ -354,14 +331,14 @@
                         <span class="input-right-show">元</span>
                     </div>
                 </div>
-                <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="outAmt_div">
-                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.outAmt}">换出金额</label>
-                    <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
-                        <input type="text" id="outAmt" name="outAmt" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='2' class="layui-input form-input text-number"
-                               data-th-value="${entity?.entrustAmt}" required="required" autocomplete="off" maxlength=9>
-                        <span class="input-right-show">元</span>
-                    </div>
-                </div>
+<!--                <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="outAmt_div">-->
+<!--                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.outAmt}">换出金额</label>-->
+<!--                    <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">-->
+<!--                        <input type="text" id="outAmt" name="outAmt" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='2' class="layui-input form-input text-number"-->
+<!--                               data-th-value="${entity?.entrustAmt}" required="required" autocomplete="off" maxlength=9>-->
+<!--                        <span class="input-right-show">元</span>-->
+<!--                    </div>-->
+<!--                </div>-->
                 <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="yield_div">
                     <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.yield}">回购利率</label>
                     <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
