@@ -518,6 +518,11 @@ public class TradeHelper {
     private void checkPrice(OrderInterface entrust, Instruction instruction) {
         BigDecimal entrustPrice = entrust.getEntrustPrice();
         BigDecimal instructionPrice = instruction.getEntrustPrice();
+        if (instruction.convertibleBond() || (instruction.newBond() && instruction.fullPrice())) {
+            entrustPrice = entrust.getFullPrice();
+            instructionPrice = instruction.getFullPrice();
+        }
+
         //检查指令价格限定
         if ((instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(entrustPrice, instructionPrice))
                 || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(entrust, instructionPrice, entrustPrice))) {
