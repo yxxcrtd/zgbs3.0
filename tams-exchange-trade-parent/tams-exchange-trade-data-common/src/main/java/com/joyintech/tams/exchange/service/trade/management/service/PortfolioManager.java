@@ -1126,7 +1126,12 @@ public class PortfolioManager extends BaseService {
      * 计算总剩余委托数量
      */
     private BigDecimal getTotalLeftAmt(List<PortfolioInstructionContextDto> list) {
-        return BigDecimal.valueOf(list.stream().mapToDouble(PortfolioInstructionContextDto::getLeftVolume).sum());
+        BigDecimal totalLeftAmt = BigDecimal.ZERO;
+        for (PortfolioInstructionContextDto dto : list) {
+            totalLeftAmt = totalLeftAmt.add(dto.getLeftAmt());
+        }
+
+        return totalLeftAmt;
     }
 
     private Long getEntrustVolume(Long totalLeftVolume, Long orderVolume, Long leftVolume, int unit) {
@@ -2182,6 +2187,7 @@ public class PortfolioManager extends BaseService {
             }
             if (是否_否.getValue().equals(ins.getEntrustClass())) {
                 dto.setLeftVolume(0L);
+                dto.setLeftAmt(BigDecimal.ZERO);
             }
             resultList.add(dto);
         }
