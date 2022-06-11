@@ -871,6 +871,7 @@ public class CfetsEtrDispatcherService extends BaseService {
     public Page<CfetsEtrDispatcherDealListInfoResponse> getEtrDispatcherDealListInfoByExe(CommonSearchInfoRequest dto) {
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         pageParam.put("instructionId", dto.getEntrustId());
+        pageParam.put("sysDate", iPlatformDate.getSysDateStr());
         Page<CfetsEtrDispatcherDealListInfoResponse> page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
                 () -> cfetsEtrDispatcherMapper.queryTrade2Touguan(pageParam));
         if (!CollectionUtils.isEmpty(page.getRoot())) {
