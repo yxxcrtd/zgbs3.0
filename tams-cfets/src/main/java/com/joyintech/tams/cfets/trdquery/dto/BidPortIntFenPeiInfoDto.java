@@ -1,5 +1,6 @@
 package com.joyintech.tams.cfets.trdquery.dto;
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModelProperty;
@@ -199,7 +200,7 @@ public class BidPortIntFenPeiInfoDto {
     }
 
     public String getAdjustmentStrategy() {
-        return SysDataUtil.getNameFromDataDict(DictCode.分配方式, getDipType());
+        return SysDataUtil.getNameFromDataDict(DictCode.调整策略, getDipType());
     }
 
     public void setAdjustmentStrategy(String adjustmentStrategy) {
@@ -207,7 +208,11 @@ public class BidPortIntFenPeiInfoDto {
     }
 
     public String getDipTypeStr() {
-         return SysDataUtil.getNameFromDataDict(DictCode.分配方式, getDipType());
+        String dipTypeStr = SysDataUtil.getNameFromDataDict(DictCode.调整策略, getDipType());
+        if (!StringUtil.isNotEmpty(dipTypeStr)){
+             dipTypeStr = SysDataUtil.getNameFromDataDict(DictCode.组合分配方式, getDipType());
+        }
+        return dipTypeStr;
     }
 
     public void setDipTypeStr(String dipTypeStr) {

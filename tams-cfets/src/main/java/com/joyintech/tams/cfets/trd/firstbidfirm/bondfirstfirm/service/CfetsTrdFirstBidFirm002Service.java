@@ -1559,9 +1559,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 // 中标标位
                 BigDecimal bidPrice = BigDecimal.ZERO;
                 if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
-                    bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 4);
+                    bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 16);
                 } else if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
-                    bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 4);
+                    bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 16);
                 } else {//价格
                     bidPrice = item.getBidPrice();
                 }
@@ -1972,11 +1972,13 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
                 this.sendPositionMethod(entity, true, null);
+                // 老头寸处理
+                this.dealOldPosition(entity, false);
             } else {
                 this.sendPositionMethodOther(entity, true, null);
+                // 老头寸处理
+                this.dealOldPosition(entity, false);
             }
-            // 老头寸处理
-//            this.dealOldPosition(entity, false);
         }
         // AOP中处理操作履历
     }
@@ -2029,9 +2031,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 wflBidOrderBidPrice.setEntrustId(item.getEntrustId());
                 // 投标标位
                 if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
-                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 4));
+                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 16));
                 } else if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
-                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 4));
+                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 16));
                 } else {//价格
                     wflBidOrderBidPrice.setBidPrice(item.getBidPrice());
                 }
@@ -2059,9 +2061,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             wflBidOrder.setWinPrinAmt(entity.getBidPriceTotal());
             // 中标标位
             if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
-                wflBidOrder.setWinPrice(ArithmeticUtil.divide(entity.getWinPrice(), new BigDecimal(100), 4));
+                wflBidOrder.setWinPrice(ArithmeticUtil.divide(entity.getWinPrice(), new BigDecimal(100), 16));
             } else if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
-                wflBidOrder.setWinPrice(ArithmeticUtil.divide(entity.getWinPrice(), new BigDecimal(10000), 4));
+                wflBidOrder.setWinPrice(ArithmeticUtil.divide(entity.getWinPrice(), new BigDecimal(10000), 16));
             } else {//价格
                 wflBidOrder.setWinPrice(entity.getWinPrice());
             }
@@ -2091,9 +2093,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 wflBidOrderBidPrice.setEntrustId(item.getEntrustId());
                 // 投标标位
                 if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
-                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 4));
+                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 16));
                 } else if (StringUtil.equals(entity.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
-                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 4));
+                    wflBidOrderBidPrice.setBidPrice(ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 16));
                 } else {//价格
                     wflBidOrderBidPrice.setBidPrice(item.getBidPrice());
                 }
@@ -2573,8 +2575,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             }
             String confirmOk = RequestUtil.getParam("confirmOk");
             ProcessMark newEntity;
-            //处理指令执行进度
-//            this.insertEtrFinishStatus(entity, OperationType.NEW);
             // 发头寸
             try {
                 if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
@@ -3530,6 +3530,16 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             Map<String, Object> params = new HashMap<>();
             params.put("entrustId", item.getEntrustId());
             params.put("protfolioId", item.getPortfolioId());
+            BigDecimal bidPrice = BigDecimal.ZERO;
+            // 中标标位
+            if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
+                bidPrice =ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(100), 16);
+            } else if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                bidPrice = ArithmeticUtil.divide(item.getBidPrice(), new BigDecimal(10000), 16);
+            } else {//价格
+                bidPrice = item.getBidPrice();
+            }
+            params.put("bidPrice",bidPrice);
             BigDecimal etrAvaNum = cfetsTrdFirstBidFirm002Mapper.selectEtrAvaNum(params);
             if (BigDecimalUtil.ACompareToB(etrAvaNum, item.getBidPriceTotal(), 6) < 0) {
                 errorList.add(new ValidMessage("指令【" + item.getEntrustId() + "】中组合【" + item.getPortfolioName() + "】剩余指令额度不足(存在流程中数据)!"));
@@ -3754,7 +3764,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     stlPayOrder.setMyAcctNo(deal.getSecManageAcctId());
                     stlPayOrder.setOrderId(entity.getBidId());
                     stlPayOrder.setCcy("CNY");
-//                    stlPayOrder.setSettleAmt(deal.getPayableAmount());
+                    stlPayOrder.setSettleAmt(deal.getTradeAmt());
                     stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
                     stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
                     stlPayOrder.setSettleDate(entity.getTradeDate());
