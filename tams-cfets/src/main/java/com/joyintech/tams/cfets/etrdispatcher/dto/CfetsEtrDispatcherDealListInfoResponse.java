@@ -199,6 +199,11 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     @ApiModelProperty(name = "registOrgStr", value = "登记托管机构", example = "字符串1")
     private String registOrgStr;
 
+    @ApiModelProperty(name = "deliveryResult", value = "交收状态")
+    private String deliveryResult;
+
+    @ApiModelProperty(name = "deliverySchedule", value = "交收进度")
+    private String deliverySchedule;
 
     public String getEffectFlag() {
         return effectFlag;
@@ -1790,5 +1795,21 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
 
     public void setWinPrinAmt(BigDecimal winPrinAmt) {
         this.winPrinAmt = winPrinAmt;
+    }
+
+    public String getDeliveryResult() {
+        return deliveryResult;
+    }
+
+    public void setDeliveryResult(String deliveryResult) {
+        this.deliveryResult = deliveryResult;
+    }
+
+    public String getDeliverySchedule() {
+        return deliverySchedule;
+    }
+
+    public void setDeliverySchedule(String deliverySchedule) {
+        this.deliverySchedule = deliverySchedule;
     }
 }
