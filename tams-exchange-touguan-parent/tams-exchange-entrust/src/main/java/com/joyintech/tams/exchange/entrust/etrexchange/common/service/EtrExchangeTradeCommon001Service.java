@@ -686,7 +686,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         }
         //处理履历
         if (OperationType.MODIFY.equals(arg1)) {
-            updateCfetsOprHis(dto.getEntrustId(), "modify", dto.getCreateUser(), dto.getCreateDept());
+            updateCfetsOprHis(dto.getEntrustId(), ENTRUST_RECORD_MODIFY, dto.getCreateUser(), dto.getCreateDept());
         } else {
             updateCfetsOprHis(dto.getEntrustId(), dto.getOptType(), dto.getCreateUser(), dto.getCreateDept());
         }
