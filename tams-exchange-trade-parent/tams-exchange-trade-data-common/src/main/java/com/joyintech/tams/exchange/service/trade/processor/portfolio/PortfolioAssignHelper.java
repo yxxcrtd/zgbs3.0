@@ -139,6 +139,16 @@ public class PortfolioAssignHelper {
             return ResultBean.error(ErrorCode.MIN_TRD_UNIT_LIMIT_ERROR);
         }
 
+        // 最小交易数量：优先分配一次
+        BigDecimal minNum = BigDecimal.valueOf(minTrdUnitLimit.getMinNum());
+        if (ObjectUtil.isNull(minNum) || minNum.intValue() <= 0) {
+            log.warn("未找到最小交易数量: instructionId [{}], entrustProp = [{}]", instructionId, entrustProp);
+            return ResultBean.error(ErrorCode.MIN_TRD_NUM_LIMIT_ERROR);
+        }
+
+        // 可分配到最小交易数量的组合数量
+        int minNumAssignableCount = Math.min(NumberUtil.div(orginVolume, minNum, 2).intValue(), instructionDetails.size());
+
         //质押式回购的步长是对金额控制的，因此要转换成数量
         if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
             minStep = minStep.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
