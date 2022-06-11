@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+import static com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum.STANDARD_COUPONS_IN_AND_OUT;
 
 @RestController("OrderController_dtx")
 @RequestMapping("/trade/joyin")
@@ -84,7 +84,7 @@ public class OrderController {
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
 
-        if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
+        if (STANDARD_COUPONS_IN_AND_OUT.getCode().equals(instruction.getBusiTypeTg())) {
             order.setEntrustPrice(NumberUtil.div(order.getEntrustPrice(), 100));
         }
 
