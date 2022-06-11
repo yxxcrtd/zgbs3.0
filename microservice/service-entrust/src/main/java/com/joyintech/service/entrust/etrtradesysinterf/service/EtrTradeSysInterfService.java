@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +58,9 @@ public class EtrTradeSysInterfService extends BaseService<EtrTradeSysInterfDto>{
      */
     @Autowired
     private BaseEtrInvestInfoMapper etrInvestInfoMapper;
+
+    @Autowired
+	private JoyinbusinessCommonService joyinbusinessCommonService;
 	
     /**
      * 指令接口查询
@@ -171,6 +176,11 @@ public class EtrTradeSysInterfService extends BaseService<EtrTradeSysInterfDto>{
     			boolean status = this.etrInvestInfoServiceImpl.receptionDelegate(dislist);
     			if(status) {
     				result = 1;
+    				//处理履历
+					CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+					oprHisReq.setEntrustId(entrustId);
+					oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
+					joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     			}
     			
     		} 
@@ -186,6 +196,11 @@ public class EtrTradeSysInterfService extends BaseService<EtrTradeSysInterfDto>{
         			boolean status = etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_待接收.getValue());
         			if(status) {
         				result = 1;
+						//处理履历
+						CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+						oprHisReq.setEntrustId(entrustId);
+						oprHisReq.setOperType(DictCodeListExt3.操作类型_放弃.getValue());
+						joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
         			}
     				List<EtrDistribute> disList = new ArrayList<EtrDistribute>();
     				
@@ -205,6 +220,11 @@ public class EtrTradeSysInterfService extends BaseService<EtrTradeSysInterfDto>{
         			boolean status = etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeListExt3.委托状态_待分发.getValue());
         			if(status) {
         				result = 1;
+						//处理履历
+						CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+						oprHisReq.setEntrustId(entrustId);
+						oprHisReq.setOperType(DictCodeListExt3.操作类型_放弃.getValue());
+						joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
         			}
     			}
     			

@@ -1405,6 +1405,11 @@ public class CfetsEtrDispatcherService extends BaseService {
                         }
                     }
                 }
+                //处理履历
+                CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+                oprHisReq.setEntrustId(entrustId);
+                oprHisReq.setOperType(DictCodeListExt3.操作类型_退回.getValue());
+                joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
             }
             return b;
         }
