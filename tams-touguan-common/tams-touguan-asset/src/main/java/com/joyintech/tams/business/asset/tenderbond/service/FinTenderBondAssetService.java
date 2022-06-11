@@ -407,6 +407,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        param.put("includeInterface",'Y');
         param.put("platDate", DateUtil.platDateFromCache());
         PageHelper.startPage((Integer) param.get("pageNo"), (Integer) param.get("pageSize"));
         List<SelectOptionDto> list = finTenderBondAssetMapper.getAppearMarketIdForSelect(param);

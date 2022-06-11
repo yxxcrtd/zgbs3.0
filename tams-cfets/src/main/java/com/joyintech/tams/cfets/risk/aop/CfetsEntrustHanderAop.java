@@ -55,7 +55,8 @@ public class CfetsEntrustHanderAop {
      * 保存至代办，从代办中提交到流程中，需要执行风险占用
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.etr..*.*.checkSaveError(..)) " +
-            " || execution(* com.joyintech.tams.cfets.etr..*.*.check(..))")
+            " || execution(* com.joyintech.tams.cfets.etr..*.*.check(..))" +
+            " || execution(* com.joyintech.tams.cfets.etr..*.*.checkSave(..))")
     protected void checkSaveError() {
     }
 
