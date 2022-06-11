@@ -743,6 +743,7 @@
             var finprodType2 = $("#finprodType2_" + currentTab).val();
             var jJHQXX = queryJJHQXX(secId, secName, finprodType2);
             var ps = $("#ps_" + currentTab).val();
+            console.log(finprodType2);
             if (finprodType2 == FINPROD_TYPE_TG_F06 || finprodType2 == FINPROD_TYPE_TG_F10) {
                 /*if (ps == PS_T01) {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#limitUp_jj");
@@ -3426,6 +3427,10 @@
             if(ps == PS_T97){
                 $("#invAim_div_" + currentTab).hide();
                 $("#businessModelDiv_"+ currentTab).hide();
+            }
+            var priceModel = $("#priceModel_" + currentTab).val();
+            if(priceModel == PRICE_MODEL_PRM10){
+                $("#entrustPrice_" + currentTab).attr('disabled', 'disabled');
             }
         }
     var addMinPriceStep = function (type, num, input) {
