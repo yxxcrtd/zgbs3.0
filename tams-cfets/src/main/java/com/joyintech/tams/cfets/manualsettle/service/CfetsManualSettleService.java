@@ -15,6 +15,7 @@ import com.joyintech.tams.business.common.dto.PositionRulePtlData;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo004Mapper;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.manualsettle.dto.*;
@@ -1094,7 +1095,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         for(CfetsManualSettleDealInfo dealInfo : listTemp){
                             this.closeDelegateMethod(dealInfo.getEntrustId(),"","交收失败");
                         }
-                        this.closeDelegate(listTemp,entity.getRemark(),entity.getTgBusiType());
+                        SpringContextUtil.getApplicationContext().getBean(CfetsManualSettleService.class).closeDelegate(listTemp,entity.getRemark(),entity.getTgBusiType());
                     }
                 }
             }
@@ -1235,9 +1236,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
      * @see
      * @since 1.0
      */
-    public com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto closeDelegate(List<CfetsManualSettleDealInfo> listTemp,String remark,String tgBusiType) throws Exception {
+    public CfetsEtribBondInfo003Dto closeDelegate(List<CfetsManualSettleDealInfo> listTemp, String remark, String tgBusiType) throws Exception {
         List<String> entrustIdList = listTemp.stream().map(CfetsManualSettleDealInfo::getEntrustId).collect(Collectors.toList());
-        List<TrdBondInvestTradeDto> dtoList = new ArrayList<>();
+        List<CfetsEtribBondInfo003Dto> dtoList = new ArrayList<>();
         // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit start
         if(CollectionUtils.isNotEmpty(entrustIdList)){
             Map<String, BigDecimal> etrFinishMap = EntrustCompleteUtil.getEtrFinishAmtList(entrustIdList);
@@ -1253,11 +1254,11 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 else if(entrustIdList.contains(etrDto.getEntrustId())){
                     recallEntrustIdList.add(etrDto);
                 }
-                TrdBondInvestTradeDto tradeDto = new TrdBondInvestTradeDto();
+                CfetsEtribBondInfo003Dto tradeDto = new CfetsEtribBondInfo003Dto();
                 BeanUtil.copyPropertiesIgnoreNull(tradeDto,etrDto);
                 dtoList.add(tradeDto);
             }
-
+/*
             //没有做过交易，直接关闭的
             if(!StringUtil.isEmptyList(recallEntrustIdList)) {
                 // add by yushilong 批量撤销预占 start
@@ -1269,7 +1270,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             //已经有委托完成度的
             if(!StringUtil.isEmptyList(closeEntrustIdList)) {
                 EntrustCompleteUtil.doComplete(closeEntrustIdList);
-            }
+            }*/
 
         }
 
@@ -1278,8 +1279,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         //更新操作日志
         this.closeDelegatOprHisMethod(listTemp,remark);
 
-        com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto tradeDto = new com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto();
-        tradeDto.setTradeDtoList(dtoList);
+        CfetsEtribBondInfo003Dto tradeDto = new CfetsEtribBondInfo003Dto();
+        tradeDto.setSelectedItem(dtoList);
         return tradeDto;
     }
 

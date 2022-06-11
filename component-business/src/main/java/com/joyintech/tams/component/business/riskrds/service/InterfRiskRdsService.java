@@ -680,7 +680,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             try {
                 doListCommon(v, dataMap, portfolioIds, tradeIds, targetList);
             } catch (Exception e) {
-                ;
+                e.printStackTrace();
             }
         }
         // 取得交易的反向交易编号

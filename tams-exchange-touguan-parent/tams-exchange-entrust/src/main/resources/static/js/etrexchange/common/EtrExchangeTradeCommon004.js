@@ -743,6 +743,7 @@
             var finprodType2 = $("#finprodType2_" + currentTab).val();
             var jJHQXX = queryJJHQXX(secId, secName, finprodType2);
             var ps = $("#ps_" + currentTab).val();
+            console.log(finprodType2);
             if (finprodType2 == FINPROD_TYPE_TG_F06 || finprodType2 == FINPROD_TYPE_TG_F10) {
                 /*if (ps == PS_T01) {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#limitUp_jj");
@@ -1167,6 +1168,21 @@
                     }
                 }
             }
+            // ZGCPCN-1269:对价格模式为收盘价固定价格的竞价股票指令处理 modify by fuyongsheng 20220611 start
+            if(currentTab === "jj" && priceModel === DECLA_TYPE_PRM10){
+                var currentDate = new Date();
+                // 15:00 时间戳
+                var time1500 = new Date(currentDate.getFullYear(),currentDate.getMonth(),currentDate.getDate(),15,0,0).getTime();
+                // 当前时间为15:00前时，指令价格处理同股票市价指令时处理（指令价格只读，显示0，小数位按照股票最小价差显示）
+                if(currentDate.getTime()<time1500){
+                    $("#entrustPrice_jj").attr("disabled", true);
+                    $("#entrustPrice_jj").val(zeroPrice).trigger('change');
+                }else{ // 当前时间为15:00-15:30时，指令价格只读，显示最新价
+                    $("#entrustPrice_jj").val(formatPrice(getMktPrice())).trigger('blur').trigger('change');
+                    $("#entrustPrice_jj").attr("disabled", true);
+                }
+            }
+            // ZGCPCN-1269:对价格模式为收盘价固定价格的竞价股票指令处理 modify by fuyongsheng 20220611 end
         } else {
             if (finprodType2 == FINPROD_TYPE_TG_F01 && isStandardPs(ps)) {
                 $("#price_" + currentTab).val('').trigger('blur').trigger('change');
@@ -3426,6 +3442,10 @@
             if(ps == PS_T97){
                 $("#invAim_div_" + currentTab).hide();
                 $("#businessModelDiv_"+ currentTab).hide();
+            }
+            var priceModel = $("#priceModel_" + currentTab).val();
+            if(priceModel == PRICE_MODEL_PRM10){
+                $("#entrustPrice_" + currentTab).attr('disabled', 'disabled');
             }
         }
     var addMinPriceStep = function (type, num, input) {

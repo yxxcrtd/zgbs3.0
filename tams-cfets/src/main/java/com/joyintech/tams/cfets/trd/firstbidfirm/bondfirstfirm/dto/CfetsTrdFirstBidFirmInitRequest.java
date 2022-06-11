@@ -23,9 +23,9 @@ public class CfetsTrdFirstBidFirmInitRequest {
 
     @ApiModelProperty(name = "flag", value = "指令存在流程中或有效的投标方式为自主投标和代投代缴的投标确认数据,Y/N", example = "Y")
     private String flag;
-//
-//    @ApiModelProperty(name = "biddingMethod", value = "投标方式,初始化页面需要", example = "01")
-//    private String biddingMethod;
+
+    @ApiModelProperty(name = "isSearch", value = "是否是指令明细查询,Y/N", example = "Y")
+    private String isSearch;
 
     public List<CfetsTrdFirstBidFirmEntrustDto> getEntrustDtos() {
         return entrustDtos;
@@ -58,13 +58,12 @@ public class CfetsTrdFirstBidFirmInitRequest {
     public void setFlag(String flag) {
         this.flag = flag;
     }
-    //
-//    public String getBiddingMethod() {
-//        return biddingMethod;
-//    }
-//
-//    public void setBiddingMethod(String biddingMethod) {
-//        this.biddingMethod = biddingMethod;
-//    }
 
+    public String getIsSearch() {
+        return isSearch;
+    }
+
+    public void setIsSearch(String isSearch) {
+        this.isSearch = isSearch;
+    }
 }
