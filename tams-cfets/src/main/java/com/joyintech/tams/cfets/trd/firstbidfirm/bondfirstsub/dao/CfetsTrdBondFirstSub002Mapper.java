@@ -97,4 +97,14 @@ public interface CfetsTrdBondFirstSub002Mapper {
      * @date 2022/5/18 19:36
      */
     String getIssuer(@Param("finprodId") String finprodId);
+
+    /**
+     * 查询是否存在生效数据
+     *
+     * @param bidId
+     * @return java.lang.Integer
+     * @author jiangpeng
+     * @date 2022/6/11 12:35
+     */
+    Integer selectBidOrders(@Param("bidId") String bidId);
 }

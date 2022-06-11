@@ -259,4 +259,10 @@
         where ROWNUM = 1 and fp.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectBidOrders" resultType="java.lang.Integer">
+        select count(*)
+        from BID_ORDER
+        where BID_ID = #{bidId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>
