@@ -743,69 +743,29 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             if (StringUtil.isNotEmpty(tmp.get("requestNo"))) {
                 dto.setReqOnId(tmp.get("requestNo").toString());
             }
-            // 请求类型
-            /**
-             BPB	上海协议回购成交申报		    正回购
-             BPC	上海协议回购到期续做申报		到期续做
-             BPD	上海协议回购解除质押		    接触质押
-             BPE	上海协议回购换券申报		    中途换券
-             BPF	上海协议回购提前终止申报		提前购回
-             */
-            String entrustProp = tmp.get("entrustProp") == null ? null : tmp.get("entrustProp").toString();
-            if (StringUtil.isNotEmpty(entrustProp)) {
-                //BPB	上海协议回购成交申报		    正回购
-                if (StringUtil.equals(SB_SHXYHGCJ, entrustProp)) {
-                    dto.setReqType(DictCodeListExt3.交易方向_正回购.getValue());
-                }
-                //BPC	上海协议回购到期续做申报		到期续做
-                else if (StringUtil.equals(SB_SHXYHGDQXZ, entrustProp)) {
-                    dto.setReqType(DictCodeListExt3.交易方向_到期续做.getValue());
-                }
-                //BPD	上海协议回购解除质押		    接触质押
-                else if (StringUtil.equals(SB_SHXYHGJCZY, entrustProp)) {
-                    dto.setReqType(DictCodeListExt3.交易方向_解除质押.getValue());
-                }
-                //BPE	上海协议回购换券申报		    中途换券
-                else if (StringUtil.equals(SB_SHXYHGHJSB, entrustProp)) {
-                    dto.setReqType(DictCodeListExt3.交易方向_中途换券.getValue());
-                }
-                //BPF	上海协议回购提前终止申报		提前购回
-                else if (StringUtil.equals(SB_SHXYHGTQZZSB, entrustProp)) {
-                    dto.setReqType(DictCodeListExt3.交易方向_提前购回.getValue());
-                }
-                //BPF	深圳债券质押协议回购初始交易		正回购
-                else if (StringUtil.equals(SB_SZXYHGCSJY, entrustProp)) {
-                    dto.setReqType(DictCodeListExt3.交易方向_正回购.getValue());
-                }
-                //BPN	深圳债券质押协议回购购回交易		到期购回
-                else if (StringUtil.equals(SB_SZXYHGGH, entrustProp)) {
-                    // 回购到期日
-                    if (StringUtil.isNotEmpty(tmp.get("repurchaseDate"))) {
-                        String mdate = DateUtil.format(DateUtil.parse(tmp.get("repurchaseDate").toString()));
-                        if (DateUtil.compareDate(mdate, DateUtil.getSysDate()) > 0) {
-                            dto.setReqType(DictCodeListExt3.交易方向_提前购回.getValue());
-                        } else {
-                            dto.setReqType(DictCodeListExt3.交易方向_到期购回.getValue());
-                        }
-                    } else {
-                        dto.setReqType(DictCodeListExt3.交易方向_到期购回.getValue());
-                    }
-                }
-                //BPF	深圳债券质押协议回购到期续做		到期续做
-                else if (StringUtil.equals(SB_SZXYHGDQXZ, entrustProp)) {
-                    dto.setReqType(DictCodeListExt3.交易方向_到期续做.getValue());
-                }
-                else{
-                    return;
-                }
-            }
-            // 协议回购质权人类型
+            // 对手方请求类型
             if (StringUtil.isNotEmpty(tmp.get("requestType"))) {
                 dto.setReqType(tmp.get("requestType").toString());
             }
+            //对手方请求类型（首期、提前购回、中途换券、到期续做、解除质押、到期购回）
+            if (StringUtil.isNotEmpty(tmp.get("requestTypeStr"))) {
+                dto.setReqTypeStr(tmp.get("requestTypeStr").toString());
+            }
+            //对手方委托方向
+            if (StringUtil.isNotEmpty(tmp.get("bs"))) {
+                dto.setPs(tmp.get("bs").toString());
+            }
+            //对手方委托方向
+            if (StringUtil.isNotEmpty(tmp.get("bsStr"))) {
+                dto.setPsStr(tmp.get("bsStr").toString());
+            }
             // 交易场所
             if (StringUtil.isNotEmpty(tmp.get("tradeMarket"))) {
-                dto.setRepSecId(tmp.get("tradeMarket").toString());
+                dto.setTradeMarket(tmp.get("tradeMarket").toString());
+            }
+            // 交易场所
+            if (StringUtil.isNotEmpty(tmp.get("tradeMarketStr"))) {
+                dto.setTradeMarketStr(tmp.get("tradeMarketStr").toString());
             }
             // 质押券代码
             if (StringUtil.isNotEmpty(tmp.get("stockCode"))) {
@@ -845,6 +805,10 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             if (StringUtil.isNotEmpty(tmp.get("repoRate"))) {
                 dto.setYield(BigDecimal.valueOf(Double.valueOf(tmp.get("repoRate").toString())));
             }
+            // 回购利率
+            if (StringUtil.isNotEmpty(tmp.get("discount"))) {
+                dto.setConRatio(BigDecimal.valueOf(Double.valueOf(tmp.get("discount").toString())));
+            }
             // 回购期限
             if (StringUtil.isNotEmpty(tmp.get("compactTerm"))) {
                 dto.setTerm(Integer.valueOf(tmp.get("compactTerm").toString()));
@@ -865,13 +829,49 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             if (StringUtil.isNotEmpty(tmp.get("backDate"))&&DateUtil.isDateStr(tmp.get("backDate").toString())) {
                 dto.setExpireSettleDate(DateUtil.format(DateUtil.parse(tmp.get("backDate").toString())));
             }
+            // 换入质押券代码
+            if (StringUtil.isNotEmpty(tmp.get("swapIntoBonds"))) {
+                dto.setNewRepSecId(tmp.get("swapIntoBonds").toString());
+            }
+            // 换入质押券名称
+            if (StringUtil.isNotEmpty(tmp.get("swapIntoBondsName"))) {
+                dto.setNewRepSecName(tmp.get("swapIntoBondsName").toString());
+            }
+            // 换入质押券数量
+            if (StringUtil.isNotEmpty(tmp.get("swapIntoBondsVolume"))) {
+                dto.setNewRepSecNum(BigDecimal.valueOf(Double.valueOf(tmp.get("swapIntoBondsVolume").toString())));
+            }
+            // 换出质押券代码
+            if (StringUtil.isNotEmpty(tmp.get("swapOutBonds"))) {
+                dto.setOutRepSecId(tmp.get("swapOutBonds").toString());
+            }
+            // 换出质押券名称
+            if (StringUtil.isNotEmpty(tmp.get("swapOutBondsName"))) {
+                dto.setOutRepSecName(tmp.get("swapOutBondsName").toString());
+            }
+            // 换出质押券数量
+            if (StringUtil.isNotEmpty(tmp.get("swapOutBondsVolume"))) {
+                dto.setOutRepSecNum(BigDecimal.valueOf(Double.valueOf(tmp.get("swapOutBondsVolume").toString())));
+            }
             // 原质押券代码
             if (StringUtil.isNotEmpty(tmp.get("origBonds"))) {
                 dto.setOrigPledgeStampCode(tmp.get("origBonds").toString());
-                // 原质押券名称
-                if (origPledgeFinProductMap.containsKey(tmp.get("origBonds").toString())) {
-                    dto.setOrigPledgeStampName(tmp.get("origBondsName").toString());
-                }
+            }
+            // 原质押券名称
+            if (StringUtil.isNotEmpty(tmp.get("origBondsName").toString())) {
+                dto.setOrigPledgeStampName(tmp.get("origBondsName").toString());
+            }
+            //原质押券数量
+            if (StringUtil.isNotEmpty(tmp.get("origBondsVolume"))) {
+                dto.setOrigPledgeStampNum(tmp.get("origBondsVolume").toString());
+            }
+            //原质押券金额
+            if (StringUtil.isNotEmpty(tmp.get("origRepoAmount"))) {
+                dto.setOrigTradeAmt(BigDecimal.valueOf(Double.valueOf(tmp.get("origRepoAmount").toString())));
+            }
+            // 到期续做类型
+            if (StringUtil.isNotEmpty(tmp.get("transCode"))) {
+                dto.setTransCode(tmp.get("transCode").toString());
             }
             // 回购利息
             if (StringUtil.isNotEmpty(tmp.get("mIntAmt"))) {
@@ -887,7 +887,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             }
             // 本方交易员
             if (StringUtil.isNotEmpty(tmp.get("traderCode"))) {
-                dto.setCpTraderCode(tmp.get("traderCode").toString());
+                dto.setTraderCode(tmp.get("traderCode").toString());
             }
             // 本方交易商代码
             if (StringUtil.isNotEmpty(tmp.get("memberId"))) {
@@ -895,11 +895,11 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             }
             // 本方交易主体（深交所展示，否则为空）
             if (StringUtil.isNotEmpty(tmp.get("investorId"))) {
-                dto.setCpInvestorId(tmp.get("investorId").toString());
+                dto.setInvestorId(tmp.get("investorId").toString());
             }
             // 本方交易主体类型（深交所展示，否则为空）
             if (StringUtil.isNotEmpty(tmp.get("investorType"))) {
-                dto.setCpInvestorType(tmp.get("investorType").toString());
+                dto.setInvestorType(tmp.get("investorType").toString());
             }
             //对手方交易员
             if (StringUtil.isNotEmpty(tmp.get("cpTraderCode"))) {
@@ -909,21 +909,29 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             if (StringUtil.isNotEmpty(tmp.get("cpMemberId"))) {
                 dto.setCpMemberId(tmp.get("cpMemberId").toString());
             }
-            //对手方交易商
+            //对手方主体
             if (StringUtil.isNotEmpty(tmp.get("cpInvestorId"))) {
                 dto.setCpInvestorId(tmp.get("cpInvestorId").toString());
             }
-            //对手方交易商
+            //对手方主体类型
             if (StringUtil.isNotEmpty(tmp.get("cpInvestorType"))) {
                 dto.setCpInvestorType(tmp.get("cpInvestorType").toString());
             }
-            //对手方交易商
+            //对手方客户名称
             if (StringUtil.isNotEmpty(tmp.get("cpClientName"))) {
                 dto.setCpClientName(tmp.get("cpClientName").toString());
             }
             // 补充协议
             if (StringUtil.isNotEmpty(tmp.get("remark"))) {
                 dto.setAddCla(tmp.get("remark").toString());
+            }
+            // 本方资金账号
+            if (StringUtil.isNotEmpty(tmp.get("account"))) {
+                dto.setAcctNo(tmp.get("account").toString());
+            }
+            // 本方资金账号名称
+            if (StringUtil.isNotEmpty(tmp.get("accountName"))) {
+                dto.setAcctName(tmp.get("accountName").toString());
             }
 
             // 回购利率和折算率应该乘以100

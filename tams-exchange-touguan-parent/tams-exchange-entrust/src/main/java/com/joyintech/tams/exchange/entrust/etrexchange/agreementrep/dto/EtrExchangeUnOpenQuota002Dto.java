@@ -12,6 +12,7 @@ package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto;
 
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.systemtools.util.SysDatadictUtil;
 import io.swagger.annotations.ApiModelProperty;
@@ -42,7 +43,17 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      * 请求类型
      */
     private String reqType;
+
     private String reqTypeStr;
+
+    /**
+     * 交易方向
+     */
+    private String ps;
+    /**
+     * 交易方向
+     */
+    private String psStr;
     /**
      * 质押券代码
      */
@@ -98,6 +109,23 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      * 到期结算日
      */
     private String expireSettleDate;
+    @ApiModelProperty(name = "newRepSecId", value = "换入质押券代码")
+    private String newRepSecId;
+
+    @ApiModelProperty(name = "swapIntoBondsName", value = "换入质押券名称")
+    private String newRepSecName;
+
+    @ApiModelProperty(name = "swapIntoBondsVolume", value = "换入质押券数量")
+    private BigDecimal newRepSecNum;
+
+    @ApiModelProperty(name = "outRepSecId", value = "换出质押券代码")
+    private String outRepSecId;
+
+    @ApiModelProperty(name = "outRepSecName", value = "换出质押券名称")
+    private String outRepSecName;
+
+    @ApiModelProperty(name = "outRepSecNum", value = "换出质押券数量")
+    private BigDecimal outRepSecNum;
 
     /**
      * 原质押券代码
@@ -108,6 +136,22 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      * 原质押券名称
      */
     private String origPledgeStampName;
+    /**
+     * 原质押券名称
+     */
+    private String origPledgeStampNum;
+    /**
+     * 原回购金额
+     */
+    private BigDecimal origTradeAmt;
+    /**
+     * 到期续作类型（0-非第三方，1-第三方）
+     */
+    private String  transCode;
+    /**
+     * 到期续作类型（0-非第三方，1-第三方）
+     */
+    private String  transCodeStr;
 
     /**
      * 回购利息
@@ -159,6 +203,10 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      * 资金账号
      */
     private String acctNo;
+    /**
+     * 资金账号名称
+     */
+    private String acctName;
 
     private String redoType;
 
@@ -357,7 +405,7 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
     }
 
     public String getReqTypeStr() {
-        return SysDatadictUtil.getNameFromDataDict(DictCode.交易方向,this.reqType);
+        return this.reqTypeStr;
     }
 
     public String getAcctNo() {
@@ -395,7 +443,7 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
     }
 
     public String getTradeMarketStr() {
-        return SysDatadictUtil.getNameFromDataDict(DictCode.交易场所, this.tradeMarket);
+        return this.tradeMarketStr;
     }
 
     public String getOrigPledgeStampName() {
@@ -468,5 +516,120 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
 
     public void setCpClientName(String cpClientName) {
         this.cpClientName = cpClientName;
+    }
+
+    public void setReqTypeStr(String reqTypeStr) {
+        this.reqTypeStr = reqTypeStr;
+    }
+
+    public void setTradeMarketStr(String tradeMarketStr) {
+        this.tradeMarketStr = tradeMarketStr;
+    }
+
+    public String getPs() {
+        return ps;
+    }
+
+    public void setPs(String ps) {
+        this.ps = ps;
+    }
+
+    public String getPsStr() {
+        return psStr;
+    }
+
+    public void setPsStr(String psStr) {
+        this.psStr = psStr;
+    }
+
+    public String getNewRepSecId() {
+        return newRepSecId;
+    }
+
+    public void setNewRepSecId(String newRepSecId) {
+        this.newRepSecId = newRepSecId;
+    }
+
+    public String getNewRepSecName() {
+        return newRepSecName;
+    }
+
+    public void setNewRepSecName(String newRepSecName) {
+        this.newRepSecName = newRepSecName;
+    }
+
+    public BigDecimal getNewRepSecNum() {
+        return newRepSecNum;
+    }
+
+    public void setNewRepSecNum(BigDecimal newRepSecNum) {
+        this.newRepSecNum = newRepSecNum;
+    }
+
+    public String getOutRepSecId() {
+        return outRepSecId;
+    }
+
+    public void setOutRepSecId(String outRepSecId) {
+        this.outRepSecId = outRepSecId;
+    }
+
+    public String getOutRepSecName() {
+        return outRepSecName;
+    }
+
+    public void setOutRepSecName(String outRepSecName) {
+        this.outRepSecName = outRepSecName;
+    }
+
+    public BigDecimal getOutRepSecNum() {
+        return outRepSecNum;
+    }
+
+    public void setOutRepSecNum(BigDecimal outRepSecNum) {
+        this.outRepSecNum = outRepSecNum;
+    }
+
+    public String getOrigPledgeStampNum() {
+        return origPledgeStampNum;
+    }
+
+    public void setOrigPledgeStampNum(String origPledgeStampNum) {
+        this.origPledgeStampNum = origPledgeStampNum;
+    }
+
+    public BigDecimal getOrigTradeAmt() {
+        return origTradeAmt;
+    }
+
+    public void setOrigTradeAmt(BigDecimal origTradeAmt) {
+        this.origTradeAmt = origTradeAmt;
+    }
+
+    public String getAcctName() {
+        return acctName;
+    }
+
+    public void setAcctName(String acctName) {
+        this.acctName = acctName;
+    }
+
+    public String getTransCode() {
+        return transCode;
+    }
+
+    public void setTransCode(String transCode) {
+        this.transCode = transCode;
+    }
+
+    public String getTransCodeStr() {
+        if(StringUtil.isNotEmpty(this.transCode)){
+            return "0".equals(this.transCode)?"非第三方":"第三方";
+        }
+        return "";
+    }
+
+    public void setTransCodeStr(String transCodeStr) {
+        this.transCodeStr = transCodeStr;
     }
 }
