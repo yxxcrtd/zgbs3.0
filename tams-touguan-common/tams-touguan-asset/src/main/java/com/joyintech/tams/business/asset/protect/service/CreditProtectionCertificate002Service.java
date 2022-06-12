@@ -336,6 +336,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
 //            return getById(finprodId);
 //        } else {//从接口中获取
         CreditProtectionCertificate002Dto dto = interfCreditInfoMapper.getFromInterface(param);
+        if(Objects.isNull(dto)){
+            return null;
+        }
             if(StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
                 dto.setCalendarId("04");
             }else if(StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
