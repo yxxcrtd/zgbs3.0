@@ -40,6 +40,7 @@ import com.joyintech.framework.base.intf.DataDictItem;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
@@ -102,6 +103,7 @@ import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCash
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -683,7 +685,11 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             etrCommandDispatcherService.pushCommandMsg(param);
         }
         //处理履历
-        updateCfetsOprHis(dto.getEntrustId(), dto.getOptType());
+        if (OperationType.MODIFY.equals(arg1)) {
+            updateCfetsOprHis(dto.getEntrustId(), ENTRUST_RECORD_MODIFY, dto.getCreateUser(), dto.getCreateDept());
+        } else {
+            updateCfetsOprHis(dto.getEntrustId(), dto.getOptType(), dto.getCreateUser(), dto.getCreateDept());
+        }
         //插入风险试算
         basRiskMathCommService.insert(dto.getRiskTrialRetDto(),dto.getEntrustId());
     }
@@ -2080,7 +2086,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             baseEtrCashPositionCommService.entrustCloseExecute(entity.getEntrustId(), DictCodeList.是否_是.getValue());
         }
         //处理履历
-        updateCfetsOprHis(entity.getEntrustId(), "close");
+        updateCfetsOprHis(entity.getEntrustId(), "close",null,null);
         positionRequestService.sendClose(entity);
     }
 
@@ -2104,7 +2110,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
 //			positionRequestService.sendRevoke(entity);
         }
         //处理履历
-        updateCfetsOprHis(entity.getEntrustId(), "revoke");
+        updateCfetsOprHis(entity.getEntrustId(), "revoke",null,null);
         //撤回删除风险试算
         //etrExchangeTradeCommonMapper.deleteRskIsupTrial(entity.getEntrustId());
 //        restTemplate.postForObject(
@@ -5875,13 +5881,17 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     /**
      * 处理履历
      */
-    public void updateCfetsOprHis(String entrustId, String optType) {
+    public void updateCfetsOprHis(String entrustId, String optType,String optUser,String optDept) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
-        /*if (ENTRUST_RECORD_NEW.equals(optType)) {
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-        } else*/ if (ENTRUST_RECORD_NEW.equals(optType)) {
+        oprHisReq.setUserId(optUser);
+        oprHisReq.setCreateUser(optUser);
+        oprHisReq.setCreateDept(optDept);
+        oprHisReq.setUpdateUser(optUser);
+        if (ENTRUST_RECORD_MODIFY.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
+        } else if (ENTRUST_RECORD_NEW.equals(optType)) {
+            oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
         } else if ("close".equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_关闭.getValue());
         } else if ("revoke".equals(optType)) {

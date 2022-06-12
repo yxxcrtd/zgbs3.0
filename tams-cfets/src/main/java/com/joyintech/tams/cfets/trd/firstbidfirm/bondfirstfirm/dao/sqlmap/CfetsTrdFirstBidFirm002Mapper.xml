@@ -224,7 +224,7 @@
     </select>
 
     <select id="selectEntInfoByIdAndDate" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto">
-        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId,counterName , entrustId
+        select entrustStatus, firstBidStatus, issueDateStart, issueDateEnd, counterId,counterName , entrustId , entrustIdKey
         from (
                  select ee.ENTRUST_STATUS entrustStatus,
                         CASE
@@ -252,7 +252,8 @@
                             END AS        issueDateEnd/*投标日 结束*/,
                         ee.COUNTER_ID     counterId,
                         mcp.COUNTER_NAME                         counterName,
-                        ee.ENTRUST_ID     entrustId
+                        ee.ENTRUST_ID     entrustId,
+                        teer.TOTLE_ID entrustIdKey
                  from ETR_ENTRUST ee
                           left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID = ee.COUNTER_ID
                           LEFT JOIN (
@@ -266,6 +267,7 @@
                      GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID, bobp.ENTRUST_ID
                  ) bobrt ON bobrt.FINPROD_ID = ee.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
                           left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
+                          left join TOTAL_ETR_ENTRUST_REL teer on ee.ENTRUST_ID = teer.ENTRUST_ID
                  where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
                    and ee.FINPROD_ID = #{finprodId}
                    and not exists(
@@ -291,6 +293,9 @@
                    <if test="counterId != null and counterId != ''">
                        and ee.COUNTER_ID = #{counterId}
                    </if>
+                    <if test="totleId != null and totleId != ''">
+                        and teer.TOTLE_ID = #{totleId}
+                    </if>
                    )
         where issueDateEnd = #{issueDateEnd} and issueDateStart = #{issueDateStart}
     </select>
@@ -511,24 +516,21 @@
     </select>
 
     <select id="selectEtrAvaNum" resultType="java.math.BigDecimal">
-        select eed.ENTRUST_NUM*100 - nvl(T1.sumSubAmt,0)
-        from ETR_ENTRUST_DETAIL eed
-        left join(
-            select sum(T.subAmt) sumSubAmt,T.ENTRUST_ID, T.PORTFOLIO_ID
-            from (
-                     select nvl(bobp.SUBSCRIPTION_AMOUNT,0) subAmt, bobp.ENTRUST_ID, bobp.PORTFOLIO_ID
-                     from BID_ORDER bo
-                              left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
-                     where bo.IS_CANCEL = 'N'
-                       and bo.TRADE_STATUS != '03'
-                     union all
-                     select nvl(wbobp.SUBSCRIPTION_AMOUNT,0) subAmt, wbobp.ENTRUST_ID, wbobp.PORTFOLIO_ID
-                     from Wfl_BID_ORDER wbo
-                              left join Wfl_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID
-                 ) T
-                     group by T.ENTRUST_ID, T.PORTFOLIO_ID
-        )T1 on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
-        where eed.ENTRUST_ID = #{entrustId} and eed.PORTFOLIO_ID = #{protfolioId}
+        select eebp.BID_PRIN_AMT * 100 - nvl(T1.sumSubAmt, 0)
+        from ETR_ENTRUST_BID_PRICE eebp
+                 left join(select sum(T.subAmt) sumSubAmt, T.ENTRUST_ID, T.PORTFOLIO_ID,T.BID_PRICE
+                           from (select nvl(bobp.THE_WIN_PRIN_AMT, 0) subAmt, bobp.ENTRUST_ID, bobp.PORTFOLIO_ID,bobp.BID_PRICE
+                                 from BID_ORDER bo
+                                          left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                                 where bo.IS_CANCEL = 'N'
+                                   and bo.TRADE_STATUS != '03'
+                                 union all
+                                 select nvl(wbobp.THE_WIN_PRIN_AMT, 0) subAmt, wbobp.ENTRUST_ID, wbobp.PORTFOLIO_ID,wbobp.BID_PRICE
+                                 from Wfl_BID_ORDER wbo
+                                          left join Wfl_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID) T
+                           group by T.ENTRUST_ID, T.PORTFOLIO_ID,T.BID_PRICE) T1
+                          on T1.PORTFOLIO_ID = eebp.PORTFOLIO_ID and T1.ENTRUST_ID = eebp.ENTRUST_ID and T1.BID_PRICE = eebp.BID_PRICE
+        where eebp.ENTRUST_ID = #{entrustId} and eebp.PORTFOLIO_ID = #{protfolioId} and eebp.BID_PRICE = #{bidPrice}
     </select>
 
     <select id="selectManualCount" resultType="java.lang.Integer">

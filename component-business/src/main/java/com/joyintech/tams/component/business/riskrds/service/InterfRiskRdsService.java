@@ -24,6 +24,7 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.riskrds.dao.RiskRdsTrialCommonMapper;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.risktrialrds.util.Const;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -53,10 +54,6 @@ import com.joyintech.tams.component.business.riskrds.dto.EntrustBaseDto;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.component.business.riskrds.dto.TradeBaseDto;
 import com.joyintech.tams.component.business.util.CommonBusinessUtil;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.asset.util.AssetCommonUtil;
 import com.joyintech.tams.invest.common.client.ClientData;
@@ -683,7 +680,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             try {
                 doListCommon(v, dataMap, portfolioIds, tradeIds, targetList);
             } catch (Exception e) {
-                ;
+                e.printStackTrace();
             }
         }
         // 取得交易的反向交易编号
@@ -1892,7 +1889,6 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             // 中标结果确认及中标结果维护
             if (CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_中标结果确认)
                     || CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_中标结果维护)) {
-//                infRiskRdsDto.setIsDiffOccupy(DictCodeList.是否_是.getValue());
                 infRiskRdsDto.setDiffOccupyFlg((String) dataMap.get("bidId") + v.getEventStatus());
                 String amountKey = CommonUtil.isType(v.getEventStatus(),
                         BussinessDictCodeList.共同业务类型_中标结果确认) ? "adjustBallotnum" : "winPrinAmt";
@@ -1949,25 +1945,74 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 infRiskRdsDto.setTradeNum(ArithmeticUtil.divide(infRiskRdsDto.getTotalFaceAmt(),
                         new BigDecimal(100), 4));
             } else {
-                // add by zhangrui1 end
-                infRiskRdsDto.setAmount(finDto.getEntrustNum());//债券为全价总额存款、
-                infRiskRdsDto.setTradeNum(
-                        ArithmeticUtil.divide(finDto.getEntrustNum(), new BigDecimal(100), 4));
-                infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-                infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
-                // add by zhangrui1 start
-                infRiskRdsDto.setTotalFaceAmt(infRiskRdsDto.getAmount());
-                Object isDiffOccupy = CommonUtil.findValue(dataMap, "isDiffOccupy");
-                if (StringUtil.isNotEmpty(isDiffOccupy)) {
-                    infRiskRdsDto.setIsDiffOccupy((String) isDiffOccupy);
-                }
-                Object diffOccupyFlg = CommonUtil.findValue(dataMap, "diffOccupyFlg");
-                if (StringUtil.isNotEmpty(diffOccupyFlg)) {
-                    infRiskRdsDto.setDiffOccupyFlg((String) diffOccupyFlg);
-                }
-                Object isReverseOccupy = CommonUtil.findValue(dataMap, "isReverseOccupy");
-                if (StringUtil.isNotEmpty(diffOccupyFlg)) {
-                    infRiskRdsDto.setIsReverseOccupy((String) isReverseOccupy);
+                if (CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记)) {
+                    infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "subscriptionAmount", BigDecimal.ZERO));//债券为全价总额存款、
+                    infRiskRdsDto.setTradeNum(CommonUtil.getBigDecimal(dataMap, "subscriptionAmount", BigDecimal.ZERO));
+                    infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                    infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
+                    infRiskRdsDto.setTotalFaceAmt(infRiskRdsDto.getAmount());
+                    infRiskRdsDto.setPortfolioCode(finDto.getPortfolioId());
+                    Object isDiffOccupy = CommonUtil.findValue(dataMap, "isDiffOccupy");
+                    if (StringUtil.isNotEmpty(isDiffOccupy)) {
+                        infRiskRdsDto.setIsDiffOccupy((String) isDiffOccupy);
+                    }
+                    Object diffOccupyFlg = CommonUtil.findValue(dataMap, "diffOccupyFlg");
+                    if (StringUtil.isNotEmpty(diffOccupyFlg)) {
+                        infRiskRdsDto.setDiffOccupyFlg((String) diffOccupyFlg);
+                    }
+                    Object isReverseOccupy = CommonUtil.findValue(dataMap, "isReverseOccupy");
+                    if (StringUtil.isNotEmpty(diffOccupyFlg)) {
+                        infRiskRdsDto.setIsReverseOccupy((String) isReverseOccupy);
+                    }
+                } else if (CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入) ||
+                        CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴) ||
+                        CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标)) {
+                        if (CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入)) {
+                            infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "entrustNum", BigDecimal.ZERO));//券面总额
+                            infRiskRdsDto.setTradeNum(CommonUtil.getBigDecimal(dataMap, "entrustNum", BigDecimal.ZERO));
+                        }
+                        if (CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴)
+                          || CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标)) {
+                            infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "totalBiddingNum", BigDecimal.ZERO));//汇总券面总额
+                            infRiskRdsDto.setTradeNum(CommonUtil.getBigDecimal(dataMap, "totalBiddingNum", BigDecimal.ZERO));
+                        }
+                        infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                        infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
+                        infRiskRdsDto.setTotalFaceAmt(infRiskRdsDto.getAmount());
+                        infRiskRdsDto.setPortfolioCode(finDto.getPortfolioId());
+                        Object isDiffOccupy = CommonUtil.findValue(dataMap, "isDiffOccupy");
+                        if (StringUtil.isNotEmpty(isDiffOccupy)) {
+                            infRiskRdsDto.setIsDiffOccupy((String) isDiffOccupy);
+                        }
+                        Object diffOccupyFlg = CommonUtil.findValue(dataMap, "diffOccupyFlg");
+                        if (StringUtil.isNotEmpty(diffOccupyFlg)) {
+                            infRiskRdsDto.setDiffOccupyFlg((String) diffOccupyFlg);
+                        }
+                        Object isReverseOccupy = CommonUtil.findValue(dataMap, "isReverseOccupy");
+                        if (StringUtil.isNotEmpty(diffOccupyFlg)) {
+                            infRiskRdsDto.setIsReverseOccupy((String) isReverseOccupy);
+                        }
+                }else {
+                    // add by zhangrui1 end
+                    infRiskRdsDto.setAmount(finDto.getEntrustNum());//债券为全价总额存款、
+                    infRiskRdsDto.setTradeNum(
+                            ArithmeticUtil.divide(finDto.getEntrustNum(), new BigDecimal(100), 4));
+                    infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                    infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
+                    // add by zhangrui1 start
+                    infRiskRdsDto.setTotalFaceAmt(infRiskRdsDto.getAmount());
+                    Object isDiffOccupy = CommonUtil.findValue(dataMap, "isDiffOccupy");
+                    if (StringUtil.isNotEmpty(isDiffOccupy)) {
+                        infRiskRdsDto.setIsDiffOccupy((String) isDiffOccupy);
+                    }
+                    Object diffOccupyFlg = CommonUtil.findValue(dataMap, "diffOccupyFlg");
+                    if (StringUtil.isNotEmpty(diffOccupyFlg)) {
+                        infRiskRdsDto.setDiffOccupyFlg((String) diffOccupyFlg);
+                    }
+                    Object isReverseOccupy = CommonUtil.findValue(dataMap, "isReverseOccupy");
+                    if (StringUtil.isNotEmpty(diffOccupyFlg)) {
+                        infRiskRdsDto.setIsReverseOccupy((String) isReverseOccupy);
+                    }
                 }
             }
             // add by zhangrui1 end
@@ -2525,33 +2570,49 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             infRiskRdsDto.setPledgedCode(finDto.getFinprodId());
         }
         if (StringUtil.equals(DictCodeListExt2.平安资产类型_一级市场债.getValue(), v.getAssetType())) {
-            infRiskRdsDto.setAmount(finDto.getFpriceAmt());//债券为全价总额存款
-            // add by zhangrui1 汇总确认 start
-            String winPrinAmtKey = "bidPrinAmt";
-            Object winPrinAmt = dataMap.get(winPrinAmtKey);
-            if (infRiskRdsDto.getAmount() == null && winPrinAmt != null) {
-                infRiskRdsDto.setAmount(
-                        winPrinAmt instanceof BigDecimal ? (BigDecimal) winPrinAmt : new BigDecimal(
-                                winPrinAmt.toString()));
+            if (CommonUtil.isType(v.getEventStatus(), DictCodeListExt4.共通业务类型_中标结果维护自主投标) ||
+                    CommonUtil.isType(v.getEventStatus(), DictCodeListExt4.共通业务类型_中标结果维护代投代缴)) {
+                infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "totalBiddingNum", BigDecimal.ZERO));//汇总券面总额
+                infRiskRdsDto.setTradeNum(
+                        ArithmeticUtil.divide(infRiskRdsDto.getAmount(), new BigDecimal(100), 4));
+                // add by zhangrui1 汇总确认 end
+                infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
+                //一级市场债两个service用的DTO里的中标日字段不一样，大小写不一致。。
+                if (StringUtil.isNotEmpty(dataMap.get("bidDate"))) {
+                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("bidDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                } else if (StringUtil.isNotEmpty(dataMap.get("payDate"))) {
+                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("payDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                }
+                infRiskRdsDto.setEventId(StringUtil.isNotEmpty(dataMap.get("bidId")) ? dataMap.get("bidId").toString() : StringUtil.EMPTY);
+                //设置是否是股东发行
+                infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
+            }else{
+                infRiskRdsDto.setAmount(finDto.getFpriceAmt());//债券为全价总额存款
+                // add by zhangrui1 汇总确认 start
+                String winPrinAmtKey = "bidPrinAmt";
+                Object winPrinAmt = dataMap.get(winPrinAmtKey);
+                if (infRiskRdsDto.getAmount() == null && winPrinAmt != null) {
+                    infRiskRdsDto.setAmount(winPrinAmt instanceof BigDecimal ? (BigDecimal) winPrinAmt : new BigDecimal(
+                            winPrinAmt.toString()));
+                }
+                infRiskRdsDto.setTradeNum(
+                        ArithmeticUtil.divide(infRiskRdsDto.getAmount(), new BigDecimal(100), 4));
+                // add by zhangrui1 汇总确认 end
+                infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
+                //一级市场债两个service用的DTO里的中标日字段不一样，大小写不一致。。
+                if (StringUtil.isNotEmpty(dataMap.get("biddate"))) {
+                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("biddate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                } else if (StringUtil.isNotEmpty(dataMap.get("bidDate"))) {
+                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("bidDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                } else if (StringUtil.isNotEmpty(dataMap.get("payDate"))) {
+                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("payDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                }
+                infRiskRdsDto.setEventId(StringUtil.isNotEmpty(dataMap.get("bidId")) ? dataMap.get("bidId").toString() : StringUtil.EMPTY);
+                //设置是否是股东发行
+                infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
             }
-            infRiskRdsDto.setTradeNum(
-                    ArithmeticUtil.divide(infRiskRdsDto.getAmount(), new BigDecimal(100), 4));
-            // add by zhangrui1 汇总确认 end
-            infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-            infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
-
-            //一级市场债两个service用的DTO里的中标日字段不一样，大小写不一致。。
-            if (StringUtil.isNotEmpty(dataMap.get("biddate"))) {
-                infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("biddate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
-            } else if (StringUtil.isNotEmpty(dataMap.get("bidDate"))) {
-                infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("bidDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
-            } else if (StringUtil.isNotEmpty(dataMap.get("payDate"))) {
-                infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("payDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
-            }
-            infRiskRdsDto.setEventId(StringUtil.isNotEmpty(dataMap.get("bidId")) ? dataMap.get("bidId").toString() : StringUtil.EMPTY);
-
-            //设置是否是股东发行
-            infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
         }
         if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_利率互换.getValue(), v.getFinType()) ||
                 StringUtil.equals(DictCodeListExt2.平安资产类型_利率互换.getValue(), v.getAssetType())) {

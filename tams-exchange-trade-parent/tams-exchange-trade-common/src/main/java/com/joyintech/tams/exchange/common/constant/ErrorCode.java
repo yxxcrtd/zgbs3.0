@@ -42,6 +42,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     MIN_TRD_UNIT_LIMIT_ERROR(26, "未找到最小交易单元"),
 
+    MIN_TRD_NUM_LIMIT_ERROR(27, "未找到最小交易数量"),
+
     DB_ERROR(100, "数据库返回错误"),
 
     CHECK_ERROR(101, "校验失败"),
@@ -175,6 +177,8 @@ public enum ErrorCode implements IEnum<Integer> {
     NOT_FAIR_INSTRUCTION_ERROR(4017, "非公平交易模式，无法进行公平交易！"),
 
     NOT_EXIST_FAIR_INSTRUCTION_ERROR(4018, "没有符合公平交易的指令，无法进行公平交易！"),
+
+    NOT_FAIR_ORDER_ERROR(4019, "不符合公平交易条件，无法进行公平交易！"),
 
     INSTRUCTIONS_DERIVATIVE_BS_OC_ERROR(4030, "指令中衍生品买卖方向和开平仓标志不能为空"),
 

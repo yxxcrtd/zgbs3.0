@@ -1854,7 +1854,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
      */
     操作类型_新建(DictCode.操作类型,"01","新建"),
     操作类型_修改(DictCode.操作类型,"02","修改"),
-    操作类型_撤回(DictCode.操作类型,"03","撤销"),
+    操作类型_撤回(DictCode.操作类型,"03","撤回"),
     操作类型_关闭(DictCode.操作类型,"04","关闭"),
     操作类型_退回(DictCode.操作类型,"05","退回"),
     操作类型_分发(DictCode.操作类型,"06","分发"),

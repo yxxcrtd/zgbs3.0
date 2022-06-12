@@ -256,7 +256,7 @@
                        then fpi.REFER_YIELD end                                    rate/*当带入资产的息票品种为利随本清/附息-固定利率时，显示字段票面利率*/
              , eea.SEC_ACCT_ID      secManageAcctId
              , ssai.SEC_ACCT_NAME   secAcctName
-             , ee.INV_MANAGER_ID    invManagerName
+             , su.REAL_NAME                             invManagerName
              , ee.CCY               ccy
              , ee.REMARK            remark
              , pp.PORTFOLIO_NAME    portfolioName
@@ -270,6 +270,7 @@
                  left join ETR_ENTRUST_DETAIL eed on eed.ENTRUST_ID = ee.ENTRUST_ID
                  left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eed.PORTFOLIO_ID
                  left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
+                 left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
         <where>
             <if test="entrustId != null and entrustId != '' ">
                 eed.ENTRUST_ID = #{entrustId}

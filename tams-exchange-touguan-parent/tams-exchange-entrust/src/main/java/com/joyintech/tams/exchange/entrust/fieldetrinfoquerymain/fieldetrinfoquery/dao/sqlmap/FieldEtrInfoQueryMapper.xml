@@ -608,10 +608,10 @@
                 OR t.finprodAbbr like '%' || #{search} || '%'
                 OR t.remark like '%' || #{search} || '%'
                 OR t.secAcctId like '%' || #{search} || '%'
+                OR t.etrPrice like '%' || #{search} || '%'
             <if test="search_isNumberFlag != null and search_isNumberFlag == true">
                 OR round(t.entrustAmt,2)||'' = round(#{search},2)
                 OR round(t.entrustNum,0)||'' = round(#{search},0)
-                OR round(t.etrPrice,3)||'' = round(#{search},3)
                 OR round(t.termDays,2)||'' = round(#{search},2)
                 OR round(t.exeProgress,2)||'' = round(#{search},2)
                 OR round(t.dealProgress,2)||'' = round(#{search},2)
@@ -1074,8 +1074,10 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 		 AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD')
 		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
                 OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
+        AND ( STD.SETTLE_SPEED = '0' OR STD.SETTLE_SPEED IS NULL )
+	    WHERE TT.TRADE_TYPE = '0'
         <!-- 信用保护凭证新家逻辑-->
-        AND ( STD.SETTLE_SPEED = '0' OR STD.SETTLE_SPEED IS NULL ) UNION
+        UNION
         SELECT
             tpda.ENTRUST_ID INSTRUCTION_ID,
             NULL ENTRUST_ID,

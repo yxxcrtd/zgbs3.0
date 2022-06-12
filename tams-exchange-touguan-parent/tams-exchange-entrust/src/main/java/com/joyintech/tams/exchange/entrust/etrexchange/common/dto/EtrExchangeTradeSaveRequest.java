@@ -773,16 +773,17 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
     public void setCurrentTab(String currentTab) {
         this.currentTab = currentTab;
     }
-    public List<EtrExchangeTradePortfolioRequest> getTradeMultiPtl001Dtos(){
-        List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos=this.portfolioList;
-        if(!CollectionUtils.isEmpty(tradeMultiPtl001Dtos)){
-            tradeMultiPtl001Dtos.stream().forEach(item->{
-                if(StringUtil.equals(item.getIsMulti(), DictCodeList.是否_是.getValue())) {
-                    item.setEntrustId(item.getEntrustId()+"-"+item.getPortfolioId());
+
+    public List<EtrExchangeTradePortfolioRequest> getTradeMultiPtl001Dtos() {
+        List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos = this.portfolioList;
+        if (!CollectionUtils.isEmpty(tradeMultiPtl001Dtos)) {
+            tradeMultiPtl001Dtos.forEach(item -> {
+                if (StringUtil.equals(item.getIsMulti(), DictCodeList.是否_是.getValue())) {
+                    item.setEntrustId(this.getEntrustId() + "-" + item.getPortfolioId());
                 }
             });
         }
-        return  tradeMultiPtl001Dtos;
+        return tradeMultiPtl001Dtos;
     }
 
 }

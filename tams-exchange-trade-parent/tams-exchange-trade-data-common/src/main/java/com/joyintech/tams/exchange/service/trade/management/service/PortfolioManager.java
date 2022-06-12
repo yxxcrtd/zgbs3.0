@@ -1122,6 +1122,18 @@ public class PortfolioManager extends BaseService {
         return list.stream().mapToLong(PortfolioInstructionContextDto::getLeftVolume).sum();
     }
 
+    /**
+     * 计算总剩余委托数量
+     */
+    private BigDecimal getTotalLeftAmt(List<PortfolioInstructionContextDto> list) {
+        BigDecimal totalLeftAmt = BigDecimal.ZERO;
+        for (PortfolioInstructionContextDto dto : list) {
+            totalLeftAmt = totalLeftAmt.add(dto.getLeftAmt());
+        }
+
+        return totalLeftAmt;
+    }
+
     private Long getEntrustVolume(Long totalLeftVolume, Long orderVolume, Long leftVolume, int unit) {
         if (totalLeftVolume == 0L) {
             return 0L;
@@ -1874,14 +1886,16 @@ public class PortfolioManager extends BaseService {
             return ResultBean.success(result);
         }
 
-        Long fairTotalLeftVolume;
+        List<PortfolioInstructionContextDto> resultList;
         if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
-            fairTotalLeftVolume = getBondFairTotalLeftVolume(orderPlaceBean, instruction, tick);
+            resultList = getBondFairTotalLeftVolume(orderPlaceBean, instruction, tick);
         } else {
-            fairTotalLeftVolume = getFairTotalLeftVolume(orderPlaceBean, instruction, tick);
+            resultList = getFairTotalLeftVolume(orderPlaceBean, instruction, tick);
         }
 
-        result.setTotalLeftVolume(fairTotalLeftVolume);
+        result.setTotalEntrustAmt(getTotalLeftAmt(resultList));
+        result.setTotalLeftVolume(getTotalLeftVolume(resultList));
+
         result.setInfoLevel("0");
         return ResultBean.success(result);
 
@@ -1900,7 +1914,7 @@ public class PortfolioManager extends BaseService {
     /**
      * 获取公平交易相关指令
      */
-    public Long getBondFairTotalLeftVolume(OrderPlaceBean bean, Instruction instruction, TickBean tick) {
+    public List<PortfolioInstructionContextDto> getBondFairTotalLeftVolume(OrderPlaceBean bean, Instruction instruction, TickBean tick) {
         // 最新价
         BigDecimal lastPrice = TradeUtils.getBigDecimal(tick.getLastPrice(), 4);
 
@@ -2024,23 +2038,32 @@ public class PortfolioManager extends BaseService {
             dto = new PortfolioInstructionContextDto();
             if (StringUtil.equals(ins.getEntrustClass(), 是否_否.getValue())) {
                 dto.setLeftVolume(0L);
+                dto.setLeftAmt(BigDecimal.ZERO);
             } else {
                 if (EntrustUtils.isVolume(ins)) {
                     dto.setLeftVolume(ins.getEntrustNum() - ins.getEntrustLeftAmt().longValue() - ins.getFrozenQuantity().longValue());
+                    dto.setLeftAmt(TradeUtils.multiply(price, dto.getLeftVolume(), 2));
                 } else {
-                    dto.setLeftVolume(TradeUtils.divide(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2), price, 2).longValue());
+                    dto.setLeftAmt(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2));
+                    dto.setLeftVolume(TradeUtils.divide(dto.getLeftAmt(), price, 2).longValue());
                 }
             }
             resultList.add(dto);
         }
 
-        return getTotalLeftVolume(resultList);
+        return resultList;
+
+//        if (instruction.volumeInstruction()) {
+//            return BigDecimal.valueOf(getTotalLeftVolume(resultList));
+//        }
+//
+//        return getTotalLeftAmt(resultList);
     }
 
     /**
      * 获取公平交易相关指令
      */
-    public Long getFairTotalLeftVolume(OrderPlaceBean bean, Instruction instruction, TickBean tick) {
+    public List<PortfolioInstructionContextDto> getFairTotalLeftVolume(OrderPlaceBean bean, Instruction instruction, TickBean tick) {
         // 涨停价
         BigDecimal upperLimitPrice = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
         // 跌停价
@@ -2158,16 +2181,25 @@ public class PortfolioManager extends BaseService {
 
             if (EntrustUtils.isVolume(ins)) {
                 dto.setLeftVolume(ins.getEntrustNum() - ins.getEntrustLeftAmt().longValue() - ins.getFrozenQuantity().longValue());
+                dto.setLeftAmt(TradeUtils.multiply(price, dto.getLeftVolume(), 2));
             } else {
-                dto.setLeftVolume(TradeUtils.divide(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2), price, 2).longValue());
+                dto.setLeftAmt(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2));
+                dto.setLeftVolume(TradeUtils.divide(dto.getLeftAmt(), price, 2).longValue());
             }
             if (是否_否.getValue().equals(ins.getEntrustClass())) {
                 dto.setLeftVolume(0L);
+                dto.setLeftAmt(BigDecimal.ZERO);
             }
             resultList.add(dto);
         }
 
-        return getTotalLeftVolume(resultList);
+        return resultList;
+
+//        if (instruction.volumeInstruction()) {
+//            return BigDecimal.valueOf(getTotalLeftVolume(resultList));
+//        }
+//
+//        return getTotalLeftAmt(resultList);
     }
 }
 

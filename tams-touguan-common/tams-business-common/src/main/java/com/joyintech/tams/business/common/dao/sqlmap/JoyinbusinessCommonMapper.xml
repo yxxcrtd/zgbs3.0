@@ -325,15 +325,19 @@
             </if>
             <if test="finprodId != null and finprodId != '' and portfolioId != null and portfolioId != ''">
                 AND A.PORTFOLIO_ID  IN (
-                    SELECT PSA.PORTFOLIO_ID AS PORTFOLIO_ID
-                    FROM PTL_SEC_ACCT PSA, STL_SEC_ACCT_INFO V
-                    LEFT JOIN FIN_PRODUCT R
-                    ON R.REGIST_ORG = V.REGIST_ORG
-                    and V.TRADE_PLACE = R.trade_market
-                    WHERE PSA.ACCT_NO = V.SEC_ACCT_ID
-                    AND V.SEC_ACCT_TYPE = 'SEC'
-                    AND PSA.PORTFOLIO_ID = #{portfolioId}
-                    AND R.FINPROD_ID = #{finprodId})
+                    SELECT PTL_SEC_ACCT.PORTFOLIO_ID  PORTFOLIO_ID FROM PTL_SEC_ACCT
+                    WHERE PTL_SEC_ACCT.ACCT_NO IN (
+                        SELECT V.SEC_ACCT_ID AS SECACCTID
+                        FROM PTL_SEC_ACCT PSA, STL_SEC_ACCT_INFO V
+                        LEFT JOIN FIN_PRODUCT R
+                        ON R.REGIST_ORG = V.REGIST_ORG
+                        and V.TRADE_PLACE = R.trade_market
+                        WHERE PSA.ACCT_NO = V.SEC_ACCT_ID
+                        AND V.SEC_ACCT_TYPE = 'SEC'
+                        AND PSA.PORTFOLIO_ID = #{portfolioId}
+                        AND R.FINPROD_ID = #{finprodId}
+                        )
+                    )
             </if>
         </where>
     </select>

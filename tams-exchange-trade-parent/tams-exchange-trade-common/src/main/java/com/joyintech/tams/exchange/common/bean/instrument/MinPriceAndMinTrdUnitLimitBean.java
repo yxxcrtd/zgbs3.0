@@ -34,6 +34,9 @@ public class MinPriceAndMinTrdUnitLimitBean implements Serializable {
     @ApiModelProperty(required = false, name = "isFullPrice", value = "是否全价，默认为净价")
     private String isFullPrice = "N";
 
+    @ApiModelProperty( name = "subStockType", value = "股票类型")
+    private String subStockType;
+
     public MinPriceAndMinTrdUnitLimitBean() {
     }
 
@@ -97,6 +100,14 @@ public class MinPriceAndMinTrdUnitLimitBean implements Serializable {
 
     public void setIsFullPrice(String isFullPrice) {
         this.isFullPrice = isFullPrice;
+    }
+
+    public String getSubStockType() {
+        return subStockType;
+    }
+
+    public void setSubStockType(String subStockType) {
+        this.subStockType = subStockType;
     }
 
     @Override

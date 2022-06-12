@@ -67,7 +67,7 @@ public class EntrustPropUtils {
         }
 
         //判断是否非交易业务
-        if (EntrustUtils.isNotTrade(busiTypeTg)) {
+        if (EntrustUtils.isNotBuyOrSellTrade(busiTypeTg)) {
             return decideEntrustProp(instruction.getPs());
         }
 

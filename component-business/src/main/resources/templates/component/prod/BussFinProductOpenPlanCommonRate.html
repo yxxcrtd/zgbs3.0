@@ -42,8 +42,8 @@
 								data-th-data-result="${OPENMODE}" searchable="false"
 								placeholder="请输入内容"
 								data-th-placeholder="#{SysCommon.placeholder}"
-								data-th-required="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002' "
-						>
+								data-th-required = "true">
+								<!--data-th-required="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002' "-->
 						</select>
 					</div>
 				</div>
@@ -192,7 +192,7 @@
 				<div class="form-inline-wrap">
 					<div id="hidden_div_1">
 						<label class="layui-form-label form-label-wrap"
-							   th:text="#{FinProductOpenRule.calcMethod}">推算方法</label>
+							   th:text="#{FinProductOpenRule.calcMethod}">推算方法<span class="star-sign">*</span></label>
 						<div class="layui-input-inline input-inline">
 							<!--
 								<select th:id="|${bussFinProductOpenPlanDto}_calcMethod|"
@@ -230,7 +230,7 @@
 				</div>
 				<div class="form-inline-wrap">
 					<label class="layui-form-label form-label-wrap"
-						   th:text="#{FinProductOpenRule.tradedayRule}">营业日准则</label>
+						   th:text="#{FinProductOpenRule.tradedayRule}">营业日准则<span class="star-sign">*</span></label>
 					<div class="layui-input-inline input-inline">
 						<select th:id="|${bussFinProductOpenPlanDto}_tradedayRule|"
 								th:name="|${bussFinProductOpenPlanDto}.tradedayRule|"
@@ -247,7 +247,7 @@
 			<!-- modify by mashukai 20201116 BS-2025 草稿箱开放模式反显值不对 end -->
 			<div class="layui-form-item">
 				<div class="form-inline-wrap">
-					<label class="layui-form-label form-label-wrap" th:text="#{FinProductOpenRule.calcRule}">推算规则</label>
+					<label class="layui-form-label form-label-wrap" th:text="#{FinProductOpenRule.calcRule}">推算规则<span class="star-sign">*</span></label>
 					<div class="layui-input-inline input-inline">
 						<!-- 一体化对应etliu -->
 						<!-- <select th:id="|${bussFinProductOpenPlanDto}_calcRule|" th:name="|${bussFinProductOpenPlanDto}.calcRule|"
@@ -311,7 +311,7 @@
 
 				<div class="form-inline-wrap" th:id="|${bussFinProductOpenPlanDto}_cpriceRuleDiv|">
 					<label class="layui-form-label form-label-wrap"
-						   th:text="#{FinProductOpenRule.cpriceRule}">净值日准则</label>
+						   th:text="#{FinProductOpenRule.cpriceRule}">净值日准则<span class="star-sign">*</span></label>
 					<div class="layui-input-inline input-inline">
 						<select th:id="|${bussFinProductOpenPlanDto}_cpriceRule|"
 								th:name="|${bussFinProductOpenPlanDto}.cpriceRule|"
@@ -356,8 +356,9 @@
 								data-th-data-result="${OPENMODE}" searchable="false"
 								placeholder="请输入内容"
 								data-th-placeholder="#{SysCommon.placeholder}"
-								data-th-required="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002' "
-						>
+								data-th-required = "true">
+<!--								data-th-required="${pageId} eq 'FinProductBuild002' or ${pageId} eq 'FinNetValueProductBuild002' "-->
+<!--						>-->
 						</select>
 					</div>
 				</div>
@@ -504,7 +505,7 @@
 			<div class="layui-form-item">
 				<div class="form-inline-wrap">
 					<label class="layui-form-label form-label-wrap"
-						   th:text="#{FinProductOpenRule.calcMethod}">推算方法</label>
+						   th:text="#{FinProductOpenRule.calcMethod}">推算方法<span class="star-sign">*</span></label>
 					<div class="layui-input-inline input-inline">
 						<!--
                             <select th:id="|${bussFinProductOpenPlanRedDto}_calcMethod|"
@@ -539,7 +540,7 @@
 				</div>
 				<div class="form-inline-wrap">
 					<label class="layui-form-label form-label-wrap"
-						   th:text="#{FinProductOpenRule.tradedayRule}">营业日准则</label>
+						   th:text="#{FinProductOpenRule.tradedayRule}">营业日准则<span class="star-sign">*</span></label>
 					<div class="layui-input-inline input-inline">
 						<select th:id="|${bussFinProductOpenPlanRedDto}_tradedayRule|"
 								th:name="|${bussFinProductOpenPlanRedDto}.tradedayRule|"
@@ -556,7 +557,7 @@
 			<div class="layui-form-item">
 				<div class="form-inline-wrap">
 					<label class="layui-form-label form-label-wrap"
-						   th:text="#{FinProductOpenRule.calcRule}">推算规则</label>
+						   th:text="#{FinProductOpenRule.calcRule}">推算规则<span class="star-sign">*</span></label>
 					<div class="layui-input-inline input-inline">
 						<!--
                           <select th:id="|${bussFinProductOpenPlanRedDto}_calcRule|"
@@ -602,7 +603,7 @@
 			<div class="layui-form-item">
 				<div class="form-inline-wrap" th:id="|${bussFinProductOpenPlanRedDto}_cpriceRuleDiv|">
 					<label class="layui-form-label form-label-wrap"
-						   th:text="#{FinProductOpenRule.cpriceRule}">净值日准则</label>
+						   th:text="#{FinProductOpenRule.cpriceRule}">净值日准则<span class="star-sign">*</span></label>
 					<div class="layui-input-inline input-inline">
 						<select th:id="|${bussFinProductOpenPlanRedDto}_cpriceRule|"
 								th:name="|${bussFinProductOpenPlanRedDto}.cpriceRule|"

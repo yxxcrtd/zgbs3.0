@@ -572,6 +572,8 @@ public class InvestmentManagement extends BaseService {
             } else {
                 minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimit));
             }
+            
+            minPriceAndMinTrdUnitLimitBean.setSubStockType(instrument.getSubStockType());
 
             logger.info("填充最小价差等交易属性信息 => 【minPriceAndMinTrdUnitLimitBean = {}】", minPriceAndMinTrdUnitLimitBean);
             instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);

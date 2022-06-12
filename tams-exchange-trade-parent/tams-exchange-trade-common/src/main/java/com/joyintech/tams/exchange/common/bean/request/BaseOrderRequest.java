@@ -52,6 +52,9 @@ public class BaseOrderRequest implements Serializable {
     @ApiModelProperty(name="orderSoftControl",value="下单软控是否继续？Y：继续",example="Y")
     protected String orderSoftControl;
 
+    @ApiModelProperty(name = "fairOrderFlag", value = "是否公平交易", example = "true|false")
+    private boolean fairOrderFlag;
+
     public String getInstructionId() {
         return instructionId;
     }
@@ -114,6 +117,14 @@ public class BaseOrderRequest implements Serializable {
 
     public void setOrderSoftControl(String orderSoftControl) {
         this.orderSoftControl = orderSoftControl;
+    }
+
+    public boolean isFairOrderFlag() {
+        return fairOrderFlag;
+    }
+
+    public void setFairOrderFlag(boolean fairOrderFlag) {
+        this.fairOrderFlag = fairOrderFlag;
     }
 
     @Override

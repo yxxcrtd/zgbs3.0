@@ -10,6 +10,7 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.terminal.trade.cds.CDSTradeClient;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -357,22 +358,14 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
     @Override
     public void onReqIntegratedEntrust(IntegratedEntrust integratedEntrust, long requestId) {
         //信用保护凭证不走交易直接，走交易登记逻辑
-        if (StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), integratedEntrust.getBusiTypeTg())) {
-            integratedEntrust.setLocalEntrustId(genLocalId());
-            integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
-            integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
-            requestIdEntrustMap.put(integratedEntrust.getId(),requestId);
-            tradeResponse.resIntegratedEntrust(integratedEntrust);
-
-            integratedEntrust.setEntrustStatus(EntrustStatus.SUCCEEDED.value);
-            integratedEntrust.setTradedVolume(integratedEntrust.getEntrustVolume());
-            this.onIntegratedEntrust(integratedEntrust);
-
-            Trade trade = getTrade(integratedEntrust, Calendar.getInstance(), TradeType.NORMAL.value);
-            this.onTrade(trade);
-
-            return;
-        }
+//        if (StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), integratedEntrust.getBusiTypeTg())) {
+//            CDSTradeClient cdsTradeClient = SpringContextUtils.getBean(CDSTradeClient.class);
+//            cdsTradeClient.init(this,null,this);
+//            requestIdEntrustMap.put(integratedEntrust.getId(), requestId);
+//            cdsTradeClient.integratedEntrust(integratedEntrust, requestId);
+//
+//            return;
+//        }
 
         ITradeRequest request = tradeRequestMap.get(integratedEntrust.getAccountId());
         integratedEntrust.setLocalEntrustId(genLocalId());
@@ -386,32 +379,6 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
             requestIdEntrustMap.put(integratedEntrust.getId(), requestId);
             request.integratedEntrust(integratedEntrust, requestId);
         }
-    }
-
-    private AtomicInteger brokerTradeId = new AtomicInteger(0);
-
-    private Trade getTrade(EntrustInterface entrust, Calendar now, int tradeType) {
-        Trade trade = new Trade();
-        trade.setTradedVolume(entrust.getEntrustVolume());
-        trade.setAccountId(entrust.getAccountId());
-        trade.setTradingDay(entrust.getTradingDay());
-        trade.setMarket(entrust.getMarket());
-        trade.setFinanceAccount(entrust.getFinanceAccount());
-        trade.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
-        trade.setEntrustBs(entrust.getEntrustBs());
-        trade.setIsFullPrice(entrust.getIsFullPrice());
-        trade.setTradedPrice(entrust.getEntrustPrice());
-        trade.setBsFlag(entrust.getBsFlag());
-        trade.setAssetType(entrust.getAssetType());
-        trade.setTradeType(tradeType);
-        trade.setBrokerEntrustId(entrust.getBrokerEntrustId());
-        trade.setStockName(entrust.getStockName());
-        trade.setEntrustProp(entrust.getEntrustProp());
-        trade.setLocalEntrustId(entrust.getLocalEntrustId());
-        trade.setEntrustId(entrust.getId());
-        trade.setTradeTime(now.get(Calendar.HOUR_OF_DAY) + "" + now.get(Calendar.MINUTE) + "" + now.get(Calendar.SECOND));
-        trade.setBrokerTradeId(trade.getTradeTime() + brokerTradeId.incrementAndGet());
-        return trade;
     }
 
     @Override

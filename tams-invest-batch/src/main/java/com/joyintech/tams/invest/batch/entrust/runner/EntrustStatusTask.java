@@ -10,6 +10,8 @@
  
 package com.joyintech.tams.invest.batch.entrust.runner;
 
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
+import com.mchange.v2.lang.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -57,10 +59,9 @@ public class EntrustStatusTask extends BatchBaseService{
                  while (isRunning) {
                      // Sonar Fix modify by huwei 220609
                      try {
-                         lock1.wait(30000);
+                         Thread.sleep(30000);
                      } catch (InterruptedException e) {
                          logger.error(e.getMessage(),e);
-                         Thread.currentThread().interrupt();
                      }
                  }
                  isRunning = true;
@@ -76,6 +77,8 @@ public class EntrustStatusTask extends BatchBaseService{
          }
          catch (Exception e) {
              logger.error(e.getMessage());
+             //异常信息记录到批处理的日志详情
+             throw new BatchException(RiskUtil.getLogString(e));
          }
          isRunning=false;
          return result;

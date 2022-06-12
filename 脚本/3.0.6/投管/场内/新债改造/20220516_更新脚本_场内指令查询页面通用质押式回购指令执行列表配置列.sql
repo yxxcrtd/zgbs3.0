@@ -19,7 +19,7 @@ insert into CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DI
 values ('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', 'EX018', 'entrustVolume', '委托数量', null, 8, 1, 0, 0, 100, '{"colAlign": "left","dataType":"amount","precision":"2","unit":"wanYuan"}', 0, 'COMM', 1, 0, null, null, 0);
 
 insert into CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-values ('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', 'EX018', 'financeAccount', '资金账户', null, 3, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+values ('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', 'EX018', 'accountName', '资金账户', null, 3, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
 
 insert into CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 values ('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', 'EX018', 'marketStr', '交易场所', null, 7, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
@@ -73,7 +73,7 @@ insert into CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DI
 values ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX018', 'entrustId', '委托编号', null, 1, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
 
 insert into CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-values ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX018', 'financeAccount', '资金账户', null, 3, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+values ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX018', 'accountName', '资金账户', null, 3, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
 
 insert into CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 values ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX018', 'marketStr', '交易场所', null, 7, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);

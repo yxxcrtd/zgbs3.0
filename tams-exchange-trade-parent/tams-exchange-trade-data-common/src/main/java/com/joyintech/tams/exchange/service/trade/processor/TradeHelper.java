@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -59,7 +60,10 @@ import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券入库;
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
+import static com.joyintech.tams.exchange.common.constant.BatchPriceMode.*;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
+import static com.joyintech.tams.exchange.common.constant.ErrorCode.INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR;
+import static com.joyintech.tams.exchange.common.constant.ErrorCode.NOT_FAIR_ORDER_ERROR;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
 import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.NEGOTIATED_REPO;
@@ -511,9 +515,16 @@ public class TradeHelper {
      * 1、是否满足指令价格限定；
      * 2、是否满足行情涨跌停价限制
      */
-    private void checkPrice(OrderInterface entrust, Instruction instruction) {
+    private void checkPrice(BatchInfo batchInfo,OrderInterface entrust, Instruction instruction) {
         BigDecimal entrustPrice = entrust.getEntrustPrice();
         BigDecimal instructionPrice = instruction.getEntrustPrice();
+        if (instruction.convertibleBond() || (instruction.newBond() && instruction.fullPrice())) {
+            if (batchInfo.getCompleteTimes() == 0) {
+                entrustPrice = entrust.getFullPrice();
+            }
+            instructionPrice = instruction.getFullPrice();
+        }
+
         //检查指令价格限定
         if ((instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(entrustPrice, instructionPrice))
                 || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(entrust, instructionPrice, entrustPrice))) {
@@ -526,8 +537,8 @@ public class TradeHelper {
             TickBean tick = (TickBean) tickBean.getData();
             BigDecimal minPrice = instruction.queryMinPrice(entrust.getEntrustProp());
             int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
-            double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
-            double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
+            double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), round, RoundingMode.UP);
+            double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), round, RoundingMode.DOWN);
             if (InvestAssetTypeEnum.STOCK.value.equals(entrust.getAssetType())) {
                 logger.info("检查【股票】涨停价格。。。");
                 fillEntrustPrice(entrust, lowerLimitPrice, upperLimitPrice, entrustPrice);
@@ -727,7 +738,11 @@ public class TradeHelper {
         order.setIsNoGuard(instruction.getIsNoGuard());
 
         //1.公平下单
-        if (fairOrderHelper.createFairOrder(order, instruction)) {
+        if (dto.isFairOrderFlag()) {
+            if (!fairOrderHelper.createFairOrder(order, instruction)) {
+                order.setErrorCode(NOT_FAIR_ORDER_ERROR.value);
+                order.setErrorMsg(NOT_FAIR_ORDER_ERROR.errorMsg);
+            }
             return order;
         }
 
@@ -830,7 +845,7 @@ public class TradeHelper {
 //        return convertOrderToEntrust(order, batchInfo, workflow, false);
 //    }
 
-    public void setBatchOrderPrice(Order order, BatchInfo batchInfo, Instruction instruction) {
+    /*public void setBatchOrderPrice(Order order, BatchInfo batchInfo, Instruction instruction) {
         // 市价委托
         if (isMarketPrice(order.getEntrustProp())) {
             return;
@@ -871,17 +886,19 @@ public class TradeHelper {
                 order.setOrderPrice(TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), round));
             }
         }
-    }
+    }*/
 
     private void setBatchEntrustPrice(Order order, BatchInfo batchInfo, Entrust entrust, Instruction instruction, int round) {
+        BigDecimal offsetPrice = NumberUtil.mul(batchInfo.getPriceOffset(), batchInfo.getCompleteTimes());
         // 市价委托：填充反向涨跌停价
         if (isMarketPrice(order.getEntrustProp())) {
             entrust.setEntrustPrice(order.getOrderPrice());
             return;
         }
         // 价格类型：固定递增
-        if (batchInfo.getPriceMode() == BatchPriceMode.FIX_AND_INCREASE.value) {
-            BigDecimal price = TradeUtils.add(batchInfo.getBeginPrice(), TradeUtils.multiply(batchInfo.getPriceOffset(), batchInfo.getCompleteTimes(), round), round);
+        int priceMode = batchInfo.getPriceMode();
+        if (priceMode == FIX_AND_INCREASE.value) {
+            BigDecimal price = TradeUtils.add(batchInfo.getBeginPrice(), offsetPrice, round);
 //            if (order.getEntrustBs().equals(EntrustBs.SELL.value) && TradeUtils.lessThan(price, instruction.getEntrustPrice())) {
 //                price = instruction.getEntrustPrice();
 //            } else if (order.getEntrustBs().equals(EntrustBs.BUY.value) && TradeUtils.bigThan(price, instruction.getEntrustPrice())) {
@@ -893,27 +910,28 @@ public class TradeHelper {
         ResultBean tickBean = quoteService.getTick(entrust.getStockCode());
         if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
             TickBean tick = (TickBean) tickBean.getData();
-            if (batchInfo.getPriceMode() == BatchPriceMode.BID_OFFSET.value) {
+            BigDecimal offsetLastPrice = TradeUtils.add(tick.getLastPrice(), offsetPrice, round);
+            if (priceMode == BID_OFFSET.value) {
                 if (tick.getBidPrice().get(0) > 0) {
-                    entrust.setEntrustPrice(TradeUtils.add(tick.getBidPrice().get(0), batchInfo.getPriceOffset(), round));
+                    entrust.setEntrustPrice(TradeUtils.add(tick.getBidPrice().get(0), offsetPrice, round));
                 } else {
                     logger.info("bidPrice not greater than zero {}, try lastPrice", entrust.getStockCode());
                     if (tick.getLastPrice() > 0) {
-                        entrust.setEntrustPrice(TradeUtils.add(tick.getLastPrice(), batchInfo.getPriceOffset(), round));
+                        entrust.setEntrustPrice(offsetLastPrice);
                     }
                 }
-            } else if (batchInfo.getPriceMode() == BatchPriceMode.ASK_OFFSET.value) {
+            } else if (priceMode == ASK_OFFSET.value) {
                 if (tick.getAskPrice().get(0) > 0) {
-                    entrust.setEntrustPrice(TradeUtils.add(tick.getAskPrice().get(0), batchInfo.getPriceOffset(), round));
+                    entrust.setEntrustPrice(TradeUtils.add(tick.getAskPrice().get(0), offsetPrice, round));
                 } else {
                     logger.info("askPrice not greater than zero {}, try lastPrice", entrust.getStockCode());
                     if (tick.getLastPrice() > 0) {
-                        entrust.setEntrustPrice(TradeUtils.add(tick.getLastPrice(), batchInfo.getPriceOffset(), round));
+                        entrust.setEntrustPrice(offsetLastPrice);
                     }
                 }
             } else if (tick.getLastPrice() > 0) {
-                if (batchInfo.getPriceMode() == BatchPriceMode.LAST_OFFSET.value) {
-                    entrust.setEntrustPrice(TradeUtils.add(tick.getLastPrice(), batchInfo.getPriceOffset(), round));
+                if (priceMode == BatchPriceMode.LAST_OFFSET.value) {
+                    entrust.setEntrustPrice(offsetLastPrice);
                 } else {
                     entrust.setEntrustPrice(TradeUtils.getBigDecimal(tick.getLastPrice(), round));
                 }
@@ -929,7 +947,7 @@ public class TradeHelper {
             }
 
             //资产类型是债券，处理净价、全价
-            if (InvestAssetTypeEnum.isBond(order.getAssetType())) {
+/*            if (InvestAssetTypeEnum.isBond(order.getAssetType())) {
                 EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
                 dto.setPrice(entrust.getEntrustPrice());
                 dto.setEntrustVolume(entrust.getEntrustVolume());
@@ -941,7 +959,7 @@ public class TradeHelper {
                 entrust.setEntrustPrice(dto.getNetPrice());
                 entrust.setFullPrice(dto.getFullPrice());
                 entrust.setExpireYearRate(dto.getYield());
-            }
+            }*/
         }
     }
 
@@ -988,6 +1006,7 @@ public class TradeHelper {
         Entrust entrust = new Entrust();
         BeanUtils.copyProperties(order, entrust, "id", "entrustStatus", "frozenBalance", "frozenVolume", "tradedBalance", "tradedPrice", "tradedVolume", "createTime");
         entrust.setCreateTime(new Date(System.currentTimeMillis()));
+        entrust.setParentOrderId(order.getId());
         int entrustVolume = batchInfo.getBeginVolume() + batchInfo.getVolumeOffset() * batchInfo.getCompleteTimes();
         entrust.setEntrustVolume(entrustVolume);
 
@@ -997,7 +1016,7 @@ public class TradeHelper {
         setBatchEntrustPrice(order, batchInfo, entrust, instruction, round);
 
         //批量委托检查委托价格
-        checkPrice(entrust, instruction);
+        checkPrice(batchInfo, entrust, instruction);
 
         //资产类型是债券，处理净价、全价
         if (InvestAssetTypeEnum.isBond(order.getAssetType())) {
@@ -1186,9 +1205,6 @@ public class TradeHelper {
 
     public void handleBatchOrder(BatchInfo batchInfo, Order order, WorkflowBean workflow) {
         String orderId = batchInfo.getOrderId();
-        if (Objects.isNull(order)) {
-            order = orderService.findById(orderId);
-        }
         logger.info("handle batch order => 【orderId = {}】, 【entrustTimes = {}】, 【completeTimes = {}】", orderId, batchInfo.getEntrustTimes(), batchInfo.getCompleteTimes());
 
         if (ObjectUtil.isNotNull(workflow) && batchInfo.getCompleteTimes() == 0) {
@@ -1204,7 +1220,6 @@ public class TradeHelper {
         }
 
         Entrust entrust = convertBatchOrderToEntrust(order, batchInfo, workflow);
-        entrust.setParentOrderId(order.getId());
 
         long entrustVolume = entrust.getEntrustVolume();
         if (batchInfo.getEntrustTimes() > batchInfo.getCompleteTimes() && entrustVolume > 0) {

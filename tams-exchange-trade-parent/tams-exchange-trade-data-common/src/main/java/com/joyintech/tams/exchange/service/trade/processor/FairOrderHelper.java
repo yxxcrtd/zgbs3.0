@@ -172,7 +172,7 @@ public class FairOrderHelper {
     }
 
     public boolean createFairOrder(Order order, Instruction instruction) {
-        // 判断order是否要做公平交易
+        logger.info("{createFairOrder()】 判断order是否要做公平交易：instructionId={}", instruction.getEntrustId());
         if (!Strings.isNullOrEmpty(order.getAlgorithmId())
                 || !EntrustUtils.isFairOrder(order.getEntrustProp())
                 || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
@@ -183,33 +183,39 @@ public class FairOrderHelper {
         ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
 
         PortfolioAllocationResponse portfolioAllocationResponse = Convert.convert(PortfolioAllocationResponse.class, resultBean.getData());
+        if (StrUtil.isNotEmpty(portfolioAllocationResponse.getInfoLevel())
+                && portfolioAllocationResponse.getInfoLevel().equals("1")) {
+            logger.info("fair order failed");
+            order.setOrderStatus(OrderStatus.STOP.value);
+            return false;
+        }
+
         List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
+        if (CollectionUtils.isEmpty(instructions)) {
+            return false;
+        }
+        long totoleNum = instructions.stream().map(Instruction::getTermDays).reduce(BigDecimal.ZERO, BigDecimal::add).longValue();
+        if (totoleNum == 0) {
+            return false;
+        }
         Map<String, List<Instruction>> instructionMap = instructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
         if (instructionMap.size() <= 1) {
             // 走普通委托
             return false;
         }
 
-        if (StrUtil.isNotEmpty(portfolioAllocationResponse.getInfoLevel())
-                && portfolioAllocationResponse.getInfoLevel().equals("1")) {
-            logger.info("fair order failed");
-            order.setOrderStatus(OrderStatus.STOP.value);
-            return true;
-        }
-
-        long totoleNum = instructions.stream().map(Instruction::getTermDays).reduce(BigDecimal.ZERO, BigDecimal::add).longValue();
-        if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid() && totoleNum == 0) {
-            //卖出价格不得小于最优价，买入不得高于最优价
-            if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {
-                order.setErrorCode(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.value);
-                order.setErrorMsg(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.errorMsg);
-                return true;
-            } else if (order.getEntrustBs().equals(EntrustBs.BUY.value)) {
-                order.setErrorCode(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.value);
-                order.setErrorMsg(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.errorMsg);
-                return true;
-            }
-        }
+//        if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid() && totoleNum == 0) {
+//            //卖出价格不得小于最优价，买入不得高于最优价
+//            if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {
+//                order.setErrorCode(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.value);
+//                order.setErrorMsg(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.errorMsg);
+//                return true;
+//            } else if (order.getEntrustBs().equals(EntrustBs.BUY.value)) {
+//                order.setErrorCode(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.value);
+//                order.setErrorMsg(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.errorMsg);
+//                return true;
+//            }
+//        }
 
         order.setBusinessFlag(BusinessFlag.FAIR.value);
         orderService.asyncUpdate(order);
