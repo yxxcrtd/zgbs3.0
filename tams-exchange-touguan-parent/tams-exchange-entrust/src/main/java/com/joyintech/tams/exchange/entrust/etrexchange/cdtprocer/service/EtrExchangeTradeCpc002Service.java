@@ -66,6 +66,21 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
     public Page<EtrCreditProtectionCertificateResponse> selectEtrExchange(EtrCreditProtectionCertificateRequest request) {
         Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("userId", SecurityUtil.getLoginUser().getUserName());
+        if(Objects.equals(param.get("sort"), "dealPercentAge")){
+            param.put("sort", "dealPercent");
+        }
+        if(Objects.equals(param.get("sort"), "entrustStatusString")){
+            param.put("sort", "entrustStatus");
+        }
+        if(Objects.equals(param.get("sort"), "ImplementPercentAge")){
+            param.put("sort", "ImplementPercent");
+        }
+        if(Objects.equals(param.get("sort"), "psStr")){
+            param.put("sort", "ps");
+        }
+        if(Objects.equals(param.get("sort"), "priceModelString")){
+            param.put("sort", "priceModel");
+        }
         param.put("sysDate", iPlatformDate.getSysDateStr());
         param.put("ENTRUST_BUSS_TYPE_30",DictCodeListExt3.上农商_指令业务类型_信用保护凭证指令.getValue());
         param.put("PRICE_MODEL_PRM02", DictCodeListExt2.价格模式_限价指令.getValue());

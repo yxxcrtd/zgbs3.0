@@ -783,7 +783,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
     public void setCheckParams(EtrCreditProtectionCertificateApplyRequest entity, EtrParameterDto paraDto) {
         /********************************/
         //设置默认最小价差、最小交易单位；否则指令组件抛异常；
-        paraDto.setMinDiffPrice(BigDecimal.valueOf(0.001).setScale(3, BigDecimal.ROUND_HALF_UP));
+        paraDto.setMinDiffPrice(BigDecimal.valueOf(50).setScale(3, BigDecimal.ROUND_HALF_UP));
         paraDto.setMinDealUnit(new BigDecimal(1));
 
         Map<String, UnitEnum> numUnit = new HashMap<String, UnitEnum>();

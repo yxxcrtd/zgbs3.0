@@ -37,6 +37,8 @@ public class EtrCreditProtectionCertificateResponse {
     private String entrustStatusString;
 
 
+
+
     /**
      * 执行进度
      */
@@ -302,6 +304,8 @@ public class EtrCreditProtectionCertificateResponse {
         this.implementPercent = implementPercent;
     }
 
+    private BigDecimal ImplementPercentAge;
+
     /**
      * 获取执行百分比
      * @return
@@ -316,6 +320,10 @@ public class EtrCreditProtectionCertificateResponse {
         }
     }
 
+    public void setImplementPercentAge(BigDecimal ImplementPercentAge){
+        this.ImplementPercentAge = ImplementPercentAge;
+    }
+
     /**
      * 获取 dealPercent
      * @return dealPercent.
@@ -323,6 +331,8 @@ public class EtrCreditProtectionCertificateResponse {
     public BigDecimal getDealPercent() {
         return dealPercent;
     }
+
+    private BigDecimal dealPercentAge;
 
     /**
      * 获取成交百分比
@@ -336,6 +346,10 @@ public class EtrCreditProtectionCertificateResponse {
         }else{
             return new BigDecimal(0);
         }
+    }
+
+    public void setDealPercentAge(BigDecimal dealPercentAge){
+        this.dealPercentAge = dealPercentAge;
     }
 
     /**
@@ -361,7 +375,6 @@ public class EtrCreditProtectionCertificateResponse {
     public void setPortfolioName(String portfolioName) {
         this.portfolioName = portfolioName;
     }
-
 
     /**
      * 获取 getPsStr
