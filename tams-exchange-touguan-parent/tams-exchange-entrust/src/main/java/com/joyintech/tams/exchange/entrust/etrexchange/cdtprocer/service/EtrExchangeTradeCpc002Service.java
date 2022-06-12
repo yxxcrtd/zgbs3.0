@@ -72,7 +72,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
         if(Objects.equals(param.get("sort"), "entrustStatusString")){
             param.put("sort", "entrustStatus");
         }
-        if(Objects.equals(param.get("sort"), "ImplementPercentAge")){
+        if(Objects.equals(param.get("sort"), "implementPercentAge")){
             param.put("sort", "ImplementPercent");
         }
         if(Objects.equals(param.get("sort"), "psStr")){
