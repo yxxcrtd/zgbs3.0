@@ -53,7 +53,7 @@
         T1.PRICE as price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM as entrustNum
+        ,nvl(T1.ENTRUST_NUM,0)/10000 as entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -194,8 +194,8 @@
         ,
         T1.PRICE as price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
-        ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        ,T1.ENTRUST_AMT entrustAmt,
+        nvl(T1.ENTRUST_NUM,0)/10000 entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice

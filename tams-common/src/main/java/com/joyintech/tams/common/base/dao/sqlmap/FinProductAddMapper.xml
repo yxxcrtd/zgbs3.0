@@ -195,7 +195,7 @@
                                      LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,
                                      IS_SEVEN_DAY_CASHABLE,OPEN_TYPE,PROTECT_OBJECT,REF_ENTITY,
                                      REF_SEC,REF_SEC_FEATURES,GRACE_PERIOD,BOOK_BUILDING_DATE,PAY_DATE,
-                                     NOM_CAPI,SETTLE_METHOD,ISSUERSHORT,GUA_TYPE,ORIGINAL_OWNER)
+                                     NOM_CAPI,SETTLE_METHOD,ISSUERSHORT,GUA_TYPE,ORIGINAL_OWNER,BASIS)
         values (#{finprodId,jdbcType=VARCHAR}, #{saleDepartment,jdbcType=VARCHAR}, #{saleLayer,jdbcType=VARCHAR},
                 #{salePeriod,jdbcType=DECIMAL}, #{purSpeed,jdbcType=DECIMAL}, #{redSpeed,jdbcType=DECIMAL},
                 #{isSecBond,jdbcType=VARCHAR}, #{windId,jdbcType=VARCHAR}, #{isAutoUpdate,jdbcType=VARCHAR},
@@ -233,7 +233,7 @@
                 #{isOpenEveryDay,jdbcType=VARCHAR},#{isSevenDayCashable,jdbcType=VARCHAR},#{openType,jdbcType=VARCHAR},
                 #{protectObject,jdbcType=VARCHAR},#{refEntity,jdbcType=VARCHAR},#{refSec,jdbcType=VARCHAR},#{refSecFeatures,jdbcType=VARCHAR},
                 #{gracePeriod,jdbcType=DECIMAL},#{bookBuildingDate,jdbcType=DATE},#{payDate,jdbcType=DATE},#{nomCapi,jdbcType=DECIMAL},
-                #{settleMethod,jdbcType=VARCHAR},#{issuershort,jdbcType=VARCHAR},#{guaType,jdbcType=VARCHAR},#{originalOwner,jdbcType=VARCHAR}
+                #{settleMethod,jdbcType=VARCHAR},#{issuershort,jdbcType=VARCHAR},#{guaType,jdbcType=VARCHAR},#{originalOwner,jdbcType=VARCHAR},#{basis,jdbcType=VARCHAR}
                 )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >

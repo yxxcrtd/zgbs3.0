@@ -99,6 +99,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
             param.put("finprodMarketIds", null);
         }
         return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeCpc002Mapper.selectEtrExchanges(param));
+
     }
 
     /**
