@@ -7,6 +7,8 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMapper;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
@@ -43,7 +45,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
      * 基础--中债报送(资产)
      */
     @Autowired(required = false)
-    private JoyinbusinessCommonService joyinbusinessCommonService;
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
     @Autowired
     private IPlatformDate iplatformDate;
@@ -213,6 +215,12 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> cfetsPrimaryBidManageMapper.selectDetailForPage(pageParam));
         return page;
+    }
+
+    public Page<SelectOptionDto> getManager(SelectOptionCommonRequest dto) {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("manager", dto.getSearch());
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.getManagers(param));
     }
 
 }

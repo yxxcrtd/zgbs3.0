@@ -214,6 +214,11 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("ps", allDto.getPs())
                     .put("isCheck", isCheck)
                     .put("data", list.get(0));
+            if (allDto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                    || allDto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
+                map.put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.REPO003);
+                map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_质押式回购到期.getValue());
+            }
             if (StringUtil.equals(allDto.getPs(), 交易方向_行权回售.getValue())) {
                 map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
             }
@@ -549,6 +554,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     && (StringUtil.equals(dto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级投标.getValue())
                     || StringUtil.equals(dto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级申购.getValue()))){
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
+            } else if (StringUtil.isNotEmpty(dto.getTrdBankManualSettleInfo())
+                    && (StringUtil.equals(dto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_质押式回购到期.getValue()))) {
+                riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
             } else {
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             }
@@ -707,7 +715,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (data instanceof CfetsManualSettleInsertDto) {
             CfetsManualSettleInsertDto dto = (CfetsManualSettleInsertDto) data;
             CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl);
-            this.generateInputDto(inputDto, dto.getTrdBankManualSettleInfo(), dto.getTrdBankManualSettleInfo());
+            this.generateInputDto(inputDto, dto.getTrdBankManualSettleInfo(), dto);
             result.add(inputDto);
         }
         if (data instanceof CfetsManualSettleInsertDto) {
@@ -983,7 +991,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
             if (StringUtil.equals(businessDto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级投标.getValue())
              || StringUtil.equals(businessDto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_债券一级申购.getValue())) {
                 dto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
-            }else{
+            } else if (StringUtil.equals(businessDto.getTrdBankManualSettleInfo().getBusiType(),头寸业务类型_质押式回购到期.getValue())) {
+                dto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+            } else {
                 dto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             }
             dto.setTradeMarket(trdProductDeal.getTradeMarket());
@@ -1180,11 +1190,18 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         if (obj instanceof TrdBankManualSettleInfo) {
             TrdBankManualSettleInfo inputDto = (TrdBankManualSettleInfo) obj;
+            CfetsManualSettleInsertDto insertDto = (CfetsManualSettleInsertDto) detailObj;
             BeanUtil.copyPropertiesIgnoreNull(creditLinesInputDto, inputDto);
             creditLinesInputDto.setTradeId(inputDto.getTradeId());
             creditLinesInputDto.setTradeAmt(inputDto.getSettleAmt());
             creditLinesInputDto.setTradeDate(inputDto.getSettleDate());
-            creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            if (inputDto.getBusiType().equals(头寸业务类型_质押式回购到期.getValue()) && insertDto.getPs().equals(交易方向_正回购.getValue())) {
+                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
+            } else if (inputDto.getBusiType().equals(头寸业务类型_质押式回购到期.getValue()) && insertDto.getPs().equals(交易方向_逆回购.getValue())) {
+                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+            } else {
+                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            }
         }
         // 银行间回购指令
         if (obj instanceof CfetsEtribRepoInfo003Dto){
