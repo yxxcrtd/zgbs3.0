@@ -130,8 +130,7 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @ApiOperation(value = "查询指令管理分页数据", notes = "查询指令管理分页数据")
     @PostMapping("/findEtrInfoPage")
     @ResponseBody
-    public Message<Page<CfetsEtrIBondFirstBidFindEtrInfoDto>> findEtrInfoPage(@RequestBody CfetsEtrIBondFirstBidFindEtrInfoRequest dto)
-            throws Exception {
+    public Message<Page<CfetsEtrIBondFirstBidFindEtrInfoDto>> findEtrInfoPage(@RequestBody CfetsEtrIBondFirstBidFindEtrInfoRequest dto) {
         try {
             Page<CfetsEtrIBondFirstBidFindEtrInfoDto> list = cfetsEtrBondFirstBid001Service.findEtrInfoPage(dto);
             return new Message<Page<CfetsEtrIBondFirstBidFindEtrInfoDto>>().success().setData(list);
@@ -145,8 +144,7 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @ApiOperation(value = "查询待发行信息分页数据", notes = "查询待发行信息分页数据")
     @PostMapping("/findIssueInfoPage")
     @ResponseBody
-    public Message<Page<CfetsEtrIBondFirstBidFindIssueInfoDto>> findIssueInfoPage(@RequestBody CfetsEtrIBondFirstBidFindIssueInfoRequest dto)
-            throws Exception {
+    public Message<Page<CfetsEtrIBondFirstBidFindIssueInfoDto>> findIssueInfoPage(@RequestBody CfetsEtrIBondFirstBidFindIssueInfoRequest dto) {
         try {
             Page<CfetsEtrIBondFirstBidFindIssueInfoDto> list = cfetsEtrBondFirstBid001Service.findIssueInfoPage(dto);
             return new Message<Page<CfetsEtrIBondFirstBidFindIssueInfoDto>>().success().setData(list);
@@ -254,14 +252,14 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @ResponseBody
     @ApiOperation(value = "风险试算", notes = "风险试算")
     @PostMapping("doRiskcal")
-    public Message<AjaxResult> doRiskcal(@RequestBody CfetsEtrIbdoRiskcalRequest dto) throws Exception {
+    public Message<AjaxResult> doRiskcal(@RequestBody CfetsEtrIbdoRiskcalRequest dto) {
         AjaxResult ajaxResult = new AjaxResult();
-        CfetsEtribdoRiskcalResponse result=new CfetsEtribdoRiskcalResponse();
+        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
 
         result.setStdrtninfo("处理成功");
         result.setRiskTrialSpan("试算通过");
         result.setRiskMathFlag("02");
-        List<CfetsEtribdoRiskcalResponse> resultlist=new ArrayList<>();
+        List<CfetsEtribdoRiskcalResponse> resultlist = new ArrayList<>();
         CfetsEtribdoRiskcalResponse list1 = new CfetsEtribdoRiskcalResponse();
         list1.setKriCode("72ed1f74da2c4e23bb7ad4a2bc0b04f3");
         list1.setPortfolioCode("1221yq");
