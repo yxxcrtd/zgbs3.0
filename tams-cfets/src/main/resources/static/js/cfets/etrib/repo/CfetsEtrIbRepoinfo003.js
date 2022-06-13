@@ -665,7 +665,7 @@
         var param = JSON.parse(JSON.stringify(object))
         $.ajax({
             type: "POST",
-            url: basePath + 'riskTrial/doRiskcal/CfetsEtrRepoInfo',
+            url: basePath + 'riskTrial/doRiskcal/CfetsEtrIbRepoinfo003',
             dataType: "json",
             contentType: "application/json",
             async: false,

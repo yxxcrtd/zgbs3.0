@@ -76,7 +76,7 @@ public class MskCreditMarketInfo002Controller extends BaseController {
             StringUtil.isNotEmpty(secId) && StringUtil.isNotEmpty(valueDate)
             && StringUtil.isNotEmpty(valueSource)) {
             //通过主键查询数据
-            MskCreditInfoProSaveRequest dto = mskCreditMarketInfoPro001Service.selectByKey(
+            MskCreditInfoProSaveRequest dto = mskCreditMarketInfoPro001Service.selectByKey(null,
                     secId, valueDate, valueSource);
             model.put(GlobalConstant.ENTITY, dto);
         }
@@ -115,7 +115,7 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     public Message<AjaxResult> check(@RequestBody MskCreditInfoProSaveRequest dto, BindingResult result) {
         AjaxResult res= new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
-        if(mskCreditMarketInfoPro001Service.selectByKey(dto.getSecid(), dto.getCdate(),dto.getValueSource()) != null){
+        if(mskCreditMarketInfoPro001Service.selectByKey(dto.getMdprice(), dto.getSecid(), dto.getCdate(),dto.getValueSource()) != null){
             errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0006")));
             res.setErrorList(errorList);
             res.setMessageType(MessageType.错误消息);
