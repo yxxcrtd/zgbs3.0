@@ -222,19 +222,19 @@
     <select id="selectTrader" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT
         t.TRADER id,
-        t.TRADER text
+        NVL(t.NAME, t.TRADER) text
         FROM
         (
         SELECT DISTINCT
-        etr_add.TRADER
-        FROM
-        ETR_ENTRUST_ADD etr_add
-        INNER JOIN
-        ETR_ENTRUST etr
+        etr_add.TRADER ,su.REAL_NAME NAME
+        FROM ETR_ENTRUST_ADD etr_add
+        INNER JOIN ETR_ENTRUST etr
         ON etr.ENTRUST_ID = etr_add.ENTRUST_ID
+        LEFT JOIN SYS_USER su ON su.USER_NAME = etr_add.TRADER
         UNION
-        SELECT BID_ORDER.OUR_TRADER  TRADER
+        SELECT BID_ORDER.OUR_TRADER  TRADER,su.REAL_NAME NAME
           FROM BID_ORDER
+        LEFT JOIN SYS_USER su ON su.USER_NAME = BID_ORDER.OUR_TRADER
         ) t
         <where>
             <if test="search != null and !search.equals('')">

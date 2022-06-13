@@ -373,4 +373,17 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
             return new Message<AjaxResult>().fail().setMessage("风险试算异常");
         }
     }
+
+    @PostMapping("/getManagers")
+    @ApiOperation(value = "投资经理查询", notes = "投资经理查询")
+    @ResponseBody
+    public Message<Page<SelectOptionDto>> getManagers(@RequestBody SelectOptionCommonRequest item) {
+        try {
+            Page<SelectOptionDto> list = cfetsPrimaryBidManage001Service.getManager(item);
+            return new Message<Page<SelectOptionDto>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
+        }
+    }
 }

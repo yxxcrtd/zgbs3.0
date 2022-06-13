@@ -467,6 +467,18 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 flag3 = true;
             }
         }
+        if (flag2 && StringUtil.isNotEmpty(counterName) && !counterOnlyFlag) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "04");
+            map.put("massege", "存在多个其他交易对手的未勾选的已接收指令，是否仍进行投标确认？");
+            massageMapList.add(map);
+        }
+        if (flag3) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "03");
+            map.put("massege", "该资产存在未接收指令待处理，是否现在进行投标确认？");
+            massageMapList.add(map);
+        }
         if (flag1) {
             Map<String, Object> map = new HashMap<>();
             map.put("type", "01");
@@ -474,21 +486,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             map.put("ids", entrustIdList1);
             massageMapList.add(map);
         }
-        if (flag2) {
+        if (flag2 && StringUtil.isNotEmpty(counterName) && counterOnlyFlag) {
             Map<String, Object> map = new HashMap<>();
             map.put("type", "02");
-            if (StringUtil.isNotEmpty(counterName) && counterOnlyFlag) {
-                map.put("massege", "存在交易对手为" + counterName + "的未勾选的已接收指令，是否自动选择一并投标确认？");
-                map.put("ids", entrustIdList2);
-            } else {
-                map.put("massege", "存在多个其他交易对手的未勾选的已接收指令，是否仍进行投标确认？");
-            }
-            massageMapList.add(map);
-        }
-        if (flag3) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("type", "03");
-            map.put("massege", "该资产存在未接收指令待处理，是否现在进行投标确认？");
+            map.put("massege", "存在交易对手为" + counterName + "的未勾选的已接收指令，是否自动选择一并投标确认？");
+            map.put("ids", entrustIdList2);
             massageMapList.add(map);
         }
         if (CollectionUtils.isNotEmpty(massageMapList)) {
@@ -854,7 +856,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             }
             cfetsTrdFirstBidFirmInfoDto = list.get(0);
             cfetsTrdFirstBidFirmInfoDto.setProductDtos(productDtos);
-            cfetsTrdFirstBidFirmInfoDto.setCounterId(counterId);
+            if(StringUtil.isEmpty(request.getCounterId())) {
+                request.setCounterId(counterId);
+            }
             request.getProductDtos().addAll(cfetsTrdFirstBidFirmInfoDto.getProductDtos());
         }
         //  自主投标和代投代缴

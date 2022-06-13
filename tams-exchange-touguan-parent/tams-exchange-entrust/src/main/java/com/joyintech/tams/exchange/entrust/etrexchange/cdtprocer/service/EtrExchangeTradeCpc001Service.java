@@ -202,7 +202,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         doInsertBackupQuery(entity);
         doInsertFlow(entity);
         //插入和修改时，指令持仓流水 、现金流水处理,支持多组合
-//        doInsetOrUpdateForEtrPositionHoldMulti(entity);
+        doInsetOrUpdateForEtrPositionHoldMulti(entity);
         //增加调用头寸引擎代码start
         String decisionAct = 系统动作_修改.getValue();
         String systemAct = 系统动作_修改.getValue();

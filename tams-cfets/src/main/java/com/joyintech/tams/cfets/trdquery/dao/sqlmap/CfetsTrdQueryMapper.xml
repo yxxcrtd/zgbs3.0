@@ -254,16 +254,21 @@
             (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '02' end AS regStatus,
             ''   calMode
         FROM BID_ORDER BO
-        LEFT JOIN (SELECT BRBP.BID_ID,wm_concat(BRBP.SEC_ACCT_ID) SEC_ACCT_ID,
-                                  wm_concat(STLINFO.SEC_ACCT_NAME) SEC_ACCT_NAME,
+        LEFT JOIN (SELECT BRBP.BID_ID,wm_concat(NVL(BRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID)) SEC_ACCT_ID,
+                                  wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
                                   wm_concat(BRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                                   wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
                                   wm_concat(TO_CHAR(ROUND(BRBP.BID_PRICE*100,4),'FM9999990.0000')||'%') BID_PRICE
                    FROM BID_ORDER_BID_PRICE BRBP
                    LEFT JOIN PTL_PORTFOLIO PP
                           ON PP.PORTFOLIO_ID = BRBP.PORTFOLIO_ID
+                   LEFT JOIN ETR_ENTRUST_DETAIL EED
+                          ON PP.PORTFOLIO_ID = EED.PORTFOLIO_ID
+                         AND BRBP.ENTRUST_ID = EED.ENTRUST_ID
                    LEFT JOIN STL_SEC_ACCT_INFO STLINFO
                           ON BRBP.SEC_ACCT_ID=STLINFO.SEC_ACCT_ID
+                   LEFT JOIN STL_SEC_ACCT_INFO STLINFO1
+                          ON EED.SEC_ACCT_ID=STLINFO1.SEC_ACCT_ID
                    where 1=1
                     <if test="secAcctIdList != null and secAcctIdList.size() > 0">
                         AND BRBP.SEC_ACCT_ID in
@@ -395,8 +400,8 @@
              ''   calMode
         FROM
             WFL_BID_ORDER WBO
-        LEFT JOIN (SELECT WBRBP.BID_ID,wm_concat(WBRBP.SEC_ACCT_ID) SEC_ACCT_ID,
-                    wm_concat(STLINFO.SEC_ACCT_NAME) SEC_ACCT_NAME,
+        LEFT JOIN (SELECT WBRBP.BID_ID,wm_concat(NVL(WBRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID)) SEC_ACCT_ID,
+                    wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
                     wm_concat(WBRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                     wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
                     wm_concat(TO_CHAR(ROUND(WBRBP.BID_PRICE*100,4),'FM990.0000')||'%') BID_PRICE
@@ -405,6 +410,11 @@
                 ON PP.PORTFOLIO_ID = WBRBP.PORTFOLIO_ID
                 LEFT JOIN STL_SEC_ACCT_INFO STLINFO
                 ON WBRBP.SEC_ACCT_ID=STLINFO.SEC_ACCT_ID
+                LEFT JOIN ETR_ENTRUST_DETAIL EED
+                       ON PP.PORTFOLIO_ID = EED.PORTFOLIO_ID
+                      AND WBRBP.ENTRUST_ID = EED.ENTRUST_ID
+                LEFT JOIN STL_SEC_ACCT_INFO STLINFO1
+                       ON EED.SEC_ACCT_ID=STLINFO1.SEC_ACCT_ID
                 where 1=1
                 <if test="secAcctIdList != null and secAcctIdList.size() > 0">
                     AND BRBP.SEC_ACCT_ID in
@@ -2781,7 +2791,9 @@
             LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
             LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
             left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
-            LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
+            left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID=T2.FINPROD_ID
+            LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,INPUT_VALUE_3 AS issueClass,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
+                   ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps AND (btm.issueClass = fpi.ISSUE_CLASS  OR btm.issueClass IS NULL )
             LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FIN_PRODUCT_TYPE.TYPE_8
             LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.BUSI_TYPE
             LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
@@ -2919,7 +2931,9 @@
             LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
             LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
             left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
-            LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
+            left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID=T2.FINPROD_ID
+            LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,INPUT_VALUE_3 AS issueClass,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
+                   ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps AND (btm.issueClass = fpi.ISSUE_CLASS  OR btm.issueClass IS NULL )
             LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FIN_PRODUCT_TYPE.TYPE_8
             LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.BUSI_TYPE
             LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
@@ -3058,7 +3072,9 @@
             LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
             LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
             left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
-            LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
+            left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID=T2.FINPROD_ID
+            LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,INPUT_VALUE_3 AS issueClass,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
+                   ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps AND (btm.issueClass = fpi.ISSUE_CLASS  OR btm.issueClass IS NULL )
             LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FIN_PRODUCT_TYPE.TYPE_8
             LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.BUSI_TYPE
             LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
@@ -3361,7 +3377,9 @@
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
         left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
-        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm ON fin_product_type.TYPE_8 = btm.Finprod_Type_Tg AND tot.PS = btm.ps
+        left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID=fp.FINPROD_ID
+        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps ,INPUT_VALUE_3 AS issueClass, OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
+               ON fin_product_type.TYPE_8 = btm.Finprod_Type_Tg AND tot.PS = btm.ps AND (btm.issueClass = fpi.ISSUE_CLASS  OR btm.issueClass IS NULL )
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = fin_product_type.TYPE_8
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.BUSI_TYPE
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = tot.PS
@@ -3507,7 +3525,9 @@
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
         left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
-        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm ON fin_product_type.TYPE_8 = btm.Finprod_Type_Tg AND tot.PS = btm.ps
+        left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID=fp.FINPROD_ID
+        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,INPUT_VALUE_3 AS issueClass,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
+               ON fin_product_type.TYPE_8 = btm.Finprod_Type_Tg AND tot.PS = btm.ps AND (btm.issueClass = fpi.ISSUE_CLASS OR btm.issueClass IS NULL )
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = fin_product_type.TYPE_8
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.BUSI_TYPE
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = tot.PS
@@ -3652,7 +3672,9 @@
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
         left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
-        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm ON fin_product_type.TYPE_8 = btm.Finprod_Type_Tg AND tot.PS = btm.ps
+        left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID=fp.FINPROD_ID
+        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,INPUT_VALUE_3 AS issueClass,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
+               ON fin_product_type.TYPE_8 = btm.Finprod_Type_Tg AND tot.PS = btm.ps AND (btm.issueClass = fpi.ISSUE_CLASS  OR btm.issueClass IS NULL )
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = fin_product_type.TYPE_8
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.BUSI_TYPE
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = tot.PS
