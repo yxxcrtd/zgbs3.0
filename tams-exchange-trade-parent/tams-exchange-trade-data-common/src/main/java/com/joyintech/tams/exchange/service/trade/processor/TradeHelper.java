@@ -20,6 +20,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.utils.*;
@@ -239,6 +240,21 @@ public class TradeHelper {
 
     public void addEntrustToReceiver(EntrustInterface entrust, Instruction instruction, int msgType) {
         TradeAgent agent = tradeAgentManager.findAgentByAccountId(entrust.getAccountId());
+
+        //信用保护凭证不依赖终端
+        //TODO 目前只对具体业务判断，后续可通过全局簿记开关控制：
+        //（1）开关开启所有业务走簿记功能，不在依赖终端；
+        //（2）开关关闭所有业务走交易接口，需要依赖终端；
+        if(StringUtil.equals(BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.getCode(),instruction.getBusiTypeTg())){
+            TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(entrust.getInstructionId());
+            if (Constants.PROCESS_TYPE_ENTRUST == msgType) {
+                tradeMsgReceiver.addMsg(MsgType.REQ_ENTRUST, entrust, agent);
+            } else if (Constants.PROCESS_TYPE_INTEGRATED == msgType) {
+                tradeMsgReceiver.addMsg(MsgType.REQ_INTEGRATED, entrust, agent);
+            }
+            return;
+        }
+
         if (Objects.nonNull(agent)) {
             TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(entrust.getInstructionId());
             if (Constants.PROCESS_TYPE_ENTRUST == msgType) {
