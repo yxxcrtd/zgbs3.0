@@ -324,7 +324,7 @@
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
         WHERE
-        m.SECID=#{secid,jdbcType=VARCHAR}
+        m.SECID=#{secid,jdbcType=VARCHAR} and m.CDATE = #{cdate,jdbcType=VARCHAR}
     </select>
 
     <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
