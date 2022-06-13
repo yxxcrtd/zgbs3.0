@@ -139,6 +139,14 @@ public class InstructionHistory implements Serializable, KeyMethodInterface<Stri
     @Size(max = 32)
     private String counterDealerId = "";
 
+    @ApiModelProperty(name = "counterInvestorId", value = "对手方交易主体代码")
+    @Size(max = 32)
+    private String counterInvestorId = "";
+
+    @ApiModelProperty(name = "counterInvestorType", value = "对手方交易主体类型")
+    @Size(max = 32)
+    private String counterInvestorType = "";
+
     @ApiModelProperty(required = false, name = "appointmentNumber", value = "约定号")
     @Size(max = 10)
     private String appointmentNumber = "";
@@ -596,6 +604,22 @@ public class InstructionHistory implements Serializable, KeyMethodInterface<Stri
 
     public void setCounterDealerId(String counterDealerId) {
         this.counterDealerId = counterDealerId;
+    }
+
+    public String getCounterInvestorId() {
+        return counterInvestorId;
+    }
+
+    public void setCounterInvestorId(String counterInvestorId) {
+        this.counterInvestorId = counterInvestorId;
+    }
+
+    public String getCounterInvestorType() {
+        return counterInvestorType;
+    }
+
+    public void setCounterInvestorType(String counterInvestorType) {
+        this.counterInvestorType = counterInvestorType;
     }
 
     public String getAppointmentNumber() {

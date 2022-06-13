@@ -149,6 +149,14 @@ public class InstructionExportVo {
     @Size(max = 32)
     private String counterDealerId = "";
 
+    @ApiModelProperty(name = "counterInvestorId", value = "对手方交易主体代码")
+    @Size(max = 32)
+    private String counterInvestorId = "";
+
+    @ApiModelProperty(name = "counterInvestorType", value = "对手方交易主体类型")
+    @Size(max = 32)
+    private String counterInvestorType = "";
+
     @ApiModelProperty(name = "appointmentNumber", value = "约定号")
     @Size(max = 10)
     private String appointmentNumber = "";
@@ -410,6 +418,9 @@ public class InstructionExportVo {
     @ApiModelProperty(name = "entrustPriceView", value = "指令价格(展示)")
     private BigDecimal entrustPriceView;
 
+    @ApiModelProperty(name = "quoteRequestId", value = "行情请求编号")
+    private String quoteRequestId;
+
     @ApiModelProperty(name = "minPriceAndMinTrdUnitLimitBean", value = "最小价差、买卖单位及交易上下限控制")
     private MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean;
 
@@ -612,6 +623,22 @@ public class InstructionExportVo {
 
     public void setCounterDealerId(String counterDealerId) {
         this.counterDealerId = counterDealerId;
+    }
+
+    public String getCounterInvestorId() {
+        return counterInvestorId;
+    }
+
+    public void setCounterInvestorId(String counterInvestorId) {
+        this.counterInvestorId = counterInvestorId;
+    }
+
+    public String getCounterInvestorType() {
+        return counterInvestorType;
+    }
+
+    public void setCounterInvestorType(String counterInvestorType) {
+        this.counterInvestorType = counterInvestorType;
     }
 
     public String getAppointmentNumber() {
@@ -1269,5 +1296,13 @@ public class InstructionExportVo {
 
     public void setEntrustPriceView(BigDecimal entrustPriceView) {
         this.entrustPriceView = entrustPriceView;
+    }
+
+    public String getQuoteRequestId() {
+        return quoteRequestId;
+    }
+
+    public void setQuoteRequestId(String quoteRequestId) {
+        this.quoteRequestId = quoteRequestId;
     }
 }
