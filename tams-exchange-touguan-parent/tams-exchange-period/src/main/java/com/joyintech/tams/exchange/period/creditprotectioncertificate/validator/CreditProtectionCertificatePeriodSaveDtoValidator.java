@@ -28,6 +28,12 @@ public class CreditProtectionCertificatePeriodSaveDtoValidator implements BeanVa
     public List<ValidMessage> valid(Object o) {
         List<ValidMessage> errorList = new ArrayList<>();
         CreditProtectionCertificatePeriodSaveDto dto = (CreditProtectionCertificatePeriodSaveDto) o;
+        if (CollectionUtils.isEmpty(dto.getBillingDetails())) {
+            ValidMessage validMessage = new ValidMessage();
+            validMessage.setField("billingDetails");
+            validMessage.setMessage("结算明细信息不能为空");
+            errorList.add(validMessage);
+        }
         if (StringUtil.equals(dto.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
             if (dto.getDeliverBond() == null) {
                 ValidMessage validMessage = new ValidMessage();
@@ -35,23 +41,17 @@ public class CreditProtectionCertificatePeriodSaveDtoValidator implements BeanVa
                 validMessage.setMessage("结算方式为实物结算时，交付债券不能为空");
                 errorList.add(validMessage);
             }
-            if (CollectionUtils.isEmpty(dto.getBillingDetails())) {
-                ValidMessage validMessage = new ValidMessage();
-                validMessage.setField("deliverBondAmount");
-                validMessage.setMessage("结算方式为实物结算时，债券交付数量不能为空");
-                errorList.add(validMessage);
-            } else {
-                List<BillingDetailsDto> billingDetails = dto.getBillingDetails();
-                for (BillingDetailsDto billingDetail : billingDetails) {
-                    if (null == billingDetail.getDeliverBondAmount()) {
-                        ValidMessage validMessage = new ValidMessage();
-                        validMessage.setField("deliverBondAmount");
-                        validMessage.setMessage("结算方式为实物结算时，债券交付数量不能为空");
-                        errorList.add(validMessage);
-                        break;
-                    }
+            List<BillingDetailsDto> billingDetails = dto.getBillingDetails();
+            for (BillingDetailsDto billingDetail : billingDetails) {
+                if (null == billingDetail.getDeliverBondAmount()) {
+                    ValidMessage validMessage = new ValidMessage();
+                    validMessage.setField("deliverBondAmount");
+                    validMessage.setMessage("结算方式为实物结算时，债券交付数量不能为空");
+                    errorList.add(validMessage);
+                    break;
                 }
             }
+
         }
         return errorList;
     }
