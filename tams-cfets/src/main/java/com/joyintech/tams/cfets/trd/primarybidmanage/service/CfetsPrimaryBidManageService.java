@@ -267,6 +267,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         Map<String, Object> param = BeanUtil.object2Map(request);
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,request);
+        wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
+        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
         bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
         bidResultTotalMapper.insertSelective(bidResultTotal);
         BidOrder record = new BidOrder();
@@ -772,8 +774,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         if ("save".equals(entity.getOperateType())) {
             return;
         }
-
-        if (type.toString().equals("NEW") && entity.getOperateType().equals("submit")) {
+        if (type.toString().equals("NEW") && !StringUtil.isNotEmpty(entity.getOperateType())) {
+            if(!StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.WFL_AUTO), "02")){
+                beforeWorkFlow(entity);
+            }
+            // 发送头寸
+            this.sendPositionMethod(entity, true, null);
+        }else if (type.toString().equals("NEW") && entity.getOperateType().equals("submit")) {
             if(!StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.WFL_AUTO), "02")){
                 beforeWorkFlow(entity);
             }
@@ -981,7 +988,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      * @since 1.0
      */
     public void beforeWorkFlow(CfetsPrimaryBidManageSaveRequest request) {
-        if (request.getOperateType().equals("revoke")) {
+        if (StringUtil.isNotEmpty(request.getOperateType()) && request.getOperateType().equals("revoke")) {
             WflBidResultTotal wflBidResultTotal = new WflBidResultTotal();
             BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, request);
             wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());

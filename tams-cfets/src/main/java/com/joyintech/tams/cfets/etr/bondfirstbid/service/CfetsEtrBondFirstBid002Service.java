@@ -517,6 +517,13 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         dto.setEntrustNum(dto.getTotalBiddingNum());
         dto.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
         dto.setEntrustDate(dto.getEntrustDate() != null ? dto.getEntrustDate() : DateUtil.platDateFromCache());
+        dto.setVdate(dto.getEntrustDate());
+        if (dto.getIssueDate() != null) {
+            dto.setMdate(dto.getIssueDate());
+        }
+        if (dto.getTenderEdate() != null) {
+            dto.setMdate(dto.getTenderEdate());
+        }
 
         List<CfetsBiddingProductDto> biddingProductList = dto.getBiddingProductList();
         List<CfetsEtrBondFirstBid002Dto> etrInvestBondFirstBidList = new ArrayList<>();
@@ -824,6 +831,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             etrEntrust.setEntrustNum(dto.getTotalBiddingNum().divide(new BigDecimal(100)));
             etrEntrust.setPs(DictCodeList.交易方向_买入.getValue());
             etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
+            etrEntrust.setVdate(dto.getVdate());
+            etrEntrust.setMdate(dto.getMdate());
             //委托附属表
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
             etrEntrustAdd.setBusiTypePosition(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
@@ -919,6 +928,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             if (etrEntrust.getEntrustDate() == null) {
                 etrEntrust.setEntrustDate(iPlatformDate.getSysDate());
             }
+            etrEntrust.setVdate(dto.getVdate());
+            etrEntrust.setMdate(dto.getMdate());
 
             //委托附属表
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
@@ -1072,7 +1083,13 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         dto.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
         dto.setElementId(cfetsDto.getElementId());
         dto.setEntrustDate(cfetsDto.getEtrDate() != null ? cfetsDto.getEtrDate() : DateUtil.platDateFromCache());
-        dto.setVdate(cfetsDto.getEtrDate());
+        dto.setVdate(dto.getEntrustDate());
+        if (dto.getIssueDate() != null) {
+            dto.setMdate(dto.getIssueDate());
+        }
+        if (dto.getTenderEdate() != null) {
+            dto.setMdate(dto.getTenderEdate());
+        }
 
         List<CfetsBiddingProductDto> biddingProductList = cfetsDto.getBiddingProductList();
 
@@ -1133,7 +1150,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     if (DateUtil.compareDate(cfetsDto.getEtrDate(), cfetsDto.getIssueDate()) >= 0) {
                         dd.setMdate(cfetsDto.getIssueDate());
                     } else {
-                        dd.setMdate(cfetsDto.getEtrDate());
+                        dd.setMdate(cfetsDto.getEntrustDate());
                     }
 
                     etrInvestBondFirstBidList.add(dd);
@@ -1154,7 +1171,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                 }
 
-                dd.setMdate(cfetsDto.getTenderDate());
+
                 etrInvestBondFirstBidList.add(dd);
             }
 
@@ -1179,7 +1196,6 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             }
 
-            dd.setMdate(cfetsDto.getTenderDate());
             etrInvestBondFirstBidList.add(dd);
         }
 

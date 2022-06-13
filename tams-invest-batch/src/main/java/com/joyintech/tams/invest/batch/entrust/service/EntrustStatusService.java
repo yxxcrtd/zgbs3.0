@@ -25,6 +25,7 @@ import com.joyintech.tams.invest.common.trade.CreditLinesUpdate;
 import com.joyintech.tams.invest.common.trade.CreditLinesUpdateImpl;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
@@ -75,13 +76,18 @@ public class EntrustStatusService {
 
             // 处理对接了头寸引擎的指令关闭 start
             List<EntrustClosePosEtrReqDto> etrReqDtoList = entrustStatusMapper.selectEntrustList(params);
-            List<String> entrustIds = entrustStatusMapper.selectEntrustIds(params);
+           // List<String> entrustIds = entrustStatusMapper.selectEntrustIds(params);
+            List<String> entrustIds = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(etrReqDtoList)) {
+                entrustIds = etrReqDtoList.stream().map(EntrustClosePosEtrReqDto::getCloseId).collect(Collectors.toList());
+            }
             List<EntrustClosePosEtrReqDto> entrustIdList = etrReqDtoList.stream().filter(item->
                     (StringUtil.equals(item.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
                             || StringUtil.equals(item.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()))
                  || (StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())
                             || StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
-                            || StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())))
+                            || StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()))
+                 ||(StringUtil.equals(item.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())))
                     .collect(Collectors.toList());
             //entrustStatusMapper.updateDistributeStatus(params);//add by yangwenjun 20201211 更新委托指令分发表中的接收状态
            // entrustStatusMapper.updateEntrustStatus(params);
