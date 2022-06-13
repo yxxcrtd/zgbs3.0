@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
+import com.joyintech.framework.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -334,7 +335,10 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
             Map<String, IOcpRelParamItem> ocpPmItem = new HashMap<>();
             newOcpRelParam.setItems(ocpPmItem);
             // add by zhangrui1 差分预占 start
-            newOcpRelParam = ocpRelParam != null ? (OccupyRelParam)ocpRelParam : newOcpRelParam;
+            if (ocpRelParam != null){
+                BeanUtil.copyPropertiesIgnoreNull(newOcpRelParam,ocpRelParam);
+            }
+//            newOcpRelParam = ocpRelParam != null ? (OccupyRelParam)ocpRelParam : newOcpRelParam;
             // add by zhangrui1 差分预占 end
             // 计算参数值
             Map<String, Map<String, IValue<Object>>> newValMap = calcParamVal(eveList,
