@@ -16,6 +16,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.CacheUtil;
@@ -604,13 +605,17 @@ public class InvestmentManagement extends BaseService {
                 InstructionPledge instructionPledge = instructionPledges.get(0);
                 String market = StockCodeUtils.getMarket(instructionPledge.getFinprodMarketId());
                 if (Market.isShMarket(market)) {
-                    pledges.addAll(instructionPledges);
+                    pledges.addAll(getInstructionPledges(instructionPledges));
                 } else {
+                    //换入债券
                     Optional<InstructionPledge> pledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
+                    //换出债券
                     Optional<InstructionPledge> oldPledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "02")).findFirst();
-                    if (!pledgeOptional.isPresent() && !oldPledgeOptional.isPresent()) {
-                        pledges.addAll(instructionPledges);
-                    } else {
+                    if (pledgeOptional.isPresent() && oldPledgeOptional.isPresent()) {
+                        //当前债券
+                        List<InstructionPledge> pledgeList = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "00")).collect(Collectors.toList());
+                        pledges.addAll(getInstructionPledges(pledgeList));
+
                         InstructionPledge pledge = new InstructionPledge();
                         BeanUtils.copyProperties(pledgeOptional.get(), pledge);
                         InstructionPledge oldPledge = oldPledgeOptional.get();
@@ -624,6 +629,8 @@ public class InvestmentManagement extends BaseService {
                         pledge.setOldPledgeRatio(oldPledge.getPledgeRatio());
 
                         pledges.add(pledge);
+                    } else {
+                        pledges.addAll(getInstructionPledges(instructionPledges));
                     }
                 }
             }
@@ -631,6 +638,16 @@ public class InvestmentManagement extends BaseService {
         return pledges;
     }
 
+    private List<InstructionPledge> getInstructionPledges(List<InstructionPledge> pledgeList) {
+        List<InstructionPledge> pledges = Lists.newArrayList();
+        Set<String> set = Sets.newHashSet();
+        for (InstructionPledge pledge : pledgeList) {
+            if (set.add(pledge.getFinprodMarketId())) {
+                pledges.add(pledge);
+            }
+        }
+        return pledges;
+    }
 
     /**
      * 查询指令列表
