@@ -9,6 +9,7 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade003Dto;
 import com.joyintech.tams.exchange.entrust.etrexchange.position.bean.PositionRequestBaseBean;
@@ -205,6 +206,12 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             if (/*交易方向_正回购.getValue().equals(repPs) && */交易方向_中途换券.getValue().equals(ps)) {
                 bean.setFinprodId(entity.getNewfinprodId());
                 bean.setSecAmount(entity.getNewRepSecNum().multiply(BigDecimal.valueOf(100L)));
+            }
+            // 换券方式
+            if(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType())){
+                resultMap.put("bondExchangeType", "02");
+            }else{
+                resultMap.put("bondExchangeType", "01");
             }
 
             Map<String, Object> map = BeanUtil.object2Map(bean);

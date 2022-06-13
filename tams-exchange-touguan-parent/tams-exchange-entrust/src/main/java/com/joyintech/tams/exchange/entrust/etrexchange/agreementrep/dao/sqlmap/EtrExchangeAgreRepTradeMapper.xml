@@ -490,7 +490,7 @@
         LEFT JOIN settle_trans_data std
             on trd_product_deal_2.f_trade_id = std.trade_id
         LEFT JOIN PTL_PORTFOLIO /** 组合 **/
-            on trd_product_deal_add.Portfolio_Id = PTL_PORTFOLIO.Portfolio_Id
+            on trd_proEntrustMsgbyMQServiceduct_deal_add.Portfolio_Id = PTL_PORTFOLIO.Portfolio_Id
         LEFT JOIN trd_fin_product_deal_total trd_fin_product_deal_total /** 金融产品临时交易1 **/
             on fin_trade_product.finprod_id = trd_fin_product_deal_total.finprod_id
             AND fin_trade_product.branch = trd_fin_product_deal_total.branch
