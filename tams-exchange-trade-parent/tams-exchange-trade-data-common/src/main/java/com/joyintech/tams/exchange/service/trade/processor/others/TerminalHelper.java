@@ -365,10 +365,11 @@ public class TerminalHelper {
             pageSize = 1000;
         }
         String accountId = request.getAccountId();
-        String entrustProp = request.getEntrustProp();
+//        String entrustProp = request.getEntrustProp();
+        String orderType = request.getOrderType();
         // 投管查询行情时，不会传入账户信息，需要查询到所有券商的行情信息， 故选择当前已连接券商，并选择其中一个账户进行查询
         if (StrUtil.isEmpty(accountId)) {
-            return quoteJob.getRepurchaseQuoteReceiveList(entrustProp);
+            return quoteJob.getRepurchaseQuoteReceiveList(orderType);
         }
         return sendRepurchaseQuoteReceive(request);
     }
