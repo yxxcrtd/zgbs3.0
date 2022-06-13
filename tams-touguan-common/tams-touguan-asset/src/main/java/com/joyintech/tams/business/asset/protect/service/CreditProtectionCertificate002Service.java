@@ -95,7 +95,10 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      */
     public void saveOperate(String tradeId, String remark, DictCodeListExt3 operType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(tradeId);
+        //add wsz 修改 ZGCPCN-1333 start
+        String finprodId = this.getFinprodId(tradeId);
+        oprHisReq.setEntrustId(finprodId);
+        //add wsz 修改 ZGCPCN-1333 end
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
@@ -159,56 +162,56 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         finProductType.setType7(DictCodeList.信用保护凭证类型_信用保护凭证.getValue());
         finProductType.setType8(DictCodeList.平安资产类型_信用保护凭证.getValue());
         finProductTypeMapper.insert(finProductType);
-        //新增现金流信息
-        String cashId = CommonUtil.generateCashFlowCode(dto.getFinprodId(),
-                DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
-                DictCodeListExt1.现金流二级类型_本金.getValue());
-        FinCashInfo finCashInfo = new FinCashInfo();
-        finCashInfo.setCashId(cashId);
-        finCashInfo.setCashType1(DictCodeListExt1.现金流一级类型_本金.getValue());
-        finCashInfo.setCashType2(DictCodeListExt1.现金流二级类型_本金.getValue());
-        finCashInfo.setFinprodId(dto.getFinprodId());
-        finCashInfo.setFinprodType(DictCodeListExt1.现金流业务类型_金融产品.getValue());
-        finCashInfo.setBranch(0l);
-        BeanUtil.copyPropertiesIgnoreNull(finCashInfo, dto);
-        finCashInfoMapper.insert(finCashInfo);
-        //添加现金流计算规则
-        FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
-        BeanUtil.copyPropertiesIgnoreNull(finCashCalcRule, dto);
-        finCashCalcRule.setCashId(cashId);
-        finCashCalcRule.setEffDate(dto.getVdate());
-        finCashCalcRule.setEffDate(dto.getVdate());
-        finCashCalcRule.setBaseType(DictCodeList.基数类型_实收资本.getValue());
-        finCashCalcRule.setBaseDateType(DictCodeList.基数日期类型_当日.getValue());
-        finCashCalcRule.setBasis(dto.getBasis());
-        finCashCalcRule.setFinprodId(dto.getFinprodId());
-        finCashCalcRule.setBranch(0l);
-        finCashCalcRuleMapper.insert(finCashCalcRule);
-        //添加资金流计划
-        FinCashPlan finCashPlan = new FinCashPlan();
-        finCashPlan.setCashId(cashId);
-        finCashPlan.setCashNum(0l);
-        finCashPlan.setCashType(DictCodeList.现金流类型_到期还本.getValue());
-        finCashPlan.setVdateUnadjust(dto.getVdate());
-        finCashPlan.setMdateUnadjust(dto.getMdate());
-        finCashPlan.setPayDateUnadjust(dto.getMdate());
-        finCashPlan.setVdate(dto.getVdate());
-        finCashPlan.setMdate(dto.getMdate());
-        finCashPlan.setPayDate(dto.getMdate());
-        Long day = DateUtil.getBetweenDayNumber(DateUtil.format(dto.getVdate()),DateUtil.format(dto.getMdate()));
-        finCashPlan.setTermdays(day);
-        finCashPlan.setVdateTerm(dto.getVdate());
-        finCashPlan.setMdateTerm(dto.getMdate());
-        finCashPlan.setIntPrinAmt(cash);
-        finCashPlan.setCashBaseamt(cash);
-        finCashPlan.setCashUnitType(DictCodeList.现金流单位_总额.getValue());
-        finCashPlan.setFinprodId(dto.getFinprodId());
-        finCashPlan.setFinprodType(dto.getFinprodType());
-        finCashPlan.setFinprodType2(dto.getFinprodType2());
-        finCashPlan.setPayType(DictCodeList.支付方式_现金.getValue());
-        finCashPlan.setBranch(0l);
-        finCashPlan.setBasis(dto.getBasis());
-        finCashPlanMapper.insert(finCashPlan);
+//        //新增现金流信息
+//        String cashId = CommonUtil.generateCashFlowCode(dto.getFinprodId(),
+//                DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
+//                DictCodeListExt1.现金流二级类型_本金.getValue());
+//        FinCashInfo finCashInfo = new FinCashInfo();
+//        finCashInfo.setCashId(cashId);
+//        finCashInfo.setCashType1(DictCodeListExt1.现金流一级类型_本金.getValue());
+//        finCashInfo.setCashType2(DictCodeListExt1.现金流二级类型_本金.getValue());
+//        finCashInfo.setFinprodId(dto.getFinprodId());
+//        finCashInfo.setFinprodType(DictCodeListExt1.现金流业务类型_金融产品.getValue());
+//        finCashInfo.setBranch(0l);
+//        BeanUtil.copyPropertiesIgnoreNull(finCashInfo, dto);
+//        finCashInfoMapper.insert(finCashInfo);
+//        //添加现金流计算规则
+//        FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
+//        BeanUtil.copyPropertiesIgnoreNull(finCashCalcRule, dto);
+//        finCashCalcRule.setCashId(cashId);
+//        finCashCalcRule.setEffDate(dto.getVdate());
+//        finCashCalcRule.setEffDate(dto.getVdate());
+//        finCashCalcRule.setBaseType(DictCodeList.基数类型_实收资本.getValue());
+//        finCashCalcRule.setBaseDateType(DictCodeList.基数日期类型_当日.getValue());
+//        finCashCalcRule.setBasis(dto.getBasis());
+//        finCashCalcRule.setFinprodId(dto.getFinprodId());
+//        finCashCalcRule.setBranch(0l);
+//        finCashCalcRuleMapper.insert(finCashCalcRule);
+//        //添加资金流计划
+//        FinCashPlan finCashPlan = new FinCashPlan();
+//        finCashPlan.setCashId(cashId);
+//        finCashPlan.setCashNum(0l);
+//        finCashPlan.setCashType(DictCodeList.现金流类型_到期还本.getValue());
+//        finCashPlan.setVdateUnadjust(dto.getVdate());
+//        finCashPlan.setMdateUnadjust(dto.getMdate());
+//        finCashPlan.setPayDateUnadjust(dto.getMdate());
+//        finCashPlan.setVdate(dto.getVdate());
+//        finCashPlan.setMdate(dto.getMdate());
+//        finCashPlan.setPayDate(dto.getMdate());
+//        Long day = DateUtil.getBetweenDayNumber(DateUtil.format(dto.getVdate()),DateUtil.format(dto.getMdate()));
+//        finCashPlan.setTermdays(day);
+//        finCashPlan.setVdateTerm(dto.getVdate());
+//        finCashPlan.setMdateTerm(dto.getMdate());
+//        finCashPlan.setIntPrinAmt(cash);
+//        finCashPlan.setCashBaseamt(cash);
+//        finCashPlan.setCashUnitType(DictCodeList.现金流单位_总额.getValue());
+//        finCashPlan.setFinprodId(dto.getFinprodId());
+//        finCashPlan.setFinprodType(dto.getFinprodType());
+//        finCashPlan.setFinprodType2(dto.getFinprodType2());
+//        finCashPlan.setPayType(DictCodeList.支付方式_现金.getValue());
+//        finCashPlan.setBranch(0l);
+//        finCashPlan.setBasis(dto.getBasis());
+//        finCashPlanMapper.insert(finCashPlan);
         //附件
         MstFileInputParameter mstFileInputParameter = dto.getMstFileInputParameter();
         if (StringUtil.isNotEmpty(mstFileInputParameter)
@@ -227,29 +230,32 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      */
     public void delete(CreditProtectionCertificate002Dto dto) {
         //1.删除融产品分类表
+        //add wsz 修改 ZGCPCN-1333 start
+        String finprodId = this.getFinprodId(dto.getFinprodMarketId());
         FinProductTypeKey typeKey = new FinProductTypeKey();
         typeKey.setBranch(0l);
-        typeKey.setFinprodId(dto.getFinprodId());
+        typeKey.setFinprodId(finprodId);
         finProductTypeMapper.deleteByPrimaryKey(typeKey);
         //3.删除金融产品标的附属表
-        finProductAddMapper.deleteByPrimaryKey(dto.getFinprodId());
+        finProductAddMapper.deleteByPrimaryKey(finprodId);
         //4.删除金融产品标的表
-        finProductMapper.deleteByPrimaryKey(dto.getFinprodId());
-        //5.删除现金流信息
-        String cashId = CommonUtil.generateCashFlowCode(dto.getFinprodId(),
-                DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
-                DictCodeListExt1.现金流二级类型_本金.getValue());
-        finCashInfoMapper.deleteByPrimaryKey(cashId);
-        //6.删除现金流计算规则
-        FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
-        finCashCalcRule.setCashId(cashId);
-        finCashCalcRule.setEffDate(dto.getVdate());
-        finCashCalcRuleMapper.deleteByPrimaryKey(finCashCalcRule);
-        //7.删除资金流计划
-        FinCashPlan finCashPlan = new FinCashPlan();
-        finCashPlan.setCashId(cashId);
-        finCashPlan.setMdate(dto.getMdate());
-        finCashPlanMapper.deleteByPrimaryKey(finCashPlan);
+        finProductMapper.deleteByPrimaryKey(finprodId);
+        //add wsz 修改 ZGCPCN-1333 end
+//        //5.删除现金流信息
+//        String cashId = CommonUtil.generateCashFlowCode(dto.getFinprodId(),
+//                DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
+//                DictCodeListExt1.现金流二级类型_本金.getValue());
+//        finCashInfoMapper.deleteByPrimaryKey(cashId);
+//        //6.删除现金流计算规则
+//        FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
+//        finCashCalcRule.setCashId(cashId);
+//        finCashCalcRule.setEffDate(dto.getVdate());
+//        finCashCalcRuleMapper.deleteByPrimaryKey(finCashCalcRule);
+//        //7.删除资金流计划
+//        FinCashPlan finCashPlan = new FinCashPlan();
+//        finCashPlan.setCashId(cashId);
+//        finCashPlan.setMdate(dto.getMdate());
+//        finCashPlanMapper.deleteByPrimaryKey(finCashPlan);
     }
 
     /**
@@ -408,6 +414,13 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     @Override
     public void doBack(CreditProtectionCertificate002Dto entity) {
 
+    }
+
+    public String getFinprodId(String finprodId){
+        if(!Objects.isNull(finprodId)&&!finprodId.contains(DictCodeList.信用保护凭证类型_信用保护凭证.getValue())){
+            return DictCodeList.信用保护凭证类型_信用保护凭证.getValue()+"_"+ finprodId;
+        }
+        return finprodId;
     }
 
 

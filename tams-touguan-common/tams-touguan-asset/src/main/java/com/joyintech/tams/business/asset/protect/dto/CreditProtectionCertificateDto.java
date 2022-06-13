@@ -1,5 +1,6 @@
 package com.joyintech.tams.business.asset.protect.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -8,6 +9,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  *  信用保护凭证标的
@@ -35,12 +37,12 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
     private String refEntity;//		参考实体
     private String refSec;//		参考债项
     private String refSecFeatures;//		参考债项特征
-    private String vDate;//		起始日
+    private Date vDate;//		起始日
     private String gracePeriod;//		宽限期（天）
-    private String mDate;//		到期日
-    private String pledgeDeadlineDate;//		簿记建档日
-    private String payDate;//		缴款日
-    private String listingDate;//		上市流通日
+    private Date mDate;//		到期日
+    private Date pledgeDeadlineDate;//		簿记建档日
+    private Date payDate;//		缴款日
+    private Date listingDate;//		上市流通日
     private String calendarId;//		交易日历
     private BigDecimal issuePrice;//		创设价格（元）
     private String ratebasic;//		计费年度天数
@@ -172,11 +174,12 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
         this.refSecFeatures = refSecFeatures;
     }
 
-    public String getvDate() {
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    public Date getvDate() {
         return vDate;
     }
 
-    public void setvDate(String vDate) {
+    public void setvDate(Date vDate) {
         this.vDate = vDate;
     }
 
@@ -188,35 +191,39 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
         this.gracePeriod = gracePeriod;
     }
 
-    public String getmDate() {
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    public Date getmDate() {
         return mDate;
     }
 
-    public void setmDate(String mDate) {
+    public void setmDate(Date mDate) {
         this.mDate = mDate;
     }
 
-    public String getPledgeDeadlineDate() {
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    public Date getPledgeDeadlineDate() {
         return pledgeDeadlineDate;
     }
 
-    public void setPledgeDeadlineDate(String pledgeDeadlineDate) {
+    public void setPledgeDeadlineDate(Date pledgeDeadlineDate) {
         this.pledgeDeadlineDate = pledgeDeadlineDate;
     }
 
-    public String getPayDate() {
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    public Date getPayDate() {
         return payDate;
     }
 
-    public void setPayDate(String payDate) {
+    public void setPayDate(Date payDate) {
         this.payDate = payDate;
     }
 
-    public String getListingDate() {
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    public Date getListingDate() {
         return listingDate;
     }
 
-    public void setListingDate(String listingDate) {
+    public void setListingDate(Date listingDate) {
         this.listingDate = listingDate;
     }
 
