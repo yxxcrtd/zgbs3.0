@@ -60,6 +60,13 @@ public class CfetsEntrustHanderAop {
     protected void checkSaveError() {
     }
 
+    /**
+     * 保存至代办，从代办中提交到流程中，需要执行风险占用 一级投标指令
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.etr..*.*.checkSave(..))")
+    protected void checkSave() {
+    }
+
 
     /**
      * 保存至代办，从代办中提交到流程中，需要执行风险占用
@@ -101,7 +108,7 @@ public class CfetsEntrustHanderAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning(pointcut = "checkSaveError()", returning = "ajaxResultMessage")
+    @AfterReturning(pointcut = "checkSaveError() || checkSave()", returning = "ajaxResultMessage")
     public void checkSaveError(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
         AjaxResult ajaxResult = ajaxResultMessage.getData();
         if (ajaxResult != null && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {

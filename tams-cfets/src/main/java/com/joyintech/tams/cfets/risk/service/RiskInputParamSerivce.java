@@ -52,6 +52,10 @@ import com.joyintech.tams.component.business.riskall.utils.RiskUtil;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
 import com.joyintech.tams.component.business.trade.dto.BussTrdTransfenpeiDto;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -99,6 +103,12 @@ public class RiskInputParamSerivce extends RiskCommonService {
     private CfetsEtrIbBondinfoService cfetsEtrIbBondinfoService;
     @Autowired
     private CfetsManualSettleService cfetsManualSettleService;
+
+    @Autowired
+    private RiskInputParamGenerateBusinessSerivce riskInputParamGenerateBusinessSerivce;
+
+    @Autowired
+    private RiskInputBuildAuthorizeParamSerivce riskInputBuildAuthorizeParamSerivce;
 
     @Autowired
     private EtrEntrustMapper etrEntrustMapper;
@@ -394,6 +404,10 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put("ps", dto.getPs())
                     .put("isCheck", isCheck)
                     .put("data", dto);
+        }
+        // 一级投标指令 check
+        if (obj instanceof CfetsEtrBondFirstBidSaveRequest || StringUtil.equals(pageId, "CfetsEtrBondFirstBid002")) {
+            return riskInputParamGenerateBusinessSerivce.generateEtrBondFirstBid(decisionAct, flowStatus, isCheck, businessJson);
         }
         return null;
     }
@@ -1301,7 +1315,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
             TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(inputDto.getTradeId());
             TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(inputDto.getTradeId());
-            creditLinesInputDto.setEntrustId(trdProductDealAdd.getEntrustId()); 
+            creditLinesInputDto.setEntrustId(trdProductDealAdd.getEntrustId());
             creditLinesInputDto.setTradeDate(inputDto.getTrdBankManualSettleInfo().getSettleDate());
             creditLinesInputDto.setCounterId(trdProductDeal.getCounterId());
             creditLinesInputDto.setTradeId(inputDto.getTradeId());
