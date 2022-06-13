@@ -1722,8 +1722,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         }
 
         // 本方交易员
-        String trader = entrustMsgbyMQMapper.queryTradeId(infContractDetailfile.getEntrustId());
-        dto.setTrader(trader);
+//        String trader = entrustMsgbyMQMapper.queryTradeId(infContractDetailfile.getEntrustId());
+        dto.setCounterTrader(infContractDetailfile.getCounterId());
+        dto.setTrader(infContractDetailfile.getTradeId());
 
         if(dto.getCcy() == null){
             dto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
@@ -1771,8 +1772,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, dto);
         trdProductTempDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
         // 对手方交易员
-        String counterTrader = entrustMsgbyMQMapper.queryCounterTradeId(infContractDetailfile.getEntrustId());
-        trdProductTempDeal.setCounterTrader(counterTrader);
+//        String counterTrader = entrustMsgbyMQMapper.queryCounterTradeId(infContractDetailfile.getEntrustId());
+        trdProductTempDeal.setCounterTrader(infContractDetailfile.getCounterId());
+        trdProductTempDeal.setTrader(infContractDetailfile.getTradeId());
 
         dto.setTrdProductTempDeal(trdProductTempDeal);
         // 金融产品临时交易Entity

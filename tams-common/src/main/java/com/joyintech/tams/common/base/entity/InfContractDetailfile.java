@@ -579,4 +579,15 @@ public class InfContractDetailfile extends BaseEntity {
     public void setBusiType(String busiType) {
         this.busiType = busiType == null ? null : busiType.trim();
     }
+
+
+    private String tradeId;         //本方交易员
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
 }

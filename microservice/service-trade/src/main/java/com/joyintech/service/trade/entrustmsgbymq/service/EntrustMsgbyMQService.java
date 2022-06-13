@@ -118,6 +118,10 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
     	infContractDetailfile.setTradeMarket(tradeMessage.getTradeMarket());
     	infContractDetailfile.setTradePlat(tradeMessage.getTradePlat());
     	infContractDetailfile.setFinprodMarketId(tradeMessage.getFinprodMarketId());
+
+		infContractDetailfile.setCounterId(tradeMessage.getCounterId());
+		infContractDetailfile.setTradeId(tradeMessage.getTradeId());
+
     	if(tradeMessage.getDealVolume() != null){
     		infContractDetailfile.setShareAmt(BigDecimal.valueOf(tradeMessage.getDealVolume()));
     	}

@@ -33,6 +33,7 @@ public class TradeMessage implements Cloneable, Serializable {
     private BigDecimal dealMargin;      //交易保证金
     private BigDecimal pledgeRatio;      //折算比例
     private String counterId;       //交易对手
+    private String tradeId;         //本方交易员
 
     /**
      * 下单组合明细数据消息
@@ -266,5 +267,13 @@ public class TradeMessage implements Cloneable, Serializable {
 
     public void setCounterId(String counterId) {
         this.counterId = counterId;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
     }
 }
