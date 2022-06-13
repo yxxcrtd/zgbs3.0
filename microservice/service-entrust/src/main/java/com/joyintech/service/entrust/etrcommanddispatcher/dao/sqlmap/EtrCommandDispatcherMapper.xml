@@ -54,10 +54,10 @@
                     ELSE '' END
           END
           DEALMODE,/*交易方式*/
-		  A.COUNTER_ID COUNTERID,/*交易对手*/
+		  <!--A.COUNTER_ID COUNTERID,/*交易对手*/-->
 		  T6.COUNTER_NAME counterName, /*交易对手名称*/
 		  F.COUNTER_SEAT counterSeat,/**对手席位*/
-		  A.COUNTER_TRADER COUNTERTRADER,/**对手方交易员*/
+		  <!-- A.COUNTER_TRADER COUNTERTRADER,/**对手方交易员*/-->
 		  A.CONTACT_INFO CONTACTINFO,/**对手方联系方式*/
 		  F.counter_org counterDealerId,/**对手方交易商代码*/
 		  F.COUNTER_CON_NO appointmentNumber,/**约定号*/
@@ -108,7 +108,7 @@
 		  F.EXP_CON_NUM conNum,/*转股数量*/
 		  DECODE(H.IS_APPROVAL,'Y','1','N','0','') approverFlage,/*审批标志*/
 		 -- '0' approverFlage,
-		  F.TRADER  ourTrader,/*本方交易员*/
+		  <!-- F.TRADER  ourTrader,/*本方交易员*/-->
 		  nvl(F.vpay_DATE,FTP.VPAY_DATE) vPayDate,
 		  NVL(F.mpay_date,FTP.mpay_date) mPayDate,
 		  F.cap_days capDays,
@@ -136,14 +136,20 @@
 		decode(F.PRICE_TYPE,'01','Y','02','N','') isNetPrice,
 		nvl(A.BUSINESS_MODEL,A.INV_AIM) businessModel,
 		F.REQUEST_ID quoteRequestId,
-		tpda.OUT_DEALER_PARTY_NO counterInvestorId
+		tpda.OUT_DEALER_PARTY_NO counterInvestorId,
+		mddi.DEALER_PARTY_TYPE counterInvestorType,
+		tpd.COUNTER_TRADER counterTrader,/**对手方交易员*/
+		tpd.TRADER  ourTrader, /*本方交易员*/
+		tpd.COUNTER_ID counterId,/*交易对手*/
+		FTP.MDATE repoMdate /*回购到期日*/
 		FROM ETR_ENTRUST A
 		LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT_ADD FRA ON FRA.FINPROD_ID = A.FINPROD_ID
 		LEFT JOIN ETR_ENTRUST_ADD F ON A.ENTRUST_ID = F.ENTRUST_ID
 		left join TRD_PRODUCT_DEAL tpd on tpd.F_TRADE_ID = F.TRADE_ID
-		left join TRD_PRODUCT_DEAL_ADD tpda on tpda.F_TRADE_ID = tpd.TRADE_ID
+		left join TRD_PRODUCT_DEAL_ADD tpda on tpda.TRADE_ID = tpd.TRADE_ID
+		left join MST_DEALER_DETAIL_INFO mddi on (mddi.DEALER_NO = tpda.OUT_DEALER_NO and mddi.DEALER_PARTY_NO = tpda.OUT_DEALER_PARTY_NO)
 		LEFT JOIN FIN_DEAL_PLEDGE FDP ON tpd.FINPROD_ID = FDP.FINPROD_ID
 		LEFT JOIN FIN_TRADE_PRODUCT FTP ON tpd.FINPROD_ID = FTP.FINPROD_ID
 		LEFT JOIN STL_SEC_ACCT_INFO G ON F.SEC_ACCT_ID = G.SEC_ACCT_ID

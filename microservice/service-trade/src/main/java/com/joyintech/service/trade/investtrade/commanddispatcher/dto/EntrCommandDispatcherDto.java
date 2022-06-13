@@ -1304,4 +1304,17 @@ public class EntrCommandDispatcherDto extends BaseEntity{
     public void setCounterInvestorType(String counterInvestorType) {
         this.counterInvestorType = counterInvestorType;
     }
+
+    /**
+     * 回购到期日
+     */
+    private Date repoMdate;
+
+    public Date getRepoMdate() {
+        return repoMdate;
+    }
+
+    public void setRepoMdate(Date repoMdate) {
+        this.repoMdate = repoMdate;
+    }
 }

@@ -443,6 +443,19 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      */
     private String isNetPrice;
 
+    /**
+     * 回购到期日
+     */
+    private Date repoMdate;
+
+    public Date getRepoMdate() {
+        return repoMdate;
+    }
+
+    public void setRepoMdate(Date repoMdate) {
+        this.repoMdate = repoMdate;
+    }
+
     public String getIsNetPrice() {
         return isNetPrice;
     }
