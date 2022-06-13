@@ -15,17 +15,18 @@ import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
 import com.joyintech.tams.exchange.common.enums.exchange.QuoteStatusEnum;
-import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
-import com.joyintech.tams.exchange.common.enums.exchange.RepoTypeEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.PledgeDisPlaceDirEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
 import com.joyintech.tams.exchange.common.request.RepurchaseQuoteSendRequest;
-import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TickConverter;
 import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
@@ -36,10 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -72,6 +70,8 @@ public class IntegratedQuoteManagement {
     private EntrustManagement entrustManagement;
     @Autowired
     private InstructionService instructionService;
+    @Autowired
+    private InstructionPledgeService instructionPledgeService;
 
     public ResultBean getTick(String stockCode) {
         if ("*".equals(stockCode)) {
@@ -406,7 +406,7 @@ public class IntegratedQuoteManagement {
 
     private BaseRepurchaseQuoteSendResponse createSendQuoteByIntegratedEntrust(IntegratedEntrustVo entrust) {
         BaseRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse = new BaseRepurchaseQuoteSendResponse();
-//        baseRepurchaseQuoteSendResponse.setRequestType();
+//        baseRepurchaseQuoteSendResponse.setRequestType(cn.hutool.core.util.EnumUtil.getFieldBy(RepurchaseTypeEnum::getCode, RepurchaseTypeEnum::getBusiTypeTgCode, entrust.getBusiTypeTg()));
 //        baseRepurchaseQuoteSendResponse.setBs();
         baseRepurchaseQuoteSendResponse.setStockCode(entrust.getStockCode());
         baseRepurchaseQuoteSendResponse.setStockName(entrust.getStockName());
@@ -420,9 +420,9 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setCpInvestorId(entrust.getPropInvestorName());
         baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
         baseRepurchaseQuoteSendResponse.setCpInvestorType(entrust.getPropOwnerType());
-        baseRepurchaseQuoteSendResponse.setCpClientName(null);
+//        baseRepurchaseQuoteSendResponse.setCpClientName(null);
         baseRepurchaseQuoteSendResponse.setRemark(entrust.getRemark());
-//        baseRepurchaseQuoteSendResponse.setRequestTypeStr();
+//        baseRepurchaseQuoteSendResponse.setRequestTypeStr(cn.hutool.core.util.EnumUtil.getFieldBy(RepurchaseTypeEnum::getDescription, RepurchaseTypeEnum::getBusiTypeTgCode, entrust.getBusiTypeTg()));
 //        baseRepurchaseQuoteSendResponse.setBsStr();
 //        baseRepurchaseQuoteSendResponse.setPledgeNumberStr();
 //        baseRepurchaseQuoteSendResponse.setInvestorTypeStr();
@@ -430,53 +430,70 @@ public class IntegratedQuoteManagement {
 //        baseRepurchaseQuoteSendResponse.setRequestStatus();
 //        baseRepurchaseQuoteSendResponse.setRequestStatusStr();
 
+        Instruction instruction = instructionService.findById(entrust.getInstructionId());
+        if (ObjectUtil.isNull(instruction)) {
+            log.warn("查询指令失败 => 【entrustId = {}】，【instructionId = {}】", entrust.getId(), entrust.getInstructionId());
+            baseRepurchaseQuoteSendResponse.setBs(instruction.getFirstRepoPs());
+        }
+        baseRepurchaseQuoteSendResponse.setCpClientName(instruction.getPortfolioName());
+        baseRepurchaseQuoteSendResponse.setBs(instruction.getFirstRepoPs());
+
         String ps = entrust.getPs();
         // 正回购
         if (PsEnum.POSITIVE_REPO.codeEquals(ps)) {
-            baseRepurchaseQuoteSendResponse.setRequestType(RepoTypeEnum.FIRST_PHASE.getCode());
-            baseRepurchaseQuoteSendResponse.setBs(RepoBsEnum.REPURCHASE.getCode());
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.首期.getCode());
+            baseRepurchaseQuoteSendResponse.setBs(PsEnum.POSITIVE_REPO.getCode());
 
-            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse);
+            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
         }
 
         // 逆回购
         else if (PsEnum.REVERSED_REPO.codeEquals(ps)) {
-            baseRepurchaseQuoteSendResponse.setRequestType(RepoTypeEnum.FIRST_PHASE.getCode());
-            baseRepurchaseQuoteSendResponse.setBs(RepoBsEnum.REVERSE_REPURCHASE.getCode());
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.首期.getCode());
+            baseRepurchaseQuoteSendResponse.setBs(PsEnum.REVERSED_REPO.getCode());
 
-            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse);
+            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
         }
 
         if (EnumUtil.notIn(ps, PsEnum.POSITIVE_REPO, PsEnum.REVERSED_REPO)) {
-            // 需要查询首期的数据
             NonFirstBaseRepurchaseQuoteSendResponse nonFirstBaseRepurchaseQuoteSendResponse = (NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
-            nonFirstBaseRepurchaseQuoteSendResponse.setOrigSerialNo(null);
-            nonFirstBaseRepurchaseQuoteSendResponse.setBs(null);
+            nonFirstBaseRepurchaseQuoteSendResponse.setOrigSerialNo(entrust.getOrigSerialNo());
+
         }
 
         // 中途换券
         else if (PsEnum.REPO_EXCHANGE_COUPONS_MIDWAY.codeEquals(ps)) {
-            baseRepurchaseQuoteSendResponse.setRequestType(RepoTypeEnum.REPO_EXCHANGE_COUPONS_MIDWAY.getCode());
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.中途换券.getCode());
 
             ZTHQRepurchaseQuoteSendResponse sendResponse = (ZTHQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
 
             sendResponse.setDiscount(entrust.getDiscount());
-            sendResponse.setNewDiscount(null);
-            sendResponse.setExchangeAmount(null);
-            sendResponse.setSwapIntoBonds(null);
-            sendResponse.setSwapIntoBondsVolume(null);
-            sendResponse.setSwapOutBonds(null);
-            sendResponse.setSwapOutBondsVolume(null);
+            if ("31".equals(instruction.getEntrustBussType())) {
+                sendResponse.setExchangeAmount(instruction.getEntrustAmt());
+            } else{
+                List<InstructionPledge> pledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instruction.getEntrustId());
+                InstructionPledge swapInPledge = pledges.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_IN.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+                if (ObjectUtil.isNotNull(swapInPledge)) {
+                    sendResponse.setNewDiscount(swapInPledge.getPledgeRatio());
+                    sendResponse.setSwapIntoBonds(swapInPledge.getFinprodMarketId());
+                    sendResponse.setSwapIntoBondsVolume(swapInPledge.getPledgeNumber());
+                }
+                InstructionPledge swapOutPledge = pledges.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_OUT.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+                if (ObjectUtil.isNotNull(swapOutPledge)) {
+                    sendResponse.setSwapOutBonds(swapOutPledge.getFinprodMarketId());
+                    sendResponse.setSwapOutBondsVolume(swapOutPledge.getPledgeNumber());
+                }
+            }
         }
 
         // 提前购回
         else if (PsEnum.REPO_ADVANCE.codeEquals(ps)) {
-            baseRepurchaseQuoteSendResponse.setRequestType(RepoTypeEnum.REPO_ADVANCE.getCode());
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.提前购回.getCode());
 
-            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse);
+            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
 
             TQGHRepurchaseQuoteSendResponse sendResponse = (TQGHRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
-            sendResponse.setRepoAdvanceDate(null);
+            sendResponse.setRepoAdvanceDate(DateUtil.getSysDate());
         }
 
         // 到期购回
@@ -492,9 +509,9 @@ public class IntegratedQuoteManagement {
 
         // 到期续做
         else if (PsEnum.REPO_RENEW.codeEquals(ps)) {
-            baseRepurchaseQuoteSendResponse.setRequestType(RepoTypeEnum.REPO_RENEW.getCode());
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.到期续做.getCode());
 
-            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse);
+            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
 
             DQXZRepurchaseQuoteSendResponse sendResponse = (DQXZRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
 
@@ -503,25 +520,24 @@ public class IntegratedQuoteManagement {
 
         // 解除质押
         else if (PsEnum.REPO_UNSTAKE.codeEquals(ps)) {
-            baseRepurchaseQuoteSendResponse.setRequestType(RepoTypeEnum.REPO_UNSTAKE.getCode());
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.解除质押.getCode());
 
             JCZYRepurchaseQuoteSendResponse sendResponse = (JCZYRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
-
-            sendResponse.setSettleAmount(null);
+            sendResponse.setSettleAmount(instruction.getEntrustAmt());
         }
 
         return baseRepurchaseQuoteSendResponse;
     }
 
-    private void fillSQQuoteSendResponse(IntegratedEntrustVo entrust, SQRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse) {
+    private void fillSQQuoteSendResponse(IntegratedEntrustVo entrust, SQRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse, Instruction instruction) {
         baseRepurchaseQuoteSendResponse.setBackBalance(entrust.getBackBalance());
         baseRepurchaseQuoteSendResponse.setBackDate(entrust.getBackDate());
-        baseRepurchaseQuoteSendResponse.setCapDays(null);
+        baseRepurchaseQuoteSendResponse.setCapDays(instruction.getCapDays().intValue());
         baseRepurchaseQuoteSendResponse.setDiscount(entrust.getDiscount());
         baseRepurchaseQuoteSendResponse.setmIntAmt(NumberUtil.div(entrust.getBackBalance(), entrust.getEntrustBalance()));
         baseRepurchaseQuoteSendResponse.setRepoAmount(entrust.getEntrustBalance());
         baseRepurchaseQuoteSendResponse.setRepoRate(entrust.getEntrustPrice());
-        baseRepurchaseQuoteSendResponse.setRepoMdate(null);
+        baseRepurchaseQuoteSendResponse.setRepoMdate(DateUtil.format(instruction.getRepoMdate()));
         baseRepurchaseQuoteSendResponse.setFirstSettleDate(entrust.getFirstSettleDate());
         baseRepurchaseQuoteSendResponse.setBackDate(entrust.getBackDate());
     }

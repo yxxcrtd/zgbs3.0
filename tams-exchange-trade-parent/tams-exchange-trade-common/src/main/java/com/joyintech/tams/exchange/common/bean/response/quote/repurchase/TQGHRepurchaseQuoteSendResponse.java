@@ -11,7 +11,7 @@ public class TQGHRepurchaseQuoteSendResponse extends SQRepurchaseQuoteSendRespon
     private String origSerialNo;
 
     @ApiModelProperty(name = "repoAdvanceDate", value = "提前购回日")
-    private Integer repoAdvanceDate;
+    private String repoAdvanceDate;
 
     public String getOrigSerialNo() {
         return origSerialNo;
@@ -21,11 +21,11 @@ public class TQGHRepurchaseQuoteSendResponse extends SQRepurchaseQuoteSendRespon
         this.origSerialNo = origSerialNo;
     }
 
-    public Integer getRepoAdvanceDate() {
+    public String getRepoAdvanceDate() {
         return repoAdvanceDate;
     }
 
-    public void setRepoAdvanceDate(Integer repoAdvanceDate) {
+    public void setRepoAdvanceDate(String repoAdvanceDate) {
         this.repoAdvanceDate = repoAdvanceDate;
     }
 }
