@@ -78,7 +78,26 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
         map.put("secId", secId);
         map.put("valueDate", valueDate);
         map.put("valueSource", valueSource);
-        return mskCreditInfoProMapper.selectByKey(map);
+        List<MskCreditInfoProSaveRequest> list =  mskCreditInfoProMapper.selectByKey(map);
+        if(list.isEmpty() || list.size()<=0){
+            return null;
+        }  else {
+            return list.get(0);
+        }
+    }
+
+    public boolean selectByKeys(String mdprice, String secId, String valueDate, String valueSource) {
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("mdprice",mdprice);
+        map.put("secId", secId);
+        map.put("valueDate", valueDate);
+        map.put("valueSource", valueSource);
+        List<MskCreditInfoProSaveRequest> list =  mskCreditInfoProMapper.selectByKey(map);
+        if(!list.isEmpty() && list.size()==1){
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
