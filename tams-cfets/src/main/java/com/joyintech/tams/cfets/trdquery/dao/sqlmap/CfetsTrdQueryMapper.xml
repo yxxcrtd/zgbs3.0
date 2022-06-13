@@ -254,16 +254,21 @@
             (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '02' end AS regStatus,
             ''   calMode
         FROM BID_ORDER BO
-        LEFT JOIN (SELECT BRBP.BID_ID,wm_concat(BRBP.SEC_ACCT_ID) SEC_ACCT_ID,
-                                  wm_concat(STLINFO.SEC_ACCT_NAME) SEC_ACCT_NAME,
+        LEFT JOIN (SELECT BRBP.BID_ID,wm_concat(NVL(BRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID)) SEC_ACCT_ID,
+                                  wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
                                   wm_concat(BRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                                   wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
                                   wm_concat(TO_CHAR(ROUND(BRBP.BID_PRICE*100,4),'FM9999990.0000')||'%') BID_PRICE
                    FROM BID_ORDER_BID_PRICE BRBP
                    LEFT JOIN PTL_PORTFOLIO PP
                           ON PP.PORTFOLIO_ID = BRBP.PORTFOLIO_ID
+                   LEFT JOIN ETR_ENTRUST_DETAIL EED
+                          ON PP.PORTFOLIO_ID = EED.PORTFOLIO_ID
+                         AND BRBP.ENTRUST_ID = EED.ENTRUST_ID
                    LEFT JOIN STL_SEC_ACCT_INFO STLINFO
                           ON BRBP.SEC_ACCT_ID=STLINFO.SEC_ACCT_ID
+                   LEFT JOIN STL_SEC_ACCT_INFO STLINFO1
+                          ON EED.SEC_ACCT_ID=STLINFO1.SEC_ACCT_ID
                    where 1=1
                     <if test="secAcctIdList != null and secAcctIdList.size() > 0">
                         AND BRBP.SEC_ACCT_ID in
@@ -395,8 +400,8 @@
              ''   calMode
         FROM
             WFL_BID_ORDER WBO
-        LEFT JOIN (SELECT WBRBP.BID_ID,wm_concat(WBRBP.SEC_ACCT_ID) SEC_ACCT_ID,
-                    wm_concat(STLINFO.SEC_ACCT_NAME) SEC_ACCT_NAME,
+        LEFT JOIN (SELECT WBRBP.BID_ID,wm_concat(NVL(WBRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID)) SEC_ACCT_ID,
+                    wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
                     wm_concat(WBRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                     wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
                     wm_concat(TO_CHAR(ROUND(WBRBP.BID_PRICE*100,4),'FM990.0000')||'%') BID_PRICE
@@ -405,6 +410,11 @@
                 ON PP.PORTFOLIO_ID = WBRBP.PORTFOLIO_ID
                 LEFT JOIN STL_SEC_ACCT_INFO STLINFO
                 ON WBRBP.SEC_ACCT_ID=STLINFO.SEC_ACCT_ID
+                LEFT JOIN ETR_ENTRUST_DETAIL EED
+                       ON PP.PORTFOLIO_ID = EED.PORTFOLIO_ID
+                      AND WBRBP.ENTRUST_ID = EED.ENTRUST_ID
+                LEFT JOIN STL_SEC_ACCT_INFO STLINFO1
+                       ON EED.SEC_ACCT_ID=STLINFO1.SEC_ACCT_ID
                 where 1=1
                 <if test="secAcctIdList != null and secAcctIdList.size() > 0">
                     AND BRBP.SEC_ACCT_ID in
