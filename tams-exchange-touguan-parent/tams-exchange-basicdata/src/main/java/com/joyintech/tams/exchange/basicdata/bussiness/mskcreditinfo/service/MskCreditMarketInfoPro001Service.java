@@ -134,10 +134,11 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
         return Boolean.FALSE;
     }
 
-    public MskCreditInfoProSaveRequest getBasicInfos(String secid, Object o) {
+    public MskCreditInfoProSaveRequest getBasicInfos(MskCreditInfoProSaveRequest request) {
         MskCreditInfoProSaveRequest dto = new MskCreditInfoProSaveRequest();
         Map<String,Object> map= new HashMap<>();
-        map.put("secid",secid);
+        map.put("secid",request.getSecid());
+        map.put("cdate",request.getCdate());
         return mskCreditInfoProMapper.getBasicInfo(map);
     }
 
