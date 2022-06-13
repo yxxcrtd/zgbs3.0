@@ -33,7 +33,7 @@ public interface MskCreditInfoProMapper {
 
     List<MskCreditInfoProSaveRequest> select(Map<String, Object> params);
 
-    MskCreditInfoProSaveRequest selectByKey(Map<String, Object> map);
+    List<MskCreditInfoProSaveRequest> selectByKey(Map<String, Object> map);
 
     List<String> getBusinessData(WflValidInputParameter parameter);
 
