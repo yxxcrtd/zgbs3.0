@@ -18,8 +18,11 @@ import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.constant.*;
+import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangePortfolioAllocationRequest;
+import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangePortfolioAllocationResponse;
+import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangeProtfolioDetailRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto;
-import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradeSaveRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -777,8 +780,8 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
     private CreditLinesInputDto generateInputDto(Object object, String status, String method){
         CreditLinesInputDto creditLinesInputDto = null;
         // 交易所指令
-        if (object instanceof EtrExchangeTradeSaveRequest){
-            EtrExchangeTradeSaveRequest inputDto = (EtrExchangeTradeSaveRequest) object;
+        if (object instanceof EtrExchangeProtfolioDetailRequest){
+            EtrExchangeProtfolioDetailRequest inputDto = (EtrExchangeProtfolioDetailRequest) object;
             //债转股
             if (inputDto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())
                     && StringUtil.equals(DictCodeListExt1.交易方向_债转股.getValue(),inputDto.getPs())){
@@ -912,6 +915,34 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             }
 
         }
+        if (object instanceof EtrExchangeTradeSaveSecRepoRequest){
+            EtrExchangeTradeSaveSecRepoRequest inputDto = (EtrExchangeTradeSaveSecRepoRequest) object;
+            // 债券指令
+            if (inputDto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                    && (StringUtil.equals(DictCodeList.交易方向_买入.getValue(),inputDto.getPs()))){
+                creditLinesInputDto = new CreditLinesInputDto();
+                creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
+                creditLinesInputDto.setTradeId(inputDto.getEntrustId());
+                creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
+                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                creditLinesInputDto.setTradeDate(inputDto.getVdate());
+                creditLinesInputDto.setTradeStatus(status);
+                creditLinesInputDto.setPs(DictCodeList.交易方向_买入.getValue());
+                creditLinesInputDto.setCounterId(inputDto.getCounterId());
+                creditLinesInputDto.setShareAmt(inputDto.getEntrustNum());
+                //最新面值
+                BigDecimal newFaceValue = creditLinesDealsMapper.getFaceValue(creditLinesInputDto);
+                if (newFaceValue == null){
+                    newFaceValue = new BigDecimal(100);
+                }
+                if (creditLinesInputDto.getShareAmt() != null) {
+                    creditLinesInputDto.setTradeAmt(newFaceValue.multiply(creditLinesInputDto.getShareAmt()));
+                }else {
+                    creditLinesInputDto.setTradeAmt(inputDto.getEntrustAmt());
+                }
+            }
+        }
+
         // 校验是否需要调用接口
         boolean isCallCreditInterf = checkCallCreditInterf(creditLinesInputDto,status,method);
         if (isCallCreditInterf){
@@ -1113,11 +1144,13 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
         PtlPortfolio ptlPortfolio = ptlPortfolioMapper.selectByPrimaryKey(paramMap.get("portfolioId") + "");
         if(ptlPortfolio != null && StringUtil.isNotEmpty(ptlPortfolio.getCcy())){
             paramMap.put("ccy", ptlPortfolio.getCcy());
-        }
-        //add by chenjiaxing 币种为空时默认为人民币 start
-        if(StringUtil.isEmpty(ptlPortfolio.getCcy())){
+        }else{
             paramMap.put("ccy", "CNY");
         }
+        //add by chenjiaxing 币种为空时默认为人民币 start
+     /*   if(StringUtil.isEmpty(ptlPortfolio.getCcy())){
+            paramMap.put("ccy", "CNY");
+        }*/
         //add by chenjiaxing 币种为空时默认为人民币 start
         // 可用现金
         Map<String, Object> cash = this.getProAvailableCash(paramMap);
@@ -1711,5 +1744,65 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
         }
 
         return result;
+    }
+
+    /**
+     * 查找组合对应的证券账户
+     *
+     */
+    public EtrExchangePortfolioAllocationResponse selectEtrPortfolioAllocationList(EtrExchangePortfolioAllocationRequest dto) {
+        EtrExchangePortfolioAllocationResponse response=new EtrExchangePortfolioAllocationResponse();
+        BigDecimal minStep=dto.getMinStep();
+        BigDecimal entrustNum=dto.getEntrustNum();
+        BigDecimal entrustAmt=dto.getEntrustAmt();
+        BigDecimal entrustPrice=dto.getEntrustPrice()==null?BigDecimal.ZERO:dto.getEntrustPrice();
+        BigDecimal leftEntrustNum=entrustNum;
+        //初始化为0
+        dto.getPortfolioList().stream().forEach(item->{
+            item.setEntrustNum(BigDecimal.ZERO);
+            item.setEntrustAmt(BigDecimal.ZERO);
+        });
+
+        boolean flag=true;
+        //目标类型是数量安装步长分配
+        List<EtrExchangeProtfolioDetailRequest> portfolioList = dto.getPortfolioList();
+        int sumSize = dto.getPortfolioList().size();
+        String ps=portfolioList.get(0).getPs();
+        if(StringUtil.equals(DictCodeListExt3.交易方向_质押券出库.getValue(),ps)||StringUtil.equals(DictCodeListExt3.交易方向_质押券入库.getValue(),ps)){
+            entrustPrice=ArithmeticUtil.divide(entrustPrice,new BigDecimal(100),2);
+        }
+        if (StringUtil.equals(DictCodeListExt3.目标类型_数量.getValue(), dto.getTargetType())) {
+            while (flag) {
+                for (int i = 0; i < sumSize; i++) {
+                    EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
+
+                        if (leftEntrustNum.compareTo(minStep) > 0) {
+                            item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), minStep));
+                            item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
+                            leftEntrustNum = ArithmeticUtil.subtract(leftEntrustNum, minStep);
+                        } else {
+                            item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), leftEntrustNum));
+                            item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
+                            flag = false;
+                            break;
+                        }
+                }
+            }
+        }else{ //目标类型是金额还是平均分配
+            for (int i = 0; i < sumSize; i++) {
+                EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
+                if (i != sumSize - 1) {
+                    item.setEntrustNum(ArithmeticUtil.divide(entrustNum, sumSize, 0));
+                    item.setEntrustAmt(ArithmeticUtil.divide(entrustAmt, sumSize, 2));
+                } else {
+                    BigDecimal tempEntrustNum = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustNum).reduce(BigDecimal::add).get();
+                    BigDecimal tempEntrustAmt = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustAmt).reduce(BigDecimal::add).get();
+                    item.setEntrustNum(ArithmeticUtil.subtract(entrustNum, tempEntrustNum));
+                    item.setEntrustAmt(ArithmeticUtil.subtract(entrustAmt, tempEntrustAmt));
+                }
+            }
+        }
+        BeanUtil.copyPropertiesIgnoreNull(response, dto);
+        return response;
     }
 }

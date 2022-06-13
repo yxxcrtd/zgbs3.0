@@ -2,13 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="~{layout/default}">
 
 <head>
-    <title data-th-text="#{TrdIntoValuationDuration001}">存款类存续期管理</title>
+    <title data-th-text="#{TrdIntoValuationDuration001}">融入券存续期</title>
 </head>
 
 <body>
     <div layout:fragment="content">
         <div class="form-button-area">
             <a id="TrdIntoValuationDuration001_btn_add" class="layui-btn layui-btn-sm btn-create" data-th-text="#{SysCommon.create}">新建</a>
+            <a id="TrdIntoValuationDuration001_btn_delete" class="layui-btn layui-btn-sm btn-delete" data-th-text="#{SysCommon.delete}">删除</a>
         </div>
         <div class="joyin-form-wrap joyin-filter-form condition-area">
             <form class="layui-form" id="searchForm">
@@ -23,10 +24,10 @@
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable">产品名称</label>
                         <div class="layui-input-inline input-inline">
-                            <select type="text" id="portfolioId" name="portfolioId"
+                            <select type="text" id="finprodId" name="finprodId"
                                     class="layui-input form-input input-select" placeholder="请输入内容"
                                     data-th-placeholder="#{SysCommon.placeholder}" multiple="true"
-                                    data-th-data-url="@{/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration001/findPortfolioId}">
+                                    data-th-data-url="@{/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration001/getFinprodId}">
                             </select>
                         </div>
                     </div>
@@ -34,10 +35,10 @@
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable">资产名称</label>
                         <div class="layui-input-inline input-inline">
-                            <select type="text" id="finprodMarketId" name="finprodMarketId"
+                            <select type="text" id="asset" name="asset"
                                     class="layui-input form-input input-select" placeholder="请输入内容" multiple="true"
                                     data-th-placeholder="#{SysCommon.placeholder}"
-                                    data-th-data-url="@{/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration001/findFinprodId}">
+                                    data-th-data-url="@{/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration001/getAssetId}">
                             </select>
                         </div>
                     </div>

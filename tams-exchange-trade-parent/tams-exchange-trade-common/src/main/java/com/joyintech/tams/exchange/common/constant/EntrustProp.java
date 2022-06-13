@@ -1,9 +1,12 @@
 package com.joyintech.tams.exchange.common.constant;
 
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
 import java.util.HashSet;
 import java.util.Set;
 
-public enum EntrustProp {
+public enum EntrustProp implements IEnum<String> {
     //根据恒生柜台转入可能使用的值
     NORMAL("限价", "0"),
     ALLOTMENT("配股", "1"),
@@ -93,6 +96,13 @@ public enum EntrustProp {
     AGREED_REPURCHASE_BUYBACK_WARRANT("约定购回配股权证购回", "RNP"),
     AGREED_REPURCHASE_BUYBACK("约定购回购回交易", "RNR"),
 
+    //新债改造
+//  	XZ_PPCJ_XD("匹配成交下单", "0"),//重复了，使用原有的
+    SZ_XSCJ_XD("协商成交下单", "FI9-1"),
+    SZ_XSCJ_JS("协商成交接受", "FI9-2"),
+    SZ_XSCJ_JJ("协商成交拒绝", "FI9-3"),
+    UN_MAKE_SURE("未指令", null),
+
     //期货市价
     FTDC_OPT_ANYPRICE("任意价", "FU1"),
     //FTDC_OPT_LIMITPRICE("限价","FU2"),
@@ -109,7 +119,11 @@ public enum EntrustProp {
     FTDC_OPT_BIDPRICE1PLUSONETICKS("买一价浮动上浮1个ticks", "FUD"),
     FTDC_OPT_BidPrice1PlusTwoTicks("买一价浮动上浮2个ticks", "FUE"),
     FTDC_OPT_BIDPRICE1PLUSTHREETICKS("买一价浮动上浮3个ticks", "FUF"),
-    FTDC_OPT_FIVELEVELPRICE("五档价", "FUG");
+    FTDC_OPT_FIVELEVELPRICE("五档价", "FUG"),
+
+
+    CREDIT_PROTECTION_CERTIFICATE("信用保护凭证", "EX019"),
+    ;
 
     private static Set<String> marketPriceSet = new HashSet<>();
 
@@ -144,6 +158,28 @@ public enum EntrustProp {
     EntrustProp(String name, String value) {
         this.name = name;
         this.value = value;
+    }
+
+    /**
+     * 是否现券交易
+     */
+    public static boolean isNewBondTrade(String entrustProp) {
+        return EntrustProp.NORMAL.value.equals(entrustProp)
+                || EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value.equals(entrustProp);
+    }
+
+    /**
+     * 是否协商成交交易
+     */
+    public static boolean isConsultingTrade(String entrustProp) {
+        if (StringUtil.equals(entrustProp, EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value)
+                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_XD.value)
+                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JS.value)
+                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JJ.value)) {
+            return true;
+        }
+
+        return false;
     }
 
     // 是否需要跳过风控
@@ -229,6 +265,16 @@ public enum EntrustProp {
     }
 
     public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
         return name;
     }
 }

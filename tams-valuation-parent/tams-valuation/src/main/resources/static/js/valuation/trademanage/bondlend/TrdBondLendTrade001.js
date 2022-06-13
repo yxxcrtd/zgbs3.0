@@ -5,7 +5,7 @@
     var getPageParams = function() {
         return {
             tradeId: $('#tradeId').val(),
-            finprodId: $.trim($('#finprodId').val()),
+            finprodId: $.trim($('#prodId').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
             ps: $.trim($('#ps').val())
@@ -24,37 +24,60 @@
             }
         },
         dblclick:function(table, data) {
-            Joyin.dialog(JoyinUtil.getLabel("债券借贷交易查看："),
-                JoyinUtil.getRealPath("/valuation/trademanage/bondlend/TrdBondLendTrade002/init"),
-                "90%", "90%", {pageModel:PAGE_MODEL_REFERENCE,tradeId:data.tradeId,prodId:data.finprodId,ps:data.ps},
-                function(){
-                    //table.reload();
-                });
+            if(data.ps == '01' || data.ps == '02') {
+                Joyin.dialog(JoyinUtil.getLabel("债券借贷交易查看："),
+                    basePath + "valuation/trademanage/bondlend/TrdBondLendTrade002/init",
+                    "95%", "90%", {
+                        pageModel: PAGE_MODEL_REFERENCE,
+                        tradeId: data.tradeId, prodId: data.finprodId, ps: data.ps
+                    });
+            }else{
+                Joyin.dialog(JoyinUtil.getLabel("债券借贷交易查看："),
+                    basePath + "valuation/trademanage/bondlend/TrdBondLendTrade003/init",
+                    "95%", "90%", {
+                        pageModel: PAGE_MODEL_REFERENCE,
+                        tradeId: data.tradeId, prodId: data.finprodId, ps: data.ps
+                    });
+            }
         },
         cols:[
             {field:'tradeId', title: '交易编号',width:220},
             {field:'outTradeId', title: '外部成交编号',width:220},
-            {field:'finprodId', title: '产品代码',width:180},
-            {field:'finprodName', title: '产品名称',width:180},
+            {field:'prodId', title: '产品代码',width:180},
+            {field:'prodName', title: '产品名称',width:180},
             {field:'secId', title: '标的债券代码',width:180},
             {field:'secAbbr', title: '标的债券简称',width:180},
             {field:'psStr', title: '交易类型',sortField:"ps",width:150},
             {field:'ps', title: '交易类型',visible:false},
-            {field:'tradeDate', title: '交易日',width:120},
-            {field:'settleDate', title: '交割日',width:120},
-            {field:'vdate', title: '起息日',width:120},
-            {field:'mdate', title: '到期日',width:120},
+            {field:'tradeDateStr', width:120,  title: '交易日期',sortField:'tradeDate'},
+            {field:'tradeDate', title: '交易日期',visible:false},
+            {field:'vdateStr', width:120,  title: '首次结算日',sortField:'vdate'},
+            {field:'vdate', title: '首次结算日',visible:false},
+            {field:'mdateStr', width:120,  title: '到期结算日',sortField:'mdate'},
+            {field:'mdate', title: '到期结算日',visible:false},
             {field:'term',title: '借贷期限',width:180},
             {field:'prinAmt',type:"money", title: '券面总额（万元）',width:180},
-            {field:'feeRate', type:"money",title: '借贷费率%',width:180},
+            {field:'feeRate', type:"money",digit:4,title: '借贷费率%',width:180},
             {field:'fee',type:"money", title: '借贷费用',width:180},
-            {field:'settleAmt',type:"money", title: '结算金额',width:180},
             {field:'ccyFmt', title: '币种',sortField:"ccy",width:180},
             {field:'ccy', title: '币种',visible:false},
             {field:'acctNo', title: '资金账户',width:180},
+            {field:'dealFlag', title: '首期交易标识',visible:false},
             {field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width : 120,
-                align : 'center',type : 'action', buttons : [ 'edit', 'delt' ,
-                    {text: '<i class="iconfont icon-submit"></i>', clas: 'check', title: '到期'}]}
+                align : 'center',type : 'action',
+                render : function(data, type, row, meta){
+                    var buttons = "";
+                    if(row.ps == '03' || (row.dealFlag == '01' && (row.ps == '01' || row.ps == '02'))){
+                        buttons += '<i class="btn layui-icon edit" title="编辑">&#xe642;</i>';
+                        buttons += '<i class="btn layui-icon delt" title="删除" >&#xe640;</i>';
+                    }else{
+                        buttons += '<i class="btn layui-icon edit" title="编辑">&#xe642;</i>';
+                        buttons += '<i class="btn layui-icon delt" title="删除">&#xe640;</i>';
+                        buttons += '<i class="iconfont icon-submit check" title="到期"></i>';
+                    }
+                    return buttons;
+                }
+            }
         ],
         //loadonce:true
     });

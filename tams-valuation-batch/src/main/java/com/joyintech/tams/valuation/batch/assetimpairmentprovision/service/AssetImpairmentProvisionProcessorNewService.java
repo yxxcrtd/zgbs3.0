@@ -206,17 +206,17 @@ public class AssetImpairmentProvisionProcessorNewService {
 		}
 
 		// 1.4.其他应收款-本金
-		searchDto.setBaseSubjectNatureList(
-				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
-		Map<String, BigDecimal> receivableMap = accountingCommonService
-				.getSubjectBalanceCollection(searchDto, DictCodeList.余额方向_借方.getValue(),null);
+//		searchDto.setBaseSubjectNatureList(
+//				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//		Map<String, BigDecimal> receivableMap = accountingCommonService
+//				.getSubjectBalanceCollection(searchDto, DictCodeList.余额方向_借方.getValue(),null);
 		// 变量.其他应收本金 = 科目余额
 		BigDecimal receivableBjSubjectBalance = BigDecimal.ZERO;
-		if(receivableMap !=null&& receivableMap.get(targetFinProduct.getCcy())!=null){
-			receivableBjSubjectBalance = receivableMap.get(targetFinProduct.getCcy());
-		}else{
-			receivableBjSubjectBalance = BigDecimal.ZERO;
-		}
+//		if(receivableMap !=null&& receivableMap.get(targetFinProduct.getCcy())!=null){
+//			receivableBjSubjectBalance = receivableMap.get(targetFinProduct.getCcy());
+//		}else{
+//			receivableBjSubjectBalance = BigDecimal.ZERO;
+//		}
 
 		// 1.5.其他应收款-利息
 		// 变量.其他应收利息 = 科目余额
@@ -234,7 +234,7 @@ public class AssetImpairmentProvisionProcessorNewService {
 
 		// 1.6.逾期利息
 		searchDto.setBaseSubjectNatureList(
-				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue())));
 		Map<String, BigDecimal> overdueLxMap = accountingCommonService
 				.getSubjectBalanceCollection(searchDto, DictCodeList.余额方向_借方.getValue(), null);
 		// 变量.逾期利息 = 科目余额
@@ -395,13 +395,13 @@ public class AssetImpairmentProvisionProcessorNewService {
 		} else if (targetFinProduct.getFinprodType().equals(DictCodeListExt1.金融产品类型_同业借款.getValue())) {
 			ad.setTableId(DictCodeListTableId.会计场景代码_拆放同业_减值计提.getValue());
 		} else if (targetFinProduct.getFinprodType().equals(DictCodeListExt1.金融产品类型_债券.getValue())) {
-			if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_摊余成本类.getValue())) {
+			if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())) {
 				ad.setTableId(DictCodeListTableId.会计场景代码_摊余成本类债券_减值计提.getValue());
-			} else if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())) {
+			} else if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())) {
 				ad.setTableId(DictCodeListTableId.会计场景代码_综合收益类债券_减值计提.getValue());
 			}
 		} else if (targetFinProduct.getFinprodType().equals(DictCodeListExt1.金融产品类型_计划类资产.getValue())) {
-			if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_摊余成本类.getValue())) {
+			if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())) {
 				/** modify by yanya on 20201222 增加是否其他债券分支处理逻辑 start**/
 				//如果为其他债券
 				if(StringUtil.equals(DictCodeList.是否_是.getValue(), targetFinProduct.getIsQtzq())) {
@@ -411,7 +411,7 @@ public class AssetImpairmentProvisionProcessorNewService {
 					ad.setTableId(DictCodeListTableId.会计场景代码_摊余成本类收益型计划类资产_减值计提.getValue());
 				}
 				/** modify by yanya on 20201222 增加是否其他债券分支处理逻辑 end**/
-			} else if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())) {
+			} else if (acctEntity.getInvAim().equals(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())) {
 				/** modify by yanya on 20201222 增加是否其他债券分支处理逻辑 start**/
 				//如果为其他债券
 				if(StringUtil.equals(DictCodeList.是否_是.getValue(), targetFinProduct.getIsQtzq())) {
@@ -509,6 +509,9 @@ public class AssetImpairmentProvisionProcessorNewService {
 		ad.setAccountSceneMap(accountSceneMap);// 记账场景要素
 		ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
 		ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
+		// add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+		ad.setSubjectMappingConfigDefault(acctEntity.getSubjectMappingConfig());// 辅助核算项
+		// add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
 
 		// 记账凭证生成
 		BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, batchExecuteInfo);
@@ -517,10 +520,10 @@ public class AssetImpairmentProvisionProcessorNewService {
 		List<ValBokBookdetailBatch> valBokBookdetailBatch = resultNowNow.getValBokBookdetailBatch();
 		List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
 		for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
-			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类资产减值.getValue())
+			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())
 					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.定期存款_减值准备.getValue())
-					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.拆放同业减值准备.getValue())
-					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其它综合收益_减值.getValue())) {
+					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.买入返售金融资产_减值准备.getValue())
+					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())) {
 				valBokBookdetailBatchResult.add(dto);
 			}
 		}

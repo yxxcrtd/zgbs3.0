@@ -17,8 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.valuation.batch.common.cache.service.ChangingCacheService;
+import com.joyintech.tams.valuation.batch.common.cache.service.ValuationBatchCacheService;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,14 +62,12 @@ public class BatchDispatchReader extends BaseReader<BatchDispatchReaderDto> {
      */
     @Autowired
     private BatchDispatchMapper batchDispatchMapper;
-    /**
-     * accountingMethodMapper
-     */
-    @Autowired
-    private AccountingMethodMapper accountingMethodMapper;
-
     @Autowired
     private BatchDispathReaderService batchDispathReaderService;
+    @Autowired
+    private ValuationBatchCacheService valuationBatchCacheService;
+    @Autowired
+    private ChangingCacheService changingCacheService;
     
     /**
      * 账务删除任务组
@@ -93,8 +94,10 @@ public class BatchDispatchReader extends BaseReader<BatchDispatchReaderDto> {
         List<String>  batchGroupSeqNos = new ArrayList<>();
         List<String> matchTypeList = new ArrayList<>();
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_批处理任务组SEQ.getValue());
-        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(
-            matchTypeList, this.getBatchExecuteInfo().getTaskId(), null);
+//        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(
+//            matchTypeList, this.getBatchExecuteInfo().getTaskId(), null);
+        List<BokMatchRlat> valMatchRlats=valuationBatchCacheService.getBokMatchRlatFromCache( matchTypeList, this.getBatchExecuteInfo().getTaskId(), null);
+
         valMatchRlats.forEach(x->{
             batchGroupSeqNos.add(x.getTarget());
         });
@@ -104,8 +107,9 @@ public class BatchDispatchReader extends BaseReader<BatchDispatchReaderDto> {
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_业务类型.getValue());
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_跑批规则.getValue());
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_是否全量.getValue());
-        List<BokMatchRlat> valMatchRlats1 = accountingMethodMapper.selectValMatchRlatBySource(
-            matchTypeList, null, null);
+//        List<BokMatchRlat> valMatchRlats1 = accountingMethodMapper.selectValMatchRlatBySource(
+//            matchTypeList, null, null);
+        List<BokMatchRlat> valMatchRlats1=valuationBatchCacheService.getBokMatchRlatFromCache( matchTypeList, null, null);
         // 按任务分组
         Map<String, List<BokMatchRlat>> valMatchRlatMap = valMatchRlats1.stream().collect(
             Collectors.groupingBy(x -> x.getSource()));
@@ -193,7 +197,8 @@ public class BatchDispatchReader extends BaseReader<BatchDispatchReaderDto> {
         Map<String, Object> param = new HashMap<>();
         param.put("booksetType", DictCodeList.账套类别_银行账套.getValue());
         param.put(GlobalConstant.BOOKSETS, booksetList);
-        List<BokBookset> booksets = accountingMethodMapper.getBooksetInfoByParam(param);
+        //List<BokBookset> booksets = accountingMethodMapper.getBooksetInfoByParam(param);
+        List<BokBookset> booksets = changingCacheService.getValBokBookset(booksetList);
         List<DealAccountingTodo> todoList = new ArrayList<>();
         for (BokBookset bookset : booksets) {
             DealAccountingTodo todo = new DealAccountingTodo();
@@ -219,4 +224,5 @@ public class BatchDispatchReader extends BaseReader<BatchDispatchReaderDto> {
 //        this.getParams().put(BatchTaskInfo.class.getName(), batchTaskInfoList);
 //        return batchTaskInfoList;
 //    }
+
 }

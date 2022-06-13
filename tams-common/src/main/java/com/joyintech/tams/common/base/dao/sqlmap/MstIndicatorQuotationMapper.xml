@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.common.base.dao.MstIndicatorQuotationMapper" >
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.MstIndicatorQuotation" >
+        <id column="INDICATOR_CODE" property="indicatorCode" jdbcType="VARCHAR" />
+        <id column="DEAL_DATE" property="dealDate" jdbcType="DATE" />
+        <id column="CCY" property="ccy" jdbcType="VARCHAR" />
+        <result column="PRE_CLOSE_PRICE" property="preClosePrice" jdbcType="DECIMAL" />
+        <result column="OPEN_PRICE" property="openPrice" jdbcType="DECIMAL" />
+        <result column="HIGH_PRICE" property="highPrice" jdbcType="DECIMAL" />
+        <result column="LOW_PRICE" property="lowPrice" jdbcType="DECIMAL" />
+        <result column="CLOSE_PRICE" property="closePrice" jdbcType="DECIMAL" />
+        <result column="DATA_SOURCE" property="dataSource" jdbcType="VARCHAR" />
+        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
+        <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        INDICATOR_CODE INDICATOR_CODE, DEAL_DATE DEAL_DATE, CCY CCY, PRE_CLOSE_PRICE PRE_CLOSE_PRICE, 
+        OPEN_PRICE OPEN_PRICE, HIGH_PRICE HIGH_PRICE, LOW_PRICE LOW_PRICE, CLOSE_PRICE CLOSE_PRICE, 
+        DATA_SOURCE DATA_SOURCE, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
+        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+    </sql>
+    <sql id="Sql_All_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.MstIndicatorQuotationMapper.Base_Column_List" />
+        from MST_INDICATOR_QUOTATION
+    </sql>
+    <sql id="Sql_All_Effective_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.MstIndicatorQuotationMapper.Base_Column_List" />
+        from MST_INDICATOR_QUOTATION
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.joyintech.tams.common.base.entity.MstIndicatorQuotationKey" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.MstIndicatorQuotationMapper.Base_Column_List" />
+        from MST_INDICATOR_QUOTATION
+        where INDICATOR_CODE = #{indicatorCode,jdbcType=VARCHAR}
+          and DEAL_DATE = #{dealDate,jdbcType=DATE}
+          and CCY = #{ccy,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.MstIndicatorQuotationKey" >
+        delete from MST_INDICATOR_QUOTATION
+        where INDICATOR_CODE = #{indicatorCode,jdbcType=VARCHAR}
+          and DEAL_DATE = #{dealDate,jdbcType=DATE}
+          and CCY = #{ccy,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.MstIndicatorQuotation" >
+        insert into MST_INDICATOR_QUOTATION (INDICATOR_CODE, DEAL_DATE, CCY, 
+            PRE_CLOSE_PRICE, OPEN_PRICE, HIGH_PRICE, 
+            LOW_PRICE, CLOSE_PRICE, DATA_SOURCE, 
+            CREATE_USER, CREATE_DEPT, CREATE_TIME, 
+            UPDATE_USER, UPDATE_TIME)
+        values (#{indicatorCode,jdbcType=VARCHAR}, #{dealDate,jdbcType=DATE}, #{ccy,jdbcType=VARCHAR}, 
+            #{preClosePrice,jdbcType=DECIMAL}, #{openPrice,jdbcType=DECIMAL}, #{highPrice,jdbcType=DECIMAL}, 
+            #{lowPrice,jdbcType=DECIMAL}, #{closePrice,jdbcType=DECIMAL}, #{dataSource,jdbcType=VARCHAR}, 
+            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.MstIndicatorQuotation" >
+        insert into MST_INDICATOR_QUOTATION
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="indicatorCode != null" >
+                INDICATOR_CODE,
+            </if>
+            <if test="dealDate != null" >
+                DEAL_DATE,
+            </if>
+            <if test="ccy != null" >
+                CCY,
+            </if>
+            <if test="preClosePrice != null" >
+                PRE_CLOSE_PRICE,
+            </if>
+            <if test="openPrice != null" >
+                OPEN_PRICE,
+            </if>
+            <if test="highPrice != null" >
+                HIGH_PRICE,
+            </if>
+            <if test="lowPrice != null" >
+                LOW_PRICE,
+            </if>
+            <if test="closePrice != null" >
+                CLOSE_PRICE,
+            </if>
+            <if test="dataSource != null" >
+                DATA_SOURCE,
+            </if>
+            <if test="createUser != null" >
+                CREATE_USER,
+            </if>
+            <if test="createDept != null" >
+                CREATE_DEPT,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="indicatorCode != null" >
+                #{indicatorCode,jdbcType=VARCHAR},
+            </if>
+            <if test="dealDate != null" >
+                #{dealDate,jdbcType=DATE},
+            </if>
+            <if test="ccy != null" >
+                #{ccy,jdbcType=VARCHAR},
+            </if>
+            <if test="preClosePrice != null" >
+                #{preClosePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="openPrice != null" >
+                #{openPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="highPrice != null" >
+                #{highPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="lowPrice != null" >
+                #{lowPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="closePrice != null" >
+                #{closePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="dataSource != null" >
+                #{dataSource,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createDept != null" >
+                #{createDept,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.MstIndicatorQuotation" >
+        insert into MST_INDICATOR_QUOTATION(INDICATOR_CODE, DEAL_DATE, CCY, PRE_CLOSE_PRICE, 
+        OPEN_PRICE, HIGH_PRICE, LOW_PRICE, CLOSE_PRICE, DATA_SOURCE, CREATE_USER, CREATE_DEPT, 
+        CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+        select INDICATOR_CODE, DEAL_DATE, CCY, PRE_CLOSE_PRICE, 
+            OPEN_PRICE, HIGH_PRICE, LOW_PRICE, CLOSE_PRICE, DATA_SOURCE, CREATE_USER, CREATE_DEPT, 
+            CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+             from MST_INDICATOR_QUOTATION
+             where 1 = 1 and INDICATOR_CODE = #{indicatorCode,jdbcType=VARCHAR} and DEAL_DATE = #{dealDate,jdbcType=DATE} and CCY = #{ccy,jdbcType=VARCHAR}
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.MstIndicatorQuotation" >
+        update MST_INDICATOR_QUOTATION
+        <set >
+            <if test="preClosePrice != null" >
+                PRE_CLOSE_PRICE = #{preClosePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="openPrice != null" >
+                OPEN_PRICE = #{openPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="highPrice != null" >
+                HIGH_PRICE = #{highPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="lowPrice != null" >
+                LOW_PRICE = #{lowPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="closePrice != null" >
+                CLOSE_PRICE = #{closePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="dataSource != null" >
+                DATA_SOURCE = #{dataSource,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where INDICATOR_CODE = #{indicatorCode,jdbcType=VARCHAR}
+          and DEAL_DATE = #{dealDate,jdbcType=DATE}
+          and CCY = #{ccy,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.MstIndicatorQuotation" >
+        update MST_INDICATOR_QUOTATION
+        set PRE_CLOSE_PRICE = #{preClosePrice,jdbcType=DECIMAL},
+            OPEN_PRICE = #{openPrice,jdbcType=DECIMAL},
+            HIGH_PRICE = #{highPrice,jdbcType=DECIMAL},
+            LOW_PRICE = #{lowPrice,jdbcType=DECIMAL},
+            CLOSE_PRICE = #{closePrice,jdbcType=DECIMAL},
+            DATA_SOURCE = #{dataSource,jdbcType=VARCHAR},
+            UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+        where INDICATOR_CODE = #{indicatorCode,jdbcType=VARCHAR}
+          and DEAL_DATE = #{dealDate,jdbcType=DATE}
+          and CCY = #{ccy,jdbcType=VARCHAR}
+    </update>
+</mapper>

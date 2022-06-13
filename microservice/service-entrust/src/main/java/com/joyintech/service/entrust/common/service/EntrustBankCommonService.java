@@ -10,53 +10,28 @@
  
 package com.joyintech.service.entrust.common.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.framework.base.BaseService;
-import com.joyintech.service.entrust.etrplanassetn.dto.EtrPlanAssetNDto;
-import com.joyintech.service.entrust.etrplanassetr.dto.EtrPlanAssetRDto;
-import com.joyintech.service.entrust.etrprojectnet.dto.EtrProjectNetDto;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.invest.common.component.base.entrust.impl.dao.BaseEtrInvestInfoMapper;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.framework.export.paginator.domain.ITableRow;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.entrust.common.dao.EntrustBankCommonMapper;
+import com.joyintech.service.entrust.common.dto.EtrBondFirstBidInfoDto;
+import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
 import com.joyintech.tams.common.base.entity.EtrFinishStatus;
 import com.joyintech.tams.common.base.entity.EtrFinishStatusKey;
 import com.joyintech.tams.common.base.entity.EtrQuoteFinishStatus;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.framework.grid.Page;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.component.base.entrust.impl.dao.BaseEtrInvestInfoMapper;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.joyintech.framework.base.BaseService;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.framework.export.paginator.domain.ITableRow;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.jdbc.datasource.DataSource;
-import com.joyintech.framework.jdbc.enums.DataSourceType;
-import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
-import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.service.entrust.common.dao.EntrustBankCommonMapper;
-import com.joyintech.service.entrust.common.dao.EntrustCommonPersonSelectMapper;
-import com.joyintech.service.entrust.etrinvestallinfo.dto.EtrInvestAllInfoDto;
-import com.joyintech.service.entrust.etrinvestbondinfo.dto.EtrInvestBondInfoDto;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import org.springframework.web.bind.annotation.RequestBody;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 投资委托人员信息下拉框查询
@@ -71,6 +46,9 @@ public class EntrustBankCommonService extends BaseService<ITableRow> {
 	  
 	@Autowired
 	private EtrEntrustMapper etrEntrustMapper;
+
+	@Autowired
+	private EtrEntrustAddMapper etrEntrustAddMapper;
 	
 	@Autowired
 	private BaseEtrInvestInfoMapper baseEtrInvestInfoMapper;
@@ -89,6 +67,7 @@ public class EntrustBankCommonService extends BaseService<ITableRow> {
 			return "1";
 		}
 		EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entrustId);
+		EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
 		if (etrEntrust == null) {
 			return "1";
 		}
@@ -98,6 +77,15 @@ public class EntrustBankCommonService extends BaseService<ITableRow> {
 				||StringUtil.equals(etrEntrust.getEntrustStatus(),BussinessDictCodeList.委托状态_已撤回.getValue()))) {
 			return "1";
 		}
+		if (StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级投标.getValue(),etrEntrustAdd.getBusiTypePosition()) ||
+				StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级申购.getValue(),etrEntrustAdd.getBusiTypePosition())) {
+			String firstBidFlag = getFirstBidFlag(entrustId ,etrEntrustAdd.getBusiTypePosition());
+			if (StringUtil.isNotEmpty(firstBidFlag)) {
+				return firstBidFlag;
+			}
+			return null;
+		}
+
 		EtrFinishStatusKey etrFinishStatusKey = new EtrFinishStatusKey();
 		etrFinishStatusKey.setEntrustId(entrustId);
 		List<EtrFinishStatus> etrFinishStatusList = baseEtrInvestInfoMapper.selectEtrFinishStatusByPrimaryKey(
@@ -127,6 +115,46 @@ public class EntrustBankCommonService extends BaseService<ITableRow> {
 		}
 
 		return "3";
+	}
+
+	/**
+	 * 一级投标 关闭指令状态校验
+	 * @param entrustId
+	 * @return
+	 */
+	private String getFirstBidFlag(String entrustId, String busiTypePosition) {
+
+		Map<String,Object> param= new HashMap<>();
+		param.put("entrustId", entrustId);
+		//报价发行
+		if (StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), busiTypePosition)) {
+			EtrFinishStatusKey etrFinishStatusKey = new EtrFinishStatusKey();
+			etrFinishStatusKey.setEntrustId(entrustId);
+			List<EtrFinishStatus> etrFinishStatusList = baseEtrInvestInfoMapper.selectEtrFinishStatusByPrimaryKey(
+					etrFinishStatusKey);
+			if (!StringUtil.isEmptyList(etrFinishStatusList)) {
+				return "5";
+			}
+			int i = entrustBankCommonMapper.checkFirstBidDataStatus(param);
+			if (i > 0) {
+				return "5";
+			}
+
+		}
+		//招标发行和簿记建档
+		if (StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), busiTypePosition)) {
+			//中标状态
+			EtrBondFirstBidInfoDto bidInfoDto = entrustBankCommonMapper.selectBidInfo(param);
+			if (!StringUtil.equals(bidInfoDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标)) {
+				return "4";
+			}
+			int i = entrustBankCommonMapper.checkFirstBidDataStatus(param);
+			if (i > 0) {
+				return "4";
+			}
+		}
+
+		return null;
 	}
 
 }

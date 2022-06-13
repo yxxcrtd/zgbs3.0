@@ -63,7 +63,7 @@ public class FinPlanAssetCController {
     @Transactional
     @DTXTransaction
     @PostMapping("delete")
-    public int delete(@RequestBody FinPlanAssetCDto dto) {
+    public int delete(@RequestBody FinPlanAssetCDto dto) throws Exception {
         return finPlanAssetCService.delete(dto);
     }
     
@@ -81,7 +81,7 @@ public class FinPlanAssetCController {
     @Transactional
     @DTXTransaction
     @PostMapping("insert")
-    public int insert(@RequestBody FinPlanAssetCDto dto)  throws IllegalAccessException, InvocationTargetException {
+    public int insert(@RequestBody FinPlanAssetCDto dto)  throws Exception {
         return finPlanAssetCService.insert(dto);
     }
 
@@ -99,7 +99,7 @@ public class FinPlanAssetCController {
     @Transactional
     @DTXTransaction
     @PostMapping("update")
-    public int update(@RequestBody FinPlanAssetCDto dto) throws IllegalAccessException, InvocationTargetException{
+    public int update(@RequestBody FinPlanAssetCDto dto) throws Exception {
         return finPlanAssetCService.update(dto);
     }
     /**
@@ -110,7 +110,7 @@ public class FinPlanAssetCController {
      * @throws Exception 异常
      */
     @PostMapping("getBasicInfoByFinprodId")
-    public FinPlanAssetCDto getBasicInfoByFinprodId(@RequestBody Map<String, Object> param){
+    public FinPlanAssetCDto getBasicInfoByFinprodId(@RequestBody Map<String, Object> param) throws Exception {
         return finPlanAssetCService.getBasicInfoByFinprodId(param);
     }
     /* 增加快捷录入 add by zhuyongkang 2019/10/12 start*/

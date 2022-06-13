@@ -3,39 +3,15 @@ $(function(){
      * 获取查询参数
      */
     var getPageParams = function() {
-        var createUser=$("#createUser").val()
-        if(createUser){
-            createUser=createUser.join(",");
-        }
-        //产品代码 多选择
-        var portfolioIdTemp = $('#portfolioId').val();
-        var portfolioId = null;
-        if(portfolioIdTemp != null){
-            portfolioId = portfolioIdTemp.join(",");
-        }
-
-        //资产代码  多选择
-        var finprodIdTemp = $('#finprodId').val();
-        var finprodId = null;
-        if(finprodIdTemp != null){
-            finprodId = finprodIdTemp.join(",");
-        }
-
-        //交易类型  多选择
-        var psTemp = $('#ps').val();
-        var ps = null;
-        if(psTemp != null && psTemp != ''){
-            ps = psTemp.join(",");
-        }
         return {
-            tradeId:$('#tradeId').val(),
-            portfolioId:portfolioId,
-            finprodType:$('#finprodType').val(),
-            finprodId:finprodId,
-            ps:ps,
-            tradeMarket:$('#tradeMarket').val(),
-            createUser:createUser
-        };
+            tradeId: $('#tradeId').val(),
+            finprodId: $.trim($('#finprodId').val()),
+            asset: $.trim($('#asset').val()),
+            tradeDateBegin: $("#tradeDate").startDate(),
+            tradeDateEnd: $("#tradeDate").endDate(),
+            ps: $('#ps').val(),
+            tradeMarket: $('#tradeMarket').val()
+        }
     };
     
     /**
@@ -53,29 +29,67 @@ $(function(){
             Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/init",
                     "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
-                    portfolioId:data.portfolioId,
-                    finprodId:data.finprodId,
-                    tradeId:data.tradeId});
+                    tradeId:data.tradeId,ps:data.ps});
         },
         cols:[
             {field:'tradeId', width:180, title: '交易编号'}
-            ,{field:'portfolioId', width:150, title: '产品代码'}
-            ,{field:'portfolioName', width:150, title: '产品名称'}
-            ,{field:'finprodId', width:150, title: '资产代码'}
-            ,{field:'finprodName', width:150, title: '资产名称'}
+            ,{field:'prodId', width:150, title: '产品代码'}
+            ,{field:'prodName', width:220, title: '产品名称'}
+            ,{field:'assetId', width:150, title: '资产代码'}
+            ,{field:'assetAbbr', width:220, title: '资产名称'}
             ,{field:'tradeMarketStr', width:150, title: '交易场所',sortField:'tradeMarket'}
             ,{field:'psStr', width:150, title: '交易类型',sortField:'ps'}
-            ,{field:'tradeDate', type:'date' ,width:150, title: '交易日', visible: false}
-            ,{field:'tradeDateStr',width:150, title: '交易日'}
+            ,{field:'tradeDateStr',width:150, title: '交易日期',sortField:'tradeDate'}
+            ,{field:'tradeDate',  title: '交易日期', visible: false}
             ,{field:'bonusAmt', width:150, title: '分红金额',type:'number'}
-            ,{field:'unitCprice', width:150, title: '单位分红净值',type:'number'}
-            ,{field:'nums', width:150, title: '交易份额',type:'number'}
-            ,{field:'ccy', width:150, title: '币种',sortField:'ccy'}
-            ,{field:'mdateSettleAmt', width:150, title: '结算金额',type:'number'}
-            ,{field:'assetAccount', width:150, title: '资金账户'}
+            ,{field:'unitBonusUnitValue', width:150, title: '单位分红净值',type:'number',digit: '4'}
+            ,{field:'dealNumReInvest', width:150, title: '交易份额',type:'number'}
+            ,{field:'ccyFmt', title: '币种',sortField:"ccy",width:180}
+            ,{field:'ccy', title: '币种',visible:false}
+            // ,{field:'settleAmt', width:150, title: '结算金额',type:'money'}
+            ,{field:'myAcctNo', title: '资金账户',width:180}
             ,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['edit', 'delt']}
         ]
     });
+
+    /**
+     * 绑定编辑事件
+     */
+    table.bind('click', '.edit', function(data, index) {
+        data.pageModel = PAGE_MODEL_EDIT;
+        var object = {selectedItem: [data], operateType:"edit"};//请求参数
+        Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
+            Joyin.dialog(JoyinUtil.getLabel("基金存续期管理-修改"),
+                basePath + "valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/init",//打开新界面
+                "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
+                    tradeId:data.tradeId  //金融产品代码
+                    ,ps:data.ps
+                },function(){
+                    table.reload();//回调函数，表格刷新
+                });
+        });
+    });
+
+    /**
+     * 绑定删除事件
+     */
+    table.bind('click', '.delt', function(data, index) {
+        var object = {selectedItem: [data], operateType:"delete"};
+        Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001/check', object, function(result) {
+            Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
+                WorkFlow.doDeleteList(
+                    basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001/delete',
+                    object,
+                    "TrdFundBonusValuationTrade001_btn_delete",
+                    "TrdFundBonusValuationTrade002",
+                    function() {
+                        table.reload();
+                    }
+                );
+            });
+        });
+    });
+
     /**
      * 导出事件
      */
@@ -101,7 +115,7 @@ $(function(){
         $('#TrdFundBonusValuationTrade001_btn_add').click(function() {
             Joyin.dialog(JoyinUtil.getLabel("TrdFundBonusValuationTrade002"),
                     basePath+ "valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/init",
-                        "98%", "98%", {pageModel:PAGE_MODEL_NEW});
+                        "95%", "90%", {pageModel:PAGE_MODEL_NEW});
         });
        
         //导出
@@ -113,37 +127,32 @@ $(function(){
             table.load();
         });
 
-        /**
-         * 绑定编辑事件
-         */
-        table.bind('click', '.edit', function(data, index) {
-            data.pageModel = PAGE_MODEL_EDIT;
-            var object = {selectedItem: [data], operateType:"edit"};//请求参数
-            Joyin.dialog(JoyinUtil.getLabel("基金交易-修改"),
-                basePath + "valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/init",//打开新界面
-                "98%", "98%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
-                    tradeId:data.tradeId  //金融产品代码
-                },function(){
-                    table.reload();//回调函数，表格刷新
-                });
-        });
+        // 绑定删除事件
+        $('#TrdFundBonusValuationTrade001_btn_delete').click(function() {
+            if(table!=null && table!=''){
+                var selArr = table.getAllCheckedRows();
+            }
+            if (!selArr || selArr.length == 0) {
+                Joyin.error(JoyinUtil.getMessage("COMMON_E_0002"));
+                return;
+            }
 
-        /**
-         * 绑定删除事件
-         */
-        table.bind('click', '.delt', function(data, index) {
-            var object = {selectedItem: [data], operateType:"delete"};
-            Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
-                WorkFlow.doDeleteList(
-                    basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001/delete',
-                    object,
-                    "TrdFundBonusValuationTrade001_btn_delete",
-                    "TrdFundBonusValuationTrade002",
-                    function() {
-                        table.reload();
-                    }
-                );
+            // 启动删除流程
+            var object = {selectedItem: selArr, operateType:"delete"};
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001/check', object, function(result) {
+                Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
+                    WorkFlow.doDeleteList(
+                        basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001/delete',
+                        object,
+                        "TrdFundBonusValuationTrade001_btn_delete",
+                        "TrdFundBonusValuationTrade002",
+                        function() {
+                            table.reload();
+                        }
+                    );
+                });
             });
         });
+
     });
 }());

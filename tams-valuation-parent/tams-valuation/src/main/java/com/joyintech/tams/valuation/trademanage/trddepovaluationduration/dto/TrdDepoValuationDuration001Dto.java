@@ -91,9 +91,9 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
     private String ps;
 
     /**
-     * 计划支付日
+     * 计息结束日
      */
-    private Date planPayDate;
+    private Date endDate;
 
     /**
      * 实际支付日
@@ -161,7 +161,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
     }
 
     @PrimaryKey(PrimaryKey.Field.PK_1)
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.tradeId", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepoValuationDuration002.tradeId", groups = {ValidateGroupEdit.class})
     public String getTradeId() {
         return tradeId;
     }
@@ -178,7 +178,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.outTradeId = outTradeId;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.portfolioName", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.portfolioId", groups = {ValidateGroupEdit.class})
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -187,7 +187,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.portfolioId = portfolioId;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.portfolioId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.portfolioName", groups = {ValidateGroupEdit.class})
     public String getPortfolioName() {
         return portfolioName;
     }
@@ -196,7 +196,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.portfolioName = portfolioName;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.finprodName", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -205,7 +205,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.finprodMarketId = finprodMarketId;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.finprodName", groups = {ValidateGroupEdit.class})
     public String getFinprodName() {
         return finprodName;
     }
@@ -232,13 +232,13 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.ps = ps;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.planPayDate", groups = {ValidateGroupEdit.class})
-    public Date getPlanPayDate() {
-        return planPayDate;
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.endDate", groups = {ValidateGroupEdit.class})
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setPlanPayDate(Date planPayDate) {
-        this.planPayDate = planPayDate;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     @NotEmpty(fieldName = "TrdDepoValuationDuration002.payDate", groups = {ValidateGroupEdit.class})
@@ -277,7 +277,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.ccy = ccy;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.otherAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepoValuationDuration002.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -304,7 +304,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.trdAcctId = trdAcctId;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.dealAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepoValuationDuration002.dealAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getDealAmt() {
         return dealAmt;
     }
@@ -341,15 +341,15 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
     }
 
 
-    //导出转化计划支付日
-    private  String planPayDateStr;
+    //导出转化计息结束日
+    private  String endDateStr;
 
-    public String getPlanPayDateStr() {
-        String planPayDateStr=" ";
-        if(getPlanPayDate() !=null){
-            planPayDateStr=DateUtil.format(getPlanPayDate());
+    public String getEndDateStr() {
+        String endDateStr=" ";
+        if(getEndDate() !=null){
+            endDateStr=DateUtil.format(getEndDate());
         }
-        return planPayDateStr;
+        return endDateStr;
     }
 
     //导出转化实际支付日
@@ -358,7 +358,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
     public String getPayDateStr() {
         String payDateStr=" ";
         if(getPayDate() !=null){
-            planPayDateStr=DateUtil.format(getPayDate());
+            payDateStr=DateUtil.format(getPayDate());
         }
         return payDateStr;
     }

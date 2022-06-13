@@ -257,7 +257,9 @@
                 </if>
             ORDER BY 
                 A.BOOK_DATE DESC,
-                A.BUS_VOUCHNUM DESC
+                A.BUS_VOUCHNUM DESC,
+                B.CD_FLAG DESC,
+                NVL(B.DETAIL_SUBJECT_NO, B.SUBJECT_NO) ASC
         </if>
         
     </select>

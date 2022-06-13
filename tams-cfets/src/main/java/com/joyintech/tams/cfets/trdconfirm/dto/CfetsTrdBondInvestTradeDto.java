@@ -19,6 +19,7 @@ import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.trade.dto.BussTrdAvailableCashQuery;
 import com.joyintech.tams.component.business.trade.dto.BussTrdTransfenpeiDto;
@@ -429,6 +430,8 @@ public class CfetsTrdBondInvestTradeDto extends TrdFinProductDealTotal implement
     private String oprType;
 
     private List<CfetsTrdBondInvestTradeDto> dtoList;
+
+    private List<TrdBondInvestTradeDto> tradeDtoList;
 
     public String getSettleIsPayWithTrade() {
         return settleIsPayWithTrade;
@@ -2458,5 +2461,13 @@ public class CfetsTrdBondInvestTradeDto extends TrdFinProductDealTotal implement
 
     public void setOprType(String oprType) {
         this.oprType = oprType;
+    }
+
+    public List<TrdBondInvestTradeDto> getTradeDtoList() {
+        return tradeDtoList;
+    }
+
+    public void setTradeDtoList(List<TrdBondInvestTradeDto> tradeDtoList) {
+        this.tradeDtoList = tradeDtoList;
     }
 }

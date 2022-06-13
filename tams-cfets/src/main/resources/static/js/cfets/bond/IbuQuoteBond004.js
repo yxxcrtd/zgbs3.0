@@ -4,6 +4,7 @@
      * 是否可编辑
      */
     var editFlag = true;
+    var rskApproval;
 
     var el = function (ele) {
         return $("#IbuQuoteBond004_bodydiv " + ele);
@@ -23,6 +24,103 @@
         }
         return result;
     }
+
+
+
+    function query(ele) {
+        return $("#IbuQuoteBond004_bodydiv " + ele);
+    }
+
+
+    var colsRiskTrialRet = [
+        {
+            /* 指标名称*/
+            field: 'kriName',
+            width: 100,
+            title: 'BaseRiskMathComm.indName',
+            sortable: false
+        }
+        , {/*指标类型*/
+            field: 'kriTypeCn',
+            width: 50,
+            title: 'BaseRiskMathComm.indType',
+            sortable: false
+        }
+        , {
+            /*组合名称*/
+            field: 'portfolioName',
+            width: 150,
+            title: 'BaseRiskMathComm.portfolioName',
+            sortable: false
+        }
+        , {
+            /*预警阈值*/
+            field: 'warningLine',
+            width: 150,
+            title: 'BaseRiskMathComm.wthreshold',
+            sortable: false
+        }
+        , {
+            /*审批线*/
+            field: 'approveLine',
+            width: 150,
+            title: 'BaseRiskMathComm.approveold',
+            sortable: false
+        }
+        , {
+            /*当前实际值*/
+            field: 'kriValue',
+            width: 200,
+            title: 'BaseRiskMathComm.currValue',
+            sortable: false
+        }
+        , {
+            /*原值*/
+            field: 'oldValue',
+            width: 200,
+            title: 'BaseRiskMathComm.preValue',
+            sortable: false
+        }
+        , {
+            /*趋势*/
+            field: 'kriTrend',
+            width: 200,
+            title: 'BaseRiskMathComm.kriTrend',
+            sortable: false
+        }
+
+        , {
+            field: 'kriStatusCn', title: 'BaseRiskMathComm.currStatus', sortable: false,
+            render: function (data, type, row, meta) {
+                if (row.kriStatus == 0) {
+                    return "<span>正常</span>";
+                }
+                if (row.kriStatus == 1) {
+                    return "<span style='color:orange'>预警</span>";
+                }
+                if (row.kriStatus == 2) {
+                    return "<span style='color:#F7580D'>审批</span>";
+                }
+                if (row.kriStatus == 3) {
+                    return "<span style='color:#F71A0D'>违规</span>";
+                }
+                if (row.kriStatus == 4) {
+                    return "<span style='color:#951F1F'>异常</span>";
+                }
+                return row.kriStatus;
+            }
+        }
+    ]
+
+    var tableRisk = query("#riskTrialRetTable").joyintable({
+        data: entity_RiskTrialRetList || [],
+        cols: colsRiskTrialRet,
+        page: true,
+        addToLast: true,
+        searchOnInit: true,
+        checkbox: false,
+        height: 290
+    });
 
     /**
      * 登记组合分配列表
@@ -274,6 +372,7 @@
             object.calculateField = $("input:radio[name=calculateField]:checked").val();
         }
         object.workflowId = workflowId;
+        object.rskApproval = rskApproval;
         return object;
     }
 
@@ -357,7 +456,7 @@
         var riskFlag = false;
         $.ajax({
             type: "POST",
-            url: basePath + 'cfets/bankuplink/bond/IbuQuoteBond/doRiskcal',
+            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond',
             dataType: "json",
             contentType: "application/json",
             async: false,
@@ -374,16 +473,27 @@
         }*/
         var obj = getSubmitParam("submit");
         var errorMsg = "";
+        var confirmMsg = "";
         Joyin.ajaxJson(basePath + 'cfets/bond/IbuQuoteBond004/check', obj, function (result) {
            if(result.data && result.data.errorList && result.data.errorList.length > 0) {
                $.each(result.data.errorList,function (index,item) {
                    errorMsg = errorMsg + item.message + "<br\>";
                })
            }
+            if(result.data && result.data.message && result.data.messageType === 'confirm') {
+                confirmMsg = result.data.message;
+            }
         },false)
         if(errorMsg && errorMsg.length > 0) {
             Joyin.error(errorMsg);
             return false;
+        }
+
+        if(confirmMsg && confirmMsg.length > 0) {
+            rskApproval = result.data.data;
+            return Joyin.confirm(confirmMsg, function (){
+                saveOrSubmitAction('submit');
+            });
         }
         return true;
     }
@@ -586,10 +696,49 @@
     }
 
 
+    //绑定风险试算
+    $('#IbuQuoteBond004_btn_riskcal').click(function () {
+        var object = $.serializeToObject('#submitForm');
+        var param = JSON.parse(JSON.stringify(object));
+        param.ptlAllocations = param.cfetsBondDealDialogueQuoteDtoList;
+        $.ajax({
+            type: "POST",
+            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond',
+            dataType: "json",
+            contentType: "application/json",
+            async: false,
+            data: JSON.stringify(param),
+            success: function (result) {
+                if(result.code === '000') {
+                    var data = result.data.data;
+                    if(data.riskTrialSpan) {
+                        $("#riskTrialSpan").html("&nbsp;&nbsp;" + data.riskTrialSpan);
+                    }
+                    riskResultResponse = data;
+                    entity_RiskTrialRetList = data.riskcalReturnList;
+                    if(entity_RiskTrialRetList) {
+                        $.each(entity_RiskTrialRetList, function (index, item) {
+                            item.conclusion = data.riskTrialSpan;
+                        })
+                    }
+                    tableRisk.clear();
+                    tableRisk.addRow(entity_RiskTrialRetList);
+                }else if(result.message){
+                    Joyin.error(result.message);
+                }
+            }
+        });
+    });
+
     $(function () {
         // 初始化页面
         initPage();
         enableControl();
+
+        if(ps != PS_T03){
+            $("#riskTrialRet_div").hide();
+            $("#IbuQuoteBond004_btn_riskcal").hide();
+        }
 
         layui.use(['form'], function () {
             // 绑定计算模式的点击事件

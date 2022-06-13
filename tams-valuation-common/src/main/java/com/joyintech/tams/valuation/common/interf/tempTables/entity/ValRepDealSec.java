@@ -1059,4 +1059,17 @@ public class ValRepDealSec extends BaseEntity {
     public void setFundSettleDate(Date fundSettleDate) {
         this.fundSettleDate = fundSettleDate;
     }
+
+    /**
+     * 关联系统交易编号  外部交易编号
+     */
+    private String fTradeId;
+
+    public String getfTradeId() {
+        return fTradeId;
+    }
+
+    public void setfTradeId(String fTradeId) {
+        this.fTradeId = fTradeId;
+    }
 }

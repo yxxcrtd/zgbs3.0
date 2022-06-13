@@ -1,12 +1,17 @@
 package com.joyintech.tams.valuation.trademanage.irs.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.valuation.trademanage.irs.validator.TrdIRSValuationTradeValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
@@ -15,6 +20,9 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
+@PageId("TrdIRSValuationTrade002")
+@ValidLogic(targetClass = TrdIRSValuationTradeValidator.class, groups = { ValidateGroupEdit.class,
+        ValidateGroupDelete.class })
 public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
@@ -64,17 +72,17 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 起息日
      */
-    private String vdate;
+    private Date vdate;
 
     /**
      * 到期日
      */
-    private String mdate;
+    private Date mdate;
 
     /**
      * 名义本金
@@ -101,7 +109,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
     /**
      * 固定利率首期起息日
      */
-    private String firstPayDateR;
+    private Date firstPayDateR;
 
     /**
      * 挂钩利率
@@ -127,7 +135,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
     /**
      * 浮动利率首期起息日
      */
-    private String firstPayDateF;
+    private Date firstPayDateF;
 
     /**
      * 首期利率确定日
@@ -142,14 +150,12 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
     /**
      * 交易手续费
      */
-    @NotEmpty(fieldName = "交易手续费")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal dealFeeAmt;
 
     /**
      * 结算手续费
      */
-    @NotEmpty(fieldName = "结算服务费")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal stlFeeAmt;
 
@@ -169,6 +175,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
      */
     private String acctNo;
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.ps", groups = { ValidateGroupEdit.class })
     public String getPs() {
         return ps;
     }
@@ -177,6 +184,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.ps = ps;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.tradeId", groups = { ValidateGroupEdit.class })
     public String getTradeId() {
         return tradeId;
     }
@@ -185,14 +193,16 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.tradeDate", groups = { ValidateGroupEdit.class })
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.ccy", groups = { ValidateGroupEdit.class })
     public String getCcy() {
         return ccy;
     }
@@ -211,6 +221,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
                 SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.acctNo", groups = { ValidateGroupEdit.class })
     public String getAcctNo() {
         return acctNo;
     }
@@ -243,6 +254,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.outTradeId = outTradeId;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.settleAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }
@@ -264,22 +276,25 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
-    public String getVdate() {
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.vdate", groups = { ValidateGroupEdit.class })
+    public Date getVdate() {
         return vdate;
     }
 
-    public void setVdate(String vdate) {
+    public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
 
-    public String getMdate() {
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.mdate", groups = { ValidateGroupEdit.class })
+    public Date getMdate() {
         return mdate;
     }
 
-    public void setMdate(String mdate) {
+    public void setMdate(Date mdate) {
         this.mdate = mdate;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.prin", groups = { ValidateGroupEdit.class })
     public BigDecimal getPrin() {
         return prin;
     }
@@ -288,6 +303,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.prin = prin;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.yield", groups = { ValidateGroupEdit.class })
     public BigDecimal getYield() {
         return yield;
     }
@@ -296,6 +312,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.yield = yield;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.fixPayCycle", groups = { ValidateGroupEdit.class })
     public String getFixPayCycle() {
         return fixPayCycle;
     }
@@ -304,14 +321,16 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.fixPayCycle = fixPayCycle;
     }
 
-    public String getFirstPayDateR() {
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.firstPayDateR", groups = { ValidateGroupEdit.class })
+    public Date getFirstPayDateR() {
         return firstPayDateR;
     }
 
-    public void setFirstPayDateR(String firstPayDateR) {
+    public void setFirstPayDateR(Date firstPayDateR) {
         this.firstPayDateR = firstPayDateR;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.intType", groups = { ValidateGroupEdit.class })
     public String getIntType() {
         return intType;
     }
@@ -320,6 +339,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.intType = intType;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.spreadRate", groups = { ValidateGroupEdit.class })
     public BigDecimal getSpreadRate() {
         return spreadRate;
     }
@@ -328,6 +348,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.spreadRate = spreadRate;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.floatPayCycle", groups = { ValidateGroupEdit.class })
     public String getFloatPayCycle() {
         return floatPayCycle;
     }
@@ -336,11 +357,12 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.floatPayCycle = floatPayCycle;
     }
 
-    public String getFirstPayDateF() {
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.firstPayDateF", groups = { ValidateGroupEdit.class })
+    public Date getFirstPayDateF() {
         return firstPayDateF;
     }
 
-    public void setFirstPayDateF(String firstPayDateF) {
+    public void setFirstPayDateF(Date firstPayDateF) {
         this.firstPayDateF = firstPayDateF;
     }
 
@@ -352,6 +374,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.pageModel = pageModel;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
     }
@@ -360,6 +383,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.prodId = prodId;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.prodName", groups = { ValidateGroupEdit.class })
     public String getProdName() {
         return prodName;
     }
@@ -368,6 +392,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.prodName = prodName;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.fixBasis", groups = { ValidateGroupEdit.class })
     public String getFixBasis() {
         return fixBasis;
     }
@@ -376,6 +401,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.fixBasis = fixBasis;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.floatBasis", groups = { ValidateGroupEdit.class })
     public String getFloatBasis() {
         return floatBasis;
     }
@@ -384,6 +410,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.floatBasis = floatBasis;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.firstResetDate", groups = { ValidateGroupEdit.class })
     public Date getFirstResetDate() {
         return firstResetDate;
     }
@@ -392,6 +419,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.firstResetDate = firstResetDate;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.resetFreq", groups = { ValidateGroupEdit.class })
     public String getResetFreq() {
         return resetFreq;
     }
@@ -400,6 +428,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.resetFreq = resetFreq;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.dealFeeAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getDealFeeAmt() {
         return dealFeeAmt;
     }
@@ -408,6 +437,7 @@ public class TrdIRSValuationTrade002Dto extends BaseEntity implements ProcessEnt
         this.dealFeeAmt = dealFeeAmt;
     }
 
+    @NotEmpty(fieldName = "TrdIRSValuationTrade002.stlFeeAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getStlFeeAmt() {
         return stlFeeAmt;
     }

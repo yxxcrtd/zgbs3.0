@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 @ApiModel(value = "委托信息", description = "委托信息")
 public class EntrustQueryBean implements Serializable {
@@ -152,6 +153,55 @@ public class EntrustQueryBean implements Serializable {
     @ApiModelProperty(name = "busiTypeTgStr", value = "业务类型")
     private String busiTypeTgStr;
 
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
+    private String isNetPrice;
+
+    @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
+    private String ownerType;
+    @ApiModelProperty(required = true, name = "investorId", value = "本方交易主体ID")
+    private String investorId;
+    @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
+    private String investorName;
+    @ApiModelProperty(required = true, name = "propInvestorId", value = "对手方交易主体ID")
+    private String propInvestorId;
+    @ApiModelProperty(required = true, name = "propInvestorName", value = "对手方交易主体名称")
+    private String propInvestorName;
+    @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
+    private String tradeId;
+    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员")
+    private String tradeName;
+    @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
+    private String dealerId;
+    @ApiModelProperty(required = true, name = "dealerName", value = "本方交易商名称")
+    private String dealerName;
+    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
+    private String counterId;
+    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
+    private String propTradeId;
+    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员")
+    private String propTradeName;
+    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
+    private String propDealerId;
+    @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
+    private String propDealerName;
+    @ApiModelProperty(required = true, name = "propOwnerType", value = "对手方报价所有者类型")
+    private String propOwnerType;
+
+    // 信用保护凭证使用 --start
+    @ApiModelProperty(name = "counterName", value = "交易对手名称")
+    private String counterName;
+
+    @ApiModelProperty(name = "propAcctNo", value = "对手资金账户")
+    private String propAcctNo;
+
+    @ApiModelProperty(name = "propAcctName", value = "对手资金账户名称")
+    private String propAcctName;
+    // 信用保护凭证使用 --end
+
     /**
      * ////////////////////////////查询无用字段
      */
@@ -278,6 +328,9 @@ public class EntrustQueryBean implements Serializable {
 
     @ApiModelProperty(name = "operateUser", value = "操作人员ID 执行撤销异常委托操作人员ID", hidden = true)
     private String operateUser;
+
+    @ApiModelProperty(name = "entrustPriceView", value = "委托价格(展示)")
+    private BigDecimal entrustPriceView;
 
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
@@ -861,7 +914,11 @@ public class EntrustQueryBean implements Serializable {
         if (StringUtil.isEmpty(tradePlat)) {
             return null;
         }
-        return DictCodeList.from(DictCode.交易平台, tradePlat).getCodeName();
+        DictCodeList dictCode = DictCodeList.from(DictCode.交易平台, tradePlat);
+        if (Objects.nonNull(dictCode)) {
+            return dictCode.getCodeName();
+        }
+        return tradePlat;
     }
 
     public void setTradePlatStr(String tradePlatStr) {
@@ -872,7 +929,11 @@ public class EntrustQueryBean implements Serializable {
         if (StringUtil.isEmpty(finprodType2)) {
             return null;
         }
-        return DictCodeListExt1.from(DictCode.金融产品类型, finprodType2).getCodeName();
+        DictCodeListExt1 dictCode = DictCodeListExt1.from(DictCode.金融产品类型, finprodType2);
+        if (Objects.nonNull(dictCode)) {
+            return dictCode.getCodeName();
+        }
+        return finprodType2;
     }
 
     public void setFinprodType2Str(String finprodType2Str) {
@@ -883,7 +944,11 @@ public class EntrustQueryBean implements Serializable {
         if (StringUtil.isEmpty(ps)) {
             return null;
         }
-        return DictCodeListExt2.from(DictCode.交易方向, ps).getCodeName();
+        DictCodeListExt2 dictCode = DictCodeListExt2.from(DictCode.交易方向, ps);
+        if (Objects.nonNull(dictCode)) {
+            return dictCode.getCodeName();
+        }
+        return ps;
     }
 
     public void setEntrustBsStr(String entrustBsStr) {
@@ -934,7 +999,11 @@ public class EntrustQueryBean implements Serializable {
         if (StringUtil.isEmpty(busiTypeTg)) {
             return null;
         }
-        return DictCodeListExt3.from(DictCode.投管业务类型, busiTypeTg).getCodeName();
+        DictCodeListExt3 dictCode = DictCodeListExt3.from(DictCode.投管业务类型, busiTypeTg);
+        if (Objects.nonNull(dictCode)) {
+            return dictCode.getCodeName();
+        }
+        return busiTypeTg;
     }
 
 
@@ -988,5 +1057,161 @@ public class EntrustQueryBean implements Serializable {
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
+    }
+
+    public String getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(String ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getPropInvestorId() {
+        return propInvestorId;
+    }
+
+    public void setPropInvestorId(String propInvestorId) {
+        this.propInvestorId = propInvestorId;
+    }
+
+    public String getPropInvestorName() {
+        return propInvestorName;
+    }
+
+    public void setPropInvestorName(String propInvestorName) {
+        this.propInvestorName = propInvestorName;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getPropTradeId() {
+        return propTradeId;
+    }
+
+    public void setPropTradeId(String propTradeId) {
+        this.propTradeId = propTradeId;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getPropDealerName() {
+        return propDealerName;
+    }
+
+    public void setPropDealerName(String propDealerName) {
+        this.propDealerName = propDealerName;
+    }
+
+    public String getPropOwnerType() {
+        return propOwnerType;
+    }
+
+    public void setPropOwnerType(String propOwnerType) {
+        this.propOwnerType = propOwnerType;
+    }
+
+    public String getTradeName() {
+        return tradeName;
+    }
+
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
+    public String getPropTradeName() {
+        return propTradeName;
+    }
+
+    public void setPropTradeName(String propTradeName) {
+        this.propTradeName = propTradeName;
+    }
+
+    public BigDecimal getEntrustPriceView() {
+        if (StringUtil.isNotEmpty(isFullPrice) && StringUtil.equals(isFullPrice, "Y")) {
+            return fullPrice;
+        } else {
+            return entrustPrice;
+        }
+    }
+
+    public void setEntrustPriceView(BigDecimal entrustPriceView) {
+        this.entrustPriceView = entrustPriceView;
     }
 }

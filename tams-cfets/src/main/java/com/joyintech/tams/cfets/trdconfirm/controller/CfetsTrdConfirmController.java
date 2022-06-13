@@ -9,31 +9,35 @@
 package com.joyintech.tams.cfets.trdconfirm.controller;
 
 
-
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
-import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
-import com.joyintech.tams.cfets.etrib.bond.dto.CfetsEtrIbfindEtrinfoRequest;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.joyintech.tams.business.common.pojo.Message;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -46,6 +50,9 @@ public class CfetsTrdConfirmController extends BaseController {
     @Autowired
     private CfetsTrdConfirmService cfetsTrdConfirmService;
 
+    @Autowired
+    private IPlatformDate iPlatformDate;
+
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
     @ResponseBody
@@ -54,10 +61,13 @@ public class CfetsTrdConfirmController extends BaseController {
         //是否支持CSTP下行接口
         initPageParams.put("IS_SUPPORT_CSTP_FLAG_BOND", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BOND"));
         initPageParams.put("IS_SUPPORT_CSTP_FLAG_REPO", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO"));
+        initPageParams.put("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
         //银行间债券交易执行是否可手工确认
         initPageParams.put("IS_CFETSSECTRD_MANUALCONFIRM_FLAG", CacheUtil.getSysParam("IS_CFETSSECTRD_MANUALCONFIRM_FLAG"));
         //银行间回购交易执行是否可手工确认
         initPageParams.put("IS_CFETSREPOTRD_MANUALCONFIRM_FLAG", CacheUtil.getSysParam("IS_CFETSREPOTRD_MANUALCONFIRM_FLAG"));
+        // 银行间一级申购交易执行是否可手工确认
+        initPageParams.put("IS_CFETSFIRSTSECTRD_MANUALCONFIRM_FLAG", CacheUtil.getSysParam("IS_CFETSFIRSTSECTRD_MANUALCONFIRM_FLAG"));
         //交易员是否可查看全部CSTP下行成交数据
         initPageParams.put("IS_QUERYALLCSTP_FLAG", CacheUtil.getSysParam("IS_QUERYALLCSTP_FLAG"));
         //自动刷新时间
@@ -73,6 +83,9 @@ public class CfetsTrdConfirmController extends BaseController {
         initPageParams.put("TRD_MATCH_TYPE", this.getSelectDataFromDataDic(DictCode.下行交易匹配类型, null));
         initPageParams.put("CSTP_BUSINESS_TYPE", this.getSelectDataFromDataDic(DictCode.CSTP资产类型, null));
         initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式_登记, null));
+        initPageParams.put("CUSTOM_ASSET_TYPE_TWO", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
+        // 系统日期
+        initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         //pageId
         initPageParams.put("pageId", "CfetsTrdConfirm");
         return new Message<Map<String, Object>>(initPageParams).success();
@@ -80,8 +93,7 @@ public class CfetsTrdConfirmController extends BaseController {
     @ApiOperation(value = "交易执行列表分页查询", notes = "交易执行列表分页查询")
     @PostMapping("/findAllRegInfoList")
     @ResponseBody
-    public Message<Page<CfetsTrdConfirmRegInfoListResponse>> findAllRegInfoList(@RequestBody CfetsTrdConfirmRegInfoListRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdConfirmRegInfoListResponse>> findAllRegInfoList(@RequestBody CfetsTrdConfirmRegInfoListRequest dto) {
         try {
             Page<CfetsTrdConfirmRegInfoListResponse> page =cfetsTrdConfirmService.findAllRegInfoList(dto);
             return new Message<Page<CfetsTrdConfirmRegInfoListResponse>>().success().setData(page);
@@ -93,7 +105,7 @@ public class CfetsTrdConfirmController extends BaseController {
     @ResponseBody
     @ApiOperation(value = "交易执行-成交确认", notes = "交易执行-成交确认")
     @PostMapping("trdConfirmSave")
-    public Message<AjaxResult> trdConfirmSave(@RequestBody CfetsTrdConfirmRegInfoListResponse dto) throws Exception {
+    public Message<AjaxResult> trdConfirmSave(@RequestBody CfetsTrdConfirmRegInfoListResponse dto) {
         //对选择的数据进行check
         AjaxResult ajax= cfetsTrdConfirmService.trdConfirmSaveCheckMethod(dto);
         if(null!=ajax && !StringUtil.isEmptyList(ajax.getErrorList())){
@@ -114,21 +126,19 @@ public class CfetsTrdConfirmController extends BaseController {
     @ApiOperation(value = "CSTP成交回报分页查询", notes = "CSTP成交回报分页查询")
     @PostMapping("/findAllCstpInfoList")
     @ResponseBody
-    public Message<Page<CfetsTrdConfirmCstpInfoListResponse>> findAllCstpInfoList(@RequestBody CfetsTrdConfirmCstpInfoListRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdConfirmCstpInfoListResponse>> findAllCstpInfoList(@RequestBody CfetsTrdConfirmCstpInfoListRequest dto) {
         try {
             Page<CfetsTrdConfirmCstpInfoListResponse> page =cfetsTrdConfirmService.findAllCstpInfoList(dto);
             return new Message<Page<CfetsTrdConfirmCstpInfoListResponse>>().success().setData(page);
         } catch (Exception e) {
-            logger.error("查询交易登记列表分页数据异常", e);
-            return new Message<Page<CfetsTrdConfirmCstpInfoListResponse>>().fail().setMessage("查询交易登记列表分页数据异常");
+            logger.error("查询CSTP成交回报分页数据异常", e);
+            return new Message<Page<CfetsTrdConfirmCstpInfoListResponse>>().fail().setMessage("查询CSTP成交回报分页数据异常");
         }
     }
     @ResponseBody
     @ApiOperation(value = "CSTP成交回报-手工匹配校验", notes = "CSTP成交回报-手工匹配校验")
     @PostMapping("checkCstpManualMatch")
-    public Message<AjaxResult> checkCstpManualMatch(@RequestBody CfetsTrdConfirmManualMatchInfoRequest manualMatchDto)
-            throws Exception {
+    public Message<AjaxResult> checkCstpManualMatch(@RequestBody CfetsTrdConfirmManualMatchInfoRequest manualMatchDto){
         try {
             AjaxResult ajax= cfetsTrdConfirmService.checkCstpManualMatch(manualMatchDto);
             if(null!=ajax){
@@ -144,7 +154,7 @@ public class CfetsTrdConfirmController extends BaseController {
     @ResponseBody
     @ApiOperation(value = "CSTP成交回报-手工匹配", notes = "CSTP成交回报-手工匹配")
     @PostMapping("cstpManualMatch")
-    public Message<AjaxResult> cstpManualMatch(@RequestBody CfetsTrdConfirmManualMatchInfoRequest manualMatchDto) throws Exception {
+    public Message<AjaxResult> cstpManualMatch(@RequestBody CfetsTrdConfirmManualMatchInfoRequest manualMatchDto) {
         try {
             AjaxResult ajaxResult = cfetsTrdConfirmService.cstpManualMatchMethod(manualMatchDto);
             if (null!=ajaxResult && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
@@ -160,8 +170,7 @@ public class CfetsTrdConfirmController extends BaseController {
     @ApiOperation(value = "匹配确认列表分页查询", notes = "匹配确认列表分页查询")
     @PostMapping("/findAllTrdCstpInfoList")
     @ResponseBody
-    public Message<Page<CfetsTrdConfirmTrdCstpMatchResponse>> findAllTrdCstpInfoList(@RequestBody CfetsTrdConfirmTrdCstpMatchRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdConfirmTrdCstpMatchResponse>> findAllTrdCstpInfoList(@RequestBody CfetsTrdConfirmTrdCstpMatchRequest dto){
         try {
             Page<CfetsTrdConfirmTrdCstpMatchResponse> page =cfetsTrdConfirmService.findAllTrdCstpInfoList(dto);
             return new Message<Page<CfetsTrdConfirmTrdCstpMatchResponse>>().success().setData(page);
@@ -173,8 +182,7 @@ public class CfetsTrdConfirmController extends BaseController {
     @ApiOperation(value = "匹配确认列表-交易执行债券数据分页查询", notes = "匹配确认列表-交易执行债券数据分页查询")
     @PostMapping("/findAllTrdBondList")
     @ResponseBody
-    public Message<Page<CfetsTrdConfirmExecBondInfoResponse>> findAllTrdBondList(@RequestBody CfetsTrdConfirmExecCstpRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdConfirmExecBondInfoResponse>> findAllTrdBondList(@RequestBody CfetsTrdConfirmExecCstpRequest dto) {
         try {
             Page<CfetsTrdConfirmExecBondInfoResponse> page =cfetsTrdConfirmService.findAllTrdBondList(dto);
             return new Message<Page<CfetsTrdConfirmExecBondInfoResponse>>().success().setData(page);
@@ -183,11 +191,23 @@ public class CfetsTrdConfirmController extends BaseController {
             return new Message<Page<CfetsTrdConfirmExecBondInfoResponse>>().fail().setMessage("查询匹配确认列表分页数据异常");
         }
     }
+
+    @ApiOperation(value = "匹配确认列表-交易执行一级申购数据分页查询", notes = "匹配确认列表-交易执行质押式数据分页查询")
+    @PostMapping("/findAllTrdBidList")
+    @ResponseBody
+    public Message<Page<CfetsTrdConfirmExecFirstBondInfoResponse>> findAllTrdBidList(@RequestBody CfetsTrdConfirmExecCstpRequest dto) {
+        try {
+            Page<CfetsTrdConfirmExecFirstBondInfoResponse> page = cfetsTrdConfirmService.findAllTrdBidList(dto);
+            return new Message<Page<CfetsTrdConfirmExecFirstBondInfoResponse>>().success().setData(page);
+        } catch (Exception e) {
+            logger.error("交易执行质押式数据分页查询数据异常", e);
+            return new Message<Page<CfetsTrdConfirmExecFirstBondInfoResponse>>().fail().setMessage("交易执行质押式数据分页查询数据异常");
+        }
+    }
     @ApiOperation(value = "匹配确认列表-交易执行质押式数据分页查询", notes = "匹配确认列表-交易执行质押式数据分页查询")
     @PostMapping("/findAllTrdRepoList")
     @ResponseBody
-    public Message<Page<CfetsTrdConfirmExecRepoInfoResponse>> findAllTrdRepoList(@RequestBody CfetsTrdConfirmExecCstpRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdConfirmExecRepoInfoResponse>> findAllTrdRepoList(@RequestBody CfetsTrdConfirmExecCstpRequest dto) {
         try {
             Page<CfetsTrdConfirmExecRepoInfoResponse> page =cfetsTrdConfirmService.findAllTrdRepoList(dto);
             return new Message<Page<CfetsTrdConfirmExecRepoInfoResponse>>().success().setData(page);
@@ -199,8 +219,7 @@ public class CfetsTrdConfirmController extends BaseController {
     @ApiOperation(value = "匹配确认列表-cstp成交债券数据分页查询", notes = "匹配确认列表-cstp成交债券数据分页查询")
     @PostMapping("/findAllCstpBondList")
     @ResponseBody
-    public Message<Page<CfetsTrdConfirmCstpBondInfoResponse>> findAllCstpBondList(@RequestBody CfetsTrdConfirmExecCstpRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdConfirmCstpBondInfoResponse>> findAllCstpBondList(@RequestBody CfetsTrdConfirmExecCstpRequest dto) {
         try {
             Page<CfetsTrdConfirmCstpBondInfoResponse> page =cfetsTrdConfirmService.findAllCstpBondList(dto);
             return new Message<Page<CfetsTrdConfirmCstpBondInfoResponse>>().success().setData(page);
@@ -209,11 +228,23 @@ public class CfetsTrdConfirmController extends BaseController {
             return new Message<Page<CfetsTrdConfirmCstpBondInfoResponse>>().fail().setMessage("查询匹配确认列表分页数据异常");
         }
     }
+
+    @ApiOperation(value = "匹配确认列表-cstp成交一级申购数据分页查询", notes = "匹配确认列表-cstp成交质押式数据分页查询")
+    @PostMapping("/findAllCstpBidList")
+    @ResponseBody
+    public Message<Page<CfetsTrdConfirmExecFirstBondInfoResponse>> findAllCstpBidList(@RequestBody CfetsTrdConfirmExecCstpRequest dto) {
+        try {
+            Page<CfetsTrdConfirmExecFirstBondInfoResponse> page = cfetsTrdConfirmService.findAllCstpBidList(dto);
+            return new Message<Page<CfetsTrdConfirmExecFirstBondInfoResponse>>().success().setData(page);
+        } catch (Exception e) {
+            logger.error("cstp成交质押式数据分页查询数据异常", e);
+            return new Message<Page<CfetsTrdConfirmExecFirstBondInfoResponse>>().fail().setMessage("cstp成交质押式数据分页查询数据异常");
+        }
+    }
     @ApiOperation(value = "匹配确认列表-cstp成交质押式数据分页查询", notes = "匹配确认列表-cstp成交质押式数据分页查询")
     @PostMapping("/findAllCstpRepoList")
     @ResponseBody
-    public Message<Page<CfetsTrdConfirmCstpRepoInfoResponse>> findAllCstpRepoList(@RequestBody CfetsTrdConfirmExecCstpRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdConfirmCstpRepoInfoResponse>> findAllCstpRepoList(@RequestBody CfetsTrdConfirmExecCstpRequest dto) {
         try {
             Page<CfetsTrdConfirmCstpRepoInfoResponse> page =cfetsTrdConfirmService.findAllCstpRepoList(dto);
             return new Message<Page<CfetsTrdConfirmCstpRepoInfoResponse>>().success().setData(page);
@@ -225,7 +256,7 @@ public class CfetsTrdConfirmController extends BaseController {
     @ResponseBody
     @ApiOperation(value = "匹配取消", notes = "匹配取消")
     @PostMapping("cancelTrdMatchInfo")
-    public Message<AjaxResult> cancelTrdMatchInfo(@RequestBody CfetsTrdConfirmTrdCstpMatchResponse manualMatchDto) throws Exception {
+    public Message<AjaxResult> cancelTrdMatchInfo(@RequestBody CfetsTrdConfirmTrdCstpMatchResponse manualMatchDto) {
         try {
             cfetsTrdConfirmService.cancelTrdMatchInfo(manualMatchDto);
             return new Message<AjaxResult>().success().setData(new AjaxResult("匹配取消成功"));
@@ -268,4 +299,25 @@ public class CfetsTrdConfirmController extends BaseController {
         });
     }
 
+    @ResponseBody
+    @ApiOperation(value = "交易执行-发行失败", notes = "交易执行-发行失败")
+    @PostMapping("issuingFail")
+    public Message<AjaxResult> issuingFail(@RequestBody CfetsTrdConfirmRegInfoListResponse dto) {
+        //对选择的数据进行check
+        AjaxResult ajax = cfetsTrdConfirmService.issuingFailCheckMethod(dto);
+        if (null != ajax && !StringUtil.isEmptyList(ajax.getErrorList())) {
+            return new Message<AjaxResult>().success().setData(ajax);
+        }
+        try {
+            AjaxResult ajaxResult = cfetsTrdConfirmService.issuingFailMethod(dto);
+            if (null != ajaxResult && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
+                return new Message<AjaxResult>().success().setData(ajaxResult);
+            } else {
+                return new Message<AjaxResult>().success().setData(new AjaxResult("发行失败成功"));
+            }
+        } catch (Exception e) {
+            logger.error("交易执行-发行失败数据异常", e);
+            return new Message<AjaxResult>().fail().setMessage("发行失败数据异常");
+        }
+    }
 }

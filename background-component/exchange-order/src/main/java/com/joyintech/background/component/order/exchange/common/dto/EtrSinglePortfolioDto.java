@@ -123,6 +123,16 @@ public class EtrSinglePortfolioDto extends EtrBaseDto {
      *业务模式
      */
     private String businessModel;
+    /**
+     * 投管业务类型
+     */
+    private String busiTypePosition;
+
+    /**
+     * 计价方式
+     */
+    private String priceType;
+
 
     /**
      * Constructor
@@ -474,5 +484,21 @@ public class EtrSinglePortfolioDto extends EtrBaseDto {
 
     public void setBusinessModel(String businessModel) {
         this.businessModel = businessModel;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
+    public String getPriceType() {
+        return priceType;
+    }
+
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
     }
 }

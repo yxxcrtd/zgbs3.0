@@ -20,19 +20,19 @@
         END AS dealPercent,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T4.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
+        decode(T1.PS,'T68',ROUND( nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )/100,'T69',ROUND( nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )/100,ROUND( nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
         END AS finishAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
+        decode(T1.PS,'T68',ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )/100,'T69',ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )/100,ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
         END AS avaNum,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T4.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
+        decode(T1.PS,'T68',ROUND( nvl( T4.ENT_FINISH_AMT, 0 ), 4 )/100,'T69',ROUND( nvl( T4.ENT_FINISH_AMT, 0 ), 4 )/100,ROUND( nvl( T4.ENT_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
         END AS finishDealAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
+        decode(T1.PS,'T68',ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )/100,'T69',ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )/100,ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
         END AS avaDealAmt,
         nvl(detail.PORTFOLIO_ID,T5.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,T5.PORTFOLIO_NAME) portfolioName,
@@ -49,11 +49,12 @@
         ,c1.acctName as dealCurAcctName
         ,T1.PRICE_MODEL priceModel
         ,T2.DEAL_MODE as declaType
-        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}, #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE
-        T1.PRICE END price
+        ,CASE WHEN T1.PS IN (#{PS_03}, #{PS_04}) THEN T1.PRICE * 100
+        WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL
+        ELSE T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
-        ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL ELSE T1.ENTRUST_AMT END entrustAmt
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN round(T1.ENTRUST_NUM/100,2) ELSE T1.ENTRUST_NUM END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -80,6 +81,8 @@
         ,T1.BUSINESS_MODEL businessModel
         ,T1.STOCK_ID
         ,T2.EXP_CON_NUM
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.PRICE * 100  END discountRate
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.ENTRUST_AMT  END standardBondVolume
         FROM
         ETR_ENTRUST T1
         INNER JOIN ETR_ENTRUST_ADD T2 ON
@@ -164,7 +167,7 @@
         END AS finishAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
+        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
         END AS avaNum,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
@@ -172,7 +175,7 @@
         END AS finishDealAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
+        ROUND( nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
         END AS avaDealAmt,
         nvl(detail.PORTFOLIO_ID,T5.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,T5.PORTFOLIO_NAME) portfolioName,
@@ -189,10 +192,12 @@
         ,c1.acctName as dealCurAcctName
         ,T1.PRICE_MODEL priceModel
         ,T2.DEAL_MODE as declaType
-        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}, #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE T1.PRICE END price
+        ,CASE WHEN T1.PS IN (#{PS_03}, #{PS_04}) THEN T1.PRICE * 100
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
-        ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL
+        ELSE T1.PRICE END price
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL ELSE T1.ENTRUST_AMT END entrustAmt
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN round(T1.ENTRUST_NUM/100,2) ELSE T1.ENTRUST_NUM END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -219,6 +224,8 @@
         ,T1.BUSINESS_MODEL businessModel
         ,T1.STOCK_ID
         ,T2.EXP_CON_NUM
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.PRICE * 100  END discountRate
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.ENTRUST_AMT  END standardBondVolume
         FROM
         WFL_ETR_ENTRUST T1
         INNER JOIN WFL_ETR_ENTRUST_ADD T2 ON
@@ -425,6 +432,7 @@
             FIN_PRODUCT FP
         ON
             TEMP.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE FPT ON FPT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN
             PTL_PORTFOLIO PP
         ON
@@ -477,9 +485,20 @@
         ) invaim on invaim.FINPROD_ID=TEMP.FINPROD_ID and invaim.PORTFOLIO_ID=TEMP.PORTFOLIO_ID
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
-        <if test="tradePlat != null and tradePlat !='' and tradePlat==NO_TRADE_BUSINESS_ETR">
-            AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR}
-        </if>
+        <choose>
+            <when test="tradePlat != null and tradePlat !='' and tradePlat== '03'.toString()">
+                AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}  AND FP.TRADE_MARKET=#{TRADE_PLACE_03}   <!-- 可债券、上交所 -->
+            </when>
+            <when test="tradePlat != null and tradePlat != '' and tradePlat == '02'.toString()">
+                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
+            </when>
+            <when test="tradePlat != null and tradePlat != '' and tradePlat == '04'.toString()">
+                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
+            </when>
+            <otherwise>
+                AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR}  <!--  债券 -->
+            </otherwise>
+        </choose>
         <if test="portfolioIdList != null and portfolioIdList.size()>0">
             <foreach collection="portfolioIdList" open="AND TEMP.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
                     #{portfolioId,jdbcType=VARCHAR}
@@ -1347,7 +1366,10 @@
 
     <select id="IsSpeedTOneOrZero" resultType="java.lang.String">
         SELECT
-            decode(fpa.TRADE_PLAT,'03', 'Y', 'N')
+            <!-- modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0】 start -->
+            <!--decode(fpa.TRADE_PLAT,'03', 'Y', 'N') -->
+            fpa.IS_NO_GUARD
+            <!-- modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0】 end -->
         FROM
             fin_product fp
             LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID
@@ -1538,7 +1560,7 @@
         a.FINPROD_ID ,
         a.INV_AIM ,
         a.PS ,
-        a.UNIT_CPRICE AS PRICE,
+        nvl(a.UNIT_CPRICE,0) AS PRICE,
         a.SHARE_AMT AS AMT
         from TRD_PRODUCT_DEAL a
         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
@@ -1568,7 +1590,7 @@
         a.FINPROD_ID ,
         a.INV_AIM ,
         a.PS ,
-        a.UNIT_CPRICE AS PRICE,
+        nvl(a.UNIT_CPRICE,0) AS PRICE,
         a.SHARE_AMT AS AMT
         from TRD_PRODUCT_TEMP_DEAL a
         LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
@@ -1663,7 +1685,14 @@
         LEFT JOIN FIN_PRODUCT ON RSK_ISUP_TRIAL.ASSET_CODE=FIN_PRODUCT.FINPROD_ID
         WHERE RSK_ISUP_TRIAL.TRADE_ID  in (select TRADE_ID from temp) AND RSK_ISUP_TRIAL.SEQ_NO IN (
         SELECT  max(SEQ_NO) FROM RSK_ISUP_TRIAL
-        WHERE RSK_ISUP_TRIAL.TRADE_ID in (select TRADE_ID from temp) group by PORTFOLIO_ID
+        WHERE RSK_ISUP_TRIAL.TRADE_ID in (select TRADE_ID from temp)
+        <if test="portfolioIdList != null and portfolioIdList.size != 0">
+            AND PORTFOLIO_ID IN
+            <foreach collection="portfolioIdList" open="(" item="portfolioId" separator="," close=")">
+                #{portfolioId,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        group by PORTFOLIO_ID
         )
     </select>
 
@@ -1792,6 +1821,102 @@
          where SSAI.TRD_ACCT_ID =#{acctId,jdbcType=VARCHAR} and rownum=1
     </select>
 
+    <!--查询资产是否进行了SPPI测试-->
+    <select id="queryAssetIsSppiTest"  resultType="com.joyintech.tams.common.base.entity.SppiImportData">
+       	select
+	TMP1.bondId   				AS bondId,
+	TMP1.isSppiPass				AS isSppiPass
+ from
+	(
+		select
+				TMP.bondId   				AS bondId,
+				TMP.isSppiPass				AS isSppiPass,
+				ROW_NUMBER() OVER (PARTITION BY TMP.bondId ORDER BY TMP.updateTime DESC) AS RN
+		from
+				(
+						select
+						x.finprod_id bondId,
+						x.test_status isSppiPass,
+						x.UPDATE_TIME updateTime
+					from sppi_test x
+					where x.finprod_id=#{finprodId,jdbcType=VARCHAR}
+						UNION ALL
+						select
+						t.bond_id  bondId,
+						t.is_sppi_pass isSppiPass,
+					  t.UPDATE_TIME updateTime
+              from SPPI_IMPORT_DATA t
+              where t.bond_id=#{finprodId,jdbcType=VARCHAR}
+					)TMP
+	)TMP1	where TMP1.RN=1
+    </select>
 
+    <!--未来是否有行权-->
+    <select id="countBondHasEexrPlan" resultType="java.lang.Integer">
+        select count(1)
+        from FIN_EXERCISE_PLAN
+        where
+            FINPROD_ID = #{finprodId}
+            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE} and EXERCISE_TYPE in ('01','02')
+    </select>
+
+    <!--组合持有资产业务模式查询 -->
+    <select id="selectAllBusModelList" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
+        SELECT DISTINCT
+        BUSINESS_MODEL AS businessModel,
+        PORTFOLIO_ID portfolioId,
+        FINPROD_ID finprodId
+        FROM
+        (
+        SELECT
+        PORTFOLIO_ID,
+        FINPROD_ID,
+        BUSINESS_MODEL
+        FROM
+        (
+        SELECT
+        b.PORTFOLIO_ID,
+        a.FINPROD_ID,
+        a.BUSINESS_MODEL,
+        ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
+        FROM
+        TRD_PRODUCT_DEAL a
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID = b.TRADE_ID
+        WHERE
+        1 = 1
+        AND a.TRADE_DATE <![CDATA[<=]]> to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
+        )
+        WHERE
+        rn = 1 UNION ALL
+        SELECT
+        PORTFOLIO_ID,
+        FINPROD_ID,
+        BUSINESS_MODEL
+        FROM
+        (
+        SELECT
+        b.PORTFOLIO_ID,
+        a.FINPROD_ID,
+        a.BUSINESS_MODEL,
+        ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
+        FROM
+        TRD_PRODUCT_TEMP_DEAL a
+        LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID = b.TRADE_ID
+        WHERE
+        1 = 1
+        AND a.TRADE_DATE = to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
+        )
+        WHERE
+        rn = 1
+        ) TMP
+        WHERE
+        TMP.PORTFOLIO_ID =#{ portfolioId,jdbcType = VARCHAR }
+        AND TMP.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
+    </select>
+
+    <delete id="deleteRskIsupTrial">
+        delete from RSK_ISUP_TRIAL
+        where TRADE_ID = #{entrustId, jdbcType=VARCHAR}
+    </delete>
 
 </mapper>

@@ -240,7 +240,7 @@ public class FinProductValuation001Service extends BaseService<FinProductValuati
 				Map<String, BigDecimal> bondext = finProductValuation001Dao.selectMktprice(dealInfo.getAssetcode(),
 						start, DictCodeList.估值来源_中债登_CBC.getValue());
 				dto.setDuration(bondext == null ? BigDecimal.ZERO : bondext.get("DURATION"));
-				if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dealInfo.getTarget())) {
+				if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(dealInfo.getTarget())) {
 					// 获取T-1日估值信息
 					Map<String, BigDecimal> preValue = finProductValuation001Dao.selectBeforeValue(dealInfo.getPtlid(),
 							dealInfo.getFinprodid(), start);

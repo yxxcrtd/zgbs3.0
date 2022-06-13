@@ -41,7 +41,7 @@ public class SSEFileConverterUtil {
         }
         InterfQuoteShFileBean interfQuoteShFileBean = JSON.parseObject(data, InterfQuoteShFileBean.class);
         // 解析竞价行情
-        String[] records = StrUtil.split(interfQuoteShFileBean.getMktdt(), GlobalConstant.VERTICAL_LINE);
+        String[] records = StringUtil.split(interfQuoteShFileBean.getMktdt(), GlobalConstant.VERTICAL_LINE);
         SSEFileQuote sseFileQuoteBean;
         if (records[0].equals(MDStreamID.FUND.value)) {
             sseFileQuoteBean = setParam(SSEFileFundQuoteBean.class, records);
@@ -52,7 +52,7 @@ public class SSEFileConverterUtil {
             return null;
         }
         // 解析涨跌停价
-        String[] contents = StrUtil.split(interfQuoteShFileBean.getCpxx(), GlobalConstant.VERTICAL_LINE);
+        String[] contents = StringUtil.split(interfQuoteShFileBean.getCpxx(), GlobalConstant.VERTICAL_LINE);
         // 字段相关索引位置按交易所文件固定查询获取
         if (contents.length < 23) {
             logger.warn("记录格式错误，请检查该数据是否合法！！ record [{}]", Arrays.toString(contents));

@@ -39,6 +39,8 @@ public enum DictCodeListNatureGroup implements BaseDictCodeList {
     分组代码_减值计提利息调整类对应科目查询(DictCode.分组代码,"LOSS_LXTZ_KMCX","减值计提利息调整类对应科目查询"),
     分组代码_减值计提减值准备类对应科目查询(DictCode.分组代码,"LOSS_JZZB_KMCX","减值计提减值准备类对应科目查询"),
     分组代码_增值税损益科目查询(DictCode.分组代码,"TAX_LXSR_KMCX","增值税损益科目查询"),
+	分组代码_其他综合收益对应查询科目(DictCode.分组代码,"QTZHSY_KMCX","其他综合收益对应查询科目"),
+
 	;
 	
 	/**  

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.business.common.dao.CfgDataTableMapper">
+
+    <sql id="selectCfgDataTableShow">
+        select PAGECODE,
+               DTCODE,
+               SPCDCODE,
+               COLCODE,
+               COLNAME,
+               DICTCODE,
+               SEQNO,
+               DISPLAYED,
+               FROZEN,
+               SORT,
+               MAXLEN,
+               EXTENDCFG,
+               EFFERANGE,
+               RANGEID,
+               STATUS,
+               REMARK1,
+               REMARK2,
+               REMARK3,
+               ISKEY,
+               IS_HIDE
+        from CFG_DATATABLE_SHOW
+    </sql>
+
+    <insert id="insertCfgDataTableBatch" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="dataTable" index="index">
+            into CFG_DATATABLE_SHOW
+            (PAGECODE,DTCODE,SPCDCODE,COLCODE,COLNAME,DICTCODE,SEQNO,DISPLAYED,FROZEN,SORT,MAXLEN,EXTENDCFG,EFFERANGE,RANGEID,STATUS,REMARK1,REMARK2,REMARK3,ISKEY,IS_HIDE)
+            values(
+            #{dataTable.pageCode ,jdbcType=VARCHAR},
+            #{dataTable.dtCode,jdbcType=VARCHAR},
+            #{dataTable.spcdCode,jdbcType=VARCHAR},
+            #{dataTable.colCode,jdbcType=VARCHAR},
+            #{dataTable.colName,jdbcType=VARCHAR},
+            #{dataTable.dictCode,jdbcType=VARCHAR},
+            #{dataTable.seqNo,jdbcType=INTEGER},
+            #{dataTable.disPlayed,jdbcType=INTEGER},
+            #{dataTable.frozen,jdbcType=INTEGER},
+            #{dataTable.sort,jdbcType=INTEGER},
+            #{dataTable.maxLen,jdbcType=INTEGER},
+            #{dataTable.extendCfg,jdbcType=VARCHAR},
+            #{dataTable.effeRange,jdbcType=INTEGER},
+            #{dataTable.rangeId,jdbcType=VARCHAR},
+            #{dataTable.status,jdbcType=INTEGER},
+            #{dataTable.remark1,jdbcType=INTEGER},
+            #{dataTable.remark2,jdbcType=VARCHAR},
+            #{dataTable.remark3,jdbcType=VARCHAR},
+            #{dataTable.iskey,jdbcType=INTEGER},
+            #{dataTable.isHide,jdbcType=INTEGER}
+            )
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+    <update id="updateCfgDataTableBatch" parameterType="java.util.List">
+        <foreach collection="list" item="dataTable" index="index" open="begin" close=";end;" separator=";">
+            update CFG_DATATABLE_SHOW
+            <set>
+                <if test="dataTable.pageCode !=null and dataTable.pageCode !=''">
+                    PAGECODE = #{dataTable.pageCode ,jdbcType=VARCHAR},
+                </if>
+                <if test="dataTable.dtCode !=null and dataTable.dtCode !=''">
+                    DTCODE = #{dataTable.dtCode,jdbcType=VARCHAR},
+                </if>
+                <if test="dataTable.spcdCode !=null and dataTable.spcdCode !=''">
+                    SPCDCODE = #{dataTable.spcdCode,jdbcType=VARCHAR},
+                </if>
+                <if test="dataTable.colCode !=null and dataTable.colCode !=''">
+                    COLCODE = #{dataTable.colCode,jdbcType=VARCHAR},
+                </if>
+                <if test="dataTable.colName !=null and dataTable.colName !=''">
+                    COLNAME = #{dataTable.colName,jdbcType=VARCHAR},
+                </if>
+                <if test="dataTable.dictCode !=null and dataTable.dictCode !=''">
+                    DICTCODE = #{dataTable.dictCode,jdbcType=VARCHAR},
+                </if>
+                <if test="dataTable.seqNo !=null">
+                    SEQNO=#{dataTable.seqNo,jdbcType=INTEGER},
+                </if>
+                <if test="dataTable.disPlayed !=null">
+                    DISPLAYED = #{dataTable.disPlayed,jdbcType=INTEGER},
+                </if>
+                <if test="dataTable.frozen !=null">
+                    FROZEN = #{dataTable.frozen,jdbcType=INTEGER},
+                </if>
+                <if test="dataTable.sort !=null">
+                    SORT = #{dataTable.sort,jdbcType=INTEGER},
+                </if>
+                <if test="dataTable.maxLen !=null">
+                    MAXLEN = #{dataTable.maxLen,jdbcType=INTEGER},
+                </if>
+                <if test="dataTable.extendCfg !=null and dataTable.extendCfg !=''">
+                    EXTENDCFG = #{dataTable.extendCfg,jdbcType=VARCHAR},
+                </if>
+                <if test="dataTable.effeRange !=null">
+                    EFFERANGE = #{dataTable.effeRange,jdbcType=INTEGER},
+                </if>
+                <if test="dataTable.rangeId !=null and dataTable.rangeId !=''">
+                    RANGEID = #{dataTable.rangeId,jdbcType=VARCHAR},
+                </if>
+                <if test="dataTable.status !=null">
+                    STATUS = #{dataTable.status,jdbcType=INTEGER},
+                </if>
+                <if test="dataTable.remark1 !=null">
+                    REMARK1 = #{dataTable.remark1,jdbcType=INTEGER},
+                </if>
+                <if test="dataTable.remark2 !=null and dataTable.remark2 !=''">
+                    REMARK2 = #{dataTable.remark2,jdbcType=VARCHAR},
+                </if>
+                <if test="dataTable.remark3 !=null and dataTable.remark3 !=''">
+                    REMARK3 = #{dataTable.remark3,jdbcType=VARCHAR}
+                </if>
+                <if test="dataTable.iskey !=null">
+                    SORT = #{dataTable.iskey,jdbcType=INTEGER},
+                </if>
+                <if test="dataTable.isHide !=null">
+                    IS_HIDE = #{dataTable.isHide,jdbcType=VARCHAR},
+                </if>
+            </set>
+            where PAGECODE = #{dataTable.pageCode ,jdbcType=VARCHAR} and
+            DTCODE = #{dataTable.dtCode,jdbcType=VARCHAR} and
+            SPCDCODE = #{dataTable.spcdCode,jdbcType=VARCHAR} and
+            COLCODE = #{dataTable.colCode,jdbcType=VARCHAR} and
+            EFFERANGE = #{dataTable.effeRange,jdbcType=INTEGER} and
+            RANGEID = #{dataTable.rangeId,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+
+    <select id="getCfgDataTableList" resultType="com.joyintech.tams.business.common.entity.CfgDataTableShow">
+
+    </select>
+
+    <select id="getDtCodeByPageCode" parameterType="String" resultType="java.lang.String">
+        select distinct(DTCODE)
+        from CFG_DATATABLE_SHOW
+        where PAGECODE = #{pageCode}
+    </select>
+
+    <select id="getByPageCode" parameterType="String"
+            resultType="com.joyintech.tams.business.common.entity.CfgDataTableShow">
+        <include refid="selectCfgDataTableShow"/>
+        <where>
+            <if test="pageCode != null  and pageCode != ''">and PAGECODE = #{pageCode}</if>
+            <if test="dtCode != null  and dtCode != ''">and DTCODE = #{dtCode}</if>
+            <if test="spcdCode != null  and spcdCode != ''">and SPCDCODE = #{spcdCode}</if>
+            <if test="effeRange != null">and EFFERANGE = #{effeRange}</if>
+            <if test="rangeId != null  and rangeId != ''">and RANGEID = #{rangeId}</if>
+        </where>
+        and STATUS = 1 order by SEQNO
+    </select>
+
+    <select id="getBySpcdCodes" parameterType="String"
+            resultType="com.joyintech.tams.business.common.entity.CfgDataTableShow">
+        <include refid="selectCfgDataTableShow"/>
+        <where>
+            <if test="pageCode != null  and pageCode != ''">and PAGECODE = #{pageCode}</if>
+            <if test="dtCode != null  and dtCode != ''">and DTCODE = #{dtCode}</if>
+            <if test="spcdCodes != null and spcdCodes.size() > 0 ">
+                AND SPCDCODE IN
+                <foreach collection="spcdCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="effeRange != null">and EFFERANGE = #{effeRange}</if>
+            <if test="rangeId != null  and rangeId != ''">and RANGEID = #{rangeId}</if>
+        </where>
+        and STATUS = 1 order by SEQNO
+    </select>
+
+    <select id="getBySpcdCodesshowInvaim" parameterType="String"
+            resultType="com.joyintech.tams.business.common.entity.CfgDataTableShow">
+        <include refid="selectCfgDataTableShow"/>
+        <where>
+            <if test="pageCode != null  and pageCode != ''">and PAGECODE = #{pageCode}</if>
+            <if test="dtCode != null  and dtCode != ''">and DTCODE = #{dtCode}</if>
+            <if test="spcdCodes != null and spcdCodes.size() > 0 ">
+                AND SPCDCODE IN
+                <foreach collection="spcdCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="effeRange != null">and EFFERANGE = #{effeRange}</if>
+            <if test="rangeId != null  and rangeId != ''">and RANGEID = #{rangeId}</if>
+<!--            <if test="showInvaimOrBussinssmodel =='01'  and (pageCode=='EtrExchangeTradeJj' or pageCode=='EtrExchangeTradeFjyywzl001' or pageCode=='EtrExchangeAgreeBond002' or pageCode=='EtrExchangeBlockTrade' or pageCode=='EtrExchangeAgreRepTrade001' or pageCode=='etrExchangeTradeSecRepo')">-->
+<!--                and COLCODE!='businessModelStr'-->
+<!--            </if>-->
+<!--            <if test="showInvaimOrBussinssmodel =='02'  and (pageCode=='EtrExchangeTradeJj' or pageCode=='EtrExchangeTradeFjyywzl001' or pageCode=='EtrExchangeAgreeBond002' or pageCode=='EtrExchangeBlockTrade' or pageCode=='EtrExchangeAgreRepTrade001' or pageCode=='etrExchangeTradeSecRepo')">-->
+<!--                and COLCODE!='invAimStr'-->
+<!--            </if>-->
+        </where>
+        and STATUS = 1 order by SEQNO
+    </select>
+    <select id="getBySpcdCodesByIsHide" parameterType="String"
+                     resultType="com.joyintech.tams.business.common.entity.CfgDataTableShow">
+    <include refid="selectCfgDataTableShow"/>
+    <where>
+        <if test="pageCode != null  and pageCode != ''">and PAGECODE = #{pageCode}</if>
+        <if test="dtCode != null  and dtCode != ''">and DTCODE = #{dtCode}</if>
+        <if test="spcdCodes != null and spcdCodes.size() > 0 ">
+            AND SPCDCODE IN
+            <foreach collection="spcdCodes" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="effeRange != null">and EFFERANGE = #{effeRange}</if>
+        <if test="rangeId != null  and rangeId != ''">and RANGEID = #{rangeId}</if>
+        <if test="isHide != null  and isHide != ''">and IS_HIDE = #{isHide}</if>
+    </where>
+    and STATUS = 1 order by SEQNO
+</select>
+</mapper>

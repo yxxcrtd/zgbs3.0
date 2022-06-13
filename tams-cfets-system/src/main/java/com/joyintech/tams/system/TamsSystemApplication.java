@@ -59,12 +59,12 @@ public class TamsSystemApplication extends WebApplication {
 
 	@Bean
 	public Docket dataBankuplinkDocket() {
-		return SwaggerConfig.createDocket("本币业务交易", "com.joyintech.tams.cfets.bankuplink.bond.controller");
+		return SwaggerConfig.createDocket("本币业务交易", "com.joyintech.tams.cfets.trd.bond.controller");
 	}
 
 	@Bean
 	public Docket dataBankuplinkRepoDocket() {
-		return SwaggerConfig.createDocket("本币业务交易-质押式回购", "com.joyintech.tams.cfets.bankuplink.repo.controller");
+		return SwaggerConfig.createDocket("本币业务交易-质押式回购", "com.joyintech.tams.cfets.trd.repo.controller");
 	}
 
 	@Bean
@@ -93,6 +93,64 @@ public class TamsSystemApplication extends WebApplication {
 	public Docket dataCfetsTrdRedeem() {
 		return SwaggerConfig.createDocket("赎回登记", "com.joyintech.tams.cfets.trdredeem.controller");
 	}
+
+	@Bean
+	public Docket dataAssetInfo() {
+		return SwaggerConfig.createDocket("债券标的", "com.joyintech.tams.business.asset.bond");
+	}
+
+	@Bean
+	public Docket datatenderbond() {
+		return SwaggerConfig.createDocket("新债标的", "com.joyintech.tams.business.asset.tenderbond");
+	}
+
+	@Bean
+	public Docket tenderBond() {
+		return SwaggerConfig.createDocket("一级投标确认", "com.joyintech.tams.cfets.trd.firstbidfirm");
+	}
+
+	@Bean
+	public Docket bondFirstBid() {
+		return SwaggerConfig.createDocket("一级投标指令", "com.joyintech.tams.cfets.etr.bondfirstbid");
+	}
+
+	@Bean
+	public Docket etrBond() {
+		return SwaggerConfig.createDocket("本币业务指令-债券", "com.joyintech.tams.cfets.etr.bond");
+	}
+
+	@Bean
+	public Docket bondMarketInfoQuery() {
+		return SwaggerConfig.createDocket("债券市场信息查询", "com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery");
+	}
+
+
+	@Bean
+	public Docket commonBondMarketInfoQuery() {
+		return SwaggerConfig.createDocket("公共债券信息查询", "com.joyintech.tams.business.common");
+	}
+
+
+	@Bean
+	public Docket listedbondInfoQuery() {
+		return SwaggerConfig.createDocket("待上市债券市场信息查询", "com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery");
+	}
+
+	@Bean
+	public Docket systemBond() {
+		return SwaggerConfig.createDocket("银行间基础信息", "com.joyintech.tams.touguan.basicdata.cfetsbusinesspara");
+	}
+
+	@Bean
+	public Docket primarybidmanage() {
+		return SwaggerConfig.createDocket("中标结果维护", "com.joyintech.tams.cfets.trd.primarybidmanage");
+	}
+
+	@Bean
+	public Docket cfetsEtrInfoQuery() {
+		return SwaggerConfig.createDocket("银行间指令查询", "com.joyintech.tams.cfets.etrinfoquery");
+	}
+
 	public static void main(String[] args) throws Exception {
     	initLog();
     	initSpring(args);

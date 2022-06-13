@@ -4,15 +4,15 @@
         <Row>
             <Cell order="1" name="交易编号">tradeId</Cell>
             <Cell order="2" name="外部成交编号">outTradeId</Cell>
-            <Cell order="3" name="产品代码">finprodId</Cell>
-            <Cell order="4" name="产品名称">finprodName</Cell>
+            <Cell order="3" name="产品代码">prodId</Cell>
+            <Cell order="4" name="产品名称">prodName</Cell>
             <Cell order="5" name="合约类型">contractTypeFmt</Cell>
             <Cell order="6" name="合约标的">targetId</Cell>
             <Cell order="7" name="交易类型">psStr</Cell>
-            <Cell order="8" name="交易日">tradeDate</Cell>
+            <Cell order="8" name="交易日">tradeDateStr</Cell>
             <Cell order="9" name="期限">term</Cell>
-            <Cell order="10" name="起息日">vdate</Cell>
-            <Cell order="11" name="到期日">mdate</Cell>
+            <Cell order="10" name="起息日">vdateStr</Cell>
+            <Cell order="11" name="到期日">mdateStr</Cell>
             <Cell order="12" name="交易对手">counterId</Cell>
             <Cell order="13" name="名义本金">nomCapiStr</Cell>
             <Cell order="14" name="期权费">optFeeStr</Cell>

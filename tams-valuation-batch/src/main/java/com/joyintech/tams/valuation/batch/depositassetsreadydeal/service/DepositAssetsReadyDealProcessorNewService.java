@@ -201,15 +201,15 @@ public class DepositAssetsReadyDealProcessorNewService {
         searchDao.setBookDate(acctEntity.getBookDate());
         List<SubjectBalance> listSubjectBalance = null;
         //2.4.其他应收款本金余额
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
-        glb_qtyskbjsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
+//        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//        glb_qtyskbjsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         //2.5.其他应收款利息余额
         searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue())));
         glb_qtysklxsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         //2.6. 逾期利息余额查询
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue())));
         glb_qilxsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         /**add by wujie on 20201031 end**/
@@ -423,6 +423,9 @@ public class DepositAssetsReadyDealProcessorNewService {
                 ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
                 ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
 
+                // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+                ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+                // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
                 // 记账凭证生成
                 BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
                 // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -532,7 +535,7 @@ public class DepositAssetsReadyDealProcessorNewService {
                 Map<String, Map<String, Object>> accountNatrueMap = new HashMap<>();
                 Map<String, Object> accountNatrueBranchMap = new HashMap<>();
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(), accountNatrueBranchMap);
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), accountNatrueBranchMap);
                 ad.setAccountNatrueMap(accountNatrueMap);
                 // 发生数量->冲减数量
                 accountSceneMap.put(BookConstant.HAPPEN_NUMBER, cjNum);
@@ -552,7 +555,7 @@ public class DepositAssetsReadyDealProcessorNewService {
                     searchDao.setBookDate(acctEntity.getBookDate());
                     searchDao.setTaskPri(dealNow.getTaskPri());
                     searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                        Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+                        Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
                     searchDao.setBranch(dealNow.getBranch());
                     listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
                         searchDao, DictCodeList.余额方向_借方.getValue());
@@ -607,7 +610,9 @@ public class DepositAssetsReadyDealProcessorNewService {
                 ad.setAccountSceneMap(accountSceneMap);// 记账场景要素
                 ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
                 ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
-
+                // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+                ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+                // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
                 // 记账凭证生成
                 BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
                 // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中

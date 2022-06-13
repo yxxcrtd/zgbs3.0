@@ -99,12 +99,22 @@
     </select>
 
     <select id="findLogDetail" resultType="com.joyintech.tams.valuation.system.log.dto.ValBatchLog001Dto">
-        SELECT B.TASK_NAME,
+       SELECT
+            A.SEQ_NO,
+            B.TASK_NAME,
             to_char(A.EXECUTE_DATE, 'yyyy-MM-dd') batchDate,
             A.TASK_STATUS,
-            C.LOG_INFO
+            C.LOG_INFO,
+            D.BOOKSET_ID,
+            D.FINPROD_ID,
+            D.BUSI_ID,
+            D.RESULT_INFO,
+            D.DETAIL_EX,
+            D.FILE_PATH,
+            D.EXE_SEQNO
         FROM SYS_BATCH_EXEC_INFO A LEFT JOIN SYS_BATCH_TASK B ON A.TASK_ID = B.TASK_ID
         LEFT JOIN SYS_BATCH_EXEC_LOG C ON A.SEQ_NO = C.SEQ_NO
+        LEFT JOIN SYS_BATCH_DETAIL_LOG D ON A.SEQ_NO = D.EXE_SEQNO
         WHERE A.SEQ_NO = #{logSeqNo}
     </select>
     

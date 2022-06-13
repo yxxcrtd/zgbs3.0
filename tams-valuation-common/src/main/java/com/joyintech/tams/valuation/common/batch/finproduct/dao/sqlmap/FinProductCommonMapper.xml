@@ -60,7 +60,8 @@
 			c.TYPE_18 AS type18, /**分类18,证券代码**/
 			a.REGIST_ORG registOrg, /**登记托管机构**/
 			/** add by yanya on 20201217 增加是否其他债券的查询 **/
-			NVL(b.IS_QTZQ, 'N') isQtzq /**是否其他债券**/
+			/**NVL(b.IS_QTZQ, 'N') isQtzq 是否其他债券**/
+			'N' AS isQtzq /**不走其他债权场景**/
 			FROM
 			FIN_PRODUCT a
 			left join FIN_PRODUCT ofpd on ofpd.finprod_id = a.finprod_id
@@ -126,7 +127,8 @@
 				c.TYPE_18 AS type18, /**分类18,证券代码**/
 				null registOrg, /**登记托管机构**/
 			   /** add by yanya on 20201217 增加是否其他债券的查询 **/
-			   NVL(b.IS_QTZQ, 'N') isQtzq /**是否其他债券**/
+				/**NVL(b.IS_QTZQ, 'N') isQtzq 是否其他债券**/
+				'N' AS isQtzq /**不走其他债权场景**/
 		    FROM
 		    FIN_trade_PRODUCT a
 		    LEFT JOIN FIN_PRODUCT_ADD b ON a.finprod_id =
@@ -713,6 +715,7 @@
 		vsd.SEC_DETAIL_TYPE AS secDetailType,
 		vsd.INV_AIM AS invAim,
 		vsd.VALUATION_METHOD AS valuationMethod,
+		vsd.VALUATION_ID as valuationId,
 		vsd.VALUATION_PRICE AS valuationPrice,
 		vsd.VALUATION_PRICE_2 AS valuationPrice2,
 		vsd.QUOTA_DIGIT AS quotaDigit,
@@ -1522,6 +1525,26 @@ AND	fin.BRANCH = 0
 	<select id="getfinprodType2" resultType="java.lang.String">
 		select finprod_type2  from fin_cash_plan where finprod_id = #{finprodId}
 		and rownum=1
+	</select>
+
+
+	<select id="getMarketPriceForIrs" resultType="com.joyintech.tams.common.base.entity.MstValIrs"
+			parameterType="java.util.Map">
+		SELECT VAL_DATE valDate,
+		       VALUATION valuation,
+		       CCY ccy,
+			   DATASOURCE_TYPE datasourceType,
+			   VALMODEL_ID valmodelId
+		FROM MST_VAL_IRS mvi
+		WHERE mvi.FINPROD_ID2 = #{finprodId}
+		   AND mvi.VAL_DATE <![CDATA[<=]]> #{happenDate}
+		<if test="datasourceType != null and datasourceType !='' ">
+			and mvi.DATASOURCE_TYPE = #{datasourceType}
+		</if>
+		<if test="valmodelId != null and valmodelId !='' ">
+			and mvi.VALMODEL_ID = #{valmodelId}
+		</if>
+		ORDER BY VAL_DATE DESC
 	</select>
 
 </mapper>

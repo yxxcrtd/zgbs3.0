@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.common.bean;
 
+import com.google.common.base.MoreObjects;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -51,7 +52,7 @@ public class MinTrdUnitLimit implements Serializable {
     private String minNumUnit;
 
     @ApiModelProperty(required = false, name = "maxNum", value = "最大交易数量")
-    private Integer maxNum = 0;
+    private Long maxNum = 0L;
 
     @ApiModelProperty(required = false, name = "maxNumUnit", value = "最大交易数量单位")
     private String maxNumUnit;
@@ -63,7 +64,7 @@ public class MinTrdUnitLimit implements Serializable {
     private String minNumMarketUnit;
 
     @ApiModelProperty(required = false, name = "maxNumMarket", value = "最大交易数量（市价）")
-    private Integer maxNumMarket = 0;
+    private Long maxNumMarket = 0L;
 
     @ApiModelProperty(required = false, name = "maxNumMarketUnit", value = "最大交易数量单位（市价）")
     private String maxNumMarketUnit;
@@ -178,11 +179,11 @@ public class MinTrdUnitLimit implements Serializable {
         this.minNumUnit = minNumUnit;
     }
 
-    public Integer getMaxNum() {
+    public Long getMaxNum() {
         return maxNum;
     }
 
-    public void setMaxNum(Integer maxNum) {
+    public void setMaxNum(Long maxNum) {
         this.maxNum = maxNum;
     }
 
@@ -210,11 +211,11 @@ public class MinTrdUnitLimit implements Serializable {
         this.minNumMarketUnit = minNumMarketUnit;
     }
 
-    public Integer getMaxNumMarket() {
+    public Long getMaxNumMarket() {
         return maxNumMarket;
     }
 
-    public void setMaxNumMarket(Integer maxNumMarket) {
+    public void setMaxNumMarket(Long maxNumMarket) {
         this.maxNumMarket = maxNumMarket;
     }
 
@@ -240,5 +241,32 @@ public class MinTrdUnitLimit implements Serializable {
 
     public void setMarket(String market) {
         this.market = market;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("tradeMarket", tradeMarket)
+                .add("tradePlat", tradePlat)
+                .add("assetType", assetType)
+                .add("assetType1", assetType1)
+                .add("assetType2", assetType2)
+                .add("ps", ps)
+                .add("marketType", marketType)
+                .add("minStep", minStep)
+                .add("minStepUnit", minStepUnit)
+                .add("minAmt", minAmt)
+                .add("maxAmt", maxAmt)
+                .add("minNum", minNum)
+                .add("minNumUnit", minNumUnit)
+                .add("maxNum", maxNum)
+                .add("maxNumUnit", maxNumUnit)
+                .add("minNumMarket", minNumMarket)
+                .add("minNumMarketUnit", minNumMarketUnit)
+                .add("maxNumMarket", maxNumMarket)
+                .add("maxNumMarketUnit", maxNumMarketUnit)
+                .add("effDate", effDate)
+                .add("market", market)
+                .toString();
     }
 }

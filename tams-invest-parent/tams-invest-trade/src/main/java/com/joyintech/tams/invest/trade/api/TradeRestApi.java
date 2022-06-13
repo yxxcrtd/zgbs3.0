@@ -140,6 +140,9 @@ public class TradeRestApi {
                 if (finProductTradeDto.getBaseTradeProductDealDtos() != null && finProductTradeDto.getBaseTradeProductDealDtos().size() > 0) {
                 	for (int index = 0; index < finProductTradeDto.getBaseTradeProductDealDtos().size(); index++) {
                         TrdProductDeal trdProductDeal = finProductTradeDto.getBaseTradeProductDealDtos().get(index).getTrdProductDeal();
+                        if(null == trdProductDeal){
+                            continue;
+                        }
                         // 可转债申购确认需要设置申购类型为普通申购
                         if (StringUtil.equals(trdProductDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
                 			&& StringUtil.equals(trdProductDeal.getPs(), DictCodeList.交易方向_申购确认.getValue())) {

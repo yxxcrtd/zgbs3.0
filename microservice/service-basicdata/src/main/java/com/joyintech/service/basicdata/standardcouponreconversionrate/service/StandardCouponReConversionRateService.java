@@ -13,11 +13,13 @@ import com.joyintech.service.basicdata.standardcouponreconversionrate.dao.BasicS
 import com.joyintech.service.basicdata.standardcouponreconversionrate.dto.StandardCouponReConversionRateDto;
 import com.joyintech.tams.common.base.dao.StdBondMoreConvrateInfoMapper;
 import com.joyintech.tams.common.base.entity.StdBondMoreConvrateInfo;
+import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,6 +87,20 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
         return basicStandardCouponReConversionRateMapper.getList(dto);
     }
 
+    public List<StandardCouponReConversionRateDto> getBokerList(StandardCouponReConversionRateDto dto){
+        return basicStandardCouponReConversionRateMapper.getBokerList(dto);
+    }
+
+    public List<WflValidInputParameter> getBusinessData(WflValidInputParameter dto){
+        List<String> list = basicStandardCouponReConversionRateMapper.getBusinessData(dto);
+        if (CollectionUtils.isNotEmpty(list)) {
+            List<WflValidInputParameter> result = new ArrayList<>();
+            result.add(new WflValidInputParameter());
+            return result;
+        }
+        return new ArrayList<>();
+    }
+
     /**
      * 删除操作
      */
@@ -105,6 +121,9 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
      */
     public int insert(StandardCouponReConversionRateDto dto) {
         dto.setMoreConvrate(new BigDecimal(dto.getTandardRate()).divide(new BigDecimal("100")));
+        if(StringUtils.isNotEmpty(dto.getAccountType())&&StringUtils.isEmpty(dto.getAcctNo())){
+            dto.setAcctNo(dto.getAccountType());
+        }
         return stdBondMoreConvrateInfoMapper.insertSelective(dto);
     }
 
@@ -214,7 +233,7 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
                     dto1.setStartDate(startDate);
                     StandardCouponReConversionRateDto checkdto = basicStandardCouponReConversionRateMapper.selectByPrimaryKey(dto1);
                     if(checkdto != null){
-                        ValidMessage validMessage = new ValidMessage((i+2)+"行记录已存在，请检查！");
+                        ValidMessage validMessage = new ValidMessage((i+2)+"记录已存在，是否覆盖！");
                         errorList.add(validMessage);
                     }
                 }
@@ -312,6 +331,13 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
                 if(StringUtil.isEmpty(result)){
                     flag = false;
                     message.add("券商不存在");
+                } else {
+                    param.put("brokerId", result);
+                    String accountType = basicStandardCouponReConversionRateMapper.checkAccountTypeInfo(param);
+                    if(StringUtil.isNotEmpty(accountType)){
+                        flag = false;
+                        message.add("已维护整体再折算率，无法按单个资产维护");
+                    }
                 }
             }
             //资产代码
@@ -328,6 +354,8 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
                     flag = false;
                     message.add("资产代码有误");
                 }
+
+
             }
             if(list.get(3) == null || list.get(3).trim().equals("")){
                 flag = false;

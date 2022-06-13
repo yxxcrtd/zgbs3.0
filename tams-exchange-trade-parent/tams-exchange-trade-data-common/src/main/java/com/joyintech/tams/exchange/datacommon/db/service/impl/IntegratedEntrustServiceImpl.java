@@ -10,7 +10,7 @@ import com.joyintech.tams.exchange.common.bean.EntrustQryBean;
 import com.joyintech.tams.exchange.common.bean.EntrustQueryBean;
 import com.joyintech.tams.exchange.common.constant.EntrustStatus;
 import com.joyintech.tams.exchange.common.constant.EntrustType;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrustExample;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
@@ -101,7 +101,7 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
                 IntegratedEntrust entrust = e.getValue();
                 if (!EntrustType.CANCEL.value.equals(entrust.getEntrustType())
                         && statusList.contains(String.valueOf(entrust.getEntrustStatus()))
-                        && ptlAuthList.contains(entrust.getPortfolioId())) {
+                        /*&& ptlAuthList.contains(entrust.getPortfolioId())*/) {
                     entrustList.add(entrust);
                 }
             }
@@ -170,7 +170,7 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
         EntrustQryBean entrustQryBean = new EntrustQryBean(userId, accountId, "", portfolioId, market, stockCode, entrustProp, entrustStatus, EntrustType.CANCEL.value, ptlAuthList);
         List<IntegratedEntrust> integratedEntrustList = integratedEntrustMapper.selectEntrustsPageInfo(entrustQryBean);
         integratedEntrustList.forEach(integratedEntrust -> {
-            if (InvestmentAssetType.isFutures(integratedEntrust.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(integratedEntrust.getAssetType())) {
                 integratedEntrust.setStockCode(StockCodeUtils.getStockCode(integratedEntrust.getStockCode()));
             }
         });
@@ -193,7 +193,7 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
         EntrustQryBean entrustQryBean = new EntrustQryBean(userId, accountId, "", portfolioId, market, stockCode, entrustProp, entrustStatus, EntrustType.CANCEL.value, ptlAuthList);
         List<EntrustQueryBean> entrustQueryBeanList = integratedEntrustMapper.selectEntrustsByPage(entrustQryBean);
         entrustQueryBeanList.forEach(entrustQueryBean -> {
-            if (InvestmentAssetType.isFutures(entrustQueryBean.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(entrustQueryBean.getAssetType())) {
                 entrustQueryBean.setStockCode(StockCodeUtils.getStockCode(entrustQueryBean.getStockCode()));
             }
             if("EX005".equals(entrustQueryBean.getBusiTypeTg())){

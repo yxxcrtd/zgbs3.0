@@ -244,7 +244,7 @@
         </if>
     </sql>-->
     <!--查询该资产对应的组合分配列表-->
-    <select id="queryCfetsBussCombDisList" parameterType="Map" resultType="com.joyintech.tams.cfets.bankuplink.bond.dto.PtlAllocationDto">
+    <select id="queryCfetsBussCombDisList" parameterType="Map" resultType="com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto">
         select
         p.portfolio_id as portfolioId,
         pp.portfolio_name as portfolioName,

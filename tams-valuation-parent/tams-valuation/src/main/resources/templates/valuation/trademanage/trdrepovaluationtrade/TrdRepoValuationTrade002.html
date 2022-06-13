@@ -19,9 +19,9 @@
                                            data-th-text="#{TrdRepoValuationTrade002.tradeId}">交易编号</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" class="layui-input form-input" id="tradeId"
-                                               name="tradeId" placeholder="请输入内容"
-                                               data-th-placeholder="#{SysCommon.placeholder}" required="required" disabled="disabled"
-                                               data-th-value="${entity?.tradeId?:12345}" maxlength="60">
+                                               name="tradeId" placeholder="自动生成"
+                                               disabled="disabled"
+                                               data-th-value="${entity?.tradeId}" maxlength="60">
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
@@ -40,7 +40,7 @@
                                         <select id="portfolioId" name="portfolioId" th:initValue="${entity?.portfolioId}"
                                                 class="layui-input form-input input-select available"
                                                 data-th-placeholder="#{SysCommon.placeholder}" required
-                                                data-th-data-url="@{/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001/findPortfolioId}">
+                                                data-th-data-url="@{/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001/getFinprodId}">
                                         </select>
                                     </div>
                                 </div>
@@ -132,8 +132,8 @@
                             </div>
 
                             <div class="layui-form-item">
-                                <div class="layui-inline layui-col-md4  layui-col-sm4 layui-col-lg4">
-                                    <label class="layui-form-label form-lable">交易对手</label>
+                                <div class="form-inline-wrap">
+                                    <label class="layui-form-label form-label-wrap">交易对手</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="counterId" name="counterId"
                                                 class="layui-input form-input input-select"
@@ -142,6 +142,16 @@
                                                 data-th-data-url="@{/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/getCounterId}"
                                                 data-th-initvalue="${entity?.counterId}">
                                         </select>
+                                    </div>
+                                </div>
+                                <div class="form-inline-wrap" id="repoTypeDiv">
+                                    <label class="layui-form-label form-label-wrap">回购类型</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <select required type="text" id="repoType" name="repoType"
+                                                class="layui-input form-input input-select"
+                                                placeholder="请输入内容" th:required="required" th:placeholder="#{SysCommon.placeholder}"
+                                                th:data-result='${TARGET_BACK_TYPE}' allowClear="true" formatoption="true"
+                                                th:initValue="${entity?.repoType}"></select>
                                     </div>
                                 </div>
                             </div>
@@ -180,7 +190,7 @@
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap" data-th-text="#{TrdDepositValuationTrade002.ccy}">币种</label>
+                                    <label class="layui-form-label form-label-wrap">币种</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="ccy" name="ccy"
                                                 data-th-data-result="${CCY}"
@@ -246,14 +256,6 @@
                                                placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
                                     </div>
                                 </div>
-                                <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap">其他费用</label>
-                                    <div class="layui-input-inline input-inline">
-                                        <input type="text" th:id="otherAmt" th:name="otherAmt" required th:value="${entity?.otherAmt?:0}" maxlength="28"
-                                               data-textrange="2" data-fixtype="2" class="layui-input form-input text-number"
-                                               placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -276,9 +278,10 @@
                                     <label class="layui-form-label form-lable" >资金账户</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select" parentIds="portfolioId"
-                                                th:data-url="@{/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/getTrdAcctId}"
+                                                th:data-url="@{/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/getTrdAcctId}"
                                                 allowClear="true" placeholder="请输入内容" required="required"
-                                                data-th-placeholder="#{SysCommon.placeholder}">
+                                                data-th-placeholder="#{SysCommon.placeholder}"
+                                                data-th-initvalue="${entity?.trdAcctId}">
                                         </select>
                                     </div>
                                 </div>

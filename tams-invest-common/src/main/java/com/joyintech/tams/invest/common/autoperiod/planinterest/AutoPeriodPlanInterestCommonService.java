@@ -110,6 +110,13 @@ public class AutoPeriodPlanInterestCommonService extends BaseService {
             baseTradeInfoDto.getTrdFinProductDealTotal().setFpriceAmt(
                 baseTradeInfoDto.getTrdFinProductDealTotal().getTradeAmt());
 
+            // add by 王声之 20220601 start
+            // 3.0.6场内 ZGCPCN-1014: 计划类利率型存续期画面，付息或还本或到期，点确认，提交提示系统异常
+            for (BussTrdTransferOrderDto tempOrderDto : stlPayOrdersList) {
+                tempOrderDto.setInvAim(finAssetIntInfo.getInvAim());
+            }
+            // add by 王声之 20220601 end
+
             StlPayOrders stl = autoPeriodCommonService.gen划款指令流程(stlPayOrdersList,
                 baseTradeInfoDto.getTrdFinProductDealTotal(), entity.getWorkflowId());
             baseTradeInfoDto.getTrdFinProductDealTotal().setFpriceAmt(fPriceAmt);

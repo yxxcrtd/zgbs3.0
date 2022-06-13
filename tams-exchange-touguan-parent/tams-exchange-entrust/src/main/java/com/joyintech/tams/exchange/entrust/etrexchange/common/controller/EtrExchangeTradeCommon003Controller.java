@@ -126,6 +126,9 @@ public class EtrExchangeTradeCommon003Controller extends BaseController{
                 }else if(StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())
                         &&item.getDealPercent()!=null && BigDecimal.ZERO.compareTo(item.getDealPercent())<0){
                     errList.add(new ValidMessage(item.getEntrustStatusString()+"成交进度大于0的指令不允许关闭!"));
+                }else if(StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())
+                        &&item.getImplementPercent()!=null && BigDecimal.ZERO.compareTo(item.getImplementPercent())<0){
+                    errList.add(new ValidMessage(item.getEntrustStatusString()+"执行进度大于0的指令不允许关闭!"));
                 }
                 wflValidInputParameter.setBusinessDataPk1(item.getEntrustId());
                 if (WorkFlowUtil.isNotFromToDoList() && mstWorkflowCommonService.isInWflProcess(wflValidInputParameter)) {

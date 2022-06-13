@@ -7,13 +7,16 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.service.entrust.etrconbond.controller;
 
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.common.service.WFlowCommonService;
@@ -22,9 +25,21 @@ import com.joyintech.service.entrust.etrconbond.service.EtrConBondService;
 import com.joyintech.service.entrust.etrconbond.service.PositionRequestEtrConBondService;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +48,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
+
 /**
  * 可转债委托
+ *
  * @author gejiaao
  * @version 1.0 2019年10月24日
  * @see EtrConBondController
@@ -43,7 +62,9 @@ import java.util.Map;
 @RestController("EtrConBondCtr_dtx")
 @RequestMapping("/EtrConBond")
 public class EtrConBondController {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(EtrConBondController.class);
+
     @Autowired
     private EtrConBondService service;
 
@@ -52,14 +73,33 @@ public class EtrConBondController {
 
     @Autowired
     private SysWflBusinessListMapper sysWflBusinessListMapper;
-    
+
+    @Autowired
+    private EtrEntrustBackupMapper etrEntrustBackupMapper;
+
+    @Autowired
+    private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    @Autowired
+    private WflEtrEntrustAddMapper wflEtrEntrustAddMapper;
+
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
+    @Autowired
+    private WflEtrEntrustMapper wflEtrEntrustMapper;
+
+    public static final String OPERATE_TYPE_SAVE = "save";
+    public static final String OPERATE_TYPE_SUBMIT = "submit";
+    public static final String OPERATE_TYPE_MODIFY = "modify";
+
     /**
-     * 
      * 检索分页数据。返回类型是Service的泛型。
      * <功能详细描述>
+     *
      * @param pageParam int
-     * @param page int
-     * @param length int
+     * @param page      int
+     * @param length    int
      * @return Page<EtrFundDto>
      * @throws Exception Exception
      * @see
@@ -68,24 +108,26 @@ public class EtrConBondController {
     @PostMapping("/findPage/{page}/{length}")
     public Page<EtrConBondDto> selectForPage(@RequestBody Map<String, Object> pageParam, @PathVariable("page") int page,
                                              @PathVariable("length") int length) {
-        return service.selectForPage(page,length,pageParam);
+        return service.selectForPage(page, length, pageParam);
     }
 
     /**
      * 获取资产代码联想文本框信息
-     * @return 
+     *
+     * @return
      * @throws Exception
      * @see
      * @since 1.0
      */
     @RequestMapping("getFinprodId/{page}/{length}")
     public Page<SelectOptionDto> getFinprodId(@RequestBody Map<String, Object> param,
-                                              @PathVariable("page") int page, @PathVariable("length") int length)
-    {
+                                              @PathVariable("page") int page, @PathVariable("length") int length) {
         return service.getFinprodId(page, length, param);
     }
+
     /**
      * 获取新建界面的资产代码联想下拉框框
+     *
      * @param
      * @return
      * @throws Exception
@@ -93,44 +135,49 @@ public class EtrConBondController {
      * @since 1.0
      */
     @PostMapping("getFinprodIdForAdd/{page}/{length}")
-    public Page<SelectOptionDto> getFinprodIdForAdd(@RequestBody Map<String, Object> param,@PathVariable("page") int page,
-                                                    @PathVariable("length") int length)
-    {
-        return service.getFinprodIdForAdd(page,length,param);
+    public Page<SelectOptionDto> getFinprodIdForAdd(@RequestBody Map<String, Object> param, @PathVariable("page") int page,
+                                                    @PathVariable("length") int length) {
+        return service.getFinprodIdForAdd(page, length, param);
     }
-    
+
     /**
      * 操作前校验
      * <功能详细描述>
+     *
      * @param dto
      * @return
      * @see
      * @since 1.0
      */
     @PostMapping("check")
-    public List<ValidMessage> check(@RequestBody EtrConBondDto dto){
+    public List<ValidMessage> check(@RequestBody EtrConBondDto dto) {
         return service.check(dto);
     }
+
     /**
-     * 撤回委托 
+     * 撤回委托
      * <功能详细描述>
+     *
      * @param dto 实体类
      * @return boolean
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      * @see
      * @since 1.0
      */
     @Transactional
     @DTXTransaction
     @PostMapping("recall")
-    public boolean recallDelegate(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException{
+    public boolean recallDelegate(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException {
+        log.info("recall() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
         boolean result = service.recallDelegate(dto);
-        positionRequestService.sendRevoke(dto);
+        //positionRequestService.sendRevoke(dto);
         return result;
     }
+
     /**
      * 关闭委托
+     *
      * @param
      * @return
      * @see
@@ -139,13 +186,16 @@ public class EtrConBondController {
     @Transactional
     @DTXTransaction
     @GetMapping("close")
-    public boolean closeDelegate(String entrustId,String closeWay) {
+    public boolean closeDelegate(String entrustId, String closeWay) {
+        log.info("close() called with parameters => 【entrustId = {}】", entrustId);
         boolean result = service.closeDelegate(entrustId, closeWay);
         positionRequestService.sendClose(entrustId, closeWay);
         return result;
     }
+
     /**
      * 通过主键查询数据
+     *
      * @param entrustId
      * @return
      * @see
@@ -155,19 +205,21 @@ public class EtrConBondController {
     public EtrConBondDto selectByKey(String entrustId) {
         return service.selectByKey(entrustId);
     }
+
     /**
      * 工作流完成方法
      * <功能详细描述>
+     *
      * @param
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      * @see
      * @since 1.0
      */
     @Transactional
     @DTXTransaction
     @PostMapping("doComplete")
-    public void doComplete(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException{
+    public void doComplete(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException {
         WFlowCommonService.doCompleteFlow(dto.getWorkflowId());
         service.doComplete(dto, dto.getOperateType());
     }
@@ -175,50 +227,153 @@ public class EtrConBondController {
     @Transactional
     @DTXTransaction
     @PostMapping("doInsert")
-    public void doInsert(@RequestBody EtrConBondDto dto){
-        WFlowCommonService.doInsertFlow(dto.getOperateType(), service.initBaseDto(dto));
-        service.doInsert(dto, dto.getOperateType());
+    public void doInsert(@RequestBody EtrConBondDto dto) {
+        log.info("doInsert() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
 
+        String operateType = dto.getOperateType();
+        WFlowCommonService.doInsertFlow(operateType, service.initBaseDto(dto));
+        service.doInsert(dto, operateType);
+
+        //保存不处理
+        if (StringUtil.equals(OPERATE_TYPE_SAVE, operateType)) {
+            return;
+        }
         String decisionAct = DictCodeListExt3.系统动作_新建.getValue();
         String systemAct = DictCodeListExt3.系统动作_新建.getValue();
-        if (StringUtil.equals(dto.getOperateType(), "modify")) {
+        if (StringUtil.equals(OPERATE_TYPE_MODIFY, operateType)) {
             systemAct = DictCodeListExt3.系统动作_修改.getValue();
         }
-        positionRequestService.sendEtrConBondDto(dto,decisionAct,systemAct);
+        try {
+            positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
+        }catch (PositionException e){
+            WorkFlowUtil.showMessage(e.getMessage(),MessageType.错误消息);
+        }
     }
 
     @Transactional
     @DTXTransaction
     @PostMapping("doUpdate")
-    public void doUpdate(@RequestBody EtrConBondDto dto){
-        WFlowCommonService.doUpdateFlow(dto.getOperateType(), service.initBaseDto(dto));
-        
-        service.doInsert(dto, dto.getOperateType());
+    public void doUpdate(@RequestBody EtrConBondDto dto) {
+        log.info("doUpdate() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
 
-        String decisionAct = DictCodeListExt3.系统动作_新建.getValue();
-        String systemAct = DictCodeListExt3.系统动作_新建.getValue();
-        SysWflBusinessList sysBus=sysWflBusinessListMapper.selectByPrimaryKey(dto.getWorkflowId());
-        if(null!=sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())){
-            decisionAct = DictCodeListExt3.系统动作_修改.getValue();
+        String operateType = dto.getOperateType();
+        WFlowCommonService.doUpdateFlow(operateType, service.initBaseDto(dto));
+
+        service.doInsert(dto, operateType);
+
+//        String decisionAct = DictCodeListExt3.系统动作_新建.getValue();
+//        String systemAct = DictCodeListExt3.系统动作_新建.getValue();
+//        SysWflBusinessList sysBus=sysWflBusinessListMapper.selectByPrimaryKey(dto.getWorkflowId());
+//        if(null!=sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())){
+//            decisionAct = DictCodeListExt3.系统动作_修改.getValue();
+//        }
+//        if (StringUtil.equals(dto.getOperateType(), "modify")) {
+//            systemAct = DictCodeListExt3.系统动作_修改.getValue();
+//        }
+////        dto.setSoftSkipMode("Y");
+//        positionRequestService.sendEtrConBondDto(dto,decisionAct,systemAct);
+
+        //保存不需要处理头寸
+        if (StringUtil.equals(OPERATE_TYPE_SAVE, operateType)) {
+            return;
         }
-        if (StringUtil.equals(dto.getOperateType(), "modify")) {
-            systemAct = DictCodeListExt3.系统动作_修改.getValue();
+        //增加调用头寸引擎代码start
+        String decisionAct = 系统动作_修改.getValue();
+        String systemAct = 系统动作_修改.getValue();
+        EtrEntrust etrEntrust = etrEntrustBackupMapper.selectByPrimaryKey(dto.getEntrustId());
+        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(dto.getWorkflowId());
+        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+            if (etrEntrust == null) {
+                systemAct = 系统动作_新建.getValue();
+                decisionAct = 系统动作_修改.getValue();
+            }
+        } else {
+            if (etrEntrust == null) {
+                systemAct = 系统动作_新建.getValue();
+                decisionAct = 系统动作_新建.getValue();
+            }
         }
-//        dto.setSoftSkipMode("Y");
-        positionRequestService.sendEtrConBondDto(dto,decisionAct,systemAct);
+        if (StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+            dto.setSoftSkipMode("Y");
+        }
+        try {
+            dto.setPositionSeqno(null);
+            positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
+        } catch (PositionException e) {
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            if (StringUtil.isNotBlank(message.getMessage())) {
+                WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+            } else {
+                if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                    BaseMap bm = (BaseMap) message.getData();
+                    StringBuffer messageStr = (StringBuffer) bm.get("message");
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+            }
+        }
+        //增加调用头寸引擎代码end
     }
 
     @Transactional
     @DTXTransaction
     @PostMapping("doBack")
-    public void doBack(@RequestBody EtrConBondDto dto){
+    public void doBack(@RequestBody EtrConBondDto dto) {
+        log.info("doBack() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
+        BaseEtrInvestInfoDto baseEtrInvestInfoDto = new BaseEtrInvestInfoDto();
+        baseEtrInvestInfoDto.setWorkFlowId(dto.getWorkflowId());
+
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustId());
+        if(null == etrEntrust) {
+            etrEntrust = new EtrEntrust();
+            etrEntrust.setEntrustId(dto.getEntrustId());
+            WflEtrEntrustKey key = new WflEtrEntrustKey();
+            key.setEntrustId(dto.getEntrustId());
+            key.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+            WflEtrEntrust wflEtrEntrust = wflEtrEntrustMapper.selectByPrimaryKey(key);
+            if(null != wflEtrEntrust) {
+                BeanUtil.copyPropertiesIgnoreNull(etrEntrust, wflEtrEntrust);
+            }
+        }
+
+        etrEntrust.setEntrustStatus(BussinessDictCodeList.委托状态_已退回.getValue());
+
+        baseEtrInvestInfoDto.setEtrEntrust(etrEntrust);
+
+        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(dto.getEntrustId());
+        if(null == etrEntrustAdd) {
+            etrEntrustAdd = new EtrEntrustAdd();
+            etrEntrustAdd.setEntrustId(dto.getEntrustId());
+            WflEtrEntrustAddKey key = new WflEtrEntrustAddKey();
+            key.setEntrustId(dto.getEntrustId());
+            key.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+            WflEtrEntrustAdd wflEtrEntrustAdd = wflEtrEntrustAddMapper.selectByPrimaryKey(key);
+            if(null != wflEtrEntrustAdd) {
+                BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, wflEtrEntrustAdd);
+            }
+        }
+        baseEtrInvestInfoDto.setEtrEntrustAdd(etrEntrustAdd);
+        WFlowCommonService.inserBackuptWithQuery(baseEtrInvestInfoDto);
         WFlowCommonService.doBackFlow(dto.getWorkflowId(), dto.getEntrustId());
-        positionRequestService.sendDelete(dto);
+        WFlowCommonService.doInsertFlow(dto.getOperateType(),baseEtrInvestInfoDto);
+//        positionRequestService.sendDelete(dto);
     }
+
+    @Transactional
+    @DTXTransaction
+    @PostMapping("doDelete")
+    public void doDelete(@RequestBody Map<String, Object> param) {
+        log.info("doDelete() called with parameters => 【param = {}】", param);
+        final String workflowId = (String) param.get("workflowId");
+        WFlowCommonService.deleteFlow(workflowId);
+        EtrConBondDto entity = new EtrConBondDto();
+        entity.setWorkflowId(workflowId);
+        positionRequestService.sendDelete(entity);
+    }
+
     /**
-     * 
      * 删除投资委托
      * <功能详细描述>
+     *
      * @param entrustId
      * @return
      * @see
@@ -228,13 +383,14 @@ public class EtrConBondController {
     @DTXTransaction
     @GetMapping("delete")
     public boolean deleteDelegate(String entrustId) {
+        log.info("delete() called with parameters => 【entrustId = {}】", entrustId);
         return service.deleteDelegate(entrustId);
     }
 
     /**
-     * 
      * 组合可用现金查询
      * <功能详细描述>
+     *
      * @return
      * @see
      * @since 1.0
@@ -245,8 +401,9 @@ public class EtrConBondController {
     }
 
     /**
-     *验证子组合是否可以申购
+     * 验证子组合是否可以申购
      * <功能详细描述>
+     *
      * @return
      * @see
      * @since 1.0
@@ -259,6 +416,7 @@ public class EtrConBondController {
     /**
      * 获取金融产品信息
      * <功能详细描述>
+     *
      * @return
      * @see
      * @since 1.0

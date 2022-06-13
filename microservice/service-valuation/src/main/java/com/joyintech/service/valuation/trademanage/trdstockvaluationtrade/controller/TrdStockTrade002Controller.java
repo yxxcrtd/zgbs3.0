@@ -12,7 +12,7 @@ package com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.contr
 
 
 import com.joyintech.framework.annotation.DTXTransaction;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade002Dto;
+import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.service.TrdStockTrade002Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +44,7 @@ public class TrdStockTrade002Controller {
      *             异常
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdStockTrade002Dto queryTradeInfoByTradeId(@RequestBody String tradeId) {
+    public TrdStockTradeDto queryTradeInfoByTradeId(@RequestBody String tradeId) {
         return trdStockTrade002Service.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -72,7 +72,7 @@ public class TrdStockTrade002Controller {
     @Transactional
     @DTXTransaction
     @RequestMapping("insert")
-    public int insert(@RequestBody TrdStockTrade002Dto dto)
+    public int insert(@RequestBody TrdStockTradeDto dto)
             throws Exception {
         return trdStockTrade002Service.insert(dto);
     }
@@ -87,7 +87,7 @@ public class TrdStockTrade002Controller {
     @Transactional
     @DTXTransaction
     @RequestMapping("update")
-    public int update(@RequestBody TrdStockTrade002Dto dto)
+    public int update(@RequestBody TrdStockTradeDto dto)
             throws Exception {
         return trdStockTrade002Service.update(dto);
     }

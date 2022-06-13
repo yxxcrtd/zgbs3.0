@@ -1,8 +1,8 @@
 package com.joyintech.tams.cfets.trdredeem.dto;
 
 import com.joyintech.background.component.common.pack.common.base.BaseEntity;
-import com.joyintech.tams.cfets.bankuplink.bond.dto.CounterInfoDto;
-import com.joyintech.tams.cfets.bankuplink.bond.dto.PtlAllocationDto;
+import com.joyintech.tams.cfets.trd.bond.dto.CounterInfoDto;
+import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -3399,7 +3399,7 @@
         </if>
     </sql>
     <select id="findManualSettleInfoOther"
-            resultType="com.joyintech.tams.cfets.cfetsmanualsettle.dto.CfetsManualSettleInfoOtherListRespond">
+            resultType="com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond">
         SELECT
         distinct
         T4.FINPROD_MARKET_ID finprodMarketId,
@@ -3474,7 +3474,7 @@
 
     </select>
     <select id="findPortIntFenPeiInfoList"
-            resultType="com.joyintech.tams.cfets.cfetsmanualsettle.dto.PortIntFenPeiInfoDto">
+            resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
         SELECT ROWNUM rowNums,
         TPDA.PORTFOLIO_ID portfolioId,
         pp.PORTFOLIO_NAME portfolioName,
@@ -3981,7 +3981,7 @@
         AND T1.TRADE_STATUS = #{TRADE_STATUS01}
     </select>
     <select id="findRepoPortIntFenPeiInfoList"
-            resultType="com.joyintech.tams.cfets.cfetsmanualsettle.dto.PortIntFenPeiInfoDto">
+            resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
         SELECT
         TPDA.Entrust_Id entrustId,
         TPDA.PORTFOLIO_ID portfolioId,

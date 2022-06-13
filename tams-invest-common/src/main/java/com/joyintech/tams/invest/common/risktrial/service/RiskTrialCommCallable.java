@@ -200,7 +200,7 @@ public class RiskTrialCommCallable {
 						            tempTradeAmount = inputDto.getTradeAmount().negate();
 						        }
 
-								if(params.get(paramName) != null && params.get(paramName) != null){
+								if(params.get(paramName) != null){
 									params.put(paramName,ArithmeticUtil.doAdd(new BigDecimal(params.get(paramName).toString()), tempTradeAmount));
 								} 
 						    }

@@ -73,7 +73,13 @@ public class HqDetailInfoInfoRecWriter extends InterfBaseWriter<BaseEntity> {
     @Autowired
     ValStockQuotationInfoMapper valStockQuotationInfoMapper;
     /** add by yanya on 20210831 增加股票行情接口 end**/
-    
+
+    /** add by weipeng on 20220429 增加股票流动性折扣信息、指数行情接口 start**/
+    @Autowired
+    ValStockLiquidDiscountInfoBatchMapper valStockLiquidDiscountInfoBatchMapper;
+    @Autowired
+    ValStockIndicatorQuotationBatchMapper valStockIndicatorQuotationBatchMapper;
+    /** add by yanya on 20210831 增加股票行情接口 end**/
     @Value("${interf.properties.maxSqlNum}")
     private int maxSqlNum;
 
@@ -386,6 +392,55 @@ public class HqDetailInfoInfoRecWriter extends InterfBaseWriter<BaseEntity> {
                 }
             }
             /** add by yanya on 20210831 增加股票行情接口 end**/
+
+            /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情 start**/
+            List<MstStockLiquidDiscountInfo> valDiscountInfoList = result.getMstStockLiquidDiscountInfoList();
+            // 入库
+            if (CollectionUtils.isNotEmpty(valDiscountInfoList)) {
+                // 定义一个固定大小插入存放集合
+                List<MstStockLiquidDiscountInfo> listInsert = new ArrayList<MstStockLiquidDiscountInfo>();
+                for (MstStockLiquidDiscountInfo e : valDiscountInfoList) {
+                    // 小于最大值
+                    if (listInsert.size() < maxSqlNum) {
+                        listInsert.add(e);
+                    }
+                    else if (listInsert.size() >= maxSqlNum) {
+                        valStockLiquidDiscountInfoBatchMapper.deleteBatch(listInsert);
+                        valStockLiquidDiscountInfoBatchMapper.insertBatch(listInsert);
+                        listInsert.clear();
+                        listInsert.add(e);
+                    }
+                }
+                // 如果循环结束，小于最大值
+                if (CollectionUtils.isNotEmpty(listInsert)) {
+                    valStockLiquidDiscountInfoBatchMapper.deleteBatch(listInsert);
+                    valStockLiquidDiscountInfoBatchMapper.insertBatch(listInsert);
+                }
+            }
+            List<MstIndicatorQuotation> valIndicatorInfoList = result.getMstIndicatorQuotationList();
+            // 入库
+            if (CollectionUtils.isNotEmpty(valIndicatorInfoList)) {
+                // 定义一个固定大小插入存放集合
+                List<MstIndicatorQuotation> listInsert = new ArrayList<MstIndicatorQuotation>();
+                for (MstIndicatorQuotation e : valIndicatorInfoList) {
+                    // 小于最大值
+                    if (listInsert.size() < maxSqlNum) {
+                        listInsert.add(e);
+                    }
+                    else if (listInsert.size() >= maxSqlNum) {
+                        valStockIndicatorQuotationBatchMapper.deleteBatch(listInsert);
+                        valStockIndicatorQuotationBatchMapper.insertBatch(listInsert);
+                        listInsert.clear();
+                        listInsert.add(e);
+                    }
+                }
+                // 如果循环结束，小于最大值
+                if (CollectionUtils.isNotEmpty(listInsert)) {
+                    valStockIndicatorQuotationBatchMapper.deleteBatch(listInsert);
+                    valStockIndicatorQuotationBatchMapper.insertBatch(listInsert);
+                }
+            }
+            /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情 end**/
         }
 
     }

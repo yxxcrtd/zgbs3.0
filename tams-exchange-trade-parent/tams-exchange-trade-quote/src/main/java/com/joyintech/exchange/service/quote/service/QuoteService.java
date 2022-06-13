@@ -8,6 +8,7 @@ import com.joyintech.exchange.service.quote.enums.InterfSrcType;
 import com.joyintech.exchange.service.quote.sh.file.utils.SSEFileConverterUtil;
 import com.joyintech.exchange.service.quote.sz.binary.utils.SZSEBinaryConverterUtil;
 import com.joyintech.exchange.service.quote.utils.InterfHttpRequestUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.QuoteDataProto;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
@@ -15,11 +16,11 @@ import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.TickByte;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
+//import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.proto.QuoteProto;
 import com.joyintech.tams.exchange.common.utils.TestConverter;
 import com.joyintech.tams.exchange.common.utils.TickConverter;
-import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
+//import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +32,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.joyintech.tams.constant.DictCodeList.是否_是;
+
 @Component
 public class QuoteService {
     private static final Logger logger = LoggerFactory.getLogger(QuoteService.class);
     private ThreadLocal<QuoteProto.TickBean.Builder> threadLocalBuilder = ThreadLocal.withInitial(QuoteProto.TickBean::newBuilder);
 
+    /**
+     * 是否使用的mock行情
+     */
+    public static final String TRD_USE_MOCK_QUOTE= "TRD_USE_MOCK_QUOTE";
+    /**
+     * 默认MOCK行情资产
+     */
+    public static final String TRD_DEFAULT_MOCK_QUOTE = "TRD_DEFAULT_MOCK_QUOTE";
+
     @Autowired
     private QuoteTickService quoteTickService;
-    @Autowired
-    private FuturesInstrumentService futuresInstrumentService;
+//    @Autowired
+//    private FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private InterfHttpRequestUtil interfHttpRequestUtil;
 
@@ -52,10 +64,10 @@ public class QuoteService {
     public ResultBean getTick(String stockCode) {
         TickBean tickBean = null;
 
-        FuturesInstrument futuresInstrument = futuresInstrumentService.queryByStockCode(stockCode);
-        if (Objects.nonNull(futuresInstrument)) {
-            stockCode = futuresInstrument.getInnerCode();
-        }
+//        FuturesInstrument futuresInstrument = futuresInstrumentService.queryByStockCode(stockCode);
+//        if (Objects.nonNull(futuresInstrument)) {
+//            stockCode = futuresInstrument.getInnerCode();
+//        }
         if (useInterfQuoteFlag) {
             String code = interfHttpRequestUtil.getSimpleStockCode(stockCode);
             String quoteStr = interfHttpRequestUtil.doRequest(code);
@@ -63,7 +75,18 @@ public class QuoteService {
         } else {
             tickBean = TickConverter.convertTick(quoteTickService.findFromRedisById(stockCode));
         }
-
+        if (Objects.isNull(tickBean)) {
+            if (StringUtil.equals(是否_是.getValue(), CacheUtil.getSysParam(TRD_USE_MOCK_QUOTE))) {
+                String defaultMockQuote = CacheUtil.getSysParam(TRD_DEFAULT_MOCK_QUOTE);
+                if (StringUtil.isEmpty(defaultMockQuote)) {
+                    defaultMockQuote = "100303.SZ";
+                }
+                return this.getTick(defaultMockQuote);
+            } else {
+                logger.debug("[行情服务] 获取行情失败");
+                return  new ResultBean(ErrorCode.QUOTATION_NOT_EXIST);
+            }
+        }
         logger.debug("[行情服务] 获取行情：证券代码{}，行情数据{}", stockCode, JSON.toJSONString(tickBean));
         return new ResultBean(ErrorCode.SUCCESS, tickBean);
     }

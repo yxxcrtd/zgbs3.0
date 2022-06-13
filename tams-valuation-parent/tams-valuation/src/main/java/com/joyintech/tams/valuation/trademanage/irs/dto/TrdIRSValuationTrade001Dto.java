@@ -3,6 +3,7 @@ package com.joyintech.tams.valuation.trademanage.irs.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -11,6 +12,7 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdIRSValuationTrade001Dto extends BaseEntity implements ProcessEntity {
@@ -45,17 +47,17 @@ public class TrdIRSValuationTrade001Dto extends BaseEntity implements ProcessEnt
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 起息日
      */
-    private String vdate;
+    private Date vdate;
 
     /**
      * 到期日
      */
-    private String mdate;
+    private Date mdate;
 
     /**
      * 名义本金
@@ -77,7 +79,7 @@ public class TrdIRSValuationTrade001Dto extends BaseEntity implements ProcessEnt
     /**
      * 固定利率首期起息日
      */
-    private String firstPayDateR;
+    private Date firstPayDateR;
 
     /**
      * 挂钩利率
@@ -98,7 +100,7 @@ public class TrdIRSValuationTrade001Dto extends BaseEntity implements ProcessEnt
     /**
      * 浮动利率首期起息日
      */
-    private String firstPayDateF;
+    private Date firstPayDateF;
 
     /**
      * 交易对手
@@ -170,12 +172,16 @@ public class TrdIRSValuationTrade001Dto extends BaseEntity implements ProcessEnt
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
+    }
+
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
     }
 
     public String getCcy() {
@@ -257,20 +263,28 @@ public class TrdIRSValuationTrade001Dto extends BaseEntity implements ProcessEnt
         return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
-    public String getVdate() {
+    public Date getVdate() {
         return vdate;
     }
 
-    public void setVdate(String vdate) {
+    public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
 
-    public String getMdate() {
+    public String getVdateStr() {
+        return DateUtil.format(this.getVdate());
+    }
+
+    public Date getMdate() {
         return mdate;
     }
 
-    public void setMdate(String mdate) {
+    public void setMdate(Date mdate) {
         this.mdate = mdate;
+    }
+
+    public String getMdateStr() {
+        return DateUtil.format(this.getMdate());
     }
 
     public BigDecimal getPrin() {
@@ -297,12 +311,16 @@ public class TrdIRSValuationTrade001Dto extends BaseEntity implements ProcessEnt
         this.fixPayCycle = fixPayCycle;
     }
 
-    public String getFirstPayDateR() {
+    public Date getFirstPayDateR() {
         return firstPayDateR;
     }
 
-    public void setFirstPayDateR(String firstPayDateR) {
+    public void setFirstPayDateR(Date firstPayDateR) {
         this.firstPayDateR = firstPayDateR;
+    }
+
+    public String getFirstPayDateRStr() {
+        return DateUtil.format(this.getFirstPayDateR());
     }
 
     public String getIntType() {
@@ -329,12 +347,16 @@ public class TrdIRSValuationTrade001Dto extends BaseEntity implements ProcessEnt
         this.floatPayCycle = floatPayCycle;
     }
 
-    public String getFirstPayDateF() {
+    public Date getFirstPayDateF() {
         return firstPayDateF;
     }
 
-    public void setFirstPayDateF(String firstPayDateF) {
+    public void setFirstPayDateF(Date firstPayDateF) {
         this.firstPayDateF = firstPayDateF;
+    }
+
+    public String getFirstPayDateFStr() {
+        return DateUtil.format(this.getFirstPayDateF());
     }
 
     public String getCounterId() {

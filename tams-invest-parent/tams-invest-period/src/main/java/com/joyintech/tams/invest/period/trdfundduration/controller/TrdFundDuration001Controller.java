@@ -219,7 +219,7 @@ public class TrdFundDuration001Controller extends BaseController {
         TrdFundDuration001Dto temp = trdFundDuration001Service.findEffectiveData(paramMap);
         paramMap.put("busiCode", dto.getTotleTradeId());
         temp.setBussTrdTransferOrder(periodCommonService.selectPayOrders(temp.getTotleTradeId()));
-        paramMap.put("registDate", DateUtil.format(dto.getRegistDate()));
+        paramMap.put("registDate", DateUtil.format(temp.getRegistDate()));
         temp.setFinAssetIntInfoList(trdFundDuration001Service.findAssetIntInfo(paramMap));
         temp.setBaseTotalTradeInfoDto(trdFundDuration001Service.genFinProductTradeDto(temp));
         //        构建流程参数

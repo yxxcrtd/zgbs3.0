@@ -70,6 +70,7 @@
         <result column="ISSUER_ECONOMIC_TYPE" property="issuerEconomicType" jdbcType="VARCHAR" />
         <result column="ISSUER_DESC" property="issuerDesc" jdbcType="VARCHAR" />
         <result column="ISSUER_INSTITUTIONS" property="issuerInstitutions" jdbcType="VARCHAR" />
+        <result column="IS_NETPRICE" property="isNetprice" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List" >
         SECID SECID, SOURCE SOURCE, SECNAME SECNAME, SECCODE SECCODE, MARKET MARKET, SECFULLNAME SECFULLNAME, 
@@ -89,7 +90,8 @@
         CITY_INVEST_SEC_WIND CITY_INVEST_SEC_WIND, CITY_INVEST_SEC_CBRC CITY_INVEST_SEC_CBRC, 
         ASSET_CLASS ASSET_CLASS, CONCRETE_CLASS CONCRETE_CLASS, CONCRETE_CLASS_SM CONCRETE_CLASS_SM, 
         ISSUER_SCALE_TYPE ISSUER_SCALE_TYPE, ISSUER_TECHNOLOGY_TYPE ISSUER_TECHNOLOGY_TYPE, 
-        ISSUER_ECONOMIC_TYPE ISSUER_ECONOMIC_TYPE, ISSUER_DESC ISSUER_DESC, ISSUER_INSTITUTIONS ISSUER_INSTITUTIONS
+        ISSUER_ECONOMIC_TYPE ISSUER_ECONOMIC_TYPE, ISSUER_DESC ISSUER_DESC, ISSUER_INSTITUTIONS ISSUER_INSTITUTIONS,
+        IS_NETPRICE IS_NETPRICE
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -137,7 +139,8 @@
             CITY_INVEST_SEC_WIND, CITY_INVEST_SEC_CBRC, 
             ASSET_CLASS, CONCRETE_CLASS, CONCRETE_CLASS_SM, 
             ISSUER_SCALE_TYPE, ISSUER_TECHNOLOGY_TYPE, 
-            ISSUER_ECONOMIC_TYPE, ISSUER_DESC, ISSUER_INSTITUTIONS
+            ISSUER_ECONOMIC_TYPE, ISSUER_DESC, ISSUER_INSTITUTIONS,
+            IS_NETPRICE
             )
         values (#{secid,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, #{secname,jdbcType=VARCHAR}, 
             #{seccode,jdbcType=VARCHAR}, #{market,jdbcType=CHAR}, #{secfullname,jdbcType=VARCHAR}, 
@@ -162,7 +165,8 @@
             #{cityInvestSecWind,jdbcType=VARCHAR}, #{cityInvestSecCbrc,jdbcType=VARCHAR}, 
             #{assetClass,jdbcType=VARCHAR}, #{concreteClass,jdbcType=VARCHAR}, #{concreteClassSm,jdbcType=VARCHAR}, 
             #{issuerScaleType,jdbcType=VARCHAR}, #{issuerTechnologyType,jdbcType=VARCHAR}, 
-            #{issuerEconomicType,jdbcType=VARCHAR}, #{issuerDesc,jdbcType=VARCHAR}, #{issuerInstitutions,jdbcType=VARCHAR}
+            #{issuerEconomicType,jdbcType=VARCHAR}, #{issuerDesc,jdbcType=VARCHAR}, #{issuerInstitutions,jdbcType=VARCHAR},
+            #{isNetprice,jdbcType=VARCHAR}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.InterfPayhsrcsecinfo" >
@@ -372,6 +376,9 @@
             <if test="issuerInstitutions != null" >
                 ISSUER_INSTITUTIONS,
             </if>
+            <if test="isNetprice != null">
+                IS_NETPRICE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="secid != null" >
@@ -578,6 +585,9 @@
             <if test="issuerInstitutions != null" >
                 #{issuerInstitutions,jdbcType=VARCHAR},
             </if>
+            <if test="isNetprice != null">
+                #{isNetPrice,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.InterfPayhsrcsecinfo" >
@@ -591,7 +601,7 @@
         UPDATE_USER, UPDATE_TIME, PUBENDDATE, CITY_INVEST_SEC_CHB, CITY_INVEST_SEC_PROVINCES, 
         CITY_INVEST_SEC_CITIES, CITY_INVEST_SEC_COUNTY, CITY_INVEST_SEC_WIND, CITY_INVEST_SEC_CBRC, 
         ASSET_CLASS, CONCRETE_CLASS, CONCRETE_CLASS_SM, ISSUER_SCALE_TYPE, ISSUER_TECHNOLOGY_TYPE, 
-        ISSUER_ECONOMIC_TYPE, ISSUER_DESC, ISSUER_INSTITUTIONS)
+        ISSUER_ECONOMIC_TYPE, ISSUER_DESC, ISSUER_INSTITUTIONS, IS_NETPRICE)
         select SECID, SOURCE, SECNAME, SECCODE, MARKET, SECFULLNAME, 
             RATEBASIC, COUPONSPECIES, INTERESTRATE, VDATE, MDATE, PAYCYCLE, FACEVALUE, ISSUEPRICE, 
             PAPERIR, SCHECALRULE, FIRSTRATEDAY, WORKDAYRULE, ISSUERSHORT, RESETTYPE, OBSERVEBEFDAY, 
@@ -602,7 +612,7 @@
             #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, PUBENDDATE, CITY_INVEST_SEC_CHB, CITY_INVEST_SEC_PROVINCES, 
             CITY_INVEST_SEC_CITIES, CITY_INVEST_SEC_COUNTY, CITY_INVEST_SEC_WIND, CITY_INVEST_SEC_CBRC, 
             ASSET_CLASS, CONCRETE_CLASS, CONCRETE_CLASS_SM, ISSUER_SCALE_TYPE, ISSUER_TECHNOLOGY_TYPE, 
-            ISSUER_ECONOMIC_TYPE, ISSUER_DESC, ISSUER_INSTITUTIONS
+            ISSUER_ECONOMIC_TYPE, ISSUER_DESC, ISSUER_INSTITUTIONS, IS_NETPRICE
              from INTERF_PAYHSRCSECINFO
              where 1 = 1 and SECID = #{secid,jdbcType=VARCHAR} and SOURCE = #{source,jdbcType=VARCHAR}
     </insert>
@@ -798,6 +808,9 @@
             <if test="issuerInstitutions != null" >
                 ISSUER_INSTITUTIONS = #{issuerInstitutions,jdbcType=VARCHAR},
             </if>
+            <if test="isNetprice != null">
+                IS_NETPRICE = #{isNetprice,jdbcType=VARCHAR},
+            </if>
         </set>
         where SECID = #{secid,jdbcType=VARCHAR}
           and SOURCE = #{source,jdbcType=VARCHAR}
@@ -866,7 +879,8 @@
             ISSUER_TECHNOLOGY_TYPE = #{issuerTechnologyType,jdbcType=VARCHAR},
             ISSUER_ECONOMIC_TYPE = #{issuerEconomicType,jdbcType=VARCHAR},
             ISSUER_DESC = #{issuerDesc,jdbcType=VARCHAR},
-            ISSUER_INSTITUTIONS = #{issuerInstitutions,jdbcType=VARCHAR}
+            ISSUER_INSTITUTIONS = #{issuerInstitutions,jdbcType=VARCHAR},
+            IS_NETPRICE = #{isNetprice,jdbcType=VARCHAR}
         where SECID = #{secid,jdbcType=VARCHAR}
           and SOURCE = #{source,jdbcType=VARCHAR}
     </update>

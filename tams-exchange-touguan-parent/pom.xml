@@ -19,6 +19,8 @@
 
     <modules>
         <module>tams-exchange-entrust</module>
+        <module>tams-exchange-basicdata</module>
+        <module>tams-exchange-period</module>
     </modules>
 
     <build>

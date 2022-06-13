@@ -6,10 +6,12 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.valuation.component.common.constants.BussinessDictCodeList;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
-import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTrade001Dto;
+import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeResult;
-import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTrade002Dto;
+import com.joyintech.tams.common.base.dao.FinProductAddMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +32,9 @@ public class TrdBondTrade002Service extends BaseService {
 
     @Autowired
     private TrdBondTradeMapper trdBondTradeMapper;
+
+    @Autowired
+    private FinProductAddMapper finProductAddMapper;
 
     /**
      * 金融产品交易BatchMapper
@@ -116,8 +122,18 @@ public class TrdBondTrade002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdBondTrade002Dto queryTradeInfoByTradeId(String tradeId){
-        return  trdBondTradeMapper.queryTradeInfoByTradeId(tradeId);
+    public TrdBondTradeDto queryTradeInfoByTradeId(String tradeId){
+        Map<String, Object> param = new HashMap<>();
+        param.put("tradeId",tradeId);
+        param.put("BUSI_TYPE_02", BussinessDictCodeList.业务类型_债券交易.getValue());
+        param.put("FEE_TYPE_B01",BussinessDictCodeList.费用类型_经手费.getValue());
+        param.put("FEE_TYPE_B05",BussinessDictCodeList.费用类型_佣金.getValue());
+        param.put("FEE_TYPE_B06",BussinessDictCodeList.费用类型_交易手续费.getValue());
+        param.put("FEE_TYPE_B07",BussinessDictCodeList.费用类型_结算费.getValue());
+        param.put("FEE_TYPE_B08",BussinessDictCodeList.费用类型_结算手续费.getValue());
+        param.put("YES_NO_Y",DictCodeList.是否_是.getValue());
+        param.put("YES_NO_N",DictCodeList.是否_否.getValue());
+        return  trdBondTradeMapper.queryTradeInfoByTradeId(param);
     }
 
     /**
@@ -158,9 +174,8 @@ public class TrdBondTrade002Service extends BaseService {
             List<TrdProductDeal> listInsert = new ArrayList<TrdProductDeal>();
             for (TrdProductDeal e : listValFinProductDeal) {
                     listInsert.add(e);
-                    valFinProductDealBatchMapper.insertBatch(listInsert);
-
                 }
+            valFinProductDealBatchMapper.insertBatch(listInsert);
             }
 
         // 金融产品实物交易
@@ -170,9 +185,9 @@ public class TrdBondTrade002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<TrdFinProductBarter> listInsert = new ArrayList<TrdFinProductBarter>();
             for (TrdFinProductBarter e : listTrdFinProductBarter) {
-                    listInsert.add(e);
-                    valTrdFinProductBarterBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valTrdFinProductBarterBatchMapper.insertBatch(listInsert);
         }
 
         // 估值核算交易扩展表
@@ -182,9 +197,9 @@ public class TrdBondTrade002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<TrdProductDealAdd> listInsert = new ArrayList<TrdProductDealAdd>();
             for (TrdProductDealAdd e : listValFinProductDealExt) {
-                    listInsert.add(e);
-                    valTrdProductDealAddBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valTrdProductDealAddBatchMapper.insertBatch(listInsert);
         }
 
         // 交易类金融产品
@@ -194,9 +209,9 @@ public class TrdBondTrade002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<FinTradeProduct> listInsert = new ArrayList<FinTradeProduct>();
             for (FinTradeProduct e : listValFinTradeProduct) {
-                    listInsert.add(e);
-                    valFinTradeProductBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valFinTradeProductBatchMapper.insertBatch(listInsert);
         }
 
         // 入账信息表
@@ -206,9 +221,9 @@ public class TrdBondTrade002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<BokDealAccounting> listInsert = new ArrayList<BokDealAccounting>();
             for (BokDealAccounting e : listValDealAccounting) {
-                    listInsert.add(e);
-                    valDealAccountingBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valDealAccountingBatchMapper.insertBatch(listInsert);
         }
 
         // 账务明细表
@@ -218,9 +233,9 @@ public class TrdBondTrade002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<BokDealAccountingDetail> listInsert = new ArrayList<BokDealAccountingDetail>();
             for (BokDealAccountingDetail e : listValDealAccountingDetail) {
-                    listInsert.add(e);
-                    valDealAccountingDetailBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valDealAccountingDetailBatchMapper.insertBatch(listInsert);
         }
 
         //账务明细代码表
@@ -230,9 +245,10 @@ public class TrdBondTrade002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<BokDetailId> listInsert = new ArrayList<BokDetailId>();
             for (BokDetailId e : listValBokDetailId) {
-                    listInsert.add(e);
-                    valBokDetailIdBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valBokDetailIdBatchMapper.deleteBatch(listInsert);
+            valBokDetailIdBatchMapper.insertBatch(listInsert);
         }
 
         // 交易费用明细表
@@ -242,9 +258,9 @@ public class TrdBondTrade002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<TrdTradeFeeDetail> listInsert = new ArrayList<TrdTradeFeeDetail>();
             for (TrdTradeFeeDetail e : listValTradeFeeDetail) {
-                    listInsert.add(e);
-                    valTradeFeeDetailBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valTradeFeeDetailBatchMapper.insertBatch(listInsert);
         }
         //结算指令表
         List<StlOrders>  ValOrdersList=dto.getValOrdersList();
@@ -253,9 +269,9 @@ public class TrdBondTrade002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<StlOrders> listInsert = new ArrayList<StlOrders>();
             for (StlOrders e : ValOrdersList) {
-                    listInsert.add(e);
-                    valOrdersBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valOrdersBatchMapper.insertBatch(listInsert);
         }
         //结算指令拓展表
         List<StlOrdersExt> ValOrdersExtList=dto.getValOrdersExtList();
@@ -264,20 +280,26 @@ public class TrdBondTrade002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<StlOrdersExt> listInsert = new ArrayList<StlOrdersExt>();
             for (StlOrdersExt e : ValOrdersExtList) {
-                    listInsert.add(e);
-                    valOrdersExtBatchMapper.insertBatch(listInsert);
-                }
+                listInsert.add(e);
             }
+            valOrdersExtBatchMapper.insertBatch(listInsert);
+        }
 
         return 1;
     }
 
     public int update(TrdBondTradeResult dto){
-        TrdBondTrade001Dto dto1 = new TrdBondTrade001Dto();
-        dto1.setFinprodId(dto.getTrdBondTrade002Dto().getProdId());
-        dto1.setTradeId(dto.getTrdBondTrade002Dto().getTradeId());
+        TrdBondTradeDto dto1 = new TrdBondTradeDto();
+        dto1.setProdId(dto.getTrdBondTradeDto().getProdId());
+        dto1.setTradeId(dto.getTrdBondTradeDto().getTradeId());
        trdBondTrade001Service.delete(dto1);
        return insert(dto);
+    }
+
+    public List<FinCashPlanDto> getRepaymentInfo(Map<String, Object> map){
+        map.put("cashType",DictCodeListExt1.现金流二级类型_本金.getValue());
+        map.put("finprodType",DictCodeListExt1.金融产品类型_债券.getValue());
+        return trdBondTradeMapper.getRepaymentInfo(map);
     }
 
 }

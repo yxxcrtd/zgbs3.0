@@ -14,38 +14,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.dao.FinProductAddMapper;
-import com.joyintech.tams.common.base.dao.FinProductMapper;
-import com.joyintech.tams.common.base.dao.FinProductRecommentMapper;
-import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
-import com.joyintech.tams.common.base.dao.FinProductValuationMapper;
-import com.joyintech.tams.common.base.dao.FinStdsecConverseRadioMapper;
-import com.joyintech.tams.common.base.dao.MstBondCreditRatingMapper;
-import com.joyintech.tams.common.base.dao.MstBondMarketInfoMapper;
-import com.joyintech.tams.common.base.dao.MstBondValuationInfoMapper;
-import com.joyintech.tams.common.base.dao.MstFundMarketInfoMapper;
-import com.joyintech.tams.common.base.dao.RepAssetBondMapper;
-import com.joyintech.tams.common.base.dao.RepAssetDeptMapper;
-import com.joyintech.tams.common.base.dao.RepFundMapper;
-import com.joyintech.tams.common.base.entity.FinCashInfo;
-import com.joyintech.tams.common.base.entity.FinCashPayRule;
-import com.joyintech.tams.common.base.entity.FinCashPlan;
-import com.joyintech.tams.common.base.entity.FinExercisePlan;
-import com.joyintech.tams.common.base.entity.FinOpenRule;
-import com.joyintech.tams.common.base.entity.FinProductRecomment;
-import com.joyintech.tams.common.base.entity.FinProductTypeKey;
-import com.joyintech.tams.common.base.entity.FinProductValuation;
-import com.joyintech.tams.common.base.entity.FinStdsecConverseRadio;
-import com.joyintech.tams.common.base.entity.MstBondCreditRating;
-import com.joyintech.tams.common.base.entity.MstBondMarketInfo;
-import com.joyintech.tams.common.base.entity.MstBondValuationInfo;
-import com.joyintech.tams.common.base.entity.MstFundMarketInfo;
 import com.joyintech.tams.component.base.core.BaseFinProductBaseInfoService;
 import com.joyintech.tams.component.base.core.BaseFinProductCashCalcRuleService;
 import com.joyintech.tams.component.base.core.BaseFinProductCashCountingRuleService;
@@ -213,6 +189,9 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
     private RepAssetBondMapper repAssetBondMapper;
     @Autowired
     private RepAssetDeptMapper repAssetDeptMapper;
+
+    @Autowired
+    private FinProductIssueMapper finProductIssueMapper;
     /**
      * 债券信息评级
      */
@@ -319,6 +298,10 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                 	for(MstBondCreditRating mstBondCreditRating : dto.getMstBondCreditRatingList()){
                 		mstBondCreditRatingMapper.insert(mstBondCreditRating);
                 	}
+                }
+                //发行信息
+                if(null != dto.getFinProductIssue()){
+                    finProductIssueMapper.insert(dto.getFinProductIssue());
                 }
             }
             return true;

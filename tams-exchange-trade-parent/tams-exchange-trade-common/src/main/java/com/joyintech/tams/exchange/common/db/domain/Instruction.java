@@ -1,22 +1,36 @@
 package com.joyintech.tams.exchange.common.db.domain;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.tams.exchange.common.bean.MinPrice;
+import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.instrument.MinPriceAndMinTrdUnitLimitBean;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
+import com.joyintech.tams.exchange.common.constant.TradePlat;
+import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
+import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
-import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
+
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1.是否_否;
 
 @ApiModel(value = "指令信息", description = "指令信息")
 public class Instruction implements Serializable, KeyMethodInterface<String>, Cloneable {
@@ -175,9 +189,12 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @JsonSerialize(using = DoubleSerializerUtils.class)
     private BigDecimal entrustAmt = new BigDecimal("0.00");
 
-    @ApiModelProperty(required = false, name = "entrustNum", value = "委托数量")
+    @ApiModelProperty(required = false, name = "entrustNum", value = "指令数量")
     @Digits(integer = 30, fraction = 4)
     private long entrustNum = 0;
+
+    @ApiModelProperty(name = "leftVolume", value = "剩余数量")
+    private long leftVolume;
 
     @ApiModelProperty(required = false, name = "entrustStatus", value = "委托状态")
     @Size(max = 50)
@@ -299,7 +316,7 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @Size(max = 128)
     private String invAim = "";
 
-    @ApiModelProperty(required = false, name = "invAim", value = "存储指令分发时，同一条指令的对应的多个trader")
+    @ApiModelProperty(required = false, name = "tradersInfo", value = "存储指令分发时，同一条指令的对应的多个trader")
     private String tradersInfo;
 
     @ApiModelProperty(required = false, name = "isAutoReceive", value = "自动接收标志")
@@ -390,8 +407,15 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @ApiModelProperty(required = false, name = "updateTime", value = "修改时间")
     private Date updateTime;
 
-    @ApiModelProperty( name = "tradeSide", value = "交易方向")
+    @ApiModelProperty(name = "tradeSide", value = "交易方向")
     private String tradeSide;
+
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
+    private String isNetPrice;
 
     @Id
     public String getEntrustId() {
@@ -1082,6 +1106,38 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         this.updateTime = updateTime;
     }
 
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
+    }
+
+    public long getLeftVolume() {
+        return leftVolume;
+    }
+
+    public void setLeftVolume(long leftVolume) {
+        this.leftVolume = leftVolume;
+    }
+
     public String getTradeSide() {
         if (DictCodeListExt3.投管业务类型_首期.getValue().equals(busiTypeTg)
                 || DictCodeListExt3.投管业务类型_提前购回.getValue().equals(busiTypeTg)
@@ -1100,10 +1156,12 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         Instruction that = (Instruction) o;
         return entrustNum == that.entrustNum &&
                 count == that.count &&
@@ -1200,11 +1258,162 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         entrustId = id;
     }
 
+    /**
+     * 使用序列化实现深拷贝
+     *
+     * @return 拷贝对象
+     */
     public Instruction cloneInstruction() {
+        Instruction cloneInstruction;
         try {
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(bout);
+            out.writeObject(this);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(bout.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            cloneInstruction = (Instruction) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
+        }
+        return cloneInstruction;
+
+       /* try {
             return (Instruction) this.clone();
         } catch (CloneNotSupportedException e) {
             return null;
+        }*/
+    }
+
+    public InstructionExportVo cloneInstructionExportVo() {
+        InstructionExportVo instructionExportVo = new InstructionExportVo();
+        BeanUtils.copyProperties(this, instructionExportVo);
+        return instructionExportVo;
+    }
+
+    @Override
+    public String toString() {
+        return JSONUtil.toJsonStr(this);
+    }
+
+    public MinTrdUnitLimit queryMinTrdUnitLimit(String entrustProp) {
+        MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean = this.getMinPriceAndMinTrdUnitLimitBean();
+
+        if (ObjectUtil.isNull(minPriceAndMinTrdUnitLimitBean)) {
+            return null;
         }
+        List<MinTrdUnitLimit> minTrdUnitLimitList = minPriceAndMinTrdUnitLimitBean.getMinTrdUnitLimitList();
+        if (ObjectUtil.isEmpty(minTrdUnitLimitList)) {
+            return null;
+        }
+        if (minTrdUnitLimitList.size() == 1 || StrUtil.isEmpty(entrustProp)) {
+            return minTrdUnitLimitList.get(0);
+        } else {
+            String entrustPropWithoutSuffix = entrustProp.split(StrUtil.DASHED)[0];
+            return minTrdUnitLimitList.stream()
+                    .filter(item -> item.getTradePlat().equals(entrustPropWithoutSuffix))
+                    .findFirst()
+                    .orElse(minTrdUnitLimitList.get(0));
+        }
+    }
+
+    public BigDecimal queryMinPrice(String entrustProp) {
+        MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean = this.getMinPriceAndMinTrdUnitLimitBean();
+
+        if (ObjectUtil.isNull(minPriceAndMinTrdUnitLimitBean)) {
+            return null;
+        }
+        List<MinPrice> minPriceList = minPriceAndMinTrdUnitLimitBean.getMinPriceList();
+        if (ObjectUtil.isEmpty(minPriceList)) {
+            return null;
+        }
+        if (minPriceList.size() == 1 || StrUtil.isEmpty(entrustProp)) {
+            return minPriceList.get(0).getMinPrice();
+        } else {
+            String entrustPropWithoutSuffix = entrustProp.split(StrUtil.DASHED)[0];
+            return minPriceList.stream()
+                    .filter(item -> item.getTradePlat().equals(entrustPropWithoutSuffix))
+                    .map(MinPrice::getMinPrice)
+                    .findFirst()
+                    .orElse(minPriceList.get(0).getMinPrice());
+        }
+    }
+
+    public Integer queryScale(String entrustProp) {
+        BigDecimal minPrice = queryMinPrice(entrustProp);
+        return ObjectUtil.isNull(minPrice) ? 4 : minPrice.scale();
+    }
+
+    /**
+     * 新债-非可转债
+     */
+    public boolean newBond() {
+        return InvestAssetTypeEnum.BOND.codeEquals(this.getAssetType())
+                && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
+                && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
+    }
+
+    /**
+     * 非新债-可转债
+     */
+    public boolean convertibleBond() {
+        return InvestAssetTypeEnum.BOND.codeEquals(this.getAssetType())
+                && SecondAssetType.KZZ.codeEquals(this.getAssetType1())
+                && TradePlat.NEW_BOND.codeNotEquals(this.getTradePlat());
+    }
+
+    /**
+     * 全价
+     */
+    public boolean fullPrice() {
+        return StrUtil.isNotEmpty(this.getIsNetPrice())
+                && 是否_否.getValue().equals(this.getIsNetPrice());
+    }
+
+    /**
+     * 新债且全价
+     */
+    public boolean newBondAndFullPrice() {
+        return this.newBond() && this.fullPrice();
+    }
+
+    public String complexAssertTypeWhenConvertibleBond() {
+        if (convertibleBond()) {
+            return StrUtil.builder()
+                    .append(this.getAssetType())
+                    .append(StrUtil.DASHED)
+                    .append(this.getAssetType1())
+                    .toString();
+        }
+        return this.getAssetType();
+    }
+
+    /**
+     * 是否是数量指令
+     */
+    public boolean volumeInstruction() {
+        // 新债
+        if (newBond()) {
+            return TargetTypeEnum.VOLUME.codeEquals(this.getTargetType());
+        }
+        return this.getEntrustNum() > 0L;
+    }
+
+    /**
+     * 是否是金额指令
+     */
+    public boolean amtInstruction() {
+        return !volumeInstruction();
+    }
+
+    /**
+     * 是否是非交易类指令
+     */
+    public boolean unTradeInstruction() {
+        return EnumUtil.in(this.getPs(),
+                InstructionPs.BOND2STOCK, InstructionPs.ALLOCATESHARE, InstructionPs.APPLY,
+                InstructionPs.PZ, InstructionPs.RESALE,
+                InstructionPs.SEAL, InstructionPs.UNSEAL);
+//        return EntrustUtils.isNotTrade(this.getBusiTypeTg());
     }
 }

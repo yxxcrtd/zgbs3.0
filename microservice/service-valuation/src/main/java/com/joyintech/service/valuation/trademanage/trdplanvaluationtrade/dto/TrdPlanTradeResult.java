@@ -317,4 +317,6 @@ public class TrdPlanTradeResult extends BaseEntity {
     public void setListInterfProductDealBookCommonDto(List<InterfProductDealBookCommonDto> listInterfProductDealBookCommonDto) {
         this.listInterfProductDealBookCommonDto = listInterfProductDealBookCommonDto;
     }
+
+
 }

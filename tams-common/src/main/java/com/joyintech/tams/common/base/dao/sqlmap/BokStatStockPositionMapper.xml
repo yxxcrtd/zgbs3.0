@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.common.base.dao.BokStatStockPositionMapper" >
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.BokStatStockPosition" >
+        <id column="BOOKSET_ID" property="booksetId" jdbcType="VARCHAR" />
+        <id column="HAPPEN_DATE" property="happenDate" jdbcType="DATE" />
+        <id column="BOK_DETAIL_ID" property="bokDetailId" jdbcType="VARCHAR" />
+        <id column="STOCK_POSITION_TYPE" property="stockPositionType" jdbcType="VARCHAR" />
+        <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+        <result column="FINPROD_TYPE" property="finprodType" jdbcType="VARCHAR" />
+        <result column="SHARE_AMT" property="shareAmt" jdbcType="DECIMAL" />
+        <result column="COST_AMT" property="costAmt" jdbcType="DECIMAL" />
+        <result column="TDY_FLOAT_INGPL" property="tdyFloatIngpl" jdbcType="DECIMAL" />
+        <result column="FLOAT_INGPL_EXP" property="floatIngplExp" jdbcType="DECIMAL" />
+        <result column="TDY_FLOAT_INGPL_B" property="tdyFloatIngplB" jdbcType="DECIMAL" />
+        <result column="COST_AMT_B" property="costAmtB" jdbcType="DECIMAL" />
+        <result column="FLOAT_INGPL_EXP_B" property="floatIngplExpB" jdbcType="DECIMAL" />
+        <result column="VAL_DATE" property="valDate" jdbcType="DATE" />
+        <result column="VAL_PRICE" property="valPrice" jdbcType="DECIMAL" />
+        <result column="CCY" property="ccy" jdbcType="VARCHAR" />
+        <result column="B_CCY" property="bCcy" jdbcType="VARCHAR" />
+        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
+        <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        BOOKSET_ID BOOKSET_ID, HAPPEN_DATE HAPPEN_DATE, BOK_DETAIL_ID BOK_DETAIL_ID, STOCK_POSITION_TYPE STOCK_POSITION_TYPE, 
+        FINPROD_ID FINPROD_ID, FINPROD_TYPE FINPROD_TYPE, SHARE_AMT SHARE_AMT, COST_AMT COST_AMT, 
+        TDY_FLOAT_INGPL TDY_FLOAT_INGPL, FLOAT_INGPL_EXP FLOAT_INGPL_EXP, TDY_FLOAT_INGPL_B TDY_FLOAT_INGPL_B, 
+        COST_AMT_B COST_AMT_B, FLOAT_INGPL_EXP_B FLOAT_INGPL_EXP_B, VAL_DATE VAL_DATE, VAL_PRICE VAL_PRICE, 
+        CCY CCY, B_CCY B_CCY, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
+        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+    </sql>
+    <sql id="Sql_All_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BokStatStockPositionMapper.Base_Column_List" />
+        from BOK_STAT_STOCK_POSITION
+    </sql>
+    <sql id="Sql_All_Effective_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BokStatStockPositionMapper.Base_Column_List" />
+        from BOK_STAT_STOCK_POSITION
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.joyintech.tams.common.base.entity.BokStatStockPositionKey" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BokStatStockPositionMapper.Base_Column_List" />
+        from BOK_STAT_STOCK_POSITION
+        where BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+          and HAPPEN_DATE = #{happenDate,jdbcType=DATE}
+          and BOK_DETAIL_ID = #{bokDetailId,jdbcType=VARCHAR}
+          and STOCK_POSITION_TYPE = #{stockPositionType,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BokStatStockPositionKey" >
+        delete from BOK_STAT_STOCK_POSITION
+        where BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+          and HAPPEN_DATE = #{happenDate,jdbcType=DATE}
+          and BOK_DETAIL_ID = #{bokDetailId,jdbcType=VARCHAR}
+          and STOCK_POSITION_TYPE = #{stockPositionType,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.BokStatStockPosition" >
+        insert into BOK_STAT_STOCK_POSITION (BOOKSET_ID, HAPPEN_DATE, BOK_DETAIL_ID, 
+            STOCK_POSITION_TYPE, FINPROD_ID, FINPROD_TYPE, 
+            SHARE_AMT, COST_AMT, TDY_FLOAT_INGPL, 
+            FLOAT_INGPL_EXP, TDY_FLOAT_INGPL_B, COST_AMT_B, 
+            FLOAT_INGPL_EXP_B, VAL_DATE, VAL_PRICE, 
+            CCY, B_CCY, CREATE_USER, 
+            CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
+            UPDATE_TIME)
+        values (#{booksetId,jdbcType=VARCHAR}, #{happenDate,jdbcType=DATE}, #{bokDetailId,jdbcType=VARCHAR}, 
+            #{stockPositionType,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, #{finprodType,jdbcType=VARCHAR}, 
+            #{shareAmt,jdbcType=DECIMAL}, #{costAmt,jdbcType=DECIMAL}, #{tdyFloatIngpl,jdbcType=DECIMAL}, 
+            #{floatIngplExp,jdbcType=DECIMAL}, #{tdyFloatIngplB,jdbcType=DECIMAL}, #{costAmtB,jdbcType=DECIMAL}, 
+            #{floatIngplExpB,jdbcType=DECIMAL}, #{valDate,jdbcType=DATE}, #{valPrice,jdbcType=DECIMAL}, 
+            #{ccy,jdbcType=VARCHAR}, #{bCcy,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
+            #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
+            #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.BokStatStockPosition" >
+        insert into BOK_STAT_STOCK_POSITION
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="booksetId != null" >
+                BOOKSET_ID,
+            </if>
+            <if test="happenDate != null" >
+                HAPPEN_DATE,
+            </if>
+            <if test="bokDetailId != null" >
+                BOK_DETAIL_ID,
+            </if>
+            <if test="stockPositionType != null" >
+                STOCK_POSITION_TYPE,
+            </if>
+            <if test="finprodId != null" >
+                FINPROD_ID,
+            </if>
+            <if test="finprodType != null" >
+                FINPROD_TYPE,
+            </if>
+            <if test="shareAmt != null" >
+                SHARE_AMT,
+            </if>
+            <if test="costAmt != null" >
+                COST_AMT,
+            </if>
+            <if test="tdyFloatIngpl != null" >
+                TDY_FLOAT_INGPL,
+            </if>
+            <if test="floatIngplExp != null" >
+                FLOAT_INGPL_EXP,
+            </if>
+            <if test="tdyFloatIngplB != null" >
+                TDY_FLOAT_INGPL_B,
+            </if>
+            <if test="costAmtB != null" >
+                COST_AMT_B,
+            </if>
+            <if test="floatIngplExpB != null" >
+                FLOAT_INGPL_EXP_B,
+            </if>
+            <if test="valDate != null" >
+                VAL_DATE,
+            </if>
+            <if test="valPrice != null" >
+                VAL_PRICE,
+            </if>
+            <if test="ccy != null" >
+                CCY,
+            </if>
+            <if test="bCcy != null" >
+                B_CCY,
+            </if>
+            <if test="createUser != null" >
+                CREATE_USER,
+            </if>
+            <if test="createDept != null" >
+                CREATE_DEPT,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="booksetId != null" >
+                #{booksetId,jdbcType=VARCHAR},
+            </if>
+            <if test="happenDate != null" >
+                #{happenDate,jdbcType=DATE},
+            </if>
+            <if test="bokDetailId != null" >
+                #{bokDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="stockPositionType != null" >
+                #{stockPositionType,jdbcType=VARCHAR},
+            </if>
+            <if test="finprodId != null" >
+                #{finprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="finprodType != null" >
+                #{finprodType,jdbcType=VARCHAR},
+            </if>
+            <if test="shareAmt != null" >
+                #{shareAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="costAmt != null" >
+                #{costAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="tdyFloatIngpl != null" >
+                #{tdyFloatIngpl,jdbcType=DECIMAL},
+            </if>
+            <if test="floatIngplExp != null" >
+                #{floatIngplExp,jdbcType=DECIMAL},
+            </if>
+            <if test="tdyFloatIngplB != null" >
+                #{tdyFloatIngplB,jdbcType=DECIMAL},
+            </if>
+            <if test="costAmtB != null" >
+                #{costAmtB,jdbcType=DECIMAL},
+            </if>
+            <if test="floatIngplExpB != null" >
+                #{floatIngplExpB,jdbcType=DECIMAL},
+            </if>
+            <if test="valDate != null" >
+                #{valDate,jdbcType=DATE},
+            </if>
+            <if test="valPrice != null" >
+                #{valPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="ccy != null" >
+                #{ccy,jdbcType=VARCHAR},
+            </if>
+            <if test="bCcy != null" >
+                #{bCcy,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createDept != null" >
+                #{createDept,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.BokStatStockPosition" >
+        insert into BOK_STAT_STOCK_POSITION(BOOKSET_ID, HAPPEN_DATE, BOK_DETAIL_ID, STOCK_POSITION_TYPE, 
+        FINPROD_ID, FINPROD_TYPE, SHARE_AMT, COST_AMT, TDY_FLOAT_INGPL, FLOAT_INGPL_EXP, 
+        TDY_FLOAT_INGPL_B, COST_AMT_B, FLOAT_INGPL_EXP_B, VAL_DATE, VAL_PRICE, CCY, B_CCY, 
+        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+        select BOOKSET_ID, HAPPEN_DATE, BOK_DETAIL_ID, STOCK_POSITION_TYPE, 
+            FINPROD_ID, FINPROD_TYPE, SHARE_AMT, COST_AMT, TDY_FLOAT_INGPL, FLOAT_INGPL_EXP, 
+            TDY_FLOAT_INGPL_B, COST_AMT_B, FLOAT_INGPL_EXP_B, VAL_DATE, VAL_PRICE, CCY, B_CCY, 
+            CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+             from BOK_STAT_STOCK_POSITION
+             where 1 = 1 and BOOKSET_ID = #{booksetId,jdbcType=VARCHAR} and HAPPEN_DATE = #{happenDate,jdbcType=DATE} and BOK_DETAIL_ID = #{bokDetailId,jdbcType=VARCHAR} and STOCK_POSITION_TYPE = #{stockPositionType,jdbcType=VARCHAR}
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.BokStatStockPosition" >
+        update BOK_STAT_STOCK_POSITION
+        <set >
+            <if test="finprodId != null" >
+                FINPROD_ID = #{finprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="finprodType != null" >
+                FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR},
+            </if>
+            <if test="shareAmt != null" >
+                SHARE_AMT = #{shareAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="costAmt != null" >
+                COST_AMT = #{costAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="tdyFloatIngpl != null" >
+                TDY_FLOAT_INGPL = #{tdyFloatIngpl,jdbcType=DECIMAL},
+            </if>
+            <if test="floatIngplExp != null" >
+                FLOAT_INGPL_EXP = #{floatIngplExp,jdbcType=DECIMAL},
+            </if>
+            <if test="tdyFloatIngplB != null" >
+                TDY_FLOAT_INGPL_B = #{tdyFloatIngplB,jdbcType=DECIMAL},
+            </if>
+            <if test="costAmtB != null" >
+                COST_AMT_B = #{costAmtB,jdbcType=DECIMAL},
+            </if>
+            <if test="floatIngplExpB != null" >
+                FLOAT_INGPL_EXP_B = #{floatIngplExpB,jdbcType=DECIMAL},
+            </if>
+            <if test="valDate != null" >
+                VAL_DATE = #{valDate,jdbcType=DATE},
+            </if>
+            <if test="valPrice != null" >
+                VAL_PRICE = #{valPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="ccy != null" >
+                CCY = #{ccy,jdbcType=VARCHAR},
+            </if>
+            <if test="bCcy != null" >
+                B_CCY = #{bCcy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+          and HAPPEN_DATE = #{happenDate,jdbcType=DATE}
+          and BOK_DETAIL_ID = #{bokDetailId,jdbcType=VARCHAR}
+          and STOCK_POSITION_TYPE = #{stockPositionType,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BokStatStockPosition" >
+        update BOK_STAT_STOCK_POSITION
+        set FINPROD_ID = #{finprodId,jdbcType=VARCHAR},
+            FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR},
+            SHARE_AMT = #{shareAmt,jdbcType=DECIMAL},
+            COST_AMT = #{costAmt,jdbcType=DECIMAL},
+            TDY_FLOAT_INGPL = #{tdyFloatIngpl,jdbcType=DECIMAL},
+            FLOAT_INGPL_EXP = #{floatIngplExp,jdbcType=DECIMAL},
+            TDY_FLOAT_INGPL_B = #{tdyFloatIngplB,jdbcType=DECIMAL},
+            COST_AMT_B = #{costAmtB,jdbcType=DECIMAL},
+            FLOAT_INGPL_EXP_B = #{floatIngplExpB,jdbcType=DECIMAL},
+            VAL_DATE = #{valDate,jdbcType=DATE},
+            VAL_PRICE = #{valPrice,jdbcType=DECIMAL},
+            CCY = #{ccy,jdbcType=VARCHAR},
+            B_CCY = #{bCcy,jdbcType=VARCHAR},
+            UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+        where BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+          and HAPPEN_DATE = #{happenDate,jdbcType=DATE}
+          and BOK_DETAIL_ID = #{bokDetailId,jdbcType=VARCHAR}
+          and STOCK_POSITION_TYPE = #{stockPositionType,jdbcType=VARCHAR}
+    </update>
+</mapper>

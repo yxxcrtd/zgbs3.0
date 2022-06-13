@@ -531,6 +531,9 @@ public class CalcOccupyInfoService {
             boolean isFormula = StringUtil.isNotEmpty(item.getFormulaOpr());
             // 实占额度
             IOcpRelParamItem item2 = items2.get(en.getKey());
+            if (item2 == null){
+                return;
+            }
             BigDecimal val2 = item2.getOccupyVal();
             boolean isFormula2 = StringUtil.isNotEmpty(item2.getFormulaOpr());
             // 如果预占是公式实占不是时
@@ -647,10 +650,7 @@ public class CalcOccupyInfoService {
             }
             // redis识别域
             HashSet<String> hs = new HashSet<>();
-            valMap.entrySet().forEach(en -> {
-                String key = en.getKey();
-                hs.add(key);
-            });
+            valMap.forEach((key, value) -> hs.add(key));
             OcpRelParamItem ocpPmItem = new OcpRelParamItem();
             // 预占/实占的对象
             ocpPmItem.setOccupyItem(epr.isFormula() ? epr.formulaRelItem() : epr.getRelItem());

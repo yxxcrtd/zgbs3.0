@@ -18,11 +18,12 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.option.service.TrdOptionValuationTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -32,11 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -73,31 +74,16 @@ public class TrdOptionValuationTrade002Controller extends BaseController {
         String tradeId = getParam("tradeId");
 
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdOptionValuationTrade002Dto entity= trdOptionValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            TrdOptionValuationTrade001Dto entity= trdOptionValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdOptionValuationTrade002Dto entity = trdOptionValuationTrade002Service.queryTradeInfoByTradeId(tradeId);
+            TrdOptionValuationTrade001Dto entity = trdOptionValuationTrade002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
         return super.init(model);
-    }
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdId(param);
     }
 
     /**
@@ -117,7 +103,7 @@ public class TrdOptionValuationTrade002Controller extends BaseController {
     /**
      * 确认校验
      *
-     * @param trdOptionValuationTrade002Dto 参数
+     * @param trdOptionValuationTrade001Dto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -125,9 +111,10 @@ public class TrdOptionValuationTrade002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@Valid @RequestBody TrdOptionValuationTrade002Dto trdOptionValuationTrade002Dto,
+    public AjaxResult check( @RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdOptionValuationTrade001Dto trdOptionValuationTrade001Dto,
                               BindingResult result) {
-        return commonCheck(result, trdOptionValuationTrade002Dto.getOperateType());
+        return commonCheck(result, trdOptionValuationTrade001Dto.getOperateType());
     }
 
 
@@ -142,15 +129,16 @@ public class TrdOptionValuationTrade002Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    AjaxResult save(@RequestBody @Valid TrdOptionValuationTrade002Dto dto, BindingResult br)
+    AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdOptionValuationTrade001Dto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdOptionValuationTrade002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdOptionValuationTrade002Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdOptionValuationTrade001Dto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdOptionValuationTrade001Dto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 
@@ -166,7 +154,7 @@ public class TrdOptionValuationTrade002Controller extends BaseController {
         workFlowParameter.setBusinessType(DictCodeListExt3.共通业务类型_期权交易.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
             getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId(),
-            getMessage("交易日") + GlobalConstant.COLON + entity.getTradeDate()));
+            getMessage("交易日") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
 
         String msg = trdOptionValuationTrade002Service.start(processParameter, dto);
 

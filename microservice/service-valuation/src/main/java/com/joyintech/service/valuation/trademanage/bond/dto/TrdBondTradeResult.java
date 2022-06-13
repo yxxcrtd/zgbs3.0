@@ -82,7 +82,7 @@ public class TrdBondTradeResult extends BaseEntity {
      */
     private List<ValInterflog> valInterflog = new ArrayList<ValInterflog>();
 
-    private TrdBondTrade002Dto trdBondTrade002Dto;
+    private TrdBondTradeDto trdBondTradeDto;
 
     /**
      * 读取数据数量
@@ -323,11 +323,11 @@ public class TrdBondTradeResult extends BaseEntity {
         this.listValFinTradeProduct = listValFinTradeProduct;
     }
 
-    public TrdBondTrade002Dto getTrdBondTrade002Dto() {
-        return trdBondTrade002Dto;
+    public TrdBondTradeDto getTrdBondTradeDto() {
+        return trdBondTradeDto;
     }
 
-    public void setTrdBondTrade002Dto(TrdBondTrade002Dto trdBondTrade002Dto) {
-        this.trdBondTrade002Dto = trdBondTrade002Dto;
+    public void setTrdBondTradeDto(TrdBondTradeDto trdBondTradeDto) {
+        this.trdBondTradeDto = trdBondTradeDto;
     }
 }

@@ -10,10 +10,13 @@
  
 package com.joyintech.tams.invest.entrust.etrplanassetn.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
@@ -58,6 +61,13 @@ public class EtrPlanAssetN001Controller extends BaseController{
      */
     @Autowired
     private EtrPlanAssetNService etrPlanAssetNService;
+
+    /**
+     * service
+     */
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
     /**
      * 页面初始化
      */
@@ -147,9 +157,12 @@ public class EtrPlanAssetN001Controller extends BaseController{
     @RequestMapping("recall")
     public AjaxResult recallDelegate(@RequestBody EtrPlanAssetNDto dto)  throws Exception{
         List<EtrPlanAssetNDto> dtolist = dto.getSelectedItem();
+        List<EtrPlanAssetNDto> dtoslist = new ArrayList<>();
         if(dtolist != null && dtolist.size()>0){
             for(EtrPlanAssetNDto entity : dtolist){
                 etrPlanAssetNService.recallDelegate(entity);
+                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
+                entity.setCounterId(etrEntrust.getCounterId());
             }
             // add by yushilong 批量撤销预占 start
             EntrustRdsCommonAop.doListPreOccupy(dtolist, DictCodeList.平安资产类型_计划类资产_净值型.getValue(),

@@ -3,7 +3,11 @@ package com.joyintech.service.trade.entrustmsgbymq.service;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.service.trade.entrustmsgbymq.dto.PortfolioTradeMessage;
+import com.joyintech.tams.common.base.dao.InfContractPortfolioDetailMapper;
+import com.joyintech.tams.common.base.entity.InfContractPortfolioDetail;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -49,7 +53,13 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
      */
     @Autowired
     private InfContractDetailfileMapper mapper;
-    
+
+	/**
+	 * 委托成交消息主推接口Mapper
+	 */
+	@Autowired
+	private InfContractPortfolioDetailMapper infContractPortfolioDetailMapper;
+
     /**
      * 成交信息预清算Service
      */
@@ -76,8 +86,8 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 
 		}catch (Exception e){
 			logger.error("成交消息接收失败-错误信息:{}" + e.getMessage());
-			logger.error("成交消息接收失败-错误信息:{}" + e);
-			e.printStackTrace();
+			logger.error("成交消息接收失败-错误信息:{}" , e);
+//			e.printStackTrace();
 			logger.error("成交消息接收失败-错误信息:{},消息内容:{}", e.getLocalizedMessage(), tradeMessageStr);
 			//throw new Exception("成交消息接收失败");
 		}
@@ -147,7 +157,30 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 		}
 
     	mapper.insertSelective(infContractDetailfile);
-    	tradePreClearingService.tradePreClearing(infContractDetailfile);
+
+		// 下单成交组合明细数据入库 add by fuyongsheng 20220511 start
+		if(CollectionUtils.isNotEmpty(tradeMessage.getPortfolioTradeMessages())){
+			for(PortfolioTradeMessage portfolioMessage : tradeMessage.getPortfolioTradeMessages()){
+				InfContractPortfolioDetail detail = new InfContractPortfolioDetail();
+				detail.setSeqno(infContractDetailfile.getSeqno());
+				detail.setPortfolioId(portfolioMessage.getPortfolioId());
+				detail.setPortfolioName(portfolioMessage.getPortfolioName());
+				detail.setShareAmt(portfolioMessage.getTradeNum());
+				detail.setTradeAmt(portfolioMessage.getTradeAmt());
+				detail.setEntrustAmt(portfolioMessage.getEntrustAmt());
+				detail.setEntrustNum(portfolioMessage.getEntrustNum());
+				detail.setTargetType(portfolioMessage.getTargetType());
+				detail.setCreateUser("system");// 创建用户
+				detail.setCreateDept("dept");// 创建部门
+				detail.setCreateTime(new Date());// 创建时间
+				detail.setUpdateUser("system");// 更新用户
+				detail.setUpdateTime(new Date());// 更新时间
+				infContractPortfolioDetailMapper.insertSelective(detail);
+			}
+		}
+		// 下单成交组合明细数据入库 add by fuyongsheng 20220511 end
+
+		tradePreClearingService.tradePreClearing(infContractDetailfile);
     }
 
 
@@ -164,8 +197,8 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 			}
 		}catch (Exception e){
             logger.error("成交消息接收失败-错误信息:{}" + e.getMessage());
-            logger.error("成交消息接收失败-错误信息:{}" + e);
-            e.printStackTrace();
+            logger.error("成交消息接收失败-错误信息:{}" , e);
+            // e.printStackTrace();
             logger.error("执行进度接收失败-错误信息:{},消息内容:{}", e.getLocalizedMessage(), tradeMessageStr);
             //throw new Exception("执行进度消息接收失败");
 		}
@@ -239,8 +272,8 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 
 		}catch (Exception e){
 			logger.error("手工交收消息接收失败-错误信息:{}" + e.getMessage());
-			logger.error("手工交收消息接收失败-错误信息:{}" + e);
-			e.printStackTrace();
+			logger.error("手工交收消息接收失败-错误信息:{}" , e);
+//			e.printStackTrace();
 			logger.error("手工交收消息接收失败-错误信息:{},消息内容:{}", e.getLocalizedMessage(), tradeMessageStr);
 			//throw new Exception("成交消息接收失败");
 		}

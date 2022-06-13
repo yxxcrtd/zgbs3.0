@@ -6,11 +6,23 @@
 		FP.*,
 		FP.CCY,NVL(FPA.FACE_VALUE,100) AS faceValue,
 		FPT.TYPE_11 type11,
-		FPT.TYPE_12 type12
+		FPT.TYPE_12 type12,
+		FPA.DEAL_MODE dealMode,
+		FPA.INVESTMENT_CYCLE investmentCycle,
+		FPA.TERM_TYPE termType
+		/*FPA.PRODUCT_TYPE prodType,*/
+		/*FPA.MIN_PRODUCT_HOLD minProductHold*/
 		FROM FIN_PRODUCT FP
 		INNER JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID=FPA.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT_TYPE FPT ON FP.FINPROD_ID=FPT.FINPROD_ID AND FPT.BRANCH=0
-		WHERE  FP.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+		<where>
+			<if test="list != null  and list.size() > 0">
+				FP.FINPROD_ID in
+				<foreach collection="list" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</where>
 	</select>
 
 	<select id="getExchangeRate" resultType="java.math.BigDecimal">
@@ -103,5 +115,93 @@
 		WHERE  pp.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
 	</select>
 
+	<select id="getFinOpenRule" resultType="com.joyintech.tams.common.base.entity.FinOpenRule">
+		WITH CASH_INFO_TEMP AS (
+		select CASH_ID,FINPROD_ID from FIN_CASH_INFO
+		where FIN_CASH_INFO.CASH_TYPE_1 ='01'
+		and FIN_CASH_INFO.CASH_TYPE_2 = 'C01'
+		and FIN_CASH_INFO.FINPROD_TYPE ='01'
+		<if test="list != null  and list.size() > 0">
+			AND FIN_CASH_INFO.FINPROD_ID in
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if> ORDER BY FIN_CASH_INFO.FINPROD_ID
+		)
+		SELECT DISTINCT cit.FINPROD_ID cashId,
+		foor.CALC_RULE,foor.OPEN_MODE,foor.OPEN_TYPE,
+		foor.OPEN_CYCLE,foor.OPEN_CYCLE_UNIT
+		FROM CASH_INFO_TEMP cit
+		INNER JOIN FIN_OPEN_RULE foor ON cit.CASH_ID=FOOR.CASH_ID
+		/**根据开放类型倒序排，若有申赎不同频，则有两条记录，一个open_type为01,一个为02，则优先取赎回的**/
+		ORDER BY foor.OPEN_TYPE desc
+	</select>
 
+
+	<select id="getFinOpenPlan" resultType="com.joyintech.tams.common.base.entity.FinOpenPlan">
+		SELECT * FROM (
+		/**申购开放**/
+		SELECT
+		FINPROD_ID , OPEN_VDATE
+		FROM
+		FIN_OPEN_PLAN fop
+		WHERE
+		fop.FINPROD_ID LIKE 'F16_%' AND fop.OPEN_TYPE = '01' AND NOT EXISTS (
+		SELECT 1 FROM FIN_OPEN_PLAN fop2 WHERE fop2.OPEN_TYPE = '02' AND fop.CASH_ID =fop2.CASH_ID
+		)
+		/**赎回开放**/
+		UNION ALL
+		SELECT
+		FINPROD_ID ,OPEN_VDATE
+		FROM
+		FIN_OPEN_PLAN fop
+		WHERE
+		fop.FINPROD_ID LIKE 'F16_%' AND fop.OPEN_TYPE = '02'
+		/**申赎同频**/
+		UNION ALL
+		SELECT
+		fop.FINPROD_ID , OPEN_VDATE
+		FROM
+		FIN_OPEN_PLAN fop
+		WHERE
+		fop.FINPROD_ID LIKE 'F16_%' AND fop.OPEN_TYPE = '03'
+		)
+		<where>
+			<if test="list != null  and list.size() > 0">
+				FINPROD_ID in
+				<foreach collection="list" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		order by FINPROD_ID,OPEN_VDATE ASC
+	</select>
+
+	<select id="getTradeInfo" resultType="com.joyintech.tams.invest.common.asset.dto.AssetGenerateEntry">
+		SELECT tpd.*,tpda.WITH_LOCK_PERIOD FROM TRD_PRODUCT_DEAL tpd
+		INNER JOIN TRD_PRODUCT_DEAL_ADD tpda ON tpd.TRADE_ID =TPDA.TRADE_ID
+		<where>
+			tpd.TRADE_STATUS ='01' AND nvl(tpd.IS_CANCEL,'N')='N'
+			<if test="finprodList != null  and finprodList.size() > 0">
+				and tpd.FINPROD_ID in
+				<foreach collection="finprodList" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			<if test="tradeList != null  and tradeList.size() > 0">
+				and tpd.TRADE_ID in
+				<foreach collection="tradeList" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			AND EXISTS (
+			SELECT 1 FROM PTL_SEC_POSITION psp WHERE tpd.FINPROD_ID =psp.FINPROD_ID
+			AND tpda.PORTFOLIO_ID =psp.PORTFOLIO_ID AND psp.HODING_TYPE ='03' AND psp.AMOUNT >0
+			AND NOT EXISTS
+			(SELECT 1 FROM PTL_SEC_POSITION psp2 WHERE psp2.PORTFOLIO_ID =psp.PORTFOLIO_ID
+			AND psp.FINPROD_ID =psp2.FINPROD_ID  AND psp2.HODING_TYPE ='03' AND psp.CDATE &lt;psp2.CDATE
+			)
+			)
+		</where>
+	</select>
 </mapper>

@@ -301,4 +301,48 @@ public class CstpSecAutoTradeService extends BaseService<TrdBondInvestTradeDto> 
 		}
 	}
 
+
+	/**
+	 * 前后端分离版本用 一级申购自动匹配
+	 * @author jiangpeng
+	 * @date 2022/5/6 17:31
+	 * @param interfCstpBjfxjg 一级申购下行报文
+	 * @param resultBaseDto 处理结果
+	 */
+	public void secAutoBidTrade(InterfCstpBjfxjg interfCstpBjfxjg, ResultBaseDto resultBaseDto) {
+		String oritradeId = interfCstpBjfxjg.getTrdId();
+		// 判断债券标的是否存在
+		FinProduct finProduct = autoTradeMapper.selectSecByFinprodMarketId(interfCstpBjfxjg.getInstrumentId());
+		if (null == finProduct) {
+			// 防止有些标的的finprodId没带后缀，因此这里进行第二次查询
+			finProduct = autoTradeMapper.selectSecByFinprodMarketId(interfCstpBjfxjg.getInstrumentId() + ".IB");
+		}
+		if (StringUtil.isNotEmpty(finProduct)) {
+			// 判断是否已经生成了交易
+			TrdProductDeal deal = autoTradeMapper.isExistsTrade(oritradeId);
+			//判断该下行数据，是否已经匹配成功了。
+			TrdConfirmMatchDto matchDto = cstpMapper.selectMatchDtoByCstpTradeId(oritradeId);
+			if (!StringUtil.isNotEmpty(deal) && !StringUtil.isNotEmpty(matchDto)) {
+				try {
+					Map<String, Object> param = new HashMap<>();
+					param.put("interfCstpBjfxjg", interfCstpBjfxjg);
+					restTemplate.postForObject(
+							ServiceApplication.PINGAN_SERVICE_NAME + "/cfets/common/CfetsIbuQuoteBatchCommon/cstpAutoTrade",
+							param, Map.class);
+				} catch (Exception e) {
+					resultBaseDto.setErrMsg(e.getMessage());
+					logger.error(this.getClass() + "一级申购成交明细接口异常:" + e.getMessage());
+				}
+			} else {
+				String msg = "成交单编号：" + oritradeId + "，已经存在有效交易！";
+				resultBaseDto.setErrMsg(msg);
+				logger.info(msg);
+			}
+		} else {
+			String msg = "债券代码不存在！";
+			resultBaseDto.setErrMsg(msg);
+			logger.info(msg);
+		}
+	}
+
 }

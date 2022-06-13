@@ -1,0 +1,63 @@
+delete from INTERF_POSITION_CONFIG where TRADE_PLAT = 'TRANS_MATCH' and FINPROD_TYPE = 'F37' and PS in('T01','T02');
+
+insert into INTERF_POSITION_CONFIG
+  (TRADE_PLAT,
+   FINPROD_TYPE,
+   PS,
+   BUSI_ACT,
+   POSITION_TYPE,
+   ENTITY,
+   INTERF_TYPE,
+   CREATE_USER,
+   CREATE_DEPT,
+   CREATE_TIME,
+   UPDATE_USER,
+   UPDATE_TIME,
+   REMARK,
+   ENABLE)
+values
+  ('TRANS_MATCH',
+   'F37',
+   'T01',
+   '19',
+   'TRD',
+   'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto',
+   'CPC001',
+   'system',
+   null,
+   sysdate,
+   'system',
+   sysdate,
+   '信用保护凭证-买入',
+   'Y');
+
+insert into INTERF_POSITION_CONFIG
+  (TRADE_PLAT,
+   FINPROD_TYPE,
+   PS,
+   BUSI_ACT,
+   POSITION_TYPE,
+   ENTITY,
+   INTERF_TYPE,
+   CREATE_USER,
+   CREATE_DEPT,
+   CREATE_TIME,
+   UPDATE_USER,
+   UPDATE_TIME,
+   REMARK,
+   ENABLE)
+values
+  ('TRANS_MATCH',
+   'F37',
+   'T02',
+   '19',
+   'TRD',
+   'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto',
+   'CPC001',
+   'system',
+   null,
+   sysdate,
+   'system',
+   sysdate,
+   '信用保护凭证-卖出',
+   'Y');

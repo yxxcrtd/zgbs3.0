@@ -398,4 +398,48 @@ public class MstSecuritiesAccountController {
         Page<SelectOptionDto> asas=mstSecuritiesAccountService.getFinprodMarketInfoNewUi(page, length, map);
         return asas;
     }
+
+    /**
+     * 获取证券代码(债券 质押式回购)
+     *
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("getFinprodMarketInfoSecRepo/{page}/{length}")
+    public Page<SelectOptionDto> getFinprodMarketInfoSecRepo(@RequestBody Map<String, Object> map,
+                                                           @PathVariable("page") int page, @PathVariable("length") int length) throws Exception {
+        Page<SelectOptionDto> asas=mstSecuritiesAccountService.getFinprodMarketInfoSecRepo(page, length, map);
+        return asas;
+    }
+
+
+    /**
+     * 获取证券代码(债券 质押式回购)
+     *
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("getFinprodMarketInfoCds/{page}/{length}")
+    public Page<SelectOptionDto> getFinprodMarketInfoCds(@RequestBody Map<String, Object> map,
+                                                             @PathVariable("page") int page, @PathVariable("length") int length) throws Exception {
+        Page<SelectOptionDto> asas=mstSecuritiesAccountService.getFinprodMarketInfoCds(page, length, map);
+        return asas;
+    }
+
+    /**
+     * 现券列表查询获取资产代码
+     * @param map
+     * @param page
+     * @param length
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("getFinprodListSecRepo/{page}/{length}")
+    public Page<SelectOptionDto> getFinprodListSecRepo(@RequestBody Map<String, Object> map,
+                                                             @PathVariable("page") int page, @PathVariable("length") int length) throws Exception {
+        Page<SelectOptionDto> asas=mstSecuritiesAccountService.getFinprodListSecRepo(page, length, map);
+        return asas;
+    }
 }

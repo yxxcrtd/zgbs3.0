@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.common.base.dao.AssetDailyInfoMapper_mysql" >
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.AssetDailyInfo" >
+        <id column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+        <id column="CDATE" property="cdate" jdbcType="DATE" />
+        <result column="M_PENDING_PERIOD" property="mPendingPeriod" jdbcType="DECIMAL" />
+        <result column="M_PENDING_PERIOD_UNIT" property="mPendingPeriodUnit" jdbcType="VARCHAR" />
+        <result column="EX_PENDING_PERIOD" property="exPendingPeriod" jdbcType="DECIMAL" />
+        <result column="EX_PENDING_PERIOD_UNIT" property="exPendingPeriodUnit" jdbcType="VARCHAR" />
+        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
+        <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        FINPROD_ID FINPROD_ID,CDATE CDATE, M_PENDING_PERIOD,M_PENDING_PERIOD_UNIT,EX_PENDING_PERIOD,EX_PENDING_PERIOD_UNIT,
+        CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT,CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+    </sql>
+    <sql id="Sql_All_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.AssetDailyInfoMapper.Base_Column_List" />
+        from ASSET_DAILY_INFO
+    </sql>
+    <sql id="Sql_All_Effective_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.AssetDailyInfoMapper.Base_Column_List" />
+        from ASSET_DAILY_INFO
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.joyintech.tams.common.base.entity.AssetDailyInfoKey" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.AssetDailyInfoMapper.Base_Column_List" />
+        from ASSET_DAILY_INFO
+        where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+          and CDATE = #{cdate,jdbcType=DATE}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.AssetDailyInfoKey" >
+        delete from ASSET_DAILY_INFO
+        where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+          and CDATE = #{cdate,jdbcType=DATE}
+    </delete>
+    <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.AssetDailyInfo" >
+        insert into ASSET_DAILY_INFO (FINPROD_ID, CDATE,M_PENDING_PERIOD,M_PENDING_PERIOD_UNIT,EX_PENDING_PERIOD,EX_PENDING_PERIOD_UNIT
+                                      CREATE_USER,CREATE_DEPT, CREATE_TIME, UPDATE_USER,  UPDATE_TIME)
+        values (#{finprodId,jdbcType=VARCHAR}, #{cdate,jdbcType=DATE},
+            #{mPendingPeriod,jdbcType=DECIMAL},#{mPendingPeriodUnit,jdbcType=VARCHAR},#{exPendingPeriod,jdbcType=DECIMAL},
+            #{exPendingPeriodUnit,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR},
+            #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
+            #{updateTime,jdbcType=TIMESTAMP}
+            )
+    </insert>
+    <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.AssetDailyInfo" >
+        insert into ASSET_DAILY_INFO
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="finprodId != null" >
+                FINPROD_ID,
+            </if>
+            <if test="cdate != null" >
+                CDATE,
+            </if>
+            <if test="mPendingPeriod != null" >
+                M_PENDING_PERIOD,
+            </if>
+            <if test="mPendingPeriodUnit != null" >
+                M_PENDING_PERIOD_UNIT,
+            </if>
+            <if test="exPendingPeriod != null" >
+                EX_PENDING_PERIOD,
+            </if>
+            <if test="exPendingPeriodUnit != null" >
+                EX_PENDING_PERIOD_UNIT,
+            </if>
+            <if test="createUser != null" >
+                CREATE_USER,
+            </if>
+            <if test="createDept != null" >
+                CREATE_DEPT,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="finprodId != null" >
+                #{finprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="cdate != null" >
+                #{cdate,jdbcType=DATE},
+            </if>
+            <if test="mPendingPeriod != null" >
+                #{mPendingPeriod,jdbcType=DECIMAL},
+            </if>
+            <if test="mPendingPeriodUnit != null" >
+                #{mPendingPeriodUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="exPendingPeriod != null" >
+                #{exPendingPeriod,jdbcType=DECIMAL},
+            </if>
+            <if test="exPendingPeriodUnit != null" >
+                #{exPendingPeriodUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createDept != null" >
+                #{createDept,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.AssetDailyInfo" >
+        insert into ASSET_DAILY_INFO(FINPROD_ID, CDATE,M_PENDING_PERIOD,M_PENDING_PERIOD_UNIT
+                                     ,EX_PENDING_PERIOD,EX_PENDING_PERIOD_UNIT,
+                                     CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        )
+        select FINPROD_ID, CDATE, M_PENDING_PERIOD,M_PENDING_PERIOD_UNIT,EX_PENDING_PERIOD,EX_PENDING_PERIOD_UNIT
+            , CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+             from ASSET_DAILY_INFO
+             where 1 = 1 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and CDATE = #{cdate,jdbcType=DATE}
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.AssetDailyInfo" >
+        update ASSET_DAILY_INFO
+        <set >
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="mPendingPeriod != null" >
+                M_PENDING_PERIOD = #{mPendingPeriod,jdbcType=DECIMAL},
+            </if>
+            <if test="mPendingPeriodUnit != null" >
+                M_PENDING_PERIOD_UNIT = #{mPendingPeriodUnit,jdbcType=VARCHAR} ,
+            </if>
+            <if test="exPendingPeriod != null" >
+                EX_PENDING_PERIOD = #{exPendingPeriod,jdbcType=DECIMAL},
+            </if>
+            <if test="exPendingPeriodUnit != null" >
+                EX_PENDING_PERIOD_UNIT = #{exPendingPeriodUnit,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+          and CDATE = #{cdate,jdbcType=DATE}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.AssetDailyInfo" >
+        update ASSET_DAILY_INFO
+        set UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            M_PENDING_PERIOD = #{mPendingPeriod,jdbcType=DECIMAL},
+            M_PENDING_PERIOD_UNIT = #{mPendingPeriodUnit,jdbcType=VARCHAR} ,
+            EX_PENDING_PERIOD = #{exPendingPeriod,jdbcType=DECIMAL},
+            EX_PENDING_PERIOD_UNIT = #{exPendingPeriodUnit,jdbcType=VARCHAR}
+        where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+          and CDATE = #{cdate,jdbcType=DATE}
+    </update>
+</mapper>

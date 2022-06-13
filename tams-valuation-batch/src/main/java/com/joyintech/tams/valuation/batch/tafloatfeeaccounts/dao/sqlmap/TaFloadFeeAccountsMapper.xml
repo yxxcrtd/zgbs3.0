@@ -59,6 +59,9 @@
 			and bc.CD_FLAG = #{cdFlag,jdbcType=VARCHAR}
 			/**AND 账务明细（当前表）.优先级  小于 参数.优先级**/
 		    and bc.TASK_ID <![CDATA[ < ]]> #{taskId}
+			<if test="subjectNo != null and subjectNo != ''">
+				AND bc.SUBJECT_NO = #{subjectNo}
+			</if>
 		/**账务明细（当前表）.BOOK_ORDER**/
 		order by bc.book_order
 	</select>

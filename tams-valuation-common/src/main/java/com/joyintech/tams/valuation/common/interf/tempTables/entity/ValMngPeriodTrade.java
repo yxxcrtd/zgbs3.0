@@ -129,6 +129,13 @@ public class ValMngPeriodTrade extends BaseEntity {
      */
     private String channelId;
 
+    /*add by sunshuaishuai 20220418 交易管理 start*/
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+    /*add by sunshuaishuai 20220418 end*/
+
     /**
      * 取得 产品代码
      * @return 产品代码
@@ -501,4 +508,36 @@ public class ValMngPeriodTrade extends BaseEntity {
     public void setChannelId(String channelId) {
         this.channelId = channelId == null ? null : channelId.trim();
     }
+
+    /**
+     *资金账户
+     * yc 20220323
+     */
+    private String myAcctNo;
+
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+
+    /*add by sunshuaishuai 20220418 交易管理 start*/
+    /**
+     * 取得 数据来源
+     * @return 数据来源
+     */
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * 设置 数据来源
+     * @param dataSource 数据来源
+     */
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+    /*add by sunshuaishuai 20220418 end*/
 }

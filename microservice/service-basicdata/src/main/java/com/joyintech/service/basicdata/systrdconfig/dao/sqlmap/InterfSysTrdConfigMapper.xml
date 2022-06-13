@@ -410,7 +410,7 @@
         ) T3
         ON T.FINPROD_ID = T3.FINPROD_ID
         WHERE T.TRADE_MARKET IN (#{TRADE_MARKET_03,jdbcType=VARCHAR},#{TRADE_MARKET_04,jdbcType=VARCHAR})
-        AND T2.TYPE_8 IN (#{ASSET_TYPE_F01,jdbcType=VARCHAR},#{ASSET_TYPE_F02,jdbcType=VARCHAR},#{ASSET_TYPE_F11,jdbcType=VARCHAR},#{ASSET_TYPE_F20,jdbcType=VARCHAR})
+        AND T2.TYPE_8 IN (#{ASSET_TYPE_F01,jdbcType=VARCHAR},#{ASSET_TYPE_F02,jdbcType=VARCHAR},#{ASSET_TYPE_F11,jdbcType=VARCHAR},#{ASSET_TYPE_F20,jdbcType=VARCHAR},#{ASSET_TYPE_F37,jdbcType=VARCHAR})
         <if test="market != null and market != ''">
             AND T.TRADE_MARKET = #{market,jdbcType=VARCHAR}
         </if>
@@ -539,4 +539,89 @@
         ) TEMP
         where TEMP.rn = 1
     </select>
+
+
+    <select id="getDealerTraderInfo"
+            resultType="com.joyintech.service.basicdata.systrdconfig.dto.TradeInfoProResponse">
+        select
+        mdi.DEALER_NO,
+        mci.CUSTOMER_NAME dealerName,
+        MDDI.DEALER_PARTY_NO,
+        MDDI.DEALER_PARTY_TYPE,
+        MDDI.DEALER_PARTY_NAME,
+        MDDI.TRADER_NO ,
+        MDDI.TRADER_NAME ,
+        MDDI.IS_OUR
+        from
+        MST_DEALER_INFO mdi
+        LEFT JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
+        and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
+        left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = mdi.CUSTOMER_ID
+        left join MST_SALE_DEPARTMENT MSD on MDDI.CUSTOMER_ID =MSD.BROKER_ID
+        LEFT JOIN STL_CAPACCT_INFO SCI ON MSD.SALE_DEPID = SCI.OWN_DEPT
+        left join STL_SEC_ACCT_INFO SSAI on SCI.ACCT_NO = SSAI.TRD_ACCT_ID
+        <where>
+            <if test="tradePlace != null and tradePlace != ''">
+                mdi.TRADE_MARKET = #{tradePlace}
+            </if>
+            <if test="acctNo != null and acctNo != ''">
+                and  SCI.ACCT_NO = #{acctNo}
+            </if>
+            <if test="isOur != null and isOur != ''">
+                and MDDI.IS_OUR = #{isOur}
+            </if>
+            <if test="dealerNo != null and dealerNo != ''">
+                and mdi.DEALER_NO = #{dealerNo}
+            </if>
+            <if test="dealerName != null and dealerName != ''">
+                and mci.CUSTOMER_ABBR like concat(concat('%',#{dealerName}),'%')
+            </if>
+            <if test="traderNo != null and traderNo != ''">
+                and MDDI.TRADER_NO like concat(concat('%',#{traderNo}),'%')
+            </if>
+            <if test="traderName != null and traderName != ''">
+                and MDDI.TRADER_NAME like concat(concat('%',#{traderName}),'%')
+            </if>
+            <if test="dealerPartyNo != null and dealerPartyNo != ''">
+                and MDDI.DEALER_PARTY_NO like concat(concat('%',#{dealerPartyNo}),'%')
+            </if>
+            <if test="dealerPartyName != null and dealerPartyName != ''">
+                and MDDI.DEALER_PARTY_NAME like concat(concat('%',#{dealerPartyName}),'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getMstRepoProductInfo" resultType="map">
+        select
+        T1.TRADE_MARKET,
+        T1.TERM_TYPE
+        FROM MST_REPO_PRODUCT T1
+        WHERE
+        T1.MARKET_ID = #{finprodId}
+    </select>
+
+
+    <!--查询资产是否进行了SPPI测试-->
+    <select id="queryAssetIsSppiTest"  resultType="com.joyintech.tams.common.base.entity.SppiImportData">
+        select * from (
+        select x.test_status isSppiPass
+        from sppi_test x
+        where x.finprod_id=#{finprodId,jdbcType=VARCHAR}
+        union
+        select t.is_sppi_pass
+        from SPPI_IMPORT_DATA t
+        where t.bond_id=#{finprodId,jdbcType=VARCHAR}
+        ) where rownum=1
+    </select>
+
+    <!--未来是否有行权-->
+    <select id="countBondHasEexrPlan" resultType="java.lang.Integer">
+        select count(1)
+        from FIN_EXERCISE_PLAN
+        where
+            FINPROD_ID = #{finprodId}
+            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE} and EXERCISE_TYPE in ('01','02')
+    </select>
+
+
 </mapper>

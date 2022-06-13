@@ -323,19 +323,19 @@
                             </div>
                         </div> -->
                         
-                        <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01' "  class="form-inline-wrap"  style=" width: 50%; padding:0px;">
-                                    <label class="layui-form-label" style="width: 105px;" 
-                                           data-th-text="#{EtrIbBondinfo002.invAim}">投资目的</label>
-                                    <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
-                                        <select type="text" id="invAim" name="invAim"
-                                                class="layui-input form-input input-select"
-                                                data-th-data-result='${INV_AIM}' allowClear="true"
-                                                placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
-                                                required="required" formatoption="true"
-                                                data-th-initValue="${entity?.invAim}">
-                                        </select>
-                                    </div>
-                         </div>
+<!--                        <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01' "  class="form-inline-wrap"  style=" width: 50%; padding:0px;">-->
+<!--                                    <label class="layui-form-label" style="width: 105px;" -->
+<!--                                           data-th-text="#{EtrIbBondinfo002.invAim}">投资目的</label>-->
+<!--                                    <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">-->
+<!--                                        <select type="text" id="invAim" name="invAim"-->
+<!--                                                class="layui-input form-input input-select"-->
+<!--                                                data-th-data-result='${INV_AIM}' allowClear="true"-->
+<!--                                                placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"-->
+<!--                                                required="required" formatoption="true"-->
+<!--                                                data-th-initValue="${entity?.invAim}">-->
+<!--                                        </select>-->
+<!--                                    </div>-->
+<!--                         </div>-->
                        <!-- <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='02' " class="form-inline-wrap" id = "businessModelDiv_jj">
                             <label class="layui-form-label form-label-wrap"
                                    data-th-text="#{EtrBondFirstLBidding002.businessModel}">业务模式</label>
@@ -501,7 +501,7 @@
                 })
                 // add by wanshiwei ZGZGST-2818:审批时现金没有正确显示 20210923 end
                 //展示投资目的或业务模式参数
-                var SHOW_INVAIM_OR_BUSSINSSMODEL =  /*[[${SHOW_INVAIM_OR_BUSSINSSMODEL}]]*/'';
+                // var SHOW_INVAIM_OR_BUSSINSSMODEL =  /*[[${SHOW_INVAIM_OR_BUSSINSSMODEL}]]*/'';
             </script>
             <script data-th-src="@{/js/component/common/TradeCommon.js}" type="text/javascript"></script>
             <script data-th-src="@{/js/invest/entrust/etribbondinfo/EtrIbBondinfo002.js}" type="text/javascript"></script>

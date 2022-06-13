@@ -19,15 +19,10 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.bankuplink.bond.dto.CfetsBondRegCheckDetaileRequst;
-import com.joyintech.tams.cfets.bankuplink.bond.dto.CfetsBondRegCheckRequst;
-import com.joyintech.tams.cfets.bankuplink.bond.dto.PtlAllocationDto;
-import com.joyintech.tams.cfets.bankuplink.bond.service.CfetsQuotedCommonService;
-import com.joyintech.tams.cfets.bankuplink.bond.service.IbuQuoteBondService;
-import com.joyintech.tams.cfets.bankuplink.repo.dto.CfetsRepoDealRegisterQuoteDto;
-import com.joyintech.tams.cfets.bankuplink.repo.service.CfetsRepoQuotedPrice004Service;
-import com.joyintech.tams.cfets.etrib.bond.controller.CfetsEtrIbBondinfoController;
-import com.joyintech.tams.cfets.etrib.bond.dto.CfetsBussCombDistribtBaseDto;
+import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
+import com.joyintech.tams.cfets.trd.bond.service.CfetsQuotedCommonService;
+import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondService;
+import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.trdredeem.dto.CfetsTrdRedeemCheckRequst;
 import com.joyintech.tams.cfets.trdredeem.dto.CfetsTrdRedeemDealCommonDto;
 import com.joyintech.tams.cfets.trdredeem.dto.CfetsTrdRedeemDealRegisterQuoteDto;
@@ -35,8 +30,6 @@ import com.joyintech.tams.cfets.trdredeem.dto.CfetsTrdRedeemRegInfoListResponse;
 import com.joyintech.tams.cfets.trdredeem.service.CfetsTrdRedeem001Service;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -58,7 +51,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,13 +76,6 @@ public class CfetsTrdRedeem001Controller extends BaseController {
     @Autowired(required = false)
     private BaseGetBusinessId baseGetBusinessId;
 
-    @Autowired
-    private IPlatformDate iPlatformDate;
-
-    @Autowired
-    private IbuQuoteBondService ibuQuoteBondService;
-    @Autowired
-    private CfetsQuotedCommonService cfetsQuotedCommonService;
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
     @Override
@@ -178,7 +163,7 @@ public class CfetsTrdRedeem001Controller extends BaseController {
 
     /**
      * 待办事项页面,保存校验
-     * @param CfetsTrdRedeemDealCommonDto
+     * @param cfetsTrdRedeemDealCommonDto
      * @return
      */
     @PostMapping("/checkByHome")

@@ -493,7 +493,7 @@ public class SftpTools {
             curDir = sftp.pwd();
             sftp.cd(curDir);
             try {
-              localfile = new SafelyFile(localDir + File.separator + fileName);
+              localfile = new SafelyFile(localDir + "/" + fileName);
               output = new FileOutputStream(localfile);
               sftp.get(fileName, output);
           }

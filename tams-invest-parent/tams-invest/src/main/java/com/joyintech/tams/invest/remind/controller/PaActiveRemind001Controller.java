@@ -144,6 +144,9 @@ public class PaActiveRemind001Controller extends BaseController implements Activ
         model.addAttribute("R10S1", BussinessDictCodeList.提醒类型_小分类_债券上市流通操作.getValue());
         model.addAttribute("R10S2", BussinessDictCodeList.提醒类型_小分类_资产要素登记修改.getValue());
 
+        model.addAttribute("R12", BussinessDictCodeList.提醒类型_大分类_标准券额度不足提醒.getValue());
+        model.addAttribute("R12S1", BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue());
+
         if (MultilevelDataAuthorityUtil.isEnabled()) {
             User user = SecurityUtil.getLoginUser();
             model.addAttribute("isEJFRflag", true);
@@ -170,5 +173,17 @@ public class PaActiveRemind001Controller extends BaseController implements Activ
         Map<String, Object> result=paActiveRemind001Service.searchCount(param);
         return result;
     }
-    
+
+
+    /**
+     * 标准券额度不足提醒查询资产代码
+     */
+    @ResponseBody
+    @RequestMapping("searchFinprodId")
+    public Map<String, Object> searchFinprodId(@RequestBody Map<String, Object> param){
+        param.put("quaryDate", DateUtil.parse((String)param.get("cdate")));
+        Map<String, Object> result=paActiveRemind001Service.searchFinprodId(param);
+        return result;
+    }
+
 }

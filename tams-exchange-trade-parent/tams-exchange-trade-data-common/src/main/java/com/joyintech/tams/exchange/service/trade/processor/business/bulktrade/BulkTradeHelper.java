@@ -1,13 +1,15 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.bulktrade;
 
+import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
-import com.joyintech.tams.exchange.common.cache.QuoteTickService;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
-import com.joyintech.tams.exchange.common.proto.QuoteProto;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
@@ -36,8 +38,10 @@ public class BulkTradeHelper {
 
     @Autowired
     private InstrumentService instrumentService;
+//    @Autowired
+//    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
     @Autowired
     private StockHelper stockHelper;
     @Autowired
@@ -61,28 +65,28 @@ public class BulkTradeHelper {
         } else if (Market.SHSE.value.equals(market)) {
             tradePlat = TradePlat.SH_SCALE;
         }
-        if (InvestmentAssetType.STOCK.value.equals(assetType)) { //股票
+        if (InvestAssetTypeEnum.STOCK.value.equals(assetType)) { //股票
             if (!stockHelper.checkCommonParam(entrustPrice, entrustVolume, orderInterface, instrument, instruction.getTradePlat(), instruction.getPs(), entrustBalance, instruction.getEntrustBussType(), instruction.getPriceMode())) {
                 return false;
             }
-            if (compareMinOrMaxVolumeAndBalance(orderInterface, entrustBalance, bgEntrustVolume, minTrdUnitLimit, InvestmentAssetType.STOCK, tradePlat))
+            if (compareMinOrMaxVolumeAndBalance(orderInterface, entrustBalance, bgEntrustVolume, minTrdUnitLimit, InvestAssetTypeEnum.STOCK, tradePlat))
                 return false;
-        } else if (InvestmentAssetType.FUND.value.equals(assetType)) { //基金
+        } else if (InvestAssetTypeEnum.FUND.value.equals(assetType)) { //基金
             if (!fundHelper.checkCommonParam(entrustPrice, entrustVolume, orderInterface, instrument, instruction.getTradePlat(), instruction.getPs(), entrustBalance, instruction.getEntrustBussType(), instruction.getPriceMode())) {
                 return false;
             }
-            if (compareMinOrMaxVolumeAndBalance(orderInterface, entrustBalance, bgEntrustVolume, minTrdUnitLimit, InvestmentAssetType.FUND, tradePlat))
+            if (compareMinOrMaxVolumeAndBalance(orderInterface, entrustBalance, bgEntrustVolume, minTrdUnitLimit, InvestAssetTypeEnum.FUND, tradePlat))
                 return false;
-        } else if (InvestmentAssetType.BOND.value.equals(assetType)) { //债券
+        } else if (InvestAssetTypeEnum.BOND.value.equals(assetType)) { //债券
             if (!bondHelper.checkCommonParam(orderInterface.getFullPrice(), entrustPrice, entrustVolume, orderInterface, instrument, instruction.getTradePlat(), instruction.getPs(), entrustBalance, instruction.getEntrustBussType(), instruction.getPriceMode())) {
                 return false;
             }
            /* if (!checkBondPriceLimit(orderInterface, entrustPrice)) {
                 return false;
             }*/
-            if (compareMinOrMaxVolumeAndBalance(orderInterface, entrustBalance, bgEntrustVolume, minTrdUnitLimit, InvestmentAssetType.BOND, tradePlat))
+            if (compareMinOrMaxVolumeAndBalance(orderInterface, entrustBalance, bgEntrustVolume, minTrdUnitLimit, InvestAssetTypeEnum.BOND, tradePlat))
                 return false;
-        } else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) { //质押式回购
+        } else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType)) { //质押式回购
             if (!checkUnitVol(bgEntrustVolume, orderInterface, instrument)) {
                 return false;
             }
@@ -94,7 +98,7 @@ public class BulkTradeHelper {
                 return false;
             }
             if (Objects.nonNull(minTrdUnitLimit)) {
-                if (compareMinOrMaxVolumeAndBalance(orderInterface, entrustBalance, bgEntrustVolume, minTrdUnitLimit, InvestmentAssetType.BOND, tradePlat))
+                if (compareMinOrMaxVolumeAndBalance(orderInterface, entrustBalance, bgEntrustVolume, minTrdUnitLimit, InvestAssetTypeEnum.BOND, tradePlat))
                     return false;
             }
         } else {
@@ -113,16 +117,16 @@ public class BulkTradeHelper {
         return true;
     }
 
-    private boolean compareMinOrMaxVolumeAndBalance(OrderInterface orderInterface, BigDecimal entrustBalance, BigInteger bgEntrustVolume, MinTrdUnitLimit minTrdUnitLimit, InvestmentAssetType investmentAssetType, TradePlat tradePlat) {
+    private boolean compareMinOrMaxVolumeAndBalance(OrderInterface orderInterface, BigDecimal entrustBalance, BigInteger bgEntrustVolume, MinTrdUnitLimit minTrdUnitLimit, InvestAssetTypeEnum investAssetTypeEnum, TradePlat tradePlat) {
         if (Objects.nonNull(minTrdUnitLimit)) {
             if (bgEntrustVolume.compareTo(BigInteger.valueOf(minTrdUnitLimit.getMinNum())) < 0 && entrustBalance.compareTo(minTrdUnitLimit.getMinAmt()) < 0) {
                 orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
-                orderInterface.setErrorMsg("不满足" + tradePlat.name + investmentAssetType.name + "大宗交易最小买入数量:" + minTrdUnitLimit.getMinNum() + ",或者金额" + minTrdUnitLimit.getMinAmt());
+                orderInterface.setErrorMsg("不满足" + tradePlat.name + investAssetTypeEnum.name + "大宗交易最小买入数量:" + minTrdUnitLimit.getMinNum() + ",或者金额" + minTrdUnitLimit.getMinAmt());
                 return true;
             }
             if (bgEntrustVolume.compareTo(BigInteger.valueOf(minTrdUnitLimit.getMaxNum())) > 0 || entrustBalance.compareTo(minTrdUnitLimit.getMaxAmt()) > 0) {
                 orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
-                orderInterface.setErrorMsg("超过" + tradePlat.name + investmentAssetType.name + "大宗交易最大买入数量:" + minTrdUnitLimit.getMaxNum() + ",或者金额" + minTrdUnitLimit.getMaxAmt());
+                orderInterface.setErrorMsg("超过" + tradePlat.name + investAssetTypeEnum.name + "大宗交易最大买入数量:" + minTrdUnitLimit.getMaxNum() + ",或者金额" + minTrdUnitLimit.getMaxAmt());
                 return true;
             }
         }
@@ -187,8 +191,11 @@ public class BulkTradeHelper {
 
     //检查交易价格涨跌停限制
     private boolean checkPriceLimit(OrderInterface orderInterface, BigDecimal entrustPrice) {
-        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
-        if (Objects.nonNull(tick)) {
+        ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean)tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+//        if (Objects.nonNull(tick)) {
             double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
             double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
             if ((Double.compare(lowerLimitPrice, 0.0) > 0 && Double.compare(lowerLimitPrice, entrustPrice.doubleValue()) > 0)
@@ -204,8 +211,11 @@ public class BulkTradeHelper {
     //检查债券交易价格上下限
     private boolean checkBondPriceLimit(OrderInterface orderInterface, BigDecimal entrustPrice) {
         //（min（最低价（债券五档行情中的最低价），收盘价x70%）<=price<=max（最高价（债券五档行情中的最高价），收盘价x130%））
-        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
-        if (Objects.nonNull(tick)) {
+        ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean)tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+//        if (Objects.nonNull(tick)) {
             double lowerLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 0.7, 4);
             double upperLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 1.3, 4);
             lowerLimitPrice = Math.min(lowerLimitPrice, TradeUtils.formatDouble(tick.getLowPrice(), 4));
@@ -231,17 +241,18 @@ public class BulkTradeHelper {
     //债券交易价格上下限
     private boolean checkBondPriceLimit(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, String tradePlat, String entrustBussType, String priceMode) {
         logger.info("没有涨跌幅");
-        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+        boolean checkPrice = false;
         String isFullPrice = orderInterface.getIsFullPrice();
-        boolean checkPrice;
-        if (!FullPriceConst.FULL_PRICE.value.equals(isFullPrice)) {
-            checkPrice = priceHelper.checkPrice(entrustPrice, orderInterface, instrument, tick, tradePlat, entrustBussType, priceMode);
-        } else {
-            checkPrice = priceHelper.checkPrice(orderInterface.getFullPrice(), orderInterface, instrument, tick, tradePlat, entrustBussType, priceMode);
+        ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean) tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+            if (!FullPriceConst.FULL_PRICE.value.equals(isFullPrice)) {
+                checkPrice = priceHelper.checkPrice(entrustPrice, orderInterface, instrument, tick, tradePlat, entrustBussType, priceMode);
+            } else {
+                checkPrice = priceHelper.checkPrice(orderInterface.getFullPrice(), orderInterface, instrument, tick, tradePlat, entrustBussType, priceMode);
+            }
         }
-        if (!checkPrice) {
-            return false;
-        }
-        return true;
+        return !checkPrice;
     }
 }

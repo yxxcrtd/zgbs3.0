@@ -34,6 +34,12 @@ public interface StlDataGatherMapper {
     List<SettleTransDataDto> selectSettleTransData(Map<String, Object> paraMap);
 
     /**
+     * 获取投管交易编号
+     * @param 查询参数
+     * @return 投管交易编号
+     */
+    List<String> selectTradeIdTgs(Map<String, Object> paraMap);
+    /**
      * 查询前置交易编号
      * @param paraMap 查询参数
      * @return 前置交易编号
@@ -137,12 +143,18 @@ public interface StlDataGatherMapper {
     List<SettleTransDataDto> listBondSettleTransData(Map<String, Object> paraMap);
 
     /**
-     * 回购存续期
+     * 竞价回购存续期
      * @param paraMap
      * @return
      */
     List<SettleTransDataDto> listRepoSettleTransData(Map<String, Object> paraMap);
 
+    /**
+     * 协议回购到期成交明细数据
+     * @param paraMap
+     * @return
+     */
+    List<SettleTransDataDto> listRepoH01MaturitySettleTransData(Map<String, Object> paraMap);
     /**
      * 持仓余额
      * @param param
@@ -257,5 +269,24 @@ public interface StlDataGatherMapper {
     List<EtrPledge> selectEtrPledges(@Param("entrustId")String entrustId, @Param("finProdId")String finProdId);
 
     int selectDzcjList(Map<String, Object> searchParam);
+    /**
+     * 根据汇总交易编号查询出所有汇总交易
+     * @param tradeIdTgList
+     * @return 所有汇总交易
+     */
+    List<TrdFinProductDealTotal>  selectTotalTradesBytotleTradeId(@Param("tradeIdTgList") List<String> tradeIdTgList);
 
+    /**
+     * 根据汇总的成交明细查询出原成交明细列表
+     * @param stdMap
+     * @return成交明细列表
+     */
+    List<SettleTransDataDto> selectSettleTransDatas(Map<String, Object> stdMap);
+
+    /**
+     * 查询一级投标债券对应信息
+     * @param searchParam
+     * @return
+     */
+    List<SettleTransDataDto> selectBondFirstBiddingData(Map<String, Object> searchParam);
 }

@@ -1,6 +1,8 @@
 package com.joyintech.tams.exchange.common.constant;
 
-public enum ErrorCode {
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
+public enum ErrorCode implements IEnum<Integer> {
 
     SUCCESS(0, "success"),
     /**
@@ -38,17 +40,30 @@ public enum ErrorCode {
 
     INSTRUCTION_APPLY_NOT_UNIQUE(25, "只能进行一次该申报"),
 
+    MIN_TRD_UNIT_LIMIT_ERROR(26, "未找到最小交易单元"),
+
+    MIN_TRD_NUM_LIMIT_ERROR(27, "未找到最小交易数量"),
+
     DB_ERROR(100, "数据库返回错误"),
+
+    CHECK_ERROR(101, "校验失败"),
+
+    API_ERROR(102, "接口调用失败"),
+
+    ATTRIBUTE_ERROR(103, "有效申报价格校验失败"),
 
     INNER_RISK_ERROR(200, "内部风控检查错误"),
 
-    MASTER_TOKEN_DISABLE(300, "主从模式关闭"),
+    MASTER_TOKEN_DISABLE(310, "主从模式关闭"),
+
+    TRIGGER_SOFT_CONTROL(333, "触发软控"),
 
     SYSTEM_ERROR(500, "服务器内部错误"),
 
     SYSTEM_FUNCTION_NOT_IMPLEMENT(501, "功能未实现"),
 
     EUREKA_SERVER_ERROR(600, "当前主节点不可用"),
+
     /**
      * 1001 —— 2000业务错误号
      */
@@ -91,6 +106,16 @@ public enum ErrorCode {
     INSTRUMENT_INFO_NOT_EXIT(1019, "申报代码信息不存在"),
 
     ENTRUST_PROP_NOT_EXIT(1020, "委托属性不存在"),
+
+    UN_SUPPORT_ENTRUST_PROP(1021, "现券交易不支持当前委托属性"),
+    TRADE_NOT_EMPTY(1022, "本方交易员不能为空"),
+    DEALER_NOT_EMPTY(1023, "本方交易商ID或名称不能为空"),
+    INVESTOR_NOT_EMPTY(1024, "本方交易主体ID或名称不能为空"),
+    COUNTER_NOT_EMPTY(1025, "交易对手不能为空"),
+    PROP_TRADE_NOT_EMPTY(1026, "对手方交易员不能为空"),
+    PROP_DEALER_NOT_EMPTY(1027, "对手方交易商ID或名称不能为空"),
+    PROP_INVESTOR_NOT_EMPTY(1028, "对手方交易主体ID或名称不能为空"),
+    CONTRACT_ID_NOT_EMPTY(1029, "协商成交约定号不能为空"),
 
     /**
      * 2001 —— 3000终端错误号
@@ -143,7 +168,7 @@ public enum ErrorCode {
 
     INSTRUCTION_END_DATE_ERROR(4013, "指令的结束日小于平台日"),
 
-    INSTRUCTIONS_PRICE_ERROR(4014, "指令委托价格超限"),
+    INSTRUCTIONS_PRICE_ERROR(4014, "委托价格超限"),
 
     REQ_PARAMETER_INSTRUCTION_ID_ERROR(4015, "指令ID错误"),
 
@@ -153,15 +178,39 @@ public enum ErrorCode {
 
     NOT_EXIST_FAIR_INSTRUCTION_ERROR(4018, "没有符合公平交易的指令，无法进行公平交易！"),
 
+    NOT_FAIR_ORDER_ERROR(4019, "不符合公平交易条件，无法进行公平交易！"),
+
     INSTRUCTIONS_DERIVATIVE_BS_OC_ERROR(4030, "指令中衍生品买卖方向和开平仓标志不能为空"),
 
     INSTRUCTIONS_DERIVATIVE_BS_OC_NOT_MATCH_ERROR(4031, "指令中衍生品买卖方向和开平标志不匹配"),
+
+    INSTRUCTION_DETAILS_NOT_EXIST(4032, "指令组合明细不存在"),
 
     INSTRUCTION_PLEDGE_NUMBER_ERROR(4050, "抵押券数量错误"),
 
     INSTRUCTIONS_RETURN_FORBID(4051, "当前指令不可退回"),
 
     QUOTATION_NOT_EXIST(4052, "未获取到当前资产行情信息"),
+
+    INSTRUCTIONS_BUY_PRICE_ERROR(4053, "买入委托价格不得超过指令价格"),
+
+    INSTRUCTIONS_SELL_PRICE_ERROR(4054, "卖出委托价格不得低于指令价格"),
+
+    INSTRUCTIONS_POSITIVEREPO_PRICE_ERROR(4055, "正回购委托价格不得超过指令价格"),
+
+    INSTRUCTIONS_REVERSEDREPO_PRICE_ERROR(4056, "逆回购委托价格不得低于指令价格"),
+
+    INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR(4057, "公平交易买入或正回购委托价格不得超过最优价"),
+
+    INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR(4058, "公平交易卖出或逆回购委托价格不得低于最优价"),
+
+    INSTRUCTIONS_NO_GUARD_BOND_ERROR(4059, "非担保债券不支持公平交易"),
+
+    APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR(4997, "分发指令数据存在不合法"),
+
+    APPOINT_INSTRUCTION_PARAMETER_ERROR(4998, "分发指令数据错误"),
+
+    APPOINT_INSTRUCTION_ERROR(4999, "处理分发指令数据失败"),
 
     INSTRUCTIONS_ERROR_CODE_END(5000, "instruction error code end"),
     /**
@@ -217,11 +266,33 @@ public enum ErrorCode {
         return this.value == 0;
     }
 
+    public static boolean isFail(int value) {
+        return value != 0;
+    }
+
+    public static boolean isNotSoftControlFail(int value) {
+        return value != 0 && value != 333;
+    }
+
+    public static boolean isSoftControlFail(int value) {
+        return value == 333;
+    }
+
     public static boolean isSuccess(int value) {
         return value == 0;
     }
 
     public static String getStr(ErrorCode errorCode) {
         return errorCode.value + ":" + errorCode.errorMsg;
+    }
+
+    @Override
+    public Integer getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return errorMsg;
     }
 }

@@ -46,6 +46,8 @@ public class StlCapacctInfo extends StlCapacctInfoKey {
      */
     private String isOverdraw;
 
+    private String ccy;
+
     /**
      * 备注
      */
@@ -80,6 +82,16 @@ public class StlCapacctInfo extends StlCapacctInfoKey {
      * 交易密码
      */
     private String tradePass;
+
+    private String acctType;
+
+    private String stockExchangeNo;
+
+    private String status;
+
+    private String acctPwd;
+
+    private String tradePwd;
 
     /**
      * 取得 账号
@@ -225,6 +237,16 @@ public class StlCapacctInfo extends StlCapacctInfoKey {
         this.isOverdraw = isOverdraw == null ? null : isOverdraw.trim();
     }
 
+    @Override
+    public String getCcy() {
+        return ccy;
+    }
+
+    @Override
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
+    }
+
     /**
      * 取得 备注
      * @return 备注
@@ -334,5 +356,47 @@ public class StlCapacctInfo extends StlCapacctInfoKey {
      */
     public void setAccountNature(String accountNature) {
         this.accountNature = accountNature;
+    }
+
+    public String getAcctType() {
+        return acctType;
+    }
+
+    public void setAcctType(String acctType) {
+        this.acctType = acctType;
+    }
+
+    public String getStockExchangeNo() {
+        return stockExchangeNo;
+    }
+
+    public void setStockExchangeNo(String stockExchangeNo) {
+        this.stockExchangeNo = stockExchangeNo;
+    }
+
+    @Override
+    public String getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getAcctPwd() {
+        return acctPwd;
+    }
+
+    public void setAcctPwd(String acctPwd) {
+        this.acctPwd = acctPwd;
+    }
+
+    public String getTradePwd() {
+        return tradePwd;
+    }
+
+    public void setTradePwd(String tradePwd) {
+        this.tradePwd = tradePwd;
     }
 }

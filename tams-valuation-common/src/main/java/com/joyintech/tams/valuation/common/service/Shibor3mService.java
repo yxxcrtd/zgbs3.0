@@ -1450,7 +1450,8 @@ public class Shibor3mService {
 			// = -df_deal_shibor3m.已实现浮动
 			// df_deal_shibor3m.loc[df_deal_shibor3m.交易方向 == '互换支付浮动', '未实现浮动']
 			// = -df_deal_shibor3m.未实现浮动
-			if (DictCodeListExt2.互换方式_收取固定.getValue().equals(deal.getPs())) {
+			//if (DictCodeListExt2.互换方式_收取固定.getValue().equals(deal.getPs())) {
+			if (DictCodeListExt2.互换方式_收取浮动.getValue().equals(deal.getPs())) {
 				yishixianGuding = -yishixianGuding;
 				weishixianGuding = -weishixianGuding;
 			} else {

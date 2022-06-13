@@ -7,19 +7,28 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.FinProductAdd;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.asset.annotation.DictEnum;
 import com.joyintech.tams.invest.common.asset.annotation.DictList;
 import com.joyintech.tams.invest.common.asset.annotation.Number;
 import com.joyintech.tams.invest.common.asset.dao.AssetGenerateMapper;
 import com.joyintech.tams.invest.common.asset.dto.AssetGenerateEntry;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.constantrds.RedisKeyEnum;
+import com.joyintech.tams.invest.common.redisinit.dto.ImplCond;
+import com.joyintech.tams.invest.common.redisinit.service.RiskRedisInitService;
+import com.joyintech.tams.invest.common.riskinfrds.calendar.entity.ICalendar;
+import com.joyintech.tams.invest.common.riskinfrds.calendar.service.CalendarService;
 import com.joyintech.tams.invest.common.riskinfrds.info.entity.IAssetInfo;
+import com.joyintech.tams.invest.common.riskinfrds.info.entity.IProdInfo;
 import com.joyintech.tams.invest.common.riskinfrds.info.service.AssetInfoRedisService;
+import com.joyintech.tams.invest.common.riskinfrds.info.service.ProdInfoRedisService;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
+import com.joyintech.tools.collectors.JoyinCollectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -32,6 +41,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +57,10 @@ public class AssetCommonUtil {
     private static AssetGenerateMapper assetGenerateMapper;
 
     private static AssetInfoRedisService assetInfoSrc;
+
+    private static ProdInfoRedisService prodInfoSrc;
+
+    private static CalendarService calendarSrc;
 
     private static Map<String,BigDecimal> faceValMap=new HashMap<>();
 
@@ -76,14 +90,21 @@ public class AssetCommonUtil {
 
     public static List<String> couponTypeList=Arrays.asList(DictCodeList.息票品种_贴现.getValue(), DictCodeList.息票品种_零息.getValue());
 
+    public static List<String> openTypeList=Arrays.asList(DictCodeList.开放模式_周期开放.getValue(),DictCodeList.开放模式_定期开放.getValue(),DictCodeList.开放模式_高频开放.getValue());
+
+    /**
+     * redis数据初始化
+     */
+    private static RiskRedisInitService<ImplCond> redisRriter;
+
     /**
      * 获取标的面值
      * @param finProdId
      * @return
      */
     private static void getFaceValDb(String finProdId){
-        AssetGenerateEntry astEntry=assetGenerateMapper.qryFaceOrOtherInf(finProdId);
-        BigDecimal faceVal=StringUtil.isNotEmpty(astEntry)?convert(astEntry.getFaceValue(),BigDecimal.class,obj->new BigDecimal(obj.toString())):null;
+        List<AssetGenerateEntry> astEntryList=assetGenerateMapper.qryFaceOrOtherInf(Arrays.asList(finProdId));
+        BigDecimal faceVal= StringUtil.isEmptyList(astEntryList)?null:convert(astEntryList.get(0).getFaceValue(),BigDecimal.class, obj->new BigDecimal(obj.toString()));
         faceValMap.put(finProdId,StringUtil.isNotEmpty(faceVal)?faceVal:new BigDecimal(100));
     }
 
@@ -92,8 +113,9 @@ public class AssetCommonUtil {
      * @param finProdId
      */
     private static void isOverSeasBondDb(String finProdId){
-        AssetGenerateEntry astEntry=assetGenerateMapper.qryFaceOrOtherInf(finProdId);
-        if(StringUtil.isNotEmpty(astEntry)){
+        List<AssetGenerateEntry> astEntryList=assetGenerateMapper.qryFaceOrOtherInf(Arrays.asList(finProdId));
+        AssetGenerateEntry astEntry=StringUtil.isEmptyList(astEntryList)?null:astEntryList.get(0);
+        if(StringUtil.isNotEmpty(astEntry) || null != astEntry){
             if(astTypeList.contains(astEntry.getFinprodType2())&&StringUtil.equals(astEntry.getBlnArea(),境外)){
                 isOverBondMap.put(finProdId,true);
             }
@@ -107,10 +129,10 @@ public class AssetCommonUtil {
      */
     public static BigDecimal getFaceValRds(String finProdId){
         Map<String, IAssetInfo> mapAsset = assetInfoSrc.getMapFromRedis(RedisKeyEnum.资产基本信息.key(), Arrays.asList(finProdId));
-        for(IAssetInfo iAst:mapAsset.values()){
+        /*for(IAssetInfo iAst:mapAsset.values()){
             //return StringUtil.isNotEmpty(iAst.getFaceValue())?iAst.getFaceValue():new BigDecimal(100);
             return new BigDecimal(100);
-        }
+        }*/
         return getFaceVal(finProdId);
     }
 
@@ -122,11 +144,22 @@ public class AssetCommonUtil {
      * @return
      */
     public static <R> R getAssetInfo(String finProdId,Function<IAssetInfo,R> func){
-        Map<String, IAssetInfo> mapAsset = assetInfoSrc.getMapFromRedis(RedisKeyEnum.资产基本信息.key(), Arrays.asList(finProdId));
-        R r=null;
-        for(IAssetInfo iAst:mapAsset.values()){
-            r=StringUtil.isNotEmpty(iAst)?func.apply(iAst):null;
+        if(StringUtil.isBlank(finProdId)){
+            return null;
         }
+        IAssetInfo iAssetInfo = assetInfoSrc.getInfoFromRedis(RedisKeyEnum.资产基本信息.key(), finProdId);
+        R r=null;
+        if(!StringUtil.isNotEmpty(iAssetInfo)&&StringUtil.isNotEmpty(finProdId)){
+            //若redis取不到从数据库取
+            ImplCond cond=new ImplCond();
+            cond.setDel(false);
+            cond.setPlateDate(DateUtil.parse(DateUtil.getSysDate()));
+            cond.setAssetIdArray(finProdId);
+            redisRriter.dealAssetData(cond);
+            iAssetInfo=assetInfoSrc.getInfoFromRedis(RedisKeyEnum.资产基本信息.key(), finProdId);
+        }
+        r= StringUtil.isNotEmpty(iAssetInfo)?func.apply(iAssetInfo):null;
+
         return r;
     }
 
@@ -138,7 +171,11 @@ public class AssetCommonUtil {
      * @return
      */
     public static <R> R getAssetInfoDb(String finProdId,Function<AssetGenerateEntry,R> func){
-        AssetGenerateEntry astEntry=assetGenerateMapper.qryFaceOrOtherInf(finProdId);
+        if(StringUtil.isBlank(finProdId)){
+            return null;
+        }
+        List<AssetGenerateEntry> astEntryList=assetGenerateMapper.qryFaceOrOtherInf(Arrays.asList(finProdId));
+        AssetGenerateEntry astEntry=StringUtil.isEmptyList(astEntryList)?null:astEntryList.get(0);
         R r=null;
         if(StringUtil.isNotEmpty(astEntry)){
             r=func.apply(astEntry);
@@ -147,13 +184,36 @@ public class AssetCommonUtil {
     }
 
     /**
+     * 获取交易信息(从DB)，可自定义获取交易信息
+     * @param tradeList
+     * @param finprodList
+     * @param func
+     * @param <R>
+     * @return
+     */
+    public static <R> R getTradeInfo(List<String> tradeList,List<String> finprodList,Function<List<AssetGenerateEntry>,R> func){
+        if(StringUtil.isEmptyList(finprodList)&&StringUtil.isEmptyList(tradeList)){
+            return null;
+        }
+        List<AssetGenerateEntry> trdList=assetGenerateMapper.getTradeInfo(tradeList,finprodList);
+        R r=null;
+        if(!StringUtil.isEmptyList(trdList)){
+            r=func.apply(trdList);
+        }
+        return r;
+    }
+
+    /**
      * 获取组合信息，可自定义获取标的里各字段
      * @param func
-     * @param finProdId
+     * @param portfolioId
      * @param <R>
      * @return
      */
     public static <R> R getPortfolioInfo(String portfolioId,Function<AssetGenerateEntry,R> func){
+        if(StringUtil.isBlank(portfolioId)){
+            return null;
+        }
         AssetGenerateEntry astEntry=assetGenerateMapper.qryPortfolioIdInfo(portfolioId);
         R r=null;
         if(StringUtil.isNotEmpty(astEntry)){
@@ -162,6 +222,59 @@ public class AssetCommonUtil {
         return r;
     }
 
+    /**
+     * 获取日历信息
+     * @param calendarId
+     * @param <R>
+     * @return
+     */
+    public static <R> R getCalendar(String calendarId,Function<ICalendar,R> func) {
+        if(StringUtil.isBlank(calendarId)){
+            return null;
+        }
+        ICalendar iCalendar=calendarSrc.getCalendar(calendarId);
+        if(!StringUtil.isNotEmpty(iCalendar)){
+            //若redis取不到从数据库取
+            ImplCond cond=new ImplCond();
+            cond.setDel(false);
+            cond.setPlateDate(DateUtil.parse(DateUtil.getSysDate()));
+            cond.setCalendarIdArray(calendarId);
+            redisRriter.dealCalendarData(cond);
+            iCalendar=calendarSrc.getCalendar(calendarId);
+        }
+        R r=null;
+        if(StringUtil.isNotEmpty(iCalendar)){
+            r=func.apply(iCalendar);
+        }
+        return r;
+    }
+
+    /**
+     * 获取产品信息
+     * @param prodId
+     * @param <R>
+     * @return
+     */
+    public static <R> R getProdInfo(String prodId,Function<IProdInfo,R> func) {
+        if(StringUtil.isBlank(prodId)){
+            return null;
+        }
+        IProdInfo prod = prodInfoSrc.getProdInfo(prodId);
+        if(!StringUtil.isNotEmpty(prod)) {
+            //若redis取不到从数据库取
+            ImplCond cond = new ImplCond();
+            cond.setDel(false);
+            cond.setPlateDate(DateUtil.parse(DateUtil.getSysDate()));
+            cond.setPortfIdArray(prodId);
+            redisRriter.dealPortData(cond);
+            prod = prodInfoSrc.getProdInfo(prodId);
+        }
+        R r=null;
+        if(StringUtil.isNotEmpty(prod)){
+            r=func.apply(prod);
+        }
+        return r;
+    }
 
     /**
      * 获取标的面值,未获取到默认100
@@ -215,6 +328,136 @@ public class AssetCommonUtil {
         }else {
             return BigDecimal.ONE;
         }
+    }
+
+    /**
+     * 比较指定天数产品投资周期（目前按产品需求以赎回计划优先计算)
+     * @param purPlanList   画面传过来的申购计划
+     * @param purRule   画面传过来的申购基本要素
+     * @param repPlanList   画面传过来的赎回计划
+     * @param repRule   画面传过来的赎回基本要素
+     * @param prodInfo  画面传过来的基本要素
+     * @param compare   比如判断是否大于90天，传90
+     * @param <T>
+     * @param <K>
+     * @return  备注 小于返回-1，等于返回0，大于返回1
+     */
+    public static <T extends FinOpenPlan,K extends FinOpenRule,V extends FinProduct> Integer comparePtlCycle(List<T> purPlanList,K purRule,
+                                                                                        List<T> repPlanList,K repRule,V prodInfo,Integer compare){
+        if((Objects.isNull(purRule)&&Objects.isNull(repRule))||null==compare||null==prodInfo){
+            return null;
+        }
+        if(!checkNull(purPlanList,purRule)){
+            return null;
+        }
+        //按产品需求以赎回计划优先处理,若是申赎同频，则就以申购计划为准
+        if((!Objects.isNull(purRule)&&CommonUtil.isType(purRule.getOpenType(),DictCodeList.申赎开放类型_申赎开放))
+                ||Objects.isNull(repRule)||StringUtil.isBlank(repRule.getOpenMode())){
+            repPlanList=purPlanList;
+            repRule=purRule;
+        }
+        //若为封闭式退出
+        if(!Objects.isNull(repRule)){
+            if(!openTypeList.contains(repRule.getOpenMode())){
+                return null;
+            }
+            //若是高频开放的产品默认日开
+            if(CommonUtil.isType(repRule.getOpenMode(),DictCodeList.开放模式_高频开放)){
+                return BigDecimal.ONE.compareTo(new BigDecimal(compare));
+            }
+        }
+        //获取投资周期
+        Long days=getPtlInvestPeriod(repPlanList,()->prodInfo.getVdate());
+        return null==days?null:days.compareTo(compare.longValue());
+    }
+
+    /**
+     * 比较指定天数产品投资周期（目前按产品需求以赎回计划优先计算）
+     * @param ptlList 指定产品(支持多个)
+     * @param compare 比如判断是否大于90天，传90
+     * @return 备注 KEY 产品代码 VALUE：小于返回-1，等于返回0，大于返回1
+     */
+    public static Map<String,Integer> comparePtlCycle(List<String> ptlList,Integer compare){
+        if(StringUtil.isEmptyList(ptlList)||null==compare){
+            return null;
+        }
+        //查询开放规则表
+        List<FinOpenRule> finOpenRuleList=assetGenerateMapper.getFinOpenRule(ptlList.stream().map(item->{
+            item=DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()+GlobalConstant.UNDER_LINE+item;
+            return item;
+        }).collect(Collectors.toList()));
+        if(StringUtil.isEmptyList(finOpenRuleList)){
+            return null;
+        }
+        //以产品分组为key,value为规则基本信息List
+        Map<String,List<FinOpenRule>> ptlRuleMap = finOpenRuleList.stream().collect(JoyinCollectors.groupingBy(x->StringUtil.replaceAll(x.getCashId(),
+                DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()+GlobalConstant.UNDER_LINE,StringUtil.EMPTY)));
+
+        //查询开放计划表
+        List<FinOpenPlan> ptlPlanList = assetGenerateMapper.getFinOpenPlan(ptlList.stream().map(item->{
+            item=DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()+GlobalConstant.UNDER_LINE+item;
+            return item;
+        }).collect(Collectors.toList()));
+        //以产品分组为key,value为开放赎回计划List
+        Map<String,List<FinOpenPlan>> ptlPlanMap = StringUtil.isEmptyList(ptlPlanList)?null:ptlPlanList.stream().collect(JoyinCollectors.groupingBy(x->StringUtil.replaceAll(x.getFinprodId(),
+                DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()+GlobalConstant.UNDER_LINE,StringUtil.EMPTY)));
+
+        Map<String,Integer> retMap=new HashMap<>();
+        ptlRuleMap.forEach((k,vRuleList)->{
+            //若是高频开放的产品默认日开(目前产品设计高频开放没有计划信息)
+            if(!StringUtil.isEmptyList(vRuleList)&&CommonUtil.isType(vRuleList.get(0).getOpenMode(),DictCodeList.开放模式_高频开放)){
+                retMap.put(k,BigDecimal.ONE.compareTo(new BigDecimal(compare)));
+                return;
+            }
+            //若没有计划跳出当前循环
+            if(CollectionUtils.isEmpty(ptlPlanMap)||StringUtil.isEmptyList(ptlPlanMap.get(k))){
+                retMap.put(k,null);
+            }
+            Long days=getPtlInvestPeriod(ptlPlanMap.get(k),()->getAssetInfo(DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()+GlobalConstant.UNDER_LINE+k,obj->obj.getVdate()));
+            retMap.put(k,null==days?null:days.compareTo(compare.longValue()));
+        });
+        return retMap;
+    }
+
+    /**
+     * 获取产品投资周期
+     * @param tPlanList  需要处理的计划(开放或赎回计划)
+     * @return
+     * 备注：计算相邻两个开放计划的赎回确认日的时间间隔，当日期差小于N天时即周期小于N天；
+     * 当没有赎回计划时，则计算相邻两个开放计划的申购确认日的时间间隔；若3)	当【生成计划】的只包含1条数据时，
+     * 以【开放计划信息】模块中【推算方法】字段的信息确定开始日，进而确定周期。
+     * 则以【起息日】字段作为“开始日”，用第1条记录的【赎回确认日】减去“开始日”确定周期，无【赎回确认日】时采用【申购确认日】进行计算
+     */
+    public static <T extends FinOpenPlan,F extends FinOpenRule> Long getPtlInvestPeriod(List<T> tPlanList,Supplier<Date> supplier){
+        if(StringUtil.isEmptyList(tPlanList)){
+            return null;
+        }
+        //处理开放计划只有一条的情况
+        if(1==tPlanList.size()){
+            if(StringUtil.isBlank(tPlanList.get(0).getFinprodId())){
+                return DateUtil.getBetweenDayNumber(supplier.get(),
+                        tPlanList.get(0).getOpenVdate());
+            }
+            return DateUtil.getBetweenDayNumber(getAssetInfo(tPlanList.get(0).getFinprodId(),obj->obj.getVdate()),
+                    tPlanList.get(0).getOpenVdate());
+        }
+        //若是1条以上则用后一条计划减去前一条再取最小值
+        List<Long> daysList = new ArrayList<>();
+        tPlanList.stream().reduce((pre,cru)->{
+            daysList.add(DateUtil.getBetweenDayNumber(pre.getOpenVdate(),
+                    cru.getOpenVdate()));
+            return cru;
+        });
+        /*RiskUtil.dealList(tPlan, new ArrayList<>(),(list)->{
+            return DateUtil.getBetweenDayNumber(list.get(0).getOpenVdate(),
+                    list.get(1).getOpenVdate());
+        }, (list) -> {
+            daysList.addAll(list);
+        });*/
+        if (!StringUtil.isEmptyList(daysList)) {
+            return Collections.min(daysList);
+        }
+        return null;
     }
 
     /**
@@ -458,6 +701,18 @@ public class AssetCommonUtil {
     }
 
     /**
+     * 检查List与对应的Entity不为空或List可为空
+     * @param tList
+     * @param k
+     * @param <T>
+     * @param <K>
+     * @return
+     */
+    private static <T,K> Boolean checkNull(List<T> tList,K k){
+        return (!StringUtil.isEmptyList(tList)&&!Objects.isNull(k))||StringUtil.isEmptyList(tList);
+    }
+
+    /**
      * Object对象转化为指定类型
      * @param obj
      * @param beanClass
@@ -479,6 +734,11 @@ public class AssetCommonUtil {
     }
 
     @Autowired(required = false)
+    public void setCalendarSrc(CalendarService calendarSrc) {
+        AssetCommonUtil.calendarSrc = calendarSrc;
+    }
+
+    @Autowired(required = false)
     public void setAssetGenerateMapper(AssetGenerateMapper assetGenerateMapper) {
         AssetCommonUtil.assetGenerateMapper = assetGenerateMapper;
     }
@@ -486,5 +746,15 @@ public class AssetCommonUtil {
     @Autowired(required = false)
     public void setAssetInfoRedisService(AssetInfoRedisService assetInfoSrc) {
         AssetCommonUtil.assetInfoSrc = assetInfoSrc;
+    }
+
+    @Autowired(required = false)
+    public void setProdInfoRedisService(ProdInfoRedisService prodInfoSrc) {
+        AssetCommonUtil.prodInfoSrc = prodInfoSrc;
+    }
+
+    @Autowired(required = false)
+    public void setRedisRriter(RiskRedisInitService<ImplCond> redisRriter) {
+        this.redisRriter = redisRriter;
     }
 }

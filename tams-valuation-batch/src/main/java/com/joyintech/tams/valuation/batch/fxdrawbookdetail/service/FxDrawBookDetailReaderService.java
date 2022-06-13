@@ -12,6 +12,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodMapper;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
+import com.joyintech.tams.valuation.batch.common.cache.service.ValuationBatchCacheService;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dao.DrawBaseInfoSelectComMapper;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComDTO;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
@@ -46,11 +47,8 @@ public class FxDrawBookDetailReaderService {
     @Autowired
     private BookCommonLogic bookCommonLogic;
 
-    /**
-     * accountingMethodMapper
-     */
     @Autowired
-    private AccountingMethodMapper accountingMethodMapper;
+    private ValuationBatchCacheService valuationBatchCacheService;
 
     /**
      * 逾期罚息计提mapper
@@ -87,7 +85,8 @@ public class FxDrawBookDetailReaderService {
         // drawBaseInfoSelectComMapper.selectDrawBaseInfoFromCurr(sqlMap);
         List<String> matchTypeList = new ArrayList<>();
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_科目性质.getValue());
-        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(matchTypeList, (String)param.get("taskId"), null);
+        //List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(matchTypeList, (String)param.get("taskId"), null);
+        List<BokMatchRlat> valMatchRlats = valuationBatchCacheService.getBokMatchRlatFromCache(matchTypeList, (String)param.get("taskId"), null);
         if (valMatchRlats != null && valMatchRlats.size() > 0) {
             List<String> targetList = new ArrayList<>();
             valMatchRlats.forEach(x->{

@@ -10,13 +10,13 @@
 
 package com.joyintech.tams.valuation.common.interf.base.dto;
 
+import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.tams.common.base.entity.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.framework.base.BaseEntity;
 
 /**
  * 交易接口 模板处理返回共通结果
@@ -84,6 +84,11 @@ public class AssetDealInfoValCommonResult extends BaseEntity {
      * 行权申请更新list
      */
     private List<SecExecApplyDto> listSecExecApply = new ArrayList<>();
+
+    /**
+     * 股票锁定业务表list
+     */
+    private List<TrdTradeNewStockLocked> listTrdTradeNewStockLocked = new ArrayList<>();
     
     /**
      * 日志
@@ -342,5 +347,21 @@ public class AssetDealInfoValCommonResult extends BaseEntity {
 
     public void setListSecExecApply(List<SecExecApplyDto> listSecExecApply) {
         this.listSecExecApply = listSecExecApply;
+    }
+
+    /**
+     * 获取 listTrdTradeNewStockLocked
+     * @@return listTrdTradeNewStockLocked
+     */
+    public List<TrdTradeNewStockLocked> getListTrdTradeNewStockLocked() {
+        return listTrdTradeNewStockLocked;
+    }
+
+    /**
+     * 设置 listTrdTradeNewStockLocked
+     * @param listTrdTradeNewStockLocked
+     */
+    public void setListTrdTradeNewStockLocked(List<TrdTradeNewStockLocked> listTrdTradeNewStockLocked) {
+        this.listTrdTradeNewStockLocked = listTrdTradeNewStockLocked;
     }
 }

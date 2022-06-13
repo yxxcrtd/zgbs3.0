@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.invest.trade.plannet.validator;
 
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -17,6 +18,7 @@ import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
 import com.joyintech.tams.component.business.trade.dto.BussTrdTransfenpeiDto;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
 import com.joyintech.tams.invest.trade.common.validator.TradeCommonValidator;
@@ -123,13 +125,18 @@ public class TrdPlanNetInvestTradeValidator implements TradeCommonValidator {
                         errorList.add(new ValidMessage("tradeAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdFundInvestTrade002.tradeAmt"))));
                     }
                 }
-                else if (StringUtil.equals(dto.getPs(),
-                    DictCodeList.交易方向_赎回.getValue())) {
+                if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回.getValue())) {
                     if (shareAmt == null && tradeAmt == null) {
                         errorList.add(new ValidMessage("shareAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdPlanNetInvestTrade003.tradeAmtSha"))));
                     }
                 }
-
+                // TISHKS-776 交易份额提交申请时未作必填校验，为空时提交，进入审批报系统异常 modify by huwei1 20220505 start
+                if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_买入.getValue())) {
+                    if (null == shareAmt) {
+                        errorList.add(new ValidMessage("shareAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdPlanNetInvestTrade003.tradeSha"))));
+                    }
+                }
+                // TISHKS-776 交易份额提交申请时未作必填校验，为空时提交，进入审批报系统异常 modify by huwei1 20220505 end
                 //dto内已经有过校验，无需重复校验
 //                if (tradeAmt != null && tradeAmt.compareTo(zero) == -1) {
 //                    errorList.add(new ValidMessage("tradeAmt", this.getMessage("BUSS_COM_E_0004", this.getMessage("TrdFundInvestTrade002.tradeAmt"),"0")));
@@ -202,14 +209,15 @@ public class TrdPlanNetInvestTradeValidator implements TradeCommonValidator {
                 param.put("chlId", dto.getChlId());
                 Map<String, Object> para = trdPlanNetInvestTrade002Service.getProAvailableCash(param);
                 BigDecimal accCash = new BigDecimal((String)para.get("cashT2"));
-                //交易对手没有足够的现金 
-                if(accCash.compareTo(dto.getTradeAmt())==-1){
+                //交易对手没有足够的现金
+                //add wsz ZGCPCN-1127 修改交易验证软控 start
+                if(accCash.compareTo(dto.getTradeAmt())<0 && CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_CASH_SWITCH).equals(DictCodeListExt1.是或否_否.getValue())){
                     errorList.add(new ValidMessage("",
                         getMessage("BUSS_COM_E_0003", 
                         param.get("portfolioId")+"  "+getMessage("TrdPlanNetInvestTrade002.tradeAmt"),
                         getMessage("TrdFundInvestTrade002.accAvailableCash"))));
                 }
-                
+                //add wsz ZGCPCN-1127 修改交易验证软控 end
                 //同时验证卖出方是否有足够的持仓
                 PtlSecPositionFlowDto ptlSecPositionFlowDto = new PtlSecPositionFlowDto();
                 ptlSecPositionFlowDto.setCdate(dto.getTradeDate());
@@ -277,12 +285,19 @@ public class TrdPlanNetInvestTradeValidator implements TradeCommonValidator {
                     if (tradeAmt == null) {
                         errorList.add(new ValidMessage("tradeAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdFundInvestTrade002.tradeAmt"))));
                     }
-                } else if (StringUtil.equals(dto.getPs(),
-                        DictCodeList.交易方向_赎回.getValue())) {
+                }
+                if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回.getValue())) {
                     if (shareAmt == null && tradeAmt == null) {
                         errorList.add(new ValidMessage("shareAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdPlanNetInvestTrade003.tradeAmtSha"))));
                     }
                 }
+                // TISHKS-776 交易份额提交申请时未作必填校验，为空时提交，进入审批报系统异常 modify by huwei1 20220505 start
+                if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_买入.getValue())) {
+                    if (null == shareAmt) {
+                        errorList.add(new ValidMessage("shareAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdPlanNetInvestTrade003.tradeSha"))));
+                    }
+                }
+                // TISHKS-776 交易份额提交申请时未作必填校验，为空时提交，进入审批报系统异常 modify by huwei1 20220505 end
 
                 //解决点击提交提示语有重复的问题
                 //dto内已经有了校验，无需重复进行校验
@@ -370,13 +385,15 @@ public class TrdPlanNetInvestTradeValidator implements TradeCommonValidator {
                 param.put("chlId", dto.getChlId());
                 Map<String, Object> para = trdPlanNetInvestTrade002Service.getProAvailableCash(param);
                 BigDecimal accCash = new BigDecimal((String) para.get("cashT2"));
-                //交易对手没有足够的现金 
-                if (accCash.compareTo(dto.getTradeAmt()) == -1) {
+                //交易对手没有足够的现金
+                //add wsz ZGCPCN-1127 修改交易验证软控 start
+                if (accCash.compareTo(dto.getTradeAmt()) < 0 && CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_CASH_SWITCH).equals(DictCodeListExt1.是或否_是.getValue())) {
                     errorList.add(new ValidMessage("",
                             getMessage("BUSS_COM_E_0003",
                                     param.get("portfolioId") + "  " + getMessage("TrdPlanNetInvestTrade002.tradeAmt"),
                                     getMessage("TrdFundInvestTrade002.accAvailableCash"))));
                 }
+                //add wsz ZGCPCN-1127 修改交易验证软控 end
                 if(StringUtil.isEmptyList(dto.getBussTrdTransfenpeiDto())) {
                     //同时验证卖出方是否有足够的持仓
                     PtlSecPositionFlowDto ptlSecPositionFlowDto = new PtlSecPositionFlowDto();

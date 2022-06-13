@@ -66,9 +66,10 @@ public class ValRiftTask extends BatchBaseService{
             if(isRunning) {
                 while (isRunning) {
                     try {
-                        Thread.sleep(30000);
+                        lock1.wait(30000);
                     } catch (InterruptedException e) {
                         logger.error(e.getMessage(),e);
+                        Thread.currentThread().interrupt();
                     }
                 }
                 isRunning = true;

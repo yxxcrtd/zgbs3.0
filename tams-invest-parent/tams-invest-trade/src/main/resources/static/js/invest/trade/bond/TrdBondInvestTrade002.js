@@ -553,17 +553,19 @@ var calculateField;
                     //文本框事件              		
                 	  /*  $("#settleAmtDiv").show();
                     $("#exchangeAmtDiv").show();*/
-                    if(ps =="T03"){                		
-                		$("#settleAmtDiv").hide();
-                		$("#exchangeAmtDiv").hide();
-                		$("#commissionAmtDiv").hide();
-                	}else if(ps !="T03"){
+                    // TISHKS-1075:回售也展示佣金、结算费、经手费字段 modify by fuyongsheng 20220505 start
+                    // if(ps =="T03"){
+                	// 	$("#settleAmtDiv").hide();
+                	// 	$("#exchangeAmtDiv").hide();
+                	// 	$("#commissionAmtDiv").hide();
+                	// }else if(ps !="T03"){
                 		$("#settleAmtDiv").show();
                 		$("#exchangeAmtDiv").show();
                 		if(!$("#chlId").val()){ 
                 		$("#commissionAmtDiv").show();
                 		}
-                	}
+                	// }
+                    // TISHKS-1075:回售也展示佣金、结算费、经手费字段 modify by fuyongsheng 20220505 end
                     if(initFlag){
                         $("#settleAmt").trigger("change");
                         $("#exchangeAmt").trigger("change");
@@ -618,17 +620,19 @@ var calculateField;
                     //如果是交易场所+交易市场 == 深圳证券交易所+二级市场;
                   /*  $("#settleAmtDiv").show();
                     $("#exchangeAmtDiv").show();*/
-                    if(ps =="T03"){                		
-                		$("#settleAmtDiv").hide();
-                		$("#exchangeAmtDiv").hide();
-                		$("#commissionAmtDiv").hide();
-                	}else if(ps !="T03"){
+                    // TISHKS-1075:回售也展示佣金、结算费、经手费字段 modify by fuyongsheng 20220505 start
+                    // if(ps =="T03"){
+                	// 	$("#settleAmtDiv").hide();
+                	// 	$("#exchangeAmtDiv").hide();
+                	// 	$("#commissionAmtDiv").hide();
+                	// }else if(ps !="T03"){
                 		$("#settleAmtDiv").show();
                 		$("#exchangeAmtDiv").show();
                 		if(!$("#chlId").val()){ 
                 		$("#commissionAmtDiv").show();
                 		}
-                	}                  
+                	// }
+                    // TISHKS-1075:回售也展示佣金、结算费、经手费字段 modify by fuyongsheng 20220505 end
                     if(initFlag){
                         $("#settleAmt").trigger("change");
                         $("#exchangeAmt").trigger("change");
@@ -2160,12 +2164,14 @@ var calculateField;
                 }else{
                 	$("#tradeMarketCash_div").hide();
                 }
-                
-                if($('#ps').val()=="T03"){                		
-            		$("#settleAmtDiv").hide();
-            		$("#exchangeAmtDiv").hide();
-            		$("#commissionAmtDiv").hide();
-            	}
+
+                // TISHKS-1075:回售也展示佣金、结算费、经手费字段 modify by fuyongsheng 20220505 start
+                // if($('#ps').val()=="T03"){
+            	// 	$("#settleAmtDiv").hide();
+            	// 	$("#exchangeAmtDiv").hide();
+            	// 	$("#commissionAmtDiv").hide();
+            	// }
+                // TISHKS-1075:回售也展示佣金、结算费、经手费字段 modify by fuyongsheng 20220505 end
                 if($('#chlId').val()){                		
             		$("#commissionAmtDiv").hide();
             	}
@@ -2386,11 +2392,13 @@ var calculateField;
                     if(!$("#chlId").val()){ 
                     $("#commissionAmtDiv").show();
                     }
-                    if($('#ps').val()=="T03"){
-                    	 $("#settleAmtDiv").hide();
-                         $("#exchangeAmtDiv").hide();
-                         $("#commissionAmtDiv").hide();
-                    }
+                    // TISHKS-1075:回售也展示佣金、结算费、经手费字段 modify by fuyongsheng 20220505 start
+                    // if($('#ps').val()=="T03"){
+                    // 	 $("#settleAmtDiv").hide();
+                    //      $("#exchangeAmtDiv").hide();
+                    //      $("#commissionAmtDiv").hide();
+                    // }
+                    // TISHKS-1075:回售也展示佣金、结算费、经手费字段 modify by fuyongsheng 20220505 end
                     $("#commissionAmtRateDiv").show();
                     if($("#type6").val()&&$("#type6").val()==WINDTYPEONE_B17){
                         $("#stampDutyAmtDiv").show();

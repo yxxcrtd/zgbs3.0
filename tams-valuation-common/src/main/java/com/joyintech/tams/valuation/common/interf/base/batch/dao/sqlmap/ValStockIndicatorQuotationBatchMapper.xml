@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.valuation.common.interf.base.batch.dao.ValStockIndicatorQuotationBatchMapper" >
+    <insert id="insertBatch" parameterType="java.util.List" >
+        insert into MST_INDICATOR_QUOTATION (INDICATOR_CODE, DEAL_DATE, CCY,
+        PRE_CLOSE_PRICE, OPEN_PRICE, HIGH_PRICE,
+        LOW_PRICE, CLOSE_PRICE, DATA_SOURCE,
+        CREATE_USER, CREATE_DEPT, CREATE_TIME,
+        UPDATE_USER, UPDATE_TIME)
+        <foreach collection="list" item="item" separator=" from dual union all select" open=" select * from (select " close=" from dual) tmp ">
+            #{item.indicatorCode,jdbcType=VARCHAR}, #{item.dealDate,jdbcType=DATE}, #{item.ccy,jdbcType=VARCHAR},
+            #{item.preClosePrice,jdbcType=DECIMAL}, #{item.openPrice,jdbcType=DECIMAL}, #{item.highPrice,jdbcType=DECIMAL},
+            #{item.lowPrice,jdbcType=DECIMAL}, #{item.closePrice,jdbcType=DECIMAL}, #{item.dataSource,jdbcType=VARCHAR},
+            #{item.createUser,jdbcType=VARCHAR}, #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateUser,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP}
+        </foreach>
+    </insert>
+
+    <delete id="deleteBatch" parameterType="java.util.List">
+        delete from MST_INDICATOR_QUOTATION
+        where 1=1
+        <if test='list != null and list.size()>0'>
+            AND (
+                (INDICATOR_CODE, DEAL_DATE, CCY) IN
+                <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+                    <if test="(index % 1000) == 999">
+                        (null, null, null)) OR (INDICATOR_CODE, DEAL_DATE, CCY) in (
+                    </if>
+                    (#{item.indicatorCode,jdbcType=VARCHAR},  #{item.dealDate,jdbcType=DATE}, #{item.ccy,jdbcType=VARCHAR})
+                </foreach>
+            )
+        </if>
+    </delete>
+</mapper>

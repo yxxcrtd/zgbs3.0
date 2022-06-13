@@ -36,9 +36,9 @@ public class CfetsPositionPriceService extends BaseService{
     private SqlSessionTemplate template;
     
     public void autoSettle(Date cdate, List<String> portfolioIdList) {
-        if (!StringUtil.equals(CacheUtil.getSysParam("auto_settle_flag"),"Y")){
-            return;
-        }
+//        if (!StringUtil.equals(CacheUtil.getSysParam("auto_settle_flag"),"Y")){
+//            return;
+//        }
 
         /** 返回结果
          * KEY:组合+资产代码+投资目的

@@ -99,6 +99,13 @@ public class ValBotAstTrade extends BaseEntity {
      */
     private String channelId;
 
+    /*add by sunshuaishuai 20220415 交易管理 start*/
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+    /*add by sunshuaishuai 20220415 end*/
+
     /**
      * 取得 产品代码
      * @return 产品代码
@@ -372,4 +379,48 @@ public class ValBotAstTrade extends BaseEntity {
     public void setChannelId(String channelId) {
         this.channelId = channelId == null ? null : channelId.trim();
     }
+
+    /**
+     *资金账户
+     */
+    private String myAcctNo;
+
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+
+    /**
+     * 关联系统交易编号  外部交易编号
+     */
+    private String fTradeId;
+
+    public String getfTradeId() {
+        return fTradeId;
+    }
+
+    public void setfTradeId(String fTradeId) {
+        this.fTradeId = fTradeId;
+    }
+
+    /*add by sunshuaishuai 20220415 start*/
+    /**
+     * 取得 数据来源
+     * @return 数据来源
+     */
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * 设置 数据来源
+     * @param dataSource 数据来源
+     */
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+    /*add by sunshuaishuai 20220415 end*/
 }

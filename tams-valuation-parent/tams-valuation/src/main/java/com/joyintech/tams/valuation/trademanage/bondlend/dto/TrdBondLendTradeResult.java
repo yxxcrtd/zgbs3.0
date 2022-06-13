@@ -72,7 +72,10 @@ public class TrdBondLendTradeResult extends BaseEntity {
      */
     private List<StlOrdersExt> valOrdersExtList = new ArrayList<StlOrdersExt>();
 
-    private TrdBondLendTrade002Dto trdBondLendTrade002Dto;
+    private TrdBondLendTradeDto trdBondLendTradeDto;
+
+    private TrdBondLendTrade001Dto trdBondLendTrade001Dto;
+
     /**
      * 读取数据数量
      */
@@ -205,11 +208,19 @@ public class TrdBondLendTradeResult extends BaseEntity {
     }
 
 
-    public TrdBondLendTrade002Dto getTrdBondLendTrade002Dto() {
-        return trdBondLendTrade002Dto;
+    public TrdBondLendTradeDto getTrdBondLendTradeDto() {
+        return trdBondLendTradeDto;
     }
 
-    public void setTrdBondLendTrade002Dto(TrdBondLendTrade002Dto trdBondLendTrade002Dto) {
-        this.trdBondLendTrade002Dto = trdBondLendTrade002Dto;
+    public void setTrdBondLendTradeDto(TrdBondLendTradeDto trdBondLendTradeDto) {
+        this.trdBondLendTradeDto = trdBondLendTradeDto;
+    }
+
+    public TrdBondLendTrade001Dto getTrdBondLendTrade001Dto() {
+        return trdBondLendTrade001Dto;
+    }
+
+    public void setTrdBondLendTrade001Dto(TrdBondLendTrade001Dto trdBondLendTrade001Dto) {
+        this.trdBondLendTrade001Dto = trdBondLendTrade001Dto;
     }
 }

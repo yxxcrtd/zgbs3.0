@@ -49,7 +49,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 标的类共通方法
@@ -344,7 +343,7 @@ public class FinProductCommonService {
      * @param finProduct
      * @return
      */
-    private SchemeDetailDto querySchemaDetail(Date queryDate, String booksetId, String invAim,TargetFinProduct finProduct) {
+    public SchemeDetailDto querySchemaDetail(Date queryDate, String booksetId, String invAim,TargetFinProduct finProduct) {
         SchemeDetailDto schemeDetail = null;
 
 
@@ -420,7 +419,8 @@ public class FinProductCommonService {
         // 查看数据库配置表 - 特殊资产配置开关是否。只有开关打开才执行特殊资产逻辑
         //查询估值方案
         schemeDetailDto = querySchemaDetail(happenDate,booksetId,invAim,targetFinProduct);
-        if(schemeDetailDto==null){
+        // 估值方案为空，或为摊余成本法估值时，直接返回，不取行情
+        if(schemeDetailDto==null || DictCodeListExt1.估值方法_摊余成本法.getValue().equals(schemeDetailDto.getValuationMethod())){
 //            logger.warn("账套代码："+booksetId+"，资产代码："+finProdId+"，投资目的："+invAim+"找不到估值方案，市价按0计算.");
             marketPriceDto.setPrice(BigDecimal.ZERO);
             return marketPriceDto;
@@ -428,14 +428,14 @@ public class FinProductCommonService {
 
         // 5.2 根据估值方案取对应市价
         // 参数.投资目的 == 'AC'
-        if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(invAim)) {
+        if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(invAim)) {
             // 变量.市价净价 = 0;
             // marketPrice = BigDecimal.ZERO;
             marketPriceDto.setPrice(BigDecimal.ZERO);
         }
         // 参数.投资目的 = “FVTPL” || （参数.投资目的 = “FVOCI”)
-        else if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim)
-                 || DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(invAim)
+                 || DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(invAim)) {
             // 估值方法为成本法
             if (DictCodeListExt1.估值方法_成本法.getValue().equals(schemeDetailDto.getValuationMethod())
                 || DictCodeListExt1.估值方法_摊余成本法.getValue().equals(schemeDetailDto.getValuationMethod())) {
@@ -459,7 +459,7 @@ public class FinProductCommonService {
             || DictCodeList.息票品种_贴现.getValue().equals(targetFinProduct.getCouponSpecies())) {
             BigDecimal marketPrice = marketPriceDto.getPrice();
             // if（变量.市价 = null）
-            if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)
+            if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(invAim)
                     /**add by wujie on 20190621 start**/
                     &&
                     !(
@@ -502,23 +502,11 @@ public class FinProductCommonService {
         if(DictCodeListExt1.证券品种_债券.getValue().equals(targetFinProduct.getType18())) {
             /** add by yanya on 20200116 市价查询-债券 价格等于"全价"处理 stat**/
             //if(变量.价格类型 = “全价“)
-            if (DictCodeListExt3.价格类别_全价.getValue().equals(schemeDetailDto.getPriceClass())) {
-                if (marketPriceDto.getPrice() != null && marketPriceDto.getPrice().compareTo(BigDecimal.ZERO) != 0) {
-                    BigDecimal 本日应计利息余额 = this.getBondFullPriceInterestBalance(finProdId, happenDate);
-                    //出参.市价净价 - 变量.本日应计利息余额
-                    marketPriceDto.setPrice(ArithmeticUtil.subtract(marketPriceDto.getPrice(), 本日应计利息余额));
-                } else {
-                    if (DictCodeList.息票品种_零息.getValue().equals(targetFinProduct.getCouponSpecies())
-                            || DictCodeList.息票品种_贴现.getValue().equals(targetFinProduct.getCouponSpecies())) {
-                        marketPriceDto.setPrice(targetFinProduct.getIssuePrice());
-                    }
-                }
-            } else {
-                if ((DictCodeList.息票品种_零息.getValue().equals(targetFinProduct.getCouponSpecies())
-                        || DictCodeList.息票品种_贴现.getValue().equals(targetFinProduct.getCouponSpecies()))
-                        && (marketPriceDto.getPrice() == null || marketPriceDto.getPrice().compareTo(BigDecimal.ZERO) == 0)) {
-                    marketPriceDto.setPrice(targetFinProduct.getIssuePrice());
-                }
+            if(DictCodeListExt3.价格类别_全价.getValue().equals(schemeDetailDto.getPriceClass())
+               && marketPriceDto.getPrice() != null && marketPriceDto.getPrice().compareTo(BigDecimal.ZERO) != 0) {
+                BigDecimal 本日应计利息余额 = this.getBondFullPriceInterestBalance(finProdId, happenDate);
+                //出参.市价净价 - 变量.本日应计利息余额
+                marketPriceDto.setPrice(ArithmeticUtil.subtract(marketPriceDto.getPrice(), 本日应计利息余额));
             }
             /** add by yanya on 20200116 市价查询-债券 价格等于"全价"处理 end**/
         }
@@ -2014,7 +2002,7 @@ public class FinProductCommonService {
         }
         //2.3 利息差额处理
         //IF 数据字典：投资目的.公允价值变动类 eq 入参.行权确认交易DTO.投资目的
-        if (StringUtil.equals(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue(), dealNow.getInvAim())) {
+        if (StringUtil.equals(DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue(), dealNow.getInvAim())) {
             //变量.利息差额 =					入参.行权确认交易DTO.利息金额 - 变量.应计利息
             利息金额差额 = ArithmeticUtil.doSub(dealNow.getIntAmt(), 应计利息);
         }
@@ -2105,37 +2093,37 @@ public class FinProductCommonService {
         String tableId = "";//返回的场景代码
         //数据字典：交易方向.行权-回售+数据字典：投资目的.摊余成本类=数据字典：交易方向.行权-回售申请+数据字典：会计事件代码.摊余成本债券-回售申请
         if(StringUtil.equals(DictCodeList.交易方向_行权_回售.getValue(), ps)
-                && StringUtil.equals(DictCodeListExt1.投资目的_摊余成本类.getValue(), invAim)) {
+                && StringUtil.equals(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue(), invAim)) {
             returnPs = DictCodeListExt3.交易方向_行权回售申请.getValue();
             tableId = DictCodeListTableId.会计场景代码_摊余成本债券_回售申请.getValue();
         }
         //数据字典：交易方向.行权-回售+数据字典：投资目的.公允价值变动类=数据字典：交易方向.行权-回售申请+数据字典：会计事件代码.公允价值损益类债券-回售申请
         else if (StringUtil.equals(DictCodeList.交易方向_行权_回售.getValue(), ps)
-                && StringUtil.equals(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue(), invAim)) {
+                && StringUtil.equals(DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue(), invAim)) {
             returnPs = DictCodeListExt3.交易方向_行权回售申请.getValue();
             tableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_回售申请.getValue();
         }
         //数据字典：交易方向.行权-回售+数据字典：投资目的.综合收益类=数据字典：交易方向.行权-回售申请+数据字典：会计事件代码.综合收益债券-回售申请
         else if (StringUtil.equals(DictCodeList.交易方向_行权_回售.getValue(), ps)
-                && StringUtil.equals(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue(), invAim)) {
+                && StringUtil.equals(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue(), invAim)) {
             returnPs = DictCodeListExt3.交易方向_行权回售申请.getValue();
             tableId = DictCodeListTableId.会计场景代码_综合收益债券_回售申请.getValue();
         }
         //数据字典：交易方向.行权-赎回+数据字典：投资目的.摊余成本类=数据字典：交易方向.行权-赎回结转+数据字典：会计事件代码.摊余成本债券-赎回结转
         else if (StringUtil.equals(DictCodeList.交易方向_行权_赎回.getValue(), ps)
-                && StringUtil.equals(DictCodeListExt1.投资目的_摊余成本类.getValue(), invAim)) {
+                && StringUtil.equals(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue(), invAim)) {
             returnPs = DictCodeListExt3.交易方向_行权赎回结转.getValue();
             tableId = DictCodeListTableId.会计场景代码_摊余成本债券_赎回结转.getValue();
         }
         //数据字典：交易方向.行权-赎回+数据字典：投资目的.公允价值变动类=数据字典：交易方向.行权-赎回结转+数据字典：会计事件代码.公允价值损益类债券-赎回结转
         else if (StringUtil.equals(DictCodeList.交易方向_行权_赎回.getValue(), ps)
-                && StringUtil.equals(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue(), invAim)) {
+                && StringUtil.equals(DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue(), invAim)) {
             returnPs = DictCodeListExt3.交易方向_行权赎回结转.getValue();
             tableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_赎回结转.getValue();
         }
         //数据字典：交易方向.行权-赎回+数据字典：投资目的.综合收益类=数据字典：交易方向.行权-赎回结转+数据字典：会计事件代码.综合收益债券-赎回结转
         else if (StringUtil.equals(DictCodeList.交易方向_行权_赎回.getValue(), ps)
-                && StringUtil.equals(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue(), invAim)) {
+                && StringUtil.equals(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue(), invAim)) {
             returnPs = DictCodeListExt3.交易方向_行权赎回结转.getValue();
             tableId = DictCodeListTableId.会计场景代码_综合收益债券_赎回结转.getValue();
         }
@@ -2152,13 +2140,13 @@ public class FinProductCommonService {
      */
     private String getExecYjlxBaseSubjectNatrue(String invAim) {
         String yjlxBaseSubjectNatrue = null;
-        if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(invAim)) {
+        if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(invAim)) {
             yjlxBaseSubjectNatrue = DictCodeBaseSubjectNatrue.摊余成本类债券应计利息.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(invAim)) {
             yjlxBaseSubjectNatrue = DictCodeBaseSubjectNatrue.公允价值损益类应计利息.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(invAim)) {
             yjlxBaseSubjectNatrue = DictCodeBaseSubjectNatrue.综合收益类应计利息.getValue();
         }
         return yjlxBaseSubjectNatrue;
@@ -2171,13 +2159,13 @@ public class FinProductCommonService {
      */
     private String getExecCbBaseSubjectNatrue(String invAim) {
         String cbBaseSubjectNatrue = null;
-        if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(invAim)) {
+        if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(invAim)) {
             cbBaseSubjectNatrue = DictCodeBaseSubjectNatrue.摊余成本类成本.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(invAim)) {
             cbBaseSubjectNatrue = DictCodeBaseSubjectNatrue.公允价值损益类_成本.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(invAim)) {
             cbBaseSubjectNatrue = DictCodeBaseSubjectNatrue.综合收益类成本.getValue();
         }
         return cbBaseSubjectNatrue;
@@ -2224,4 +2212,40 @@ public class FinProductCommonService {
     public String getfinprodType2(String finprodId) {
         return  finProductCommonMapper.getfinprodType2(finprodId);
     }
+
+    /**
+     * 估值查詢-利率互換
+     * @author 殷亚
+     * @date 2022/4/28 15:49
+     * @param map
+     * @return com.joyintech.tams.common.base.entity.MstValIrs
+     * @see
+     * @version 1.0
+     */
+    public MstValIrs getIrsMarketPrice(Map<String, Object> map,BigDecimal quotaDigit,String priceTailMode) {
+        MstValIrs mstValIrs = new MstValIrs();
+        List<MstValIrs> list = finProductCommonMapper.getMarketPriceForIrs(map);
+        if(!CollectionUtils.isEmpty(list)){
+            mstValIrs=list.get(0);
+            if (quotaDigit != null) {
+                RoundingMode roundingMode = null;
+                if(DictCodeList.估值舍入规则_四舍五入.getValue().equals(priceTailMode)){
+                    roundingMode = RoundingMode.HALF_UP;
+                }
+                else if(DictCodeList.估值舍入规则_舍位.getValue().equals(priceTailMode)){
+                    roundingMode = RoundingMode.DOWN;
+                }
+                else if(DictCodeList.估值舍入规则_进位.getValue().equals(priceTailMode)){
+                    roundingMode = RoundingMode.UP;
+                }
+                mstValIrs.setValuation(ArithmeticUtil.round(mstValIrs.getValuation(),
+                        quotaDigit.intValue(), roundingMode));
+            }
+
+
+        }
+        return mstValIrs;
+    }
+
+
 }

@@ -14,6 +14,9 @@ public class PositionCashRequestDto {
     @ApiModelProperty(name="portfolioIdList",value="组合代码集合",example="[字符串1,字符串2,...]", required = true)
     private List<String> portfolioIdList;
 
+    @ApiModelProperty(name="ptlList",value="组合代码集合")
+    private List<PositionCashRequestDetailDto> ptlList;
+
     @ApiModelProperty(name="cdate",value="交易日期",example="2021-10-20", required = true)
     private String cdate;
 
@@ -31,6 +34,9 @@ public class PositionCashRequestDto {
 
     @ApiModelProperty(name="acctTypes",value="账户现金查询账户类型集合",example="['A01','A07']")
     private List<String> acctTypes;
+
+    @ApiModelProperty(name="finprodId",value="资产代码",example="xxx")
+    private String finprodId;
 
     public List<String> getPortfolioIdList() {
         return portfolioIdList;
@@ -86,5 +92,21 @@ public class PositionCashRequestDto {
 
     public void setAcctTypes(List<String> acctTypes) {
         this.acctTypes = acctTypes;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
+    }
+
+    public List<PositionCashRequestDetailDto> getPtlList() {
+        return ptlList;
+    }
+
+    public void setPtlList(List<PositionCashRequestDetailDto> ptlList) {
+        this.ptlList = ptlList;
     }
 }

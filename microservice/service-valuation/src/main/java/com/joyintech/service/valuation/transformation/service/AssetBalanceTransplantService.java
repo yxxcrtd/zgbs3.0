@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,8 +33,6 @@ import com.joyintech.tams.common.base.entity.BokSubject;
 import com.joyintech.tams.common.base.entity.TrsSubjectRelation;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.service.DataTransplantCommonService;
 import com.joyintech.tams.valuation.common.utils.ValStringUtil;
@@ -194,9 +191,9 @@ public class AssetBalanceTransplantService extends CommonExportService<BalanceTr
 		}
 		else if("债券".equals(dto.getAssetType())){
 			busiDetailType = DictCodeListExt1.金融产品类型_债券.getValue();
-			invAim = DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue();
+			invAim = DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue();
 			profitType = DictCodeList.收益类型_收益型.getValue();
-			invAimName = invAim+":"+DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getCodeName();
+			invAimName = invAim+":"+DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getCodeName();
 			busiDetailTypeName = busiDetailType+GlobalConstant.分号+DictCodeListExt1.金融产品类型_债券.getCodeName();
 		}
 		else if("自定义资产".equals(dto.getAssetType())){

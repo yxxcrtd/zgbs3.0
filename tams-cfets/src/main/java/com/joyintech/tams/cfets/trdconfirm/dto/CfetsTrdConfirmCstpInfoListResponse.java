@@ -76,6 +76,9 @@ public class CfetsTrdConfirmCstpInfoListResponse {
     @ApiModelProperty(name="tradeYield",value="成交价%",example="1")
     private BigDecimal tradeYield;
 
+    @ApiModelProperty(name="tradeYieldStr",value="成交价+单位",example="1")
+    private String tradeYieldStr;
+
 
     @ApiModelProperty(name="termDays",value="期限（天）",example="1")
     private BigDecimal termDays;
@@ -153,12 +156,10 @@ public class CfetsTrdConfirmCstpInfoListResponse {
     }
 
     public String getBusinesstypeName() {
-        if(StringUtil.equals("BOND",getBusinesstype())){
-            return "现券买卖";
-        }else{
-            return "质押式回购";
+        if (StringUtil.isEmpty(getBusinesstype())) {
+            return StringUtil.EMPTY;
         }
-      //  return SysDataUtil.getNameFromDataDict(DictCode.CSTP资产类型, getBusinesstype());
+        return SysDataUtil.getNameFromDataDict(DictCode.CSTP资产类型, getBusinesstype());
     }
 
     public void setBusinesstypeName(String businesstypeName) {
@@ -251,6 +252,14 @@ public class CfetsTrdConfirmCstpInfoListResponse {
 
     public void setTradeYield(BigDecimal tradeYield) {
         this.tradeYield = tradeYield;
+    }
+
+    public String getTradeYieldStr() {
+        return tradeYieldStr;
+    }
+
+    public void setTradeYieldStr(String tradeYieldStr) {
+        this.tradeYieldStr = tradeYieldStr;
     }
 
     public BigDecimal getTermDays() {

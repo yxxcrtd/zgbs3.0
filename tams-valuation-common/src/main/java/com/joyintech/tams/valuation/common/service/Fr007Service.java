@@ -1286,7 +1286,8 @@ public class Fr007Service {
 			yishixianFudong = yishixianFudong * deal.getTradeAmt().doubleValue();
 			// 未实现浮动 = df_deal_fr007.未实现浮动 * df_deal_fr007['交易金额']
 			weishixianFudong = weishixianFudong * deal.getTradeAmt().doubleValue();
-			if (DictCodeListExt2.互换方式_收取浮动.getValue().equals(deal.getPs())) {
+			//if (DictCodeListExt2.互换方式_收取浮动.getValue().equals(deal.getPs())) {
+			if (DictCodeListExt2.互换方式_收取固定.getValue().equals(deal.getPs())) {
 				// '已实现浮动'] = -df_deal_fr007.已实现浮动
 				yishixianFudong = -yishixianFudong;
 				// '未实现浮动'] = -df_deal_fr007.未实现浮动

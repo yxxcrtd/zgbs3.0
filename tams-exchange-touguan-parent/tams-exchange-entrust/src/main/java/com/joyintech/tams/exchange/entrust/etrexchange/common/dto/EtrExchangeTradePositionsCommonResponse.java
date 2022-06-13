@@ -330,10 +330,14 @@ public class EtrExchangeTradePositionsCommonResponse {
      * @return businessModelStr
      */
     public String getBusinessModelStr(){
-        if(StringUtil.isNotEmpty(getBusinessModel())){
-            return SysDataUtil.getNameFromDataDict(DictCode.业务模式,getBusinessModel());
-        }
-        else {
+        if (StringUtil.isNotEmpty(getBusinessModel())) {
+            String[] models = StringUtil.split(getBusinessModel(), ",");
+            StringBuilder str = new StringBuilder();
+            for (String model : models) {
+                str.append(SysDataUtil.getNameFromDataDict(DictCode.业务模式, model)).append(",");
+            }
+            return str.length() > 0 ? str.substring(0, str.length() - 1) : "";
+        } else {
             return "";
         }
     }

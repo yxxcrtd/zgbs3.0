@@ -2,6 +2,7 @@ package com.joyintech.tams.settle.batch.datagather.dto;
 
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.tams.common.base.entity.SettleTransDataPledge;
+import com.joyintech.tams.common.base.entity.SettleTransDataTotal;
 
 import java.util.List;
 
@@ -38,7 +39,22 @@ public class InvestTradeReaderDto extends NeedOperateEntity {
      * 除权交易数据
      */
     private List<SettleDelDealDetailDto> settleTransDataDelDtoList;
-    
+
+    public List<SettleTransDataTotal> getSettleTransDataTotalList() {
+        return settleTransDataTotalList;
+    }
+
+    public void setSettleTransDataTotalList(List<SettleTransDataTotal> settleTransDataTotalList) {
+        this.settleTransDataTotalList = settleTransDataTotalList;
+    }
+
+    /**
+     * 债券一级投标交收结果汇总数据
+     */
+    private List<SettleTransDataTotal> settleTransDataTotalList;
+
+
+
     public InvestTradeReaderDto() {
     }
 

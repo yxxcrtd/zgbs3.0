@@ -113,7 +113,7 @@ public class SecblTranDealTemplateRecService {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-	private  Map<String, Object> handleValSeclendDeal(List<ValSeclendDeal> listValSeclendDeal,Date resovleDate,Map<String,Object> params,
+	public  Map<String, Object> handleValSeclendDeal(List<ValSeclendDeal> listValSeclendDeal,Date resovleDate,Map<String,Object> params,
 			List<ValInterflog> valInterflog){
      List<String> bookSetIds = (List<String>)params.get(InterfCommonConstant.接口_运行接口账套ID);
      String valModel = (String)params.get(InterfCommonConstant.接口模式);
@@ -391,9 +391,10 @@ public class SecblTranDealTemplateRecService {
 //    	trdProductDeal.setCounterType(dto.getCounterType());
     	//交易场所=A.交易场所
     	trdProductDeal.setTradeMarket(dto.getTradeMarket());
+        /*modify by sunshuaishuai 交易管理 20220325 start*/
     	//关联系统交易编号=A.成交编号
-    	trdProductDeal.setfTradeId(dto.getTradeId());
-    	
+    	trdProductDeal.setfTradeId(dto.getOutTradeId());
+        /*modify by sunshuaishuai 20220325 end*/
     	trdProductDeal.setCreateTime(dto.getCreateTime());
     	
         //原交易编号
@@ -421,6 +422,10 @@ public class SecblTranDealTemplateRecService {
         trdProductDeal.setRegistOrg(dto.getRegistAgency());
         /** add by yanya on 20200122 增加总交易费用、未随交易支付费用、登记托管机构 end**/
 
+        /*add by sunshuaishuai 交易管理 20220325 start*/
+        //资金账户
+        trdProductDeal.setMyAcctNo(dto.getMyAcctNo());
+        /*add by sunshuaishuai 20220325 end*/
     	return trdProductDeal;
     }
 

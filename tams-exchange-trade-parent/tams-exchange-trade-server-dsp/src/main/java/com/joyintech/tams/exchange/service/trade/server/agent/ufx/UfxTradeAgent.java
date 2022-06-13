@@ -75,7 +75,12 @@ public class UfxTradeAgent extends TradeAgentDsp {
         String accountId = account.getId();
         TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_ACCOUNT_LOGIN.value);
         agentInfo.setAccountId(accountId);
-        ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, account);
+        Map<String, String> parameters = Maps.newHashMap();
+        parameters.put("account", accountId);
+        parameters.put("financeAccount", account.getFinanceAccount());
+        parameters.put("pwd", account.getTradePwd());
+        parameters.put("password", account.getTradePwd());
+        ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
         // 账户登录成功，记录下登录成功的账户
         if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
             logger.info("account {} login success", accountId);
@@ -153,7 +158,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         // '1'-逆序　'0'-正序
         parameters.put("query_direction", "0");
 
-        TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_QRY_TRADE.value);
+        TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_QRY_TRADE.value, "Bidding");
         agentInfo.setAccountId(accountId);
         ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
         List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
@@ -195,9 +200,9 @@ public class UfxTradeAgent extends TradeAgentDsp {
         parameters.put("entrust_amount", entrust.getEntrustVolume());
         //全价
         if (FullPriceConst.FULL_PRICE.value.equals(entrust.getIsFullPrice())) {
-            parameters.put("entrust_price", entrust.getFullPrice().doubleValue());
+            parameters.put("entrust_price", entrust.getFullPrice().toPlainString());
         } else {//净价
-            parameters.put("entrust_price", entrust.getEntrustPrice().doubleValue());
+            parameters.put("entrust_price", entrust.getEntrustPrice().toPlainString());
         }
         parameters.put("entrust_bs", entrust.getEntrustBs());
         parameters.put("entrust_prop", entrust.getEntrustProp());
@@ -206,6 +211,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
 
         TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_ENTRUST.value, entrustProp);
         agentInfo.setAccountId(entrust.getAccountId());
+        parameters.put("password", getAccount(agentInfo.getAccountId()).getTradePwd());
         try {
             ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
             Map<String, Object> ds = (Map<String, Object>) resultBean.getData();
@@ -221,6 +227,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 entrust.setBrokerEntrustId((String) ds.get("entrust_no"));
                 entrust.setReportTime((String) ds.get("entrust_time"));
                 entrust.setReportNo((String) ds.get("report_no"));
+                entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
             }
 
             TerminalId terminalId = new TerminalId();
@@ -254,6 +261,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
 
         TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_INTEGRATED_ENTRUST.value, entrustProp);
         agentInfo.setAccountId(entrust.getAccountId());
+        parameters.put("password", getAccount(agentInfo.getAccountId()).getTradePwd());
         try {
             ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
             Map<String, Object> ds = (Map<String, Object>) resultBean.getData();
@@ -270,6 +278,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 if (!Strings.isNullOrEmpty(initDate)) {
                     entrust.setTradingDay(initDate);
                 }
+                entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
             }
 
             TerminalId terminalId = new TerminalId();
@@ -315,6 +324,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
                     cancelEntrustBean.setMarket(Market.SZSE.value);
                 }
                 cancelEntrustBean.setStockCode((String) ds.get("stock_code"));
+                cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
             }
             onRspCancelEntrust(cancelEntrustBean);
         } catch (Exception e) {
@@ -378,6 +388,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 cancelEntrustBean.setErrorCode(errorCode);
             } else {
                 cancelEntrustBean.setCancelBrokerEntrustId((String) ds.get("entrust_no"));
+                cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
             }
 
             onRspCancelIntegratedEntrust(cancelEntrustBean);
@@ -402,9 +413,8 @@ public class UfxTradeAgent extends TradeAgentDsp {
             logger.error("不支持查询该行情类型，quoteType：{}", quoteQryBean.getQuoteType());
             return Collections.emptyList();
         }
-
-        TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(),
-                FunctionCode.REQ_QRY_INTEGRATED_QUOTE.value, quoteType, quoteQryBean.getMarket());
+        // xiazelei 修改于 2022/4/29 16:07 置空market参数
+        TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_QRY_INTEGRATED_QUOTE.value, quoteType, null);
         agentInfo.setAccountId(quoteQryBean.getAccountId());
         ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
         if (resultBean.getErrorCode() != ErrorCode.SUCCESS.value) {
@@ -423,8 +433,10 @@ public class UfxTradeAgent extends TradeAgentDsp {
 
             String market = StockCodeUtils.getMarket(quoteQryBean.getStockCode());
             if (market.equals(Market.SZSE.value)) {
+                quoteQryBean.setMarket(Market.SZSE.value);
                 parameters.put("exchange_type", ExchangeType.SZ.value);
             } else if (market.equals(Market.SHSE.value)) {
+                quoteQryBean.setMarket(Market.SHSE.value);
                 parameters.put("exchange_type", ExchangeType.SH.value);
             }
             parameters.put("cbphq_type", "00");
@@ -877,6 +889,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
     private List<Trade> getProtocolBackTradeReBack(String accountId, int pageSize, String positionStr) {
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("accountId", accountId);
+        parameters.put("account", accountId);
         parameters.put("position_str", positionStr);
         //固收 深圳and上海协议回购成交申报
         String entrustProp = "BPN,BPR,BPT,BPB,BPH,BPI,FI1,FI3,FI9,a,b,c,e,AFW,AFC";
@@ -1029,8 +1042,10 @@ public class UfxTradeAgent extends TradeAgentDsp {
     }
 
     private List<Entrust> getOrderReBack(String accountId, int pageSize, String positionStr) {
+        Account account = getAccount(accountId);
         Map<String, Object> parameters = Maps.newHashMap();
         parameters.put("account", accountId);
+        parameters.put("password", account.getTradePwd());
         parameters.put("request_num", pageSize);
         parameters.put("position_str", positionStr);
         TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_QRY_ENTRUST.value, "Bidding");
@@ -1140,6 +1155,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         Map<String, Object> parameters = Maps.newHashMap();
         parameters.put("account", accountId);
         parameters.put("password_type", "2");
+        parameters.put("password", getAccount(accountId).getTradePwd());
         if (!Objects.isNull(positionStr) && !Objects.isNull(positionStr.getTradePositionStr())) {
             parameters.put("position_str", positionStr.getTradePositionStr());
         }
@@ -1151,7 +1167,8 @@ public class UfxTradeAgent extends TradeAgentDsp {
         TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_QRY_TRADE.value, "Bidding");
         agentInfo.setAccountId(accountId);
         ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
+        List<Map<String, Object>> resList = Lists.newArrayList();
+        resList = (List<Map<String, Object>>) resultBean.getData();
 
         return UfxMsgParseHelper.parseTrades(accountId, resList);
     }
@@ -1192,6 +1209,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
     private List<Trade> getProtocolBackTrade(String accountId, PositionStr positionStr) {
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("accountId", accountId);
+        parameters.put("account", accountId);
         parameters.put("position_str", "");
         if (!Objects.isNull(positionStr) && !Objects.isNull(positionStr.getProtocolBackPositionStr())) {
             parameters.put("position_str", positionStr.getProtocolBackPositionStr());
@@ -1251,9 +1269,9 @@ public class UfxTradeAgent extends TradeAgentDsp {
         }
 
         if (FullPriceConst.FULL_PRICE.value.equals(integratedEntrust.getIsFullPrice())) {
-            parameters.put("entrust_price", integratedEntrust.getFullPrice().doubleValue());
+            parameters.put("entrust_price", integratedEntrust.getFullPrice().toPlainString());
         } else {
-            parameters.put("entrust_price", integratedEntrust.getEntrustPrice().doubleValue());
+            parameters.put("entrust_price", integratedEntrust.getEntrustPrice().toPlainString());
         }
         parameters.put("entrust_prop", integratedEntrust.getEntrustProp());
         parameters.put("entrust_amount", integratedEntrust.getEntrustVolume());
@@ -1267,7 +1285,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 (EntrustProp.LARGE_AFTER_CLOSING_WEIGHT_PRICE.value.equals(integratedEntrust.getEntrustProp())
                 ))
         )) {
-            parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().doubleValue());
+            parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().toPlainString());
         }
         if (IntegratedEntrustUtils.isBulk_YX_DJ(integratedEntrust.getBsFlag())) {
             //意向申报 定价申报
@@ -1288,9 +1306,9 @@ public class UfxTradeAgent extends TradeAgentDsp {
             parameters.put("exchange_type", ExchangeType.SH.value);
         }
         if (FullPriceConst.FULL_PRICE.value.equals(integratedEntrust.getIsFullPrice())) {
-            parameters.put("entrust_price", integratedEntrust.getFullPrice().doubleValue());
+            parameters.put("entrust_price", integratedEntrust.getFullPrice().toPlainString());
         } else {
-            parameters.put("entrust_price", integratedEntrust.getEntrustPrice().doubleValue());
+            parameters.put("entrust_price", integratedEntrust.getEntrustPrice().toPlainString());
         }
         parameters.put("entrust_prop", integratedEntrust.getEntrustProp());
         parameters.put("entrust_amount", integratedEntrust.getEntrustVolume());
@@ -1320,7 +1338,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         parameters.put("cbpconfer_id", integratedEntrust.getContractId());
         parameters.put("entrust_amount", integratedEntrust.getEntrustVolume());
         parameters.put("entrust_bs", integratedEntrust.getEntrustBs());
-        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().doubleValue());
+        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().toPlainString());
         parameters.put("date_back", integratedEntrust.getBackDate());
         parameters.put("prop_seat_no", integratedEntrust.getPropSeatNo());
         parameters.put("expire_year_rate", convertExpireYearRate(integratedEntrust.getEntrustPrice()));
@@ -1335,7 +1353,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
             parameters.put("exchange_type", ExchangeType.SH.value);
         }
         parameters.put("cbpconfer_id", integratedEntrust.getContractId());
-        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().doubleValue());
+        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().toPlainString());
         parameters.put("entrust_bs", integratedEntrust.getEntrustBs());
         parameters.put("expire_year_rate", convertExpireYearRate(integratedEntrust.getEntrustPrice()));
         parameters.put("orig_report_id", integratedEntrust.getOrigSerialNo());
@@ -1350,7 +1368,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
             parameters.put("exchange_type", ExchangeType.SH.value);
         }
         parameters.put("cbpconfer_id", integratedEntrust.getContractId());
-        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().doubleValue());
+        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().toPlainString());
         parameters.put("entrust_bs", integratedEntrust.getEntrustBs());
         parameters.put("expire_year_rate", convertExpireYearRate(integratedEntrust.getEntrustPrice()));
         parameters.put("orig_report_id", integratedEntrust.getOrigSerialNo());
@@ -1373,7 +1391,8 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 integratedEntrust.getEntrustBs(), integratedEntrust.getMarket())) {
             parameters.put("cbpconfer_id", integratedEntrust.getContractId());
         }
-        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().doubleValue());
+        // xiazelei 修改于 2022/4/22 10:37 修改所有的.doubleValue() 科学计数法有问题
+        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().toPlainString());
         parameters.put("repurchase_date", integratedEntrust.getBackDate());
         parameters.put("expire_year_rate", convertExpireYearRate(integratedEntrust.getEntrustPrice()));
         parameters.put("entrust_prop", integratedEntrust.getEntrustProp());
@@ -1402,7 +1421,15 @@ public class UfxTradeAgent extends TradeAgentDsp {
         }
     }
 
-    private static double convertExpireYearRate(BigDecimal entrustPrice) {
-        return TradeUtils.divide(entrustPrice, 100, 3).doubleValue();
+    private static String convertExpireYearRate(BigDecimal entrustPrice) {
+        // xiazelei 修改于 2022/4/22 10:37  保存5位小数
+        return TradeUtils.divide(entrustPrice, 100, 5).toPlainString();
+    }
+
+    @Override
+    public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
+            throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

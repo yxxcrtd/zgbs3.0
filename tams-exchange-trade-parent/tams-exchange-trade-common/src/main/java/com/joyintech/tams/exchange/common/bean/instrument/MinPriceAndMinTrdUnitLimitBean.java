@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.common.bean.instrument;
 
+import com.google.common.base.MoreObjects;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import io.swagger.annotations.ApiModel;
@@ -32,6 +33,9 @@ public class MinPriceAndMinTrdUnitLimitBean implements Serializable {
 
     @ApiModelProperty(required = false, name = "isFullPrice", value = "是否全价，默认为净价")
     private String isFullPrice = "N";
+
+    @ApiModelProperty( name = "subStockType", value = "股票类型")
+    private String subStockType;
 
     public MinPriceAndMinTrdUnitLimitBean() {
     }
@@ -96,5 +100,26 @@ public class MinPriceAndMinTrdUnitLimitBean implements Serializable {
 
     public void setIsFullPrice(String isFullPrice) {
         this.isFullPrice = isFullPrice;
+    }
+
+    public String getSubStockType() {
+        return subStockType;
+    }
+
+    public void setSubStockType(String subStockType) {
+        this.subStockType = subStockType;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("errorCode", errorCode)
+                .add("errorMsg", errorMsg)
+                .add("stockCode", stockCode)
+                .add("minPriceList", minPriceList)
+                .add("minTrdUnitLimitList", minTrdUnitLimitList)
+                .add("volumeMultiple", volumeMultiple)
+                .add("isFullPrice", isFullPrice)
+                .toString();
     }
 }

@@ -1,14 +1,15 @@
 package com.joyintech.service.basicdata.systrdconfig.service;
 
+import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.service.basicdata.systrdconfig.dao.InterfSysTrdConfigMapper;
-import com.joyintech.service.basicdata.systrdconfig.dto.MinPirceDto;
-import com.joyintech.service.basicdata.systrdconfig.dto.MinTrdUnitLimitDto;
-import com.joyintech.service.basicdata.systrdconfig.dto.TrdOthCodeInfoDto;
-import com.joyintech.service.basicdata.systrdconfig.dto.TrdTimeConfigDto;
+import com.joyintech.service.basicdata.systrdconfig.dto.*;
 import com.joyintech.tams.common.base.dao.MstCounterPartyInfoMapper;
+import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
 import com.joyintech.tams.common.base.entity.MstCounterPartyInfo;
+import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
@@ -40,6 +41,13 @@ public class InterfSysTrdConfigService{
     @Autowired
     IPlatformDate iPlatformDateImpl;
 
+    @Autowired
+    private SppiImportDataMapper sppiImportDataMapper;
+
+
+
+
+
 
 
     /**
@@ -57,12 +65,16 @@ public class InterfSysTrdConfigService{
             map.put("assetType","F07");
         }
         if (map.get("finprodId")!=null && map.get("finprodId")!=""){
-            Map<String,Object> map1 = interfSysTrdConfigMapper.getFinProdInfo(map);
-            map.put("tradeMarket",map1.get("TRADE_MARKET"));
-            map.put("assetType",map1.get("TYPE_8"));
-            map.put("assetType1",map1.get("TYPE_6"));
-            map.put("assetType2",map1.get("TYPE_7"));
-
+            if(StringUtil.equals(map.get("assetType"),"F07")){
+                Map<String,Object> map2 = interfSysTrdConfigMapper.getMstRepoProductInfo(map);
+                map.put("tradeMarket",map2.get("TRADE_MARKET"));
+            }else{
+                Map<String,Object> map1 = interfSysTrdConfigMapper.getFinProdInfo(map);
+                map.put("tradeMarket",map1.get("TRADE_MARKET"));
+                map.put("assetType",map1.get("TYPE_8"));
+                map.put("assetType1",map1.get("TYPE_6"));
+                map.put("assetType2",map1.get("TYPE_7"));
+            }
         }
         returnMap.put("errorCode",0);
         returnMap.put("errorMsg","成功");
@@ -323,5 +335,65 @@ public class InterfSysTrdConfigService{
         returnMap.put("data",interfSysTrdConfigMapper.getPurchQuotaInfo(params));
         return returnMap;
 
+    }
+
+
+    public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {
+        return interfSysTrdConfigMapper.getDealerTraderInfo(dto);
+    }
+
+    public Map<String, Object> getBidPriceConInfo(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+//        if (params.get("ps") == null || params.get("finprodId") == null  || params.get("businessModel") == null || params.get("price") == null){
+        if (params.get("ps") == null || params.get("finprodId") == null  || params.get("businessModel") == null || params.get("price") == null
+                || StringUtil.isEmpty(params.get("businessModel").toString())){
+            resultMap.put("status",1);
+            resultMap.put("message","参数缺失");
+            return resultMap;
+        }
+        String ps = params.get("ps").toString();
+        String finprodId = params.get("finprodId").toString();
+        String businessModel = params.get("businessModel").toString();
+        String price = params.get("price").toString();
+        if(StringUtil.equals(ps,DictCodeList.交易方向_买入.getValue())) {
+            Map<String, Object> paramsppi = new HashMap<>();
+            paramsppi.put("finprodId", finprodId);
+            SppiImportData sppiDto = interfSysTrdConfigMapper.queryAssetIsSppiTest(paramsppi);
+            if (com.joyintech.framework.util.StringUtil.isNotEmpty(sppiDto)) {
+                if (com.joyintech.framework.util.StringUtil.isNotEmpty(sppiDto.getIsSppiPass()) && com.joyintech.framework.util.StringUtil.equals(sppiDto.getIsSppiPass(), "2")) {
+                    //判断该资产未来是否有行权计划
+                    Map<String, Object> param = new HashMap<>();
+                    param.put("finprodId", finprodId);
+                    param.put("sysDate", DateUtil.platDateFromCache());
+                    if (interfSysTrdConfigMapper.countBondHasEexrPlan(param) > 0) {
+                        if (com.joyintech.framework.util.StringUtil.isNotEmpty(businessModel) && com.joyintech.framework.util.StringUtil.equals(businessModel, DictCodeListExt3.业务模式_收取合同约定的现金流.getValue())) {
+                            SppiImportData sppiImportData = sppiImportDataMapper.selectByPrimaryKey(finprodId);
+                            if (null != sppiImportData && com.joyintech.framework.util.StringUtil.isNotEmpty(sppiImportData.getBidPriceCon())) {
+                                String[] split = sppiImportData.getBidPriceCon().split(",");
+//                                if ((!(new BigDecimal(price).compareTo(new BigDecimal(split[0]))==0))&&(new BigDecimal(price).compareTo(new BigDecimal(split[1])) <= 0)){
+                                // modify by fxmei 2022-05-23 需求变更 start
+                                if ((new BigDecimal(price).compareTo(new BigDecimal(split[1])) <= 0)){
+                                // modify by fxmei 2022-05-23 需求变更 end
+                                    resultMap.put("status",1);
+                                    resultMap.put("message","净价不满足使权不重大购入价条件，若继续提交，业务模式会发生变更");
+                                    return resultMap;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        resultMap.put("status",0);
+        resultMap.put("message","成功");
+        return resultMap;
+    }
+
+    public Map<String, Object> getSppiTestInfo(Map<String, Object> params) {
+        Map<String,Object> returnMap = new HashMap<String,Object>();
+        returnMap.put("errorCode",0);
+        returnMap.put("errorMsg","成功");
+        returnMap.put("data",interfSysTrdConfigMapper.queryAssetIsSppiTest(params));
+        return returnMap;
     }
 }

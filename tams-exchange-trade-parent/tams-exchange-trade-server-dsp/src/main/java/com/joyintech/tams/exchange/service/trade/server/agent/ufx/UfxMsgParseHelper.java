@@ -225,7 +225,8 @@ public class UfxMsgParseHelper {
             }
             String withdrawAmount = (String) ds.get("withdraw_amount");
             if (!Strings.isNullOrEmpty(withdrawAmount)) {
-                entrust.setCancelVolume(Long.parseLong(withdrawAmount));
+                // xiazelei 修改于 2022/4/13 14:49  修改含有小数的整数字段【后台返回的整数字段不规范可能含有小数部分如0.00】，只取整数部分。
+                entrust.setCancelVolume(BigDecimal.valueOf(Double.parseDouble(withdrawAmount)).longValue());
             }
 
             //确认国金的协议回购和固收委托是否是这个字段
@@ -400,7 +401,8 @@ public class UfxMsgParseHelper {
             integratedQuoteBt.setOrigPledgeStampCode((String) ds.get("old_impawn_code"));
             String impawnAmount = (String) ds.get("impawn_amount");
             if (!Strings.isNullOrEmpty(impawnAmount)) {
-                integratedQuoteBt.setPledgeStampVolume(Integer.parseInt(impawnAmount.substring(0, impawnAmount.lastIndexOf("."))));
+                //xiazelei 20220407 修改含有小数的整数字段，只取整数部分。
+                integratedQuoteBt.setPledgeStampVolume(BigDecimal.valueOf(Double.parseDouble(impawnAmount)).intValue());
             }
             String funderRatio = (String) ds.get("funder_ratio");
             if (!Strings.isNullOrEmpty(funderRatio)) {
@@ -462,7 +464,8 @@ public class UfxMsgParseHelper {
             }
             String sellQuoteAmount = (String) ds.get("sell_quote_amount");
             if (!Strings.isNullOrEmpty(sellQuoteAmount)) {
-                integratedQuoteBt.setSellQuoteAmount(Integer.parseInt(sellQuoteAmount.substring(0, sellQuoteAmount.lastIndexOf("."))));
+                //xiazelei 20220407 修改含有小数的整数字段，只取整数部分。
+                integratedQuoteBt.setSellQuoteAmount(BigDecimal.valueOf(Double.parseDouble(sellQuoteAmount)).intValue());
             }
             String sellQuotePrice = (String) ds.get("sell_quote_price");
             if (!Strings.isNullOrEmpty(sellQuotePrice)) {
@@ -492,7 +495,8 @@ public class UfxMsgParseHelper {
             }
             String buyQuoteAmount = (String) ds.get("buy_quote_amount");
             if (!Strings.isNullOrEmpty(buyQuoteAmount)) {
-                integratedQuoteBt.setBuyQuoteAmount(Integer.parseInt(buyQuoteAmount.substring(0, buyQuoteAmount.lastIndexOf("."))));
+                //xiazelei 20220407 修改含有小数的整数字段，只取整数部分。
+                integratedQuoteBt.setBuyQuoteAmount(BigDecimal.valueOf(Double.parseDouble(buyQuoteAmount)).intValue());
             }
             String buyQuotePrice = (String) ds.get("buy_quote_price");
             if (!Strings.isNullOrEmpty(buyQuotePrice)) {
@@ -505,7 +509,8 @@ public class UfxMsgParseHelper {
             integratedQuoteBt.setSellConfirmId((String) ds.get("sell_confirm_id"));
             String entrustAmount = (String) ds.get("entrust_amount");
             if (!Strings.isNullOrEmpty(entrustAmount)) {
-                integratedQuoteBt.setEntrustVolume(Integer.parseInt(entrustAmount.substring(0, entrustAmount.lastIndexOf("."))));
+                //xiazelei 20220407 修改含有小数的整数字段，只取整数部分。
+                integratedQuoteBt.setEntrustVolume(BigDecimal.valueOf(Double.parseDouble(entrustAmount)).intValue());
             }
             integratedQuoteBt.setLiaisonName((String) ds.get("relation_name"));
             String relationTel = (String) ds.get("relation_tel");
@@ -595,8 +600,9 @@ public class UfxMsgParseHelper {
             positionBean.setStockName((String) ds.get("stock_name"));
             positionBean.setCostPrice(Double.parseDouble((String) ds.get("cost_price")));
             positionBean.setMarketValue(Double.parseDouble((String) ds.get("market_value")));
-            positionBean.setHoldVolume(Long.parseLong((String) ds.get("hold_amount")));
-            positionBean.setEnableVolume(Long.parseLong((String) ds.get("enable_amount")));
+            // xiazelei 修改于 2022/4/13 14:49  修改含有小数的整数字段【后台返回的整数字段不规范可能含有小数部分如0.00】，只取整数部分。
+            positionBean.setHoldVolume(BigDecimal.valueOf(Double.parseDouble((String) ds.get("hold_amount"))).longValue());
+            positionBean.setEnableVolume(BigDecimal.valueOf(Double.parseDouble((String) ds.get("enable_amount"))).longValue());
             positionBean.setPositionStr((String) ds.get("position_str"));
             list.add(positionBean);
         }
@@ -626,7 +632,8 @@ public class UfxMsgParseHelper {
             instrument.setDownPrice(BigDecimal.valueOf(Double.parseDouble((String) ds.get("down_price"))));
             instrument.setStkcodeStatus((String) ds.get("stkcode_status"));
             instrument.setAssetType((String) ds.get("stock_type"));
-            instrument.setHighVolume(Long.parseLong((String) ds.get("high_amount")));
+            // xiazelei 修改于 2022/4/13 14:49  修改含有小数的整数字段【后台返回的整数字段不规范可能含有小数部分如0.00】，只取整数部分。
+            instrument.setHighVolume(BigDecimal.valueOf(Double.parseDouble((String) ds.get("high_amount"))).longValue());
             instrument.setLowVolume(Integer.parseInt((String) ds.get("low_amount")));
             instrument.setTradePlat((String) ds.get("trade_plat"));
             instrument.setPostStr((String) ds.get("position_str"));
@@ -639,7 +646,7 @@ public class UfxMsgParseHelper {
             instrument.setExdividendFlag((String) ds.get("exdividend_flag"));
             instrument.setStbtransFlag((String) ds.get("stbtrans_flag"));
             instrument.setMarketLowVolume(Integer.parseInt((String) ds.get("market_low_amount")));
-            instrument.setMarketHighVolume(Integer.parseInt((String) ds.get("market_high_amount")));
+            instrument.setMarketHighVolume(Long.parseLong((String) ds.get("market_high_amount")));
             instrument.setBondinvFlag((String) ds.get("bondinv_flag"));
             list.add(instrument);
         }

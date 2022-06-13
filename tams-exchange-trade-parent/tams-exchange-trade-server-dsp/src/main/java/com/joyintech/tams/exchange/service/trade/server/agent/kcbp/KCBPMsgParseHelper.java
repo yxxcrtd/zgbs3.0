@@ -1,5 +1,13 @@
 package com.joyintech.tams.exchange.service.trade.server.agent.kcbp;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.springframework.beans.BeanUtils;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.joyintech.tams.exchange.common.bean.AccountFinance;
@@ -9,6 +17,7 @@ import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
 import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteBean;
 import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
 import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
 import com.joyintech.tams.exchange.common.bean.PledgeDiscount;
 import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
@@ -29,13 +38,6 @@ import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.service.trade.server.agent.EntrustIdManager;
-import org.springframework.beans.BeanUtils;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author lifangpeng
@@ -553,7 +555,7 @@ public class KCBPMsgParseHelper {
 
             instrument.setStkcodeStatus(resMap.get("stkstatus"));
             if (!Strings.isNullOrEmpty(resMap.get("marketmaxqty"))) {
-                instrument.setMarketHighVolume(Integer.parseInt(resMap.get("marketmaxqty")));
+                instrument.setMarketHighVolume(Long.parseLong(resMap.get("marketmaxqty")));
             }
             if (!Strings.isNullOrEmpty(resMap.get("marketminqty"))) {
                 instrument.setMarketLowVolume(Integer.parseInt(resMap.get("marketminqty")));
@@ -693,6 +695,34 @@ public class KCBPMsgParseHelper {
             list.add(integratedBulkQuoteBean);
         }
 
+        return list;
+    }
+    
+    public static List<NegotiateQuoteReceiveBean> parseNegotiateQuoteReceive(ResultBean resultBean, String market) {
+        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+        List<NegotiateQuoteReceiveBean> list = Lists.newArrayListWithExpectedSize(resList.size());
+        for (Map<String, String> resMap : resList) {
+        	NegotiateQuoteReceiveBean negotiateQuoteReceiveBean = new NegotiateQuoteReceiveBean();
+        	negotiateQuoteReceiveBean.setRequestTime(resMap.get("transacttime"));//申报时间
+        	negotiateQuoteReceiveBean.setRequestStatus(Integer.parseInt(resMap.get("reportstatus"))); //成交申报请求状态
+        	negotiateQuoteReceiveBean.setStockCode(StockCodeUtils.formatStockCode(resMap.get("stkcode"), "SZ"));//证券代码
+        	negotiateQuoteReceiveBean.setStockName(resMap.get("stkname"));//证券名称
+        	negotiateQuoteReceiveBean.setBs(resMap.get("side"));//买卖方向
+        	negotiateQuoteReceiveBean.setAmount(Integer.parseInt(resMap.get("orderqty")));//数量
+        	negotiateQuoteReceiveBean.setEntrustPrice(BigDecimal.valueOf(Double.parseDouble(resMap.get("orderprice"))));//价格（净价） 
+        	negotiateQuoteReceiveBean.setMemberId(resMap.get("cpmemberid"));//接收方交易商代码 --> 本方交易商
+        	negotiateQuoteReceiveBean.setTraderCode(resMap.get("cptradercode"));//接收方交易员代码 --> 本方交易员
+        	negotiateQuoteReceiveBean.setInvestorId(resMap.get("cpinvestorid"));//接收方交易主体代码 --> 本方交易主体
+        	negotiateQuoteReceiveBean.setInvestorType(resMap.get("cpinvestortype"));//接收方交易主体类型 --> 本方交易主体类型
+        	negotiateQuoteReceiveBean.setCpInvestorType(resMap.get("memberid"));//申报方交易商 --> 对手方交易商
+        	negotiateQuoteReceiveBean.setCpTraderCode(resMap.get("tradercode"));//申报方交易员代码 --> 对手方交易员
+        	negotiateQuoteReceiveBean.setCpInvestorId(resMap.get("investorid"));//申报方交易主体代码 --> 对手方交易主体
+        	negotiateQuoteReceiveBean.setCpInvestorType(resMap.get("investortype"));//申报方交易主体类型 --> 对手方交易主体类型
+        	negotiateQuoteReceiveBean.setConfirmId(resMap.get("confirmid"));//约定号
+        	negotiateQuoteReceiveBean.setPositionStr(resMap.get("posstr"));//定位串
+        	negotiateQuoteReceiveBean.setRemark(resMap.get("memo"));//备注
+            list.add(negotiateQuoteReceiveBean);
+        }
         return list;
     }
 

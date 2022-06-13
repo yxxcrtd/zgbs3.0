@@ -25,6 +25,7 @@ import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +121,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
         String assetType2 = StringUtil.isNotEmpty(
             inputDto.getAssetType2()) ? inputDto.getAssetType2() : baseAssetCashPositionCommMapper.selectFundType(
                 inputDto.getTrdProductDeal().getFinprodId());
-
+        String stage = inputDto.getStage();
         List<PtlSecPositionFlowDto> result = new ArrayList<>();
         PtlSecPositionFlowDto resultDto = new PtlSecPositionFlowDto();
         resultDto.setPortfolioId(inputDto.getPortfolioId());
@@ -188,7 +189,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
         }
         //add by yujiaping 2021-1-6 解决ZGBS-139 计划类净值型卖出交易提交后（流程中），没有占用资产可用持仓 start
         else if ((DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(deal.getFinprodType2())
-                && (DictCodeList.收益类型_净值型.getValue().equals(profitType)))             
+                && (DictCodeList.收益类型_净值型.getValue().equals(profitType)))
               && (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())
                 /*|| DictCodeList.交易方向_赎回.getValue().equals(deal.getPs())*/)) {
                  resultDto.setCdate(deal.getTradeDate());
@@ -299,7 +300,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
 
         /*
          * 1 输入金融产品交易Entity.金融产品类型（投管分类）in (“正回购”,“逆回购”) and 金融产品交易Entity.交易场所 = 数据字典缓存.交易场所.银行间 and 金融产品交易Entity.交易方向 in （“到期”）
-         *  
+         *
          */
         else if ((正回购_逆回购.contains(deal.getFinprodType2()) && DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())
                   && DictCodeList.交易方向_到期.getValue().equals(deal.getPs())) ) {
@@ -336,11 +337,11 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             /**** 回购释放头寸处理*****chenlei1*add***end **/
             return result;
         }
-        /* 
+        /*
          * 2 输入金融产品交易Entity.金融产品类型（投管分类）in (“拆入”,“拆出”) and 金融产品交易Entity.交易方向 in （“到期”）
          *
          */
-        else if (拆入_拆出.contains(deal.getFinprodType2()) && 
+        else if (拆入_拆出.contains(deal.getFinprodType2()) &&
         		(DictCodeList.交易方向_到期.getValue().equals(deal.getPs()) || DictCodeList.交易方向_卖出.getValue().equals(deal.getPs()) ) ) {
               resultDto.setCdate(deal.getSettleDate());
               resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
@@ -367,7 +368,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                           result.add(resultDto);
                       }
                   }
-        
+
               }
               else {
                   result.add(resultDto);
@@ -400,7 +401,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             if (!DictCodeList.交易方向_赎回确认.getValue().equals(deal.getPs()) && !DictCodeList.交易方向_赎回.getValue().equals(deal.getPs())){
                 resultDto.setCdate(deal.getTradeDate());
                 resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
-                result.add(resultDto);    
+                result.add(resultDto);
             }
             if (inputDto.getPositionType().equals(DictCodeList.持仓类型_可用.getValue()) && DictCodeList.交易方向_赎回.getValue().equals(deal.getPs())) {
                 resultDto.setCdate(deal.getTradeDate());
@@ -589,6 +590,34 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 resultDto.setCdate(deal.getSettleDate());
                 resultDto.setAmount(deal.getShareAmt());
                 result.add(resultDto);
+                return result;
+            }
+        }
+
+        if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
+                && "ISSUE_CLASS_01".equals(assetType2)// 发行方式 报价发行
+                && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
+            // 成交 增加在途持仓
+            if ("02".equals(stage)) {
+                resultDto.setCdate(deal.getSettleDate());
+                resultDto.setAmount(deal.getShareAmt());
+                resultDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
+                result.add(resultDto);
+                return result;
+            }
+            // 交收 减少在途持仓 增加实际持仓
+            if ("03".equals(stage)) {
+                resultDto.setCdate(deal.getSettleDate());
+                PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
+                BeanUtil.copyPropertiesIgnoreNull(flowDto, resultDto);
+                flowDto.setAmount(deal.getShareAmt().negate());
+                flowDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
+                result.add(flowDto);
+                PtlSecPositionFlowDto flowDto1 = new PtlSecPositionFlowDto();
+                BeanUtil.copyPropertiesIgnoreNull(flowDto1, resultDto);
+                flowDto1.setAmount(deal.getShareAmt());
+                flowDto1.setHodingType(DictCodeList.持仓类型_实际.getValue());
+                result.add(flowDto1);
                 return result;
             }
         }
@@ -1104,6 +1133,48 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 return result;
             }
             // 活期存放 交易方向为卖出 end
+            // 场内-信用保护凭证 start
+            else if (DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(deal.getFinprodType2())
+                    && !DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())) {
+                resultDto.setCdate(deal.getTradeDate());
+                if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())) {
+                    resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
+                }
+                if (DictCodeList.交易方向_买入.getValue().equals(deal.getPs()) || DictCodeList.交易方向_申购.getValue().equals(deal.getPs())) {
+                    resultDto.setAmount(deal.getShareAmt());
+                }
+                result.add(resultDto);
+                return result;
+            }
+            // 场内-信用保护凭证 end
+            // 场内-一级投标债 start
+            else if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
+                    && !DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())) {
+                resultDto.setCdate(deal.getTradeDate());
+                if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())) {
+                    resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
+                }
+                if (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())) {
+                    resultDto.setAmount(deal.getShareAmt());
+                }
+                result.add(resultDto);
+                // 前置交易编号不为空,说明是交收结果数据,需要反冲交收通知头寸
+                if(StringUtil.isNotEmpty(deal.getbTradeId())){
+                    List<TrdProductDeal> trdProductDeals = baseAssetCashPositionCommMapper.selectTrdProductDealByTotleTradeId(
+                            deal.getbTradeId());
+                    if(CollectionUtils.isNotEmpty(trdProductDeals)){
+                        List<PtlSecPositionFlowDto> bPtlSecPositionFlows = baseAssetCashPositionCommMapper.selectAllPositionByTotle(
+                                trdProductDeals.get(0).getTradeId());
+                        for(PtlSecPositionFlowDto bPtlSecPositionFlow : bPtlSecPositionFlows){
+                            bPtlSecPositionFlow.setCdate(deal.getTradeDate());
+                            bPtlSecPositionFlow.setAmount(ArithmeticUtil.multiply(bPtlSecPositionFlow.getAmount(), new BigDecimal(-1)));
+                            result.add(bPtlSecPositionFlow);
+                        }
+                    }
+                }
+                return result;
+            }
+            // 场内-一级投标债 end
         }
         return result;
     }
@@ -1140,6 +1211,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             String assetType2 = StringUtil.isNotEmpty(
                 inputDto.getAssetType2()) ? inputDto.getAssetType2() : baseAssetCashPositionCommMapper.selectFundType(
                     inputDto.getTrdProductDeal().getFinprodId());
+            String stage = inputDto.getStage();
             PtlCashPositionFlowDto resultDto = new PtlCashPositionFlowDto();
             // 输入参数.组合代码
             resultDto.setPortfolioId(portfolioId);
@@ -1153,6 +1225,10 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             resultDto.setOrderId(stlPayOrder.getOrderId());
             // 流程id
             resultDto.setWorkflowId(stlPayOrder.getWorkflowId());
+            // 指令代码
+            if (StringUtil.isNotEmpty(dealAdd)) {
+                resultDto.setEntrustId(dealAdd.getEntrustId());
+            }
             // 金融产品交易Entity.金融产品代码
             String chlId = null;
             if (StringUtil.isNotEmpty(deal.getChlId())) {
@@ -1275,7 +1351,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
                 result.add(resultDto);
                 return result;
-            } 
+            }
             /*
              * 输入金融产品交易Entity.金融产品类型（投管分类）= 数据字典缓存.金融产品类型（投管分类).债券 and 金融产品交易Entity.交易场所 ！= 数据字典缓存.交易场所.银行间 and 金融产品交易Entity.交易方向 in （“买入”）and 金融产品交易Entity.交易平台
              * in （“场内交易”） and 输入划款指令Entity.账户类型=数据字典.账户类型.交易所资金账户
@@ -1674,6 +1750,33 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 return result;
             }
             //add by  liutf 20200108 end
+            // add by jiangpeng on 20220428 新增一级申购业务处理 start
+            else if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
+                    && "ISSUE_CLASS_01".equals(assetType2)// 发行方式 报价发行
+                    && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
+                resultDto.setCdate(stlPayOrder.getSettleDate());
+                resultDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                // 交收 增加可用金额 减少实际
+                if ("03".equals(stage)) {
+                    PtlCashPositionFlowDto flowDto1 = new PtlCashPositionFlowDto();
+                    BeanUtil.copyPropertiesIgnoreNull(flowDto1, resultDto);
+                    flowDto1.setAmount(stlPayOrder.getSettleAmt());
+                    flowDto1.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                    result.add(flowDto1);
+                    PtlCashPositionFlowDto flowDto2 = new PtlCashPositionFlowDto();
+                    BeanUtil.copyPropertiesIgnoreNull(flowDto2, resultDto);
+                    flowDto2.setAmount(stlPayOrder.getSettleAmt().negate());
+                    flowDto2.setHodingType(DictCodeList.持仓类型_实际.getValue());
+                    flowDto2.setIsDeleteAble(DictCodeList.是否_否.getValue());
+                    result.add(flowDto2);
+                } else {
+                    // 登记/成交 扣减可用金额
+                    resultDto.setAmount(stlPayOrder.getSettleAmt().negate());
+                    result.add(resultDto);
+                }
+                return result;
+            }
+            // add by jiangpeng on 20220428 新增一级申购业务处理 end
 
             // 2 只插入“实际”
             if (DictCodeList.持仓类型_实际.getValue().equals(inputDto.getPositionType())) {
@@ -2416,6 +2519,48 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                     return result;
                 }
                 // 活期存放 交易方向为卖出 end
+                // 场内-信用保护凭证 start
+                else if (DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(deal.getFinprodType2())
+                        && !DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())) {
+                    resultDto.setCdate(deal.getTradeDate());
+                    if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())) {
+                        resultDto.setAmount(stlPayOrder.getSettleAmt());
+                    }
+                    if (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())) {
+                        resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
+                    }
+                    result.add(resultDto);
+                    return result;
+                }
+                // 场内-信用保护凭证 end
+                // 场内-一级投标债 start
+                else if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
+                        && !DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())) {
+                    resultDto.setCdate(deal.getTradeDate());
+                    if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())) {
+                        resultDto.setAmount(stlPayOrder.getSettleAmt());
+                    }
+                    if (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())) {
+                        resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
+                    }
+                    result.add(resultDto);
+                    // 前置交易编号不为空,说明是交收结果数据,需要反冲交收通知头寸
+                    if(StringUtil.isNotEmpty(deal.getbTradeId())){
+                        List<TrdProductDeal> trdProductDeals = baseAssetCashPositionCommMapper.selectTrdProductDealByTotleTradeId(
+                                deal.getbTradeId());
+                        if(CollectionUtils.isNotEmpty(trdProductDeals)){
+                            List<PtlCashPositionFlowDto> bPtlCashPositionFlows = baseAssetCashPositionCommMapper.selectAllCashPositionByTotle(
+                                    trdProductDeals.get(0).getTradeId());
+                            for(PtlCashPositionFlowDto bPtlCashPositionFlow : bPtlCashPositionFlows){
+                                bPtlCashPositionFlow.setCdate(deal.getTradeDate());
+                                bPtlCashPositionFlow.setAmount(ArithmeticUtil.multiply(bPtlCashPositionFlow.getAmount(), new BigDecimal(-1)));
+                                result.add(bPtlCashPositionFlow);
+                            }
+                        }
+                    }
+                    return result;
+                }
+                // 场内-一级投标债 end
             }
         }
         return result;

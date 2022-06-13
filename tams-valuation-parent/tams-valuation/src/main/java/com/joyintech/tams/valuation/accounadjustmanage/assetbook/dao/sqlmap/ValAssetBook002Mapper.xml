@@ -129,15 +129,22 @@
 	            #{updateTime,jdbcType=TIMESTAMP}
 			)
     </insert>
-    
+
+	<!-- modify by weipeng 不应该查询凭证，账套日期为开始日时应当可以修改 -->
     <select id="queryVoucherCount" parameterType="map" resultType="java.lang.Integer">
-    	SELECT
-    		SUM(voucherCount)
-    	FROM (
-    		SELECT COUNT(1) voucherCount FROM BOK_VOUCH_MAIN WHERE bookset_id = #{booksetId,jdbcType=VARCHAR}
-		   	UNION
-		   	SELECT COUNT(1) voucherCount FROM TRD_VOUCH_DEAL WHERE bookset_id = #{booksetId,jdbcType=VARCHAR}
-    	)
+--     	SELECT
+--     		SUM(voucherCount)
+--     	FROM (
+--     		SELECT COUNT(1) voucherCount FROM BOK_VOUCH_MAIN WHERE bookset_id = #{booksetId,jdbcType=VARCHAR}
+-- 		   	UNION
+-- 		   	SELECT COUNT(1) voucherCount FROM TRD_VOUCH_DEAL WHERE bookset_id = #{booksetId,jdbcType=VARCHAR}
+--     	)
+			SELECT COUNT(1)
+			FROM BOK_BOOKSET_DATE A
+			INNER JOIN BOK_BOOKSET Bpo
+				ON B.BOOKSET_ID = A.BOOKSET_ID
+			WHERE A.BOOKSET_ID = #{booksetId}
+			      AND A.BOOKSET_DATE <![CDATA[ > ]]> B.START_DATE
     </select>
     
     <select id="getDataInWorklow" parameterType="com.joyintech.framework.base.entity.ProcessMark" resultType="java.lang.Integer">

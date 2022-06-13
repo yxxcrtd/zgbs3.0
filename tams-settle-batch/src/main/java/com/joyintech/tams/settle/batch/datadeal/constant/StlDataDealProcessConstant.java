@@ -33,7 +33,8 @@ public class StlDataDealProcessConstant {
 	public static final String JSFS_001 = "001";
 	// SzdJsmx交收方式_逐笔非担保
 	public static final String JSFS_002 = "002";
-	
+
+
 	// SzdJsmx业务类型_国债交易
 	public static final String YWLX_003 = "003";
 	// SzdJsmx业务类型_企债交易
@@ -48,6 +49,8 @@ public class StlDataDealProcessConstant {
 	public static final String YWLX_012 = "012";
 	// SzdJsmx业务类型_要约收购及债券回售
 	public static final String YWLX_301 = "301";
+	//SzdJsmx业务类型_要约收购及债券回售   JSMX03债回购的业务类型从301-》305
+	public static final String YWLX_305 = "305";
 	// SzdJsmx业务类型_可转换公司债券申购
 	public static final String YWLX_020 = "020";
 	// SzdJsmx业务类型_网上发行业务
@@ -56,6 +59,10 @@ public class StlDataDealProcessConstant {
 	public static final String YWLX_653 = "653";
 	// SzdJsmx业务类型_债转股
 	public static final String YWLX_011 = "011";
+	// SzdJsmx业务类型_公司债场内分销
+	public static final String YWLX_612 = "612";
+	// SzdJsmx业务类型_国债场内分销
+	public static final String YWLX_022 = "022";
 	// SzdJsmx业务类型_账户式质押式债券回购
 	public static final String YWLX_023 = "023";
 	// SzdJsmx业务类型_固定收益证券综合电子平台国债隔夜回购
@@ -82,6 +89,8 @@ public class StlDataDealProcessConstant {
 	public static final String YWLX_616 = "616";
 	// SzdJsmx业务类型_债券质押式协议回购解除质押（不出凭证）
 	public static final String YWLX_618 = "618";
+	//  SzdJsmx业务类型_信用保护凭证转让
+	public static final String YWLX_690 = "690";
 	// SzdJsmx业务类型_封闭基金交易
 	public static final String YWLX_002 = "002";
 	// SzdJsmx业务类型_上证LOF（分级基金）交易
@@ -200,8 +209,6 @@ public class StlDataDealProcessConstant {
     public static final String QSBZ_010 = "010";
     // SzdJsmx清算标志_公司债
     public static final String QSBZ_011 = "011";
-	
-	
 	// SzdJsmx过户类型_摘牌
 	public static final String GHLX_00L = "00L";
 	// SzdJsmx过户类型_其他非交易过户
@@ -265,6 +272,8 @@ public class StlDataDealProcessConstant {
 
 	public static final String JGDM_0100 = "0100";
 
+	public static final String JGDM_0101 = "0101";
+
 	// SzdJsmx权益类别_红利
 	public static final String QYLB_HL = "HL";
 
@@ -291,6 +300,8 @@ public class StlDataDealProcessConstant {
 	public static final String SJSMX_JYFS_02 = "02";
 	// SzdSjsmx交易方式_经深交所申报的非交易业务-撮合交易平台
 	public static final String SJSMX_JYFS_03 = "03";
+	// SzdSjsmx交易方式_固定收益交易平台业务
+	public static final String SJSMX_JYFS_13 = "13";
 	// SzdSjsmx交易方式_担保净额DVP交收
 	public static final String SJSMX_JSFS_Y = "Y";
 	// SzdSjsmx交易方式_非担保交收
@@ -327,6 +338,8 @@ public class StlDataDealProcessConstant {
 	public static final String SJSMX_YWLB_JY00 = "JY00";
 	// 业务列表_综合金融服务平台交易（非担保交收模式）
 	public static final String SJSMX_YWLB_JY01 = "JY01";
+	// 业务列表_债券分销
+	public static final String SJSMX_YWLB_JY02 = "JY02";
 	// 业务列表_质押式回购初始成交
 	public static final String SJSMX_YWLB_HGCS = "HGCS";
 	// 业务列表_质押式回购到期成交
@@ -422,12 +435,20 @@ public class StlDataDealProcessConstant {
 	public static final String SJSJG_YWLB_PG90 = "PG90";
 	// 业务类别：初始交易
 	public static final String SJSJG_YWLB_XYCS = "XYCS";
+	// 业务类别：提前购回
+	public static final String SJSJG_YWLB_XYTG = "XYTG";
 	// 业务类别：购回交易
 	public static final String SJSJG_YWLB_XYDQ = "XYDQ";
 	// 业务类别：协议回购合约
 	public static final String SJSJG_YWLB_XYHY = "XYHY";
-	// 业务类别：到期续做
+	// 业务类别：到期续做(不更换对手方)
 	public static final String SJSJG_YWLB_XYXZ = "XYXZ";
+	// 业务类别：到期续做(变更对手方)
+	public static final String SJSJG_YWLB_XYXB = "XYXB";
+	// 业务类别：变更质押券
+	public static final String SJSJG_YWLB_XYBG = "XYBG";
+	// 业务类别：解除质押
+	public static final String SJSJG_YWLB_XYZJ = "XYZJ";
 	// 业务类别：报价回购初始交易
 	public static final String SJSJG_YWLB_BJCS = "BJCS";
 	// 业务类别：报价回购购回交易

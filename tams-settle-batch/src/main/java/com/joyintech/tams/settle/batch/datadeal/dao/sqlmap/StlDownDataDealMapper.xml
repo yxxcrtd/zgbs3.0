@@ -276,10 +276,10 @@
     <select id="selectSzdSjsmx" parameterType="java.util.Map"
             resultMap="com.joyintech.tams.common.base.dao.SzdSjsmxMapper.BaseResultMap">
 		SELECT
-		SEQNO,
-		IMPORT_DATE,
-		DATA_FILE,
-		IS_SETTLE_TARGET,
+		t1.SEQNO,
+		t1.IMPORT_DATE,
+		t1.DATA_FILE,
+		t1.IS_SETTLE_TARGET,
 		MXYWLSH,
 		MXJSZH,
 		MXBFZH,
@@ -334,7 +334,13 @@
 		T2.CJBH = T1.MXZXBH AND T2.SEAT_NUMBER = T1.MXJYDY  AND T2.DEAL_DATE = #{dealDate,jdbcType=DATE}
 		LEFT JOIN SETTLE_TRANS_DATA_STATUS T3 ON
 		T3.TRADE_ID = T2.TRADE_ID
-        <where>
+		LEFT JOIN SZD_SJSJG
+		ON		T1.MXZXBH = SZD_SJSJG.JGZXBH
+		AND		T1.MXJYDY = SZD_SJSJG.JGJYDY
+		AND		T1.MXCJRQ = SZD_SJSJG.JGCJRQ
+		AND		T1.MXYWLB = SZD_SJSJG.JGYWLB
+		AND		T1.IMPORT_DATE = SZD_SJSJG.IMPORT_DATE
+		<where>
 			T1.IMPORT_DATE = #{dealDate,jdbcType=DATE} AND (upper(T1.DATA_FILE) LIKE CONCAT(#{dataFile}, '%')) AND T1.IS_SETTLE_TARGET = 'Y'
 			and (T3.CHECK_RESULT is null or T3.CHECK_RESULT in ('0', '2'))
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
@@ -343,6 +349,7 @@
         			#{searchMapValueData}
         		</foreach>
         	</foreach>
+			AND SZD_SJSJG.JGYWLB IS NULL
         </where>
     </select>
 
@@ -731,32 +738,8 @@
 		CON_FINPROD_ID conFinprodId
 		FROM
 		FIN_PRODUCT_CONVERTIBLE
-		where CON_SHARE_ID = #{zqdm1}
+		where FINPROD_ID = #{zqdm1}
 	</select>
-
-	<select id="selectSqSettleTransDatas" resultType="com.joyintech.tams.common.base.entity.SettleTransData">
-		SELECT
-		<include refid="com.joyintech.tams.common.base.dao.SettleTransDataMapper.Base_Column_List" />
-		FROM
-			SETTLE_TRANS_DATA
-		WHERE
-			CJBH = #{sqcjbh, jdbcType=VARCHAR}
-			AND SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
-			AND SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
-	</select>
-
-	<select id="selectShSqSettleTransDatas" resultType="com.joyintech.tams.common.base.entity.SettleTransData">
-		SELECT
-		<include refid="com.joyintech.tams.common.base.dao.SettleTransDataMapper.Base_Column_List" />
-		FROM
-		SETTLE_TRANS_DATA
-		WHERE
-		CJBH = #{sqcjbh, jdbcType=VARCHAR}
-		AND SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
-		AND SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
-		AND VDATE = #{vdate, jdbcType=DATE}
-	</select>
-
 
 	<select id="selectSqSettleTransDataPledges" resultType="com.joyintech.tams.common.base.entity.SettleTransDataPledge">
 		SELECT
@@ -770,6 +753,7 @@
 			std.CJBH = #{sqcjbh, jdbcType=VARCHAR}
 			AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
 			AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+		  	AND std.VDATE = #{vdate, jdbcType=DATE}
 	</select>
 
 	<!-- 是否节假日 0:工作日 -->

@@ -165,6 +165,12 @@ public class CfetsTrdQueryTradeInfoListResponse {
     @ApiModelProperty(name="trader",value="交易员",example="trader")
     private String trader;
 
+    @ApiModelProperty(name="bidId",value="投标编号")
+    private String bidId;
+
+    @ApiModelProperty(name="bidModle",value="交易员")
+    private String bidModle;
+
     @ApiModelProperty(name="selectedItem",value="选择的数据",example="1")
     private transient List<CfetsTrdQueryTradeInfoListResponse> selectedItem;
     @ApiModelProperty(name="operateType",value="操作类型",example="1")
@@ -563,5 +569,21 @@ public class CfetsTrdQueryTradeInfoListResponse {
 
     public void setWorkflowParameter(String workflowParameter) {
         this.workflowParameter = workflowParameter;
+    }
+
+    public String getBidId() {
+        return bidId;
+    }
+
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
     }
 }

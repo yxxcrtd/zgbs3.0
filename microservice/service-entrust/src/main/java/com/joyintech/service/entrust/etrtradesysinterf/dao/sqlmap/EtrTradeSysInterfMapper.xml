@@ -133,7 +133,15 @@
         	<if test="entrustId != null and !entrustId.equals('')">
                 AND A.Entrust_Id = #{entrustId}
             </if>
-            <if test="portfolioId != null and !portfolioId.equals('')">
+            <!--TISHKS-629:支持指令list modify by fuyongsheng 20220506 start-->
+			<if test="entrustIds != null and entrustIds.size()>0">
+				AND A.Entrust_Id IN
+				<foreach collection="entrustIds" item="entrustId" open="(" close=")" separator=",">
+					#{entrustId}
+				</foreach>
+			</if>
+			<!--TISHKS-629:支持指令list modify by fuyongsheng 20220506 end-->
+			<if test="portfolioId != null and !portfolioId.equals('')">
                 AND A.PORTFOLIO_ID = #{portfolioId}
             </if>
             <if test="entrustStatus != null and !entrustStatus.equals('')">

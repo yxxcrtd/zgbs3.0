@@ -5,6 +5,8 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
+import com.joyintech.service.trade.entrustmsgbymq.service.TradePreCommonService;
 import com.joyintech.service.trade.manualsettle.dao.ManualSettleMapper;
 import com.joyintech.service.trade.manualsettle.dto.ManualSettleDto;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -24,10 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeList.是否_否;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
@@ -57,6 +57,12 @@ public class PositionRequestManualSettleService {
     @Autowired
     private FinTradeProductMapper finTradeProductMapper;
 
+    @Autowired
+    private TradePreCommonService tradePreCommonService;
+
+    @Autowired
+    private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
+
     public static final String TRADE_PLAT = "TRD_MANUAL_SETTLE";
 
     /**
@@ -69,15 +75,6 @@ public class PositionRequestManualSettleService {
         Map<String, Object> resultMap = new HashMap<>();
         setCommonField(entity, resultMap);
         String finprodType = entity.getFinprodType2();
-//        if(!entity.getBusiType().equals("01")&&!entity.getBusiType().equals("02")&&!entity.getBusiType().equals("03")&&!entity.getBusiType().equals("04")){
-//            finprodType = DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue();
-//        }else {
-//            finprodType = DictCodeListExt1.金融产品类型_投管用_债券.getValue();
-//            String type6 = commonPositionEngineService.getType6(entity.getFinprodId());
-//            if (DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue().equals(type6)) {
-//                finprodType += "-" + type6;
-//            }
-//        }
         String type6 = commonPositionEngineService.getType6(entity.getFinprodId());
         if (DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue().equals(type6)
                 // ZGTFCP-1372:增加债券资产类型条件 modify by fuyongsheng 20220319 start
@@ -85,7 +82,14 @@ public class PositionRequestManualSettleService {
             // ZGTFCP-1372:增加债券资产类型条件 modify by fuyongsheng 20220319 end
             finprodType += "-" + type6;
         }
-        TrdProductTempDeal trdProductTempDeal = trdProductTempDealMapper.selectByPrimaryKey(entity.getTradeId());
+
+        // 多组合/单组合，查询条件不同 totalTradeId / tradeId
+        List<TrdProductTempDeal> trdProductTempDealList = new ArrayList<>();
+        if (tradePreCommonService.isMultiPortFolioEntrust(entity.getEntrustNo())) {
+            trdProductTempDealList = manualSettleMapper.selectTrdProductTempDeals(entity.getTradeId());
+        } else {
+            trdProductTempDealList = Arrays.asList(trdProductTempDealMapper.selectByPrimaryKey(entity.getTradeId()));
+        }
         EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getEntrustNo());
         if(etrEntrustAdd != null){
             if (DictCodeList.回购类型_质押式协议回购.getValue().equals(etrEntrustAdd.getAssetType1())
@@ -93,15 +97,17 @@ public class PositionRequestManualSettleService {
                 finprodType += "-" + etrEntrustAdd.getAssetType1();
             }
         }
-        logger.debug("【手工交收查询头寸接口参数】finprodType:{},ps:{}", finprodType, trdProductTempDeal.getPs());
-        String interType = commonPositionEngineService.getPositionInterType("TRD", TRADE_PLAT, finprodType, trdProductTempDeal.getPs(), DictCodeListExt3.共通业务类型_手工交收.getValue(), entity.getClass().getName());
+        logger.debug("【手工交收查询头寸接口参数】finprodType:{},ps:{}", finprodType, trdProductTempDealList.get(0).getPs());
+        String interType = commonPositionEngineService.getPositionInterType("TRD", TRADE_PLAT, finprodType, trdProductTempDealList.get(0).getPs(), DictCodeListExt3.共通业务类型_手工交收.getValue(), entity.getClass().getName());
         logger.debug("【手工交收查询头寸接口结果】interType:{}", interType);
         if (INTERF_TYPE_BOND002.equals(interType)) {
-            this.bond002(entity, resultMap);
+            this.bond002(entity, resultMap, trdProductTempDealList);
         } else if (INTERF_TYPE_BOND003.equals(interType)) {
-            this.bond003(entity, resultMap);
+            this.bond003(entity, resultMap, trdProductTempDealList);
         } else if (INTERF_TYPE_REPO002.equals(interType)) {
             this.repo002(entity, resultMap);
+        } else if (INTERF_TYPE_CERTIFICATE001.equals(interType)) {
+            this.certificate001(entity, resultMap);
         }
         if(StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))){
             PositionHttpRequest.send(resultMap);
@@ -116,9 +122,14 @@ public class PositionRequestManualSettleService {
      * @param entity
      * @param resultMap
      */
-    private void bond002(ManualSettleDto entity, Map<String, Object> resultMap) {
+    private void bond002(ManualSettleDto entity, Map<String, Object> resultMap, List<TrdProductTempDeal> trdProductTempDealList) {
+        Map<String ,TrdProductTempDeal> trdProductTempDealMap = new HashMap<>();
+        for (TrdProductTempDeal trdProductTempDeal : trdProductTempDealList) {
+            TrdProductTempDealAdd trdProductTempDealAdd = trdProductTempDealAddMapper.selectByPrimaryKey(trdProductTempDeal.getTradeId());
+            trdProductTempDealMap.put(trdProductTempDealAdd.getPortfolioId(), trdProductTempDeal);
+        }
         resultMap.put("interfaceType", INTERF_TYPE_BOND002);
-        TrdProductTempDeal trdProductTempDeal = trdProductTempDealMapper.selectByPrimaryKey(entity.getTradeId());
+        //TrdProductTempDeal trdProductTempDeal = trdProductTempDealMapper.selectByPrimaryKey(entity.getTradeId());
         // ZGTFCP-1281:修改获取业务类型方法 modify by fuyongsheng 20220318 start
         // String busiType = commonPositionEngineService.getPositionBusiType(trdProductTempDeal.getFinprodType2(), trdProductTempDeal.getPs(), null);
         EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustNo());
@@ -140,33 +151,20 @@ public class PositionRequestManualSettleService {
             resultMap.put("bTotalTradeId", entity.getTradeId());
         }
         // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 end
-        resultMap.put("ps", trdProductTempDeal.getPs());
+        resultMap.put("ps", trdProductTempDealList.get(0).getPs());
         String deliveryType = commonPositionEngineService.getDeliveryType(entity.getFinprodId());
         resultMap.put("settleSpeed", parseSettleSpreed(deliveryType));
         resultMap.put("bidResult", 是否_否.getValue());
         resultMap.put("purchModle", null);
         resultMap.put("tradePlace", entity.getTradeMarket());
-        if((DictCodeList.交易平台_大宗交易平台.getValue().equals(entity.getTradePlat())
-                ||DictCodeList.交易平台_综合协议交易平台.getValue().equals(entity.getTradePlat()))
-                &&(DictCodeList.交易方向_买入.getValue().equals(trdProductTempDeal.getPs())
-                ||DictCodeList.交易方向_卖出.getValue().equals(trdProductTempDeal.getPs()))
-                &&(DictCodeListExt3.申报类型_意向申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_定价申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_点击成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_日均价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_收盘价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_不指定.getValue().equals(etrEntrustAdd.getDealMode()))){
-            resultMap.put("sharesTradePlatform", DictCodeList.交易平台_大宗交易平台.getValue());
-        }else {
-            resultMap.put("sharesTradePlatform", DictCodeList.交易平台_竞价撮合平台.getValue());
-        }
+        // 交易平台
+        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, trdProductTempDealList.get(0).getPs(), INTERF_TYPE_BOND002));
         resultMap.put("deliveryType", deliveryType);
         resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("workFlowId", null);
         resultMap.put("cdate", entity.getSettleDate());
-        resultMap.put("ccy", trdProductTempDeal.getCcy());
+        resultMap.put("ccy", trdProductTempDealList.get(0).getCcy());
         resultMap.put("finprodId", entity.getFinprodId());
 
         Map<String,Object> paraMap = new HashMap<>();
@@ -177,7 +175,7 @@ public class PositionRequestManualSettleService {
         for (PortfolioCalculateDto dto:list) {
             Map<String, Object> pltMap = new HashMap<>();
             pltMap.put("portfolioId", dto.getPortfolioId());
-            pltMap.put("tradeId", entity.getSettleSeqNo());
+            pltMap.put("tradeId", trdProductTempDealMap.get(dto.getPortfolioId()).getTradeId());
             pltMap.put("etrId", etrEntrust.getEntrustId());
             pltMap.put("ordEntrustId", null);
             pltMap.put("etrSecAmount", dto.getEtrSecAmount());
@@ -191,7 +189,7 @@ public class PositionRequestManualSettleService {
             // ZGTFCP-1461:修改赋值 modify by fuyongsheng 20220322 end
             pltMap.put("secAmount", dto.getSecAmount());
             pltMap.put("cashAmount", dto.getCashAmount());
-            pltMap.put("invAim", trdProductTempDeal.getInvAim());
+            pltMap.put("invAim", trdProductTempDealList.get(0).getInvAim());
             pltMap.put("integrateSecAmount", dto.getIntegrateSecAmount());
             pltMap.put("ownSecAmount", dto.getOwnSecAmount());
             ptlList.add(pltMap);
@@ -205,10 +203,13 @@ public class PositionRequestManualSettleService {
      * @param entity
      * @param resultMap
      */
-    private void bond003(ManualSettleDto entity, Map<String, Object> resultMap) {
+    private void bond003(ManualSettleDto entity, Map<String, Object> resultMap, List<TrdProductTempDeal> trdProductTempDealList) {
+        Map<String ,TrdProductTempDeal> trdProductTempDealMap = new HashMap<>();
+        for (TrdProductTempDeal trdProductTempDeal : trdProductTempDealList) {
+            TrdProductTempDealAdd trdProductTempDealAdd = trdProductTempDealAddMapper.selectByPrimaryKey(trdProductTempDeal.getTradeId());
+            trdProductTempDealMap.put(trdProductTempDealAdd.getPortfolioId(), trdProductTempDeal);
+        }
         resultMap.put("interfaceType", INTERF_TYPE_BOND003);
-
-        TrdProductTempDeal trdProductTempDeal = trdProductTempDealMapper.selectByPrimaryKey(entity.getTradeId());
 
         // String busiType = commonPositionEngineService.getPositionBusiType(trdProductTempDeal.getFinprodType2(), trdProductTempDeal.getPs(), null);
         // ZGTFCP-1281:修改获取业务类型方法 modify by fuyongsheng 20220318 start
@@ -232,32 +233,19 @@ public class PositionRequestManualSettleService {
             resultMap.put("bTotalTradeId", entity.getTradeId());
         }
         // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 end
-        resultMap.put("ps", trdProductTempDeal.getPs());
+        resultMap.put("ps", trdProductTempDealList.get(0).getPs());
         String deliveryType = commonPositionEngineService.getDeliveryType(entity.getFinprodId());
         resultMap.put("settleSpeed", parseSettleSpreed(deliveryType));
         resultMap.put("purchModle", null);
         resultMap.put("tradePlace", entity.getTradeMarket());
-        if((DictCodeList.交易平台_大宗交易平台.getValue().equals(entity.getTradePlat())
-                ||DictCodeList.交易平台_综合协议交易平台.getValue().equals(entity.getTradePlat()))
-                &&(DictCodeList.交易方向_买入.getValue().equals(trdProductTempDeal.getPs())
-                ||DictCodeList.交易方向_卖出.getValue().equals(trdProductTempDeal.getPs()))
-                &&(DictCodeListExt3.申报类型_意向申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_定价申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_点击成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_日均价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_收盘价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_不指定.getValue().equals(etrEntrustAdd.getDealMode()))){
-            resultMap.put("sharesTradePlatform", DictCodeList.交易平台_大宗交易平台.getValue());
-        }else {
-            resultMap.put("sharesTradePlatform", DictCodeList.交易平台_竞价撮合平台.getValue());
-        }
+        // 交易平台
+        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, trdProductTempDealList.get(0).getPs(), INTERF_TYPE_BOND003));
         resultMap.put("deliveryType", deliveryType);
         resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("workFlowId", null);
         resultMap.put("cdate", entity.getSettleDate());
-        resultMap.put("ccy", trdProductTempDeal.getCcy());
+        resultMap.put("ccy", trdProductTempDealList.get(0).getCcy());
 
         Map<String,Object> paraMap = new HashMap<>();
         paraMap.put("dealNo", entity.getTradeId());
@@ -268,12 +256,13 @@ public class PositionRequestManualSettleService {
             Map<String, Object> ptlCash = new HashMap<>(8);
             ptlCash.put("portfolioId", dto.getPortfolioId());
             ptlCash.put("cashAcctId", dto.getCashAcctId());
-            ptlCash.put("tradeId", entity.getTradeId());
+            ptlCash.put("tradeId", trdProductTempDealMap.get(dto.getPortfolioId()).getTradeId());
             ptlCash.put("etrId", etrEntrust.getEntrustId());
             ptlCash.put("cashAmount", dto.getCashAmount());
             ptlCash.put("etrSecAmount", dto.getEtrSecAmount());
             ptlCash.put("ordId", dto.getOrderId());
             ptlCash.put("ordSecAmount", dto.getOrdSecAmount());
+            ptlCash.put("secAmount", dto.getSecAmount());
             ptlCashList.add(ptlCash);
 
             Map<String, Object> bondSec = new HashMap<>();
@@ -281,7 +270,7 @@ public class PositionRequestManualSettleService {
             bondSec.put("finprodId", entity.getFinprodId());
             bondSec.put("secAcctId", dto.getSecAcctId());
             // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 start
-            bondSec.put("tradeId", entity.getTradeId());
+            bondSec.put("tradeId", trdProductTempDealMap.get(dto.getPortfolioId()).getTradeId());
             bondSec.put("etrId", etrEntrust.getEntrustId());
             // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 end
             bondSec.put("integrateSecAmount", new BigDecimal(0));
@@ -479,6 +468,65 @@ public class PositionRequestManualSettleService {
     }
 
     /**
+     * 信用保护凭证
+     *
+     * @param entity
+     * @param resultMap
+     */
+    private void certificate001(ManualSettleDto entity, Map<String, Object> resultMap) {
+        InfContractDetailfile infContractDetailfile = manualSettleMapper.selectInfContractDetailfile(entity.getEntrustNo(), entity.getDealNo());
+        //业务动作
+        if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_交收.getValue())) {
+            resultMap.put("busiAct", DictCodeListExt3.业务动作_交收确认.getValue());
+        } else if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
+            resultMap.put("busiAct", DictCodeListExt3.业务动作_交收回溯.getValue());
+        } else if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_交收失败.getValue())) {
+            resultMap.put("busiAct", DictCodeListExt3.业务动作_交收失败.getValue());
+        }
+        // 业务类型
+        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
+        //交易方向
+        resultMap.put("ps", infContractDetailfile.getPs());
+        //交易场所
+        resultMap.put("tradePlace", entity.getTradeMarket());
+        //决策动作
+        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
+        //系统动作
+        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
+        //流程编号
+        resultMap.put("workFlowId", null);
+        //信用事件结算方式
+        resultMap.put("ceSettleType", null);
+        //日期
+        resultMap.put("cdate", entity.getTradeDate());
+        //币种
+        resultMap.put("ccy", infContractDetailfile.getCcy());
+        //前次交易编号
+        resultMap.put("bTotalTradeId", null);
+
+        Map<String,Object> paraMap = new HashMap<>();
+        paraMap.put("dealNo", entity.getTradeId());
+        List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
+        //组合数据集
+        List<Map<String, Object>> ptlList = new ArrayList<>(4);
+        for (PortfolioCalculateDto dto : list){
+            Map<String, Object> plt = new HashMap<>(8);
+            plt.put("portfolioId", dto.getPortfolioId());
+            plt.put("finprodId", entity.getFinprodId());
+            plt.put("tradeId", entity.getTradeId());
+            plt.put("etrId", infContractDetailfile.getEntrustId());
+            plt.put("etrSecAmount", dto.getEtrSecAmount());
+            plt.put("cashAcctId", dto.getCashAcctId());
+            plt.put("secAcctId", dto.getSecAcctId());
+            plt.put("secAmount", dto.getSecAmount());
+            plt.put("cashAmount", dto.getCashAmount());
+            ptlList.add(plt);
+
+        }
+        resultMap.put("ptlList", ptlList);
+    }
+
+    /**
      * 解析清算速度
      * <p>
      * 清算速度	见数据字典：清算速度
@@ -577,4 +625,17 @@ public class PositionRequestManualSettleService {
         finTradeProductKey.setBranch(0L);
         return finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
     }
+
+    /**
+     * 获取交易平台
+     * @param entity
+     * @param ps
+     * @param interfaceType
+     * @return
+     */
+    private String getSharesTradePlatform(ManualSettleDto entity, String ps, String interfaceType){
+        return commonPositionEngineService.getExchangeTradePlatform(entity.getEntrustNo(),
+                entity.getTradePlat(), ps, entity.getFinprodId(), interfaceType);
+    }
+
 }

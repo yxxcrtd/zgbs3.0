@@ -6,6 +6,7 @@
 package com.joyintech.tams.cfets.trdquery.service;
 
 import com.google.common.collect.Lists;
+import com.joyintech.background.component.uplink.interbank.business.dto.BaseQuoteDto;
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
 import com.joyintech.calculation.bonds.SecIntSchedule;
@@ -33,12 +34,14 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
+import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.cfets.bankuplink.bond.service.CfetsBondDealQuotedPrice004Service;
-import com.joyintech.tams.cfets.cfetsmanualsettle.dao.CfetsManualSettleMapper;
-import com.joyintech.tams.cfets.cfetsmanualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
+import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
+import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmMatchDto;
 import com.joyintech.tams.cfets.trdquery.dao.CfetsTrdQueryMapper;
@@ -54,6 +57,8 @@ import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
+import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
+import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
 import com.joyintech.tams.component.business.settle.dto.BussSettleOrderParameterDto;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.component.business.trade.BussTrdAvailableCashQueryService;
@@ -73,6 +78,7 @@ import com.joyintech.tams.invest.common.component.business.basicdata.dto.BasicTr
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.cstp.service.CstpCommonService;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -352,6 +358,9 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
 
     @Autowired
     private CfetsManualSettleMapper cfetsManualSettleMapper;
+
+    @Autowired
+    private CfetsQuotedCommonService cfetsQuotedCommonService;
 
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
@@ -1067,7 +1076,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
      * @see
      * @since 1.0
      */
-    public void doCompleteRevoke(CfetsTrdBondInvestTradeDto entity,String settleRemark,Boolean isNeedDealPosition) {
+    public TrdBondInvestTradeDto doCompleteRevoke(CfetsTrdBondInvestTradeDto entity,String settleRemark,Boolean isNeedDealPosition) {
         // 调用基础组合.【金融产品交易组件.查询金融产品交易信息】获取原交易信息
         if (entity.getTotleTradeId().lastIndexOf('R') == entity.getTotleTradeId().length() - 1) {
             entity.setTotleTradeId(entity.getTotleTradeId().substring(0, entity.getTotleTradeId().length() - 1));
@@ -1077,6 +1086,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         List<String> totleIdList = new ArrayList(totleIdList1);
 
         List<BaseTradeProductDealDto> baseTradeProductDealDtos = baseTradeProductDealService.selectTotalDeal(totleIdList);
+        List<TrdBondInvestTradeDto> list = new ArrayList<>();
 
         FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
         for (BaseTradeProductDealDto baseTradeProductDealDto : baseTradeProductDealDtos) {
@@ -1149,8 +1159,12 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 }
 
             }
+            TrdBondInvestTradeDto bondDto=new  TrdBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(bondDto, baseTradeProductDealDto);
+            bondDto.setTotleTradeId(cetradeid);
+            bondDto.setFinprodId(entity.getFinprodId());
+            list.add(bondDto);
         }
-
         // add by etliu 20210927 start
         if (entity != null) {
             if (StringUtil.isBlank(entity.getoFinprodId())
@@ -1220,10 +1234,18 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             paramMap.put("totleTradeId", totleTradeId);
             paramMap.put("tradeStatus", BussinessDictCodeList.银行间上行报价状态_已撤销.getValue());
             cfetsTrdQueryMapper.updateIbuByPrimaryKeySelective(paramMap);
+            // 删除指令完成度
+            BaseQuoteDto baseQuoteDto = new BaseQuoteDto();
+            baseQuoteDto.setQuoteId(totleTradeId);
+            cfetsQuotedCommonService.deleteByQuoteId(baseQuoteDto);
             paramMap.put("exeId", exeId);
             paramMap.put("remark", DictCodeListExt3.交收状态_交收失败.getCodeName());
             cfetsTrdQueryMapper.updateInterfTradSecdealByTradeId(paramMap);
         }
+        TrdBondInvestTradeDto tradeDto = new TrdBondInvestTradeDto();
+        BeanUtil.copyPropertiesIgnoreNull(tradeDto,entity);
+        tradeDto.setTrdBondInvestTradeDtoList(list);
+        return tradeDto;
     }
 
     /**
@@ -1463,7 +1485,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 BigDecimal prinamt = interfTradSecdeal.getPrinamt();
                 BigDecimal subtract = ArithmeticUtil.doAdd(prinamt,
                     ArithmeticUtil.multiply(inputDto.getTrdProductDeal().getShareAmt(), new BigDecimal(100)));
-                if (subtract.compareTo(BigDecimal.ZERO) == -1 || subtract.compareTo(BigDecimal.ZERO) == 0) {// 小于0的话
+                if (subtract.compareTo(BigDecimal.ZERO) < 0 || subtract.compareTo(BigDecimal.ZERO) == 0) {// 小于0的话
                     record.setPrinamt(BigDecimal.ZERO);
                 }
                 else {
@@ -1507,7 +1529,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         }
         // 撤销
         else {
-            this.doCompleteRevoke(entity,"",true);
+            SpringContextUtil.getApplicationContext().getBean(CfetsTrdBondInvestTrade002Service.class).doCompleteRevoke(entity,"",true);
 
             //补充  如果是撤销将交易ID赋值为null
             Map<String, Object> map = new HashMap<>();
@@ -1833,19 +1855,19 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             validMessageList.add(validMessage);
         }
         // 投资目的
-        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
+//        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
             if (StringUtil.isBlank(dto.getInvAim())) {
                 ValidMessage validMessage = new ValidMessage("invAim",
                         getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.businessModel")));
                 validMessageList.add(validMessage);
             }
-        }else{
-            if (StringUtil.isBlank(dto.getInvAim())) {
-                ValidMessage validMessage = new ValidMessage("invAim",
-                        getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.invAim")));
-                validMessageList.add(validMessage);
-            }
-        }
+//        }else{
+//            if (StringUtil.isBlank(dto.getInvAim())) {
+//                ValidMessage validMessage = new ValidMessage("invAim",
+//                        getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.invAim")));
+//                validMessageList.add(validMessage);
+//            }
+//        }
         // 3.劵面总额
         if (dto.getTradeAmt() == null) {
             ValidMessage validMessage = new ValidMessage("tradeAmt",

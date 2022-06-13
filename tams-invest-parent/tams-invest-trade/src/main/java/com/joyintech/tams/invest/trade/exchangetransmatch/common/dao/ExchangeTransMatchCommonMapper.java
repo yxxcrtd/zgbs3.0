@@ -104,20 +104,7 @@ public interface ExchangeTransMatchCommonMapper {
     List<ExchangeTransMatchCommonEntrustDetailDto> getEntrustDetailList(@Param("entrustId") String entrustId);
 
     /**
-     * 获取首期委托交易
-     * @return
-     */
-    TrdProductDeal getFirstRepoTrade(Map<String, Object> paraMap);
-
-    /**
-     * 获取首期成交明细
-     * @param paraMap
-     * @return
-     */
-    SettleTransData getFirstRepoSettleTransData(Map<String, Object> paraMap);
-
-    /**
-     * 获取首期交易的
+     * 获取首期交易的质押品信息
      * @param paraMap
      * @return
      */
@@ -190,4 +177,11 @@ public interface ExchangeTransMatchCommonMapper {
      * @return
      */
     FinTradeProduct getFinTradeProduct(@Param("finprodId") String finprodId);
+
+    /**
+     * 根据指令编号查询交易
+     * @param entrustId
+     * @return
+     */
+    List<TrdProductDeal> getTrdProductDealsByEntrustId(@Param("entrustId") String entrustId);
 }

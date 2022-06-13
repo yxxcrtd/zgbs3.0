@@ -62,6 +62,11 @@ public class FinCashCalcRule extends FinCashCalcRuleKey {
     private String remark;
 
     /**
+     * 交易市场计息基础
+     */
+    private String marketBasis;
+
+    /**
      * 取得 计算类型，固定利率、浮动利率
      * @return 计算类型，固定利率、浮动利率
      */
@@ -235,5 +240,24 @@ public class FinCashCalcRule extends FinCashCalcRuleKey {
      */
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+
+    /**
+     * 获取 交易市场计息基础
+     *
+     * @return marketBasis 交易市场计息基础
+     */
+    public String getMarketBasis() {
+        return this.marketBasis;
+    }
+
+    /**
+     * 设置 交易市场计息基础
+     *
+     * @param marketBasis 交易市场计息基础
+     */
+    public void setMarketBasis(String marketBasis) {
+        this.marketBasis = marketBasis;
     }
 }

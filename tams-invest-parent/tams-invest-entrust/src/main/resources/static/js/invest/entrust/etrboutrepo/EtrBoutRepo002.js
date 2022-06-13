@@ -241,6 +241,13 @@
 
             var objectForm = $.serializeToObject('#searchForm');
             objectForm.finprodId =$('#finprodIdhid').val();
+            var entrustAmt=$('#entrustAmt').val();
+            if (entrustAmt) {
+                if(entrustAmtUnit == '02' ){
+                    entrustAmt=JoyinMath.doMul(entrustAmt, 10000, 2, JoyinMath.ROUND_HALF_UP);//万元转成元
+                }
+            }
+            objectForm.entrustAmt = entrustAmt;
             window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfData/0/RSK002/F10',objectForm,getriskdata());
         });
 

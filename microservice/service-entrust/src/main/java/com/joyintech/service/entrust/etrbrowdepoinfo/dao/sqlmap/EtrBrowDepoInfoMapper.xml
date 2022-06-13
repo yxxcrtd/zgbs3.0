@@ -156,7 +156,7 @@
         FIN_PRODUCT.FINPROD_NAME            finprodName,
         ETR_ENTRUST.PS                        ps,
         ETR_ENTRUST.PRICE*100                price,
-        ETR_ENTRUST_ADD.PAY_FREQ            payFreq,
+        fc.PAY_CYCLE                         payFreq,
         ETR_ENTRUST.CCY                        ccy,
         ETR_ENTRUST.VDATE                    vdate,
         ETR_ENTRUST.MDATE                    mdate,
@@ -172,6 +172,7 @@
 
         inner join     FIN_PRODUCT
         on            FIN_PRODUCT.FINPROD_ID = ETR_ENTRUST.FINPROD_ID
+        left join FIN_CASH_PAY_RULE fc on fc.FINPROD_ID = FIN_PRODUCT.FINPROD_ID
         <!-- 加入 产品类型表查询 王贵奇 2019/8/1 开始 -->
         left  join  FIN_PRODUCT_TYPE
         on            FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID
@@ -274,7 +275,7 @@
         FIN_PRODUCT.FINPROD_NAME            finprodName,
         ETR_ENTRUST.PS                        ps,
         ETR_ENTRUST.PRICE*100                price,
-        ETR_ENTRUST_ADD.PAY_FREQ            payFreq,
+        fc.PAY_CYCLE                         payFreq,
         ETR_ENTRUST.CCY                        ccy,
         ETR_ENTRUST.VDATE                    vdate,
         ETR_ENTRUST.MDATE                    mdate,
@@ -290,6 +291,7 @@
 
         inner join     FIN_PRODUCT
         on            FIN_PRODUCT.FINPROD_ID = ETR_ENTRUST.FINPROD_ID
+        left join FIN_CASH_PAY_RULE fc on fc.FINPROD_ID = FIN_PRODUCT.FINPROD_ID
         <!-- 加入 产品类型表查询 王贵奇 2019/8/1 开始 -->
         left  join  FIN_PRODUCT_TYPE
         on            FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID

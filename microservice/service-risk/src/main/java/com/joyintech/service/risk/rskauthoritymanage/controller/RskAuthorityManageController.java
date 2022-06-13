@@ -51,9 +51,10 @@ public class RskAuthorityManageController {
      * @param param
      * @return
      */
-    @PostMapping("/getUser")
-    public List<SelectOptionDto> getFinprodMarketIdToNew(@RequestBody Map<String, Object> param) {
-        return rskAuthorityManageService.getUser(param);
+    @PostMapping("/getUser/{page}/{length}")
+    public Page<SelectOptionDto> getFinprodMarketIdToNew(@RequestBody Map<String, Object> param,@PathVariable("page") int page,
+                                                         @PathVariable("length") int length) {
+        return rskAuthorityManageService.getUser(param,length,page);
     }
     /**
      * 画面查询

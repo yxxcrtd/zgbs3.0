@@ -130,6 +130,10 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	 * 回购到期日
 	 */
 	private String hgMDate;
+	/**
+	 * 头寸业务类型
+	 */
+	private String busiTypePosition;
 
 	public String getRiskTrialSpan() {
 		return riskTrialSpan;
@@ -554,5 +558,13 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 
 	public void setHgMDate(String hgMDate) {
 		this.hgMDate = hgMDate;
+	}
+
+	public String getBusiTypePosition() {
+		return busiTypePosition;
+	}
+
+	public void setBusiTypePosition(String busiTypePosition) {
+		this.busiTypePosition = busiTypePosition;
 	}
 }

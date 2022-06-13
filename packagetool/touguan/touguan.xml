@@ -45,11 +45,11 @@
         <module>../../microservice/service-customer-report</module>
         <module>../../microservice/service-document</module>
         <module>../../microservice/service-entrust</module>
-        <module>../../microservice/service-exchange</module>
+<!--        <module>../../microservice/service-exchange</module>-->
         <module>../../microservice/service-period</module>
         <module>../../microservice/service-portfolio</module>
         <module>../../microservice/service-product</module>
-        <module>../../microservice/service-quote-new</module>
+<!--        <module>../../microservice/service-quote-new</module>-->
         <module>../../microservice/service-report</module>
         <module>../../microservice/service-risk</module>
 		<module>../../microservice/service-risk-redis</module>
@@ -70,26 +70,29 @@
         <!-- 前台应用 -->
         <module>../../tams-customer-interf</module>
 
-        <module>../../tams-exchange-parent</module>
+<!--        <module>../../tams-exchange-parent</module>-->
 
         <module>../../tams-invest-interf</module>
 
         <module>../../tams-invest-parent</module>
         <module>../../tams-system/touguan/app</module>
-        <module>../../tams-business-common</module>
+        <module>../../tams-touguan-common</module>
         <module>../../tams-cfets</module>
         <module>../../tams-cfets-system</module>
         <module>../../tams-common-basicdata</module>
         <module>../../tams-exchange-touguan-parent/tams-exchange-entrust</module>
+        <module>../../tams-exchange-touguan-parent/tams-exchange-basicdata</module>
+        <module>../../tams-exchange-touguan-parent/tams-exchange-period</module>
         <module>../../tams-exchange-touguan-system</module>
         <module>../../tams-svreport-common</module>
         <module>../../tams-svreport-parent/tams-svreport-interf</module>
-        <module>../../tams-exchange-trade-parent/tams-exchange-trade-common</module>
-        <module>../../tams-exchange-trade-parent/tams-exchange-trade-data-common</module>
-        <module>../../tams-exchange-trade-parent/tams-exchange-trade-quote</module>
-        <module>../../tams-exchange-trade-parent/tams-exchange-trade-server-dsp</module>
-        <module>../../tams-exchange-trade-parent/tams-exchange-trade-server-terminal</module>
-        <module>../../tams-exchange-trade-parent/tams-exchange-trade</module>
+        <module>../../tams-exchange-trade-parent</module>
+<!--        <module>../../tams-exchange-trade-parent/tams-exchange-trade-common</module>-->
+<!--        <module>../../tams-exchange-trade-parent/tams-exchange-trade-data-common</module>-->
+<!--        <module>../../tams-exchange-trade-parent/tams-exchange-trade-quote</module>-->
+<!--        <module>../../tams-exchange-trade-parent/tams-exchange-trade-server-dsp</module>-->
+<!--        <module>../../tams-exchange-trade-parent/tams-exchange-trade-server-terminal</module>-->
+<!--        <module>../../tams-exchange-trade-parent/tams-exchange-trade</module>-->
 
     </modules>
 </project>

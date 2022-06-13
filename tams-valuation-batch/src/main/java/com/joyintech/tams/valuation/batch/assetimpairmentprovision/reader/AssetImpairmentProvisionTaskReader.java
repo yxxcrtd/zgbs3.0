@@ -10,22 +10,24 @@
 
 package com.joyintech.tams.valuation.batch.assetimpairmentprovision.reader;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.joyintech.batch.batchbase.baseclass.BaseReader;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.batch.assetimpairmentprovision.dto.AssetImpairmentProvisionReaderResult;
+import com.joyintech.tams.valuation.batch.assetimpairmentprovision.service.AssetImpairmentProvisionReaderNewService;
+import com.joyintech.tams.valuation.batch.assetimpairmentprovision.service.AssetImpairmentProvisionReaderService;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
+import com.joyintech.tams.valuation.common.constants.BookConstant;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.batch.batchbase.baseclass.BaseReader;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.tams.valuation.batch.assetimpairmentprovision.dto.AssetImpairmentProvisionReaderResult;
-import com.joyintech.tams.valuation.batch.assetimpairmentprovision.service.AssetImpairmentProvisionReaderService;
-import com.joyintech.tams.valuation.batch.assetintdatecarryover.dto.AssetIntdateCarryoverReaderResult;
-import com.joyintech.tams.valuation.batch.assetintdatecarryover.service.AssetIntdateCarryoverReaderService;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
-import com.joyintech.tams.valuation.common.constants.BookConstant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 资产减值计提批处理 - 读入
@@ -44,6 +46,11 @@ public class AssetImpairmentProvisionTaskReader extends BaseReader<AssetImpairme
      */
     @Autowired
     private AssetImpairmentProvisionReaderService assetImpairmentProvisionReaderService;
+    /**
+     * reader方法的 Service
+     */
+    @Autowired
+    private AssetImpairmentProvisionReaderNewService assetImpairmentProvisionReaderNewService;
     
     @Autowired
     private BookCommonLogic bookCommonLogic;
@@ -70,7 +77,19 @@ public class AssetImpairmentProvisionTaskReader extends BaseReader<AssetImpairme
         }
 
         // 获取reader返回值
-        List<AssetImpairmentProvisionReaderResult> resultList = assetImpairmentProvisionReaderService.execute(serviceParamMap);
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
+        List<AssetImpairmentProvisionReaderResult> resultList  = new ArrayList<AssetImpairmentProvisionReaderResult>();
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
+        // 若按照内部科目编码分录，则需要映射分录对应科目信息.
+        //调用service方法进行逻辑逻辑
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            resultList = assetImpairmentProvisionReaderNewService.execute(serviceParamMap);
+        }
+        else{
+            resultList = assetImpairmentProvisionReaderService.execute(serviceParamMap);
+        }
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end
 
         return resultList;
     }

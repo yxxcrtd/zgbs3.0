@@ -26,9 +26,9 @@ $(function() {
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/check', object, function(result) {
             Joyin.confirm(result.data, function() {
                 if (operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/save', object, "TrdLendValuationTrade003_btn_save");
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/save', object, "TrdRepoValuationTrade003_btn_save");
                 } else {
-                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/save', object, "TrdLendValuationTrade003_btn_submit");
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/save', object, "TrdRepoValuationTrade003_btn_submit");
                 }
             });
         })
@@ -39,7 +39,7 @@ $(function() {
         var mdate=$("#mdate").val();
         if(mdate){
             if(mdate>platDate){ //平台日小于到期日
-                $('#ps').textSelect("setValue",'C20');
+                $('#ps').textSelect("setValue",'T54');
             }else if(mdate==platDate){
                 $('#ps').textSelect("setValue",'T07');
             }else {
@@ -74,22 +74,7 @@ $(function() {
         }
     }
 
-    //应计利息联动处理     应计利息=交易本金*回购利率*实际占款天数/365
-    // var intAmtCalculate=function () {
-    //     if($('#prinAmt').val() !=null && $('#prinAmt').val() != ''
-    //         && $('#rebackPrice').val() != null && $('#rebackPrice').val() != ''
-    //         && $('#actpaydays').val() != null && $('#actpaydays').val() != ''
-    //         && $('#mdate').val() != null && $('#mdate').val() != ''
-    //         && $('#vdate').val() != null && $('#vdate').val() != '' ){
-    //         var result1=JoyinMath.doMul($('#rebackPrice').val(),0.01,4);
-    //         var result2=JoyinMath.doMul($('#prinAmt').val(),result1,4);
-    //         var result3=JoyinMath.doMul(result2,$('#actpaydays').val() ,4);
-    //         var result4=JoyinMath.doDiv(result3,365 ,2);
-    //         $('#intAmt').val(result4);
-    //     }else {
-    //         $('#intAmt').val('');
-    //     }
-    // }
+
 
     // 本金金额 联动
     $('#prinAmt').change(function(){
@@ -114,12 +99,10 @@ $(function() {
     //计算结算金额  结算金额=本金金额+应计利息+逾期利息金额+其他费用  overdueAmt
     var settleAmtCalculate = function(){
         if($('#prinAmt').val() != null && $('#prinAmt').val() != ''
-            && $('#intAmt').val() != null && $('#intAmt').val() != ''
-            && $('#otherAmt').val() != null && $('#otherAmt').val() != ''){
+            && $('#intAmt').val() != null && $('#intAmt').val() != ''){
             var result1 = JoyinMath.doAdd($('#prinAmt').val(), $('#intAmt').val(),2);
             var result2 = JoyinMath.doAdd(result1, $('#overdueAmt').val(),2);
-            var result3 = JoyinMath.doAdd(result2, $('#otherAmt').val(),2);
-            $('#settleAmt').val(result3);
+            $('#settleAmt').val(result2);
         }else{
             $('#settleAmt').val('');
         }
@@ -147,14 +130,13 @@ $(function() {
     $('#portfolioId').change(function(){
         var portfolioId = $('#portfolioId').val();
         if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+            $('#portfolioName').val($('#portfolioId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#portfolioName').val('').trigger('change');
         }
     });
+
 
     //校验   交割日必须大于等于交易日
     var checkDate=function () {

@@ -11,8 +11,11 @@
 package com.joyintech.tams.valuation.trademanage.trdfundvaluationtrade.service;
 
 import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -54,23 +57,18 @@ public class TrdFundValuationTrade001Service extends CommonExportService<TrdFund
         simpleRestTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdFundValuationTrade/" + action, entity, Integer.class);
     }
 
-
-    /**
-     * 根据条件查询所有
-     *
-     * @param params
-     * @return
-     * @see
-     * @since 1.0
-     */
-    public List<TrdFundValuationTradeDto> findAll(Map<String, Object> params) {
-        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFundValuationTrade/findAll",
-                params, TrdFundValuationTradeDto.class);
-
+    @Override
+    protected void buildExportParam(ExportParam exportParam) {
+        exportParam.config("/com/joyintech/tams/valuation/trademanage/trdfundvaluationtrade/conf/export.xml")
+                .dataSource(DataSourceType.MASERT);
     }
 
-
-
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<TrdFundValuationTradeDto> selectPageData(Map<String, Object> selectParam) {
+        return selectForPage(selectParam);
+    }
 
 }

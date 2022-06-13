@@ -115,6 +115,28 @@ public class ValMngMnfTade extends BaseEntity {
      */
     private String channelId;
 
+    /*add by sunshuaishuai 20220325 交易管理 start*/
+    /**
+     * 交割日
+     */
+    private Date settleDate;
+
+    /**
+     * 外部成交编号
+     */
+    private String outTradeId;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+    /*add by sunshuaishuai 20220325 end*/
+
     /**
      * 取得 产品代码
      * @return 产品代码
@@ -435,4 +457,70 @@ public class ValMngMnfTade extends BaseEntity {
     public void setChannelId(String channelId) {
         this.channelId = channelId == null ? null : channelId.trim();
     }
+
+    /*add by sunshuaishuai 20220325 交易管理 start*/
+    /**
+     * 取得 交割日
+     * @return 交割日
+     */
+    public Date getSettleDate() {
+        return settleDate;
+    }
+
+    /**
+     * 设置 交割日
+     * @param settleDate 交割日
+     */
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
+    }
+
+    /**
+     * 取得 外部成交编号
+     * @return 外部成交编号
+     */
+    public String getOutTradeId() {
+        return outTradeId;
+    }
+
+    /**
+     * 设置 外部成交编号
+     * @param outTradeId 外部成交编号
+     */
+    public void setOutTradeId(String outTradeId) {
+        this.outTradeId = outTradeId == null ? null : outTradeId.trim();
+    }
+
+    /**
+     * 取得 资金账户
+     * @return 资金账户
+     */
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    /**
+     * 设置 资金账户
+     * @param myAcctNo 资金账户
+     */
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+
+    /**
+     * 取得 数据来源
+     * @return 数据来源
+     */
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * 设置 数据来源
+     * @param dataSource 数据来源
+     */
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+    /*add by sunshuaishuai 20220325 end*/
 }

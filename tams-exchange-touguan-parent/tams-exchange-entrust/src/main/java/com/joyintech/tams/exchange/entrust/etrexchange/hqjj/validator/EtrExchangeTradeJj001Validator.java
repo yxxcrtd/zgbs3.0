@@ -381,7 +381,7 @@ public class EtrExchangeTradeJj001Validator implements EtrCommonValidator {
 //				}
 //			}
 			//新股申购
-			if (DictCodeList.交易方向_申购.getValue().equals(dto.getPs()) && DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(dto.getFinprodType2())) {
+			if (DictCodeList.交易方向_申购.getValue().equals(dto.getPs()) && DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(dto.getFinprodType2()) && !"modify".equals(dto.getOptType()) ) {
 				Map<String, Object> param = new HashMap<String, Object>();
 				param.put("finprodId", dto.getFinprodId());//金融产品代码
 				param.put("secAcctId",dto.getSecAcctId());
@@ -409,7 +409,7 @@ public class EtrExchangeTradeJj001Validator implements EtrCommonValidator {
 //				}
 			}
 			// 可转债申购
-			if (DictCodeList.交易方向_申购.getValue().equals(dto.getPs()) && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(dto.getFinprodType2())) {
+			if (DictCodeList.交易方向_申购.getValue().equals(dto.getPs()) && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(dto.getFinprodType2()) && !"modify".equals(dto.getOptType())) {
 				Map<String, Object> param = new HashMap<String, Object>();
 				param.put("finprodId", dto.getFinprodId());//金融产品代码
 				param.put("entrustId",dto.getEntrustId());
@@ -434,6 +434,11 @@ public class EtrExchangeTradeJj001Validator implements EtrCommonValidator {
 //				if (entrustNum.compareTo(dto.getEntrustNum())<0) {
 //					errorList.add(new ValidMessage("entrustNum", getMessage("ETR_ERROR_0063")));
 //				}
+			}
+
+			Boolean isNonTradingTime = etrExchangeTrade001Service.isNonTradingTime(dto);
+			if (isNonTradingTime) {
+				errorList.add(new ValidMessage("当日已闭市，不允许下指令"));
 			}
 
 //			//配股配债权益数量check

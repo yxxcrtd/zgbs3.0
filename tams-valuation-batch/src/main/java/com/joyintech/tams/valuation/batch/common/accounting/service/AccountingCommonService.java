@@ -10,35 +10,30 @@
 
 package com.joyintech.tams.valuation.batch.common.accounting.service;
 
-import com.google.common.collect.Lists;
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.BokBooksetMapper;
 import com.joyintech.tams.common.base.dao.BokStatBokPositionMapper;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListTableId;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.valuation.batch.common.accounting.dao.AccountingCommonMapper;
 import com.joyintech.tams.valuation.batch.common.accounting.dao.ValBokSubjectInfoMapper;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.*;
 import com.joyintech.tams.valuation.batch.common.base.entity.BokStatBokPositionDto;
+import com.joyintech.tams.valuation.batch.common.cache.service.ChangingCacheService;
 import com.joyintech.tams.valuation.batch.common.calculation.service.CalculationCommonService;
+import com.joyintech.tams.valuation.batch.profitandlossaccounting.dto.ProfitAndLossAccountingSubject;
+import com.joyintech.tams.valuation.common.batch.finproduct.dao.FinProductCommonMapper;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetCashPlan;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetFinProduct;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
 import com.joyintech.tams.valuation.common.constants.DataIndexSequenceType;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.utils.DBUtil;
 import groovy.lang.Tuple2;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -90,6 +85,15 @@ public class AccountingCommonService {
      */
     @Autowired
     private CalculationCommonService calculationCommonService;
+
+    /**
+     * 标的类共同mapper
+     */
+    @Autowired
+    private FinProductCommonMapper finProductCommonMapper;
+
+    @Autowired
+    private ChangingCacheService changingCacheService;
 
     /**
      * 全局变量：底层科目级别
@@ -1179,7 +1183,8 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<String> getValSubjectNatureList(String groupId) {
-        return accountingCommonMapper.getValSubjectNatureList(groupId,null);
+        //        return accountingCommonMapper.getValSubjectNatureList(groupId,null);
+        return changingCacheService.getValSubjectNatureList(groupId);
     }
 
     /**
@@ -1192,7 +1197,9 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<String> getValSubjectNatureListWithAcctStandardId(String groupId,String acctStandardId) {
-        return accountingCommonMapper.getValSubjectNatureList(groupId,acctStandardId);
+        //由于根本不存在其他会计准则，估值只使用会计准则_企业准则，acctStandardId传参无意义
+//        return accountingCommonMapper.getValSubjectNatureList(groupId,acctStandardId);
+        return changingCacheService.getValSubjectNatureList(groupId);
     }
 
     /**
@@ -1785,21 +1792,24 @@ public class AccountingCommonService {
     /**
      * 对应科目查询
      *
-     * @param subjectNo 科目号
+     * @param detailSubjectNoTail 四级科目尾号
      * @param booksetId 账套代码
      * @param baseSubjectNature 基础科目性质列表
      * @return 科目信息列表
      * @see
      * @since 1.0
      */
-    public List<CorrespondSubjectEntity> getCorrespondSubject(String subjectNo, String booksetId,
+    public List<CorrespondSubjectEntity> getCorrespondSubject(String detailSubjectNoTail, String booksetId,
                                                               List<String> baseSubjectNature) {
-        String booksetIdTmpl = null;
-        BokBookset bokBookset = bokBooksetMapper.selectByPrimaryKey(booksetId);
-        if(bokBookset!=null){
-            booksetIdTmpl = bokBookset.getBooksetIdTmpl();
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
+        // 若按照内部科目编码分录，则需要映射分录对应科目信息.
+        //调用service方法进行逻辑逻辑
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            return accountingCommonMapper.getCorrespondSubjectNew(detailSubjectNoTail, booksetId,
+                baseSubjectNature);
         }
-        return accountingCommonMapper.getCorrespondSubject(subjectNo, booksetIdTmpl,
+        return accountingCommonMapper.getCorrespondSubject(detailSubjectNoTail, booksetId,
                 baseSubjectNature);
     }
     /**
@@ -1812,7 +1822,8 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<BokSubject> getSubjectInfo(Map<String, Object> map) {
-        return accountingCommonMapper.getSubjectInfo(map);
+        //return accountingCommonMapper.getSubjectInfo(map);
+        return changingCacheService.getSubjectInfoList(map);
     }
     /**
      * 合并场景代码
@@ -1906,8 +1917,8 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<BokBooksetExt> getValBokBooksetExt(String booksetId, List<String> paramCodeList) {
-
-        return accountingCommonMapper.getValBokBooksetExt(booksetId, paramCodeList);
+        //return accountingCommonMapper.getValBokBooksetExt(booksetId, paramCodeList);
+        return changingCacheService.getValBokBooksetExt(booksetId, paramCodeList);
     }
 
     /**
@@ -2248,7 +2259,8 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<StayDrawSubprdEntity> querySubBokAcctInfo(Map<String, Object> params) {
-        return accountingCommonMapper.querySubBokAcctInfo(params);
+        //return accountingCommonMapper.querySubBokAcctInfo(params);
+        return changingCacheService.getValSubBokAcctInfo(params);
     }
 
     /**
@@ -2696,6 +2708,10 @@ public class AccountingCommonService {
         param.put("bookDate", bookDate);
         param.put("listBaseSubjectNature", listBaseSubjectNature);
         param.put("isFloat", isFloat);
+        /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
+        param.put("accountEntryType",accountEntryType);
+        /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
         return accountingCommonMapper.selectFloatSubjectBalance(param);
     }
 
@@ -2740,21 +2756,21 @@ public class AccountingCommonService {
         String mrTableId = "";//买入会计场景
         String mcTableId = "";//卖出会计场景
         //if(投资目的 = 数据字典.投资目的_公允价值变动计入当期损益){
-        if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim)) {
+        if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(invAim)) {
             // 变量.成本基础科目性质 = 基础科目性质数据字典.公允价值损益类_成本;
             baseSubjectNature = DictCodeBaseSubjectNatrue.公允价值损益类_成本.getValue();
             mrTableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_买入.getValue();
             mcTableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_卖出.getValue();
         }
         // if(投资目的 = 数据字典.投资目的.投资目的_摊余成本类){
-        else if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(invAim)) {
             //变量.成本基础科目性质 = 基础科目性质数据字典.摊余成本类成本;
             baseSubjectNature = DictCodeBaseSubjectNatrue.摊余成本类成本.getValue();
             mrTableId = DictCodeListTableId.会计场景代码_摊余成本类债券_买入.getValue();
             mcTableId = DictCodeListTableId.会计场景代码_摊余成本类债券_卖出.getValue();
         }
         //if(投资目的 = 数据字典.投资目的_综合收益类成本){
-        else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(invAim)) {
             //变量.成本基础科目性质 = 基础科目性质数据字典.公允价值损益类_成本;
             baseSubjectNature = DictCodeBaseSubjectNatrue.综合收益类成本.getValue();
             mrTableId = DictCodeListTableId.会计场景代码_综合收益类债券_买入.getValue();
@@ -2799,5 +2815,20 @@ public class AccountingCommonService {
         return num;
     }
     /** add by yanya on 20191203 增加债券实际成本数量查询方法 end**/
+
+    /**
+     * 查询损益结转科目
+     *
+     * @param booksetId 账套代码
+     * @param subjectTypeList 科目类型
+     * @param baseSubjectNatureList 基础科目性质1
+     * @return 损益结转科目列表
+     * @see
+     * @since 1.0
+     */
+    public List<ProfitAndLossAccountingSubject> selectPalSubject(String booksetId, List<String> subjectTypeList, List<String> baseSubjectNatureList){
+        return changingCacheService.selectPalSubject(booksetId,subjectTypeList,baseSubjectNatureList);
+
+    }
 
 }

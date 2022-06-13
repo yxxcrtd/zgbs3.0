@@ -591,6 +591,10 @@
         LEFT JOIN FIN_PRODUCT_TYPE ON FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD ON FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         <include refid="getFinprodMarketIdWhere"></include>
+        <!-- modify by etliu start 20220601:【3.0.6场内 ZGCPCN-1047 场外公募基金指令新建画面，资产代码下拉框为空，应该为场外基金】 start -->
+        <!-- AND FIN_PRODUCT.MDATE > sysdate-->
+        AND ( FIN_PRODUCT.MDATE > sysdate or FIN_PRODUCT.MDATE is null )
+        <!-- modify by etliu start 20220601:【3.0.6场内 ZGCPCN-1047 场外公募基金指令新建画面，资产代码下拉框为空，应该为场外基金】 end -->
         <if test="ps != null and ps != ''">
             <if test="ps == PS_T04 or ps == PS_T06 ">
                 AND  (FIN_PRODUCT_TYPE.TYPE_6 != #{FUND_ASSET_TYPE_F02} OR (FIN_PRODUCT_TYPE.TYPE_6 = #{FUND_ASSET_TYPE_F02}

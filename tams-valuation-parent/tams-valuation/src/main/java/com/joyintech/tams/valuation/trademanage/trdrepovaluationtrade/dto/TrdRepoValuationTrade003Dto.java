@@ -15,8 +15,11 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.validator.TrdRepoValuationTrade003DtoValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
@@ -26,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 @PageId("TrdRepoValuationTrade003")
+@ValidLogic(targetClass = TrdRepoValuationTrade003DtoValidator.class, groups = {ValidateGroupEdit.class, ValidateGroupDelete.class})
 public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEntity {
 
     /**
@@ -177,7 +181,7 @@ public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEn
         this.outTradeId = outTradeId;
     }
 
-    @NotEmpty(fieldName = "TrdRepoValuationTrade003.portfolioName", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdRepoValuationTrade003.portfolioId", groups = {ValidateGroupEdit.class})
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -186,7 +190,7 @@ public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEn
         this.portfolioId = portfolioId;
     }
 
-    @NotEmpty(fieldName = "TrdRepoValuationTrade003.portfolioId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdRepoValuationTrade003.portfolioName", groups = {ValidateGroupEdit.class})
     public String getPortfolioName() {
         return portfolioName;
     }
@@ -308,7 +312,7 @@ public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEn
         this.ccy = ccy;
     }
 
-    @NotEmpty(fieldName = "TrdRepoValuationTrade003.otherAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdRepoValuationTrade003.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -368,5 +372,18 @@ public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEn
 
     public void setMdate(Date mdate) {
         this.mdate = mdate;
+    }
+
+    /**
+     * 回购类型（H01：质押式协议回购；H02：质押式竞价回购）
+     */
+    private String repoType;
+
+    public String getRepoType() {
+        return repoType;
+    }
+
+    public void setRepoType(String repoType) {
+        this.repoType = repoType;
     }
 }

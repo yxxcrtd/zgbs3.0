@@ -41,13 +41,25 @@
         },
 
         dblclick:function(table, data) {
-            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
-                basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",
-                "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
-                    portfolioId:data.portfolioId,
-                    entrustId:data.entrustId,
-                    finprodId:data.finprodId,
-                    tradeId:data.tradeId});
+            var ps=data.ps;
+            if(ps=="03" || ps=="04"){
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                        portfolioId:data.portfolioId,
+                        entrustId:data.entrustId,
+                        finprodId:data.finprodId,
+                        tradeId:data.tradeId});
+            }else { //展示到期确认页面
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/init",
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                        portfolioId:data.portfolioId,
+                        entrustId:data.entrustId,
+                        finprodId:data.finprodId,
+                        tradeId:data.tradeId});
+            }
+
         },
 
         cols:[
@@ -67,19 +79,33 @@
             ,{field:'mdateStr', width:150,  title: '到期日',sortField:'mdate'}
             ,{field:'mdate', title: '到期日',visible:false}
             ,{field:'prinAmt', width:150, title: '券面总额(万元)',type:'number',sortField:'prinAmt',digit:2}
-            ,{field:'rebackPrice', width:150, title: '回购利率%',type:'number',sortField:'rebackPrice'}
+            ,{field:'rebackPrice', width:150, title: '回购利率%',type:'number',sortField:'rebackPrice',digit:4}
             ,{field:'fprice', width:150, title: '首次全价总额',type:'number',sortField:'fprice'}
             ,{field:'mfprice', width:150, title: '到期全价总额',type:'number',sortField:'mfprice'}
             ,{field:'settleAmt', width:150, title: '结算金额',type:'number',sortField:'settleAmt'}
             ,{field:'ccyFmt', width:150, title: '币种',sortField:'ccy'}
             ,{field:'ccy', title: '币种',visible:false}
             ,{field:'trdAcctId', title: '资金账户',width:100}
+            ,{field:'dealFlag', title: '首期交易标识',visible:false}
             ,{field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width : 120,
-                align : 'center',type : 'action', buttons : [ 'edit', 'delt' ,
-                    {text: '<i class="iconfont icon-submit"></i>', clas: 'confirm', title: '到期'}]}
+                align : 'center',type : 'action',
+                render : function(data, type, row, meta){
+                    var buttons = "";
+                    if(row.ps == 'T07' || (row.dealFlag == '01' && (row.ps == '03' || row.ps == '04'))){
+                        buttons += '<i class="btn layui-icon edit" title="编辑">&#xe642;</i>';
+                        buttons += '<i class="btn layui-icon delt" title="删除" >&#xe640;</i>';
+                    }else{
+                        buttons += '<i class="btn layui-icon edit" title="编辑">&#xe642;</i>';
+                        buttons += '<i class="btn layui-icon delt" title="删除">&#xe640;</i>';
+                        buttons += '<i class="iconfont icon-submit check" title="到期"></i>';
+                    }
+                    return buttons;
+                }
+            }
         ],
         //loadonce:true
     });
+
 
     /**
      * 导出选中的表格数据
@@ -103,9 +129,37 @@
     };
     
     $(function () {
+
+
         // 绑定按钮事件
         $('#TrdOutRightRepoValuationTrade001_btn_search').click(function() {
             table.load();
+        });
+        // 绑定批量删除事件
+        $('#TrdOutRightRepoValuationTrade001_btn_delete').click(function() {
+            if(table!=null && table!=''){
+                var selArr = table.getAllCheckedRows();
+            }
+            if (!selArr || selArr.length == 0) {
+                Joyin.error(JoyinUtil.getMessage("COMMON_E_0002"));
+                return;
+            }
+            // 启动删除流程
+            var object = {selectedItem: selArr, operateType:"delete"};
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
+
+                Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001", JoyinUtil.getLabel("SysCommon.delete")), function () {
+                    WorkFlow.doDeleteList(
+                        basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/delete',
+                        object,
+                        "TrdOutRightRepoValuationTrade001_btn_delete",
+                        "TrdOutRightRepoValuationTrade002",
+                        function () {
+                            table.reload();
+                        }
+                    );
+                });
+            });
         });
         
         $('#TrdOutRightRepoValuationTrade001_btn_export').click(function() {
@@ -113,7 +167,7 @@
         });
         $('#TrdOutRightRepoValuationTrade001_btn_add').click(
                 function() {
-                    Joyin.dialog(JoyinUtil.getLabel("TrdRepoValuationTrade002"), basePath
+                    Joyin.dialog(JoyinUtil.getLabel("TrdOutRightRepoValuationTrade002"), basePath
                             + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init", "99%", "99%", {
                         pageModel : PAGE_MODEL_NEW
                     }, function() {
@@ -127,13 +181,17 @@
         table.bind('click', '.edit', function(data, index) {
             data.pageModel = PAGE_MODEL_EDIT;
             var object = {selectedItem: [data], operateType:"edit"};//请求参数
-            Joyin.dialog(JoyinUtil.getLabel("买断式回购交易-修改"),
-                basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",//打开新界面
-                "98%", "98%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
-                    tradeId:data.tradeId  //金融产品代码
-                },function(){
-                    table.reload();//回调函数，表格刷新
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
+
+                Joyin.dialog(JoyinUtil.getLabel("买断式回购交易-修改"),
+                    basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",//打开新界面
+                    "95%", "90%", {
+                        pageModel: PAGE_MODEL_EDIT,//请求的page_model
+                        tradeId: data.tradeId  //金融产品代码
+                    }, function () {
+                        table.reload();//回调函数，表格刷新
                 });
+            });
         });
 
         /**
@@ -141,28 +199,31 @@
          */
         table.bind('click', '.delt', function(data, index) {
             var object = {selectedItem: [data], operateType:"delete"};
-            Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
-                WorkFlow.doDeleteList(
-                    basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/delete',
-                    object,
-                    "TrdOutRightRepoValuationTrade001_btn_delete",
-                    "TrdOutRightRepoValuationTrade002",
-                    function() {
-                        table.reload();
-                    }
-                );
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
+
+                Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001", JoyinUtil.getLabel("SysCommon.delete")), function () {
+                    WorkFlow.doDeleteList(
+                        basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/delete',
+                        object,
+                        "TrdOutRightRepoValuationTrade001_btn_delete",
+                        "TrdOutRightRepoValuationTrade002",
+                        function () {
+                            table.reload();
+                        }
+                    );
+                });
             });
         });
 
         /**
          * 绑定确认事件
          */
-        table.bind('click', '.confirm', function(data, index) {
+        table.bind('click', '.check', function(data, index) {
             var object = {selectedItem: [data], operateType:"confirm"};//请求参数
             // Joyin.ajaxJson(basePath + 'valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade002/check', object, function(result) {//请求路径，请求参数回调函数
             Joyin.dialog(JoyinUtil.getLabel("到期确认"),
                 basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/init",//打开新界面
-                "98%", "98%", {//请求的page_model
+                "95%", "90%", {//请求的page_model
                     tradeId:data.tradeId,  //金融产品代码
                     operateType:"confirm"
                 },function(){

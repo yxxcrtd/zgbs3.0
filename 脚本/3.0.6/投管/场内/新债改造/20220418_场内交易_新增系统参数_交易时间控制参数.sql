@@ -1,0 +1,3 @@
+delete from sys_para where system_code = 'TRD' and para_code = 'trd_trade_time_switch';
+INSERT INTO SYS_PARA (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG)
+VALUES ('TRD', 'trd_trade_time_switch', 'Y', '01', 'Y,N', '非交易时间段是否禁止场内交易下单(Y：禁止 N：不禁止)', 'system', null, sysdate, 'system', sysdate, null, '01');

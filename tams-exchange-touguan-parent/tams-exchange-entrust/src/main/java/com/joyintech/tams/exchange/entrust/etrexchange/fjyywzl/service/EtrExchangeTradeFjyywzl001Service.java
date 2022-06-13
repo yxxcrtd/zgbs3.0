@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.fjyywzl.service;
 
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,30 +76,33 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
                 logger.info("请求用户【{}】", "userId = " + userId);
                 map.put("userId", SecurityUtil.getLoginUser().getUserName());
                 getZqzyPositionParam(map);
-                Page<EtrExchangeTradeFjyywzlZqzyDto> result = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
+                Page<EtrExchangeTradeFjyywzlZqzyDto> result = super.queryForPage(request.getPageMode().getPageNo(), 1000,
                         () -> etrExchangeTradeFjyywzl001Mapper.findZqzyPositionsPageNew(map));
                 List<EtrExchangeTradeFjyywzlZqzyDto> returnList=new ArrayList<>();
                 if(result!=null&&!CollectionUtils.isEmpty(result.getRoot())){
                     // 计算浮动盈亏
                     for(EtrExchangeTradeFjyywzlZqzyDto entity : result.getRoot()){
-                        //可用数量
+                        //标准券数量T日标准券额度（交易）,单位：万元
+                        BigDecimal secNum=ArithmeticUtil.divide(entity.getSecNum(),new BigDecimal(100),4, RoundingMode.DOWN);
+                        entity.setSecNum(secNum);
+                        //可用数量T日可入库持仓（指令）单位：万元
                         PositionCashSecDto secDto=new PositionCashSecDto();
                         BeanUtil.copyPropertiesIgnoreNull(secDto,entity);
                         secDto.setTradePlat(TempConstant.NO_TRADE_BUSINESS_ETR);
                         BigDecimal canRepoNum=etrTradeCommonervice.selectAvailableNum(secDto);
-                        //canRepoNum=ArithmeticUtil.divide(canRepoNum,100,0);
+                        canRepoNum=ArithmeticUtil.divide(canRepoNum,new BigDecimal(100),2, RoundingMode.DOWN);
                         entity.setCanRepoNum(canRepoNum);
+                        //持仓数量，取交易的净额结算可用持仓（交易），单位：万元
+                        BigDecimal  positionsNum=selectActNum(DictCodeListExt3.资产类型_资产账户持仓.getValue(),secDto);
                         //过滤掉标准券和质押数量都等于0
-                        if(entity.getSecNum().compareTo(BigDecimal.ZERO)==0&&canRepoNum.compareTo(BigDecimal.ZERO)==0){
+                        if (entity.getSecNum().compareTo(BigDecimal.ZERO) == 0 && canRepoNum.compareTo(BigDecimal.ZERO) == 0 && positionsNum.compareTo(BigDecimal.ZERO) == 0) {
                             continue;
                         }
-                        //持仓数量，取交易的
-                        BigDecimal  positionsNum=selectActNum(DictCodeListExt3.资产类型_资产账户持仓.getValue(),secDto);
-                        //positionsNum=ArithmeticUtil.divide(positionsNum,100,0);
+                        positionsNum=ArithmeticUtil.divide(positionsNum,new BigDecimal(100),2, RoundingMode.DOWN);
                         entity.setPositionsNum(positionsNum);
-                        //质押数量，取交易的
+                        //质押数量，取交易的T日质押券入库持仓（交易），单位：万元
                         BigDecimal  repoNum=selectActNum(DictCodeListExt3.资产类型_质押式通用回购入库质押券持仓.getValue(),secDto);
-                        //repoNum=ArithmeticUtil.divide(repoNum,100,0);
+                        repoNum=ArithmeticUtil.divide(repoNum,new BigDecimal(100),2, RoundingMode.DOWN);
                         entity.setRepoNum(repoNum);
                         returnList.add(entity);
                     }
@@ -142,6 +147,12 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
         } else {
             pageParam.put("date", iPlatformDate.getSysDate());
         }
+
+        if(StringUtil.isNotEmpty(pageParam.get("finprodMarketId"))){
+            pageParam.put("finprodIdList",
+                    StringUtil.splitToList(GlobalConstant.COMMA, pageParam.get("finprodMarketId").toString()));
+            pageParam.put("finprodMarketId",null);
+        }
     }
 
     /**
@@ -169,26 +180,27 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
         if(StringUtil.isNotEmpty(dto.getPortfolioId())&&StringUtil.isNotEmpty(dto.getAcctId())){
             Map<String,Object> map=new HashMap<>();
             map.put("portfolioId",dto.getPortfolioId());
-            map.put("acctNo",dto.getAcctId());
+            //map.put("acctNo",dto.getAcctId());
             List<SelectOptionDto> ptlSecAcctInfoList=
             restTemplate.postForList(
                     ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getPtlSecAcctInfo", map,
                     SelectOptionDto.class);
             if(!CollectionUtils.isEmpty(ptlSecAcctInfoList)){
-                SelectOptionDto selectOptionDto=ptlSecAcctInfoList.get(0);
-                List<LinkedHashMap<String,String>>  acctSecList = (List<LinkedHashMap<String,String>>) selectOptionDto.getObject();
                 List<PositionCashSecDto> shProList=new ArrayList<>();
                 List<PositionCashSecDto> szProList=new ArrayList<>();
-                for(LinkedHashMap<String,String> linkedHashMap:acctSecList){
-                    PositionCashSecDto cashSecDto=new PositionCashSecDto();
-                    cashSecDto.setPortfolioId(dto.getPortfolioId());
-                    cashSecDto.setFinprodId("XN_PRODID999");
-                    if(StringUtil.equals(BussinessDictCodeList.交易场所_上海证券交易所.getValue(),linkedHashMap.get("tradeMarket"))){
-                        cashSecDto.setSecAcctId(linkedHashMap.get("secAcctId"));
-                        shProList.add(cashSecDto);
-                    }else   if(StringUtil.equals(BussinessDictCodeList.交易场所_深圳证券交易所.getValue(),linkedHashMap.get("tradeMarket"))){
-                        cashSecDto.setSecAcctId(linkedHashMap.get("secAcctId"));
-                        szProList.add(cashSecDto);
+                for(SelectOptionDto selectOptionDto:ptlSecAcctInfoList) {
+                    List<LinkedHashMap<String, String>> acctSecList = (List<LinkedHashMap<String, String>>) selectOptionDto.getObject();
+                    for (LinkedHashMap<String, String> linkedHashMap : acctSecList) {
+                        PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                        cashSecDto.setPortfolioId(dto.getPortfolioId());
+                        cashSecDto.setFinprodId("XN_PRODID999");
+                        if (StringUtil.equals(BussinessDictCodeList.交易场所_上海证券交易所.getValue(), linkedHashMap.get("tradeMarket"))) {
+                            cashSecDto.setSecAcctId(linkedHashMap.get("secAcctId"));
+                            shProList.add(cashSecDto);
+                        } else if (StringUtil.equals(BussinessDictCodeList.交易场所_深圳证券交易所.getValue(), linkedHashMap.get("tradeMarket"))) {
+                            cashSecDto.setSecAcctId(linkedHashMap.get("secAcctId"));
+                            szProList.add(cashSecDto);
+                        }
                     }
                 }
                 //筛选出当前组合下所有持仓
@@ -196,8 +208,8 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
                 secNumSh=etrExchangeTradeCommon002Service.queryProPosition(DictCodeListExt3.资产类型_质押式通用回购已使用融资券总额度.getValue(),shProList);
                 if(secNumSh!=null&&secNumSh.compareTo(BigDecimal.ZERO) != 0){
                     BigDecimal sumNumSh=canNumSh.add(secNumSh);
-                    rateShTemp=ArithmeticUtil.divide(secNumSh,sumNumSh,2);
-                    rateShTemp=ArithmeticUtil.multiply(rateShTemp,new BigDecimal(100));
+                    rateShTemp=ArithmeticUtil.divide(secNumSh,sumNumSh,4);
+                    rateShTemp=ArithmeticUtil.multiply(rateShTemp,new BigDecimal(100)).setScale(2);
                     rateSh=rateShTemp+"%";
                 }else{
                     rateSh="0%";
@@ -206,8 +218,8 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
                 secNumZh=etrExchangeTradeCommon002Service.queryProPosition(DictCodeListExt3.资产类型_质押式通用回购已使用融资券总额度.getValue(),szProList);
                 if(secNumZh!=null&&secNumZh.compareTo(BigDecimal.ZERO) != 0){
                     BigDecimal sumNumZh=canNumZh.add(secNumZh);
-                    rateSZhTemp=ArithmeticUtil.divide(secNumZh,sumNumZh,2);
-                    rateSZhTemp=ArithmeticUtil.multiply(rateSZhTemp,new BigDecimal(100));
+                    rateSZhTemp=ArithmeticUtil.divide(secNumZh,sumNumZh,4);
+                    rateSZhTemp=ArithmeticUtil.multiply(rateSZhTemp,new BigDecimal(100)).setScale(2);
                     rateZh=rateSZhTemp+"%";
                 }else{
                     rateZh="0%";
@@ -215,6 +227,11 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
             }
 
         }
+        //单位修改万元
+        canNumSh=ArithmeticUtil.divide(canNumSh,new BigDecimal(10000),2,RoundingMode.DOWN);
+        secNumSh=ArithmeticUtil.divide(secNumSh,new BigDecimal(10000),2,RoundingMode.DOWN);
+        canNumZh=ArithmeticUtil.divide(canNumZh,new BigDecimal(10000),2,RoundingMode.DOWN);
+        secNumZh=ArithmeticUtil.divide(secNumZh,new BigDecimal(10000),2,RoundingMode.DOWN);
         if(canNumSh.compareTo(BigDecimal.ZERO)>0){
             canNumShColor="green";
         }else if(canNumSh.compareTo(BigDecimal.ZERO)<0){
@@ -235,11 +252,11 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
         }else if(rateSZhTemp.compareTo(BigDecimal.ZERO)>0){
             rateZhColor="red";
         }
-        resultMap.put("canNumSh",canNumSh+"张");
-        resultMap.put("secNumSh",secNumSh+"张");
+        resultMap.put("canNumSh",canNumSh+"万元");
+        resultMap.put("secNumSh",secNumSh+"万元");
         resultMap.put("rateSh",rateSh);
-        resultMap.put("canNumZh",canNumZh+"张");
-        resultMap.put("secNumZh",secNumZh+"张");
+        resultMap.put("canNumZh",canNumZh+"万元");
+        resultMap.put("secNumZh",secNumZh+"万元");
         resultMap.put("rateZh",rateZh);
         resultMap.put("canNumShColor",canNumShColor);
         resultMap.put("canNumZhColor",canNumZhColor);

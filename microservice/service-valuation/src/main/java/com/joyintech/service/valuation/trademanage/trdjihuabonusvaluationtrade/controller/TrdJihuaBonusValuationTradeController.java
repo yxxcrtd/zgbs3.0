@@ -10,24 +10,18 @@
 
 package com.joyintech.service.valuation.trademanage.trdjihuabonusvaluationtrade.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.framework.annotation.DTXTransaction;
+import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.service.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusTradeResult;
 import com.joyintech.service.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusValuationTradeDto;
 import com.joyintech.service.valuation.trademanage.trdjihuabonusvaluationtrade.service.TrdJihuaBonusValuationTradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
+import java.util.List;
+import java.util.Map;
 
 /**
  * service 基金存续期
@@ -43,32 +37,6 @@ public class TrdJihuaBonusValuationTradeController extends BaseController {
 
     @Autowired
     private TrdJihuaBonusValuationTradeService trdJihuaBonusValuationTradeService;
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 返回的数据
-     * @exception Exception
-     *                异常
-     * @since 1.0
-     */
-    @PostMapping("findPortfolioId/{page}/{length}")
-    public Page<SelectOptionDto> findPortfolioId(@RequestBody Map<String,Object> map,
-                                           @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdJihuaBonusValuationTradeService.findPortfolioId(page,length,map);
-    }
-
-    /**
-     * 资产代码下拉框
-     * @since 1.0
-     */
-    @PostMapping("findFinprodId/{page}/{length}")
-    public Page<SelectOptionDto> findFinprodId(@RequestBody Map<String,Object> map,
-                                                 @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdJihuaBonusValuationTradeService.findFinprodId(page,length,map);
-    }
-
-
 
     /**
      * 查询 支持分页 <功能详细描述>
@@ -112,8 +80,8 @@ public class TrdJihuaBonusValuationTradeController extends BaseController {
      * @since 1.0
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdJihuaBonusValuationTradeDto queryTradeInfoByTradeId(@RequestBody String  tradeId) {
-        return trdJihuaBonusValuationTradeService.queryTradeInfoByTradeId(tradeId);
+    public TrdJihuaBonusValuationTradeDto queryTradeInfoByTradeId(@RequestBody Map<String, Object> param) {
+        return trdJihuaBonusValuationTradeService.queryTradeInfoByTradeId(param);
     }
 
 
@@ -126,7 +94,7 @@ public class TrdJihuaBonusValuationTradeController extends BaseController {
     @Transactional
     @DTXTransaction
     @PostMapping("insert")
-    public void insertNet(@RequestBody TrdJihuaBonusTradeResult dto) {
+    public void insert(@RequestBody TrdJihuaBonusTradeResult dto) {
         trdJihuaBonusValuationTradeService.insert(dto);
     }
 
@@ -139,7 +107,7 @@ public class TrdJihuaBonusValuationTradeController extends BaseController {
     @Transactional
     @DTXTransaction
     @PostMapping("update")
-    public void updateNet(@RequestBody TrdJihuaBonusTradeResult dto) {
+    public void update(@RequestBody TrdJihuaBonusTradeResult dto) {
         trdJihuaBonusValuationTradeService.update(dto);
     }
 

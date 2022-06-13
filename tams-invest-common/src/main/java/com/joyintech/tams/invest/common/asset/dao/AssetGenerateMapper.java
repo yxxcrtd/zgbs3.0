@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import com.joyintech.tams.common.base.entity.FinCashInfo;
+import com.joyintech.tams.common.base.entity.FinOpenRule;
 
 
 /**
@@ -23,11 +25,11 @@ public interface AssetGenerateMapper {
 	/**
 	 * 查询债券的面值等其它信息
 	 * <功能详细描述>
-	 * @param finprodId
+	 * @param finprodIdList
 	 * @see
 	 * @since 1.0
 	 */
-	AssetGenerateEntry qryFaceOrOtherInf(String finprodId);
+	List<AssetGenerateEntry> qryFaceOrOtherInf(List<String> finprodIdList);
 
 	/**
      * 查询汇率
@@ -62,4 +64,17 @@ public interface AssetGenerateMapper {
 
 
 	AssetGenerateEntry qryPortfolioIdInfo(String portfolioId);
+
+	List<FinOpenRule> getFinOpenRule(List<String> portfolioIdList);
+
+	<T> List<T> getFinOpenPlan(List<String> portfolioIdList);
+
+	/**
+	 * 查询交易信息
+	 * @param tradeList
+	 * @param finprodList
+	 * @see
+	 * @since 1.0
+	 */
+	List<AssetGenerateEntry> getTradeInfo(@Param("tradeList") List<String> tradeList, @Param("finprodList") List<String> finprodList );
 }

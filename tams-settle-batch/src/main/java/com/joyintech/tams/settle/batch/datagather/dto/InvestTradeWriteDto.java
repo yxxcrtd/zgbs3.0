@@ -87,6 +87,11 @@ public class InvestTradeWriteDto extends NeedToWriteEntity {
 
     private List<PtlSecPositionFlow> ptlSecPositionFlowList;
 
+    // TrdBankManualSettleInfo
+    private List<TrdBankManualSettleInfo> trdBankManualSettleInfoList;
+    // TrdBankManualSettleFlow
+    private List<TrdBankManualSettleFlow> trdBankManualSettleFlowList;
+
     public InvestTradeWriteDto() {
     	finProductDealTotalList = new ArrayList<TotalTrdProductDealDto>();
     	trdDealTotalAddList = new ArrayList<TrdDealTotalAdd>();
@@ -100,6 +105,8 @@ public class InvestTradeWriteDto extends NeedToWriteEntity {
     	dealPledgeList = new ArrayList<FinDealPledge>();
     	etrFinishStatusList = new ArrayList<EtrFinishStatus>();
     	settleTransTgMappingList = new ArrayList<SettleTransTgMapping>();
+        trdBankManualSettleInfoList = new ArrayList<TrdBankManualSettleInfo>();
+        trdBankManualSettleFlowList = new ArrayList<TrdBankManualSettleFlow>();
     }
 
     public String getSecType() {
@@ -253,4 +260,21 @@ public class InvestTradeWriteDto extends NeedToWriteEntity {
 
 
     //add by wujie on 20220301 end remark:调用估值交易入账参数对象
+
+    //add by liujiasheng 20220512
+    public List<TrdBankManualSettleInfo> getTrdBankManualSettleInfoList() {
+        return trdBankManualSettleInfoList;
+    }
+
+    public void setTrdBankManualSettleInfoList(List<TrdBankManualSettleInfo> trdBankManualSettleInfoList) {
+        this.trdBankManualSettleInfoList = trdBankManualSettleInfoList;
+    }
+
+    public List<TrdBankManualSettleFlow> getTrdBankManualSettleFlowList() {
+        return trdBankManualSettleFlowList;
+    }
+
+    public void setTrdBankManualSettleFlowList(List<TrdBankManualSettleFlow> trdBankManualSettleFlowList) {
+        this.trdBankManualSettleFlowList = trdBankManualSettleFlowList;
+    }
 }

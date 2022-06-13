@@ -83,7 +83,7 @@ public class RepDealAssetTemplateRecService {
         return result;
     }
 
-    private Map<String, Object> handleValBotAstInfo(List<ValRepDealAsset> listValRepDealAsset) {
+    public Map<String, Object> handleValBotAstInfo(List<ValRepDealAsset> listValRepDealAsset) {
         Map<String, Object> result = new HashMap<>();
         // 定义 债券回购质押品信息List
         List<FinDealPledge> listFinDealPledge = new ArrayList<FinDealPledge>();

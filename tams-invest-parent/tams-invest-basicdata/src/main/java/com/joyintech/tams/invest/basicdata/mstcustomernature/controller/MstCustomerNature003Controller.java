@@ -116,6 +116,7 @@ public class MstCustomerNature003Controller extends BaseController {
         model.addAttribute("CUSTOMER_NATURE_09", DictCodeList.客户性质_投资顾问.getValue());
         model.addAttribute("CUSTOMER_NATURE_10", DictCodeListExt3.客户性质_券商.getValue());
         model.addAttribute("CUSTOMER_NATURE_12", DictCodeListExt3.客户性质_交易对手.getValue());
+        model.addAttribute("CUSTOMER_NATURE_13", DictCodeListExt3.客户性质_原始权益人.getValue());
         model.addAttribute("CUSTOMER_TYPE_01", DictCodeList.客户类型_法人.getValue());
         model.addAttribute("CUSTOMER_TYPE_02", DictCodeList.客户类型_自然人.getValue());
         return super.init(model);
@@ -164,6 +165,7 @@ public class MstCustomerNature003Controller extends BaseController {
         map.put("flag_06", DictCodeList.客户性质_出质人.getCodeName());
         map.put("flag_10", DictCodeListExt3.客户性质_券商.getCodeName());
         map.put("flag_12", DictCodeListExt3.客户性质_交易对手.getCodeName());
+        map.put("flag_13", DictCodeListExt3.客户性质_原始权益人.getCodeName());
         map.put("index", DictCodeList.客户类型_法人.getCodeName());
         map.put("count", DictCodeList.客户类型_自然人.getCodeName());
         //查找原客户性质配置情况；
@@ -217,6 +219,10 @@ public class MstCustomerNature003Controller extends BaseController {
             if (DictCodeListExt3.客户性质_交易对手.getValue().equals(
                     mstCustomerNatureDto.getCustomerCharater())) {
                     listCustomerCharater.add((String)map.get("flag_12"));
+            }
+            if (DictCodeListExt3.客户性质_原始权益人.getValue().equals(
+                    mstCustomerNatureDto.getCustomerCharater())) {
+                listCustomerCharater.add((String)map.get("flag_13"));
             }
             //listCustomerCharater.add(mstCustomerNatureDto.getCustomerCharater());
             //原来不是交易对手，现在是交易对手，新建
@@ -322,10 +328,10 @@ public class MstCustomerNature003Controller extends BaseController {
                     if (StringUtil.equals(dto.getCustomerType(), DictCodeList.客户类型_自然人.getValue())) {
                         return new AjaxResult("客户性质为发行人时，选择数据的客户类型不能为自然人！", MessageType.错误消息);
                     }
-                    String isFinLicenceStr = mstCustomerNatureService.checkIsFinLicenceStr(dto.getCustomerId());
-                    if(StringUtil.isEmpty(isFinLicenceStr)) {
-                        return new AjaxResult("客户性质为发行人时，机构信息中的“是否持有金融牌照”字段不可以为空！", MessageType.错误消息);
-                    }
+//                    String isFinLicenceStr = mstCustomerNatureService.checkIsFinLicenceStr(dto.getCustomerId());
+//                    if(StringUtil.isEmpty(isFinLicenceStr)) {
+//                        return new AjaxResult("客户性质为发行人时，机构信息中的“是否持有金融牌照”字段不可以为空！", MessageType.错误消息);
+//                    }
                 }
             }
         }

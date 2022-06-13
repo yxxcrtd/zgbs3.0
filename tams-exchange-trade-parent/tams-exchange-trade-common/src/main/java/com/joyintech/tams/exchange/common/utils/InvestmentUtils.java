@@ -1,14 +1,16 @@
 package com.joyintech.tams.exchange.common.utils;
 
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Order;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 
 public class InvestmentUtils {
 
     public static boolean hasSameDir(Instruction instruction, Order order) {
-        if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
             if (EntrustBs.BUY.value.equals(order.getEntrustBs())) {
                 return DerivativeBsDir.BUY.value.equals(instruction.getDerivativeBsDir());
             } else if (EntrustBs.SELL.value.equals(order.getEntrustBs())) {
@@ -21,7 +23,7 @@ public class InvestmentUtils {
     }
 
     public static boolean hasSameDir(Instruction instruction, String entrustBs) {
-        if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
             if (EntrustBs.BUY.value.equals(entrustBs)) {
                 return DerivativeBsDir.BUY.value.equals(instruction.getDerivativeBsDir());
             } else if (EntrustBs.SELL.value.equals(entrustBs)) {
@@ -34,9 +36,9 @@ public class InvestmentUtils {
     }
 
     public static String getInstructionBs(String assetType, String entrustBS) {
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType) && EntrustBs.BUY.value.equals(entrustBS)) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType) && EntrustBs.BUY.value.equals(entrustBS)) {
             return InstructionPs.POSITIVEREPO.value;
-        } else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType) && EntrustBs.SELL.value.equals(entrustBS)) {
+        } else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType) && EntrustBs.SELL.value.equals(entrustBS)) {
             return InstructionPs.REVERSEDREPO.value;
         } else if (EntrustBs.BUY.value.equals(entrustBS)) {
             return InstructionPs.BUY.value;
@@ -47,13 +49,56 @@ public class InvestmentUtils {
     }
 
     public static boolean isNormalTradeFromInstruction(String tradePlat) {
-        if (Strings.isNullOrEmpty(tradePlat) || TradePlat.NORMAL.value.equals(tradePlat)) return true;
-        else return false;
+        return Strings.isNullOrEmpty(tradePlat) || TradePlat.NORMAL.value.equals(tradePlat);
+    }
+
+    /**
+     * 根据交易平台和交易方式判断是否支持公平交易
+     * <p>
+     * 1. 交易平台 = {@link com.joyintech.tams.exchange.common.constant.TradePlat#NORMAL} <br>
+     * 2. 交易平台 = {@link com.joyintech.tams.exchange.common.constant.TradePlat#NEW_BOND} && 交易方式 in [{@link com.joyintech.tams.exchange.common.constant.EntrustProp#NORMAL},{@link com.joyintech.tams.exchange.common.constant.EntrustProp#UN_MAKE_SURE}]<br/>
+     *
+     * @param tradePlat 交易平台
+     * @param dealMode  交易方式
+     * @return 是否支持公平交易
+     */
+    public static boolean filterFairInstructionByTradePlatAndDealMode(String tradePlat, String dealMode) {
+        if (StrUtil.isEmpty(tradePlat)) {
+            return false;
+        }
+
+        if (TradePlat.NORMAL.codeEquals(tradePlat)) {
+            return true;
+        }
+        if (TradePlat.NEW_BOND.codeEquals(tradePlat)
+                && (StrUtil.isEmpty(dealMode) || EntrustProp.NORMAL.codeEquals(dealMode))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 根据交易方向判断是否支持公平交易
+     * <p>
+     * 交易方向 in [{@link com.joyintech.tams.exchange.common.constant.InstructionPs#BUY}
+     * {@link com.joyintech.tams.exchange.common.constant.InstructionPs#SELL}
+     * {@link com.joyintech.tams.exchange.common.constant.InstructionPs#POSITIVEREPO}
+     * {@link com.joyintech.tams.exchange.common.constant.InstructionPs#REVERSEDREPO}
+     * ] <br>
+     *
+     * @param ps 交易方向
+     * @return 是否支持公平交易
+     */
+    public static boolean filterFairInstructionByPs(String ps) {
+        if (StrUtil.isEmpty(ps)) {
+            return false;
+        }
+        return EnumUtil.in(ps, InstructionPs.BUY, InstructionPs.SELL, InstructionPs.POSITIVEREPO, InstructionPs.REVERSEDREPO);
     }
 
     // 指令进度判断
     public static boolean isInstructionProcessComplete(Instruction instruction) {
-        if (instruction.getEntrustNum() > 0) {
+        if (instruction.volumeInstruction()) {
             return TradeUtils.add(instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), 0).longValue() == instruction.getEntrustNum();
         } else {
             return TradeUtils.add(instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), 2).compareTo(instruction.getEntrustAmt()) == 0;

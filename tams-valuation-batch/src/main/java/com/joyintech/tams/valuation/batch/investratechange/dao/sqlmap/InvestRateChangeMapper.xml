@@ -66,7 +66,7 @@
    			1=1
        		and tpd.VDATE <![CDATA[ <= ]]> #{happenDate, jdbcType=DATE}
       		and tpd.MDATE <![CDATA[ >= ]]> #{happenDate, jdbcType=DATE}
-        	and tpd.FINPROD_TYPE2 = #{finProdType, jdbcType=VARCHAR}
+        	and tpd.FINPROD_TYPE = #{finProdType, jdbcType=VARCHAR}
         	and tpd.TRADE_STATUS = #{tradeStatus, jdbcType=VARCHAR}
         	and tpd.PS = #{PS, jdbcType=VARCHAR}
 	</select>

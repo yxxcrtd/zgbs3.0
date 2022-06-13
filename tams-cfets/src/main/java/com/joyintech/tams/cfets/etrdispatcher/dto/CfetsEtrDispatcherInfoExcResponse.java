@@ -1,5 +1,6 @@
 package com.joyintech.tams.cfets.etrdispatcher.dto;
 
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.constant.DictCode;
@@ -519,7 +520,11 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     }
 
     public String getOtherBusiModel() {
-        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, super.getBusiModel());
+//        String flag = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        if("02".equals(flag)){
+            return SysDataUtil.getNameFromDataDict(DictCode.业务模式, super.getBusiModel());
+//        }
+//        return SysDataUtil.getNameFromDataDict(DictCode.投资目的, super.getBusiModel());
     }
 
     /**

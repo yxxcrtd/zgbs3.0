@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper">
+
+    <select id="queryForPage"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto"
+            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest">
+        SELECT
+        PAYHSRCSECINFO.SECID,
+        PAYHSRCSECINFO.SECNAME,
+        PAYHSRCSECINFO.SECFULLNAME,
+        PAYHSRCSECINFO.SECCODE,
+        PAYHSRCSECINFO.MARKET,
+        PAYHSRCSECINFO.INSTITUTION,
+        PAYHSRCSECINFO.ISSUEPRICE,
+        to_char(PAYHSRCSECINFO.PUBENDDATE,'yyyy-MM-dd') PUBENDDATE,
+        to_char(PAYHSRCSECINFO.VDATE,'yyyy-MM-dd') VDATE,
+        to_char(PAYHSRCSECINFO.MDATE,'yyyy-MM-dd') MDATE,
+        PAYHSRCSECINFO.ISSUEAMT/100000000 ISSUEAMT,
+        CUSTOMER_INFO1.CUSTOMER_NAME issuerName,
+        PAYHSRCSECINFO.SECTYPE,
+        PAYHSRCSECINFO.SECTYPE2,
+        CASE PAYHSRCSECINFO.ISSUETYPE WHEN '01' THEN '1' ELSE '2' END AS ISSUETYPE,
+        PAYHSRCSECINFO.BLNAREA,
+        PAYHSRCSECINFO.ISSUS,
+        PAYHSRCSECINFO.ISSECBOND,
+        PAYHSRCSECINFO.CITY_INVEST_SEC_CHB CITYINVESTSECWIND,
+        PAYHSRCSECINFO.CCY,
+        PAYHSRCSECINFO.FACEVALUE,
+        PAYHSRCSECINFO.GUARANTOR,
+        PAYHSRCSECINFO.GUARTYPE,
+        CASE WHEN ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y' ) THEN 'Y' ELSE 'N' END AS
+        IS_RIGHT,
+        PAYHSRCSECINFO.REMARK,
+        PAYHSRCSECINFO.COUPONSPECIES,
+        PAYHSRCSECINFO.INTERESTRATE,
+        PAYHSRCSECINFO.PAPERIR,
+        PAYHSRCSECINFO.SPREADRATE_8 SPREADRATE8,
+        PAYHSRCSECINFO.RATECODE,
+        PAYHSRCSECINFO.COEFFICIENT,
+        PAYHSRCSECINFO.TOPRATE,
+        PAYHSRCSECINFO.BOTTOMRATE,
+        PAYHSRCSECINFO.RESETTYPE,
+        PAYHSRCSECINFO.OBSERVEBEFDAY,
+        PAYHSRCSECINFO.OBSERVEBEFUNIT,
+        CASE WHEN ( PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' OR PAYHSRCSECINFO.PUTOPTION = 'A_B_DAY' ) THEN
+        'A/A' ELSE PAYHSRCSECINFO.RATEBASIC END AS RATEBASIC,
+        CASE WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' THEN '02' WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN
+        '01' END AS BASISSTYLE,
+        PAYHSRCSECINFO.WORKDAYRULE,
+        PAYHSRCSECINFO.PAYCYCLE,
+        PAYHSRCSECINFO.SCHECALRULE,
+        PAYHSRCSECINFO.FIRSTRATEDAY,
+        PAYHSRCSECOPTION.OPTIONTYPE,
+        PAYHSRCSECOPTION.THEORYOPTIONPAYDAY,
+
+        PAYHSRCSECRATING.RATING ztGradeResult,
+        PAYHSRCSECRATING.RATINGORG ztGradeOrgId,
+        PAYHSRCSECRATING2.RATING zxGradeResult,
+        PAYHSRCSECRATING2.RATINGORG zxGradeOrgId,
+        PAYHSRCSECINFO.IS_GREEN_BOND,
+        to_char(PAYHSRCSECINFO.DELISTING_DATE,'yyyy-MM-dd') DELISTINGDATE,
+        PAYHSRCSECINFO.CROSS_MARKET_CODE,
+        PAYHSRCSECINFO.FIRST_RATE_DETERMINATION_DATE firstConfirmDate
+        FROM
+        INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+        LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO1 ON PAYHSRCSECINFO.ISSUERSHORT = CUSTOMER_INFO1.CUSTOMER_ID
+        LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO2 ON CUSTOMER_INFO1.CUSTOMER_ID = PAYHSRCSECINFO.GUARANTOR
+        LEFT JOIN ( SELECT SECID, OPTIONTYPE, THEORYOPTIONPAYDAY FROM ( SELECT ROW_NUMBER ( ) OVER ( PARTITION BY
+        PAYHSRCSECOPTION.SECID ORDER BY PAYHSRCSECOPTION.THEORYOPTIONPAYDAY DESC )
+        NUM, SECID, OPTIONTYPE, THEORYOPTIONPAYDAY FROM INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION WHERE
+        PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ > ]]> to_date( #{platformDate}, 'YYYY-MM-DD' )
+        ) WHERE NUM = 1 ) PAYHSRCSECOPTION ON PAYHSRCSECOPTION.SECID = PAYHSRCSECINFO.SECID
+        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM
+        INTERF_PAYHSRCSECRATING WHERE ratingtype='C') PAYHSRCSECRATING ON PAYHSRCSECRATING.SECID = PAYHSRCSECINFO.SECID
+        AND PAYHSRCSECRATING.NUM = 1
+        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM
+        INTERF_PAYHSRCSECRATING WHERE ratingtype='I') PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID =
+        PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING2.NUM = 1
+        left join SYS_DATADICT_LIST sdl_tp on PAYHSRCSECINFO.MARKET = sdl_tp.ITEM_CODE and
+        sdl_tp.DICT_CODE='TRADE_PLACE'
+        left join SYS_DATADICT_LIST sdl_ro on PAYHSRCSECINFO.ISSUEPRICE = sdl_ro.ITEM_CODE and
+        sdl_ro.DICT_CODE='REGIST_ORG'
+        left join SYS_DATADICT_LIST sdl_catt on PAYHSRCSECINFO.SECTYPE = sdl_catt.ITEM_CODE and
+        sdl_catt.DICT_CODE='WINDTYPEONE'
+        left join SYS_DATADICT_LIST sdl_catth on PAYHSRCSECINFO.SECTYPE2 = sdl_catth.ITEM_CODE and
+        sdl_catth.DICT_CODE='WINDTYPETWO'
+        left join SYS_DATADICT_LIST sdl_cs on PAYHSRCSECINFO.COUPONSPECIES = sdl_cs.ITEM_CODE and
+        sdl_cs.DICT_CODE='COUPON_SPECIES'
+        left join SYS_DATADICT_LIST sdl_it on PAYHSRCSECINFO.INTERESTRATE = sdl_it.ITEM_CODE and
+        sdl_it.DICT_CODE='INT_TYPE'
+        left join SYS_DATADICT_LIST sdl_fu on PAYHSRCSECINFO.payCycle = sdl_fu.ITEM_CODE and
+        sdl_fu.DICT_CODE='FREQUENCY_UNIT'
+        left join SYS_DATADICT_LIST sdl_sd on PAYHSRCSECINFO.RATECODE = sdl_sd.ITEM_CODE and
+        sdl_sd.DICT_CODE='SECRATE_DATA'
+        left join SYS_DATADICT_LIST sdl_em on PAYHSRCSECOPTION.OPTIONTYPE = sdl_em.ITEM_CODE and
+        sdl_em.DICT_CODE='EXEC_MODE'
+        left join SYS_DATADICT_LIST sdl_is on PAYHSRCSECINFO.ISSUS = sdl_is.ITEM_CODE and sdl_is.DICT_CODE='YES_OR_NO'
+        left join SYS_DATADICT_LIST sdl_isb on PAYHSRCSECINFO.ISSECBOND=sdl_isb.ITEM_CODE and
+        sdl_isb.DICT_CODE='YES_OR_NO'
+        left join SYS_DATADICT_LIST sdl_yo on PAYHSRCSECINFO.CITY_INVEST_SEC_CHB = sdl_yo.ITEM_CODE and
+        sdl_yo.DICT_CODE='YES_OR_NO'
+        left join SYS_DATADICT_LIST sdl_ccy on PAYHSRCSECINFO.ccy=sdl_ccy.ITEM_CODE and sdl_ccy.DICT_CODE='CCY'
+        left join SYS_DATADICT_LIST sdl_rt on PAYHSRCSECINFO.ISSUETYPE = sdl_rt.ITEM_CODE and
+        sdl_rt.DICT_CODE='RAISE_TYPE'
+        left join SYS_DATADICT_LIST sdl_ba on PAYHSRCSECINFO.BLNAREA = sdl_ba.ITEM_CODE and sdl_ba.DICT_CODE='BLN_AREA'
+        left join SYS_DATADICT_LIST sdl_sgt on PAYHSRCSECINFO.GUARTYPE = sdl_sgt.ITEM_CODE and
+        sdl_sgt.DICT_CODE='SVR_GUA_TYPE'
+
+        <where>
+            PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]> to_date ( #{platformDate}, 'YYYY-MM-DD' )
+
+            <if test="secId !=null and secId !=''">
+                AND PAYHSRCSECINFO.SECID = #{secId,jdbcType=VARCHAR}
+            </if>
+
+            <if test="market !=null and market !=''">
+                AND PAYHSRCSECINFO.MARKET = #{market,jdbcType=VARCHAR}
+            </if>
+
+            <if test="secTypes != null and secTypes.size() > 0">
+                AND PAYHSRCSECINFO.SECTYPE in
+                <foreach collection="secTypes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="secType2s != null and secType2s.size() > 0">
+                AND PAYHSRCSECINFO.SECTYPE2 in
+                <foreach collection="secType2s" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="institution !=null and institution !=''">
+                AND PAYHSRCSECINFO.institution = #{institution,jdbcType=VARCHAR}
+            </if>
+
+            <if test="issuer !=null and issuer !=''">
+                AND PAYHSRCSECINFO.ISSUERSHORT = #{issuer,jdbcType=VARCHAR}
+            </if>
+
+            <if test="issueDateStart != null">
+                AND PAYHSRCSECINFO.PUBENDDATE >= #{issueDateStart,jdbcType=DATE}
+            </if>
+
+            <if test="issueDateEnd != null">
+                AND PAYHSRCSECINFO.PUBENDDATE <![CDATA[ <= ]]> #{issueDateEnd,jdbcType=DATE}
+            </if>
+
+            <if test="vdateStart != null">
+                AND PAYHSRCSECINFO.VDATE >= #{vdateStart,jdbcType=DATE}
+            </if>
+
+            <if test="vdateEnd != null">
+                AND PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
+            </if>
+
+            <if test="mdateStart != null">
+                AND PAYHSRCSECINFO.MDATE >= #{mdateStart,jdbcType=DATE}
+            </if>
+
+            <if test="mdateEnd != null">
+                AND PAYHSRCSECINFO.MDATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
+            </if>
+
+            <if test="theOryOptionPayDayStart != null">
+                AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY >= #{theOryOptionPayDayStart,jdbcType=DATE}
+            </if>
+
+            <if test="theOryOptionPayDayEnd != null">
+                AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ <=]]> #{theOryOptionPayDayEnd,jdbcType=DATE}
+            </if>
+
+            <if test="couponSpecies !=null and couponSpecies !=''">
+                AND PAYHSRCSECINFO.COUPONSPECIES = #{couponSpecies,jdbcType=VARCHAR}
+            </if>
+
+            <if test="interestRate !=null and interestRate !=''">
+                AND PAYHSRCSECINFO.INTERESTRATE = #{interestRate,jdbcType=VARCHAR}
+            </if>
+
+            <if test="payCycle !=null and payCycle !=''">
+                AND PAYHSRCSECINFO.PAYCYCLE = #{payCycle,jdbcType=VARCHAR}
+            </if>
+
+            <if test="ccy !=null and ccy !=''">
+                AND PAYHSRCSECINFO.CCY = #{ccy,jdbcType=VARCHAR}
+            </if>
+
+            <if test="isSus !=null and isSus !=''">
+                AND PAYHSRCSECINFO.ISSUS = #{isSus,jdbcType=VARCHAR}
+            </if>
+
+            <if test='isRight !=null and isRight !="" and isRight == "Y"'>
+                AND ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y')
+            </if>
+
+            <if test='isRight !=null and isRight !="" and isRight == "N"'>
+                AND ( PAYHSRCSECINFO.CALLOPTION = 'N' AND PAYHSRCSECINFO.PUTOPTION = 'N')
+            </if>
+
+            <if test="optionType !=null and optionType !=''">
+                AND PAYHSRCSECOPTION.OPTIONTYPE = #{optionType,jdbcType=VARCHAR}
+            </if>
+
+            <if test="zxGrade !=null and zxGrade !=''">
+                AND PAYHSRCSECRATING2.RATING in (#{zxGrade,jdbcType=VARCHAR})
+            </if>
+
+            <if test="ztGrade !=null and ztGrade !=''">
+                AND PAYHSRCSECRATING.RATING in (#{ztGrade,jdbcType=VARCHAR})
+            </if>
+
+            <if test="search !=null and search !=''">
+                AND (
+                PAYHSRCSECINFO.SECID like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.SECNAME like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.SECFULLNAME like '%' || #{search} || '%' OR
+                CUSTOMER_INFO1.CUSTOMER_NAME like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.SECCODE like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.MARKET like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.INSTITUTION like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.ISSUERSHORT like '%' || #{search} || '%' OR
+                to_char(PAYHSRCSECINFO.PUBENDDATE,'yyyy-MM-dd') = #{search} OR
+                to_char(PAYHSRCSECINFO.VDATE,'yyyy-MM-dd') = #{search} OR
+                to_char(PAYHSRCSECINFO.MDATE,'yyyy-MM-dd') = #{search} OR
+                to_char(PAYHSRCSECOPTION.THEORYOPTIONPAYDAY,'yyyy-MM-dd') = #{search} OR
+                PAYHSRCSECINFO.COUPONSPECIES like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.INTERESTRATE like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.PAYCYCLE like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.CCY like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.ISSUS like '%' || #{search} || '%' OR
+                PAYHSRCSECOPTION.OPTIONTYPE like '%' || #{search} || '%' OR
+                PAYHSRCSECRATING2.RATING like '%' || #{search} || '%' OR
+                PAYHSRCSECRATING.RATING like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.RATEBASIC like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.GUARANTOR like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.GUARTYPE like '%' || #{search} || '%' OR
+                TO_CHAR(PAYHSRCSECINFO.ISSUEPRICE, 'fm99999999999990.0000') ||''= #{search} OR
+                TO_CHAR(PAYHSRCSECINFO.ISSUEAMT/100000000, 'fm99999999999990.00') ||''= #{search} OR
+                TO_CHAR(PAYHSRCSECINFO.PAPERIR, 'fm99999999999990.0000') ||''= #{search} OR
+                TO_CHAR(PAYHSRCSECINFO.FACEVALUE, 'fm99999999999990.0000') ||''= #{search} OR
+                TO_CHAR(PAYHSRCSECINFO.SPREADRATE_8, 'fm99999999999990.00') ||''= #{search} OR
+                sdl_tp.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_ro.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_catt.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_catth.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_cs.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_it.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_fu.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_sd.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_em.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_is.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_isb.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_yo.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_ccy.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_rt.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_ba.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl_sgt.ITEM_VALUE like '%' || #{search} || '%'
+
+                )
+            </if>
+        </where>
+        ORDER BY
+        PAYHSRCSECINFO.SECTYPE,
+        PAYHSRCSECINFO.SECTYPE2,
+        PAYHSRCSECINFO.VDATE,
+        PAYHSRCSECINFO.SECID
+    </select>
+
+    <select id="queryForAddCoupons"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto"
+            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest">
+        SELECT
+        PAYHSRCSECINFO.SECID,
+        PAYHSRCSECINFO.SECNAME,
+        PAYHSRCSECINFO.SECFULLNAME,
+        PAYHSRCSECINFO.SECCODE,
+        PAYHSRCSECINFO.MARKET,
+        PAYHSRCSECINFO.INSTITUTION,
+        PAYHSRCSECINFO.ISSUEPRICE,
+        PAYHSRCSECINFO.PUBENDDATE,
+        PAYHSRCSECINFO.VDATE,
+        PAYHSRCSECINFO.MDATE,
+        PAYHSRCSECINFO.ISSUEAMT/100000000 ISSUEAMT,
+        CUSTOMER_INFO1.CUSTOMER_NAME issuerName,
+        PAYHSRCSECINFO.SECTYPE,
+        PAYHSRCSECINFO.SECTYPE2,
+        CASE
+        PAYHSRCSECINFO.ISSUETYPE
+        WHEN '01' THEN
+        '1' ELSE '2'
+        END AS ISSUETYPE,
+        PAYHSRCSECINFO.BLNAREA,
+        PAYHSRCSECINFO.ISSUS,
+        PAYHSRCSECINFO.ISSECBOND,
+        PAYHSRCSECINFO.CITY_INVEST_SEC_CHB CITYINVESTSECWIND,
+        PAYHSRCSECINFO.CCY,
+        PAYHSRCSECINFO.FACEVALUE,
+        CUSTOMER_INFO2.CUSTOMER_NAME WARRANTOR,
+        PAYHSRCSECINFO.GUARTYPE,
+        CASE
+
+        WHEN ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y' ) THEN
+        'Y' ELSE 'N'
+        END AS IS_RIGHT,
+        PAYHSRCSECINFO.REMARK,
+        PAYHSRCSECINFO.COUPONSPECIES,
+        PAYHSRCSECINFO.INTERESTRATE,
+        PAYHSRCSECINFO.PAPERIR,
+        PAYHSRCSECINFO.SPREADRATE_8 SPREADRATE8,
+        PAYHSRCSECINFO.RATECODE,
+        PAYHSRCSECINFO.COEFFICIENT,
+        PAYHSRCSECINFO.TOPRATE,
+        PAYHSRCSECINFO.BOTTOMRATE,
+        PAYHSRCSECINFO.RESETTYPE,
+        PAYHSRCSECINFO.OBSERVEBEFDAY,
+        PAYHSRCSECINFO.OBSERVEBEFUNIT,
+        CASE
+
+        WHEN ( PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' OR PAYHSRCSECINFO.PUTOPTION = 'A_B_DAY' ) THEN
+        'A/A' ELSE PAYHSRCSECINFO.RATEBASIC
+        END AS RATEBASIC,
+        CASE
+
+        WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' THEN
+        '02'
+        WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN
+        '01'
+        END AS BASISSTYLE,
+        PAYHSRCSECINFO.WORKDAYRULE,
+        PAYHSRCSECINFO.PAYCYCLE,
+        PAYHSRCSECINFO.SCHECALRULE,
+        PAYHSRCSECINFO.FIRSTRATEDAY
+        FROM
+        INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+        LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO1 ON PAYHSRCSECINFO.ISSUERSHORT = CUSTOMER_INFO1.CUSTOMER_ID
+        LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO2 ON CUSTOMER_INFO1.CUSTOMER_ID = PAYHSRCSECINFO.GUARANTOR
+        LEFT JOIN INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION ON PAYHSRCSECOPTION.SECID = PAYHSRCSECINFO.SECID
+        LEFT JOIN INTERF_PAYHSRCSECRATING PAYHSRCSECRATING ON PAYHSRCSECRATING.SECID = PAYHSRCSECINFO.SECID AND
+        PAYHSRCSECRATING.ratingtype = 'C'
+        LEFT JOIN INTERF_PAYHSRCSECRATING PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID = PAYHSRCSECINFO.SECID AND
+        PAYHSRCSECRATING2.ratingtype = 'I'
+        <where>
+            PAYHSRCSECINFO.VDATE <![CDATA[<=]]> to_date ( #{iplatformDate}, 'YYYY-MM-DD' )
+
+            <if test="secId !=null and secId !=''">
+                AND PAYHSRCSECINFO.SECID = #{secId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+
+    <!-- 债券付息计划信息 -->
+    <select id="queryFinBondMarketCashPlan"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto"
+            parameterType="Map">
+        select
+        SECID,
+        SCHEDUTYPE,
+        TOTALINTERESTSTARTDAY,
+        TOTALINTERESTENDDAY,
+        INTERESTSTARTDAY,
+        INTERESTENDDAY,
+        INTERESTPAYDAY,
+        COUPONRATE,
+        ACCRUEINTAMT,
+        DAILYACCRUEINT,
+        PRINAMTPAY,
+        CASHPAY cashAmt,
+        PRINAMT,
+        SOURCE
+        from
+        INTERF_PAYHSRCSECSCHEDULE
+        where SECID = #{secId,jdbcType=VARCHAR}
+        <if test="maxTradeDate != null">
+            AND INTERESTSTARTDAY >= #{maxTradeDate,jdbcType=VARCHAR}
+        </if>
+
+        <if test="scheduTypeList != null and scheduTypeList.size()>0">
+            and SCHEDUTYPE in (
+            <foreach item="item" index="index" collection="scheduTypeList" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        ORDER BY INTERESTPAYDAY ASC
+    </select>
+
+    <select id="queryFinBondPayHSrcSecOption"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto">
+        select SECID,
+               OPTIONSTARTDAY,
+               OPTIONENDDAY,
+               OPTIONPAYDAY,
+               THEORYOPTIONPAYDAY,
+               OPTIONPRICE,
+               OPTIONTYPE,
+               OPTIONCLAUSE,
+               '01' OPTIONSTATUS
+        from INTERF_PAYHSRCSECOPTION
+        where SECID = #{secId,jdbcType=VARCHAR}
+        ORDER BY THEORYOPTIONPAYDAY ASC
+    </select>
+
+    <select id="queryFinBondMarketForCoupons"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto"
+            parameterType="Map">
+        SELECT PAYHSRCSECINFO.SECID,
+               PAYHSRCSECINFO.SECNAME,
+               PAYHSRCSECINFO.SECFULLNAME,
+               PAYHSRCSECINFO.SECCODE,
+               PAYHSRCSECINFO.MARKET,
+               PAYHSRCSECINFO.INSTITUTION,
+               PAYHSRCSECINFO.INSTITUTIONTEXT,
+               PAYHSRCSECINFO.ISSUEPRICE,
+               PAYHSRCSECINFO.PUBENDDATE,
+               PAYHSRCSECINFO.VDATE,
+               PAYHSRCSECINFO.MDATE,
+               PAYHSRCSECINFO.DELISTING_DATE,
+               PAYHSRCSECINFO.CALLOPTION,
+               PAYHSRCSECINFO.PUTOPTION,
+               MARKET_INFO.MARKET_AMT,
+               MARKET_INFO.VALUE_DATE,
+               PAYHSRCSECINFO.ISSUEAMT/100000000            ISSUEAMT,
+               PAYHSRCSECINFO.ISSUERSHORT                   issuer,
+               CUSTOMER_INFO1.CUSTOMER_NAME                 issuerName,
+               PAYHSRCSECINFO.SECTYPE                       primaryClassification,
+               PAYHSRCSECINFO.SECTYPE2                      secondaryClassification,
+               TYPE_CONFIG.INPUT_VALUE_2                    SECTYPE,
+               TYPE_CONFIG.INPUT_VALUE_3                    SECTYPE2,
+               TYPE_CONFIG.INPUT_VALUE_4                    SECTYPE3,
+               CASE
+                   PAYHSRCSECINFO.ISSUETYPE
+                   WHEN '01' THEN
+                       '1'
+                   ELSE '2'
+                   END AS                                   ISSUETYPE,
+               PAYHSRCSECINFO.BLNAREA,
+               PAYHSRCSECINFO.FACEVALUE,
+               PAYHSRCSECINFO.ISSUS,
+               CASE
+
+                   WHEN (PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y') THEN
+                       'Y'
+                   ELSE 'N'
+                   END AS                                   ISRIGHT,
+               'Y'                                          ISAUTOUPDATE,
+               PAYHSRCSECINFO.IS_NETPRICE,
+               PAYHSRCSECINFO.CCY,
+               PAYHSRCSECINFO.GUARTYPE,
+               PAYHSRCSECINFO.GUARANTOR,
+               PAYHSRCSECINFO.CITY_INVEST_SEC_WIND,
+               PAYHSRCSECINFO.CITY_INVEST_SEC_CHB,
+               PAYHSRCSECINFO.IS_GREEN_BOND,
+               PAYHSRCSECINFO.ISSECBOND,
+               PAYHSRCSECINFO.CROSS_MARKET_CODE,
+               PAYHSRCSECINFO.REMARK,
+               --转债信息
+               PAYHSRCSECINFO.CON_FINPROD_ID,
+               PAYHSRCSECINFO.CON_SHARE_ID,
+               PRODUCT.FINPROD_ABBR                         SHARENAME,
+               PAYHSRCSECINFO.CON_VDATE,
+               PAYHSRCSECINFO.CON_PRICE,
+               PAYHSRCSECINFO.RESALE_PRICE,
+               PAYHSRCSECINFO.REDEEM_PRICE,
+               --计息要素
+               PAYHSRCSECINFO.COUPONSPECIES,
+               PAYHSRCSECINFO.INTERESTRATE,
+               PAYHSRCSECINFO.PAPERIR,
+               PAYHSRCSECINFO.BASE_RATE_ACCURACY,
+               PAYHSRCSECINFO.RATECODE,
+               PAYHSRCSECINFO.COEFFICIENT,
+               PAYHSRCSECINFO.SPREADRATE_8                  SPREADRATE8,
+               PAYHSRCSECINFO.TOPRATE,
+               PAYHSRCSECINFO.BOTTOMRATE,
+               PAYHSRCSECINFO.RESETTYPE,
+               PAYHSRCSECINFO.OBSERVEBEFDAY,
+               PAYHSRCSECINFO.OBSERVEBEFUNIT,
+               PAYHSRCSECINFO.FIRST_RATE_DETERMINATION_DATE firstConfirmDate,
+               CASE
+
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/365' THEN
+                       'A/365'
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/360' THEN
+                       'A/360'
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/365F' THEN
+                       'A/365F'
+                   WHEN PAYHSRCSECINFO.RATEBASIC = '30/360' THEN
+                       '30/360'
+                   WHEN (PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' OR PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY') THEN
+                       'A/A'
+                   ELSE NULL
+                   END AS                                   RATEBASIC,
+               CASE
+
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' THEN
+                       '02'
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN
+                       '01'
+                   ELSE NULL
+                   END AS                                   basisStyle,
+               PAYHSRCSECINFO.FIRSTRATEDAY,
+               PAYHSRCSECINFO.SCHECALRULE,
+               PAYHSRCSECINFO.PAYCYCLE,
+               PAYHSRCSECINFO.WORKDAYRULE,
+               PAYHSRCSECINFO.REMARK,
+               PAYHSRCSECINFO.PAPERIR yield,
+               'Y' ISWIND
+        FROM INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+                 LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO1
+                           ON PAYHSRCSECINFO.ISSUERSHORT = CUSTOMER_INFO1.CUSTOMER_ID
+                 LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO2 ON CUSTOMER_INFO1.CUSTOMER_ID = PAYHSRCSECINFO.GUARANTOR
+                 LEFT JOIN FIN_PRODUCT PRODUCT ON PRODUCT.FINPROD_MARKET_ID = PAYHSRCSECINFO.CON_FINPROD_ID AND
+                                                  PRODUCT.FINPROD_TYPE2 = 'F10'
+                 LEFT JOIN FIN_PRODUCT_TYPE_CONFIG TYPE_CONFIG on PAYHSRCSECINFO.SECTYPE = TYPE_CONFIG.OUTPUT_VALUE_1
+            AND (TYPE_CONFIG.OUTPUT_VALUE_2 is null or PAYHSRCSECINFO.SECTYPE2 = TYPE_CONFIG.OUTPUT_VALUE_2) AND
+                                                                  TYPE_CONFIG.CONFIG_TYPE = 'WINDTWO_TG_TYPE'
+                 LEFT JOIN MST_BOND_MARKET_INFO MARKET_INFO ON MARKET_INFO.SEC_ID = PAYHSRCSECINFO.SECID AND
+                                                               MARKET_INFO.VALUE_DATE <![CDATA[<=]]>
+                                                               TO_DATE(#{platformDate}, 'YYYY-MM-DD')
+        WHERE PAYHSRCSECINFO.SECID = #{secId, jdbcType = VARCHAR}
+          and rownum = 1
+    </select>
+
+    <select id="queryFinProductForCoupons"
+            parameterType="Map"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto">
+        SELECT
+        T1.FINPROD_ID secId,
+        T1.FINPROD_MARKET_ID secCode,
+        T1.FINPROD_NAME secFullName,
+        T1.FINPROD_ABBR secName,
+        T1.TRADE_MARKET market,
+        T1.REGIST_ORG institution,
+        T1.ISSUE_PRICE,
+        T1.IDATE pubendDate,
+        T1.VDATE VDATE,
+        T1.MDATE MDATE,
+        T1.DELISTING_DATE,
+        NVl(T1.ISSUE_AMT,0)/100000000 issueAmt,
+        T1.ISSUER,
+        T8.CUSTOMER_NAME issuerName,
+        T3.TYPE_9 secType,
+        T3.TYPE_10 secType2,
+        T3.TYPE_11 secType3,
+        T1.ISSUE_TYPE issueType,
+        T1.BLN_AREA blnArea,
+        T1.IS_SUS issus,
+        T1.IS_RIGHT isRight,
+        T2.IS_ALLOW_OVERWRITE isAutoUpdate,
+        T2.IS_NETPRICE isNetprice,
+        T2.IS_NO_GUARD isNoGuard,
+        T1.CCY CCY,
+        T1.CAPI_INCOME_FEATURE capiIncomeFeature,
+        T2.CONCEPT_TYPE conceptTypes,
+        T2.CROSS_MARKET_CODE crossMarketCode,
+        T1.SUSTAINABLE_REMARK remark,
+        T5.CON_FINPROD_ID conFinprodId,
+        T6.FINPROD_ABBR conFinprodName,
+        T5.CON_VDATE conVdate,
+        T5.CON_PRICE conPrice,
+        100/T5.CON_PRICE conProportion,
+        T5.RESALE_PRICE resalePrice,
+        T5.REDEEM_PRICE redeemPrice,
+        T1.COUPON_SPECIES couponSpecies,
+        T12.CALC_TYPE interestRate,
+        T12.YIELD YIELD,
+        T16.BENCHMARK_ID_ACCURACY baseRateAccuracy,
+        T16.BENCHMARK_ID rateCode,
+        T16.COEFFICIENT coefficient,
+        T16.SPREAD_RATE spreadRate8,
+        T16.HIGHEST_RATE toprate,
+        T16.LOWEST_RATE bottomrate,
+        T16.RESET_TYPE resetType,
+        T16.OBSERVE_BEF_DAY observeBefDay,
+        T16.OBSERVE_BEF_UNIT observeBefUnit,
+        T16.FIRST_CONFIRM_DATE firstConfirmDate,
+        T1.REMARK REMARK,
+        NVL(T4.CIRCULATION_DATE,T7.LISTING_DATE) listingDate,
+        T10.CASH_ID basisStyle,
+        T11.CASH_ID principalCashId,
+        T13.PAY_CYCLE payCycle,
+        T13.PAY_TDAY_RULE workDayRule,
+        T13.CALC_RULE schecalRule,
+        T13.FIRST_PAY_DATE firstRateDay,
+        T2.IS_SEC_BOND isSecBond,
+        T2.GUA_TYPE guarType,
+        T2.ORIGINAL_OWNER originalOwner,
+        T1.SPONSOR guarantor,
+        Case when T12.BASIS = 'A/A_B_COUP' THEN 'A/A'
+        when T12.BASIS = 'A/A_B_DAY' THEN 'A/A'
+        else T12.BASIS END  ratebasic,
+        Case when T12.MARKET_BASIS = 'A/A_B_COUP' THEN 'A/A'
+        when T12.MARKET_BASIS = 'A/A_B_DAY' THEN 'A/A'
+        else T12.MARKET_BASIS END  marketBasis
+        FROM FIN_PRODUCT T1
+        LEFT JOIN FIN_PRODUCT_ADD T2 ON T2.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE T3 ON T3.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT T4 ON T4.CIRCULATION_CODE = T1.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD T7 ON T7.FINPROD_ID = T4.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_CONVERTIBLE T5 ON T5.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT T6 ON T5.CON_FINPROD_ID = T6.FINPROD_ID AND T6.FINPROD_TYPE2=#{FINPROD_TYPE2_F10}
+        LEFT JOIN MST_CUSTOMER_INFO T8 ON T8.CUSTOMER_ID = T1.ISSUER
+        LEFT JOIN MST_CUSTOMER_INFO_ADD T9 ON T9.CUSTOMER_ID = T8.CUSTOMER_ID
+        LEFT JOIN FIN_CASH_INFO T10 ON T10.FINPROD_ID = T1.FINPROD_ID AND T10.FINPROD_TYPE =
+        #{FIN_CASH_BUSINESS_TYPE_01} AND T10.BRANCH = 0 AND T10.CASH_TYPE_1 = #{CASH_TYPE_1_02} AND T10.CASH_TYPE_2 =
+        #{CASH_TYPE_2_C02}
+        LEFT JOIN FIN_CASH_INFO T11 ON T11.FINPROD_ID = T1.FINPROD_ID AND T11.FINPROD_TYPE =
+        #{FIN_CASH_BUSINESS_TYPE_01} AND T11.BRANCH = 0 AND T11.CASH_TYPE_1 = #{CASH_TYPE_1_01} AND T11.CASH_TYPE_2 =
+        #{CASH_TYPE_2_C01}
+        LEFT JOIN FIN_CASH_CALC_RULE T12 ON T12.FINPROD_ID = T1.FINPROD_ID AND T12.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+        AND T12.FINPROD_TYPE2 = #{FINPROD_TYPE_F01} AND T12.BRANCH = 0 AND T12.CASH_ID = T10.CASH_ID AND T12.IS_INITIAL
+        = 'Y'
+        LEFT JOIN FIN_CASH_PAY_RULE T13 ON T13.FINPROD_ID = T1.FINPROD_ID AND T13.FINPROD_TYPE = #{FINPROD_TYPE_F01} AND
+        T13.FINPROD_TYPE2 = #{FINPROD_TYPE_F01} AND T13.BRANCH = 0 AND T13.CASH_ID = T10.CASH_ID
+        LEFT JOIN FIN_RATE_INFO T16 ON T16.FINPROD_ID = T1.FINPROD_ID AND T16.FINPROD_TYPE = #{FINPROD_TYPE_F01} AND
+        T16.FINPROD_TYPE2 = #{FINPROD_TYPE_F01} AND T16.BRANCH = 0 AND T16.CASH_ID = T10.CASH_ID
+        <where>
+            <if test="secId != null and secId != ''">
+                ( T1.FINPROD_ID = #{secId}
+                OR T1.FINPROD_MARKET_ID = #{secId})
+                AND T1.FINPROD_TYPE2=#{finprodType}
+                AND T1.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+            </if>
+        </where>
+    </select>
+
+    <select id="getAssetId" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        SECID id,
+        SECNAME text,
+        SECNAME object,
+        SECID parentId
+        FROM INTERF_PAYHSRCSECINFO
+        <where>
+            <if test="search != null and search != ''">
+                and (SECID like concat(concat('%',#{search}),'%')
+                or SECNAME like concat(concat('%',#{search}),'%')
+                or SECFULLNAME like concat(concat('%',#{search}),'%')
+                )
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectInvScheduleList"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto">
+        SELECT VDATE        intereststartday,
+               MDATE        interestendday,
+               PAY_DATE     interestpayday,
+               RANGE_YIELD  couponrate,
+               INT_PRIN_AMT prinamt,
+               INT_AMT      accrueintamt,
+               BASIS        basis,
+               PRIN_AMT     prinAmt,
+               CASH_AMT     cashAmt
+        from FIN_CASH_PLAN fcp
+        WHERE fcp.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+          AND fcp.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+          AND fcp.BRANCH = 0
+          AND fcp.CASH_ID = #{cashId}
+    </select>
+
+
+    <select id="selectFinExercisePlanList"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto">
+        SELECT EXERCISE_STATUS   optionStatus,
+               VDATE             optionStartDay,
+               MDATE             optionEndDay,
+               EXERCISE_TYPE     optionType,
+               EXERCISE_DATE     theOryOptionPayDay,
+               ACT_EXERCISE_DATE optionPayDay,
+               EXERCISE_PRICE    optionPrice,
+               EXERCISE_REMARK   optionClause
+        from FIN_EXERCISE_PLAN fep
+        WHERE fep.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+          AND fep.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+          AND fep.BRANCH = 0
+          AND fep.CASH_ID = #{cashId}
+    </select>
+</mapper>

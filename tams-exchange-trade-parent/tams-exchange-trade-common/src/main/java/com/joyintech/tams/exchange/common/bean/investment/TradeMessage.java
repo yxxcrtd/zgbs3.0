@@ -1,14 +1,18 @@
 package com.joyintech.tams.exchange.common.bean.investment;
 
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
+import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
+import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 
 
-public class TradeMessage implements Cloneable, Serializable {
+public class TradeMessage extends BasicMessage {
     private static final long serialVersionUID = -7909494233501258978L;
     private String entrustId;       // 委托代码
     private String orderId;         // 订单代码
@@ -36,6 +40,14 @@ public class TradeMessage implements Cloneable, Serializable {
     private String busiType;        // 业务类型（手工交收用）
     private String counterId;     // 交易对手
     private BigDecimal pledgeRatio;     // 折算比例%
+    private Double entrustVolume;      // 委托数量
+    private String propAcctNo; //对手资金账户
+
+
+    /**
+     * 下单组合明细数据消息
+     */
+    private List<PortfolioTradeMessage> portfolioTradeMessages;
 
     public String getEntrustId() {
         return entrustId;
@@ -245,27 +257,65 @@ public class TradeMessage implements Cloneable, Serializable {
         this.pledgeRatio = pledgeRatio;
     }
 
+    public Double getEntrustVolume() {
+        return entrustVolume;
+    }
+
+    public void setEntrustVolume(Double entrustVolume) {
+        this.entrustVolume = entrustVolume;
+    }
+
+    public String getPropAcctNo() {
+        return propAcctNo;
+    }
+
+    public void setPropAcctNo(String propAcctNo) {
+        this.propAcctNo = propAcctNo;
+    }
+
+    public List<PortfolioTradeMessage> getPortfolioTradeMessages() {
+        return portfolioTradeMessages;
+    }
+
+    public void setPortfolioTradeMessages(List<PortfolioTradeMessage> portfolioTradeMessages) {
+        this.portfolioTradeMessages = portfolioTradeMessages;
+    }
+
     private static TradeMessage templateMessage = new TradeMessage();
 
-    public static TradeMessage createTradeMessage(Trade trade) {
+    public static TradeMessage createTradeMessage(Trade trade, EntrustInterface entrust) {
         TradeMessage tradeMessage;
         try {
             tradeMessage = (TradeMessage) templateMessage.clone();
+            tradeMessage.setId(trade.getId());
             tradeMessage.setEntrustId(trade.getInstructionId());
             tradeMessage.setOrderId(trade.getEntrustId());
             tradeMessage.setEntrustNo(trade.getBrokerEntrustId());
             tradeMessage.setDealNo(trade.getBrokerTradeId());
-            tradeMessage.setAcctNo(trade.getFinanceAccount());
+            tradeMessage.setAcctNo(entrust.getAccountId());
             tradeMessage.setFinprodMarketId(trade.getStockCode());
             tradeMessage.setDealVolume((double) trade.getTradedVolume());
             tradeMessage.setDealPrice(trade.getTradedPrice());
-            if (trade.getClearBalance() != null && trade.getClearBalance().compareTo(BigDecimal.ZERO) > 0) {
-                tradeMessage.setDealBalance(trade.getClearBalance());
-            } else {
-                tradeMessage.setDealBalance(trade.getTradedBalance());
-            }
+            tradeMessage.setDealBalance(trade.getTradedBalance());
             if (!BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 tradeMessage.setFullPrice(trade.getTradedVolume() > 0 ? TradeUtils.divide(trade.getTradedBalance(), trade.getTradedVolume(), 4).doubleValue() : 0);
+            }
+            if (Objects.nonNull(trade.getFullPrice()) && trade.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
+                tradeMessage.setFullPrice(trade.getFullPrice().doubleValue());
+            }
+            //协议回购
+            if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
+                //到期结算金额
+                tradeMessage.setDealBalance(entrust.getBackBalance());
+            } else if (InvestAssetTypeEnum.isBond(trade.getAssetType())
+                    && EntrustProp.isTrade(entrust.getEntrustProp())
+                    && Objects.nonNull(tradeMessage.getFullPrice())
+                    && tradeMessage.getFullPrice() != 0) {
+                //成交全价金额
+                tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
+            }else if(InvestAssetTypeEnum.isCreditProtectionCertificate(trade.getAssetType())) { //信用保护凭证
+                tradeMessage.setCounterId(trade.getCounterId());//交易对手
+                tradeMessage.setPropAcctNo(trade.getPropAcctNo());//对手资金账户
             }
             tradeMessage.setTradingDay(trade.getTradingDay());
         } catch (CloneNotSupportedException e) {

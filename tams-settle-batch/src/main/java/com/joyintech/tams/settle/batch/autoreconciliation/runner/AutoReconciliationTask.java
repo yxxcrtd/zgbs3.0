@@ -17,6 +17,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+/**
+ * 自动对账批处理
+ *
+ * @author fuyongsheng
+ * @see AutoReconciliationTask
+ * @since 1.0
+ */
 @Service("autoReconciliationTask")
 @Scope("prototype")
 public class AutoReconciliationTask extends BatchBaseService {

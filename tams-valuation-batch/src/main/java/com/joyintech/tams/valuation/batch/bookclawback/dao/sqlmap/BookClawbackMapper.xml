@@ -110,6 +110,10 @@
 				#{baseSubjectNature}
 			</foreach>
 		</if>
+		/**AND 账务明细（当前表）.科目号 =  (参数.科目号）**/
+		<if test="subjectNo != null and subjectNo != ''">
+			AND bc.SUBJECT_NO = #{subjectNo}
+		</if>
 		/**AND 账务明细（当前表）.场景代码 IN  (参数.list场景代码）**/
 		<if test="tableIdList != null and tableIdList.size > 0">
 			AND bc.TABLE_ID IN

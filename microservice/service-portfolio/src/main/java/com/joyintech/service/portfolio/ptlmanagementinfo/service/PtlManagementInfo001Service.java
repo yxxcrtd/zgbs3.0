@@ -10,14 +10,12 @@
 package com.joyintech.service.portfolio.ptlmanagementinfo.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.joyintech.tams.invest.common.asset.util.AssetCommonUtil;
+import com.joyintech.tams.invest.common.prodinfo.BussRuleService;
+import com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
@@ -28,6 +26,7 @@ import com.joyintech.tams.common.base.entity.FinOpenPlan;
 import com.joyintech.tams.common.base.entity.FinRateInfo;
 import com.joyintech.tams.common.base.entity.MstIntRateInfo;
 import com.joyintech.tams.invest.common.dto.mock.portfolio.MockPtlPortfolioDto;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -104,6 +103,9 @@ import com.joyintech.tams.invest.common.valuationinterf.dto.ProdOtherInfoInitInp
  */
 @Service("backPtlManagementInfo001Service")
 public class PtlManagementInfo001Service extends BaseService<PtlManagementInfoDto> {
+
+    @Autowired
+    private BussRuleService bussRuleService;
 
     // 注入组合微服务的Mapper
     /**
@@ -192,6 +194,9 @@ public class PtlManagementInfo001Service extends BaseService<PtlManagementInfoDt
 
     @Autowired
     private FinCashInfoMapper finCashInfoMapper;
+
+    @Autowired(required = false)
+    public IPlatformDate platformDate;
 
     /**
      * 插入操作
@@ -322,23 +327,31 @@ public class PtlManagementInfo001Service extends BaseService<PtlManagementInfoDt
     @Transactional(rollbackFor = Exception.class)
     public void relateAutoRuleIndicator(PtlManagementInfoDto entity){
         List<String> ptlRuleIdList =new ArrayList<>();
-        List<RskRulePoolConfig> ptlPoolList=ptlManagementInfo001Mapper.selectPtlRuleAll();
-        Map<String,List<RskRulePoolConfig>> ptlPoolMap=ptlPoolList.stream().collect(Collectors.groupingBy(RskRulePoolConfig::getRuleId));
+        List<IRskRulePoolConfig> ptlPoolList=ptlManagementInfo001Mapper.selectPtlRuleAll();
+        Map<String,List<IRskRulePoolConfig>> ptlPoolMap=ptlPoolList.stream().collect(Collectors.groupingBy(IRskRulePoolConfig::getRuleId));
         ptlPoolMap.keySet().forEach(key->{
+            List<String> portList =new ArrayList<>();
+            if(CommonUtil.isType(entity.getOpenType(),DictCodeList.开放类型_开放式)){
+                portList.add(entity.getPortfolioId());
+            }
             //按paramNum倒序排
-            List<RskRulePoolConfig> newPtlPoolList=ptlPoolMap.get(key).stream().sorted(Comparator.comparing(RskRulePoolConfig::getParamNum).reversed()).collect(Collectors.toList());
+            List<IRskRulePoolConfig> newPtlPoolList=ptlPoolMap.get(key).stream().sorted(Comparator.comparing(IRskRulePoolConfig::getParamNum).reversed()).collect(Collectors.toList());
             //系统内处理为（（A∪B）∩C）∪D，由外向内逐层处理
             String sqlWhere=StringUtil.EMPTY;
-            for(RskRulePoolConfig dto:newPtlPoolList){
-                String column= RiskUtil.getTableColumn(dto.getClassifyDimension());
-                sqlWhere=RiskUtil.getTableColumnSql(dto.getLinkSign(),column,dto.getClassifyDimensionVal(),sqlWhere);
+            for(IRskRulePoolConfig dto:newPtlPoolList){
+                //---流动性风险改造过滤开放周期 start---
+                sqlWhere=dto.getPoolSql(portList,sqlWhere);
+                //---流动性风险改造过滤开放周期 end---
             }
             //查询符合规则的组合
-            if(!StringUtil.isEmptyList(ptlManagementInfo001Mapper.getMatchPortData(sqlWhere,entity.getPortfolioId()))){
+            if(!StringUtil.isEmptyList(rskRuleCommonMapper.getMatchPortData(sqlWhere,entity.getPortfolioId(),DateUtil.format(StringUtil.isNotEmpty(platformDate.getSysDate()) ? platformDate.getSysDate() : new Date())))){
                 ptlRuleIdList.add(key);//说明当前这个规则符合这个组合的属性
             }
         });
         if (!StringUtil.isEmptyList(ptlRuleIdList)) {
+            //---流动性风险改造入规则关联组合表 start---
+            bussRuleService.insertRulePortList(Arrays.asList(entity.getPortfolioId()),ptlRuleIdList,()->Arrays.asList(entity.getPortfolioId()));
+            //---流动性风险改造入规则关联组合表 end---
             List<String> ruleIndList=ptlManagementInfo001Mapper.selectRuleRelInd(ptlRuleIdList);
             for (String indId : ruleIndList) {
                 RskPortfolioIndicator rskPortfolioIndicator = new RskPortfolioIndicator();
@@ -1024,6 +1037,10 @@ public class PtlManagementInfo001Service extends BaseService<PtlManagementInfoDt
         bussCommonMapperDelegateService.deleteByPrimaryKey(PtlValParamMapper.class, portfolioId);
         deleteUserId(portfolioId);
         deleteFinCashInfoByFinprodId(portfolioId);
+
+        //删除组合时同步删除银行间账户组合关系（IBU_PORTFOLIO_ACCT_RELA）
+        ptlManagementInfo001Mapper.deleteByPortfolioId(portfolioId);
+
         return "Success";
     }
 

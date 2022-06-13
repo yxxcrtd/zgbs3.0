@@ -356,7 +356,7 @@ public class TrdOutRightRepoValuationTrade003Dto extends BaseEntity implements P
         this.settFeeAmt = settFeeAmt;
     }
 
-    @NotEmpty(fieldName = "TrdOutRightRepoValuationTrade003.otherAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdOutRightRepoValuationTrade003.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }

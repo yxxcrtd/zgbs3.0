@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.constant.DictCodeListExt1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -109,7 +110,7 @@ public class RepDealSecSubjectTemplateRecService {
         return result;
     }
 
-    private Map<String, Object> handleValBotAstInfo(List<ValRepDealSecSubject> listValRepDealSecSubject) {
+    public Map<String, Object> handleValBotAstInfo(List<ValRepDealSecSubject> listValRepDealSecSubject) {
         Map<String, Object> result = new HashMap<>();
         // 定义 交易类金融产品List
         List<FinTradeProduct> listValTradeFinProduct = new ArrayList<FinTradeProduct>();
@@ -258,7 +259,6 @@ public class RepDealSecSubjectTemplateRecService {
         /**add by wujie on 20180822 start**/
         // 分类1 = A.资产类型
         valFinProductType.setType1(dto.getAssetClass());
-        
         // 分类2 = 调用共通方法查询核算分类
         FinProductClass fdto = new FinProductClass();
         //金融产品类型
@@ -278,6 +278,10 @@ public class RepDealSecSubjectTemplateRecService {
 
         /**add by wujie on 20180822 end**/
         valFinProductType.setBranch(InterfCommonConstant.分支序号_默认);
+        /**add by yinya on 2022-03-07 新会计引擎升级，科目体系需要区分回购类型，回购标的接口新增回购类型**/
+        valFinProductType.setType6(dto.getTargetBackType());
+        //保存SEC_TYPE
+        valFinProductType.setType18(DictCodeListExt1.证券品种_回购.getValue());
         return valFinProductType;
     }
 

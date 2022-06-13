@@ -401,6 +401,11 @@ public class TrdProductDeal extends BaseEntity {
      */
     private String entrustId;
 
+    /**
+     * 发行方式(暂时股票用)
+     */
+    private String issueType;
+
 
     public String getPortfolioId() {
         return portfolioId;
@@ -1646,5 +1651,28 @@ public class TrdProductDeal extends BaseEntity {
 
     public void setCancelDate(Date cancelDate) {
         this.cancelDate = cancelDate;
+    }
+
+    /*add by sunshuaishuai 20220323 交易界面：交易表添加资金账户 start*/
+    /**
+     * 资金账户
+     */
+    private String myAcctNo;
+
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+    /*add by sunshuaishuai 20220323 交易界面：交易表添加资金账户 end*/
+
+    public String getIssueType() {
+        return issueType;
+    }
+
+    public void setIssueType(String issueType) {
+        this.issueType = issueType;
     }
 }

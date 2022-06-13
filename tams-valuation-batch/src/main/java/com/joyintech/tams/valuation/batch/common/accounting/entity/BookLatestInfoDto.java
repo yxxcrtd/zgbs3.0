@@ -10,9 +10,9 @@
  
 package com.joyintech.tams.valuation.batch.common.accounting.entity;
 
-import java.util.Date;
-
 import com.joyintech.tams.common.base.entity.BokBookdetailCurrent;
+
+import java.util.Date;
 
 /**
  * 凭证最新账务查询
@@ -33,6 +33,10 @@ public class BookLatestInfoDto extends BokBookdetailCurrent{
      */
     private Date booksetDateNew;
 
+    /**
+     * 投资目的
+     */
+    private String invAim;
     
     /**
      * 获取 账套日期表.账套日期
@@ -52,8 +56,13 @@ public class BookLatestInfoDto extends BokBookdetailCurrent{
     public void setBooksetDateNew(Date booksetDateNew) {
         this.booksetDateNew = booksetDateNew;
     }
-    
-    
 
+    public String getInvAim() {
+        return invAim;
+    }
+
+    public void setInvAim(String invAim) {
+        this.invAim = invAim;
+    }
 
 }

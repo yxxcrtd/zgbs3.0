@@ -264,14 +264,14 @@ public interface AccountingCommonMapper {
     /**
      * 对应科目查询
      *
-     * @param subjectNo 科目号
+     * @param detailSubjectNoTail 四级科目尾号
      * @param booksetId 账套代码
      * @param baseSubjectNature 基础科目性质列表
      * @return 科目信息列表
      * @see
      * @since 1.0
      */
-    List<CorrespondSubjectEntity> getCorrespondSubject(@Param("subjectNo") String subjectNo,
+    List<CorrespondSubjectEntity> getCorrespondSubject(@Param("detailSubjectNoTail") String detailSubjectNoTail,
                                                  @Param("booksetId") String booksetId,
                                                  @Param("baseSubjectNature") List<String> baseSubjectNature);
     
@@ -514,4 +514,57 @@ public interface AccountingCommonMapper {
      * @since 1.0
      */
     int deleteBokAssetMarketInfo(Map<String, Object> param);
+
+    /**
+     * 对应科目查询
+     *
+     * @param detailSubjectNoTail 四级科目尾号
+     * @param booksetId 账套代码
+     * @param baseSubjectNature 基础科目性质列表
+     * @return 科目信息列表
+     * @see
+     * @since 1.0
+     */
+    List<CorrespondSubjectEntity> getCorrespondSubjectNew(@Param("detailSubjectNoTail") String detailSubjectNoTail,
+                                                       @Param("booksetId") String booksetId,
+                                                       @Param("baseSubjectNature") List<String> baseSubjectNature);
+
+    /**
+     *
+     * 账套参数查询
+     * @param booksetId 账套代码
+     * @param paramCode 参数项
+     * @return 账套配置表DTO
+     * @see
+     * @since 1.0
+     */
+    BokBooksetExt getBokBooksetExt(@Param("booksetId") String booksetId,
+                                   @Param("paramCode") String paramCode);
+
+    /* @Author 殷亚
+     * @Description 账套分层子结构全量查询
+     * @Date  2022-3-10 18:48
+     * @Version 1.0
+     * @Param []
+     * @Return java.util.List<com.joyintech.tams.valuation.batch.common.accounting.entity.StayDrawSubprdEntity>
+     **/
+    List<StayDrawSubprdEntity> queryAllSubBokAcctInfo();
+
+    /**
+     *
+     * 账套参数全量查询
+     * @return 账套配置表DTO
+     * @see
+     * @since 1.0
+     */
+    List<BokBooksetExt> getAllBokBooksetExt();
+
+    /**
+     *
+     * 账套参数全量查询
+     * @return 账套配置表DTO
+     * @see
+     * @since 1.0
+     */
+    List<BokSubject> getAllBokSubject();
 }

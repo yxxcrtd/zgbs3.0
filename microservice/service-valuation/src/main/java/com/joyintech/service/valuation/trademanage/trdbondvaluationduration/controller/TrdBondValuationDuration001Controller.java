@@ -13,7 +13,7 @@ package com.joyintech.service.valuation.trademanage.trdbondvaluationduration.con
 
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration001Dto;
+import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.service.TrdBondValuationDuration001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,28 +46,16 @@ public class TrdBondValuationDuration001Controller {
      * @since 1.0
      */
     @RequestMapping("findPage/{page}/{length}")
-    public Page<TrdBondValuationDuration001Dto> queryForPage(@RequestBody Map<String, Object> param,
-                                                  @PathVariable("page") int page, @PathVariable("length") int length)
+    public Page<TrdBondValuationDurationDto> queryForPage(@RequestBody Map<String, Object> param,
+                                                          @PathVariable("page") int page, @PathVariable("length") int length)
             throws Exception {
         return trdBondValuationDuration001Service.selectForPage(page, length, param);
-    }
-
-    /**
-     * 不分页数据查询
-     *
-     * @param param
-     * @return
-     * @throws Exception
-     */
-    @PostMapping("/queryPageList")
-    public List<TrdBondValuationDuration001Dto> queryPageList(@RequestBody Map<String, Object> param){
-        return trdBondValuationDuration001Service.queryPageList(param);
     }
 
     @Transactional
     @DTXTransaction
     @PostMapping("delete")
-    public int delete(@RequestBody TrdBondValuationDuration001Dto dto){
+    public int delete(@RequestBody TrdBondValuationDurationDto dto){
         return trdBondValuationDuration001Service.delete(dto);
     }
 

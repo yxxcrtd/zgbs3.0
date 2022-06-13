@@ -86,17 +86,17 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 			if (!StringUtil.isNotEmpty(dto.getAcctNo())) {
 				errorList.add(new ValidMessage("acctNo", this.getMessage("ETR_ERROR_0020")));
 			}
-			if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
+//			if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
 				if(!StringUtil.isNotEmpty(dto.getBusinessModel())
 				         &&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
 					errorList.add(new ValidMessage("businessModel", "请输入业务模式"));
 				}
-			}else{
-				if(!StringUtil.isNotEmpty(dto.getInvAim())
-						&&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-					errorList.add(new ValidMessage("invAim", this.getMessage("ETR_ERROR_0060")));
-				}
-			}
+//			}else{
+//				if(!StringUtil.isNotEmpty(dto.getInvAim())
+//						&&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
+//					errorList.add(new ValidMessage("invAim", this.getMessage("ETR_ERROR_0060")));
+//				}
+//			}
 			if (!StringUtil.isNotEmpty(dto.getStockId())&&!StringUtil.isNotEmpty(dto.getFinprodId())) {
 				errorList.add(new ValidMessage("stockId", this.getMessage("ETR_ERROR_0016")));
 			}
@@ -131,6 +131,9 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 				Map<String, Object> resultMap  = etrExchangeTrade001Service.findQuotations(map);
 				if (resultMap != null){
 					BigDecimal price = dto.getEntrustPrice();
+					if(price == null){
+						price = dto.getPrice();
+					}
 					if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_股票.getValue())
 							|| dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_基金.getValue())){
 						// 涨停
@@ -149,8 +152,8 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 						BigDecimal highPrice = new BigDecimal(resultMap.get("highPrice").toString()).setScale(2,BigDecimal.ROUND_HALF_UP);
 						// 最低价
 						BigDecimal lowPrice = new BigDecimal(resultMap.get("lowPrice").toString()).setScale(2,BigDecimal.ROUND_HALF_UP);
-						BigDecimal max = highPrice.max(preClosePrice.multiply(new BigDecimal(1.3)));
-						BigDecimal min = lowPrice.min(preClosePrice.multiply(new BigDecimal(0.7)));
+						BigDecimal max = highPrice.max(preClosePrice.multiply(BigDecimal.valueOf(1.3)));
+						BigDecimal min = lowPrice.min(preClosePrice.multiply(BigDecimal.valueOf(0.7)));
 						if (price.compareTo(max) > 0 || price.compareTo(min) < 0){
 							errorList.add(new ValidMessage("price", this.getMessage("ETR_ERROR_0055")));
 						}
@@ -166,7 +169,7 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 						&& dto.getEntrustNum().compareTo(BigDecimal.ZERO) > 0) {
 					String finprodType2 = dto.getFinprodType2();
 					if (finprodType2.equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
-							|| finprodType2.equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+							|| finprodType2.equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
 							|| finprodType2.equals("ZYSHG")) {
 						finprodType2 = DictCodeList.平安资产类型_质押式回购.getValue();
 					}
@@ -203,7 +206,7 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 									prompt += "最低交易数量" + etrExchangeTrade001Service.getNumAndUnit(
 											minTrdUnitLimitDto.getMinNum(), minTrdUnitLimitDto.getMinNumUnit());
 								}
-								if (flag1 && flag2 && flag1 && null != minTrdUnitLimitDto.getMinNum()
+								if (flag1 && flag2  && null != minTrdUnitLimitDto.getMinNum()
 										&& null != minTrdUnitLimitDto.getMinAmt()) {
 									prompt += "，";
 								}
@@ -211,7 +214,7 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 									prompt += "最低交易金额"
 											+ etrExchangeTrade001Service.getNumAndUnit(minTrdUnitLimitDto.getMinAmt());
 								}
-								if (flag1 && flag2 && flag1 && null != minTrdUnitLimitDto.getMinNum()
+								if (flag1 && flag2  && null != minTrdUnitLimitDto.getMinNum()
 										&& null != minTrdUnitLimitDto.getMinAmt()) {
 									prompt += "，应至少满足一个！";
 								}

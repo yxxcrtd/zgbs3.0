@@ -160,6 +160,10 @@ public class AssetInterestCal {
             isd.setVdateTerm(res.get(res.size()-1).getMdateTerm());
             // 实际起始日
             isd.setVdate(res.get(res.size()-1).getMdate());
+            //计息基础
+            if (!StringUtil.isNotEmpty(isd.getBasis())) {
+                isd.setBasis(scai.getBasis());
+            }
         }
 
         return res;

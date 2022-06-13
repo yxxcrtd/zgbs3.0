@@ -40,9 +40,6 @@ public class TrdIRSValuationTrade001Service extends BaseService {
     public Page<TrdIRSValuationTrade001Dto> selectForPage(int page, int length,
                                                           Map<String, Object> pageParam)
             throws Exception {
-
-        List<Map<String,String>> list = trdIRSValuationTradeMapper.selectList();
-
         //产品代码
         String finprodId = (String)pageParam.get("finprodId");
         String[] finprodIdArr = null;

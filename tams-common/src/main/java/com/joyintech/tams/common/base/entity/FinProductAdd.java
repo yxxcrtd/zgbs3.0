@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.json.CustomDateDeserialize;
+import oracle.sql.DATE;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -431,6 +433,11 @@ public class FinProductAdd extends BaseEntity {
     private String isIssueAsset;
 
     /**
+     * 是否非担保
+     */
+    private String isNoGuard;
+
+    /**
      * 上市代码
      */
     private String appearMarketId;
@@ -439,6 +446,136 @@ public class FinProductAdd extends BaseEntity {
      * null
      */
     private String windCode;
+
+    /**
+     * 跨市场发行
+     */
+    private String crossMarket;
+
+    /**
+     * 跨市场发行代码,多个逗号分割
+     */
+    private String crossMarketCode;
+
+    /**
+     * 概念标识
+     */
+    private String conceptType;
+
+    /**
+     * 是否允许资讯数据覆盖
+     */
+    private String isAllowOverwrite;
+
+    /**
+     * 原摘牌日
+     */
+    private String oldDelistingDate;
+
+    /**
+     * 上市日是否来源交易
+     */
+    private String listingDateFromTrade;
+
+    /**
+     *
+     * 说明书是否披露风险标志
+     */
+    private String directDisclosureRiskFlag;
+
+    /**
+     * 是否每日开放申赎
+     */
+    private String isOpenEveryDay;
+
+    /**
+     * 是否每日开放申赎
+     */
+    private String isSevenDayCashable;
+
+    /**
+     * 开放类型
+     */
+    private String openType;
+
+    /**
+     *保护对象
+     */
+    private String protectObject;
+    /**
+     * 参考实体
+     */
+    private String refEntity;
+    /**
+     * 参考债项
+     */
+    private String refSec;
+    /**
+     * 参考债项特征
+     */
+    private String refSecFeatures;
+    /**
+     * 宽限期
+     */
+    private Long gracePeriod;
+    /**
+     * 簿记建档日
+     */
+    private Date bookBuildingDate;
+    /**
+     * 缴款日
+     */
+    private Date payDate;
+    /**
+     * 名义本金总额
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal nomCapi;
+    /**
+     * 结算方式
+     */
+    private String settleMethod;
+
+    private String issuershort;
+
+    /**
+     * 担保方式
+     */
+    private String guaType;
+
+    /**
+     * 原始权益人
+     */
+    private String originalOwner;
+
+    private String basis;
+
+    /**
+     * 获取 计息基础
+     *
+     * @return basis 计息基础
+     */
+    public String getBasis() {
+        return this.basis;
+    }
+
+    /**
+     * 设置 计息基础
+     *
+     * @param basis 计息基础
+     */
+    public void setBasis(String basis) {
+        this.basis = basis;
+    }
+
+
+    public String getDirectDisclosureRiskFlag() {
+        return directDisclosureRiskFlag;
+    }
+
+    public void setDirectDisclosureRiskFlag(String directDisclosureRiskFlag) {
+        this.directDisclosureRiskFlag = directDisclosureRiskFlag;
+    }
 
     /**
      * 取得 金融产品代码
@@ -1774,6 +1911,14 @@ public class FinProductAdd extends BaseEntity {
         this.isIssueAsset = isIssueAsset == null ? null : isIssueAsset.trim();
     }
 
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard == null ? null : isNoGuard.trim();
+    }
+
     /**
      * 取得 上市代码
      * @return 上市代码
@@ -1804,5 +1949,229 @@ public class FinProductAdd extends BaseEntity {
      */
     public void setWindCode(String windCode) {
         this.windCode = windCode == null ? null : windCode.trim();
+    }
+
+    /**
+     * 取得 跨市场发行
+     * @return 跨市场发行
+     */
+    public String getCrossMarket() {
+        return crossMarket;
+    }
+
+    /**
+     * 设置 跨市场发行
+     * @param crossMarket 跨市场发行
+     */
+    public void setCrossMarket(String crossMarket) {
+        this.crossMarket = crossMarket == null ? null : crossMarket.trim();
+    }
+
+    /**
+     * 取得 跨市场发行代码,多个逗号分割
+     * @return 跨市场发行代码,多个逗号分割
+     */
+    public String getCrossMarketCode() {
+        return crossMarketCode;
+    }
+
+    /**
+     * 设置 跨市场发行代码,多个逗号分割
+     * @param crossMarketCode 跨市场发行代码,多个逗号分割
+     */
+    public void setCrossMarketCode(String crossMarketCode) {
+        this.crossMarketCode = crossMarketCode == null ? null : crossMarketCode.trim();
+    }
+
+    /**
+     * 获取 概念标识
+     *
+     * @return conceptType 概念标识
+     */
+    public String getConceptType() {
+        return this.conceptType;
+    }
+
+    /**
+     * 设置 概念标识
+     *
+     * @param conceptType 概念标识
+     */
+    public void setConceptType(String conceptType) {
+        this.conceptType = conceptType;
+    }
+
+    /**
+     * 获取 是否允许资讯数据覆盖
+     *
+     * @return isAllowOverwrite 是否允许资讯数据覆盖
+     */
+    public String getIsAllowOverwrite() {
+        return this.isAllowOverwrite;
+    }
+
+    /**
+     * 设置 是否允许资讯数据覆盖
+     *
+     * @param isAllowOverwrite 是否允许资讯数据覆盖
+     */
+    public void setIsAllowOverwrite(String isAllowOverwrite) {
+        this.isAllowOverwrite = isAllowOverwrite;
+    }
+
+    /**
+     * 获取 原摘牌日
+     *
+     * @return oldDelistingDate 原摘牌日
+     */
+    public String getOldDelistingDate() {
+        return this.oldDelistingDate;
+    }
+
+    /**
+     * 设置 原摘牌日
+     *
+     * @param oldDelistingDate 原摘牌日
+     */
+    public void setOldDelistingDate(String oldDelistingDate) {
+        this.oldDelistingDate = oldDelistingDate;
+    }
+
+    /**
+     * 获取 上市日是否来源交易
+     *
+     * @return listingDateFromTrade 上市日是否来源交易
+     */
+    public String getListingDateFromTrade() {
+        return listingDateFromTrade;
+    }
+
+    /**
+     * 设置 上市日是否来源交易
+     *
+     * @param listingDateFromTrade 上市日是否来源交易
+     */
+    public void setListingDateFromTrade(String listingDateFromTrade) {
+        this.listingDateFromTrade = listingDateFromTrade;
+    }
+
+    public String getIsOpenEveryDay() {
+        return isOpenEveryDay;
+    }
+
+    public void setIsOpenEveryDay(String isOpenEveryDay) {
+        this.isOpenEveryDay = isOpenEveryDay;
+    }
+
+    public String getIsSevenDayCashable() {
+        return isSevenDayCashable;
+    }
+
+    public void setIsSevenDayCashable(String isSevenDayCashable) {
+        this.isSevenDayCashable = isSevenDayCashable;
+    }
+
+    public String getOpenType() {
+        return openType;
+    }
+
+    public void setOpenType(String openType) {
+        this.openType = openType;
+    }
+
+    public String getProtectObject() {
+        return protectObject;
+    }
+
+    public void setProtectObject(String protectObject) {
+        this.protectObject = protectObject;
+    }
+
+    public String getRefEntity() {
+        return refEntity;
+    }
+
+    public void setRefEntity(String refEntity) {
+        this.refEntity = refEntity;
+    }
+
+    public String getRefSec() {
+        return refSec;
+    }
+
+    public void setRefSec(String refSec) {
+        this.refSec = refSec;
+    }
+
+    public String getRefSecFeatures() {
+        return refSecFeatures;
+    }
+
+    public void setRefSecFeatures(String refSecFeatures) {
+        this.refSecFeatures = refSecFeatures;
+    }
+
+    public Long getGracePeriod() {
+        return gracePeriod;
+    }
+
+    public void setGracePeriod(Long gracePeriod) {
+        this.gracePeriod = gracePeriod;
+    }
+
+    public Date getBookBuildingDate() {
+        return bookBuildingDate;
+    }
+
+    public void setBookBuildingDate(Date bookBuildingDate) {
+        this.bookBuildingDate = bookBuildingDate;
+    }
+
+    public Date getPayDate() {
+        return payDate;
+    }
+
+    public void setPayDate(Date payDate) {
+        this.payDate = payDate;
+    }
+
+    public BigDecimal getNomCapi() {
+        return nomCapi;
+    }
+
+    public void setNomCapi(BigDecimal nomCapi) {
+        this.nomCapi = nomCapi;
+    }
+
+    public String getSettleMethod() {
+        return settleMethod;
+    }
+
+    public void setSettleMethod(String settleMethod) {
+        this.settleMethod = settleMethod;
+    }
+
+    public String getIssuershort() {
+        return issuershort;
+    }
+
+    public void setIssuershort(String issuershort) {
+        this.issuershort = issuershort;
+    }
+
+    public String getGuaType() {
+        return guaType;
+    }
+
+    public void setGuaType(String guaType) {
+        this.guaType = guaType;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
     }
 }

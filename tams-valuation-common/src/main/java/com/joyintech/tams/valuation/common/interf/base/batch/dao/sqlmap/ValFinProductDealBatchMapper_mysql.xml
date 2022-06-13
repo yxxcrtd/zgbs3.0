@@ -25,6 +25,9 @@
         ,PAY_DATE
         <!-- add by wujie on 20190420 end -->
         ,B_TRADE_ID
+        <!-- add by sunshuaishuai on 20220323 start -->
+        ,MY_ACCT_NO
+        <!-- add by sunshuaishuai on 20220323 end -->
         ) values
         <foreach collection="list" item="item" separator=",">
             (#{item.tradeId,jdbcType=VARCHAR}, #{item.busiType,jdbcType=VARCHAR}, #{item.finprodId,jdbcType=VARCHAR},
@@ -49,7 +52,11 @@
             <!-- add by wujie on 20190420 start -->
             ,#{item.payDate,jdbcType=DATE}
             <!-- add by wujie on 20190420 end -->
-            ,#{item.bTradeId,jdbcType=VARCHAR})
+            ,#{item.bTradeId,jdbcType=VARCHAR}
+            <!-- add by sunshuaishuai on 20220323 start -->
+            ,#{item.myAcctNo,jdbcType=VARCHAR}
+            <!-- add by sunshuaishuai on 20220323 end -->
+            )
         </foreach>
     </insert>
 
@@ -78,6 +85,9 @@
         ,PAY_DATE
         <!-- add by wujie on 20190420 end -->
         ,B_TRADE_ID
+        <!-- add by sunshuaishuai on 20220323 start -->
+        ,MY_ACCT_NO
+        <!-- add by sunshuaishuai on 20220323 end -->
         ) VALUES(
         #{tradeId,jdbcType=VARCHAR}, #{busiType,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR},
         #{finprodType,jdbcType=VARCHAR}, #{branch,jdbcType=DECIMAL}, #{tradeDate,jdbcType=DATE},
@@ -102,6 +112,9 @@
         ,#{payDate,jdbcType=DATE}
         <!-- add by wujie on 20190420 end -->
         , #{bTradeId,jdbcType=VARCHAR}
+        <!-- add by sunshuaishuai on 20220323 start -->
+        ,#{myAcctNo,jdbcType=VARCHAR}
+        <!-- add by sunshuaishuai on 20220323 end -->
         )
     </insert>
 </mapper>

@@ -231,7 +231,8 @@ public class BasePtlCashPositionInfoServiceImpl implements BasePtlCashPositionIn
                 basePtlCashPositionInfoMapper.updatePosition(params);
             }
             // 2.2.4 if 输入参数.持仓类型 = 数据字典缓存.持仓类型.实际
-            if (DictCodeList.持仓类型_实际.getValue().equals(positionFlowDto.getHodingType())) {
+            if (DictCodeList.持仓类型_实际.getValue().equals(positionFlowDto.getHodingType())
+                    && !DictCodeList.是否_否.getValue().equals(positionFlowDto.getIsDeleteAble())) {
                 positionFlowDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 deleteCashPosition(positionFlowDto);
             }
@@ -300,5 +301,21 @@ public class BasePtlCashPositionInfoServiceImpl implements BasePtlCashPositionIn
         Assert.notNull(positionQueryDto.getCdate(), "日期不能为null");
         Assert.isTrue(StringUtil.isNotEmpty(positionQueryDto.getCcy()), "币种不能为空");
         return basePtlCashPositionInfoMapper.queryTrdAvailableCashNew(positionQueryDto);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BigDecimal queryActCashPosition(PtlCashPositionFlowDto positionQueryDto) {
+        Assert.isTrue(positionQueryDto != null, "查询dto不能为null");
+        Assert.isTrue(StringUtil.isNotEmpty(positionQueryDto.getPortfolioId()), "组合代码不能为空");
+        Assert.notNull(positionQueryDto.getCdate(), "日期不能为null");
+        Assert.isTrue(StringUtil.isNotEmpty(positionQueryDto.getCcy()), "币种不能为空");
+        String holdingType = positionQueryDto.getHodingType();
+        positionQueryDto.setNeedAcctType(true);
+        positionQueryDto.setHodingType(DictCodeList.持仓类型_实际.getValue());
+        BigDecimal 实际现金 = queryOtherCashPosition(positionQueryDto);
+        positionQueryDto.setHodingType(holdingType);
+        return 实际现金;
     }
 }

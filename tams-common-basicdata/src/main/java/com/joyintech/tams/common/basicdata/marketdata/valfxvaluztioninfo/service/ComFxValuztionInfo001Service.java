@@ -255,31 +255,32 @@ public class ComFxValuztionInfo001Service extends CommonExportService<ComFxValuz
         if (null == list || list.size() != 6) {
             ExcelValidDto dto = new ExcelValidDto(StringUtil.EMPTY, String.valueOf(i), "数据列数错误");
             excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(0))) {
-            // 验证导入交易编号是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "交易编号为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(1))) {
-            // 验证导入估值日期是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "估值日期为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(2))) {
-            // 验证导入估值是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "估值为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(3))) {
-            // 验证导入币种是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "币种为空");
-            excelValidDtolist.add(dto);
-        }
-        if (StringUtil.isEmpty(list.get(4))) {
-            // 验证导入数据来源是否为空
-            ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "数据来源为空");
-            excelValidDtolist.add(dto);
+        }else{
+            if (StringUtil.isEmpty(list.get(0))) {
+                // 验证导入交易编号是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "交易编号为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(1))) {
+                // 验证导入估值日期是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "估值日期为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(2))) {
+                // 验证导入估值是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "估值为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(3))) {
+                // 验证导入币种是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "币种为空");
+                excelValidDtolist.add(dto);
+            }
+            if (StringUtil.isEmpty(list.get(4))) {
+                // 验证导入数据来源是否为空
+                ExcelValidDto dto = new ExcelValidDto(list.get(0), String.valueOf(i+2), "数据来源为空");
+                excelValidDtolist.add(dto);
+            }
         }
         return excelValidDtolist;
     }

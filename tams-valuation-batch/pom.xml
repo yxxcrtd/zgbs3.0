@@ -16,14 +16,15 @@
     </properties>
 
     <dependencies>
+        <!-- add by yinya 引用log4j，实现详细日志的单独按日记录 -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>batch-framework</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eweb4j</groupId>
-            <artifactId>fel</artifactId>
-            <version>0.8</version>
         </dependency>
         <dependency>
             <groupId>com.joyintech</groupId>

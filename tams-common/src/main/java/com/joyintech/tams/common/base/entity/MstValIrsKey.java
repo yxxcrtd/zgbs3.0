@@ -20,6 +20,19 @@ public class MstValIrsKey extends BaseEntity {
     private Date valDate;
 
     /**
+     * 估值模型
+     */
+    private String valmodelId;
+
+    public String getValmodelId() {
+        return valmodelId;
+    }
+
+    public void setValmodelId(String valmodelId) {
+        this.valmodelId = valmodelId;
+    }
+
+    /**
      * 取得 金融产品代码（市场代码）
      * @return 金融产品代码（市场代码）
      */

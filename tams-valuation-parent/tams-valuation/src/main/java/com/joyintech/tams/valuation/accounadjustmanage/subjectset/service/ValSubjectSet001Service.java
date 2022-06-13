@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.valuation.accounadjustmanage.subjectset.dto.ValSubjectHandDto;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -210,4 +211,37 @@ public class ValSubjectSet001Service extends CommonExportService<ValBokSubjectDt
     public List<ValBokSubjectDto> selectValBokSubjectByInCode(ValBokSubjectDto dto) {
         return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME+"/ValSubjectSet002/selectValBokSubjectByInCode", dto, ValBokSubjectDto.class);
     }
+
+    /*add by sunshuaishuai 辅助核算项修改 20220406 start*/
+    /**
+     * 根据基础科目性质查询辅助核算项
+     *
+     * @param map 过滤参数
+     * @return 上级科目代码列表
+     * @throws Exception
+     * @see
+     * @since 1.0
+     */
+    public List<ValSubjectHandDto> getHandCode(Map<String, Object> map) {
+        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME
+                +"/ValSubjectSet002/getHandCode", map, ValSubjectHandDto.class);
+
+    }
+
+    /**
+     * 根据基础科目性质联动辅助核算项下拉框
+     *
+     * @param map 过滤参数
+     * @return 上级科目代码列表
+     * @throws Exception
+     * @see
+     * @since 1.0
+     */
+    public List<SelectOptionDto> getType(Map<String, Object> map) {
+        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME
+                +"/ValSubjectSet002/getType", map, SelectOptionDto.class);
+
+    }
+
+    /*add by sunshuaishuai 辅助核算项修改 20220406 end*/
 }

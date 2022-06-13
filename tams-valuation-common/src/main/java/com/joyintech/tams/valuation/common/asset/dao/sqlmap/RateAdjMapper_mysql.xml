@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.valuation.common.asset.dao.RateAdjMapper_mysql">
+
+    <select id="getDealCalendarHoliday" resultType="java.lang.String">
+        select
+        date_format(CDATE, '%Y-%m-%d') as HOLIDATE
+        from
+        VAL_VW_MST_HOLIDAY
+        where
+        IS_HOLIDAY > 0
+        <if test="startDate != null">
+            and CDATE >= #{startDate, jdbcType=DATE}
+        </if>
+        <if test="endDate != null">
+            and CDATE &lt;= #{endDate, jdbcType=DATE}
+        </if>
+        <if test="dealCalId != null and dealCalId != ''">
+            and TRADE_CALENDAR_ID = #{dealCalId}
+        </if>
+    </select>
+
+
+    <select id="getFinPayInterestStdInfoByProductId"  parameterType="Map" resultType="com.joyintech.tams.valuation.common.asset.dto.FinCashPayRuleDto">
+        SELECT
+        T1.CASH_ID CASH_ID, T1.CASH_TYPE_1 CASH_TYPE_1, T1.CASH_TYPE_2 CASH_TYPE_2, T1.CCY CCY, T1.FINPROD_ID FINPROD_ID,
+        T1.FINPROD_TYPE FINPROD_TYPE, T1.BRANCH BRANCH, T1.FEE_ID FEE_ID, T1.CHL_FINPROD_ID CHL_FINPROD_ID,
+        T1.CHL_LEVEL CHL_LEVEL, T1.CREATE_USER CREATE_USER,
+        T1.CREATE_DEPT CREATE_DEPT, T1.CREATE_TIME CREATE_TIME, T1.UPDATE_USER UPDATE_USER, T1.UPDATE_TIME UPDATE_TIME
+        ,T2.FINPROD_ID FINPROD_ID
+        , T2.FINPROD_TYPE FINPROD_TYPE
+        , T2.FINPROD_TYPE2 FINPROD_TYPE2
+        , T2.FINPROD_ABBR FINPROD_ABBR
+        , T2.FINPROD_NAME FINPROD_NAME
+        , T2.COUPON_SPECIES
+        , T3.EFF_DATE EFF_DATE
+        , T3.PAY_CYCLE_VAL PAY_CYCLE_VAL
+        , T3.PAY_CYCLE PAY_CYCLE
+        , T3.DAY_TYPE DAY_TYPE
+        , T3.DAY_VALUE DAY_VALUE
+        , T3.END_TDAY_RULE END_TDAY_RULE
+        , T3.PAY_TDAY_RULE PAY_TDAY_RULE
+        , T3.CALC_RULE CALC_RULE
+        , T3.FIRST_PAY_DATE FIRST_PAY_DATE
+        , T3.CASH_UNIT_TYPE CASH_UNIT_TYPE
+        ,T3.REMARK  REMARK
+        FROM
+        FIN_CASH_INFO T1
+        LEFT JOIN FIN_PRODUCT T2 ON T2.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_CASH_PAY_RULE T3 ON T3.CASH_ID = T1.CASH_ID
+        <if test="vdate != null and vdate != ''">
+            AND T3.EFF_DATE  = str_to_date ( #{vdate}, '%Y-%m-%d' )
+        </if>
+        <where>
+            <if test="finprodId != null and finprodId != ''">
+                AND T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            </if>
+            <if test="cashType != null and cashType != ''">
+                AND T1.CASH_TYPE_2 = #{cashType,jdbcType=VARCHAR}
+            </if>
+            <if test="finprodType != null and finprodType != ''">
+                AND T1.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+</mapper>

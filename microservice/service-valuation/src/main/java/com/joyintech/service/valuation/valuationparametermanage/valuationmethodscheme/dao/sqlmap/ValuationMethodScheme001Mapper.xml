@@ -2,86 +2,91 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dao.ValuationMethodScheme001Mapper">
 
-	<select id="selectScheme" resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.ValuationMethodScheme001Dto">
-		select 
-            SCHEME_ID as schemeId,
-            SCHEME_NAME as schemeName,
-            SCHEME_DESCRIPTION as schemeDescription, 
-            ISDEFAULT as isdefault,
-            CREATE_USER as createUser,
-            CREATE_DEPT as createDept,
-            CREATE_TIME as createTime, 
-            UPDATE_USER as updateUser,
-            UPDATE_TIME as updateTime
+    <select id="selectScheme"
+            resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.ValuationMethodScheme001Dto">
+        select
+        SCHEME_ID as schemeId,
+        SCHEME_NAME as schemeName,
+        SCHEME_DESCRIPTION as schemeDescription,
+        ISDEFAULT as isdefault,
+        CREATE_USER as createUser,
+        CREATE_DEPT as createDept,
+        CREATE_TIME as createTime,
+        UPDATE_USER as updateUser,
+        UPDATE_TIME as updateTime
         from bok_VAL_SCHEME
         <where>
             <if test="searchKey != null and !''.equals(searchKey)">
-                AND (SCHEME_ID like '%' || #{searchKey} || '%' 
-                    OR SCHEME_NAME like '%' || #{searchKey} || '%')
-            </if> 
-            
+                AND (SCHEME_ID like '%' || #{searchKey} || '%'
+                OR SCHEME_NAME like '%' || #{searchKey} || '%')
+            </if>
+
             <!-- select2查询 -->
             <if test="search != null and !''.equals(search)">
-                AND (SCHEME_ID like '%' || #{search} || '%' 
-                    OR SCHEME_NAME like '%' || #{search} || '%')
+                AND (SCHEME_ID like '%' || #{search} || '%'
+                OR SCHEME_NAME like '%' || #{search} || '%')
             </if>
-            
+
             <!-- 唯一性：验证 -->
             <if test="(schemeId != null and schemeId != '') and (schemeName != null and schemeName != '')">
                 AND (SCHEME_ID = #{schemeId}
-                 OR   SCHEME_NAME = #{schemeName}
+                OR SCHEME_NAME = #{schemeName}
                 )
             </if>
             <if test="(schemeId == null) and (schemeName != null and schemeName != '')">
                 AND SCHEME_NAME = #{schemeName}
             </if>
-            
-             <!-- 忽略本身 -->
+
+            <!-- 忽略本身 -->
             <if test="owner != null and owner != ''">
                 AND SCHEME_ID != #{owner}
             </if>
         </where>
-	</select>
+    </select>
 
-	
-	<select id="selectSchemeDetail" resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.ValuationMethodScheme001Dto">
+
+    <select id="selectSchemeDetail"
+            resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.ValuationMethodScheme001Dto">
         select
-            sd.SCHEME_DETAIL_ID as schemeDetailId, /** 方案明细代码 **/
-            sd.SCHEME_ID as schemeId,/** 方案代码 **/
-            sd.TRADE_MARKET as tradeMarketCode,/** 交易市场Code **/
-            sd.TRADE_MARKET as tradeMarket,/** 交易市场 **/
-            sd.SEC_TYPE as secTypeCode,/** 证券品种Code **/
-            sd.SEC_TYPE as secType,/** 证券品种 **/
-            sd.SEC_DETAIL_TYPE as secDetailTypeCode,/** 证券细分类Code **/
-            sd.SEC_DETAIL_TYPE as secDetailType,/** 证券细分类 **/
-            sd.INV_AIM as invAimCode,/** 投资目的Code **/
-            sd.INV_AIM as invAim,/** 投资目的 **/
-            sd.VALUATION_METHOD as valuationMethodCode,/** 估值方法Code **/
-            sd.VALUATION_METHOD as valuationMethod,/** 估值方法 **/
-            sd.VALUATION_PRICE as valuationPriceCode,/** 估值市价Code **/
-            sd.VALUATION_PRICE as valuationPrice,/** 估值市价 **/
-            sd.VALUATION_PRICE_2 as valuationPrice2Code,/** 估值第二市价Code **/
-            sd.VALUATION_PRICE_2 as valuationPrice2,/** 估值第二市价 **/
-            sd.QUOTA_DIGIT as quotaDigit,/** 行情位数 **/
-            sd.PRICE_TAIL_MODE as priceTailMode, /** 行情尾数处理方式 **/
-            sd.PRICE_TAIL_MODE as priceTailModeCode, /** 行情尾数处理方式 **/
-            sd.PRICE_CLASS  as  priceClass, /** 价格类型 **/
-            sd.PRICE_CLASS as priceClassCode, /** 价格类型 **/
-            sd.VALUATION_DATE as valuationDate, /** 估值日期  **/
-            sd.VALUATION_DATE as valuationDateCode,
-            TO_CHAR(sd.VDATE,'YYYY-MM-DD') AS vdate,/** 开始日 **/
-            TO_CHAR(sd.MDATE,'YYYY-MM-DD') AS mdate,/** 结束日 **/
-            
-            s.SCHEME_DESCRIPTION as schemeDescription
+        sd.SCHEME_DETAIL_ID as schemeDetailId, /** 方案明细代码 **/
+        sd.SCHEME_ID as schemeId,/** 方案代码 **/
+        sd.TRADE_MARKET as tradeMarketCode,/** 交易市场Code **/
+        sd.TRADE_MARKET as tradeMarket,/** 交易市场 **/
+        sd.SEC_TYPE as secTypeCode,/** 证券品种Code **/
+        sd.SEC_TYPE as secType,/** 证券品种 **/
+        sd.SEC_DETAIL_TYPE as secDetailTypeCode,/** 证券细分类Code **/
+        sd.SEC_DETAIL_TYPE as secDetailType,/** 证券细分类 **/
+        sd.INV_AIM as invAimCode,/** 投资目的Code **/
+        sd.INV_AIM as invAim,/** 投资目的 **/
+        sd.VALUATION_METHOD as valuationMethodCode,/** 估值方法Code **/
+        sd.VALUATION_METHOD as valuationMethod,/** 估值方法 **/
+        /**add by yinya on 20220427 **/
+        sd.VALUATION_ID as valuationId ,/** 估值模型 **/
+        /**add by yinya on 20220427 **/
+        sd.VALUATION_PRICE as valuationPriceCode,/** 估值市价Code **/
+        sd.VALUATION_PRICE as valuationPrice,/** 估值市价 **/
+        sd.VALUATION_PRICE_2 as valuationPrice2Code,/** 估值第二市价Code **/
+        sd.VALUATION_PRICE_2 as valuationPrice2,/** 估值第二市价 **/
+        sd.QUOTA_DIGIT as quotaDigit,/** 行情位数 **/
+        sd.PRICE_TAIL_MODE as priceTailMode, /** 行情尾数处理方式 **/
+        sd.PRICE_TAIL_MODE as priceTailModeCode, /** 行情尾数处理方式 **/
+        sd.PRICE_CLASS as priceClass, /** 价格类型 **/
+        sd.PRICE_CLASS as priceClassCode, /** 价格类型 **/
+        sd.VALUATION_DATE as valuationDate, /** 估值日期 **/
+        sd.VALUATION_DATE as valuationDateCode,
+        TO_CHAR(sd.VDATE,'YYYY-MM-DD') AS vdate,/** 开始日 **/
+        TO_CHAR(sd.MDATE,'YYYY-MM-DD') AS mdate,/** 结束日 **/
+
+        s.SCHEME_DESCRIPTION as schemeDescription
         from bok_VAL_SCHEME_DETAIL sd
         inner join bok_VAL_SCHEME s
-            on sd.SCHEME_ID = s.SCHEME_ID
+        on sd.SCHEME_ID = s.SCHEME_ID
         <where>
             <if test="schemeId != null and schemeId != ''">
                 AND sd.SCHEME_ID = #{schemeId}
             </if>
-            
-            
+
+
             <!-- <if test="secType != null and secType != ''">
                 AND sd.SEC_TYPE = #{secType}
             </if> -->
@@ -113,8 +118,8 @@
                     #{item}
                 </foreach>
             </if>
-            
-            
+
+
             <!-- 忽略本身 -->
             <if test="owner != null and owner != ''">
                 AND sd.SCHEME_DETAIL_ID != #{owner}
@@ -122,15 +127,16 @@
             <if test="vdate != null and vdate != ''">
                 AND sd.VDATE = TO_DATE(#{vdate},'YYYY-MM-DD')
             </if>
-            
-            
+
+
             <!--  导出 -->
             <if test="schemeDetailId!=null and !''.equals(schemeDetailId.trim())">
                 AND (sd.SCHEME_DETAIL_ID in
-                <foreach collection="schemeDetailId.split(',')" item="item" index="index"  open="(" separator="," close=")">
-                   <if test="(index % 998) == 0">
-						null) OR sd.SCHEME_DETAIL_ID in (
-					</if>
+                <foreach collection="schemeDetailId.split(',')" item="item" index="index" open="(" separator=","
+                         close=")">
+                    <if test="(index % 998) == 0">
+                        null) OR sd.SCHEME_DETAIL_ID in (
+                    </if>
                     #{item}
                 </foreach>
                 )
@@ -138,47 +144,48 @@
         </where>
         order by sd.update_time desc
     </select>
-    
-    <select id="selectSpecialAssets" resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.ValuationMethodScheme001Dto">
+
+    <select id="selectSpecialAssets"
+            resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.ValuationMethodScheme001Dto">
         select
-            t.SCHEME_DETAIL_ID as schemeDetailId, /** 方案明细代码 **/
-            t.SCHEME_ID as schemeId,/** 方案代码 **/
-            nvl(vfp.finprod_market_id,t.FINPROD_ID) as finprodId,/** 资产代码 数据库中存资产代码，页面显示市场代码 **/
-            t.FINPROD_NAME as finprodName,/** 资产名称 **/
-            t.TRADE_MARKET as tradeMarketCode,/** 交易市场Code **/
-            t.TRADE_MARKET as tradeMarket,/** 交易市场 **/
-            t.SEC_TYPE as secTypeCode,/** 证券品种Code **/
-            t.SEC_TYPE as secType,/** 证券品种 **/
-            t.SEC_DETAIL_TYPE as secDetailTypeCode,/** 证券细分类Code **/
-            t.SEC_DETAIL_TYPE as secDetailType,/** 证券细分类 **/
-            t.INV_AIM as invAimCode,/** 投资目的Code **/
-            t.INV_AIM as invAim,/** 投资目的 **/
-            t.VALUATION_METHOD as valuationMethodCode,/** 估值方法Code **/
-            t.VALUATION_METHOD as valuationMethod,/** 估值方法 **/
-            t.VALUATION_PRICE as valuationPriceCode,/** 估值市价Code **/
-            t.VALUATION_PRICE as valuationPrice,/** 估值市价 **/
-            t.VALUATION_PRICE_2 as valuationPrice2Code,/** 估值第二市价Code **/
-            t.VALUATION_PRICE_2 as valuationPrice2,/** 估值第二市价 **/
-            t.QUOTA_DIGIT as quotaDigit,/** 行情位数 **/
-            t.PRICE_TAIL_MODE as priceTailMode, /** 行情尾数处理方式 **/
-            t.PRICE_TAIL_MODE as priceTailModeCode, /** 行情尾数处理方式 **/
-            t.PRICE_CLASS  as  priceClass, /** 价格类型 **/
-            t.PRICE_CLASS as priceClassCode, /** 价格类型 **/
-            t.VALUATION_DATE as valuationDate, /** 估值日期 **/
-            t.VALUATION_DATE as valuationDateCode,
-            TO_CHAR(t.VDATE,'YYYY-MM-DD') AS vdate,/** 开始日 **/
-            TO_CHAR(t.MDATE,'YYYY-MM-DD') AS mdate,/** 结束日 **/
-            vfp.finprod_type as finprodType
-        from BOK_VAL_SCHEME_DETAIL_SPECIAL t 
-        	left join FIN_PRODUCT vfp on t.FINPROD_ID = vfp.FINPROD_ID and (vfp.FINPROD_TYPE = 'F01'  or ((vfp.profit_type is null or vfp.profit_type = '02') and vfp.finprod_type = 'F17' ))
+        t.SCHEME_DETAIL_ID as schemeDetailId, /** 方案明细代码 **/
+        t.SCHEME_ID as schemeId,/** 方案代码 **/
+        nvl(vfp.finprod_market_id,t.FINPROD_ID) as finprodId,/** 资产代码 数据库中存资产代码，页面显示市场代码 **/
+        t.FINPROD_NAME as finprodName,/** 资产名称 **/
+        t.TRADE_MARKET as tradeMarketCode,/** 交易市场Code **/
+        t.TRADE_MARKET as tradeMarket,/** 交易市场 **/
+        t.SEC_TYPE as secTypeCode,/** 证券品种Code **/
+        t.SEC_TYPE as secType,/** 证券品种 **/
+        t.SEC_DETAIL_TYPE as secDetailTypeCode,/** 证券细分类Code **/
+        t.SEC_DETAIL_TYPE as secDetailType,/** 证券细分类 **/
+        t.INV_AIM as invAimCode,/** 投资目的Code **/
+        t.INV_AIM as invAim,/** 投资目的 **/
+        t.VALUATION_METHOD as valuationMethodCode,/** 估值方法Code **/
+        t.VALUATION_METHOD as valuationMethod,/** 估值方法 **/
+        t.VALUATION_PRICE as valuationPriceCode,/** 估值市价Code **/
+        t.VALUATION_PRICE as valuationPrice,/** 估值市价 **/
+        t.VALUATION_PRICE_2 as valuationPrice2Code,/** 估值第二市价Code **/
+        t.VALUATION_PRICE_2 as valuationPrice2,/** 估值第二市价 **/
+        t.QUOTA_DIGIT as quotaDigit,/** 行情位数 **/
+        t.PRICE_TAIL_MODE as priceTailMode, /** 行情尾数处理方式 **/
+        t.PRICE_TAIL_MODE as priceTailModeCode, /** 行情尾数处理方式 **/
+        t.PRICE_CLASS as priceClass, /** 价格类型 **/
+        t.PRICE_CLASS as priceClassCode, /** 价格类型 **/
+        t.VALUATION_DATE as valuationDate, /** 估值日期 **/
+        t.VALUATION_DATE as valuationDateCode,
+        TO_CHAR(t.VDATE,'YYYY-MM-DD') AS vdate,/** 开始日 **/
+        TO_CHAR(t.MDATE,'YYYY-MM-DD') AS mdate,/** 结束日 **/
+        vfp.finprod_type as finprodType
+        from BOK_VAL_SCHEME_DETAIL_SPECIAL t
+        left join FIN_PRODUCT vfp on t.FINPROD_ID = vfp.FINPROD_ID and (vfp.FINPROD_TYPE = 'F01' or ((vfp.profit_type is
+        null or vfp.profit_type = '02') and vfp.finprod_type = 'F17' ))
         <where>
             <if test="schemeId != null and schemeId != ''">
 
                 AND t.SCHEME_ID = #{schemeId}
             </if>
-            
-            
-            
+
+
             <!-- select2的模糊查询 -->
             <if test="search!=null and !''.equals(search.trim())">
                 AND (t.FINPROD_ID like '%' || #{search} || '%'
@@ -192,10 +199,10 @@
                 </foreach>
             </if>
             <if test="tradeMarket != null and tradeMarket != ''">
-               <!--  AND TRADE_MARKET = #{tradeMarket} -->
+                <!--  AND TRADE_MARKET = #{tradeMarket} -->
 
-                 AND t.TRADE_MARKET in
-               <foreach collection="tradeMarket.split(',')" item="item" open="(" separator="," close=")">
+                AND t.TRADE_MARKET in
+                <foreach collection="tradeMarket.split(',')" item="item" open="(" separator="," close=")">
                     #{item}
                 </foreach>
             </if>
@@ -207,7 +214,7 @@
                     #{item}
                 </foreach>
             </if>
-            
+
             <!-- 忽略本身 -->
             <if test="owner != null and owner != ''">
 
@@ -215,7 +222,7 @@
             </if>
             <if test="(vdate != null and vdate != '') and (mdate == null or mdate == '')">
 
-                AND t.VDATE is not null 
+                AND t.VDATE is not null
                 AND t.MDATE is null
             </if>
             <if test="(vdate != null and vdate != '') and ('checkArea'.equals(mdate))">
@@ -229,9 +236,10 @@
             </if>
             <if test="(vdate != null and vdate != '') and (mdate != null and mdate != '') and (!'checkArea'.equals(vdate) and !'checkArea'.equals(mdate))">
 
-                AND not(t.VDATE <![CDATA[>]]> TO_DATE(#{mdate}, 'YYYY-MM-DD') OR t.MDATE <![CDATA[<]]> TO_DATE(#{vdate}, 'YYYY-MM-DD'))
+                AND not(t.VDATE <![CDATA[>]]> TO_DATE(#{mdate}, 'YYYY-MM-DD') OR t.MDATE <![CDATA[<]]> TO_DATE(#{vdate},
+                'YYYY-MM-DD'))
             </if>
-            
+
             <!--  导出 -->
             <if test="schemeDetailId!=null and !''.equals(schemeDetailId.trim())">
 
@@ -244,48 +252,48 @@
 
         order by t.update_time desc
     </select>
-    
-    
-    
-    <select id="selectFinprod" resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.ValuationMethodScheme001Dto">
+
+
+    <select id="selectFinprod"
+            resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.ValuationMethodScheme001Dto">
         select distinct
-		    FINPROD_ID as finprodId,/** 资产代码 **/
-		    FINPROD_NAME as finprodName/** 资产名称 **/
-		from BOK_VAL_SCHEME_DETAIL_SPECIAL
+        FINPROD_ID as finprodId,/** 资产代码 **/
+        FINPROD_NAME as finprodName/** 资产名称 **/
+        from BOK_VAL_SCHEME_DETAIL_SPECIAL
         <where>
             <if test="schemeId != null and schemeId != ''">
                 AND SCHEME_ID = #{schemeId}
             </if>
-            
+
             <!-- select2的模糊查询 -->
             <if test="search!=null and !''.equals(search.trim())">
                 AND (FINPROD_ID like '%' || #{search} || '%'
                 OR FINPROD_NAME like '%' || #{search} || '%' )
             </if>
 
-<!--             <if test="finprodId!=null and !''.equals(finprodId.trim())">
-                AND FINPROD_ID in
-                <foreach collection="finprodId.split(',')" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
+            <!--             <if test="finprodId!=null and !''.equals(finprodId.trim())">
+                            AND FINPROD_ID in
+                            <foreach collection="finprodId.split(',')" item="item" open="(" separator="," close=")">
+                                #{item}
+                            </foreach>
 
-            </if> -->
+                        </if> -->
         </where>
     </select>
-    
-    
+
+
     <select id="getLinkSelectOption" resultType="com.joyintech.framework.select.SelectOptionDto">
         select distinct
-            sdl.ITEM_CODE id, sdl.ITEM_VALUE text
+        sdl.ITEM_CODE id, sdl.ITEM_VALUE text
         from SYS_DATADICT_LIST sdl
         inner join SYS_DATADICT_LIST_LINK sdll
-            on sdl.ITEM_CODE = sdll.ITEM_CODE
+        on sdl.ITEM_CODE = sdll.ITEM_CODE
         <if test="dict_code_parent != null and dict_code_parent != ''">
             and sdll.LINKED_DICT_CODE = #{dict_code_parent}
         </if>
         <if test="dict_code_child != null and dict_code_child != ''">
-           and sdl.DICT_CODE = #{dict_code_child}
-           and sdll.DICT_CODE = #{dict_code_child}
+            and sdl.DICT_CODE = #{dict_code_child}
+            and sdll.DICT_CODE = #{dict_code_child}
         </if>
         <if test="item_code_parent != null and item_code_parent != ''">
             and TRIM(sdll.LINKED_ITEM_CODE) = TRIM(#{item_code_parent})
@@ -297,20 +305,21 @@
         </where>
         order by sdl.ITEM_CODE
     </select>
-    
+
     <!-- modify by dongjun on 20181218 start  -->
-    <select id="getLinkSelectPageOption" resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.SelectPageOptionDto">
+    <select id="getLinkSelectPageOption"
+            resultType="com.joyintech.service.valuation.valuationparametermanage.valuationmethodscheme.dto.SelectPageOptionDto">
         select distinct
-            sdl.ITEM_CODE id, sdl.ITEM_VALUE text
+        sdl.ITEM_CODE id, sdl.ITEM_VALUE text
         from SYS_DATADICT_LIST sdl
         inner join SYS_DATADICT_LIST_LINK sdll
-            on sdl.ITEM_CODE = sdll.ITEM_CODE
+        on sdl.ITEM_CODE = sdll.ITEM_CODE
         <if test="dict_code_parent != null and dict_code_parent != ''">
             and sdll.LINKED_DICT_CODE = #{dict_code_parent}
         </if>
         <if test="dict_code_child != null and dict_code_child != ''">
-           and sdl.DICT_CODE = #{dict_code_child}
-           and sdll.DICT_CODE = #{dict_code_child}
+            and sdl.DICT_CODE = #{dict_code_child}
+            and sdll.DICT_CODE = #{dict_code_child}
         </if>
         <if test="item_code_parent != null and item_code_parent != ''">
             and TRIM(sdll.LINKED_ITEM_CODE) = TRIM(#{item_code_parent})
@@ -322,13 +331,13 @@
         </where>
         order by sdl.ITEM_CODE
     </select>
-     <!-- modify by dongjun on 20181218 end  -->
-     
+    <!-- modify by dongjun on 20181218 end  -->
+
     <select id="getIsdefault" resultType="java.lang.Integer">
-select count(1)
-from
-bok_val_scheme
-where
-ISDEFAULT = #{isdefault}
+        select count(1)
+        from
+        bok_val_scheme
+        where
+        ISDEFAULT = #{isdefault}
     </select>
 </mapper>

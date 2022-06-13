@@ -188,7 +188,7 @@
         cols:[
              {field:'indId', width:150 , visible: false}
             ,{field:'portfolioId', width:150 , visible: false}
-            ,{field:'portfolioLevel', width:250 , title: 'RskSupervisionPortfPoint001.portfolioLevel',visible: false}
+            ,{field:'portfolioLevel', width:150 , title: 'RskSupervisionPortfPoint001.portfolioLevel',visible: false}
             ,{field:'indName', width:250 , title: 'RskSupervisionPortfPoint001.indName',
             	render : function(data, type, row, meta) {
                     return '<i style="color:#0078F0;font-style: normal;cursor: pointer;" class="indName">'+data+'</a>';
@@ -493,7 +493,7 @@
 			}
 			$("#treePortfInd").css('height','670px');
 			var preUrl=getAllRelationUrl+"?";
-			$("#treePortfInd").attr('url',preUrl+"type="+type+'&portfName='+$("#portfolioSingleName").val()+'&profitType='+$("#profitType").val()+'&issueMode='+$("#issueMode").val()+'&raiseType='+$("#raiseType").val()+'&investType='+$("#investType").val()+'&portfolioType='+$("#portfolioType").val()+'&saleObject='+$("#saleObject").val()+'&isComplianceProd='+$("#isComplianceProd").val());
+			$("#treePortfInd").attr('url',preUrl+"type="+type+'&portfName='+$("#portfolioSingleName").val()+'&profitType='+$("#profitType").val()+'&issueMode='+$("#issueMode").val()+'&raiseType='+$("#raiseType").val()+'&investType='+$("#investType").val()+'&portfolioType='+$("#portfolioType").val()+'&saleObject='+$("#saleObject").val()+'&isComplianceProd='+$("#isComplianceProd").val()+'&isFaceSingleInvestor='+$("#isFaceSingleInvestor").val());
 			searchTreeSingle('01');
 		})
 

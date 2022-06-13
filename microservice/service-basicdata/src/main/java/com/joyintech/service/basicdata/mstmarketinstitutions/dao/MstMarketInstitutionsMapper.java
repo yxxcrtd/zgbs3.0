@@ -13,6 +13,7 @@ package com.joyintech.service.basicdata.mstmarketinstitutions.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.joyintech.tams.common.base.entity.InterfCmsInstitution;
@@ -179,5 +180,21 @@ public interface MstMarketInstitutionsMapper {
      * @since 1.0
      */
     List<MstMarketInstitutionsDto> deleteCheck(List<MstMarketInstitutionsDto> item);
+
+    /**
+     * 根据信用代码查询客户信息
+     *
+     * @param insitituteCode
+     * @return
+     */
+    MstMarketInstitutionsDto getByInsitituteCode(@Param("insitituteCode") String insitituteCode);
+
+    /**
+     * 获取接口表中的数据
+     *
+     * @param insitituteCode
+     * @return
+     */
+    MstMarketInstitutionsDto getInterfCustomerInfo(@Param("insitituteCode") String insitituteCode);
 
 }

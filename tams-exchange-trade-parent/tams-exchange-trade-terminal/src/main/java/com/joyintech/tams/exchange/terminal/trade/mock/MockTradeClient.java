@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.terminal.trade.mock;
 
+import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
@@ -10,6 +11,7 @@ import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.net.agent.Agent;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.terminal.agent.ITerminalMsgNotify;
@@ -17,12 +19,15 @@ import com.joyintech.tams.exchange.terminal.agent.TerminalAgent;
 import com.joyintech.tams.exchange.terminal.constant.AccountLoginStatus;
 import com.joyintech.tams.exchange.terminal.trade.ITradeRequest;
 import com.joyintech.tams.exchange.terminal.trade.TradeResponseImpl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -57,6 +62,7 @@ public class MockTradeClient implements ITradeRequest {
         return new HashSet<>();
     }
 
+    @Override
     public void setITerminalMsgNotify(ITerminalMsgNotify iTerminalMsgNotify) {
         this.iTerminalMsgNotify = iTerminalMsgNotify;
     }
@@ -94,7 +100,7 @@ public class MockTradeClient implements ITradeRequest {
      */
     @Override
     public void entrust(Entrust entrust, Long requestId) {
-        if (InvestmentAssetType.FUTURES.value.equals(entrust.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(entrust.getAssetType())) {
             logger.info("期货交易mock 开始 {}", JsonUtils.getJsonFromObject(entrust));
             mockFuturesEntrust(entrust);
             logger.info("... 期货交易mock 结束 ...");
@@ -238,18 +244,21 @@ public class MockTradeClient implements ITradeRequest {
         trade.setFinanceAccount(entrust.getFinanceAccount());
         trade.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
         trade.setEntrustBs(entrust.getEntrustBs());
-        if (FullPriceConst.FULL_PRICE.value.equals(entrust.getIsFullPrice())) {//全价
+        trade.setIsFullPrice(entrust.getIsFullPrice());
+        //全价
+        if (FullPriceConst.FULL_PRICE.value.equals(entrust.getIsFullPrice())) {
             trade.setTradedPrice(entrust.getFullPrice());
         } else {
             trade.setTradedPrice(entrust.getEntrustPrice());
         }
+        trade.setFullPrice(entrust.getFullPrice());
         trade.setBsFlag(entrust.getBsFlag());
         trade.setAssetType(entrust.getAssetType());
         trade.setTradeType(tradeType);
         trade.setBrokerEntrustId(entrust.getBrokerEntrustId());
         trade.setStockName(entrust.getStockName());
         trade.setEntrustProp(entrust.getEntrustProp());
-        if (InvestmentAssetType.FUTURES.value.equals(entrust.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(entrust.getAssetType())) {
             trade.setOffsetFlag(entrust.getOffsetFlag());
             trade.setHedgeFlag(entrust.getHedgeFlag());
         }
@@ -257,6 +266,7 @@ public class MockTradeClient implements ITradeRequest {
         trade.setEntrustId(entrust.getId());
         trade.setTradeTime(now.get(Calendar.HOUR_OF_DAY) + "" + now.get(Calendar.MINUTE) + "" + now.get(Calendar.SECOND));
         trade.setBrokerTradeId(trade.getTradeTime() + brokerTradeId.incrementAndGet());
+        trade.setPs(entrust.getPs());
         return trade;
     }
 
@@ -271,19 +281,19 @@ public class MockTradeClient implements ITradeRequest {
     public void integratedEntrust(IntegratedEntrust integratedEntrust, Long requestId) {
         if (IntegratedEntrustUtils.isBulk(integratedEntrust.getEntrustProp())) {
             //            if (Market.SHSE.value.equals(integratedEntrust.getMarket())) {
-            //                if (integratedEntrust.getAssetType().equals(InvestmentAssetType.STOCK.value)) {
+            //                if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.STOCK.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 300000.00, 2000000.00);
-            //                } else if (integratedEntrust.getAssetType().equals(InvestmentAssetType.BOND.value)) {
+            //                } else if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.BOND.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 10000.00, 1000000.00);
-            //                } else if (integratedEntrust.getAssetType().equals(InvestmentAssetType.FUND.value)) {
+            //                } else if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.FUND.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 300000.00, 300000.00);
             //                }
             //            } else {
-            //                if (integratedEntrust.getAssetType().equals(InvestmentAssetType.STOCK.value)) {
+            //                if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.STOCK.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 300000.00, 2000000.00);
-            //                } else if (integratedEntrust.getAssetType().equals(InvestmentAssetType.BOND.value)) {
+            //                } else if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.BOND.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 5000.00, 500000.00);
-            //                } else if (integratedEntrust.getAssetType().equals(InvestmentAssetType.FUND.value)) {
+            //                } else if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.FUND.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 2000000.00, 2000000.00);
             //                }
             //            }
@@ -311,7 +321,7 @@ public class MockTradeClient implements ITradeRequest {
             }
         } else if (IntegratedEntrustUtils.isFixedIncome(integratedEntrust.getEntrustProp())) {
             //            if (!Market.SHSE.value.equals(integratedEntrust.getMarket())
-            //                    || !InvestmentAssetType.BOND.value.equals(integratedEntrust.getAssetType())) {
+            //                    || !InvestAssetTypeEnum.BOND.value.equals(integratedEntrust.getAssetType())) {
             //                logger.info("固收平台不支持该市场合约 {}", integratedEntrust.getStockCode());
             //                integratedEntrust.setEntrustStatus(EntrustStatus.INVALID.value);
             //                integratedEntrust.setErrorMsg("固收平台不支持该市场合约" + integratedEntrust.getStockCode());
@@ -343,6 +353,17 @@ public class MockTradeClient implements ITradeRequest {
             //                mockTradeResponse.resIntegratedEntrust(integratedEntrust);
             //                return;
             //            }
+            integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
+            if (mockIntegratedEntrustFailByEntrustVolume(integratedEntrust))
+                return;
+            mockTradeResponse.resIntegratedEntrust(integratedEntrust);
+            integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
+            if (mockNoTradeByEntrustVolume(integratedEntrust))
+                return;
+            mockTradeOrPartTradeByEntrustVolume(integratedEntrust);
+        } else if (EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())
+                || EntrustProp.SZ_XSCJ_JS.value.equals(integratedEntrust.getEntrustProp())
+                || EntrustProp.SZ_XSCJ_JJ.value.equals(integratedEntrust.getEntrustProp())) {//新债 深圳协商成交
             integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
             if (mockIntegratedEntrustFailByEntrustVolume(integratedEntrust))
                 return;
@@ -654,22 +675,25 @@ public class MockTradeClient implements ITradeRequest {
 
     @Override
     public void queryIntegratedQuotes(QuoteQryBean quoteQryBean, Long requestId) {
+        String stockCode = quoteQryBean.getStockCode();
+        TickBean tickBean = queryQuoteTick(stockCode);
+
         List<IntegratedQuote> integratedQuotes = new ArrayList<>();
         if (quoteQryBean.getQuoteType() == QuoteType.BULK_QUOTE.value) {
             if (integratedEntrustQuoteList.size() > 0) {
                 integratedEntrustQuoteList.forEach(integratedEntrust -> {
-                    if (integratedEntrust.getStockCode().equals(quoteQryBean.getStockCode())) {
+                    if (integratedEntrust.getStockCode().equals(stockCode)) {
                         IntegratedQuote integratedQuote = MockQuoteData.makeIntegratedEntrustQuote(integratedEntrust);
                         integratedQuote.setQuoteType(QuoteType.BULK_QUOTE.value);
                         integratedQuotes.add(integratedQuote);
                     }
                 });
             }
-            integratedQuotes.addAll(MockQuoteData.makeMockDataForBulk(quoteQryBean.getStockCode()));
+            integratedQuotes.addAll(MockQuoteData.makeMockDataForBulk(stockCode, tickBean));
         } else if (quoteQryBean.getQuoteType() == QuoteType.AFTER_BULK_QUOTE.value) {
-            integratedQuotes.addAll(MockQuoteData.makeAfterBulkQuote(quoteQryBean.getStockCode()));
+            integratedQuotes.addAll(MockQuoteData.makeAfterBulkQuote(stockCode, tickBean));
         } else if (quoteQryBean.getQuoteType() == QuoteType.FIXED_INCOME_QUOTE.value) {
-            integratedQuotes.addAll(MockQuoteData.makeFixedIncomeQuote(quoteQryBean.getStockCode()));
+            integratedQuotes.addAll(MockQuoteData.makeFixedIncomeQuote(stockCode, tickBean));
         }
         mockTradeResponse.resQueryIntegratedQuotes(integratedQuotes, requestId);
     }
@@ -714,8 +738,8 @@ public class MockTradeClient implements ITradeRequest {
 
     public void onTrade(Trade trade) {
         if (!(IntegratedEntrustUtils.isProtocolBack_SH(trade.getEntrustProp())
-                || IntegratedEntrustUtils.isProtocolBack_SZ(trade.getEntrustProp())) && !InvestmentAssetType.FUTURES.value.equals(trade.getAssetType())) {
-            trade.setTradedBalance(TradeUtils.calculateBalanceForRisk(trade.getEntrustBs(), trade.getTradedPrice(), trade.getTradedVolume(), trade.getAssetType()));
+                || IntegratedEntrustUtils.isProtocolBack_SZ(trade.getEntrustProp())) && !InvestAssetTypeEnum.FUTURES.value.equals(trade.getAssetType())) {
+            trade.setTradedBalance(TradeUtils.calculateBalanceForRisk(trade.getFullPrice(), trade.getTradedPrice(), trade.getTradedVolume(), trade.getAssetType(), trade.getPs()));
         }
         if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
             trade.setBrokerTradeId(trade.getEntrustId());
@@ -730,13 +754,19 @@ public class MockTradeClient implements ITradeRequest {
 
     @Override
     public void queryIntegratedBulkQuote(IntegratedBulkQuoteQryBean integratedBulkQuoteQryBean, Long requestId) {
-        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeMockDataForBulk(integratedBulkQuoteQryBean.getStockCode());
+        String stockCode = integratedBulkQuoteQryBean.getStockCode();
+        TickBean tickBean = queryQuoteTick(stockCode);
+
+        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeMockDataForBulk(stockCode, tickBean);
         mockTradeResponse.resQueryIntegratedBulkQuote(MockConverter.convertIntegratedBulkQuoteBeans(integratedQuotes), requestId);
     }
 
     @Override
     public void queryIntegratedBulkCloseQuote(IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean, Long requestId) {
-        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeAfterBulkQuote(integratedBulkCloseQuoteQryBean.getStockCode());
+        String stockCode = integratedBulkCloseQuoteQryBean.getStockCode();
+        TickBean tickBean = queryQuoteTick(stockCode);
+
+        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeAfterBulkQuote(stockCode, tickBean);
         mockTradeResponse.resQueryIntegratedBulkCloseQuote(MockConverter.convertIntegratedBulkCloseQuoteBeans(integratedQuotes), requestId);
     }
 
@@ -957,7 +987,10 @@ public class MockTradeClient implements ITradeRequest {
 
     @Override
     public void queryIntegratedFixedIncomeQuote(IntegratedFixedIncomeQuoteQryBean integratedFixedIncomeQuoteQryBean, Long requestId) {
-        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeFixedIncomeQuote(integratedFixedIncomeQuoteQryBean.getStockCode());
+        String stockCode = integratedFixedIncomeQuoteQryBean.getStockCode();
+        TickBean tickBean = queryQuoteTick(stockCode);
+
+        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeFixedIncomeQuote(stockCode, tickBean);
         mockTradeResponse.resQueryIntegratedFixedIncomeQuote(MockConverter.convertIntegratedFixedIncomeQuoteBeans(integratedQuotes), requestId);
     }
 
@@ -981,4 +1014,41 @@ public class MockTradeClient implements ITradeRequest {
 
     }
 
+    @Override
+    public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+        // TODO Auto-generated method stub
+//        String stockCode = negotiateQuoteQueryBean.getStockCode();
+//        TickBean tickBean = queryQuoteTick(stockCode);
+        List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = MockQuoteData.makeNegotiateQuoteReceive(negotiateQuoteQueryBean, null);
+        mockTradeResponse.resQueryNegotiateQuoteReceive(negotiateQuoteReceiveBeans, requestId);
+    }
+
+
+    @Value("${mock.quote-tick-url:http://127.0.0.1:8080/tams/service/joyin/quote/tick}")
+    private String quoteTickUrl;
+
+    private TickBean queryQuoteTick(String stockCode) {
+        try {
+//            HttpRequest request = HttpRequest.post(quoteTickUrl)
+//                    .body(JSONUtil.createObj()
+//                            .set("userId", "xxx")
+//                            .set("stockCode", stockCode)
+//                            .toString());
+//            String body = request.execute().body();
+//            logger.info("行情信息：{}", body);
+//            ResultBean resultBean = JSONUtil.toBean(body, ResultBean.class);
+
+            Map<String, Object> params = Maps.newHashMap();
+            params.put("userId", "xxx");
+            params.put("stockCode", stockCode);
+
+            RestTemplate restTemplate = SpringContextUtils.getBean(RestTemplate.class);
+
+            ResultBean resultBean = restTemplate.postForObject(quoteTickUrl, params, ResultBean.class);
+            return Convert.convert(TickBean.class, resultBean.getData());
+        } catch (Exception e) {
+            logger.error("获取行情失败：stockCode={}", stockCode, e);
+        }
+        return null;
+    }
 }

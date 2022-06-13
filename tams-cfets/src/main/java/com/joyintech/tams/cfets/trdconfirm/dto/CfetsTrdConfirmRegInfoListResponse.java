@@ -40,11 +40,17 @@ public class CfetsTrdConfirmRegInfoListResponse{
     @ApiModelProperty(name="effectiveStatusName",value="有效状态",example="A1")
     private String effectiveStatusName;
 
-    @ApiModelProperty(name="finprodType2",value="资产类型Code",example="A1")
+    @ApiModelProperty(name="finprodType2",value="业务类型Code",example="01")
     private String  finprodType2;
 
-    @ApiModelProperty(name="finprodType2Name",value="资产类型",example="A1")
+    @ApiModelProperty(name="finprodType2Name",value="业务类型",example="A1")
     private String  finprodType2Name;
+
+    @ApiModelProperty(name="assetType",value="资产类型Code",example="A1")
+    private String  assetType;
+
+    @ApiModelProperty(name="assetTypeName",value="资产类型",example="A1")
+    private String  assetTypeName;
 
     @ApiModelProperty(name="finprodId",value="资产代码Id",example="ZC1")
     private String finprodId;
@@ -83,7 +89,10 @@ public class CfetsTrdConfirmRegInfoListResponse{
     private BigDecimal faceValue;
 
     @ApiModelProperty(name="tradeYield",value="成交价",example="1")
-    private String tradeYield;
+    private BigDecimal tradeYield;
+
+    @ApiModelProperty(name="tradeYieldStr",value="成交价显示",example="1")
+    private String tradeYieldStr;
 
     @ApiModelProperty(name="termDays",value="期限（天）",example="1")
     private BigDecimal termDays;
@@ -492,6 +501,25 @@ public class CfetsTrdConfirmRegInfoListResponse{
         this.finprodType2Name = finprodType2Name;
     }
 
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public String getAssetTypeName() {
+        if (StringUtil.isEmpty(getAssetType())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产二级分类, getAssetType());
+    }
+
+    public void setAssetTypeName(String assetTypeName) {
+        this.assetTypeName = assetTypeName;
+    }
+
     public String getFinprodId() {
         return finprodId;
     }
@@ -589,12 +617,20 @@ public class CfetsTrdConfirmRegInfoListResponse{
         this.faceValue = faceValue;
     }
 
-    public String getTradeYield() {
+    public BigDecimal getTradeYield() {
         return tradeYield;
     }
 
-    public void setTradeYield(String tradeYield) {
+    public void setTradeYield(BigDecimal tradeYield) {
         this.tradeYield = tradeYield;
+    }
+
+    public String getTradeYieldStr() {
+        return this.tradeYieldStr;
+    }
+
+    public void setTradeYieldStr(String tradeYieldStr) {
+        this.tradeYieldStr = tradeYieldStr;
     }
 
     public BigDecimal getTermDays() {
@@ -975,6 +1011,9 @@ public class CfetsTrdConfirmRegInfoListResponse{
     }
 
     public String getDealTypeName() {
+        if(StringUtil.equals(getFinprodType2(),"03")){//一级申购登记类型为空
+            return StringUtil.EMPTY;
+        }
         return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getDealType());
     }
 

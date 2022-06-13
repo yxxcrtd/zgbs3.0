@@ -222,7 +222,7 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
     private int count;
 
     @ApiModelProperty(name = "isFullPrice", value = "全价(Y:是 ， N：否)")
-    private String isFullPrice;//  Y:是 ， N：否
+    private String isFullPrice;
 
     @ApiModelProperty(name = "offsetFlag", value = "冲正标识")
     private String offsetFlag;
@@ -258,6 +258,14 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
     private BigDecimal conNum;
     @ApiModelProperty(name = "entrustClass", value = "委托指令类别：01-单组合，02-多组合")
     private String entrustClass;
+
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+
+    @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
+    private String softSkipMode;
 
     public Order() {
         this.orderPrice = new BigDecimal("0.00");
@@ -477,6 +485,7 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
         return isFullPrice;
     }
 
+    @Override
     public void setIsFullPrice(String isFullPrice) {
         this.isFullPrice = isFullPrice;
     }
@@ -737,6 +746,22 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
         this.entrustClass = entrustClass;
     }
 
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
     public String getPriceMode() {
         if (StringUtil.isNotEmpty(extend2) && extend2.contains("priceMode")) {
             Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
@@ -746,6 +771,14 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
             }
         }
         return "";
+    }
+
+    public String getSoftSkipMode() {
+        return softSkipMode;
+    }
+
+    public void setSoftSkipMode(String softSkipMode) {
+        this.softSkipMode = softSkipMode;
     }
 
     public static Order getTemplateOrder() {
@@ -776,6 +809,7 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
             newOrder.setOffsetFlag(orderPlaceBean.getOffsetFlag());
             newOrder.setHedgeFlag(orderPlaceBean.getHedgeFlag());
             newOrder.setFullPrice(orderPlaceBean.getFullPrice() == null ? new BigDecimal("0.00") : orderPlaceBean.getFullPrice());
+            newOrder.setSoftSkipMode(orderPlaceBean.getSoftSkipMode());
             return newOrder;
         } catch (Exception e) {
         }

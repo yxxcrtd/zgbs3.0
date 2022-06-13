@@ -107,8 +107,8 @@ public class AssetImpairmentProvisionReaderService {
         param.put("FINPROD_TYPE_F05", DictCodeListExt1.金融产品类型_债券买断式逆回购.getValue());
         param.put("FINPROD_TYPE_F07", DictCodeListExt1.金融产品类型_存款.getValue());
         param.put("FINPROD_TYPE_F21", DictCodeListExt1.金融产品类型_同业借款.getValue());
-        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
-        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_摊余成本类.getValue());
+        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
         param.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
         param.put("LOSS_TEST_RATE", ValDictCodeList.账套配置表参数项_减值测算频率.getValue());
         param.put("LOSS_TEST_DATE", ValDictCodeList.账套配置表参数项_减值测算日.getValue());

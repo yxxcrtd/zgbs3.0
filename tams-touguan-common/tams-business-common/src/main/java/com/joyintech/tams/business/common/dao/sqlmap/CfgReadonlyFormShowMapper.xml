@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.business.common.dao.CfgReadonlyFormShowMapper" >
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.business.common.entity.CfgReadonlyFormShow" >
+    <id column="PAGECODE" property="pagecode" jdbcType="VARCHAR" />
+    <id column="DTCODE" property="dtcode" jdbcType="VARCHAR" />
+    <id column="SPCDCODE" property="spcdcode" jdbcType="VARCHAR" />
+    <id column="COLCODE" property="colcode" jdbcType="VARCHAR" />
+    <result column="COLNAME" property="colname" jdbcType="VARCHAR" />
+    <result column="DICTCODE" property="dictcode" jdbcType="VARCHAR" />
+    <result column="SEQNO" property="seqno" jdbcType="DECIMAL" />
+    <result column="EXTENDCFG" property="extendcfg" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="REMARK1" property="remark1" jdbcType="DECIMAL" />
+    <result column="REMARK2" property="remark2" jdbcType="VARCHAR" />
+    <result column="REMARK3" property="remark3" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, 
+    REMARK1, REMARK2, REMARK3
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.joyintech.tams.business.common.entity.CfgReadonlyFormShow" >
+    select 
+    <include refid="Base_Column_List" />
+    from CFG_READONLY_FORM_SHOW
+    where PAGECODE = #{pagecode,jdbcType=VARCHAR}
+      and DTCODE = #{dtcode,jdbcType=VARCHAR}
+      and SPCDCODE = #{spcdcode,jdbcType=VARCHAR}
+      and COLCODE = #{colcode,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.business.common.entity.CfgReadonlyFormShow" >
+    delete from CFG_READONLY_FORM_SHOW
+    where PAGECODE = #{pagecode,jdbcType=VARCHAR}
+      and DTCODE = #{dtcode,jdbcType=VARCHAR}
+      and SPCDCODE = #{spcdcode,jdbcType=VARCHAR}
+      and COLCODE = #{colcode,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.joyintech.tams.business.common.entity.CfgReadonlyFormShow" >
+    insert into CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE,
+      COLCODE, COLNAME, DICTCODE, 
+      SEQNO, EXTENDCFG, STATUS, 
+      REMARK1, REMARK2, REMARK3
+      )
+    values (#{pagecode,jdbcType=VARCHAR}, #{dtcode,jdbcType=VARCHAR}, #{spcdcode,jdbcType=VARCHAR}, 
+      #{colcode,jdbcType=VARCHAR}, #{colname,jdbcType=VARCHAR}, #{dictcode,jdbcType=VARCHAR}, 
+      #{seqno,jdbcType=DECIMAL}, #{extendcfg,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
+      #{remark1,jdbcType=DECIMAL}, #{remark2,jdbcType=VARCHAR}, #{remark3,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.business.common.entity.CfgReadonlyFormShow" >
+    insert into CFG_READONLY_FORM_SHOW
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pagecode != null" >
+        PAGECODE,
+      </if>
+      <if test="dtcode != null" >
+        DTCODE,
+      </if>
+      <if test="spcdcode != null" >
+        SPCDCODE,
+      </if>
+      <if test="colcode != null" >
+        COLCODE,
+      </if>
+      <if test="colname != null" >
+        COLNAME,
+      </if>
+      <if test="dictcode != null" >
+        DICTCODE,
+      </if>
+      <if test="seqno != null" >
+        SEQNO,
+      </if>
+      <if test="extendcfg != null" >
+        EXTENDCFG,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="remark1 != null" >
+        REMARK1,
+      </if>
+      <if test="remark2 != null" >
+        REMARK2,
+      </if>
+      <if test="remark3 != null" >
+        REMARK3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pagecode != null" >
+        #{pagecode,jdbcType=VARCHAR},
+      </if>
+      <if test="dtcode != null" >
+        #{dtcode,jdbcType=VARCHAR},
+      </if>
+      <if test="spcdcode != null" >
+        #{spcdcode,jdbcType=VARCHAR},
+      </if>
+      <if test="colcode != null" >
+        #{colcode,jdbcType=VARCHAR},
+      </if>
+      <if test="colname != null" >
+        #{colname,jdbcType=VARCHAR},
+      </if>
+      <if test="dictcode != null" >
+        #{dictcode,jdbcType=VARCHAR},
+      </if>
+      <if test="seqno != null" >
+        #{seqno,jdbcType=DECIMAL},
+      </if>
+      <if test="extendcfg != null" >
+        #{extendcfg,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="remark1 != null" >
+        #{remark1,jdbcType=DECIMAL},
+      </if>
+      <if test="remark2 != null" >
+        #{remark2,jdbcType=VARCHAR},
+      </if>
+      <if test="remark3 != null" >
+        #{remark3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.business.common.entity.CfgReadonlyFormShow" >
+    update CFG_READONLY_FORM_SHOW
+    <set >
+      <if test="colname != null" >
+        COLNAME = #{colname,jdbcType=VARCHAR},
+      </if>
+      <if test="dictcode != null" >
+        DICTCODE = #{dictcode,jdbcType=VARCHAR},
+      </if>
+      <if test="seqno != null" >
+        SEQNO = #{seqno,jdbcType=DECIMAL},
+      </if>
+      <if test="extendcfg != null" >
+        EXTENDCFG = #{extendcfg,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="remark1 != null" >
+        REMARK1 = #{remark1,jdbcType=DECIMAL},
+      </if>
+      <if test="remark2 != null" >
+        REMARK2 = #{remark2,jdbcType=VARCHAR},
+      </if>
+      <if test="remark3 != null" >
+        REMARK3 = #{remark3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where PAGECODE = #{pagecode,jdbcType=VARCHAR}
+      and DTCODE = #{dtcode,jdbcType=VARCHAR}
+      and SPCDCODE = #{spcdcode,jdbcType=VARCHAR}
+      and COLCODE = #{colcode,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.business.common.entity.CfgReadonlyFormShow" >
+    update CFG_READONLY_FORM_SHOW
+    set COLNAME = #{colname,jdbcType=VARCHAR},
+      DICTCODE = #{dictcode,jdbcType=VARCHAR},
+      SEQNO = #{seqno,jdbcType=DECIMAL},
+      EXTENDCFG = #{extendcfg,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      REMARK1 = #{remark1,jdbcType=DECIMAL},
+      REMARK2 = #{remark2,jdbcType=VARCHAR},
+      REMARK3 = #{remark3,jdbcType=VARCHAR}
+    where PAGECODE = #{pagecode,jdbcType=VARCHAR}
+      and DTCODE = #{dtcode,jdbcType=VARCHAR}
+      and SPCDCODE = #{spcdcode,jdbcType=VARCHAR}
+      and COLCODE = #{colcode,jdbcType=VARCHAR}
+  </update>
+
+  <select id="getReadonlyForm" parameterType="String"
+          resultType="com.joyintech.tams.business.common.entity.CfgReadonlyFormShow">
+    select
+    <include refid="Base_Column_List" />
+    from CFG_READONLY_FORM_SHOW
+    <where>
+      <if test="pageCode != null  and pageCode != ''">and PAGECODE = #{pageCode}</if>
+      <if test="dtCode != null  and dtCode != ''">and DTCODE = #{dtCode}</if>
+      <if test="spcdCode != null  and spcdCode != ''">and SPCDCODE = #{spcdCode}</if>
+    </where>
+    order by SEQNO
+  </select>
+
+  <select id="getReadonlyForms" parameterType="String"
+          resultType="com.joyintech.tams.business.common.entity.CfgReadonlyFormShow">
+    select
+    <include refid="Base_Column_List" />
+    from CFG_READONLY_FORM_SHOW
+    <where>
+      <if test="pageCode != null  and pageCode != ''">and PAGECODE = #{pageCode}</if>
+      <if test="dtCode != null  and dtCode != ''">and DTCODE = #{dtCode}</if>
+      <if test="spcdCodes != null and spcdCodes.size() > 0 ">
+        AND SPCDCODE IN
+        <foreach collection="spcdCodes" item="item" open="(" close=")" separator=",">
+          #{item}
+        </foreach>
+      </if>
+      <if test="spcdCodes == null or spcdCodes.size() == 0 ">
+        AND SPCDCODE = '999999' /*999999为通用规则,无特殊配置时只查询999999*/
+      </if>
+    </where>
+    order by SEQNO
+  </select>
+</mapper>

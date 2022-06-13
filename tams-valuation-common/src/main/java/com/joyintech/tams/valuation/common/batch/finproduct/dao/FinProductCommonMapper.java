@@ -530,4 +530,15 @@ public interface FinProductCommonMapper {
      * 查询标的金融产品类型（投管分类）
      */
     String getfinprodType2(@Param("finprodId") String finprodId);
+
+    /**
+     * 估值查詢-利率互換
+     * @author 殷亚
+     * @date 2022/4/28 15:42
+     * @param map
+     * @return java.util.List<com.joyintech.tams.common.base.entity.MstValIrs>
+     * @see
+     * @version 1.0
+     */
+    List<MstValIrs> getMarketPriceForIrs(Map<String, Object> map);
 }

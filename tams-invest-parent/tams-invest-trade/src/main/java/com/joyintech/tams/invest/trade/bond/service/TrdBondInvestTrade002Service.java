@@ -6,7 +6,6 @@
 package com.joyintech.tams.invest.trade.bond.service;
 
 import com.google.common.collect.Lists;
-import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
 import com.joyintech.calculation.bonds.SecIntSchedule;
@@ -23,6 +22,7 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
@@ -35,6 +35,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -54,14 +55,6 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.common.component.base.group.impl.dao.BasePtlCashPositionInfoMapper;
-import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
-import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
-import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
-import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
-import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
-import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
-import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.ExchangeTransMatchCommonService;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.component.base.trade.BaseTradeProductDealService;
 import com.joyintech.tams.invest.common.component.business.basicdata.BaseTradeFeeCommService;
 import com.joyintech.tams.invest.common.component.business.basicdata.dto.BasicTradeFeeInputDto;
@@ -75,7 +68,11 @@ import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.InvestInterfCommDto;
 import com.joyintech.tams.invest.common.dto.common.PtlAllocationDto;
 import com.joyintech.tams.invest.common.dto.cstp.InterfTradSecdealDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
+import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.risk.service.RiskCreditListCommonValidatorService;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.invest.common.service.MapperDelegateService;
@@ -90,6 +87,7 @@ import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommSer
 import com.joyintech.tams.invest.common.trade.service.MultiApproveTradeCheckService;
 import com.joyintech.tams.invest.common.trade.service.PreTrdCommonBaseService;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.interf.service.InterfComponentService;
 import com.joyintech.tams.invest.interf.service.InterfComponentService.OrderCaller;
 import com.joyintech.tams.invest.trade.bond.dto.BaseEtrInvestInfoDto;
@@ -97,6 +95,8 @@ import com.joyintech.tams.invest.trade.bond.dto.SecCpriceInfoDto;
 import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeCSTPDto;
 import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
+import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.ExchangeTransMatchCommonService;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -279,6 +279,9 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
 
     @Autowired
     private StlSecAcctInfoMapper stlSecAcctInfoMapper;
+
+    @Autowired
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
     @Autowired
     private PaPtlPortfolioMapper paPtlPortfolioMapper;
@@ -1949,7 +1952,12 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
                 exchangeTransMatchCommonService.transactionRecord(entity.getDealSqeId(),trdFinProductDealTotal.getTotleTradeId(),operationType);
             }
             if(StringUtil.isNotEmpty(entity.getBondFirstSign()) && StringUtil.equals("01",entity.getBondFirstSign())){
-                sendPositionMethod(entity);
+                // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 start
+                if(!DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())
+                        && !DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())){
+                    sendPositionMethod(entity);
+                }
+                // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 end
             }
         }
         // 撤销
@@ -2006,9 +2014,13 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
 
             exchangeTransMatchCommonService.transactionRecord(entity.getDealSqeId(),entity.getTotleTradeId(),OperationType.REVOKE);
             if(StringUtil.isNotEmpty(entity.getBondFirstSign()) && StringUtil.equals("01",entity.getBondFirstSign())){
-                PositionHttpRequest.dorevoke(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue(),entity.getPs());
+                // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 start
+                if(!DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())
+                        && !DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())){
+                    PositionHttpRequest.dorevoke(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue(),entity.getPs());
+                }
+                // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 end
             }
-
         }
         // 如果中标结果进来 add by gejiaao 2019年8月6日 start
 //        if (StringUtil.isNotEmpty(entity.getBondFirstSign())) {
@@ -2350,19 +2362,19 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
             validMessageList.add(validMessage);
         }
         // 投资目的
-        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
+//        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
             if (StringUtil.isBlank(dto.getInvAim())) {
                 ValidMessage validMessage = new ValidMessage("invAim",
                         getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.businessModel")));
                 validMessageList.add(validMessage);
             }
-        }else{
-            if (StringUtil.isBlank(dto.getInvAim())) {
-                ValidMessage validMessage = new ValidMessage("invAim",
-                        getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.invAim")));
-                validMessageList.add(validMessage);
-            }
-        }
+//        }else{
+//            if (StringUtil.isBlank(dto.getInvAim())) {
+//                ValidMessage validMessage = new ValidMessage("invAim",
+//                        getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.invAim")));
+//                validMessageList.add(validMessage);
+//            }
+//        }
         // 3.劵面总额
         if (dto.getTradeAmt() == null) {
             ValidMessage validMessage = new ValidMessage("tradeAmt",
@@ -2678,6 +2690,7 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
                 schedule.setActualStartDate(toLocalDate(item.getVdate()));
                 schedule.setActualCutoffDate(toLocalDate(item.getMdate()));
                 schedule.setAmount(item.getIntAmt());
+                schedule.setCorpus(ArithmeticUtil.divide(item.getIntPrinAmt(), new BigDecimal(100), 12));
                 invScheduleList.add(schedule);
                 intSchList.add(item);
             }
@@ -2688,6 +2701,10 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
         tempParamMap.put("ps", dto.getPs());
         SecInfoModelDto secInfoModelDto = restTemplate.postForObject(
             ServiceApplication.TRADE_SERVICE_NAME + "/TrdBondInvestTrade/getSecInfoModel", tempParamMap, SecInfoModelDto.class);
+        FinCashCalcRule finCashCalcRule = joyinbusinessCommonMapper.selectBasisByFinprodId(dto.getFinprodId(), iPlatformDate.getSysDate());
+        if (StringUtil.isNotEmpty(finCashCalcRule) && StringUtil.isNotEmpty(finCashCalcRule.getMarketBasis())) {
+            secInfoModelDto.setBasis(finCashCalcRule.getMarketBasis());
+        }
         SecInfoModel secInfoModel = toSecInfoModel(secInfoModelDto);
         // 如果交易场所为上交所、深交所的情况
         if (isJiaoYiSuo) {

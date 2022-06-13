@@ -273,7 +273,6 @@ public class TrdFxForwardValuationTradeDto extends WflTrdProductDeal implements 
      */
     @Override
     @PrimaryKey(Field.PK_1)
-    @NotEmpty(fieldName="TrdFxForwardValuationTrade001.tradeId",groups = {ValidateGroupEdit.class})
     public String getTradeId(){
         return super.getTradeId();
     }
@@ -454,7 +453,6 @@ public class TrdFxForwardValuationTradeDto extends WflTrdProductDeal implements 
 
     //交易金额
     @Override
-    @NotEmpty(fieldName="TrdFxForwardValuationTrade001.tradeAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getTradeAmt() {
         return super.getTradeAmt();
     }

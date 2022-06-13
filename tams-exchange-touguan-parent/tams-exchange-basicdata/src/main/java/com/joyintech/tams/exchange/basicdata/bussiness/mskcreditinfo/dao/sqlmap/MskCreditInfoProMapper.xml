@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dao.MskCreditInfoProMapper">
+    <insert id="insertSelective" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+        insert into MST_CREDIT_MARKET_INFO
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="secid != null" >
+                secid,
+            </if>
+            <if test="cdate != null" >
+                cdate,
+            </if>
+            <if test="mdprice != null" >
+                MDPRICE,
+            </if>
+            <if test="mcprice != null" >
+                MCPRICE,
+            </if>
+            <if test="mint != null" >
+                MINT,
+            </if>
+            <if test="myield != null" >
+                MYIELD,
+            </if>
+            <if test="mMduration != null" >
+                M_MDURATION,
+            </if>
+            <if test="mCnvxty != null" >
+                M_CNVXTY,
+            </if>
+            <if test="issueMarketNum != null" >
+                ISSUE_MARKET_NUM,
+            </if>
+            <if test="creditType != null" >
+                CREDIT_TYPE,
+            </if>
+            <if test="valueSource != null" >
+                VALUE_SOURCE,
+            </if>
+            <if test="createUser != null" >
+                CREATE_USER,
+            </if>
+            <if test="createDept != null" >
+                CREATE_DEPT,
+            </if>
+            <if test="createTime != null" >
+                CREATE_Time,
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="secid != null" >
+                #{secid,jdbcType=VARCHAR},
+            </if>
+            <if test="cdate != null" >
+                #{cdate,jdbcType=VARCHAR},
+            </if>
+            <if test="mdprice != null" >
+                #{mdprice,jdbcType=DECIMAL},
+            </if>
+            <if test="mcprice != null" >
+                #{mcprice,jdbcType=DECIMAL},
+            </if>
+            <if test="mint != null" >
+                #{mint,jdbcType=DECIMAL},
+            </if>
+            <if test="myield != null" >
+                #{myield,jdbcType=DECIMAL},
+            </if>
+            <if test="mMduration != null" >
+                #{mMduration,jdbcType=DECIMAL},
+            </if>
+            <if test="mCnvxty != null" >
+                #{mCnvxty,jdbcType=DECIMAL},
+            </if>
+            <if test="issueMarketNum != null" >
+                #{issueMarketNum,jdbcType=DECIMAL},
+            </if>
+            <if test="creditType != null" >
+                #{creditType,jdbcType=VARCHAR},
+            </if>
+            <if test="valueSource != null" >
+                #{valueSource,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createDept != null" >
+                #{createDept,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+
+     delete from MST_CREDIT_MARKET_INFO
+        where SECID = #{secid,jdbcType=VARCHAR}
+          and CDATE = #{cdate,jdbcType=VARCHAR}
+          and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
+
+    </delete>
+
+
+    <select id="queryForPage"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" parameterType="Map">
+         SELECT
+            m.SECID secid,
+            f.FINPROD_ABBR finprodAbbr,
+            m.VALUE_SOURCE,
+            sdl1.item_value valueSourceStr,
+            m.CDATE cdate,
+            m.MDPRICE mdprice,
+            m.MCPRICE mcprice,
+            m.MINT mint,
+            m.MYIELD*100 myield,
+            m.M_MDURATION mMduration,
+            m.M_CNVXTY mCnvxty,
+            m.ISSUE_MARKET_NUM issueMarketNum,
+            m.CREDIT_TYPE creditType,
+            sdl2.item_value creditTypeStr
+         FROM
+             MST_CREDIT_MARKET_INFO		m
+         LEFT JOIN
+             FIN_PRODUCT		f
+         ON	 f.FINPROD_MARKET_ID=m.SECID
+         LEFT JOIN
+             INTERF_CREDITINFO	i
+         ON	 i.SECID = m.SECID
+        LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='VALUATION_SOURCE' and sdl1.item_code = m.VALUE_SOURCE
+        LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='PROTECTION_CREDIT_TYPE' and sdl2.item_code = m.CREDIT_TYPE
+        <where>
+            <if test="secIdList != null and secIdList.size() > 0">
+                AND (m.SECID IN
+                <foreach collection="secIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="valueSourceStr != null and valueSourceStr != ''">
+                AND m.VALUE_SOURCE = #{valueSource}
+            </if>
+            <if test="cdateStart != null and cdateStart != ''">
+                <![CDATA[AND  m.cdate >= #{cdateStart,jdbcType=VARCHAR} ]]>
+            </if>
+            <if test="cdateEnd != null and cdateEnd != ''">
+                <![CDATA[AND  m.cdate <= #{cdateEnd,jdbcType=VARCHAR}]]>
+            </if>
+            <include refid="vagueQueryWhere"></include>
+        </where>
+        ORDER BY
+          m.SECID
+    </select>
+    <select id="select"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" parameterType="Map">
+        SELECT
+        m.SECID secid,
+        f.FINPROD_ABBR finprodAbbr,
+        m.VALUE_SOURCE valueSource,
+        sdl1.item_value valueSourceStr,
+        m.CDATE cdate,
+        m.MDPRICE mdprice,
+        m.MCPRICE mcprice,
+        m.MINT mint,
+        m.MYIELD*100 myield,
+        m.M_MDURATION mMduration,
+        m.M_CNVXTY mCnvxty,
+        m.ISSUE_MARKET_NUM issueMarketNum,
+        m.CREDIT_TYPE creditType,
+        sdl2.item_value creditTypeStr
+        FROM
+        MST_CREDIT_MARKET_INFO		m
+        LEFT JOIN
+        FIN_PRODUCT		f
+        ON	 f.FINPROD_MARKET_ID=m.SECID
+        LEFT JOIN
+        INTERF_CREDITINFO	i
+        ON	 i.SECID = m.SECID
+        LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='VALUATION_SOURCE' and sdl1.item_code = m.VALUE_SOURCE
+        LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='PROTECTION_CREDIT_TYPE' and sdl2.item_code = m.CREDIT_TYPE
+        <where>
+            <if test="secIdList != null and secIdList.size() > 0">
+                AND (m.SECID IN
+                <foreach collection="secIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="valueSourceStr != null and valueSourceStr != ''">
+                AND m.VALUE_SOURCE = #{valueSource}
+            </if>
+            <if test="cdateStart != null and cdateStart != ''">
+                <![CDATA[AND  m.cdate >= TO_DATE(#{cdateStart},'YYYY-MM-DD') ]]>
+            </if>
+            <if test="cdateEnd != null and cdateEnd != ''">
+                <![CDATA[AND  m.cdate <= TO_DATE(#{cdateEnd},'YYYY-MM-DD')]]>
+            </if>
+        </where>
+        ORDER BY
+        m.SECID
+    </select>
+
+    <sql id="vagueQueryWhere">
+        <if test="search != null and search != '' ">
+            AND  (
+            sdl1.ITEM_VALUE like '%' || #{search} || '%'
+            or sdl2.ITEM_VALUE like '%' || #{search} || '%'
+            OR m.SECID like '%' || #{search} || '%'
+            OR m.CREDIT_TYPE like '%' || #{search} || '%'
+            <if test="search_isNumberFlag != null and search_isNumberFlag == true">
+            or (m.MYIELD*100 = #{search})
+            or (m.MCPRICE = #{search})
+            or (m.MINT = #{search})
+            or (m.M_MDURATION = #{search})
+            or (m.M_CNVXTY = #{search})
+            </if>
+            )
+        </if>
+    </sql>
+
+    <select id="selectByKey"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+         SELECT
+        m.SECID secid,
+        f.FINPROD_ABBR finprodAbbr,
+        m.VALUE_SOURCE,
+        m.CDATE cdate,
+        m.MDPRICE mdprice,
+        m.MCPRICE mcprice,
+        m.MINT mint,
+        m.MYIELD*100 myield,
+        m.M_MDURATION mMduration,
+        m.M_CNVXTY mCnvxty,
+        m.ISSUE_MARKET_NUM issueMarketNum,
+        m.CREDIT_TYPE creditType
+        FROM
+        MST_CREDIT_MARKET_INFO		m
+        LEFT JOIN
+        FIN_PRODUCT		f
+        ON	 f.FINPROD_MARKET_ID=m.SECID
+        LEFT JOIN
+        INTERF_CREDITINFO	i
+        ON	 i.SECID = m.SECID
+        where
+        m.SECID=#{secId,jdbcType=VARCHAR}
+        AND
+        m.CDATE=#{valueDate,jdbcType=VARCHAR}
+        AND
+        m.VALUE_SOURCE=#{valueSource,jdbcType=VARCHAR}
+        <if test="mdprice != null and mdprice !=''">
+            and m.MDPRICE = #{mdprice,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+
+    <select id="getBusinessData" parameterType="com.joyintech.tams.component.business.core.dto.WflValidInputParameter" resultType="java.lang.String">
+        select pm.STATUS status
+        from SYS_DATA_PROCESS_MARK pm
+        inner join (
+        select
+        max(HIS_NO)	       HIS_NO,
+        WORKFLOW_ID
+        from SYS_DATA_PROCESS_MARK
+        <where>
+            <if test="pageId != null and pageId !=''">
+                PAGE_ID = #{pageId}
+            </if>
+        </where>
+        group by  WORKFLOW_ID
+        ) tempHis on  pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
+        <where>
+            <if test="seachMode != null and seachMode !='' and seachMode == '01'.toString()">
+                pm.status in ('A','U','P')
+            </if>
+            <if test="pageId != null and pageId !=''">
+                and pm.PAGE_ID = #{pageId}
+            </if>
+            <if test="businessDataPk1 != null and businessDataPk1 !=''">
+                and pm.BUSINESS_DATA_PK1 = #{businessDataPk1}
+            </if>
+            <if test="businessDataPk2 != null and businessDataPk2 !=''">
+                and pm.BUSINESS_DATA_PK2 = #{businessDataPk2}
+            </if>
+            <if test="workflowId != null and workflowId !=''">
+                and pm.WORKFLOW_ID != #{workflowId}
+            </if>
+        </where>
+        order by pm.create_time desc
+    </select>
+
+
+    <select id="getBasicInfo" parameterType="Map" resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+             SELECT
+        m.SECID secid,
+        f.FINPROD_ABBR finprodAbbr,
+        m.VALUE_SOURCE,
+        m.CDATE cdate,
+        m.MDPRICE mdprice,
+        m.MCPRICE mcprice,
+        m.MINT mint,
+        m.MYIELD*100 myield,
+        m.M_MDURATION mMduration,
+        m.M_CNVXTY mCnvxty,
+        m.ISSUE_MARKET_NUM issueMarketNum,
+        m.CREDIT_TYPE creditType
+        FROM
+        MST_CREDIT_MARKET_INFO		m
+        LEFT JOIN
+        FIN_PRODUCT		f
+        ON	 f.FINPROD_MARKET_ID=m.SECID
+        LEFT JOIN
+        INTERF_CREDITINFO	i
+        ON	 i.SECID = m.SECID
+        WHERE
+        m.SECID=#{secid,jdbcType=VARCHAR}
+    </select>
+
+    <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="text" property="text" jdbcType="VARCHAR"/>
+        <result column="object" property="object" jdbcType="VARCHAR"/>
+        <!-- 	        <association property="object" javaType="java.util.Map">
+                        <result column="FINPROD_ABBR" property="finprodAbbr" jdbcType="VARCHAR"/>
+                    </association> -->
+    </resultMap>
+
+    <select id="getFinprodMarketInfo" resultMap="finprodIdMap">
+        SELECT DISTINCT id,object,text from (
+        select
+        FIN.FINPROD_MARKET_ID AS id,
+        FIN.FINPROD_MARKET_ID object,
+        FIN.FINPROD_ABBR AS text
+        FROM
+        FIN_PRODUCT  FIN  where FINPROD_TYPE2=#{finprodType2}
+
+        union all
+        select
+        i.SECID AS id,
+        i.SECID object,
+        i.SECNAME AS text
+        from   INTERF_CREDITINFO	i ) t
+        <where>
+            <if test="search != null and !search.equals('')">
+                AND (t.id like concat('%',concat(#{search},'%')) OR t.text like concat('%',concat(#{search},'%')))
+            </if>
+        </where>
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" >
+        update MST_CREDIT_MARKET_INFO
+        <set >
+            <if test="mint != null" >
+                MINT = #{mint,jdbcType=DECIMAL},
+            </if>
+            <if test="mdprice != null" >
+                MDPRICE = #{mdprice,jdbcType=DECIMAL},
+            </if>
+            <if test="mcprice != null" >
+                MCPRICE = #{mcprice,jdbcType=DECIMAL},
+            </if>
+            <if test="myield != null" >
+                MYIELD = #{myield,jdbcType=DECIMAL},
+            </if>
+            <if test="mMduration != null" >
+                M_MDURATION = #{mMduration,jdbcType=DECIMAL},
+            </if>
+            <if test="mCnvxty != null" >
+                M_CNVXTY = #{mCnvxty,jdbcType=DECIMAL},
+            </if>
+            <if test="issueMarketNum != null" >
+                ISSUE_MARKET_NUM = #{issueMarketNum,jdbcType=DECIMAL},
+            </if>
+            <if test="creditType != null" >
+                CREDIT_TYPE = #{creditType,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where SECID = #{secid,jdbcType=VARCHAR}
+        and CDATE = #{cdate,jdbcType=VARCHAR}
+        and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

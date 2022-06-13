@@ -26,21 +26,24 @@ $(function() {
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/check', object, function(result) {
             Joyin.confirm(result.data, function() {
                 if (operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/save', object, "TrdOutRightRepoValuationTrade002_btn_save");
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/save', object, "TrdOutRightRepoValuationTrade003_btn_save");
                 } else {
-                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/save', object, "TrdOutRightRepoValuationTrade002_btn_submit");
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/save', object, "TrdOutRightRepoValuationTrade003_btn_submit");
                 }
             });
         })
     }
 
     var init=function(){
-        $('#cpdm').hide();
-        $('#zcdm').hide();
+        // $('#cpdm').hide();
+        // $('#zcdm').hide();
         $('#endDate').hide(); //到期日隐藏
         var mdate=$('#mdate').val();
         $('#tradeDate').val(mdate);
+        $('#settleDate').val(mdate);
         $('#ps').textSelect("setValue",'T07');
+        var settleAmt=JoyinMath.doAdd($('#mfprice').val(), $('#otherAmt').val(), 2);
+        $('#settleAmt').val(settleAmt);
     }
     /**
      * 画面加载完成
@@ -81,35 +84,37 @@ $(function() {
     });
 
 
-    //根据产品名称联动出产品代码
+
     $('#portfolioId').change(function(){
         var portfolioId = $('#portfolioId').val();
         if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+            $('#portfolioName').val($('#portfolioId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#portfolioName').val('').trigger('change');
         }
     });
 
-    //根据标的资产名称联动出标的资产代码
+    /**
+     * 资产代码联动带出资产简称，交易场所
+     */
     $('#finprodMarketId').change(function(){
         var finprodMarketId = $('#finprodMarketId').val();
         if(finprodMarketId){
             var dataPort = $('#finprodMarketId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#finprodName').val(finprodId).trigger('change');
+            // var term = dataPort.term;
+            // var rebackPrice = JoyinMath.doMul(dataPort.rebackPrice, 100, 4);
+
+            $('#finprodName').val($('#finprodMarketId').select2('data')[0].id).trigger('change');
+            // $('#term').val(term).trigger('change');
+            // $('#rebackPrice').val(rebackPrice).trigger('change');
 
         }else {
             $('#finprodName').val('').trigger('change');
+            // $('#term').val('').trigger('change');
+            // $('#rebackPrice').val('').trigger('change');
         }
     });
-
-
-
-
 
 
 }());

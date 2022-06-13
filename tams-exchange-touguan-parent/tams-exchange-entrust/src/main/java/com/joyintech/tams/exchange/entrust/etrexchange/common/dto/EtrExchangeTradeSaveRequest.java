@@ -13,12 +13,14 @@ package com.joyintech.tams.exchange.entrust.etrexchange.common.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.validator.EtrExchangeTradeJj001Validator;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
@@ -26,8 +28,10 @@ import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -103,7 +107,7 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
     private String businessTypeName;
 
     @ApiModelProperty(name="standardBondVolume",value="标准券数量",example="")
-    private Long standardBondVolume;
+    private BigDecimal standardBondVolume;
 
     @ApiModelProperty(name="repoAmt",value="回购金额",example="12")
     private BigDecimal repoAmt;
@@ -231,6 +235,9 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
     @ApiModelProperty(required = true,name="portfolioList",value="组合列表",example="[{'portfolioId':'qwqw'}]]")
     List<EtrExchangeTradePortfolioRequest> portfolioList;
 
+    List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos; //待办提交风险试算结果保存需要
+
+
     /**
      * 组合名称
      */
@@ -256,6 +263,10 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
 
 
     private BigDecimal disRate;
+    /**
+     * 投管业务类型
+     */
+    private String busiTypePosition;
 
     public BigDecimal getDisRate() {
         return disRate;
@@ -591,11 +602,11 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
         this.priceModel = priceModel;
     }
 
-    public Long getStandardBondVolume() {
+    public BigDecimal getStandardBondVolume() {
         return standardBondVolume;
     }
 
-    public void setStandardBondVolume(Long standardBondVolume) {
+    public void setStandardBondVolume(BigDecimal standardBondVolume) {
         this.standardBondVolume = standardBondVolume;
     }
 
@@ -751,7 +762,28 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
         return currentTab;
     }
 
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
     public void setCurrentTab(String currentTab) {
         this.currentTab = currentTab;
     }
+
+    public List<EtrExchangeTradePortfolioRequest> getTradeMultiPtl001Dtos() {
+        List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos = this.portfolioList;
+        if (!CollectionUtils.isEmpty(tradeMultiPtl001Dtos)) {
+            tradeMultiPtl001Dtos.forEach(item -> {
+                if (StringUtil.equals(item.getIsMulti(), DictCodeList.是否_是.getValue())) {
+                    item.setEntrustId(this.getEntrustId() + "-" + item.getPortfolioId());
+                }
+            });
+        }
+        return tradeMultiPtl001Dtos;
+    }
+
 }

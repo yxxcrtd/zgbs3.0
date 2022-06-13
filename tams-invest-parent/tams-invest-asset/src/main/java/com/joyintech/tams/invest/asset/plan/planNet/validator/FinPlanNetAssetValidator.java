@@ -5,6 +5,7 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.common.base.entity.FinOpenPlan;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.asset.plan.planNet.dto.FinPlanNetAssetDto;
@@ -140,6 +141,19 @@ public class FinPlanNetAssetValidator implements BeanValidator {
 
         if (dto.getOperateType() != null && !StringUtil.equals(dto.getOperateType(), "delete")) {
             errorList = chbInvDataCheckService.chbCheckCommon(errorList, value, null, dto.getRepAssetType());
+        }
+
+        //同一数据行：开放开始日小于等于开放结束日，开放结束日小于等于开放确认日
+        if (dto.getBussFinProductOpenPlanDto() != null) {
+            List<FinOpenPlan> finOpenPlanListTemp = dto.getBussFinProductOpenPlanDto().getFinOpenPlanList();
+            if (!StringUtil.isEmptyList(finOpenPlanListTemp)){
+                for (FinOpenPlan finOpenPlan : finOpenPlanListTemp) {
+                    if(!(finOpenPlan.getOpenDateStr().compareTo(finOpenPlan.getOpenDateEnd())<=0 && finOpenPlan.getOpenDateEnd().compareTo(finOpenPlan.getOpenVdate())<=0)){
+                        errorList.add(new ValidMessage("开放计划中开放开始日必须小于等于开放结束日，开放结束日必须小于等于开放确认日"));
+                        break;
+                    }
+                }
+            }
         }
 
         return errorList;

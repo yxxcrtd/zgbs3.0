@@ -16,6 +16,7 @@ import java.util.Map;
 
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.valuation.batch.common.cache.service.ValuationBatchCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -68,7 +69,7 @@ public class ExpReturnSubProductFixedFeeCalBookTask extends BatchBaseService {
 	@Autowired
 	private BookCommonLogic bookCommonLogic;
 	@Autowired
-	private AccountingMethodMapper accountingMethodMapper;
+	private ValuationBatchCacheService valuationBatchCacheService;
 
 	/**
 	 * batchBuilder
@@ -123,8 +124,9 @@ public class ExpReturnSubProductFixedFeeCalBookTask extends BatchBaseService {
 		cashTypeList.add(DictCodeListExt1.现金流二级类型_代销费.getValue());*/
 		List<String> matchTypeList=Lists.newArrayList();
 		matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_计提现金流类型.getValue());
-        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(
-            matchTypeList, this.getBatchExecuteInfo().getTaskId(), null);
+//        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(
+//            matchTypeList, this.getBatchExecuteInfo().getTaskId(), null);
+		List<BokMatchRlat> valMatchRlats = valuationBatchCacheService.getBokMatchRlatFromCache(matchTypeList, this.getBatchExecuteInfo().getTaskId(), null);
         for(BokMatchRlat rlat:valMatchRlats){
             cashTypeList.add(rlat.getTarget());
         }

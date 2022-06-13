@@ -10,38 +10,20 @@
 
 package com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
 import com.joyintech.framework.util.StringUtil;
-
-import com.joyintech.tams.common.base.entity.BokDealAccounting;
-import com.joyintech.tams.common.base.entity.BokDealAccountingDetail;
-import com.joyintech.tams.common.base.entity.BokDetailId;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
-import com.joyintech.tams.common.base.entity.ValInterflog;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
-import com.joyintech.tams.valuation.common.interf.base.dto.FundDealInfoForInterfRecCommonResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.InterfProductDealBookCommonDto;
-import com.joyintech.tams.valuation.common.interf.base.dto.TargetFinProduct;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateCheckReturnResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateSourceFlgDTO;
+import com.joyintech.tams.valuation.common.interf.base.dto.*;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValBonusResTrade;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * 06红利再投交易
@@ -130,7 +112,7 @@ public class FundBonusReinvestmentDealRecService {
      * @since 1.0
      */
     @SuppressWarnings({"unchecked"})
-    private Map<String, Object> handleValBonusResTrade(List<ValBonusResTrade> listValBonusResTrade,Date resovleDate,Map<String,Object> params,
+    public Map<String, Object> handleValBonusResTrade(List<ValBonusResTrade> listValBonusResTrade,Date resovleDate,Map<String,Object> params,
     		List<ValInterflog> valInterflog) {
         List<String> bookSetIds = (List<String>)params.get(InterfCommonConstant.接口_运行接口账套ID);
     	String valModel = (String)params.get(InterfCommonConstant.接口模式);
@@ -354,6 +336,11 @@ public class FundBonusReinvestmentDealRecService {
         }
       //通道代码 = a.通道代码
         result.setChlId(dto.getChannelId());
+
+        /*add by sunshuaishuai 交易管理 20220323 start*/
+        //交易场所
+        result.setTradeMarket(dto.getTradeMarket());
+        /*add by sunshuaishuai 20220323 end*/
         return result;
     }
 

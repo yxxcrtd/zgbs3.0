@@ -301,6 +301,11 @@ public class SettleTransData extends BaseEntity {
     private String settleMode;
 
     /**
+     * 交收结果
+     */
+    private String deliveryResult;
+
+    /**
      * 印花税_原始
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
@@ -1250,6 +1255,14 @@ public class SettleTransData extends BaseEntity {
         this.settleMode = settleMode == null ? null : settleMode.trim();
     }
 
+    public String getDeliveryResult() {
+        return deliveryResult;
+    }
+
+    public void setDeliveryResult(String deliveryResult) {
+        this.deliveryResult = deliveryResult == null ? null : deliveryResult.trim();
+    }
+
     /**
      * 取得 印花税_原始
      * @return 印花税_原始
@@ -1486,4 +1499,5 @@ public class SettleTransData extends BaseEntity {
     public void setTradeType(String tradeType) {
         this.tradeType = tradeType;
     }
+
 }

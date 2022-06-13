@@ -3,23 +3,32 @@ package com.joyintech.service.valuation.trademanage.bondlend.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
-import com.joyintech.tams.constant.DictCode;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
+import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
-public class TrdBondLendTrade001Dto extends BaseEntity {
+public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 交易编号
+     * 操作类型
      */
-    @PrimaryKey(value= PrimaryKey.Field.PK_1)
-    private String tradeId;
+    private String operateType;
+
+    private String pageModel;
+
+    /**
+     * 选择数据
+     */
+    private List<TrdBondLendTrade001Dto> selectedItem;
+
+    /**
+     * 要素id
+     */
+    private String elementId;
 
     /**
      * 外部成交编号
@@ -27,14 +36,19 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
     private String outTradeId;
 
     /**
-     * 金融产品代码
+     * 借贷期限
      */
-    private String finprodId;
+    private Long term;
 
     /**
-     * 产品名称
+     * 金融产品代码
      */
-    private String finprodName;
+    private String prodId;
+
+    /**
+     * 金融产品名称
+     */
+    private String prodName;
 
     /**
      * 债券代码
@@ -47,43 +61,44 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
     private String secAbbr;
 
     /**
+     * 金融产品类型
+     */
+    private String finprodType;
+
+    /**
      * 交易方向
      */
     private String ps;
 
     /**
-     * 交易日
+     * 交易编号
      */
-    private String tradeDate;
+    @PrimaryKey(value= PrimaryKey.Field.PK_1)
+    private String tradeId;
 
     /**
-     * 交割日期
+     * 交易日
      */
-    private String settdateDate;
+    private Date tradeDate;
 
     /**
      * 起息日
      */
-    private String vdate;
+    private Date vdate;
 
     /**
      * 到期日
      */
-    private String mdate;
+    private Date mdate;
 
     /**
-     * 借贷期限
+     * 券面总额
      */
-    private Long term;
-
-    /**
-     * 券面总额（万元）
-     */
-    @JsonSerialize(using = BigDecimalSerializer.class)
+    @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal prinAmt;
 
     /**
-     * 借贷费率%
+     * 借贷费率
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal feeRate;
@@ -100,6 +115,19 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
     private String ccy;
 
     /**
+     * 其他应付费用
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal otherAmt;
+
+
+    /**
+     * 现金交割金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal settAmt;
+
+    /**
      * 结算金额
      */
     private BigDecimal settleAmt;
@@ -110,26 +138,16 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
     private String acctNo;
 
     /**
-     * 选中的数据
+     * 是否现金交割
      */
-    private transient List<TrdBondLendTrade001Dto> selectedItem;
+    private String isSettAmt;
 
-    /**
-     * 操作类型
-     */
-    private String operateType;
-
-    /**
-     * 要素id
-     */
-    private String elementId;
-
-    public String getFinprodId() {
-        return finprodId;
+    public String getProdId() {
+        return prodId;
     }
 
-    public void setFinprodId(String finprodId) {
-        this.finprodId = finprodId;
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
     public String getSecId() {
@@ -164,20 +182,12 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
-    }
-
-    public String getSettdateDate() {
-        return settdateDate;
-    }
-
-    public void setSettdateDate(String settdateDate) {
-        this.settdateDate = settdateDate;
     }
 
     public String getCcy() {
@@ -188,22 +198,12 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
         this.ccy = ccy;
     }
 
-    /**
-     * 取得 币种Fmt
-     *
-     * @return 币种
-     */
-    public String getCcyFmt() {
-        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.币种, ccy))?
-                SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
+    public BigDecimal getOtherAmt() {
+        return otherAmt;
     }
 
-    public String getAcctNo() {
-        return acctNo;
-    }
-
-    public void setAcctNo(String acctNo) {
-        this.acctNo = acctNo;
+    public void setOtherAmt(BigDecimal otherAmt) {
+        this.otherAmt = otherAmt;
     }
 
     public String getOperateType() {
@@ -214,36 +214,20 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
         this.operateType = operateType;
     }
 
+    public String getPageModel() {
+        return pageModel;
+    }
+
+    public void setPageModel(String pageModel) {
+        this.pageModel = pageModel;
+    }
+
     public List<TrdBondLendTrade001Dto> getSelectedItem() {
         return selectedItem;
     }
 
     public void setSelectedItem(List<TrdBondLendTrade001Dto> selectedItem) {
         this.selectedItem = selectedItem;
-    }
-
-    public String getOutTradeId() {
-        return outTradeId;
-    }
-
-    public void setOutTradeId(String outTradeId) {
-        this.outTradeId = outTradeId;
-    }
-
-    public String getFinprodName() {
-        return finprodName;
-    }
-
-    public void setFinprodName(String finprodName) {
-        this.finprodName = finprodName;
-    }
-
-    public BigDecimal getSettleAmt() {
-        return settleAmt;
-    }
-
-    public void setSettleAmt(BigDecimal settleAmt) {
-        this.settleAmt = settleAmt;
     }
 
     public String getElementId() {
@@ -254,43 +238,28 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
         this.elementId = elementId;
     }
 
-    public String getPrinAmtStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getPrinAmt()==null?"0.00":decimalFormat.format(this.getPrinAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    public String getOutTradeId() {
+        return outTradeId;
     }
 
-    public String getFeeStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getFee()==null?"0.00":decimalFormat.format(this.getFee().setScale(2,BigDecimal.ROUND_HALF_UP));
+    public void setOutTradeId(String outTradeId) {
+        this.outTradeId = outTradeId;
     }
 
-    public String getSettleAmtStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    public String getProdName() {
+        return prodName;
     }
 
-    public String getVdate() {
-        return vdate;
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
     }
 
-    public void setVdate(String vdate) {
-        this.vdate = vdate;
+    public BigDecimal getSettleAmt() {
+        return settleAmt;
     }
 
-    public String getMdate() {
-        return mdate;
-    }
-
-    public void setMdate(String mdate) {
-        this.mdate = mdate;
-    }
-
-    public Long getTerm() {
-        return term;
-    }
-
-    public void setTerm(Long term) {
-        this.term = term;
+    public void setSettleAmt(BigDecimal settleAmt) {
+        this.settleAmt = settleAmt;
     }
 
     public BigDecimal getPrinAmt() {
@@ -315,5 +284,61 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
 
     public void setFee(BigDecimal fee) {
         this.fee = fee;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    public Long getTerm() {
+        return term;
+    }
+
+    public void setTerm(Long term) {
+        this.term = term;
+    }
+
+    public BigDecimal getSettAmt() {
+        return settAmt;
+    }
+
+    public void setSettAmt(BigDecimal settAmt) {
+        this.settAmt = settAmt;
+    }
+
+    public String getIsSettAmt() {
+        return isSettAmt;
+    }
+
+    public void setIsSettAmt(String isSettAmt) {
+        this.isSettAmt = isSettAmt;
+    }
+
+    public Date getVdate() {
+        return vdate;
+    }
+
+    public void setVdate(Date vdate) {
+        this.vdate = vdate;
+    }
+
+    public Date getMdate() {
+        return mdate;
+    }
+
+    public void setMdate(Date mdate) {
+        this.mdate = mdate;
+    }
+
+    public String getFinprodType() {
+        return finprodType;
+    }
+
+    public void setFinprodType(String finprodType) {
+        this.finprodType = finprodType;
     }
 }

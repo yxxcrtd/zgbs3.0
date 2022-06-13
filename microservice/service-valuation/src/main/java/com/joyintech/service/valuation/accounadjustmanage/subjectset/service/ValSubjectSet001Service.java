@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -167,7 +168,69 @@ public class ValSubjectSet001Service extends CommonExportService<ValBokSubjectDt
      * @since 1.0
      */
     public ValBokSubjectDto selectValBokSubject(ValBokSubjectDto dto) {
-        return valSubjectSet001Mapper.selectValBokSubject(dto);
+        Map<String, Object> map =new HashMap<>();
+        map.put("booksetId",dto.getBooksetId());
+        map.put("subjectNo",dto.getSubjectNo());
+        map.put("default","DEFAULT");
+        List<ValBokSubjectDto> list = valSubjectSet001Mapper.selectValBokSubject(map);
+        ValBokSubjectDto valBokSubjectDto = list.get(0);//返回的实体类
+        Map<String, Object> param =new HashMap<>();
+        param.put("default","DEFAULT");
+        param.put("subjectInternalCode",valBokSubjectDto.getSubjectInternalCode());
+        if(!StringUtil.isEmptyList(list)){
+            //查询辅助核算配置表里的字典值
+            List<ValSubjectHandDto> list1=valSubjectSet001Mapper.getHandCode(param);
+            int length = list1.size();
+            switch (length){
+                case 1: valBokSubjectDto.setType1(list.get(0).getType2()); break;
+                case 2: valBokSubjectDto.setType1(list.get(0).getType2());
+                        valBokSubjectDto.setType2(list.get(1).getType2()); break;
+                case 3: valBokSubjectDto.setType1(list.get(0).getType2());
+                        valBokSubjectDto.setType2(list.get(1).getType2());
+                        valBokSubjectDto.setType3(list.get(2).getType2()); break;
+                case 4: valBokSubjectDto.setType1(list.get(0).getType2());
+                        valBokSubjectDto.setType2(list.get(1).getType2());
+                        valBokSubjectDto.setType3(list.get(2).getType2());
+                        valBokSubjectDto.setType4(list.get(3).getType2()); break;
+                case 5: valBokSubjectDto.setType1(list.get(0).getType2());
+                        valBokSubjectDto.setType2(list.get(1).getType2());
+                        valBokSubjectDto.setType3(list.get(2).getType2());
+                        valBokSubjectDto.setType4(list.get(3).getType2());
+                        valBokSubjectDto.setType5(list.get(4).getType2()); break;
+                case 6: valBokSubjectDto.setType1(list.get(0).getType2());
+                        valBokSubjectDto.setType2(list.get(1).getType2());
+                        valBokSubjectDto.setType3(list.get(2).getType2());
+                        valBokSubjectDto.setType4(list.get(3).getType2());
+                        valBokSubjectDto.setType5(list.get(4).getType2());
+                        valBokSubjectDto.setType6(list.get(5).getType2()); break;
+                case 7: valBokSubjectDto.setType1(list.get(0).getType2());
+                        valBokSubjectDto.setType2(list.get(1).getType2());
+                        valBokSubjectDto.setType3(list.get(2).getType2());
+                        valBokSubjectDto.setType4(list.get(3).getType2());
+                        valBokSubjectDto.setType5(list.get(4).getType2());
+                        valBokSubjectDto.setType6(list.get(5).getType2());
+                        valBokSubjectDto.setType7(list.get(6).getType2()); break;
+                case 8: valBokSubjectDto.setType1(list.get(0).getType2());
+                        valBokSubjectDto.setType2(list.get(1).getType2());
+                        valBokSubjectDto.setType3(list.get(2).getType2());
+                        valBokSubjectDto.setType4(list.get(3).getType2());
+                        valBokSubjectDto.setType5(list.get(4).getType2());
+                        valBokSubjectDto.setType6(list.get(5).getType2());
+                        valBokSubjectDto.setType7(list.get(6).getType2());
+                        valBokSubjectDto.setType8(list.get(7).getType2()); break;
+                case 9: valBokSubjectDto.setType1(list.get(0).getType2());
+                        valBokSubjectDto.setType2(list.get(1).getType2());
+                        valBokSubjectDto.setType3(list.get(2).getType2());
+                        valBokSubjectDto.setType4(list.get(3).getType2());
+                        valBokSubjectDto.setType5(list.get(4).getType2());
+                        valBokSubjectDto.setType6(list.get(5).getType2());
+                        valBokSubjectDto.setType7(list.get(6).getType2());
+                        valBokSubjectDto.setType8(list.get(7).getType2());
+                        valBokSubjectDto.setType9(list.get(8).getType2()); break;
+            }
+
+        }
+        return valBokSubjectDto;
     }
 
     /**
@@ -226,6 +289,10 @@ public class ValSubjectSet001Service extends CommonExportService<ValBokSubjectDt
             }
         }
 
+        /*add by sunshuaishuai 20220407 辅助核算项修改 start*/
+        hands = create(dto);
+        /*add by sunshuaishuai 20220407 辅助核算项修改 end*/
+
         if (StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_EDIT)) {
             valSubjectSet001Mapper.updateByPrimaryKey(dto);
             /**删除科目辅助核算信息**/
@@ -266,5 +333,169 @@ public class ValSubjectSet001Service extends CommonExportService<ValBokSubjectDt
         return valSubjectSet001Mapper.selectValBokSubjectByInCode(dto);
     }
 
+    /*add by sunshuaishuai 辅助核算项修改 20220406 start*/
+    /**
+     * 根据基础科目性质查询辅助核算项
+     *
+     * @param param 过滤参数
+     * @return 上级科目代码列表
+     * @throws Exception
+     * @see
+     * @since 1.0
+     */
+    public List<ValSubjectHandDto> getHandCode(Map<String, Object> param) {
+        param.put("default","DEFAULT");
+        return valSubjectSet001Mapper.getHandCode(param);
+    }
 
+    /**
+     * 根据基础科目性质联动辅助核算项下拉框
+     *
+     * @param param 过滤参数
+     * @return 上级科目代码列表
+     * @throws Exception
+     * @see
+     * @since 1.0
+     */
+    public List<SelectOptionDto> getType(Map<String, Object> param) {
+        List<SelectOptionDto> selectOptionDtos = new ArrayList<>();
+        if(StringUtil.isNotEmpty(param.get("subjectInternalCode"))){
+            param.put("default","DEFAULT");
+            List<ValSubjectHandDto> list=valSubjectSet001Mapper.getHandCode(param);
+            String type = (String) param.get("type");
+            int i = Integer.parseInt(type.split("type")[1]);
+            if(!StringUtil.isEmptyList(list)){
+                if(i <= list.size()){
+                    ValSubjectHandDto dto = list.get(i-1);
+                    param.put("handCode",dto.getHandCode());
+                    selectOptionDtos = valSubjectSet001Mapper.getType(param);
+                }
+            }
+        }
+        return selectOptionDtos;
+    }
+
+    /**
+     * 将页面的多个辅助核算项组装成对应的实体类
+     *
+     * @param
+     * @return 上级科目代码列表
+     * @throws Exception
+     * @see
+     * @since 1.0
+     */
+    public List<ValSubjectHandDto> create(ValBokSubjectDto dto){
+        List<ValSubjectHandDto> dtoList = new ArrayList<>();
+        Map<String, Object> param = new HashMap<>();
+        param.put("subjectInternalCode",dto.getSubjectInternalCode());
+        param.put("default","DEFAULT");
+        List<ValSubjectHandDto> list=valSubjectSet001Mapper.getHandCode(param);
+        //额外处理默认的情况
+        if(StringUtil.isNotEmpty(dto.getTypeDefault())){
+            String[] typeArr = dto.getTypeDefault().split(",");
+            ValSubjectHandDto valSubjectHandDto = new ValSubjectHandDto();
+            valSubjectHandDto.setBooksetId(dto.getBooksetId());
+            valSubjectHandDto.setSubjectInternalCode(dto.getSubjectInternalCode());
+            valSubjectHandDto.setHandCode("DEFAULT");
+            valSubjectHandDto.setHandCodeValue(typeArr[0]);
+            valSubjectHandDto.setSubjectNo(dto.getSubjectNo());
+            valSubjectHandDto.setCreateUser(dto.getCreateUser());
+            valSubjectHandDto.setCreateDept(dto.getCreateDept());
+            valSubjectHandDto.setUpdateUser(dto.getUpdateUser());
+            valSubjectHandDto.setCreateTime(dto.getCreateTime());
+            valSubjectHandDto.setUpdateTime(dto.getUpdateTime());
+            dtoList.add(valSubjectHandDto);
+        }
+        if(StringUtil.isNotEmpty(dto.getType1())){
+            String type = "type1";
+            dtoList.addAll(generateEntity(type,list,dto));
+        }
+        if(StringUtil.isNotEmpty(dto.getType2())){
+            String type = "type2";
+            dtoList.addAll(generateEntity(type,list,dto));
+        }
+        if(StringUtil.isNotEmpty(dto.getType3())){
+            String type = "type3";
+            dtoList.addAll(generateEntity(type,list,dto));
+        }
+        if(StringUtil.isNotEmpty(dto.getType4())){
+            String type = "type4";
+            dtoList.addAll(generateEntity(type,list,dto));
+        }
+        if(StringUtil.isNotEmpty(dto.getType5())){
+            String type = "type5";
+            dtoList.addAll(generateEntity(type,list,dto));
+        }
+        if(StringUtil.isNotEmpty(dto.getType6())){
+            String type = "type6";
+            dtoList.addAll(generateEntity(type,list,dto));
+        }
+        if(StringUtil.isNotEmpty(dto.getType7())){
+            String type = "type7";
+            dtoList.addAll(generateEntity(type,list,dto));
+        }
+        if(StringUtil.isNotEmpty(dto.getType8())){
+            String type = "type8";
+            dtoList.addAll(generateEntity(type,list,dto));
+        }
+        if(StringUtil.isNotEmpty(dto.getType9())){
+            String type = "type9";
+            dtoList.addAll(generateEntity(type,list,dto));
+        }
+        return dtoList;
+    }
+
+    /**
+     * 将页面的多个辅助核算项组装成对应的实体类
+     *
+     * @param
+     * @return 上级科目代码列表
+     * @throws Exception
+     * @see
+     * @since 1.0
+     */
+    public List<ValSubjectHandDto> generateEntity(String typeName, List<ValSubjectHandDto> list,ValBokSubjectDto dto){
+        List<ValSubjectHandDto> list1 = new ArrayList<>();
+        int i = Integer.parseInt(typeName.split("type")[1]);
+        if(i <= list.size()){
+            ValSubjectHandDto entity = list.get(i-1);
+            String[] typeArr = new String[15];
+            if("type1".equals(typeName)){
+                typeArr = dto.getType1().split(",");
+            }else if("type2".equals(typeName)){
+                typeArr = dto.getType2().split(",");
+            }else if("type3".equals(typeName)){
+                typeArr = dto.getType3().split(",");
+            }else if("type4".equals(typeName)){
+                typeArr = dto.getType4().split(",");
+            }else if("type5".equals(typeName)){
+                typeArr = dto.getType5().split(",");
+            }else if("type6".equals(typeName)){
+                typeArr = dto.getType6().split(",");
+            }else if("type7".equals(typeName)){
+                typeArr = dto.getType7().split(",");
+            }else if("type8".equals(typeName)){
+                typeArr = dto.getType8().split(",");
+            }else if("type9".equals(typeName)){
+                typeArr = dto.getType9().split(",");
+            }
+
+            for (int j = 0; j < typeArr.length; j++) {
+                ValSubjectHandDto valSubjectHandDto = new ValSubjectHandDto();
+                valSubjectHandDto.setBooksetId(dto.getBooksetId());
+                valSubjectHandDto.setSubjectInternalCode(dto.getSubjectInternalCode());
+                valSubjectHandDto.setHandCode(entity.getHandCode());
+                valSubjectHandDto.setHandCodeValue(typeArr[j]);
+                valSubjectHandDto.setSubjectNo(dto.getSubjectNo());
+                valSubjectHandDto.setCreateUser(dto.getCreateUser());
+                valSubjectHandDto.setCreateDept(dto.getCreateDept());
+                valSubjectHandDto.setUpdateUser(dto.getUpdateUser());
+                valSubjectHandDto.setCreateTime(dto.getCreateTime());
+                valSubjectHandDto.setUpdateTime(dto.getUpdateTime());
+                list1.add(valSubjectHandDto);
+            }
+        }
+        return list1;
+    }
+    /*add by sunshuaishuai 辅助核算项修改 20220406 end*/
 }

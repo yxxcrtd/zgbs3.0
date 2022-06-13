@@ -45,26 +45,26 @@
             dataTableDetail.table == null ? dataTableDetail.load() : dataTableDetail.reload();
             // GNS-940:根据资产类型控制详情列展示 modify by fuyongsheng 20220223 start
             if(data && data.finprodType2 && data.finprodType2 === 'F01'){
-                dataTableDetail.showColumns([{field:'settleNum',visible: true}]);
+                dataTableDetail.showColumns([{field:'settleNumStr',visible: true}]);
                 dataTableDetail.showColumns([{field:'settleAmt',visible: true}]);
                 dataTableDetail.showColumns([{field:'finprodMarketId',visible: true}]);
                 dataTableDetail.showColumns([{field:'finprodName',visible: true}]);
-                dataTableDetail.showColumns([{field:'prin',visible: false}]);
+                dataTableDetail.showColumns([{field:'prinStr',visible: false}]);
                 dataTableDetail.showColumns([{field:'mTradeAmt',visible: false}]);
                 dataTableDetail.showColumns([{field:'pledgeIdAbbr',visible: false}]);
                 dataTableDetail.showColumns([{field:'pledgeName',visible: false}]);
-                dataTableDetail.showColumns([{field:'pledgeNumber',visible: false}]);
+                dataTableDetail.showColumns([{field:'pledgeNumberStr',visible: false}]);
                 dataTableDetail.showColumns([{field:'bPledgeIdAbbr',visible: false}]);
             }else{
-                dataTableDetail.showColumns([{field:'settleNum',visible: false}]);
+                dataTableDetail.showColumns([{field:'settleNumStr',visible: false}]);
                 dataTableDetail.showColumns([{field:'settleAmt',visible: false}]);
                 dataTableDetail.showColumns([{field:'finprodMarketId',visible: false}]);
                 dataTableDetail.showColumns([{field:'finprodName',visible: false}]);
-                dataTableDetail.showColumns([{field:'prin',visible: true}]);
+                dataTableDetail.showColumns([{field:'prinStr',visible: true}]);
                 dataTableDetail.showColumns([{field:'mTradeAmt',visible: true}]);
                 dataTableDetail.showColumns([{field:'pledgeIdAbbr',visible: true}]);
                 dataTableDetail.showColumns([{field:'pledgeName',visible: true}]);
-                dataTableDetail.showColumns([{field:'pledgeNumber',visible: true}]);
+                dataTableDetail.showColumns([{field:'pledgeNumberStr',visible: true}]);
                 dataTableDetail.showColumns([{field:'bPledgeIdAbbr',visible: true}]);
             }
             // GNS-940:根据资产类型控制详情列展示 modify by fuyongsheng 20220223 end
@@ -89,23 +89,26 @@
             ,{field:'tradeMarket', visible:false}
             ,{field:'tradeMarketStr', title: '交易市场', width:'150',sortField:'tradeMarket'}
             ,{field:'tradePlat', visible:false}
-            ,{field:'tradePlatStr', title: '交易平台', width:'150',sortField:'tradePlat'}
+            ,{field:'tradePlatStr', title: '交易平台', width:'150',sortField:'tradePlat', visible:false}
             ,{field:'finprodId',visible:false}
             ,{field:'finprodMarketId', title: 'EtrTransactionDetail001.finprodId', width:'150'}
             ,{field:'finprodName', title: 'EtrTransactionDetail001.finprodName', width:'150'}
             // GNS-940:修改字段展示名称 modify by fuyongsheng 20220222 start
             // ,{field:'settleNum',title: '交割数量', width:'150', type:'money'}
             // ,{field:'settleAmt', title: '交割金额', width:'150', type:'money'}
-            ,{field:'settleNum',title: '交收数量', width:'150', type:'money'}
+            ,{field:'settleNum',title: '交收数量', width:'150', type:'money', visible:false}
+            ,{field:'settleNumStr',title: '交收数量', width:'150', type:'money', sortField:'settleNum'}
             ,{field:'settleAmt', title: '交收金额', width:'150', type:'money'}
             // GNS-940:修改字段展示名称 modify by fuyongsheng 20220222 end
-            ,{field:'prin', title: '回购金额', width:'150', type:'money'}
+            ,{field:'prin', title: '回购金额', width:'150', type:'money', visible:false}
+            ,{field:'prinStr', title: '回购金额', width:'150', type:'money', sortField:'prin'}
             ,{field:'mTradeAmt', title: '到期结算金额', width:'150', type:'money'}
             // ,{field:'pledgeId', title: '质押券代码', width:'150'}
             ,{field:'pledgeId', title: '质押券代码', width:'150', visible:false}
             ,{field:'pledgeIdAbbr', title: '质押券代码', width:'150'}
             ,{field:'pledgeName', title: '质押券名称', width:'150'}
-            ,{field:'pledgeNumber', title: '质押券数量', width:'150'}
+            ,{field:'pledgeNumber', title: '质押券数量', width:'150', visible:false}
+            ,{field:'pledgeNumberStr', title: '质押券数量', width:'150', sortField:'pledgeNumber'}
             ,{field:'bPledgeId', title: '原质押券代码', width:'150', visible:false}
             ,{field:'bPledgeIdAbbr', title: '原质押券代码', width:'150'}
             ,{field:'busiType', title: '业务类别', width:'150', visible:false}
@@ -142,14 +145,17 @@
             ,{field:'settleTimeStr', title: '交收时间', width:'200'}
             ,{field:'finprodMarketId', title:'资产代码', width:'150'}
             ,{field:'finprodName', title:'资产名称', width:'150'}
-            ,{field:'settleNum',title:'交收数量', width:'150', type:'money'}
+            ,{field:'settleNum',title: '交收数量', width:'150', type:'money', visible:false}
+            ,{field:'settleNumStr',title: '交收数量', width:'150', type:'money', sortField:'settleNum'}
             ,{field:'settleAmt',title:'交收金额', width:'150', type:'money'}
-            ,{field:'prin', title: '回购金额', width:'150', type:'money'}
+            ,{field:'prin', title: '回购金额', width:'150', type:'money', visible:false}
+            ,{field:'prinStr', title: '回购金额', width:'150', type:'money', sortField:'prin'}
             ,{field:'mTradeAmt', title: '到期结算金额', width:'150', type:'money'}
             ,{field:'pledgeId', title: '质押券代码', width:'150', visible:false}
             ,{field:'pledgeIdAbbr', title: '质押券代码', width:'150'}
             ,{field:'pledgeName', title: '质押券名称', width:'150'}
-            ,{field:'pledgeNumber', title: '质押券数量', width:'150'}
+            ,{field:'pledgeNumber', title: '质押券数量', width:'150', visible:false}
+            ,{field:'pledgeNumberStr', title: '质押券数量', width:'150', sortField:'pledgeNumber'}
             ,{field:'bPledgeId', title: '原质押券代码', width:'150', visible:false}
             ,{field:'bPledgeIdAbbr', title: '原质押券代码', width:'150'}
             ,{field:'operType', title:'操作类型', width:'200', visible:false}

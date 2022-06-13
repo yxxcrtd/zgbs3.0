@@ -1,0 +1,1568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper">
+    <!-- 场内交易持仓查询 -->
+    <select id="findPositionsPage" parameterType="Map"
+            resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfo001Dto">
+    select
+        TEMP.PORTFOLIO_ID portfolioId,
+        PP.PORTFOLIO_NAME portfolioName,
+        TEMP.FINPROD_ID,
+        FP.FINPROD_MARKET_ID finprodMarketId,
+        FP.FINPROD_ABBR finprodAbbr,
+        T4.TYPE_9 secType1,
+        TEMP.AMOUNT amount,
+        NVL(TEMP.AMOUNT, 0) / 100 shareAmt,
+        NVL(TEMP.AMOUNT04, 0) / 100 avaPledgePrin,
+        NVL(t7.amount, 0) / 100 avaShareAmt,
+        MBVI.NETPRICE price,
+        NVL(MBVI.NETPRICE, 0) * NVL(TEMP.AMOUNT, 0)/10000 positionsPrice,
+        atd.COST_POSITION,
+        atd.COST_POSITION_NUM
+        ,tchl.SEC_ACCT_ID
+        ,TEMP.INV_AIM invAim
+        from
+        (
+        SELECT
+        PSP.PORTFOLIO_ID AS PORTFOLIO_ID ,
+        PSP.FINPROD_ID   AS FINPROD_ID,
+        PSP.INV_AIM as INV_AIM,
+        SUM(CASE WHEN PSP.HODING_TYPE IN (#{POSITION_TYPE_03}, #{POSITION_TYPE_05}) THEN NVL(PSP.AMOUNT,0)
+        WHEN PSP.HODING_TYPE IN (#{POSITION_TYPE_06}) THEN -1* NVL(PSP.AMOUNT,0)
+        END) AS AMOUNT,
+        SUM(NVL(case when PSP.HODING_TYPE=#{POSITION_TYPE_04} then AMOUNT else 0 end, 0)) AS AMOUNT04
+        FROM
+        PTL_SEC_POSITION PSP
+        INNER JOIN
+        PTL_PORTFOLIO PP
+        ON
+        PSP.PORTFOLIO_ID = PP.PORTFOLIO_ID
+        INNER JOIN
+        PTL_PORTFOLIO_AUTHORITY PPA
+        ON
+        PP.PORTFOLIO_ID = PPA.PORTFOLIO_ID
+        <if test="userId != null and userId != ''">
+            AND PPA.USER_ID = #{userId}
+        </if>
+        WHERE
+        PSP.BRANCH =0
+        AND PSP.HODING_TYPE IN (#{POSITION_TYPE_03}, #{POSITION_TYPE_04}, #{POSITION_TYPE_05}, #{POSITION_TYPE_06})
+        AND PSP.CDATE = to_date(#{sysDate},'yyyy-MM-dd')
+        GROUP BY
+        PSP.PORTFOLIO_ID ,
+        PSP.FINPROD_ID,
+        PSP.INV_AIM
+        )TEMP
+        LEFT JOIN PTL_PORTFOLIO PP ON TEMP.PORTFOLIO_ID = PP.PORTFOLIO_ID
+        LEFT JOIN FIN_PRODUCT FP ON TEMP.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE T4 ON T4.FINPROD_ID = FP.FINPROD_ID
+        left join (
+            select
+            portfolio_id,
+            finprod_id,
+            sum(t.amount) as amount
+            from etr_sec_position t
+        where 1=1
+            <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+                AND portfolio_id in
+                <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            and cdate = to_date(#{sysDate},'yyyy-MM-dd')
+            and hoding_type = 'E01'
+            group by portfolio_id,finprod_id
+        ) t7 on t7.portfolio_id = TEMP.portfolio_id and t7.finprod_id = TEMP.finprod_id
+        LEFT JOIN (
+            select SEC_ID, NETPRICE, LAST_PERIOD from (
+                select ROW_NUMBER() OVER(PARTITION BY SEC_ID ORDER BY VALUE_DATE DESC) rn, SEC_ID, NETPRICE, LAST_PERIOD
+                from MST_BOND_VALUATION_INFO_TOTAL WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{sysDate},'yyyy-MM-dd')
+            ) where rn = 1
+        ) MBVI ON FP.FINPROD_MARKET_ID = MBVI.SEC_ID
+        left join COST_POSITION_DB atd
+            on atd.portfolio_id = TEMP.portfolio_id and
+            atd.finprod_id = TEMP.finprod_id and
+            atd.CDATE = to_date(#{sysDate},'yyyy-MM-dd') - 1
+        left join (
+        select
+        min(esp.SEC_ACCT_ID) SEC_ACCT_ID,
+        esp.FINPROD_ID,
+        esp.PORTFOLIO_ID
+        FROM
+        etr_sec_position esp
+        inner join fin_product fp on fp.FINPROD_ID = esp.SEC_ACCT_ID and fp.FINPROD_TYPE2 = 'F28'
+        where 1=1
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND esp.portfolio_id in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        and esp.cdate = to_date(#{sysDate},'yyyy-MM-dd')
+        and esp.hoding_type = 'E01'
+        group by esp.FINPROD_ID,esp.PORTFOLIO_ID
+        ) tchl on tchl.portfolio_id = TEMP.portfolio_id and tchl.finprod_id = TEMP.finprod_id
+    where
+        FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}
+        <if test="tradeMarketList != null and tradeMarketList.size() > 0"> /* 交易场所，仅限银行间交易 */
+            AND FP.TRADE_MARKET in
+            <foreach collection="tradeMarketList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND TEMP.portfolio_id in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="secType1 != null and secType1 != ''">
+            AND T4.TYPE_9 = #{secType1,jdbcType=VARCHAR}
+        </if>
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND FP.FINPROD_MARKET_ID in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getTradeListByFinprodId" resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrTrdProductDealDto">
+        select t.finprod_id finprodId,t.share_amt shareAmt,t.yield,t.ps,t.UNIT_CPRICE unitCprice,
+        pt.PORTFOLIO_ID
+        from trd_product_deal t
+        inner JOIN trd_product_deal_add tpda on t.TRADE_ID=tpda.TRADE_ID
+        inner JOIN FIN_PRODUCT T3 ON t.FINPROD_ID = T3.FINPROD_ID
+        inner JOIN  fin_product_type fpt
+        on t.finprod_id=fpt.finprod_id
+        and t.branch=fpt.branch
+        inner join ptl_trade pt on pt.BUSI_NO = t.TRADE_ID
+        where 1=1
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND T3.FINPROD_MARKET_ID in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="portfolioIdList != null and portfolioIdList.size()>0">
+            AND tpda.PORTFOLIO_ID IN
+            <foreach collection="portfolioIdList" item="item" separator="," open="(" close =")">
+                #{item}
+            </foreach>
+        </if>
+        and to_date(#{sysDate},'yyyy-MM-dd')=t.SETTLE_DATE
+        and fpt.type_8='F01'
+        and t.trade_status='01'
+        and t.is_cancel='N'
+        and t.ps in('T01','T02')
+        order by t.UPDATE_TIME asc
+    </select>
+<!--
+    <select id="getEtrFinProductInfo" resultType="com.joyintech.service.entrust.etribbondinfo.dto.EtrFinProductDto">
+select
+    t1.FINPROD_MARKET_ID secId,
+    t1.FINPROD_ABBR finprodAbbr,
+    t1.FINPROD_NAME secName,
+    t2.TYPE_9 secType,
+    t1.issuer issuer,
+    t3.CUSTOMER_NAME issuerName,
+    TO_CHAR(t1.VDATE,'yyyy-MM-dd') vdate,
+    TO_CHAR(t1.MDATE,'yyyy-MM-dd') mdate,
+    TO_NUMBER(MBVI.LAST_PERIOD) lastqx,
+    TO_CHAR(t4.PAY_DATE,'yyyy-MM-dd') lastPaydate
+    ,t6.INT_TYPE AS rateType
+	,NVL(t8.YIELD, t6.RATE)*100 rate
+	,TO_CHAR(B.EXERCISE_DATE,'yyyy-MM-dd') xqdate
+    ,NVL(MBVI.BPYIELD, 0)*100 gzRate
+    ,MBVI.NETVALUATION_EXERCISE priceXq
+    ,MBVI.NETVALUATION_RECOMMENDED priceTj
+    ,MBVI.NETPRICE as newPrice
+    ,t7.CUSTOMER_NAME sponsorName
+from
+    FIN_PRODUCT t1
+    LEFT JOIN FIN_PRODUCT_TYPE t2 ON t2.FINPROD_ID = t1.FINPROD_ID
+    LEFT JOIN mst_customer_info t3 ON t1.ISSUER = t3.CUSTOMER_ID
+    LEFT JOIN (
+        select
+            f2.FINPROD_ID,
+            min(f1.PAY_DATE) PAY_DATE
+        from
+            fin_cash_plan f1
+            inner join fin_cash_info f2 on f1.CASH_ID = f2.CASH_ID
+            inner join FIN_PRODUCT f3 on f2.FINPROD_ID = f3.FINPROD_ID
+            where
+            f2.CASH_TYPE_2 = 'C02' and
+            f1.MDATE &gt;= to_date(#{sysDate},'yyyy-MM-dd') and
+            f3.FINPROD_TYPE2 = 'F01'
+            <if test="finprodId != null and finprodId != ''">
+                AND f3.FINPROD_ID = #{finprodId}
+            </if>
+        group by f2.FINPROD_ID
+    ) t4 on t4.FINPROD_ID = t1.FINPROD_ID
+    left join fin_cash_info t5 on t5.FINPROD_ID = t1.FINPROD_ID AND t5.CASH_TYPE_2 = 'C02' and t5.FINPROD_TYPE = '01'
+    LEFT JOIN FIN_RATE_INFO t6 ON t6.CASH_ID = t5.CASH_ID
+    LEFT JOIN mst_customer_info t7 ON t1.sponsor = t7.CUSTOMER_ID
+    left join (
+        select FINPROD_ID, max(eff_date) as EFF_DATE
+        from FIN_CASH_CALC_RULE
+        where
+        1=1
+        <if test="finprodId != null and finprodId != ''">
+            AND FINPROD_ID = #{finprodId}
+        </if>
+        group by FINPROD_ID
+    ) tempT8
+    on t1.FINPROD_ID = tempT8.FINPROD_ID
+    LEFT JOIN FIN_CASH_CALC_RULE t8 ON t8.FINPROD_ID=tempT8.FINPROD_ID AND t8.EFF_DATE = tempT8.EFF_DATE
+    and t8.CASH_ID = t5.CASH_ID
+    LEFT JOIN (
+        &lt;!&ndash; 取大于当前时间的最接近的实际行权日 &ndash;&gt;
+        select A.FINPROD_ID,min(A.EXERCISE_DATE) EXERCISE_DATE
+        from FIN_EXERCISE_PLAN A
+        where
+        sysdate &lt;= A.ACT_EXERCISE_DATE and A.EXERCISE_TYPE in (#{EXEC_MODE_01}, #{EXEC_MODE_02})
+        <if test="finprodId != null and finprodId != ''">
+            AND A.FINPROD_ID = #{finprodId}
+        </if>
+        group by A.FINPROD_ID
+    ) B on t1.FINPROD_ID = B.FINPROD_ID
+    LEFT JOIN (
+        select * from (
+            select ROW_NUMBER() OVER(PARTITION BY SEC_ID ORDER BY VALUE_DATE DESC) rn, MST_BOND_VALUATION_INFO_TOTAL.*
+            from MST_BOND_VALUATION_INFO_TOTAL WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{sysDate},'yyyy-MM-dd')
+        ) where rn = 1
+    ) MBVI ON t1.FINPROD_MARKET_ID = MBVI.SEC_ID
+    where 1=1 AND t1.FINPROD_TYPE2='F01'
+    <if test="finprodId != null and finprodId != ''">
+        AND t1.FINPROD_ID = #{finprodId}
+    </if>
+
+    </select>
+
+    <select id="getEtrFinExerciseInfo" resultType="java.lang.String">
+    select
+    distinct t2.ITEM_CODE ITEM_CODE
+    from
+    FIN_EXERCISE_PLAN t1
+    inner join sys_datadict_list t2
+        on t2.DICT_CODE = 'EXEC_MODE' and t1.EXERCISE_TYPE = t2.ITEM_CODE
+    where
+          t1.FINPROD_TYPE2 = #{FINPROD_TYPE2_F01} and
+          sysdate &lt;= t1.ACT_EXERCISE_DATE and t1.EXERCISE_TYPE in (#{EXEC_MODE_01}, #{EXEC_MODE_02})
+      <if test="finprodId != null and finprodId != ''">
+            AND t1.FINPROD_ID = #{finprodId}
+      </if>
+    </select>
+
+
+    <select id="getAllTradeListByFinprodId" resultType="com.joyintech.service.entrust.etribbondinfo.dto.EtrTrdProductDealDto">
+        select t.finprod_id finprodId,t.share_amt shareAmt,t.yield,t.ps,t.UNIT_CPRICE unitCprice,
+        pt.PORTFOLIO_ID
+        from trd_product_deal t
+        inner JOIN trd_product_deal_add tpda on t.TRADE_ID=tpda.TRADE_ID
+        inner JOIN FIN_PRODUCT T3 ON t.FINPROD_ID = T3.FINPROD_ID
+        inner JOIN  fin_product_type fpt
+        on t.finprod_id=fpt.finprod_id
+        and t.branch=fpt.branch
+        inner join ptl_trade pt on pt.BUSI_NO = t.TRADE_ID
+        where 1=1
+        <if test="finprodId != null">
+            AND T.finprod_id = #{finprodId,jdbcType=VARCHAR}
+        </if>
+        <if test="portfolioId != null ">
+            AND tpda.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+        </if>
+        and to_date(#{sysDate},'yyyy-MM-dd') >= t.SETTLE_DATE
+        and fpt.type_8='F01'
+        and t.trade_status='01'
+        and t.is_cancel='N'
+        and t.ps in('T01','T02')
+        order by t.CREATE_TIME asc
+    </select>-->
+    <select id="selectPortfolioInfoist" parameterType="Map"
+            resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondPosinfo001Dto">
+        select
+        PP.PORTFOLIO_ID AS portfolioId ,
+        PP.PORTFOLIO_NAME portfolioName
+        FROM
+        PTL_PORTFOLIO PP
+        INNER JOIN
+        PTL_PORTFOLIO_AUTHORITY PPA
+        ON
+        PP.PORTFOLIO_ID = PPA.PORTFOLIO_ID
+        <if test="userId != null and userId != ''">
+            AND PPA.USER_ID = #{userId}
+        </if>
+        WHERE 1=1
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND PP.PORTFOLIO_ID in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectFinprodInfoList" parameterType="Map"
+            resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondPosinfo001Dto">
+        select
+        FP.finprod_id　finprodId,
+        FP.FINPROD_MARKET_ID finprodMarketId,
+        FP.FINPROD_ABBR finprodAbbr,
+        T4.TYPE_9 secType1,
+        MBVI.NETPRICE price
+        from
+        FIN_PRODUCT FP
+        LEFT JOIN FIN_PRODUCT_TYPE T4 ON T4.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN (
+        select SEC_ID, NETPRICE, LAST_PERIOD from (
+        select ROW_NUMBER() OVER(PARTITION BY SEC_ID ORDER BY VALUE_DATE DESC) rn, SEC_ID, NETPRICE, LAST_PERIOD
+        from MST_BOND_VALUATION_INFO_TOTAL WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{sysDate},'yyyy-MM-dd')
+        ) where rn = 1
+        ) MBVI ON FP.FINPROD_MARKET_ID = MBVI.SEC_ID
+        where
+        FP.FINPROD_TYPE2 ='F01'
+        <if test="tradeMarketList != null and tradeMarketList.size() > 0"> /* 交易场所，仅限银行间交易 */
+            AND FP.TRADE_MARKET in
+            <foreach collection="tradeMarketList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="secType1 != null and secType1 != ''">
+            AND T4.TYPE_9 = #{secType1,jdbcType=VARCHAR}
+        </if>
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND FP.finprod_id in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!--持仓列表-->
+    <select id="queryPositionsPage" parameterType="Map" resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondPosinfo001Dto">
+
+        select * from (
+            SELECT
+            etrptl.PORTFOLIO_ID as portfolioId,
+            e.PORTFOLIO_NAME as portfolioName,
+            etrptl.FINPROD_ID as finprodId,
+            d.FINPROD_ABBR as finprodAbbr,
+            d.FINPROD_MARKET_ID as finprodMarketId,
+            c.TYPE_11 as secType1, /*债券一级分类code*/
+            invaim.INV_AIM as busiModel,  /*业务模式code*/
+            /*指令汇总可用持仓、指令可质押持仓、指令已质押持仓*/
+            ROUND(etrptl.ETR_SUM_KYCC/10000,2) as etrPledgePrin,
+            ROUND(etrptl.ETR_PLEDGE_KZYCC/10000,2) as etrAvaPledgePrin,
+            ROUND(etrptl.ETR_PLEDGE_YZYCC/10000,2) as etrAlrPledgePrin,
+            /*交易可用券面总额、交易在途券面总额*/
+            ROUND(etrptl.PTL_BOND_BFQKYCC/10000,2) as trdAvaShareAmt,
+            ROUND(etrptl.PTL_BOND_BFQZTCC/10000,2) as trdIntransShareAmt,
+            /* 1持仓成本 service从map查询 */
+            null as positionsAmt,
+            /* 2持仓单位成本 service从map查询*/
+            null as unitCost,
+            /* 3最新净价 根据规则12来获取，优先从service中取债券行情数据*/
+            tt.NETPRICE as price,
+            /* 4持仓市值 （交易可用券面总额+交易在途券面总额）*最新净价/单位面值 service中算，需要最新净价*/
+            null as positionsPrice,
+            /* 5浮动盈亏 =持仓市值-持仓成本 service中算*/
+            null as floatingPL,
+            /* 账户持仓 */
+            ROUND(etrptl.PTL_BOND_ZHCC/10000,2) as accountPosition
+            FROM (
+                SELECT
+                (CASE WHEN aa.PORTFOLIO_ID IS NULL THEN bb.PORTFOLIO_ID ELSE aa.PORTFOLIO_ID END ) AS PORTFOLIO_ID,
+                (CASE WHEN aa.FINPROD_ID IS NULL THEN bb.FINPROD_ID ELSE aa.FINPROD_ID END ) AS FINPROD_ID,
+                nvl(aa.ETR_SUM_KYCC,0) AS ETR_SUM_KYCC, nvl(aa.ETR_PLEDGE_KZYCC,0) ETR_PLEDGE_KZYCC, nvl(aa.ETR_PLEDGE_YZYCC,0) ETR_PLEDGE_YZYCC,
+                nvl(bb.PTL_BOND_BFQKYCC,0) PTL_BOND_BFQKYCC, nvl(bb.PTL_BOND_BFQZTCC,0) PTL_BOND_BFQZTCC,
+                NVL(bb.PTL_BOND_ZHCC,0) PTL_BOND_ZHCC
+                FROM (
+                    SELECT
+                    a.PORTFOLIO_ID, a.FINPROD_ID,
+                    sum(CASE WHEN b.S_HOLDINGTYPE=#{S_001} THEN a.AMOUNT*nvl(b.CAL_FLAG,1) ELSE 0 END) ETR_SUM_KYCC,
+                    sum(CASE WHEN b.S_HOLDINGTYPE=#{S_002} THEN a.AMOUNT*nvl(b.CAL_FLAG,1) ELSE 0 END) ETR_PLEDGE_KZYCC,
+                    sum(CASE WHEN a.HODING_TYPE=#{A_012} THEN a.AMOUNT*nvl(b.CAL_FLAG,1) ELSE 0 END) ETR_PLEDGE_YZYCC
+                    FROM ETR_SEC_POSITION_RULE a
+                    INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON a.PORTFOLIO_ID = PPA.PORTFOLIO_ID
+                    <if test="userId != null and userId != ''">
+                        AND PPA.USER_ID = #{userId}
+                    </if>
+                    LEFT JOIN PTL_POSITION_CFG b ON a.HODING_TYPE =b.HOLDINGTYPE AND b.S_HOLDINGTYPE IN (#{S_001},#{S_002})
+                    WHERE a.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') AND a.DATE_TYPE =#{DATE_TYPE_0}
+                    <if test="portfolioId != null and portfolioId != ''">
+                        AND a.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+                    </if>
+                    <if test="portfolioIdList != null">
+                        AND a.PORTFOLIO_ID in
+                        <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                    <if test="finprodId != null and finprodId != ''">
+                        AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+                    </if>
+                    <if test="finprodIdList != null">
+                        AND a.FINPROD_ID in
+                        <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                    GROUP BY a.PORTFOLIO_ID, a.FINPROD_ID
+                ) aa
+                FULL OUTER JOIN (
+                    <!-- 本方券可用持仓、本方券在途持仓、账户持仓 -->
+                    select a.PORTFOLIO_ID, a.FINPROD_ID,
+                    sum(CASE WHEN a.HODING_TYPE =#{A_004} THEN a.AMOUNT ELSE 0 END) AS PTL_BOND_BFQKYCC,
+                    sum(CASE WHEN a.HODING_TYPE =#{A_008} THEN a.AMOUNT ELSE 0 END) AS PTL_BOND_BFQZTCC,
+                    sum(CASE WHEN a.HODING_TYPE =#{A_001} THEN a.AMOUNT ELSE 0 END) AS PTL_BOND_ZHCC
+                    from PTL_SEC_POSITION_RULE a
+                    INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON a.PORTFOLIO_ID = PPA.PORTFOLIO_ID
+                    <if test="userId != null and userId != ''">
+                        AND PPA.USER_ID = #{userId}
+                    </if>
+                    where a.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') AND a.DATE_TYPE =#{DATE_TYPE_0}
+                    <if test="portfolioId != null and portfolioId != ''">
+                        AND a.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+                    </if>
+                    <if test="portfolioIdList != null">
+                        AND a.PORTFOLIO_ID in
+                        <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                    <if test="finprodId != null and finprodId != ''">
+                        AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+                    </if>
+                    <if test="finprodIdList != null">
+                        AND a.FINPROD_ID in
+                        <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                    GROUP BY a.PORTFOLIO_ID, a.FINPROD_ID
+                ) bb ON aa.PORTFOLIO_ID=bb.PORTFOLIO_ID AND aa.FINPROD_ID=bb.FINPROD_ID 
+            ) etrptl
+            LEFT JOIN FIN_PRODUCT_TYPE c ON etrptl.FINPROD_ID = c.FINPROD_ID
+            LEFT JOIN FIN_PRODUCT d ON etrptl.FINPROD_ID=d.FINPROD_ID
+            LEFT JOIN PTL_PORTFOLIO e ON etrptl.PORTFOLIO_ID=e.PORTFOLIO_ID 
+            <if test="BOND_VALUATION_RULE != null and BOND_VALUATION_RULE =='01'">
+                <!-- 所有银行间债券均优先取中债，没有中债取上清 -->
+                left join (
+                    select SEC_ID, NETPRICE from (
+                        SELECT ROW_NUMBER () over(
+                            PARTITION BY SEC_ID 
+                            ORDER BY VALUE_DATE DESC, DECODE(VALUE_SOURCE, #{VALUATION_SOURCE_CBC}, 1, 0) DESC
+                        ) rn, a.*
+                        FROM MST_BOND_VALUATION_INFO a
+                        WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') 
+                            AND VALUE_SOURCE IN (#{VALUATION_SOURCE_CBC},#{VALUATION_SOURCE_SCH})
+                    ) WHERE rn =1
+                ) tt on tt.SEC_ID=d.FINPROD_MARKET_ID
+            </if>
+            <if test="BOND_VALUATION_RULE != null and BOND_VALUATION_RULE =='02'">
+                <!-- 银行间债券根据债券登记托管机构判断，中债的债券取中债估值，上清债券取上清所估值，没有再取另外一个 -->
+                left join (
+                    select SEC_ID, NETPRICE from (
+                        SELECT ROW_NUMBER () over(
+                            PARTITION BY SEC_ID 
+                            ORDER BY VALUE_DATE DESC, DECODE(T2.REGIST_ORG, #{REGIST_ORG_01}, 1, #{REGIST_ORG_02}, 1, 0) DESC
+                        ) rn, t1.*
+                        FROM MST_BOND_VALUATION_INFO t1
+                        LEFT JOIN FIN_PRODUCT t2 ON t1.SEC_ID =t2.FINPROD_MARKET_ID AND t2.FINPROD_TYPE =#{FINPROD_TYPE_TG_F01} 
+                            AND DECODE(t1.VALUE_SOURCE, #{VALUATION_SOURCE_CBC}, #{REGIST_ORG_01}, #{VALUATION_SOURCE_SCH}, #{REGIST_ORG_02}, 'NULL')=T2.REGIST_ORG
+                        WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') 
+                            AND VALUE_SOURCE IN (#{VALUATION_SOURCE_CBC},#{VALUATION_SOURCE_SCH})
+                    ) WHERE rn =1
+                ) tt on tt.SEC_ID=d.FINPROD_MARKET_ID
+            </if>
+            <!-- 业务模式查交易表 -->
+            left join (
+                select FINPROD_ID, PORTFOLIO_ID, listagg(INV_AIM, ',') WITHIN GROUP (ORDER BY PORTFOLIO_ID, FINPROD_ID) as INV_AIM
+                from (
+                    SELECT FINPROD_ID, PORTFOLIO_ID, INV_AIM
+                    FROM (
+                        select
+                        a.BUSINESS_MODEL as INV_AIM , a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
+                        ROW_NUMBER () over(
+                        PARTITION BY a.TRADE_ID
+                        ORDER BY a.TRADE_DATE DESC
+                        ) rn
+                        from TRD_PRODUCT_DEAL a
+                        LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+                        WHERE 1=1
+                        <if test="finprodId != null and finprodId != ''">
+                            AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+                        </if>
+                        <if test="portfolioIdList != null">
+                            AND b.PORTFOLIO_ID in
+                            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                                #{item}
+                            </foreach>
+                        </if>
+                        AND a.TRADE_DATE &lt;= to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') - 1
+                    ) WHERE rn = 1
+                    UNION
+                    SELECT a.FINPROD_ID, b.PORTFOLIO_ID, a.BUSINESS_MODEL as INV_AIM
+                    from TRD_PRODUCT_DEAL a
+                    LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+                    WHERE 1=1
+                    <if test="finprodId != null and finprodId != ''">
+                        AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+                    </if>
+                    <if test="portfolioIdList != null">
+                        AND b.PORTFOLIO_ID in
+                        <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                    AND a.TRADE_DATE = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd')
+                ) GROUP BY FINPROD_ID, PORTFOLIO_ID
+            ) invaim on invaim.FINPROD_ID=etrptl.FINPROD_ID and invaim.PORTFOLIO_ID=etrptl.PORTFOLIO_ID
+            <if test="search != null and search != ''">
+                <!--模糊查询使用-->
+                LEFT JOIN (
+                    SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST WHERE DICT_CODE= 'CUSTOM_ASSET_TYPE_FOUR'
+                ) f on f.ITEM_CODE=c.TYPE_11
+                LEFT JOIN (
+                    SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST WHERE DICT_CODE= 'BUSINESS_MODEL'
+                ) g on g.ITEM_CODE = invaim.INV_AIM
+            </if>
+            <!-- 账户持仓为0时数据不展示 -->
+            where (
+                    etrptl.PTL_BOND_ZHCC != 0 or etrptl.ETR_SUM_KYCC != 0 or etrptl.ETR_PLEDGE_KZYCC != 0 or etrptl.ETR_PLEDGE_YZYCC != 0
+                    or etrptl.PTL_BOND_BFQKYCC != 0 
+                ) and d.TRADE_MARKET in ('01','02') <!--只展示交易场所为银行间和商业柜台的数据-->
+            <!-- 关键字模糊查询 -->
+            <include refid="positionQueryAnd"/>
+            <if test="secType1 != null and secType1 != ''">
+                and c.TYPE_11 = #{secType1,jdbcType=VARCHAR}
+            </if>
+        )
+        <!--前端传入排序字段-->
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort} ${direction}
+        </if>
+    </select>
+
+    <sql id="positionQueryAnd">
+        <if test="search != null and search != ''">
+            and (
+                etrptl.PORTFOLIO_ID || '|' || e.PORTFOLIO_NAME || '|' || etrptl.FINPROD_ID || '|' || 
+                d.FINPROD_ABBR || '|' || d.FINPROD_MARKET_ID || '|' || c.TYPE_11 || '|' || invaim.INV_AIM || '|' || 
+                f.ITEM_VALUE || '|' || g.ITEM_VALUE 
+                like '%' || #{search} || '%' 
+                <if test="search_isNumberFlag != null and search_isNumberFlag == true">
+                    or round(etrptl.ETR_SUM_KYCC / 10000,2) = to_number(#{search})
+                    or round(etrptl.ETR_PLEDGE_KZYCC / 10000,2)= to_number(#{search})
+                    or round(etrptl.ETR_PLEDGE_YZYCC / 10000,2) = to_number(#{search})
+                    or round(etrptl.PTL_BOND_BFQKYCC / 10000,2) = to_number(#{search})
+                    or round(etrptl.PTL_BOND_BFQZTCC / 10000,2) = to_number(#{search})
+                    or (tt.NETPRICE = #{search})
+                    or round(etrptl.PTL_BOND_ZHCC / 10000,2) = to_number(#{search})
+                </if>
+            )
+        </if>
+    </sql>
+    
+    <!-- 查询前一日持仓指标 -->
+    <select id="selectLastCostAmt" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
+        select
+        a.PORTFOLIO_ID, a.FINPROD_ID,
+        sum(nvl(a.BUY_COST_AMT, 0)) BUY_COST_AMT, sum(nvl(a.SHARE_AMT, 0)) SHARE_AMT
+        from PTL_SEC_UNITCOST a
+        LEFT JOIN FIN_PRODUCT b ON a.FINPROD_ID =b.FINPROD_ID and b.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F01}
+        LEFT JOIN FIN_PRODUCT_TYPE c ON a.FINPROD_ID =c.FINPROD_ID
+        WHERE b.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F01} AND b.TRADE_MARKET=#{SVR_TRADE_MARKET_01} AND a.CDATE =#{cdate}
+        <if test="portfolioIdList != null">
+            AND a.PORTFOLIO_ID in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="finprodIdList != null">
+            AND b.FINPROD_ID in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="secType1 != null and secType1 != ''">
+            and c.TYPE_8 = #{secType1,jdbcType=VARCHAR}
+        </if>
+        GROUP BY a.PORTFOLIO_ID, a.FINPROD_ID
+        ORDER BY a.PORTFOLIO_ID, a.FINPROD_ID
+    </select>
+
+    <!-- 当日交易数据查询 -->
+    <select id="selectCurrTrdData" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
+        select
+        b.PORTFOLIO_ID ,
+        a.FINPROD_ID ,
+        a.INV_AIM ,
+        a.PS ,
+        a.UNIT_CPRICE AS PRICE,
+        a.SHARE_AMT AS AMT
+        from TRD_PRODUCT_DEAL a
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+        LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID AND c.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F01}
+        LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID
+        WHERE a.TRADE_DATE =#{cdate} AND c.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F01} AND c.TRADE_MARKET=#{SVR_TRADE_MARKET_01}
+        AND a.PS IN (#{PS_T01},#{PS_T02},#{PS_T03}) AND a.TRADE_STATUS =#{TRADE_STATUS_01}
+        AND a.IS_CANCEL=#{YN_N}
+        <if test="portfolioIdList != null">
+            AND b.PORTFOLIO_ID in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="finprodIdList != null">
+            AND a.FINPROD_ID in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="secType1 != null and secType1 != ''">
+            and d.TYPE_8 = #{secType1,jdbcType=VARCHAR}
+        </if>
+        ORDER BY b.PORTFOLIO_ID, a.FINPROD_ID , a.INV_AIM , a.CREATE_TIME DESC
+    </select>
+
+    <!--头寸信息-->
+    <select id="queryPositionInfo" parameterType="Map" resultType="map">
+        SELECT  ROUND(sum(nvl(summary.t0kyxj,0)),2) AS T0KYXJ, /*T日可用现金*/
+        ROUND(sum(summary.t1kyxj),2) AS T1KYXJ, /*T+1日可用现金*/
+        ROUND(sum(summary.AMOUNT),2) AS ZHXJ, /*账户现金*/
+        ROUND(sum(summary.rrqmkdgh),2) AS RRQMKDGHCC, /*融入券卖空待购回持仓*/
+        ROUND(sum(summary.zctrkycc),2) AS ZCTRKYCC, /*资产T日可用持仓*/
+        ROUND(sum(summary.zct1rkycc),2) AS ZCT1RKYCC, /*资产T+1日可用持仓*/
+        ROUND(sum(summary.bfqtrkycc),2) AS BFQTRKYCC, /*本方券T日可用持仓*/
+        ROUND(sum(summary.bfqt1rkycc),2) AS BFQT1RKYCC, /*本方券T+1日可用持仓*/
+        ROUND(sum(summary.rrqtrkycc),2) AS RRQTRKYCC, /*融入券T日可用持仓*/
+        ROUND(sum(summary.rrqt1rkycc),2) AS RRQT1RKYCC /*融入券T+1日可用持仓*/
+        FROM (
+            /*多组合，再汇总一遍*/
+            SELECT
+            aa.t0kyxj, aa.t1kyxj, cc.AMOUNT, bb.rrqmkdgh, bb.zctrkycc,
+            bb.zct1rkycc, bb.bfqtrkycc, bb.bfqt1rkycc, bb.rrqtrkycc, bb.rrqt1rkycc
+            FROM(
+                select
+                a.PORTFOLIO_ID,
+                sum(
+                CASE WHEN b.S_HOLDINGTYPE=#{S_004} AND a.DATE_TYPE ='0' THEN a.AMOUNT*nvl(b.CAL_FLAG,1) ELSE NULL END
+                ) AS t0kyxj, /*T日可用现金*/
+                sum(
+                CASE WHEN b.S_HOLDINGTYPE=#{S_004} AND a.DATE_TYPE ='1' THEN a.AMOUNT*nvl(b.CAL_FLAG,1) ELSE NULL END
+                ) AS t1kyxj /*T+1日可用现金*/
+                from ETR_CASH_POSITION_RULE a
+                LEFT JOIN PTL_POSITION_CFG b ON a.HODING_TYPE =b.HOLDINGTYPE AND b.S_HOLDINGTYPE IN (#{S_004})
+                where a.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') and b.S_HOLDINGTYPE IN (#{S_004}) 
+                <if test="portfolioIdList != null">
+                    AND a.PORTFOLIO_ID in
+                    <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                GROUP BY a.PORTFOLIO_ID
+            ) aa
+            FULL OUTER JOIN (
+                select
+                a.PORTFOLIO_ID,
+                sum(
+                CASE WHEN b1.S_HOLDINGTYPE=#{S_003} AND a.DATE_TYPE ='0' THEN a.AMOUNT*nvl(b1.CAL_FLAG,1) ELSE NULL END
+                ) AS rrqmkdgh, /*融入券卖空待购回持仓*/
+                sum(
+                CASE WHEN b.S_HOLDINGTYPE=#{S_001} AND a.DATE_TYPE ='0' THEN a.AMOUNT*nvl(b.CAL_FLAG,1) ELSE NULL END
+                ) AS zctrkycc, /*资产T日可用持仓*/
+                sum(
+                CASE WHEN b.S_HOLDINGTYPE=#{S_001} AND a.DATE_TYPE ='1' THEN a.AMOUNT*nvl(b.CAL_FLAG,1) ELSE NULL END
+                ) AS zct1rkycc, /*资产T+1日可用持仓*/
+                sum(CASE WHEN a.HODING_TYPE=#{A_004} AND a.DATE_TYPE ='0' THEN AMOUNT ELSE NULL END) AS bfqtrkycc, /*本方券T日可用持仓*/
+                sum(CASE WHEN a.HODING_TYPE=#{A_004} AND a.DATE_TYPE ='1' THEN AMOUNT ELSE NULL END) AS bfqt1rkycc, /*本方券T+1日可用持仓*/
+                sum(CASE WHEN a.HODING_TYPE=#{A_005} AND a.DATE_TYPE ='0' THEN AMOUNT ELSE NULL END) AS rrqtrkycc, /*融入券T日可用持仓*/
+                sum(CASE WHEN a.HODING_TYPE=#{A_005} AND a.DATE_TYPE ='1' THEN AMOUNT ELSE NULL END) AS rrqt1rkycc /*融入券T+1日可用持仓*/
+                from ETR_SEC_POSITION_RULE a
+                LEFT JOIN PTL_POSITION_CFG b ON a.HODING_TYPE =b.HOLDINGTYPE AND b.S_HOLDINGTYPE = #{S_001}
+                LEFT JOIN PTL_POSITION_CFG b1 ON a.HODING_TYPE =b1.HOLDINGTYPE AND b1.S_HOLDINGTYPE = #{S_003}
+                where a.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') 
+                <if test="finprodId != null and finprodId !=''">
+                    and a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+                </if>
+                <if test="portfolioIdList != null">
+                    AND a.PORTFOLIO_ID in
+                    <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                GROUP BY a.PORTFOLIO_ID
+            ) bb ON aa.PORTFOLIO_ID=bb.PORTFOLIO_ID
+            LEFT JOIN (
+                <!--账户现金-->
+                SELECT d.PORTFOLIO_ID, sum(d.AMOUNT) AMOUNT
+                FROM ETR_CASH_POSITION_RULE d
+                where d.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') AND d.HODING_TYPE =#{C_01} and DATE_TYPE ='0' 
+                <if test="acctId != null and acctId !=''">
+                    and d.ACCT_ID = #{acctId,jdbcType=VARCHAR}
+                </if>
+                <if test="portfolioIdList != null">
+                    AND d.PORTFOLIO_ID in
+                    <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                GROUP BY d.PORTFOLIO_ID
+            ) cc ON nvl(aa.PORTFOLIO_ID, bb.PORTFOLIO_ID)=cc.PORTFOLIO_ID
+        ) summary
+    </select>
+
+    <select id="getEtrFinProductInfo" resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrFinProductDto">
+        select * from
+        (SELECT
+        t1.FINPROD_ID secId,
+        t1.FINPROD_MARKET_ID marketId,
+        t1.FINPROD_NAME secName,
+        t1.FINPROD_ABBR secAbbr,
+        sdl.ITEM_VALUE secType,
+        MCI.CUSTOMER_NAME issuer,
+        TO_CHAR(t1.VDATE,'yyyy-MM-dd') vdate,
+        TO_CHAR(t1.MDATE,'yyyy-MM-dd') mdate,
+        TO_CHAR(MBVI.LAST_PERIOD,'fm99990.00') ||'年' lastqx,
+        MBVI.VALUE_SOURCE valueSource,
+        TO_CHAR(MBVI.VALUE_DATE,'yyyy-MM-dd') valueDate,
+        TO_CHAR(t4.PAY_DATE,'yyyy-MM-dd') lastPaydate,
+        sd.ITEM_VALUE rateType,
+        TO_CHAR(ROUND(fccc.YIELD*100,4),'fm990.0000') ||'%' rate,
+        MBCR.O_TYPE otype,
+        sd1.ITEM_VALUE zxGrade,
+        sd2.ITEM_VALUE ztGrade,
+        t1.IS_RIGHT xqFlg,
+        TO_CHAR(B.EXERCISE_DATE,'yyyy-MM-dd') xqdate,
+        TO_CHAR(MBVI.NETVALUATION_EXERCISE,'fm99990.0000') ||'元' priceXq,
+        TO_CHAR(MBVI.NETPRICE,'fm99990.0000') ||'元' priceTj,
+        PJ.INNEROUTER inOrOut,
+        TO_CHAR(ROUND(MBVI.BPYIELD*100,4),'fm99990.0000') ||'%' gzRate,
+        sdltwo.ITEM_VALUE type2,
+        sdlIssueType.ITEM_VALUE issueType,
+        MCI2.CUSTOMER_NAME sponsorName,
+        sdlCouponSpecies.ITEM_VALUE couponSpecies,
+        sdlPayCycle.ITEM_VALUE payCycle,
+        FCCR.BASIS basis,
+        TO_CHAR(ROUND(t1.ISSUE_AMT/10000,2),'fm999999999999999999999990.00') || '万元' issueAmt,
+        TO_CHAR(ROUND(MBVI.M_DURATION,2),'fm9999999999999990.00') mDuration,
+        TO_CHAR(ROUND(MBVI.INTEREST_DURATION,2),'fm9999999999999990.00') interestDuration,
+        TO_CHAR(ROUND(MBVI.SDURATION,2),'fm9999999999999990.00') sDuration,
+        TO_CHAR(ROUND(MBVI.M_CONVEXITY,2),'fm9999999999999990.00') mConvexity,
+        TO_CHAR(ROUND(MBVI.BPVALUE,4),'fm9999999999999990.0000') bpvalue,
+        CASE WHEN T2.TYPE_6 = 'B13' THEN TO_CHAR(ROUND(TO_NUMBER(t1.MDATE-t1.VDATE),2),'FM99990.00')||'天'
+            else TO_CHAR(months_between(t1.MDATE,t1.VDATE)/12,'FM99990.00')||'年' end as deadline,
+        TO_CHAR(ROUND(MBMI.MARKET_AMT/10000,2),'fm999999999999999999999990.00') || '万元' as secMarketAmt
+        FROM FIN_PRODUCT t1
+        LEFT JOIN FIN_PRODUCT_TYPE t2 ON t1.FINPROD_ID = t2.FINPROD_ID
+        LEFT JOIN MST_BOND_MARKET_INFO MBMI on t1.FINPROD_MARKET_ID=MBMI.SEC_ID
+        <if test="BOND_VALUATION_RULE != null and BOND_VALUATION_RULE =='01'">
+            <!-- 所有银行间债券均优先取中债，没有中债取上清 -->
+            left join (
+            select mbvi_tmp.* from (
+            SELECT ROW_NUMBER () over(
+            PARTITION BY SEC_ID
+            ORDER BY VALUE_DATE DESC, DECODE(VALUE_SOURCE, #{VALUATION_SOURCE_CBC}, 1, 0) DESC
+            ) rn, a.*
+            FROM MST_BOND_VALUATION_INFO a
+            WHERE to_char(#{sysDate,jdbcType=VARCHAR},'yyyy-MM-dd') >= to_char(VALUE_DATE,'yyyy-MM-dd')
+            AND VALUE_SOURCE IN (#{VALUATION_SOURCE_CBC},#{VALUATION_SOURCE_SCH})
+            ) mbvi_tmp WHERE rn =1
+            ) MBVI on MBVI.SEC_ID=t1.FINPROD_MARKET_ID
+        </if>
+        <if test="BOND_VALUATION_RULE != null and BOND_VALUATION_RULE =='02'">
+            <!-- 银行间债券根据债券登记托管机构判断，中债的债券取中债估值，上清债券取上清所估值，没有再取另外一个 -->
+            left join (
+            select mbvi_tmp.* from (
+            SELECT ROW_NUMBER () over(
+            PARTITION BY SEC_ID
+            ORDER BY VALUE_DATE DESC, DECODE(T2.REGIST_ORG, #{REGIST_ORG_01}, 1, #{REGIST_ORG_02}, 1, 0) DESC
+            ) rn, t1.*
+            FROM MST_BOND_VALUATION_INFO t1
+            LEFT JOIN FIN_PRODUCT t2 ON t1.SEC_ID =t2.FINPROD_MARKET_ID AND t2.FINPROD_TYPE =#{FINPROD_TYPE_TG_F01}
+            AND DECODE(t1.VALUE_SOURCE, #{VALUATION_SOURCE_CBC}, #{REGIST_ORG_01}, #{VALUATION_SOURCE_SCH}, #{REGIST_ORG_02}, 'NULL')=T2.REGIST_ORG
+            WHERE to_char(#{sysDate,jdbcType=VARCHAR},'yyyy-MM-dd') >= to_char(VALUE_DATE,'yyyy-MM-dd')
+            AND VALUE_SOURCE IN (#{VALUATION_SOURCE_CBC},#{VALUATION_SOURCE_SCH})
+            ) mbvi_tmp WHERE rn =1
+            ) MBVI on MBVI.SEC_ID=t1.FINPROD_MARKET_ID
+        </if>
+        LEFT JOIN (
+        select
+        f2.FINPROD_ID,
+        min(f1.PAY_DATE) PAY_DATE
+        from
+        fin_cash_plan f1
+        inner join fin_cash_info f2 on f1.CASH_ID = f2.CASH_ID
+        inner join FIN_PRODUCT f3 on f2.FINPROD_ID = f3.FINPROD_ID
+        where
+        f2.CASH_TYPE_2 = 'C02' and
+        to_char(f1.PAY_DATE,'yyyy-MM-dd') >= to_char(#{sysDate},'yyyy-MM-dd') and
+        f3.FINPROD_TYPE2 = 'F01'
+        group by f2.FINPROD_ID
+        ) t4 on t4.FINPROD_ID = t1.FINPROD_ID
+        left join
+        fin_cash_info t5 on t5.FINPROD_ID = t1.FINPROD_ID AND t5.CASH_TYPE_2 = 'C02' and t5.FINPROD_TYPE = '01'
+        LEFT JOIN
+        FIN_RATE_INFO t6 ON t6.CASH_ID = t5.CASH_ID AND to_char(#{sysDate},'yyyy-MM-dd') >= to_char(t6.EFF_DATE,'yyyy-MM-dd')
+        LEFT JOIN (
+        SELECT
+        fcc.YIELD as YIELD,
+        fcc.FINPROD_ID as FINPROD_ID
+        FROM
+        FIN_CASH_CALC_RULE fcc
+        WHERE
+        EFF_DATE =
+        (
+        SELECT
+        MAX(f1.EFF_DATE)
+        FROM
+        FIN_CASH_CALC_RULE f1
+        WHERE
+        to_char(#{sysDate},'yyyy-MM-dd') >= to_char(f1.EFF_DATE,'yyyy-MM-dd')
+        AND f1.FINPROD_ID=#{secId} )
+        AND FINPROD_ID=#{secId}
+        ) fccc
+        on
+            fccc.FINPROD_ID = t1.FINPROD_ID
+        LEFT JOIN
+            mst_customer_info t7 ON t1.SPONSOR = t7.CUSTOMER_ID
+        LEFT JOIN (
+        <!-- 取大于当前时间的最接近的实际行权日 -->
+        select A.FINPROD_ID,min(A.EXERCISE_DATE) EXERCISE_DATE
+        from FIN_EXERCISE_PLAN A
+        where
+        to_char(A.EXERCISE_DATE,'yyyy-MM-dd') >= to_char(#{sysDate},'yyyy-MM-dd')
+        <if test="secId != null and secId != ''">
+            AND A.FINPROD_ID = #{secId}
+        </if>
+        group by A.FINPROD_ID
+        ) B on t1.FINPROD_ID = B.FINPROD_ID
+        LEFT JOIN
+        FIN_CASH_PAY_RULE FCPR ON FCPR.FINPROD_ID = t1.FINPROD_ID
+        LEFT JOIN
+        MST_BOND_CREDIT_RATING MBCR ON t1.FINPROD_MARKET_ID = MBCR.O_CODE AND MBCR.O_TYPE = '02'
+        LEFT JOIN
+        SYS_DATADICT_LIST sd1 ON sd1.DICT_CODE = 'MAIN_GRADE_RESULT' AND sd1.ITEM_CODE = MBCR.GRADE_RESULT
+        LEFT JOIN
+        MST_BOND_CREDIT_RATING MBCRA ON t1.ISSUER = MBCRA.O_CODE AND MBCRA.O_TYPE = '01'
+        LEFT JOIN
+        SYS_DATADICT_LIST sd2 ON sd2.DICT_CODE = 'MAIN_GRADE_RESULT' AND sd2.ITEM_CODE = MBCRA.GRADE_RESULT
+        LEFT JOIN
+        SYS_DATADICT_LIST sdl ON sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_FOUR' AND sdl.ITEM_CODE = t2.TYPE_11
+        LEFT JOIN
+        SYS_DATADICT_LIST sdltwo ON sdltwo.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO' AND sdltwo.ITEM_CODE = t2.TYPE_9
+        LEFT JOIN
+        SYS_DATADICT_LIST sdlIssueType ON sdlIssueType.DICT_CODE = 'ISSUE_TYPE' AND sdlIssueType.ITEM_CODE = t1.ISSUE_TYPE
+        LEFT JOIN
+        SYS_DATADICT_LIST sdlCouponSpecies ON sdlCouponSpecies.DICT_CODE = 'COUPON_SPECIES' AND sdlCouponSpecies.ITEM_CODE = t1.COUPON_SPECIES
+        LEFT JOIN
+        SYS_DATADICT_LIST sdlPayCycle ON sdlPayCycle.DICT_CODE = 'FREQUENCY_UNIT' AND sdlPayCycle.ITEM_CODE = FCPR.PAY_CYCLE
+        LEFT JOIN
+        SYS_DATADICT_LIST sd ON sd.DICT_CODE = 'INT_TYPE' AND sd.ITEM_CODE = t6.INT_TYPE
+        LEFT JOIN MST_CUSTOMER_INFO MCI ON t1.ISSUER = MCI.CUSTOMER_ID
+        LEFT JOIN MST_CUSTOMER_INFO MCI2 ON t1.SPONSOR = MCI2.CUSTOMER_ID
+        LEFT JOIN
+        FIN_CASH_CALC_RULE FCCR ON FCCR.FINPROD_ID = t1.FINPROD_ID
+        LEFT JOIN (
+        SELECT * FROM(
+        SELECT OCODE,
+        INNEROUTER,
+        GRADEDATE,
+        MSTRATINGRESULT01
+        GRADERESULT,
+        rank() over (
+        partition
+        BY
+        OCODE
+        ORDER BY
+        gradeDate
+        DESC
+        ) rk FROM view_fin_product_rating
+        ) WHERE rk = 1
+        ) PJ ON PJ.OCODE = t1.FINPROD_MARKET_ID
+        LEFT JOIN FIN_EXERCISE_PLAN A ON t1.FINPROD_ID = A.FINPROD_ID
+        where 1 = 1
+        <if test="secId != null and secId != ''">
+            AND t1.FINPROD_ID = #{secId}
+        </if>
+        ORDER  BY t6.EFF_DATE desc ) where rownum = 1
+    </select>
+    <!--交易日取最大值-->
+    <select id="getMaxTradeDate" resultType="java.util.Date">
+        SELECT
+        Max(TRADE_DATE) TRADE_DATE
+        FROM(
+            SELECT
+            Max(TRADE_DATE) TRADE_DATE
+            FROM TRD_PRODUCT_DEAL
+            WHERE FINPROD_ID = #{secId} AND TRADE_STATUS = '01' AND (IS_CANCEL='N' or IS_CANCEL IS NULL)
+            UNION ALL
+            SELECT
+            Max(TRADE_DATE) TRADE_DATE
+            FROM WFL_TRD_PRODUCT_DEAL
+            WHERE FINPROD_ID = #{secId}
+        )
+    </select>
+
+    <!--交易日取最小值-->
+    <select id="getMinTradeDate" resultType="java.util.Date">
+        SELECT
+        Min(TRADE_DATE) TRADE_DATE
+        FROM(
+        SELECT Min(TRADE_DATE) TRADE_DATE
+        FROM TRD_PRODUCT_DEAL
+        WHERE FINPROD_ID = #{secId} AND TRADE_STATUS = '01' AND (IS_CANCEL='N' or IS_CANCEL IS NULL)
+        UNION ALL
+        SELECT Min(TRADE_DATE) TRADE_DATE
+        FROM WFL_TRD_PRODUCT_DEAL
+        WHERE FINPROD_ID = #{secId}
+        )
+    </select>
+
+    <select id="getEtrFinExerciseInfo" resultType="java.lang.String">
+        select
+        distinct t2.ITEM_VALUE ITEM_CODE
+        from
+        FIN_EXERCISE_PLAN t1
+        inner join sys_datadict_list t2
+        on t2.DICT_CODE = 'EXEC_MODE' and t1.EXERCISE_TYPE = t2.ITEM_CODE
+        where
+        t1.FINPROD_TYPE2 = #{FINPROD_TYPE2_F01} and
+         t1.EXERCISE_TYPE in (#{EXEC_MODE_01}, #{EXEC_MODE_02})
+        <if test="secId != null and secId != ''">
+            AND t1.FINPROD_ID = #{secId}
+        </if>
+    </select>
+
+    <!-- 指令管理查询 -->
+    <select id="findEtrinfo" parameterType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrInvestBondInfoReqDto"
+            resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfoDto">
+        select
+        T1.ENTRUST_ID entrustId,
+        T1.ENTRUST_STATUS entrustStatus,
+        T8.REAL_NAME invManagerId,
+        T1.PORTFOLIO_ID portfolioId,
+        T2.PORTFOLIO_NAME portfolioName,
+        T1.FINPROD_ID finprodId,
+        T3.FINPROD_MARKET_ID finprodMarketId,
+        T3.FINPROD_ABBR finprodAbbr,
+        T4.type_11 secType1,
+        T1.PS as ps,
+        NVL(T1.ENTRUST_NUM,0) / 100 shareNum,
+        T1.PRICE_MODEL priceModel,
+        T1.PRICE unitPrice,
+        T7.FULL_PRICE allPrice,
+        T7.MATURE_YIELD*100 matureYield,
+        T7.EXER_YIELD*100 exerYield,
+        T7.SETTLE_SPREED as settleSpreed,
+        T1.vdate etrDate,
+        T1.REMARK as remark
+        ,T1.INV_AIM as businessModel
+        from
+        ETR_ENTRUST T1
+        INNER JOIN PTL_PORTFOLIO T2 ON T1.PORTFOLIO_ID = T2.PORTFOLIO_ID
+        LEFT JOIN FIN_PRODUCT T3 ON T1.FINPROD_ID = T3.FINPROD_ID
+        LEFT JOIN
+        (
+        SELECT
+        ENTRUST_ID,
+        SUM(
+        FINISH_AMT) as FINISH_AMT
+        FROM
+        ETR_FINISH_STATUS
+        GROUP BY
+        ENTRUST_ID) T5
+        ON T1.ENTRUST_ID = T5.ENTRUST_ID
+        LEFT
+        JOIN ETR_ENTRUST_ADD T7 ON T1.ENTRUST_ID = T7.ENTRUST_ID
+        LEFT JOIN SYS_USER T8 ON T1.INV_MANAGER_ID = T8.USER_NAME
+        LEFT JOIN FIN_PRODUCT_TYPE T4 ON T4.FINPROD_ID = T1.FINPROD_ID
+        where 1=1
+        <if test="entrustId != null and entrustId != ''">
+            AND T1.ENTRUST_ID = #{entrustId}
+        </if>
+    </select>
+    <!-- 指令管理查询 -->
+    <select id="findEtrinfoPage" parameterType="Map"
+            resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbfindEtrinfoResponse">
+        select * from (select aaa.* from (
+        <choose>
+            <when test="search == '有效'">
+                <!-- 有效状态查询 -->
+                <include refid="onlyEtrEntrust"></include>
+            </when>
+            <otherwise>
+                <include refid="onlyWtfEtrEntrust"></include>
+                UNION ALL
+                <include refid="onlyEtrEntrust"></include>
+            </otherwise>
+        </choose>
+        ) aaa
+        left join SYS_DATADICT_LIST sdl on aaa.entrustStatus=sdl.ITEM_CODE and sdl.DICT_CODE='ENTRUST_STATUS'
+        left join SYS_DATADICT_LIST dictps on aaa.PS=dictps.ITEM_CODE and dictps.DICT_CODE='PS'
+        left join SYS_DATADICT_LIST dictpriceModel on aaa.priceModel=dictpriceModel.ITEM_CODE and dictpriceModel.DICT_CODE='PRICE_MODEL'
+        left join SYS_DATADICT_LIST dictbusiModel on aaa.busiModel=dictbusiModel.ITEM_CODE and dictbusiModel.DICT_CODE='BUSINESS_MODEL'
+        left join SYS_DATADICT_LIST dictSecType on aaa.secType1=dictSecType.ITEM_CODE and dictSecType.DICT_CODE='CUSTOM_ASSET_TYPE_FOUR'
+        <!-- 关键字模糊查询 -->
+        <include refid="vagueQueryWhere"></include>
+        order by sdl.ORDER_NO, aaa.entrustId DESC)
+        <!--前端传入排序字段-->
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort} ${direction}
+        </if>
+    </select>
+    <sql id="onlyEtrEntrust">
+        select
+        decode(T1.ENTRUST_STATUS,'08','流程中','有效') as effectiveStatusName,
+        T1.ENTRUST_ID entrustId,
+        T1.ENTRUST_STATUS entrustStatus,
+        T8.REAL_NAME invManagerId,
+        T1.PORTFOLIO_ID portfolioId,
+        T2.PORTFOLIO_NAME portfolioName,
+        T1.FINPROD_ID finprodId,
+        T3.FINPROD_MARKET_ID finprodMarketId,
+        T3.FINPROD_ABBR finprodAbbr,
+        T4.type_11 secType1,
+        T1.PS ps,
+        NVL(T1.ENTRUST_NUM,0) / 100 shareNum,
+        T1.PRICE_MODEL priceModel,
+        T1.BUSINESS_MODEL as busiModel,
+        T1.PRICE unitPrice,
+        T7.FULL_PRICE allPrice,
+        T7.MATURE_YIELD*100 matureYield,
+        T7.EXER_YIELD*100 exerYield,
+        T7.SETTLE_SPREED settleSpreed,
+        TO_CHAR(T1.entrust_date, 'yyyy-MM-dd')  as etrDate,
+        null as approver,
+        T1.REMARK as remark,
+        trunc((NVL(T6.FINISH_AMT,0)+NVL(T5.ENT_FINISH_AMT*100,0))/(T1.ENTRUST_NUM*100),4)*100 execProcess,
+        trunc((NVL(C.totalShareAmt,nvl(C2.totalShareAmt,0))+NVL(C3.FINISH_AMT*100,0))/(T1.ENTRUST_NUM*100),4)*100 transProcess,
+        NVL(T6.FINISH_AMT,0)/10000+NVL(T5.ENT_FINISH_AMT,0)/100  as execFinishAmt,
+        (NVL(T1.ENTRUST_NUM,0)/100 - NVL(T5.ENT_FINISH_AMT,0)/100-NVL(T6.FINISH_AMT,0)/10000) as execRemainderAmt,
+        NVL(C.totalShareAmt,nvl(C2.totalShareAmt,0))/10000+NVL(C3.FINISH_AMT/100,0)  as transFinishAmt,
+        NVL(T1.ENTRUST_NUM,0)/100 - NVL(C.totalShareAmt,nvl(C2.totalShareAmt,0))/10000-NVL(C3.FINISH_AMT/100,0) as transRemainderAmt,
+        NVL(T7.OUR_ENT_NUM,0)/100  as entrustOwnNum,
+        NVL(T7.LENDIN_ENT_NUM,0)/100  as entrustIntegrateNum,
+        T7.calculate_field as calculateField,
+        null as wflExist
+        from
+        ETR_ENTRUST T1
+        INNER JOIN
+        PTL_PORTFOLIO_AUTHORITY PPA
+        ON
+        T1.PORTFOLIO_ID = PPA.PORTFOLIO_ID
+        <if test="userId != null and userId != ''">
+            AND PPA.USER_ID = #{userId}
+        </if>
+        INNER JOIN PTL_PORTFOLIO T2 ON T1.PORTFOLIO_ID = T2.PORTFOLIO_ID
+        LEFT JOIN FIN_PRODUCT T3 ON T1.FINPROD_ID = T3.FINPROD_ID
+        LEFT JOIN
+        (
+        SELECT
+        ENTRUST_ID,
+        SUM(FINISH_AMT) AS FINISH_AMT
+        FROM
+        ETR_QUOTE_FINISH_STATUS
+        GROUP BY
+        ENTRUST_ID) T6
+        ON  T1.ENTRUST_ID = T6.ENTRUST_ID
+        LEFT JOIN
+        (
+        SELECT
+        ENTRUST_ID,
+        SUM(FINISH_AMT) as FINISH_AMT,
+        SUM(ENT_FINISH_AMT) AS ENT_FINISH_AMT
+        FROM
+        ETR_FINISH_STATUS
+        GROUP BY
+        ENTRUST_ID) T5
+        ON T1.ENTRUST_ID = T5.ENTRUST_ID
+        LEFT JOIN ETR_ENTRUST_ADD T7 ON T1.ENTRUST_ID = T7.ENTRUST_ID
+        LEFT JOIN SYS_USER T8 ON T1.INV_MANAGER_ID = T8.USER_NAME
+        LEFT JOIN FIN_PRODUCT_TYPE T4 ON T4.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN
+        (SELECT C.ENTRUST_ID,
+        SUM(nvl(C.SHARE_AMT, 0)) * 100 totalShareAmt
+        FROM IBU_QUOTE_BOND A
+        LEFT JOIN IBU_QUOTE_BOND_DET B ON A.QUOTE_ID = B.QUOTE_ID
+        LEFT JOIN IBU_QUOTE_ETR_RE C ON A.QUOTE_ID = C.QUOTE_ID
+        WHERE B.TRADE_STATUS = '07'
+        GROUP BY C.ENTRUST_ID) C
+        ON C.ENTRUST_ID = T1.ENTRUST_ID
+        LEFT JOIN
+        (SELECT A.ENTRUST_ID,
+        nvl(A.SHARE_AMT, 0) * 100 totalShareAmt
+        FROM IBU_QUOTE_BOND A
+        LEFT JOIN IBU_QUOTE_BOND_DET B ON A.QUOTE_ID = B.QUOTE_ID
+        WHERE B.TRADE_STATUS = '07') C2
+        ON C2.ENTRUST_ID = T1.ENTRUST_ID
+        LEFT JOIN(
+        SELECT
+        ENTRUST_ID,
+        SUM(FINISH_AMT) AS FINISH_AMT
+        FROM ETR_FINISH_STATUS
+        <!--登记与报价分开统计-->
+        INNER JOIN (SELECT
+        DISTINCT T3.TRADE_ID
+        FROM TRDQUTO_MATCH_INFO T1
+        INNER JOIN REG_FIN_PRODUCT_DEAL_TOTAL T2 ON
+        T1.PRE_TRADE_ID = T2.TOTLE_TRADE_ID
+        INNER JOIN TRD_PRODUCT_DEAL T3 ON
+        T3.TOTLE_TRADE_ID = T1.TRD_ID
+        WHERE
+        TRD_CONF_STATUS = '1')	REG
+        ON REG.TRADE_ID = ETR_FINISH_STATUS.TRADE_ID
+        GROUP BY
+        ENTRUST_ID) C3
+        ON T1.ENTRUST_ID = C3.ENTRUST_ID
+        where T1.ENTRUST_NUM!=0 and T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}
+        and T1.TRADE_MARKET in (#{TRADE_MARKET_01},#{TRADE_MARKET_02})
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND T1.portfolio_id in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="finprodAbbr != null and finprodAbbr != ''">
+            AND T3.FINPROD_ABBR like '%' || #{finprodAbbr,jdbcType=VARCHAR} || '%'
+        </if>
+        <if test="settleSpeedList != null and settleSpeedList.size() > 0">
+            AND  decode(T7.SETTLE_SPREED,0,'01',1,'02',2,'03')  in
+            <foreach collection="settleSpeedList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="repManagerList != null and repManagerList.size() > 0">
+            AND T1.INV_MANAGER_ID in
+            <foreach collection="repManagerList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND T3.FINPROD_ID in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="psList != null and psList.size() > 0">
+            AND T1.PS in
+            <foreach collection="psList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustStatus != null and entrustStatus.size() > 0">
+            AND T1.ENTRUST_STATUS in
+            <foreach collection="entrustStatus" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustId != null and entrustId != ''">
+            AND T1.ENTRUST_ID = #{entrustId}
+        </if>
+        <if test="entrustStartDate!=null and entrustStartDate!='' and  entrustEndDate!=null and entrustEndDate!='' ">
+            <![CDATA[ AND T1.ENTRUST_DATE  >= to_date(#{entrustStartDate},'yyyy-mm-dd') ]]>
+            <![CDATA[ AND T1.ENTRUST_DATE <= to_date(#{entrustEndDate},'yyyy-mm-dd') ]]>
+        </if>
+    </sql>
+    <sql id="onlyWtfEtrEntrust">
+        select distinct
+        decode(T1.ENTRUST_STATUS,'08','流程中','有效') as effectiveStatusName,
+        T1.ENTRUST_ID entrustId,
+        T1.ENTRUST_STATUS entrustStatus,
+        T8.REAL_NAME invManagerId,
+        T1.PORTFOLIO_ID portfolioId,
+        T2.PORTFOLIO_NAME portfolioName,
+        T1.FINPROD_ID finprodId,
+        T3.FINPROD_MARKET_ID finprodMarketId,
+        T3.FINPROD_ABBR finprodAbbr,
+        T4.type_11 secType1,
+        T1.PS ps,
+        NVL(T1.ENTRUST_NUM,0) / 100 shareNum,
+        T1.PRICE_MODEL priceModel,
+        T1.BUSINESS_MODEL as busiModel,
+        T1.PRICE unitPrice,
+        T7.FULL_PRICE allPrice,
+        T7.MATURE_YIELD*100 matureYield,
+        T7.EXER_YIELD*100 exerYield,
+        T7.SETTLE_SPREED as settleSpreed,
+        TO_CHAR(T1.ENTRUST_DATE, 'yyyy-MM-dd') as etrDate,
+        nextUser.userName as approver,
+        T1.REMARK as remark,
+        trunc((NVL(T6.FINISH_AMT,0)+NVL(T5.ENT_FINISH_AMT*100,0))/(T1.ENTRUST_NUM*100),4)*100 execProcess,
+        trunc(NVL(T5.FINISH_AMT,0)*100/(T1.ENTRUST_NUM*100),4)*100 transProcess,
+        NVL(T6.FINISH_AMT,0)/10000 +NVL(T5.ENT_FINISH_AMT,0)/100  as execFinishAmt,
+        (NVL(T1.ENTRUST_NUM,0)/100- NVL(T5.ENT_FINISH_AMT,0)/100- NVL(T6.FINISH_AMT,0)/10000) as execRemainderAmt,
+        NVL(T5.FINISH_AMT,0)/100  as transFinishAmt,
+        (NVL(T1.ENTRUST_NUM,0)/100- NVL(T5.FINISH_AMT,0)/100) as transRemainderAmt,
+        NVL(T7.OUR_ENT_NUM,0)/100  as entrustOwnNum,
+        NVL(T7.LENDIN_ENT_NUM,0)/100  as entrustIntegrateNum,
+        T7.cal_mode as calculateField,
+        'Y' as wflExist
+        from
+        WFL_ETR_ENTRUST T1
+        INNER JOIN
+        PTL_PORTFOLIO_AUTHORITY PPA
+        ON
+        T1.PORTFOLIO_ID = PPA.PORTFOLIO_ID
+        <if test="userId != null and userId != ''">
+            AND PPA.USER_ID = #{userId}
+        </if>
+        INNER JOIN PTL_PORTFOLIO T2 ON T1.PORTFOLIO_ID = T2.PORTFOLIO_ID
+        LEFT JOIN FIN_PRODUCT T3 ON T1.FINPROD_ID = T3.FINPROD_ID
+        LEFT JOIN
+        (
+        SELECT
+        ENTRUST_ID,
+        SUM(FINISH_AMT) AS FINISH_AMT
+        FROM
+        ETR_QUOTE_FINISH_STATUS
+        GROUP BY
+        ENTRUST_ID) T6
+        ON  T1.ENTRUST_ID = T6.ENTRUST_ID
+        LEFT JOIN
+        (
+        SELECT
+        ENTRUST_ID,
+        SUM(FINISH_AMT) as FINISH_AMT,
+        SUM(ENT_FINISH_AMT) AS ENT_FINISH_AMT
+        FROM
+        ETR_FINISH_STATUS
+        GROUP BY
+        ENTRUST_ID) T5
+        ON T1.ENTRUST_ID = T5.ENTRUST_ID
+        LEFT JOIN WFL_ETR_ENTRUST_ADD T7 ON T1.ENTRUST_ID = T7.ENTRUST_ID
+        LEFT JOIN SYS_USER T8 ON T1.INV_MANAGER_ID = T8.USER_NAME
+        LEFT JOIN FIN_PRODUCT_TYPE T4 ON T4.FINPROD_ID = T1.FINPROD_ID
+        left join
+        (select
+        nextApp.workFlowId,
+        (select listagg(SYS_USER.REAL_NAME, ',') within group(order by SYS_USER.USER_NAME) from SYS_USER where
+        instr(','||nextApp.nowUserId||',' , ','||SYS_USER.USER_NAME||',') > 0) userName
+        from
+        (
+        SELECT distinct case when T.PROCESS_STATE = 'END' then  null else T.NEXT_USER end AS nowUserId,
+        sdpm.Workflow_Id as workFlowId
+        FROM SYS_WFL_BUSINESS_LIST T
+        inner join SYS_DATA_PROCESS_MARK sdpm
+        on sdpm.business_data_pk1=T.TRADE_ID
+        WHERE EXISTS
+        (SELECT 1
+            FROM SYS_WFL_BUSINESS_LIST A
+            WHERE A.SEQ_NO = (SELECT MAX(B.SEQ_NO)
+                FROM SYS_WFL_BUSINESS_LIST B
+                WHERE A.WORKFLOW_ID = B.WORKFLOW_ID)
+                AND T.SEQ_NO = A.SEQ_NO)
+                AND T.PROCESS_STATE in ('ING')
+                and T.BUSINESS_TYPE='ETR52') nextApp
+        ) nextUser
+        on T1.Workflow_Id=nextUser.workFlowId
+        where T1.ENTRUST_NUM!=0 and
+        T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}
+        and T1.TRADE_MARKET in ( #{TRADE_MARKET_01},#{TRADE_MARKET_02})
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND T1.portfolio_id in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustStatus != null and entrustStatus.size() > 0">
+            AND T1.ENTRUST_STATUS in
+            <foreach collection="entrustStatus" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="finprodAbbr != null and finprodAbbr != ''">
+            AND T3.FINPROD_ABBR like '%' || #{finprodAbbr,jdbcType=VARCHAR} || '%'
+        </if>
+        <if test="settleSpeedList != null and settleSpeedList.size() > 0">
+            AND  decode(T7.SETTLE_SPREED,0,'01',1,'02',2,'03')  in
+            <foreach collection="settleSpeedList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="repManagerList != null and repManagerList.size() > 0">
+            AND T1.INV_MANAGER_ID in
+            <foreach collection="repManagerList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND T3.FINPROD_ID in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="psList != null and psList.size() > 0">
+            AND T1.PS in
+            <foreach collection="psList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustId != null and entrustId != ''">
+            AND T1.ENTRUST_ID  LIKE concat('%',concat(#{entrustId,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="entrustStartDate!=null and entrustStartDate!='' and  entrustEndDate!=null and entrustEndDate!='' ">
+            <![CDATA[ AND T1.ENTRUST_DATE >= to_date(#{entrustStartDate},'yyyy-mm-dd') ]]>
+            <![CDATA[ AND T1.ENTRUST_DATE <= to_date(#{entrustEndDate},'yyyy-mm-dd') ]]>
+        </if>
+    </sql>
+    <sql id="vagueQueryWhere">
+        <if test="search != null and search != '' and search !='有效' ">
+            <where>
+                ((aaa.effectiveStatusName || '|' || sdl.ITEM_VALUE || '|' || aaa.portfolioId || '|' || aaa.portfolioName
+                || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr || '|' || dictSecType.ITEM_VALUE || '|' || dictps.ITEM_VALUE
+                || '|T+' || aaa.settleSpreed || '|' || dictpriceModel.ITEM_VALUE   || '|' || aaa.invManagerId
+                || '|' || aaa.entrustId || '|' || approver || '|' || aaa.REMARK || '|' || dictbusiModel.ITEM_VALUE
+                like '%' || #{search} || '%')
+                or to_char(aaa.unitPrice,'FM99990.9990')=#{search} or  aaa.unitPrice||'' =#{search}
+                or to_char(aaa.allPrice,'FM99990.9990')=#{search} or  aaa.allPrice||'' =#{search}
+                or to_char(aaa.matureYield,'FM99990.9990')=#{search} or  aaa.matureYield||'' =#{search}
+                or to_char(aaa.exerYield,'FM99990.9990')=#{search} or  aaa.exerYield||'' =#{search}
+                or to_char(aaa.execProcess,'FM99990.9990')=#{search} or  aaa.execProcess||'' =#{search}
+                or to_char(aaa.transProcess,'FM99990.9990')=#{search} or  aaa.transProcess||'' =#{search}
+                or  aaa.etrDate||'' =#{search}
+                or  aaa.etrDate=#{year}||'-'||#{search}
+                or  replace(aaa.etrDate,'-','/')=#{search}
+                or  replace(aaa.etrDate,'-','/')=#{year}||'/'||#{search}
+                <if test="search_isNumberFlag != null and search_isNumberFlag == true">
+                    or aaa.shareNum=to_number(#{search})
+                </if>
+                )
+            </where>
+        </if>
+    </sql>
+    <select id="findAssetInfo"
+            resultType="com.joyintech.tams.common.base.entity.FinProduct">
+        select
+        T1.ccy,T1.Calendar_Id as calendarId,T1.vdate vdate,T1.mdate mdate,T1.TRADE_MARKET as tradeMarket,
+        T1.finprod_abbr as finprodAbbr
+        from
+        fin_product T1
+        where T1.finprod_id = #{entrustId}
+    </select>
+    <select id="findAssetExercise" resultType="com.joyintech.tams.common.base.entity.FinExercisePlan">
+    select
+        <include refid="com.joyintech.tams.common.base.dao.FinExercisePlanMapper.Base_Column_List" />
+    from FIN_EXERCISE_PLAN pd
+    where ROWNUM = 1
+        <if test="platDate != null">
+            and pd.exercise_date <![CDATA[>]]>#{platDate}
+        </if>
+        <if test="finprodId != null and finprodId != ''">
+            and pd.FINPROD_ID = #{finprodId}
+        </if>
+        <if test="ps != null and ps.equals('T03')">
+            and pd.exercise_type='02'
+        </if>
+        <if test="ps != null and ps.equals('T39')">
+            and pd.exercise_type='01'
+        </if>
+        <if test="isNull != null and isNull != ''">
+            and pd.EXERCISE_PRICE is null
+        </if>
+    order by pd.exercise_date desc
+    </select>
+    <select id="queryPositionByEtrInfo" parameterType="Map" resultType="map">
+        select
+        sum(
+        CASE WHEN b.S_HOLDINGTYPE=#{S_003} THEN a.AMOUNT*nvl(b.CAL_FLAG,1) ELSE 0 END
+        ) AS RRQMKDGH, /*融入券卖空待购回持仓*/
+        sum(CASE WHEN a.HODING_TYPE=#{A_004} AND a.DATE_TYPE ='0' THEN AMOUNT ELSE 0 END) AS BFQTRKYCC
+        from ETR_SEC_POSITION_RULE a
+        LEFT JOIN PTL_POSITION_CFG b ON a.HODING_TYPE =b.HOLDINGTYPE AND b.S_HOLDINGTYPE IN (#{S_003})
+        where to_char(a.cdate,'yyyy-MM-dd') = to_char(#{cdate},'yyyy-MM-dd') and (b.S_HOLDINGTYPE IN (#{S_003}) or a.HODING_TYPE in (#{A_004}))
+        and a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+        and  a.PORTFOLIO_ID  = #{portfolioId,jdbcType=VARCHAR}
+        and a.date_type='0'
+    </select>
+    <select id="findPtlInfo"
+            resultType="com.joyintech.tams.common.base.entity.PtlPortfolio">
+        SELECT DISTINCT
+        A.PORTFOLIO_ID portfolioId,
+        A.PORTFOLIO_NAME  portfolioName
+        from
+        PTL_PORTFOLIO A
+        where A.PORTFOLIO_ID = #{portfolioId}
+        and rownum=1
+    </select>
+    <!-- 是否节假日 -->
+    <select id="getIsHoliday" parameterType="java.util.Map" resultType="String">
+        SELECT
+        IS_HOLIDAY
+        FROM
+        VAL_VW_MST_HOLIDAY
+        WHERE CDATE = #{cdate}
+        AND TRADE_CALENDAR_ID = #{calendarId}
+    </select>
+    <!--查询该资产对应的组合分配列表-->
+    <select id="queryCfetsBussCombDisList" parameterType="Map" resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsBussCombDistribtBaseDto">
+        select
+        tt.portfolio_id as portfolioId,
+        pp.portfolio_name portfolioName,
+        inva.INV_AIM as businessModel,
+        nvl(tt.entrustNum,0)/10000 as entrustNum
+        from
+        (select a.portfolio_id,a.finprod_id,
+        sum(CASE WHEN b.S_HOLDINGTYPE=#{S_001} THEN a.AMOUNT*nvl(b.CAL_FLAG,1) ELSE 0 END) as entrustNum
+        from ETR_SEC_POSITION_RULE a
+        LEFT JOIN PTL_POSITION_CFG b
+        ON a.HODING_TYPE = b.HOLDINGTYPE
+        AND b.S_HOLDINGTYPE =#{S_001}
+        inner join ptl_portfolio_authority ppa
+        on a.portfolio_id=ppa.portfolio_id
+        <if test="userId != null and userId != ''">
+            AND PPA.USER_ID = #{userId}
+        </if>
+        where a.cdate= #{platDate}
+        and a.finprod_id=#{finprodId,jdbcType=VARCHAR}
+        and a.date_type='0'
+        group by  a.portfolio_id,a.finprod_id)tt
+        <!-- 业务模式查交易表 -->
+        left join (
+            select FINPROD_ID, PORTFOLIO_ID, listagg(INV_AIM, ',') WITHIN GROUP (ORDER BY PORTFOLIO_ID, FINPROD_ID) as INV_AIM
+            from (
+                SELECT distinct FINPROD_ID, PORTFOLIO_ID, INV_AIM
+                FROM (
+                    select
+                    a.INV_AIM , a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
+                    ROW_NUMBER () over(PARTITION BY a.FINPROD_ID,b.PORTFOLIO_ID ORDER BY a.TRADE_DATE DESC) rn
+                    from TRD_PRODUCT_DEAL a
+                    LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+                    WHERE 1=1 AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+                    AND a.TRADE_DATE &lt;= #{platDate,jdbcType=DATE}-1
+                    and a.trade_status='01'
+                    and a.is_cancel='N'
+                ) WHERE rn = 1
+               union
+                SELECT distinct a.FINPROD_ID, b.PORTFOLIO_ID, a.INV_AIM
+                from TRD_PRODUCT_DEAL a
+                LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+                WHERE 1=1 AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+                AND a.TRADE_DATE = #{platDate,jdbcType=DATE}
+                and a.trade_status='01'
+                and a.is_cancel='N'
+            ) GROUP BY FINPROD_ID, PORTFOLIO_ID
+        ) inva
+        on inva.FINPROD_ID=tt.FINPROD_ID and inva.PORTFOLIO_ID=tt.PORTFOLIO_ID
+        left join PTL_PORTFOLIO pp
+        on pp.portfolio_id=tt.portfolio_id
+        where tt.entrustNum>0
+    </select>
+    <!--查询资产是否行权债-->
+    <select id="queryAssetIsRight" resultType="Boolean">
+        SELECT count(*)
+        from fin_product T1
+        inner join FIN_EXERCISE_PLAN p
+        on p.finprod_id=T1.finprod_id
+        where
+        T1.is_right='Y'
+        and p.exercise_date>#{platDate}
+        and T1.finprod_id=#{finprodId,jdbcType=VARCHAR}
+    </select>
+    <!--查询该资产该组合的所有的业务模式-->
+    <select id="selectAllBusModelListByInfo" parameterType="Map" resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsBussCombDistribtDto">
+        SELECT distinct INV_AIM as businessModel,PORTFOLIO_NAME  portfolioName
+        FROM (
+        select
+        a.INV_AIM , a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,pp.PORTFOLIO_NAME,
+        ROW_NUMBER () over( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC) rn
+        from TRD_PRODUCT_DEAL a
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+        left join PTL_PORTFOLIO pp
+        on b.PORTFOLIO_ID=pp.PORTFOLIO_ID
+        WHERE 1=1
+            AND a.finprod_id=#{finprodId,jdbcType=VARCHAR}
+            AND b.PORTFOLIO_ID =#{portfolioId,jdbcType=VARCHAR}
+            AND a.TRADE_DATE &lt;= to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') - 1
+            and a.INV_AIM is not null
+            and a.trade_status='01'
+            and a.is_cancel='N'
+        ) WHERE rn = 1
+        UNION
+        SELECT distinct a.INV_AIM as businessModel,pp.PORTFOLIO_NAME  portfolioName
+        from TRD_PRODUCT_DEAL a
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+        left join PTL_PORTFOLIO pp
+        on b.PORTFOLIO_ID=pp.PORTFOLIO_ID
+        WHERE 1=1
+            AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            AND b.PORTFOLIO_ID =#{portfolioId,jdbcType=VARCHAR}
+            and a.INV_AIM is not null
+            and a.trade_status='01'
+            and a.is_cancel='N'
+            AND a.TRADE_DATE = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd')
+    </select>
+    <!--该指令退回时，指令初始下达时间-->
+    <select id="selectTransmitTimeByInfo"
+            resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto">
+        select t2.transmit_time  as transmitTime
+        from etr_entrust t1
+        inner join etr_entrust_add t2
+        on t1.entrust_id=t2.entrust_id
+        where t1.entrust_id=#{entrustId}
+        and t1.entrust_status='05'
+        and rownum=1
+    </select>
+    <!--查询资产是否进行了赎回登记-->
+    <select id="queryAssetIsShReg" resultType="Boolean">
+        SELECT count(*)
+        from reg_fin_product_deal_total
+        where ps='T39' and trade_status='01' and is_cancel='N'
+        and finprod_id=#{finprodId,jdbcType=VARCHAR}
+        and trade_date<![CDATA[<=]]>#{platDate}
+        and settle_date>=#{platDate}
+    </select>
+    <select id="findInvAimInTrd" resultType="string">
+        select distinct businessModel
+        from (
+            SELECT a.INV_AIM as businessModel
+            from TRD_PRODUCT_DEAL a
+            LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+            WHERE 1=1
+            AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            AND b.PORTFOLIO_ID =#{portfolioId,jdbcType=VARCHAR}
+            and a.INV_AIM is not null
+            AND a.TRADE_DATE <![CDATA[<=]]> #{platDate}
+            and a.trade_status='01'
+            and a.is_cancel='N'
+            order by a.update_time desc)
+        where rownum=1
+    </select>
+    <select id="findInvAimInEtr" resultType="string">
+        select distinct businessModel
+        from (
+        select aaa.businessModel from (
+            SELECT a.INV_AIM as businessModel,a.update_time as updateTime
+            from etr_entrust a
+            WHERE 1=1
+            AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            AND a.PORTFOLIO_ID =#{portfolioId,jdbcType=VARCHAR}
+            and a.INV_AIM is not null
+            AND a.entrust_date <![CDATA[<=]]> #{platDate}
+            union
+            SELECT b.INV_AIM as businessModel,b.update_time as updateTime
+            from wfl_etr_entrust b
+            WHERE 1=1
+            AND b.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            AND b.PORTFOLIO_ID =#{portfolioId,jdbcType=VARCHAR}
+            and b.INV_AIM is not null
+            AND b.entrust_date <![CDATA[<=]]> #{platDate}
+        )aaa
+        order by aaa.updateTime desc
+        )
+        where rownum=1
+    </select>
+    <!--查询资产是否进行了SPPI测试-->
+    <select id="queryAssetIsSppiTest"  resultType="com.joyintech.tams.common.base.entity.SppiImportData">
+        select * from (
+        select x.test_status isSppiPass
+        from sppi_test x
+        where x.finprod_id=#{finprodId,jdbcType=VARCHAR}
+        union
+        select t.is_sppi_pass
+        from SPPI_IMPORT_DATA t
+        where t.bond_id=#{finprodId,jdbcType=VARCHAR}
+        ) where rownum=1
+
+    </select>
+</mapper>

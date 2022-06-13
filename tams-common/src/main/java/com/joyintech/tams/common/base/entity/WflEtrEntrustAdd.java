@@ -522,6 +522,22 @@ public class WflEtrEntrustAdd extends WflEtrEntrustAddKey {
      * 目标值单位
      */
     private String mulUnit;
+    /**
+     * 投管业务类型
+     */
+    private String busiTypePosition;
+    /**
+     * 计价模式
+     */
+    private String priceType;
+
+    public String getPriceType() {
+        return priceType;
+    }
+
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
+    }
 
     /**
      * 取得 清算速度
@@ -2052,5 +2068,13 @@ public class WflEtrEntrustAdd extends WflEtrEntrustAddKey {
 
     public void setMulUnit(String mulUnit) {
         this.mulUnit = mulUnit;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 }

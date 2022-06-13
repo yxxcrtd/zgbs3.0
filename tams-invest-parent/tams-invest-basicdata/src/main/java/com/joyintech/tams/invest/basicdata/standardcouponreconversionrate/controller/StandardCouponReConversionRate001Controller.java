@@ -59,11 +59,14 @@ public class StandardCouponReConversionRate001Controller extends BaseController 
                 DictCode.柜台接口类型,DictCode.是或否});
         List<SelectOptionDto> brokerIds = new ArrayList<SelectOptionDto> ();
         List<SelectOptionDto> finprodIdList = new ArrayList<SelectOptionDto> ();
+        List<SelectOptionDto> accountTypeList = new ArrayList<SelectOptionDto>();
         try {
             brokerIds = getMstCustomerInfo();
             model.addAttribute("brokerIds", JsonUtils.objectArray2Json(brokerIds.toArray()));
             finprodIdList = getFinprodIdInfo();
             model.addAttribute("finprodIdList", JsonUtils.objectArray2Json(finprodIdList.toArray()));
+            accountTypeList = getPtlSecAcctInfo();
+            model.addAttribute("accountTypeList", JsonUtils.objectArray2Json(accountTypeList.toArray()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -150,10 +153,16 @@ public class StandardCouponReConversionRate001Controller extends BaseController 
         WorkFlowParameter<StandardCouponReConversionRateDto> params = new WorkFlowParameter<StandardCouponReConversionRateDto>();
         params.setPageId("StandardCouponReConversionRate002");
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(entity-> entity.getFinprodId ()+"-"+entity.getBrokerId ());
         params.setBusinessType(DictCodeListExt3.共通业务类型_标准券再折算率.getValue());
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> SpringContextUtil.getTextValue("资产代码") + "("+ entity.getFinprodId () + ")");
+        params.setBusinessCode(item ->
+                        StringUtils.isNotEmpty( item.getFinprodId ()) ? item.getFinprodId ()+"-"+item.getBrokerId ()
+                                :item.getAccountType ()+"-"+item.getBrokerId ()
+                );
+        params.setComment(entity->
+            StringUtils.isNotEmpty( entity.getFinprodId ()) ? SpringContextUtil.getTextValue("资产代码") + "("+ entity.getFinprodId () + ")"
+            :SpringContextUtil.getTextValue("资金账户") + "("+ entity.getAccountType () + ")"
+        );
         processParameter.setWorkFlowParameter(params);
         String msg = standardCouponReConversionRateService.start(processParameter,
                 dto.getSelectedItem().toArray(new StandardCouponReConversionRateDto[dto.getSelectedItem().size()]));

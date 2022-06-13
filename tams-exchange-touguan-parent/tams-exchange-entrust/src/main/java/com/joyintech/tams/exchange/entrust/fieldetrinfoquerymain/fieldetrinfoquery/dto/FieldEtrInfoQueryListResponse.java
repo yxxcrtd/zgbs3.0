@@ -10,13 +10,12 @@
 
 package com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto;
 
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import io.swagger.annotations.ApiModel;
@@ -24,6 +23,9 @@ import io.swagger.annotations.ApiModelProperty;
 import org.thymeleaf.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * 场内指令分发
@@ -73,7 +75,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     private String effectFlag;
 
     @ApiModelProperty(name="etrPrice",value="指令价格",example="99")
-    private BigDecimal etrPrice;
+    private String etrPrice;
 
     @ApiModelProperty(name="exeProgress",value="执行进度%",example="50%")
     private BigDecimal exeProgress;
@@ -108,8 +110,18 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     @ApiModelProperty(name="trdAcctId",value="资金账户",example="XXX资金账户")
     private String trdAcctId;
 
+    @ApiModelProperty(name="assetType",value="平安资产类型",example="债券,质押式回购")
+    private String assetType;
+
     @ApiModelProperty(name="assetType1",value="资产一级类型",example="质押式协议回购")
     private String assetType1;
+
+    @ApiModelProperty(name = "bidModle", value = "投标方式")
+    private String bidModle;
+
+    @ApiModelProperty(name = "isWin", value = "中标结果")
+    private String isWin;
+
 
     /**
      * 获取 otherEntrustStatus
@@ -137,13 +149,13 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
      */
     public String getOtherFinprodType2() {
         if (StringUtil.equals(super.getFinprodType2(), BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue())){
-            return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, BussinessDictCodeList.平安资产类型_一级投标债券.getValue());
+            return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, BussinessDictCodeList.平安资产类型_债券.getValue());
         }
-        else if (StringUtil.equals(super.getFinprodType2(), BussinessDictCodeList.平安资产类型_回购.getValue())
+        else if (StringUtil.equals(getAssetType(), BussinessDictCodeList.平安资产类型_回购.getValue())
                 && StringUtil.equals(getAssetType1(), DictCodeList.回购类型_质押式协议回购.getValue())) {
             return BussinessConstant.NEGOTIATED_REPURCHASE_TEXT;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, super.getFinprodType2());
+        return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, getAssetType());
     }
 
     /**
@@ -175,6 +187,9 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
      * @return priceModel.
      */
     public String getOtherPriceModel() {
+        if (StringUtil.equals(this.getBusiTypePosition(),DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return null;
+        }
         return SysDataUtil.getNameFromDataDict(DictCode.价格模式, super.getPriceModel());
     }
 
@@ -227,6 +242,10 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         this.targetType = targetType;
     }
 
+    /**
+     * 取得 委托额度，交易金额
+     * @return 委托额度，交易金额
+     */
     public BigDecimal getEntrustAmt() {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
             return null;
@@ -234,6 +253,60 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         return super.getEntrustAmt();
     }
 
+    public String getEntrustAmtStr() {
+        if (getEntrustAmt() == null) {
+            return "";
+        }
+        String tips = "指令金额:";
+        NumberFormat numberInstance = NumberFormat.getNumberInstance(Locale.getDefault());
+        numberInstance.setMinimumFractionDigits(2);
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return null;
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return tips + numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(10000),2)) + "(万元)";
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
+                StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
+            return tips + numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(100),2)) + "(万元)";
+        }
+        return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
+    }
+    public BigDecimal getEntrustNum() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return null;
+        }
+        return super.getEntrustNum();
+    }
+    public String getEntrustNumStr() {
+        if (getEntrustNum() == null) {
+            return "";
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return null;
+        }
+        String tips = "指令数量:";
+        NumberFormat numberInstance = NumberFormat.getNumberInstance(Locale.getDefault());
+        numberInstance.setMinimumFractionDigits(2);
+        // 指令数量入库时已经 除以 100了
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return tips + numberInstance.format(ArithmeticUtil.divide(super.getEntrustNum(),new BigDecimal("100"),2)) + "(万元)";
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())){
+            return tips + numberInstance.format(getEntrustNum().setScale(2, RoundingMode.HALF_UP)) + "(万元)";
+        }
+        if (StringUtil.equals(getAssetType(),DictCodeList.平安资产类型_债券.getValue())
+            || StringUtil.equals(getAssetType(),DictCodeList.平安资产类型_质押式回购.getValue())){
+            return tips + numberInstance.format(super.getEntrustNum().setScale(0, RoundingMode.HALF_UP)) + "(张)";
+        }
+        if (StringUtil.equals(getAssetType(),DictCodeList.平安资产类型_基金.getValue())){
+            return tips + numberInstance.format(super.getEntrustNum().setScale(0, RoundingMode.HALF_UP)) + "(份)";
+        }
+        if (StringUtil.equals(getAssetType(), DictCodeListExt2.平安资产类型_股票.getValue())){
+            return tips + numberInstance.format(super.getEntrustNum().setScale(0, RoundingMode.HALF_UP)) + "(股)";
+        }
+        return tips + numberInstance.format(super.getEntrustNum().setScale(0, RoundingMode.HALF_UP));
+    }
     public void setOtherPs(String otherPs) {
         this.otherPs = otherPs;
     }
@@ -279,6 +352,9 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getTermDays() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return convertTermDays(getFinprodAbbr());
+        }
         return termDays;
     }
 
@@ -319,22 +395,69 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getOtherBusiTypePosition() {
-        return SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
+        String busiTypePosition = SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
+        if (StringUtil.isEmpty(busiTypePosition)) {
+            return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
+        }
+        return busiTypePosition;
     }
 
-    public BigDecimal getEtrPrice() {
-        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
-        && StringUtils.equals("PRM03",this.getPriceModel())){
-            return new BigDecimal(0.00);
-        }
+//    public BigDecimal getEtrPrice() {
+//        if (etrPrice == null){
+//            return null;
+//        }
+//        if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), this.getBusiTypePosition()) &&
+//                StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), this.getPriceModel())){
+//            return null;
+//        }
+//        if (StringUtil.equals(this.getBusiTypePosition(),DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+//            return null;
+//        }
+//        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
+//            && StringUtils.equals("PRM03",this.getPriceModel())){
+//            return new BigDecimal("0.00");
+//        }
+//        if(StringUtils.equals(getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+//            return etrPrice.setScale(3,BigDecimal.ROUND_HALF_UP);
+//        }
+//        return etrPrice.setScale(4, RoundingMode.HALF_UP);
+//    }
+
+
+    public String getEtrPrice() {
         return etrPrice;
     }
 
-    public void setEtrPrice(BigDecimal etrPrice) {
+    public void setEtrPrice(String etrPrice) {
         this.etrPrice = etrPrice;
     }
 
+    public String getEtrPriceStr() {
+        if (getEtrPrice() == null){
+            return null;
+        }
+        String tips = "指令价格:";
+        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
+                && StringUtils.equals("PRM03",this.getPriceModel())){
+            return tips + "0.00";
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return tips + getEtrPrice() + "%";
+        }
+        return tips + getEtrPrice();
+    }
+
+//    public void setEtrPrice(BigDecimal etrPrice) {
+//        this.etrPrice = etrPrice;
+//    }
+
     public BigDecimal getExecFinishAmt() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return ArithmeticUtil.divide(execFinishAmt,new BigDecimal("100"),2);
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return ArithmeticUtil.divide(execFinishAmt,new BigDecimal("10000"),2);
+        }
         return execFinishAmt;
     }
 
@@ -343,6 +466,12 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public BigDecimal getExecRemainderAmt() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return ArithmeticUtil.divide(execRemainderAmt,new BigDecimal("100"),2);
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return ArithmeticUtil.divide(execRemainderAmt,new BigDecimal("10000"),2);
+        }
         return execRemainderAmt;
     }
 
@@ -351,6 +480,12 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public BigDecimal getTransFinishAmt() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return ArithmeticUtil.divide(transFinishAmt,new BigDecimal("100"),2);
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return ArithmeticUtil.divide(transFinishAmt,new BigDecimal("10000"),2);
+        }
         return transFinishAmt;
     }
 
@@ -359,6 +494,12 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public BigDecimal getTransRemainderAmt() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return ArithmeticUtil.divide(transRemainderAmt,new BigDecimal("100"),2);
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return ArithmeticUtil.divide(transRemainderAmt,new BigDecimal("10000"),2);
+        }
         return transRemainderAmt;
     }
 
@@ -412,5 +553,97 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
 
     public void setAssetType1(String assetType1) {
         this.assetType1 = assetType1;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    /**
+     * 期限品种映射期限天数
+     * @param termType
+     * @return
+     */
+    private String convertTermDays(String termType){
+        String termDays = "";
+        switch (termType){
+            case "GC001":
+                termDays = "1";
+                break;
+            case "R-001":
+                termDays = "1";
+                break;
+            case "GC002":
+                termDays = "2";
+                break;
+            case "R-002":
+                termDays = "2";
+                break;
+            case "GC003":
+                termDays = "3";
+                break;
+            case "R-003":
+                termDays = "3";
+                break;
+            case "GC004":
+                termDays = "4";
+                break;
+            case "R-004":
+                termDays = "4";
+                break;
+            case "GC007":
+                termDays = "7";
+                break;
+            case "R-007":
+                termDays = "7";
+                break;
+            case "GC014":
+                termDays = "14";
+                break;
+            case "R-014":
+                termDays = "14";
+                break;
+            case "GC028":
+                termDays = "28";
+                break;
+            case "R-028":
+                termDays = "28";
+                break;
+            case "GC091":
+                termDays = "91";
+                break;
+            case "R-091":
+                termDays = "91";
+                break;
+            case "GC182":
+                termDays = "182";
+                break;
+            case "R-182":
+                termDays = "182";
+                break;
+            default:
+                break;
+        }
+        return termDays;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
+    public String getIsWin() {
+        return isWin;
+    }
+
+    public void setIsWin(String isWin) {
+        this.isWin = isWin;
     }
 }

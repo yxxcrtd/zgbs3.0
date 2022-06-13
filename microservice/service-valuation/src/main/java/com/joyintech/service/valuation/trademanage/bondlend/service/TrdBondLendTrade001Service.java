@@ -5,7 +5,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.valuation.trademanage.bondlend.dao.TrdBondLendTradeMapper;
-import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
+import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -38,8 +38,8 @@ public class TrdBondLendTrade001Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public Page<TrdBondLendTrade001Dto> selectForPage(int page, int length,
-                                                      Map<String, Object> pageParam)
+    public Page<TrdBondLendTradeDto> selectForPage(int page, int length,
+                                                   Map<String, Object> pageParam)
             throws Exception {
         //产品代码
         String finprodId = (String)pageParam.get("finprodId");
@@ -106,7 +106,7 @@ public class TrdBondLendTrade001Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public List<TrdBondLendTrade001Dto> queryPageList(Map<String, Object> params){
+    public List<TrdBondLendTradeDto> queryPageList(Map<String, Object> params){
         //产品代码
         String finprodId = (String)params.get("finprodId");
         String[] finprodIdArr = null;
@@ -166,10 +166,10 @@ public class TrdBondLendTrade001Service extends BaseService {
     }
 
 
-    public int delete(TrdBondLendTrade001Dto dto) {
+    public int delete(TrdBondLendTradeDto dto) {
         int count=0;
         Map<String, Object> params = new HashMap<>();
-        params.put("booksetId",dto.getFinprodId());
+        params.put("booksetId",dto.getProdId());
         params.put("tradeId",dto.getTradeId());
 
         List<TrdProductDeal> listDeal = new ArrayList<>();

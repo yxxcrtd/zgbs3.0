@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import com.joyintech.tams.invest.common.prodinfo.dao.RskRuleCommonMapper;
 
 @SuppressWarnings("rawtypes")
 @Service("backRskPortAutoRelatePointService")
@@ -34,6 +35,9 @@ public class RskPortAutoRelatePointService extends BaseService {
 
     @Autowired
     private RskRuleInfoMapper rskRuleInfoMapper;
+
+    @Autowired
+    private RskRuleCommonMapper rskRuleCommonMapper;
 
     @Autowired
     private RskRulePoolConfigMapper rskRulePoolConfigMapper;
@@ -90,6 +94,8 @@ public class RskPortAutoRelatePointService extends BaseService {
     @Transactional(rollbackFor = Throwable.class)
     public int deleteRule(RskPortAutoRelatePoint002Dto dto) {
         rskRuleInfoMapper.deleteByPrimaryKey(dto.getRuleId());
+        // 删除规则关联组合信息
+        rskRuleCommonMapper.deleteRulePort(dto.getRuleId(),null);
         // 删除规则入池配置
         rskPortAutoRelatePointMapper.deletePoolConfigByRuleId(dto.getRuleId());
         // 删除规则指标关联

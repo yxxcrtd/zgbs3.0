@@ -28,6 +28,11 @@ import java.text.MessageFormat;
 public class TamsSystemApplication extends WebApplication {
 
 	@Bean
+	public Docket dataCreditProtectionCertificatePeriod() {
+		return SwaggerConfig.createDocket("信用凭证保护存续期", "com.joyintech.tams.exchange.period.creditprotectioncertificate");
+	}
+
+	@Bean
 	public Docket dataBusinessCommonDocket() {
 		return SwaggerConfig.createDocket("通用接口", "com.joyintech.tams.business.common.controller");
 	}
@@ -37,7 +42,12 @@ public class TamsSystemApplication extends WebApplication {
 		return SwaggerConfig.createDocket("场内交易", "com.joyintech.tams.exchange.entrust.etrexchange");
 
 	}
-	
+
+	@Bean
+	public Docket dataTradeInfoDocket() {
+		return SwaggerConfig.createDocket("交易商信息维护", "com.joyintech.tams.exchange.basicdata.bussiness.traderinfo");
+
+	}
 
 
 	public static void main(String[] args) throws Exception {

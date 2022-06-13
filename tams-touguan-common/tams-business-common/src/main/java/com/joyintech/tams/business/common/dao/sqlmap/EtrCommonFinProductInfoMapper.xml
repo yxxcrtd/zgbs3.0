@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.business.common.dao.EtrCommonFinProductInfoMapper">
+
+    <select id="findFinProductInfo"
+            resultType="com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoResponse"
+            parameterType="com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoRequest">
+        SELECT
+        PRODUCT.FINPROD_ID finprodId,
+        PRODUCT.FINPROD_MARKET_ID finprodMarketId,
+        PRODUCT.FINPROD_ABBR finprodAbbr,
+        PRODUCT.FINPROD_NAME finprodName,
+        PRODUCT.TRADE_MARKET tradeMarket,
+        PRODUCT.REGIST_ORG registOrg,
+        PRODUCT.ISSUER issuer,
+        CUSTOMER_INFO.CUSTOMER_NAME issuerName,
+        PRODUCT.ISSUE_TYPE issueType,
+        case when PRODUCT.CIRCULATION_CODE is not null then TOTAL.SETTLE_DATE else PRODUCT_ADD.LISTING_DATE end as ONMARKET_DATE,
+        case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_MARKET_ID else PRODUCT_ADD.APPEAR_MARKET_ID end as APPEAR_MARKET_ID,
+        PRODUCT.VDATE vdate,
+        PRODUCT.MDATE mdate,
+        PRODUCT_TYPE.TYPE_9 assetTypeOne,
+        PRODUCT_TYPE.TYPE_10 assetTypeTwo,
+        PRODUCT_TYPE.TYPE_11 assetTypeThree,
+        PRODUCT_TYPE.TYPE_11 bondType,
+        PRODUCT.COUPON_SPECIES couponSpecies,
+        PRODUCT.CCY ccy,
+        PRODUCT.CAPI_INCOME_FEATURE capiIncomeFeature,
+        PRODUCT_ADD.IS_AUTO_UPDATE isAutoUpdate,
+        TO_CHAR(ISSUE.ISSUE_PRICE,'fm999999999999999999999990.0000') issuePrice,
+        PRODUCT.REMARK,
+        ISSUE.INT_TYPE intType,
+        ISSUE.PAY_CYCLE payCycle,
+
+        case
+        when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
+        SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
+        else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+        end as referYield,
+
+        RATE_INFO.INT_RATE basicRate,
+        ISSUE.RATE_GRADE rateGrade,
+        ISSUE.BP bp,
+        ISSUE.ISSUE_DATE issueDate,
+        TO_CHAR(ROUND(ISSUE.MIN_PER_TAMT/100000000,2),'fm999999999999999999999990.0000') minPerTamt,
+        TO_CHAR(ROUND(ISSUE.MAX_PER_UTAMT/100000000,2),'fm999999999999999999999990.0000') maxPerUtamt,
+        ISSUE.ISSUE_SDATE issueSdate,
+        ISSUE.ISSUE_EDATE issueEdate,
+        PRODUCT_ADD.BID_DATE bidDate,
+
+        case
+        when ISSUE.ISSUE_CLASS ='01' THEN to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        else to_char(ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+        end as bidDateStr,
+        case
+        when ISSUE.ISSUE_CLASS ='01' THEN to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        else to_char(ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+        end as settleDate,
+        PRODUCT_ADD.LISTING_DATE listingDate,
+        ISSUE.ISSUE_CLASS issueClass,
+        ISSUE.TENDER_TYPE tenderType,
+        ISSUE.TENDER_TARGET tenderTarget,
+        ISSUE.TENDER_SDATE tenderSdate,
+        ISSUE.TENDER_EDATE tenderEdate,
+        ISSUE.ISSUE_STYLE issueStyle,
+        TO_CHAR(ROUND(ISSUE.PLAN_ISSUE_AMT/100000000,2),'fm999999999999999999999990.00') planIssueAmt,
+        ISSUE.ADD_BATCH addBatch,
+        ISSUE.PAY_DATE payDate,
+        ISSUE.PAY_EDATE payEdate,
+        ISSUE.FIRST_CONFIRM_DATE firstConfirmDate,
+        ISSUE.ASSIGN_REGDATE assignRegdate,
+        PRODUCT_ADD.ISSUE_STATUS,
+        ISSUE.TENDER_SDATE tenderSdate,
+        ISSUE.TENDER_EDATE tenderEdate,
+        TO_CHAR(ROUND(ISSUE.MIN_PAMT/100000000, 4), 'fm999999999999999999999990.0000') minPamt,
+        TO_CHAR(ROUND(ISSUE.MAX_PAMT/100000000, 4), 'fm999999999999999999999990.0000') maxPamt,
+        ISSUE.MAX_TOTALAMT maxTotalamt,
+        ISSUE.MIN_TAMT minTamt,
+        ISSUE.MAX_TAMT maxTamt,
+        ISSUE.TENDER_UNIT tenderUnit,
+        ISSUE.MAX_TENDER_UNIT maxTenderUnit,
+        ISSUE.MAX_TENDER_PLUS maxTenderPlus,
+        ISSUE.SERI_Y_N seriYN,
+        ISSUE.MAX_TOTAL_TENDER maxTotalTender,
+        PRODUCT.FINPROD_TYPE2 finprodType2
+        FROM
+        FIN_PRODUCT PRODUCT
+        LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+        LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL TOTAL ON PRODUCT.FINPROD_ID = TOTAL.FINPROD_ID and TOTAL.FINPROD_TYPE2 = 'F32'
+        LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID AND PRODUCT_TYPE.BRANCH = '0'
+        LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO ON PRODUCT.ISSUER = CUSTOMER_INFO.CUSTOMER_ID
+        LEFT JOIN MST_INT_RATE_INFO RATE_INFO ON ISSUE.INT_RATE_ID = RATE_INFO.INT_RATE_ID
+        LEFT JOIN FIN_PRODUCT PRODUCT2 ON PRODUCT.CIRCULATION_CODE = PRODUCT2.FINPROD_ID
+        LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDL on ISSUE.INT_RATE_ID = SDL.ITEM_CODE
+        <where>
+
+            <if test="finprodId != null and finprodId != ''">
+                and PRODUCT.FINPROD_ID = #{finprodId}
+            </if>
+
+            <if test="finprodType2 != null and finprodType2 != ''">
+                and PRODUCT.FINPROD_TYPE2 = #{finprodType2}
+            </if>
+
+            <if test="finprodType != null and finprodType != ''">
+                and PRODUCT.FINPROD_TYPE = #{finprodType}
+            </if>
+
+            <if test="finprodMarketId != null and finprodMarketId != ''">
+                and PRODUCT.FINPROD_MARKET_ID = #{finprodMarketId}
+            </if>
+
+            <if test="tradeMarketList != null and tradeMarketList.size() > 0">
+                AND PRODUCT.TRADE_MARKET IN(
+                <foreach item="item" index="index" collection="tradeMarketList" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            and ROWNUM = 1
+        </where>
+    </select>
+
+</mapper>

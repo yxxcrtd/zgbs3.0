@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.invest.trade.planccy.validator;
 
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -19,6 +20,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
 import com.joyintech.tams.invest.trade.common.validator.TradeCommonValidator;
@@ -209,13 +211,15 @@ public class TrdPlanCcyInvestTradeValidator implements TradeCommonValidator {
                 param.put("calId", dto.getCalendarId());
                 Map<String, Object> para = trdPlanCcyInvestTrade002Service.getProAvailableCash(param);
                 BigDecimal accCash = new BigDecimal((String)para.get("cashT2"));
-                //交易对手没有足够的现金 
-                if(accCash.compareTo(dto.getTradeAmt())==-1){
+                //交易对手没有足够的现金
+                //add wsz ZGCPCN-1127 修改交易验证软控 start
+                if(accCash.compareTo(dto.getTradeAmt())<0  && CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_CASH_SWITCH).equals(DictCodeListExt1.是或否_否.getValue())){
                     errorList.add(new ValidMessage("",
                         getMessage("BUSS_COM_E_0003", 
                         param.get("portfolioId")+"  "+getMessage("TrdPlanCcyInvestTrade002.tradeAmt"),
                         getMessage("TrdPlanCcyInvestTrade002.accAvailableCash"))));
                 }
+                //add wsz ZGCPCN-1127 修改交易验证软控 end
             }
         }
         else if (StringUtil.equals(dto.getOperateType(), "submit")) {
@@ -359,13 +363,15 @@ public class TrdPlanCcyInvestTradeValidator implements TradeCommonValidator {
                 param.put("calId", dto.getCalendarId());
                 Map<String, Object> para = trdPlanCcyInvestTrade002Service.getProAvailableCash(param);
                 BigDecimal accCash = new BigDecimal((String)para.get("cashT2"));
-                //交易对手没有足够的现金 
-                if(accCash.compareTo(dto.getTradeAmt())==-1){
+                //交易对手没有足够的现金
+                //add wsz ZGCPCN-1127 修改交易验证软控 start
+                if(accCash.compareTo(dto.getTradeAmt())<0  && CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_CASH_SWITCH).equals(DictCodeListExt1.是或否_否.getValue())){
                     errorList.add(new ValidMessage("",
                         getMessage("BUSS_COM_E_0003", 
                         param.get("portfolioId")+"  "+getMessage("TrdPlanCcyInvestTrade002.tradeAmt"),
                         getMessage("TrdPlanCcyInvestTrade002.accAvailableCash"))));
                 }
+                //add wsz ZGCPCN-1127 修改交易验证软控 end
             }
         }
         else if (StringUtil.equals(dto.getOperateType(), "revoke")) {

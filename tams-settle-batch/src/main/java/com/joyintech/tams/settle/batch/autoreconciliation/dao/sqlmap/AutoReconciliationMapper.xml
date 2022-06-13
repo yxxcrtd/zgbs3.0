@@ -127,6 +127,7 @@
 				SETTLE_TRANS_DATA_ADD stda ON std.TRADE_ID = stda.TRADE_ID
 			WHERE
 				NOT EXISTS(SELECT 1 FROM SETTLE_TRANS_DATA stdtmp WHERE std.TRADE_ID = stdtmp.TRADE_ID AND stdtmp.PS = #{PS_T49} AND stdtmp.FINPROD_TYPE2 = #{prodType2_F01})
+				AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			GROUP BY
 				std.APPLY_TRADE_ID,
 				std.FINPROD_TYPE2,
@@ -211,6 +212,8 @@
 				SETTLE_TRANS_DATA std
 			LEFT JOIN
 				SETTLE_TRANS_DATA_ADD stda ON std.TRADE_ID = stda.TRADE_ID
+			WHERE
+				std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			GROUP BY
 				std.FINPROD_ID,
 				std.FINPROD_TYPE2,
@@ -277,6 +280,7 @@
 			tmp.TRADE_ID IS NOT NULL
 			AND tmp.PARA_VALUE = #{PARA_VALUE_03}
 			AND (stda.REPO_TYPE IS NULL OR stda.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
+			AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 		UNION ALL
 		<!-- 查询成交明细数据2 -->
 		SELECT
@@ -332,6 +336,7 @@
 			tmp.TRADE_ID IS NULL
 			AND tmp.PARA_VALUE = #{PARA_VALUE_03}
 			AND (stda.REPO_TYPE IS NULL OR stda.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
+			AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 		UNION ALL
 		<!-- 查询协议回购委托汇总数据 -->
 		SELECT
@@ -415,6 +420,7 @@
 				SETTLE_TRANS_DATA_ADD stda ON std.TRADE_ID = stda.TRADE_ID
 			WHERE
 				stda.REPO_TYPE = #{TARGET_BACK_TYPE_H01}
+				AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			GROUP BY
 				std.APPLY_TRADE_ID,
 				std.FINPROD_TYPE2,
@@ -494,6 +500,7 @@
 				    AND (stda.REPO_TYPE IS NULL OR stda.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
 				  	AND (
 						std.PS NOT IN (#{PS_T68},#{PS_T69},#{PS_T94},#{PS_T04},#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T49},#{PS_T46},#{PS_T97})
+						AND std.FINPROD_TYPE2 NOT IN (#{prodType2_F32}, #{prodType2_F37})
 						AND (
 						    (std.FINPROD_TYPE2 = #{prodType2_F01} AND std.PS NOT IN (#{PS_T39},#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T49},#{PS_T97}))
 				  	    	OR ((std.FINPROD_TYPE2 = #{prodType2_F02} OR std.FINPROD_TYPE2 = #{prodType2_F03}) AND std.PS NOT IN (#{PS_T07},#{PS_T49}))
@@ -501,6 +508,7 @@
 						)
 					)
 					AND NOT EXISTS (SELECT 1 FROM STL_SEC_RECON_DETAIL detail WHERE detail.TRADE_ID = std.TRADE_ID)
+					AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 				GROUP BY
 					std.DEAL_DATE,
 					std.ACCT_NO,
@@ -583,6 +591,7 @@
 					AND (stda.REPO_TYPE IS NULL OR stda.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
 					AND (
 						std.PS NOT IN (#{PS_T68},#{PS_T69},#{PS_T94},#{PS_T04},#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T49},#{PS_T46},#{PS_T97})
+						AND std.FINPROD_TYPE2 NOT IN (#{prodType2_F32}, #{prodType2_F37})
 						AND (
 							(std.FINPROD_TYPE2 = #{prodType2_F01} AND std.PS NOT IN (#{PS_T39},#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T49},#{PS_T97}))
 							OR ((std.FINPROD_TYPE2 = #{prodType2_F02} OR std.FINPROD_TYPE2 = #{prodType2_F03}) AND std.PS NOT IN (#{PS_T07},#{PS_T49}))
@@ -590,6 +599,7 @@
 						)
 					)
 					AND NOT EXISTS (SELECT 1 FROM STL_SEC_RECON_DETAIL detail WHERE detail.TRADE_ID = std.TRADE_ID)
+					AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 				GROUP BY
 					std.DEAL_DATE,
 					std.ACCT_NO,
@@ -673,6 +683,7 @@
 					AND (stda.REPO_TYPE IS NULL OR stda.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
 					AND (
 						std.PS NOT IN (#{PS_T68},#{PS_T69},#{PS_T94},#{PS_T04},#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T49},#{PS_T46},#{PS_T97})
+						AND std.FINPROD_TYPE2 NOT IN (#{prodType2_F32}, #{prodType2_F37})
 						AND (
 							(std.FINPROD_TYPE2 = #{prodType2_F01} AND std.PS NOT IN (#{PS_T39},#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T49},#{PS_T97}))
 							OR ((std.FINPROD_TYPE2 = #{prodType2_F02} OR std.FINPROD_TYPE2 = #{prodType2_F03}) AND std.PS NOT IN (#{PS_T07},#{PS_T49}))
@@ -680,6 +691,7 @@
 						)
 					)
 					AND NOT EXISTS (SELECT 1 FROM STL_SEC_RECON_DETAIL detail WHERE detail.TRADE_ID = std.TRADE_ID)
+					AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			) detail
 			LEFT JOIN
 				FIN_PRODUCT fp ON detail.FINPROD_ID = fp.FINPROD_ID
@@ -721,6 +733,7 @@
 				AND std.PS NOT IN (#{PS_T68},#{PS_T69},#{PS_T94},#{PS_T93},#{PS_T04},#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T49},#{PS_T46},#{PS_T97})
 				AND NOT EXISTS (SELECT 1 FROM STL_SEC_RECON_DETAIL detail WHERE detail.TRADE_ID = std.TRADE_ID)
 				AND EXISTS (SELECT 1 FROM STL_SEC_RECON_PARA ssrp WHERE msd.BROKER_ID = ssrp.CUSTOMER_ID)
+				AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			GROUP BY
 				std.APPLY_TRADE_ID,
 				std.FINPROD_ID,

@@ -20,7 +20,6 @@ import com.joyintech.tams.valuation.common.utils.DBUtil;
 import com.joyintech.tams.valuation.tradecostmanagement.dto.TradeCostManagement001Dto;
 import com.joyintech.tams.valuation.tradecostmanagement.dto.TradeCostManagement002Dto;
 import com.joyintech.tams.valuation.tradecostmanagement.service.TradeCostManagement002Service;
-import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
@@ -201,9 +200,17 @@ public class TradeCostManagement002Controller extends BaseController {
         String feeType = this.getParam("feeType");
             List<SelectOptionDto> list = new ArrayList<SelectOptionDto>();
         if (DictCodeListExt1.一次性费用类型_结算手续费.getValue().equals(feeType)) {
-            SelectOptionDto dto = new SelectOptionDto();
-            dto.setId(DictCodeList.登记托管机构_中国证券登记结算有限责任公司.getValue());
-            dto.setText(DictCodeList.登记托管机构_中国证券登记结算有限责任公司.getCodeName());
+//            SelectOptionDto dto = new SelectOptionDto();
+//            dto.setId(DictCodeList.登记托管机构_中国证券登记结算有限责任公司.getValue());
+//            dto.setText(DictCodeList.登记托管机构_中国证券登记结算有限责任公司.getCodeName());
+            SelectOptionDto dto;
+            dto = new SelectOptionDto();
+            dto.setId(DictCodeList.登记托管机构_中央国债登记结算有限责任公司.getValue());
+            dto.setText(DictCodeList.登记托管机构_中央国债登记结算有限责任公司.getCodeName());
+            list.add(dto);
+            dto = new SelectOptionDto();
+            dto.setId(DictCodeList.登记托管机构_上海清算所.getValue());
+            dto.setText(DictCodeList.登记托管机构_上海清算所.getCodeName());
             list.add(dto);
             return list;
         }

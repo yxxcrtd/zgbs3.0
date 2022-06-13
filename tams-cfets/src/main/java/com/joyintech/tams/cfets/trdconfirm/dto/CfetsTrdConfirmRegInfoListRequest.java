@@ -23,11 +23,14 @@ public class CfetsTrdConfirmRegInfoListRequest {
     @ApiModelProperty(name="ps",value="交易方向",example="T01")
     private String ps;
 
-    @ApiModelProperty(name="regAssetType",value="资产类型",example="01")
+    @ApiModelProperty(name="regAssetType",value="业务类型",example="01")
     private String regAssetType;
 
     @ApiModelProperty(name="finprodId",value="资产代码",example="字符串1,字符串2,...")
     private String finprodId;
+
+    @ApiModelProperty(name="finprodType2",value="资产类型",example="01")
+    private String finprodType2;
 
     @ApiModelProperty(name="tradeMarket",value="交易场所",example="01")
     private String tradeMarket;
@@ -182,6 +185,14 @@ public class CfetsTrdConfirmRegInfoListRequest {
 
     public void setSelectedItem(List<CfetsTrdConfirmCstpInfoListResponse> selectedItem) {
         this.selectedItem = selectedItem;
+    }
+
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
     }
 }
 

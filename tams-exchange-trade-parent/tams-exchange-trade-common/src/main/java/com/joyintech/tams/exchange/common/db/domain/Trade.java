@@ -123,16 +123,26 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
     @ApiModelProperty(value = "成交价格")
     private BigDecimal tradedPrice;
 
+    @Digits(integer = 20, fraction = 4)
+    @JsonSerialize(using = DoubleSerializerUtils.class)
+    @ApiModelProperty(value = "净价价格")
+    private BigDecimal netPrice;
+
     @NotNull
     @Digits(integer = 20, fraction = 4)
     @JsonSerialize(using = DoubleSerializerUtils.class)
     @ApiModelProperty(value = "全价价格")
     private BigDecimal fullPrice;
 
+    @Digits(integer = 20, fraction = 4)
+    @JsonSerialize(using = DoubleSerializerUtils.class)
+    @ApiModelProperty(value = "净价金额")
+    private BigDecimal netBalance;
+
     @NotNull
     @Digits(integer = 20, fraction = 4)
     @JsonSerialize(using = DoubleSerializerUtils.class)
-    @ApiModelProperty(value = "清算金额")
+    @ApiModelProperty(value = "清算金额，全价金额")
     private BigDecimal clearBalance;
 
     @NotNull
@@ -228,14 +238,24 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
     @ApiModelProperty(name = "extend2", value = "扩展信息2")
     private String extend2;
 
-    @Digits(integer = 20, fraction = 0)
-    @ApiModelProperty(value = "标准券数量")
-    private long bondVolume;
-
-    private String tradeDate;
-    private String dealTime;
-
     private String entrustClass;
+
+    @ApiModelProperty(name = "isFullPrice", value = "是否全价（Y:是 ， N：否）")
+    private String isFullPrice;
+
+    // 信用保护凭证使用 --start
+    @ApiModelProperty(name = "counterId", value = "交易对手")
+    private String counterId;
+
+    @ApiModelProperty(name = "counterName", value = "交易对手名称")
+    private String counterName;
+
+    @ApiModelProperty(name = "propAcctNo", value = "对手资金账户")
+    private String propAcctNo;
+
+    @ApiModelProperty(name = "propAcctName", value = "对手资金账户名称")
+    private String propAcctName;
+    // 信用保护凭证使用 --end
 
     public Trade() {
         this.tradedBalance = new BigDecimal("0.00");
@@ -414,6 +434,22 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
 
     public void setTradedPrice(BigDecimal tradedPrice) {
         this.tradedPrice = tradedPrice;
+    }
+
+    public BigDecimal getNetPrice() {
+        return netPrice;
+    }
+
+    public void setNetPrice(BigDecimal netPrice) {
+        this.netPrice = netPrice;
+    }
+
+    public BigDecimal getNetBalance() {
+        return netBalance;
+    }
+
+    public void setNetBalance(BigDecimal netBalance) {
+        this.netBalance = netBalance;
     }
 
     public BigDecimal getClearBalance() {
@@ -656,35 +692,51 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
         this.extend2 = extend2;
     }
 
-    public long getBondVolume() {
-        return bondVolume;
-    }
-
-    public void setBondVolume(long bondVolume) {
-        this.bondVolume = bondVolume;
-    }
-
-    public String getTradeDate() {
-        return TradeUtils.formatDate(tradingDay);
-    }
-
-    public void setTradeDate(String tradeDate) {
-        this.tradeDate = tradeDate;
-    }
-
-    public String getDealTime() {
-        return DateUtil.format(createTime,"HH:mm:ss");
-    }
-
-    public void setDealTime(String dealTime) {
-        this.dealTime = dealTime;
-    }
-
     public String getEntrustClass() {
         return entrustClass;
     }
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getIsFullPrice() {
+        return isFullPrice;
+    }
+
+    public void setIsFullPrice(String isFullPrice) {
+        this.isFullPrice = isFullPrice;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
+    }
+
+    public String getPropAcctNo() {
+        return propAcctNo;
+    }
+
+    public void setPropAcctNo(String propAcctNo) {
+        this.propAcctNo = propAcctNo;
+    }
+
+    public String getPropAcctName() {
+        return propAcctName;
+    }
+
+    public void setPropAcctName(String propAcctName) {
+        this.propAcctName = propAcctName;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
     }
 }

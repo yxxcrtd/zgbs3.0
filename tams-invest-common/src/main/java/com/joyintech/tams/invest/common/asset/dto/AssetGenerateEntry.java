@@ -29,6 +29,41 @@ public class AssetGenerateEntry extends FinProduct {
      */
     private String type12;
 
+    /**
+     * 交易编号
+     */
+    private String tradeId;
+
+    /**
+     * 是否锁定
+     */
+    private String withLockPeriod;
+
+    /**
+     * 产品处理模式
+     */
+    private String dealMode;
+
+    ///**
+    // * 产品类型
+    // */
+    //private String prodType;
+    //
+    ///**
+    // * 产品最小持有期（天）
+    // */
+    //private String minProductHold;
+
+    /**
+     * 期限
+     */
+    private String termType;
+
+    /**
+     * 投资周期
+     */
+    private String investmentCycle;
+
     public String getFaceValue() {
         return faceValue;
     }
@@ -51,5 +86,61 @@ public class AssetGenerateEntry extends FinProduct {
 
     public void setType12(String type12) {
         this.type12 = type12;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getWithLockPeriod() {
+        return withLockPeriod;
+    }
+
+    public void setWithLockPeriod(String withLockPeriod) {
+        this.withLockPeriod = withLockPeriod;
+    }
+
+    public String getDealMode() {
+        return dealMode;
+    }
+
+    public void setDealMode(String dealMode) {
+        this.dealMode = dealMode;
+    }
+
+    //public String getProdType() {
+    //    return prodType;
+    //}
+    //
+    //public void setProdType(String prodType) {
+    //    this.prodType = prodType;
+    //}
+    //
+    //public String getMinProductHold() {
+    //    return minProductHold;
+    //}
+    //
+    //public void setMinProductHold(String minProductHold) {
+    //    this.minProductHold = minProductHold;
+    //}
+
+    public String getTermType() {
+        return termType;
+    }
+
+    public void setTermType(String termType) {
+        this.termType = termType;
+    }
+
+    public String getInvestmentCycle() {
+        return investmentCycle;
+    }
+
+    public void setInvestmentCycle(String investmentCycle) {
+        this.investmentCycle = investmentCycle;
     }
 }

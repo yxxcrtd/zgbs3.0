@@ -41,7 +41,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -128,8 +131,8 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 param.put("PS_T49", DictCodeListExt3.交易方向_债转股.getValue());
                 param.put("PS_T97", DictCodeListExt3.交易方向_配债.getValue());
                 param.put("PS_T04", DictCodeList.交易方向_申购.getValue());
-                param.put("TRADE_PLACE_03", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
-                param.put("TRADE_PLACE_04", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
+                param.put("TRADE_PLACE_03", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
+                param.put("TRADE_PLACE_04", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
                 param.put("search_isNumberFlag", CommonUtil.isNumeric(dto.getSearch()));
                 if (StringUtil.isNotEmpty((String) param.get("finprodMarketIds"))) {
                     param.put("finprodMarketIds", StringUtil.splitToList(GlobalConstant.COMMA, param.get("finprodMarketIds").toString()));
@@ -138,6 +141,8 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 }
                 param.put("A_001", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                 param.put("NO_TRADE_BUSINESS_ETR", TempConstant.NO_TRADE_BUSINESS_ETR);
+                param.put("SHARES_TRADE_PLATFORM_03", DictCodeList.交易平台_固定收益平台.getValue());
+                param.put("TYPE_6", DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
                 // 浮动盈亏计算修改 modify by yufei 20200806 start
                 //Page<EtrExchangeTradePositionsCommonResponse> result = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.findPositionsPage(param));
                 Page<EtrExchangeTradePositionsCommonResponse> result = new Page<>();
@@ -159,7 +164,7 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                         //最新价从行情取
                         EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
                         if (hqResponse != null) {
-                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : new BigDecimal(0.00);
+                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(3, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
                             entity.setPrice(lastPrice);
                         }
                         returnList.add(entity);
@@ -183,7 +188,21 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 // 查询单位成本数据
                 Map<String, EtrExchangeUnitCostDto> unitCostMap = calcEachCostAmtMap(DateUtil.parse(platDate), pList, fList, "");
                 // 计算单位成本、计算持仓成本、最新净价、持仓市值、浮动盈亏
-                return calculationAmount(unitCostMap, result, platDate);
+                calculationAmount(unitCostMap, result, platDate);
+                //非交易指令单位修改
+                if(StringUtil.equals(TempConstant.NO_TRADE_BUSINESS_ETR,dto.getTradePlat())){
+                    if (result != null && result.getRoot() != null && !result.getRoot().isEmpty()) {
+                        result.getRoot().forEach(r -> {
+                            //持仓数量		N2			万元
+                            BigDecimal positionsNum=ArithmeticUtil.divide(r.getPositionsNum(),new BigDecimal(100),2, RoundingMode.DOWN);
+                            r.setPositionsNum(positionsNum);
+                            //可卖数量		N2			万元
+                            BigDecimal sellNum=ArithmeticUtil.divide(r.getSellNum(),new BigDecimal(100),2, RoundingMode.DOWN);
+                            r.setSellNum(sellNum);
+                        });
+                    }
+                }
+                return result;
 //				return restTemplate.postForPage(
 //						ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/findPositionsPage", param,
 //						EtrExchangeTrade002Dto.class);
@@ -365,7 +384,13 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
         } else {
             param.put("declaTypeList", null);
         }
-        return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.selectEtrExchange(param));
+        //ZGCPCN-798
+        Page<EtrExchangeTradeEtrExchangeCommonResponse> page = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.selectEtrExchange(param));
+        List<EtrExchangeTradeEtrExchangeCommonResponse> root = page.getRoot();
+        List<EtrExchangeTradeEtrExchangeCommonResponse>  root2 = root.stream().filter(response -> !(StringUtil.equals(request.getTradePlat(), "02") &&
+                StringUtil.equals(response.getPs(), DictCodeList.交易方向_行权_回售.getValue()))).collect(Collectors.toList());
+        page.setRoot(root2);
+        return page;
 //		return restTemplate.postForPage(ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/selectEtrExchange",
 //				param, EtrExchangeTrade003Dto.class);
     }
@@ -569,7 +594,8 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
+//                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd,r.getPositionsAmt(),4).multiply(new BigDecimal("100"));
                 r.setFloatingPL(floatPL);
 
             });
@@ -586,7 +612,7 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
     public BigDecimal querySecInCanUse(PositionCashSecDto secDto) {
         secDto.setTradePlat(TempConstant.NO_TRADE_BUSINESS_ETR);
         BigDecimal ticketCanUse = etrTradeCommonervice.selectAvailableNum(secDto);
-        //ticketCanUse = ArithmeticUtil.divide(ticketCanUse, 100, 0);
+        ticketCanUse = ArithmeticUtil.divide(ticketCanUse, new BigDecimal(100),2, RoundingMode.DOWN); //单位改成万元
         return ticketCanUse;
     }
 
@@ -633,13 +659,14 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
         //4、标准券可用/折算率和 A对应的再折算前持仓 比较
         //canSecNum = ArithmeticUtil.divide(canSecNum, scale, 0);
         BigDecimal miniSecNum = canSecNum;
-        if (secNum.compareTo(canSecNum) == -1) {
+        if (secNum.compareTo(canSecNum) < 0) {
             miniSecNum = secNum;
         }
         //5、较小值/债券的折算率
         miniSecNum = ArithmeticUtil.divide(miniSecNum, faceValue, 0);
         miniSecNum = ArithmeticUtil.divide(miniSecNum, scale, 0);
         miniSecNum = ArithmeticUtil.multiply(miniSecNum,new BigDecimal(100));
+        miniSecNum=ArithmeticUtil.divide(miniSecNum, new BigDecimal(100),2, RoundingMode.DOWN); //单位改成万元
         return miniSecNum;
     }
 

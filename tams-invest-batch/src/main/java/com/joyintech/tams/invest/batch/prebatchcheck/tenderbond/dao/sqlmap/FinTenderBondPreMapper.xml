@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.invest.batch.prebatchcheck.tenderbond.dao.FinTenderBondPreMapper">
+
+    <select id="selectPreList" parameterType="java.util.Map" resultType="com.joyintech.tams.invest.common.prebatch.dto.SysPrebatchResultDetail">
+		select * from (
+		  SELECT
+				CASE WHEN <![CDATA[
+				ISSUE.ISSUE_DATE >= #{listingDate,jdbcType=DATE} or
+				ISSUE.TENDER_EDATE >= #{listingDate,jdbcType=DATE}  THEN '01'
+				WHEN ((ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
+				ISSUE.TENDER_EDATE < #{listingDate,jdbcType=DATE}) and PRODUCT.CIRCULATION_CODE is null) or
+				(PRODUCT.CIRCULATION_CODE is not null and PRODUCT_ADD.LISTING_DATE < #{listingDate,jdbcType=DATE}) THEN '02'
+				WHEN (ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
+				ISSUE.TENDER_EDATE < #{listingDate,jdbcType=DATE}) and PRODUCT.CIRCULATION_CODE is not null
+				and  PRODUCT_ADD.LISTING_DATE >= #{listingDate,jdbcType=DATE} THEN '03'
+				]]>
+               ELSE NULL END AS issueStage,
+			   PRODUCT_ADD.ISSUE_STATUS as issueStatus,
+			   PRODUCT.FINPROD_NAME as finprodName,
+			   PRODUCT.FINPROD_ID as finprodId
+		  FROM FIN_PRODUCT PRODUCT
+		  LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+		  LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+		  where PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR} AND PRODUCT.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+			and (PRODUCT_ADD.ISSUE_STATUS not in (#{ISSUE_STATUS_02}) or PRODUCT_ADD.ISSUE_STATUS is null ) and PRODUCT.CIRCULATION_CODE is null
+			<if test="listingDate != null">
+			    and PRODUCT_ADD.LISTING_DATE=#{listingDate,jdbcType=DATE}
+            </if>
+        ) t where t.issueStage=#{issueStage,jdbcType=VARCHAR}
+    </select>
+
+	<select id="selectPreList2" parameterType="java.util.Map" resultType="com.joyintech.tams.invest.common.prebatch.dto.SysPrebatchResultDetail">
+		select * from (
+		SELECT
+		CASE WHEN <![CDATA[
+				ISSUE.ISSUE_DATE >= #{listingDate,jdbcType=DATE} or
+				ISSUE.TENDER_EDATE >= #{listingDate,jdbcType=DATE}  THEN '01'
+				WHEN ((ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
+				ISSUE.TENDER_EDATE < #{listingDate,jdbcType=DATE}) and PRODUCT.CIRCULATION_CODE is null) or
+				(PRODUCT.CIRCULATION_CODE is not null and PRODUCT_ADD.LISTING_DATE < #{listingDate,jdbcType=DATE}) THEN '02'
+				WHEN (ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
+				ISSUE.TENDER_EDATE < #{listingDate,jdbcType=DATE}) and PRODUCT.CIRCULATION_CODE is not null
+				and  PRODUCT_ADD.LISTING_DATE >= #{listingDate,jdbcType=DATE} THEN '03'
+				]]>
+		ELSE NULL END AS issueStage,
+		PRODUCT_ADD.ISSUE_STATUS as issueStatus,
+		PRODUCT.FINPROD_NAME as finprodName,
+		PRODUCT.FINPROD_ID as finprodId
+		FROM FIN_PRODUCT PRODUCT
+		LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+		LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+		where PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR} AND PRODUCT.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+		and (PRODUCT_ADD.ISSUE_STATUS not in (#{ISSUE_STATUS_02}) or PRODUCT_ADD.ISSUE_STATUS is null ) and PRODUCT.CIRCULATION_CODE is null
+		and PRODUCT_ADD.LISTING_DATE is null
+		) t where t.issueStage=#{issueStage,jdbcType=VARCHAR}
+	</select>
+</mapper>

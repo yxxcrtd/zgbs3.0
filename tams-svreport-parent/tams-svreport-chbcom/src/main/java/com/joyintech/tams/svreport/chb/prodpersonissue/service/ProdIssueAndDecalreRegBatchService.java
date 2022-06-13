@@ -149,13 +149,13 @@ public class ProdIssueAndDecalreRegBatchService  extends SvrCBBaseService{
             sub.setSendStatus(DictCodeListExt2.报送状态_未报送.getValue());
             //update by leipeng 20200623
             //发行机构代码取值
-           /* if(StringUtil.isEmpty(sub.getIssuePartyId())){
-            	sub.setIssuePartyId(SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID));
-            }*/
             if(StringUtil.isEmpty(sub.getIssuePartyId())){
-                String issuePartyId = CommonUtil.selectBankCode();
-                sub.setIssuePartyId(issuePartyId);
+            	sub.setIssuePartyId(SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID));
             }
+//            if(StringUtil.isEmpty(sub.getIssuePartyId())){
+//                String issuePartyId = CommonUtil.selectBankCode();
+//                sub.setIssuePartyId(issuePartyId);
+//            }
             
 
             // 已登记
@@ -334,13 +334,13 @@ public class ProdIssueAndDecalreRegBatchService  extends SvrCBBaseService{
             single.setOrgCode(CommonUtil.getOrgCode());
             //update by leipeng 20200623
             //发行机构代码取值
-         /*   if(StringUtil.isEmpty(single.getIssuePartyId())){
-            	single.setIssuePartyId(SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID));
-            }*/
            if(StringUtil.isEmpty(single.getIssuePartyId())){
-               String issuePartyId = CommonUtil.selectBankCode();
-               single.setIssuePartyId(issuePartyId);
-           }
+            	single.setIssuePartyId(SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID));
+            }
+//           if(StringUtil.isEmpty(single.getIssuePartyId())){
+//               String issuePartyId = CommonUtil.selectBankCode();
+//               single.setIssuePartyId(issuePartyId);
+//           }
            //募集起始日期（从）
             if(single.getRaisePstrdate()!=null){
                 if (DictCodeListExt2.募集方式_中债_公募.getValue().equals(single.getRaiseType())){

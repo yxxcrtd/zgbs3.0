@@ -133,7 +133,10 @@ public class ValRepDealSecSubject extends BaseEntity {
      * 交易对手编码
      */
     private String counterId;
-
+    /**
+     * 回购类型
+     */
+    private String targetBackType;
 
     /**
      * 取得 回购起息的交易编号
@@ -529,5 +532,13 @@ public class ValRepDealSecSubject extends BaseEntity {
      */
     public void setCounterId(String counterId) {
         this.counterId = counterId;
+    }
+
+    public String getTargetBackType() {
+        return targetBackType;
+    }
+
+    public void setTargetBackType(String targetBackType) {
+        this.targetBackType = targetBackType;
     }
 }

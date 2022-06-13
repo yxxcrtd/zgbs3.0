@@ -158,8 +158,8 @@ public class EtrExchangeTradeMulti001Controller extends BaseController{
         model.addAttribute("ACCOUNT_SPEED_01", DictCodeList.清算速度_T_0.getValue());
         model.addAttribute("ACCOUNT_SPEED_02", DictCodeList.清算速度_T_1.getValue());
         //展示投资目的或业务模式参数
-        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
         model.addAttribute("etrExchange_HqArea_refresh_period", etrExchange_HqArea_refresh_period);
 
         model.addAttribute("useInterfQuoteFlag", useInterfQuoteFlag);
@@ -347,18 +347,18 @@ public class EtrExchangeTradeMulti001Controller extends BaseController{
             errorList.add(new ValidMessage("targetValue", this.getMessage("ETR_ERROR_0066")));
         }
 
-        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
+//        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
             if(!StringUtil.isNotEmpty(dto.getBusinessModel())
                     &&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
                 errorList.add(new ValidMessage("businessModel", "请输入业务模式"));
             }
-        }
-        else{
-            if(!StringUtil.isNotEmpty(dto.getInvAim())
-                    &&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-                errorList.add(new ValidMessage("invAim", this.getMessage("ETR_ERROR_0060")));
-            }
-        }
+//        }
+//        else{
+//            if(!StringUtil.isNotEmpty(dto.getInvAim())
+//                    &&dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
+//                errorList.add(new ValidMessage("invAim", this.getMessage("ETR_ERROR_0060")));
+//            }
+//        }
 
         // 大宗交易增加涨跌幅限制 add by 代志伟 20201015 start
         // 债券交易、债券质押式回购，指令价格需要在前收盘价格的上下30%或当日已成交的最高、最低价格之间（min（最低价（债券五档行情中的最低价），收盘价x70%）<=price<=max（最高价（债券五档行情中的最高价），收盘价x130%））；

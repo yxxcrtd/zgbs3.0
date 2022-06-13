@@ -27,7 +27,7 @@ import com.joyintech.tams.invest.common.riskinfrds.info.entity.IAssetInfo;
  * @see InterfAssetInfo
  * @since 1.0
  */
-public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
+public class InterfAssetInfo extends BaseEntity {
 
     /**
      * 序列号
@@ -515,7 +515,6 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
 	 */
 	private String bondGradeType;
 
-	@Override
 	public String getBondGradeType() {
 		return bondGradeType;
 	}
@@ -534,7 +533,6 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
      */
     private String bodyGradeType;
 
-    @Override
     public String getBodyGradeType() {
         return bodyGradeType;
     }
@@ -543,32 +541,26 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
         this.bodyGradeType = bodyGradeType;
     }
 
-    @Override
     public String getIssueType() {
         return null;
     }
 
-    @Override
     public String getType9() {
         return null;
     }
 
-    @Override
     public String getType10() {
         return null;
     }
 
-    @Override
     public String getIssuerCode() {
         return null;
     }
 
-    @Override
     public String getListLevel() {
         return null;
     }
 
-    @Override
     public String getIsCorOrg() {
         return null;
     }
@@ -577,7 +569,6 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getIsSus() {
         return null;
     }
@@ -585,7 +576,6 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getIsRight() {
         return null;
     }
@@ -593,7 +583,6 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Date getVdateLast() {
         return null;
     }
@@ -601,7 +590,6 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getCalcType() {
         return null;
     }
@@ -613,7 +601,6 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
      *
      * @return 是否可提前支取
      */
-    @Override
     public String getIsCanDrawInAdvance() {
         return null;
     }
@@ -623,8 +610,16 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getIsFlowLimited() {
+        return null;
+    }
+    public String getIsLiquidity1() {
+        return null;
+    }
+    public String getIsLiquidity2() {
+        return null;
+    }
+    public String getIsLiquidity3() {
         return null;
     }
     // add by zhangrui1 增加资产属性:是否流动性受限 end
@@ -633,14 +628,45 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getCustomerObjType() {
         return null;
     }
     // add by zhangrui1 增加资产属性:机构主体类型 end
 
-    @Override
     public String getType11() {
+        return null;
+    }
+
+    public String getType12() {
+        return null;
+    }
+    public String getStockShareType() {
+        return null;
+    }
+    public String getStockTradeStatus() {
+        return null;
+    }
+    public Date getAstLastRedempDate() {
+        return null;
+    }
+
+    public Date getAstLastRebackDate() {
+        return null;
+    }
+
+    public Date getAstLastPayDate() {
+        return null;
+    }
+
+    public String getIsSevenDayCashable() {
+        return null;
+    }
+
+    public String getIsOpenEveryDay() {
+        return null;
+    }
+
+    public String getIsBadAsset() {
         return null;
     }
 }

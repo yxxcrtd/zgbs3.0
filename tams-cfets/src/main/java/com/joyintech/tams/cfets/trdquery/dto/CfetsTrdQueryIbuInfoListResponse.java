@@ -135,8 +135,8 @@ public class CfetsTrdQueryIbuInfoListResponse {
     private String execid;
 
 
-    @ApiModelProperty(name="portfolioIds",value="组合代码",example="字符串1")
-    private String portfolioIds;
+    @ApiModelProperty(name="portfolioId",value="组合代码",example="字符串1")
+    private String portfolioId;
 
     @ApiModelProperty(name="portfolioNames",value="组合名称",example="字符串1")
     private String portfolioNames;
@@ -257,6 +257,9 @@ public class CfetsTrdQueryIbuInfoListResponse {
 
     @ApiModelProperty(name="calMode",value="计算方式",example="计算方式供前台判断使用")
     private String calMode;
+
+    @ApiModelProperty(name="effectFlag",value="有效状态",example="02")
+    private String effectFlag;
 
     public String getEffectiveStatus() {
         return effectiveStatus;
@@ -517,12 +520,12 @@ public class CfetsTrdQueryIbuInfoListResponse {
         this.execid = execid;
     }
 
-    public String getPortfolioIds() {
-        return portfolioIds;
+    public String getPortfolioId() {
+        return portfolioId;
     }
 
-    public void setPortfolioIds(String portfolioIds) {
-        this.portfolioIds = portfolioIds;
+    public void setPortfolioId(String portfolioId) {
+        this.portfolioId = portfolioId;
     }
 
     public String getPortfolioNames() {
@@ -843,5 +846,13 @@ public class CfetsTrdQueryIbuInfoListResponse {
 
     public void setCalMode(String calMode) {
         this.calMode = calMode;
+    }
+
+    public String getEffectFlag() {
+        return effectFlag;
+    }
+
+    public void setEffectFlag(String effectFlag) {
+        this.effectFlag = effectFlag;
     }
 }

@@ -14,7 +14,9 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
+import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDurationResult;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.service.TrdDepoValuationDuration001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,8 +123,8 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
 
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdDepoValuationDuration001Dto queryTradeInfoByTradeId(@RequestBody String  tradeId) {
-        return trdDepoValuationDuration001Service.queryTradeInfoByTradeId(tradeId);
+    public TrdDepoValuationDuration001Dto queryTradeInfoByTradeId(@RequestBody Map<String, Object> param) {
+        return trdDepoValuationDuration001Service.queryTradeInfoByTradeId(param);
     }
 
     /**
@@ -135,4 +137,47 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
         return trdDepoValuationDuration001Service.delete(dto);
     }
 
+    /**
+     * 插入
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdDepoValuationDurationResult dto)
+            throws Exception {
+        return trdDepoValuationDuration001Service.insert(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update")
+    public int update(@RequestBody TrdDepoValuationDurationResult dto)
+            throws Exception {
+        return trdDepoValuationDuration001Service.update(dto);
+    }
+
+
+    /**
+     *
+     * 查询存款付息计划
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("/getFinCashPlanByProductId")
+    public List<FinCashPlanDto> getFinCashPlanByProductId(@RequestBody Map<String, Object> param){
+        return trdDepoValuationDuration001Service.getFinCashPlanByProductId(param);
+    }
 }

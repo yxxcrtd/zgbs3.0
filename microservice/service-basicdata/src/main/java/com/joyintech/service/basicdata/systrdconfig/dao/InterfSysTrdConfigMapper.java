@@ -3,6 +3,7 @@ package com.joyintech.service.basicdata.systrdconfig.dao;
 import com.joyintech.service.basicdata.systrdconfig.dto.StandardCouponReConversionRateDto;
 import com.joyintech.service.basicdata.systrdconfig.dto.*;
 import com.joyintech.tams.common.base.entity.MstCounterPartyInfo;
+import com.joyintech.tams.common.base.entity.SppiImportData;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -82,4 +83,13 @@ public interface InterfSysTrdConfigMapper {
     List<StandardCouponReConversionRateDto> getAllConvrate (Map<String,Object> map);
 
     List<PurchQuotaInfoDto> getPurchQuotaInfo(Map<String, Object> params);
+
+    List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto);
+
+    Map<String, Object> getMstRepoProductInfo(Map<String,Object> map);
+
+    //查询资产是否进行了SPPI测试
+    SppiImportData queryAssetIsSppiTest(Map<String, Object> param);
+    //是否有行权计划
+    int countBondHasEexrPlan(Map<String, Object> param);
 }

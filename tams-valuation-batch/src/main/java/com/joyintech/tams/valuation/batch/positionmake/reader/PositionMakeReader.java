@@ -6,7 +6,6 @@ import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -17,22 +16,18 @@ import com.joyintech.tams.valuation.batch.common.accounting.entity.StayDrawSubpr
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.valuation.batch.positionmake.dao.PositionMakeWithoutDispatchMapper;
-import com.joyintech.tams.valuation.batch.positionmake.dto.*;
-import com.joyintech.tams.valuation.common.constants.BookConstant;
-import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
-import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
-import com.joyintech.tams.valuation.common.utils.ValDateUtil;
-import org.apache.commons.collections.CollectionUtils;
+import com.joyintech.tams.valuation.batch.positionmake.dto.PositionMakeReaderResult;
 import org.apache.commons.collections.MapUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 头寸生成批处理 - reader
@@ -43,98 +38,19 @@ import java.util.*;
 @Scope("prototype")
 public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
 
-//	@Autowired
-//	private PositionMakeMapper positionMakeMapper;
-
     @Autowired
     private PositionMakeWithoutDispatchMapper positionMakeWithoutDispatchMapper;
-
-
-    @Autowired
-    private AccountingCommonService accountingCommonService;
 
     @SuppressWarnings("unchecked")
 	@Override
     public List<PositionMakeReaderResult> createList() {
 
         // 获取task传递参数
-        Map<String, Object> params = this.getParams();
-        if (MapUtils.isEmpty(params)) {
+        if (MapUtils.isEmpty(this.getParams())) {
             return new ArrayList<>();
         }
-
-        // 数据参数
-        String seqNo = (String)params.get("seqNo");
-        String taskId = (String)params.get("taskId");
-        Date booksetDate = (Date)params.get(BookConstant.BOOKSET_DATE);
-        Date bookDate = (Date)params.get(BookConstant.BOOK_DATE);
-        Date happenDate = (Date)params.get(BookConstant.HAPPEN_DATE);
-        List<PositionMakeReaderResult> result = new ArrayList<PositionMakeReaderResult>();
-        String isSubBookset = (String)params.get(BookConstant.IS_SUB_BOOKSET);
-        if (!DictCodeListExt1.是或否_否.getValue().equals(isSubBookset)) {
-        	return result;
-        }
-        
-        // 数据参数
-        Map<String, Object> sqlMap = new HashMap<String, Object>();
-        sqlMap.put("seqNo", seqNo);
-        sqlMap.put("booksetDate", booksetDate);
-        sqlMap.put("bookDate", bookDate);
-        sqlMap.put("happenDate", happenDate);
-        sqlMap.put("taskId", taskId);
-        sqlMap.put("finprodType", DictCodeListExt1.金融产品类型_投资组合.getValue());// 金融产品类型
-        sqlMap.put("busiDetailType", DictCodeListExt1.金融产品类型_理财产品.getValue());// 业务明细类型
-        sqlMap.put("busiDetailTypeSub", DictCodeListExt1.金融产品类型_理财子产品.getValue());// 业务明细类型
-        sqlMap.put("profitType", DictCodeList.收益类型_净值型.getValue());// 收益类型
-        sqlMap.put("profitType02", DictCodeList.收益类型_收益型.getValue());// 收益类型
-        sqlMap.put("booksetIds", (List<String>)this.getParams().get(GlobalConstant.BOOKSETS));
-        
-        /**
-         * MODIFY BY WUJIE ON 20191104 START
-         * sqlMap.put("booksetIds", (List<String>)this.getParams().get(GlobalConstant.BOOKSETS));
-         */
-        //sqlMap.put("booksetIds", (List<String>)this.getParams().get(GlobalConstant.BOOKSETS));
-        
-        sqlMap.put("booksetIds", positionMakeWithoutDispatchMapper.getBooksets(sqlMap));
-        /**MODIFY BY WUJIE ON 20191104 END**/
-        
-        /**
-         * 子组合特殊处理：按产品出头寸
-         * ADD BY WUJIE ON 20191121 START
-         */
-        sqlMap.put("portfolioType", DictCodeListExt1.组合类型_子组合.getValue());// 组合类型：子组合 03
-        /**ADD BY WUJIE ON 20191121 END**/
-
-        // 1.查询组合资产估值【PTL_SEC_VALUTION】
-        List<PtlSecValution> ptlSecValutionList = this.getPtlSecValutionList(sqlMap, bookDate, happenDate);
-
-        // 2.查询产品费用头寸【BOK_POSITION_PRDFEE】
-        List<BokPositionPrdfee> bokPositionPrdfeeList = this.getBokPositionPrdfeeList(sqlMap, bookDate, happenDate);
-
-        // 3.查询产品头寸【BOK_POSITION_PRD】
-        List<BokPositionPrd> bokPositionPrdList = this.getBokPositionPrdList(sqlMap, bookDate, happenDate);
-
-        // 4.查询组合费用头寸【PTL_FEE_POSITION】
-        List<PtlFeePosition> ptlFeePositionList = this.getPtlFeePositionList(sqlMap, bookDate, happenDate);
-
-        // 5.查询组合估值头寸【PTL_PORTFOLIO_VALUATION】
-        List<PtlPortfolioValuation> ptlPortfolioValuationList = this.getPtlPortfolioValuation(sqlMap, bookDate, happenDate);
-
-        // 6.查询组合资产应收款头寸LIST 【PTL_SEC_RECEIVABLES】 add by yanya on 20191225
-        List<PtlSecReceivables> ptlSecReceivablesList = this.getPtlSecReceivablesList(sqlMap, bookDate, happenDate);
-
-        // 定义返回值
-        PositionMakeReaderResult positionMakeReaderResult = new PositionMakeReaderResult();
-        positionMakeReaderResult.setPtlSecValutionList(ptlSecValutionList);// 组合资产估值
-        positionMakeReaderResult.setBokPositionPrdfeeList(bokPositionPrdfeeList);// 产品费用头寸
-        positionMakeReaderResult.setBokPositionPrdList(bokPositionPrdList);// 产品头寸
-        positionMakeReaderResult.setPtlFeePositionList(ptlFeePositionList);// 组合费用头寸
-        positionMakeReaderResult.setPtlPortfolioValuationList(ptlPortfolioValuationList);// 组合估值头寸
-        positionMakeReaderResult.setPtlSecReceivablesList(ptlSecReceivablesList);//组合资产应收款头寸
-
-        result.add(positionMakeReaderResult);
-
-        return result;
+        // modify by weipeng on 20220312 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
+        return positionMakeWithoutDispatchMapper.getBooksets( this.getParams());
     }
 
     /**
@@ -328,7 +244,7 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
                         /** added by weipeng T+1债券在T日推送了债券信息，推送了数量以及清算款科目，摊余总成本推送为0，债券在这里特殊处理 start **/
                         if(DictCodeListExt1.金融产品类型_债券.getValue().equals(dto.getFinprodType())){
                             // 若是公允价值变动损益类，直接成本重新赋值
-                            if(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(dto.getInvAim())){
+                            if(DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(dto.getInvAim())){
                                 // 组合资产信息ENTITY.摊余总成本 = B表ENTITY.摊余总成本
                                 dto.setDscCostAmt(item.getDscCostAmt());
                                 // 组合资产信息ENTITY.摊余总成本_本位币= 成本ENTITY.摊余总成本_本位币
@@ -342,10 +258,10 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
                             }
                             else{
                                 List<String> subjectNatureList = new ArrayList<String>();
-                                if(DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dto.getInvAim())){
+                                if(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(dto.getInvAim())){
                                     subjectNatureList = Arrays.asList(DictCodeBaseSubjectNatrue.摊余成本类利息调整.getValue());
                                 }
-                                else if(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(dto.getInvAim())){
+                                else if(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(dto.getInvAim())){
                                     subjectNatureList = Arrays.asList(DictCodeBaseSubjectNatrue.综合收益类利息调整.getValue());
                                 }
                                 // 调用共通【账务类共通方法】，科目余额查询-期待方向

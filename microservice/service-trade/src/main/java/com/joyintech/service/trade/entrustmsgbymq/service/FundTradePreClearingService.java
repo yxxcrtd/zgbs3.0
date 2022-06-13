@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +17,6 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.trade.entrustmsgbymq.dao.EntrustMsgbyMQMapper;
-import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
-import com.joyintech.tams.common.base.dao.FinProductAddMapper;
-import com.joyintech.tams.common.base.dao.StlPayTempOrdersMapper;
-import com.joyintech.tams.common.base.dao.TrdProductTempDealAddMapper;
-import com.joyintech.tams.common.base.dao.TrdProductTempDealMapper;
-import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.EtrFinishStatus;
-import com.joyintech.tams.common.base.entity.FinProductAdd;
-import com.joyintech.tams.common.base.entity.InfContractDetailfile;
-import com.joyintech.tams.common.base.entity.StlPayTempOrders;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
-import com.joyintech.tams.common.base.entity.TrdProductTempDeal;
-import com.joyintech.tams.common.base.entity.TrdProductTempDealAdd;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -76,6 +64,12 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 	 */
 	@Autowired
 	TrdProductTempDealMapper trdProductTempDealMapper;
+
+	/**
+	 * 金融产品临时汇总交易表
+	 */
+	@Autowired
+	private TrdProductTempDealTotalMapper trdProductTempDealTotalMapper;
 
 	/**
 	 * 金融产品临时交易附属表主推接口Mapper
@@ -136,6 +130,9 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 		// 金融产品临时交易表Entity
 		TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
 		BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, infContractDetailfile);
+		// ZGCPCN-1133:需登录交易状态 modify by fuyongsheng 20220606 start
+		trdProductTempDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
+		// ZGCPCN-1133:需登录交易状态 modify by fuyongsheng 20220606 end
 		// 金融产品交易DTO.关联系统交易编号 = 成交明细DTO.成交编号
 		if (StringUtils.isNotEmpty(infContractDetailfile.getDealNo())) {
 			trdProductTempDeal.setfTradeId(infContractDetailfile.getDealNo());
@@ -199,9 +196,19 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
                 codeParameter.setCommonBusinessType(DictCodeList.共通业务类型_货币基金赎回);
             }
             trdProductTempDeal.setTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
+            // 多组合系列户指令须登录临时交易汇总表
+            if(tradePreCommonService.isMultiPortFolioEntrust(infContractDetailfile.getEntrustId())
+					&& StringUtil.isEmpty(trdTempDto.getTotleTradeId())){
+				trdTempDto.setTotleTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
+			}
         }
         else {
         	trdProductTempDeal.setTradeId(IDGenerator.generate());
+			// 多组合系列户指令须登录临时交易汇总表
+			if(tradePreCommonService.isMultiPortFolioEntrust(infContractDetailfile.getEntrustId())
+					&& StringUtil.isEmpty(trdTempDto.getTotleTradeId())){
+				trdTempDto.setTotleTradeId(IDGenerator.generate());
+			}
         }
 		// 金融产品交易DTO.金融产品代码<==成交明细DTO.金融产品代码
 		trdProductTempDeal.setFinprodId(infContractDetailfile.getFinprodId());
@@ -243,6 +250,7 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 			}
 		}
 		trdProductTempDeal.setTgBusiType(paBussType);
+		trdProductTempDeal.setBusiType(null == paBussType ? "BUSI_TYPE" : paBussType);
 		 // 本方交易员 根据委托代码获取委托指令分发信息的指定交易员
 		String trader = entrustMsgbyMQMapper.queryTradeId(infContractDetailfile.getEntrustId());
 		if (trader != null) {
@@ -253,8 +261,20 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 		if (etrEntrust != null) {
 			trdProductTempDeal.setCounterId(etrEntrust.getCounterId());
 		}
+		trdProductTempDeal.setTotleTradeId(trdTempDto.getTotleTradeId());
         // 临时交易入库
 		trdProductTempDealMapper.insertSelective(trdProductTempDeal);
+
+		// 多组合系列户指令需要登录临时汇总交易表 add by fuyongsheng 20220511 start
+		// 防止重复登录
+		if(StringUtil.isNotEmpty(trdTempDto.getTotleTradeId()) &&
+				null == trdProductTempDealTotalMapper.selectByPrimaryKey(trdTempDto.getTotleTradeId())){
+			// 写入金融产品临时汇总交易表
+			TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
+			BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdProductTempDeal);
+			trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
+		}
+		// 多组合系列户指令需要登录临时汇总交易表 add by fuyongsheng 20220511 end
 
 		// 金融产品临时交易附属表Entity
 		TrdProductTempDealAdd trdProductTempDealAdd = new TrdProductTempDealAdd();
@@ -372,11 +392,9 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 		trdTempDto.setSettleDate(infContractDetailfile.getTradeDate());
 		trdTempDto.setTrdProductTempDeal(trdProductTempDeal);
 		trdTempDto.setTrdProductTempDealAdd(trdProductTempDealAdd);
-		// 调用新头寸接口 add by fuyongsheng 20220307 end
-		positionRequestTradeReportService.sendTradeReportPositionRequest(trdTempDto);
 
 		// 处理头寸
-		tradePreCommonService.executePosition(finProductTradeDto);
+		tradePreCommonService.executePosition(finProductTradeDto, infContractDetailfile.getAcctNo());
 		// ZGTFCP-1499:重新封装基础对象，调用头寸公共方法 modify by fuyongsheng 20220325 end
 	}
 

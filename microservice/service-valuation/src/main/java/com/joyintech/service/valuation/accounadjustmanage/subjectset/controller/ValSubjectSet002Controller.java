@@ -16,6 +16,8 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.service.valuation.accounadjustmanage.subjectset.dto.ValSubjectHandDto;
 import org.jasypt.commons.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,4 +140,30 @@ public class ValSubjectSet002Controller extends BaseController {
     public List<ValBokSubjectDto> selectValBokSubjectByInCode(@RequestBody ValBokSubjectDto dto) {
         return valSubjectSet001Service.selectValBokSubjectByInCode(dto);
     }
+
+    /*add by sunshuaishuai 辅助核算项修改 20220406 start*/
+    /**
+     * 根据基础科目性质查询辅助核算项
+     *
+     * @return check结果
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("/getHandCode")
+    public List<ValSubjectHandDto> getHandCode(@RequestBody Map<String,Object> param){
+        return valSubjectSet001Service.getHandCode(param);
+    }
+
+    /**
+     * 根据基础科目性质联动辅助核算项下拉框
+     *
+     * @return check结果
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("/getType")
+    public List<SelectOptionDto> getType(@RequestBody Map<String,Object> param){
+        return valSubjectSet001Service.getType(param);
+    }
+    /*add by sunshuaishuai 辅助核算项修改 20220406 end*/
 }

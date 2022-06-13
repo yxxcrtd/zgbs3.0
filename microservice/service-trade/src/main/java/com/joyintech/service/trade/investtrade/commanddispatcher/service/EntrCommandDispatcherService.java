@@ -1,5 +1,6 @@
 package com.joyintech.service.trade.investtrade.commanddispatcher.service;
 
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,10 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
 					entrCommandDispatcherDto.setIsAutoReceive(isAutoReceive);
 				}
 			}
+		}
+		for (EntrCommandDispatcherDto entrCommandDispatcherDto : selectList) {
+			entrCommandDispatcherDto.setEntrustNum(entrCommandDispatcherDto.getEntrustNum() == null
+					? null : entrCommandDispatcherDto.getEntrustNum().setScale(0, RoundingMode.HALF_UP));
 		}
 		dto.setEtr_entrust_list(selectList);
 		dto.setEtr_pledge_list(this.selectPledgeList(selectList));

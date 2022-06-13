@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -271,42 +273,69 @@ public class PtlFundAllocation002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("save")
-    public AjaxResult save(@RequestBody @Validated({
+    public Message<AjaxResult> save(@RequestBody @Validated({
             ValidateGroupEdit.class}) PtlFundAllocationDto dto, BindingResult br) throws WorkFlowException {
         if (br.hasErrors()) {
-            return new AjaxResult(br);
+            AjaxResult message = new AjaxResult(br);
+            new Message<AjaxResult>().success().setData(message);
         }
-        if (StringUtil.isEmpty(dto.getBusiNo())) {
-            BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
-            bussinessCodeParameter.setCommonBusinessType(DictCodeList.共通业务类型_资金划拨管理);
-            dto.setTradeId(baseGetBussinessId != null ? baseGetBussinessId.buildBussinessCode(bussinessCodeParameter) : IDGenerator.generate());
-            if (dto.getBussTrdTransferOrder() != null && dto.getBussTrdTransferOrder().get(0) != null) {
-                dto.setBusiNo(dto.getBussTrdTransferOrder().get(0).getOrderId());
+        try {
+            if (StringUtil.isEmpty(dto.getBusiNo())) {
+                BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
+                bussinessCodeParameter.setCommonBusinessType(DictCodeList.共通业务类型_资金划拨管理);
+                dto.setTradeId(baseGetBussinessId != null ? baseGetBussinessId.buildBussinessCode(bussinessCodeParameter) : IDGenerator.generate());
+                if (dto.getBussTrdTransferOrder() != null && dto.getBussTrdTransferOrder().get(0) != null) {
+                    dto.setBusiNo(dto.getBussTrdTransferOrder().get(0).getOrderId());
+                }
             }
-        }
-        dto.setOrderId(dto.getBussTrdTransferOrder().get(0).getOrderId());
-        if (bussCommonMapperDelegateService != null) {
-            PtlPortfolio ptlPortfolio = bussCommonMapperDelegateService.selectBySinglePrimaryKey(PtlPortfolioMapper.class, dto.getPortfolioId(), PtlPortfolio.class);
-            if (ptlPortfolio != null) {
-                dto.setPortfolioName(ptlPortfolio.getPortfolioName());
+            dto.setOrderId(dto.getBussTrdTransferOrder().get(0).getOrderId());
+            if (bussCommonMapperDelegateService != null) {
+                PtlPortfolio ptlPortfolio = bussCommonMapperDelegateService.selectBySinglePrimaryKey(PtlPortfolioMapper.class, dto.getPortfolioId(), PtlPortfolio.class);
+                if (ptlPortfolio != null) {
+                    dto.setPortfolioName(ptlPortfolio.getPortfolioName());
+                }
             }
+            ProcessParameter<PtlFundAllocationDto> processParameter = new ProcessParameter<PtlFundAllocationDto>();
+            WorkFlowParameter<PtlFundAllocationDto> params = new WorkFlowParameter<PtlFundAllocationDto>();
+            params.setPageId("PtlFundAllocation002");
+            params.setElementId(dto.getElementId());
+            params.setBusinessCode(item -> item.getPortfolioId());
+            params.setBusinessType(DictCodeList.共通业务类型_资金划拨管理.getValue());
+            // 设置流程业务说明, 组合名称 + "(" + 组合名称 + ")" + "-"  + "组合代码" + "("  + "组合代码"+")"
+            params.setComment(
+                    entity -> this.getMessage("PtlFundAllocation001.portfolioId") + "("
+                            + entity.getPortfolioId() + ")" + "-"
+                            + this.getMessage("PtlFundAllocation001.portfolioName") + "("
+                            + entity.getPortfolioName() + ")"
+                            + this.getMessage("PtlFundAllocation001.orderId") + "("
+                            + entity.getBussTrdTransferOrder().get(0).getOrderId() + ")");
+            processParameter.setWorkFlowParameter(params);
+            //add wsz ZGCPCN-921 银证转账，添加捕捉头寸提交报系统异常。 start
+            String msg = null;
+            try {
+                msg = ptlFundAllocation002Service.start(processParameter, dto);
+                AjaxResult m = new AjaxResult(msg);
+                return new Message<AjaxResult>().success().setData(m);
+            } catch (Exception e) {
+                return PositionUtil.ajaxErrorReturn(e);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            return PositionUtil.ajaxErrorReturn(e);
         }
-        ProcessParameter<PtlFundAllocationDto> processParameter = new ProcessParameter<PtlFundAllocationDto>();
-        WorkFlowParameter<PtlFundAllocationDto> params = new WorkFlowParameter<PtlFundAllocationDto>();
-        params.setPageId("PtlFundAllocation002");
-        params.setElementId(dto.getElementId());
-        params.setBusinessCode(item -> item.getPortfolioId());
-        params.setBusinessType(DictCodeList.共通业务类型_资金划拨管理.getValue());
-        // 设置流程业务说明, 组合名称 + "(" + 组合名称 + ")" + "-"  + "组合代码" + "("  + "组合代码"+")"
-        params.setComment(
-                entity -> this.getMessage("PtlFundAllocation001.portfolioId") + "("
-                        + entity.getPortfolioId() + ")" + "-"
-                        + this.getMessage("PtlFundAllocation001.portfolioName") + "("
-                        + entity.getPortfolioName() + ")"
-                        + this.getMessage("PtlFundAllocation001.orderId") + "("
-                        + entity.getBussTrdTransferOrder().get(0).getOrderId() + ")");
-        processParameter.setWorkFlowParameter(params);
-        String msg = ptlFundAllocation002Service.start(processParameter, dto);
-        return new AjaxResult(msg);
+        //add wsz ZGCPCN-921 银证转账，提交报系统异常。 end
+    }
+
+    /**
+     * 获取账户实际余额
+     *
+     * @return 账户余额
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping("/getActAmount")
+    @ResponseBody
+    public BigDecimal getActAmount() {
+        return ptlFundAllocation002Service.getActAmount(RequestUtil.getPageParam());
     }
 }

@@ -56,7 +56,8 @@ public class BussFinBondRepInfoValidator implements BeanValidator{
 				 if(StringUtil.equals(dto.getRepAssetType(),DictCodeListExt2.资产_负债二级类别_商业性金融债.getValue())
 			                ||StringUtil.equals(dto.getRepAssetType(),DictCodeListExt2.资产_负债二级类别_企业债券.getValue())
 			                ||StringUtil.equals(dto.getRepAssetType(),DictCodeListExt2.资产_负债二级类别_公司债券.getValue())
-			                ||StringUtil.equals(dto.getRepAssetType(),DictCodeListExt2.资产_负债二级类别_公司债券.getValue())
+                            // Sonar Fix modify by huwei 220608
+			                //||StringUtil.equals(dto.getRepAssetType(),DictCodeListExt2.资产_负债二级类别_公司债券.getValue())
 			                ||StringUtil.equals(dto.getRepAssetType(),DictCodeListExt2.资产_负债二级类别_企业债务融资工具.getValue())
 			                ||StringUtil.equals(dto.getRepAssetType(),DictCodeListExt2.资产_负债二级类别_资产支持证券.getValue())
 			                ||StringUtil.equals(dto.getRepAssetType(),DictCodeListExt2.资产_负债二级类别_外国债券.getValue())){

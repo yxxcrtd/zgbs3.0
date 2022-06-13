@@ -87,13 +87,8 @@
     //结算金额  结算金额=借贷费用+交易手续费+结算服务费+其他费用
     var settleAmtChange = function(){
         var fee = $('#fee').val();
-        var settAmt = $('#settAmt').val();
-        var otherAmt = $('#otherAmt').val();
-        if(fee != null && fee != ''
-            && settAmt != null && settAmt != ''
-            && otherAmt != null && otherAmt != ''){
-            var settleAmt1 = JoyinMath.doAdd(JoyinMath.doAdd(fee, settAmt,2),otherAmt,2);
-            $('#settleAmt').val(settleAmt1);
+        if(fee != null && fee != ''){
+            $('#settleAmt').val(fee);
         }else{
             $('#settleAmt').val('');
         }
@@ -105,8 +100,9 @@
      */
     $(function() {
 
-        //当前是否包含流程
-        var workflowIdNow = $("#workflowId").val()
+        if($("#workflowId").val()=='' && $("#settleAmt").val()==''){
+            settleAmtChange();
+        }
 
         // init();
         //产品代码联动事件
@@ -122,14 +118,6 @@
         //结算金额联动事件
         //借贷费用
         $('#fee').change(function(){
-            settleAmtChange();
-        });
-        //结算手续费
-        $('#settAmt').change(function(){
-            settleAmtChange();
-        });
-        //其他费用
-        $('#otherAmt').change(function(){
             settleAmtChange();
         });
 

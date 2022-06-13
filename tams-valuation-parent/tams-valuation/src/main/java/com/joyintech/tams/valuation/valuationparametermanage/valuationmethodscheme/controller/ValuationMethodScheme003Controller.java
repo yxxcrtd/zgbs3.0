@@ -125,6 +125,7 @@ public class ValuationMethodScheme003Controller extends BaseController {
 		 
 		super.setSelectOptionToModel(model, DictCode.估值来源);
 		super.setSelectOptionToModel(model, DictCode.计划类资产类型);
+		super.setSelectOptionToModel(model, DictCode.利率互换估值模型);
 
 		return super.init(model);
 	}
@@ -189,9 +190,9 @@ public class ValuationMethodScheme003Controller extends BaseController {
 				&& !DictCodeListExt1.证券品种_计划类资产_净值型.getValue().equals(dto.getSecType())
 				&& !DictCodeListExt1.证券品种_计划类资产_货币型.getValue().equals(dto.getSecType())
 				&& !DictCodeListExt1.证券品种_计划类资产_收益型.getValue().equals(dto.getSecType())) {
-			if(StringUtils.isEmpty(dto.getTradeMarket())) {
-				bindingResult.rejectValue("tradeMarket", "NotBlank", "交易场所不能为空！");
-			}
+//			if(StringUtils.isEmpty(dto.getTradeMarket())) {
+//				bindingResult.rejectValue("tradeMarket", "NotBlank", "交易场所不能为空！");
+//			}
 		}
 
 		if (DictCodeListExt1.估值方法_市值成本孰低法.getValue().equals(dto.getValuationMethod())
@@ -234,6 +235,19 @@ public class ValuationMethodScheme003Controller extends BaseController {
 			}
 			if(StringUtils.isNotEmpty(msg)) {
 				return new AjaxResult(msg, MessageType.错误消息);
+			}
+		}
+
+		//add  by yinya on 20220427 模型法必须选择估值模型
+		if(dto.getValuationMethod().equals(DictCodeListExt1.估值方法_模型法.getValue())){
+			if(StringUtils.isEmpty(dto.getValuationId())) {
+				bindingResult.rejectValue("valuationId", "NotBlank", "估值模型不能为空！");
+			}
+			if(dto.getQuotaDigit() == null) {
+				bindingResult.rejectValue("quotaDigit", "NotBlank", "行情位数不能为空！");
+			}
+			if(StringUtils.isEmpty(dto.getPriceTailMode())) {
+				bindingResult.rejectValue("priceTailMode", "NotBlank", "行情尾数处理方式不能为空！");
 			}
 		}
 

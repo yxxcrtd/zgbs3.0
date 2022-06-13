@@ -129,7 +129,7 @@ public class SecPeriodDealTemplateRecService {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-	private  Map<String, Object> handleValSeclendDeal( List<ValSeclendAssetPeriodDeal> listValSeclendAssetPeriodDeal,Date resovleDate,Map<String,Object> params,
+	public   Map<String, Object> handleValSeclendDeal( List<ValSeclendAssetPeriodDeal> listValSeclendAssetPeriodDeal,Date resovleDate,Map<String,Object> params,
 			List<ValInterflog> valInterflog){
          List<String> bookSetIds = (List<String>)params.get(InterfCommonConstant.接口_运行接口账套ID);
     	 String valModel = (String)params.get(InterfCommonConstant.接口模式);
@@ -429,7 +429,9 @@ public class SecPeriodDealTemplateRecService {
         trdProductDeal.setCreateTime(dto.getCreateTime());
         //交易市场  = 流通市场.二级市场
         trdProductDeal.setTradeMarketMode(DictCodeListExt1.交易市场_二级市场.getValue());
-
+		//资金账户  = B.资金账户 yangchen 20220406 start
+		trdProductDeal.setMyAcctNo(dto.getMyAcctNo());
+		//资金账户  = B.资金账户 yangchen 20220406 end
 
     	if(DictCodeList.交易方向_融入债券还本.getValue().equals(bookType)//T31
         		|| DictCodeList.交易方向_本金返还.getValue().equals(bookType)//T32

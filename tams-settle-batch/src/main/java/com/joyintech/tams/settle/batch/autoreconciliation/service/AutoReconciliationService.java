@@ -74,7 +74,7 @@ public class AutoReconciliationService {
         param.put("PS_T39", DictCodeList.交易方向_行权_赎回.getValue());
         param.put("PS_T08", DictCodeList.交易方向_还本.getValue());
         param.put("PS_T09", DictCodeList.交易方向_收息.getValue());
-        param.put("PS_T49", DictCodeListExt1.交易方向_债转股.getValue());
+        //param.put("PS_T49", DictCodeListExt1.交易方向_债转股.getValue());
         param.put("PS_T46", DictCodeListExt2.交易方向_配股.getValue());
         param.put("PS_T97", DictCodeListExt3.交易方向_配债.getValue());
         // add by fuyongsheng 20211208 没有对账单的自动批处理(step2)功能开发 end
@@ -84,6 +84,8 @@ public class AutoReconciliationService {
         param.put("prodType2_F07", DictCodeList.平安资产类型_质押式回购.getValue());
         param.put("prodType2_F02", DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
         param.put("prodType2_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+        param.put("prodType2_F32", BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+        param.put("prodType2_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         param.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
         param.put("BUSI_SCENE_CALSS_0902RS03", DictCodeListStl.业务场景分类明细_债券协议正回购_到期.getValue());
         param.put("BUSI_SCENE_CALSS_0902RB01", DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue());
@@ -93,6 +95,8 @@ public class AutoReconciliationService {
         param.put("INTER_TYPE_4", DictCodeListExt3.柜台接口类型_金证u版.getValue());
         param.put("TRADE_MARKET_03", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
         param.put("TRADE_MARKET_04", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
+        param.put("DELIVERY_RESULT_01", DictCodeListExt4.交收结果_正常交收.getValue());
+        param.put("DELIVERY_RESULT_02", DictCodeListExt4.交收结果_部分交收.getValue());
         // 获取待自动对账的对账数据
         List<DayEndAccountDaichuliDto> autoAccountList = autoReconciliationMapper.queryAccountTodoList(param);
         reconciliationCommonService.executeReconciliation(autoAccountList);

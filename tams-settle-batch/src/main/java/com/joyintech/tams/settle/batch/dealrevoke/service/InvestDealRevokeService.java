@@ -8,6 +8,7 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import org.slf4j.Logger;
@@ -25,10 +26,6 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
@@ -141,6 +138,13 @@ public class InvestDealRevokeService {
         param.put("PURCH_MODLE_02", DictCodeListExt3.申购方式_网下申购.getValue());
         List<String> totalTradeIdTgMs = investDealRevokeMapper.selectTotalTradeIdTgM(param);
 
+
+        //删除交收结果表（交收成功的交易对应的交收结果删除）
+        param.put("totalTradeIdList", totalTradeIdTgMs);
+        param.put("DELIVERY_STATUS_02",DictCodeListExt3.交收状态_已交收.getValue());
+        List<String>  manualSettleIdTgMs = investDealRevokeMapper.selectManualSettleIdTgM(param);
+        investDealRevokeMapper.deleteManualSetDetailBySettleId(manualSettleIdTgMs);
+        investDealRevokeMapper.deleteManualSettleInfoBySettleId(manualSettleIdTgMs);
 
         param.put("psList",  Arrays.asList(DictCodeList.交易方向_上市流通.getValue()));
         param.put("busiType", DictCodeList.共通业务类型_债券类资产交易.getValue());
@@ -291,6 +295,21 @@ public class InvestDealRevokeService {
         return investDealRevokeMapper.selectTotalTradeIdTgM(param);
     }
 
+
+    /**
+     * 查询汇总交易编号
+     * @param tradeDate 交易日
+     * @param portfolioIdList 组合代码列表
+     * @return 汇总交易编号列表
+     */
+    public List<String> selectTotalTradeIdForCredit(Date tradeDate, List<String> portfolioIdList) {
+        Map<String, Object> param = createCommonParam(tradeDate, portfolioIdList);
+        param.put("busiType", DictCodeListStl.共通业务类型_信用保护凭证交易.getValue());
+        param.put("psList", Arrays.asList(DictCodeList.交易方向_买入.getValue(),DictCodeList.交易方向_卖出.getValue()));
+        param.put("tradeMarketList",Arrays.asList(DictCodeListExt1.交易场所_上海证券交易所.getValue(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()));
+        return investDealRevokeMapper.selectTotalTradeIdTgM(param);
+    }
+
     /**
      * 删除日间成交数据形成的头寸流水信息
      */
@@ -312,6 +331,9 @@ public class InvestDealRevokeService {
         	finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
         	finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券买断式正回购.getValue());
         	finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券买断式逆回购.getValue());
+        }
+        if (StringUtil.equals(DictCodeListStl.证券品种_信用保护凭证.getValue(), busiType)) {
+            finprodType2List.add(DictCodeListExt1.金融产品类型_信用保护凭证.getValue());
         }
         param.put("finprodType2List", finprodType2List);
         //删除前,查出流水，以便更新余额
@@ -374,7 +396,11 @@ public class InvestDealRevokeService {
      */
     private void positionHttpRequestBatchClose(Map<String, Object> param){
         // 撤销日间成交交易调用新头寸接口 add by fuyongsheng 20220308 start
-        // 查询日间成交交易
+        // 查询场内日间成交交易
+        // add by fuyongsheng 20220426 start
+        param.put("TRADE_MARKET_03", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
+        param.put("TRADE_MARKET_04", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
+        // add by fuyongsheng 20220426 end
         List<TrdProductTempDeal> trdProductTempDeals = investDealRevokeMapper.getTrdProductTempDeals(param);
         if(!CollectionUtils.isEmpty(trdProductTempDeals)){
             // 日间成交撤销
@@ -398,6 +424,9 @@ public class InvestDealRevokeService {
                 // 日间下单撤销数据
                 Map<String, Object> orderData = new HashMap<>();
 
+                if (null == deal.getfTradeId()) {
+                    continue;
+                }
                 // 查询下单明细数据
                 InfContractDetailfile infContractDetailfile = trdCommonBaseMapper.selectInfContractDetailfile(deal.getfTradeId());
                 if(null == infContractDetailfile){

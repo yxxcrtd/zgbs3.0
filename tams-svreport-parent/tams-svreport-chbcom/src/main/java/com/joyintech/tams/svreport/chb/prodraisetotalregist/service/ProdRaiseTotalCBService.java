@@ -536,11 +536,11 @@ public class ProdRaiseTotalCBService extends SvrDataStatusUtil {
 		dto.setStatusDate(executeDate);
 
 		//发行机构代码取值
-		//dto.setIssuePartyId(SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID));
-		if(StringUtil.isEmpty(dto.getIssuePartyId())){
-			String issuePartyId = CommonUtil.selectBankCode();
-			dto.setIssuePartyId(issuePartyId);
-		}
+		dto.setIssuePartyId(SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID));
+//		if(StringUtil.isEmpty(dto.getIssuePartyId())){
+//			String issuePartyId = CommonUtil.selectBankCode();
+//			dto.setIssuePartyId(issuePartyId);
+//		}
 //		 报送截止日生成
 //		当前批次报送时点集合
 		String subStaus=dto.getStatus();

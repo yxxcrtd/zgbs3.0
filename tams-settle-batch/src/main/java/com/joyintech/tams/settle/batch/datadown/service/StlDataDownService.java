@@ -129,7 +129,7 @@ public class StlDataDownService {
                 Stream<BondSeatPtlMapping> stream = mappingList.stream();
                 if(null != xwhField) {
                     String xwh = (String)xwhField.getValue();
-                    stream = stream.filter(item -> StringUtil.equals(item.getShSeatNo(),xwh) || StringUtil.equals(item.getShSeatNo(),xwh));
+                    stream = stream.filter(item -> StringUtil.equals(item.getShSeatNo(),xwh));
                 }
                 return stream.map(BondSeatPtlMapping::getPortfolioId).collect(Collectors.toList());
             }

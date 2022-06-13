@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook filePath="trademanage/trdirsvaluationduration/TrdIrsValuationDuration001.xlsx" name="利率互换存续期管理信息一览">
+    <Worksheet javaBean="com.joyintech.tams.valuation.trademanage.trdirsvaluationduration.dto.TrdIrsValuationDuration001Dto">
+        <Row>
+            <Cell order="1" name="交易编号">tradeId</Cell>
+            <Cell order="2" name="原始交易编号">pTradeId</Cell>
+            <Cell order="3" name="产品代码">finprodId</Cell>
+            <Cell order="4" name="产品名称">finprodName</Cell>
+            <Cell order="5" name="交易类型">psStr</Cell>
+            <Cell order="6" name="交易日期">tradeDateStr</Cell>
+            <Cell order="7" name="收付息类型">irsPsIntType</Cell>
+            <Cell order="8" name="固定利息支付日">fixPayDateStr</Cell>
+            <Cell order="9" name="固定利息">fixIntAmtStr</Cell>
+            <Cell order="10" name="浮动利息支付日">floatPayDateStr</Cell>
+            <Cell order="11" name="浮动利息">floatIntAmtStr</Cell>
+            <Cell order="12" name="提前终止收付方向">beforeEndPs</Cell>
+            <Cell order="13" name="提前终止名义本金">beforeEndPrinStr</Cell>
+            <Cell order="14" name="提前终止收付金额">beforeEndAmtStr</Cell>
+            <Cell order="15" name="结算金额">settleAmtStr</Cell>
+            <Cell order="16" name="币种">ccyFmt</Cell>
+            <Cell order="17" name="资金账户">acctNo</Cell>
+        </Row>
+    </Worksheet>
+</Workbook>

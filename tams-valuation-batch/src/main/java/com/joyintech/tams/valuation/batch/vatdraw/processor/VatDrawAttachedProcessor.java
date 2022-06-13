@@ -10,19 +10,21 @@
 
 package com.joyintech.tams.valuation.batch.vatdraw.processor;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.batch.vatdraw.dto.PrdCashDto;
+import com.joyintech.tams.valuation.batch.vatdraw.dto.VatBatchResult;
+import com.joyintech.tams.valuation.batch.vatdraw.service.VatDrawAttachedProcessorNewService;
+import com.joyintech.tams.valuation.batch.vatdraw.service.VatDrawAttachedProcessorService;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
-import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.tams.valuation.batch.vatdraw.dto.PrdCashDto;
-import com.joyintech.tams.valuation.batch.vatdraw.dto.VatBatchResult;
-import com.joyintech.tams.valuation.batch.vatdraw.service.VatDrawAttachedProcessorService;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 增值税计提批处理Processor
@@ -41,6 +43,11 @@ public class VatDrawAttachedProcessor extends BaseProcessor<NeedOperateEntity, V
      */
     @Autowired
     private VatDrawAttachedProcessorService vatDrawAttachedProcessorService;
+    /**
+     * processor方法的 Service
+     */
+    @Autowired
+    private VatDrawAttachedProcessorNewService vatDrawAttachedProcessorNewService;
 
     @Override
     public VatBatchResult process(NeedOperateEntity items)
@@ -52,8 +59,19 @@ public class VatDrawAttachedProcessor extends BaseProcessor<NeedOperateEntity, V
         thisParams.putAll(this.getParams());
         // 将返回值塞入参数中
         thisParams.put(GlobalConstant.READER_RESULT, acctEntity);
-        // 调用service方法进行逻辑逻辑
-        VatBatchResult result = vatDrawAttachedProcessorService.execute(thisParams);
+        // modify by weipeng on 20220311 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
+        VatBatchResult result = new VatBatchResult();
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
+        // 若按照内部科目编码分录，则需要映射分录对应科目信息.
+        //调用service方法进行逻辑逻辑
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            result = vatDrawAttachedProcessorNewService.execute(thisParams);
+        }
+        else{
+            result = vatDrawAttachedProcessorService.execute(thisParams);
+        }
+        // modify by weipeng on 20220311 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end
 
         // 当为null时候，给予初始化
         if (result == null) {

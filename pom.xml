@@ -41,7 +41,7 @@
         <module>tams-valuation-common</module>
         <module>tams-valuation-basicdata</module>
         <module>tams-valuation-parent</module>
-        <module>tams-business-common</module>
+<!--        <module>tams-touguan-common</module>-->
         <module>tams-cfets</module>
 <!--        <module>tams-valuation-report</module>-->
         <module>tams-exchange-trade-parent</module>
@@ -116,5 +116,6 @@
         <module>microservice/tams-service-container-touguan</module>
         <module>microservice/tams-service-system</module>
         <module>tams-exchange-touguan-parent</module>
+        <module>tams-touguan-common</module>
     </modules>
 </project>

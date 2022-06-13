@@ -583,6 +583,90 @@ $(function() {
     /**
      * 定义数据表格
      */
+    var tableR12 = $("#dataTableR12").joyintable(
+        {
+            ajax : {
+                url : 'selramind',
+                type : 'POST',
+                data : function() {
+                    return searchform();
+                }
+            },
+            cols : [
+                {
+                    field : 'remTypeStr',
+                    title : 'PaActiveRemind002.remType',
+                    width : 200
+                },
+                {
+                    field : 'finprodId',
+                    title : '组合代码',
+                    width : 200
+                },
+                {
+                    field : 'finprodName',
+                    title : '组合名称',
+                    width : 300
+                },
+                {
+                    field : 'trdAcctId',
+                    visible : false
+                },
+                {
+                    field : 'trdAcctName',
+                    title : '资金账户',
+                    width : 300
+                },
+                {
+                    field : 'reminder',
+                    title : 'PaActiveRemind002.reminder',
+                    width : 300
+                },
+                {
+                    field : 'dealF',
+                    visible : false
+                },
+                {
+                    field : 'closF',
+                    visible : false
+                },
+                {
+                    field : 'tradePlace',
+                    visible : false
+                },
+                {
+                    field : 'cdate',
+                    visible : false
+                },
+                {
+                    field : 'cdateStr',
+                    visible : false
+                },
+                {
+                    field : 'operating',
+                    title : 'PaActiveRemind002.operating',
+                    align : 'center',
+                    width : 200,
+                    render : function(data, type, row, meta) {
+                        var operating = ""
+                        if(row.dealF == "Y"){
+                            operating = operating+"<a id=\"PaActiveRemind002_btnDeal_action\" style='color: #fff;' class=\"layui-btn layui-btn-sm\">"+JoyinUtil.getLabel("PaActiveRemind002.deal")+"</a>"
+                        };
+                        if(row.closF == "Y"){
+                            operating = operating+"<a id=\"PaActiveRemind002_btnClose_action\" style='color: #fff;' class=\"layui-btn layui-btn-sm\">"+JoyinUtil.getLabel("PaActiveRemind002.close")+"</a>"
+                        };
+                        return operating
+                    },
+                } ],
+            loadonce:true,
+            searchOnInit:false
+        });
+
+
+
+    /**
+     * 定义数据表格
+     */
     var tableR3 = $("#dataTableR3").joyintable(
         {
             ajax : {
@@ -793,6 +877,14 @@ $(function() {
             $('#dataTableR5_div').toggle(false);
             $('#dataTableR9_div').toggle(true);
          	tableR9.table? tableR9.reload() : tableR9.load();
+        }else if($('#mainCategory') && $('#mainCategory').val() === 'R12') {
+            $('#dataTableR1_div').toggle(false);
+            $('#dataTableR3_div').toggle(false);
+            $('#dataTableR2_div').toggle(false);
+            $('#dataTableR5_div').toggle(false);
+            $('#dataTableR9_div').toggle(false);
+            $('#dataTableR12_div').toggle(true);
+            tableR12.table? tableR12.reload() : tableR12.load();
         }else{
             $('#dataTableR1_div').toggle(false);
             $('#dataTableR2_div').toggle(true);
@@ -821,6 +913,80 @@ $(function() {
             dealRemindR1(row.url, row.lable,row.prodId, row.finprodId, row.oneAttr,row.remType, row.days, row.feeId, row.menuId, tableR1,row.mdateStr,row.orgId,row.orgName);
         }
     });
+
+    /**
+     * 标准券额度不足关闭按钮绑定事件
+     */
+    tableR12.bind('click','#PaActiveRemind002_btnClose_action', function(row) {
+        closeRemindR12(row.remType, row.finprodId, row.finprodName, row.tradePlace, row.cdateStr, null, tableR12);
+    });
+    /**
+     * 标准券额度不足关闭按钮点击事件
+     */
+    function closeRemindR12(remType, finprodId, finprodName, tradePlace, cdate, remark, table){
+        if(flag == true){
+            Joyin.confirm(JoyinUtil.getMessage('FIN_E_0001'), function(){
+                Joyin.ajax(JoyinUtil.getRealPath('/invest/remind/PaActiveRemind002/closeRemind'),
+                    {
+                        remType : remType,
+                        finprodId : finprodId,
+                        tradePlace : tradePlace,
+                        finprodName : finprodName,
+                        remark : remark,
+                        cdate : cdate
+                    },
+                    function(result){
+                        Joyin.alert(JoyinUtil.getMessage("FIN_E_0002"));
+                        table.table? table.reload() : table.load();
+                    })
+            });
+        }else{
+            Joyin.alert(JoyinUtil.getMessage("FIN_E_0003"));
+        }
+    }
+
+    /**
+     * 处理按钮绑定事件
+     */
+    tableR12.bind('click','#PaActiveRemind002_btnDeal_action', function(row) {
+        dealRemindR12(row.url, row.lable, row.finprodId, row.remType, row.tradePlace, row.feeId, row.menuId, tableR1,row.cdateStr,row.orgId,row.orgName);
+    });
+
+    function dealRemindR12(url, lable, id, remType, tradePlace, feeId, menuId, table,mdate,orgId,orgName,ddate){
+        if(flag == true){
+            var finprodId;
+            var param = {
+                portfolioId: id,
+                cdate: mdate,
+                tradePlace:tradePlace
+            };
+            Joyin.ajaxJson(basePath + 'invest/remind/PaActiveRemind001/searchFinprodId', param, function (result) {
+                if (result.FINPROD_ID) {
+                    finprodId = result.FINPROD_ID;
+                }
+            }, false);
+
+            var  urlPara = "?finprodId=" + finprodId + "&portfolioId=" + id +"&ps=T68";
+            url = 'home.html#/instructions/notradeorder?a=a';
+            lable='\u975e\u4ea4\u6613\u4e49\u52a1\u6307\u4ee4';
+            var urls = "";
+            urls += url+urlPara;
+            console.log(urls);
+            var newTab = {
+                pageId: lable,
+                title: JoyinUtil.getLabel(lable),
+                url:urls,
+                id: menuId,
+                icon: ''
+            };
+            top.tab.tabDelete(newTab.id);
+            top.tab.tabAdd(newTab);
+        }else{
+            Joyin.alert(JoyinUtil.getMessage("FIN_E_0003"));
+        }
+    }
+
+
 
     /**
      * 关闭按钮绑定事件
@@ -905,6 +1071,14 @@ $(function() {
             $('#dataTableR9_div').toggle(true);
             $('#dataTableR5_div').toggle(false);
             tableR9.table? tableR9.reload() : tableR9.load();
+        }else if($('#mainCategory') && $('#mainCategory').val() === 'R12') {
+            $('#dataTableR1_div').toggle(false);
+            $('#dataTableR3_div').toggle(false);
+            $('#dataTableR2_div').toggle(false);
+            $('#dataTableR9_div').toggle(false);
+            $('#dataTableR5_div').toggle(false);
+            $('#dataTableR12_div').toggle(true);
+            tableR12.table? tableR12.reload() : tableR12.load();
         }else{
             $('#dataTableR1_div').toggle(false);
             $('#dataTableR2_div').toggle(true);

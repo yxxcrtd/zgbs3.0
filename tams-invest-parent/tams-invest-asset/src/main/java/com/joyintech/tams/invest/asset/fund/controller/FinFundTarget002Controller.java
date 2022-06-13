@@ -19,6 +19,7 @@ import java.util.Map;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeRds;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -135,6 +136,7 @@ public class FinFundTarget002Controller extends BaseController{
             dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_基金.getValue());
             /**jira:TWO-61 add by chendijun start**/
             dto.setCapiIncomeFeature(DictCodeList.是否_否.getValue());
+            dto.setOpenType(DictCodeList.开放类型_开放式.getValue());
             //add by yanya 20190830 增加投资性质默认值
 //            dto.setInvestNature(DictCodeList.投资性质_固定收益类.getValue()); //modify by jiangpeng on 20210522 TISHKBS-1373
             /**jira:TWO-61 add by chendijun end**/
@@ -147,7 +149,7 @@ public class FinFundTarget002Controller extends BaseController{
             ,DictCode.行内资产二级分类,DictCode.行内资产三级分类,DictCode.行内资产四级分类,DictCode.行内资产五级分类
             // 新增资产五级分类 wangguiqi 2019-07-23 end
             ,DictCode.交易所基金类型,DictCode.分级基金,DictCode.ETF类型
-            ,DictCode.基金类资产二级类型,DictCode.是否, DictCode.投资性质);
+            ,DictCode.基金类资产二级类型,DictCode.是否, DictCode.投资性质, DictCode.开放类型);
       //取系统参数
         model.addAttribute("CE_MODEL", CacheUtil.getSysParam(BussinessConstant.CEMODEL));
         model.addAttribute("INTI_BONUS_MODE", DictCodeList.分红方式_红利再投); // 默认分红方式-红利再投 王贵奇 2019/7/29

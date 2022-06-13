@@ -370,4 +370,17 @@ public class TrdRepoValuationTrade003Dto extends WflTrdProductDeal implements Pr
     public void setMdate(Date mdate) {
         this.mdate = mdate;
     }
+
+    /**
+     * 回购类型（H01：质押式协议回购；H02：质押式竞价回购）
+     */
+    private String repoType;
+
+    public String getRepoType() {
+        return repoType;
+    }
+
+    public void setRepoType(String repoType) {
+        this.repoType = repoType;
+    }
 }

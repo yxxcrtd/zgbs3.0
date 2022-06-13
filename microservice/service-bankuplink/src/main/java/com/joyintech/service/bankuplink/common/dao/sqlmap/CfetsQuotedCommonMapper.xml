@@ -167,9 +167,15 @@
                 A.PORTFOLIO_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 )
             </if>
-            <if test="initValue != null and initValue != ''">
-                AND A.PORTFOLIO_ID = #{initValue}
-            </if>
+			<if test="initValueList != null and initValueList.size()>0">
+				AND (A.PORTFOLIO_ID in
+				<foreach collection="initValueList" open="(" close=")"  index="index"  item="item" separator=",">
+					#{item}
+				</foreach>)
+			</if>
+			<!--            <if test="initValue != null and initValue != ''">-->
+			<!--                AND A.PORTFOLIO_ID = #{initValue}-->
+			<!--            </if>-->
             <if test="portfolioType != null and portfolioType != ''">
                 AND A.PORTFOLIO_TYPE = #{portfolioType}
             </if>

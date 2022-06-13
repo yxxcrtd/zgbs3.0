@@ -35,6 +35,21 @@ public class WflEtrEntrustDetail extends WflEtrEntrustDetailKey {
     private String workflowId;
 
     /**
+     * 证券托管户
+     */
+    private String secAcctId;
+
+    /**
+     * 投资目的
+     */
+    private String invAim;
+
+    /**
+     * 资金账户
+     */
+    private String acctNo;
+
+    /**
      * 取得 分配比例
      * @return 分配比例
      */
@@ -112,5 +127,29 @@ public class WflEtrEntrustDetail extends WflEtrEntrustDetailKey {
      */
     public void setWorkflowId(String workflowId) {
         this.workflowId = workflowId == null ? null : workflowId.trim();
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
+    }
+
+    public String getInvAim() {
+        return invAim;
+    }
+
+    public void setInvAim(String invAim) {
+        this.invAim = invAim;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
     }
 }

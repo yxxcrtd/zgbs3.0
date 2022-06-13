@@ -11,8 +11,7 @@
 package com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dao;
 
 
-import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade001Dto;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade002Dto;
+import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,12 +28,12 @@ import java.util.Map;
 @Repository(value="serviceTrdStockTradeMapper")
 public interface TrdStockTradeMapper {
 
-    List<TrdStockTrade001Dto> selectDeal(Map<String, Object> paraMap);
+    List<TrdStockTradeDto> selectDeal(Map<String, Object> paraMap);
 
     int delBokDetailIdByTradeId(Map<String, Object> map);
 
     int querySequences();
 
-    TrdStockTrade002Dto queryTradeInfoByTradeId(String tradeId);
+    TrdStockTradeDto queryTradeInfoByTradeId(String tradeId);
 
 }

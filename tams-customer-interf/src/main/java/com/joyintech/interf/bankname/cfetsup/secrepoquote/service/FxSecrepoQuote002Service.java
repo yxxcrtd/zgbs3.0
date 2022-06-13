@@ -378,7 +378,9 @@ public class FxSecrepoQuote002Service extends BaseService<FxSecrepoQuote002Dto> 
                 //新增
                 fxSecrepoQuoteMapper.deleteByPrimaryKey(dto.getSeqno());
                 fxSecrepoQuoteDetailMapper.deleteByPseqNo(dto.getSeqno());
-            }else if(dto.getOperateType2().equalsIgnoreCase("3")){
+            }
+            // Sonar Fix modify by huwei 220607
+            /*else if(dto.getOperateType2().equalsIgnoreCase("3")){
                 // 回复报价
             }else if(dto.getOperateType2().equalsIgnoreCase("4")){
                 // 修改报价
@@ -386,7 +388,7 @@ public class FxSecrepoQuote002Service extends BaseService<FxSecrepoQuote002Dto> 
                 // 交谈报价
             }else if(dto.getOperateType2().equalsIgnoreCase("5")){
                 // 撤销报价
-            }
+            }*/
 
         }
     }

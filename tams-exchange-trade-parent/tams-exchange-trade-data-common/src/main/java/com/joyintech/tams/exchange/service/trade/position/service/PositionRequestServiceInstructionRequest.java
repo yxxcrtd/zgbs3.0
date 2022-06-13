@@ -14,6 +14,7 @@ import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
+import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import com.joyintech.tams.exchange.service.trade.management.service.EntrustManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.PortfolioManager;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 import static com.joyintech.tams.constant.DictCodeList.交易方向_行权_回售;
@@ -95,6 +97,8 @@ public class PositionRequestServiceInstructionRequest {
             this.repo002(entity, resultMap);
         } else if (INTERF_TYPE_STOCK001.equals(interType)) {
             this.stock001(entity, resultMap);
+        } else if (INTERF_TYPE_CERTIFICATE001.equals(interType)) {
+            this.certificate001(entity, resultMap);
         } else {
             return;
         }
@@ -115,8 +119,12 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(PURCH_MODLE, null);
         resultMap.put(FINPROD_ID, entity.getFinprodId());
         resultMap.put(B_TOTAL_TRADE_ID, null);
+        resultMap.put(SHARES_TRADE_PLATFORM, TradePlatUtils.trd2EtrTradePlat(entity));
 
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {
@@ -125,14 +133,15 @@ public class PositionRequestServiceInstructionRequest {
             List<Map<String, Object>> ptlList = new ArrayList<>(calculateSize);
             for (PortfolioCalculateResponse item : calculates) {
                 bean = new PositionRequestBaseBean(entity);
+                bean.setPortfolioId(item.getPortfolioId());
                 BigDecimal secAmount = commonPositionEngineService.getSecAmountByBondUnit(item.getEntrustNum());
                 bean.setSecAmount(secAmount);
+                BigDecimal price = Objects.isNull(entity.getFullPrice()) ? BigDecimal.ZERO : entity.getFullPrice();
                 if (交易方向_行权_回售.getValue().equals(entity.getPs())) {
-                    bean.setCashAmount(item.getEntrustAmt());
-                } else {
-                    BigDecimal fullPrice = Objects.isNull(entity.getFullPrice()) ? BigDecimal.ZERO : entity.getFullPrice();
-                    bean.setCashAmount(fullPrice.multiply(BigDecimal.valueOf(item.getEntrustNum())));
+                    price = entity.getEntrustPrice();
                 }
+                bean.setCashAmount(price.multiply(BigDecimal.valueOf(item.getEntrustNum())).setScale(2, RoundingMode.HALF_UP));
+
                 Map<String, Object> map = BeanUtil.object2Map(bean);
                 // 下单委托编号
                 map.put(ORD_ENTRUST_ID, entity.getEntrustNo());
@@ -158,8 +167,12 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(DELIVERY_TYPE, parseDeliveryType(entity));
         resultMap.put(SETTLE_SPEED, parseSettleSpreed(resultMap));
         resultMap.put(PURCH_MODLE, null);
+        resultMap.put(SHARES_TRADE_PLATFORM, TradePlatUtils.trd2EtrTradePlat(entity));
 
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {
@@ -171,7 +184,8 @@ public class PositionRequestServiceInstructionRequest {
                 bean = new PositionRequestBaseBean(entity);
                 bean.setPortfolioId(item.getPortfolioId());
                 bean.setFinprodId(null);
-                bean.setCashAmount(item.getEntrustAmt());
+                BigDecimal price = Objects.isNull(entity.getFullPrice()) ? BigDecimal.ZERO : entity.getFullPrice();
+                bean.setCashAmount(price.multiply(BigDecimal.valueOf(item.getEntrustNum())).setScale(2, RoundingMode.HALF_UP));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
                 list.add(map);
@@ -250,7 +264,10 @@ public class PositionRequestServiceInstructionRequest {
         // ETF申赎方式
         resultMap.put(ETFREDEMPTION_METHOD, null);
 
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {
@@ -261,7 +278,7 @@ public class PositionRequestServiceInstructionRequest {
             for (PortfolioCalculateResponse item : calculates) {
                 bean = new PositionRequestBaseBean(entity);
                 bean.setPortfolioId(item.getPortfolioId());
-                bean.setCashAmount(item.getEntrustAmt());
+                bean.setCashAmount(item.getEntrustAmt().setScale(2, RoundingMode.HALF_UP));
                 bean.setSecAmount(BigDecimal.valueOf(item.getEntrustNum()));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
@@ -290,7 +307,10 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(TOTAL_TRADE_ID, entity.getEntrustId());
 
         // 调用组合计算接口，获取分配信息
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {
@@ -311,16 +331,18 @@ public class PositionRequestServiceInstructionRequest {
                 // 标准券代码
                 map.put(STANDARD_SEC_ID, STANDAR_SEC_ID);
                 //指令券面总额
-                map.put(ETR_SEC_AMOUNT, item.getEntrustAmt());
+                map.put(ETR_SEC_AMOUNT, item.getEtrSecAmount());
                 if (交易方向_质押券入库.getValue().equals(entity.getPs())
                         || 交易方向_质押券出库.getValue().equals(entity.getPs())) {
-                    map.put("cashAmount", null);//出入库时，可以为空
+                    //出入库时，可以为空
+                    map.put("cashAmount", null);
                     Map<String, Object> params = new HashMap<>();
                     params.put("finprodId", entity.getFinprodId());
                     BigDecimal faceValue = etrTradeOtherCommonService.selectFaceValue(params);
                     // 标准券总额=质押券数量*折算率*最新面值
-                    BigDecimal standardSecAmount = item.getEntrustAmt().multiply(faceValue).divide(BigDecimal.valueOf(100));
-                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.setScale( 0, BigDecimal.ROUND_DOWN ).longValue()*100);//向下取整
+                    BigDecimal standardSecAmount = item.getEntrustAmt().multiply(faceValue);
+                    //向下取整
+                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.longValue());
                 } else {
                     // 标准券总额=标准券数量*100
                     map.put(STANDARD_SEC_AMOUNT, item.getEntrustNum() * 100);
@@ -468,7 +490,7 @@ public class PositionRequestServiceInstructionRequest {
                 || 交易方向_提前购回.getValue().equals(ps)
                 || 交易方向_到期续做.getValue().equals(ps)
                 || 交易方向_中途换券.getValue().equals(ps))
-                /*&& 交易方向_正回购.getValue().equals(firstRepoPs)*/) {
+            /*&& 交易方向_正回购.getValue().equals(firstRepoPs)*/) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             // 查询质押券集合
             InstructionPledge item = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
@@ -515,7 +537,10 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(SETTLE_SPEED, null);
 
         // 调用组合计算接口，获取分配信息
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {
@@ -526,7 +551,7 @@ public class PositionRequestServiceInstructionRequest {
             for (PortfolioCalculateResponse item : calculates) {
                 bean = new PositionRequestBaseBean(entity);
                 bean.setPortfolioId(item.getPortfolioId());
-                bean.setCashAmount(item.getEntrustAmt());
+                bean.setCashAmount(item.getEntrustAmt().setScale(2, RoundingMode.HALF_UP));
                 bean.setSecAmount(BigDecimal.valueOf(item.getEntrustNum()));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
@@ -557,6 +582,54 @@ public class PositionRequestServiceInstructionRequest {
             }
         }
 
+    }
+
+    /**
+     * 信息保护凭证-下单    certificate001
+     */
+    private void certificate001(PositionInstructionRequest entity, Map<String, Object> resultMap) {
+        resultMap.put(INTERFACE_TYPE, INTERF_TYPE_CERTIFICATE001);
+        // 清算速度
+        resultMap.put(SETTLE_SPEED, null);
+        //信用事件结算方式
+        resultMap.put("ceSettleType", null);
+
+        // 调用组合计算接口，获取分配信息
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
+        if (CollectionUtils.isNotEmpty(calculates)) {
+            int calculateSize = calculates.size();
+            PositionRequestBaseBean bean;
+
+            // 组合数据集
+            List<Map<String, Object>> ptlList = new ArrayList<>(calculateSize);
+            for (PortfolioCalculateResponse item : calculates) {
+                bean = new PositionRequestBaseBean(entity);
+                bean.setPortfolioId(item.getPortfolioId());
+                bean.setCashAmount(item.getEntrustAmt());
+                bean.setSecAmount(BigDecimal.valueOf(item.getEntrustNum()));
+
+                Map<String, Object> map = BeanUtil.object2Map(bean);
+                map.put("etrSecAmount", item.getInstructionTotalAmt());
+                ptlList.add(map);
+            }
+            resultMap.put(PTL_LIST, ptlList);
+
+            // 组合附属数据集（交付物债券）	ptlSubList
+//            List<Map<String, Object>> ptlSubList = new ArrayList<>(calculateSize);
+//            for (PortfolioCalculateResponse item : calculates) {
+//                Map<String, Object> map = Maps.newHashMap();
+//                map.put("portfolioId", null);
+//                map.put("finprodId", null);
+//                map.put("tradeId", null);
+//                map.put("secAcctId", null);
+//                map.put("secAmount", null);
+//                ptlSubList.add(map);
+//            }
+            resultMap.put("ptlSubList", Lists.newArrayList());
+        }
     }
 
     /**
@@ -638,13 +711,14 @@ public class PositionRequestServiceInstructionRequest {
      * @param entity 下单对象
      * @return 组合计算信息
      */
-    private List<PortfolioCalculateResponse> getCalculateList(Instruction entity) {
+    private List<PortfolioCalculateResponse> getCalculateList(PositionInstructionRequest entity) {
         // 组装下单对象
         OrderPlaceBean orderPlaceBean = new OrderPlaceBean();
         orderPlaceBean.setEntrustPrice(entity.getEntrustPrice());
         orderPlaceBean.setEntrustVolume(entity.getEntrustNum());
         orderPlaceBean.setInstructionId(entity.getEntrustId());
         orderPlaceBean.setFullPrice(entity.getFullPrice());
+        orderPlaceBean.setEntrustProp(entity.getEntrustProp());
 
         // 调用组合计算接口，得出各组合分配到的数量金额
         ResultBean resultBean = portfolioManager.queryPortfolioCalculate(orderPlaceBean, false);

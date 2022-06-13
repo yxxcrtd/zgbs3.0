@@ -306,6 +306,36 @@
 								class="layui-input form-input text-number" data-textrange="4" />
 						</div>-->
 					</div>
+
+					<div class="layui-form-item">
+
+						<div class="form-inline-wrap" id='holdingMaxDiv'>
+							<label class="layui-form-label form-label-wrap"
+								   data-th-text="#{BussFinProductSaleParam.singleInvestorholdingMax}">单一投资者持有上限%</label>
+							<div class="layui-input-inline input-inline">
+								<input type="text" th:id="|${entityName}_singleInvestorholdingMax|"
+									   th:name="|${entityName}.singleInvestorholdingMax|"
+									   data-th-value="${entity?.singleInvestorholdingMax?:49}"
+									   placeholder="请输入0-100间数值"
+									   class="layui-input form-input input-text" data-textrange="2"
+									   onblur="if(!/^(\d{1,2}(\.\d+)?|100)$/.test(this.value))$(this).val('').trigger('change')" required/>
+							</div>
+						</div>
+
+						<div class="form-inline-wrap" id='isFaceSingleInvestorDiv' style="display:none;">
+							<label class="layui-form-label form-label-wrap"
+								   data-th-text="#{BussFinProductSaleParam.isFaceSingleInvestor}">是否面向单一投资者</label>
+							<div class="layui-input-inline input-inline">
+								<select th:id="|${entityName}_isFaceSingleInvestor|"
+										th:name="|${entityName}.isFaceSingleInvestor|"
+										class="layui-input form-input input-select"
+										th:initValue="${entity?.isFaceSingleInvestor}"
+										data-th-data-result="${YES_OR_NO}"
+										data-th-placeholder="#{SysCommon.placeholder}" required>
+								</select>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -316,6 +346,7 @@
 		var dealMode=/*[[${dealMode}]]*/'';//传过来的父页面的id
 		var profitType=/*[[${profitType}]]*/'';//传过来的父页面的id
 		var operationType=/*[[${operationType}]]*/'';//传过来的父页面的id
+		var YES_OR_NO_N = /*[[${YES_OR_NO_N}]]*/'';
 		
 	</script>
 	<script

@@ -17,14 +17,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.joyintech.tams.common.base.entity.BokStatDetPosiiton;
-import com.joyintech.tams.common.base.entity.TrdAssetLoss;
 import com.joyintech.tams.constant.DictCodeListExt3;import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.*;
 import com.joyintech.tams.valuation.common.dao.BaseCommonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1274,15 +1269,15 @@ public class FinProductCommonBatchService {
             // 特殊资产方案有值的情况
             if (specialDto != null) {
                 // 参数.投资目的 == 'AC'
-                if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(specialDto.getInvAim())) {
+                if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(specialDto.getInvAim())) {
                     // 变量.市价净价 = 0;
                     // marketPrice = BigDecimal.ZERO;
                     marketPriceDto.setPrice(BigDecimal.ZERO);
                     marketPriceDto.setPreCheckFlag(true);
                 }
                 // 参数.投资目的 = “FVTPL” || （参数.投资目的 = “FVOCI”)
-                else if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim)
-                        || DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)) {
+                else if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(invAim)
+                        || DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(invAim)) {
                     // 估值方法为成本法
                     if (DictCodeListExt1.估值方法_成本法.getValue().equals(specialDto.getValuationMethod())
                             || DictCodeListExt1.估值方法_摊余成本法.getValue().equals(specialDto.getValuationMethod())) {
@@ -1336,15 +1331,15 @@ public class FinProductCommonBatchService {
 
         // 5.2 根据估值方案取对应市价
         // 参数.投资目的 == 'AC'
-        if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(invAim)) {
+        if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(invAim)) {
             // 变量.市价净价 = 0;
             // marketPrice = BigDecimal.ZERO;
             marketPriceDto.setPrice(BigDecimal.ZERO);
             marketPriceDto.setPreCheckFlag(true);
         }
         // 参数.投资目的 = “FVTPL” || （参数.投资目的 = “FVOCI”)
-        else if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim)
-                || DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)) {
+        else if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(invAim)
+                || DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(invAim)) {
             // 估值方法为成本法
             if (DictCodeListExt1.估值方法_成本法.getValue().equals(schemeDetailDto.getValuationMethod())
                     || DictCodeListExt1.估值方法_摊余成本法.getValue().equals(schemeDetailDto.getValuationMethod())) {

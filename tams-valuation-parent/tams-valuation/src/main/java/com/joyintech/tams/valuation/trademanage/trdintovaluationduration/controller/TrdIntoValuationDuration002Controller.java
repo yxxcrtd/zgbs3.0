@@ -13,14 +13,18 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.RequestUtil;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.service.TrdIntoValuationDuration002Service;
+import com.joyintech.workflow.engine.dto.ProcessParameter;
+import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,59 +35,70 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
- * 存款类存续期新建
+ * 融入券存续期新建
  */
 @Controller
 @PageId("TrdIntoValuationDuration002")
 @RequestMapping("/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration002")
 public class TrdIntoValuationDuration002Controller extends BaseController {
-
     /**
-     * 注入质押式回购交易Service
+     * 注入融入券存续期ervice
      */
     @Autowired
     private TrdIntoValuationDuration002Service trdIntoValuationDuration002Service;
 
-
     @Autowired(required = false)
     private CommonBusinessService commonBusinessService;
 
-
-
     public String init(Model model) {
         this.setSelectOptionToModel(model,DictCode.交易方向,DictCode.交易场所,
-            DictCode.有效状态, DictCode.币种);// 新增资产二、三、四级分类 王贵奇 2019/8/1
-        // 一体化对应etliu start
-        model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
-        model.addAttribute("PS_T02", DictCodeList.交易方向_卖出.getValue());
-        // 一体化对应etliu end
+            DictCode.有效状态, DictCode.币种);
 
-        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
-        model.addAttribute("FINPROD_TYPE_F07", DictCodeListExt1.金融产品类型_存款.getValue());
-        String portfolioId = getParam("portfolioId");
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
+
         String tradeId = getParam("tradeId");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
         if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
             TrdIntoValuationDuration001Dto entity = trdIntoValuationDuration002Service.getBussinessEntityByWorkflowId(
                     workflowId);
+            if(!StringUtil.isNotEmpty(entity.getTradeId())){
+                entity.setTradeId("提交后自动生成，无需填写");
+            }
             model.addAttribute("entity",entity);
             model.addAttribute("workflowId", workflowId);
-            model.addAttribute("tradeId", entity.getTradeId());
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdIntoValuationDuration001Dto entity = trdIntoValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
-            model.addAttribute("entity", entity);
-        }else{
-            //初始化值
-            TrdIntoValuationDuration001Dto entity = new TrdIntoValuationDuration001Dto();
-//            entity.setOtherAmt(new BigDecimal("0.00"));   //其他费用
-            entity.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            Map<String, Object> map = new HashMap<>();
+            map.put("tradeId",tradeId);
+            map.put("busiType",DictCodeList.业务类型_债券借贷标的债券交易.getValue());
+            TrdIntoValuationDuration001Dto entity = trdIntoValuationDuration002Service.queryTradeInfoByTradeId(map);
             model.addAttribute("entity", entity);
         }
-//        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
+
         return super.init(model);
 
+    }
+
+    /**
+     * 资金账户下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getTrdAcctId")
+    public List<SelectOptionDto> getTrdAcctId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("portfolioId",param.get("finprodId"));
+        return commonBusinessService.getTrdAcctId(param);
     }
 
     /**
@@ -102,7 +117,42 @@ public class TrdIntoValuationDuration002Controller extends BaseController {
     }
 
 
+    /**
+     * @Description:保存
+     * @date: 2021/12/30
+     * @param:
+     * @return:
+     */
+    @ResponseBody
+    @RequestMapping("save")
+    public AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdIntoValuationDuration001Dto dto, BindingResult br) throws Exception {
+        if (br.hasErrors()) {
+            return new AjaxResult(br);
+        }
+        WorkFlowParameter<TrdIntoValuationDuration001Dto> params = new WorkFlowParameter<TrdIntoValuationDuration001Dto>();
+        params.setPageId(this.getPageId());
+        params.setElementId(dto.getElementId());
 
+        //设置主键
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            //新建初始化交易编号
+//            dto.setTradeId(trdIntoValuationDuration002Service.createPlanTradeId());
+//        }
 
+        params.setBusinessCode(dto.getSecId());  //资产代码
+        params.setBusinessType(DictCodeListExt3.共通业务类型_融入券存续期.getValue());
+        // 设置流程业务说明, entity即传入的dto
+        params.setComment(
+                entity -> SpringContextUtil.getTextValue("资产代码")+"("+ entity.getSecId() +")"+"-"+SpringContextUtil.getTextValue("交易日期") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+        );
+        //给参数变成ProcessParameter而非WorkFlowParameter
+        ProcessParameter<TrdIntoValuationDuration001Dto> parameter = new ProcessParameter<TrdIntoValuationDuration001Dto>();
+        parameter.setWorkFlowParameter(params);
+        //系统页面表IS_NEED_WORKFLOW 是否走流程，01-是，02-否
+        String msg = trdIntoValuationDuration002Service.start(parameter, dto);
+        return new AjaxResult(msg);
+    }
 
 }

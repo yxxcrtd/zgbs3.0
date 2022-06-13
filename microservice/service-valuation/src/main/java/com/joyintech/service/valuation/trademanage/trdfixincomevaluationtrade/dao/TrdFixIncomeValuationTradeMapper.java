@@ -10,15 +10,12 @@
  
 package com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
-import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import com.joyintech.framework.select.SelectOptionDto;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -31,39 +28,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 @Repository(value="serviceTrdFixIncomeValuationTradeMapper")
 public interface TrdFixIncomeValuationTradeMapper {
 
-	/**
-	 * 产品代码下拉框
-	 * @auther: yuzj
-	 * @date: 2021/12/29
-	 * @param:
-	 * @return:
-	 */
-	List<SelectOptionDto> findPortfolioId(Map<String, Object> params);
-
-
-	/**
-	 * 资产代码下拉框
-	 * @auther: yuzj
-	 * @date: 2021/12/29
-	 * @param:
-	 * @return:
-	 */
-	List<SelectOptionDto> findFinprodId(Map<String, Object> params);
-
-
-    List<TrdFixIncomeValuationTradeDto> select(Map<String, Object> key);
-
-    Integer  selectCountByTradeId(@Param("tradeId") String tradeId);
-
-
-    /**
-     * 获取自增序列值
-     * @param sequenceName 序列名
-     * @return
-     */
-    String getNextId(@Param("sequenceName") String sequenceName);
-
-	TrdFixIncomeValuationTradeDto queryTradeInfoByTradeId(String tradeId);
+	TrdFixIncomeValuationTradeDto queryTradeInfoByTradeId(Map<String, Object> param);
 
 	/**
 	 * 检索债券交易列表
@@ -74,7 +39,5 @@ public interface TrdFixIncomeValuationTradeMapper {
 	 * @since 1.0
 	 */
 	List<TrdFixIncomeValuationTradeDto> selectDeal(Map<String, Object> paraMap);
-
-
 
 }

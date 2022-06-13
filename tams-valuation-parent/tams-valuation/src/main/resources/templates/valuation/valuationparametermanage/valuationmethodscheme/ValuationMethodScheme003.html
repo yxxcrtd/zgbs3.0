@@ -41,7 +41,7 @@
                     <div class="layui-input-inline input-inline">
                         <select id="tradeMarket" name="tradeMarket" class="layui-input form-input  input-select"
                             allowClear="true" placeholder="请输入" data-th-data-result="${VALUATION_TRADE_MARKET}"
-                            data-th-initvalue="${entity?.tradeMarket}" parentIds="secType" data-th-required="true"
+                            data-th-initvalue="${entity?.tradeMarket}" parentIds="secType"
                             data-th-data-url="@{/valuation/valuationparametermanage/valuationmethodscheme/ValuationMethodScheme003/getTradeMarket}" >
                         </select>
                     </div>
@@ -91,6 +91,18 @@
                             data-th-data-url="@{/valuation/valuationparametermanage/valuationmethodscheme/ValuationMethodScheme003/getValuationMethod}">
                             <option></option>
                         </select>
+                    </div>
+                </div>
+                <div class="layui-inline layui-col-md6" id="c_valuationId" style="display: none">
+                    <label class="layui-form-label form-lable-wrap">估值模型</label>
+                    <div class="layui-input-inline input-inline">
+                        <div class="layui-input-inline input-inline">
+                            <select id="valuationId" name="valuationId" class="layui-input form-input input-select"
+                                    allowClear="true" placeholder="请输入" data-th-data-result="${VALMODEL_ID}"data-th-required="true"
+                                    data-th-initvalue="${entity?.valuationId}"parentIds="secType">
+                                <option></option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -161,6 +173,8 @@
                             data-th-value="${entity?.vdate}">
                     </div>
                 </div>
+
+
             </div>
              <div class="layui-row" style="margin: 50px;">
                 <div class="text-center">

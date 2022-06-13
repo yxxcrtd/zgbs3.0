@@ -92,6 +92,19 @@ public class TrdOutRightRepoValuationTrade001Dto extends WflTrdProductDeal imple
     private Date mdate;
 
     /**
+     * 资金到账日
+     */
+    private Date settleDate;
+
+    public Date getSettleDate() {
+        return settleDate;
+    }
+
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
+    }
+
+    /**
      * 券面总额  万元
      */
     private BigDecimal prinAmt;
@@ -157,6 +170,11 @@ public class TrdOutRightRepoValuationTrade001Dto extends WflTrdProductDeal imple
      * elementId
      */
     private String elementId;
+
+    /**
+     * 到期标识 （用于识别是否做过到期交易）
+     */
+    private String dealFlag;
 
     /**
      * 买断式回购交易实体类
@@ -435,5 +453,26 @@ public class TrdOutRightRepoValuationTrade001Dto extends WflTrdProductDeal imple
             tradeDateStr=DateUtil.format(getTradeDate());
         }
         return tradeDateStr;
+    }
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getDealFlag() {
+        return dealFlag;
+    }
+
+    public void setDealFlag(String dealFlag) {
+        this.dealFlag = dealFlag;
     }
 }

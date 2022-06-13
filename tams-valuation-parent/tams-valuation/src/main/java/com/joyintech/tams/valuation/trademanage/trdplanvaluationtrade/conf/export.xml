@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook filePath="trademanage/trdplanvaluationtrade/TrdPlanValuationTrade001.xlsx" name="计划类资产交易导出">
+	<Worksheet javaBean="com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto">
+		<Row>
+			<Cell order="1" name="交易编号">tradeId</Cell>
+			<Cell order="2" name="外部成交编号">outTradeId</Cell>
+			<Cell order="3" name="产品代码">prodId</Cell>
+			<Cell order="4" name="产品名称">prodName</Cell>
+			<Cell order="5" name="资产代码">assetId</Cell>
+			<Cell order="6" name="资产名称">assetAbbr</Cell>
+			<Cell order="7" name="交易类型">psStr</Cell>
+			<Cell order="8" name="交易日期">tradeDateStr</Cell>
+			<Cell order="9" name="结算日期">settleDateStr</Cell>
+			<Cell order="10" name="交易金额">tradeAmtStr</Cell>
+			<Cell order="11" name="交易数量">dealNumStr</Cell>
+			<Cell order="12" name="币种">ccyFmt</Cell>
+			<Cell order="13" name="资金账户">trdMyAcctNo</Cell>
+			<Cell order="14" name="数据来源">dataSourceStr</Cell>
+		</Row>
+	</Worksheet>
+</Workbook>

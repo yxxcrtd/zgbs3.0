@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorator="~{layout/default}">
 <head>
-    <title th:text="#{TrdIRSValuationTrade002}">债券借贷交易</title>
+    <title th:text="#{TrdIRSValuationTrade002}">利率互换交易新建</title>
 </head>
 <body>
 <div layout:fragment="content">
@@ -31,7 +31,8 @@
                         <div class="pro-module-item">
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable">产品代码</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdIRSValuationTrade002.prodId}">产品代码</label>
                                         <div class="layui-input-inline input-inline" >
                                             <select id="prodId" name="prodId" required
                                                     class="layui-input form-input input-select"
@@ -43,7 +44,8 @@
                                         </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap">产品名称</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdIRSValuationTrade002.prodName}">产品名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="prodName" name="prodName" required disabled
                                                 class="layui-input form-input" placeholder="请输入内容"
@@ -52,9 +54,10 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap" >交易类型</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdIRSValuationTrade002.ps}">交易类型</label>
                                     <div class="layui-input-inline input-inline">
-                                            <select type="text" id="ps" name="ps"
+                                            <select type="text" id="ps" name="ps" required
                                                     class="layui-input form-input input-select"
                                                     allowClear="true" placeholder="请输入内容"
                                                     data-th-data-result='${IRS_TYPE}'
@@ -65,7 +68,8 @@
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable">交易编号</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdIRSValuationTrade002.tradeId}">交易编号</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="tradeId" name="tradeId"
                                                required disabled
@@ -75,7 +79,8 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable">外部成交编号</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdIRSValuationTrade002.outTradeId}">外部成交编号</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="outTradeId" name="outTradeId"
                                                class="layui-input form-input"
@@ -83,36 +88,40 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable" >交易日</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdIRSValuationTrade002.tradeDate}">交易日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="tradeDate" name="tradeDate" required
                                                class="layui-input form-input input-dateSelect" placeholder="请输入内容"
                                                data-th-placeholder="#{SysCommon.placeholder}"
-                                               data-th-value="${entity?.tradeDate}">
+                                               data-th-value='${#dates.format(entity?.tradeDate,"yyyy-MM-dd")}'>
                                     </div>
                                 </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable" >起息日</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdIRSValuationTrade002.vdate}">起息日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="vdate" name="vdate" required
                                                class="layui-input form-input input-dateSelect" placeholder="请输入内容"
                                                data-th-placeholder="#{SysCommon.placeholder}"
-                                               data-th-value="${entity?.vdate}">
+                                               data-th-value='${#dates.format(entity?.vdate,"yyyy-MM-dd")}'>
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable" >到期日</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdIRSValuationTrade002.mdate}">到期日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="mdate" name="mdate" required
                                                class="layui-input form-input input-dateSelect" placeholder="请输入内容"
                                                data-th-placeholder="#{SysCommon.placeholder}"
-                                               data-th-value="${entity?.mdate}">
+                                               data-th-value='${#dates.format(entity?.mdate,"yyyy-MM-dd")}'>
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap">名义本金</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdIRSValuationTrade002.prin}">名义本金</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="prin" name="prin" required
                                                placeholder="请输入内容"  data-pattern="" data-textrange="2" maxLength="30"
@@ -123,7 +132,8 @@
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap">币种</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdIRSValuationTrade002.ccy}">币种</label>
                                     <div class="layui-input-inline input-inline">
                                         <select  type="text" id="ccy" name="ccy" required
                                                  class="layui-input form-input input-select"
@@ -147,7 +157,8 @@
                     <div class="pro-module-item">
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">固定利率%</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.yield}">固定利率%</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="yield" name="yield" required
                                            placeholder="请输入内容"  data-pattern="" data-textrange="4" maxLength="30"
@@ -157,7 +168,8 @@
                             </div>
 
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">计息基础</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.fixBasis}">计息基础</label>
                                 <div class="layui-input-inline input-inline">
                                     <select type="text" id="fixBasis" name="fixBasis" required="required"
                                             class="layui-input form-input input-select"
@@ -170,7 +182,8 @@
                             </div>
 
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">付息频率</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.fixPayCycle}">付息频率</label>
                                 <div class="layui-input-inline input-inline">
                                     <select type="text" id="fixPayCycle" name="fixPayCycle" required="required"
                                             class="layui-input form-input input-select" placeholder="请输入内容"
@@ -181,7 +194,8 @@
                         </div>
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">首期起息日</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.firstPayDateR}">首期起息日</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="firstPayDateR" name="firstPayDateR" required
                                            class="layui-input form-input input-dateSelect" placeholder="请输入日期"
@@ -200,7 +214,8 @@
                     <div class="pro-module-item">
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">挂钩利率</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.intType}">挂钩利率</label>
                                 <div class="layui-input-inline input-inline">
                                     <select type="text" id="intType" name="intType" required="required"
                                             class="layui-input form-input input-select" placeholder="请输入内容"
@@ -209,7 +224,8 @@
                                 </div>
                             </div>
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">利差(BP)</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.spreadRate}">利差(BP)</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="spreadRate" name="spreadRate" required
                                            placeholder="请输入内容"  data-pattern="" data-textrange="4" maxLength="30"
@@ -218,7 +234,8 @@
                                 </div>
                             </div>
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">计息基础</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.floatBasis}">计息基础</label>
                                 <div class="layui-input-inline input-inline">
                                     <select type="text" id="floatBasis" name="floatBasis" required="required"
                                             class="layui-input form-input input-select" placeholder="请输入内容"
@@ -230,7 +247,8 @@
 
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">付息频率</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.floatPayCycle}">付息频率</label>
                                 <div class="layui-input-inline input-inline">
                                     <select type="text" id="floatPayCycle" name="floatPayCycle" required="required"
                                             class="layui-input form-input input-select" placeholder="请输入内容"
@@ -239,14 +257,16 @@
                                 </div>
                             </div>
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">首期起息日</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.firstPayDateF}">首期起息日</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="firstPayDateF" name="firstPayDateF" required class="layui-input form-input input-dateSelect" placeholder="请输入日期"
                                            data-th-value='${#dates.format(entity?.firstPayDateF,"yyyy-MM-dd")}'/>
                                 </div>
                             </div>
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">首期利率确定日</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.firstResetDate}">首期利率确定日</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="firstResetDate" name="firstResetDate" required class="layui-input form-input input-dateSelect" placeholder="请输入日期"
                                            data-th-value='${#dates.format(entity?.firstResetDate,"yyyy-MM-dd")}'/>
@@ -256,7 +276,8 @@
 
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">利率重置频率</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.resetFreq}">利率重置频率</label>
                                 <div class="layui-input-inline input-inline">
                                     <select type="text" id="resetFreq" name="resetFreq" required="required"
                                             class="layui-input form-input input-select" placeholder="请输入内容"
@@ -278,7 +299,8 @@
                         <div class="pro-module-item">
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap" >
-                                    <label class="layui-form-label form-label-wrap">交易手续费</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdIRSValuationTrade002.dealFeeAmt}">交易手续费</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="dealFeeAmt" name="dealFeeAmt" required
                                                 class="layui-input form-input text-number" placeholder="请输入内容"
@@ -287,7 +309,8 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap" >
-                                    <label class="layui-form-label form-label-wrap">结算服务费</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdIRSValuationTrade002.stlFeeAmt}">结算服务费</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="stlFeeAmt" name="stlFeeAmt" required
                                                 class="layui-input form-input text-number" placeholder="请输入内容"
@@ -307,7 +330,8 @@
                     <div class="pro-module-item">
                         <div class="layui-form-item">
                             <div class="form-inline-wrap" >
-                                <label class="layui-form-label form-label-wrap">结算金额</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.settleAmt}">结算金额</label>
                                 <div class="layui-input-inline input-inline">
                                     <input  type="text" id="settleAmt" name="settleAmt" required
                                             class="layui-input form-input text-number" placeholder="请输入内容"
@@ -316,9 +340,10 @@
                                 </div>
                             </div>
                             <div class="form-inline-wrap" >
-                                <label class="layui-form-label form-label-wrap">资金账户</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdIRSValuationTrade002.acctNo}">资金账户</label>
                                 <div class="layui-input-inline input-inline" >
-                                    <select id="acctNo" name="acctNo" required parentIds="prodId"
+                                    <select id="acctNo" name="acctNo" required
                                             class="layui-input form-input input-select"
                                             data-th-data-url="@{/valuation/trademanage/bondlend/TrdBondLendTrade002/getTrdAcctId}"
                                             allowClear="true" placeholder="请输入内容"

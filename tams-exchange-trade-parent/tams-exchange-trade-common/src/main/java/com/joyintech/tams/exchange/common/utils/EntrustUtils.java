@@ -3,16 +3,19 @@ package com.joyintech.tams.exchange.common.utils;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.enums.DeliveryMethodEnum;
 import com.joyintech.tams.exchange.common.enums.ETFTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
@@ -270,8 +273,17 @@ public class EntrustUtils {
         } else if (bsFlag.equals(BSFlag.ZYJCJSBMR.value) || bsFlag.equals(BSFlag.ZYJCJSBMC.value)
                 || bsFlag.equals(BSFlag.ZYJCJSBMR.kdValue) || bsFlag.equals(BSFlag.ZYJCJSBMC.kdValue)) {
             return EntrustProp.SH_FIXEDINCOME_ZYJCJSB.value;
-        } else if ("9B".equals(bsFlag) || "9S".equals(bsFlag)) // 针对平安质押式回购：正回购为9B，逆回购为9S
+        } else if ("9B".equals(bsFlag) || "9S".equals(bsFlag)) { // 针对平安质押式回购：正回购为9B，逆回购为9S
             return EntrustProp.NORMAL.value;
+        } else if (bsFlag.equals(BSFlag.PPCJMR.value) || bsFlag.equals(BSFlag.PPCJMC.value)) {
+            return EntrustProp.NORMAL.value;
+        } else if (bsFlag.equals(BSFlag.XSCJSBMR.value) || bsFlag.equals(BSFlag.XSCJSBMC.value)) {
+            return EntrustProp.SZ_XSCJ_XD.value;
+        } else if (bsFlag.equals(BSFlag.XSCJHFJSMR.value) || bsFlag.equals(BSFlag.XSCJHFJSMC.value)) {
+            return EntrustProp.SZ_XSCJ_JS.value;
+        } else if (bsFlag.equals(BSFlag.XSCJHFJJMR.value) || bsFlag.equals(BSFlag.XSCJHFJJMC.value)) {
+            return EntrustProp.SZ_XSCJ_JJ.value;
+        }
         return EntrustProp.NORMAL.value;
     }
 
@@ -378,6 +390,18 @@ public class EntrustUtils {
             return BSFlag.PHDJDZMR.value;
         } else if (entrustProp.equals(EntrustProp.LARGE_AFTER_CLOSING_WEIGHT_PRICE.value) && entrustBs.equals(EntrustBs.SELL.value)) {
             return BSFlag.PHDJDZMC.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_XD.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+            return BSFlag.XSCJSBMR.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_XD.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+            return BSFlag.XSCJSBMC.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JS.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+            return BSFlag.XSCJHFJSMR.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JS.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+            return BSFlag.XSCJHFJSMC.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JJ.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+            return BSFlag.XSCJHFJJMR.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JJ.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+            return BSFlag.XSCJHFJJMC.value;
         }
         return BSFlag.ZQMR.value;
     }
@@ -437,8 +461,14 @@ public class EntrustUtils {
             return getBsFlagForETF(entrustBs, deliveryMethod, instrument.getMarket(), instrument.getEtfType());
         }
         if (entrustProp.equals(EntrustProp.NORMAL.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+            if (InvestAssetTypeEnum.isBond(assetType) && !Objects.isNull(instrument) && !"B14".equals(instrument.getAssetType1())) {
+                return BSFlag.PPCJMR.value;
+            }
             return BSFlag.ZQMR.value;
         } else if (entrustProp.equals(EntrustProp.NORMAL.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+            if (InvestAssetTypeEnum.isBond(assetType) && !Objects.isNull(instrument) && !"B14".equals(instrument.getAssetType1())) {
+                return BSFlag.PPCJMC.value;
+            }
             return BSFlag.ZQMC.value;
         } else if (entrustProp.equals(EntrustProp.IMMEDIATE_TO_CANCEL.value) && entrustBs.equals(EntrustBs.BUY.value)) {
             return BSFlag.JSMR.value;
@@ -479,7 +509,7 @@ public class EntrustUtils {
             // 申购，区分 股债基
             // 上海：基金认购
         } else if (entrustProp.equals(EntrustProp.APPLY.value) && entrustBs.equals(EntrustBs.BUY.value)) {
-            if (assetType.equals(InvestmentAssetType.FUND.value)) {
+            if (assetType.equals(InvestAssetTypeEnum.FUND.value)) {
                 return BSFlag.JJRG.value;
             }
             return BSFlag.DJSG.value;
@@ -515,13 +545,13 @@ public class EntrustUtils {
 
     // 判断是否可以做公平交易
     public static boolean allowFairOrder(Instruction instruction) {
-        return TradePlat.NORMAL.value.equals(instruction.getTradePlat())
-                && (
-                DictCodeListExt2.交易方向_买入.getValue().equals(instruction.getPs())
-                        || DictCodeListExt2.交易方向_卖出.getValue().equals(instruction.getPs())
-                        || DictCodeListExt2.交易方向_正回购.getValue().equals(instruction.getPs())
-                        || DictCodeListExt2.交易方向_逆回购.getValue().equals(instruction.getPs())
-        );
+        return (TradePlat.NORMAL.value.equals(instruction.getTradePlat())
+                || TradePlat.NEW_BOND.value.equals(instruction.getTradePlat()))
+                && (DictCodeListExt2.交易方向_买入.getValue().equals(instruction.getPs())
+                || DictCodeListExt2.交易方向_卖出.getValue().equals(instruction.getPs())
+                || DictCodeListExt2.交易方向_正回购.getValue().equals(instruction.getPs())
+                || DictCodeListExt2.交易方向_逆回购.getValue().equals(instruction.getPs()))
+                && !StringUtil.equals(instruction.getPriceMode(), InstructionPriceMode.LARGE_AFTER_CLOSING_PRICE.value);
     }
 
     /**
@@ -555,7 +585,8 @@ public class EntrustUtils {
 
     // 是否为数量指令
     public static boolean isVolume(Instruction instruction) {
-        return instruction.getEntrustNum() > 0;
+//        return instruction.getEntrustNum() > 0;
+        return instruction.volumeInstruction();
     }
 
     // 是否为金额指令
@@ -565,38 +596,38 @@ public class EntrustUtils {
 
     // 是否为股票指令
     public static boolean isStock(Instruction instruction) {
-        return InvestmentAssetType.STOCK.value.equals(instruction.getAssetType());
+        return InvestAssetTypeEnum.STOCK.value.equals(instruction.getAssetType());
     }
 
     // 是否为债券指令
     public static boolean isBond(Instruction instruction) {
-        return InvestmentAssetType.BOND.value.equals(instruction.getAssetType());
+        return InvestAssetTypeEnum.BOND.value.equals(instruction.getAssetType());
     }
 
     // 是否为基金指令
     public static boolean isFund(Instruction instruction) {
-        return InvestmentAssetType.FUND.value.equals(instruction.getAssetType());
+        return InvestAssetTypeEnum.FUND.value.equals(instruction.getAssetType());
     }
 
     // 是否为期货指令
     public static boolean isFutures(Instruction instruction) {
-        return InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType());
+        return InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType());
     }
 
     // 是否为质押式回购指令
     public static boolean isPledgeRepurchase(Instruction instruction) {
-        return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType());
+        return InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType());
     }
 
     // 是否为质押式竞价回购指令
     public static boolean isPledgeAuctionRepurchase(Instruction instruction) {
-        return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
+        return InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
                 && InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1());
     }
 
     // 是否为质押式协议回购指令
     public static boolean isPledgegreementRepurchase(Instruction instruction) {
-        return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
+        return InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
                 && InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1());
     }
 
@@ -645,7 +676,7 @@ public class EntrustUtils {
 
     // 判断是否是回购
     public static boolean isRepurchase(String entrustProp, String assetType) {
-        return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)
+        return InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType)
                 || IntegratedEntrustUtils.isProtocolBack_SH(entrustProp)
                 || IntegratedEntrustUtils.isProtocolBack_SZ(entrustProp);
     }
@@ -688,7 +719,7 @@ public class EntrustUtils {
         if (!StringUtils.isNumeric(StockCodeUtils.getStockCode(stock_code))) {
             return false;
         }
-        if (!Strings.isNullOrEmpty(instructionAssetType) && !InvestmentAssetType.BOND.value.equals(instructionAssetType)) {
+        if (!Strings.isNullOrEmpty(instructionAssetType) && !InvestAssetTypeEnum.BOND.value.equals(instructionAssetType)) {
             return false;
         }
         int stockCode = Integer.parseInt(StockCodeUtils.getStockCode(stock_code));
@@ -731,7 +762,7 @@ public class EntrustUtils {
     }
 
     public static boolean isFullPriceTerminal(String market, String stock_code, String instructionAssetType, String entrustProp) {
-        if (!Strings.isNullOrEmpty(instructionAssetType) && !InvestmentAssetType.BOND.value.equals(instructionAssetType)) {
+        if (!Strings.isNullOrEmpty(instructionAssetType) && !InvestAssetTypeEnum.BOND.value.equals(instructionAssetType)) {
             return false;
         }
         if (!EntrustUtils.isEntrustPropFullPrice(entrustProp)) {
@@ -788,7 +819,7 @@ public class EntrustUtils {
         if (!Strings.isNullOrEmpty(isFullPrice)) {
             return FullPriceConst.FULL_PRICE.value.equals(isFullPrice);
         }
-        if (!Strings.isNullOrEmpty(instructionAssetType) && !InvestmentAssetType.BOND.value.equals(instructionAssetType)) {
+        if (!Strings.isNullOrEmpty(instructionAssetType) && !InvestAssetTypeEnum.BOND.value.equals(instructionAssetType)) {
             return false;
         }
         if (!EntrustUtils.isEntrustPropFullPrice(entrustProp)) {
@@ -799,7 +830,7 @@ public class EntrustUtils {
 
     //判断是否是上海债券，单位为手（1手=10张）
     public static boolean isSHZQ(String market, String instructionAssetType, String stock_code) {
-        if (!Strings.isNullOrEmpty(instructionAssetType) && !InvestmentAssetType.BOND.value.equals(instructionAssetType)) {
+        if (!Strings.isNullOrEmpty(instructionAssetType) && !InvestAssetTypeEnum.BOND.value.equals(instructionAssetType)) {
             return false;
         }
         if (!StringUtils.isNumeric(StockCodeUtils.getStockCode(stock_code))) {
@@ -879,7 +910,7 @@ public class EntrustUtils {
 
     //需要进行持仓检查的业务
     public static boolean needPositionCheck(String entrustProp, String assetType) {
-        return EntrustProp.isSplitEntrust(entrustProp) && !InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType);
+        return EntrustProp.isSplitEntrust(entrustProp) && !InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType);
     }
 
     public static boolean isSettleTrade(String tradePlat, String entrustProp) {
@@ -912,5 +943,100 @@ public class EntrustUtils {
             return code;
         }
         return entrustProp.getName();
+    }
+
+    /**
+     * 判断是否信用保护凭证
+     */
+    public static boolean isCreditProtectionCertificate(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否支持零碎股交易
+     */
+    public static boolean isOddLotsTrade(String busiTypeTg, String entrustProp) {
+        //竞价交易
+        if (isNormalTrade(busiTypeTg)) {
+            return true;
+        }
+        //现券交易-匹配成交
+        if (isNewBond(busiTypeTg) && StringUtil.equals(EntrustProp.NORMAL.value, entrustProp)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否新债业务
+     */
+    public static boolean isNewBond(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_现券交易.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否通用质押式回购
+     */
+    public static boolean isRepurchase(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否非交易业务: 新股申购、配股 是竞价交易不是非交易
+     */
+    public static boolean isNotTrade(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_行权.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_债转股.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_质押券出入库.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_配债.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_可转债申购.getValue(), busiTypeTg);
+//                || StringUtil.equals(DictCodeListExt3.投管业务类型_配股.getValue(), busiTypeTg)
+//                || StringUtil.equals(DictCodeListExt3.投管业务类型_新股申购.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否非买卖交易
+     */
+    public static boolean isNotBuyOrSellTrade(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_行权.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_债转股.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_质押券出入库.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_配债.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_可转债申购.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_配股.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_新股申购.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否竞价交易业务
+     */
+    public static boolean isNormalTrade(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_竞价交易.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否大宗交易业务
+     */
+    public static boolean isBulk(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_大宗交易.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否协议现券业务
+     */
+    public static boolean isAgreementCashBond(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_协议现券.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否协议回购
+     */
+    public static boolean isPledgeAgreementRepurchase(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_提前购回.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_到期购回.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_到期续做.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_解除质押.getValue(), busiTypeTg);
     }
 }

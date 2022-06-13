@@ -107,256 +107,173 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                 settleTransDataDtos.stream().collect(JoyinCollectors.groupingBy(i -> i.getSecType()+","
                        + i.getPs()+","+i.getSecAcctId()+","+i.getSeatNumber())).forEach(SettleTransDataMap::put);
             }
-           for (SettleTransDataDto settleTransData : settleTransDataDtos) {
-               if (!StringUtil.equals(settleTransData.getPs(),DictCodeList.交易方向_申购确认.getValue())) {
-                   // GNS-860:还原债券存续期 modify by fuyongsheng 20220214 start
-                   handTrdProductDeal(Arrays.asList(settleTransData));
-                   // GNS-860:还原债券存续期 modify by fuyongsheng 20220214 end
-                    //汇总交(资产维度)
-                    TotalTrdProductDealDto totalTrdProductDealDto = new TotalTrdProductDealDto();
-                    // ZGZGST-4216: 交易份额使用持仓汇总数量 fuyongsheng 20211214 modify start
-                    // totalTrdProductDealDto.setShareAmt(settleTransData.getShareAmt());
-                    totalTrdProductDealDto.setPs(settleTransData.getPs());
-                    if(finprodIdMap.containsKey(settleTransData.getFinprodId())){
-                        List<PtlSecPosition> ptlSecPositionsByFinprodId = finprodIdMap.get(settleTransData.getFinprodId());
-                        // ZGZGST-4246:过滤自己证券账户下的持仓 modify by fuyongsheng start
-                        ptlSecPositionsByFinprodId.removeIf(position -> !settleTransData.getSecAcctId().equals(position.getSecAcctId()));
-                        // ZGZGST-4246:过滤自己证券账户下的持仓 modify by fuyongsheng end
-                        BigDecimal amountTotal = ptlSecPositionsByFinprodId.stream().map(PtlSecPosition::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                        totalTrdProductDealDto.setShareAmt(amountTotal);
-                    }else{
-                        totalTrdProductDealDto.setShareAmt(BigDecimal.ZERO);
-                    }
-                    // ZGZGST-4216: 交易份额使用持仓汇总数量 fuyongsheng 20211214 modify end
-                    totalTrdProductDealDto.setTradeAmt(settleTransData.getTradeAmt());
-                    totalTrdProductDealDto.setIntAmt(settleTransData.getIntAmt());
-                    totalTrdProductDealDto.setFpriceAmt(settleTransData.getFpriceAmt());
-                    totalTrdProductDealDto.setTradeAmt(settleTransData.getTradeAmt());
+            for (SettleTransDataDto settleTransData : settleTransDataDtos) {
+               // GNS-860:还原债券存续期 modify by fuyongsheng 20220214 start
+               handTrdProductDeal(Arrays.asList(settleTransData));
+               // GNS-860:还原债券存续期 modify by fuyongsheng 20220214 end
+                //汇总交(资产维度)
+                TotalTrdProductDealDto totalTrdProductDealDto = new TotalTrdProductDealDto();
+                // ZGZGST-4216: 交易份额使用持仓汇总数量 fuyongsheng 20211214 modify start
+                // totalTrdProductDealDto.setShareAmt(settleTransData.getShareAmt());
+                totalTrdProductDealDto.setPs(settleTransData.getPs());
+                if(finprodIdMap.containsKey(settleTransData.getFinprodId())){
+                    List<PtlSecPosition> ptlSecPositionsByFinprodId = finprodIdMap.get(settleTransData.getFinprodId());
+                    // ZGZGST-4246:过滤自己证券账户下的持仓 modify by fuyongsheng start
+                    ptlSecPositionsByFinprodId.removeIf(position -> !settleTransData.getSecAcctId().equals(position.getSecAcctId()));
+                    // ZGZGST-4246:过滤自己证券账户下的持仓 modify by fuyongsheng end
+                    BigDecimal amountTotal = ptlSecPositionsByFinprodId.stream().map(PtlSecPosition::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    totalTrdProductDealDto.setShareAmt(amountTotal);
+                }else{
+                    totalTrdProductDealDto.setShareAmt(BigDecimal.ZERO);
+                }
+                // ZGZGST-4216: 交易份额使用持仓汇总数量 fuyongsheng 20211214 modify end
+                totalTrdProductDealDto.setTradeAmt(settleTransData.getTradeAmt());
+                totalTrdProductDealDto.setIntAmt(settleTransData.getIntAmt());
+                totalTrdProductDealDto.setFpriceAmt(settleTransData.getFpriceAmt());
+                totalTrdProductDealDto.setTradeAmt(settleTransData.getTradeAmt());
 
-                    // modify by etliu 20220227 start
-                    // 广农商二阶段 GNS-901：【广农商场内清算】场内债券存续期-涉及到还本的交易，“利息明细信息”中未登录还本金额
-                    totalTrdProductDealDto.setPrinAmt(settleTransData.getPrinAmt());
-                    totalTrdProductDealDto.setTheoryInt(totalTrdProductDealDto.getIntAmt());
-                    totalTrdProductDealDto.setTheoryprinAmt(totalTrdProductDealDto.getPrinAmt());
-                    // modify by etliu 20220227 end
+                // modify by etliu 20220227 start
+                // 广农商二阶段 GNS-901：【广农商场内清算】场内债券存续期-涉及到还本的交易，“利息明细信息”中未登录还本金额
+                totalTrdProductDealDto.setPrinAmt(settleTransData.getPrinAmt());
+                totalTrdProductDealDto.setTheoryInt(totalTrdProductDealDto.getIntAmt());
+                totalTrdProductDealDto.setTheoryprinAmt(totalTrdProductDealDto.getPrinAmt());
+                // modify by etliu 20220227 end
 
-                    createTotalDeal(totalTrdProductDealDto,settleTransData);
-                    // finProductDealTotalList.add(totalTrdProductDealDto);
-                   totalProductDealList.add(totalTrdProductDealDto);
-                   //投管交易关系
-                    List<String> tradeIdList = settleTransData.getTradeIdList();
-                    for (String tradeId : tradeIdList) {
-                        SettleTransTgMapping settleTransTgMapping = new SettleTransTgMapping();
-                        settleTransTgMapping.setTradeId(tradeId);
-                        settleTransTgMapping.setTradeIdTg(totalTrdProductDealDto.getTotleTradeId());
-                        settleTransTgMapping.setTgDataStatus("02");
-                        // add by fuyongsheng 对成交与投管关系执行时间赋值 fuyongsheng 20211217 start
-                        settleTransTgMapping.setDealDate(getBatchExecuteInfo().getExecuteDate());
-                        // add by fuyongsheng 对成交与投管关系执行时间赋值 fuyongsheng 20211217 end
-                        settleTransTgMappingList.add(settleTransTgMapping);
-                    }
-                    //汇总交易(资产+组合维度)
-                    if (finprodIdMap.containsKey(settleTransData.getFinprodId())) {
-                        List<PtlSecPosition> ptlSecPositionsByFinprodId = finprodIdMap.get(settleTransData.getFinprodId());
-                        if(CollectionUtils.isNotEmpty(ptlSecPositionsByFinprodId)) {
-                            BigDecimal amountTotal = ptlSecPositionsByFinprodId.stream().map(item2 -> item2.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
-                            // 已分配利息总额
-                            BigDecimal assignIntAmt = BigDecimal.ZERO;
-                            for (PtlSecPosition ptlSecPosition : ptlSecPositionsByFinprodId) {
-                                //汇总交易
-                                TotalTrdProductDealDto totalTrdProductDealDtoDetaile = new TotalTrdProductDealDto();
-                                totalTrdProductDealDtoDetaile.setpTotleTradeId(totalTrdProductDealDto.getTotleTradeId());
+                createTotalDeal(totalTrdProductDealDto,settleTransData);
+                // finProductDealTotalList.add(totalTrdProductDealDto);
+               totalProductDealList.add(totalTrdProductDealDto);
+               //投管交易关系
+                List<String> tradeIdList = settleTransData.getTradeIdList();
+                for (String tradeId : tradeIdList) {
+                    SettleTransTgMapping settleTransTgMapping = new SettleTransTgMapping();
+                    settleTransTgMapping.setTradeId(tradeId);
+                    settleTransTgMapping.setTradeIdTg(totalTrdProductDealDto.getTotleTradeId());
+                    settleTransTgMapping.setTgDataStatus("02");
+                    // add by fuyongsheng 对成交与投管关系执行时间赋值 fuyongsheng 20211217 start
+                    settleTransTgMapping.setDealDate(getBatchExecuteInfo().getExecuteDate());
+                    // add by fuyongsheng 对成交与投管关系执行时间赋值 fuyongsheng 20211217 end
+                    settleTransTgMappingList.add(settleTransTgMapping);
+                }
+                //汇总交易(资产+组合维度)
+                if (finprodIdMap.containsKey(settleTransData.getFinprodId())) {
+                    List<PtlSecPosition> ptlSecPositionsByFinprodId = finprodIdMap.get(settleTransData.getFinprodId());
+                    if(CollectionUtils.isNotEmpty(ptlSecPositionsByFinprodId)) {
+                        BigDecimal amountTotal = ptlSecPositionsByFinprodId.stream().map(item2 -> item2.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
+                        // 已分配利息总额
+                        BigDecimal assignIntAmt = BigDecimal.ZERO;
+                        for (PtlSecPosition ptlSecPosition : ptlSecPositionsByFinprodId) {
+                            //汇总交易
+                            TotalTrdProductDealDto totalTrdProductDealDtoDetaile = new TotalTrdProductDealDto();
+                            totalTrdProductDealDtoDetaile.setpTotleTradeId(totalTrdProductDealDto.getTotleTradeId());
+                            //交易份额
+                            totalTrdProductDealDtoDetaile.setShareAmt(ptlSecPosition.getAmount());
+                            //交易本金
+                            totalTrdProductDealDtoDetaile.setPrinAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getPrinAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
+                            //利息总额
+                            totalTrdProductDealDtoDetaile.setIntAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getIntAmt(),ptlSecPosition.getAmount()),amountTotal,2));
+                            assignIntAmt = assignIntAmt.add(totalTrdProductDealDtoDetaile.getIntAmt());
+                            //全价总额
+                            totalTrdProductDealDtoDetaile.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getFpriceAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
+                            //交易金额
+                            totalTrdProductDealDtoDetaile.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getTradeAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
+                            totalTrdProductDealDtoDetaile.setPortfolioId(ptlSecPosition.getPortfolioId());
+
+                            // modify by etliu 20220227 start
+                            // 广农商二阶段 GNS-901：【广农商场内清算】场内债券存续期-涉及到还本的交易，“利息明细信息”中未登录还本金额
+                            totalTrdProductDealDtoDetaile.setTheoryInt(totalTrdProductDealDtoDetaile.getIntAmt());
+                            totalTrdProductDealDtoDetaile.setTheoryprinAmt(totalTrdProductDealDtoDetaile.getPrinAmt());
+                            // modify by etliu 20220227 end
+
+                            // modify by etliu 20220227 start
+                            // 广农商二阶段 GNS-975：【广农商场内清算】场内债券存续期-行权赎回交易生成时，处理相关头寸有误
+                            totalTrdProductDealDtoDetaile.setInvAim(ptlSecPosition.getInvAim());
+                            // modify by etliu 20220227 end
+
+                            createTotalDeal(totalTrdProductDealDtoDetaile, settleTransData);
+                            totalProductDealList.add(totalTrdProductDealDtoDetaile);
+                            //划款指令
+                            stlPayOrdersList.add(createStlPayOrders(totalTrdProductDealDtoDetaile, settleTransData.getAcctNo()));
+                            //交易明细(还本、收息)
+                            List<TrdProductDealDto> trdProductDealList = settleTransData.getTrdProductDealList();
+                            for (TrdProductDealDto trdProductDealDto : trdProductDealList) {
+                                TrdProductDealDto trdProductDeal = new TrdProductDealDto();
+                                trdProductDeal.setPs(trdProductDealDto.getPs());
                                 //交易份额
-                                totalTrdProductDealDtoDetaile.setShareAmt(ptlSecPosition.getAmount());
+                                trdProductDeal.setShareAmt(ptlSecPosition.getAmount());
                                 //交易本金
-                                totalTrdProductDealDtoDetaile.setPrinAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getPrinAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
+                                trdProductDeal.setPrinAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(trdProductDealDto.getPrinAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
                                 //利息总额
-                                totalTrdProductDealDtoDetaile.setIntAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getIntAmt(),ptlSecPosition.getAmount()),amountTotal,2));
-                                assignIntAmt = assignIntAmt.add(totalTrdProductDealDtoDetaile.getIntAmt());
+                                trdProductDeal.setIntAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(trdProductDealDto.getIntAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
                                 //全价总额
-                                totalTrdProductDealDtoDetaile.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getFpriceAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
+                                trdProductDeal.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(trdProductDealDto.getFpriceAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
                                 //交易金额
-                                totalTrdProductDealDtoDetaile.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getTradeAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
-                                totalTrdProductDealDtoDetaile.setPortfolioId(ptlSecPosition.getPortfolioId());
-
-                                // modify by etliu 20220227 start
-                                // 广农商二阶段 GNS-901：【广农商场内清算】场内债券存续期-涉及到还本的交易，“利息明细信息”中未登录还本金额
-                                totalTrdProductDealDtoDetaile.setTheoryInt(totalTrdProductDealDtoDetaile.getIntAmt());
-                                totalTrdProductDealDtoDetaile.setTheoryprinAmt(totalTrdProductDealDtoDetaile.getPrinAmt());
-                                // modify by etliu 20220227 end
+                                trdProductDeal.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(trdProductDealDto.getTradeAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
+                                trdProductDeal.setTotleTradeId(totalTrdProductDealDtoDetaile.getTotleTradeId());
+                                createDeal(trdProductDeal, settleTransData);
+                                trdProductDeal.setPortfolioId(ptlSecPosition.getPortfolioId());
 
                                 // modify by etliu 20220227 start
                                 // 广农商二阶段 GNS-975：【广农商场内清算】场内债券存续期-行权赎回交易生成时，处理相关头寸有误
-                                totalTrdProductDealDtoDetaile.setInvAim(ptlSecPosition.getInvAim());
+                                trdProductDeal.setInvAim(ptlSecPosition.getInvAim());
                                 // modify by etliu 20220227 end
 
-                                createTotalDeal(totalTrdProductDealDtoDetaile, settleTransData);
-                                totalProductDealList.add(totalTrdProductDealDtoDetaile);
-                                //划款指令
-                                stlPayOrdersList.add(createStlPayOrders(totalTrdProductDealDtoDetaile, settleTransData.getAcctNo()));
-                                //交易明细(还本、收息)
-                                List<TrdProductDealDto> trdProductDealList = settleTransData.getTrdProductDealList();
-                                for (TrdProductDealDto trdProductDealDto : trdProductDealList) {
-                                    TrdProductDealDto trdProductDeal = new TrdProductDealDto();
-                                    trdProductDeal.setPs(trdProductDealDto.getPs());
-                                    //交易份额
-                                    trdProductDeal.setShareAmt(ptlSecPosition.getAmount());
-                                    //交易本金
-                                    trdProductDeal.setPrinAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(trdProductDealDto.getPrinAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
-                                    //利息总额
-                                    trdProductDeal.setIntAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(trdProductDealDto.getIntAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
-                                    //全价总额
-                                    trdProductDeal.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(trdProductDealDto.getFpriceAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
-                                    //交易金额
-                                    trdProductDeal.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(trdProductDealDto.getTradeAmt(), ptlSecPosition.getAmount()), amountTotal, 2));
-                                    trdProductDeal.setTotleTradeId(totalTrdProductDealDtoDetaile.getTotleTradeId());
-                                    createDeal(trdProductDeal, settleTransData);
-                                    trdProductDeal.setPortfolioId(ptlSecPosition.getPortfolioId());
+                                TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
+                                trdProductDealAdd.setTradeId(trdProductDeal.getTradeId());
+                                trdProductDealAdd.setPortfolioId(ptlSecPosition.getPortfolioId());
+                                productDealList.add(trdProductDeal);
+                                //组合交易
+                                PtlTrade ptlTrade = new PtlTrade();
+                                ptlTrade.setPortfolioId(ptlSecPosition.getPortfolioId());
+                                ptlTradeList.add(createPtlTrade(ptlTrade, trdProductDeal));
+                                trdProductDealAddList.add(trdProductDealAdd);
+                            }
+                        }
+                        // 分配利息差额(利息差额 = 利息总额 - 已分配利息总额)
+                        BigDecimal intAmtCe = settleTransData.getIntAmt().subtract(assignIntAmt);
+                        if(intAmtCe.compareTo(BigDecimal.ZERO) != 0){
+                            // 最大一笔持仓数量
+                            BigDecimal maxAmout = ptlSecPositionsByFinprodId.stream().max(Comparator.comparing(
+                                    PtlSecPosition::getAmount)).get().getAmount();
+
+                            // modify by etliu 20220227 start
+                            // 利息分配尾差处理，其他字段也要处理
+                            Map<String, TrdProductDeal> trdProductDealMap = productDealList.stream().collect(JoyinCollectors.toMap(x -> x.getTotleTradeId(), x -> x));
+                            Map<String, StlPayOrders> stlPayOrdersMap = stlPayOrdersList.stream().collect(JoyinCollectors.toMap(x -> x.getTradeId(), x -> x));
+                            // modify by etliu 20220227 end
+
+                            // 将利息差额补到(资产+组合维度)最大持仓数量的数据上
+                            for(TotalTrdProductDealDto finProductDealTotal : totalProductDealList){
+                                // 过滤汇总交(资产维度)数据
+                                if(StringUtil.isEmpty(finProductDealTotal.getpTotleTradeId())){
+                                    continue;
+                                }
+                                // 如果当前数据持仓数量是最大持仓数量,则将利息差额补到该条数据上,跳出循环
+                                if(finProductDealTotal.getShareAmt().equals(maxAmout)){
+                                    finProductDealTotal.setIntAmt(finProductDealTotal.getIntAmt().add(intAmtCe));
 
                                     // modify by etliu 20220227 start
-                                    // 广农商二阶段 GNS-975：【广农商场内清算】场内债券存续期-行权赎回交易生成时，处理相关头寸有误
-                                    trdProductDeal.setInvAim(ptlSecPosition.getInvAim());
+                                    // 利息分配尾差处理，其他字段也要处理
+                                    finProductDealTotal.setTheoryInt(finProductDealTotal.getIntAmt());
+                                    finProductDealTotal.setFpriceAmt(ArithmeticUtil.doAdd(finProductDealTotal.getFpriceAmt(), intAmtCe));
+                                    finProductDealTotal.setTradeAmt(ArithmeticUtil.doAdd(finProductDealTotal.getTradeAmt(), intAmtCe));
+
+                                    if (trdProductDealMap.containsKey(finProductDealTotal.getTotleTradeId())) {
+                                        TrdProductDeal tempTrdProductDeal = trdProductDealMap.get(finProductDealTotal.getTotleTradeId());
+                                        tempTrdProductDeal.setIntAmt(ArithmeticUtil.doAdd(tempTrdProductDeal.getIntAmt(), intAmtCe));
+                                        tempTrdProductDeal.setFpriceAmt(ArithmeticUtil.doAdd(tempTrdProductDeal.getFpriceAmt(), intAmtCe));
+                                        tempTrdProductDeal.setTradeAmt(ArithmeticUtil.doAdd(tempTrdProductDeal.getTradeAmt(), intAmtCe));
+                                    }
+                                    if (stlPayOrdersMap.containsKey(finProductDealTotal.getTotleTradeId())) {
+                                        StlPayOrders stlPayOrders = stlPayOrdersMap.get(finProductDealTotal.getTotleTradeId());
+                                        stlPayOrders.setSettleAmt(ArithmeticUtil.doAdd(stlPayOrders.getSettleAmt(), intAmtCe));
+                                    }
                                     // modify by etliu 20220227 end
 
-                                    TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
-                                    trdProductDealAdd.setTradeId(trdProductDeal.getTradeId());
-                                    trdProductDealAdd.setPortfolioId(ptlSecPosition.getPortfolioId());
-                                    productDealList.add(trdProductDeal);
-                                    //组合交易
-                                    PtlTrade ptlTrade = new PtlTrade();
-                                    ptlTrade.setPortfolioId(ptlSecPosition.getPortfolioId());
-                                    ptlTradeList.add(createPtlTrade(ptlTrade, trdProductDeal));
-                                    trdProductDealAddList.add(trdProductDealAdd);
-                                }
-                            }
-                            // 分配利息差额(利息差额 = 利息总额 - 已分配利息总额)
-                            BigDecimal intAmtCe = settleTransData.getIntAmt().subtract(assignIntAmt);
-                            if(intAmtCe.compareTo(BigDecimal.ZERO) != 0){
-                                // 最大一笔持仓数量
-                                BigDecimal maxAmout = ptlSecPositionsByFinprodId.stream().max(Comparator.comparing(
-                                        PtlSecPosition::getAmount)).get().getAmount();
-
-                                // modify by etliu 20220227 start
-                                // 利息分配尾差处理，其他字段也要处理
-                                Map<String, TrdProductDeal> trdProductDealMap = productDealList.stream().collect(JoyinCollectors.toMap(x -> x.getTotleTradeId(), x -> x));
-                                Map<String, StlPayOrders> stlPayOrdersMap = stlPayOrdersList.stream().collect(JoyinCollectors.toMap(x -> x.getTradeId(), x -> x));
-                                // modify by etliu 20220227 end
-
-                                // 将利息差额补到(资产+组合维度)最大持仓数量的数据上
-                                for(TotalTrdProductDealDto finProductDealTotal : totalProductDealList){
-                                    // 过滤汇总交(资产维度)数据
-                                    if(StringUtil.isEmpty(finProductDealTotal.getpTotleTradeId())){
-                                        continue;
-                                    }
-                                    // 如果当前数据持仓数量是最大持仓数量,则将利息差额补到该条数据上,跳出循环
-                                    if(finProductDealTotal.getShareAmt().equals(maxAmout)){
-                                        finProductDealTotal.setIntAmt(finProductDealTotal.getIntAmt().add(intAmtCe));
-
-                                        // modify by etliu 20220227 start
-                                        // 利息分配尾差处理，其他字段也要处理
-                                        finProductDealTotal.setTheoryInt(finProductDealTotal.getIntAmt());
-                                        finProductDealTotal.setFpriceAmt(ArithmeticUtil.doAdd(finProductDealTotal.getFpriceAmt(), intAmtCe));
-                                        finProductDealTotal.setTradeAmt(ArithmeticUtil.doAdd(finProductDealTotal.getTradeAmt(), intAmtCe));
-
-                                        if (trdProductDealMap.containsKey(finProductDealTotal.getTotleTradeId())) {
-                                            TrdProductDeal tempTrdProductDeal = trdProductDealMap.get(finProductDealTotal.getTotleTradeId());
-                                            tempTrdProductDeal.setIntAmt(ArithmeticUtil.doAdd(tempTrdProductDeal.getIntAmt(), intAmtCe));
-                                            tempTrdProductDeal.setFpriceAmt(ArithmeticUtil.doAdd(tempTrdProductDeal.getFpriceAmt(), intAmtCe));
-                                            tempTrdProductDeal.setTradeAmt(ArithmeticUtil.doAdd(tempTrdProductDeal.getTradeAmt(), intAmtCe));
-                                        }
-                                        if (stlPayOrdersMap.containsKey(finProductDealTotal.getTotleTradeId())) {
-                                            StlPayOrders stlPayOrders = stlPayOrdersMap.get(finProductDealTotal.getTotleTradeId());
-                                            stlPayOrders.setSettleAmt(ArithmeticUtil.doAdd(stlPayOrders.getSettleAmt(), intAmtCe));
-                                        }
-                                        // modify by etliu 20220227 end
-
-                                        break;
-                                    }
+                                    break;
                                 }
                             }
                         }
                     }
-                }else{
-                    TotalTrdProductDealDto totalTrdProductDeal = new TotalTrdProductDealDto();
-                    String totalTradeId = settleCommonService.buildBussinessCodeExt(DictCodeListExt3.共通业务类型_可转债申购交易);
-                    // 构造 金融产品交易明细
-                    List<SettleTransDataDto> settleTransDataList = SettleTransDataMap.get(settleTransData.getSecType()+","
-                            + settleTransData.getPs()+","+settleTransData.getSecAcctId()+","+settleTransData.getSeatNumber());
-                    BigDecimal shareNumTotal = settleTransDataList.stream().map(i -> i.getShareNum()).reduce(BigDecimal.ZERO, BigDecimal::add);
-                    TrdProductDealDto trdProductDeal = new TrdProductDealDto();
-                    createDeal(trdProductDeal, settleTransData);
-//                        交易份额		=	成交明细.交易份额*成交明细.申购交易份额/SUM（成交明细.申购交易份额）※按照证券代码，交易方向，证券账户代码，席位号汇总													※差额放在成交明细.申购交易份额最大的一笔上
-//                        净价总额		=	成交明细.净价总额*成交明细.申购交易份额/SUM（成交明细.申购交易份额）※按照证券代码，交易方向，证券账户代码，席位号汇总													※差额放在成交明细.申购交易份额最大的一笔上
-//                        交易本金		=	成交明细.交易本金*成交明细.申购交易份额/SUM（成交明细.申购交易份额）※按照证券代码，交易方向，证券账户代码，席位号汇总													※差额放在成交明细.申购交易份额最大的一笔上
-//                        利息总额		=	0
-//                        全价总额		=	成交明细.交易本金*成交明细.申购交易份额/SUM（成交明细.申购交易份额）※按照证券代码，交易方向，证券账户代码，席位号汇总													※差额放在成交明细.申购交易份额最大的一笔上
-//                        交易金额		=	成交明细.交易本金*成交明细.申购交易份额/SUM（成交明细.申购交易份额）※按照证券代码，交易方向，证券账户代码，席位号汇总													※差额放在成交明细.申购交易份额最大的一笔上
-                    trdProductDeal.setPs(settleTransData.getPs());
-                    //交易份额
-                    trdProductDeal.setShareAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getShareAmt(),settleTransData.getShareNum()),shareNumTotal,2));
-                    //净价总额
-                    trdProductDeal.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getCpriceAmt(),settleTransData.getShareNum()),shareNumTotal,2));
-                    //交易本金
-                    trdProductDeal.setPrinAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getPrinAmt(), settleTransData.getShareNum()), shareNumTotal, 2));
-                    //利息总额
-                    trdProductDeal.setIntAmt(BigDecimal.ZERO);
-                    //全价总额
-                    trdProductDeal.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getPrinAmt(), settleTransData.getShareNum()), shareNumTotal, 2));
-                    //交易金额
-                    trdProductDeal.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransData.getPrinAmt(), settleTransData.getShareNum()), shareNumTotal, 2));
-                    //是否结清
-                    trdProductDeal.setIsClean(DictCodeList.是否_是.getValue());
-                    //前置交易编号
-                    trdProductDeal.setbTradeId(settleTransData.getTradeId2());
-                    // 关联系统交易编号
-                    trdProductDeal.setfTradeId(settleTransData.getTradeId());
-                    // 汇总交易编号
-                    trdProductDeal.setTotleTradeId(totalTradeId);
-                    // 投管业务类型
-                    trdProductDeal.setTgBusiType(DictCodeListExt1.平安业务类型_债券类资产买入.getValue());
-                    // 成交明细.委托代码
-                    trdProductDeal.setEntrustId(settleTransData.getEntrustId());
-                     //
-                    trdProductDeal.setCounterId(settleTransData.getPurchCounter());
-                    String tradeId = settleCommonService.buildBussinessCodeExt(DictCodeListExt3.共通业务类型_可转债申购交易);
-                    trdProductDeal.setTradeId(tradeId);
-                    // GZYHTZJY-1043: 生成可转债申购确认汇总交易 modify by fuyongsheng 20220110 start
-                    // 构造金融交易汇总表数据
-                    BeanUtil.copyProperties(totalTrdProductDeal, trdProductDeal);
-                    // 汇总交易编号
-                    totalTrdProductDeal.setTotleTradeId(totalTradeId);
-                    totalTrdProductDeal.setbTradeId(settleTransData.getTradeTotalId());
-                    totalProductDealList.add(totalTrdProductDeal);
-
-
-
-                    // GZYHTZJY-1043: 生成可转债申购确认汇总交易 modify by fuyongsheng 20220110 end
-                    //构造 金融产品交易明细附属
-                    TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
-                    trdProductDealAdd.setTradeId(trdProductDeal.getTradeId());
-                    trdProductDealAdd.setPortfolioId(settleTransData.getPortfolioId());
-                    trdProductDealAdd.setGenType(DictCodeListExt1.生成方式_接口接入.getValue());
-                    trdProductDealAdd.setPurchModle(settleTransData.getPurchModle());
-                    trdProductDealAdd.setPurchType(DictCodeListExt2.申购类型_普通申购.getValue());
-                    productDealList.add(trdProductDeal);
-                    trdProductDealAddList.add(trdProductDealAdd);
-
-                    TrdDealTotalAdd trdDealTotalAdd = new TrdDealTotalAdd();
-                    BeanUtil.copyProperties(trdDealTotalAdd, trdProductDealAdd);
-                    trdDealTotalAdd.setEntrustId(settleTransData.getEntrustId());
-                    trdDealTotalAdd.setTotleTradeId(totalTradeId);
-                    trdDealTotalAdd.setPurAmt(settleTransData.getPurchAmt());
-                    trdDealTotalAdd.setPurchDate(settleTransData.getPurchDate());
-                    trdDealTotalAddList.add(trdDealTotalAdd);
-
-                    //构造 成交数据与投管交易关系
-                    SettleTransTgMapping settleTransTgMapping = new SettleTransTgMapping();
-                    settleTransTgMapping.setTradeId(settleTransData.getTradeId());
-                    settleTransTgMapping.setTradeIdTg(totalTradeId);
-                    settleTransTgMapping.setTgDataStatus("02");
-                    settleTransTgMapping.setDealDate(getBatchExecuteInfo().getExecuteDate());
-                    settleTransTgMappingList.add(settleTransTgMapping);
-
                 }
             }
             // GNS-869: 删除金融产品汇总交易表重复赋值 fuyongsheng 20220216 start

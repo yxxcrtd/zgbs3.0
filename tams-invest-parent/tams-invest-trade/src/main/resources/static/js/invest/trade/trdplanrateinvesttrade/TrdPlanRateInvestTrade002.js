@@ -6,6 +6,9 @@ var etrAmt = '';
     var isOpics = '';
     var isHoliday = '';
     var calendarId = '';
+    // add ZGCPCN-1007 wsz 20220602 控制页面加载次数只加载一次 start
+    var initFlag =false;
+    // add ZGCPCN-1007 wsz 20220602 控制页面加载次数只加载一次 end
     var getriskdata = function(){
         var obj = {timePoint:MY_SUP_TIME_TYPE_02,valDate:$('#settleDate').val(),portfolioCode:$('#portfolioId').val(),tradeAmount:$('#tradeAmt').val(),assetType:FINPROD_TYPE_F17,isEnabled:'01',assetCode:$('#finprodMarketId').select2("data")[0].object,tradeDirection:$('#ps').val()}
         if($('#type7').val() && $('#type7').val() != ''){
@@ -775,6 +778,7 @@ var etrAmt = '';
        	}else{
        	$('#selector5').hide();
        	}
+         initFlag = true;
     });
     
     /**
@@ -791,6 +795,9 @@ var etrAmt = '';
      * 查询资产管理人
      */
     var selectManeger = function (){
+        if(initFlag){
+            return;
+        }
         var finprodId = $("#finprodMarketId").select2("data")[0].object;
         if(finprodId){
             Joyin.ajaxJson(basePath + '/invest/trade/trdplanrateinvesttrade/TrdPlanRateInvestTrade003/selectFManeger', {finprodId:finprodId},

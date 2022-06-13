@@ -1933,7 +1933,7 @@ public class CommonAutoCouponBatchService extends BaseService{
                 }
                 //单位面值
                 if(StringUtil.equals(BussinessDictCodeList.基金类资产类型_货币基金.getValue(),infChinamutualfunddescription.getfInfoType()) && StringUtil.equals(infChinamutualfunddescription.getExFundType(), DictCodeListExt2.交易所基金类型_实时申赎货币基金.getCodeName())){
-                	finProductAdd.setFaceValue(new BigDecimal(0.01));
+                	finProductAdd.setFaceValue(BigDecimal.valueOf(0.01));
                 }
                 if(StringUtil.equals(BussinessDictCodeList.基金类资产类型_货币基金.getValue(),infChinamutualfunddescription.getfInfoType()) && StringUtil.equals(infChinamutualfunddescription.getExFundType(), DictCodeListExt2.交易所基金类型_ETF.getCodeName())){
                 	finProductAdd.setFaceValue(new BigDecimal(100));

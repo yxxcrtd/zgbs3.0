@@ -85,6 +85,9 @@ public class CfetsTrdQueryTradeInfoListRequest {
     @ApiModelProperty(name="entrustId",value="指令代码",example="字符串1")
     private String entrustId;
 
+    @ApiModelProperty(name="bidId",value="投标编号",example="字符串1")
+    private String bidId;
+
     public String getEffectiveStatus() {
         return effectiveStatus;
     }
@@ -235,5 +238,13 @@ public class CfetsTrdQueryTradeInfoListRequest {
 
     public void setEntrustId(String entrustId) {
         this.entrustId = entrustId;
+    }
+
+    public String getBidId() {
+        return bidId;
+    }
+
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
     }
 }

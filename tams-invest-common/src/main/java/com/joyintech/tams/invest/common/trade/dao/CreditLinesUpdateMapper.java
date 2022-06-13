@@ -102,4 +102,8 @@ public interface CreditLinesUpdateMapper {
     BigDecimal getOccupiedQuota(CreditLinesInputDto inputDto);
 
     BigDecimal getOccupiedQuota1(CreditLinesInputDto inputDto);
+
+    // TISHKS-947:子期次占用母计划额度 modify by fuyongsheng 20220506 start
+    String getJHLFinprodId(@Param("finprodId")String finprodId);
+    // TISHKS-947:子期次占用母计划额度 modify by fuyongsheng 20220506 end
 }

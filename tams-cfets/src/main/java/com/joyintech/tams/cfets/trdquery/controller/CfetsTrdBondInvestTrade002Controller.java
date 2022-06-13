@@ -361,8 +361,8 @@ public class CfetsTrdBondInvestTrade002Controller extends BaseController {
         model.addAttribute("isEleShow", isEleShow);
 
         //展示投资目的或业务模式参数
-        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
         //展示投资目的或业务模式参数
 
         model.addAttribute("userId", LoginUserUtil.getUserName());
@@ -698,7 +698,7 @@ public class CfetsTrdBondInvestTrade002Controller extends BaseController {
         }*/
 
         // 确认提醒
-        if (result.getErrorCount() == 0) {
+        if (null != result && result.getErrorCount() == 0) {
             AjaxResult ajaxResult = trdBondInvestTrade002Service.checkConfirmInfo(dto, result);
             String confirmMsg = "";
             if (null != ajaxResult) {
@@ -997,9 +997,9 @@ public class CfetsTrdBondInvestTrade002Controller extends BaseController {
         AjaxResult ajaxResult = new AjaxResult();
         String isCounterId = trdBondInvestTrade002Service.getCounterId(params);
         if (StringUtil.equals(isCounterId, "01")) {
-            ajaxResult.setData(DictCodeListExt1.投资目的_摊余成本类.getValue());
+            ajaxResult.setData(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
         }else if (StringUtil.equals(isCounterId, "02")){ 
-            ajaxResult.setData(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
+            ajaxResult.setData(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
         }
         return ajaxResult;
     }

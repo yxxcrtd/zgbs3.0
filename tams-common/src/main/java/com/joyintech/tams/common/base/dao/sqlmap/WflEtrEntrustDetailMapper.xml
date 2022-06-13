@@ -15,12 +15,14 @@
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="INV_AIM" property="invAim" jdbcType="VARCHAR" />
+        <result column="SEC_ACCT_ID" property="secAcctId" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         ENTRUST_ID ENTRUST_ID, PORTFOLIO_ID PORTFOLIO_ID, WORKFLOW_STATUS WORKFLOW_STATUS, 
         DIS_RATE DIS_RATE, ENTRUST_AMT ENTRUST_AMT, ENTRUST_NUM ENTRUST_NUM, TARGET_TYPE TARGET_TYPE, 
         WORKFLOW_ID WORKFLOW_ID, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
-        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, INV_AIM INV_AIM, SEC_ACCT_ID SEC_ACCT_ID
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -161,6 +163,15 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
+            <if test="invAim != null" >
+                INV_AIM,
+            </if>
+            <if test="secAcctId != null" >
+                SEC_ACCT_ID,
+            </if>
+            <if test="acctNo != null" >
+                ACCT_NO,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -201,6 +212,15 @@
             </if>
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="invAim != null" >
+                #{invAim,jdbcType=VARCHAR},
+            </if>
+            <if test="secAcctId != null" >
+                #{secAcctId,jdbcType=VARCHAR},
+            </if>
+            <if test="acctNo != null" >
+                #{acctNo,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

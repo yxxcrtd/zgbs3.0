@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.valuation.batch.resetbaseruleinfo.dao.ValResetBaseRuleInfoMapper">
+<select id="selectAllBaseRuleInfo" resultType="com.joyintech.tams.valuation.batch.resetbaseruleinfo.dto.ResetBaseRuleInfoDto">
+      <!--  固定利率 -->
+   SELECT
+		T31.BASE_RULE_ID,
+		T31.RATE,
+		T31.RATE_TYPE,
+		T31.COEFFICIENT,
+		T31.SPREAD_RATE,
+		T31.EFF_DATE,
+		T31.RATE INT_RATE,
+		T31.INDEX_ID,
+		T31.INDEX_SOURCE INDEX_SOURCE 
+	FROM
+		FIN_BASE_RULE_INFO T31 
+	 WHERE 
+	    T31.EFF_DATE = TO_DATE(#{sysDate},'YYYY-MM-DD')
+	   	<!--  AND T31.INDEX_SOURCE in('03','04') -->
+		AND T31.RATE_TYPE = #{rateType01} 
+		<!-- 起息日 -->
+		<!-- 2019年9月20日  并且  业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng start -->
+		AND T31.BASE_RULE_TYPE in (#{rateType03},#{BASE_RULE_TYPE_03})
+		<!-- 2019年9月20日  并且  业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng end -->
+	UNION
+	SELECT
+		T1.BASE_RULE_ID,
+		T1.RATE,
+		T1.RATE_TYPE,
+		T1.COEFFICIENT,
+		T1.SPREAD_RATE,
+		T1.EFF_DATE,
+		T5.INT_RATE,
+		T1.INDEX_ID,
+		'' INDEX_SOURCE 
+	FROM
+		FIN_BASE_RULE_INFO T1,
+		(
+	SELECT
+		max( T2.EFF_DATE ) EFF_DATE,
+		T2.INT_RATE_ID 
+	FROM
+		MST_INT_RATE_INFO T2 
+	WHERE
+		<![CDATA[T2.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	GROUP BY
+		T2.INT_RATE_ID 
+		) T3,
+		FIN_PRODUCT T4,
+		MST_INT_RATE_INFO T5 
+	WHERE
+		T1.EFF_DATE = T4.VDATE 
+		AND T1.FINPROD_ID = T4.FINPROD_ID 
+		AND T1.EFF_DATE = TO_DATE(#{sysDate},'YYYY-MM-DD')
+		AND T1.RATE_TYPE = #{rateType02}
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng start -->
+		AND T1.BASE_RULE_TYPE in (#{rateType03},#{BASE_RULE_TYPE_03})
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng end -->
+		AND T1.INDEX_SOURCE in('03','04')
+		AND T5.INT_RATE_ID = T1.INDEX_ID 
+		AND T5.INT_RATE_ID = T3.INT_RATE_ID 
+		AND T5.EFF_DATE = T3.EFF_DATE 
+	<!-- 高频开放 -->
+	UNION
+	SELECT
+		T6.BASE_RULE_ID,
+		T6.RATE,
+		T6.RATE_TYPE,
+		T6.COEFFICIENT,
+		T6.SPREAD_RATE,
+		T6.EFF_DATE,
+		T12.INT_RATE,
+		T6.INDEX_ID,
+		T6.INDEX_SOURCE  INDEX_SOURCE
+	FROM
+		FIN_BASE_RULE_INFO T6,
+		(
+	SELECT
+		max( T7.EFF_DATE ) EFF_DATE,
+		T7.BASE_RULE_ID 
+	FROM
+		FIN_BASE_RULE_INFO T7 
+	WHERE
+		<![CDATA[T7.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	GROUP BY
+		T7.BASE_RULE_ID 
+		) T8,
+		FIN_PRODUCT T9,
+		FIN_OPEN_RULE T10,
+		FIN_CASH_INFO T11,
+		MST_INT_RATE_INFO T12,
+		(
+	SELECT
+		max( T13.EFF_DATE ) EFF_DATE,
+		T13.INT_RATE_ID 
+	FROM
+		MST_INT_RATE_INFO T13 
+	WHERE
+		<![CDATA[T13.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	GROUP BY
+		T13.INT_RATE_ID 
+		) T14 
+	WHERE
+		T6.BASE_RULE_ID = T8.BASE_RULE_ID 
+		AND T6.EFF_DATE = T8.EFF_DATE 
+		AND T6.FINPROD_ID = T9.FINPROD_ID 
+		AND T6.RATE_TYPE = #{rateType02}
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng start -->
+		AND T6.BASE_RULE_TYPE in (#{rateType03},#{BASE_RULE_TYPE_03})
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng end -->
+		AND T6.INDEX_SOURCE in('03','04')
+		AND <![CDATA[T9.MDATE >= TO_DATE(#{sysDate},'YYYY-MM-DD')]]> 
+		AND T11.FINPROD_ID = T6.FINPROD_ID 
+		AND T10.CASH_ID = T11.CASH_ID 
+		AND T10.OPEN_MODE = #{openCycle02}
+		AND T11.FINPROD_TYPE = #{finprodType} 
+		AND T11.CASH_TYPE_2 = #{cashTypeC01}
+		AND T12.INT_RATE_ID = T6.INDEX_ID 
+		AND T12.INT_RATE_ID = T14.INT_RATE_ID 
+		AND T12.EFF_DATE = T14.EFF_DATE 
+	<!-- 基准当期生效 -->
+	UNION
+	SELECT
+		T15.BASE_RULE_ID,
+		T15.RATE,
+		T15.RATE_TYPE,
+		T15.COEFFICIENT,
+		T15.SPREAD_RATE,
+		T15.EFF_DATE,
+		T21.INT_RATE,
+		T15.INDEX_ID,
+		T15.INDEX_SOURCE  INDEX_SOURCE
+	FROM
+		FIN_BASE_RULE_INFO T15,
+		( SELECT max( T16.EFF_DATE ) EFF_DATE, T16.BASE_RULE_ID FROM FIN_BASE_RULE_INFO T16 
+		WHERE <![CDATA[ T16.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+		GROUP BY T16.BASE_RULE_ID ) T17,
+		FIN_PRODUCT T18,
+		FIN_OPEN_RULE T19,
+		FIN_CASH_INFO T20,
+		MST_INT_RATE_INFO T21 
+	WHERE
+		T15.BASE_RULE_ID = T17.BASE_RULE_ID 
+		AND T15.EFF_DATE = T17.EFF_DATE 
+		AND T15.FINPROD_ID = T18.FINPROD_ID 
+		AND T15.RESET_TYPE = #{resetType03}
+		AND T15.RATE_TYPE = #{rateType02}
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng start -->
+		AND T15.BASE_RULE_TYPE in (#{rateType03},#{BASE_RULE_TYPE_03})
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng end -->
+		AND T15.INDEX_SOURCE in('03','04')
+		AND <![CDATA[ T18.MDATE >= TO_DATE(#{sysDate},'YYYY-MM-DD')]]> 
+		AND T20.FINPROD_ID = T15.FINPROD_ID 
+		AND T20.FINPROD_TYPE = #{finprodType} 
+		AND T21.INT_RATE_ID = T15.INDEX_ID 
+		AND T20.CASH_TYPE_2 = #{cashTypeC01}
+		AND T21.EFF_DATE = TO_DATE(#{sysDate},'YYYY-MM-DD')
+		<!-- AND <![CDATA[ T21.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]> 
+		AND <![CDATA[T17.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]> -->
+	<!-- 基准期初（申购确认日）	  -->
+	UNION
+	SELECT
+		T22.BASE_RULE_ID,
+		T22.RATE,
+		T22.RATE_TYPE,
+		T22.COEFFICIENT,
+		T22.SPREAD_RATE,
+		T22.EFF_DATE,
+		T28.INT_RATE,
+		T22.INDEX_ID,
+		T22.INDEX_SOURCE  INDEX_SOURCE
+	FROM
+		FIN_BASE_RULE_INFO T22,
+		( SELECT max( T23.EFF_DATE ) EFF_DATE, T23.BASE_RULE_ID FROM FIN_BASE_RULE_INFO T23 
+		WHERE <![CDATA[ T23.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+		GROUP BY T23.BASE_RULE_ID ) T24,
+		FIN_PRODUCT T25,
+		FIN_FLOAT_ACCRUAL_SCHE T26,
+		FIN_CASH_INFO T27,
+		MST_INT_RATE_INFO T28,
+		(
+	SELECT
+		max( T29.EFF_DATE ) EFF_DATE,
+		T29.INT_RATE_ID 
+	FROM
+		MST_INT_RATE_INFO T29 
+		WHERE <![CDATA[ T29.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	GROUP BY
+		T29.INT_RATE_ID 
+		) T30 
+	WHERE
+		T22.BASE_RULE_ID = T24.BASE_RULE_ID 
+		AND T22.EFF_DATE = T24.EFF_DATE 
+		AND T22.FINPROD_ID = T25.FINPROD_ID 
+		AND T22.RATE_TYPE = #{rateType02}
+		AND T22.INDEX_SOURCE in('03','04')
+		AND <![CDATA[ T25.MDATE >= TO_DATE(#{sysDate},'YYYY-MM-DD')]]> 
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng start -->
+		AND T22.BASE_RULE_TYPE in (#{rateType03},#{BASE_RULE_TYPE_03})
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng end -->
+		AND T27.FINPROD_ID = T22.FINPROD_ID 
+		AND T27.FINPROD_TYPE = #{finprodType}
+		AND T27.CASH_TYPE_2 = #{cashTypeC04} 
+		AND T26.CASH_ID = T27.CASH_ID 
+		AND ((T22.RESET_TYPE = #{resetType01} AND T26.ACCR_STR_DATE = TO_DATE(#{sysDate},'YYYY-MM-DD')) OR (T22.RESET_TYPE = #{resetType02} AND T26.ACCR_END_DATE = TO_DATE(#{sysDate},'YYYY-MM-DD')))
+		AND T28.INT_RATE_ID = T22.INDEX_ID 
+		AND T28.INT_RATE_ID = T30.INT_RATE_ID 
+		AND T28.EFF_DATE = T30.EFF_DATE 
+	<!-- 到期日 -->
+	UNION
+		SELECT
+		T31.BASE_RULE_ID,
+		T31.RATE,
+		T31.RATE_TYPE,
+		T31.COEFFICIENT,
+		T31.SPREAD_RATE,
+		T31.EFF_DATE,
+		T35.INT_RATE,
+		T31.INDEX_ID,
+		T31.INDEX_SOURCE  INDEX_SOURCE
+	FROM
+		FIN_BASE_RULE_INFO T31,
+		( SELECT max( T32.EFF_DATE ) EFF_DATE, T32.BASE_RULE_ID FROM FIN_BASE_RULE_INFO T32
+		WHERE <![CDATA[ T32.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+		GROUP BY T32.BASE_RULE_ID ) T33,
+		FIN_PRODUCT T34,
+		MST_INT_RATE_INFO T35,
+		(
+	SELECT
+		max( T36.EFF_DATE ) EFF_DATE,
+		T36.INT_RATE_ID 
+	FROM
+		MST_INT_RATE_INFO T36
+		WHERE <![CDATA[ T36.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	GROUP BY
+		T36.INT_RATE_ID 
+		) T37 
+	WHERE
+		T31.BASE_RULE_ID = T33.BASE_RULE_ID 
+		AND T31.EFF_DATE = T33.EFF_DATE 
+		AND T31.FINPROD_ID = T34.FINPROD_ID 
+		AND T31.RESET_TYPE = #{resetType02}
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng start -->
+		AND T31.BASE_RULE_TYPE in (#{rateType03},#{BASE_RULE_TYPE_03})
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng end -->
+		AND T31.RATE_TYPE = #{rateType02}
+		AND T31.INDEX_SOURCE in('03','04')
+		AND T34.MDATE = TO_DATE(#{sysDate},'YYYY-MM-DD')
+		AND T35.INT_RATE_ID = T31.INDEX_ID 
+		AND T35.INT_RATE_ID = T37.INT_RATE_ID 
+		AND T35.EFF_DATE = T37.EFF_DATE 
+		<!-- 复合基准 -->
+		UNION 
+		SELECT
+		T1.BASE_RULE_ID,
+		T1.RATE,
+		T1.RATE_TYPE,
+		T1.COEFFICIENT,
+		T1.SPREAD_RATE,
+		T1.EFF_DATE,
+		0 INT_RATE,
+		T1.INDEX_ID,
+		T1.INDEX_SOURCE
+	FROM
+		FIN_BASE_RULE_INFO T1,
+		( SELECT max( T2.EFF_DATE ) EFF_DATE, T2.BASE_RULE_ID FROM FIN_BASE_RULE_INFO T2
+		WHERE <![CDATA[ T2.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+		GROUP BY T2.BASE_RULE_ID ) T3,
+		FIN_PRODUCT T4
+	WHERE
+		T1.BASE_RULE_ID = T3.BASE_RULE_ID 
+		AND T1.EFF_DATE = T3.EFF_DATE 
+		AND T1.FINPROD_ID = T4.FINPROD_ID
+		AND <![CDATA[ T1.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]> 
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng start -->
+		AND T1.BASE_RULE_TYPE in (#{rateType03},#{BASE_RULE_TYPE_03})
+		<!-- 2019年9月20日  并且 业绩基准信息.业绩基准类型 = ‘浮动管理费’ by yangxiaofeng end -->
+		AND T1.RATE_TYPE = #{rateType02}
+		AND T1.INDEX_SOURCE = #{benchMarkType05}
+		<![CDATA[ AND T4.MDATE >= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+</select>
+
+<select id="selectAllBaseRuleInfoIsFh" resultType="com.joyintech.tams.valuation.batch.resetbaseruleinfo.dto.ResetBaseRuleInfoDto">
+SELECT
+		T1.BASE_RULE_ID,
+		T1.RATE,
+		T1.RATE_TYPE,
+		T1.COEFFICIENT,
+		T1.SPREAD_RATE,
+		T1.EFF_DATE,
+		T1.INDEX_SOURCE
+	FROM
+		FIN_BASE_RULE_INFO T1,
+		( SELECT max( T2.EFF_DATE ) EFF_DATE, T2.BASE_RULE_ID FROM FIN_BASE_RULE_INFO T2
+		WHERE <![CDATA[ T2.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+		GROUP BY T2.BASE_RULE_ID ) T3,
+		FIN_PRODUCT T4,
+	WHERE
+		T1.BASE_RULE_ID = T3.BASE_RULE_ID 
+		AND T1.EFF_DATE = T3.EFF_DATE 
+		AND T1.FINPROD_ID = T4.FINPROD_ID 
+		AND T1.RATE_TYPE = #{rateType02}
+		AND T1.INDEX_SOURCE = #{benchMarkType05}
+		<![CDATA[ AND T4.MDATE >= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+</select>
+
+<!-- SELECT基准成分信息 -->
+<select id="selectMstIndexComponentInfo" resultType="com.joyintech.tams.valuation.batch.resetbaseruleinfo.dto.MstIndexComponentDto">
+SELECT
+	INDEX_ID,
+	COMPONENT_ID,
+	COMPONENT_TYPE,
+	WEIGHT
+FROM
+	MST_INDEX_COMPONENT 
+WHERE
+	INDEX_ID = #{indexId} 
+</select>
+
+<!-- GET 利率行情信息 -->
+<select id="getMstIntRateInfo" resultType="com.joyintech.tams.valuation.batch.resetbaseruleinfo.dto.MstIntRateInfoDto">
+SELECT
+	T1.INT_RATE_ID INT_RATE_ID,
+	T1.INT_RATE_TYPE INT_RATE_TYPE,
+	T1.EFF_DATE EFF_DATE,
+	T1.RELAESE_DATE RELAESE_DATE,
+	T1.INT_RATE INT_RATE,
+	T1.CCY CCY,
+	T1.INPUT_TYPE INPUT_TYPE 
+FROM
+	MST_INT_RATE_INFO T1,
+	( SELECT max( T2.EFF_DATE ) EFF_DATE, T2.INT_RATE_ID FROM MST_INT_RATE_INFO T2 
+	WHERE <![CDATA[  T2.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	GROUP BY T2.INT_RATE_ID ) T3 
+WHERE
+	T1.EFF_DATE = T3.EFF_DATE 
+	AND T1.INT_RATE_ID = T3.INT_RATE_ID
+	AND T1.INT_RATE_ID = #{intRateId}
+</select>
+
+<!-- GET 最大申购开始日 -->
+<select id="getMaxOpenVdate" resultType="java.util.Date">
+SELECT
+	max( T1.OPEN_VDATE ) OPEN_VDATE 
+FROM
+	FIN_OPEN_PLAN T1,FIN_BASE_RULE_INFO T2 
+where T1.OPEN_TYPE IN ( '01', '03' ) AND T1.FINPROD_ID = T2.FINPROD_ID 
+	AND T2.BASE_RULE_ID = #{bastRuleId} 
+	AND <![CDATA[ T1.OPEN_VDATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+</select>
+
+<!-- GET金融产品起息日 -->
+<select id="getVdate" resultType="java.util.Date">
+SELECT
+	VDATE 
+FROM
+	FIN_PRODUCT T1,
+	FIN_BASE_RULE_INFO T2 
+WHERE
+	T1.FINPROD_ID = T2.FINPROD_ID
+	AND  T2.BASE_RULE_ID = #{bastRuleId} AND T2.EFF_DATE = TO_DATE(#{effDate},'YYYY-MM-DD')
+</select>
+
+<!-- GET收盘价  最大生效时间 -->
+<select id="getClostPrice" resultType="java.math.BigDecimal">
+SELECT
+	CLOSE_PRICE 
+FROM
+	MST_EXPONENT_QUOTATION T1,
+	( SELECT max( T2.EFF_DATE ) EFF_DATE, T2.MARKET_ID FROM MST_EXPONENT_QUOTATION T2 
+	WHERE <![CDATA[  T2.EFF_DATE <= TO_DATE(#{effDate},'YYYY-MM-DD')]]>
+	GROUP BY T2.MARKET_ID ) T3
+WHERE T1.MARKET_ID = #{componentId} AND T1.MARKET_ID = T3.MARKET_ID AND T1.EFF_DATE = T3.EFF_DATE
+</select>
+
+<!-- GET前收盘价  最大生效时间 -->
+<select id="getPClostPrice" resultType="java.math.BigDecimal">
+SELECT
+	P_CLOSE_PRICE 
+FROM
+	MST_EXPONENT_QUOTATION T1,
+	( SELECT max( T2.EFF_DATE ) EFF_DATE, T2.MARKET_ID FROM MST_EXPONENT_QUOTATION T2 
+	WHERE <![CDATA[  T2.EFF_DATE <= TO_DATE(#{effDate},'YYYY-MM-DD')]]>
+	GROUP BY T2.MARKET_ID ) T3
+WHERE T1.MARKET_ID = #{componentId} AND T1.MARKET_ID = T3.MARKET_ID AND T1.EFF_DATE = T3.EFF_DATE
+</select>
+
+<delete id="deleteMstRateInfo">
+	delete from MST_INT_RATE_INFO
+	<where>
+		<if test="effDate != null and effDate != ''">
+		<![CDATA[AND EFF_DATE = TO_DATE(#{effDate},'YYYY-MM-DD')]]>
+		</if> 
+		<if test="intRateType != null and intRateType != ''">
+			AND INT_RATE_TYPE = #{intRateType}
+		</if>
+	</where>
+	
+</delete>
+</mapper>

@@ -6,16 +6,20 @@
             bsc.BOOKSET_ID AS booksetId,
             bsc.SCENE_NODE_ID as sceneNodeId,
             bsc.SUBJECT_NO as subjectNo,
-            bs.SUBJECT_NAME as subjectName,
+            decode(bsc.BOOKSET_ID,'SUBJECT_INTERNAL_001',bsi.SUBJECT_INTERNAL_NAME,bs.SUBJECT_NAME) as subjectName,
             bsc.CD_FLAG as cdFlag,
             bsc.FORM_ELE as formEle,
             bsc.BOK_DETAIL_ID as bokDetailId,
             bok.dict_name as dictName,
-            bok.dict_code as dictCode
+            bok.dict_code as dictCode,
+            bok.DICT_SOURCE as dictSource
         FROM BOK_SCENESUBJECT bsc
         LEFT JOIN BOK_SUBJECT bs
             ON bs.BOOKSET_ID = bsc.BOOKSET_ID
             AND bs.SUBJECT_NO = bsc.SUBJECT_NO
+        /**SUBJECT_INTERNAL_001账套 取科目性质代码和名称**/
+        LEFT JOIN bok_subject_internal bsi
+        on bsi.SUBJECT_INTERNAL_CODE = bsc.SUBJECT_NO
         left join BOK_TABLEDICT bok
             on bsc.FORM_ELE = bok.dict_id
              and bok.bookset_id = bsc.BOOKSET_ID

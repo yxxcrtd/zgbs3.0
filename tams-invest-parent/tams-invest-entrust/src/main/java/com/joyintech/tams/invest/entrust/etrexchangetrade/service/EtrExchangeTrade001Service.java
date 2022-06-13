@@ -1037,7 +1037,7 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 		List<EtrExchangeTradeQuotation001Dto> list = new ArrayList<EtrExchangeTradeQuotation001Dto>();
 		String secId= (String)map.get("secId");
 
-		String param = "?quote_type=5&stockId="+secId;
+		String param = "?quote_type=5&stock_code="+secId;
 
 		Map quoteMap = restTemplate.getForObject(ServiceApplication.EXCHANGE_SERVICE_NAME + queryIntegratedQuote + param, Map.class);
 
@@ -2279,9 +2279,12 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 								.checkIsBlank(rowData.get(11), "EtrExchangeTrade001.invAim", lineNo));
 					}
 					if (StringUtil.isBlank(confirmMsg)) {
-						// 投资目的
-						String priceModel = convertToItemCode(DictCode.投资目的.getValue(), rowData.get(11));
-						unit.setInvAim(priceModel);
+//						// 投资目的
+//						String priceModel = convertToItemCode(DictCode.投资目的.getValue(), rowData.get(11));
+//						unit.setInvAim(priceModel);
+						// 业务模式
+						String priceModel = convertToItemCode(DictCode.业务模式.getValue(), rowData.get(11));
+						unit.setBusinessModel(priceModel);
 					} else {
 						// 设置提示信息
 						promptMsg = confirmMsg;
@@ -2307,10 +2310,10 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 							}
 							if (StringUtils.isEmpty(confirmMsg)) {
 								if (DictCodeListExt2.价格模式_指定价格.getValue().equals(priceModel)) {
-									confirmMsg = etrCommonService.StringAddByBr(confirmMsg, this.getMessage("ETR_ST_007", lineNo));
+									/*confirmMsg = etrCommonService.StringAddByBr(confirmMsg, this.getMessage("ETR_ST_007", lineNo));
 									promptMsg = etrCommonService.StringAddByBr(promptMsg, confirmMsg);
-									confirmMsg = "";
-									//unit.setPriceModel(DictCodeListExt2.价格模式_限价指令.getValue());
+									confirmMsg = "";*/
+									unit.setPriceModel(DictCodeListExt2.价格模式_限价指令.getValue());
 								} else {
 									unit.setPriceModel(priceModel);
 								}
@@ -2707,6 +2710,12 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 							BigDecimal vailableNum = selectAvailableNum(mapSec);
 							if (StringUtil.isNotEmpty(vailableNum)) {
 								unit.setAccAvailablePos(vailableNum);
+								if(vailableNum.compareTo(new BigDecimal(0))<1){
+									confirmMsg ="可用持仓不足(行号为" + lineNo + ")。";
+									promptMsg = etrCommonService.StringAddByBr(promptMsg, confirmMsg);
+									// 清空confirmMsg
+									confirmMsg = "";
+								}
 							}
 							unit.setTradePlat(DictCodeList.交易平台_竞价撮合平台.getValue());
 							settleEntrustType(unit);

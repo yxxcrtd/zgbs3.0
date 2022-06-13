@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo004Mapper">
+
+    <select id="findTraderByPartyId" resultType="java.lang.String">
+        select distinct MCCI.PARTY_ID
+        from MST_CFETS_CUSTOMER_INFO MCCI
+                 left join MST_COUNTER_PARTY MCP on MCCI.PARTY_ID = MCP.PARTY_ID
+        where MCP.PARTY_ID = #{partyId}
+    </select>
+
+    <select id="findTraderByCounterId" resultType="java.lang.String">
+        select MCCI.PARTY_ID
+        from MST_CFETS_CUSTOMER_INFO MCCI
+                 left join MST_COUNTER_PARTY MCP on MCCI.PARTY_ID = MCP.PARTY_ID
+        where MCP.COUNTER_ID = #{counterId}
+    </select>
+
+    <select id="getIsExistCounterId" resultType="java.lang.Integer">
+        select count(*)  from ETR_ENTRUST
+        where COUNTER_ID is not null
+        <if test="entrustIdList != null and entrustIdList.size() > 0">
+            AND ENTRUST_ID in
+            <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectEtrSecPositionFlow" resultMap="com.joyintech.tams.common.base.dao.EtrSecPositionFlowMapper.BaseResultMap">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.EtrSecPositionFlowMapper.Base_Column_List"></include>
+        FROM
+        ETR_SEC_POSITION_FLOW
+        WHERE
+        TRADE_ID = #{bizCode}
+        AND TRADE_ID != FINPROD_ID
+        AND HODING_TYPE IN (#{POSITION_TYPE_ROLLIN}, #{POSITION_TYPE_ROLLOUT})
+    </select>
+
+    <select id="selectPtlCashPositionFlow" resultMap="com.joyintech.tams.common.base.dao.PtlCashPositionFlowMapper.BaseResultMap">
+
+        select
+        <include refid="com.joyintech.tams.common.base.dao.PtlCashPositionFlowMapper.Base_Column_List" />
+        from PTL_CASH_POSITION_FLOW
+        WHERE
+        ORDER_ID = #{bizCode}
+        AND HODING_TYPE IN (#{hodingType})
+    </select>
+
+    <update id="updatePosition" parameterType="com.joyintech.tams.common.base.entity.EtrSecPosition" >
+		update ETR_SEC_POSITION
+		set AMOUNT = AMOUNT + #{amount,jdbcType=DECIMAL}
+		where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+		  and SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
+		  and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+		  and BRANCH = #{branch,jdbcType=DECIMAL}
+		  and INV_AIM = #{invAim,jdbcType=VARCHAR}
+		  and HODING_TYPE = #{hodingType,jdbcType=VARCHAR}
+		  and CDATE = #{cdate,jdbcType=DATE}
+	</update>
+
+    <update id="updatePtlCashPosition" parameterType="com.joyintech.tams.common.base.entity.PtlCashPosition" >
+		update PTL_CASH_POSITION
+        <set >
+            <if test="amount != null" >
+                AMOUNT = AMOUNT + #{amount,jdbcType=DECIMAL},
+            </if>
+            <if test="chlFinprodId != null" >
+                CHL_FINPROD_ID = #{chlFinprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isExistNew != null" >
+                IS_EXIST_NEW = #{isExistNew,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+          and ACCT_ID = #{acctId,jdbcType=VARCHAR}
+          and HODING_TYPE = #{hodingType,jdbcType=VARCHAR}
+          and CDATE = #{cdate,jdbcType=DATE}
+          and CCY = #{ccy,jdbcType=VARCHAR}
+	</update>
+
+    <select id="selectOldTradeId" resultType="java.lang.String">
+        select distinct regDeal.TRADE_ID
+        from REG_FIN_PRODUCT_DEAL regDeal
+        <where>
+            regDeal.IS_CANCEL = 'N' and regDeal.TRADE_STATUS != '03'
+            <if test="entrustIdList!=null and entrustIdList.size()>0">
+                and regDeal.ENTRUST_ID in
+                <foreach collection="entrustIdList" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>

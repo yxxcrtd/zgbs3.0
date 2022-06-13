@@ -1,13 +1,15 @@
 package com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.thymeleaf.util.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -69,7 +71,7 @@ public class TradeQueryBean implements Serializable {
     private String entrustBsStr;
 
     @ApiModelProperty(value = "成交数量")
-    private long tradedVolume;
+    private BigDecimal tradedVolume;
 
     @JsonSerialize(using = DoubleSerializerUtils.class)
     @ApiModelProperty(value = "成交价格")
@@ -81,6 +83,12 @@ public class TradeQueryBean implements Serializable {
 
     @ApiModelProperty(value = "成交时间")
     private Date createTime;
+
+    @ApiModelProperty(name = "deliveryResult", value = "交收状态")
+    private String deliveryResult;
+
+    @ApiModelProperty(name = "deliverySchedule", value = "交收进度")
+    private String deliverySchedule;
 
     /**
      * ///////////////////////////////////查询无用字段
@@ -325,6 +333,10 @@ public class TradeQueryBean implements Serializable {
     }
 
     public BigDecimal getTradedBalance() {
+        // 质押券出入库
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return null;
+        }
         return tradedBalance;
     }
 
@@ -332,15 +344,23 @@ public class TradeQueryBean implements Serializable {
         this.tradedBalance = tradedBalance;
     }
 
-    public long getTradedVolume() {
+    public BigDecimal getTradedVolume() {
+        // 质押券出入库 ZGCPCN-404
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(tradedVolume)),new BigDecimal("100"),2);
+        }
         return tradedVolume;
     }
 
-    public void setTradedVolume(long tradedVolume) {
+    public void setTradedVolume(BigDecimal tradedVolume) {
         this.tradedVolume = tradedVolume;
     }
 
     public BigDecimal getTradedPrice() {
+        // 质押券出入库
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return null;
+        }
         return tradedPrice;
     }
 
@@ -584,5 +604,265 @@ public class TradeQueryBean implements Serializable {
 
     public void setEntrustBsStr(String entrustBsStr) {
         this.entrustBsStr = entrustBsStr;
+    }
+
+    public String getDeliveryResult() {
+        return deliveryResult;
+    }
+
+    public void setDeliveryResult(String deliveryResult) {
+        this.deliveryResult = deliveryResult;
+    }
+
+    public String getDeliverySchedule() {
+        return deliverySchedule;
+    }
+
+    public void setDeliverySchedule(String deliverySchedule) {
+        this.deliverySchedule = deliverySchedule;
+    }
+
+    /**
+     * 页面悬浮窗提示使用字段
+     */
+    private String tradedVolumeStr;
+    private String tradedPriceStr;
+    private String tradedBalanceStr;
+
+    public String getTradedVolumeStr() {
+        return tradedVolumeStr;
+    }
+
+    public void setTradedVolumeStr(String tradedVolumeStr) {
+        this.tradedVolumeStr = tradedVolumeStr;
+    }
+
+    public String getTradedPriceStr() {
+        return tradedPriceStr;
+    }
+
+    public void setTradedPriceStr(String tradedPriceStr) {
+        this.tradedPriceStr = tradedPriceStr;
+    }
+
+    public String getTradedBalanceStr() {
+        return tradedBalanceStr;
+    }
+
+    public void setTradedBalanceStr(String tradedBalanceStr) {
+        this.tradedBalanceStr = tradedBalanceStr;
+    }
+
+    /******** 一级投标 ********/
+
+    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码,系统内代码一般不用于显示")
+    private String finprodId;
+
+    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码,显示用代码")
+    private String finprodMarketId;
+
+    @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称")
+    private String finprodAbbr;
+
+    @ApiModelProperty(required = false, name = "remark", value = "备注")
+    private String remark;
+
+    @ApiModelProperty(name = "counterId", value = "交易对手", example = "A1")
+    private String counterId;
+
+    @ApiModelProperty(name = "counterName", value = "交易对手名称", example = "A1")
+    private String counterName;
+
+    @ApiModelProperty(name = "tradeMarket", value = "交易场所")
+    private String tradeMarket;
+
+    @ApiModelProperty(name = "tradeMarketStr", value = "交易场所名称")
+    private String tradeMarketStr;
+
+    @ApiModelProperty(name = "shareNum", value = "券面总额", example = "1000000")
+    private BigDecimal shareNum;
+
+    @ApiModelProperty(name = "price", value = "净价", example = "1")
+    private BigDecimal price;
+
+    @ApiModelProperty(name = "tradeAmt", value = "交易金额", example = "1000.00")
+    private BigDecimal tradeAmt;
+
+    @ApiModelProperty(name = "biddingMethod", value = "投标方式", example = "01")
+    private String biddingMethod;
+
+    @ApiModelProperty(name = "biddingMethodStr", value = "投标方式名称,展示用", example = "自主投标")
+    private String biddingMethodStr;
+
+    @ApiModelProperty(name = "payType", value = "缴款方式", example = "01")
+    private String payType;
+
+    @ApiModelProperty(name = "payTypeStr", value = "缴款方式名称,展示用", example = "一级分销")
+    private String payTypeStr;
+
+    @ApiModelProperty(name = "payDate", value = "缴款日")
+    private Date payDate;
+
+    @ApiModelProperty(name = "payDateStr", value = "缴款日格式化,展示用")
+    private String payDateStr;
+
+    @ApiModelProperty(name = "etrBidPriceTotal", value = "指令投标券面总额(万元) 需前端转化", example = "1")
+    private BigDecimal etrBidPriceTotal;
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
+    }
+
+    public String getFinprodAbbr() {
+        return finprodAbbr;
+    }
+
+    public void setFinprodAbbr(String finprodAbbr) {
+        this.finprodAbbr = finprodAbbr;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
+    }
+
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
+    }
+
+    public String getTradeMarketStr() {
+        if (StringUtil.isEmpty(getTradeMarket())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易场所, getTradeMarket());
+    }
+
+    public void setTradeMarketStr(String tradeMarketStr) {
+        this.tradeMarketStr = tradeMarketStr;
+    }
+
+    public BigDecimal getShareNum() {
+        return shareNum;
+    }
+
+    public void setShareNum(BigDecimal shareNum) {
+        this.shareNum = shareNum;
+    }
+
+    public String getBiddingMethod() {
+        return biddingMethod;
+    }
+
+    public void setBiddingMethod(String biddingMethod) {
+        this.biddingMethod = biddingMethod;
+    }
+
+    public String getBiddingMethodStr() {
+        if (StringUtil.isEmpty(getBiddingMethod())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, getBiddingMethod());
+    }
+
+    public void setBiddingMethodStr(String biddingMethodStr) {
+        this.biddingMethodStr = biddingMethodStr;
+    }
+
+    public String getPayType() {
+        return payType;
+    }
+
+    public void setPayType(String payType) {
+        this.payType = payType;
+    }
+
+    public String getPayTypeStr() {
+        if (StringUtil.isEmpty(getPayType())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.缴款方式, getPayType());
+    }
+
+    public void setPayTypeStr(String payTypeStr) {
+        this.payTypeStr = payTypeStr;
+    }
+
+    public Date getPayDate() {
+        return payDate;
+    }
+
+    public void setPayDate(Date payDate) {
+        this.payDate = payDate;
+    }
+
+    public String getPayDateStr() {
+
+        if (null != this.getPayDate()) {
+            return DateUtil.format(this.getPayDate());
+        }
+        return payDateStr;
+    }
+
+    public void setPayDateStr(String payDateStr) {
+        this.payDateStr = payDateStr;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
+    }
+
+    public BigDecimal getEtrBidPriceTotal() {
+        return etrBidPriceTotal;
+    }
+
+    public void setEtrBidPriceTotal(BigDecimal etrBidPriceTotal) {
+        this.etrBidPriceTotal = etrBidPriceTotal;
     }
 }

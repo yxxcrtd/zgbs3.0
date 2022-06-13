@@ -90,10 +90,6 @@ public class TrdFxSwapValuationTradeDto extends WflTrdProductDeal implements Pro
      */
     private String curPair;
 
-    /**
-     * 交易类型
-     */
-    private String ps;
 
     /**
      * 期限类型
@@ -527,10 +523,6 @@ public class TrdFxSwapValuationTradeDto extends WflTrdProductDeal implements Pro
         this.curPair = curPair;
     }
 
-    @Override
-    public void setPs(String ps) {
-        this.ps = ps;
-    }
 
     @NotEmpty(fieldName="TrdFxSwapValuationTrade002.termType",groups = {ValidateGroupEdit.class})
     public String getTermType() {
@@ -593,7 +585,6 @@ public class TrdFxSwapValuationTradeDto extends WflTrdProductDeal implements Pro
     }
 
     @Override
-    @NotEmpty(fieldName="TrdFxSwapValuationTrade002.vdate",groups = {ValidateGroupEdit.class})
     public Date getVdate() {
         return vdate;
     }
