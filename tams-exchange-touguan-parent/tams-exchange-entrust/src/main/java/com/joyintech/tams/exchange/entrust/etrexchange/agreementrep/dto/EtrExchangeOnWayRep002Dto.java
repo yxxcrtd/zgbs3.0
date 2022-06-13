@@ -197,6 +197,33 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
      * 逆回购方交易商代码
      */
     private String revRepurOrgId;
+    /**
+     * 本方交易员
+     */
+    private String tradeName;
+    /**
+     * 本方交易商
+     */
+    private String dealerName;
+    /**
+     * 本方交易主体
+     */
+    private String investorName;
+    /**
+     * 对手方交易员
+     */
+    private String counterTradeName;
+    /**
+     * 对手方交易商
+     */
+    private String counterDealerName;
+    /**
+     * 对手方交易主体
+     */
+    private String counterInvestorName;
+
+
+
 
     public String getPortfolioId() {
         return portfolioId;
@@ -484,5 +511,54 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
 
     public void setCounterName(String counterName) {
         this.counterName = counterName;
+    }
+
+
+    public String getTradeName() {
+        return tradeName;
+    }
+
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getCounterTradeName() {
+        return counterTradeName;
+    }
+
+    public void setCounterTradeName(String counterTradeName) {
+        this.counterTradeName = counterTradeName;
+    }
+
+    public String getCounterDealerName() {
+        return counterDealerName;
+    }
+
+    public void setCounterDealerName(String counterDealerName) {
+        this.counterDealerName = counterDealerName;
+    }
+
+    public String getCounterInvestorName() {
+        return counterInvestorName;
+    }
+
+    public void setCounterInvestorName(String counterInvestorName) {
+        this.counterInvestorName = counterInvestorName;
     }
 }
