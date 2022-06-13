@@ -119,7 +119,7 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
             throws Exception {
         CreditProtectionCertificatePeriodSaveDto res = null;
         String businessCode = "null".equals(getParam("businessCode")) ? null : getParam("businessCode");
-        if(businessCode == null){
+        if (businessCode == null) {
             return new Message<CreditProtectionCertificatePeriodSaveDto>().fail().setMessage("请输入参数 businessCode ");
         }
         if (StringUtil.isNotEmpty(businessCode)) {
@@ -188,7 +188,7 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
                         getMessage("pingan.common.revoke"), getMessage("pingan.common.revoke"));
                 return new Message<AjaxResult>().fail().setMessage(message);
             }
-            return new Message<AjaxResult>().success().setMessage("校验通过");
+            return new Message<AjaxResult>().success().setData(new AjaxResult("撤回check成功"));
         } catch (Exception e) {
             logger.error("撤回check异常", e);
             return new Message<AjaxResult>().fail().setMessage("撤回check异常");
@@ -203,30 +203,15 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
             if (null == dto) {
                 return new Message<AjaxResult>().fail().setMessage("请选择一条数据！");
             }
-            ProcessParameter<CreditProtectionCertificatePeriodSaveDto> processParameter = new ProcessParameter<>();
-            WorkFlowParameter<CreditProtectionCertificatePeriodSaveDto> params = new WorkFlowParameter<>();
-//            CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(dto.getBusiCode());
             ProcessMark processMark = new ProcessMark();
             processMark.setPageId("CreditProtectionCertificatePeriod002");
             processMark.setBusinessDataPk1(dto.getBusiCode());
             CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getBussinessEntityByPk(processMark);
-            if(null == entity){
+            if (null == entity) {
                 entity = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(dto.getBusiCode());
             }
-            entity.setPageId("CreditProtectionCertificatePeriod002");
-            entity.setElementId("CreditProtectionCertificatePeriod002_btn_revoke");
-            entity.setWorkflowParameter("REVOKE|||1|CreditProtectionCertificatePeriod002|CreditProtectionCertificatePeriod002_btn_revoke|false");
-            params.setPageId(entity.getPageId());
-            params.setElementId(entity.getElementId());
-            params.setBusinessCode(dto.getBusiCode());
-            params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
-            params.setComment(creditProtectionCertificatePeriod002Service.generateComment(entity));
-            processParameter.setWorkFlowParameter(params);
-            String msg = creditProtectionCertificatePeriod002Service.start(processParameter, entity);
-            if (StringUtil.isBlank(msg)) {
-                return new Message<AjaxResult>().setData(new AjaxResult("撤回成功"));
-            }
-            return new Message<AjaxResult>().setData(new AjaxResult(msg));
+            creditProtectionCertificatePeriod002Service.doRevokeComplete(entity);
+            return new Message<AjaxResult>().success().setData(new AjaxResult("撤回成功"));
         } catch (Exception e) {
             logger.error("撤回异常", e);
             return new Message<AjaxResult>().fail().setMessage("撤回异常");

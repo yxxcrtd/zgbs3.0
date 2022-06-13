@@ -38,18 +38,18 @@ public class RiskNodeConfigService {
 
 
     /**
-     * 根据传入的对象获取配置数据
-     * 报文实例：
-     * {
-     *     "interfaceType":"Bond001", 场外现券：Bond001,场外质押式回购：REPO003,场内现券：Bond002,配置在RSK_NODE_CONFIG表中根节点的值
-     *     "busiAct":"02", 业务动作,对应数据字典 DictCode.业务动作
-     *     "ps":"T01", 交易方向,对应数据字典 DictCode.交易方向
-     *     "tradePlace":"01", 交易方向,对应数据字典 DictCode.交易场所
-     *     "decisionAct":"01",系统动作,对应数据字典 DictCode.系统动作
-     *     "flowStatus":"01", 流程节点,对应数据字典 DictCode.流程节点
-     *     "busiType":"02", 业务类型,对应数据字典 DictCode.头寸业务类型
-     * }
-     * 具体字段以RSK_NODE_CONFIG表中配置的字段为准
+     * <p>根据传入的对象获取配置数据
+     * <p>报文实例：
+     * <p>{
+     *     <p>"interfaceType":"Bond001", 场外现券：Bond001,场外质押式回购：REPO003,场内现券：Bond002,配置在RSK_NODE_CONFIG表中根节点的值
+     *     <p>"busiAct":"02", 业务动作,对应数据字典 DictCode.业务动作
+     *     <p>"ps":"T01", 交易方向,对应数据字典 DictCode.交易方向
+     *     <p>"tradePlace":"01", 交易方向,对应数据字典 DictCode.交易场所
+     *     <p>"decisionAct":"01",系统动作,对应数据字典 DictCode.系统动作
+     *     <p>"flowStatus":"01", 流程节点,对应数据字典 DictCode.流程节点
+     *    <p> "busiType":"02", 业务类型,对应数据字典 DictCode.头寸业务类型
+     * <p>}
+     * <p>具体字段以RSK_NODE_CONFIG表中配置的字段为准
      * @param param
      * @return
      */

@@ -186,10 +186,10 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             WorkFlowParameter<CreditProtectionCertificatePeriodSaveDto> params = new WorkFlowParameter<>();
             params.setPageId(this.getPageId());
             params.setElementId(dto.getElementId());
-            if (StringUtil.isBlank(dto.getBusiCode())) {
-                String busiCode = creditProtectionCertificatePeriod002Service.generateBusiCode(dto);
-                dto.setBusiCode(busiCode);
-            }
+//            if (StringUtil.isBlank(dto.getBusiCode())) {
+            String busiCode = creditProtectionCertificatePeriod002Service.generateBusiCode(dto);
+            dto.setBusiCode(busiCode);
+//            }
             params.setBusinessCode(dto.getBusiCode());
             params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
             params.setComment(creditProtectionCertificatePeriod002Service.generateComment(dto));
