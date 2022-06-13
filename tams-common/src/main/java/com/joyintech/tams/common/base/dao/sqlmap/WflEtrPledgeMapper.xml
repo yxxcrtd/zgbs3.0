@@ -159,7 +159,7 @@
             <if test="workflowStatus != null" >
                 WORKFLOW_STATUS,
             </if>
-            <if test="workflowStatus != null" >
+            <if test="displaceDir != null" >
                 DISPLACE_DIR,
             </if>
         </trim>
@@ -203,8 +203,8 @@
             <if test="workflowStatus != null" >
                 #{workflowStatus,jdbcType=VARCHAR},
             </if>
-            <if test="workflowStatus != null" >
-                #{workflowStatus,jdbcType=VARCHAR},
+            <if test="displaceDir != null" >
+                #{displaceDir,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

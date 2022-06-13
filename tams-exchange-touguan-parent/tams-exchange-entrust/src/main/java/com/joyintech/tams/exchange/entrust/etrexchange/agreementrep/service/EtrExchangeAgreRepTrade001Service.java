@@ -2227,7 +2227,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
           	systemAct = DictCodeListExt3.系统动作_新建.getValue();
           	decisionAct = DictCodeListExt3.系统动作_新建.getValue();
         }
-  		//positionRequestService.send(entity,decisionAct,systemAct);
+  		positionRequestService.send(entity,decisionAct,systemAct);
   		//增加调用头寸引擎代码end
 
     }
