@@ -21,6 +21,7 @@ import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
+import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
@@ -140,8 +141,11 @@ public class CommonCheckKit extends BaseCheckKit {
      * 检查账号及终端登录情况
      */
     private void checkAccountAndAgent(Instruction instruction) throws BusinessResultException {
+        //信用保护凭证不依赖终端
+        if (StringUtil.equals(CREDIT_PROTECTION_CERTIFICATE.getCode(), instruction.getBusiTypeTg())) {
+            return;
+        }
         String acctNo = instruction.getAcctNo();
-
         Account account = accountManager.getAccountById(acctNo);
         if (ObjectUtil.isNull(account)) {
             throw new BusinessResultException(ErrorCode.ACCOUNT_NOT_LOGIN);
@@ -264,7 +268,7 @@ public class CommonCheckKit extends BaseCheckKit {
     }
 
     private void checkMinStepWithBuy(BaseOrderRequest order, Instruction instruction) {
-        if (order.isFairOrder()) {
+        if (order.isFairOrderFlag()) {
             log.info("【公平交易】不检查委托数量是否符合最小买入单位整数倍");
             return;
         }
@@ -319,7 +323,7 @@ public class CommonCheckKit extends BaseCheckKit {
 
         if (EntrustUtils.isNotBuyOrSellTrade(instruction.getBusiTypeTg())
                 || EnumUtil.in(instruction.getAssetType(), InvestAssetTypeEnum.BOND)) {
-            log.info("【非买卖交易和债券交易】不需要检查价格是否满足涨跌停价：busiTypeTg={}",instruction.getBusiTypeTg());
+            log.info("【非买卖交易和债券交易】不需要检查价格是否满足涨跌停价：busiTypeTg={}", instruction.getBusiTypeTg());
             return;
         }
         if (lowerLimitPrice.compareTo(entrustPrice) > 0

@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.joyintech.tams.constant.DictCodeListExt3.流程节点_流程提交;
-import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 
 /**
  * 风险升级 4合一接口
@@ -40,7 +39,7 @@ public class RiskTrialController {
     @PostMapping("/doRiskcal/{pageId}")
     public Message<AjaxResult> doRiskcal(@RequestBody Map<String, Object> param, @PathVariable("pageId") String pageId) {
         try {
-            RiskCommonOutputDto outputDto = paramSerivce.buildParamThenRisk(param, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), pageId);
+            RiskCommonOutputDto outputDto = paramSerivce.buildParamThenRisk(param, 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), pageId);
             CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
             result.setRiskMathFlag("02");
             AjaxResult m = new AjaxResult();

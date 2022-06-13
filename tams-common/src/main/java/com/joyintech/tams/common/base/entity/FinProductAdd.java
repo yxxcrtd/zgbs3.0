@@ -548,6 +548,26 @@ public class FinProductAdd extends BaseEntity {
      */
     private String originalOwner;
 
+    private String basis;
+
+    /**
+     * 获取 计息基础
+     *
+     * @return basis 计息基础
+     */
+    public String getBasis() {
+        return this.basis;
+    }
+
+    /**
+     * 设置 计息基础
+     *
+     * @param basis 计息基础
+     */
+    public void setBasis(String basis) {
+        this.basis = basis;
+    }
+
 
     public String getDirectDisclosureRiskFlag() {
         return directDisclosureRiskFlag;

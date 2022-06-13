@@ -259,6 +259,9 @@
         m.CDATE=#{valueDate,jdbcType=VARCHAR}
         AND
         m.VALUE_SOURCE=#{valueSource,jdbcType=VARCHAR}
+        <if test="mdprice != null and mdprice !=''">
+            and m.MDPRICE = #{mdprice,jdbcType=VARCHAR}
+        </if>
     </select>
 
 

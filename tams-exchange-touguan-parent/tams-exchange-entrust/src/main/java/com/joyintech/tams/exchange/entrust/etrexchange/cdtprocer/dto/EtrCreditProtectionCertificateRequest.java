@@ -1,9 +1,11 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto;
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -57,6 +59,24 @@ public class EtrCreditProtectionCertificateRequest {
 
     @ApiModelProperty(name="finprodMarketIds",value="多个市场代码",example="A,B")
     private String finprodMarketIds;
+
+    private BigDecimal ImplementPercentAge;
+    public BigDecimal getImplementPercentAge(){
+        return ImplementPercentAge;
+    }
+
+    public void setImplementPercentAge(BigDecimal ImplementPercentAge){
+        this.ImplementPercentAge = ImplementPercentAge;
+    }
+
+    private BigDecimal dealPercentAge;
+    public BigDecimal getDealPercentAge(){
+      return dealPercentAge;
+    }
+
+    public void setDealPercentAge(BigDecimal dealPercentAge){
+        this.dealPercentAge = dealPercentAge;
+    }
 
     public PageMode getPageMode() {
         return pageMode;

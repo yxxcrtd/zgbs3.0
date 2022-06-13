@@ -72,8 +72,9 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
     }
 
 
-    public MskCreditInfoProSaveRequest selectByKey(String secId, String valueDate, String valueSource) {
+    public MskCreditInfoProSaveRequest selectByKey(String mdprice, String secId, String valueDate, String valueSource) {
         Map<String,Object> map = new HashMap<String,Object>();
+        map.put("mdprice",mdprice);
         map.put("secId", secId);
         map.put("valueDate", valueDate);
         map.put("valueSource", valueSource);

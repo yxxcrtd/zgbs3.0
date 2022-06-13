@@ -42,6 +42,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     MIN_TRD_UNIT_LIMIT_ERROR(26, "未找到最小交易单元"),
 
+    MIN_TRD_NUM_LIMIT_ERROR(27, "未找到最小交易数量"),
+
     DB_ERROR(100, "数据库返回错误"),
 
     CHECK_ERROR(101, "校验失败"),

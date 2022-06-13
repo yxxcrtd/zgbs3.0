@@ -153,7 +153,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
-                if(mskCreditMarketInfoPro001Service.selectByKey(entity.getSecid(), entity.getCdate(),entity.getValueSource()) == null){
+                if(mskCreditMarketInfoPro001Service.selectByKey(null,entity.getSecid(), entity.getCdate(),entity.getValueSource()) == null){
                     errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
@@ -189,7 +189,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                     wr.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(wr);
                 }
-                if(mskCreditMarketInfoPro001Service.selectByKey((String) param.get("secid"), (String)param.get("cdate"),(String)param.get("valueSource")) == null){
+                if(mskCreditMarketInfoPro001Service.selectByKey(null,(String) param.get("secid"), (String)param.get("cdate"),(String)param.get("valueSource")) == null){
                     errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
                     wr.setErrorList(errorList);
                     wr.setMessageType(MessageType.错误消息);

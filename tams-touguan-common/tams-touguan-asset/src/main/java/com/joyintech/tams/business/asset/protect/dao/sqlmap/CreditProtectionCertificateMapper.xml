@@ -141,7 +141,8 @@
         sdl2.item_value settleMethodStr,
         fpa.IS_ALLOW_OVERWRITE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
         sdl1.item_value isOrNoStr,
-        fp.REMARK
+        fp.REMARK,
+        fpa.basic
         FROM
         FIN_PRODUCT fp
         LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID

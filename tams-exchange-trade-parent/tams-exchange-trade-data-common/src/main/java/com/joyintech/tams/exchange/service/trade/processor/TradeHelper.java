@@ -20,6 +20,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.utils.*;
@@ -239,6 +240,21 @@ public class TradeHelper {
 
     public void addEntrustToReceiver(EntrustInterface entrust, Instruction instruction, int msgType) {
         TradeAgent agent = tradeAgentManager.findAgentByAccountId(entrust.getAccountId());
+
+        //信用保护凭证不依赖终端
+        //TODO 目前只对具体业务判断，后续可通过全局簿记开关控制：
+        //（1）开关开启所有业务走簿记功能，不在依赖终端；
+        //（2）开关关闭所有业务走交易接口，需要依赖终端；
+        if(StringUtil.equals(BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.getCode(),instruction.getBusiTypeTg())){
+            TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(entrust.getInstructionId());
+            if (Constants.PROCESS_TYPE_ENTRUST == msgType) {
+                tradeMsgReceiver.addMsg(MsgType.REQ_ENTRUST, entrust, agent);
+            } else if (Constants.PROCESS_TYPE_INTEGRATED == msgType) {
+                tradeMsgReceiver.addMsg(MsgType.REQ_INTEGRATED, entrust, agent);
+            }
+            return;
+        }
+
         if (Objects.nonNull(agent)) {
             TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(entrust.getInstructionId());
             if (Constants.PROCESS_TYPE_ENTRUST == msgType) {
@@ -515,11 +531,13 @@ public class TradeHelper {
      * 1、是否满足指令价格限定；
      * 2、是否满足行情涨跌停价限制
      */
-    private void checkPrice(OrderInterface entrust, Instruction instruction) {
+    private void checkPrice(BatchInfo batchInfo,OrderInterface entrust, Instruction instruction) {
         BigDecimal entrustPrice = entrust.getEntrustPrice();
         BigDecimal instructionPrice = instruction.getEntrustPrice();
         if (instruction.convertibleBond() || (instruction.newBond() && instruction.fullPrice())) {
-            entrustPrice = entrust.getFullPrice();
+            if (batchInfo.getCompleteTimes() == 0) {
+                entrustPrice = entrust.getFullPrice();
+            }
             instructionPrice = instruction.getFullPrice();
         }
 
@@ -535,8 +553,8 @@ public class TradeHelper {
             TickBean tick = (TickBean) tickBean.getData();
             BigDecimal minPrice = instruction.queryMinPrice(entrust.getEntrustProp());
             int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
-            double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
-            double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
+            double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), round, RoundingMode.UP);
+            double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), round, RoundingMode.DOWN);
             if (InvestAssetTypeEnum.STOCK.value.equals(entrust.getAssetType())) {
                 logger.info("检查【股票】涨停价格。。。");
                 fillEntrustPrice(entrust, lowerLimitPrice, upperLimitPrice, entrustPrice);
@@ -736,7 +754,7 @@ public class TradeHelper {
         order.setIsNoGuard(instruction.getIsNoGuard());
 
         //1.公平下单
-        if (dto.isFairOrder()) {
+        if (dto.isFairOrderFlag()) {
             if (!fairOrderHelper.createFairOrder(order, instruction)) {
                 order.setErrorCode(NOT_FAIR_ORDER_ERROR.value);
                 order.setErrorMsg(NOT_FAIR_ORDER_ERROR.errorMsg);
@@ -1014,7 +1032,7 @@ public class TradeHelper {
         setBatchEntrustPrice(order, batchInfo, entrust, instruction, round);
 
         //批量委托检查委托价格
-        checkPrice(entrust, instruction);
+        checkPrice(batchInfo, entrust, instruction);
 
         //资产类型是债券，处理净价、全价
         if (InvestAssetTypeEnum.isBond(order.getAssetType())) {
