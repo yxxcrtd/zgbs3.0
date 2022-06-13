@@ -21,10 +21,9 @@ import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
-import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
-import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
@@ -46,7 +45,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
-import static com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum.*;
+import static com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE;
+import static com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum.STANDARD_COUPONS_IN_AND_OUT;
 
 /**
  * 报单通用检查
@@ -283,9 +283,8 @@ public class CommonCheckKit extends BaseCheckKit {
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
 
-        if (InvestAssetTypeEnum.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
-                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
-                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+        //判断是否万元单位
+        if (isWanyuanUnit(instruction, minTrdUnitLimit)) {
             minStep = minStep / 100;
         }
 
@@ -367,9 +366,8 @@ public class CommonCheckKit extends BaseCheckKit {
             minNum = minTrdUnitLimit.getMinNum();
         }
 
-        if (InvestAssetTypeEnum.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
-                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
-                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+        //判断是否万元单位
+        if (isWanyuanUnit(instruction, minTrdUnitLimit)) {
             minNum = minNum / 100;
         }
 
@@ -401,6 +399,19 @@ public class CommonCheckKit extends BaseCheckKit {
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
+    }
+
+    private boolean isWanyuanUnit(Instruction instruction, MinTrdUnitLimit minTrdUnitLimit) {
+        if (InvestAssetTypeEnum.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
+                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+            return true;
+        }
+        if (StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), instruction.getBusiTypeTg())) {
+            return true;
+        }
+
+        return false;
     }
 
     @SuppressWarnings("unused")
