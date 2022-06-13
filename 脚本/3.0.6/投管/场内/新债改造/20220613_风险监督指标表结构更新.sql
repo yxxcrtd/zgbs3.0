@@ -1,0 +1,1 @@
+alter table RSK_ISUP_INDICATOR modify SUP_DOC VARCHAR2(1000);

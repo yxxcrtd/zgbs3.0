@@ -157,8 +157,8 @@
         fa.SETTLE_METHOD    settleMethod
         from FIN_PRODUCT f
         left join FIN_PRODUCT_ADD fa on fa.FINPROD_ID = f.FINPROD_ID
-        where f.FINPROD_ID = #{finprodId}
-        or f.FINPROD_MARKET_ID = #{finprodId}
+        where f.FINPROD_MARKET_ID = #{finprodId}
+        and f.FINPROD_TYPE2 = 'F37'
     </select>
     <select id="getEntityByBusinessCode"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto">
