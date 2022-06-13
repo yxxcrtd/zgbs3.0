@@ -1147,10 +1147,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     }
 
                     //投标日前下的指令，指令结束日为投标日;投标日后下的指令，指令结束日为指令日期
-                    if (DateUtil.compareDate(cfetsDto.getEtrDate(), cfetsDto.getIssueDate()) >= 0) {
-                        dd.setMdate(cfetsDto.getIssueDate());
+                    if (DateUtil.compareDate(dto.getEntrustDate(), dto.getIssueDate()) >= 0) {
+                        dd.setMdate(dto.getIssueDate());
                     } else {
-                        dd.setMdate(cfetsDto.getEntrustDate());
+                        dd.setMdate(dto.getEntrustDate());
                     }
 
                     etrInvestBondFirstBidList.add(dd);
