@@ -223,6 +223,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             CfetsPrimaryBidManageCfmResponse response = cfetsPrimaryBidManageMapper.getBidManageCfmInfo(param);
             List<BidProductDto> bidProductList = cfetsPrimaryBidManageMapper.getBidProductList(param);
+            for(BidProductDto bidProduct:bidProductList){
+                bidProduct.setTotalBidPrinamt(ArithmeticUtil.round(bidProduct.getTotalBidPrinamt(),2, RoundingMode.HALF_UP));
+                bidProduct.setWinPrinAmt(ArithmeticUtil.round(bidProduct.getWinPrinAmt(),2, RoundingMode.HALF_UP));
+            }
             if(StringUtil.isNotEmpty(response.getBidModle()) && response.getBidModle().equals(DictCodeListExt4.投标方式_自主投标.getValue())) {
                 Map<String, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
                 List<SummaryBidDto> summaryBidList = new ArrayList<>();

@@ -295,6 +295,11 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                 if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
                     errorList.add(new ValidMessage("存在流程中数据，不可进行中标结果维护！"));
                 }
+                parameter.setPageId("CfetsTrdFirstBidFirm002");
+                parameter.setBusinessDataPk1(dto.getBidId());
+                if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
+                    errorList.add(new ValidMessage("选择数据须已投标且不存在流程中数据，请重新选择！"));
+                }
                 res.setErrorList(errorList);
                 return new Message<AjaxResult>().success().setData(res);
             }
