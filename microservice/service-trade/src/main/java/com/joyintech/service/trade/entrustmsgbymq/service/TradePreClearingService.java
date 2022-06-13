@@ -2059,6 +2059,15 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();
         bussTrdTransferOrder.add(bussTrdTransferOrderDto);
         dto.setBussTrdTransferOrder(bussTrdTransferOrder);
+
+        //金融产品临时交易表
+        trdProductTempDealMapper.insertSelective(trdProductTempDeal);
+        //金融产品临时交易附属表
+        trdProductTempDealAddMapper.insertSelective(trdProductTempDealAdd);
+        // 写入临时划款指令表
+        StlPayTempOrders stlPayTempOrders = new StlPayTempOrders();
+        BeanUtil.copyPropertiesIgnoreNull(stlPayTempOrders, bussTrdTransferOrderDto);
+        stlPayTempOrdersMapper.insertSelective(stlPayTempOrders);
     }
 
     /**
