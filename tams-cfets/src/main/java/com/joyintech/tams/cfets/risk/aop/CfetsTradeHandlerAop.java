@@ -127,7 +127,8 @@ public class CfetsTradeHandlerAop {
     /**
      * 债券成交确认
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteMethod(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteMethod(..))" +
+            "|| execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteBidMethod(..))")
     protected void completePoint() {
     }
 
