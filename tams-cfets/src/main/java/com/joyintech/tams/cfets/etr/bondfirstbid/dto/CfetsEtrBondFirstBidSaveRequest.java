@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 一级投标指令保存请求参数
+ *
  * @Author: kchen
  * @Date: 2022/4/19 9:31
  */

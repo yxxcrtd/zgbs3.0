@@ -224,18 +224,6 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 map.put(NodeConfigConstant.BUSI_ACT, 业务动作_交收失败.getValue());
             }
         }
-        if (obj instanceof CfetsEtrBondFirstBidSaveRequest || StringUtil.equals(pageId, "cfetsEtrBondFirstBid002")) {
-            CfetsEtrBondFirstBidSaveRequest dto = JsonUtils.json2Object(businessJson, CfetsEtrBondFirstBidSaveRequest.class);
-            return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
-                    .put(NodeConfigConstant.DECISION_ACT, decisionAct)
-                    .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
-                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级投标.getValue())
-                    .put("tradePlace", dto.getTradeMarket())
-                    .put("ps", dto.getPs())
-                    .put("isCheck", isCheck)
-                    .put("data", dto);
-        }
         if (obj instanceof CfetsTrdFirstBidFirmInfoDto || StringUtil.equals(pageId, "CfetsTrdFirstBidFirm002")) {
             CfetsTrdFirstBidFirmInfoDto dto = JsonUtils.json2Object(businessJson, CfetsTrdFirstBidFirmInfoDto.class);
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
@@ -675,6 +663,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             this.generateInputDto(inputDto, data, null);
             result.add(inputDto);
         }
+        // 一级投标指令
         if (data instanceof CfetsEtrBondFirstBidSaveRequest) {
             List<CfetsBiddingProductDto> list = ((CfetsEtrBondFirstBidSaveRequest) data).getBiddingProductList();
             //这里处理授信
@@ -1086,7 +1075,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 creditLinesInputDto.setTradeAmt(newFaceValue.multiply(ArithmeticUtil.divide(creditLinesInputDto.getTradeAmt(), 100, 2)));
             }
         }
-        if (obj instanceof CfetsEtrBondFirstBidSaveRequest) {//银行间债券指令
+        if (obj instanceof CfetsEtrBondFirstBidSaveRequest) {//一级投标指令
             CfetsEtrBondFirstBidSaveRequest inputDto = (CfetsEtrBondFirstBidSaveRequest) obj;
             CfetsBiddingProductDto detailDto = (CfetsBiddingProductDto) detailObj;
             creditLinesInputDto.setTradeId(inputDto.getEntrustId());
