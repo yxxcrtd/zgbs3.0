@@ -138,6 +138,16 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 对手方交易商代码
      */
     private String counterDealerId;
+
+    /**
+     * 对手方交易主体代码
+     */
+    private String counterInvestorId;
+
+    /**
+     * 对手方交易主体类型
+     */
+    private String counterInvestorType;
     
 
     /**
@@ -1263,5 +1273,34 @@ public class EtrCommandDispatcherDto extends BaseEntity{
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    /**
+     * 行情请求编号
+     */
+    private String quoteRequestId;
+
+    public String getQuoteRequestId() {
+        return quoteRequestId;
+    }
+
+    public void setQuoteRequestId(String quoteRequestId) {
+        this.quoteRequestId = quoteRequestId;
+    }
+
+    public String getCounterInvestorId() {
+        return counterInvestorId;
+    }
+
+    public void setCounterInvestorId(String counterInvestorId) {
+        this.counterInvestorId = counterInvestorId;
+    }
+
+    public String getCounterInvestorType() {
+        return counterInvestorType;
+    }
+
+    public void setCounterInvestorType(String counterInvestorType) {
+        this.counterInvestorType = counterInvestorType;
     }
 }
