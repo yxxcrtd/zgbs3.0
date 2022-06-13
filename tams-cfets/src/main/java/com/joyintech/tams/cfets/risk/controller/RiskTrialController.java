@@ -69,6 +69,20 @@ public class RiskTrialController {
             logger.error("风险试算异常", e);
             return new Message<AjaxResult>().fail().setMessage("风险试算异常");
         }
+    }
 
+    @ApiOperation(value = "风险占用", notes = "风险占用")
+    @PostMapping("/doOccupy/{pageId}/{decisionAct}/{flowStatus}")
+    public Message<AjaxResult> doOccupy(@RequestBody Map<String, Object> param,
+                                        @PathVariable("pageId") String pageId,
+                                        @PathVariable("decisionAct") String decisionAct,
+                                        @PathVariable("flowStatus") String flowStatus) {
+        try {
+            paramSerivce.buildParamThenOccupy(param, decisionAct, flowStatus, pageId);
+            return new Message<AjaxResult>().success();
+        } catch (Exception e) {
+            logger.error("风险占用更新异常", e);
+            return new Message<AjaxResult>().fail().setMessage("风险占用更新异常");
+        }
     }
 }

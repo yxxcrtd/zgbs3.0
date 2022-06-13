@@ -29,7 +29,7 @@
             sdl3.item_value tradeMarketStr,				<!-- 交易场所-->
             fpa.ISSUERSHORT issueRshort,
             ci1.CUSTOMER_NAME issueRshortStr,       <!-- 创立机构-->
-            fpa.NOM_CAPI issueAmt,								<!-- 名义本金总额-->
+            nvl(fpa.NOM_CAPI,0)/10000 issueAmt,								<!-- 名义本金总额-->
             fpa.PROTECT_OBJECT protectObject,			<!-- 保护对象-->
             sdl4.item_value protectObjectStr,
             fpa.REF_SEC_FEATURES refSecFeatures,  <!-- 参考债项特征-->

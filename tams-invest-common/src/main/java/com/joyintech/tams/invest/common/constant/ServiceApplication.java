@@ -21,7 +21,7 @@ import javax.annotation.PostConstruct;
 
 /**
  * 微服务访问路径定义
- * 
+ *
  * @author 何阳阳
  * @version 2.0 2018年9月8日
  * @see ServiceApplication
@@ -34,14 +34,17 @@ public class ServiceApplication {
      * 适配器服务
      */
     public static String ADAPTER_SERVICE_NAME = "http://adapterService";
+
     /**
      * 自定义接口服务
      */
     public static String CUSTOMER_INTERF_NAME = "http://customerInterfService";
+
     /**
      * 共通服务
      */
     public static String COMMON_SERVICE_NAME = "http://commonService";
+
     /**
      * 基础数据及行情管理
      */
@@ -122,7 +125,8 @@ public class ServiceApplication {
      */
     public static String CHB_SERVICE_NAME = "http://chbService";
 
-    /**     * 交易系统接口
+    /**
+     * 交易系统接口
      */
     public static String EXCHANGE_SERVICE_NAME = "http://exchangeService";
 
@@ -162,7 +166,7 @@ public class ServiceApplication {
 
         @PostConstruct
         private void setConfig() {
-            if(!config.isSingle()) {
+            if (!config.isSingle()) {
                 COMMON_SERVICE_NAME = COMMON_SERVICE_NAME + config.getCommonService();
                 BASICDATA_SERVICE_NAME = BASICDATA_SERVICE_NAME + config.getBasicDataService();
                 DOCUMENT_SERVICE_NAME = DOCUMENT_SERVICE_NAME + config.getDocumentService();
@@ -182,12 +186,12 @@ public class ServiceApplication {
                 PINGAN_SERVICE_NAME = PINGAN_SERVICE_NAME + config.getTamsServer();
                 INVEST_INTERF_SERVICE_NAME = INVEST_INTERF_SERVICE_NAME + config.getInvestInterfService();
 
-                CHB_SERVICE_NAME = CHB_SERVICE_NAME + config.getChbService();                EXCHANGE_SERVICE_NAME = EXCHANGE_SERVICE_NAME + config.getExchangeService();
+                CHB_SERVICE_NAME = CHB_SERVICE_NAME + config.getChbService();
+                EXCHANGE_SERVICE_NAME = EXCHANGE_SERVICE_NAME + config.getExchangeService();
                 QUOTE_SERVICE_NAME = EXCHANGE_SERVICE_NAME + config.getQuoteService();
                 BANKUPLINK_SERVICE_NAME = BANKUPLINK_SERVICE_NAME + config.getBankuplinkService();
-                INTERF_PLACE_SERVICE_NAME = INTERF_PLACE_SERVICE_NAME +config.getInterfPlaceService();
-            }
-            else {
+                INTERF_PLACE_SERVICE_NAME = INTERF_PLACE_SERVICE_NAME + config.getInterfPlaceService();
+            } else {
                 COMMON_SERVICE_NAME = config.getCommonService();
                 BASICDATA_SERVICE_NAME = config.getBasicDataService();
                 DOCUMENT_SERVICE_NAME = config.getDocumentService();
@@ -235,7 +239,7 @@ public class ServiceApplication {
         private String assetService;
 
         private String portfolioService;
-        
+
         private String channelService;
 
         private String productService;
@@ -264,6 +268,7 @@ public class ServiceApplication {
         private String investInterfService;
 
         private String chbService;
+
         private String exchangeService;
 
         private String quoteService;
@@ -282,7 +287,7 @@ public class ServiceApplication {
 
         /**
          * 获取 investInterfService
-         * 
+         *
          * @return investInterfService.
          */
         public String getInvestInterfService() {
@@ -291,7 +296,7 @@ public class ServiceApplication {
 
         /**
          * 设置 investInterfService
-         * 
+         *
          * @param investInterfService investInterfService
          */
         public void setInvestInterfService(String investInterfService) {
@@ -316,7 +321,7 @@ public class ServiceApplication {
 
         /**
          * 获取 single
-         * 
+         *
          * @return single.
          */
         public boolean isSingle() {
@@ -325,7 +330,7 @@ public class ServiceApplication {
 
         /**
          * 设置 single
-         * 
+         *
          * @param single single
          */
         public void setSingle(boolean single) {
@@ -422,7 +427,7 @@ public class ServiceApplication {
 
         /**
          * 获取 commonService
-         * 
+         *
          * @return commonService.
          */
         public String getCommonService() {
@@ -431,7 +436,7 @@ public class ServiceApplication {
 
         /**
          * 设置 commonService
-         * 
+         *
          * @param commonService commonService
          */
         public void setCommonService(String commonService) {
@@ -440,7 +445,7 @@ public class ServiceApplication {
 
         /**
          * 获取 basicDataService
-         * 
+         *
          * @return basicDataService.
          */
         public String getBasicDataService() {
@@ -449,7 +454,7 @@ public class ServiceApplication {
 
         /**
          * 设置 basicDataService
-         * 
+         *
          * @param basicDataService basicDataService
          */
         public void setBasicDataService(String basicDataService) {
@@ -458,6 +463,7 @@ public class ServiceApplication {
 
         /**
          * 获取 channelService
+         *
          * @return channelService.
          */
         public String getChannelService() {
@@ -466,6 +472,7 @@ public class ServiceApplication {
 
         /**
          * 设置 channelService
+         *
          * @param channelService channelService
          */
         public void setChannelService(String channelService) {
@@ -495,6 +502,7 @@ public class ServiceApplication {
         public void setChbService(String chbService) {
             this.chbService = chbService;
         }
+
         public String getExchangeService() {
             return exchangeService;
         }
@@ -511,13 +519,13 @@ public class ServiceApplication {
             this.quoteService = quoteService;
         }
 
-		public String getBankuplinkService() {
-			return bankuplinkService;
-		}
+        public String getBankuplinkService() {
+            return bankuplinkService;
+        }
 
-		public void setBankuplinkService(String bankuplinkService) {
-			this.bankuplinkService = bankuplinkService;
-		}
+        public void setBankuplinkService(String bankuplinkService) {
+            this.bankuplinkService = bankuplinkService;
+        }
     }
 
 }
