@@ -265,6 +265,8 @@ public class EntrustStatusService {
             url = tamsSerever + String.format("/riskTrial/doOccupy/%s/%s/%s", pageId, 系统动作_关闭.getValue(), 流程节点_流程提交.getValue());
             EtrEntrust etrEntrust = new EtrEntrust();
             etrEntrust.setEntrustId(cfetsEntrustClosePosEtrReqDto.getCloseId());
+            etrEntrust.setPs(cfetsEntrustClosePosEtrReqDto.getPs());
+            etrEntrust.setTradeMarket(cfetsEntrustClosePosEtrReqDto.getTradeMarket());
             if (isSingle) {
                 message = simpleRestTemplate.postForObject(url, etrEntrust, Message.class);
             } else {
