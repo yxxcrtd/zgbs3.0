@@ -1999,8 +1999,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 this.dealOldPosition(entity, false);
             } else {
                 this.sendPositionMethodOther(entity, true, null);
-                // 老头寸处理
-                this.dealOldPosition(entity, false);
+                // 自主投标不处理老头寸 在中标结果维护时处理
             }
         }
         // AOP中处理操作履历
@@ -2824,8 +2823,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
                         DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
             }
-            // 老头寸处理
-            this.dealOldPosition(entity, true);
+            if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
+                // 老头寸处理
+                this.dealOldPosition(entity, true);
+            }
             //处理指令执行进度
             this.insertEtrFinishStatus(entity, OperationType.REVOKE);
         } catch (PositionException e) {
@@ -3748,9 +3749,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      * @date 2022/4/28 10:37
      */
     public void dealOldPosition(CfetsTrdFirstBidFirmInfoDto entity, boolean isRevokeOrBack) {
-//        if (StringUtil.isNotEmpty(entity)) {
-//            return;
-//        }
         if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             // 撤销或退回
             entity.setTradeDate(iPlatformDate.getSysDate());
@@ -3771,7 +3769,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     trdProductDeal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
                     trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
                     trdProductDeal.setSettleDate(entity.getTradeDate());
-//                    trdProductDeal.setPrinAmt(deal.getSubscriptionAmount());
+                    trdProductDeal.setPrinAmt(deal.getBidPriceTotal());
                     trdProductDeal.setTradeDate(entity.getTradeDate());
                     trdProductDeal.setSettleDate(entity.getTradeDate());
                     baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);

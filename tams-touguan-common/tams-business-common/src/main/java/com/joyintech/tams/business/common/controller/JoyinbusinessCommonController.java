@@ -379,7 +379,7 @@ public class JoyinbusinessCommonController extends BaseController {
             if (!SecurityUtil.getLoginUser().isAdmin() && StringUtils.isNotEmpty(userId)) {
                 list = userService.getPermissions(userId);
             }
-            resultMap.put("isAdmin",Boolean.TRUE);
+            resultMap.put("isAdmin",SecurityUtil.getLoginUser().isAdmin());
             resultMap.put("PermissionLists",list);
             return new Message<Map<String, Object>>().success().setData(resultMap);
         } catch (Exception e) {

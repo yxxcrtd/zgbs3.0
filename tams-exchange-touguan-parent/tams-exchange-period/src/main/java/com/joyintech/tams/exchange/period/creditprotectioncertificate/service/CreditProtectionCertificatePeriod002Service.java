@@ -139,6 +139,15 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         }
     }
 
+    public void doRevokeComplete(CreditProtectionCertificatePeriodSaveDto entity){
+        investPeriodCommonService.revokeReverseTradeTable(entity.getBusiCode(),
+                LoginUserUtil.getUserName(), "", null, null,null);
+        CreditProtectionCertificatePeriodSaveDto dto = getBussinessEntityByWorkflowId(entity.getWorkflowId());
+        doOldPositionSubmit(dto, true);
+        doOldPositionConfirm(dto, true);
+        positionRequestService.sendRevokeCreditProtectionCertificatePeriod(entity);
+    }
+
     @Override
     public void doUpdate(CreditProtectionCertificatePeriodSaveDto entity) {
         BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);

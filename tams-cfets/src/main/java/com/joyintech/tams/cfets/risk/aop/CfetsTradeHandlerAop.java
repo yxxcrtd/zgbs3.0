@@ -43,7 +43,7 @@ public class CfetsTradeHandlerAop {
     /**
      * 日志
      */
-    private static Logger logger = LoggerFactory.getLogger(CfetsEntrustHanderAop.class);
+    private static final Logger logger = LoggerFactory.getLogger(CfetsEntrustHanderAop.class);
 
     @Autowired
     private RiskInputParamSerivce inputParamSerivce;
