@@ -353,7 +353,7 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         //对选择的数据进行check
         AjaxResult ajaxResult = cfetsEtrBondFirstBid001Service.modifyDelegateCheckMethod(dto);
         if (!StringUtil.isEmptyList(ajaxResult.getErrorList())) {
-            return new Message<AjaxResult>().fail().setData(ajaxResult);
+            return new Message<AjaxResult>().success().setData(ajaxResult);
         }
         try {
             CfetsEtrBondFirstBidReqDto item = dto.getSelectedItem().get(0);
