@@ -658,7 +658,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrSecRepoBondDto.setMatureYield(ArithmeticUtil.divide(dto.getYield(), new BigDecimal(100), 8)); // 到期收益率
             etrSecRepoBondDto.setFullPrice(dto.getFprice()); // 全价
             etrSecRepoBondDto.setPrice(dto.getPrice());
-            BigDecimal cash = StringUtil.isNotEmpty(dto.getEntrustNum())? dto.getEntrustNum().multiply(new BigDecimal(10000)):new BigDecimal(0.00);
+            BigDecimal cash = StringUtil.isNotEmpty(dto.getEntrustNum())? dto.getEntrustNum().multiply(new BigDecimal(10000)):BigDecimal.valueOf(0.00);
             etrSecRepoBondDto.setEntrustAmt(dto.getEntrustAmt());
             etrSecRepoBondDto.setEntrustNum(cash);
             etrSecRepoBondDto.setCalMode(dto.getCalculateField());// 计算方式
