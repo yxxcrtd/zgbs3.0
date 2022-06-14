@@ -27,6 +27,7 @@ import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset003Dto
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -258,34 +259,16 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      * @param dto
      * @return
      */
-    public FinBondAssetSaveRequest validAddCoupons(FinTenderBondAsset003Dto dto) {
+    public FinBondMarketInfoDetailQueryDto validAddCoupons(FinTenderBondAsset003Dto dto) {
         List<ValidMessage> validMessages = new ArrayList<>();
         Map<String, String> param = new HashMap();
         param.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
         param.put("finprodMarketId", dto.getAppearMarketId());
         String finproductId = finTenderBoundAssetMapper.selectFinprodId(param);
         if (StringUtil.isEmpty(finproductId)) {
-            FinBondAssetSaveRequest request = finBondAssetService.getInterfBondDto(dto.getAppearMarketId());
-            if (Objects.isNull(request)) {
-                request = new FinBondAssetSaveRequest();
-                request.setFinprodMarketId(dto.getAppearMarketId());
-                return request;
-            }
-            if (StringUtil.isNotEmpty(dto)) {
-                request.setCreditFlag("");
-                request.setFinprodMarketId(dto.getAppearMarketId());
-                ValidUtils.valid(request, validMessages);
-                ValidUtils.valid(request.getFinProductConvertible(), validMessages);
-                ValidUtils.valid(request.getFinInterestFactorDto(), validMessages);
-                if (StringUtil.isEmpty(request.getType9()) || StringUtil.isEmpty(request.getType10()) && StringUtil.isEmpty(request.getType11())) {
-                    validMessages.add(new ValidMessage("资产类型不能为空"));
-                }
-                validMessages.addAll(finBondAssetValidatorService.valid(request));
-                if (CollectionUtils.isNotEmpty(validMessages)) {
-                    return request;
-                } else {
-                    return null;
-                }
+            validMessages = finBondMarketInfoQuery001Service.addCouponsValid(dto.getAppearMarketId());
+            if(CollectionUtils.isNotEmpty(validMessages)) {
+                return finBondMarketInfoQuery001Service.queryFinBondMarketForCoupons(dto.getAppearMarketId());
             }
         }
         return null;
