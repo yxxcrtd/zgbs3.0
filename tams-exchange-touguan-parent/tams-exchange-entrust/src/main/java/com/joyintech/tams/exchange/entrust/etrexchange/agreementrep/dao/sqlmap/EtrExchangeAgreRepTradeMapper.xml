@@ -490,7 +490,7 @@
         LEFT JOIN settle_trans_data std
             on trd_product_deal_2.f_trade_id = std.trade_id
         LEFT JOIN PTL_PORTFOLIO /** 组合 **/
-            on trd_proEntrustMsgbyMQServiceduct_deal_add.Portfolio_Id = PTL_PORTFOLIO.Portfolio_Id
+            on trd_product_deal_add.Portfolio_Id = PTL_PORTFOLIO.Portfolio_Id
         LEFT JOIN trd_fin_product_deal_total trd_fin_product_deal_total /** 金融产品临时交易1 **/
             on fin_trade_product.finprod_id = trd_fin_product_deal_total.finprod_id
             AND fin_trade_product.branch = trd_fin_product_deal_total.branch
@@ -637,7 +637,7 @@
         SDL3.ITEM_VALUE tradePlatString,
         SDL4.ITEM_VALUE psStr,
         SDL5.ITEM_VALUE busiTypeTgString,
-        btm.OUTPUT_VALUE_1 busiTypeTg,
+        etr_entrust_add.BUSI_TYPE_POSITION busiTypeTg,
         SYS_USER.REAL_NAME invManagerName,
         etr_entrust_add.TRADER as homeTrader,
         etr_entrust.REMARK as addCla,
@@ -674,11 +674,8 @@
         LEFT JOIN SYS_DATADICT_LIST SDL2 ON SDL2.DICT_CODE ='TRADE_PLACE' AND SDL2.ITEM_CODE = etr_entrust.trade_market
         LEFT JOIN SYS_DATADICT_LIST SDL3 ON SDL3.DICT_CODE ='SHARES_TRADE_PLATFORM' AND SDL3.ITEM_CODE = etr_entrust.Trade_Plat
         LEFT JOIN SYS_DATADICT_LIST SDL4 ON SDL4.DICT_CODE ='PS' AND SDL4.ITEM_CODE = etr_entrust_add.BUSI_PS
-        LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm ON (ETR_ENTRUST.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR  btm.INPUT_VALUE_2 is null)
-            AND (ETR_ENTRUST.Ps = btm.INPUT_VALUE_3 OR  btm.INPUT_VALUE_3 is null)
-            AND (ETR_ENTRUST.TRADE_PLAT = btm.INPUT_VALUE_1 OR btm.INPUT_VALUE_1 IS NULL)
         LEFT JOIN SYS_USER ON ETR_ENTRUST.INV_MANAGER_ID = SYS_USER.USER_NAME
-        LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = btm.OUTPUT_VALUE_1
+        LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = etr_entrust_add.BUSI_TYPE_POSITION
         where etr_entrust.TRADE_MARKET IN ('03','04')
         and etr_entrust_add.ASSET_TYPE1 = 'H01'
         <if test="entrustStatus != null and entrustStatus != ''">
@@ -794,7 +791,7 @@
             SDL3.ITEM_VALUE tradePlatString,
             SDL4.ITEM_VALUE psStr,
             SDL5.ITEM_VALUE busiTypeTgString,
-            btm.OUTPUT_VALUE_1 busiTypeTg,
+            wfl_etr_entrust_add.BUSI_TYPE_POSITION busiTypeTg,
             SYS_USER.REAL_NAME invManagerName,
             wfl_etr_entrust_add.TRADER as homeTrader,
             wfl_etr_entrust.REMARK as addCla,
@@ -831,11 +828,8 @@
             LEFT JOIN SYS_DATADICT_LIST SDL2 ON SDL2.DICT_CODE ='TRADE_PLACE' AND SDL2.ITEM_CODE = wfl_etr_entrust.trade_market
             LEFT JOIN SYS_DATADICT_LIST SDL3 ON SDL3.DICT_CODE ='SHARES_TRADE_PLATFORM' AND SDL3.ITEM_CODE = wfl_etr_entrust.Trade_Plat
             LEFT JOIN SYS_DATADICT_LIST SDL4 ON SDL4.DICT_CODE ='PS' AND SDL4.ITEM_CODE = wfl_etr_entrust_add.BUSI_PS
-            LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm ON (wfl_etr_entrust.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR  btm.INPUT_VALUE_2 is null)
-                AND (wfl_etr_entrust.Ps = btm.INPUT_VALUE_3 OR  btm.INPUT_VALUE_3 is null)
-                AND (wfl_etr_entrust.TRADE_PLAT = btm.INPUT_VALUE_1 OR btm.INPUT_VALUE_1 IS NULL)
             LEFT JOIN SYS_USER ON wfl_etr_entrust.INV_MANAGER_ID = SYS_USER.USER_NAME
-            LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = btm.OUTPUT_VALUE_1
+            LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = wfl_etr_entrust_add.BUSI_TYPE_POSITION
             where wfl_etr_entrust.TRADE_MARKET IN ('03','04')
             and wfl_etr_entrust_add.ASSET_TYPE1 = 'H01'
             <if test="entrustStatus != null and entrustStatus != ''">

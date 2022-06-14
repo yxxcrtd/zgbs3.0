@@ -648,6 +648,8 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         param.put("portfolioIdList", request.getPortfolioIdList());
         param.put("zyj", request.getZyj());
         param.put("search_isNumberFlag", BaseMap.isNumeric(request.getKeywords()));
+        param.put("DISPLACE DIRECTION_01", DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+
         Page<EtrExchangeAgreRepTrade003Dto> page =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeAgreRepTradeMapper.selectEtrEntrust(param));
 
         List<SysUser> userList = restTemplate.postForList(ServiceApplication.ENTRUST_SERVICE_NAME + "/EntrustCommon/getAllUserList",
