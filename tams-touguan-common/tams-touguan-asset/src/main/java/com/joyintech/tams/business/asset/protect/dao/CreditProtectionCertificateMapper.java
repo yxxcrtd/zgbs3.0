@@ -27,6 +27,8 @@ public interface CreditProtectionCertificateMapper {
 
     List<String> getRefList(Map<String, Object> pageParam);
 
+    String getMstCustomerInfo(Map<String, Object> pageParam);
+
     int insertFileSelective(SysUploadFileInfo var1);
 
     int updateFileByPrimaryKey(SysUploadFileInfo var1);

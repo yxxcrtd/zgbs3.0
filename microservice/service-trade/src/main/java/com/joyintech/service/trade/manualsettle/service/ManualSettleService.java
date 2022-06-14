@@ -190,6 +190,8 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // ZGCPCN-1001:新增场内现券买入卖出 modify by fuyongsheng 20220531 start
                     &&!dto.getBusiType().equals("25") // 场内现券买入
                     &&!dto.getBusiType().equals("26") // 场内现券卖出
+                    &&!dto.getBusiType().equals("27") // 信用保护凭证买入
+                    &&!dto.getBusiType().equals("28") // 信用保护凭证卖出
                     // ZGCPCN-1001:新增场内现券买入卖出 modify by fuyongsheng 20220531 end
             ){
                 if(StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_交收.getValue())) {

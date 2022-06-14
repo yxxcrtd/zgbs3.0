@@ -183,6 +183,30 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     }
 
     /**
+     * 加券前的校验
+     * @param secId
+     * @return
+     */
+    public List<ValidMessage> addCouponsValid(String secId) {
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2(secId, DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        List<ValidMessage> validMessages = new ArrayList<>();
+        if (Objects.nonNull(finProduct)) {
+            validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
+            return validMessages;
+        }
+        //校验
+        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.selectWindBondAssetBySecId(secId);
+        if (Objects.isNull(interfPayhsrcsecinfoDto)) {
+            validMessages.add(new ValidMessage("未查询到该待上市债券信息，无法加券，请手工维护"));
+            return validMessages;
+        }
+        //校验必填项
+        addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
+        return validMessages;
+    }
+
+
+    /**
      * 加券市场信息查询
      *
      * @param secId

@@ -136,20 +136,18 @@
         fpa.LISTING_DATE listingDate,					<!-- 上市流通日	-->
         fp.CALENDAR_ID calendarId,						<!-- 交易日历		-->
         fp.ISSUE_PRICE issuePrice,						<!-- 创设价格（元）-->
-        fccr.BASIS basis,									<!-- 计费年度天数	-->
         fpa.SETTLE_METHOD settleMethod,			<!-- 结算方式		-->
         sdl2.item_value settleMethodStr,
         fpa.IS_ALLOW_OVERWRITE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
         sdl1.item_value isOrNoStr,
         fp.REMARK,
-        fpa.basic
+        fpa.basis                       <!-- 计费年度天数	-->
         FROM
         FIN_PRODUCT fp
         LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID
         LEFT JOIN FIN_CASH_INFO fci ON fci.FINPROD_ID = fp.FINPROD_ID
         LEFT JOIN MST_CUSTOMER_INFO ci1 ON fpa.ISSUERSHORT = ci1.CUSTOMER_ID
         LEFT JOIN MST_CUSTOMER_INFO ci2 ON fpa.REF_ENTITY = ci2.CUSTOMER_ID
-        LEFT JOIN FIN_CASH_CALC_RULE fccr ON fccr.FINPROD_ID = fp.FINPROD_ID AND fccr.CASH_ID = fci.CASH_ID
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='YES_OR_NO' and sdl1.item_code = fpa.IS_ALLOW_OVERWRITE
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='SETTLE_METHOD' and sdl2.item_code = fpa.SETTLE_METHOD
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='TRADE_PLACE' and sdl3.item_code = fp.TRADE_MARKET
@@ -159,6 +157,10 @@
                 fp.FINPROD_ID = #{finprodMarketId}
             </if>
         </where>
+    </select>
+
+    <select id="getMstCustomerInfo" resultType="java.lang.String">
+        select CUSTOMER_NAME from MST_CUSTOMER_INFO where CUSTOMER_ID = #{customerId}
     </select>
 
     <select id="getRefList" resultType="java.lang.String">

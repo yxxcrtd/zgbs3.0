@@ -17,6 +17,8 @@ import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -47,6 +49,9 @@ public class FinTenderBondAsset003Controller extends BaseController {
 
     @Autowired
     private FinTenderBondAsset003Service finTenderBoundAsset003Service;
+
+    @Autowired
+    private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
 
 
     @ResponseBody
@@ -112,7 +117,7 @@ public class FinTenderBondAsset003Controller extends BaseController {
     @PostMapping("/checkAddCoupons")
     @ApiOperation(value = "上市流通前自动加券校验是否通过", notes = "上市流通前自动加券校验是否通过")
     public Message checkAddCoupons(@RequestBody FinTenderBondAsset003Dto dto) {
-        FinBondAssetSaveRequest request = finTenderBoundAsset003Service.validAddCoupons(dto);
+        FinBondMarketInfoDetailQueryDto request = finTenderBoundAsset003Service.validAddCoupons(dto);
         if (Objects.isNull(request)) {
             return Message.success("校验成功", null);
         } else {

@@ -85,8 +85,14 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
         initPageParams.put("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
         // 登记页面id 用于登记撤销
         initPageParams.put("PAGE_ID_BOND_FIRST", "TenderBondSub002");
-        //刷新时间
-        initPageParams.put("ibuQuoteBondFirst_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
+        // 指令列表刷新时间
+        initPageParams.put("cfetsTrdBondFirstSub_etrTable_refresh_period", CacheUtil.getSysParam("cfetsTrdBondFirstSub_etrTable_refresh_period"));
+        // 当日申购列表刷新时间
+        initPageParams.put("cfetsTrdBondFirstSub_daysub_refresh_period", CacheUtil.getSysParam("cfetsTrdBondFirstSub_daysub_refresh_period"));
+        // 当日申购明细列表刷新时间
+        initPageParams.put("cfetsTrdBondFirstSub_daysubdetails_refresh_period", CacheUtil.getSysParam("cfetsTrdBondFirstSub_daysubdetails_refresh_period"));
+        // 投标执行明细列表刷新时间
+        initPageParams.put("cfetsTrdBondFirstSub_details_refresh_period", CacheUtil.getSysParam("cfetsTrdBondFirstSub_details_refresh_period"));
         initPageParams.put("effDate", CacheUtil.getSysParam("ibuVar_quoteEffTime"));
         return new Message<>(initPageParams).success();
     }

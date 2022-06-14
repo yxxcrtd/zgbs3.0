@@ -22,9 +22,9 @@
 
         nvl( to_char(RDI_RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.00') , to_char(RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.00')) as issueSize,
 
-        nvl( to_char(RDI_RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd hh:mm:ss')) AS issueDate,
+        nvl( to_char(TO_DATE( RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd' ),'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd hh:mm:ss')) AS issueDate,
 
-        nvl( to_char(RDI_RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss')) AS eventDate,
+        nvl( to_char(TO_DATE( RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd' ),'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss')) AS eventDate,
 
         RELEASE_INFO.DEBT_REGISTRATION_DATE as debtRegistrationDate,
 
@@ -32,7 +32,7 @@
         RELEASE_INFO.LISTING_CODE as listingCode,
         SEC_INFO.CROSS_MARKET_CODE as crossMarketCode,
 
-        nvl( to_char(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.INTEREST_ACCRUAL_DATE,'yyyy-mm-dd hh:mm:ss')) AS interestAccrualDate,
+        nvl( to_char(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-mm-dd' ),'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.INTEREST_ACCRUAL_DATE,'yyyy-mm-dd hh:mm:ss')) AS interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
         SEC_INFO.EXPIRY_DATE expiryDate,
@@ -44,7 +44,7 @@
         SEC_INFO.CURRENCY,
 
         nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) as issuePx,
-        nvl(to_char(RDI_RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000'), to_char(RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000')) as stipulationValue,
+        nvl(RDI_RELEASE_INFO.STIPULATION_VALUE, to_char(RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000')) as stipulationValue,
 
         nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as
         singleMinSubAmt,
@@ -61,7 +61,7 @@
 
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
-        LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
+        LEFT JOIN (SELECT t.SECURITY_ID||'.IB' SEC_ID, t.* FROM INTERF_RDI_RELEASE_INFO t) RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SEC_ID = SEC_INFO.SEC_ID
         LEFT JOIN MST_CUSTOMER_INFO_ADD CUSTOMER_INFO_ADD on SEC_INFO.ISSUER = CUSTOMER_INFO_ADD.INSITITUTE_CODE
         LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO on CUSTOMER_INFO_ADD.CUSTOMER_ID = CUSTOMER_INFO.CUSTOMER_ID
         LEFT JOIN FIN_PRODUCT PRODUCT on SEC_INFO.SEC_ID = PRODUCT.FINPROD_MARKET_ID AND FINPROD_TYPE2 = 'F32'
@@ -232,9 +232,9 @@
 
         nvl( to_char(RDI_RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.0000') , to_char(RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.0000')) as issueSize,
 
-        nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss')) as issueDate,
+        nvl(TO_CHAR(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd'), 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss')) as issueDate,
         TO_CHAR(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-mm-dd hh:mm:ss') as eventDate,
-        nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss')) as payDate,
+        nvl(TO_CHAR(TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd'), 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss')) as payDate,
 
         RELEASE_INFO.DEBT_REGISTRATION_DATE AS debtRegistrationDate,
 
@@ -242,7 +242,7 @@
         RELEASE_INFO.LISTING_CODE AS listingCode,
         SEC_INFO.CROSS_MARKET_CODE AS crossMarketCode,
 
-        nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
+        nvl(TO_CHAR(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-mm-dd'), 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
         'yyyy-mm-dd hh:mm:ss')) as interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
@@ -254,7 +254,7 @@
         SEC_INFO.RATE_TYPE rateType,
         SEC_INFO.CURRENCY,
         nvl( to_char(RDI_RELEASE_INFO.ISSUE_PX, 'fm99999999999990.0000') , to_char(RELEASE_INFO.ISSUE_PX, 'fm99999999999990.0000')) as issuePx,
-        nvl( to_char(RDI_RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000') , to_char( RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000')) as stipulationValue,
+        nvl( RDI_RELEASE_INFO.STIPULATION_VALUE , to_char( RELEASE_INFO.STIPULATION_VALUE, 'fm99999999999990.0000')) as stipulationValue,
 
         nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT, RELEASE_INFO.SINGLE_MIN_SUB_AMT) as singleMinSubAmt,
         nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT, RELEASE_INFO.SINGLE_MAX_SUB_AMT) as singleMaxSubAmt,
@@ -289,8 +289,8 @@
         FROM
         INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO --wind一级未发行债券信息接口表
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID --wind一级未发行债券发行信息接口表
-        LEFT JOIN (SELECT * FROM INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in('同业存单','公司短期融资券')) RDI_RELEASE_INFO ON
-        RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
+        LEFT JOIN (SELECT t.SECURITY_ID||'.IB'SEC_ID, t.* FROM INTERF_RDI_RELEASE_INFO t where t.SECURITY_TYPE in('同业存单','公司短期融资券')) RDI_RELEASE_INFO ON
+        RDI_RELEASE_INFO.SEC_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
 
         LEFT JOIN MST_CUSTOMER_INFO_ADD CUSTOMER_INFO_ADD on SEC_INFO.ISSUER = CUSTOMER_INFO_ADD.INSITITUTE_CODE
         LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO on CUSTOMER_INFO_ADD.CUSTOMER_ID = CUSTOMER_INFO.CUSTOMER_ID

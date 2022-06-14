@@ -651,7 +651,6 @@
                MDATE        interestendday,
                PAY_DATE     interestpayday,
                RANGE_YIELD  couponrate,
-               INT_PRIN_AMT prinamt,
                INT_AMT      accrueintamt,
                BASIS        basis,
                PRIN_AMT     prinAmt,
