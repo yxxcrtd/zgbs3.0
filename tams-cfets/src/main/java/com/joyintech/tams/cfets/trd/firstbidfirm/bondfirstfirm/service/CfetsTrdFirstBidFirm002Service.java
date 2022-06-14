@@ -3661,7 +3661,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         req.setBalanceCheck(balanceCheck);
         req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
-        req.setBusiAct(DictCodeListExt3.业务动作_汇总确认.getValue());
+        req.setBusiAct(DictCodeListExt3.业务动作_投标确认.getValue());
         req.setPs(DictCodeList.交易方向_买入.getValue());
         req.setPurchModle(DictCodeListExt4.头寸申购方式_分销买入.getValue());
         if (isSubmit) {
@@ -3736,7 +3736,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         req.setBalanceCheck(balanceCheck);
         req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
-        req.setBusiAct(DictCodeListExt3.业务动作_汇总确认.getValue());
+        req.setBusiAct(DictCodeListExt3.业务动作_投标确认.getValue());
         req.setPs(DictCodeList.交易方向_买入.getValue());
         if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), entity.getBiddingMethod())) {
             req.setPurchModle(DictCodeListExt4.头寸申购方式_自主投标.getValue());

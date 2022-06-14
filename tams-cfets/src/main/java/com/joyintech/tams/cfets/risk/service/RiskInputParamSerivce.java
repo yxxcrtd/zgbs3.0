@@ -33,7 +33,10 @@ import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSa
 import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealRegisterQuoteDto;
 import com.joyintech.tams.cfets.trd.repo.dto.RepoPtlAllocationDto;
-import com.joyintech.tams.cfets.trdconfirm.dto.*;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmManualMatchInfoRequest;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdRepoTrade003Dto;
 import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdQueryTradeInfoListResponse;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
@@ -49,10 +52,6 @@ import com.joyintech.tams.component.business.riskall.utils.RiskUtil;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
 import com.joyintech.tams.component.business.trade.dto.BussTrdTransfenpeiDto;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt4;
-import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -101,9 +100,15 @@ public class RiskInputParamSerivce extends RiskCommonService {
     @Autowired
     private CfetsManualSettleService cfetsManualSettleService;
 
+    /**
+     * 构造风险报文入参
+     */
     @Autowired
     private RiskInputParamGenerateBusinessSerivce riskInputParamGenerateBusinessSerivce;
 
+    /**
+     * 构建授权试算参数
+     */
     @Autowired
     private RiskInputBuildAuthorizeParamSerivce riskInputBuildAuthorizeParamSerivce;
 
@@ -231,51 +236,17 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 map.put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND002);
             }
         }
+        // 一级投标确认
         if (obj instanceof CfetsTrdFirstBidFirmInfoDto || StringUtil.equals(pageId, "CfetsTrdFirstBidFirm002")) {
-            CfetsTrdFirstBidFirmInfoDto dto = JsonUtils.json2Object(businessJson, CfetsTrdFirstBidFirmInfoDto.class);
-            BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
-                    .put(NodeConfigConstant.DECISION_ACT, decisionAct)
-                    .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
-                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级投标.getValue())
-                    .put("tradePlace", dto.getTradeMarket())
-                    .put("ps", DictCodeList.交易方向_买入.getValue())
-                    .put("isCheck", isCheck)
-                    .put("data", dto);
-            if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())
-              || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-                map.put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND002);
-            }
-            return map;
+            return riskInputParamGenerateBusinessSerivce.generateCfetsTrdFirstBidFirmInfo(decisionAct, flowStatus, isCheck, businessJson);
         }
+        // 一级申购
         if (obj instanceof CfetsTrdBondFirstSubInfoDto || StringUtil.equals(pageId, "TenderBondSub002")) {
-            CfetsTrdBondFirstSubInfoDto dto = JsonUtils.json2Object(businessJson, CfetsTrdBondFirstSubInfoDto.class);
-            return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
-                    .put(NodeConfigConstant.DECISION_ACT, decisionAct)
-                    .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
-                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级申购.getValue())
-                    .put("tradePlace", 交易场所_银行间.getValue())
-                    .put("ps", DictCodeList.交易方向_买入.getValue())
-                    .put("isCheck", isCheck)
-                    .put("data", dto);
+            return riskInputParamGenerateBusinessSerivce.generateCfetsTrdBondFirstSubInfo(decisionAct, flowStatus, isCheck, businessJson);
         }
+        // 中标结果维护
         if (obj instanceof CfetsPrimaryBidManageSaveRequest || StringUtil.equals(pageId, "CfetsPrimaryBidManage002")) {
-            CfetsPrimaryBidManageSaveRequest dto = JsonUtils.json2Object(businessJson, CfetsPrimaryBidManageSaveRequest.class);
-            BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
-                    .put(NodeConfigConstant.BUSI_ACT, 业务动作_中标结果维护.getValue())
-                    .put(NodeConfigConstant.DECISION_ACT, decisionAct)
-                    .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
-                    .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级投标.getValue())
-                    .put("tradePlace", dto.getTradeMarket())
-                    .put("ps", DictCodeList.交易方向_买入.getValue())
-                    .put("isCheck", isCheck)
-                    .put("data", dto);
-            if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())
-                    || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-                map.put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND002);
-            }
-            return map;
+            return riskInputParamGenerateBusinessSerivce.generateCfetsPrimaryBidManage(decisionAct, flowStatus, isCheck, businessJson);
         }
         if (obj instanceof CfetsTrdBondInvestTradeDto) {
             CfetsTrdBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, CfetsTrdBondInvestTradeDto.class);
