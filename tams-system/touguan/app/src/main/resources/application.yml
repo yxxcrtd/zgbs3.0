@@ -1,0 +1,87 @@
+############################开源框架的配置############################
+
+#============Server配置============#
+server:
+  port: 8080                      # Server HTTP port
+  address: 0.0.0.0
+  servlet:
+    contextPath: /tams            # Context path of the application.  
+  ssl:
+   enabled: false                 # 是否启用SSL支持  
+  tomcat:
+    accept-count: 100             # 当所有可能的请求处理线程都在使用时，传入的连接请求的最大队列长度  
+    max-connections: 300          # 服务器在任何给定时间内接受和处理的最大连接数  
+    max-http-form-post-size: 50MB # 整个POST请求的最大大小    
+    uri-encoding: UTF-8           # 用来解码URI的字符编码
+    threads:
+      max: 200                    # Tomcat工作线程的最大数量
+      min-spare: 200              # Tomcat工作线程的最小数量 
+      
+#============logging配置============#            
+logging:
+  level: 
+    root: info
+  file:
+    path: /tmp/logs
+    
+#============mybatis配置============#  
+mybatis:
+  mapper-locations:
+  - classpath*:com/joyintech/**/dao/sqlmap/**/*Mapper*.xml
+
+#============Spring配置============#  
+spring:
+  application:    name: tams-server
+    
+  profiles:
+    include:    - framework    #资管框架
+    - rmdb         #关系数据库
+    - tams         #资管配置
+    - redis        #Redis
+    - rabbitmq     #RabbitMQ
+    - microservice #微服务
+    - exchange     #场内、银行间
+    - postion      #头寸  
+  cloud:    nacos:      discovery:        enabled: false
+          
+  ## 附件上传 ##    
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB         # 设置单个文件的大小 
+      max-request-size: 100MB     # 设置单次请求的文件的总大小
+  jmx:
+    enabled: false                # 关闭jmx监控 
+  mvc:
+    format:
+      date: yyyy-MM-dd            # 时间格式化(非json报文时,服务端参数是日期)
+  thymeleaf:
+    enabled: true
+    encoding: UTF-8
+    cache: false
+  freemarker:
+    enabled: false
+  ## 国际化 ##
+  messages:
+    basename: i18n/message/*messages,i18n/label/*labels
+    encoding: UTF-8
+  ## 缓存 ##  
+  cache:
+    type: ehcache
+    ehcache:
+      config: config/ehcache.xml
+  autoconfigure:    exclude:    - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  web:
+    resources:      chain:        strategy:          fixed:            enabled: true         #静态资源配置:js和css变更时无需手工清缓存
+  ## JSON ##  
+  jackson:
+    locale: zh                           # 当地时区
+    deserialization:
+      fail-on-unknown-properties: false  # json中含pojo不存在属性时是否失败报错,默认true
+    generator:
+      ignore-unknown: true               # 忽略将要解析的任何JSON的未知属性
+    default-property-inclusion: NON_NULL # 返回日期格式字符串
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      indent-output: true                # 格式化输出json字符串
+        
