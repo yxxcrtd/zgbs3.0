@@ -1,122 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
 		<groupId>com.joyintech</groupId>
 		<artifactId>tams-parent</artifactId>
-        <version>0.0.5.alibaba</version>
+		<version>0.0.5.alibaba</version>
 	</parent>
 
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>tams-base</artifactId>
-    <version>2.1.2</version>
-    <packaging>pom</packaging>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>tams-base</artifactId>
+	<version>2.1.2</version>
+	<packaging>pom</packaging>
 
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
 
-    <modules>
-    	<!-- 前台应用 -->
-        <module>component-base</module>
-        <module>component-business</module>
-        <module>tams-common</module>
-        <module>tams-common-customer</module>
-        <module>tams-disclosure-busicommon</module>
-        <module>tams-disclosure-common</module>
-        <module>tams-disclosure-interf</module>
-        <module>tams-disclosure-parent</module>
-        <module>tams-invest-common</module>
-        <!--        清结算共通包-->
-        <module>tams-settle-common</module>
-        <module>tams-invest-interf</module>
-        <module>tams-invest-parent</module>
-        <module>tams-svreport-common</module>
-        <module>tams-svreport-parent</module>
-        <module>tams-valuation-api</module>
-        <module>tams-valuation-common</module>
-        <module>tams-valuation-basicdata</module>
-        <module>tams-valuation-parent</module>
-<!--        <module>tams-touguan-common</module>-->
-        <module>tams-cfets</module>
-<!--        <module>tams-valuation-report</module>-->
-        <module>tams-exchange-trade-parent</module>
+	<modules>
+		<!-- 前台应用 -->
+		<module>component-base</module>
+		<module>component-business</module>
+		<module>tams-common</module>
+		<module>tams-common-customer</module>
+		<module>tams-disclosure-busicommon</module>
+		<module>tams-disclosure-common</module>
+		<module>tams-disclosure-interf</module>
+		<module>tams-disclosure-parent</module>
+		<module>tams-invest-common</module>
+		<!-- 清结算共通包 -->
+		<module>tams-settle-common</module>
+		<module>tams-invest-interf</module>
+		<module>tams-invest-parent</module>
+		<module>tams-svreport-common</module>
+		<module>tams-svreport-parent</module>
+		<module>tams-valuation-api</module>
+		<module>tams-valuation-common</module>
+		<module>tams-valuation-basicdata</module>
+		<module>tams-valuation-parent</module>
+		<!-- <module>tams-touguan-common</module> -->
+		<module>tams-cfets</module>
+		<!-- <module>tams-valuation-report</module> -->
+		<module>tams-exchange-trade-parent</module>
 
-        <!-- 批处理  
-        <module>tams-batch-common</module>
-        <module>tams-disclosure-batch</module>
-        <module>tams-valuation-batch</module>
-        <module>tams-settle-batch</module>
-        <module>tams-invest-batch</module>
-        <module>tams-svreport-batch</module>
-        <module>tams/batch</module>
--->
-        <!-- 接口 -->
-        <module>tams-valuation-interf</module>
-        <module>tams-customer-interf</module>
+		<!-- 批处理 <module>tams-batch-common</module> <module>tams-disclosure-batch</module> 
+			<module>tams-valuation-batch</module> <module>tams-settle-batch</module> 
+			<module>tams-invest-batch</module> <module>tams-svreport-batch</module> <module>tams/batch</module> -->
+		<!-- 接口 -->
+		<module>tams-valuation-interf</module>
+		<module>tams-customer-interf</module>
 
-		<!--         微服务 -->
-        <module>microservice/service-asset</module>
-        <module>microservice/service-basicdata</module>
-        <module>microservice/service-chb</module>
+		<!-- 微服务 -->
+		<module>microservice/service-asset</module>
+		<module>microservice/service-basicdata</module>
+		<module>microservice/service-chb</module>
 		<module>microservice/service-chb3</module>
-        <module>microservice/service-common</module>
-        <module>microservice/service-customer-report</module>
-        <module>microservice/service-disclosure</module>
-        <module>microservice/service-document</module>
-        <module>microservice/service-entrust</module>
-<!--         <module>microservice/service-interf</module> -->
-        <module>microservice/service-pbc</module>
-        <module>microservice/service-period</module>
-        <module>microservice/service-portfolio</module>
-        <module>microservice/service-product</module>
-        <module>microservice/service-report</module>
-        <module>microservice/service-risk</module>
-        <module>microservice/service-settle</module>
-        <module>microservice/service-svrcom</module>
-        <module>microservice/service-trade</module>
-        <module>microservice/service-valuation</module>
-        <module>microservice/service-valuation-basicdata</module>
-        <module>microservice/service-invest-interf</module>
-        <module>microservice/service-interf</module>
-        <module>microservice/service-risk-redis</module>
-        <module>microservice/service-risk-redis-inf</module>
-<!--        <module>microservice/service-exchange</module>-->
-<!--        <module>microservice/service-quote-new</module>-->
-<!--         几许中心包 -->
-        <module>JixuCenter</module>
+		<module>microservice/service-common</module>
+		<module>microservice/service-customer-report</module>
+		<module>microservice/service-disclosure</module>
+		<module>microservice/service-document</module>
+		<module>microservice/service-entrust</module>
+		<!-- <module>microservice/service-interf</module> -->
+		<module>microservice/service-pbc</module>
+		<module>microservice/service-period</module>
+		<module>microservice/service-portfolio</module>
+		<module>microservice/service-product</module>
+		<module>microservice/service-report</module>
+		<module>microservice/service-risk</module>
+		<module>microservice/service-settle</module>
+		<module>microservice/service-svrcom</module>
+		<module>microservice/service-trade</module>
+		<module>microservice/service-valuation</module>
+		<module>microservice/service-valuation-basicdata</module>
+		<module>microservice/service-invest-interf</module>
+		<module>microservice/service-interf</module>
+		<module>microservice/service-risk-redis</module>
+		<module>microservice/service-risk-redis-inf</module>
+		<!-- <module>microservice/service-exchange</module> -->
+		<!-- <module>microservice/service-quote-new</module> -->
+		<!-- 几许中心包 -->
+		<module>JixuCenter</module>
 
-        <module>microservice/tams-service-container</module>
-        <module>microservice/tams-service-container-yunying</module>
-        <module>microservice/service-bankuplink</module>
-        <module>tams/app</module>
+		<module>microservice/tams-service-container</module>
+		<module>microservice/tams-service-container-yunying</module>
+		<module>microservice/service-bankuplink</module>
+		<module>tams/app</module>
 
-        <module>tams-system/touguan/app</module>
-        <module>tams-system/yunying/app</module>
-        <!--  
-        <module>tams-system/touguan/batch</module>
-        <module>tams-system/yunying/batch</module>
-		-->
-        <module>tams-common-basicdata</module>
-        <module>microservice/service-common-basicdata</module>
+		<module>tams-system/touguan/app</module>
+		<module>tams-system/yunying/app</module>
+		<!-- <module>tams-system/touguan/batch</module> <module>tams-system/yunying/batch</module> -->
+		<module>tams-common-basicdata</module>
+		<module>microservice/service-common-basicdata</module>
 
-        <!-- 组件  -->
-        <module>background-component/component-check</module>
-        <module>background-component/component-common</module>
-        <module>background-component/inter-bank-uplink</module>
-        <module>background-component/exchange-order</module>
-        <module>background-component/msg-generate</module>
-        <module>microservice/service-valuation-valmodel</module>
-        <module>microservice/service-valuation-lossmodel</module>
-        <!-- <module>tams-valuation-batch-valmodel</module>
-        <module>tams-valuation-batch-lossmodel</module> -->
-        <module>microservice/tams-service-container-touguan</module>
-        <module>microservice/tams-service-system</module>
-        <module>tams-exchange-touguan-parent</module>
-        <module>tams-touguan-common</module>
-    </modules>
+		<!-- 组件 -->
+		<module>background-component/component-check</module>
+		<module>background-component/component-common</module>
+		<module>background-component/inter-bank-uplink</module>
+		<module>background-component/exchange-order</module>
+		<module>background-component/msg-generate</module>
+		<module>microservice/service-valuation-valmodel</module>
+		<module>microservice/service-valuation-lossmodel</module>
+		<!-- <module>tams-valuation-batch-valmodel</module> <module>tams-valuation-batch-lossmodel</module> -->
+		<module>microservice/tams-service-container-touguan</module>
+		<module>microservice/tams-service-system</module>
+		<module>tams-exchange-touguan-parent</module>
+		<module>tams-touguan-common</module>
+	</modules>
 </project>

@@ -17,7 +17,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.WebApplicationInitializer;
 
-
 @Configuration
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class ServletInitializer extends SpringBootServletInitializer implements WebApplicationInitializer {
