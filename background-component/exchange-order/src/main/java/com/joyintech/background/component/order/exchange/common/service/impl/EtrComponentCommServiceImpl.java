@@ -339,6 +339,10 @@ class EtrComponentCommServiceImpl<V extends EtrBaseDto> implements EtrComponentC
         return parameter.get();
     }
 
+    public void unload() {
+        parameter.remove();
+    }
+
     protected FinishStatusComponent getFinishStatusDto(EtrDealDto dto, User user) {
         FinishStatusComponent finishDto = new FinishStatusComponent();
         BeanUtil.copyPropertiesIgnoreNull(finishDto, dto);
