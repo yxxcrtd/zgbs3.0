@@ -7,6 +7,8 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.RiskNodeConfigDtl;
 import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
 import com.joyintech.tams.component.business.riskall.utils.RiskUtil;
@@ -39,6 +41,9 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
 
     @Autowired
     private CreditLinesDealsMapper creditLinesDealsMapper;
+
+    @Autowired
+    private FinProductMapper finProductMapper;
 
     /**
      * 一级投标指令 构建授信计算参数
@@ -132,6 +137,7 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
         //这里处理授信
         CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, data);
         CfetsTrdBondFirstSubInfoDto dto = (CfetsTrdBondFirstSubInfoDto) data;
+        FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
         BeanUtil.copyPropertiesIgnoreNull(inputDto, dto);
 //        inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
         inputDto.setTradeId(dto.getBidId());
@@ -139,7 +145,7 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
         inputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         inputDto.setTradeDate(dto.getTradeDate());
         inputDto.setPs(DictCodeList.交易方向_买入.getValue());
-//        inputDto.setCounterId(dto.getCounterId()); 发行人?
+        inputDto.setCounterId(finProduct.getIssuer()); //发行人?
         inputDto.setTradeAmt(dto.getPayableAmount());
         if (dto.getSubscriptionAmount() != null) {
             inputDto.setShareAmt(dto.getSubscriptionAmount().divide(new BigDecimal(100), RoundingMode.HALF_UP));

@@ -110,7 +110,9 @@ public class CfetsTrdFirstBidFirmProductDto {
     @ApiModelProperty(name = "secDesirableCash", value = "券商户可取现金(元)")
     private BigDecimal secDesirableCash;
 
-    List<CfetsTrdFirstBidFirmProductDto> list;
+    private List<CfetsTrdFirstBidFirmProductDto> list;
+
+    private String finprodId;
 
     public String getEntrustId() {
         return entrustId;
@@ -403,5 +405,13 @@ public class CfetsTrdFirstBidFirmProductDto {
 
     public void setList(List<CfetsTrdFirstBidFirmProductDto> list) {
         this.list = list;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }
