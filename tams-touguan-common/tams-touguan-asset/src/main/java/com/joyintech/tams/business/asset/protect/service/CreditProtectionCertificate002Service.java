@@ -4,6 +4,7 @@ import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.file.SafelyFile;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
@@ -24,9 +25,9 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.tams.systemtools.dao.JoyinFSMapper;
+import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
@@ -89,18 +90,25 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     /**
      * 保存操作类型
      *
-     * @param tradeId
-     * @param remark
+     * @param dto
      * @param operType
      */
-    public void saveOperate(String tradeId, String remark, DictCodeListExt3 operType) {
+    public void saveOperate(CreditProtectionCertificate002Dto dto, DictCodeListExt3 operType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         //add wsz 修改 ZGCPCN-1333 start
-        String finprodId = this.getFinprodId(tradeId);
+        String finprodId = this.getFinprodId(dto.getFinprodMarketId());
         oprHisReq.setEntrustId(finprodId);
         //add wsz 修改 ZGCPCN-1333 end
         oprHisReq.setOperType(operType.getValue());
-        oprHisReq.setBusiDes(remark);
+        oprHisReq.setBusiDes(dto.getRemark());
+
+        // modify by yangxunpeng ZGCPCN-1352 start
+        oprHisReq.setUserId(dto.getUpdateUser());
+        oprHisReq.setCreateUser(dto.getCreateUser());
+        oprHisReq.setCreateDept(dto.getCreateDept());
+        oprHisReq.setUpdateUser(dto.getUpdateUser());
+        // modify by yangxunpeng ZGCPCN-1352 end
+
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
@@ -108,19 +116,19 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     public void doComplete(CreditProtectionCertificate002Dto dto, OperationType type) {
         if (OperationType.DELETE == type) {
             this.delete(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_放弃);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_放弃);
         } else if (OperationType.NEW == type && "auto".equals(dto.getOperateType2())) {
             this.insert(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_自动加券);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_自动加券);
         } else if (OperationType.NEW == type && StringUtil.isEmpty(dto.getOperateType2())) {
             this.insert(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_新建);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_新建);
         } else if (OperationType.MODIFY == type && "cover".equals(dto.getOperateType2())) {
             this.update(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_资讯数据覆盖);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_资讯数据覆盖);
         } else if (OperationType.MODIFY == type && StringUtil.isEmpty(dto.getOperateType2())) {
             this.update(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_修改);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_修改);
         }
     }
 
