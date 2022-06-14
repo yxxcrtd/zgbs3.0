@@ -243,7 +243,7 @@
             BRBP.PORTFOLIO_NAME AS	portfolioNames,
             ''									AS	quoteType,
             ''									AS	matchStatus,
-            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FP.ISSUE_CLASS ELSE ''  END issueType,
+            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FPI.ISSUE_CLASS ELSE ''  END issueType,
             BO.REMARK AS	remark,
             decode(BO.IS_CANCEL,'Y','03','N','01') effectiveStatus,
             case when  (BO.IS_CANCEL = 'N' AND ( BO.BID_MODLE = #{WIN_TYPE_03} OR
@@ -396,7 +396,7 @@
             WBRBP.PORTFOLIO_NAME AS	portfolioNames,
             ''	    AS	quoteType,
             ''		AS	matchStatus,
-            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FP.ISSUE_TYPE ELSE '' END issueType,
+            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FPI.ISSUE_CLASS ELSE '' END issueType,
             WBO.REMARK	 AS	remark,
             #{STATUS_VALID_04}	effectiveStatusStr,
             '04' AS regStatus,
