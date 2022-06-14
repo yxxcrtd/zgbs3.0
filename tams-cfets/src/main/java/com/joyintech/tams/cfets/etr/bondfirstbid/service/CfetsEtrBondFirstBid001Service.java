@@ -563,7 +563,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
                         && StringUtil.equals(DictCodeListExt4.新债_发行方式_报价发行.getValue(), etrInfoDto.getIssueClass())) {
                     if (!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已撤回.getValue())
                             && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已退回.getValue())) {
-                        validMessage.setMessage("只有指令状态为已撤回、已退回的指令允许修改");
+                        validMessage.setMessage("只可对已退回、已撤回的指令进行修改操作");
                         res.setErrorList(Arrays.asList(validMessage));
                         return res;
                     }

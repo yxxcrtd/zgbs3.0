@@ -1020,7 +1020,11 @@ public class RiskInputParamSerivce extends RiskCommonService {
             FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
             dto.setAssetSecType(finProductType.getType9());
             dto.setFinprodId(businessDto.getTrdBankManualSettleInfo().getFinprodId());
-        } else {
+        } else if (data instanceof CfetsEtrBondFirstBidSaveRequest) {
+            // 一级投标指令
+            riskInputBuildAuthorizeParamSerivce.buildEtrBondFirstBidAuthorizeParam(dto, data);
+        }
+        else {
             Map<String, Object> map = BeanUtil.object2Map(data);
             dto.setCounterId((String) map.get("counterId"));
             dto.setPrinAmt((BigDecimal) map.get("tradeAmt"));
