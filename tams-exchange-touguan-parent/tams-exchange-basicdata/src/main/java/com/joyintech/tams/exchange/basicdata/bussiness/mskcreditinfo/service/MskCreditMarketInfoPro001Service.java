@@ -103,9 +103,9 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
 
     @Override
     public void doInsert(MskCreditInfoProSaveRequest entity, OperationType type) {
-        if(OperationType.NEW == type){
-            this.insert(entity);
-        }
+//        if(OperationType.NEW == type){
+//            this.insert(entity);
+//        }
     }
 
     @Override
@@ -122,9 +122,14 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
     public void doComplete(MskCreditInfoProSaveRequest mskCreditInfoProSaveRequest, OperationType operationType) {
         if (OperationType.DELETE == operationType) {
             this.delete(mskCreditInfoProSaveRequest);
-        }else if(OperationType.MODIFY == operationType){
+        } else if (OperationType.MODIFY == operationType) {
             this.update(mskCreditInfoProSaveRequest);
         }
+        // modify by yangxunpeng ZGCPCN-1355 start
+        else if (OperationType.NEW == operationType) {
+            this.insert(mskCreditInfoProSaveRequest);
+        }
+        // modify by yangxunpeng ZGCPCN-1355 end
     }
 
     private void update(MskCreditInfoProSaveRequest mskCreditInfoProSaveRequest) {
