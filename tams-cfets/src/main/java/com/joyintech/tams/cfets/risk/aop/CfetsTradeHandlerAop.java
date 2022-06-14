@@ -8,6 +8,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -19,6 +20,7 @@ import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListRsk;
+import com.joyintech.workflow.engine.constant.OperationType;
 import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -37,8 +39,8 @@ import java.util.List;
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
 
-//@Component
-//@Aspect
+@Component
+@Aspect
 public class CfetsTradeHandlerAop {
     /**
      * 日志
@@ -145,6 +147,15 @@ public class CfetsTradeHandlerAop {
     @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doCompleteRevoke(..))")
     protected void doCompleteRevoke() {
     }
+
+    /**
+     * 债券回售登记撤销
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service.doComplete(..))")
+    protected void doCompleteRegRevoke() {
+    }
+
+
     /**
      * 交易撤销
      */
@@ -250,7 +261,10 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("insertPoint()")
     public void occupyOnInsert(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        OperationType op = (OperationType)args[1];
+        if(!StringUtil.equals(op.name(), OperationType.REVOKE.name())) {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        }
     }
 
     /**
@@ -290,11 +304,38 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning("doCompleteRevoke() || doRevokeComplete()")
+    @AfterReturning("doRevokeComplete()")
     public void revokeComplete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
     }
+
+    /**
+     * 债券交易撤销
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning(pointcut = "doCompleteRevoke() ",returning = "tradeDto")
+    public void bondRevokeComplete(JoinPoint joinPoint, TrdBondInvestTradeDto tradeDto) throws BusinessException {
+        inputParamSerivce.buildParamThenOccupy(tradeDto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+    }
+
+    /**
+     * 债券回售交易登记撤销
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning(pointcut = "doCompleteRegRevoke() ")
+    public void bondRevokeRegComplete(JoinPoint joinPoint) throws BusinessException {
+        Object[] args = joinPoint.getArgs();
+        OperationType op = (OperationType)args[1];
+        if(StringUtil.equals(op.name(), OperationType.REVOKE.name())) {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+        }
+    }
+
 
     /**
      * 指令强制完成

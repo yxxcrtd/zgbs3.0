@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.joyintech.tams.exchange.service.trade.processor.msg.MsgReceiverManager;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,9 +162,12 @@ public class TradeMsgProcessor {
     private MessageSenderManagement messageSenderManagement;
     @Autowired
     private PortfolioTradeMessageHelper portfolioTradeMessageHelper;
-    @Lazy
+//    @Lazy
+//    @Autowired
+//    private TradeMsgReceiver tradeMsgReceiver;
+
     @Autowired
-    private TradeMsgReceiver tradeMsgReceiver;
+    private MsgReceiverManager msgReceiverManager;
 
     @Value("${yali.open:false}")
     private boolean yaliFlag;
@@ -421,6 +425,8 @@ public class TradeMsgProcessor {
         BeanUtils.copyProperties(integratedEntrust, terminalId);
         terminalId.setId(integratedEntrust.getId());
         integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
+
+        TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(integratedEntrust.getInstructionId());
         tradeMsgReceiver.addMsg(MsgType.RESP_INTEGRATED, terminalId);
 
         integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);

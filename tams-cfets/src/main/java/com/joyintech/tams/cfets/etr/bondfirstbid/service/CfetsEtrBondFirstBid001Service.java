@@ -525,26 +525,27 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
      * @return
      */
     public AjaxResult modifyDelegateCheckMethod(CfetsEtrBondFirstBidReqDto dto) {
-        if(!StringUtil.isNotEmpty(dto)|| StringUtil.isEmptyList(dto.getSelectedItem())){
-            AjaxResult res=new AjaxResult();
-            ValidMessage  validMessage= new ValidMessage();
+        if (!StringUtil.isNotEmpty(dto) || StringUtil.isEmptyList(dto.getSelectedItem())) {
+            AjaxResult res = new AjaxResult();
+            ValidMessage validMessage = new ValidMessage();
             validMessage.setMessage(getMessage("COMMON_E_0002"));
             res.setErrorList(Arrays.asList(validMessage));
             return res;
         }
         List<CfetsEtrBondFirstBidReqDto> selectedItem = dto.getSelectedItem();
-        AjaxResult ajaxResult=new AjaxResult();
-        if(StringUtil.isNotEmpty(selectedItem)){
-            if(selectedItem.size()>1){
-                AjaxResult res=new AjaxResult();
-                ValidMessage  validMessage= new ValidMessage();
+        AjaxResult ajaxResult = new AjaxResult();
+        if (StringUtil.isNotEmpty(selectedItem)) {
+            if (selectedItem.size() > 1) {
+                AjaxResult res = new AjaxResult();
+                ValidMessage validMessage = new ValidMessage();
                 validMessage.setMessage("委托指令修改仅允许一条数据");
                 res.setErrorList(Arrays.asList(validMessage));
                 return res;
             }
-            for(CfetsEtrBondFirstBidReqDto Item:selectedItem){
-                AjaxResult res=new AjaxResult();
-                ValidMessage  validMessage= new ValidMessage();
+            for (CfetsEtrBondFirstBidReqDto Item : selectedItem) {
+                AjaxResult res = new AjaxResult();
+                ValidMessage validMessage = new ValidMessage();
+
                 //查询指令信息
                 Map<String, Object> params = new HashMap<>();
                 params.put("entrustId", Item.getEntrustId());
@@ -556,26 +557,29 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
                     res.setErrorList(Arrays.asList(validMessage));
                     return res;
                 }
+
                 //报价发行
                 if (StringUtil.isNotEmpty(etrInfoDto.getIssueClass())
-                        && StringUtil.equals(DictCodeListExt4.新债_发行方式_报价发行.getValue(),etrInfoDto.getIssueClass())) {
-                    if(!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已撤回.getValue())
-                            && !StringUtil.equals(Item.getEntrustStatus(),BussinessDictCodeList.委托状态_已退回.getValue())
-                    ){
+                        && StringUtil.equals(DictCodeListExt4.新债_发行方式_报价发行.getValue(), etrInfoDto.getIssueClass())) {
+                    if (!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已撤回.getValue())
+                            && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已退回.getValue())) {
                         validMessage.setMessage("只有指令状态为已撤回、已退回的指令允许修改");
                         res.setErrorList(Arrays.asList(validMessage));
                         return res;
                     }
-                }else {
-                    if (StringUtil.equals(DictCodeList.一级投标中标状态_已投标, etrInfoDto.getFirstBidStatus())) {
+                } else {
+                    if (StringUtil.equals(DictCodeList.一级投标中标状态_已投标.getValue(), etrInfoDto.getFirstBidStatus())) {
                         validMessage.setMessage("债券已投标，不可修改指令");
                         res.setErrorList(Arrays.asList(validMessage));
                         return res;
                     }
+
                     if (!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_待分发.getValue())
                             && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_待接收.getValue())
-                            && (!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue()) &&
-                            !StringUtil.equals(etrInfoDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue()))) {
+                            && !(StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue()) &&
+                            StringUtil.equals(etrInfoDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue()))
+                            && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已撤回.getValue())
+                            && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已退回.getValue())) {
                         validMessage.setMessage("只可对未投标债券已接收指令和待分发、待接收、已退回、已撤回的指令进行修改操作");
                         res.setErrorList(Arrays.asList(validMessage));
                         return res;
@@ -583,9 +587,10 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
 
                 }
 
-            };
+            }
+
         }
-        return new AjaxResult();
+        return ajaxResult;
     }
 
     /**

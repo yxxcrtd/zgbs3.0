@@ -646,7 +646,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 stringObjectMap.put("finprodType2",DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                 stringObjectMap.put("ps",dto.getPs());
                 stringObjectMap.put("ccy","CNY");
-                stringObjectMap.put("tradeMarket",交易场所_银行间);
+                stringObjectMap.put("tradeMarket",交易场所_银行间.getValue());
                 stringObjectMap.put("mdate",dto.getActSetteDate());
                 bussTrdTransfenpeiDto.add(stringObjectMap);
             }

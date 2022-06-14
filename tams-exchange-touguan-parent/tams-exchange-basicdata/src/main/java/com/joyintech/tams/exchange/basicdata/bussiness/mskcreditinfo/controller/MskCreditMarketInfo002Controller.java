@@ -175,12 +175,11 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     @ResponseBody
     @PostMapping("/getBasicInfo")
     public Message<MskCreditInfoProSaveRequest> getBasicInfo(@RequestBody MskCreditInfoProSaveRequest request){
-        String secid = null;
-        if (StringUtil.isNotEmpty(request.getSecid())) {
-            secid = request.getSecid();
-        }
-        MskCreditInfoProSaveRequest resultDto = mskCreditMarketInfoPro001Service.getBasicInfos(
-                secid,null);
+//        String secid = null;
+//        if (StringUtil.isNotEmpty(request.getSecid())) {
+//            secid = request.getSecid();
+//        }
+        MskCreditInfoProSaveRequest resultDto = mskCreditMarketInfoPro001Service.getBasicInfos(request);
         return new Message<MskCreditInfoProSaveRequest>().success().setData(resultDto);
     }
 
