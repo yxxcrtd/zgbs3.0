@@ -96,8 +96,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     public void saveOperate(CreditProtectionCertificate002Dto dto, DictCodeListExt3 operType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         //add wsz 修改 ZGCPCN-1333 start
-        String finprodId = this.getFinprodId(dto.getFinprodMarketId());
-        oprHisReq.setEntrustId(finprodId);
+        oprHisReq.setEntrustId(dto.getFinprodMarketId());
         //add wsz 修改 ZGCPCN-1333 end
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(dto.getRemark());
@@ -384,6 +383,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         }
         //add wsz 修改bug ZGCPCN-1211 20220610 【信用保护凭证标的】信用保护凭证指令资产代码输入资产代码，点击查看，无法查看标的详情 end
         entity = creditProtectionCertificateMapper.getByFinProdId(param);
+        if(Objects.isNull(entity)){
+            return null;
+        }
         BigDecimal cash = StringUtil.isNotEmpty(entity.getNomCapi())? entity.getNomCapi().divide(new BigDecimal(10000)):new BigDecimal(0.00);
         entity.setNomCapi(cash);
         List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
@@ -402,6 +404,28 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             entity.setRefSecList(refList.stream().collect(Collectors.joining(",")));
         }
         return entity;
+    }
+
+    public String getRefList(CreditProtectionCertificate002Dto entity){
+        if(!StringUtils.isNotEmpty(entity.getRefSec())){
+            return null;
+        }
+        Map<String,Object> params = new HashMap<>();
+        params.put("finprodType2", DictCodeListExt1.金融产品类型_债券.getValue());
+        params.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        params.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        params.put("refList", StringUtil.splitToList(null, entity.getRefSec()));
+        List<String> refList = creditProtectionCertificateMapper.getRefList(params);
+        return refList.stream().collect(Collectors.joining(","));
+    }
+
+    public String getMstCustomerInfo(String customerId){
+        if(!StringUtils.isNotEmpty(customerId)){
+            return null;
+        }
+        Map<String,Object> params = new HashMap<>();
+        params.put("customerId", customerId);
+        return creditProtectionCertificateMapper.getMstCustomerInfo(params);
     }
 
     @Override
