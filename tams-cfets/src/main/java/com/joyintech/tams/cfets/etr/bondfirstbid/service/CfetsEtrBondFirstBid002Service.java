@@ -1147,10 +1147,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     }
 
                     //投标日前下的指令，指令结束日为投标日;投标日后下的指令，指令结束日为指令日期
-                    if (DateUtil.compareDate(cfetsDto.getEtrDate(), cfetsDto.getIssueDate()) >= 0) {
-                        dd.setMdate(cfetsDto.getIssueDate());
+                    if (DateUtil.compareDate(dto.getEntrustDate(), dto.getIssueDate()) >= 0) {
+                        dd.setMdate(dto.getIssueDate());
                     } else {
-                        dd.setMdate(cfetsDto.getEntrustDate());
+                        dd.setMdate(dto.getEntrustDate());
                     }
 
                     etrInvestBondFirstBidList.add(dd);
@@ -1255,9 +1255,15 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             EtrEntrust etrEntrust = new EtrEntrust();
             etrEntrust.setEntrustId(dto.getEntrustId());
             etrEntrust.setEntrustNum(ArithmeticUtil.divide(dto.getTotalBiddingNum(), 100, 4));
+            etrEntrust.setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());
             etrEntrustMapper.updateByPrimaryKeySelective(etrEntrust);
+
+            //更新委托表
+            EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
+            etrEntrustAdd.setEntrustId(dto.getEntrustId());
+            etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             //更新委托附属表
-            etrEntrustAddMapper.updateByPrimaryKeySelective(null);
+            etrEntrustAddMapper.updateByPrimaryKeySelective(etrEntrustAdd);
 
             //保存委托投标标位表
             List<EtrEntrustBidPrice> bidPriceList = new ArrayList<>();
@@ -1307,6 +1313,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
         if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())) {
             WflEtrEntrust wflEtrEntrust =  wflEtrEntrustMapper.selectByEntrustId(cfetsDto.getEntrustId());
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(cfetsDto.getEntrustId());
             if (wflEtrEntrust != null) {
                 messages.add(new ValidMessage("正在流程中，不允许修改！"));
                 ajaxResult.setErrorList(messages);
@@ -1328,6 +1335,15 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     messages.add(new ValidMessage("指令修改需保证与原指令证券账户一致！"));
                     ajaxResult.setErrorList(messages);
                     return ajaxResult;
+                }
+            }else {
+                if (StringUtil.equals(etrEntrust.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())) {
+                    if (!StringUtil.equals(cfetsDto.getFinprodId(),etrEntrust.getFinprodId())) {
+                        messages.add(new ValidMessage("招标发行/簿记建档的已接收指令，修改时不能修改资产！"));
+                        ajaxResult.setErrorList(messages);
+                        return ajaxResult;
+                    }
+
                 }
             }
 

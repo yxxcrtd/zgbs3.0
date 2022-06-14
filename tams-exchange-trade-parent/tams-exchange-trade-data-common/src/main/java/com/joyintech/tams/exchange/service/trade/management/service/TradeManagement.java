@@ -155,7 +155,8 @@ public class TradeManagement {
                 trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 trade.setBondVolume(trade.getTradedPrice().multiply(BigDecimal.valueOf(trade.getTradedVolume())).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
                 trade.setTradedPrice(trade.getTradedPrice().multiply(BigDecimal.valueOf(100)));
-            } else if (投管业务类型_现券交易.getValue().equals(trade.getBusiTypeTg())) {
+            } else if (投管业务类型_现券交易.getValue().equals(trade.getBusiTypeTg())
+                    || 投管业务类型_信用保护凭证.getValue().equals(trade.getBusiTypeTg())) {
                 trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
             } else if (投管业务类型_通用式质押回购.getValue().equals(trade.getBusiTypeTg())) {
                 trade.setTradedBalance(trade.getTradedBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
