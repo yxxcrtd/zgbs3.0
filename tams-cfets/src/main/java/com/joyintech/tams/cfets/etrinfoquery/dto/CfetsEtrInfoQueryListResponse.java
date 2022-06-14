@@ -355,7 +355,7 @@ public class CfetsEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getIssueDateStr() {
-        return DateUtil.format(this.getIssueDate());
+        return issueDateStr;
     }
 
     public void setIssueDateStr(String issueDateStr) {
