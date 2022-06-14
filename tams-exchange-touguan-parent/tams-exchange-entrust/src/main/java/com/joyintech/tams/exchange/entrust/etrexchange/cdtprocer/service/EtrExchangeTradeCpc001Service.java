@@ -550,8 +550,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         List<EtrSecPositionFlowDto> etrSecPositionFlows = new ArrayList<>();// 持仓流水
         EtrSecPositionFlowDto etrSecPositionFlowDtoUnit = new EtrSecPositionFlowDto();// 组合持仓流水DTO
         EtrCashPositionFlowDto etrCashPositionFlowDtoUnit = new EtrCashPositionFlowDto();// 组合现金流水DTO
-        if (DictCodeList.交易方向_卖出.getValue().equals(etrSinglePortfolioDto.getPs())
-                || DictCodeList.交易方向_申购.getValue().equals(etrSinglePortfolioDto.getPs())) {
+        if (DictCodeList.交易方向_卖出.getValue().equals(etrSinglePortfolioDto.getPs())) {
             /********************** 持仓流水DTO构造 *************************************/
             etrSecPositionFlowDtoUnit.setSeqno(getSeqNo());
             etrSecPositionFlowDtoUnit.setPortfolioId(etrSinglePortfolioDto.getPortfolioId());// 组合代码
@@ -567,7 +566,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrSecPositionFlowDtoUnit.setTradeId(etrSinglePortfolioDto.getEntrustId());// 指令编号
             etrSecPositionFlows.add(etrSecPositionFlowDtoUnit);
             /*************************************************************************/
-        } else if (DictCodeList.交易方向_买入.getValue().equals(etrSinglePortfolioDto.getPs())) {
+        } else if (DictCodeList.交易方向_买入.getValue().equals(etrSinglePortfolioDto.getPs()) || DictCodeList.交易方向_申购.getValue().equals(etrSinglePortfolioDto.getPs())) {
             /********************** 持仓流水DTO构造 *************************************/
             etrCashPositionFlowDtoUnit.setSeqno(getSeqNo());
             etrCashPositionFlowDtoUnit.setPortfolioId(etrSinglePortfolioDto.getPortfolioId());// 组合代码
