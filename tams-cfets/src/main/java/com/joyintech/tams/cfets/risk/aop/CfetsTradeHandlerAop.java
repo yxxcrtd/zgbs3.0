@@ -160,9 +160,9 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 交易撤销
+     * 强制完成
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trd.bond..*.*.doForcedFinish(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.doForcedFinish(..))")
     protected void doForcedFinish() {
     }
 
@@ -341,7 +341,7 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning(pointcut = "doForcedFinish()", returning = "bondInfo003Dto")
     public void doForcedFinish(JoinPoint joinPoint, CfetsEtribBondInfo003Dto bondInfo003Dto) throws BusinessException {
-        inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+        inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_关闭.getValue(), 流程节点_审批生效.getValue(), null);
     }
 
     /**
