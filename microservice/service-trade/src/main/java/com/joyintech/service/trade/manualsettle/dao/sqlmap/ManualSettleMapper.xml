@@ -33,11 +33,18 @@
             T1.SETTLE_AMT settleAmt,-->
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.PRIN ELSE NULL END prin,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.M_TRADE_AMT ELSE NULL END mTradeAmt,
+            <!--
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.PLEDGE_NUMBER ELSE NULL END pledgeNumber,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.PLEDGE_ID ELSE NULL END pledgeId,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.B_PLEDGE_ID ELSE NULL END bPledgeId,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F1.FINPROD_ABBR ELSE NULL END pledgeName,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F1.FINPROD_MARKET_ID ELSE NULL END pledgeIdAbbr,
+            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F2.FINPROD_MARKET_ID ELSE NULL END bPledgeIdAbbr,-->
+            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN  PN.PLEDGE_NUMBER ELSE NULL END pledgeNumber,
+            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ID ELSE NULL END pledgeId,
+            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.B_PLEDGE_ID ELSE NULL END bPledgeId,
+            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ABBR ELSE NULL END pledgeName,
+            <!-- CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F1.FINPROD_MARKET_ID ELSE NULL END pledgeIdAbbr, -->
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F2.FINPROD_MARKET_ID ELSE NULL END bPledgeIdAbbr,
             <!--T1.PRIN prin,
             T1.M_TRADE_AMT mTradeAmt,
@@ -60,7 +67,9 @@
 
         LEFT JOIN  STL_CAPACCT_INFO  sci ON T1.ACCT_NO = sci.ACCT_NO
         LEFT JOIN  STL_SEC_ACCT_INFO ssai ON T1.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+        <!-- modify by yangxunpeng 协议回购手工交收处理 start
         LEFT JOIN  FIN_PRODUCT  F1 ON T1.PLEDGE_ID = F1.FINPROD_ID
+        modify by yangxunpeng 协议回购手工交收处理 end -->
         LEFT JOIN  FIN_PRODUCT  F2 ON T1.B_PLEDGE_ID = F2.FINPROD_ID
         <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 start-->
         LEFT JOIN (
@@ -76,6 +85,16 @@
             GROUP BY
             ENTRUST_ID
         ) detail ON T1.ENTRUST_NO = detail.ENTRUST_ID
+        left join (
+        SELECT FDP.FINPROD_ID FINPROD_ID,
+        SUM(FDP.PLEDGE_NUMBER) PLEDGE_NUMBER,
+        wm_concat(FP.FINPROD_ID) PLEDGE_FINPROD_ID,
+        wm_concat(FP.FINPROD_ABBR) PLEDGE_FINPROD_ABBR
+        FROM FIN_DEAL_PLEDGE FDP
+        LEFT JOIN FIN_PRODUCT FP ON FDP.PLEDGE_FINPROD_ID = FP.FINPROD_ID
+        WHERE FDP.BRANCH = 0
+        GROUP BY FDP.FINPROD_ID
+        ) PN on PN.FINPROD_ID = T1.FINPROD_ID
         <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 end-->
         <where>
             <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 start-->
