@@ -808,9 +808,9 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 dto.setYield(BigDecimal.valueOf(Double.valueOf(tmp.get("repoRate").toString())));
             }
             // 回购利率
-            if (StringUtil.isNotEmpty(tmp.get("discount"))) {
-                dto.setConRatio(BigDecimal.valueOf(Double.valueOf(tmp.get("discount").toString())));
-            }
+//            if (StringUtil.isNotEmpty(tmp.get("discount"))) {
+//                dto.setConRatio(BigDecimal.valueOf(Double.valueOf(tmp.get("discount").toString())));
+//            }
             // 回购期限
             if (StringUtil.isNotEmpty(tmp.get("compactTerm"))) {
                 dto.setTerm(Integer.valueOf(tmp.get("compactTerm").toString()));
@@ -860,7 +860,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 dto.setOrigPledgeStampCode(tmp.get("origBonds").toString());
             }
             // 原质押券名称
-            if (StringUtil.isNotEmpty(tmp.get("origBondsName").toString())) {
+            if (StringUtil.isNotEmpty(tmp.get("origBondsName"))) {
                 dto.setOrigPledgeStampName(tmp.get("origBondsName").toString());
             }
             //原质押券数量
