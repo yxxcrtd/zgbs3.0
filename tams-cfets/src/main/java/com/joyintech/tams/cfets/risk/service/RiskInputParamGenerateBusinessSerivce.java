@@ -4,6 +4,9 @@ import com.joyintech.background.component.common.pack.common.util.JsonUtils;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
+import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
+import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInsertDto;
+import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
@@ -14,9 +17,13 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_行权回售;
 
 /**
  * 构造风险报文入参
@@ -27,6 +34,9 @@ import static com.joyintech.tams.constant.DictCodeListExt3.*;
 @Service
 public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
     private static final Logger logger = LoggerFactory.getLogger(RiskInputParamGenerateBusinessSerivce.class);
+
+    @Autowired
+    private CfetsManualSettleService cfetsManualSettleService;
 
     /**
      * 组装一级投标指令
@@ -140,6 +150,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
      * @date 2022/6/10 11:43
      */
     BaseMap generateCfetsPrimaryBidManage(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
+        logger.debug("组装中标结果维护:" + businessJson);
         CfetsPrimaryBidManageSaveRequest dto = JsonUtils.json2Object(businessJson, CfetsPrimaryBidManageSaveRequest.class);
         BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                 .put(NodeConfigConstant.BUSI_ACT, 业务动作_中标结果维护.getValue())
@@ -154,6 +165,57 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
                 || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
             map.put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND002);
         }
+        return map;
+    }
+
+    /**
+     * 组装交收
+     *
+     * @param decisionAct  系统动作
+     * @param flowStatus   流程节点
+     * @param isCheck      是否校验
+     * @param businessJson Json数据
+     * @return com.joyintech.tams.business.common.pojo.BaseMap
+     * @author jiangpeng
+     * @date 2022/6/10 11:43
+     */
+    BaseMap generateCfetsManualSettle(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
+        logger.debug("组装交收:" + businessJson);
+        CfetsManualSettleDto allDto = JsonUtils.json2Object(businessJson, CfetsManualSettleDto.class);
+        // 接口字段名
+        String interfaceType = NodeConfigConstant.BOND001;
+        // 业务类型
+        String busiType = 头寸业务类型_债券存续期交易.getValue();
+        // 业务动作
+        String busiAct = 业务动作_交收确认.getValue();
+        if (allDto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                || allDto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
+            interfaceType = NodeConfigConstant.REPO003;
+            busiType = 头寸业务类型_质押式回购到期.getValue();
+        }
+        if (StringUtil.equals(allDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())
+                || StringUtil.equals(allDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+            interfaceType = NodeConfigConstant.BOND002;
+        }
+        if (StringUtil.equals(allDto.getPs(), 交易方向_行权回售.getValue())) {
+            busiType = 头寸业务类型_债券行权交易.getValue();
+        }
+        if (StringUtil.equals(allDto.getButtonType(), 交收操作类型_回溯.getValue())) {
+            busiAct = 业务动作_交收回溯.getValue();
+        }
+        if (StringUtil.equals(allDto.getButtonType(), 交收操作类型_交收失败.getValue())) {
+            busiAct = 交收操作类型_交收失败.getValue();
+        }
+        List<CfetsManualSettleInsertDto> list = cfetsManualSettleService.handleSettleData(allDto);
+        BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
+                .put(NodeConfigConstant.BUSI_ACT, busiAct)
+                .put(NodeConfigConstant.PS, allDto.getPs())
+                .put(NodeConfigConstant.TRADE_PLACE, 交易场所_银行间.getValue())
+                .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                .put(NodeConfigConstant.BUSI_TYPE, busiType)
+                .put(NodeConfigConstant.IS_CHECK, isCheck)
+                .put(NodeConfigConstant.DATA, list.get(0));
         return map;
     }
 
