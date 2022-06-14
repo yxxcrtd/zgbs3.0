@@ -77,7 +77,7 @@
         where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
         ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
         AND ((T2.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpi.ISSUE_CLASS) or
-            T2.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
+            (T2.FINPROD_TYPE2 != 'F32' or T2.FINPROD_TYPE2 is null) and btm.issueClass is null)
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.busi_type
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
@@ -237,7 +237,7 @@
         where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
         ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
         AND ((T2.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpi.ISSUE_CLASS) or
-        T2.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
+            (T2.FINPROD_TYPE2 != 'F32' or T2.FINPROD_TYPE2 is null) and btm.issueClass is null)
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.busi_type
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
@@ -398,7 +398,7 @@
         where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
         ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
         AND ((T2.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpi.ISSUE_CLASS) or
-        T2.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
+        (T2.FINPROD_TYPE2 != 'F32' or T2.FINPROD_TYPE2 is null) and btm.issueClass is null)
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.busi_type
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
