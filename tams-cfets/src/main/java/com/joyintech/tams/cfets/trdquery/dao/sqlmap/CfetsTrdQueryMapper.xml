@@ -234,7 +234,7 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.PAYABLE_AMOUNT END AS	tradeAmt,
             BO.BID_ID  AS	busiCode,
-            BO.OUR_TRADER AS	trader,
+            su.real_name AS	trader,
             to_char(BO.BID_DATE,'yyyy-MM-dd') 	AS	regTradeDate,
             to_char(BO.BID_DATE,'yyyy-MM-dd')	AS	confirmTradeDate,
             BO.COUNTER_ID  AS	counterId,
@@ -248,10 +248,10 @@
             decode(BO.IS_CANCEL,'Y','03','N','01') effectiveStatus,
             case when  (BO.IS_CANCEL = 'N' AND ( BO.BID_MODLE = #{WIN_TYPE_03} OR
             (BO.BID_MODLE IN (#{WIN_TYPE_01},#{WIN_TYPE_02})AND BRT.TOTAL_WIN_ID IS NOT NULL) OR
-            (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NOT NULL))) then '01'
+            (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NOT NULL))) then '02'
                  when (BO.IS_CANCEL = 'N' AND (
             (BO.BID_MODLE IN (#{WIN_TYPE_01},#{WIN_TYPE_02})AND BRT.TOTAL_WIN_ID IS NULL)OR
-            (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '02'
+            (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '01'
              WHEN  BO.IS_CANCEL = 'Y'AND BO.TRADE_STATUS = '01'  THEN '03'end AS regStatus,
             ''   calMode
         FROM BID_ORDER BO
@@ -279,8 +279,9 @@
                     </if>
                    GROUP BY BRBP.BID_ID
             ) BRBP ON BRBP.BID_ID = BO.BID_ID
-       LEFT JOIN FIN_PRODUCT FP
+        LEFT JOIN FIN_PRODUCT FP
               ON FP.FINPROD_ID = BO.FINPROD_ID
+        left join sys_user su on  BO.OUR_TRADER = su.user_name
         LEFT JOIN FIN_PRODUCT_ISSUE FPI
                ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE FPT
@@ -352,10 +353,10 @@
                 AND (case when  (BO.IS_CANCEL = 'N' AND (
                 BO.BID_MODLE = #{WIN_TYPE_03} OR
                 (BO.BID_MODLE IN (#{WIN_TYPE_01},#{WIN_TYPE_02})AND BRT.TOTAL_WIN_ID IS NOT NULL) OR
-                (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NOT NULL))) then '01'
+                (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NOT NULL))) then '02'
                 when (BO.IS_CANCEL = 'N' AND (
                 (BO.BID_MODLE IN (#{WIN_TYPE_01},#{WIN_TYPE_02})AND BRT.TOTAL_WIN_ID IS NULL)OR
-                (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '02'
+                (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '01'
                 WHEN  BO.IS_CANCEL = 'Y'AND BO.TRADE_STATUS = '01'  THEN '03'  end ) in
                 <foreach collection="regStatusList" item="item" open="(" close=")" separator=",">
                     #{item}
@@ -386,7 +387,7 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN WBO.PAYABLE_AMOUNT END  AS	tradeAmt,
             WBO.BID_ID AS busiCode,
-            WBO.OUR_TRADER	AS	trader,
+            su.real_name AS	trader,
             to_char(WBO.BID_DATE,'yyyy-MM-dd') 	AS	regTradeDate,
             null	AS	confirmTradeDate,
             WBO.COUNTER_ID		AS	counterId,
@@ -430,6 +431,7 @@
                 ON FP.FINPROD_ID = WBO.FINPROD_ID
          LEFT JOIN FIN_PRODUCT_ISSUE FPI
                 ON FPI.FINPROD_ID = FP.FINPROD_ID
+        left join sys_user su on  WBO.OUR_TRADER = su.user_name
          LEFT JOIN FIN_PRODUCT_TYPE FPT
                 ON FPT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN MST_COUNTER_PARTY mcci ON WBO.COUNTER_ID= mcci.COUNTER_ID
@@ -4996,7 +4998,8 @@
                 BO.WIN_PRICE  winPrice,
                 BO.UNIT_CPRICE unitCprice,
                 BO.UNIT_INT unitInt,
-                BO.SETT_FEE_AMT settleFeeAmt
+                BO.SETT_FEE_AMT settleFeeAmt,
+                BO.REMARK remark
             FROM BID_ORDER BO
             LEFT JOIN (SELECT BRBP.BID_ID,SUM(EE.ENTRUST_NUM) ENTRUST_NUM,SUM(BRBP.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT
                 FROM BID_ORDER_BID_PRICE BRBP
@@ -5038,7 +5041,8 @@
                 WBO.WIN_PRICE  winPrice,
                 WBO.UNIT_CPRICE unitCprice,
                 WBO.UNIT_INT unitInt,
-                WBO.SETT_FEE_AMT settleFeeAmt
+                WBO.SETT_FEE_AMT settleFeeAmt,
+                WBO.REMARK remark
             FROM WFL_BID_ORDER WBO
             LEFT JOIN (SELECT WBRBP.BID_ID,SUM(EE.ENTRUST_NUM) ENTRUST_NUM,SUM(WBRBP.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT
                         FROM WFL_BID_ORDER_BID_PRICE WBRBP
@@ -5113,8 +5117,8 @@
                 WBRBP.SEC_ACCT_ID secManageAcctId,
                 STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
                 SU.REAL_NAME invManagerId
-         FROM BID_ORDER_BID_PRICE WBRBP
-         LEFT JOIN BID_ORDER WBO
+         FROM WFL_BID_ORDER_BID_PRICE WBRBP
+         LEFT JOIN WFL_BID_ORDER WBO
                    ON WBRBP.BID_ID = WBO.BID_ID
          LEFT JOIN FIN_PRODUCT_ISSUE FPI
                    ON FPI.FINPROD_ID = WBO.FINPROD_ID
