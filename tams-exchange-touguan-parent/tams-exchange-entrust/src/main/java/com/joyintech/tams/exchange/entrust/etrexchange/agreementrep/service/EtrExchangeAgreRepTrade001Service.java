@@ -33,11 +33,13 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePortfolioRequest;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindingResult;
 
@@ -968,6 +970,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         dto.setEtrEntrustAdd(etrEntrustAdd);
         dto.setEtrPledgeList(list);
+        dto.setEtrEntrustDetailList(handleEtrEntrustDetail(etrEntrust,etrEntrustAdd));
         return dto;
     }
     /**
@@ -1623,6 +1626,12 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
            	    EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).updateSettings(paraDto);
            	    EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).entrustEdit(agreRepOpenSecDto);
            }
+        }
+        //指令组合详情
+        List<EtrEntrustDetail> etrEntrustDetailList=handleEtrEntrustDetail(etrEntrust,etrEntrustAdd);
+        etrEntrustDetailMapper.deleteByEntrustId(etrEntrustDetailList.get(0).getEntrustId());
+        for (EtrEntrustDetail etrEntrustDetail : etrEntrustDetailList) {
+            etrEntrustDetailMapper.insertSelective(etrEntrustDetail);
         }
         // 自动分发数据入库 add by yufei 20200808 start
         if(!StringUtil.isEmptyList(etrDistributeList)){
@@ -2662,5 +2671,19 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         return tradeId;
 
+    }
+    //构建组合详情
+    private List<EtrEntrustDetail> handleEtrEntrustDetail(EtrEntrust etrEntrust,EtrEntrustAdd etrEntrustAdd){
+        //组合详情
+        List<EtrEntrustDetail> etrEntrustDetailList = new ArrayList<>();
+        EtrEntrustDetail etrEntrustDetail = new EtrEntrustDetail();
+        etrEntrustDetail.setPortfolioId(etrEntrust.getPortfolioId());
+        etrEntrustDetail.setEntrustId(etrEntrust.getEntrustId());
+        etrEntrustDetail.setEntrustAmt(etrEntrust.getEntrustAmt());
+        etrEntrustDetail.setEntrustNum(etrEntrust.getEntrustNum());
+        etrEntrustDetail.setDisRate(new BigDecimal(1));
+        etrEntrustDetail.setTargetType(etrEntrustAdd.getTargetType());
+        etrEntrustDetailList.add(etrEntrustDetail);
+        return etrEntrustDetailList;
     }
 }

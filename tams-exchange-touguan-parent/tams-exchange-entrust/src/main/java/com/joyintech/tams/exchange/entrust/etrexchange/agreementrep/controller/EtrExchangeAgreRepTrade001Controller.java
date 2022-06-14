@@ -727,6 +727,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购首期指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购首期指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购首期指令.getValue();
+            busiTypePosition=DictCodeListExt3.投管业务类型_首期.getValue();
         }
         dto.setBusiTypePosition(busiTypePosition);
         //add end
