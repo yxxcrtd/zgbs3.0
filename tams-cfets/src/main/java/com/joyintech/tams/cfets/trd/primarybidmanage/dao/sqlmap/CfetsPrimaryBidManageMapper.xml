@@ -311,7 +311,9 @@
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
             BRT.WIN_PRICE           winPrice,
-            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')         winPriceStr,
+            CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
+                 decode(FPI.TENDER_TARGET,'01', to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
+                 ELSE '' END winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -480,7 +482,9 @@
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
             BRT.WIN_PRICE           winPrice,
-            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')           winPriceStr,
+            CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
+              decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
+            ELSE '' END             winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
@@ -540,7 +544,9 @@
             BRT.WIN_TYPE            bidType,
             BRT.WIN_PRINAMT/10000   winPrinamt,
             BRT.WIN_PRICE           winPrice,
-            decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')    winPriceStr,
+            CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
+                 decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
+            ELSE '' END winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
             BRT.PAY_DATE            payDate,
