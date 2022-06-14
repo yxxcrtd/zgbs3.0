@@ -22,11 +22,9 @@ import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import com.joyintech.framework.exception.BusinessException;
-import oracle.jdbc.OracleTypes;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -34,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Element;
 
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.valuation.common.interf.base.constant.DictCodeInterfList;
@@ -47,6 +46,9 @@ import com.joyintech.tams.valuation.common.interf.base.service.vasinterf.model.I
 import com.joyintech.tams.valuation.common.interf.base.service.vasinterf.model.Transaction;
 import com.joyintech.tams.valuation.common.interf.base.service.vasinterf.model.ValInertfBuildXml001Dto;
 import com.joyintech.tams.valuation.common.interf.base.util.DbUtil;
+import com.joyintech.tams.valuation.common.interf.transdata.service.HqTemplateCommonService;
+
+import oracle.jdbc.OracleTypes;
 
 /**
  * VAS批量生成文件
@@ -61,7 +63,8 @@ import com.joyintech.tams.valuation.common.interf.base.util.DbUtil;
 @Service
 @Scope("prototype")
 public class VasInterfCommonService{
-	private Logger log = Logger.getLogger(getClass());
+	
+	private static Logger log = LoggerFactory.getLogger(VasInterfCommonService.class);
 
 	private static String TEMPLATE_PATH = "com/joyintech/interf/common/base/service/vasinterf/template/";
 	private static String PROCEDURE_PREFIX = "PKG_TCMS_VAS.";
@@ -161,7 +164,7 @@ public class VasInterfCommonService{
 				file.delete();
 
 		log.info(new StringBuilder("开始处理：").append("startDate=").append(startDate).append(", endDate=")
-				.append(endDate));
+				.append(endDate).toString());
 
 		// 基础信息
 		generate(conn, startDate, endDate, destDir, "P_QUERY_ACCOUNTINFO", "ValAccountInfo","账户信息 "); // 账户信息 1
@@ -299,7 +302,7 @@ public class VasInterfCommonService{
 			String templateId,String templateName) {
 		String procedure = PROCEDURE_PREFIX + procedureName;
 		log.info(new StringBuilder("处理：").append("procedure=").append(procedure).append(",templateId=")
-				.append(templateId));
+				.append(templateId).toString());
 		try {
 			List<Map<String, Object>> list = queryData(conn, startDate, endDate, procedure);
 			if (StringUtil.isEmptyList(list)){

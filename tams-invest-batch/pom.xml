@@ -27,7 +27,7 @@
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>joyintech-system</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.5.alibaba</version>
         </dependency>
         <dependency>
             <groupId>com.joyintech</groupId>

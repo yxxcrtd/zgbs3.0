@@ -22,12 +22,13 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.boot.web.servlet.ErrorPage;
-import org.springframework.boot.web.servlet.ErrorPageRegistry;
+import org.springframework.boot.web.server.ErrorPage;
+import org.springframework.boot.web.server.ErrorPageRegistry;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.NestedServletException;
+
 import com.joyintech.framework.util.StringUtil;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)

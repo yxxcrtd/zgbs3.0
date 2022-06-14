@@ -106,7 +106,7 @@
 		<dependency>
 			<groupId>com.joyintech</groupId>
 			<artifactId>framework-core</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5.alibaba</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
 		<dependency>

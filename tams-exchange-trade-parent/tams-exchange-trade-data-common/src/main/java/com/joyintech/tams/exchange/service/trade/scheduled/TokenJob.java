@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.scheduled;
 
 
+import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.google.common.base.Strings;
 import com.joyintech.tams.exchange.common.bean.cache.QuoteServiceNode;
 import com.joyintech.tams.exchange.common.cache.QuoteServiceNodeService;
@@ -16,7 +17,7 @@ import com.joyintech.tams.exchange.common.utils.HttpUtils;
 import com.joyintech.tams.exchange.common.utils.SpringContextUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.ServiceNodeService;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
-import com.netflix.appinfo.InstanceInfo;
+//import com.netflix.appinfo.InstanceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +61,12 @@ public class TokenJob {
     @Value("${server.context-path:/tams}")
     private String prefixYiTiHua;
 
-    @Value("${application.micorservice.contextPath.single:false}")
+    /**
+     * 是否单体服务
+     */
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
-
+    
     @Autowired
     private ServiceApplication.ContextPathConfiguration config;
 
@@ -157,7 +161,8 @@ public class TokenJob {
                             changeYitiHuaServiceAddress();
                             return;
                         }
-                        if (changeEurekaClientStatus(InstanceInfo.InstanceStatus.UP.name())) {
+//                        TODO 待实现
+                        if (changeEurekaClientStatus("UP")) {//InstanceInfo.InstanceStatus.UP.name())) {
                             masterAddress = serviceNode.getNodeAddress();
                             logger.info("current node {} is master now!!!", masterAddress);
                             return;
@@ -180,7 +185,9 @@ public class TokenJob {
                         }
                         //如果从master切换到slaver，更改注册状态
                         else if (isOutOfService) {
-                            if (!changeEurekaClientStatus(InstanceInfo.InstanceStatus.OUT_OF_SERVICE.name())) {
+//                        	TODO 待实现
+//                            if (!changeEurekaClientStatus(InstanceInfo.InstanceStatus.OUT_OF_SERVICE.name())) {
+                        	if (!changeEurekaClientStatus("OUT_OF_SERVICE")) {
                                 logger.info("unregister eureka failed. {} - {}", serviceName, instanceName);
                             }
                         }
@@ -208,16 +215,19 @@ public class TokenJob {
 
     private boolean changeEurekaClientStatus(String instanceStatus) {
         try {
+        	//TODO 待实现
             // eureka 管理接口这里没有返回数据，只有一个空字符串，暂时无法识别
             String result = HttpUtils.doRequest(eurekaUrl + instanceStatus, "PUT", null);
             logger.info("changeEurekaClientStatus result:{}", result);
-            if (InstanceInfo.InstanceStatus.OUT_OF_SERVICE.name().equals(instanceStatus)) {
+//            if (InstanceInfo.InstanceStatus.OUT_OF_SERVICE.name().equals(instanceStatus)) {
+            if ("OUT_OF_SERVICE".equals(instanceStatus)) {
                 isOutOfService = !Objects.nonNull(result);
             }
             return Objects.nonNull(result);
         } catch (Exception e) {
             logger.info("changeEurekaClientStatus error: {} - {}", instanceStatus, e);
-            if (InstanceInfo.InstanceStatus.OUT_OF_SERVICE.name().equals(instanceStatus)) {
+//            if (InstanceInfo.InstanceStatus.OUT_OF_SERVICE.name().equals(instanceStatus)) {
+            if ("OUT_OF_SERVICE".equals(instanceStatus)) {
                 isOutOfService = true;
             }
             return false;

@@ -101,7 +101,7 @@ public class ServiceApplicationInvestInterf {
     public static String PINGAN_SERVICE_NAME = "http://tams-server";
 
     @Configuration
-    @ConditionalOnProperty(prefix = "application.micorservice.contextPath", name = "commonService")
+    @ConditionalOnProperty(prefix = "application.micorservice.contextpath", name = "commonService")
     @EnableConfigurationProperties(ContextPathConfiguration.class)
     class AutoConfig {
 
@@ -145,7 +145,7 @@ public class ServiceApplicationInvestInterf {
         }
     }
 
-    @ConfigurationProperties(prefix = "application.micorservice.contextPath")
+    @ConfigurationProperties(prefix = "application.micorservice.contextpath")
     class ContextPathConfiguration {
 
         private boolean single;

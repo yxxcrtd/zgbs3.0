@@ -1,25 +1,18 @@
 package com.joyintech.tams.system;
 
-import com.joyintech.framework.config.WebApplication;
-import com.joyintech.system.SystemApplication;
-import org.springframework.beans.PropertyValue;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.bind.PropertySourcesPropertyValues;
-import org.springframework.boot.env.PropertySourcesLoader;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import springfox.documentation.spring.web.plugins.Docket;
-
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.joyintech.framework.config.WebApplication;
+import com.joyintech.system.SystemApplication;
+
+import springfox.documentation.spring.web.plugins.Docket;
 
 /**
  * 系统启动类
@@ -149,16 +142,8 @@ public class TamsSystemApplication extends WebApplication {
 	public static void main(String[] args) throws Exception {
     	initLog();
     	initSpring(args);
-//    	initConfigData();
 		printSystemInfo();
     }
-    
-//    private static void initConfigData() {
-//		DataCoreLifecycleManager core = SpringUtil.getBean(DataCoreLifecycleManager.class);
-//    	core.init();
-//    	DataRouterLifecycleManager router = SpringUtil.getBean(DataRouterLifecycleManager.class);
-//    	router.init();
-//	}
 
 	private static void printSystemInfo() throws UnknownHostException {
 		String port = SpringUtil.getEnvironment().getProperty("server.port");
@@ -201,23 +186,7 @@ public class TamsSystemApplication extends WebApplication {
      * 启动类兼容资管0.0.3框架
      */
     private static void initLog() {
-        PropertySourcesLoader propertiesLoader = new PropertySourcesLoader();
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource("classpath:/application-framework.yml");
-        try {
-        	PropertySource<?> propertySource = propertiesLoader.load(resource, null, "application", null);
-        	MutablePropertySources propertySources = new MutablePropertySources();
-        	propertySources.addFirst(propertySource);
-        	PropertySourcesPropertyValues values = new PropertySourcesPropertyValues(propertySources, false);
-        	PropertyValue value = values.getPropertyValue("log.path");
-        	if (null != value) {
-        		System.setProperty("logfolder", (String)value.getValue());
-        	} else {
-        		System.setProperty("logfolder", "logs");
-        	}
-        } catch (IOException e) {
-        	throw new RuntimeException(e);
-        }
+    	System.setProperty("logfolder", "logs");
     }
     
 }

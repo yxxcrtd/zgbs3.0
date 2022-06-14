@@ -55,7 +55,7 @@ public class SvrServiceApplication {
     public static String CUSTOMER_INTERF_NAME = "http://customerInterfService";
 
     @Configuration
-    @ConfigurationProperties(prefix = "application.micorservice.contextPath")
+    @ConfigurationProperties(prefix = "application.micorservice.contextpath")
     class AutoConfig {
         private boolean single;
 

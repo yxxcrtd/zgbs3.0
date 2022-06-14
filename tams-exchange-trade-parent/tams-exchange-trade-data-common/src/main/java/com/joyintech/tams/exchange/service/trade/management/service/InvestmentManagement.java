@@ -107,12 +107,13 @@ public class InvestmentManagement extends BaseService {
     private MinPriceService minPriceService;
     @Autowired
     private InstrumentManagement instrumentManagement;
+
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
-
+    
     /**
      * 指令查询带条件
      *

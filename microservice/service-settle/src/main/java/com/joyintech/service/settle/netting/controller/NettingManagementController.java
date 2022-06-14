@@ -1,25 +1,22 @@
 package com.joyintech.service.settle.netting.controller;
 
-import com.joyintech.framework.annotation.PageId;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.service.settle.dvporder.service.DvpOrdersManagementService;
 import com.joyintech.service.settle.netting.service.NettingManagementService;
 import com.joyintech.service.settle.netting.service.TransferMessageService;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.invest.common.dto.settle.dvporder.DvpOrdersDto;
-import com.joyintech.tams.invest.common.dto.settle.dvporder.DvpOrdersManagementDto;
 import com.joyintech.tams.invest.common.dto.settle.netting.NettingManagementDto;
 import com.joyintech.tams.invest.common.dto.settle.netting.NettingOrdersDto;
 import com.joyintech.tams.invest.common.dto.settle.netting.TransferMessageDto;
-import com.netflix.discovery.converters.Auto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author 姚轶文

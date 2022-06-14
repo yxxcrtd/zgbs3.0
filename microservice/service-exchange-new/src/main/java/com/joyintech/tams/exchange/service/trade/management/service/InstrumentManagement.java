@@ -40,11 +40,6 @@ public class InstrumentManagement extends BaseService {
     private FuturesHelper futuresHelper;
     @Autowired
     private FuturesInstrumentService futuresInstrumentService;
-    /**
-     * 是否单体服务
-     */
-    @Value("${application.micorservice.contextPath.single:false}")
-    private boolean isSingle;
 
     @Autowired(required = false)
     @Qualifier("simpleRestTemplate")

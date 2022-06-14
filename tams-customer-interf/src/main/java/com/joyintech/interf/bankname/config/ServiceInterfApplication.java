@@ -42,7 +42,7 @@ public class ServiceInterfApplication {
     public static String CUSTOMER_INTERF_NAME = "http://customerInterfService";
     
     @Configuration
-    @ConditionalOnProperty(prefix = "application.micorservice.contextPath", name = "adapterService")
+    @ConditionalOnProperty(prefix = "application.micorservice.contextpath", name = "adapterService")
     @EnableConfigurationProperties(ContextPathConfiguration.class)
     class AutoConfig {
     	
@@ -63,7 +63,7 @@ public class ServiceInterfApplication {
             }
         }
         
-        @ConfigurationProperties(prefix = "application.micorservice.contextPath")
+        @ConfigurationProperties(prefix = "application.micorservice.contextpath")
         class ContextPathConfiguration {
 
             private boolean single;

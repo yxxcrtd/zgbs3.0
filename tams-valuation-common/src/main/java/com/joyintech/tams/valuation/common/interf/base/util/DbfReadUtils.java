@@ -22,14 +22,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.joyintech.tams.common.base.entity.ValInterflog;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.constant.TempConstant;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateCheckReturnResult;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateColMatchDTO;
@@ -47,7 +46,8 @@ import com.linuxense.javadbf.DBFReader;
 @Service
 @Scope("prototype")
 public class DbfReadUtils {
-    Logger logger = Logger.getLogger(DbfReadUtils.class);
+//    Logger logger = Logger.getLogger(DbfReadUtils.class);
+	private static Logger logger = LoggerFactory.getLogger(DbfReadUtils.class);
 
     private final static  String CHARSET = "GB2312";
     

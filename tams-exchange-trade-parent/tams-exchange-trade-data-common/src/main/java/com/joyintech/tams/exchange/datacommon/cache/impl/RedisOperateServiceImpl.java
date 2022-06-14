@@ -1,14 +1,17 @@
 package com.joyintech.tams.exchange.datacommon.cache.impl;
 
-import com.joyintech.redis.core.base.RedisHashOperator;
-import com.joyintech.tams.exchange.datacommon.cache.RedisOperateService;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
+
+import com.joyintech.redis.core.base.RedisHashOperator;
+import com.joyintech.tams.exchange.datacommon.cache.RedisOperateService;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.util.JedisClusterCRC16;
+import redis.clients.jedis.util.JedisClusterCRC16;
+//import redis.clients.util.JedisClusterCRC16;
 
 /**
  * @ClassName RedisOperService

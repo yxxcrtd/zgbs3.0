@@ -63,13 +63,13 @@ public class InvestRiskManagement extends BaseService {
     private SplitOrderHelper splitOrderHelper;
     @Autowired
     private PortfolioManager portfolioManager;
+
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
-
-
+    
     public RiskOccupyBean riskCheck(Collection<EntrustInterface> entrusts) {
         return riskCheck(entrusts, null);
     }

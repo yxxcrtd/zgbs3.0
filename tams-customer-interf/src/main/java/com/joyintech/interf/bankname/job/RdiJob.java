@@ -10,11 +10,13 @@
 
 package com.joyintech.interf.bankname.job;
 
-import com.joyintech.interf.bankname.cfetsup.job.service.ImixCounterDealerXmlReaderService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
+
+import com.joyintech.interf.bankname.cfetsup.job.service.ImixCounterDealerXmlReaderService;
 
 /**
  * 解析外汇交易中心rdi数据
@@ -27,7 +29,8 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 public class RdiJob {
     /** 日志 */
-    private static Logger log = Logger.getLogger(RdiJob.class);
+//    private static Logger log = Logger.getLogger(RdiJob.class);
+	private static Logger log = LoggerFactory.getLogger(RdiJob.class);
     @Autowired
     private ImixCounterDealerXmlReaderService imixCounterDealerXmlReaderService;
     public void analysisRdi() {

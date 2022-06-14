@@ -10,15 +10,11 @@
 
 package com.joyintech.tams.disclosure.common.socket.util;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.env.PropertySourcesLoader;
 import org.springframework.core.env.PropertySource;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+
+import com.joyintech.framework.util.SpringContextUtil;
 
 
 /**
@@ -50,23 +46,24 @@ public class SocketUtils {
      * @since 1.0
      */
     public static String getPropertyValue(String key) {
-        String value = "";
-        try {
-            if (propertySource == null) {
-                PropertySourcesLoader propertiesLoader = new PropertySourcesLoader();
-                ResourceLoader resourceLoader = new DefaultResourceLoader();
-                Resource resource = resourceLoader.getResource("classpath:/application.yml");
-                propertySource = propertiesLoader.load(resource, null, "application", null);
-            }
-            Object profile = propertySource.getProperty(key);
-            if (null != profile) {
-                value = profile.toString();
-            }
-        }
-        catch (IOException e1) {
-        	logger.error(e1.getMessage(),e1);
-        }
-        return value;
+//        String value = "";
+//        try {
+//            if (propertySource == null) {
+//                PropertySourcesLoader propertiesLoader = new PropertySourcesLoader();
+//                ResourceLoader resourceLoader = new DefaultResourceLoader();
+//                Resource resource = resourceLoader.getResource("classpath:/application.yml");
+//                propertySource = propertiesLoader.load(resource, null, "application", null);
+//            }
+//            Object profile = propertySource.getProperty(key);
+//            if (null != profile) {
+//                value = profile.toString();
+//            }
+//        }
+//        catch (IOException e1) {
+//        	logger.error(e1.getMessage(),e1);
+//        }
+//        return value;
+    	 return SpringContextUtil.getPropValue(key, String.class);
     }
     
     /**

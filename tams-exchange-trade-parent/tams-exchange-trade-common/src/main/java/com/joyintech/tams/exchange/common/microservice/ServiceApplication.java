@@ -68,7 +68,7 @@ public class ServiceApplication {
     public static String PORTFOLIO_SERVICE_NAME = "http://portfolioService";//组合权限
 
     @Configuration
-    @ConditionalOnProperty(prefix = "application.micorservice.contextPath", name = "entrustService")
+    @ConditionalOnProperty(prefix = "application.micorservice.contextpath", name = "entrustService")
     @EnableConfigurationProperties(ContextPathConfiguration.class)
     class AutoConfig {
 
@@ -89,7 +89,7 @@ public class ServiceApplication {
         }
     }
 
-    @ConfigurationProperties(prefix = "application.micorservice.contextPath")
+    @ConfigurationProperties(prefix = "application.micorservice.contextpath")
     public static
     class ContextPathConfiguration {
 

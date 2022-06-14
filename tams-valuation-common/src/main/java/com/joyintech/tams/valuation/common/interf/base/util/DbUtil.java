@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author maodongjin
@@ -28,7 +29,8 @@ public class DbUtil {
 	/**
 	 * 日志
 	 */
-	private Logger logger = Logger.getLogger(DbUtil.class);
+//	private Logger logger = Logger.getLogger(DbUtil.class);
+	private static Logger logger = LoggerFactory.getLogger(DbUtil.class);
 	
 	//驱动程序名
 	private static String oracleDriver ="oracle.jdbc.driver.OracleDriver";

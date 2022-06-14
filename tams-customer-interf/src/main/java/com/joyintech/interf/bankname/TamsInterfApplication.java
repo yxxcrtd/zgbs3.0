@@ -16,7 +16,8 @@ import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+//import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class}, excludeName = {
         "org.activiti.spring.boot.SecurityAutoConfiguration",
         "org.activiti.spring.boot.JpaProcessEngineAutoConfiguration"})
-@EnableEurekaClient
+//@EnableEurekaClient
+@EnableDiscoveryClient(autoRegister = true)
 @SpringBootApplication(exclude= SecurityAutoConfiguration.class)
 public class TamsInterfApplication extends Application {
 

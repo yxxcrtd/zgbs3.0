@@ -21,9 +21,9 @@ import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import com.joyintech.framework.exception.BusinessException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Element;
 
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.valuation.common.interf.base.constant.DictCodeInterfList;
@@ -60,7 +61,8 @@ import oracle.jdbc.OracleTypes;
 @Scope("prototype")
 public class VASBatchAction{
 
-	private Logger log = Logger.getLogger(getClass());
+//	private Logger log = Logger.getLogger(getClass());
+	private static Logger log = LoggerFactory.getLogger(VASBatchAction.class);
 
 	private static String TEMPLATE_PATH = "com/joyintech/interf/valuation/vas/template/";
 	private static String PROCEDURE_PREFIX = "PKG_TCMS_VAS.";
@@ -245,7 +247,7 @@ public class VASBatchAction{
 			String templateId) {
 		String procedure = PROCEDURE_PREFIX + procedureName;
 		log.info(new StringBuilder("处理：").append("procedure=").append(procedure).append(",templateId=")
-				.append(templateId));
+				.append(templateId).toString());
 		try {
 			List<Map<String, Object>> list = queryData(conn, startDate, endDate, procedure);
 			if (StringUtil.isEmptyList(list))

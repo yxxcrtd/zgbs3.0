@@ -19,7 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +42,9 @@ import com.joyintech.service.report.regulatoryreporting.palopenmarketdealersmont
 @Service
 public class PalOpenMarketDealersMonthlyService extends BaseService<ChbBankMonthReportModelDto>{
 	
+	// 日志处理
+	private static final Logger logger = LoggerFactory.getLogger(PalOpenMarketDealersMonthlyService.class);
+		
 	// 存储属性代码和展示代码的映射关系
 	private static Map<String, String> porpertyMap = new HashMap<String, String>(1 << 6);
 	
@@ -204,9 +208,6 @@ public class PalOpenMarketDealersMonthlyService extends BaseService<ChbBankMonth
 		cellListEx.add("samt16");
 	}
 
-	// 日志处理
-	private Logger logger = Logger.getLogger(PalOpenMarketDealersMonthlyService.class);
-	
 	@Autowired
 	private ChbBankMonthReportMapper chbBankMonthReportMapper;
 	
@@ -226,7 +227,7 @@ public class PalOpenMarketDealersMonthlyService extends BaseService<ChbBankMonth
 					ca.getActualMaximum(Calendar.DAY_OF_MONTH));
 			dateend = ca.getTime();
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error("", e);
 		}
 		String orgname = "一级交易商中银行类机构";
 		ChbBankMonthReportModelDto resultmodel = new ChbBankMonthReportModelDto();

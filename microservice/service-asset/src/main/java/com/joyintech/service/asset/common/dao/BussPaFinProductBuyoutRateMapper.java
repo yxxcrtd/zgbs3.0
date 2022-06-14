@@ -10,9 +10,8 @@
  
 package com.joyintech.service.asset.common.dao;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-
-import feign.Param;
 
 /**
  *  金融产品买断利率(平安)

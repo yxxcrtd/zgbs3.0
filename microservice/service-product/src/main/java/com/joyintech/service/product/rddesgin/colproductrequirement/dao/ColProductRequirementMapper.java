@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import com.joyintech.service.product.rddesgin.colproductrequirement.dto.ColProductRequirement001Dto;
 
-import feign.Param;
-
 @Repository
 public interface ColProductRequirementMapper {
 	

@@ -27,7 +27,6 @@ import com.joyintech.tams.invest.entrust.etribbondinfo.dto.EtrFinProductDto;
 import com.joyintech.tams.invest.entrust.etribbondinfo.dto.EtrIbBondinfo001Dto;
 import com.joyintech.tams.invest.entrust.etribbondinfo.service.EtrIbBondinfo001Service;
 import com.joyintech.tams.invest.entrust.home.service.HomeService;
-import feign.Param;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

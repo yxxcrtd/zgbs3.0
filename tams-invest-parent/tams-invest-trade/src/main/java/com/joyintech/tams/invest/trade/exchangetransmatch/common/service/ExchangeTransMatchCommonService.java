@@ -223,13 +223,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
     private ExchangeTransMatchRepoCommonService exchangeTransMatchRepoCommonService;
     // modify by etliu 20220110 end
 
-    @Value("${application.micorservice.contextPath.tamsServer:http://tams-server}")
+    @Value("${application.micorservice.contextpath.tamsServer:http://tams-server}")
     private String tamsSerever;
 
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
     // modify by etliu 20220222 start

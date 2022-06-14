@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.joyintech</groupId>
 		<artifactId>tams-parent</artifactId>
-        <version>0.0.4</version>
+        <version>0.0.5.alibaba</version>
 	</parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -46,7 +46,7 @@
 <!--        <module>tams-valuation-report</module>-->
         <module>tams-exchange-trade-parent</module>
 
-        <!-- 批处理  -->
+        <!-- 批处理  
         <module>tams-batch-common</module>
         <module>tams-disclosure-batch</module>
         <module>tams-valuation-batch</module>
@@ -54,7 +54,7 @@
         <module>tams-invest-batch</module>
         <module>tams-svreport-batch</module>
         <module>tams/batch</module>
-
+-->
         <!-- 接口 -->
         <module>tams-valuation-interf</module>
         <module>tams-customer-interf</module>
@@ -96,10 +96,11 @@
         <module>tams/app</module>
 
         <module>tams-system/touguan/app</module>
-        <module>tams-system/touguan/batch</module>
         <module>tams-system/yunying/app</module>
+        <!--  
+        <module>tams-system/touguan/batch</module>
         <module>tams-system/yunying/batch</module>
-
+		-->
         <module>tams-common-basicdata</module>
         <module>microservice/service-common-basicdata</module>
 
@@ -111,8 +112,8 @@
         <module>background-component/msg-generate</module>
         <module>microservice/service-valuation-valmodel</module>
         <module>microservice/service-valuation-lossmodel</module>
-        <module>tams-valuation-batch-valmodel</module>
-        <module>tams-valuation-batch-lossmodel</module>
+        <!-- <module>tams-valuation-batch-valmodel</module>
+        <module>tams-valuation-batch-lossmodel</module> -->
         <module>microservice/tams-service-container-touguan</module>
         <module>microservice/tams-service-system</module>
         <module>tams-exchange-touguan-parent</module>

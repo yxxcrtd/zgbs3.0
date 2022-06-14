@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.joyintech</groupId>
     <artifactId>tams-parent</artifactId>
-      <version>0.0.4</version>
+      <version>0.0.5.alibaba</version>
   </parent>
   <artifactId>tams-disclosure-busicommon</artifactId>
   <version>3.0.0</version>

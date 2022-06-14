@@ -69,13 +69,13 @@ public class InvestInterfaceHelper extends BaseService {
     @Autowired(required = false)
     @Qualifier("loadBalancedRestTemplate")
     protected JoyinRestTemplate restTemplate;
+
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
-
-
+    
     /**
      * SPPI检查-债券现券买入指令提交校验时对于使权不重大的购入价条件判断
      */

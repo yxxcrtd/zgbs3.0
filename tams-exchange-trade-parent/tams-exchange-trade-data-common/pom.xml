@@ -26,7 +26,6 @@
 		<dependency>
 			<groupId>com.joyintech</groupId>
 			<artifactId>framework-rabbitmq</artifactId>
-			<version>0.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.rabbitmq</groupId>

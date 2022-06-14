@@ -10,15 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.joyintech.tams.common.base.entity.ValInterflog;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.constant.TempConstant;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateCheckReturnResult;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateColMatchDTO;
@@ -42,7 +41,8 @@ public class DbReadUtils {
 	/**
 	 * 日志
 	 */
-	private Logger logger = Logger.getLogger(DbReadUtils.class);
+//	private Logger logger = Logger.getLogger(DbReadUtils.class);
+	private static Logger logger = LoggerFactory.getLogger(DbReadUtils.class);
 	
 	/**
      * db数据库读取数据解析

@@ -1,0 +1,77 @@
+#市场行情信息接口
+MarketInfoInterf:
+  exchangeUrl: http://127.0.0.1:8099 #交易所
+  cmdsUrl: http://10.1.20.135:8099  #外汇交易中心
+
+#监听市场行情最新净价
+cmdsWebSocketUrl: ws://192.168.90.244:18888/dsp/cmds
+#监听债券行情键值
+bondWebSocketKey: Subscriber
+
+# 场内交易使用配置
+netty:
+  port: 9190
+  buffer:
+    recv: 4194304
+    send: 4194304
+    write:
+      high: 81960
+      low: 10240
+  idle:
+    read: 20
+    write: 10
+    all: 0
+  thread:
+    num:
+      boss: 1
+      worker: 10
+scheduled:
+  token:
+    enable: false
+    fixedRate: 20000
+    node: trade1
+  history:
+    cron: 0 30 20 ? * MON-FRI
+  instrument:
+    cron: 0 0 8 ? * MON-FRI
+    price: 0 15 9 ? * MON-FRI
+    flushData: 0 0 9 ? * MON-FRI
+  cacheData:
+    fixedRate: 60000
+  login:
+    fixedRate: 20000
+  tradeAgent:
+    fixedRate: 3000
+terminal:
+  default: default
+trade:
+  thread:
+    msg:
+      num: 8
+    risk:
+      alive: 5000
+      capacity: 128
+
+quote:
+  flag: false #是否使用接口平台行情，true 是，false 否
+  ws:
+    host: ws://192.168.90.208:16667/dsp
+    url: /exchange
+  http:
+    host: http://192.168.90.208:1668/dsp
+    url: /datarouter/http/json/callTrigger
+    gpCode: GZYH
+    triggerCode: GZ_HQ_SH
+agent:
+  active: false #是否对接接口平台，true-是，false-否
+  terminal:
+    host: http://192.168.90.208:1668/dsp
+    url: /datarouter/http/json/callTrigger
+  query:
+    interval: 10000
+    count: 2
+  keep:
+    fixRate: 30000
+  cache:
+    path: cache
+    clean: 0 0 16 ? * MON-FRI

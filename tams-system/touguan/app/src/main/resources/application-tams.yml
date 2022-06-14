@@ -1,0 +1,101 @@
+listener:
+  port: 8888
+  length: 8
+  encode: UTF-8
+  
+spring:
+    dfstype: 2
+
+shiro:
+  sessionId: JSESSIONID
+  casClientName: tams
+  ssoEnable: false  #是否开启sso验证，可以和joyinsso 统一登录配套使用。如果没有统一登录，但为true的话，就不校验密码
+  #  loginUrl: http://127.0.0.1:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
+  allowUrl: /core/selectRule,/common/ptlposition/insertPosition,/BussSettleOrderComm/generateSettleOrder,
+    /common/trdcommonbase/insertTradeInfo,/TrdFxswapInvestTrade001/doComplete,/TrdBondInvestTrade/**,/BussRepoSec/**,/common/trdcommonbase/selectParam/COM/is_auto_generate_negate_deal,/CstpAutoSelect/**,
+    /TrdBondDuration/findAllData,/TrdDepoDuration/selectAllData,/TrdRepoDuration/selectAllData,/TrdProjectDuration/selectAllData,
+    /TrdRepoDuration/findEffectiveData,/TrdProjectDuration/findEffectiveData,/TrdPlanInterestDuration/findEffectiveData,
+    /TrdDepoDuration/findEffectiveData,/TrdPlanInterestDuration/selectAllData,/TrdLendDuration/getEntityByMap,
+    /TrdLendDuration/selectAllDataList,/TrdBondDuration/findEffectiveData,/TrdExchangeDuration/findAllData,
+    /TrdRepoDuration/findFinCashInfo,/TrdRepoDuration/findRepoInfo,/service/**,/api/sys/refreshPlatDate,/invest/trade/forwex/TrdForwexInvestTrade002/autosave, /mobileApproval/AssetMobileApproval/getAuditDetailConfig,
+    /invest/trade/bond/TrdBondInvestTrade002/secAutoTrade,/invest/trade/trdrepotrade/TrdRepoTrade002/repoAutoTrade,/cstp/match/*,/CfetsQuotedCommon/**,
+    /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
+    /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
+    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,/trade/joyin/**,
+    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/interf/xp,/interf/xp/**,/interf/zg,/interf/zg/**,/FinProjectTargetAsset/insert,/FinAssetRateAdj/getFinAssetRateAdjByCashId,
+    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile,
+    /EtrAgreRepTrade/getEntrustInfoByTradeId,/trade/joyin/**,/EntrustMsgbyMQ/**,/asset/tenderBondAsset003/*,/core/*,/AssetCommon/*,/MstCustomerNature/*
+
+specialsyspara:
+  parakey: AUTHORIZE_LIMIT||PRICE_CAL_TYPE||portfolio_handle_userid||settle_acct_name||settle_acct_no||prod_tru_acct_no||prod_tru_acct_name||lending_acct_no||lending_acct_name
+
+#页面特殊参数取值
+specialsyspage:
+  pagekey: SysInstitution001||SysDepartment001||SysUser001||SysActorRole001||SysActorAssign001||SysBatchProcess001||SysBatchStart001||ValBatchStart001||SystemBatchQuartzConfig001||Workflow001||SysDate001||SysDataDict001||SysParaSet001
+application:
+  chb:
+    #由于一二期直连调用组件包，组件包不能访问缓存，故在此配置同三期一致的路径
+    filepath: /home/tams/svr_nb_prod/sharedata/chb/send/CB/
+    #由于一二期直连调用组件包，组件包不能访问缓存，故在此配置同三期一致的路径
+    download-file-path: /home/tams/svr_nb_prod/sharedata/chb/recive/CB/
+    maxSqlNum: 1000    #单次入库处理最大数据条数
+    msg-start-time: 0600    #中债开始接收报文时间，早上6点
+    msg-end-time: 2200     #中债结束接收报文时间，晚上10点
+    reportCbFeedBackHandleCountOneTime: 10000    #中债反馈文件，单次解析最大行数
+    isExceptionWhenSendTimeout: 01  #中债报送文件发送超时的时候，是否抛出异常
+  cache:
+    file: classpath:ehcache_app.xml
+  remindPage: invest/remindMain
+  menuType: hover
+  sysCode: TAMS
+  menuPosition: top  #菜单默认位置（设置主题后失效），支持left和top两种
+  pageStep: 100  #数据表格页码步长
+  logo: /image/logos/left-logo.png #系统图标，框架中会根据分辨率自动适配
+  minLogo: /image/logos/min-logo.png #系统图标，框架中会根据分辨率自动适配
+  leftMenuLogo: /image/logos/left-logo.png #系统图标，框架中会根据分辨率自动适配
+  topMenuLogo: /image/logos/top-logo.png #系统图标，框架中会根据分辨率自动适配
+  sessionTimeout: 1800000  #超时自动退出
+  joyinsso: false  #统一登录是否开启  需要ssoEnable为true。
+  interfMaxCorePoolSize: 20  #上游接口解析读取文件处理最大线程数
+  maxDataCountOneTimeForInvestholdInfo: 50  #上游接口解析读取文件处理中持有信息批量查询单次最大查询主键数（江苏银行50）
+  reportInterfIsNeedOkFile: 1  #上游接口解析读取文件处理中，是否需要.ok传输完成标志文件（1：需要 0：不需要）
+  reportInterfOkFileExtension: ok  #上游接口解析读取文件处理中，传输完成标志文件的扩展名（默认为ok）
+  reportInsertCount: 15  #数据批量一次性insert条数
+  reportSelectOrDeleteCount: 50  #数据批量一次查询或者删除条数
+  reportSelectOrDeleteCountForShenFen: 100  #数据批量一次查询或者删除条数(身份信息用)
+  reportInsertLongCount: 10  #数据批量一次性insert条数(单条数据字段较多)
+  reportInterfFileEncoding: UTF-8  #上游接口文件编码格式
+  reportInterfOneTimeDataCount: 1000  #上游接口解析读取文件处理,单线程处理数据条数
+  reportInterfOneTimeSqlLdrDataCount: 200000  #上游接口解析读取文件处理,单次sqlldr处理最大数据条数
+  reportInterfOneTimeSqlLdrCommitCount: 10000  #上游接口解析读取文件处理,单次sqlldr处理单次提交数
+  reportInterfSplitCharacter: '|'   #上游txt文件解析分割符
+  reportCbFeedBackHandleCountOneTime: 10000  #中债反馈文件内容单次处理数据条数
+  riskTestMaxCorePoolSize: 20
+  riskTestmaxSubmitProductSize: 50
+  versionInfo:   #版本信息
+    systemVersion: V3.0.2
+    lastChromeVersion: 73
+    customerName: 某某银行
+  runOptimize: N  #启动优化开关
+
+#交易压力测试性能优化开关
+flag: false
+
+xinping:
+  properties:
+    urlIP: 127.0.0.1
+    urlPort: 9191
+
+#清除 批处理 缓存的配置，添加此配置后可登录批处理地址http://ip:8084进行批处理缓存更新
+url:
+  batch: http://192.168.90.243:8084/main/about/refreshCache
+
+#消息推送方式:1-MQ；2-接口(开发使用)
+trd-info-push-mode: 1
+
+prod:
+  bussRep: 1
+  
+jixu:
+  user:
+    type: 2   

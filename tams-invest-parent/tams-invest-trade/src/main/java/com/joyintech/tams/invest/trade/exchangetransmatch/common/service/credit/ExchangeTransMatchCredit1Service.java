@@ -54,10 +54,10 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
-    @Value("${application.micorservice.contextPath.commonService:http://commonService}")
+    @Value("${application.micorservice.contextpath.commonService:http://commonService}")
     private String commonServiceName;
 
     public List<ExchangeTransMatchBaseTradeDto> genFinProductTradeDto(ExchangeTransMatchCommonDto transDto, ExchangeTransMatchCommonEntrustDto entrustDto) {

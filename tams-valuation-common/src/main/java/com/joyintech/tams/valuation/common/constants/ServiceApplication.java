@@ -61,7 +61,7 @@ public class ServiceApplication {
 	public static String VAL_MODEL_SERVICE_NAME = "http://valModelService";
 
 	@Configuration
-	@ConditionalOnProperty(prefix = "application.micorservice.contextPath", name = "valuationService")
+	@ConditionalOnProperty(prefix = "application.micorservice.contextpath", name = "valuationService")
 	@EnableConfigurationProperties(ContextPathConfiguration.class)
 	class AutoConfig {
 
@@ -92,7 +92,7 @@ public class ServiceApplication {
 
 
 
-	@ConfigurationProperties(prefix = "application.micorservice.contextPath")
+	@ConfigurationProperties(prefix = "application.micorservice.contextpath")
 	class ContextPathConfiguration {
 
 		private boolean single;

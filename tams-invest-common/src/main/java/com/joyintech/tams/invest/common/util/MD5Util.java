@@ -1,15 +1,17 @@
 package com.joyintech.tams.invest.common.util;
 
-import org.apache.log4j.Logger;
-
 import java.security.MessageDigest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MD5Util {
 	
 	/**
 	 * 日志
 	 */
-	private static Logger logger = Logger.getLogger(MD5Util.class);
+//	private static Logger logger = Logger.getLogger(MD5Util.class);
+	private static final Logger logger = LoggerFactory.getLogger(MD5Util.class);
 
     public static String string2MD5(String inStr) {
         MessageDigest md5 = null;

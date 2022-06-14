@@ -1,20 +1,27 @@
 package com.joyintech.interf.bankname.cfetsup.job.service;
 
 
-import com.joyintech.framework.file.SafelyFile;
-import com.joyintech.interf.bankname.cfetsup.exception.FTPDirectoryAccessException;
-import com.joyintech.interf.bankname.cfetsup.exception.FTPDownloadException;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
-import com.joyintech.interf.bankname.cfetsup.exception.FTPLoginException;
-import com.joyintech.interf.bankname.cfetsup.job.dao.ImixServiceMapper;
-import com.joyintech.interf.bankname.cfetsup.job.dto.*;
-import com.joyintech.interf.bankname.cfetsup.utils.FTPHelper;
-import com.joyintech.interf.bankname.cfetsup.utils.ZipUtils;
-
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -23,17 +30,25 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-
-import javax.xml.parsers.*;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.*;
+import com.joyintech.framework.file.SafelyFile;
+import com.joyintech.interf.bankname.cfetsup.exception.FTPDirectoryAccessException;
+import com.joyintech.interf.bankname.cfetsup.exception.FTPDownloadException;
+import com.joyintech.interf.bankname.cfetsup.exception.FTPLoginException;
+import com.joyintech.interf.bankname.cfetsup.job.dao.ImixServiceMapper;
+import com.joyintech.interf.bankname.cfetsup.job.dto.FxImixBondinfoDto;
+import com.joyintech.interf.bankname.cfetsup.job.dto.FxImixErrorInfoDto;
+import com.joyintech.interf.bankname.cfetsup.job.dto.FxImixMemInfoDto;
+import com.joyintech.interf.bankname.cfetsup.job.dto.FxImixMemMailInfoDto;
+import com.joyintech.interf.bankname.cfetsup.job.dto.FxJgzcgxDto;
+import com.joyintech.interf.bankname.cfetsup.utils.FTPHelper;
+import com.joyintech.interf.bankname.cfetsup.utils.ZipUtils;
 @Service
 public class ImixCounterDealerXmlReaderService {
 	/** 日志 */
-	private static Logger log = Logger
-			.getLogger(ImixCounterDealerXmlReaderService.class);
+//	private static Logger log = Logger
+//			.getLogger(ImixCounterDealerXmlReaderService.class);
+	private static Logger log = LoggerFactory.getLogger(ImixCounterDealerXmlReaderService.class);
+	
 	/**
 	 * server
 	 */
@@ -151,7 +166,7 @@ public class ImixCounterDealerXmlReaderService {
 					ct++;
 				}
 			} catch (Exception e) {
-				log.error(e);
+				log.error("",e);
 			}
 		}
 		es.shutdown();
@@ -807,13 +822,13 @@ public class ImixCounterDealerXmlReaderService {
 		try {
 			helper.downloadFiles("/", TEMPFOLDER, downloadFiles);
 		} catch ( FTPDirectoryAccessException e) {
-			log.error(e);
+			log.error("",e);
 			log.error("没有对对于文件的访问权限");
 		} catch (FTPDownloadException e) {
-			log.error(e);
+			log.error("",e);
 			log.error("文件下载出错");
 		} catch (IOException e) {
-			log.error(e);
+			log.error("",e);
 		}
 		// 解压文件
 		log.info("解压文件!");

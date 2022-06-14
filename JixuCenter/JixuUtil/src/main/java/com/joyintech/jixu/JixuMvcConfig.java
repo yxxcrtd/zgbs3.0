@@ -3,7 +3,6 @@ package com.joyintech.jixu;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +36,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.jixu.common.tool.JixuInterceptor;
 import com.jixu.common.tool.MyJobFactory;
 import com.jixu.common.type.UserTmpID;
@@ -67,7 +67,8 @@ public class JixuMvcConfig extends WebMvcConfigurerAdapter{
 	private int userType;
 	
 	@Autowired
-	private BasicDataSource masterDataSource;
+//	private BasicDataSource masterDataSource;
+	private DruidDataSource masterDataSource;
 	
 	@Autowired
 	private JixuDataSourcePoolProp jixuDataSourcePoolProp;
@@ -332,24 +333,36 @@ public class JixuMvcConfig extends WebMvcConfigurerAdapter{
     	if(userType==UserTmpID.userJixuType) {
 	        masterDataSource.setValidationQuery(jixuDataSourcePoolProp.getValidationQuery());
 	        masterDataSource.setInitialSize(jixuDataSourcePoolProp.getInitialSize());
-	        masterDataSource.setMaxTotal(jixuDataSourcePoolProp.getMaxTotal());
+	        
+//	        masterDataSource.setMaxTotal(jixuDataSourcePoolProp.getMaxTotal());
+	        masterDataSource.setMaxActive(jixuDataSourcePoolProp.getMaxTotal());
+	        
 	        masterDataSource.setMaxIdle(jixuDataSourcePoolProp.getMaxIdle());
 	        masterDataSource.setMinIdle(jixuDataSourcePoolProp.getMinIdle());
-	        masterDataSource.setMaxWaitMillis(jixuDataSourcePoolProp.getMaxWaitMillis());
+	        
+//	        masterDataSource.setMaxWaitMillis(jixuDataSourcePoolProp.getMaxWaitMillis());
+	        masterDataSource.setMaxWait(jixuDataSourcePoolProp.getMaxWaitMillis());
+	        
 	        masterDataSource.setDefaultAutoCommit(jixuDataSourcePoolProp.getDefaultAutoCommit());
 	        masterDataSource.setDefaultReadOnly(jixuDataSourcePoolProp.getDefaultReadOnly());
 	        masterDataSource.setDefaultTransactionIsolation(jixuDataSourcePoolProp.getDefaultTransactionIsolation());
 	        masterDataSource.setMinEvictableIdleTimeMillis(jixuDataSourcePoolProp.getMinEvictableIdleTimeMillis());
 	        masterDataSource.setPoolPreparedStatements(jixuDataSourcePoolProp.isPoolPreparedStatements());
 	        masterDataSource.setMaxOpenPreparedStatements(jixuDataSourcePoolProp.getMaxOpenPreparedStatements());
-	        masterDataSource.setRemoveAbandonedOnBorrow(jixuDataSourcePoolProp.isRemoveAbandonedOnBorrow());
 	        masterDataSource.setRemoveAbandonedTimeout(jixuDataSourcePoolProp.getRemoveAbandonedTimeout());
-	        masterDataSource.setRemoveAbandonedOnMaintenance(jixuDataSourcePoolProp.isRemoveAbandonedOnMaintenance());
+	        
+//	        masterDataSource.setRemoveAbandonedOnBorrow(jixuDataSourcePoolProp.isRemoveAbandonedOnBorrow());
+//	        masterDataSource.setRemoveAbandonedOnMaintenance(jixuDataSourcePoolProp.isRemoveAbandonedOnMaintenance());
+	        masterDataSource.setRemoveAbandoned(jixuDataSourcePoolProp.isRemoveAbandonedOnMaintenance());
+	        
 	        masterDataSource.setTimeBetweenEvictionRunsMillis(jixuDataSourcePoolProp.getTimeBetweenEvictionRunsMillis());
 	        masterDataSource.setNumTestsPerEvictionRun(jixuDataSourcePoolProp.getNumTestsPerEvictionRun());
 	        masterDataSource.setTestOnBorrow(jixuDataSourcePoolProp.isTestOnBorrow());
 	        masterDataSource.setTestOnReturn(jixuDataSourcePoolProp.isTestOnReturn());
-	        masterDataSource.setTestOnCreate(jixuDataSourcePoolProp.isTestOnCreate());
+	        
+//	        masterDataSource.setTestOnCreate(jixuDataSourcePoolProp.isTestOnCreate());
+	        masterDataSource.setTestOnBorrow(jixuDataSourcePoolProp.isTestOnCreate());
+	        
 	        masterDataSource.setLogAbandoned(jixuDataSourcePoolProp.isLogAbandoned());
         }
     }

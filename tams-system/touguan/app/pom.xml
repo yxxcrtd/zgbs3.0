@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.joyintech</groupId>
 		<artifactId>tams-parent</artifactId>
-		<version>0.0.4</version>
+		<version>0.0.5.alibaba</version>
 	</parent>
 	<artifactId>tams-touguan</artifactId>
 	<version>0.1.9</version>
@@ -106,7 +106,7 @@
 			</exclusions>
 		</dependency>
 
-		<!-- 接口画面端 -->
+		<!-- 接口画面端 
 		<dependency>
 			<groupId>com.joyintech</groupId>
 			<artifactId>tams-customer-interf</artifactId>
@@ -118,7 +118,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+-->
         <!-- 移动APP -->
 		<dependency>
 			<groupId>com.joyintech</groupId>

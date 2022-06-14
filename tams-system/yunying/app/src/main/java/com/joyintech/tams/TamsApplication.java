@@ -3,7 +3,11 @@ package com.joyintech.tams;
 import com.joyintech.framework.JoyinApplication;
 import com.joyintech.framework.config.WebApplication;
 import com.joyintech.tams.common.ErrorPageFilter;
+
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author 王波
@@ -11,6 +15,8 @@ import org.springframework.context.annotation.Bean;
  * @see 
  * @since 1.0
  */
+@MapperScan(value = "com.joyintech.**.dao", annotationClass = Repository.class)
+@ComponentScan(basePackages = "com.joyintech")
 public class TamsApplication extends WebApplication {
     @Bean
     public ErrorPageFilter errorPageFilter() {

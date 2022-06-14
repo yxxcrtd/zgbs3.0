@@ -62,8 +62,6 @@ import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 
-import groovy.xml.Entity;
-
 /**
  * 信息调整管理_付费规则调整 〈功能详细描述〉
  * 

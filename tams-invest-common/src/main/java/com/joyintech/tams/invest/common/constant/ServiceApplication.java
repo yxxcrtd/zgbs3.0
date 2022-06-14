@@ -153,7 +153,7 @@ public class ServiceApplication {
     public static String INTERF_PLACE_SERVICE_NAME = "http://interfPlaceService";
 
     @Configuration
-    @ConditionalOnProperty(prefix = "application.micorservice.contextPath", name = "commonService")
+    @ConditionalOnProperty(prefix = "application.micorservice.contextpath", name = "commonService")
     @EnableConfigurationProperties(ContextPathConfiguration.class)
     class AutoConfig {
 
@@ -217,7 +217,7 @@ public class ServiceApplication {
         }
     }
 
-    @ConfigurationProperties(prefix = "application.micorservice.contextPath")
+    @ConfigurationProperties(prefix = "application.micorservice.contextpath")
     class ContextPathConfiguration {
 
         private boolean single;

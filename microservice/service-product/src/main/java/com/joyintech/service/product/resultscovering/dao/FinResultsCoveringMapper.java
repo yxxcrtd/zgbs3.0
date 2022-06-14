@@ -4,13 +4,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.product.resultscovering.dto.FinResultsCovering001Dto;
 import com.joyintech.service.product.resultscovering.dto.FinResultsCovering002Dto;
-
-import feign.Param;
 
 @Repository
 public interface FinResultsCoveringMapper {

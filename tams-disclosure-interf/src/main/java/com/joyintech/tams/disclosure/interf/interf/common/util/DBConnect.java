@@ -24,10 +24,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
-import org.apache.commons.dbcp.BasicDataSource;
+//import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.joyintech.tams.disclosure.interf.interf.common.constant.InterfConstant;
 import com.joyintech.tams.disclosure.interf.interf.common.dto.InterfEntity;
 
@@ -56,7 +57,7 @@ public class DBConnect {
 	 * @param basicDataSource
 	 *            DB信息
 	 */
-	public static void insertData(String tablename, List<String> sqlList, BasicDataSource basicDataSource) {
+	public static void insertData(String tablename, List<String> sqlList, DruidDataSource basicDataSource) {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
@@ -126,7 +127,7 @@ public class DBConnect {
 	 *             InstantiationException
 	 */
 	public static <T extends InterfEntity> List<T> selectData(String sql, Class<T> targetClass,
-			BasicDataSource basicDataSource) throws InstantiationException, IllegalAccessException {
+			DruidDataSource basicDataSource) throws InstantiationException, IllegalAccessException {
 		Connection conn = null;
 		ArrayList<T> result = new ArrayList<T>();
 		Statement statement = null;
@@ -208,7 +209,7 @@ public class DBConnect {
 	 * @param basicDataSource
 	 *            DB信息
 	 */
-	public static void insertData(String tablename, List<String> sqlList, BasicDataSource basicDataSource,
+	public static void insertData(String tablename, List<String> sqlList, DruidDataSource basicDataSource,
 			boolean printProgress) {
 		Connection conn = null;
 		Statement stmt = null;

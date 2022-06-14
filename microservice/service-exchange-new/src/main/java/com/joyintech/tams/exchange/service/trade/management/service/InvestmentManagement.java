@@ -61,12 +61,6 @@ public class InvestmentManagement extends BaseService {
     @Autowired
     private OrderService orderService;
 
-    /**
-     * 是否单体服务
-     */
-    @Value("${application.micorservice.contextPath.single:false}")
-    private boolean isSingle;
-
     @Autowired(required = false)
     @Qualifier("simpleRestTemplate")
     protected JoyinRestTemplate simpleRestTemplate;

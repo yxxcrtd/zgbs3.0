@@ -1,0 +1,100 @@
+#============jasypt配置(配置文件加密解密)============# 
+jasypt:
+  encryptor:
+    bean: stringEncryptor
+    
+#============框架中用到日志============# 
+log:
+  path: /home/tams/logs/tams/touguan
+  level: debug
+        
+#============application配置============#     
+application:
+  exportDiagramPath: /tmp/joyintech-workflow
+  sessionTimeout: 1800000 #session超时时间设置（毫秒）
+  menuType: click #菜单模式，支持click和hover两种
+  menuPosition: top #菜单位置（设置主题后失效），支持left和top两种
+  pageStep: 10 #数据表格页码步长
+  mainPage: myHome #自定义主页
+  remindPage: noticeCenterTemplate #自定义主动提醒
+  sysCode: ALL #系统代码
+  logoAbout: /public/images/logo-about.png #系统图标
+  logo: /public/images/logo/left-logo.png #系统图标
+  minLogo: /public/images/logo/min-logo.png #系统图标
+  leftMenuLogo: /public/images/logo/left-logo.png
+  topMenuLogo: /public/images/logo/top-logo.png
+  bankNameLog: /public/images/bankNameLog.png #系统名称log
+  cache:
+     file: classpath:config/ehcache.xml
+  runOptimize: N #Y表示业务代码做过启动优化，N表示业务代码没有做过启动优化
+  
+#============线程池配置============# 
+threadpool:
+  corePoolSize: 5 #核心线程数
+  maxPoolSize: 600 #最大线程数
+  queueCapacity: 600 #线程队列大小
+  keepAliveSeconds: 60 #线程池维护线程所允许的空闲时间（秒）
+  namePrefix: async-service- #线程池中的线程的名称前缀
+
+#============pagehelper分页插件配置============#
+pagehelper:
+  helperDialect: oracle
+  autoRuntimeDialect: true
+  rowBoundsWithCount: true
+  pageSizeZero: true
+  reasonable: false             #分页插件超过最后一页返回不返回数据
+  supportMethodsArguments: true
+  offsetAsPageNum: true
+  params: count=countSql;pageNum=curPage;pageSize=pageSize;
+  
+#============文件上传配置============#
+multipart:
+  enabled: true
+  location: /tmp/file
+  maxFileSize: 2048MB
+  maxRequestSize: 20MB  
+    
+#============shiro配置============#
+shiro:
+  enable: true
+  sessionId: JSID
+  allowDuplicateLogin: false #是否允许重复登录
+  redirectToSavedRequest: false #登录成功后是否跳转到之前请求的画面，如果该值设置为false则始终跳转到loginSuccessUrl
+  sessionStorage: cache #session存储位置（database，cache，memory）
+  loginUrl: /auth/login #登录地址，在开启cas后该地址配置不生效
+  logoutUrl: /auth/logout #登出地址
+  loginSuccessUrl: /index.html #登录成功地址
+  unauthorizedUrl: /error/403 #权限认证失败跳转地址
+  ssoEnable: false #是否开启SSO认证（SSO和CAS同时只能开启一个）
+  casEnable: false #是否开启统一认证
+  jwtEnable: false #是否启用jwt认证
+  ihsEnable: false #是否使用IHS负载
+  casServerUrlPrefix: http://localhost:8080/cas #cas server地址
+  casLoginUrl: /login #Cas登录页面地址
+  casLogoutUrl: /logout #Cas登出页面地址
+  casFilterUrlPattern: /cas #casFilter UrlPattern
+  noSessionTouchUrl: /websocket,/main/getMoneyShowType,/activeReminder/getCountForShow
+
+#============分布式事务配置============#
+tx-lcn:
+  springcloud:
+    loadbalance:
+      enabled: true #开启负载均衡
+  client:
+    dtxAspectOrder: 0 # 事务控制切面控制次序
+    #dtxTime: 1000 #分布式事物超时时间（毫秒），由服务器同步过来
+    resourceOrder: 0 # 资源切面次序
+    #txManagerHeart: #tm心跳检测时间
+    #chainLevel: #通信等级
+    #tmRpcTimeout: #tm通信超时时间，由服务器同步过来
+    #machineId: server-0，由服务器同步过来
+#    managerAddress: 127.0.0.1:8070 # manager服务地址(rpc端口),可填写多个负载
+  logger:
+    enabled: true # 开启日志数据库记录存储
+    onlyError: true
+    tableName: SYS_DTX_LOGGER
+  message:
+    netty:
+      waitTime: 1000 # 与TxManager通讯最大等待时间（毫秒），必须大于5毫秒，否则会使用默认值
+      reconnectCount: 8 #断线重连次数
+      reconnectDelay: 6000 #重连延迟时间（毫秒）    
