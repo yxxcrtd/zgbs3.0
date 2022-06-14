@@ -40,7 +40,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
     private CfetsManualSettleService cfetsManualSettleService;
 
     /**
-     * 组装一级投标指令
+     * 组装一级投标指令构造风险报文入参
      *
      * @param decisionAct  系统动作
      * @param flowStatus   流程节点
@@ -51,7 +51,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
      * @date 2022/6/10 11:43
      */
     BaseMap generateEtrBondFirstBid(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
-        logger.debug("组装一级投标指令:" + businessJson);
+        logger.debug("组装一级投标指令构造风险报文入参:" + businessJson);
         CfetsEtrBondFirstBidSaveRequest dto = JsonUtils.json2Object(businessJson, CfetsEtrBondFirstBidSaveRequest.class);
         // 接口字段名
         String interfaceType = NodeConfigConstant.BOND001;
@@ -80,7 +80,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
     }
 
     /**
-     * 组装一级投标确认
+     * 组装一级投标确认构造风险报文入参
      *
      * @param decisionAct  系统动作
      * @param flowStatus   流程节点
@@ -91,7 +91,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
      * @date 2022/6/10 11:43
      */
     BaseMap generateCfetsTrdFirstBidFirmInfo(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
-        logger.debug("组装一级投标确认:" + businessJson);
+        logger.debug("组装一级投标确认构造风险报文入参:" + businessJson);
         CfetsTrdFirstBidFirmInfoDto dto = JsonUtils.json2Object(businessJson, CfetsTrdFirstBidFirmInfoDto.class);
         // 接口字段名
         String interfaceType = NodeConfigConstant.BOND001;
@@ -102,11 +102,12 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
             interfaceType = NodeConfigConstant.BOND002;
             tradePlace = null;
         }
+        // 申购方式
         String purchModle = DictCodeListExt4.头寸申购方式_分销买入.getValue();
         if (StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), dto.getBiddingMethod())) {
-            purchModle = DictCodeListExt4.投标方式_代投代缴.getValue();
+            purchModle = DictCodeListExt4.头寸申购方式_代投代缴.getValue();
         } else if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), dto.getBiddingMethod())) {
-            purchModle = DictCodeListExt4.投标方式_自主投标.getValue();
+            purchModle = DictCodeListExt4.头寸申购方式_自主投标.getValue();
         }
         return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
                 .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级投标.getValue())
@@ -121,7 +122,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
     }
 
     /**
-     * 组装一级申购
+     * 组装一级申购构造风险报文入参
      *
      * @param decisionAct  系统动作
      * @param flowStatus   流程节点
@@ -132,7 +133,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
      * @date 2022/6/10 11:43
      */
     BaseMap generateCfetsTrdBondFirstSubInfo(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
-        logger.debug("组装一级申购:" + businessJson);
+        logger.debug("组装一级申购构造风险报文入参:" + businessJson);
         CfetsTrdBondFirstSubInfoDto dto = JsonUtils.json2Object(businessJson, CfetsTrdBondFirstSubInfoDto.class);
         return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                 .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级申购.getValue())
@@ -146,7 +147,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
     }
 
     /**
-     * 组装中标结果维护
+     * 组装中标结果维护构造风险报文入参
      *
      * @param decisionAct  系统动作
      * @param flowStatus   流程节点
@@ -157,7 +158,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
      * @date 2022/6/10 11:43
      */
     BaseMap generateCfetsPrimaryBidManage(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
-        logger.debug("组装中标结果维护:" + businessJson);
+        logger.debug("组装中标结果维护构造风险报文入参:" + businessJson);
         CfetsPrimaryBidManageSaveRequest dto = JsonUtils.json2Object(businessJson, CfetsPrimaryBidManageSaveRequest.class);
         BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                 .put(NodeConfigConstant.BUSI_ACT, 业务动作_中标结果维护.getValue())
@@ -177,7 +178,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
 
 
     /**
-     * 组装一级申购成交确认
+     * 组装一级申购成交确认构造风险报文入参
      *
      * @param decisionAct  系统动作
      * @param flowStatus   流程节点
@@ -188,7 +189,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
      * @date 2022/6/10 11:43
      */
     BaseMap generateCfetsTrdFirstBondInvestTrade(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
-        logger.debug("组装一级申购成交确认:" + businessJson);
+        logger.debug("组装一级申购成交确认构造风险报文入参:" + businessJson);
         CfetsTrdFirstBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, CfetsTrdFirstBondInvestTradeDto.class);
         // 接口字段名
         String interfaceType = NodeConfigConstant.BOND001;
@@ -209,7 +210,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
     }
 
     /**
-     * 组装交收
+     * 组装交收构造风险报文入参
      *
      * @param decisionAct  系统动作
      * @param flowStatus   流程节点
@@ -220,7 +221,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
      * @date 2022/6/10 11:43
      */
     BaseMap generateCfetsManualSettle(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
-        logger.debug("组装交收:" + businessJson);
+        logger.debug("组装交收构造风险报文入参:" + businessJson);
         CfetsManualSettleDto allDto = JsonUtils.json2Object(businessJson, CfetsManualSettleDto.class);
         // 接口字段名
         String interfaceType = NodeConfigConstant.BOND001;

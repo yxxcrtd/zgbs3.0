@@ -493,6 +493,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 // 分销买入
                 riskRdsDto.setEventStatus(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
             }
+            dto.getProductDtos().forEach(item -> item.setFinprodId(dto.getFinprodId()));
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getProductDtos(), null);
         }
         if (data instanceof CfetsTrdBondFirstSubInfoDto) {
@@ -909,34 +910,11 @@ public class RiskInputParamSerivce extends RiskCommonService {
     public void buildAuthorizeParam(RiskCommonInputDto dto, Object data, RiskNodeConfigDtl dtl) {
         if (this.isControl(dtl.getAuthorizeControl())) return;
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
-            CfetsTrdFirstBidFirmInfoDto infoDto = (CfetsTrdFirstBidFirmInfoDto) data;
-            Map<String, Object> map = BeanUtil.object2Map(data);
-            dto.setCounterId(infoDto.getCounterId());
-            dto.setPrinAmt(infoDto.getTradeAmt());
-            dto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
-            dto.setTradeMarket(infoDto.getTradeMarket());
-            dto.setPs("T01");
-            FinProductTypeKey key = new FinProductTypeKey();
-            key.setFinprodId(infoDto.getFinprodId());
-            key.setBranch(Long.valueOf(0));
-            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
-            dto.setAssetSecType(finProductType.getType9());
-            dto.setFinprodId(infoDto.getFinprodId());
+            // 一级投标确认
+            riskInputBuildAuthorizeParamSerivce.buildCfetsTrdFirstBidFirmInfoParam(dto, data);
         } else if (data instanceof CfetsTrdBondFirstSubInfoDto) {
-            CfetsTrdBondFirstSubInfoDto infoDto = (CfetsTrdBondFirstSubInfoDto) data;
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infoDto.getProductDtos().get(0).getEntrustId());
-            Map<String, Object> map = BeanUtil.object2Map(data);
-            dto.setCounterId(etrEntrust.getCounterId());
-            dto.setPrinAmt(etrEntrust.getEntrustAmt());
-            dto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
-            dto.setTradeMarket(etrEntrust.getTradeMarket());
-            dto.setPs(DictCodeList.交易方向_买入.getValue());
-            FinProductTypeKey key = new FinProductTypeKey();
-            key.setFinprodId(infoDto.getFinprodId());
-            key.setBranch(Long.valueOf(0));
-            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
-            dto.setAssetSecType(finProductType.getType9());
-            dto.setFinprodId(infoDto.getFinprodId());
+            // 一级申购
+            riskInputBuildAuthorizeParamSerivce.buildCfetsTrdBondFirstSubInfoParam(dto, data);
         } else if (data instanceof CfetsPrimaryBidManageSaveRequest) {
             CfetsPrimaryBidManageSaveRequest infoDto = (CfetsPrimaryBidManageSaveRequest) data;
             Map<String, Object> map = BeanUtil.object2Map(data);
