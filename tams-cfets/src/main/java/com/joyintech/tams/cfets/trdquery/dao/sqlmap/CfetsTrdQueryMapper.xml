@@ -251,7 +251,8 @@
             (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NOT NULL))) then '01'
                  when (BO.IS_CANCEL = 'N' AND (
             (BO.BID_MODLE IN (#{WIN_TYPE_01},#{WIN_TYPE_02})AND BRT.TOTAL_WIN_ID IS NULL)OR
-            (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '02' end AS regStatus,
+            (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '02'
+             WHEN  BO.IS_CANCEL = 'Y'AND BO.TRADE_STATUS = '01'  THEN '03'end AS regStatus,
             ''   calMode
         FROM BID_ORDER BO
         LEFT JOIN (SELECT BRBP.BID_ID,wm_concat(NVL(BRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID)) SEC_ACCT_ID,
@@ -354,7 +355,8 @@
                 (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NOT NULL))) then '01'
                 when (BO.IS_CANCEL = 'N' AND (
                 (BO.BID_MODLE IN (#{WIN_TYPE_01},#{WIN_TYPE_02})AND BRT.TOTAL_WIN_ID IS NULL)OR
-                (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '02' end) in
+                (FPI.ISSUE_CLASS=#{ISSUE_CLASS_01} AND TMI.PRE_TRADE_ID IS NULL))) then '02'
+                WHEN  BO.IS_CANCEL = 'Y'AND BO.TRADE_STATUS = '01'  THEN '03'  end ) in
                 <foreach collection="regStatusList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>

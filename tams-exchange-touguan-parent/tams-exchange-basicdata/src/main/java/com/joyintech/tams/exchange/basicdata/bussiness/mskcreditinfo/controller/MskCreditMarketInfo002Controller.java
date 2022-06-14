@@ -116,7 +116,7 @@ public class MskCreditMarketInfo002Controller extends BaseController {
         AjaxResult res= new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
         if(mskCreditMarketInfoPro001Service.selectByKey(null, dto.getSecid(), dto.getCdate(),null) != null){
-            errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0006")));
+            errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0006","同一资产","同一交易日期")));
             res.setErrorList(errorList);
             res.setMessageType(MessageType.错误消息);
             return new Message<AjaxResult>().success().setData(res);
