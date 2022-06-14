@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * 构造风险报文入参
+ * 构建授权试算参数
  *
  * @author jiangpeng
  * @date 2022/6/10 11:39
