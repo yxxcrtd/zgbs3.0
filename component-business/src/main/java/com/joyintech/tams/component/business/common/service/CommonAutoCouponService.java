@@ -862,8 +862,8 @@ public class CommonAutoCouponService extends BaseService {
                     //repAssetBond.setRepIndustryLevel2(interfPayhsrcsecinfo.getRepIndustryLevel2());
                 }
                 // add by caiqun 20200915 TISHKBS-864 通过底层估值表导入的债券，加券的数据不全、不正确，导致交易异常  end
-                baseFinProductBaseInfoDto.setRepAssetBond(repAssetBond);//存中债报送界面机构类型等字段
-                baseFinProductBaseInfoDto.setRepAssetDept(repAssetDept);//存中债报送界面资产负债类别
+//                baseFinProductBaseInfoDto.setRepAssetBond(repAssetBond);//存中债报送界面机构类型等字段
+//                baseFinProductBaseInfoDto.setRepAssetDept(repAssetDept);//存中债报送界面资产负债类别
                 baseFinProductBaseInfoDto.setRepAssetType(interfPayhsrcsecinfo.getAssetClass());
                 baseFinProductBaseInfoList.add(baseFinProductBaseInfoDto);
             }

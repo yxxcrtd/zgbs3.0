@@ -368,6 +368,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         //过滤已接收且执行进度>0%的数据
         List<String> entrustIdAll = new ArrayList<>();
         for (String entrustId : entrustIdListAll) {
+            Boolean addFlag = Boolean.TRUE;
             Map<String, Object> params = new HashMap<>();
             params.put("entrustId", entrustId);
             setParam(params);
@@ -376,16 +377,24 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             // 已接收且执行进度<100%的指令可以选择【放弃】接收
             if (CollectionUtils.isNotEmpty(cfetsTrdFirstBidFirmEntrustDtoList)) {
                 for (CfetsTrdFirstBidFirmEntrustDto item : cfetsTrdFirstBidFirmEntrustDtoList) {
-                    if (!(!StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())
-                            && BigDecimalUtil.ACompareToB(item.getTransactioncom(), new BigDecimal(100), 2) >= 0)) {
-                        entrustIdAll.add(entrustId);
+                    if (!StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())
+                            && BigDecimalUtil.ACompareToB(item.getTransactioncom(), new BigDecimal(100), 2) >= 0) {
+                        addFlag = Boolean.FALSE;
                     }
                 }
             }
             //是否存在流程中或者有效且数据状态不为 已撤回 已终止
             int i = cfetsTrdFirstBidFirm001Mapper.checkDataStatus(params);
-            if (!(i > 0)) {
+            if (i > 0) {
+                addFlag = Boolean.FALSE;
+
+            }
+            if (addFlag) {
                 entrustIdAll.add(entrustId);
+            }else {
+                CfetsTrdFirstBidFirmEntrustDto cfetsDto = new CfetsTrdFirstBidFirmEntrustDto();
+                cfetsDto.setEntrustId(entrustId);
+                this.undoSumSave(cfetsDto, this.SUM_FLAG_01, null);
             }
 
         }

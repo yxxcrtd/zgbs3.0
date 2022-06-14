@@ -21,14 +21,10 @@ import static com.joyintech.tams.exchange.common.constant.EntrustType.CANCEL;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgReceiverManager;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -429,10 +425,18 @@ public class TradeMsgProcessor {
         TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(integratedEntrust.getInstructionId());
         tradeMsgReceiver.addMsg(MsgType.RESP_INTEGRATED, terminalId);
 
+        Trade trade = getTrade(integratedEntrust, Calendar.getInstance(), TradeType.NORMAL.value);
+
+        Map<String, Object> extend2 = Maps.newHashMap();
+        if (StringUtil.isNotEmpty(integratedEntrust.getExtend2())) {
+            extend2 = JsonUtils.getObjectFromJson(integratedEntrust.getExtend2(), Map.class);
+        }
+        extend2.put("brokerTradeId", trade.getBrokerTradeId());
+        integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
+
         integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
         tradeMsgReceiver.addMsg(MsgType.NOTIFY_INTEGRATED, integratedEntrust);
 
-        Trade trade = getTrade(integratedEntrust, Calendar.getInstance(), TradeType.NORMAL.value);
         tradeMsgReceiver.addMsg(MsgType.NOTIFY_TRADE_RECORD, trade);
     }
 

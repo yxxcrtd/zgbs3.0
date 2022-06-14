@@ -28,6 +28,7 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -139,9 +140,9 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         }
     }
 
-    public void doRevokeComplete(CreditProtectionCertificatePeriodSaveDto entity){
+    public void doRevokeComplete(CreditProtectionCertificatePeriodSaveDto entity) {
         investPeriodCommonService.revokeReverseTradeTable(entity.getBusiCode(),
-                LoginUserUtil.getUserName(), "", null, null,null);
+                LoginUserUtil.getUserName(), "", null, null, null);
         CreditProtectionCertificatePeriodSaveDto dto = getBussinessEntityByWorkflowId(entity.getWorkflowId());
         doOldPositionSubmit(dto, true);
         doOldPositionConfirm(dto, true);
@@ -279,7 +280,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
             //债券 金融产品交易
             //金融产品交易
-            if(null != baseBussinessDto1.getTrdProductDeal2()) {
+            if (null != baseBussinessDto1.getTrdProductDeal2()) {
                 TrdProductDeal trdProductDeal2 = baseBussinessDto1.getTrdProductDeal2();
                 WflTrdProductDeal wflTrdProductDeal2 = new WflTrdProductDeal();
                 BeanUtils.copyProperties(trdProductDeal2, wflTrdProductDeal2);
@@ -632,11 +633,9 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             refSecs.addAll(Arrays.asList(StringUtil.split(finprodLinkDto.getRefSec(), ",")));
         }
         List<SelectOptionDto> refSecsOption = new ArrayList<>();
-        for (String refSec : refSecs) {
-            SelectOptionDto selectOptionDto = new SelectOptionDto();
-            selectOptionDto.setId(refSec);
-            selectOptionDto.setText(refSec);
-            refSecsOption.add(selectOptionDto);
+
+        if (!CollectionUtils.isEmpty(refSecs)) {
+            refSecsOption.addAll(creditProtectionCertificatePeriodMapper.queryOptionsForRefSecs(refSecs));
         }
 
         finprodLinkDto.setRefSecs(refSecsOption);

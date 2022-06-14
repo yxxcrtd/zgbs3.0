@@ -1343,7 +1343,8 @@ public class TrdCommonBaseService extends BaseService {
             portfolioDto.setCashAmount(portfolioDetail.getTradeAmt());
             if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
                     || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(etrEntrust.getFinprodType2())
-                    || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())) {
+                    || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())
+                    || DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(etrEntrust.getFinprodType2())) {
                 // 券面总额
                 portfolioDto.setSecAmount(ArithmeticUtil.multiply(portfolioDetail.getShareAmt(), new BigDecimal(100)));
                 // 下单券面总额
@@ -1399,7 +1400,8 @@ public class TrdCommonBaseService extends BaseService {
         portfolioDto.setCashAmount(infContractDetailfile.getTradeAmt());
         if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
                 || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(etrEntrust.getFinprodType2())
-                || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())){
+                || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())
+                || DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(etrEntrust.getFinprodType2())){
             // 指令券面总额
             portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), new BigDecimal(100)));
             // 下单券面总额
