@@ -3,6 +3,8 @@ package com.joyintech.tams.exchange.common.request;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 @ApiModel(value="我发起的协议回购行情请求报文",description="我发起的协议回购行情请求报文")
 public class RepurchaseQuoteSendRequest extends BaseRequest {
 	private static final long serialVersionUID = 1L;
@@ -17,7 +19,7 @@ public class RepurchaseQuoteSendRequest extends BaseRequest {
 	private String orderId;
 
 	@ApiModelProperty(required = false, name = "requestStatus", value = "请求状态", example = "3")
-	private Integer requestStatus;
+	private List<Integer> requestStatus;
 
 	public String getAccountId() {
 		return accountId;
@@ -43,11 +45,11 @@ public class RepurchaseQuoteSendRequest extends BaseRequest {
 		this.orderId = orderId;
 	}
 
-	public Integer getRequestStatus() {
+	public List<Integer> getRequestStatus() {
 		return requestStatus;
 	}
 
-	public void setRequestStatus(Integer requestStatus) {
+	public void setRequestStatus(List<Integer> requestStatus) {
 		this.requestStatus = requestStatus;
 	}
 }
