@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-@PageId("CreditProtectionCertificate002")
+@PageId("CreditProtectionCertificatePeriod002")
 @ValidLogic(targetClass = CreditProtectionCertificatePeriodSaveDtoValidator.class , groups = {ValidateGroupEdit.class})
 @ApiModel(value="信用凭证保护存续期",description="信用凭证保护存续期")
 public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity implements ProcessEntity {

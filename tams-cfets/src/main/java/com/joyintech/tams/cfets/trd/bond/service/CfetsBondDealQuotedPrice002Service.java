@@ -1213,7 +1213,7 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
         BigDecimal dValue = ArithmeticUtil.subtract(sumFpriceAmt, tempSumFpriceAmt);
         // Sonar Fix modify by huwei 220608
         if (null != maxDataDto) {
-            maxDataDto.setFpriceAmt(ArithmeticUtil.doAdd(null == maxDataDto ? new BigDecimal(0) : maxDataDto.getFpriceAmt(), dValue));
+            maxDataDto.setFpriceAmt(ArithmeticUtil.doAdd(maxDataDto.getFpriceAmt(), dValue));
         }
     }
     // add by etliu 20210309 银行间上下行多组合 end

@@ -52,26 +52,6 @@ public class CreditProtectionCertificate001Service extends BaseService implement
         pageParam.put("finprodType", DictCodeListExt1.金融产品类型_信用保护凭证.getValue());//现金流业务类型
         pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodIdAbrr()));
         pageParam.put("refSec", StringUtil.splitToList(null, request.getRefSec())); //参考债项
-        if (CollectionUtils.isNotEmpty(request.getVdate())) {
-            String vdateStart = request.getVdate().get(0);
-            if (StringUtil.isNotEmpty(vdateStart)){
-                pageParam.put("vdateStart",vdateStart);
-            }
-            String vdateEnd = request.getVdate().get(1);
-            if (StringUtil.isNotEmpty(vdateEnd)){
-                pageParam.put("vdateEnd",vdateEnd);
-            }
-        }
-        if (CollectionUtils.isNotEmpty(request.getMdate())) {
-            String mdateStart = request.getMdate().get(0);
-            if (StringUtil.isNotEmpty(mdateStart)){
-                pageParam.put("mdateStart",mdateStart);
-            }
-            String mdateEnd = request.getMdate().get(1);
-            if (StringUtil.isNotEmpty(mdateEnd)){
-                pageParam.put("mdateEnd",mdateEnd);
-            }
-        }
 
         Page<CreditProtectionCertificateDto> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),

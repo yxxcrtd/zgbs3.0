@@ -105,6 +105,12 @@ public class RiskInputParamSerivce extends RiskCommonService {
     @Autowired
     private RiskInputBuildAuthorizeParamSerivce riskInputBuildAuthorizeParamSerivce;
 
+    /**
+     * 构建授信计算参数
+     */
+    @Autowired
+    private RiskInputBuildCreditParamSerivce riskInputBuildCreditParamSerivce;
+
     @Autowired
     private EtrEntrustMapper etrEntrustMapper;
 
@@ -707,34 +713,15 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         // 一级投标指令
         if (data instanceof CfetsEtrBondFirstBidSaveRequest) {
-            List<CfetsBiddingProductDto> list = ((CfetsEtrBondFirstBidSaveRequest) data).getBiddingProductList();
-            //这里处理授信
-            list.forEach(e -> {
-                CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, e);
-                this.generateInputDto(inputDto, data, e);
-                result.add(inputDto);
-            });
-
+            result.addAll(riskInputBuildCreditParamSerivce.buildCreditCfetsEtrBondFirstBidParam(data, dtl));
         }
+        // 一级投标确认
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
-            List<CfetsTrdFirstBidFirmProductDto> list = ((CfetsTrdFirstBidFirmInfoDto) data).getProductDtos();
-            //这里处理授信
-            list.forEach(e -> {
-                CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, e);
-                this.generateInputDto(inputDto, data, e);
-                result.add(inputDto);
-            });
-
+            result.addAll(riskInputBuildCreditParamSerivce.buildCreditCfetsTrdFirstBidFirmInfoParam(data, dtl));
         }
+        // 一级申购
         if (data instanceof CfetsTrdBondFirstSubInfoDto) {
-            List<CfetsTrdBondFirstSubProductDto> list = ((CfetsTrdBondFirstSubInfoDto) data).getProductDtos();
-            //这里处理授信
-            list.forEach(e -> {
-                CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, e);
-                this.generateInputDto(inputDto, data, e);
-                result.add(inputDto);
-            });
-
+            result.addAll(riskInputBuildCreditParamSerivce.buildCreditCfetsTrdBondFirstSubInfoParam(data, dtl));
         }
         if (data instanceof CfetsPrimaryBidManageSaveRequest) {
             List<CfetsPrimaryBidManageSaveDetailDto> list = ((CfetsPrimaryBidManageSaveRequest) data).getAllocationDetails();
@@ -1033,7 +1020,11 @@ public class RiskInputParamSerivce extends RiskCommonService {
             FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
             dto.setAssetSecType(finProductType.getType9());
             dto.setFinprodId(businessDto.getTrdBankManualSettleInfo().getFinprodId());
-        } else {
+        } else if (data instanceof CfetsEtrBondFirstBidSaveRequest) {
+            // 一级投标指令
+            riskInputBuildAuthorizeParamSerivce.buildEtrBondFirstBidAuthorizeParam(dto, data);
+        }
+        else {
             Map<String, Object> map = BeanUtil.object2Map(data);
             dto.setCounterId((String) map.get("counterId"));
             dto.setPrinAmt((BigDecimal) map.get("tradeAmt"));

@@ -10,43 +10,25 @@
 
 package com.joyintech.tams.component.base.core.impl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.joyintech.calculation.util.ArithmeticUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.base.core.*;
+import com.joyintech.tams.component.base.core.dto.*;
+import com.joyintech.tams.component.base.core.impl.dao.BaseFinRecommentMapper;
+import com.joyintech.tams.invest.common.util.ValItemValueGenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.joyintech.calculation.util.ArithmeticUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.component.base.core.BaseFinProductBaseInfoService;
-import com.joyintech.tams.component.base.core.BaseFinProductCashCalcRuleService;
-import com.joyintech.tams.component.base.core.BaseFinProductCashCountingRuleService;
-import com.joyintech.tams.component.base.core.BaseFinProductCashInfoService;
-import com.joyintech.tams.component.base.core.BaseFinProductCashPayPlanService;
-import com.joyintech.tams.component.base.core.BaseFinProductCashRateRuleService;
-import com.joyintech.tams.component.base.core.BaseFinProductExercisePlanService;
-import com.joyintech.tams.component.base.core.BaseFinProductExerciseRuleService;
-import com.joyintech.tams.component.base.core.BaseFinProductOpenPlanService;
-import com.joyintech.tams.component.base.core.BaseFinProductOpenRuleService;
-import com.joyintech.tams.component.base.core.BaseFinProductPayRuleService;
-import com.joyintech.tams.component.base.core.dto.BaseFinProductBaseInfoDto;
-import com.joyintech.tams.component.base.core.dto.BaseFinProductCashCalcRuleDto;
-import com.joyintech.tams.component.base.core.dto.BaseFinProductCashCountingRuleDto;
-import com.joyintech.tams.component.base.core.dto.BaseFinProductCashRateRuleDto;
-import com.joyintech.tams.component.base.core.dto.BaseFinProductExerciseRuleDto;
-import com.joyintech.tams.component.base.core.dto.BaseFinProductOpenPlanDto;
-import com.joyintech.tams.component.base.core.dto.BaseFinProductOpenRuleDto;
-import com.joyintech.tams.component.base.core.impl.dao.BaseFinRecommentMapper;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.invest.common.util.ValItemValueGenUtil;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 标的类金融产品基本信息组件 〈功能详细描述〉
- * 
+ *
  * @author xiexinting
  * @version 1.0 2018年8月29日
  * @see BaseFinProductBaseInfoServiceImpl
@@ -197,8 +179,12 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
      */
     @Autowired
     private MstBondCreditRatingMapper mstBondCreditRatingMapper;
+
     /**
      * 新建标的类金融产品基本信息
+     *
+     * @param list
+     * @return
      */
     @Override
     public boolean insert(List<BaseFinProductBaseInfoDto> list) {
@@ -222,85 +208,77 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                     // 一体化对应etliu start
                     ValItemValueGenUtil.genTypeForFinProductType(dto.getFinProduct(), dto.getFinProductType());
                     // 一体化对应etliu end
-                    
+
                     finProductTypeMapper.insert(dto.getFinProductType());
                 }
                 // 增加推荐方与推荐费率 add by renping 20191014 start
                 if (!StringUtil.isEmptyList(dto.getFinProductRecommentList())) {
                     for (FinProductRecomment finProductRecomment : dto.getFinProductRecommentList()) {
-                        finProductRecomment.setRecfeeRate(ArithmeticUtil.divide(
-                            finProductRecomment.getRecfeeRate(), new BigDecimal(100), 6));
+                        finProductRecomment.setRecfeeRate(ArithmeticUtil.divide(finProductRecomment.getRecfeeRate(), new BigDecimal(100), 6));
                         finProductRecommentMapper.insert(finProductRecomment);
                     }
                 }
                 // 增加推荐方与推荐费率 add by renping 20191014 end
                 // 调用接口插入金融产品现金流信息表
-                if (null != baseFinProductCashInfoService && dto.getFinCashInfoList()!=null && !dto.getFinCashInfoList().isEmpty() ) {
+                if (null != baseFinProductCashInfoService && dto.getFinCashInfoList() != null && !dto.getFinCashInfoList().isEmpty()) {
                     baseFinProductCashInfoService.insertList(dto.getFinCashInfoList());
                 }
                 // 调用接口插入金融产品现金流支付规则表
-                if (null != baseFinProductPayRuleService && dto.getFinCashPayRuleList()!=null
-                    && !dto.getFinCashPayRuleList().isEmpty() ) {
+                if (null != baseFinProductPayRuleService && dto.getFinCashPayRuleList() != null && !dto.getFinCashPayRuleList().isEmpty()) {
                     baseFinProductPayRuleService.insert(dto.getFinCashPayRuleList());
                 }
                 // 调用接口插入金融产品现金流计提规则表
-                if (null != baseFinProductCashCountingRuleService && dto.getFinCashCountingRuleList()!=null
-                    && !dto.getFinCashCountingRuleList().isEmpty() ) {
+                if (null != baseFinProductCashCountingRuleService && dto.getFinCashCountingRuleList() != null && !dto.getFinCashCountingRuleList().isEmpty()) {
                     baseFinProductCashCountingRuleService.insert(dto.getFinCashCountingRuleList());
                 }
                 // 调用接口插入金融产品现金流支付支付计划表
-                if (null != baseFinProductCashPayPlanService && dto.getFinCashPlanList()!=null
-                    && !dto.getFinCashPlanList().isEmpty() ) {
+                if (null != baseFinProductCashPayPlanService && dto.getFinCashPlanList() != null && !dto.getFinCashPlanList().isEmpty()) {
                     baseFinProductCashPayPlanService.insertList(dto.getFinCashPlanList());
                 }
                 // 调用接口插入金融产品现金流计算规则表
-                if (null != baseFinProductCashCalcRuleService && dto.getFinCashCalcRuleList()!=null
-                    && !dto.getFinCashCalcRuleList().isEmpty() ) {
+                if (null != baseFinProductCashCalcRuleService && dto.getFinCashCalcRuleList() != null && !dto.getFinCashCalcRuleList().isEmpty()) {
                     baseFinProductCashCalcRuleService.insert(dto.getFinCashCalcRuleList());
                 }
                 // 调用接口插入金融产品现金流利率信息表
-                if (null != baseFinProductCashRateRuleService && dto.getFinRateInfoList()!=null
-                    && !dto.getFinRateInfoList().isEmpty() ) {
+                if (null != baseFinProductCashRateRuleService && dto.getFinRateInfoList() != null && !dto.getFinRateInfoList().isEmpty()) {
                     baseFinProductCashRateRuleService.insert(dto.getFinRateInfoList());
                 }
                 // 调用接口插入金融产品现金流行权规则表
-                if (null != baseFinProductExerciseRuleService && dto.getFinExerciseRuleList()!=null
-                    && !dto.getFinExerciseRuleList().isEmpty() ) {
+                if (null != baseFinProductExerciseRuleService && dto.getFinExerciseRuleList() != null && !dto.getFinExerciseRuleList().isEmpty()) {
                     baseFinProductExerciseRuleService.insert(dto.getFinExerciseRuleList());
                 }
                 // 调用接口插入金融产品现金流行权计划表
-                if (null != baseFinProductExercisePlanService && dto.getFinExercisePlanList()!=null
-                    && !dto.getFinExercisePlanList().isEmpty() ) {
+                if (null != baseFinProductExercisePlanService && dto.getFinExercisePlanList() != null && !dto.getFinExercisePlanList().isEmpty()) {
                     baseFinProductExercisePlanService.insert(dto.getFinExercisePlanList());
                 }
                 // 调用接口插入开放计划表
-                if (null != baseFinProductOpenPlanService && dto.getFinOpenPlanList()!=null && !dto.getFinOpenPlanList().isEmpty() ) {
+                if (null != baseFinProductOpenPlanService && dto.getFinOpenPlanList() != null && !dto.getFinOpenPlanList().isEmpty()) {
                     baseFinProductOpenPlanService.insert(dto.getFinOpenPlanList());
                 }
                 // 调用接口插入开放规则表
-                if (null != baseFinProductOpenRuleService && dto.getFinOpenRuleList()!=null && !dto.getFinOpenRuleList().isEmpty() ) {
+                if (null != baseFinProductOpenRuleService && dto.getFinOpenRuleList() != null && !dto.getFinOpenRuleList().isEmpty()) {
                     baseFinProductOpenRuleService.insert(dto.getFinOpenRuleList());
                 }
                 //基金报送信息
-                if(null!=dto.getRepfund()){
-                	repFundMapper.insert(dto.getRepfund());
+                if (null != dto.getRepfund()) {
+                    repFundMapper.insert(dto.getRepfund());
                 }
                 //债券中债报送
-                if(null!=dto.getRepAssetBond()){
-                	repAssetBondMapper.insert(dto.getRepAssetBond());
+                if (null != dto.getRepAssetBond()) {
+                    repAssetBondMapper.insert(dto.getRepAssetBond());
                 }
                 //债券中债报送
-                if(null!=dto.getRepAssetDept()){
-                	repAssetDeptMapper.insert(dto.getRepAssetDept());
+                if (null != dto.getRepAssetDept()) {
+                    repAssetDeptMapper.insert(dto.getRepAssetDept());
                 }
                 //债券评级信息
-                if(null!=dto.getMstBondCreditRatingList() && !dto.getMstBondCreditRatingList().isEmpty()){
-                	for(MstBondCreditRating mstBondCreditRating : dto.getMstBondCreditRatingList()){
-                		mstBondCreditRatingMapper.insert(mstBondCreditRating);
-                	}
+                if (null != dto.getMstBondCreditRatingList() && !dto.getMstBondCreditRatingList().isEmpty()) {
+                    for (MstBondCreditRating mstBondCreditRating : dto.getMstBondCreditRatingList()) {
+                        mstBondCreditRatingMapper.insert(mstBondCreditRating);
+                    }
                 }
                 //发行信息
-                if(null != dto.getFinProductIssue()){
+                if (null != dto.getFinProductIssue()) {
                     finProductIssueMapper.insert(dto.getFinProductIssue());
                 }
             }
@@ -311,6 +289,9 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
 
     /**
      * 删除标的类金融产品基本信息
+     *
+     * @param finprodIdList
+     * @return
      */
     @Override
     public boolean delete(List<String> finprodIdList) {
@@ -325,8 +306,7 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                     List<String> cashIdList = new ArrayList<>();
                     if (null != baseFinProductCashInfoService) {
                         finCashInfo.setFinprodId(finprodId);
-                        List<FinCashInfo> finCashInfoList = baseFinProductCashInfoService.select(
-                            finCashInfo);
+                        List<FinCashInfo> finCashInfoList = baseFinProductCashInfoService.select(finCashInfo);
                         for (FinCashInfo entity : finCashInfoList) {
                             cashIdList.add(entity.getCashId());
                         }
@@ -334,8 +314,7 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                             finCashInfo.setCashId(cashId);
                             baseFinProductCashInfoService.deleteByPrimaryKey(finCashInfo);
                         }
-                    }
-                    else {
+                    } else {
                         continue;
                     }
                     // 通过金融代码删除标的类金融产品表
@@ -380,8 +359,7 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                             baseFinProductCashCalcRuleDto.setCashId(cashId);
                             // modify by jiangpeng on 20210610 工单 joyinzgcpsj20210608005
 //                            baseFinProductCashCalcRuleDto.setIsInitial(DictCodeList.是否_是.getValue());
-                            baseFinProductCashCalcRuleService.deleteByBaseFinProductCashCalcRuleDto(
-                                baseFinProductCashCalcRuleDto);
+                            baseFinProductCashCalcRuleService.deleteByBaseFinProductCashCalcRuleDto(baseFinProductCashCalcRuleDto);
                         }
                     }
                     // 通过金融代码删除金融产品现金流计提规则表
@@ -390,8 +368,7 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                         baseFinProductCashCountingRuleDto.setFinprodId(finprodId);
                         for (String cashId : cashIdList) {
                             baseFinProductCashCountingRuleDto.setCashId(cashId);
-                            baseFinProductCashCountingRuleService.deleteByBaseFinProductCashCountingRuleDto(
-                                baseFinProductCashCountingRuleDto);
+                            baseFinProductCashCountingRuleService.deleteByBaseFinProductCashCountingRuleDto(baseFinProductCashCountingRuleDto);
                         }
                     }
                     // 通过金融代码删除金融产品现金流利率规则信息表
@@ -400,8 +377,7 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                         baseFinProductCashRateRuleDto.setFinprodId(finprodId);
                         for (String cashId : cashIdList) {
                             baseFinProductCashRateRuleDto.setCashId(cashId);
-                            baseFinProductCashRateRuleService.deleteByBaseFinProductCashRateRuleDto(
-                                baseFinProductCashRateRuleDto);
+                            baseFinProductCashRateRuleService.deleteByBaseFinProductCashRateRuleDto(baseFinProductCashRateRuleDto);
                         }
                     }
                     // 通过金融代码删除金融产品现金流行权规则表
@@ -410,8 +386,7 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                         baseFinProductExerciseRuleDto.setFinprodId(finprodId);
                         for (String cashId : cashIdList) {
                             baseFinProductExerciseRuleDto.setCashId(cashId);
-                            baseFinProductExerciseRuleService.delete(
-                                baseFinProductExerciseRuleDto);
+                            baseFinProductExerciseRuleService.delete(baseFinProductExerciseRuleDto);
                         }
                     }
                     // 通过金融代码删除金融产品现金流行权计划表
@@ -429,8 +404,7 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                         baseFinProductOpenPlanDto.setFinprodId(finprodId);
                         for (String cashId : cashIdList) {
                             baseFinProductOpenPlanDto.setCashId(cashId);
-                            baseFinProductOpenPlanService.deleteByFinOpenPlan(
-                                baseFinProductOpenPlanDto);
+                            baseFinProductOpenPlanService.deleteByFinOpenPlan(baseFinProductOpenPlanDto);
                         }
                     }
                     // 通过现金流代码删除开放规则表
@@ -450,6 +424,10 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
 
     /**
      * 修改标的类金融产品基本信息
+     *
+     * @param finprodIdList
+     * @param list
+     * @return
      */
     @Override
     public boolean update(List<String> finprodIdList, List<BaseFinProductBaseInfoDto> list) {
@@ -463,6 +441,9 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
 
     /**
      * 查询标的类金融产品基本信息
+     *
+     * @param finprodIdList
+     * @return
      */
     @Override
     public List<BaseFinProductBaseInfoDto> select(List<String> finprodIdList) {
@@ -478,7 +459,7 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                 // 通过金融产品代码查询金融产品分类表
                 FinProductTypeKey key = new FinProductTypeKey();
                 key.setFinprodId(finprodId);
-                key.setBranch((long)0);
+                key.setBranch((long) 0);
                 dto.setFinProductType(finProductTypeMapper.selectByPrimaryKey(key));
                 // 通过金融产品代码查询金融产品现金流信息表
                 if (null != baseFinProductCashInfoService) {
@@ -502,66 +483,53 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                 if (null != baseFinProductCashCalcRuleService) {
                     BaseFinProductCashCalcRuleDto baseFinProductCashCalcRuleDto = new BaseFinProductCashCalcRuleDto();
                     baseFinProductCashCalcRuleDto.setFinprodId(finprodId);
-                    dto.setFinCashCalcRuleList(
-                        baseFinProductCashCalcRuleService.selectByBaseFinProductCashCalcRuleDto(
-                            baseFinProductCashCalcRuleDto));
+                    dto.setFinCashCalcRuleList(baseFinProductCashCalcRuleService.selectByBaseFinProductCashCalcRuleDto(baseFinProductCashCalcRuleDto));
                 }
                 // 通过金融产品代码查询金融产品现金流计算规则表
                 if (null != baseFinProductCashCountingRuleService) {
                     BaseFinProductCashCountingRuleDto baseFinProductCashCountingRuleDto = new BaseFinProductCashCountingRuleDto();
                     baseFinProductCashCountingRuleDto.setFinprodId(finprodId);
-                    dto.setFinCashCountingRuleList(
-                        baseFinProductCashCountingRuleService.selectByBaseFinProductCashCountingRuleDto(
-                            baseFinProductCashCountingRuleDto));
+                    dto.setFinCashCountingRuleList(baseFinProductCashCountingRuleService.selectByBaseFinProductCashCountingRuleDto(baseFinProductCashCountingRuleDto));
                 }
                 // 通过金融产品代码查询金融产品现金流利率规则信息表
                 if (null != baseFinProductCashRateRuleService) {
                     BaseFinProductCashRateRuleDto baseFinProductCashRateRuleDto = new BaseFinProductCashRateRuleDto();
                     baseFinProductCashRateRuleDto.setFinprodId(finprodId);
-                    dto.setFinRateInfoList(
-                        baseFinProductCashRateRuleService.selectByBaseFinProductCashRateRuleDto(
-                            baseFinProductCashRateRuleDto));
+                    dto.setFinRateInfoList(baseFinProductCashRateRuleService.selectByBaseFinProductCashRateRuleDto(baseFinProductCashRateRuleDto));
                 }
                 // 通过金融产品代码查询金融产品现金流计提规则信息表
                 if (null != baseFinProductCashRateRuleService) {
                     BaseFinProductCashRateRuleDto baseFinProductCashRateRuleDto = new BaseFinProductCashRateRuleDto();
                     baseFinProductCashRateRuleDto.setFinprodId(finprodId);
-                    dto.setFinRateInfoList(
-                        baseFinProductCashRateRuleService.selectByBaseFinProductCashRateRuleDto(
-                            baseFinProductCashRateRuleDto));
+                    dto.setFinRateInfoList(baseFinProductCashRateRuleService.selectByBaseFinProductCashRateRuleDto(baseFinProductCashRateRuleDto));
                 }
                 // 通过金融产品代码查询金融产品现金流行权规则表
                 if (null != baseFinProductExerciseRuleService) {
                     BaseFinProductExerciseRuleDto baseFinProductExerciseRuleDto = new BaseFinProductExerciseRuleDto();
                     baseFinProductExerciseRuleDto.setFinprodId(finprodId);
-                    dto.setFinExerciseRuleList(
-                        baseFinProductExerciseRuleService.select(baseFinProductExerciseRuleDto));
+                    dto.setFinExerciseRuleList(baseFinProductExerciseRuleService.select(baseFinProductExerciseRuleDto));
                 }
                 // 通过金融产品代码查询金融产品现金流行权计划表
                 if (null != baseFinProductExercisePlanService) {
                     FinExercisePlan finExercisePlan = new FinExercisePlan();
                     finExercisePlan.setFinprodId(finprodId);
-                    dto.setFinExercisePlanList(
-                        baseFinProductExercisePlanService.select(finExercisePlan));
+                    dto.setFinExercisePlanList(baseFinProductExercisePlanService.select(finExercisePlan));
                 }
                 // 通过金融产品代码查询开放计划表
                 if (null != baseFinProductOpenPlanService) {
                     BaseFinProductOpenPlanDto baseFinProductOpenPlanDto = new BaseFinProductOpenPlanDto();
                     baseFinProductOpenPlanDto.setFinprodId(finprodId);
-                    dto.setFinOpenPlanList(baseFinProductOpenPlanService.selectByFinOpenPlan(
-                        baseFinProductOpenPlanDto));
+                    dto.setFinOpenPlanList(baseFinProductOpenPlanService.selectByFinOpenPlan(baseFinProductOpenPlanDto));
                 }
                 // 通过现金流代码查询开发规则表
-                if (null != baseFinProductOpenRuleService
-                    && null != baseFinProductCashInfoService) {
+                if (null != baseFinProductOpenRuleService && null != baseFinProductCashInfoService) {
                     List<FinCashInfo> finCashInfoList = dto.getFinCashInfoList();
                     List<FinOpenRule> finOpenRuleList = new ArrayList<>();
                     if (finCashInfoList != null && finCashInfoList.size() > 0) {
                         BaseFinProductOpenRuleDto baseFinProductOpenRuleDto = new BaseFinProductOpenRuleDto();
                         for (FinCashInfo entity : finCashInfoList) {
                             baseFinProductOpenRuleDto.setCashId(entity.getCashId());
-                            List<FinOpenRule> onpenrulelist = baseFinProductOpenRuleService.search(
-                                baseFinProductOpenRuleDto);
+                            List<FinOpenRule> onpenrulelist = baseFinProductOpenRuleService.search(baseFinProductOpenRuleDto);
                             finOpenRuleList.addAll(onpenrulelist);
                         }
                     }
@@ -573,71 +541,89 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
         }
         return null;
     }
-    
+
     /**
      * 债券估值行情保存(新增)
+     *
+     * @param list
+     * @return
      */
-	@Override
-	public boolean insertMstBondValuationInfo(List<MstBondValuationInfo> list) {
-		if (null != baseFinProductCashInfoService && list!=null && !list.isEmpty() ) {
-			for(MstBondValuationInfo mstBondValuationInfo:list){
-				mstBondValuationInfoMapper.insert(mstBondValuationInfo);
-			}
-			return true;
-		}
-		return false;
-	}
-	/**
-     * 债券市场行情保存(新增)
-     */
-	@Override
-	public boolean insertmstBondMarketInfo(List<MstBondMarketInfo> list) {
-		if (null != baseFinProductCashInfoService && list!=null && !list.isEmpty() ) {
-			for(MstBondMarketInfo mstBondMarketInfo:list){
-				mstBondMarketInfoMapper.insert(mstBondMarketInfo);
-			}
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public boolean insertMstBondValuationInfo(List<MstBondValuationInfo> list) {
+        if (null != baseFinProductCashInfoService && list != null && !list.isEmpty()) {
+            for (MstBondValuationInfo mstBondValuationInfo : list) {
+                mstBondValuationInfoMapper.insert(mstBondValuationInfo);
+            }
+            return true;
+        }
+        return false;
+    }
 
-	/**
+    /**
+     * 债券市场行情保存(新增)
+     *
+     * @param list
+     * @return
+     */
+    @Override
+    public boolean insertmstBondMarketInfo(List<MstBondMarketInfo> list) {
+        if (null != baseFinProductCashInfoService && list != null && !list.isEmpty()) {
+            for (MstBondMarketInfo mstBondMarketInfo : list) {
+                mstBondMarketInfoMapper.insert(mstBondMarketInfo);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 回购标准折算率保存(新增)
+     *
+     * @param list
+     * @return
      */
-	@Override
-	public boolean insertFinStdsecConverseRadio(List<FinStdsecConverseRadio> list) {
-		if (null != baseFinProductCashInfoService && list!=null && !list.isEmpty() ) {
-			for(FinStdsecConverseRadio finStdsecConverseRadio:list){
-				finStdsecConverseRadioMapper.insert(finStdsecConverseRadio);
-			}
-			return true;
-		}
-		return false;
-	}
-	/**
+    @Override
+    public boolean insertFinStdsecConverseRadio(List<FinStdsecConverseRadio> list) {
+        if (null != baseFinProductCashInfoService && list != null && !list.isEmpty()) {
+            for (FinStdsecConverseRadio finStdsecConverseRadio : list) {
+                finStdsecConverseRadioMapper.insert(finStdsecConverseRadio);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 基金-场外金融产品保存(新增)
+     *
+     * @param list
+     * @return
      */
-	@Override
-	public boolean insertFinProductValuation(List<FinProductValuation> list) {
-		if (null != baseFinProductCashInfoService && list!=null && !list.isEmpty() ) {
-			for(FinProductValuation finProductValuation:list){
-				finProductValuationMapper.insert(finProductValuation);
-			}
-			return true;
-		}
-		return false;
-	}
-	/**
+    @Override
+    public boolean insertFinProductValuation(List<FinProductValuation> list) {
+        if (null != baseFinProductCashInfoService && list != null && !list.isEmpty()) {
+            for (FinProductValuation finProductValuation : list) {
+                finProductValuationMapper.insert(finProductValuation);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 基金-基金市场行情保存(新增)
+     *
+     * @param list
+     * @return
      */
-	@Override
-	public boolean insertMstFundMarketInfo(List<MstFundMarketInfo> list) {
-		if (null != baseFinProductCashInfoService && list!=null && !list.isEmpty() ) {
-			for(MstFundMarketInfo mstFundMarketInfo:list){
-				mstFundMarketInfoMapper.insert(mstFundMarketInfo);
-			}
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public boolean insertMstFundMarketInfo(List<MstFundMarketInfo> list) {
+        if (null != baseFinProductCashInfoService && list != null && !list.isEmpty()) {
+            for (MstFundMarketInfo mstFundMarketInfo : list) {
+                mstFundMarketInfoMapper.insert(mstFundMarketInfo);
+            }
+            return true;
+        }
+        return false;
+    }
 }
