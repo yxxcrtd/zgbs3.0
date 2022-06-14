@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -17,6 +18,7 @@ import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
 import com.joyintech.tams.exchange.common.enums.exchange.QuoteStatusEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PledgeDisPlaceDirEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
@@ -395,9 +397,9 @@ public class IntegratedQuoteManagement {
             }
         }
 
-        Integer requestStatus = request.getRequestStatus();
-        if (ObjectUtil.isNotEmpty(requestStatus)) {
-            retList = retList.stream().filter(item -> NumberUtil.equals(item.getRequestStatus(), requestStatus)).collect(Collectors.toList());
+        List<Integer> requestStatusList = request.getRequestStatus();
+        if (CollUtil.isNotEmpty(requestStatusList)) {
+            retList = retList.stream().filter(item -> requestStatusList.contains(item.getRequestStatus())).collect(Collectors.toList());
         }
 
         return ResultBean.success(MapUtil.builder().put(ROOT, retList).build());
@@ -405,42 +407,17 @@ public class IntegratedQuoteManagement {
     }
 
     private BaseRepurchaseQuoteSendResponse createSendQuoteByIntegratedEntrust(IntegratedEntrustVo entrust) {
-        BaseRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse = new BaseRepurchaseQuoteSendResponse();
-//        baseRepurchaseQuoteSendResponse.setRequestType(cn.hutool.core.util.EnumUtil.getFieldBy(RepurchaseTypeEnum::getCode, RepurchaseTypeEnum::getBusiTypeTgCode, entrust.getBusiTypeTg()));
-//        baseRepurchaseQuoteSendResponse.setBs();
-        baseRepurchaseQuoteSendResponse.setStockCode(entrust.getStockCode());
-        baseRepurchaseQuoteSendResponse.setStockName(entrust.getStockName());
-        baseRepurchaseQuoteSendResponse.setPledgeNumber(BigDecimal.valueOf(entrust.getEntrustVolume()));
-        baseRepurchaseQuoteSendResponse.setCounterId(entrust.getCounterId());
-        baseRepurchaseQuoteSendResponse.setTraderCode(entrust.getTradeName());
-        baseRepurchaseQuoteSendResponse.setMemberId(entrust.getDealerName());
-        baseRepurchaseQuoteSendResponse.setInvestorType(entrust.getOwnerType());
-        baseRepurchaseQuoteSendResponse.setCpTraderCode(entrust.getPropTradeName());
-        baseRepurchaseQuoteSendResponse.setCpMemberId(entrust.getPropDealerName());
-        baseRepurchaseQuoteSendResponse.setCpInvestorId(entrust.getPropInvestorName());
-        baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
-        baseRepurchaseQuoteSendResponse.setCpInvestorType(entrust.getPropOwnerType());
-//        baseRepurchaseQuoteSendResponse.setCpClientName(null);
-        baseRepurchaseQuoteSendResponse.setRemark(entrust.getRemark());
-//        baseRepurchaseQuoteSendResponse.setRequestTypeStr(cn.hutool.core.util.EnumUtil.getFieldBy(RepurchaseTypeEnum::getDescription, RepurchaseTypeEnum::getBusiTypeTgCode, entrust.getBusiTypeTg()));
-//        baseRepurchaseQuoteSendResponse.setBsStr();
-//        baseRepurchaseQuoteSendResponse.setPledgeNumberStr();
-//        baseRepurchaseQuoteSendResponse.setInvestorTypeStr();
-//        baseRepurchaseQuoteSendResponse.setCpInvestorTypeStr();
-//        baseRepurchaseQuoteSendResponse.setRequestStatus();
-//        baseRepurchaseQuoteSendResponse.setRequestStatusStr();
 
         Instruction instruction = instructionService.findById(entrust.getInstructionId());
         if (ObjectUtil.isNull(instruction)) {
             log.warn("查询指令失败 => 【entrustId = {}】，【instructionId = {}】", entrust.getId(), entrust.getInstructionId());
-            baseRepurchaseQuoteSendResponse.setBs(instruction.getFirstRepoPs());
         }
-        baseRepurchaseQuoteSendResponse.setCpClientName(instruction.getPortfolioName());
-        baseRepurchaseQuoteSendResponse.setBs(instruction.getFirstRepoPs());
 
+        BaseRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse ;
         String ps = entrust.getPs();
         // 正回购
         if (PsEnum.POSITIVE_REPO.codeEquals(ps)) {
+            baseRepurchaseQuoteSendResponse = new SQRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.首期.getCode());
             baseRepurchaseQuoteSendResponse.setBs(PsEnum.POSITIVE_REPO.getCode());
 
@@ -449,6 +426,7 @@ public class IntegratedQuoteManagement {
 
         // 逆回购
         else if (PsEnum.REVERSED_REPO.codeEquals(ps)) {
+            baseRepurchaseQuoteSendResponse = new SQRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.首期.getCode());
             baseRepurchaseQuoteSendResponse.setBs(PsEnum.REVERSED_REPO.getCode());
 
@@ -456,6 +434,7 @@ public class IntegratedQuoteManagement {
         }
 
         if (EnumUtil.notIn(ps, PsEnum.POSITIVE_REPO, PsEnum.REVERSED_REPO)) {
+            baseRepurchaseQuoteSendResponse = new NonFirstBaseRepurchaseQuoteSendResponse();
             NonFirstBaseRepurchaseQuoteSendResponse nonFirstBaseRepurchaseQuoteSendResponse = (NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
             nonFirstBaseRepurchaseQuoteSendResponse.setOrigSerialNo(entrust.getOrigSerialNo());
 
@@ -463,6 +442,7 @@ public class IntegratedQuoteManagement {
 
         // 中途换券
         else if (PsEnum.REPO_EXCHANGE_COUPONS_MIDWAY.codeEquals(ps)) {
+            baseRepurchaseQuoteSendResponse = new ZTHQRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.中途换券.getCode());
 
             ZTHQRepurchaseQuoteSendResponse sendResponse = (ZTHQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
@@ -488,6 +468,7 @@ public class IntegratedQuoteManagement {
 
         // 提前购回
         else if (PsEnum.REPO_ADVANCE.codeEquals(ps)) {
+            baseRepurchaseQuoteSendResponse = new TQGHRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.提前购回.getCode());
 
             fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
@@ -509,6 +490,7 @@ public class IntegratedQuoteManagement {
 
         // 到期续做
         else if (PsEnum.REPO_RENEW.codeEquals(ps)) {
+            baseRepurchaseQuoteSendResponse = new DQXZRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.到期续做.getCode());
 
             fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
@@ -520,11 +502,43 @@ public class IntegratedQuoteManagement {
 
         // 解除质押
         else if (PsEnum.REPO_UNSTAKE.codeEquals(ps)) {
+            baseRepurchaseQuoteSendResponse = new JCZYRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.解除质押.getCode());
 
             JCZYRepurchaseQuoteSendResponse sendResponse = (JCZYRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
             sendResponse.setSettleAmount(instruction.getEntrustAmt());
+        } else {
+            baseRepurchaseQuoteSendResponse = new BaseRepurchaseQuoteSendResponse();
         }
+
+        baseRepurchaseQuoteSendResponse.setStockCode(entrust.getStockCode());
+        baseRepurchaseQuoteSendResponse.setStockName(entrust.getStockName());
+        baseRepurchaseQuoteSendResponse.setPledgeNumber(BigDecimal.valueOf(entrust.getEntrustVolume()));
+        baseRepurchaseQuoteSendResponse.setCounterId(entrust.getCounterId());
+        baseRepurchaseQuoteSendResponse.setTraderCode(entrust.getTradeName());
+        baseRepurchaseQuoteSendResponse.setMemberId(entrust.getDealerName());
+        baseRepurchaseQuoteSendResponse.setInvestorType(entrust.getOwnerType());
+        baseRepurchaseQuoteSendResponse.setCpTraderCode(entrust.getPropTradeName());
+        baseRepurchaseQuoteSendResponse.setCpMemberId(entrust.getPropDealerName());
+        baseRepurchaseQuoteSendResponse.setCpInvestorId(entrust.getPropInvestorName());
+        baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
+        baseRepurchaseQuoteSendResponse.setCpInvestorType(entrust.getPropOwnerType());
+        baseRepurchaseQuoteSendResponse.setCpClientName(entrust.getPortfolioName());
+        baseRepurchaseQuoteSendResponse.setRemark(entrust.getRemark());
+
+        baseRepurchaseQuoteSendResponse.setCpClientName(instruction.getPortfolioName());
+        if (ObjectUtil.isEmpty(baseRepurchaseQuoteSendResponse.getBs())) {
+            baseRepurchaseQuoteSendResponse.setBs(instruction.getFirstRepoPs());
+        }
+        baseRepurchaseQuoteSendResponse.setRequestTypeStr(cn.hutool.core.util.EnumUtil.getFieldBy(RepurchaseTypeEnum::getDescription, RepurchaseTypeEnum::getBusiTypeTgCode, entrust.getBusiTypeTg()));
+        baseRepurchaseQuoteSendResponse.setBsStr(cn.hutool.core.util.EnumUtil.getFieldBy(RepoBsEnum::getDescription, RepoBsEnum::getCode, baseRepurchaseQuoteSendResponse.getBs()));
+
+//        baseRepurchaseQuoteSendResponse.setBsStr();
+//        baseRepurchaseQuoteSendResponse.setPledgeNumberStr();
+//        baseRepurchaseQuoteSendResponse.setInvestorTypeStr();
+//        baseRepurchaseQuoteSendResponse.setCpInvestorTypeStr();
+//        baseRepurchaseQuoteSendResponse.setRequestStatus();
+//        baseRepurchaseQuoteSendResponse.setRequestStatusStr();
 
         return baseRepurchaseQuoteSendResponse;
     }
