@@ -25,7 +25,7 @@ application:
   topMenuLogo: /public/images/logo/top-logo.png
   bankNameLog: /public/images/bankNameLog.png #系统名称log
   cache:
-     file: classpath:config/ehcache.xml
+     file: classpath:ehcache_app.xml
   runOptimize: N #Y表示业务代码做过启动优化，N表示业务代码没有做过启动优化
   
 #============线程池配置============# 

@@ -69,7 +69,7 @@ spring:
   cache:
     type: ehcache
     ehcache:
-      config: config/ehcache.xml
+      config: classpath:ehcache_app.xml
   autoconfigure:    exclude:    - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
   web:
     resources:      chain:        strategy:          fixed:            enabled: true         #静态资源配置:js和css变更时无需手工清缓存
