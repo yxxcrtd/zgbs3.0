@@ -337,6 +337,9 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @ApiModelProperty(required = false, name = "mPayDate", value = "到期结算日")
     private Date mPayDate;
 
+    @ApiModelProperty(required = false, name = "repoMdate", value = "回购到期日")
+    private Date repoMdate;
+
     @ApiModelProperty(required = false, name = "capDays", value = "占款天数")
     @NotNull
     @Digits(integer = 10, fraction = 0)
@@ -1011,6 +1014,14 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     public void setmPayDate(Date mPayDate) {
         this.mPayDate = mPayDate;
+    }
+
+    public Date getRepoMdate() {
+        return repoMdate;
+    }
+
+    public void setRepoMdate(Date repoMdate) {
+        this.repoMdate = repoMdate;
     }
 
     public BigDecimal getCapDays() {

@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.joyintech.tams.exchange.common.constant.InvestmentAssetType.PLEDGE_REPURCHASE;
+
 /**
  * 有效价格申报范围
  */
@@ -77,6 +79,9 @@ public class MinTrdUnitLimitServiceImpl implements MinTrdUnitLimitService {
         String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
         String assetType = instrument.getAssetType();
         String assetType1 = instrument.getAssetType1();
+        if(PLEDGE_REPURCHASE.codeEquals(assetType) ){
+            assetType1 = instruction.getAssetType1();
+        }
         String subStockType = instrument.getSubStockType();
         String ps = instruction.getPs();
 

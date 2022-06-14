@@ -10,8 +10,8 @@ import com.joyintech.tams.exchange.common.enums.IEnum;
  */
 public enum RepoBsEnum implements IEnum<String> {
 
-    REPURCHASE("01", "正回购"),
-    REVERSE_REPURCHASE("02", "逆回购"),
+    REPURCHASE("03", "正回购"),
+    REVERSE_REPURCHASE("04", "逆回购"),
     ;
 
     private final String code;
