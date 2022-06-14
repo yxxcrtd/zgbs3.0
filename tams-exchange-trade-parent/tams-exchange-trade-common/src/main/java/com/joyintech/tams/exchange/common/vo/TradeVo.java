@@ -195,6 +195,20 @@ public class TradeVo implements Serializable, KeyMethodInterface<String> {
     @ApiModelProperty(name = "isFullPrice", value = "是否全价（Y:是 ， N：否）")
     private String isFullPrice;
 
+    // 信用保护凭证使用 --start
+    @ApiModelProperty(name = "counterId", value = "交易对手")
+    private String counterId;
+
+    @ApiModelProperty(name = "counterName", value = "交易对手名称")
+    private String counterName;
+
+    @ApiModelProperty(name = "propAcctNo", value = "对手资金账户")
+    private String propAcctNo;
+
+    @ApiModelProperty(name = "propAcctName", value = "对手资金账户名称")
+    private String propAcctName;
+    // 信用保护凭证使用 --end
+
     public TradeVo() {
         this.tradedBalance = new BigDecimal("0.00");
         this.tradedPrice = new BigDecimal("0.00");
@@ -676,5 +690,37 @@ public class TradeVo implements Serializable, KeyMethodInterface<String> {
 
     public void setIsFullPrice(String isFullPrice) {
         this.isFullPrice = isFullPrice;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
+    }
+
+    public String getPropAcctNo() {
+        return propAcctNo;
+    }
+
+    public void setPropAcctNo(String propAcctNo) {
+        this.propAcctNo = propAcctNo;
+    }
+
+    public String getPropAcctName() {
+        return propAcctName;
+    }
+
+    public void setPropAcctName(String propAcctName) {
+        this.propAcctName = propAcctName;
     }
 }
