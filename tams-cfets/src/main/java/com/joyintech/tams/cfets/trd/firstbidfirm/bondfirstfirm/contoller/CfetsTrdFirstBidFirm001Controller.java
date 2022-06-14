@@ -115,8 +115,14 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         initPageParams.put("platDate", tradeDate);
         // 币种
         initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种, null));
-        //刷新时间
+        // 指令列表刷新时间
         initPageParams.put("cfetsTrdFirstBidFirm_etrTable_refresh_period", CacheUtil.getSysParam("cfetsTrdFirstBidFirm_etrTable_refresh_period"));
+        // 投标确认列表刷新时间
+        initPageParams.put("cfetsTrdFirstBidFirm_tender_refresh_period", CacheUtil.getSysParam("cfetsTrdFirstBidFirm_tender_refresh_period"));
+        // 分销买入列表刷新时间
+        initPageParams.put("cfetsTrdFirstBidFirm_distribution_refresh_period", CacheUtil.getSysParam("cfetsTrdFirstBidFirm_distribution_refresh_period"));
+        // 投标执行明细列表刷新时间
+        initPageParams.put("cfetsTrdFirstBidFirm_details_refresh_period", CacheUtil.getSysParam("cfetsTrdFirstBidFirm_details_refresh_period"));
 
         // 系统参数 【是否进行指令汇总(Y:是，N:否)_一级投标】
         initPageParams.put("IS_ENTRUST_SUM_FLAG_BID", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"));
