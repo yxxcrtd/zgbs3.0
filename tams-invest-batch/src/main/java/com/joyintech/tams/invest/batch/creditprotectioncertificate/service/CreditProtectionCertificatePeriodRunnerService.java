@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.batch.creditprotectioncertificate.service;
 
+import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
@@ -18,6 +19,7 @@ import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresource
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
 import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +84,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
     private BaseGetBussinessId baseGetBussinessId;
 
 
-    public void dealExpireData(CreditProtectionCertificatePeriodWriterDto writerDto) {
+    public void dealExpireData(CreditProtectionCertificatePeriodWriterDto writerDto) throws BatchException {
         try {
 
             List<CreditProtectionCertificatePeriodExpireDataDto> expireDatas = writerDto.getExpireDatas();
@@ -206,7 +208,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             dealOldPosition(writerDto, nextWorkDate, false);
         } catch (Exception e) {
             logger.error("信用保护凭证自动生成错误", e);
-            throw e;
+            throw new BatchException(RiskUtil.getLogString(e));
         }
     }
 

@@ -105,12 +105,10 @@
         </trim>
     </insert>
     <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
-
-     delete from MST_CREDIT_MARKET_INFO
+        delete
+        from MST_CREDIT_MARKET_INFO
         where SECID = #{secid,jdbcType=VARCHAR}
           and CDATE = #{cdate,jdbcType=VARCHAR}
-          and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
-
     </delete>
 
 
@@ -392,10 +390,12 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="valueSource != null">
+                VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR},
+            </if>
         </set>
         where SECID = #{secid,jdbcType=VARCHAR}
         and CDATE = #{cdate,jdbcType=VARCHAR}
-        and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
     </update>
 
 </mapper>
