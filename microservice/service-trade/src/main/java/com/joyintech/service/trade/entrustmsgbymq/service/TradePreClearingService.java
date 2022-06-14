@@ -1978,7 +1978,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         dto.setWithLockPeriod(DictCodeListExt2.是否有锁定期_否.getValue());
         // 交易编号
         BussinessCodeParameter param = new BussinessCodeParameter();
-        param.setCommonBusinessExtType(DictCodeListExt2.fromDictCodeList(DictCodeListExt2.共通业务类型_股票投资交易));
+        param.setCommonBusinessExtType(DictCodeListExt2.fromDictCodeList(DictCodeListExt2.共通业务类型_信用保护凭证交易));
         dto.setTradeId(autoPeriodCommonService.buildBussinessCode(param));
 
         // 多组合系列户指令须登录临时交易汇总表
