@@ -9,8 +9,6 @@ import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
-import com.joyintech.system.base.dao.SysWflBusinessListMapper;
-import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
@@ -31,16 +29,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
 
-@Component
-@Aspect
+//@Component
+//@Aspect
 public class CfetsTradeHandlerAop {
     /**
      * 日志
@@ -295,7 +291,7 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("completePoint() || completeRepoPoint()")
     public void occupyOnComplete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
     }
 
     /**

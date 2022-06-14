@@ -637,22 +637,22 @@ public class CfetsTrdConfirm001Service extends BaseService {
             }
         }
         // 选择的成交编号存在对应的报价，则不影响风险
-        if (!StringUtil.isEmptyList(entity.getDtoList()) && !StringUtil.isNotBlank(entity.getfTradeId())) {
-            try {
-                List<TrdRepoTrade002Dto> list = new ArrayList<>();
-                for (CfetsTrdRepoTrade003Dto item : entity.getDtoList()) {
-                    TrdRepoTrade002Dto repoDto=new  TrdRepoTrade002Dto();
-                    BeanUtil.copyPropertiesIgnoreNull(repoDto, item);
-                    list.add(repoDto);
-                }
-                interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
-                        BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue(), DictCodeList.平安资产类型_质押式回购.getValue(),
-                        (en) -> interfRiskRdsService.sendRiskRdsListData( en,list,null));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
+//        if (!StringUtil.isEmptyList(entity.getDtoList()) && !StringUtil.isNotBlank(entity.getfTradeId())) {
+//            try {
+//                List<TrdRepoTrade002Dto> list = new ArrayList<>();
+//                for (CfetsTrdRepoTrade003Dto item : entity.getDtoList()) {
+//                    TrdRepoTrade002Dto repoDto=new  TrdRepoTrade002Dto();
+//                    BeanUtil.copyPropertiesIgnoreNull(repoDto, item);
+//                    list.add(repoDto);
+//                }
+//                interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
+//                        BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue(), DictCodeList.平安资产类型_质押式回购.getValue(),
+//                        (en) -> interfRiskRdsService.sendRiskRdsListData( en,list,null));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
 
         //更新操作记录日志
         CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
