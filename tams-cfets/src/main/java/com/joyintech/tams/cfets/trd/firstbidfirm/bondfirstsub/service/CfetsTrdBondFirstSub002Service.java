@@ -1662,6 +1662,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     trdProductDeal.setPrinAmt(deal.getSubscriptionAmount());
                     trdProductDeal.setTradeDate(entity.getTradeDate());
                     trdProductDeal.setSettleDate(entity.getTradeDate());
+                    trdProductDeal.setTradeMarket(BussinessDictCodeList.交易场所_银行间.getValue());
                     trdProductDeal.setSecManageAcctId(deal.getSecManageAcctId());
                     baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
                     TrdProductDealAdd add = new TrdProductDealAdd();
