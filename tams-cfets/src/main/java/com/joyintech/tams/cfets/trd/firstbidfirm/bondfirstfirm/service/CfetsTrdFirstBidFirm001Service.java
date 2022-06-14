@@ -1109,7 +1109,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         //拖出：取消汇总
         if (CollectionUtils.isNotEmpty(outList)) {
             CfetsTrdFirstBidFirmEntrustDto cfetsDto = outList.get(0);
-            undoSumSave(cfetsDto, this.SUM_FLAG_01);
+            undoSumSave(cfetsDto, this.SUM_FLAG_01, null);
         }
 
         if (CollectionUtils.isNotEmpty(inList)) {
@@ -1117,10 +1117,10 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             //汇总数据维度（新债标的OR投标日OR指令状态）
             Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMap = inList.stream()
                     .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getEntrustStatus()));
-//            if (!counterIsNullMap.isEmpty() && counterIsNullMap.size() > 1) {
-//                errorList.add(new ValidMessage("所选指令不满足汇总条件：【新债标的OR投标日OR交易对手OR指令状态】不同"));
-//                return errorList;
-//            }
+            if (!counterIsNullMap.isEmpty() && counterIsNullMap.size() > 1) {
+                errorList.add(new ValidMessage("所选指令不满足汇总条件：【新债标的OR投标日OR交易对手OR指令状态】不同"));
+                return errorList;
+            }
 
             List<CfetsTrdFirstBidFirmEntrustDto> counterIdList = inList.stream().filter(x -> StringUtil.isNotEmpty(x.getCounterId()))
                     .collect(Collectors.toList());
@@ -1133,36 +1133,23 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             //拖入：没有交易对手方 删除汇总关系 （指令信息自动汇总）
             if (CollectionUtils.isEmpty(counterIdList)) {
                 if (CollectionUtils.isNotEmpty(counterIdIsNullList)) {
-                    String loginUserId = LoginUserUtil.getUserName();
+                    String uuid = IDGenerator.generate();
                     for (CfetsTrdFirstBidFirmEntrustDto dto : counterIdIsNullList) {
-                        undoSumSave(dto, this.SUM_FLAG_02);
+                        undoSumSave(dto, this.SUM_FLAG_02, uuid);
                     }
                 }
             }
 
             if (CollectionUtils.isNotEmpty(counterIdList)) {
-                String loginUserId = LoginUserUtil.getUserName();
                 String uuid = IDGenerator.generate();
                 if (CollectionUtils.isNotEmpty(counterIdList)) {
-                    for (CfetsTrdFirstBidFirmEntrustDto dto :counterIdList) {
-                        cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(dto.getEntrustId(), loginUserId);
-                        TotalEtrEntrustRel totalEtrEntrustRel = new TotalEtrEntrustRel();
-                        totalEtrEntrustRel.setTotleId(uuid);
-                        totalEtrEntrustRel.setEntrustId(dto.getEntrustId());
-                        totalEtrEntrustRel.setSumFlag(this.SUM_FLAG_02);
-                        totalEtrEntrustRel.setTrader(loginUserId);
-                        totalEtrEntrustRelMapper.insertSelective(totalEtrEntrustRel);
+                    for (CfetsTrdFirstBidFirmEntrustDto dto : counterIdList) {
+                        undoSumSave(dto, this.SUM_FLAG_02, uuid);
                     }
                 }
                 if (CollectionUtils.isNotEmpty(counterIdIsNullList)) {
-                    for (CfetsTrdFirstBidFirmEntrustDto dto :counterIdIsNullList) {
-                        cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(dto.getEntrustId(), loginUserId);
-                        TotalEtrEntrustRel totalEtrEntrustRel = new TotalEtrEntrustRel();
-                        totalEtrEntrustRel.setTotleId(uuid);
-                        totalEtrEntrustRel.setEntrustId(dto.getEntrustId());
-                        totalEtrEntrustRel.setSumFlag(this.SUM_FLAG_02);
-                        totalEtrEntrustRel.setTrader(loginUserId);
-                        totalEtrEntrustRelMapper.insertSelective(totalEtrEntrustRel);
+                    for (CfetsTrdFirstBidFirmEntrustDto dto : counterIdIsNullList) {
+                        undoSumSave(dto, this.SUM_FLAG_02, uuid);
                     }
                 }
 
@@ -1178,14 +1165,13 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      * @param cfetsDto
      * @return
      */
-    public int undoSumSave(CfetsTrdFirstBidFirmEntrustDto cfetsDto, String sumFlag) {
+    public int undoSumSave(CfetsTrdFirstBidFirmEntrustDto cfetsDto, String sumFlag ,String uuid) {
         TotalEtrEntrustRel totalEtrEntrustRel = new TotalEtrEntrustRel();
-        String uuid = IDGenerator.generate();
-        totalEtrEntrustRel.setTotleId(uuid);
+        String totleId = StringUtil.isNotEmpty(uuid) ? uuid : IDGenerator.generate();
+        totalEtrEntrustRel.setTotleId(totleId);
         totalEtrEntrustRel.setEntrustId(cfetsDto.getEntrustId());
         totalEtrEntrustRel.setSumFlag(sumFlag);
         String loginUserId = LoginUserUtil.getUserName();
-        // param.put("loginUserId", loginUserId);
         totalEtrEntrustRel.setTrader(loginUserId);
         if (StringUtil.isEmpty(sumFlag)) {
             return cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(cfetsDto.getEntrustId(), loginUserId);
