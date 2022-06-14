@@ -645,6 +645,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finProductAdd.setIsPpb(DictCodeList.是否_否.getValue());
         }
         finProductAdd.setFaceValue(BigDecimal.valueOf(100));
+        finProductAdd.setInvestNature(DictCodeList.投资性质_固定收益类.getValue());
         //----add by jjpei 20190727 添加投资性质----start----
 //        if(StringUtil.isNotBlank(dto.getType4())&&DictCodeList.WIND一级分类_含债券一级分类等_优先股.getValue().equals(dto.getType4())){
 //            finProductAdd.setInvestNature(DictCodeList.投资性质_权益类.getValue());
