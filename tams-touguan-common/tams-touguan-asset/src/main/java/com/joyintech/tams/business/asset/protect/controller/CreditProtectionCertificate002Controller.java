@@ -137,7 +137,10 @@ public class CreditProtectionCertificate002Controller extends BaseController {
                 entity = creditProtectionCertificate002Service.getBussinessEntityByWorkflowId(workflowId);
             }
             //add wsz 修改现实问题 ZGCPCN-1356 start
-            CreditProtectionCertificate002Dto entity2 = creditProtectionCertificate002Service.getById(entity.getFinprodId());
+            CreditProtectionCertificate002Dto entity2 = null;
+            if(StringUtil.isNotEmpty(entity.getFinprodId())) {
+                entity2 = creditProtectionCertificate002Service.getById(entity.getFinprodId());
+            }
             if(!Objects.isNull(entity2)){
                 BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
             } else {
