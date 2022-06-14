@@ -39,8 +39,8 @@ import java.util.Map;
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
 
-@Component
-@Aspect
+//@Component
+//@Aspect
 public class CfetsEntrustHanderAop {
     /**
      * 日志

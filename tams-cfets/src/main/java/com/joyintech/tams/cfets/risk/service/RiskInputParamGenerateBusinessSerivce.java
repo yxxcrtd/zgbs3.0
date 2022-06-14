@@ -10,6 +10,7 @@ import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -56,13 +57,19 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
         String interfaceType = NodeConfigConstant.BOND001;
         // 交易场所
         String tradePlace = 交易场所_银行间.getValue();
+        // 业务类型
+        String busiType = 头寸业务类型_债券一级投标.getValue();
         if (!StringUtil.equals(dto.getTradeMarket(), 交易场所_银行间.getValue())
                 && !StringUtil.equals(dto.getTradeMarket(), 交易场所_商业银行柜台.getValue())) {
             interfaceType = NodeConfigConstant.BOND002;
             tradePlace = null;
         }
+        // 申购和一级投标不区分
+//        if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+//            busiType = 头寸业务类型_债券一级申购.getValue();
+//        }
         return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
-                .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级投标.getValue())
+                .put(NodeConfigConstant.BUSI_TYPE, busiType)
                 .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
                 .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                 .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
@@ -165,6 +172,39 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
                 || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
             map.put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND002);
         }
+        return map;
+    }
+
+
+    /**
+     * 组装一级申购成交确认
+     *
+     * @param decisionAct  系统动作
+     * @param flowStatus   流程节点
+     * @param isCheck      是否校验
+     * @param businessJson Json数据
+     * @return com.joyintech.tams.business.common.pojo.BaseMap
+     * @author jiangpeng
+     * @date 2022/6/10 11:43
+     */
+    BaseMap generateCfetsTrdFirstBondInvestTrade(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
+        logger.debug("组装一级申购成交确认:" + businessJson);
+        CfetsTrdFirstBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, CfetsTrdFirstBondInvestTradeDto.class);
+        // 接口字段名
+        String interfaceType = NodeConfigConstant.BOND001;
+        if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())
+                || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+            interfaceType = NodeConfigConstant.BOND002;
+        }
+        BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
+                .put(NodeConfigConstant.BUSI_ACT, 业务动作_成交确认.getValue())
+                .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级申购.getValue())
+                .put(NodeConfigConstant.TRADE_PLACE, dto.getTradeMarket())
+                .put(NodeConfigConstant.PS, dto.getPs())
+                .put(NodeConfigConstant.IS_CHECK, isCheck)
+                .put(NodeConfigConstant.DATA, dto);
         return map;
     }
 
