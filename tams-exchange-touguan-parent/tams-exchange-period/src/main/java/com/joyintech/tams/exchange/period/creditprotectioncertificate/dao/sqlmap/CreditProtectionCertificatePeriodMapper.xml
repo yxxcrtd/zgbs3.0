@@ -333,6 +333,16 @@
         and p.CDATE = #{tradeDate}
         and p.HODING_TYPE = 'A_001'
     </select>
+    <select id="queryOptionsForRefSecs" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        T1.FINPROD_MARKET_ID id,
+        T1.FINPROD_ABBR text
+        FROM FIN_PRODUCT T1
+        where T1.FINPROD_MARKET_ID IN
+        <foreach collection="refSecs" item="refSec" open="(" close=")" separator=",">
+            #{refSec,jdbcType=VARCHAR}
+        </foreach>
+    </select>
     <sql id="findPageQueryConditions">
         <if test="search != null and search != ''">
             and (
@@ -344,4 +354,17 @@
             )
         </if>
     </sql>
+    <!--
+    <select id="queryOptionsForRefSecs" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        CUSTOMER_ID id,
+        CUSTOMER_NAME text
+        FROM MST_CUSTOMER_INFO
+        where CUSTOMER_ID in
+        <foreach collection="refSecs" item="refSec" open="(" close=")" separator=",">
+            #{refSec,jdbcType=VARCHAR}
+        </foreach>
+    </select>
+    -->
+
 </mapper>
