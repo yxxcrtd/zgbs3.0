@@ -414,6 +414,9 @@ public class DateUtil extends DateUtils {
      * @return 间隔
      */
     public static long getBetweenDate(String begin, String end, DurationType type) {
+        if (StringUtil.isEmpty(begin) || StringUtil.isEmpty(end)) {
+            return -1;
+        }
         // 根据兩個个日期，取得相隔的天数
         LocalDateTime beginDate = dateToLocalDate(DateUtil.parse(begin));
         LocalDateTime endDate = dateToLocalDate(DateUtil.parse(end));

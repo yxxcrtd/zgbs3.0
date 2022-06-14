@@ -11,7 +11,6 @@ import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ValidUtils;
-import com.joyintech.tams.cfets.risk.aop.CfetsEntrustHanderAop;
 import com.joyintech.tams.cfets.risk.aop.CfetsTradeHandlerAop;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
@@ -19,8 +18,10 @@ import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidMana
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageValidatorService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.constant.*;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -244,12 +245,12 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         }
         // 设置流程业务说明
         params.setComment(entity -> {
-            return WorkFlowUtil.concatComment("中标日期"+
-                    GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
-                    "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType())+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+cfetsPrimaryBidManageService.getBidPriceStr(entity)+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.divide(dto.getWinPrinamt(),BigDecimal.valueOf(10000),2)+"万元"+GlobalConstant.CLOSE_PARENTHESIS);
+            return WorkFlowUtil.concatComment("中标日期" +
+                    GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
+                    "资产简称" + GlobalConstant.OPEN_PARENTHESIS + entity.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS
+                    + "中标方式" + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType()) + GlobalConstant.CLOSE_PARENTHESIS
+                    + "中标标位" + GlobalConstant.OPEN_PARENTHESIS + cfetsPrimaryBidManageService.getBidPriceStr(entity) + GlobalConstant.CLOSE_PARENTHESIS
+                    + "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(dto.getWinPrinamt(), BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS);
         });
         ProcessParameter<CfetsPrimaryBidManageSaveRequest> parameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
         parameter.setOperationType(OperationType.NEW);

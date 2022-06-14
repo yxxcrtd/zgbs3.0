@@ -450,11 +450,14 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         /***********************************************************************/
         etrSinglePortfolioDto.setDealMode(dto.getDealMode());//交易方式
         etrSinglePortfolioDto.setPriceType(dto.getPriceType());//计价方式
+
+        // modify by yangxunpeng ZGCPCN-1341
+        /**
         if(DictCodeListExt3.上农商_指令业务类型_信用保护凭证指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())){
             etrSinglePortfolioDto.setPrice(dto.getRepoRate());
             etrSinglePortfolioDto.setEntrustAmt(ArithmeticUtil.multiply(dto.getRepoAmt(),new BigDecimal(10000)));
             etrSinglePortfolioDto.setEntrustNum(ArithmeticUtil.divide(etrSinglePortfolioDto.getEntrustAmt(),new BigDecimal(100),2, RoundingMode.HALF_UP));
-        }
+        }*/
 
         // 构造单组合单资产DTO end
         return etrSinglePortfolioDto;
@@ -550,8 +553,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         List<EtrSecPositionFlowDto> etrSecPositionFlows = new ArrayList<>();// 持仓流水
         EtrSecPositionFlowDto etrSecPositionFlowDtoUnit = new EtrSecPositionFlowDto();// 组合持仓流水DTO
         EtrCashPositionFlowDto etrCashPositionFlowDtoUnit = new EtrCashPositionFlowDto();// 组合现金流水DTO
-        if (DictCodeList.交易方向_卖出.getValue().equals(etrSinglePortfolioDto.getPs())
-                || DictCodeList.交易方向_申购.getValue().equals(etrSinglePortfolioDto.getPs())) {
+        if (DictCodeList.交易方向_卖出.getValue().equals(etrSinglePortfolioDto.getPs())) {
             /********************** 持仓流水DTO构造 *************************************/
             etrSecPositionFlowDtoUnit.setSeqno(getSeqNo());
             etrSecPositionFlowDtoUnit.setPortfolioId(etrSinglePortfolioDto.getPortfolioId());// 组合代码
@@ -567,7 +569,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrSecPositionFlowDtoUnit.setTradeId(etrSinglePortfolioDto.getEntrustId());// 指令编号
             etrSecPositionFlows.add(etrSecPositionFlowDtoUnit);
             /*************************************************************************/
-        } else if (DictCodeList.交易方向_买入.getValue().equals(etrSinglePortfolioDto.getPs())) {
+        } else if (DictCodeList.交易方向_买入.getValue().equals(etrSinglePortfolioDto.getPs()) || DictCodeList.交易方向_申购.getValue().equals(etrSinglePortfolioDto.getPs())) {
             /********************** 持仓流水DTO构造 *************************************/
             etrCashPositionFlowDtoUnit.setSeqno(getSeqNo());
             etrCashPositionFlowDtoUnit.setPortfolioId(etrSinglePortfolioDto.getPortfolioId());// 组合代码
