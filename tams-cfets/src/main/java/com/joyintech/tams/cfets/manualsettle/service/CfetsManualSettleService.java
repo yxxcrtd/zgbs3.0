@@ -1072,6 +1072,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         CfetsTrdRepoTrade002Dto revokeEntity = new CfetsTrdRepoTrade002Dto();
                         revokeEntity.setTotleTradeId(entity.getTradeId());
                         revokeEntity.setTgBusiType(entity.getTgBusiType());
+                        revokeEntity.setPs(entity.getPs());
                         // 登记编号存在时,为登记,反之为报价
                         cfetsTrdRepoTrade002Service.doRevokeComplete(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId));
                     }
@@ -1280,6 +1281,19 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         this.closeDelegatOprHisMethod(listTemp,remark);
 
         CfetsEtribBondInfo003Dto tradeDto = new CfetsEtribBondInfo003Dto();
+        if (!StringUtil.isEmptyList(dtoList)){
+            String finprodType2 = dtoList.get(0).getFinprodType2();
+            if (StringUtil.equals(finprodType2,DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                || StringUtil.equals(finprodType2,DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+                tradeDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
+            }else if (StringUtil.equals(finprodType2,DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())){
+                tradeDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+                tradeDto.setPs(DictCodeList.回购拆借方向_逆回购.getValue());
+            }else if (StringUtil.equals(finprodType2,DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())){
+                tradeDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+                tradeDto.setPs(DictCodeList.回购拆借方向_正回购.getValue());
+            }
+        }
         tradeDto.setSelectedItem(dtoList);
         return tradeDto;
     }
