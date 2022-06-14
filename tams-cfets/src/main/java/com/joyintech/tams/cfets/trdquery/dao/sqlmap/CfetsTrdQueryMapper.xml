@@ -214,7 +214,7 @@
     <sql id="onlyRegBidInfo">
         SELECT
             distinct decode(BO.IS_CANCEL,'Y','撤销','N','有效')	effectiveStatusStr,
-            decode(FPT.TYPE_9,'02','01')  AS	finprodType2,
+            decode(FPT.TYPE_9,'01','01','02','01')  AS	finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN 	#{BUSI_TYPE_POSITION_01}
              WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END AS	busiTypePosition,
             FP.finprod_id as finprodId,
@@ -243,7 +243,7 @@
             BRBP.PORTFOLIO_NAME AS	portfolioNames,
             ''									AS	quoteType,
             ''									AS	matchStatus,
-            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FP.ISSUE_TYPE ELSE ''  END issueType,
+            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FP.ISSUE_CLASS ELSE ''  END issueType,
             BO.REMARK AS	remark,
             decode(BO.IS_CANCEL,'Y','03','N','01') effectiveStatus,
             case when  (BO.IS_CANCEL = 'N' AND ( BO.BID_MODLE = #{WIN_TYPE_03} OR
@@ -367,7 +367,7 @@
     <sql id="onlyWflRegBidInfo">
         SELECT
             '流程中'	effectiveStatusStr,
-            decode(FPT.TYPE_9,'02','01') AS finprodType2,
+            decode(FPT.TYPE_9,'01','01','02','01') AS finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34} END AS	busiTypePosition,
             FP.FINPROD_ID as finprodId,
