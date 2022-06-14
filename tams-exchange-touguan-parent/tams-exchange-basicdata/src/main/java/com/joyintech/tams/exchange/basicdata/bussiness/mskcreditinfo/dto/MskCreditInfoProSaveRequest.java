@@ -36,6 +36,7 @@ public class MskCreditInfoProSaveRequest extends BaseEntity implements ProcessEn
     @ApiModelProperty(name="finprodAbbr",value="凭证简称",example="A1", required = true)
     private String finprodAbbr;
 
+    @PrimaryKey(PrimaryKey.Field.PK_2)
     @ApiModelProperty(name="cdate",value="估值日",example="A1", required = true)
     private String cdate;
 
