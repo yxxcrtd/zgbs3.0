@@ -352,7 +352,7 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
 
     public String getOtherBusiTypePosition() {
         if(this.getBusiTypePosition() == null) return null;
-        return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition()) == null ?
+        return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition()).equals(this.getBusiTypePosition()) ?
                 SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition()) : 
                 SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
     }
