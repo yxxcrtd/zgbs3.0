@@ -45,7 +45,7 @@ public class NodeConfigConstant {
      */
     public static final String PS = "ps";
     /**
-     * 是否校验 数据字典 DictCode.交易方向
+     * 是否校验 布尔类型
      */
     public static final String IS_CHECK = "isCheck";
     /**
