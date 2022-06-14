@@ -280,6 +280,7 @@
         where fp.FINPROD_MARKET_ID = #{finprodId}
         and p.CDATE = #{tradeDate}
         and p.HODING_TYPE = 'A_001'
+        and p.DATE_TYPE = 0
     </select>
     <select id="getBillingDetailsByFinprodMarketIdOld"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
@@ -332,6 +333,7 @@
         and fp.FINPROD_MARKET_ID = #{finprodMarketId}
         and p.CDATE = #{tradeDate}
         and p.HODING_TYPE = 'A_001'
+        and p.DATE_TYPE = 0
     </select>
     <select id="queryOptionsForRefSecs" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT
