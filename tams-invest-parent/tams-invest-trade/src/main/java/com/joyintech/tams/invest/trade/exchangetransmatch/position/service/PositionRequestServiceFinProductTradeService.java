@@ -416,23 +416,17 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         pltMap.put(FINPROD_ID, trdProductDeal.getFinprodId());
         pltMap.put("tradeId", trdProductDeal.getTradeId());
         pltMap.put("etrId", trdProductDealAdd.getEntrustId());
-        pltMap.put("etrSecAmount", null);
+        // 指令份额	etrSecAmount
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
+        if(etrEntrust != null){
+            pltMap.put("etrSecAmount", etrEntrust.getEntrustNum());
+        }
         pltMap.put("cashAcctId", exchangeTransMatchCommonMapper.queryAccountNo(trdProductDeal.getSecManageAcctId()));
         pltMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
         pltMap.put("secAmount", ArithmeticUtil.multiply(trdProductDeal.getShareAmt(), new BigDecimal(100)));
         pltMap.put("cashAmount", trdProductDeal.getTradeAmt());
         ptlList.add(pltMap);
-
-        List<Map<String, Object>> ptlSubList = new ArrayList<>();
-        Map<String, Object> ptlSubMap = new HashMap<>();
-        ptlSubMap.put("portfolioId", null);
-        ptlSubMap.put(FINPROD_ID, null);
-        ptlSubMap.put("tradeId", null);
-        ptlSubMap.put("secAcctId", null);
-        ptlSubMap.put("secAmount", null);
-
         resultMap.put("ptlList", ptlList);
-        resultMap.put("ptlSubList", ptlSubList);
     }
 
     /**

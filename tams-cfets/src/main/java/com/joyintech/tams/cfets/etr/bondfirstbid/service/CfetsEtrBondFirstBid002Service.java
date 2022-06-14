@@ -4,7 +4,6 @@ import com.joyintech.background.component.common.pack.common.util.ArithmeticUtil
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.entity.ProcessMark;
-import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.security.SecurityUtil;
@@ -52,7 +51,6 @@ import com.joyintech.tams.common.base.dao.EtrEntrustBidPriceMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.WflEtrEntrustMapper;
-import com.joyintech.tams.common.base.entity.EtrDistribute;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
 import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
@@ -332,21 +330,13 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 posport.setPortfolioId(productDto.getPortfolioId());
                 posport.setEtrId(entity.getEntrustId());
                 posport.setTradeId(entity.getEntrustId());
-                //posport.setCashAcctId(productDto.getSecAcctId());
                 if (StringUtil.isNotEmpty(productDto.getSecAcctId())) {
                     posport.setSecAcctId(productDto.getSecAcctId()); // 证券户
                 }
                 if (StringUtil.isNotEmpty(productDto.getAcctNo())) {
                     posport.setCashAcctId(productDto.getAcctNo());
                     posport.setSecAcctId(productDto.getSecAcctId()); // 证券户
-//                    Map<String, Object> map = new HashMap<>();
-//                    map.put("acctNo",productDto.getAcctNo());
-//                    map.put("portfolioId",productDto.getPortfolioId());
-//                    map.put("tradeMarket",entity.getTradeMarket());
-//                    List<SelectOptionDto> tempList= cfetsEtrBondFirstBid001Service.getPtlSecAcctInfo(map);
-//                    SelectOptionDto temp = tempList.stream().filter(x -> Objects.equals(x.getId(),productDto.getAcctNo())).findFirst().orElse(null);
-//                    ArrayList secMap = (ArrayList) temp.getObject();
-//                    posport.setSecAcctId(((HashMap) secMap.get(0)).get("secAcctId").toString()); // 证券户
+
                 } else {
                     if (StringUtil.isNotEmpty(productDto.getPortfolioId())) {
                         Map<String, Object> map = new HashMap<String, Object>();
@@ -735,78 +725,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      */
     private void doCompleteMethod(CfetsEtrBondFirstBid002Dto dto, String operateType) {
         BaseEtrInvestInfoDto entity = initBaseEtrInfoDto(dto);
-        String isPushMsg = DictCodeList.是否_否.getValue();
         if (StringUtil.equals(operateType, "NEW")) {
-            List<EtrDistribute> etrDistributeList = new ArrayList<>();
-            // 自动分发
-            if (busiAutoEtrDispService != null) {
-                // 检测是否设置交易员
-                if (!busiAutoEtrDispService.checkHaveTrader(etrDistributeList)) {
-                    // 跳出自动分发
-                    entity.setEtrDistributeList(etrDistributeList);
-                    isPushMsg = DictCodeList.是否_是.getValue();
-                } else {
-                    // 查询委托指令下达日期，如果在自动分发区间内则改指令需自动分发
-                    if (busiAutoEtrDispService.checkEntrustTime(entity.getEtrEntrust())) {
-                        // 自动分发
-                        entity.setEtrDistributeList(
-                                busiAutoEtrDispService.selectTrader(entity.getEtrEntrust(), entity.getEtrEntrustAdd()));
-                        isPushMsg = DictCodeList.是否_是.getValue();
-                    }
-                }
-            }
             baseEtrInvestInfoService.newDelegate(entity);
         } else {
-            List<EtrDistribute> etrDistributeList = new ArrayList<>();
-            if (StringUtil.isNotEmpty(dto.getEtrInvestPersonInfo())
-                    && StringUtil.isNotEmpty(dto.getEtrInvestPersonInfo().getTrader())) {
-                List<String> traderList = StringUtil.splitToList(GlobalConstant.COMMA,
-                        dto.getEtrInvestPersonInfo().getTrader());
-                for (String trader : traderList) {
-                    EtrDistribute etrDistribute = new EtrDistribute();
-                    // 设置接收状态
-                    etrDistribute.setRecStatus(DictCodeList.委托状态_待接收.getValue());
-                    // 设置指定交易员指定交易员 = 指定交易员
-                    etrDistribute.setTrader(trader);
-                    // 设置委托代码
-                    etrDistribute.setEntrustId(dto.getEntrustId());
-                    //
-                    etrDistributeList.add(etrDistribute);
-                }
-            }
-
-            // 自动分发
-            if (busiAutoEtrDispService != null) {
-                // 检测是否设置交易员
-                if (!busiAutoEtrDispService.checkHaveTrader(etrDistributeList)) {
-                    // 跳出自动分发
-                    entity.setEtrDistributeList(etrDistributeList);
-                    isPushMsg = DictCodeList.是否_是.getValue();
-                } else {
-                    // 查询委托指令下达日期，如果在自动分发区间内则改指令需自动分发
-                    if (busiAutoEtrDispService.checkEntrustTime(entity.getEtrEntrust())) {
-                        // 自动分发
-                        entity.setEtrDistributeList(
-                                busiAutoEtrDispService.selectTrader(entity.getEtrEntrust(), entity.getEtrEntrustAdd()));
-                        isPushMsg = DictCodeList.是否_是.getValue();
-                    }
-                }
-            }
-
             baseEtrInvestInfoService.updateDelegate(entity);
-            // 文件
-            MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
-            mstFileInputParameter.setFileList(dto.getFileArray());
-            mstFileInputParameter.setBussinessId(dto.getEntrustId());
-            if (mstFileCommonService != null) {
-                mstFileCommonService.updateBusinessId(mstFileInputParameter);
-            }
-
-            if (DictCodeList.是否_是.getValue().equals(isPushMsg)) {
-                Map<String, Object> param = new HashMap<>();
-                param.put("entrustId", dto.getEntrustId());
-                etrCommandDispatcherService.pushCommandMsg(param);
-            }
         }
     }
 

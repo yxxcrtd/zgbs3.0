@@ -7,6 +7,7 @@ import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -38,10 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -138,6 +136,16 @@ public class CreditProtectionCertificate002Controller extends BaseController {
                 //流程代办checkImportData
                 entity = creditProtectionCertificate002Service.getBussinessEntityByWorkflowId(workflowId);
             }
+            //add wsz 修改现实问题 ZGCPCN-1356 start
+            CreditProtectionCertificate002Dto entity2 = creditProtectionCertificate002Service.getById(entity.getFinprodId());
+            if(!Objects.isNull(entity2)){
+                BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
+            } else {
+                entity.setRefSecList(creditProtectionCertificate002Service.getRefList(entity));
+                entity.setRefEntityStr(creditProtectionCertificate002Service.getMstCustomerInfo(entity.getRefEntity()));
+                entity.setIssuershortStr(creditProtectionCertificate002Service.getMstCustomerInfo(entity.getIssuershort()));
+            }
+            //add wsz 修改现实问题 ZGCPCN-1356 end
             return new Message<CreditProtectionCertificate002Dto>().success().setData(entity);
         } catch(Exception e){
             e.printStackTrace();
