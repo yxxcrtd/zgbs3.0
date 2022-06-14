@@ -355,7 +355,9 @@
         INNER JOIN SYS_ROLE
         ON SYS_USER_ROLE.ROLE_ID = SYS_ROLE.ROLE_ID
         <where>
-            AND SYS_ROLE.ROLE_POS IN( #{roleOne}, #{roleTwo} )
+            <if test="roleOne !=null and roleOne != '' ">
+              AND SYS_ROLE.ROLE_POS IN( #{roleOne}, #{roleTwo} )
+            </if>
             <if test="manager !=null and manager != '' ">
                 AND (SYS_USER.USER_NAME like concat(concat('%',
                 #{manager,jdbcType=VARCHAR}),'%')
