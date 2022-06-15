@@ -269,8 +269,8 @@
         select p.PORTFOLIO_ID    portfolioId,
         pp.PORTFOLIO_NAME portfolioName,
         sci.BUSI_ACCT_NO  acctNo,
-        nvl(p.AMOUNT, 0)  repNomCapi,
-        nvl(p.AMOUNT, 0)  deliverBondAmount,
+        nvl(p.AMOUNT, 0)*100  repNomCapi,
+        nvl(p.AMOUNT, 0)*100  deliverBondAmount,
         p.SEC_ACCT_ID     secAcctId
         from PTL_SEC_POSITION_RULE p
         left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
@@ -287,8 +287,8 @@
         select p.PORTFOLIO_ID    portfolioId,
         pp.PORTFOLIO_NAME portfolioName,
         sci.BUSI_ACCT_NO  acctNo,
-        nvl(p.AMOUNT, 0)  repNomCapi,
-        nvl(p.AMOUNT, 0)  deliverBondAmount,
+        nvl(p.AMOUNT, 0)*100  repNomCapi,
+        nvl(p.AMOUNT, 0)*100  deliverBondAmount,
         p.SEC_ACCT_ID     secAcctId
         from PTL_SEC_POSITION p
         left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
