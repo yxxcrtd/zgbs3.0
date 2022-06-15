@@ -258,17 +258,22 @@ public class EntrustManagement extends BaseService {
                 entrust.setEntrustPriceView(o.getEntrustPrice());
             }
 
-            if ((投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestmentAssetType.isBond(entrust.getAssetType()))
-                    || 投管业务类型_协议现券.getValue().equals(entrust.getBusiTypeTg())) {
+            String busiTypeTg = entrust.getBusiTypeTg();
+            if ((投管业务类型_大宗交易.getValue().equals(busiTypeTg) && InvestmentAssetType.isBond(entrust.getAssetType()))
+                    || 投管业务类型_协议现券.getValue().equals(busiTypeTg)) {
                 //可转债券大宗交易、协议现券 委托价格展示全价
                 entrust.setEntrustPrice(entrust.getFullPrice());
-            } else if (投管业务类型_现券交易.getValue().equals(entrust.getBusiTypeTg())) {
+            } else if (投管业务类型_现券交易.getValue().equals(busiTypeTg) || EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
                 entrust.setEntrustVolumeView(BigDecimal.valueOf(entrust.getEntrustVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setFrozenVolumeView(BigDecimal.valueOf(entrust.getFrozenVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setCancelVolumeView(BigDecimal.valueOf(entrust.getCancelVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
             }
+            if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
+                entrust.setCancelBalance(BigDecimal.valueOf(o.getCancelVolume()).multiply(BigDecimal.valueOf(100)));
+            }
 
+            entrust.setMarket(Market.getMarketName(o.getMarket()));
             entrusts.add(entrust);
         });
         return entrusts;

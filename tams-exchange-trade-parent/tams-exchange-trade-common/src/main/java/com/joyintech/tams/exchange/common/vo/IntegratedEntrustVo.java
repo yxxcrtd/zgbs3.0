@@ -326,6 +326,9 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     @Digits(integer = 20, fraction = 2)
     private BigDecimal entrustPriceView;
 
+    @ApiModelProperty(name = "cancelBalance", value = "撤单金额")
+    public BigDecimal cancelBalance;
+
     public String getSoftSkipMode() {
         return softSkipMode;
     }
@@ -1090,15 +1093,7 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     }
 
     public String getCounterId() {
-        if(StringUtil.isNotEmpty(counterId)){
-            return counterId;
-        }
-        if (StringUtil.isNotEmpty(extend2) && extend2.contains("counterId")) {
-            Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
-            return (String)map.get("counterId");
-        }
-
-        return "";
+        return counterId;
     }
 
     public void setCounterId(String counterId) {
@@ -1159,5 +1154,13 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
 
     public void setEntrustPriceView(BigDecimal entrustPriceView) {
         this.entrustPriceView = entrustPriceView;
+    }
+
+    public BigDecimal getCancelBalance() {
+        return cancelBalance;
+    }
+
+    public void setCancelBalance(BigDecimal cancelBalance) {
+        this.cancelBalance = cancelBalance;
     }
 }

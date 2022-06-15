@@ -81,6 +81,10 @@ public enum EntrustProp implements IEnum<String> {
     SZ_REPURCHASE_BUYBACK("深圳债券质押协议回购购回交易", "BPR"),
     SZ_REPURCHASE_RENEWAL("深圳债券质押协议回购到期续做", "BPT"),
 
+    //深圳 协议回购 增加 解除质押、换券申报
+    SZ_REPURCHASE_RELEASE("深圳债券质押协议回购解除质押", "BPD"),
+    SZ_REPURCHASE_EXCHANGE("深圳债券质押协议回购换券申报", "BPE"),
+
     // 上海固收平台
     SH_FIXEDINCOME_BAOJIA_CONFIRM("确定报价", "FI1"),
     SH_FIXEDINCOME_TRADE_CLICK("点击成交", "FI3"),

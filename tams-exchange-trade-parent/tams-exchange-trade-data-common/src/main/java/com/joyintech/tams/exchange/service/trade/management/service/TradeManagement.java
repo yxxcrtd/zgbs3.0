@@ -9,6 +9,7 @@ import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.constant.PresentOrHistoryQryType;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.db.domain.TradeHistory;
@@ -17,6 +18,7 @@ import com.joyintech.tams.exchange.common.request.HistoryTradeInfoRequest;
 import com.joyintech.tams.exchange.common.request.PageMode;
 import com.joyintech.tams.exchange.common.request.PageTradeInfoRequest;
 import com.joyintech.tams.exchange.common.request.TradeInfoRequest;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.common.vo.TradeVo;
 import com.joyintech.tams.exchange.datacommon.db.service.TradeHistoryService;
@@ -151,15 +153,17 @@ public class TradeManagement {
         tradeList.forEach(o -> {
             TradeVo trade = new TradeVo();
             BeanUtils.copyProperties(o, trade);
-            if (投管业务类型_质押券出入库.getValue().equals(trade.getBusiTypeTg())) {
+            String busiTypeTg = trade.getBusiTypeTg();
+            if (投管业务类型_质押券出入库.getValue().equals(busiTypeTg)) {
                 trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 trade.setBondVolume(trade.getTradedPrice().multiply(BigDecimal.valueOf(trade.getTradedVolume())).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
                 trade.setTradedPrice(trade.getTradedPrice().multiply(BigDecimal.valueOf(100)));
-            } else if (投管业务类型_现券交易.getValue().equals(trade.getBusiTypeTg())) {
+            } else if (投管业务类型_现券交易.getValue().equals(busiTypeTg) || EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
                 trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
-            } else if (投管业务类型_通用式质押回购.getValue().equals(trade.getBusiTypeTg())) {
+            } else if (投管业务类型_通用式质押回购.getValue().equals(busiTypeTg)) {
                 trade.setTradedBalance(trade.getTradedBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
             }
+            trade.setMarket(Market.getMarketName(o.getMarket()));
             tradeVos.add(trade);
         });
         return tradeVos;
