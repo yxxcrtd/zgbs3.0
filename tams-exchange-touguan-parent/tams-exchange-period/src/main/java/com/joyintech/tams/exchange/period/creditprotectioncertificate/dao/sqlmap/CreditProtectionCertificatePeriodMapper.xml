@@ -318,7 +318,7 @@
         and fa.REF_SEC is not null
     </select>
     <select id="getAmountByPortfolioIdOld" resultType="java.math.BigDecimal">
-        select nvl(p.AMOUNT, 0)
+        select nvl(p.AMOUNT, 0)*100
         from PTL_SEC_POSITION p
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
@@ -331,7 +331,7 @@
     </select>
 
     <select id="getAmountByPortfolioId" resultType="java.math.BigDecimal">
-        select nvl(p.AMOUNT, 0)
+        select nvl(p.AMOUNT, 0)*100
         from PTL_SEC_POSITION_RULE p
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
