@@ -265,11 +265,11 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                 }
                 //债券中债报送
                 if (null != dto.getRepAssetBond()) {
-                    repAssetBondMapper.insert(dto.getRepAssetBond());
+//                    repAssetBondMapper.insert(dto.getRepAssetBond());
                 }
                 //债券中债报送
                 if (null != dto.getRepAssetDept()) {
-                    repAssetDeptMapper.insert(dto.getRepAssetDept());
+//                    repAssetDeptMapper.insert(dto.getRepAssetDept());
                 }
                 //债券评级信息
                 if (null != dto.getMstBondCreditRatingList() && !dto.getMstBondCreditRatingList().isEmpty()) {
