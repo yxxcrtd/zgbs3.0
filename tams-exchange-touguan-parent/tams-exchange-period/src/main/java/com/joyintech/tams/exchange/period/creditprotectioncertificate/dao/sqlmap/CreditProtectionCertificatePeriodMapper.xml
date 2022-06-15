@@ -152,11 +152,13 @@
         f.VDATE             vdate,
         f.MDATE             mdate,
         fa.REF_ENTITY       refEntity,
+        mci.CUSTOMER_NAME   refEntityStr,
         f.TRADE_MARKET      tradeMarket,
         fa.REF_SEC          refSec,
         fa.SETTLE_METHOD    settleMethod
         from FIN_PRODUCT f
         left join FIN_PRODUCT_ADD fa on fa.FINPROD_ID = f.FINPROD_ID
+        left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fa.REF_ENTITY
         where f.FINPROD_MARKET_ID = #{finprodId}
         and f.FINPROD_TYPE2 = 'F37'
     </select>

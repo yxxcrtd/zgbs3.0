@@ -254,4 +254,13 @@ public class MskCreditInfoProSaveRequest extends BaseEntity implements ProcessEn
         this.selectedItem = selectedItem;
     }
 
+    private String operateStatus;
+
+    public String getOperateStatus() {
+        return operateStatus;
+    }
+
+    public void setOperateStatus(String operateStatus) {
+        this.operateStatus = operateStatus;
+    }
 }
