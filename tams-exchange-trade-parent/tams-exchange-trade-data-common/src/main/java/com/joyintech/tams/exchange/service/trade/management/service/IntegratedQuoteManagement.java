@@ -326,7 +326,7 @@ public class IntegratedQuoteManagement {
 
         BigDecimal pledgeNumber = request.getPledgeNumber();
         if (ObjectUtil.isNotEmpty(pledgeNumber)) {
-            stream = stream.filter(item -> NumberUtil.equals(NumberUtil.round(NumberUtil.div(item.getPledgeNumber(), 100), 2), pledgeNumber));
+            stream = stream.filter(item -> NumberUtil.equals(item.getPledgeNumber(), pledgeNumber));
         }
 
         BigDecimal repoAmount = request.getRepoAmount();
