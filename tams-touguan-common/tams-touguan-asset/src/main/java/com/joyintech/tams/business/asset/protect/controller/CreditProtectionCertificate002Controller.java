@@ -136,19 +136,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
                 //流程代办checkImportData
                 entity = creditProtectionCertificate002Service.getBussinessEntityByWorkflowId(workflowId);
             }
-            //add wsz 修改现实问题 ZGCPCN-1356 start
-            CreditProtectionCertificate002Dto entity2 = null;
-            if(StringUtil.isNotEmpty(entity.getFinprodId())) {
-                entity2 = creditProtectionCertificate002Service.getById(entity.getFinprodId());
-            }
-            if(!Objects.isNull(entity2)){
-                BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
-            } else {
-                entity.setRefSecList(creditProtectionCertificate002Service.getRefList(entity));
-                entity.setRefEntityStr(creditProtectionCertificate002Service.getMstCustomerInfo(entity.getRefEntity()));
-                entity.setIssuershortStr(creditProtectionCertificate002Service.getMstCustomerInfo(entity.getIssuershort()));
-            }
-            //add wsz 修改现实问题 ZGCPCN-1356 end
+            entity = creditProtectionCertificate002Service.getProcessEntity(entity);
             return new Message<CreditProtectionCertificate002Dto>().success().setData(entity);
         } catch(Exception e){
             e.printStackTrace();

@@ -406,6 +406,28 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         return entity;
     }
 
+    public CreditProtectionCertificate002Dto getProcessEntity(CreditProtectionCertificate002Dto entity){
+        //add wsz 修改现实问题 ZGCPCN-1356 start
+        CreditProtectionCertificate002Dto entity2 = null;
+        if(StringUtil.isNotEmpty(entity.getFinprodId())) {
+            entity2 = this.getById(entity.getFinprodId());
+        }
+        if(!Objects.isNull(entity2)){
+            BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
+        } else {
+            entity.setRefSecList(this.getRefList(entity));
+            entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
+            entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
+            List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
+            MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
+            mstFileInputParameter.setFileList(uploadInfo);
+            mstFileInputParameter.setBussinessId(entity.getFinprodId());
+            entity.setMstFileInputParameter(mstFileInputParameter);
+        }
+        //add wsz 修改现实问题 ZGCPCN-1356 end
+        return entity;
+    }
+
     public String getRefList(CreditProtectionCertificate002Dto entity){
         if(!StringUtils.isNotEmpty(entity.getRefSec())){
             return null;
