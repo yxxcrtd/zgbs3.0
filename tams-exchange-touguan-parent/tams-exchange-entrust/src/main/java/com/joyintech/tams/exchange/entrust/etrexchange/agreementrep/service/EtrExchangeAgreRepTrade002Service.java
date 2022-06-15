@@ -28,6 +28,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dao.EtrExchangeAgreRepTradeMapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.*;
+import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.enums.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePositionsCommonRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeUnitCostDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommon002Service;
@@ -747,7 +748,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             }
             // 对手方请求类型
             if (StringUtil.isNotEmpty(tmp.get("requestType"))) {
-                dto.setReqType(tmp.get("requestType").toString());
+                dto.setReqType(cn.hutool.core.util.EnumUtil.getFieldBy(RepurchaseTypeEnum::getPs, RepurchaseTypeEnum::getCode, tmp.get("requestType").toString()));
             }
             //对手方请求类型（首期、提前购回、中途换券、到期续做、解除质押、到期购回）
             if (StringUtil.isNotEmpty(tmp.get("requestTypeStr"))) {
@@ -949,6 +950,23 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
 
         page.setRoot(list);
         return page;
+    }
+
+    private String mathEntrustPs(String prop){
+        switch (prop) {
+            case SB_SHXYHGCJ:
+                return DictCodeListExt3.交易方向_正回购.getCodeName();
+            case SB_SHXYHGDQXZ:
+                return DictCodeListExt3.交易方向_到期续做.getCodeName();
+            case SB_SHXYHGJCZY:
+                return DictCodeListExt3.交易方向_解除质押.getCodeName();
+            case SB_SHXYHGHJSB:
+                return DictCodeListExt3.交易方向_中途换券.getCodeName();
+            case SB_SHXYHGTQZZSB:
+                return DictCodeListExt3.交易方向_提前购回.getCodeName();
+            default:
+                return prop;
+        }
     }
 
 }
