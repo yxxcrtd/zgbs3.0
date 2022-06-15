@@ -514,12 +514,39 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
                 }
             }
         }
+        if (StringUtil.equals(operateType, "submit")) {
+            this.emptyCheck(dto, validList);
+            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+            }
+        }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             this.emptyCheck(dto, validList);
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
             Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),null);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+            }
+            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+                }
             }
         }
         return validList;
@@ -561,6 +588,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      * @return
      */
     public String getFinprodId(CreditProtectionCertificate002Dto dto) {
+        if(!dto.getFinprodMarketId().contains(".")){
+            return String.format("%s_%s%s", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),dto.getFinprodMarketId(),dto.getTradeMarketId());
+        }
         return String.format("%s_%s", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),dto.getFinprodMarketId());
     }
 
