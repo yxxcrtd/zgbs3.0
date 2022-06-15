@@ -1295,7 +1295,8 @@ public class TradeHelper {
 
     private void fillSelfDealerTradeInfo(IntegratedEntrust integratedEntrust) {
         if (!StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
-                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())) {
+                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())
+                || !EntrustUtils.isPledgeAgreementRepurchase(integratedEntrust.getBusiTypeTg())) {
             return;
         }
         TradeInfoProRequest dto = new TradeInfoProRequest();
@@ -1320,7 +1321,8 @@ public class TradeHelper {
 
     private void fillPropDealerTradeInfo(IntegratedEntrust integratedEntrust) {
         if (!StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
-                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())) {
+                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())
+                || !EntrustUtils.isPledgeAgreementRepurchase(integratedEntrust.getBusiTypeTg())) {
             return;
         }
 
