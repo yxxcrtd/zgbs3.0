@@ -24,7 +24,12 @@
         ELSE det.portfolio_name
         END  AS portfolioName,
     CASE WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND fpt.TYPE_9 = '01' THEN 'F21' ELSE  ETR_ENTRUST_ADD.ASSET_TYPE END  AS finprodType2,
-    FIN_PRODUCT_ISSUE.ISSUE_DATE as issueDate,
+    case
+        when FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01'  THEN
+        to_char(FIN_PRODUCT_ISSUE.ISSUE_DATE, 'yyyy-mm-dd')
+        when FIN_PRODUCT_ISSUE.ISSUE_DATE is not null then to_char(FIN_PRODUCT_ISSUE.ISSUE_DATE, 'yyyy-mm-dd')
+        else to_char(FIN_PRODUCT_ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(FIN_PRODUCT_ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+        end as issueDateStr,
     CASE WHEN ETR_ENTRUST_ADD.ASSET_TYPE ='F07' AND ETR_ENTRUST.PS IN ('03', '04','T56','T93','T94','T95','T96') THEN ETR_ENTRUST_ADD.TERM_TYPE else(case when FIN_PRODUCT.FINPROD_MARKET_ID is not null
     then FIN_PRODUCT.FINPROD_MARKET_ID
     else ETR_ENTRUST_ADD.ASSET_TYPE_10 end) end finprodMarketId,
@@ -52,22 +57,22 @@
     B.realName realName,
     ETR_ENTRUST.REMARK remark,
     btm.busi_type busiTypePosition,
-    ssa.sec_acct_name secAcctId,
+    nvl(ssa.sec_acct_name,ssall.secAcctName) secAcctId,
     DECODE(ETR_ENTRUST_ADD.SETTLE_SPREED,0,'01',1,'02','2','03') settleSpeed,
     decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',ETR_ENTRUST_ADD.TERM_DAYS,'F10',ETR_ENTRUST_ADD.TERM_DAYS,'F12',ETR_ENTRUST_ADD.TERM_DAYS,'F16',ETR_ENTRUST_ADD.TERM_DAYS,'') termDays,
     CASE WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01' THEN
-        case when FIN_PRODUCT.COUPON_SPECIES = '01' AND  FIN_PRODUCT_ISSUE.INT_TYPE = '02' THEN
-        SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
-        else to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+        case when FIN_PRODUCT.COUPON_SPECIES = '01' AND  FIN_PRODUCT_ISSUE.INT_TYPE = '02' AND SDLDATA.ITEM_VALUE IS NOT NULL AND FIN_PRODUCT_ISSUE.bp IS NOT NULL THEN
+        SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
+        WHEN FIN_PRODUCT_ISSUE.REFER_YIELD IS NOT NULL THEN to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM999,999,999,999,990.9990') || ' %'
         END
     WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02','03')  THEN
-        CASE  WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
-        WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
-        WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
+        CASE  WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || ' %'
+        WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || ' 元'
+        WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || ' BP'
         ELSE bobp.BID_PRICE
         END
     ELSE
-    TO_CHAR(round(decode(btm.busi_type, '02', decode(ETR_ENTRUST_ADD.CALCULATE_FIELD, 'price', ETR_ENTRUST.PRICE, 'exerYield', ETR_ENTRUST_ADD.EXER_YIELD * 100, 'matureYield', ETR_ENTRUST_ADD.MATURE_YIELD * 100), '03', ETR_ENTRUST.PRICE, '05', ETR_ENTRUST.PRICE * 100, ''), 4))
+    TO_CHAR(round(decode(btm.busi_type, '02', decode(ETR_ENTRUST_ADD.CALCULATE_FIELD, 'price', ETR_ENTRUST.PRICE, 'exerYield', ETR_ENTRUST_ADD.EXER_YIELD * 100, 'matureYield', ETR_ENTRUST_ADD.MATURE_YIELD * 100), '03', ETR_ENTRUST.PRICE, '05', ETR_ENTRUST.PRICE * 100, ''), 4),'FM999,999,999,999,990.9990')
     END AS etrPrice,
     case when ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' and ETR_ENTRUST.ENTRUST_NUM != 0
     then trunc(nvl(NVL(T7.FINISH_AMT, 0)+ NVL(T5.ENT_FINISH_AMT*100, 0),0)/(ETR_ENTRUST.ENTRUST_NUM*100),4)*100
@@ -122,6 +127,21 @@
     GROUP BY ENTRUST_ID)B
     ON
     B.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
+    LEFT JOIN (
+        SELECT
+        listagg(ETR_ENTRUST_DETAIL.SEC_ACCT_ID, ',') WITHIN GROUP (
+        ORDER BY
+        ETR_ENTRUST_DETAIL.SEC_ACCT_ID ) secAcctId,
+        listagg(STL_SEC_ACCT_INFO.SEC_ACCT_NAME , ',') WITHIN GROUP(
+        ORDER BY STL_SEC_ACCT_INFO.SEC_ACCT_NAME) secAcctName,
+        ETR_ENTRUST_DETAIL.ENTRUST_ID AS ENTRUST_ID
+        FROM
+        ETR_ENTRUST_DETAIL
+        LEFT JOIN STL_SEC_ACCT_INFO ON
+        STL_SEC_ACCT_INFO.SEC_ACCT_ID = ETR_ENTRUST_DETAIL.SEC_ACCT_ID
+        GROUP BY
+        ENTRUST_ID) ssall ON
+    ssall.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
     LEFT JOIN
     (SELECT ENTRUST_ID,SUM(FINISH_AMT) AS FINISH_AMT FROM ETR_FINISH_STATUS WHERE ENTRUST_ID != TRADE_ID GROUP BY ENTRUST_ID) ETR_FINISH_STATUSA
     ON
@@ -157,10 +177,10 @@
    LEFT JOIN
    (select listagg(case
    when t3.TENDER_TARGET = '01'
-   then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
-   when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
+   then to_char(t0.BID_PRICE * 100, 'FM999,999,999,999,990.9990')
+   when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM999,999,999,999,990.9990')
    when t3.TENDER_TARGET = '03'
-   then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
+   then to_char(t0.BID_PRICE * 10000, 'FM999,999,999,999,990.90')
    end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
    t0.ENTRUST_ID
    from ETR_ENTRUST_BID_PRICE t0
@@ -331,7 +351,12 @@
             ELSE det.portfolio_name
             END  AS portfolioName,
         CASE WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND fpt.TYPE_9 = '01' THEN 'F21' ELSE  WFL_ETR_ENTRUST_ADD.ASSET_TYPE END  AS finprodType2,
-        FIN_PRODUCT_ISSUE.ISSUE_DATE as issueDate,
+        case
+        when FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01'  THEN
+        to_char(FIN_PRODUCT_ISSUE.ISSUE_DATE, 'yyyy-mm-dd')
+        when FIN_PRODUCT_ISSUE.ISSUE_DATE is not null then to_char(FIN_PRODUCT_ISSUE.ISSUE_DATE, 'yyyy-mm-dd')
+        else to_char(FIN_PRODUCT_ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(FIN_PRODUCT_ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+        end as issueDateStr,
         CASE WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE ='F07' AND WFL_ETR_ENTRUST.PS IN ('03', '04','T56','T93','T94','T95','T96') THEN WFL_ETR_ENTRUST_ADD.TERM_TYPE else(case when FIN_PRODUCT.FINPROD_MARKET_ID is not null
         then FIN_PRODUCT.FINPROD_MARKET_ID
         else WFL_ETR_ENTRUST_ADD.ASSET_TYPE_10 end) end finprodMarketId,
@@ -359,22 +384,22 @@
         B.realName realName,
         WFL_ETR_ENTRUST.REMARK remark,
         btm.busi_type busiTypePosition,
-        ssa.sec_acct_name secAcctId,
+        nvl(ssa.sec_acct_name,ssall.secAcctName) secAcctId,
         DECODE(WFL_ETR_ENTRUST_ADD.SETTLE_SPREED,0,'01',1,'02','2','03') settleSpeed,
         decode(WFL_ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F10',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F12',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F16',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'') termDays,
         CASE WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01' THEN
-            case when FIN_PRODUCT.COUPON_SPECIES = '01' AND  FIN_PRODUCT_ISSUE.INT_TYPE = '02' THEN
-            SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
-            else to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+            case when FIN_PRODUCT.COUPON_SPECIES = '01' AND  FIN_PRODUCT_ISSUE.INT_TYPE = '02' AND SDLDATA.ITEM_VALUE IS NOT NULL AND FIN_PRODUCT_ISSUE.bp IS NOT NULL THEN
+            SDLDATA.ITEM_VALUE || '+' || to_char(FIN_PRODUCT_ISSUE.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
+            WHEN FIN_PRODUCT_ISSUE.REFER_YIELD IS NOT NULL THEN to_char(FIN_PRODUCT_ISSUE.REFER_YIELD * 100 ,'FM999,999,999,999,990.9990') || ' %'
             END
-        WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02','03')  THEN
-            CASE  WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
-            WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
-            WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
+            WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02','03')  THEN
+            CASE  WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || ' %'
+            WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || ' 元'
+            WHEN  FIN_PRODUCT_ISSUE.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || ' BP'
             ELSE bobp.BID_PRICE
             END
         ELSE
-        TO_CHAR(round(decode(btm.busi_type,#{busiTypePosition02},decode(WFL_ETR_ENTRUST_ADD.CAL_MODE,'price',WFL_ETR_ENTRUST.PRICE,'exerYield',WFL_ETR_ENTRUST_ADD.EXER_YIELD*100,'matureYield',WFL_ETR_ENTRUST_ADD.MATURE_YIELD*100),#{busiTypePosition03},WFL_ETR_ENTRUST.PRICE,#{busiTypePosition05},WFL_ETR_ENTRUST.PRICE*100,''),4))
+        TO_CHAR(round(decode(btm.busi_type,#{busiTypePosition02},decode(WFL_ETR_ENTRUST_ADD.CAL_MODE,'price',WFL_ETR_ENTRUST.PRICE,'exerYield',WFL_ETR_ENTRUST_ADD.EXER_YIELD*100,'matureYield',WFL_ETR_ENTRUST_ADD.MATURE_YIELD*100),#{busiTypePosition03},WFL_ETR_ENTRUST.PRICE,#{busiTypePosition05},WFL_ETR_ENTRUST.PRICE*100,''),4),'FM999,999,999,999,990.9990')
         END AS  etrPrice,
         case when WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' and WFL_ETR_ENTRUST.ENTRUST_NUM != 0
         then trunc(nvl(NVL(T7.FINISH_AMT, 0)+ NVL(T5.ENT_FINISH_AMT*100, 0),0)/(WFL_ETR_ENTRUST.ENTRUST_NUM*100),4)*100
@@ -429,6 +454,21 @@
         GROUP BY ENTRUST_ID)B
         ON
         B.ENTRUST_ID = WFL_ETR_ENTRUST.ENTRUST_ID
+        LEFT JOIN (
+            SELECT
+            listagg(WFL_ETR_ENTRUST_DETAIL.SEC_ACCT_ID, ',') WITHIN GROUP (
+            ORDER BY
+            WFL_ETR_ENTRUST_DETAIL.SEC_ACCT_ID ) secAcctId,
+            listagg(STL_SEC_ACCT_INFO.SEC_ACCT_NAME , ',') WITHIN GROUP(
+            ORDER BY STL_SEC_ACCT_INFO.SEC_ACCT_NAME) secAcctName,
+            WFL_ETR_ENTRUST_DETAIL.ENTRUST_ID AS ENTRUST_ID
+            FROM
+            WFL_ETR_ENTRUST_DETAIL
+            LEFT JOIN STL_SEC_ACCT_INFO ON
+            STL_SEC_ACCT_INFO.SEC_ACCT_ID = WFL_ETR_ENTRUST_DETAIL.SEC_ACCT_ID
+            GROUP BY
+            ENTRUST_ID) ssall ON
+        ssall.ENTRUST_ID = WFL_ETR_ENTRUST.ENTRUST_ID
         LEFT JOIN
         (SELECT ENTRUST_ID,SUM(FINISH_AMT) AS FINISH_AMT FROM ETR_FINISH_STATUS WHERE ENTRUST_ID != TRADE_ID GROUP BY ENTRUST_ID) ETR_FINISH_STATUSA
         ON
@@ -467,10 +507,10 @@
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
-        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
+        then to_char(t0.BID_PRICE * 100, 'FM999,999,999,999,990.9990')
+        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM999,999,999,999,990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
+        then to_char(t0.BID_PRICE * 10000, 'FM999,999,999,999,990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.ENTRUST_ID
         from WFL_ETR_ENTRUST_BID_PRICE t0
@@ -659,6 +699,7 @@
                     OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
                     OR t.transmitTime = #{search}
                     OR t.transmitTimeSer = #{search}
+                    OR t.issueDateStr = #{search}
                 )
             </where>
         </if>
