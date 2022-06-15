@@ -392,6 +392,8 @@ public class IntegratedQuoteManagement {
                 sendBean.setRequestStatus(QuoteStatusEnum.DEAL_DONE.getCode());
             }
 
+            fillRepurchaseQuoteSendResponseDescription(sendBean);
+
             if (EnumUtil.in(entrustStatus, REPORTED, REPORTED_TOBE_CANCEL, CANCELED, PART_TRADED_CANCELED, PART_SUCCESS, PART_TRADED_CANCELED, SUCCEEDED)) {
                 retList.add(sendBean);
             }
@@ -404,6 +406,15 @@ public class IntegratedQuoteManagement {
 
         return ResultBean.success(MapUtil.builder().put(ROOT, retList).build());
 
+    }
+
+    private void fillRepurchaseQuoteSendResponseDescription(BaseRepurchaseQuoteSendResponse sendBean) {
+        sendBean.setRequestStatusStr(EnumUtil.getDescriptionByCode(QuoteStatusEnum.class, sendBean.getRequestStatus()));
+        sendBean.setRequestTypeStr(EnumUtil.getDescriptionByCode(RepurchaseTypeEnum.class, sendBean.getRequestType()));
+        sendBean.setBsStr(EnumUtil.getDescriptionByCode(RepoBsEnum.class, sendBean.getBs()));
+//        sendBean.setPledgeNumberStr();
+//        sendBean.setInvestorTypeStr();
+//        sendBean.setCpInvestorTypeStr();
     }
 
     private BaseRepurchaseQuoteSendResponse createSendQuoteByIntegratedEntrust(IntegratedEntrustVo entrust) {
@@ -433,17 +444,11 @@ public class IntegratedQuoteManagement {
             fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
         }
 
-        if (EnumUtil.notIn(ps, PsEnum.POSITIVE_REPO, PsEnum.REVERSED_REPO)) {
-            baseRepurchaseQuoteSendResponse = new NonFirstBaseRepurchaseQuoteSendResponse();
-            NonFirstBaseRepurchaseQuoteSendResponse nonFirstBaseRepurchaseQuoteSendResponse = (NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
-            nonFirstBaseRepurchaseQuoteSendResponse.setOrigSerialNo(entrust.getOrigSerialNo());
-
-        }
-
         // 中途换券
         else if (PsEnum.REPO_EXCHANGE_COUPONS_MIDWAY.codeEquals(ps)) {
             baseRepurchaseQuoteSendResponse = new ZTHQRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.中途换券.getCode());
+            ((NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
 
             ZTHQRepurchaseQuoteSendResponse sendResponse = (ZTHQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
 
@@ -470,6 +475,7 @@ public class IntegratedQuoteManagement {
         else if (PsEnum.REPO_ADVANCE.codeEquals(ps)) {
             baseRepurchaseQuoteSendResponse = new TQGHRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.提前购回.getCode());
+            ((NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
 
             fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
 
@@ -492,6 +498,7 @@ public class IntegratedQuoteManagement {
         else if (PsEnum.REPO_RENEW.codeEquals(ps)) {
             baseRepurchaseQuoteSendResponse = new DQXZRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.到期续做.getCode());
+            ((NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
 
             fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
 
@@ -504,6 +511,7 @@ public class IntegratedQuoteManagement {
         else if (PsEnum.REPO_UNSTAKE.codeEquals(ps)) {
             baseRepurchaseQuoteSendResponse = new JCZYRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.解除质押.getCode());
+            ((NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
 
             JCZYRepurchaseQuoteSendResponse sendResponse = (JCZYRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
             sendResponse.setSettleAmount(instruction.getEntrustAmt());
@@ -526,19 +534,9 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setCpClientName(entrust.getPortfolioName());
         baseRepurchaseQuoteSendResponse.setRemark(entrust.getRemark());
 
-        baseRepurchaseQuoteSendResponse.setCpClientName(instruction.getPortfolioName());
         if (ObjectUtil.isEmpty(baseRepurchaseQuoteSendResponse.getBs())) {
             baseRepurchaseQuoteSendResponse.setBs(instruction.getFirstRepoPs());
         }
-        baseRepurchaseQuoteSendResponse.setRequestTypeStr(cn.hutool.core.util.EnumUtil.getFieldBy(RepurchaseTypeEnum::getDescription, RepurchaseTypeEnum::getBusiTypeTgCode, entrust.getBusiTypeTg()));
-        baseRepurchaseQuoteSendResponse.setBsStr(cn.hutool.core.util.EnumUtil.getFieldBy(RepoBsEnum::getDescription, RepoBsEnum::getCode, baseRepurchaseQuoteSendResponse.getBs()));
-
-//        baseRepurchaseQuoteSendResponse.setBsStr();
-//        baseRepurchaseQuoteSendResponse.setPledgeNumberStr();
-//        baseRepurchaseQuoteSendResponse.setInvestorTypeStr();
-//        baseRepurchaseQuoteSendResponse.setCpInvestorTypeStr();
-//        baseRepurchaseQuoteSendResponse.setRequestStatus();
-//        baseRepurchaseQuoteSendResponse.setRequestStatusStr();
 
         return baseRepurchaseQuoteSendResponse;
     }
