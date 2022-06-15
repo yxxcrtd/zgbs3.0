@@ -216,6 +216,10 @@ public class MskCreditMarketInfo001Controller extends BaseController {
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
+        for (MskCreditInfoProSaveRequest saveRequest:dto.getSelectedItem()){
+            saveRequest.setOperateType(OperationType.DELETE.name());
+        }
+        dto.setOperateType(OperationType.DELETE.name());
         ProcessParameter<MskCreditInfoProSaveRequest> processParameter = new ProcessParameter<MskCreditInfoProSaveRequest>();
         WorkFlowParameter<MskCreditInfoProSaveRequest> params = new WorkFlowParameter<MskCreditInfoProSaveRequest>();
         params.setPageId("MstCreditMarketInfo002");

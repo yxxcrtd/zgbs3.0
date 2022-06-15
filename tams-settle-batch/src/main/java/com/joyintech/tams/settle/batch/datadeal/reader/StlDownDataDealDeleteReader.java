@@ -5,6 +5,7 @@ import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.tams.common.base.entity.SettleTransDataTotalMatch;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealDeleteOperatorDto;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDownDataDealReaderService;
 import org.apache.ibatis.annotations.Param;
@@ -75,7 +76,9 @@ public class StlDownDataDealDeleteReader extends BaseReader<StlDownDataDealDelet
 	        		xgsgBusinessTypeList.add(DictCodeListExt3.金融产品其他代码类型_新股申购代码.getValue());
 	        	}
 	        }*/
-			secTypeList = Arrays.asList(DictCodeListExt1.证券品种_债券.getValue(),DictCodeListExt1.证券品种_基金.getValue(),DictCodeListExt1.证券品种_股票.getValue(),DictCodeListExt1.证券品种_回购.getValue());
+			secTypeList = Arrays.asList(DictCodeListExt1.证券品种_债券.getValue(),DictCodeListExt1.证券品种_基金.getValue(),
+					DictCodeListExt1.证券品种_股票.getValue(),DictCodeListExt1.证券品种_回购.getValue(),
+					DictCodeListStl.证券品种_信用保护凭证.getValue());
 			otherBusinessTypeList = Arrays.asList(DictCodeListExt3.金融产品其他代码类型_配债代码.getValue()
 					// GNS-853:重复跑批，删除配股数据 modify by fuyongsheng 20220214 start
 					,DictCodeListExt3.金融产品其他代码类型_配股代码.getValue()
