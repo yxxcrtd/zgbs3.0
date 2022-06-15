@@ -5079,7 +5079,8 @@
                 BRBP.INV_AIM invAim,
                 BRBP.SEC_ACCT_ID secManageAcctId,
                 STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
-                SU.REAL_NAME invManagerId
+                SU.REAL_NAME invManagerId,
+                BO.BID_MODLE  bidModle
             FROM BID_ORDER_BID_PRICE BRBP
             LEFT JOIN BID_ORDER BO
                    ON BRBP.BID_ID = BO.BID_ID
@@ -5116,7 +5117,8 @@
                 WBRBP.INV_AIM invAim,
                 WBRBP.SEC_ACCT_ID secManageAcctId,
                 STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
-                SU.REAL_NAME invManagerId
+                SU.REAL_NAME invManagerId,
+                WBO.BID_MODLE  bidModle
          FROM WFL_BID_ORDER_BID_PRICE WBRBP
          LEFT JOIN WFL_BID_ORDER WBO
                    ON WBRBP.BID_ID = WBO.BID_ID
@@ -5210,7 +5212,8 @@
                   eed.INV_AIM invAim,
                   eed.SEC_ACCT_ID secManageAcctId,
                   ssai.SEC_ACCT_NAME secManageAcctIdStr,
-                  bo.dip_Type dipType
+                  bo.dip_Type dipType,
+                  bo.BID_MODLE  bidModle
         from BID_ORDER bo
          left join BID_ORDER_BID_PRICE brbp on bo.BID_ID = brbp.BID_ID
          left join PTL_PORTFOLIO pp on brbp.PORTFOLIO_ID = pp.PORTFOLIO_ID
@@ -5226,7 +5229,8 @@
                 eed.INV_AIM invAim,
                 eed.SEC_ACCT_ID secManageAcctId,
                 ssai.SEC_ACCT_NAME secManageAcctIdStr,
-                wbo.dip_Type dipType
+                wbo.dip_Type dipType,
+                wbo.BID_MODLE  bidModle
         from WFL_BID_ORDER wbo
          left join WFL_BID_ORDER_BID_PRICE wbrbp on wbo.BID_ID = wbrbp.BID_ID
          left join PTL_PORTFOLIO pp on wbrbp.PORTFOLIO_ID = pp.PORTFOLIO_ID

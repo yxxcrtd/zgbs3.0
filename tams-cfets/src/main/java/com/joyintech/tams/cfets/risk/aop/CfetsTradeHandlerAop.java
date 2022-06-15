@@ -241,7 +241,7 @@ public class CfetsTradeHandlerAop {
         CfetsManualSettleDto dto = (CfetsManualSettleDto) args[0];
         if (StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue()) || StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
             if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_赎回.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_还本.getValue())
-                    || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_付息.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                    || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_收息.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())) {
                 inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
             }
         }
