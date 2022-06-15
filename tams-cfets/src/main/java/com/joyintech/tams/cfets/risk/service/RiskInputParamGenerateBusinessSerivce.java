@@ -2,6 +2,7 @@ package com.joyintech.tams.cfets.risk.service;
 
 import com.joyintech.background.component.common.pack.common.util.JsonUtils;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
@@ -248,6 +249,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
             busiAct = 交收操作类型_交收失败.getValue();
         }
         List<CfetsManualSettleInsertDto> list = cfetsManualSettleService.handleSettleData(allDto);
+        BeanUtil.copyPropertiesIgnoreNull(list.get(0).getTrdBankManualSettleInfo(),allDto);
         BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
                 .put(NodeConfigConstant.BUSI_ACT, busiAct)
                 .put(NodeConfigConstant.PS, allDto.getPs())
