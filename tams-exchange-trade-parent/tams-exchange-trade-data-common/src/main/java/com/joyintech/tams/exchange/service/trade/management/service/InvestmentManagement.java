@@ -657,18 +657,23 @@ public class InvestmentManagement extends BaseService {
                 pledges.add(pledge);
             }
         }
+        if (CollectionUtils.isEmpty(pledges)) {
+            return pledges;
+        }
         InstructionPledge instructionPledge = new InstructionPledge();
         List<String> finprodIds = Lists.newArrayList();
         List<String> finprodMarketIds = Lists.newArrayList();
         List<String> finprodAbbrs = Lists.newArrayList();
         BigDecimal pledgeAmt = BigDecimal.ZERO;
         BigDecimal pledgeNumber = BigDecimal.ZERO;
+        BigDecimal pledgeRatioAmt = BigDecimal.ZERO;
         for (InstructionPledge pledge : pledges) {
             finprodIds.add(pledge.getFinprodId());
             finprodMarketIds.add(pledge.getFinprodMarketId());
             finprodAbbrs.add(pledge.getFinprodAbbr());
             pledgeAmt = pledgeAmt.add(pledge.getPledgeAmt());
             pledgeNumber = pledgeNumber.add(pledge.getPledgeNumber());
+            pledgeRatioAmt = pledgeRatioAmt.add(pledge.getPledgeNumber().multiply(pledge.getPledgeRatio()));
         }
         InstructionPledge pledge = pledges.get(0);
         instructionPledge.setEntrustId(pledge.getEntrustId());
@@ -679,7 +684,7 @@ public class InvestmentManagement extends BaseService {
         instructionPledge.setFinprodAbbr(String.join(",", finprodAbbrs));
         instructionPledge.setPledgeAmt(pledgeAmt);
         instructionPledge.setPledgeNumber(pledgeNumber);
-        instructionPledge.setPledgeRatio(pledgeAmt.divide(pledgeNumber, 2, RoundingMode.HALF_UP));
+        instructionPledge.setPledgeRatio(pledgeRatioAmt.divide(pledgeNumber, 2, RoundingMode.HALF_UP));
 
         pledges.clear();
         pledges.add(instructionPledge);

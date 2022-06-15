@@ -6,7 +6,6 @@
 
 package com.joyintech.tams.exchange.service.trade.check.business;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
@@ -27,6 +26,5 @@ public @interface Check {
      *
      * @return 业务编码
      */
-    String action() default StringUtils.EMPTY;
-
+    String[] action();
 }
