@@ -483,6 +483,7 @@ public class PositionRequestManualSettleService {
         } else if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_交收失败.getValue())) {
             resultMap.put("busiAct", DictCodeListExt3.业务动作_交收失败.getValue());
         }
+        resultMap.put("interfaceType", INTERF_TYPE_CERTIFICATE001);
         // 业务类型
         resultMap.put("busiType", DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
         //交易方向
