@@ -28,6 +28,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.service.MskCreditMarketInfoPro001Service;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
@@ -115,7 +116,7 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     public Message<AjaxResult> check(@RequestBody MskCreditInfoProSaveRequest dto, BindingResult result) {
         AjaxResult res= new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
-        if(mskCreditMarketInfoPro001Service.selectByKey(null, dto.getSecid(), dto.getCdate(),null) != null){
+        if(!StringUtil.equals(dto.getOperateStatus(), OperationType.MODIFY.name()) && mskCreditMarketInfoPro001Service.selectByKey(null, dto.getSecid(), dto.getCdate(),null) != null){
             errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0006","同一资产","同一交易日期")));
             res.setErrorList(errorList);
             res.setMessageType(MessageType.错误消息);

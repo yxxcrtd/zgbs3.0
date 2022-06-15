@@ -1729,7 +1729,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     头寸业务类型_证银转账(DictCode.头寸业务类型, "33", "证银转账"),
     头寸业务类型_债券一级申购(DictCode.头寸业务类型, "34", "债券一级申购"),
     头寸业务类型_信用保护凭证交易(DictCode.头寸业务类型, "35", "信用保护凭证交易"),
-
+    头寸业务类型_信用保护凭证存续期(DictCode.头寸业务类型, "36", "信用保护凭证存续期"),
     /**
      * 头寸业务动作
      */

@@ -935,6 +935,9 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 						etrExchangeTrade001DtoList.add(etrExchangeTrade001Dto);
 						EtrExchangeTradeSaveSecRepoRequest preRiskEtrExchangeTrade001Dto=new EtrExchangeTradeSaveSecRepoRequest();
 						BeanUtil.copyPropertiesIgnoreNull(preRiskEtrExchangeTrade001Dto,etrExchangeTrade001Dto);
+						// 系列户的 占用编号需要拼接组合代码
+						preRiskEtrExchangeTrade001Dto.setEntrustId(preRiskEtrExchangeTrade001Dto.getEntrustId()
+								+ "-"+preRiskEtrExchangeTrade001Dto.getPortfolioId());
 						riskPreEtrExchangeTrade001DtoList.add(preRiskEtrExchangeTrade001Dto);
 					}
 					riskEtrExchangeTrade001DtoList=riskPreEtrExchangeTrade001DtoList;

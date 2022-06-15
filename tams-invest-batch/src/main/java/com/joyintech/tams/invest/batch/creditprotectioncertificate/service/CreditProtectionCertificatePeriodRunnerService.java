@@ -341,14 +341,14 @@ public class CreditProtectionCertificatePeriodRunnerService {
         resultMap.put(TOTAL_TRADE_ID, writerDto.getBussinessCode());
         resultMap.put("modelType", DictCodeListExt1.子系统代码_交易.getValue());
         resultMap.put("balanceCheck", "N");
-        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
+        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue());
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_交易登记.getValue());
         resultMap.put(PS, DictCodeList.交易方向_到期.getValue());
 
         List<CreditProtectionCertificatePeriodExpireDataDto> expireDatas = writerDto.getExpireDatas();
         resultMap.put(TRADE_PLACE, expireDatas.get(0).getTradeMarket());
 
-        resultMap.put("cDate", DateUtil.format(iPlatformDate.getSysDate()));
+        resultMap.put("cdate", DateUtil.format(iPlatformDate.getSysDate()));
         resultMap.put(CCY, DictCodeList.币种_人民币_CNY.getValue());
 
         List<Map<String, Object>> ptlList = new ArrayList<>();

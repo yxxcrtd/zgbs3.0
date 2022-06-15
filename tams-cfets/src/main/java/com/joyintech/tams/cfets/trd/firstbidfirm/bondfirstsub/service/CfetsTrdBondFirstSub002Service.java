@@ -946,16 +946,16 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     /**
      * 撤销，共外部调用
      *
-     * @param totleTradeId
-     * @param remark
-     * @param isNeedDealPosition
-     * @param tgBusiType
+     * @param bidId              投标编号
+     * @param remark             备注
+     * @param isNeedDealPosition 是否需要撤销持仓
+     * @param tgBusiType         业务类型
      * @author jiangpeng
      * @date 2022/5/12 14:53
      */
-    public void dorevoke(String totleTradeId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
-        CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(totleTradeId);
-        entity.setBidId(totleTradeId);
+    public void dorevoke(String bidId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
+        CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(bidId);
+        entity.setBidId(bidId);
         this.insertData(entity, OperationType.REVOKE);
         try {
             if (isNeedDealPosition) {

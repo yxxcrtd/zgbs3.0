@@ -165,34 +165,34 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
-//
-//    @Override
-//    public void doDelete(String workflowId) {
-//        baseTradeProductDealCommServiceImpl.delete(workflowId);
-//    }
+
+    @Override
+    public void doDelete(String workflowId) {
+        baseTradeProductDealCommServiceImpl.delete(workflowId);
+    }
 
     @Override
     public void doBack(CreditProtectionCertificatePeriodSaveDto entity) {
-//        doOldPositionSubmit(entity, true);
-//        AllTradeCommonUtil.deletePositionReal(entity.getBusiCode());
+        doOldPositionSubmit(entity, true);
+        AllTradeCommonUtil.deletePositionReal(entity.getBusiCode());
     }
 
     @Override
     public void doRevoke(CreditProtectionCertificatePeriodSaveDto entity) {
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("bizCode", entity.getBusiCode());
-//        params.put("workflowId", entity.getWorkflowId());
-//        params.put("workflowStatus", DictCodeList.数据状态_删除中.getValue());
-//        params.put("user", entity.getCreateUser());
-//        params.put("dept", entity.getCreateDept() == null ? "dept" : entity.getCreateDept());
-//        params.put("time", entity.getCreateTime());
-//        params.put("revokeReason", entity.getRevokeReason());
-//        investPeriodCommonService.insertWflTable(params);
-//
-//        CreditProtectionCertificatePeriodSaveDto dto = getBussinessEntityByWorkflowId(entity.getWorkflowId());
-//        doOldPositionSubmit(dto, true);
-//        doOldPositionConfirm(dto, true);
-//        positionRequestService.sendRevokeCreditProtectionCertificatePeriod(entity);
+        Map<String, Object> params = new HashMap<>();
+        params.put("bizCode", entity.getBusiCode());
+        params.put("workflowId", entity.getWorkflowId());
+        params.put("workflowStatus", DictCodeList.数据状态_删除中.getValue());
+        params.put("user", entity.getCreateUser());
+        params.put("dept", entity.getCreateDept() == null ? "dept" : entity.getCreateDept());
+        params.put("time", entity.getCreateTime());
+        params.put("revokeReason", entity.getRevokeReason());
+        investPeriodCommonService.insertWflTable(params);
+
+        CreditProtectionCertificatePeriodSaveDto dto = getBussinessEntityByWorkflowId(entity.getWorkflowId());
+        doOldPositionSubmit(dto, true);
+        doOldPositionConfirm(dto, true);
+        positionRequestService.sendRevokeCreditProtectionCertificatePeriod(entity);
     }
 
     private void insertFlow(BaseBussinessDto baseBussinessDto, CreditProtectionCertificatePeriodSaveDto entity) {

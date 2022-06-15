@@ -43,7 +43,7 @@
             resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
         SELECT R.PORTFOLIO_ID   portfolioId,
                R.FINPROD_ID     finprodId,
-               R.AMOUNT         repNomCapi,
+               R.AMOUNT*100         repNomCapi,
                R.SEC_ACCT_ID    secAcctId,
                F.MDATE          mdate,
                F.VDATE          vdate,
@@ -62,7 +62,7 @@
             resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
         SELECT R.PORTFOLIO_ID   portfolioId,
                R.FINPROD_ID     finprodId,
-               R.AMOUNT         repNomCapi,
+               R.AMOUNT*100         repNomCapi,
                R.SEC_ACCT_ID    secAcctId,
                F.MDATE          mdate,
                F.VDATE          vdate,
