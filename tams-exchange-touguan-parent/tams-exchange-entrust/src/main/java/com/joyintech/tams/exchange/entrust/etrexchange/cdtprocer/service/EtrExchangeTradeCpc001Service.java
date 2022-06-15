@@ -1031,4 +1031,8 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         return minNum;
     }
 
+    public List<String> isOverMDate(Map<String, Object> map){
+        return etrExchangeTradeCpc002Mapper.isOverMDate(map);
+    }
+
 }

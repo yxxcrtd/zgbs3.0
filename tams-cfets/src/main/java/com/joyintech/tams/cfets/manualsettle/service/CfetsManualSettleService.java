@@ -388,6 +388,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             trdBankManualSettleInfo.setSettleDate(platformDateImpl.getSysDate());
             //交收数量
             trdBankManualSettleInfo.setSettleNum(cfetsManualSettleDto.getSettleNum());
+
             //交收金额
             if(StringUtil.equals(cfetsManualSettleDto.getTgBusiType(),DictCodeListExt3.头寸业务类型_现券交易.getValue())
                     && StringUtil.equals(cfetsManualSettleDto.getPs(),DictCodeList.交易方向_买入.getValue())){
@@ -409,6 +410,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             trdBankManualSettleInfo.setFinprodId(cfetsManualSettleDto.getFinprodId());
             trdBankManualSettleInfo.setSettleAmt(cfetsManualSettleDto.getSettleAmt());
             trdBankManualSettleInfo.setTradeId(cfetsManualSettleDto.getTradeId());
+            //业务类别
+            trdBankManualSettleInfo.setBusiType(cfetsManualSettleDto.getTgBusiType());
+            trdBankManualSettleInfo.setSettleDate(platformDateImpl.getSysDate());
             //交收状态
             trdBankManualSettleInfo.setSettleStatus(DictCodeListExt3.交收状态_未交收.getValue());
             if(StringUtil.equals(buttonType,DictCodeListExt3.交收操作类型_交收.getValue())  ||StringUtil.equals(buttonType,DictCodeListExt3.交收操作类型_交收修改.getValue())){

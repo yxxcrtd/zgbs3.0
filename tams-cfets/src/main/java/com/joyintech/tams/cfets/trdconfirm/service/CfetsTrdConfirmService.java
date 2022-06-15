@@ -847,17 +847,15 @@ public class CfetsTrdConfirmService extends BaseService{
             trdTradeFeeDetails.addAll(生成交易费用明细数据(regDeal.getTradeId(),deal.getTradeId()));
 
             //风险数据
-            if(StringUtil.equals(genType,DictCodeListExt1.生成方式_画面录入.getValue())){
-                CfetsTrdBondInvestTradeDto dto=new CfetsTrdBondInvestTradeDto();
-                BeanUtil.copyPropertiesIgnoreNull(dto,entity);
-                dto.setPortfolioId(regDeal.getPortfolioId());
-                dto.setTradeAmt(regDeal.getTradeAmt());
-                dto.setCpriceAmt(regDeal.getCpriceAmt());
-                dto.setFpriceAmt(regDeal.getFpriceAmt());
-                dto.setEntrustId(regDeal.getEntrustId());
-                dto.setTotleTradeId(deal.getTradeId());
-                dtoList.add(dto);
-            }
+            CfetsTrdBondInvestTradeDto dto=new CfetsTrdBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(dto,entity);
+            dto.setPortfolioId(regDeal.getPortfolioId());
+            dto.setTradeAmt(regDeal.getTradeAmt());
+            dto.setCpriceAmt(regDeal.getCpriceAmt());
+            dto.setFpriceAmt(regDeal.getFpriceAmt());
+            dto.setEntrustId(regDeal.getEntrustId());
+            dto.setTotleTradeId(deal.getTradeId());
+            dtoList.add(dto);
         }
 
         entity.setPtlTrade(ptlTrades);
