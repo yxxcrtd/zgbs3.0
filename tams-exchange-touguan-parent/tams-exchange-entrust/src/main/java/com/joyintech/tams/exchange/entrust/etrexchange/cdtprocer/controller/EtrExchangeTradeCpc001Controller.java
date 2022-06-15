@@ -205,16 +205,7 @@ public class EtrExchangeTradeCpc001Controller extends BaseController {
             workflowId = workflowId.replaceAll("\"","");
             EtrCreditProtectionCertificateApplyRequest entity = new EtrCreditProtectionCertificateApplyRequest();
             if (StringUtil.isNotEmpty(workflowId)) {
-                //流程代办checkImportData
-                entity = etrExchangeTradeCpc001Service.getBussinessEntityByWorkflowId(
-                        workflowId);
-                //add by chenjiaxing 流程中不显示资产名称 start
-                String[] secIds = StringUtil.split(entity.getFinprodId(),"_");
-                if(secIds!=null){
-                    if(secIds.length == 2 && StringUtil.isEmpty(entity.getStockId())){
-                        entity.setStockId(secIds[1]);
-                    }
-                }
+                entity = etrExchangeTradeCpc001Service.getBussinessEntityByWorkflowId(workflowId);
             }
             return new Message<EtrCreditProtectionCertificateApplyRequest>().success().setData(entity);
         } catch(Exception e){
