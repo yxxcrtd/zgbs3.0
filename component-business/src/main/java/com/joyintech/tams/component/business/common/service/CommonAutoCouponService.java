@@ -510,6 +510,7 @@ public class CommonAutoCouponService extends BaseService {
                         finCashCalcRule.setIsInitial(DictCodeList.是否_否.getValue());
                     }
                     finCashCalcRule.setFinprodId(finprodId);
+                    finCashCalcRule.setFinprodType(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                     finCashCalcRule.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                     finCashCalcRule.setBranch(branch);
                     finCashCalcRuleList.add(finCashCalcRule);
@@ -530,6 +531,7 @@ public class CommonAutoCouponService extends BaseService {
                     finCashCalcRule.setYield(interfPayhsrcsecinfo.getPaperir());
                     finCashCalcRule.setIsInitial(DictCodeList.是否_是.getValue());
                     finCashCalcRule.setFinprodId(finprodId);
+                    finCashCalcRule.setFinprodType(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                     finCashCalcRule.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                     finCashCalcRule.setBranch(branch);
                     finCashCalcRuleList.add(finCashCalcRule);
