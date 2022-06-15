@@ -5,7 +5,6 @@ import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedToWriteEntity;
 import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
-import com.joyintech.framework.web.PlatformDate;
 import com.joyintech.tams.invest.batch.common.util.BatchConstant;
 import com.joyintech.tams.invest.batch.overduesecpositionforward.processor.OverdueSecPositionForwardDelProcessor;
 import com.joyintech.tams.invest.batch.overduesecpositionforward.processor.OverdueSecPositionForwardProcessor;
@@ -13,7 +12,6 @@ import com.joyintech.tams.invest.batch.overduesecpositionforward.reader.OverdueS
 import com.joyintech.tams.invest.batch.overduesecpositionforward.reader.OverdueSecPositionForwardReader;
 import com.joyintech.tams.invest.batch.overduesecpositionforward.writer.OverdueSecPositionForwardDelWriter;
 import com.joyintech.tams.invest.batch.overduesecpositionforward.writer.OverdueSecPositionForwardWriter;
-import groovy.json.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;

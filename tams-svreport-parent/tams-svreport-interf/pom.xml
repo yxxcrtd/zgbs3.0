@@ -1,38 +1,35 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.joyintech</groupId>
-    <artifactId>tams-svreport-parent</artifactId>
-    <version>3.0.0</version>
-  </parent>
-  <artifactId>tams-svreport-interf</artifactId>
-  <dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.joyintech</groupId>
+		<artifactId>tams-svreport-parent</artifactId>
+		<version>3.0.0</version>
+	</parent>
+	<artifactId>tams-svreport-interf</artifactId>
+	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>tams-svreport-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcmail-jdk14</artifactId>
 			<version>1.45</version>
 		</dependency>
-<!-- 
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>bcprov-jdk14</artifactId>
-			<version>1.45</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.joyintech</groupId> <artifactId>bcprov-jdk14</artifactId> 
+			<version>1.45</version> </dependency> -->
 
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>com.citicbank</groupId>
 			<artifactId>cryppkg</artifactId>
 			<version>1.2</version>
 		</dependency>
-
 		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>sadk</artifactId>
+			<groupId>cfca.common</groupId>
+			<artifactId>SADK-ECITIC</artifactId>
 			<version>3.0.0.2</version>
 		</dependency>
 
@@ -42,118 +39,103 @@
 			<version>1.1.3</version>
 		</dependency>
 
-	<!-- 	<dependency>
-			<groupId>com.jcraft</groupId>
-			<artifactId>jsch</artifactId>
-			<version>0.1.53</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.jcraft</groupId> <artifactId>jsch</artifactId> 
+			<version>0.1.53</version> </dependency> -->
 
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-api</artifactId>
 			<version>1.2.8</version>
 		</dependency>
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-impl</artifactId>
 			<version>1.2.8</version>
 		</dependency>
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-adb</artifactId>
 			<version>1.5</version>
 		</dependency>
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-codegen</artifactId>
 			<version>1.5</version>
 		</dependency>
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-kernel</artifactId>
 			<version>1.5</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-transport-http</artifactId>
 			<version>1.5</version>
 		</dependency>
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-transport-local</artifactId>
 			<version>1.5</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.10</version>
-		</dependency> -->
- 
-        <dependency>
+		<!-- <dependency> <groupId>commons-codec</groupId> <artifactId>commons-codec</artifactId> 
+			<version>1.10</version> </dependency> -->
+
+		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>1.2.70</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.2.6</version>
-		</dependency> -->
-		<!-- <dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>4.2.5</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.joyintech</groupId> <artifactId>httpclient</artifactId> 
+			<version>4.2.6</version> </dependency> -->
+		<!-- <dependency> <groupId>com.joyintech</groupId> <artifactId>httpcore</artifactId> 
+			<version>4.2.5</version> </dependency> -->
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>org.apache.neethi</groupId>
 			<artifactId>neethi</artifactId>
 			<version>2.0.4</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>4.1.0.Final</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.joyintech</groupId> <artifactId>netty-all</artifactId> 
+			<version>4.1.0.Final</version> </dependency> -->
 		<dependency>
-			<groupId>com.joyintech</groupId>
+			<groupId>wsdl4j</groupId>
 			<artifactId>wsdl4j</artifactId>
 			<version>1.6.2</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>xpp3_min</artifactId>
-			<version>1.1.4c</version>
-		</dependency> -->
-		<!-- <dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>xstream</artifactId>
-			<version>1.3.1090728</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.joyintech</groupId> <artifactId>xpp3_min</artifactId> 
+			<version>1.1.4c</version> </dependency> -->
+		<!-- <dependency> <groupId>com.joyintech</groupId> <artifactId>xstream</artifactId> 
+			<version>1.3.1090728</version> </dependency> -->
 	</dependencies>
 
 	<build>
 		<finalName>report-interf</finalName>
-		
+
 		<plugins>
-          <!-- 打包源代码插件 -->
-          <plugin>
-             <groupId>org.apache.maven.plugins</groupId>
-             <artifactId>maven-source-plugin</artifactId>
-             <version>2.4</version>
-             <configuration>
-                <attach>true</attach>
-             </configuration>
-             <executions>
-                <execution>
-                   <phase>compile</phase>
-                   <goals>
-                      <goal>jar</goal>
-                   </goals>
-                </execution>
-             </executions>
-          </plugin>
-        </plugins>
+			<!-- 打包源代码插件 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<attach>true</attach>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 </project>
