@@ -440,7 +440,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             TrdProductDeal trdProductDeal2 = new TrdProductDeal();
             trdProductDeal2.setTradeId(totleTradeId2);
             trdProductDeal2.setBusiType(DictCodeList.共通业务类型_债券卖出.getValue());
-            trdProductDeal2.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + "_" + dto.getFinprodMarketId());
+            trdProductDeal2.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + "_" + dto.getDeliverBond());
             trdProductDeal2.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
             trdProductDeal2.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             trdProductDeal2.setBranch(0L);
