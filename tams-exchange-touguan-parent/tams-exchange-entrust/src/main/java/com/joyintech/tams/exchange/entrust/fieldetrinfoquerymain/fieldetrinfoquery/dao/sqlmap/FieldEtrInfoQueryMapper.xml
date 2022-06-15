@@ -1669,16 +1669,16 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
         LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
-        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID  = fpt.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on tpd.FINPROD_ID = FTP.FINPROD_ID
         left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
+        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
-        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND	BO.BID_ID = BRT.BID_ID
+        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = BRT.BID_ID
         LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID = #{entrustId}
-        WHERE tpd.TRADE_ID  = (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
-        OR tpd.B_TRADE_ID = (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
+        WHERE tpd.TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
+        OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
         union all
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
@@ -1692,16 +1692,16 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
         LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
-        LEFT JOIN FIN_PRODUCT_TYPE fpt  ON tpd.FINPROD_ID = fpt.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on tpd.FINPROD_ID = FTP.FINPROD_ID
         left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
+        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
-        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND	BO.BID_ID = BRT.BID_ID
+        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = BRT.BID_ID
         LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID = #{entrustId}
-        WHERE tpd.TRADE_ID  = (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
-        OR tpd.B_TRADE_ID = (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
+        WHERE tpd.TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
+        OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
     </select>
 
     <sql id="etrDispatcherDealListInfo">
