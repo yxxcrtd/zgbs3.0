@@ -692,11 +692,11 @@ public class FinBondAsset002Controller extends BaseController{
     @ApiOperation(value = "附件下载", notes = "附件下载")
     @ResponseBody
     @PostMapping( "/downloadFile")
-    public Message<MultipartFile> downloadFile(String seqNo) {
+    public Message<MultipartFile> downloadFile(SysUploadFileInfo file) {
         try {
             logger.info("文件下载开始");
-            if (StringUtil.isNotEmpty(seqNo)) {
-                MultipartFile fileInfo = finBondAssetService.downloadFileInfo(seqNo);
+            if (StringUtil.isNotEmpty(file.getSeqNo())) {
+                MultipartFile fileInfo = finBondAssetService.downloadFileInfo(file.getSeqNo());
                 return new Message<MultipartFile>().success().setData(fileInfo);
             }
             logger.info("文件下载结束");
