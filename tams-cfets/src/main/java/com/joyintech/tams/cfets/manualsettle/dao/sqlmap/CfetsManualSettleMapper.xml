@@ -489,6 +489,9 @@
         <if test="cleanStatus != null and cleanStatus!='' ">
             AND t.cleanStatus= #{cleanStatus}
         </if>
+        <if test="tradePlat_01 != null and tradePlat_01 != '' and tradePlat_02 != null and tradePlat_02 != ''">
+            AND ( t.tradePlat in( #{tradePlat_01},#{tradePlat_02} ) or t.tradePlat is null )
+        </if>
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>
         order by t.settleStatus,t.settleDate,t.finprodType2,t.tgBusiType,t.finprodMarketId,t.cleanStatus)
