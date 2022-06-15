@@ -60,6 +60,11 @@ public class NodeConfigConstant {
      * 场内现券
      */
     public static final String BOND002 = "Bond002";
+
+    /**
+     * 质押式双边回购
+     */
+    public static final String REPO001 = "REPO001";
     /**
      * 质押式回购
      */

@@ -156,11 +156,10 @@
         MST_COUNTER_PARTY T1
         LEFT JOIN MST_CUSTOMER_INFO T2 ON T1.LINK_ID = T2.CUSTOMER_ID
         LEFT JOIN MST_CUSTOMER_INFO_ADD T3 ON T3.CUSTOMER_ID = T2.CUSTOMER_ID
-        WHERE
-        COUNTER_TYPE = #{counterType}
         <where>
+            COUNTER_TYPE = #{counterType}
             <if test="counterId != null and counterId != ''">
-                T1.COUNTER_ID = #{counterId}
+               AND T1.COUNTER_ID = #{counterId}
             </if>
         </where>
     </select>

@@ -232,7 +232,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
         String busiAct = 业务动作_交收确认.getValue();
         if (allDto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                 || allDto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
-            interfaceType = NodeConfigConstant.REPO003;
+            interfaceType = NodeConfigConstant.REPO001;
             busiType = 头寸业务类型_质押式回购到期.getValue();
         }
         if (StringUtil.equals(allDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())
