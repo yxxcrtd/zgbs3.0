@@ -39,11 +39,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>tams-svreport-interf</artifactId>
-			<version>3.0.0</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.joyintech</groupId>-->
+<!--			<artifactId>tams-svreport-interf</artifactId>-->
+<!--			<version>3.0.0</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
@@ -119,42 +119,42 @@
 			</exclusions>
 		</dependency>
 -->
-        <!-- 移动APP -->
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>itext-asian</artifactId>
-			<version>3.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>5.5.8</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>jodconverter</artifactId>
-			<version>2.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>jodconverter-core</artifactId>
-			<version>3.0-beta-4</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>juh</artifactId>
-			<version>3.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>ridl</artifactId>
-			<version>3.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>unoil</artifactId>
-			<version>3.0.1</version>
-		</dependency>
+<!--        &lt;!&ndash; 移动APP &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>com.itextpdf</groupId>-->
+<!--			<artifactId>itext-asian</artifactId>-->
+<!--			<version>5.2.0</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.itextpdf</groupId>-->
+<!--			<artifactId>itextpdf</artifactId>-->
+<!--			<version>5.5.13.2</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.artofsolving</groupId>-->
+<!--			<artifactId>jodconverter</artifactId>-->
+<!--			<version>2.2.2</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.artofsolving.jodconverter</groupId>-->
+<!--			<artifactId>jodconverter-core</artifactId>-->
+<!--			<version>3.0-beta-4</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.joyintech</groupId>-->
+<!--			<artifactId>juh</artifactId>-->
+<!--			<version>3.0.1</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.joyintech</groupId>-->
+<!--			<artifactId>ridl</artifactId>-->
+<!--			<version>3.0.1</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.joyintech</groupId>-->
+<!--			<artifactId>unoil</artifactId>-->
+<!--			<version>3.0.1</version>-->
+<!--		</dependency>-->
 				<!-- 公共基础数据画面 -->
 		<dependency>
 			<groupId>com.joyintech</groupId>
