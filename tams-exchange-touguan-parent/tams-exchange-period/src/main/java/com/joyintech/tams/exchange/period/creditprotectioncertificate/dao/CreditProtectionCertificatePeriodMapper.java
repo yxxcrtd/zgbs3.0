@@ -31,6 +31,8 @@ public interface CreditProtectionCertificatePeriodMapper {
 
     CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(@Param("businessCode") String businessCode);
 
+    String getFinprodName(@Param("finprodId") String finprodId);
+
     List<BillingDetailsDto> getBillingDetailByBusinessCode(@Param("businessCode") String businessCode);
 
     /**
