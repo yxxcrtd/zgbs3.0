@@ -25,8 +25,11 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
     @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "ZC名")
     private String finprodAbbr;
 
-    @ApiModelProperty(name="tradeMarket",value="交易场所")
+    @ApiModelProperty(name = "tradeMarket", value = "交易场所")
     private String tradeMarket;
+
+    @ApiModelProperty(name = "tradeplace", value = "交易场所")
+    private String tradeplace;
 
     @ApiModelProperty(name = "issueClass", value = "发行方式", example = "01")
     private String issueClass;
@@ -209,5 +212,13 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
 
     public void setTradeMarket(String tradeMarket) {
         this.tradeMarket = tradeMarket;
+    }
+
+    public String getTradeplace() {
+        return tradeplace;
+    }
+
+    public void setTradeplace(String tradeplace) {
+        this.tradeplace = tradeplace;
     }
 }
