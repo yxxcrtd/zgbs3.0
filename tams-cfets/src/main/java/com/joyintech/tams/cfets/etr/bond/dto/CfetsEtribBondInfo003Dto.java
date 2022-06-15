@@ -176,6 +176,8 @@ public class CfetsEtribBondInfo003Dto extends EtrEntrust implements ProcessEntit
      */
     private String remark;
 
+    private String rskApproval;
+
     /**
      * 组合分配
      */
@@ -725,5 +727,13 @@ public class CfetsEtribBondInfo003Dto extends EtrEntrust implements ProcessEntit
 
     public void setForcedFinishAmt(BigDecimal forcedFinishAmt) {
         this.forcedFinishAmt = forcedFinishAmt;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
     }
 }

@@ -140,6 +140,8 @@ public class CfetsEtrRepoSaveRequest extends EtrEntrust implements ProcessEntity
      */
     private String recStatus;
 
+    private String rskApproval;
+
 
 
     /**
@@ -367,5 +369,13 @@ public class CfetsEtrRepoSaveRequest extends EtrEntrust implements ProcessEntity
 
     public void setPledgeBondTotalListDetailed(List<CfetsPledgeBondInfoDto> pledgeBondTotalListDetailed) {
         this.pledgeBondTotalListDetailed = pledgeBondTotalListDetailed;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
     }
 }
