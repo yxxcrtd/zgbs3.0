@@ -359,7 +359,9 @@ public class IntegratedQuoteManagement {
             stream = stream.filter(item -> StrUtil.equals(item.getRemark(), remark));
         }
 
-        list = stream.collect(Collectors.toList());
+        List<RepurchaseQuoteReceiveResponse> filterList = stream.collect(Collectors.toList());
+        list.clear();
+        list.addAll(filterList);
     }
 
     /**
