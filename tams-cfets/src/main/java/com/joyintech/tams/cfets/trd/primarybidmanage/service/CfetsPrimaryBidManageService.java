@@ -347,6 +347,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultTotal.setTotalWinId(entity.getTotalWinId());
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
             bidResultTotalMapper.updateByPrimaryKey(bidResultTotal);
+            cfetsPrimaryBidManageMapper.updateBidOrder(entity.getBidId());
             if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                 List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
                 for (TrdFinProductDealTotal trdFinProductDealTotal : trdFinProductDealTotalList) {
