@@ -947,4 +947,10 @@
         WHERE
             SEC_ACCT_ID = #{secAcctId}
     </select>
+
+    <update id="updateBidOrder" parameterType="java.lang.String">
+        update BID_ORDER
+        set IS_WIN = ''
+        where BID_ID = #{bidId,jdbcType=VARCHAR}
+    </update>
 </mapper>
