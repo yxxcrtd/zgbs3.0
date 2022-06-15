@@ -250,7 +250,7 @@
                 AND G1.FINPROD_ID = A1.FINPROD_ID
         WHERE A1.ENTRUST_STATUS = #{ENTRUST_STATUS_03}
             AND A1.TRADE_MARKET IN (#{TRADE_PLACE_03},#{TRADE_PLACE_04})
-            AND A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F01}, #{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}, #{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})
+            AND A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F01}, #{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}, #{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}, #{FINPROD_TYPE_TG_F32}, #{FINPROD_TYPE_TG_F37})
             <if test="portfolioIdList!=null and portfolioIdList.size()>0 ">
                 AND (A1.PORTFOLIO_ID IN
                 <foreach item="item" index="index" collection="portfolioIdList" open="(" close=")" separator=",">
