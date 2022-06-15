@@ -109,7 +109,9 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
                 ptlSubList.add(ptlSub);
             }
         }
+        if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
+            resultMap.put(PTL_SUB_LIST, ptlSubList);
+        }
         resultMap.put(PTL_LIST, ptlList);
-        resultMap.put(PTL_SUB_LIST, ptlSubList);
     }
 }
