@@ -52,9 +52,6 @@ spring:
       max-request-size: 100MB     # 设置单次请求的文件的总大小
   jmx:
     enabled: false                # 关闭jmx监控 
-  mvc:
-    format:
-      date: yyyy-MM-dd            # 时间格式化(非json报文时,服务端参数是日期)
   thymeleaf:
     enabled: true
     encoding: UTF-8
@@ -71,9 +68,11 @@ spring:
     ehcache:
       config: classpath:ehcache_app.xml
   autoconfigure:    exclude:    - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  mvc:
+    format:
+      date: yyyy-MM-dd            # 时间格式化(非json报文时,服务端参数是日期)
   web:
-    resources:      chain:        strategy:          fixed:            enabled: true         #静态资源配置:js和css变更时无需手工清缓存
-  ## JSON ##  
+    resources:      chain:        strategy:          fixed:            enabled: true         #静态资源配置:js和css变更时无需手工清缓存  ## JSON ##  
   jackson:
     locale: zh                           # 当地时区
     deserialization:
