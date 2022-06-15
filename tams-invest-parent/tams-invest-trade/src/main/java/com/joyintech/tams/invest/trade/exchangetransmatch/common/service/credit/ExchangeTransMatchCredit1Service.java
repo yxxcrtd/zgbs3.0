@@ -7,10 +7,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListStl;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -86,6 +83,8 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
                 baseTradeProductDealDto.setTrdDealTotalAdd(this.generateDealTotalAdd(entrustDtoTmp,baseTradeProductDealDto.getTrdFinProductDealTotal()));
                 //生成金融产品交易信息
                 baseTradeProductDealDto.setTrdProductDeal(this.genTrdProductDeal(transDto,entrustDtoTmp,baseTradeProductDealDto.getTrdFinProductDealTotal()));
+                //生成金融产品交易附属表信息
+                baseTradeProductDealDto.setTrdProductDealAdd(this.genTrdProductDealAdd(transDto,entrustDtoTmp,baseTradeProductDealDto.getTrdProductDeal()));
                 //生成组合交易表数据
                 baseTradeProductDealDto.setPtlTrade(this.generatePtlTrade(entrustDtoTmp,baseTradeProductDealDto.getTrdProductDeal()));
                 //生成费用信息list
@@ -105,6 +104,8 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
             baseTradeProductDealDto.setTrdDealTotalAdd(this.generateDealTotalAdd(entrustDto,baseTradeProductDealDto.getTrdFinProductDealTotal()));
             // TODO 生成金融产品交易信息
             baseTradeProductDealDto.setTrdProductDeal(this.genTrdProductDeal(transDto,entrustDto,baseTradeProductDealDto.getTrdFinProductDealTotal()));
+            //生成金融产品交易附属表信息
+            baseTradeProductDealDto.setTrdProductDealAdd(this.genTrdProductDealAdd(transDto,entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
             // TODO 生成组合交易表数据
             baseTradeProductDealDto.setPtlTrade(this.generatePtlTrade(entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
             // TODO 生成费用信息list
@@ -609,4 +610,14 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
         return trdFinProductDealTotal;
     }
 
+    /**
+     * 金融产品交易附属表
+     */
+    public TrdProductDealAdd genTrdProductDealAdd(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto,TrdProductDeal trdProductDeal) {
+        TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
+        BeanUtil.copyPropertiesIgnoreNull(trdProductDealAdd, trdProductDeal);
+        trdProductDealAdd.setEntrustId(entrustDto.getEntrustId());
+        trdProductDealAdd.setPortfolioId(entrustDto.getPortfolioId());
+        return trdProductDealAdd;
+    }
 }

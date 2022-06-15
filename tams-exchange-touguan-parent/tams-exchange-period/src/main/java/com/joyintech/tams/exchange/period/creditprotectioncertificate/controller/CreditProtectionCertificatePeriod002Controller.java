@@ -122,7 +122,7 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             }
             //保护凭证的名义本金数量超过组合下可用数量
             //债券交付数量不超过组合下的债券可用数量
-            boolean isError = StringUtil.equals(CacheUtil.getSysParam("AMOUNT_CONTROL_STL"), "01");
+            boolean softControl = StringUtil.equals(CacheUtil.getSysParam("AMOUNT_CONTROL_STL"), "Y");
             List<BillingDetailsDto> billingDetails = dto.getBillingDetails();
             StringBuilder confirmMessage = new StringBuilder();
             String newSecPositionSwitch = CacheUtil.getSysParam("NEW_SEC_POSITION_SWITCH");
@@ -135,7 +135,7 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
                     amount = creditProtectionCertificatePeriodMapper.getAmountByPortfolioId(dto.getFinprodMarketId(), billingDetail.getPortfolioId(), platformDate);
                 }
                 if (billingDetail.getRepNomCapi().compareTo(amount) > 0) {
-                    if (isError) {
+                    if (!softControl) {
                         ValidMessage validMessage = new ValidMessage();
                         validMessage.setField("repNomCapi");
                         validMessage.setMessage("保护凭证的名义本金数量不可超过组合下可用数量");
@@ -145,7 +145,7 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
                     }
                 }
                 if (billingDetail.getDeliverBondAmount() != null && billingDetail.getDeliveryAmount().compareTo(amount) > 0) {
-                    if (isError) {
+                    if (!softControl) {
                         ValidMessage validMessage = new ValidMessage();
                         validMessage.setField("deliverBondAmount");
                         validMessage.setMessage("债券交付数量不超过该组合下的债券可用数量");

@@ -328,7 +328,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     }
 
     public CommentFunction<CreditProtectionCertificatePeriodSaveDto, String> generateComment(CreditProtectionCertificatePeriodSaveDto dto) {
-        return comment -> "业务编号:(" + dto.getBusiCode() + ")-业务类型(" + dto.getPaBussTypeStr() + ")-平台日(" + DateUtil.format(iPlatformDate.getSysDate()) + ")";
+        return comment -> "业务编号:(" + dto.getBusiCode() + ")-业务类型(" + DictCodeList.共通业务类型_信用保护凭证存续期.getCodeName() + ")-平台日(" + DateUtil.format(iPlatformDate.getSysDate()) + ")";
     }
 
     private BaseBussinessDto genBaseBussinessDto(CreditProtectionCertificatePeriodSaveDto dto) {
