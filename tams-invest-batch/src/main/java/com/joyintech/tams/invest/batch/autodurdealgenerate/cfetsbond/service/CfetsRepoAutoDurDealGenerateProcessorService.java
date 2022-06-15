@@ -350,7 +350,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
     public void insertAndSendPosition(List<TrdBondDurDbInertDto> trdBondDurDbInserts){
         for(TrdBondDurDbInertDto trdBondDurDbInertDto : trdBondDurDbInserts){
             autoPeriodCommonService.insertCfetsTempDealData(trdBondDurDbInertDto);
-            sendPositionMethod(trdBondDurDbInertDto);
+//            sendPositionMethod(trdBondDurDbInertDto);
         }
     }
 
