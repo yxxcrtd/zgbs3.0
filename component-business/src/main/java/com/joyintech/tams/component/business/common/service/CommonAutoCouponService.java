@@ -446,10 +446,10 @@ public class CommonAutoCouponService extends BaseService {
                 finProductTypeConfig.setInputValue2(interfPayhsrcsecinfo.getSectype());
                 finProductTypeConfig.setInputValue3(interfPayhsrcsecinfo.getSectype2());
                 //金融债的时候判断是否次级债
-                if (StringUtil.equals(interfPayhsrcsecinfo.getSectype(),
-                        DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())) {
-                    finProductTypeConfig.setInputValue4(interfPayhsrcsecinfo.getIssecbond());
-                }
+//                if (StringUtil.equals(interfPayhsrcsecinfo.getSectype(),
+//                        DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())) {
+//                    finProductTypeConfig.setInputValue4(interfPayhsrcsecinfo.getIssecbond());
+//                }
                 //同业存单的时候五级是否他行
                 if (StringUtil.equals(interfPayhsrcsecinfo.getSectype(),
                         DictCodeList.WIND一级分类_含债券一级分类等_同业存单.getValue())) {
