@@ -605,17 +605,18 @@ public class InvestmentManagement extends BaseService {
                 InstructionPledge instructionPledge = instructionPledges.get(0);
                 String market = StockCodeUtils.getMarket(instructionPledge.getFinprodMarketId());
                 if (Market.isShMarket(market)) {
-                    pledges.addAll(getInstructionPledges(instructionPledges));
+                    pledges.addAll(getShInstructionPledges(instructionPledges));
                 } else {
+                    //当前债券
+                    List<InstructionPledge> pledgeList = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "00")).collect(Collectors.toList());
+                    pledges.addAll(getSzInstructionPledges(pledgeList));
+
                     //换入债券
                     Optional<InstructionPledge> pledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
                     //换出债券
                     Optional<InstructionPledge> oldPledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "02")).findFirst();
-                    if (pledgeOptional.isPresent() && oldPledgeOptional.isPresent()) {
-                        //当前债券
-                        List<InstructionPledge> pledgeList = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "00")).collect(Collectors.toList());
-                        pledges.addAll(getInstructionPledges(pledgeList));
 
+                    if (pledgeOptional.isPresent() && oldPledgeOptional.isPresent()) {
                         InstructionPledge pledge = new InstructionPledge();
                         BeanUtils.copyProperties(pledgeOptional.get(), pledge);
                         InstructionPledge oldPledge = oldPledgeOptional.get();
@@ -629,8 +630,6 @@ public class InvestmentManagement extends BaseService {
                         pledge.setOldPledgeRatio(oldPledge.getPledgeRatio());
 
                         pledges.add(pledge);
-                    } else {
-                        pledges.addAll(getInstructionPledges(instructionPledges));
                     }
                 }
             }
@@ -638,7 +637,7 @@ public class InvestmentManagement extends BaseService {
         return pledges;
     }
 
-    private List<InstructionPledge> getInstructionPledges(List<InstructionPledge> pledgeList) {
+    private List<InstructionPledge> getShInstructionPledges(List<InstructionPledge> pledgeList) {
         List<InstructionPledge> pledges = Lists.newArrayList();
         Set<String> set = Sets.newHashSet();
         for (InstructionPledge pledge : pledgeList) {
@@ -646,6 +645,44 @@ public class InvestmentManagement extends BaseService {
                 pledges.add(pledge);
             }
         }
+
+        return pledges;
+    }
+
+    private List<InstructionPledge> getSzInstructionPledges(List<InstructionPledge> pledgeList) {
+        List<InstructionPledge> pledges = Lists.newArrayList();
+        Set<String> set = Sets.newHashSet();
+        for (InstructionPledge pledge : pledgeList) {
+            if (StringUtil.equals(pledge.getDisplaceDir(), "00") && set.add(pledge.getFinprodMarketId())) {
+                pledges.add(pledge);
+            }
+        }
+        InstructionPledge instructionPledge = new InstructionPledge();
+        List<String> finprodIds = Lists.newArrayList();
+        List<String> finprodMarketIds = Lists.newArrayList();
+        List<String> finprodAbbrs = Lists.newArrayList();
+        BigDecimal pledgeAmt = BigDecimal.ZERO;
+        BigDecimal pledgeNumber = BigDecimal.ZERO;
+        for (InstructionPledge pledge : pledges) {
+            finprodIds.add(pledge.getFinprodId());
+            finprodMarketIds.add(pledge.getFinprodMarketId());
+            finprodAbbrs.add(pledge.getFinprodAbbr());
+            pledgeAmt = pledgeAmt.add(pledge.getPledgeAmt());
+            pledgeNumber = pledgeNumber.add(pledge.getPledgeNumber());
+        }
+        InstructionPledge pledge = pledges.get(0);
+        instructionPledge.setEntrustId(pledge.getEntrustId());
+        instructionPledge.setTradeMarket(pledge.getTradeMarket());
+        instructionPledge.setDisplaceDir(pledge.getDisplaceDir());
+        instructionPledge.setFinprodId(String.join(",", finprodIds));
+        instructionPledge.setFinprodMarketId(String.join(",", finprodMarketIds));
+        instructionPledge.setFinprodAbbr(String.join(",", finprodAbbrs));
+        instructionPledge.setPledgeAmt(pledgeAmt);
+        instructionPledge.setPledgeNumber(pledgeNumber);
+        instructionPledge.setPledgeRatio(pledgeAmt.divide(pledgeNumber, 2, RoundingMode.HALF_UP));
+
+        pledges.clear();
+        pledges.add(instructionPledge);
         return pledges;
     }
 
