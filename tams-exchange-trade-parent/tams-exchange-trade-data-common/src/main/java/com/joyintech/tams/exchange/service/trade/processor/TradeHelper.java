@@ -1294,9 +1294,7 @@ public class TradeHelper {
     }
 
     private void fillSelfDealerTradeInfo(IntegratedEntrust integratedEntrust) {
-        if (!StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
-                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())
-                || !EntrustUtils.isPledgeAgreementRepurchase(integratedEntrust.getBusiTypeTg())) {
+        if (!isFillDealerTradeInfo(integratedEntrust)) {
             return;
         }
         TradeInfoProRequest dto = new TradeInfoProRequest();
@@ -1320,9 +1318,7 @@ public class TradeHelper {
     }
 
     private void fillPropDealerTradeInfo(IntegratedEntrust integratedEntrust) {
-        if (!StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
-                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())
-                || !EntrustUtils.isPledgeAgreementRepurchase(integratedEntrust.getBusiTypeTg())) {
+        if (!isFillDealerTradeInfo(integratedEntrust)) {
             return;
         }
 
@@ -1349,6 +1345,20 @@ public class TradeHelper {
         Optional<TradeInfoProResponse> propTrade = list.stream()
                 .filter(o -> StringUtil.equals(o.getTraderNo(), integratedEntrust.getPropTradeId())).findFirst();
         propTrade.ifPresent(response -> integratedEntrust.setPropTradeName(response.getTraderName()));
+    }
+
+    private boolean isFillDealerTradeInfo(IntegratedEntrust integratedEntrust) {
+        //新债-协商成交
+        if (StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
+                && EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())) {
+            return true;
+        }
+        //协议回购
+        if (EntrustUtils.isPledgeAgreementRepurchase(integratedEntrust.getBusiTypeTg())) {
+            return true;
+        }
+
+        return false;
     }
 
     public String getEntrustId(Entrust entrust) {
