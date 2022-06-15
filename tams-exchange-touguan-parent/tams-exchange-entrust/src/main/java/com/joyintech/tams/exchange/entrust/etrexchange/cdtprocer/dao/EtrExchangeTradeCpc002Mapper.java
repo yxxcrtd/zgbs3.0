@@ -53,6 +53,8 @@ public interface EtrExchangeTradeCpc002Mapper {
      */
     List<BaseMap> selectCurrTrdData(BaseMap baseMap);
 
+    List<String> isOverMDate(Map<String, Object> map);
+
     /**
      * 查询前一日持仓指标
      * @param baseMap
