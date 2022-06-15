@@ -185,6 +185,7 @@ public class CfetsSettleService extends BaseService {
      */
     public void autoSettle(Date batchDate, List<String> productIdList) {
         if (!StringUtil.equals(CacheUtil.getSysParam("auto_settle_flag"), "Y")) {
+            logger.info("日终自动交收系统参数未开启");
             return;
         }
 //        //删除当日手工交收数据
