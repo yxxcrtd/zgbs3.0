@@ -1,7 +1,7 @@
 prod:
   bussRep: 1
 server:
-  port: 8090
+  port: 8080
   address: 0.0.0.0
   maxHttpHeaderSize: 102400
   context-path: /tams
@@ -15,7 +15,7 @@ spring:
   thymeleaf:
     cache: false
   profiles:
-    active: allinone
+    active: allinone_test
   application:
     name: tams-server
     dfstype: 2
@@ -161,7 +161,7 @@ jixu:
 shiro:
   sessionId: JSESSIONID
   casClientName: tams
-  allowUrl: /core/selectRule,/common/ptlposition/insertPosition,/BussSettleOrderComm/generateSettleOrder,/trade/joyin/**,
+  allowUrl: /core/selectRule,/common/ptlposition/insertPosition,/BussSettleOrderComm/generateSettleOrder,
     /common/trdcommonbase/insertTradeInfo,/TrdFxswapInvestTrade001/doComplete,/TrdBondInvestTrade/**,/BussRepoSec/**,/common/trdcommonbase/selectParam/COM/is_auto_generate_negate_deal,/CstpAutoSelect/**,
     /TrdBondDuration/findAllData,/TrdDepoDuration/selectAllData,/TrdRepoDuration/selectAllData,/TrdProjectDuration/selectAllData,
     /TrdRepoDuration/findEffectiveData,/TrdProjectDuration/findEffectiveData,/TrdPlanInterestDuration/findEffectiveData,
@@ -341,25 +341,25 @@ pagehelper:
   reasonable: false
 ---
 spring:
-  profiles: allinone
+  profiles: allinone_test
   thymeleaf:
     cache: false
-  #  redis:   ##单节点配置
-  #    database: 0
-  #    host: 192.168.90.47
-  #    port: 6379
-  #    timeout: 20000
+  #   redis:   ##单节点配置
   redis:
-    cluster:
-      nodes: 192.168.90.243:6379,192.168.90.243:6380,192.168.90.243:6381,192.168.90.243:6382,192.168.90.243:6383,192.168.90.243:6384
+    database: 0
+    host: 192.168.60.140
+    port: 6379
+    timeout: 20000
+  #    #cluster:
+  #    # nodes: 192.168.70.246:6379,192.168.70.246:6380,192.168.70.246:6381,192.168.70.246:6382,192.168.70.246:6383,192.168.70.246:6384
   redislock:
     redissonEnabled: false
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-#    username: BS303INIT_EXCHANGE0106
-    username: BS303INIT_EXCHANGE0106
-    password: BS303INIT_EXCHANGE0106
+    #username: BS303INIT_TEST1008_MFX
+    username: BS303INIT_TEST1008_MFX
+    password: BS303INIT_TEST1008_MFX
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
@@ -369,11 +369,11 @@ spring:
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS303INIT_EXCHANGE0106
-  sqldirpassword: BS303INIT_EXCHANGE0106
+  sqldiruserName: BS303INIT_TEST1008_MFX
+  sqldirpassword: BS303INIT_TEST1008_MFX
 shiro:
   ssoEnable: false  #是否开启sso验证，可以和joyinsso 统一登录配套使用。如果没有统一登录，但为true的话，就不校验密码
-  #  loginUrl: http://127.0.0.1:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
+  #loginUrl: http://192.168.60.111:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
   allowUrl: /core/selectRule,/common/ptlposition/insertPosition,/BussSettleOrderComm/generateSettleOrder,
     /common/trdcommonbase/insertTradeInfo,/TrdFxswapInvestTrade001/doComplete,/TrdBondInvestTrade/**,/BussRepoSec/**,/common/trdcommonbase/selectParam/COM/is_auto_generate_negate_deal,/CstpAutoSelect/**,
     /TrdBondDuration/findAllData,/TrdDepoDuration/selectAllData,/TrdRepoDuration/selectAllData,/TrdProjectDuration/selectAllData,
@@ -392,26 +392,26 @@ base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_EXCHANGE0106
-    password: BS303INIT_EXCHANGE0106
+    username: BS303INIT_TEST1008_MFX
+    password: BS303INIT_TEST1008_MFX
 interf:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_EXCHANGE0106
-    password: BS303INIT_EXCHANGE0106
+    username: BS303INIT_TEST1008_MFX
+    password: BS303INIT_TEST1008_MFX
 stresstest:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_EXCHANGE0106
-    password: BS303INIT_EXCHANGE0106
+    username: BS303INIT_TEST1008_MFX
+    password: BS303INIT_TEST1008_MFX
 wind:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_EXCHANGE0106
-    password: BS303INIT_EXCHANGE0106
+    username: BS303INIT_TEST1008_MFX
+    password: BS303INIT_TEST1008_MFX
 log:
   path: /home/tams/logs/tams/touguan
   level: debug
@@ -489,10 +489,10 @@ agent:
     host: http://192.168.90.208:1668/dsp
     url: /datarouter/http/json/callTrigger
   query:
-    interval: 10000
+    interval: 100000
     count: 2
   keep:
-    fixRate: 30000
+    fixRate: 300000
   cache:
     path: cache
     clean: 0 0 16 ? * MON-FRI
@@ -505,275 +505,3 @@ url:
 
 #消息推送方式:1-MQ；2-接口(开发使用)
 trd-info-push-mode: 1
-
----
-spring:
-  profiles: test
-  thymeleaf:
-    cache: false
-  #   redis:   ##单节点配置
-  #     database: 0
-  #     host: 192.168.70.246
-  #     port: 6379
-  #     timeout: 20000
-  redis:
-    cluster:
-      nodes: 192.168.60.98:6379,192.168.60.98:6380,192.168.60.98:6381,192.168.60.98:6382,192.168.60.98:6383,192.168.60.98:6384
-  redislock:
-    redissonEnabled: false
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-    reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
-  rabbitmq:
-    # 需求环境使用mq配置如下
-    addresses: 192.168.90.119:5672
-    username: rbmq
-    password: rbmq
-application:
-  sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-  driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS303INIT_TEST1008
-  sqldirpassword: BS303INIT_TEST1008
-shiro:
-  ssoEnable: false  #是否开启sso验证，可以和joyinsso 统一登录配套使用。如果没有统一登录，但为true的话，就不校验密码
-  #loginUrl: http://192.168.60.111:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
-  allowUrl: /core/selectRule,/common/ptlposition/insertPosition,/BussSettleOrderComm/generateSettleOrder,
-    /common/trdcommonbase/insertTradeInfo,/TrdFxswapInvestTrade001/doComplete,/TrdBondInvestTrade/**,/BussRepoSec/**,/common/trdcommonbase/selectParam/COM/is_auto_generate_negate_deal,/CstpAutoSelect/**,
-    /TrdBondDuration/findAllData,/TrdDepoDuration/selectAllData,/TrdRepoDuration/selectAllData,/TrdProjectDuration/selectAllData,
-    /TrdRepoDuration/findEffectiveData,/TrdProjectDuration/findEffectiveData,/TrdPlanInterestDuration/findEffectiveData,
-    /TrdDepoDuration/findEffectiveData,/TrdPlanInterestDuration/selectAllData,/TrdLendDuration/getEntityByMap,
-    /TrdLendDuration/selectAllDataList,/TrdBondDuration/findEffectiveData,/TrdExchangeDuration/findAllData,
-    /TrdRepoDuration/findFinCashInfo,/TrdRepoDuration/findRepoInfo,/service/**,/api/sys/refreshPlatDate,/invest/trade/forwex/TrdForwexInvestTrade002/autosave, /mobileApproval/AssetMobileApproval/getAuditDetailConfig,
-    /invest/trade/bond/TrdBondInvestTrade002/secAutoTrade,/invest/trade/trdrepotrade/TrdRepoTrade002/repoAutoTrade,/cstp/match/*,/CfetsQuotedCommon/**,
-    /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
-    /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
-    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,
-    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile
-base:
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-interf:
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-stresstest:
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-wind:
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-log:
-  path: /home/tams/logs/tams/touguan
-  level: debug
-eureka:
-  client:
-    enabled: false
-jixu:
-  user:
-    type: 2
-xinping:
-  properties:
-    urlIP: 127.0.0.1
-    urlPort: 9191
-tx-lcn:
-  client:
-    managerAddress: 192.168.60.98:8070
-
-# 场内交易使用配置
-netty:
-  port: 9190
-  buffer:
-    recv: 4194304
-    send: 4194304
-    write:
-      high: 81960
-      low: 10240
-  idle:
-    read: 20
-    write: 10
-    all: 0
-  thread:
-    num:
-      boss: 1
-      worker: 10
-scheduled:
-  token:
-    enable: false
-    fixedRate: 20000
-    node: trade1
-  history:
-    cron: 0 30 20 ? * MON-FRI
-  instrument:
-    cron: 0 0 8 ? * MON-FRI
-    price: 0 15 9 ? * MON-FRI
-    flushData: 0 0 9 ? * MON-FRI
-  cacheData:
-    fixedRate: 60000
-  login:
-    fixedRate: 20000
-  tradeAgent:
-    fixedRate: 3000
-terminal:
-  default: default
-trade:
-  thread:
-    msg:
-      num: 8
-    risk:
-      alive: 5000
-      capacity: 128
-
-position:
-  flag: false #是否控制账户持仓，true控制，false不控制
-
-
-
----
-spring:
-  profiles: local  #本地启动建议使用这个配置，修改对应配置信息
-  thymeleaf:
-    cache: false
-  #   redis:   ##单节点配置
-  #     database: 0
-  #     host: 192.168.70.246
-  #     port: 6379
-  #     timeout: 20000
-  redis:
-    cluster:
-      nodes: 192.168.60.98:6379,192.168.60.98:6380,192.168.60.98:6381,192.168.60.98:6382,192.168.60.98:6383,192.168.60.98:6384
-  redislock:
-    redissonEnabled: false
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-    reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
-  rabbitmq:
-    # 需求环境使用mq配置如下
-    addresses: 192.168.90.119:5672
-    username: rbmq
-    password: rbmq
-application:
-  sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-  driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS303INIT_TEST1008
-  sqldirpassword: BS303INIT_TEST1008
-shiro:
-  ssoEnable: false  #是否开启sso验证，可以和joyinsso 统一登录配套使用。如果没有统一登录，但为true的话，就不校验密码
-  #loginUrl: http://192.168.60.111:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
-  allowUrl: /core/selectRule,/common/ptlposition/insertPosition,/BussSettleOrderComm/generateSettleOrder,
-    /common/trdcommonbase/insertTradeInfo,/TrdFxswapInvestTrade001/doComplete,/TrdBondInvestTrade/**,/BussRepoSec/**,/common/trdcommonbase/selectParam/COM/is_auto_generate_negate_deal,/CstpAutoSelect/**,
-    /TrdBondDuration/findAllData,/TrdDepoDuration/selectAllData,/TrdRepoDuration/selectAllData,/TrdProjectDuration/selectAllData,
-    /TrdRepoDuration/findEffectiveData,/TrdProjectDuration/findEffectiveData,/TrdPlanInterestDuration/findEffectiveData,
-    /TrdDepoDuration/findEffectiveData,/TrdPlanInterestDuration/selectAllData,/TrdLendDuration/getEntityByMap,
-    /TrdLendDuration/selectAllDataList,/TrdBondDuration/findEffectiveData,/TrdExchangeDuration/findAllData,
-    /TrdRepoDuration/findFinCashInfo,/TrdRepoDuration/findRepoInfo,/service/**,/api/sys/refreshPlatDate,/invest/trade/forwex/TrdForwexInvestTrade002/autosave, /mobileApproval/AssetMobileApproval/getAuditDetailConfig,
-    /invest/trade/bond/TrdBondInvestTrade002/secAutoTrade,/invest/trade/trdrepotrade/TrdRepoTrade002/repoAutoTrade,/cstp/match/*,/CfetsQuotedCommon/**,
-    /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
-    /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
-    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,
-    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile
-base:
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-interf:
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-stresstest:
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-wind:
-  datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008
-    password: BS303INIT_TEST1008
-log:
-  path: /home/tams/logs/tams/touguan
-  level: debug
-eureka:
-  client:
-    enabled: false
-jixu:
-  user:
-    type: 2
-xinping:
-  properties:
-    urlIP: 127.0.0.1
-    urlPort: 9191
-tx-lcn:
-  client:
-    managerAddress: 192.168.60.98:8070
-
-# 场内交易使用配置
-netty:
-  port: 9190
-  buffer:
-    recv: 4194304
-    send: 4194304
-    write:
-      high: 81960
-      low: 10240
-  idle:
-    read: 20
-    write: 10
-    all: 0
-  thread:
-    num:
-      boss: 1
-      worker: 10
-scheduled:
-  token:
-    enable: false
-    fixedRate: 20000
-    node: trade1
-  history:
-    cron: 0 30 20 ? * MON-FRI
-  instrument:
-    cron: 0 0 8 ? * MON-FRI
-    price: 0 15 9 ? * MON-FRI
-    flushData: 0 0 9 ? * MON-FRI
-  cacheData:
-    fixedRate: 60000
-  login:
-    fixedRate: 20000
-  tradeAgent:
-    fixedRate: 3000
-terminal:
-  default: default
-trade:
-  thread:
-    msg:
-      num: 8
-    risk:
-      alive: 5000
-      capacity: 128
-
-position:
-  flag: false #是否控制账户持仓，true控制，false不控制
-
-
