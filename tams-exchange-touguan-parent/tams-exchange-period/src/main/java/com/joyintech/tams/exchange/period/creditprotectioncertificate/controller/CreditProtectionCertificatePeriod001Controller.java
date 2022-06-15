@@ -15,6 +15,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodMapper;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Request;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Response;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
@@ -76,6 +77,9 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
     @Autowired
     private IPlatformDate iPlatformDate;
 
+    @Autowired
+    private CreditProtectionCertificatePeriodMapper creditProtectionCertificatePeriodMapper;
+
     @ApiOperation(value = "查询画面初始化参数", notes = "查询画面初始化参数")
     @PostMapping("/getPageParams")
     @ResponseBody
@@ -131,6 +135,12 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
         }
         if (null == res) {
             res = new CreditProtectionCertificatePeriodSaveDto();
+        }
+        if (StringUtil.isNotEmpty(res.getDeliverBond())) {
+            String deliverBondStr = creditProtectionCertificatePeriodMapper.getFinprodName(res.getDeliverBond());
+            if (StringUtil.isNotEmpty(deliverBondStr)) {
+                res.setDeliverBond(deliverBondStr);
+            }
         }
         return new Message<CreditProtectionCertificatePeriodSaveDto>().success().setData(res);
     }
