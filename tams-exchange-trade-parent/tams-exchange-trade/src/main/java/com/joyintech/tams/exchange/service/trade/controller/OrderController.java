@@ -176,12 +176,6 @@ public class OrderController {
             integratedEntrust.setEntrustVolume(instruction.getEntrustNum());
         }
 
-        if (StringUtil.isNotEmpty(order.getCounterId())) {
-            Map<String, Object> extend2 = Maps.newHashMap();
-            extend2.put("counterId", order.getCounterId());
-            integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
-        }
-
         String entrustBs = EntrustPropUtils.getEntrustBs(instruction);
         logger.info("综合业务下单：买卖方向（entrustBs）转换：{} ==> {}", integratedEntrust.getEntrustBs(), entrustBs);
         integratedEntrust.setEntrustBs(entrustBs);

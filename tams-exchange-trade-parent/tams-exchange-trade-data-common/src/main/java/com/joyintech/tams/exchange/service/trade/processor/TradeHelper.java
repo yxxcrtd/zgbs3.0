@@ -1239,6 +1239,12 @@ public class TradeHelper {
             String busiTypeTg = instruction.getBusiTypeTg();
             //协议回购
             if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
+                //保存占款天数
+                if (Objects.nonNull(instruction.getCapDays())) {
+                    Map<String, Object> extend2 = Maps.newHashMap();
+                    extend2.put("capDays", instruction.getCapDays().intValue());
+                    integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
+                }
                 integratedEntrust.setBsFlag(EntrustUtils.getPledgeAgreementBsFlag(busiTypeTg, integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs(), integratedEntrust.getConformOrRefuse()));
             } else {
                 integratedEntrust.setBsFlag(EntrustUtils.getBsFlag(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs()));

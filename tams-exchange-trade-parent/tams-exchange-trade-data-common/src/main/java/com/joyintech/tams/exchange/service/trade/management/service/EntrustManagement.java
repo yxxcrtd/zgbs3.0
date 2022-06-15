@@ -21,6 +21,7 @@ import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.common.vo.EntrustVo;
 import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
@@ -271,6 +272,14 @@ public class EntrustManagement extends BaseService {
             }
             if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
                 entrust.setCancelBalance(BigDecimal.valueOf(o.getCancelVolume()).multiply(BigDecimal.valueOf(100)));
+                String extend2 = o.getExtend2();
+                if (StringUtil.isNotEmpty(extend2) && extend2.contains("capDays")) {
+                    Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
+                    entrust.setCapDays(map.get("capDays").toString());
+                }
+                if (StringUtil.equals(投管业务类型_到期续做.getValue(), busiTypeTg)) {
+                    entrust.setTransCode(StringUtil.equals("0", o.getTransCode()) ? "非第三方" : "第三方");
+                }
             }
 
             entrust.setMarket(Market.getMarketName(o.getMarket()));
