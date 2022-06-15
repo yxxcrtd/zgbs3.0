@@ -103,6 +103,16 @@ public class BidPortIntFenPeiInfoDto {
     @ApiModelProperty(name="bidPrinAmt",value="指令投标券面总额")
     private BigDecimal bidPrinAmt;
 
+    private String bidModle;
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
     public String getDipType() {
         return dipType;
     }
@@ -208,8 +218,10 @@ public class BidPortIntFenPeiInfoDto {
     }
 
     public String getDipTypeStr() {
-        String dipTypeStr = SysDataUtil.getNameFromDataDict(DictCode.调整策略, getDipType());
-        if (!StringUtil.isNotEmpty(dipTypeStr)){
+        String dipTypeStr = null;
+        if(StringUtil.equals(this.getBidModle(),"01")) {
+             dipTypeStr = SysDataUtil.getNameFromDataDict(DictCode.调整策略, getDipType());
+        }else {
              dipTypeStr = SysDataUtil.getNameFromDataDict(DictCode.组合分配方式, getDipType());
         }
         return dipTypeStr;

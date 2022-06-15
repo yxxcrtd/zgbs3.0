@@ -214,7 +214,7 @@
     <sql id="onlyRegBidInfo">
         SELECT
             distinct decode(BO.IS_CANCEL,'Y','撤销','N','有效')	effectiveStatusStr,
-            decode(FPT.TYPE_9,'02','01')  AS	finprodType2,
+            decode(FPT.TYPE_9,'01','01','02','01')  AS	finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN 	#{BUSI_TYPE_POSITION_01}
              WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END AS	busiTypePosition,
             FP.finprod_id as finprodId,
@@ -243,7 +243,7 @@
             BRBP.PORTFOLIO_NAME AS	portfolioNames,
             ''									AS	quoteType,
             ''									AS	matchStatus,
-            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FP.ISSUE_TYPE ELSE ''  END issueType,
+            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FPI.ISSUE_CLASS ELSE ''  END issueType,
             BO.REMARK AS	remark,
             decode(BO.IS_CANCEL,'Y','03','N','01') effectiveStatus,
             case when  (BO.IS_CANCEL = 'N' AND ( BO.BID_MODLE = #{WIN_TYPE_03} OR
@@ -367,7 +367,7 @@
     <sql id="onlyWflRegBidInfo">
         SELECT
             '流程中'	effectiveStatusStr,
-            decode(FPT.TYPE_9,'02','01') AS finprodType2,
+            decode(FPT.TYPE_9,'01','01','02','01') AS finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34} END AS	busiTypePosition,
             FP.FINPROD_ID as finprodId,
@@ -396,7 +396,7 @@
             WBRBP.PORTFOLIO_NAME AS	portfolioNames,
             ''	    AS	quoteType,
             ''		AS	matchStatus,
-            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FP.ISSUE_TYPE ELSE '' END issueType,
+            CASE WHEN FPI.ISSUE_CLASS =#{ISSUE_CLASS_01} THEN FPI.ISSUE_CLASS ELSE '' END issueType,
             WBO.REMARK	 AS	remark,
             #{STATUS_VALID_04}	effectiveStatusStr,
             '04' AS regStatus,
@@ -5079,7 +5079,8 @@
                 BRBP.INV_AIM invAim,
                 BRBP.SEC_ACCT_ID secManageAcctId,
                 STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
-                SU.REAL_NAME invManagerId
+                SU.REAL_NAME invManagerId,
+                BO.BID_MODLE  bidModle
             FROM BID_ORDER_BID_PRICE BRBP
             LEFT JOIN BID_ORDER BO
                    ON BRBP.BID_ID = BO.BID_ID
@@ -5116,7 +5117,8 @@
                 WBRBP.INV_AIM invAim,
                 WBRBP.SEC_ACCT_ID secManageAcctId,
                 STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
-                SU.REAL_NAME invManagerId
+                SU.REAL_NAME invManagerId,
+                WBO.BID_MODLE  bidModle
          FROM WFL_BID_ORDER_BID_PRICE WBRBP
          LEFT JOIN WFL_BID_ORDER WBO
                    ON WBRBP.BID_ID = WBO.BID_ID
@@ -5210,7 +5212,8 @@
                   eed.INV_AIM invAim,
                   eed.SEC_ACCT_ID secManageAcctId,
                   ssai.SEC_ACCT_NAME secManageAcctIdStr,
-                  bo.dip_Type dipType
+                  bo.dip_Type dipType,
+                  bo.BID_MODLE  bidModle
         from BID_ORDER bo
          left join BID_ORDER_BID_PRICE brbp on bo.BID_ID = brbp.BID_ID
          left join PTL_PORTFOLIO pp on brbp.PORTFOLIO_ID = pp.PORTFOLIO_ID
@@ -5226,7 +5229,8 @@
                 eed.INV_AIM invAim,
                 eed.SEC_ACCT_ID secManageAcctId,
                 ssai.SEC_ACCT_NAME secManageAcctIdStr,
-                wbo.dip_Type dipType
+                wbo.dip_Type dipType,
+                wbo.BID_MODLE  bidModle
         from WFL_BID_ORDER wbo
          left join WFL_BID_ORDER_BID_PRICE wbrbp on wbo.BID_ID = wbrbp.BID_ID
          left join PTL_PORTFOLIO pp on wbrbp.PORTFOLIO_ID = pp.PORTFOLIO_ID

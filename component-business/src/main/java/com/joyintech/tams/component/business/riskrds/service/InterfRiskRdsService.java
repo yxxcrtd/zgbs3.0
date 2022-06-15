@@ -1968,8 +1968,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                         CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴) ||
                         CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标)) {
                         if (CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入)) {
-                            infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "entrustNum", BigDecimal.ZERO));//券面总额
-                            infRiskRdsDto.setTradeNum(CommonUtil.getBigDecimal(dataMap, "entrustNum", BigDecimal.ZERO));
+                            infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "bidPriceTotal", BigDecimal.ZERO));//券面总额
+                            infRiskRdsDto.setTradeNum(CommonUtil.getBigDecimal(dataMap, "bidPriceTotal", BigDecimal.ZERO));
                         }
                         if (CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴)
                           || CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标)) {

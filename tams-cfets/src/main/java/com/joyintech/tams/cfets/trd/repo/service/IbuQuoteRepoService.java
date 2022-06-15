@@ -2335,7 +2335,7 @@ public class IbuQuoteRepoService extends BaseService {
      * @author jiangpeng
      * @date 2021/12/20 14:44
      */
-    public void doForcedFinish(Map<String, Object> param) {
+    public CfetsEtribBondInfo003Dto doForcedFinish(Map<String, Object> param) {
         String loginUserId = (String) param.get("loginUserId");
         this.setParam(param, 1);
         param.put("loginUserId", loginUserId);
@@ -2371,43 +2371,6 @@ public class IbuQuoteRepoService extends BaseService {
                 etrInvestBondInfoDto.setForcedFinishAmt(ArithmeticUtil.subtract(entrustAmt, finshAmt));
                 dtolist.add(etrInvestBondInfoDto);
             }
-            List<String> entrustIdList = dtolist.stream().map(
-                    CfetsEtribBondInfo003Dto::getEntrustId).collect(Collectors.toList());
-            // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit start
-            if (CollectionUtils.isNotEmpty(entrustIdList)) {
-                Map<String, BigDecimal> etrFinishMap = EntrustCompleteUtil.getEtrFinishAmtList(entrustIdList);
-                //委托没有做过交易的，和撤销相同逻辑，删除预占
-                List<CfetsEtribBondInfo003Dto> recallEntrustIdList = new ArrayList<>();
-                //委托已有完成额度，做过交易，走关闭完成的逻辑，更新预占
-                List<String> closeEntrustIdList = new ArrayList<>();
-                for (CfetsEtribBondInfo003Dto etrDto : dtolist) {
-                    if (StringUtil.isNotEmpty(etrFinishMap) && StringUtil.isNotEmpty(etrFinishMap.get(etrDto.getEntrustId()))
-                            && BigDecimal.ZERO.compareTo(etrFinishMap.get(etrDto.getEntrustId())) < 0) {
-                        closeEntrustIdList.add(etrDto.getEntrustId());
-                    } else if (entrustIdList.contains(etrDto.getEntrustId())) {
-                        recallEntrustIdList.add(etrDto);
-                    }
-                }
-
-                //没有做过交易，直接关闭的
-                if (CollectionUtils.isNotEmpty(recallEntrustIdList)) {
-                    // add by yushilong 批量撤销预占 start
-                    try {
-                        EntrustRdsCommonAop.doListPreOccupy(recallEntrustIdList, DictCodeList.平安资产类型_质押式回购.getValue(),
-                                BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    // add by yushilong 批量撤销预占 end
-                }
-
-                //已经有委托完成度的
-                if (!StringUtil.isEmptyList(closeEntrustIdList)) {
-                    EntrustCompleteUtil.doComplete(closeEntrustIdList);
-                }
-            }
-            // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit end
-            // add by zhangrui1 批量委托关闭 end
 
             if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
                 //插入旧头寸
@@ -2419,7 +2382,12 @@ public class IbuQuoteRepoService extends BaseService {
             cfetsEtrIbBondinfoService.closeDelegatePositionMethod(dtolist, DictCodeList.平安资产类型_质押式回购.getValue());
 //            //更新操作日志
             dtolist.forEach(this::closeDelegatOprHisMethod);
+            CfetsEtribBondInfo003Dto info003Dto = new CfetsEtribBondInfo003Dto();
+            info003Dto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+            info003Dto.setSelectedItem(dtolist);
+            return info003Dto;
         }
+        return null;
     }
 
     /**
