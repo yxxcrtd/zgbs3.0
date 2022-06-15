@@ -56,7 +56,7 @@ public class RiskUtil {
      */
     public static CreditLinesInputDto getCreditLinesInputDto(RiskNodeConfigDtl dtl, Object obj) {
         CreditLinesInputDto inputDto = new CreditLinesInputDto();
-        inputDto.setStatus(DictCodeListExt1.交易状态_初始.getValue());
+        inputDto.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
         if (preList.contains(dtl.getCreditOccupy())) {
             inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
             if (StringUtil.equals(DictCodeListRsk.风险占用类型_预占释放.getValue(), dtl.getCreditOccupy())) {
