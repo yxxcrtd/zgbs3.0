@@ -63,9 +63,9 @@
 		<module>../../microservice/tams-service-container-touguan</module>
 
         <!-- 批处理 -->
-<!--        <module>../../tams-invest-batch</module>-->
-<!--        <module>../../tams-settle-batch</module>-->
-<!--        <module>../../tams-system/touguan/batch</module>-->
+        <module>../../tams-invest-batch</module>
+        <module>../../tams-settle-batch</module>
+        <module>../../tams-system/touguan/batch</module>
 
         <!-- 前台应用 -->
         <module>../../tams-customer-interf</module>
