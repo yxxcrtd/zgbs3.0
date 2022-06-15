@@ -2023,10 +2023,10 @@ public class CfetsEtrDispatcherService extends BaseService {
                     productDto.setPortfolioName(ptlPortfolioMap.get(bidPrice.getPortfolioId()));
                     productDto.setBidPrice(bidPrice.getBidPrice());
                     productDto.setBidPrinAmt(ArithmeticUtil.multiply(bidPrice.getBidPrinAmt(), BigDecimal.valueOf(100)));
-                    Map<String, Object> map = new HashMap<String, Object>();
                     EtrEntrustDetail etrEntrustDetail = etrEntrustDetails.stream()
                             .filter(x -> Objects.equals(x.getPortfolioId(),bidPrice.getPortfolioId())).findFirst().orElse(null);
                     if (etrEntrustDetail != null) {
+                        productDto.setSecAcctId(etrEntrustDetail.getSecAcctId());
                         productDto.setBusinessModel(etrEntrustDetail.getInvAim());
                         productDto.setPortfolioTotalBidPrinAmt(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), BigDecimal.valueOf(100)));
                     }
