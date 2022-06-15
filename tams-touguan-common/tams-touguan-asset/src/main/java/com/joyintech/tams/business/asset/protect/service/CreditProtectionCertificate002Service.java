@@ -532,7 +532,11 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             this.emptyCheck(dto, validList);
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",DictCodeList.是否_否.getValue());
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
@@ -566,14 +570,22 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",DictCodeList.是否_否.getValue());
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息,无法修改"));
             }
         }
         if (StringUtil.equals(operateType, OperationType.DELETE.name())) {
             //删除时，需要判断当前资产是否存在指令及交易数据，如存在，则不允许删除；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), null,null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",null);
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
