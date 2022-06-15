@@ -80,6 +80,12 @@ public class StlSettleTransDataGatherService {
         map.put("PS_T12", DictCodeList.交易方向_红利再投.getValue());
         map.put("PS_T13", DictCodeList.交易方向_除权登记.getValue());
 
+        map.put("SETTLE_SPEED_T_1", 1L);
+        map.put("SETTLE_SPEED_T_0", 0L);
+
+        map.put("SETTLE_MODE_01", DictCodeListStl.交收方式_担保.getValue());
+        map.put("SETTLE_MODE_02", DictCodeListStl.交收方式_非担保.getValue());
+
         return stlSettleTransDataGatherMapper.selectNeedTotalDataList(map);
     }
 

@@ -101,15 +101,17 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
             ptlList.add(ptl);
             if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
                 Map<String, Object> ptlSub = new HashMap<>();
-                ptlSub.put("portfolioId", baseBussinessDto.getTrdProductDeal().getPortfolioId());
-                ptlSub.put(FINPROD_ID, baseBussinessDto.getTrdProductDeal().getFinprodId());
-                ptlSub.put("tradeId", baseBussinessDto.getTrdProductDeal().getTradeId());
-                ptlSub.put("secAcctId", baseBussinessDto.getTrdProductDeal().getSecManageAcctId());
-                ptlSub.put("secAmount", baseBussinessDto.getTrdProductDeal().getShareAmt());
+                ptlSub.put("portfolioId", baseBussinessDto.getTrdProductDeal2().getPortfolioId());
+                ptlSub.put(FINPROD_ID, baseBussinessDto.getTrdProductDeal2().getFinprodId());
+                ptlSub.put("tradeId", baseBussinessDto.getTrdProductDeal2().getTradeId());
+                ptlSub.put("secAcctId", baseBussinessDto.getTrdProductDeal2().getSecManageAcctId());
+                ptlSub.put("secAmount", baseBussinessDto.getTrdProductDeal2().getShareAmt());
                 ptlSubList.add(ptlSub);
             }
         }
+        if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
+            resultMap.put(PTL_SUB_LIST, ptlSubList);
+        }
         resultMap.put(PTL_LIST, ptlList);
-        resultMap.put(PTL_SUB_LIST, ptlSubList);
     }
 }

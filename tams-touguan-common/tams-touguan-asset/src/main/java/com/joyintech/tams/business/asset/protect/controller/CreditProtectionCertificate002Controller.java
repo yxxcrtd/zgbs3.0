@@ -136,19 +136,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
                 //流程代办checkImportData
                 entity = creditProtectionCertificate002Service.getBussinessEntityByWorkflowId(workflowId);
             }
-            //add wsz 修改现实问题 ZGCPCN-1356 start
-            CreditProtectionCertificate002Dto entity2 = null;
-            if(StringUtil.isNotEmpty(entity.getFinprodId())) {
-                entity2 = creditProtectionCertificate002Service.getById(entity.getFinprodId());
-            }
-            if(!Objects.isNull(entity2)){
-                BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
-            } else {
-                entity.setRefSecList(creditProtectionCertificate002Service.getRefList(entity));
-                entity.setRefEntityStr(creditProtectionCertificate002Service.getMstCustomerInfo(entity.getRefEntity()));
-                entity.setIssuershortStr(creditProtectionCertificate002Service.getMstCustomerInfo(entity.getIssuershort()));
-            }
-            //add wsz 修改现实问题 ZGCPCN-1356 end
+            entity = creditProtectionCertificate002Service.getProcessEntity(entity);
             return new Message<CreditProtectionCertificate002Dto>().success().setData(entity);
         } catch(Exception e){
             e.printStackTrace();
@@ -342,7 +330,9 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             CreditProtectionCertificate002Dto request = creditProtectionCertificate002Service.getById(saveRequest.getFinprodMarketId());
             request.setOperateType(OperationType.DELETE.name());
             selectedItem.add(request);
+//            creditProtectionCertificate002Service.delete(request);
         }
+//        return new Message<AjaxResult>().success().setData(new AjaxResult("删除成功"));
         cpc004Dto.setOperateType(OperationType.DELETE.name());
         cpc004Dto.setSelectedItem(selectedItem);
         cpc004Dto.setRemark(cpc004Dto.getRemark());

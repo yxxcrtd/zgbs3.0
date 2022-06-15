@@ -22,6 +22,33 @@ INSERT INTO SYS_DATADICT_LIST_LINK ("DICT_CODE", "ITEM_CODE", "LINKED_DICT_CODE"
 
 DELETE FROM MST_BUSINESS_ID_RULE where PREFIX_NAME = 'JYCDS';
 INSERT INTO MST_BUSINESS_ID_RULE ("SEQ_NO", "COMMON_BUSINESS_TYPE", "TYPE_1", "TYPE_2", "TYPE_3", "TYPE_4", "TYPE_5", "TYPE_6","BUSINESS_ID_RULE_TYPE", "PREFIX_NAME", "PREFIX_SEQUENCE_NAME", "PREFIX_SEQUENCE_LEN", "POSTFIX_NAME", "POSTFIX_SEQUENCE_NAME", "POSTFIX_SEQUENCE_LEN", "DATE_RULE_TYPE", "BUSINESS_ID_SERVICE_NAME", "BUSINESS_ID_METHOD_NAME", "CREATE_USER", "CREATE_DEPT", "CREATE_TIME", "UPDATE_USER", "UPDATE_TIME") VALUES ('0801', 'TRD801', NULL, NULL, NULL, NULL, NULL, NULL, '04', 'JYCDS', NULL, NULL, NULL, 'JYCDS_SEQUENCE', '4', '01', NULL, NULL, 'system', NULL, SYSDATE, 'system', SYSDATE);
+
+drop sequence JYCDS_SEQUENCE;
 create sequence JYCDS_SEQUENCE minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache;
 
 alter table TRD_FEE_CONFIG modify remark VARCHAR2(200);
+
+--手工交收查询头寸接口参数
+DELETE from INTERF_POSITION_CONFIG
+ where TRADE_PLAT = 'TRD_MANUAL_SETTLE'
+   and FINPROD_TYPE = 'F37'
+   and PS in ('T01', 'T02', 'T04')
+   and ENTITY = 'com.joyintech.service.trade.manualsettle.dto.ManualSettleDto';
+
+insert into INTERF_POSITION_CONFIG
+  (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE)
+values
+  ('TRD_MANUAL_SETTLE', 'F37', 'T01', 'STL06', 'TRD', 'com.joyintech.service.trade.manualsettle.dto.ManualSettleDto', 'CPC001', 'system', null,
+   sysdate, 'system', sysdate, '信用保护凭证-买入', 'Y');
+
+insert into INTERF_POSITION_CONFIG
+  (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE)
+values
+  ('TRD_MANUAL_SETTLE', 'F37', 'T02', 'STL06', 'TRD', 'com.joyintech.service.trade.manualsettle.dto.ManualSettleDto', 'CPC001', 'system', null,
+   sysdate, 'system', sysdate, '信用保护凭证-卖出', 'Y');
+
+insert into INTERF_POSITION_CONFIG
+  (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE)
+values
+  ('TRD_MANUAL_SETTLE', 'F37', 'T04', 'STL06', 'TRD', 'com.joyintech.service.trade.manualsettle.dto.ManualSettleDto', 'CPC001', 'system', null,
+   sysdate, 'system', sysdate, '信用保护凭证-申购', 'Y');

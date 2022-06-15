@@ -35,8 +35,8 @@ import java.util.List;
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
 
-//@Component
-//@Aspect
+@Component
+@Aspect
 public class CfetsTradeHandlerAop {
     /**
      * 日志
@@ -230,7 +230,7 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 交收/回溯/交收失败
+     * 交收/回溯
      *
      * @param joinPoint
      * @throws BusinessException

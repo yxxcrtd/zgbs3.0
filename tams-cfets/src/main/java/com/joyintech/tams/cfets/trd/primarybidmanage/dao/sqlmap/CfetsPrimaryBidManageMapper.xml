@@ -44,7 +44,7 @@
         group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
-        WHERE FPI.ISSUE_CLASS = '02' AND BO.BID_MODLE !='03'  AND BO.IS_CANCEL = 'N' AND
+        WHERE FPI.ISSUE_CLASS IN ('02','03') AND BO.BID_MODLE !='03'  AND BO.IS_CANCEL = 'N' AND
         BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE =#{COMMON_BUSINESS_TYPE_TRD97} and
         TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL='N')
         <if test="userId != null and userId != ''">
@@ -316,10 +316,10 @@
                  ELSE '' END winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
-            BRT.PAY_DATE            payDate,
-            BRT.CREDITOR_DEBT_DATE  creditorDebtDate,
-            FPA.LISTING_DATE        listingDate,
-            BRT.WIN_DATE            winDate,
+            decode(BO.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
+            decode(BO.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
+            decode(BO.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+            decode(BO.IS_WIN,'Y', BRT.WIN_DATE )           winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
             BRT.COUNTER_ID          counterId,
@@ -487,10 +487,10 @@
             ELSE '' END             winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
-            BRT.PAY_DATE            payDate,
-            BRT.CREDITOR_DEBT_DATE  creditorDebtDate,
-            FPA.LISTING_DATE        listingDate,
-            BRT.WIN_DATE            winDate,
+            decode(BO.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
+            decode(BO.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
+            decode(BO.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+            decode(BO.IS_WIN,'Y',BRT.WIN_DATE )           winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
             BRT.COUNTER_ID          counterId,
@@ -549,10 +549,10 @@
             ELSE '' END winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
-            BRT.PAY_DATE            payDate,
-            BRT.CREDITOR_DEBT_DATE  creditorDebtDate,
-            FPA.LISTING_DATE        listingDate,
-            BRT.WIN_DATE            winDate,
+            decode(BO.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
+            decode(BO.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
+            decode(BO.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+            decode(BO.IS_WIN,'Y', BRT.WIN_DATE)           winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
             BO.COUNTER_ID          counterId,
@@ -646,18 +646,18 @@
             FP.CCY                   ccy,
             FPI.TENDER_SDATE   bidDateStart,
             FPI.TENDER_EDATE   bidDateEnd,
-            BRT.CREDITOR_DEBT_DATE   creditorDebtDate,
-            FPA.LISTING_DATE listingDate,
-            BRT.WIN_TYPE   winType,
+            decode(BO.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
+            decode(BO.IS_WIN,'Y',FPA.LISTING_DATE)  listingDate,
+            decode(BO.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
             BO.BID_MODLE     bidModle,
-            BO.WIN_PRIN_AMT/10000 totalBiddingNum,
-            BRT.WIN_PRINAMT   winPrinAmt,
+            BO.WIN_PRIN_AMT totalBiddingNum,
+            decode(BO.IS_WIN,'Y',BRT.WIN_PRINAMT)  winPrinAmt,
             BRT.WIN_PRICE       winPrice,
             BRT.SETT_FEE_AMT     settFeeAmt,
-            BRT.REMARK  remark,
+            decode(BO.IS_WIN,'Y',BRT.REMARK,'未中标')  remark,
             FP.TRADE_MARKET  tradeMarket,
             BO.BID_ID  bidId,
-            BRT.PAY_DATE  payDate,
+            decode(BO.IS_WIN,'Y',BRT.PAY_DATE)   payDate,
             BO.PAY_TYPE  payType
         FROM BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
@@ -677,18 +677,18 @@
             FP.CCY                   ccy,
             FPI.TENDER_SDATE   bidDateStart,
             FPI.TENDER_EDATE   bidDateEnd,
-            BRT.CREDITOR_DEBT_DATE   creditorDebtDate,
-            FPA.LISTING_DATE listingDate,
-            BRT.WIN_TYPE   winType,
+            decode(BO.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)   creditorDebtDate,
+            decode(BO.IS_WIN,'Y',FPA.LISTING_DATE) listingDate,
+            decode(BO.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
             BO.BID_MODLE     bidModle,
-            BO.WIN_PRIN_AMT/10000 totalBiddingNum,
-            BRT.WIN_PRINAMT   winPrinAmt,
+            BO.WIN_PRIN_AMT totalBiddingNum,
+            decode(BO.IS_WIN,'Y',BRT.WIN_PRINAMT)   winPrinAmt,
             BRT.WIN_PRICE       winPrice,
             BRT.SETT_FEE_AMT     settFeeAmt,
-            BRT.REMARK  remark,
+            decode(BO.IS_WIN,'Y',BRT.REMARK,'未中标') remark,
             FP.TRADE_MARKET  tradeMarket,
             BO.BID_ID  bidId,
-            BRT.PAY_DATE  payDate,
+            decode(BO.IS_WIN,'Y',BRT.PAY_DATE)  payDate,
             BO.PAY_TYPE  payType
         FROM WFL_BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
@@ -709,7 +709,7 @@
             BRD.BID_PRICE   bidPrice,
             BRD.WIN_PRICE   winPrice,
             BRD.WIN_CPRICE   winCprice,
-            BRD.INT_AMT   intAmt,
+            decode(BO.IS_WIN,'Y',BRD.INT_AMT)   intAmt,
             BRD.PAY_AMT   payAmt,
             BRD.SETT_FEE_AMT     settFeeAmt,
             BRD.INV_AIM   invAim,
@@ -718,6 +718,7 @@
             BOBR.ACCT_NO   acctNo
         FROM BID_RESULT_DETAIL BRD
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN BID_ORDER_BID_PRICE BOBR ON BOBR.BID_ID = BRT.BID_ID
                                           AND BOBR.ENTRUST_ID = BRD.ENTRUST_ID
                                           AND BOBR.PORTFOLIO_ID = BRD.PORTFOLIO_ID
@@ -735,7 +736,7 @@
             BRD.BID_PRICE   bidPrice,
             BRD.WIN_PRICE   winPrice,
             BRD.WIN_CPRICE   winCprice,
-            BRD.INT_AMT   intAmt,
+            decode(BO.IS_WIN,'Y',BRD.INT_AMT)   intAmt,
             BRD.PAY_AMT   payAmt,
             BRD.SETT_FEE_AMT     settFeeAmt,
             BRD.INV_AIM   invAim,
@@ -744,6 +745,7 @@
             BOBR.ACCT_NO   acctNo
         FROM WFL_BID_RESULT_DETAIL BRD
         LEFT JOIN WFL_BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRD.ENTRUST_ID
         LEFT JOIN BID_ORDER_BID_PRICE BOBR ON BOBR.BID_ID = BRT.BID_ID
                                           AND BOBR.ENTRUST_ID = BRD.ENTRUST_ID
@@ -947,4 +949,10 @@
         WHERE
             SEC_ACCT_ID = #{secAcctId}
     </select>
+
+    <update id="updateBidOrder" parameterType="java.lang.String">
+        update BID_ORDER
+        set IS_WIN = ''
+        where BID_ID = #{bidId,jdbcType=VARCHAR}
+    </update>
 </mapper>

@@ -446,10 +446,10 @@ public class CommonAutoCouponService extends BaseService {
                 finProductTypeConfig.setInputValue2(interfPayhsrcsecinfo.getSectype());
                 finProductTypeConfig.setInputValue3(interfPayhsrcsecinfo.getSectype2());
                 //金融债的时候判断是否次级债
-                if (StringUtil.equals(interfPayhsrcsecinfo.getSectype(),
-                        DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())) {
-                    finProductTypeConfig.setInputValue4(interfPayhsrcsecinfo.getIssecbond());
-                }
+//                if (StringUtil.equals(interfPayhsrcsecinfo.getSectype(),
+//                        DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())) {
+//                    finProductTypeConfig.setInputValue4(interfPayhsrcsecinfo.getIssecbond());
+//                }
                 //同业存单的时候五级是否他行
                 if (StringUtil.equals(interfPayhsrcsecinfo.getSectype(),
                         DictCodeList.WIND一级分类_含债券一级分类等_同业存单.getValue())) {
@@ -510,6 +510,7 @@ public class CommonAutoCouponService extends BaseService {
                         finCashCalcRule.setIsInitial(DictCodeList.是否_否.getValue());
                     }
                     finCashCalcRule.setFinprodId(finprodId);
+                    finCashCalcRule.setFinprodType(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                     finCashCalcRule.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                     finCashCalcRule.setBranch(branch);
                     finCashCalcRuleList.add(finCashCalcRule);
@@ -530,6 +531,7 @@ public class CommonAutoCouponService extends BaseService {
                     finCashCalcRule.setYield(interfPayhsrcsecinfo.getPaperir());
                     finCashCalcRule.setIsInitial(DictCodeList.是否_是.getValue());
                     finCashCalcRule.setFinprodId(finprodId);
+                    finCashCalcRule.setFinprodType(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                     finCashCalcRule.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                     finCashCalcRule.setBranch(branch);
                     finCashCalcRuleList.add(finCashCalcRule);

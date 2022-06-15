@@ -406,6 +406,28 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         return entity;
     }
 
+    public CreditProtectionCertificate002Dto getProcessEntity(CreditProtectionCertificate002Dto entity){
+        //add wsz 修改现实问题 ZGCPCN-1356 start
+        CreditProtectionCertificate002Dto entity2 = null;
+        if(StringUtil.isNotEmpty(entity.getFinprodId())) {
+            entity2 = this.getById(entity.getFinprodId());
+        }
+        if(!Objects.isNull(entity2)){
+            BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
+        } else {
+            entity.setRefSecList(this.getRefList(entity));
+            entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
+            entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
+            List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
+            MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
+            mstFileInputParameter.setFileList(uploadInfo);
+            mstFileInputParameter.setBussinessId(entity.getFinprodId());
+            entity.setMstFileInputParameter(mstFileInputParameter);
+        }
+        //add wsz 修改现实问题 ZGCPCN-1356 end
+        return entity;
+    }
+
     public String getRefList(CreditProtectionCertificate002Dto entity){
         if(!StringUtils.isNotEmpty(entity.getRefSec())){
             return null;
@@ -492,12 +514,43 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
                 }
             }
         }
+        if (StringUtil.equals(operateType, "submit")) {
+            this.emptyCheck(dto, validList);
+            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+            }
+        }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             this.emptyCheck(dto, validList);
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",DictCodeList.是否_否.getValue());
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+            }
+            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+                }
             }
         }
         return validList;
@@ -517,14 +570,22 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",DictCodeList.是否_否.getValue());
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息,无法修改"));
             }
         }
         if (StringUtil.equals(operateType, OperationType.DELETE.name())) {
             //删除时，需要判断当前资产是否存在指令及交易数据，如存在，则不允许删除；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), null,null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",null);
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
@@ -539,6 +600,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      * @return
      */
     public String getFinprodId(CreditProtectionCertificate002Dto dto) {
+        if(!dto.getFinprodMarketId().contains(".")){
+            return String.format("%s_%s%s", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),dto.getFinprodMarketId(),dto.getTradeMarketId());
+        }
         return String.format("%s_%s", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),dto.getFinprodMarketId());
     }
 

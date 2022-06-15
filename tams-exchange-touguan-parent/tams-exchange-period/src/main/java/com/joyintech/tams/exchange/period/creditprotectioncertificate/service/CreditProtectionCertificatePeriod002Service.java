@@ -125,10 +125,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
     @Override
     public void doInsert(CreditProtectionCertificatePeriodSaveDto entity, OperationType type) {
-        BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
-        deleteFlow(entity.getWorkflowId());
-        insertFlow(baseBussinessDto, entity);
         if (!StringUtil.equalsIgnoreCase("save", entity.getOperateType())) {
+            BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
+            deleteFlow(entity.getWorkflowId());
+            insertFlow(baseBussinessDto, entity);
             doOldPositionSubmit(entity, false);
             String decisionAct = 系统动作_修改.getValue();
             String systemAct = 系统动作_修改.getValue();
@@ -151,10 +151,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
     @Override
     public void doUpdate(CreditProtectionCertificatePeriodSaveDto entity) {
-        BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
-        deleteFlow(entity.getWorkflowId());
-        insertFlow(baseBussinessDto, entity);
         if (!StringUtil.equalsIgnoreCase("save", entity.getOperateType())) {
+            BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
+            deleteFlow(entity.getWorkflowId());
+            insertFlow(baseBussinessDto, entity);
             doOldPositionSubmit(entity, false);
             String decisionAct = 系统动作_修改.getValue();
             String systemAct = 系统动作_修改.getValue();
@@ -233,8 +233,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
     private void insertDetails(CreditProtectionCertificatePeriodSaveDto entity) {
         List<BillingDetailsDto> billingDetails = entity.getBillingDetails();
+        entity.setBaseBussinessDtos(new ArrayList<>());
         for (BillingDetailsDto billingDetail : billingDetails) {
             BaseBussinessDto baseBussinessDto1 = genBaseBussinessDto2(entity, billingDetail);
+            entity.getBaseBussinessDtos().add(baseBussinessDto1);
 
             //金融产品交易
             TrdProductDeal trdProductDeal = baseBussinessDto1.getTrdProductDeal();
@@ -244,6 +246,19 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             TrdProductDealAdd trdProductDealAdd = baseBussinessDto1.getTrdProductDealAdd();
             trdProductDealAdd.setWorkflowId(entity.getWorkflowId());
             trdProductDealAddMapper.insertSelective(trdProductDealAdd);
+
+            //债券 金融产品交易
+            //金融产品交易
+            if (null != baseBussinessDto1.getTrdProductDeal2()) {
+                TrdProductDeal trdProductDeal2 = baseBussinessDto1.getTrdProductDeal2();
+                trdProductDeal2.setWorkflowId(entity.getWorkflowId());
+                trdProductDealMapper.insert(trdProductDeal2);
+                //金融产品交易附属表
+                TrdProductDealAdd trdProductDealAdd2 = baseBussinessDto1.getTrdProductDealAdd2();
+                trdProductDealAdd2.setWorkflowId(entity.getWorkflowId());
+                trdProductDealAddMapper.insertSelective(trdProductDealAdd2);
+            }
+
             //划款指令表
             StlPayOrders stlPayOrders = baseBussinessDto1.getStlPayOrders();
             stlPayOrders.setWorkflowId(entity.getWorkflowId());
@@ -328,7 +343,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     }
 
     public CommentFunction<CreditProtectionCertificatePeriodSaveDto, String> generateComment(CreditProtectionCertificatePeriodSaveDto dto) {
-        return comment -> "业务编号:(" + dto.getBusiCode() + ")-业务类型(" + dto.getPaBussTypeStr() + ")-平台日(" + DateUtil.format(iPlatformDate.getSysDate()) + ")";
+        return comment -> "业务编号:(" + dto.getBusiCode() + ")-业务类型(" + DictCodeList.共通业务类型_信用保护凭证存续期.getCodeName() + ")-平台日(" + DateUtil.format(iPlatformDate.getSysDate()) + ")";
     }
 
     private BaseBussinessDto genBaseBussinessDto(CreditProtectionCertificatePeriodSaveDto dto) {
@@ -425,7 +440,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             TrdProductDeal trdProductDeal2 = new TrdProductDeal();
             trdProductDeal2.setTradeId(totleTradeId2);
             trdProductDeal2.setBusiType(DictCodeList.共通业务类型_债券卖出.getValue());
-            trdProductDeal2.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + "_" + dto.getFinprodMarketId());
+            trdProductDeal2.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + "_" + dto.getDeliverBond());
             trdProductDeal2.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
             trdProductDeal2.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             trdProductDeal2.setBranch(0L);

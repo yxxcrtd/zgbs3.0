@@ -214,7 +214,7 @@
     <sql id="onlyRegBidInfo">
         SELECT
             distinct decode(BO.IS_CANCEL,'Y','撤销','N','有效')	effectiveStatusStr,
-            decode(FPT.TYPE_9,'01','01','02','01')  AS	finprodType2,
+            decode(FPT.TYPE_9,'01','04','02','01')  AS	finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN 	#{BUSI_TYPE_POSITION_01}
              WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END AS	busiTypePosition,
             FP.finprod_id as finprodId,
@@ -367,7 +367,7 @@
     <sql id="onlyWflRegBidInfo">
         SELECT
             '流程中'	effectiveStatusStr,
-            decode(FPT.TYPE_9,'01','01','02','01') AS finprodType2,
+            decode(FPT.TYPE_9,'01','04','02','01') AS finprodType2,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34} END AS	busiTypePosition,
             FP.FINPROD_ID as finprodId,
@@ -4985,7 +4985,8 @@
                 MCCI.COUNTER_NAME AS counterIdStr,
                 FPI.TENDER_TARGET tenderTarget,
                 FP.CCY  ccy,
-                to_char(FPI.TENDER_SDATE,'yyyy-MM-dd')||'~'|| to_char(FPI.TENDER_EDATE,'yyyy-MM-dd') AS bidDate,
+                FPI.TENDER_SDATE bidDateStart,
+                FPI.TENDER_EDATE bidDateEnd,
                 FPI.PAY_EDATE payEdate,
                 FPI.PAY_DATE payDate,
                 FPI.ASSIGN_REGDATE assignRegdate,
@@ -5028,7 +5029,8 @@
                 MCCI.COUNTER_NAME AS counterIdStr,
                 FPI.TENDER_TARGET tenderTarget,
                 FP.CCY  ccy,
-                to_char(FPI.TENDER_SDATE,'yyyy-MM-dd')||'~'|| to_char(FPI.TENDER_EDATE,'yyyy-MM-dd') AS bidDate,
+                FPI.TENDER_SDATE bidDateStart,
+                FPI.TENDER_EDATE bidDateEnd,
                 FPI.PAY_EDATE payEdate,
                 FPI.PAY_DATE payDate,
                 FPI.ASSIGN_REGDATE assignRegdate,

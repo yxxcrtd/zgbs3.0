@@ -18,24 +18,13 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
 import com.joyintech.tams.common.base.entity.FinProductIssue;
-import com.joyintech.tams.component.business.common.service.CommonBusinessService;
-import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
-import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
-import com.joyintech.tams.component.business.report.asset.bond.dto.BussFinBondRepInfoDto;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.invest.common.service.InvDataCheckService;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 债券标的信息业务验证
@@ -147,8 +136,10 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                     if (subtract.compareTo(new BigDecimal(bidMinUnit))==0){
                         resultList.add(new ValidMessage(getMessage("中标券面总额/中标标位不满足该资产发行要求！")));
                     }
+                }
+                for (int i = 0; i < dto.getAllocationDetails().size(); i++) {
                     BigDecimal[] remainder = dto.getAllocationDetails().get(0).getActWinPrinamt().divideAndRemainder(new BigDecimal(bidMinUnit));
-                    if (remainder[0].compareTo(BigDecimal.ONE)!=0){
+                    if (remainder[1].compareTo(BigDecimal.ZERO)!=0){
                         resultList.add(new ValidMessage(getMessage("中标券面总额不满足该资产发行要求，请确认")));
                     }
                 }

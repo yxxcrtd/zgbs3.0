@@ -252,7 +252,7 @@ public class EntrustStatusService {
         for (EntrustClosePosEtrReqDto cfetsEntrustClosePosEtrReqDto : entrustIdList) {
             String pageId;
             if (StringUtil.equals(cfetsEntrustClosePosEtrReqDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
-                pageId = "IbuQuoteBond";
+                pageId = "CfetsEtrIbBondinfo003";
             } else if (StringUtil.isNotBlank(cfetsEntrustClosePosEtrReqDto.getIssueClass())) {
                 if (StringUtil.equals(DictCodeListExt4.新债_发行方式_报价发行.getValue(), cfetsEntrustClosePosEtrReqDto.getIssueClass())) {
                     pageId = "TenderBondSub001";
@@ -263,14 +263,18 @@ public class EntrustStatusService {
                 pageId = "CfetsEtrIbBondinfo003";
             }
             url = tamsSerever + String.format("/riskTrial/doOccupy/%s/%s/%s", pageId, 系统动作_关闭.getValue(), 流程节点_流程提交.getValue());
-            EtrEntrust etrEntrust = new EtrEntrust();
-            etrEntrust.setEntrustId(cfetsEntrustClosePosEtrReqDto.getCloseId());
-            etrEntrust.setPs(cfetsEntrustClosePosEtrReqDto.getPs());
-            etrEntrust.setTradeMarket(cfetsEntrustClosePosEtrReqDto.getTradeMarket());
+            Map<String,Object> param = new HashMap<>();
+            param.put("entrustId",cfetsEntrustClosePosEtrReqDto.getCloseId());
+            param.put("ps",cfetsEntrustClosePosEtrReqDto.getPs());
+            param.put("tradeMarket",cfetsEntrustClosePosEtrReqDto.getTradeMarket());
+            param.put("assetType",cfetsEntrustClosePosEtrReqDto.getFinprodType2());
+            List<Map<String,Object>> list = new ArrayList<>();
+            list.add(param);
+            param.put("selectedItem",list);
             if (isSingle) {
-                message = simpleRestTemplate.postForObject(url, etrEntrust, Message.class);
+                message = simpleRestTemplate.postForObject(url, param, Message.class);
             } else {
-                message = restTemplate.postForObject(url, etrEntrust, Message.class);
+                message = restTemplate.postForObject(url, param, Message.class);
             }
             logger.info("风险占用更新结果：{}", JsonUtils.object2Json(message));
             if (Objects.nonNull(message) && !"000".equals(message.getCode())) {
