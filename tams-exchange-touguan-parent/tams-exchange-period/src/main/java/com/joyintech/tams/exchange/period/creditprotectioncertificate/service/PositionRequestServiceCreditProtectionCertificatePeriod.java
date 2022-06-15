@@ -70,7 +70,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
         }
 
         resultMap.put("balanceCheck", balanceCheck);
-        resultMap.put(BUSI_TYPE, DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
+        resultMap.put(BUSI_TYPE, DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue());
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_交易登记.getValue());
         if (StringUtil.equals(entity.getPaBussType(), DictCodeListExt1.平安业务类型_到期.getValue())) {
             resultMap.put(PS, DictCodeList.交易方向_到期.getValue());
@@ -82,7 +82,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
 
         resultMap.put(WORK_FLOW_ID, entity.getWorkflowId());
         resultMap.put("ceSettleType", entity.getSettleMethod());
-        resultMap.put("cDate", DateUtil.format(entity.getTradeDate()));
+        resultMap.put("cdate", DateUtil.format(entity.getTradeDate()));
         resultMap.put(CCY, DictCodeList.币种_人民币_CNY.getValue());
 
         List<Map<String, Object>> ptlList = new ArrayList<>();
@@ -109,7 +109,9 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
                 ptlSubList.add(ptlSub);
             }
         }
+        if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
+            resultMap.put(PTL_SUB_LIST, ptlSubList);
+        }
         resultMap.put(PTL_LIST, ptlList);
-        resultMap.put(PTL_SUB_LIST, ptlSubList);
     }
 }

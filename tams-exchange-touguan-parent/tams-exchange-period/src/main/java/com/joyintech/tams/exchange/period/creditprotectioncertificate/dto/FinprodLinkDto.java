@@ -23,13 +23,13 @@ public class FinprodLinkDto {
     /**
      * 金融产品类型（估值核算）
      */
-    @ApiModelProperty(name = "finprodType", value = "     * 金融产品类型（估值核算）")
+    @ApiModelProperty(name = "finprodType", value = "融产品类型（估值核算）")
     private String finprodType;
 
     /**
      * 金融产品类型（投管分类）
      */
-    @ApiModelProperty(name = "finprodType2", value = "     * 金融产品类型（投管分类）")
+    @ApiModelProperty(name = "finprodType2", value = "金融产品类型（投管分类）")
     private String finprodType2;
 
     /**
@@ -84,6 +84,12 @@ public class FinprodLinkDto {
      */
     @ApiModelProperty(name = "refEntity", value = "参考实体")
     private String refEntity;
+
+    /**
+     * 参考实体
+     */
+    @ApiModelProperty(name = "refEntityStr", value = "参考实体Str")
+    private String refEntityStr;
 
 
     /**
@@ -205,5 +211,13 @@ public class FinprodLinkDto {
 
     public void setMdate(Date mdate) {
         this.mdate = mdate;
+    }
+
+    public String getRefEntityStr() {
+        return refEntityStr;
+    }
+
+    public void setRefEntityStr(String refEntityStr) {
+        this.refEntityStr = refEntityStr;
     }
 }

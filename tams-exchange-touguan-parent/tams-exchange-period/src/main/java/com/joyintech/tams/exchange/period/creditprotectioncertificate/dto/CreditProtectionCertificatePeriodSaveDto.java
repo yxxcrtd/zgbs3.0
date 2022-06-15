@@ -103,6 +103,12 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
     private String refEntity;
 
     /**
+     * 参考实体
+     */
+    @ApiModelProperty(name = "refEntityStr",value = "参考实体")
+    private String refEntityStr;
+
+    /**
      * 信用事件
      */
     @ApiModelProperty(name = "creditEvent",value = "信用事件")
@@ -446,6 +452,14 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
 
     public void setDeliverBondAmount(BigDecimal deliverBondAmount) {
         this.deliverBondAmount = deliverBondAmount;
+    }
+
+    public String getRefEntityStr() {
+        return refEntityStr;
+    }
+
+    public void setRefEntityStr(String refEntityStr) {
+        this.refEntityStr = refEntityStr;
     }
 }
 
