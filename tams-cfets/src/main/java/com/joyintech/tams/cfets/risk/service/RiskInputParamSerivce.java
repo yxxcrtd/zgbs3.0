@@ -530,7 +530,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
                 list1.add(bondDto);
             }
-            if (CollectionUtils.isEmpty(entity.getDtoList())) {//处理撤销时
+            if (CollectionUtils.isEmpty(list1) && !CollectionUtils.isEmpty(entity.getBussTrdTransfenpeiDto())) {//处理撤销时
                 for (BussTrdTransfenpeiDto item : entity.getBussTrdTransfenpeiDto()) {
                     TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
                     BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
@@ -538,7 +538,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     list1.add(bondDto);
                 }
             }
-            if (CollectionUtils.isNotEmpty(entity.getTradeDtoList())) {
+            if (CollectionUtils.isEmpty(list1) && CollectionUtils.isNotEmpty(entity.getTradeDtoList())) {
                 list1.addAll(entity.getTradeDtoList());
             }
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);

@@ -357,6 +357,10 @@
         from wfl_etr_entrust_add WHERE ENTRUST_ID = #{entrustId}
     </select>
 
+    <select id="isOverMDate" resultType="java.lang.String">
+        select FINPROD_ID from FIN_PRODUCT where FINPROD_ID = #{finprodId} and MDATE &lt; to_date(#{nowDate},'yyyy-MM-dd')
+    </select>
+
     <sql id="etrExchangeQueryAnd">
         <if test="search != null and search != ''">
             and (

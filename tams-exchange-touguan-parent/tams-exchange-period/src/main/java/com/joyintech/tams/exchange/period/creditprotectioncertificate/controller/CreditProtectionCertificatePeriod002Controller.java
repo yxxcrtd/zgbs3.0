@@ -16,6 +16,7 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -201,7 +202,7 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
         } catch (PositionException e1) {
             logger.error("头寸处理异常", e1);
-            return new Message<AjaxResult>().fail().setData(new AjaxResult(e1.getMessage(), MessageType.错误消息));
+            return PositionUtil.ajaxErrorReturn(e1);
         } catch (Exception e) {
             logger.error("保存失败", e);
             return new Message<AjaxResult>().fail().setData(new AjaxResult("保存失败", MessageType.错误消息));
