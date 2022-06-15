@@ -40,11 +40,13 @@
 		   <artifactId>dc-client</artifactId>
 		   <version>3.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
 		<dependency>
-		   <groupId>net.sf</groupId>
-		   <artifactId>jasperreports</artifactId>
-		   <version>6.4.31</version>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports</artifactId>
+		    <version>6.8.0</version>
 		</dependency>
+		
 		 <dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>

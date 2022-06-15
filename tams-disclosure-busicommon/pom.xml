@@ -20,42 +20,42 @@
   	</dependency>
   	<!--Jasper改造  zhangyf 20190220 start-->
   	<dependency>
-            <groupId>com.joyintech</groupId>
+            <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>2.4.0</version>
         </dependency>
         <dependency>
-            <groupId>com.joyintech</groupId>
+            <groupId>com.lowagie</groupId>
             <artifactId>itext</artifactId>
             <version>2.1.7</version>
         </dependency>
         <dependency>
-            <groupId>com.joyintech</groupId>
+            <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
             <version>6.6.0</version>
         </dependency>
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports-fonts</artifactId>
+		    <version>6.8.0</version>
+		</dependency>
         <dependency>
-            <groupId>com.joyintech</groupId>
-            <artifactId>jasperreports-fonts</artifactId>
-            <version>6.0.0</version>
-        </dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports-functions</artifactId>
+		    <version>6.8.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports-metadata</artifactId>
+		    <version>6.8.0</version>
+		</dependency>
         <dependency>
-            <groupId>com.joyintech</groupId>
-            <artifactId>jasperreports-functions</artifactId>
-            <version>6.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.joyintech</groupId>
-            <artifactId>jasperreports-metadata</artifactId>
-            <version>6.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.joyintech</groupId>
+            <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.2</version>
         </dependency>
         <dependency>
-            <groupId>com.joyintech</groupId>
+            <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
         </dependency>
@@ -64,28 +64,32 @@
             <artifactId>ReportManager</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.apach.commons</groupId>
-            <artifactId>commons-digester</artifactId>
-            <version>1.7</version>
-        </dependency>
-        <dependency>
+		<dependency>
+		    <groupId>commons-digester</groupId>
+		    <artifactId>commons-digester</artifactId>
+		    <version>1.7</version>
+		</dependency>
+       <!--  
+       <dependency>
             <groupId>jasperreports-chart-customizers</groupId>
             <artifactId>jasperreports-chart-customizers</artifactId>
             <version>6.4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>jasperreports-chart-themes</groupId>
-            <artifactId>jasperreports-chart-themes</artifactId>
-            <version>6.4.3</version>
-        </dependency>
+        </dependency> 
+        -->
+        <!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports-chart-themes -->
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports-chart-themes</artifactId>
+		    <version>6.8.0</version>
+		</dependency>
         <!--Jasper改造  zhangyf 20190220 end-->
         <!--add by pingan 20190308 start-->
-        <dependency>
-			<groupId>net.sf</groupId>
-			<artifactId>jasperreports</artifactId>
-			<version>6.4.31</version>
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports</artifactId>
+		    <version>6.8.0</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.jaspersoft</groupId>
 			<artifactId>jasperserver-api-common</artifactId>
@@ -111,17 +115,14 @@
 		 <dependency>
     		<groupId>org.springframework.security</groupId>
     		<artifactId>spring-security-core</artifactId>
-    		<version>4.2.3.RELEASE</version>
 		</dependency>
 		<dependency>
     		<groupId>org.springframework.security</groupId>
     		<artifactId>spring-security-acl</artifactId>
-    		<version>4.2.3.RELEASE</version>
 		</dependency>
 		<dependency>
     		<groupId>org.hibernate</groupId>
     		<artifactId>hibernate-core</artifactId>
-    		<version>3.3.2.GA-HHH-2763</version>
 		</dependency>
 		 <!-- 适配器weblogic必须依赖的包 20190618  end-->
   </dependencies>

@@ -776,7 +776,7 @@ public class DisAssetLiabilityStatementQuery001Service extends CommonExportServi
 			assetList = findAssetsStatementAll(dto);
 			prefix = "全账套";
 		}
-		if (CollectionUtils.isNotEmpty(assetList)) {// 设置总计
+		if (null!=assetList) {// 设置总计
 			assetList.addAll(DisAssetLiabilityStatementUtil.getAssetListSum(assetList));
 		}
 		List<DisAssetLiabilityStatementQuery001Dto> liabilityInterestList = new ArrayList<DisAssetLiabilityStatementQuery001Dto>();
@@ -785,7 +785,7 @@ public class DisAssetLiabilityStatementQuery001Service extends CommonExportServi
 		} else {
 			liabilityInterestList = findLiabilityInterestStatementAll(dto);
 		}
-		if (CollectionUtils.isNotEmpty(liabilityInterestList)) {// 设置总计
+		if (null!=liabilityInterestList) {// 设置总计
 			assembleLiaIntSum(liabilityInterestList);
 			liabilityInterestList
 					.addAll(DisAssetLiabilityStatementUtil.getLiabilityInterestListSum(liabilityInterestList));

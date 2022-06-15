@@ -156,41 +156,46 @@
 
         <!-- 移动APP -->
 		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>itext-asian</artifactId>
-			<version>3.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>5.5.8</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>jodconverter</artifactId>
-			<version>2.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>jodconverter-core</artifactId>
-			<version>3.0-beta-4</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>juh</artifactId>
-			<version>3.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>ridl</artifactId>
-			<version>3.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.joyintech</groupId>
-			<artifactId>unoil</artifactId>
-			<version>3.0.1</version>
+		    <groupId>com.itextpdf</groupId>
+		    <artifactId>itext-asian</artifactId>
+		    <version>5.1.0</version>
 		</dependency>
 
+		<dependency>
+		    <groupId>com.itextpdf</groupId>
+		    <artifactId>itextpdf</artifactId>
+		    <version>5.5.8</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>com.artofsolving</groupId>
+		    <artifactId>jodconverter</artifactId>
+		    <version>2.2.1</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.artofsolving.jodconverter</groupId>
+		    <artifactId>jodconverter-core</artifactId>
+		    <version>3.0-beta-4</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.openoffice</groupId>
+		    <artifactId>juh</artifactId>
+		    <version>3.0.1</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.openoffice</groupId>
+		    <artifactId>ridl</artifactId>
+		    <version>3.0.1</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.openoffice</groupId>
+		    <artifactId>unoil</artifactId>
+		    <version>3.0.1</version>
+		</dependency>
 
 	</dependencies>
 	<build>
