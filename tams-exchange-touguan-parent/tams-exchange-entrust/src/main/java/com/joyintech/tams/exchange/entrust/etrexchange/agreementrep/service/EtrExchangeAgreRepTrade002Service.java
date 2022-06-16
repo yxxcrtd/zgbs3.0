@@ -790,7 +790,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
 //                        dto.setPledgeStampBalance(dto.getRepSecNum().multiply(new BigDecimal(item.get("faceValue").toString())));
 //                    }
 //                });
-                if (faceValueMap.containsKey(tmp.get("stockCode").toString())) {
+                if (faceValueMap.containsKey(tmp.get("stockCode"))) {
                     dto.setPledgeStampBalance(dto.getRepSecNum().multiply(new BigDecimal(faceValueMap.get(tmp.get("stockCode").toString()).toString())));
                 } else {
                     dto.setPledgeStampBalance(dto.getRepSecNum().multiply(new BigDecimal(100)));
