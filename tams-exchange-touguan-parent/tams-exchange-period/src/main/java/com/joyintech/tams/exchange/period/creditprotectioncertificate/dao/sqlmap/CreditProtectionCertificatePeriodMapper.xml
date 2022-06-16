@@ -106,7 +106,13 @@
             <!-- 关键字 -->
             <include refid="findPageQueryConditions"/>
         </where>
-        order by T.finprodMarketId
+        <!--前端传入排序字段-->
+        <if test="pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+            order by T.${pageMode.sort}  ${pageMode.direction}
+        </if>
+        <if test="pageMode.sort == null or pageMode.sort == '' or pageMode.direction == null or pageMode.direction == ''">
+            order by T.finprodMarketId
+        </if>
     </select>
     <select id="findBusiCode" resultType="com.joyintech.framework.select.SelectOptionDto">
         select tfpdl.TOTLE_TRADE_ID id,
