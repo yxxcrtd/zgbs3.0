@@ -32,16 +32,20 @@ import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -660,5 +664,31 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      */
     public int checkAssertOnDealed(String finprodId) {
         return creditProtectionCertificateMapper.checkAssertOnDealed(finprodId);
+    }
+
+    public MultipartFile downloadFileInfo(String seqNo) throws FileNotFoundException {
+        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
+        File pathFile = new SafelyFile(file.getPath());
+        MultipartFile multipartFile = createMultipartFile(pathFile);
+        return multipartFile;
+    }
+
+    private MultipartFile createMultipartFile(File file) {
+        try {
+            FileItem fileItem = null;
+            MultipartFile multipartFile = null;
+            fileItem = new DiskFileItem(file.getName(), Files.probeContentType(file.toPath()),
+                    false, file.getName(), (int) file.length(), file.getParentFile());
+            InputStream input = new FileInputStream(file);
+            OutputStream os = fileItem.getOutputStream();
+            IOUtils.copy(input, os);
+            multipartFile = new CommonsMultipartFile(fileItem);
+            os.close();
+            input.close();
+            return multipartFile;
+        } catch (Exception e) {
+            e.getStackTrace();
+            throw new RuntimeException("File转MultipartFile失败");
+        }
     }
 }
