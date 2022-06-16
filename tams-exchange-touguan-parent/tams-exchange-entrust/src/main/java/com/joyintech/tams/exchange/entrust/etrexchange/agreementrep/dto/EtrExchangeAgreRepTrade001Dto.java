@@ -63,6 +63,7 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private BigDecimal newConRatio;
 	private BigDecimal newRepSecNum;
 	private BigDecimal newPrintAmt;
+	private String outfinprodId;
 	private BigDecimal outRepSecNum;
 	private String outRepSecId;
 	private BigDecimal outAmt;  //换出金额
@@ -604,5 +605,11 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 		this.outPledgeFaceValue = outPledgeFaceValue;
 	}
 
+	public String getOutfinprodId() {
+		return outfinprodId;
+	}
 
+	public void setOutfinprodId(String outfinprodId) {
+		this.outfinprodId = outfinprodId;
+	}
 }

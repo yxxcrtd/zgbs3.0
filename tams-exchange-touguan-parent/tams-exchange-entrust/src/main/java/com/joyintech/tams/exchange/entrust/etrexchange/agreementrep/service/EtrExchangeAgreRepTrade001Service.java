@@ -774,13 +774,14 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             if(StringUtil.isNotEmpty(agreRepHwayChgSecDto.getFinprodId())) {
             	BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepHwayChgSecDto);
                 etrPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getNewRepSecNum(),entity.getNewpledgeFaceValue()));
+                etrPledge.setFinprodId(entity.getNewfinprodId());
                 etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
                 list.add(etrPledge);
                 //换出券
                 if(entity.getOutRepSecNum()!=null){
                     EtrPledge outPledge=new EtrPledge();
                     outPledge.setEntrustId(entity.getEntrustId());
-                    outPledge.setFinprodId(entity.getOutRepSecId());
+                    outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
                     outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
                     //质押率

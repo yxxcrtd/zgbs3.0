@@ -1907,11 +1907,11 @@
                     }
                     var newRepSecNum = $("#newRepSecNum").val();
                     if(newRepSecNum){
-                        $("#newRepSecNum").val(repSecNum/100);
+                        $("#newRepSecNum").val(newRepSecNum/100);
                     }
                     var outRepSecNum = $("#outRepSecNum").val();
                     if(outRepSecNum){
-                        $("#outRepSecNum").val(repSecNum/100);
+                        $("#outRepSecNum").val(outRepSecNum/100);
                     }
                     var ps =  $("#ps").val();
                     if(ps == 'T93' || ps == 'T94'
