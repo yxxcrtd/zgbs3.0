@@ -424,6 +424,15 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             mstFileInputParameter.setBussinessId(entity.getFinprodId());
             entity.setMstFileInputParameter(mstFileInputParameter);
         }
+        if(StringUtils.isNotEmpty(entity.getFinprodMarketId())&&!entity.getFinprodMarketId().contains(".")){
+            String markId = "";
+            if(StringUtils.isEmpty(entity.getTradeMarketId())){
+                markId = ".";
+            } else {
+                markId = entity.getTradeMarketId();
+            }
+            entity.setFinprodMarketId(entity.getFinprodMarketId()+markId);
+        }
         //add wsz 修改现实问题 ZGCPCN-1356 end
         return entity;
     }
@@ -505,27 +514,27 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());
                 if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
-                    validList.add(new ValidMessage("资产代码已存在"));
+                    validList.add(new ValidMessage("资产代码不能重复！"));
                 }
                 String finprodId = getFinprodId(dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
                 if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
-                    validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+                    validList.add(new ValidMessage("资产代码不能重复！"));
                 }
             }
         }
-        if (StringUtil.equals(operateType, "submit")) {
+        if (StringUtil.equals(operateType, "submit") && !Objects.equals(dto.getOperateStatus(),OperationType.MODIFY.name())) {
             this.emptyCheck(dto, validList);
             if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());
                 if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
-                    validList.add(new ValidMessage("资产代码已存在"));
+                    validList.add(new ValidMessage("资产代码不能重复！"));
                 }
                 String finprodId = getFinprodId(dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
                 if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
-                    validList.add(new ValidMessage("资产代码已存在"));
+                    validList.add(new ValidMessage("资产代码不能重复！"));
                 }
             }
         }
@@ -538,18 +547,18 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             map.put("ps",null);
             Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
             }
             if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());
                 if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
-                    validList.add(new ValidMessage("资产代码已存在"));
+                    validList.add(new ValidMessage("资产代码不能重复！"));
                 }
                 String finprodId = getFinprodId(dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
                 if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
-                    validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+                    validList.add(new ValidMessage("资产代码不能重复！"));
                 }
             }
         }
@@ -576,7 +585,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             map.put("ps",null);
             Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息,无法修改"));
+                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
             }
         }
         if (StringUtil.equals(operateType, OperationType.DELETE.name())) {
@@ -587,7 +596,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             map.put("ps",null);
             Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
             }
         }
         return validList;

@@ -13,6 +13,7 @@ import com.joyintech.tams.business.asset.protect.dao.CreditProtectionCertificate
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateRequest;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -116,6 +118,21 @@ public class CreditProtectionCertificate001Service extends BaseService implement
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
+    }
+
+    public Integer countFinprodIdUse(String finprodMarketId){
+        Map<String, Object> map = new HashMap<>();
+        map.put("finprodId",this.getFinprodId(finprodMarketId));
+        map.put("isCancel", DictCodeList.是否_否.getValue());
+        map.put("ps",null);
+        return creditProtectionCertificateMapper.countFinprodIdUse(map);
+    }
+
+    public String getFinprodId(String finprodId){
+        if(!Objects.isNull(finprodId)&&!finprodId.contains(DictCodeList.信用保护凭证类型_信用保护凭证.getValue())){
+            return DictCodeList.信用保护凭证类型_信用保护凭证.getValue()+"_"+ finprodId;
+        }
+        return finprodId;
     }
 
     @Override
