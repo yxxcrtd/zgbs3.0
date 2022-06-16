@@ -41,6 +41,10 @@ public class NodeConfigConstant {
      */
     public static final String TRADE_PLACE = "tradePlace";
     /**
+     * 投标结果 数据字典 DictCode.是否
+     */
+    public static final String BID_RESULT = "bidResult";
+    /**
      * 交易方向 数据字典 DictCode.交易方向
      */
     public static final String PS = "ps";
