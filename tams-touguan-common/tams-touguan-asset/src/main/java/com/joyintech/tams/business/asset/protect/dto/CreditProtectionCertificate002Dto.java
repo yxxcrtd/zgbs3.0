@@ -135,7 +135,7 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     /**
      * 计息基础 - 计费年度天数
      */
-    @ApiModelProperty(name="basis",value="计费年度天数",required = true)
+    @ApiModelProperty(name="basis",value="计费年度天数")
     private String basis;
     /**
      * 结算方式

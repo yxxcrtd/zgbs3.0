@@ -19,6 +19,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -32,10 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 信用保护凭证标的
@@ -174,6 +172,14 @@ public class CreditProtectionCertificate001Controller extends BaseController {
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
+                Integer count = creditProtectionCertificate001Service.countFinprodIdUse(entity.getFinprodMarketId());
+                if (Objects.nonNull(count) && count > 0) {
+                    errorList.add(new ValidMessage("", getMessage("存在流程中/待执行指令交易数据,不可删除!")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
+
             }
         }
         AjaxResult ajaxResult = commonCheck(result, "revoke");
