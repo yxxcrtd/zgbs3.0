@@ -65,8 +65,8 @@ $(function() {
          */
         cols: [[
             { title: 'DayEndAccount001.dzylb',align:'center',sortable: false, colspan: 6}
-            ,{ title: 'DayEndAccount001.cnqssj',align:'center',sortable: false, colspan: 7}
-            ,{ title: 'DayEndAccount001.qsdzdsj',align:'center',sortable: false, colspan: 7}
+            ,{ title: 'DayEndAccount001.cnqssj',align:'center',sortable: false, colspan: 8}
+            ,{ title: 'DayEndAccount001.qsdzdsj',align:'center',sortable: false, colspan: 8}
             , {field: 'seqNo', width: 150, visible: false}
             ,{field:'operation', title: 'SysCommon.operation',rowspan: 2, type:'action', buttons: ['edit']}
         ],[
