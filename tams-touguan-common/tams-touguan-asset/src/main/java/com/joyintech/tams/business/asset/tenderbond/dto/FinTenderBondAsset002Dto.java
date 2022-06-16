@@ -236,6 +236,24 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
     private String isRight;
 
     /**
+     * 是否次级债
+     */
+    @ApiModelProperty(name="isSecBond",value="是否次级债")
+    private String isSecBond;
+
+    /**
+     * 原始权益人
+     */
+    @ApiModelProperty(name="originalOwner",value="原始权益人")
+    private String originalOwner;
+
+    /**
+     * 担保方式
+     */
+    @ApiModelProperty(name="guartype",value="担保方式")
+    private String guartype;
+
+    /**
      * 本金收益特征
      */
     @ApiModelProperty(name="capiIncomeFeature",value="本金收益特征")
@@ -1263,5 +1281,29 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
 
     public void setCirculationDate(Date circulationDate) {
         this.circulationDate = circulationDate;
+    }
+
+    public String getIsSecBond() {
+        return isSecBond;
+    }
+
+    public void setIsSecBond(String isSecBond) {
+        this.isSecBond = isSecBond;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
+    }
+
+    public String getGuartype() {
+        return guartype;
+    }
+
+    public void setGuartype(String guartype) {
+        this.guartype = guartype;
     }
 }
