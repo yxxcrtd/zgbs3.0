@@ -320,7 +320,7 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     }
 
     public String getIssueDateStr() {
-        if (null == this.getIssueDateEnd() && null != this.getIssueDateEnd()) {
+        if (null == this.getIssueDateEnd() && null != this.getIssueDateStart()) {
             return DateUtil.format(this.getIssueDateStart());
         }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {

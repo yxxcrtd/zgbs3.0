@@ -245,6 +245,18 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "delistingDate", value = "摘牌日")
     private Date delistingDate;
 
+    @ApiModelProperty(name = "originalOwner", value = "原始权益人")
+    private String originalOwner;
+
+    @ApiModelProperty(name = "issus", value = "是否永续债,Y是N否")
+    private String issus;
+
+    @ApiModelProperty(name = "issecbond", value = "是否次级债,Y是N否")
+    private String issecbond;
+
+    @ApiModelProperty(name = "guartype", value = "担保方式")
+    private String guartype;
+
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
@@ -369,9 +381,8 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         return raiseMode;
     }
 
-
     public String getRaiseModeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.getRaiseMode());
+        return SysDataUtil.getNameFromDataDict(DictCode.债券类资产募集方式, this.getRaiseMode());
     }
 
     public void setRaiseMode(String raiseMode) {
@@ -597,7 +608,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
             return Objects.nonNull(getStipulationValue()) ? getStipulationValue() + "%" : "";
         } else if (
                 (couponSpecies.equals(BussinessDictCodeList.息票品种_利随本清.getValue())) ||
-                (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_固定利率.getValue().equals(rateType))
+                        (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_固定利率.getValue().equals(rateType))
         ) {
             return Objects.nonNull(getCouponRate()) ? getCouponRate() + "%" : "";
         } else if (couponSpecies.equals(BussinessDictCodeList.息票品种_附息.getValue()) && BussinessDictCodeList.利率类型_浮动利率.getValue().equals(rateType)) {
@@ -920,5 +931,37 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public void setAdditionalTenderEndDate(String additionalTenderEndDate) {
         this.additionalTenderEndDate = additionalTenderEndDate;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
+    }
+
+    public String getIssus() {
+        return issus;
+    }
+
+    public void setIssus(String issus) {
+        this.issus = issus;
+    }
+
+    public String getIssecbond() {
+        return issecbond;
+    }
+
+    public void setIssecbond(String issecbond) {
+        this.issecbond = issecbond;
+    }
+
+    public String getGuartype() {
+        return guartype;
+    }
+
+    public void setGuartype(String guartype) {
+        this.guartype = guartype;
     }
 }

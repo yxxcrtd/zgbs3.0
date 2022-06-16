@@ -399,6 +399,9 @@ public class CommonAutoCouponService extends BaseService {
                 finProduct.setIsSus(interfPayhsrcsecinfo.getIssus());
                 finProduct.setDelistingDate(interfPayhsrcsecinfo.getDelistingDate());
                 // add by lizhi 20190603 是否永续债,Y是N否 end
+                if (StringUtil.isNotBlank(interfPayhsrcsecinfo.getIsRight())) {
+                    finProduct.setIsRight(interfPayhsrcsecinfo.getIsRight());
+                }
                 baseFinProductBaseInfoDto.setFinProduct(finProduct);
                 //new标的类金融产品附属
                 FinProductAdd finProductAdd = new FinProductAdd();
