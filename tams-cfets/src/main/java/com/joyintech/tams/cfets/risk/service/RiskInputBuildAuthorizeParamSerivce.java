@@ -5,6 +5,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
@@ -102,6 +103,30 @@ public class RiskInputBuildAuthorizeParamSerivce extends RiskCommonService {
         dto.setPrinAmt(infoDto.getSubscriptionAmount());
         dto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
         dto.setTradeMarket(DictCodeListExt1.交易场所_银行间.getValue());
+        dto.setPs(DictCodeList.交易方向_买入.getValue());
+        FinProductTypeKey key = new FinProductTypeKey();
+        key.setFinprodId(infoDto.getFinprodId());
+        key.setBranch(0L);
+        FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
+        dto.setAssetSecType(finProductType.getType9());
+        dto.setFinprodId(infoDto.getFinprodId());
+    }
+
+    /**
+     * 构建一级申购授权试算参数
+     *
+     * @param dto  风险dto
+     * @param data 数据
+     * @author jiangpeng
+     * @date 2022/6/10 11:43
+     */
+    void buildCfetsPrimaryBidManageSaveRequestParam(RiskCommonInputDto dto, Object data) {
+        logger.debug("构建中标结果维护授权试算参数:" + JsonUtils.object2Json(data));
+        CfetsPrimaryBidManageSaveRequest infoDto = (CfetsPrimaryBidManageSaveRequest) data;
+        dto.setCounterId(infoDto.getCounterId());
+        dto.setPrinAmt(infoDto.getTotalBiddingNum());
+        dto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
+        dto.setTradeMarket(infoDto.getTradeMarket());
         dto.setPs(DictCodeList.交易方向_买入.getValue());
         FinProductTypeKey key = new FinProductTypeKey();
         key.setFinprodId(infoDto.getFinprodId());

@@ -2587,6 +2587,19 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 infRiskRdsDto.setEventId(StringUtil.isNotEmpty(dataMap.get("bidId")) ? dataMap.get("bidId").toString() : StringUtil.EMPTY);
                 //设置是否是股东发行
                 infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
+            }else if (CommonUtil.isType(v.getEventStatus(), DictCodeListExt4.共同业务类型_一级投标确认_申购_登记)) {
+                infRiskRdsDto.setAmount(finDto.getFpriceAmt());
+                infRiskRdsDto.setTradeNum(finDto.getShareAmt());
+                infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
+//                if (StringUtil.isNotEmpty(dataMap.get("tradeDate"))) {
+                infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("tradeDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+//                } else if (StringUtil.isNotEmpty(dataMap.get("settleDate"))) {
+//                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("settleDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+//                }
+                infRiskRdsDto.setEventId(StringUtil.isNotEmpty(dataMap.get("tradeId")) ? dataMap.get("tradeId").toString() : StringUtil.EMPTY);
+                //设置是否是股东发行
+                infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
             }else{
                 infRiskRdsDto.setAmount(finDto.getFpriceAmt());//债券为全价总额存款
                 // add by zhangrui1 汇总确认 start
