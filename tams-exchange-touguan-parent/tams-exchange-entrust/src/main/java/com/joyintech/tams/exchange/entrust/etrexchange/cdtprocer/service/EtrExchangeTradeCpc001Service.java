@@ -580,7 +580,8 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrSecPositionFlowDtoUnit.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());// 持仓类型
             etrSecPositionFlowDtoUnit.setCdate(iPlatformDate.getSysDate());// 日期
             etrSecPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
-            etrSecPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustNum().multiply(new BigDecimal(-1)));// 数量
+//            etrSecPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustNum().multiply(new BigDecimal(-1)));// 数量
+            etrSecPositionFlowDtoUnit.setAmount(ArithmeticUtil.multiply(etrSinglePortfolioDto.getEntrustNum(),BigDecimal.valueOf(100),BigDecimal.valueOf(-1)));// 数量
             etrSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
             etrSecPositionFlowDtoUnit.setTradeId(etrSinglePortfolioDto.getEntrustId());// 指令编号
             etrSecPositionFlows.add(etrSecPositionFlowDtoUnit);
@@ -601,6 +602,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
                     etrCashPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustAmt().multiply(new BigDecimal(-1)));// 数量
                 }
             }
+            etrCashPositionFlowDtoUnit.setAmount(ArithmeticUtil.multiply(etrCashPositionFlowDtoUnit.getAmount(),BigDecimal.valueOf(100)));
             etrCashPositionFlowDtoUnit.setOrderId(etrSinglePortfolioDto.getEntrustId());// 业务编号
             etrCashPositionFlowDtoUnit.setChlFinprodId(null);// 通道金融产品代码
             etrCashPositionFlowDtoUnit.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());// 冲正标识
