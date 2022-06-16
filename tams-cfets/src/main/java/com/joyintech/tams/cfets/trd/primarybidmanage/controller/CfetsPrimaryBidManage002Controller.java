@@ -391,7 +391,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
     @PostMapping("/selectPortfolioIdList")
     @ApiOperation(value = "组合列表查询", notes = "组合列表查询")
     @ResponseBody
-    public Message<Page<SelectOptionDto>> selectPortfolioIdList(@RequestBody CfetsSearchInfoRequest item) {
+    public Message<Page<SelectOptionDto>> selectPortfolioIdList(@RequestBody SelectOptionCommonRequest item) {
         try {
             Page<SelectOptionDto> dto = cfetsPrimaryBidManage001Service.selectPortfolioIdList(item);
             return new Message<Page<SelectOptionDto>>().success().setData(dto);
