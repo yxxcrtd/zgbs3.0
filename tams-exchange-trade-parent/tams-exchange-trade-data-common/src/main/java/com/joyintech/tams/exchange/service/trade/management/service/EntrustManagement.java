@@ -21,6 +21,7 @@ import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.common.vo.EntrustVo;
@@ -280,6 +281,8 @@ public class EntrustManagement extends BaseService {
                 if (StringUtil.equals(投管业务类型_到期续做.getValue(), busiTypeTg)) {
                     entrust.setTransCode(StringUtil.equals("0", o.getTransCode()) ? "非第三方" : "第三方");
                 }
+                entrust.setOwnerType(EnumUtil.getDescriptionByCode(InvestorType.class, o.getOwnerType()));
+                entrust.setPropOwnerType(EnumUtil.getDescriptionByCode(InvestorType.class, o.getPropOwnerType()));
             }
 
             entrust.setMarket(Market.getMarketName(o.getMarket()));

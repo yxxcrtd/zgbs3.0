@@ -616,18 +616,21 @@ public class InvestmentManagement extends BaseService {
                     //换出债券
                     Optional<InstructionPledge> oldPledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "02")).findFirst();
 
-                    if (pledgeOptional.isPresent() && oldPledgeOptional.isPresent()) {
+                    if (pledgeOptional.isPresent()) {
                         InstructionPledge pledge = new InstructionPledge();
                         BeanUtils.copyProperties(pledgeOptional.get(), pledge);
-                        InstructionPledge oldPledge = oldPledgeOptional.get();
-                        pledge.setOldFinprodId(oldPledge.getFinprodId());
-                        pledge.setOldFinprodAbbr(oldPledge.getFinprodAbbr());
-                        pledge.setOldFinprodMarketId(oldPledge.getFinprodMarketId());
-                        pledge.setOldTradeMarket(oldPledge.getTradeMarket());
-                        pledge.setOldPledgeFaceValue(oldPledge.getPledgeFaceValue());
-                        pledge.setOldPledgeAmt(oldPledge.getPledgeAmt());
-                        pledge.setOldPledgeNumber(oldPledge.getPledgeNumber());
-                        pledge.setOldPledgeRatio(oldPledge.getPledgeRatio());
+
+                        if (oldPledgeOptional.isPresent()) {
+                            InstructionPledge oldPledge = oldPledgeOptional.get();
+                            pledge.setOldFinprodId(oldPledge.getFinprodId());
+                            pledge.setOldFinprodAbbr(oldPledge.getFinprodAbbr());
+                            pledge.setOldFinprodMarketId(oldPledge.getFinprodMarketId());
+                            pledge.setOldTradeMarket(oldPledge.getTradeMarket());
+                            pledge.setOldPledgeFaceValue(oldPledge.getPledgeFaceValue());
+                            pledge.setOldPledgeAmt(oldPledge.getPledgeAmt());
+                            pledge.setOldPledgeNumber(oldPledge.getPledgeNumber());
+                            pledge.setOldPledgeRatio(oldPledge.getPledgeRatio());
+                        }
 
                         pledges.add(pledge);
                     }
