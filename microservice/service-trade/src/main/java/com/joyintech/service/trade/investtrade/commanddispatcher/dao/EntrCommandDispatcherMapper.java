@@ -7,13 +7,14 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.service.trade.investtrade.commanddispatcher.dao;
 
 import java.util.List;
 import java.util.Map;
 
 import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EtrEntrustDetailDto;
+import com.joyintech.tams.common.base.pojo.OriPledgeInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -41,9 +42,16 @@ public interface EntrCommandDispatcherMapper {
      * @since 1.0
      */
     List<EntrCommandDispatcherDto> selectList(Map<String, Object> param);
-    
-    
+
+
     List<EntrTradePledgeDto> queryEtrPledgeListByEtrId(@Param("entrustId") String entrustId);
 
     List<EtrEntrustDetailDto> selectEtrDetailList(Map<String, Object> param);
+
+    /**
+     * 原质押品信息查询
+     * @param param
+     * @return
+     */
+    List<OriPledgeInfo> getOriFinDealPledgeList(@Param("tradeId") String tradeId);
 }

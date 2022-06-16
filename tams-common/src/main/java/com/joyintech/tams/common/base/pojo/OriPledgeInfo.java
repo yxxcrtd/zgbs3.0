@@ -25,6 +25,21 @@ public class OriPledgeInfo {
     private String pledgeFinprodId;
 
     /**
+     * 质押金融产品简称
+     */
+    private String pledgefinprodAbbr;
+
+    /**
+     * 质押金融产品交易场所，银行间、上交所、深交所、柜面等
+     */
+    private String pledgeTradeMarket;
+
+    /**
+     * 质押金融产品市场代码
+     */
+    private String pledgeFinprodMarketId;
+
+    /**
      *回购金额（质押式回购）
      */
     private BigDecimal prin;
@@ -165,5 +180,29 @@ public class OriPledgeInfo {
 
     public void setPledgeTradeAmt(BigDecimal pledgeTradeAmt) {
         this.pledgeTradeAmt = pledgeTradeAmt;
+    }
+
+    public String getPledgefinprodAbbr() {
+        return pledgefinprodAbbr;
+    }
+
+    public void setPledgefinprodAbbr(String pledgefinprodAbbr) {
+        this.pledgefinprodAbbr = pledgefinprodAbbr;
+    }
+
+    public String getPledgeTradeMarket() {
+        return pledgeTradeMarket;
+    }
+
+    public void setPledgeTradeMarket(String pledgeTradeMarket) {
+        this.pledgeTradeMarket = pledgeTradeMarket;
+    }
+
+    public String getPledgeFinprodMarketId() {
+        return pledgeFinprodMarketId;
+    }
+
+    public void setPledgeFinprodMarketId(String pledgeFinprodMarketId) {
+        this.pledgeFinprodMarketId = pledgeFinprodMarketId;
     }
 }

@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EtrEntrustDetailDto;
+import com.joyintech.tams.common.base.pojo.OriPledgeInfo;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +21,7 @@ import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommand
 import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePledgeDto;
 
 /**
- * 
+ *
  * 指令分发接口Service
  * 〈功能详细描述〉
  * @author tanxuan
@@ -26,13 +31,13 @@ import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePl
  */
 @Service
 public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatcherDto>{
-	
+
 	@Autowired
 	private EntrCommandDispatcherMapper entrTradeSysInterfMapper;
-	
+
 	/**
 	 * 指令分发 <功能详细描述>
-	 * 
+	 *
 	 * @param param
 	 * @return
 	 * @see
@@ -61,7 +66,7 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
 		}
 		return dto;
 	}
-	
+
 	/**
      * 指令接口查询
      * <功能详细描述>
@@ -73,7 +78,7 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
     public List<EntrCommandDispatcherDto> selectList(Map<String, Object> param){
     	return entrTradeSysInterfMapper.selectList(param);
     }
-    
+
     /**
      * 指令回购质押品查询
      * <功能详细描述>
@@ -83,8 +88,8 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
      * @since 1.0
      */
     public List<EntrTradePledgeDto> selectPledgeList(List<EntrCommandDispatcherDto> list){
-    	List<EntrTradePledgeDto> pledgelist = new ArrayList<EntrTradePledgeDto>(); 
-    	
+    	List<EntrTradePledgeDto> pledgelist = new ArrayList<EntrTradePledgeDto>();
+
     	if(list != null && !list.isEmpty()) {
 	    	for(EntrCommandDispatcherDto dto : list) {
 	    		if("F02".equals(dto.getFinprodType2()) || "F03".equals(dto.getFinprodType2()) ) {
@@ -92,6 +97,25 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
 		    		if(queryEtrPledgeList!=null && !queryEtrPledgeList.isEmpty()) {
 		    			pledgelist.addAll(queryEtrPledgeList);
 		    		}
+					if (StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg())) {
+
+					} else {
+						List<OriPledgeInfo> oriFinDealPledgeList = entrTradeSysInterfMapper.getOriFinDealPledgeList(dto.getFinprodId());
+						for (OriPledgeInfo oriPledgeInfo : oriFinDealPledgeList) {
+							EntrTradePledgeDto pledgeDto = new EntrTradePledgeDto();
+							BeanUtils.copyProperties(dto, pledgeDto);
+							pledgeDto.setFinprodId(oriPledgeInfo.getPledgeFinprodId());
+							pledgeDto.setFinprodAbbr(oriPledgeInfo.getPledgefinprodAbbr());
+							pledgeDto.setTradeMarket(oriPledgeInfo.getPledgeTradeMarket());
+							pledgeDto.setFinprodMarketId(oriPledgeInfo.getPledgeFinprodMarketId());
+							pledgeDto.setPledgeFaceValue(oriPledgeInfo.getPledgeFaceValue());
+							pledgeDto.setPledgeNumber(oriPledgeInfo.getPledgeNumber());
+							pledgeDto.setPledgeRatio(oriPledgeInfo.getPledgeRatio());
+							pledgeDto.setPledgeAmt(oriPledgeInfo.getPledgeTradeAmt());
+							pledgeDto.setDisplaceDir("00");
+							pledgelist.add(pledgeDto);
+						}
+					}
 	    		}
 	    	}
     	}
