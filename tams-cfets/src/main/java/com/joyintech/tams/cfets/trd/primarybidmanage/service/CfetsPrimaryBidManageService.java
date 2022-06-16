@@ -1724,7 +1724,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
         if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())){
             BigDecimal bidPrice = request.getAllocationDetails().get(0).getBidPrice();
-            bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"BP";
+            bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"元";
         }
         return bidPriceStr;
     }
