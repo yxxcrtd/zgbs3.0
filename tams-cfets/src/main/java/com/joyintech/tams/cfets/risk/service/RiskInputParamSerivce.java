@@ -161,7 +161,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                         .put(NodeConfigConstant.IS_CHECK, isCheck)
                         .put(NodeConfigConstant.DATA, dto);
             } else {
-                return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
+                BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                         .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
                         .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                         .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
@@ -170,12 +170,16 @@ public class RiskInputParamSerivce extends RiskCommonService {
                         .put(NodeConfigConstant.PS, dto.getPs())
                         .put(NodeConfigConstant.IS_CHECK, isCheck)
                         .put(NodeConfigConstant.DATA, dto);
+                if (StringUtil.equals(dto.getPs(), 交易方向_行权回售.getValue())) {
+                    map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
+                }
+                return map;
             }
         }
         if (obj instanceof CfetsEtribSaveRequest || StringUtil.equals(pageId, "CfetsEtrBondInfo")) {
             CfetsEtribSaveRequest allDto = JsonUtils.json2Object(businessJson, CfetsEtribSaveRequest.class);
             CfetsEtribBondInfo003Dto dto = cfetsEtrIbBondinfoService.packageEquity(allDto);
-            return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
+            BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                     .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
@@ -184,6 +188,11 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put(NodeConfigConstant.PS, dto.getPs())
                     .put(NodeConfigConstant.IS_CHECK, isCheck)
                     .put(NodeConfigConstant.DATA, dto);
+
+            if (StringUtil.equals(dto.getPs(), 交易方向_行权回售.getValue())) {
+                map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
+            }
+            return map;
         }
         if (obj instanceof CfetsBondDealQuoteCommonDto || StringUtil.equals(pageId, "IbuQuoteBond004")) {
             CfetsBondDealQuoteCommonDto allDto = JsonUtils.json2Object(businessJson, CfetsBondDealQuoteCommonDto.class);
