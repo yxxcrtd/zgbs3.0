@@ -210,14 +210,14 @@ public class CreditProtectionCertificate002Controller extends BaseController {
      * @see
      * @since 1.0
      */
-    @ApiOperation(value="该资产是否有交易数据check", notes = "该资产是否有交易数据check")
+    @ApiOperation(value="该资产是否有成交数据check", notes = "该资产是否有成交数据check")
     @ResponseBody
     @PostMapping("/isTransInAssetCheck")
     public Message<Boolean> isTransInAssetCheck(@RequestBody FinAssetRateAdjRequest request) {
-        if(commonBusinessService.isTransInAsset(request.getFinprodId())!=0){
-            return Message.success("该资产是否有交易数据check",true);
+        if(creditProtectionCertificate002Service.checkAssertOnDealed(request.getFinprodId())!=0){
+            return Message.success("该资产是否有成交数据check",true);
         }
-        return  Message.success("该资产是否有交易数据check",false);
+        return  Message.success("该资产是否有成交数据check",false);
     }
 
     /**

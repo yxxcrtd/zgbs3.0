@@ -21,6 +21,7 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -86,6 +87,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
 
     @Autowired
     private JoyinFSMapper joyinFSMapper;
+
+    @Autowired
+    private CommonBusinessService commonBusinessService;
 
     /**
      * 保存操作类型
@@ -583,8 +587,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             map.put("finprodId",dto.getFinprodId());
             map.put("isCancel",DictCodeList.是否_否.getValue());
             map.put("ps",null);
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
-            if (Objects.nonNull(count) && count > 0) {
+            int transInAsset = commonBusinessService.isTransInAsset(dto.getFinprodId());
+            int count = creditProtectionCertificateMapper.countForInProcess(dto.getFinprodId());
+            if (transInAsset> 0 ||  count > 0) {
                 validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
             }
         }
@@ -596,7 +601,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             map.put("ps",null);
             Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
+                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可删除"));
             }
         }
         return validList;
@@ -648,4 +653,12 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         ValidUtils.valid(dto, validList);
     }
 
+    /**
+     * 检查资产是否存在成交数据
+     * @param finprodId
+     * @return
+     */
+    public int checkAssertOnDealed(String finprodId) {
+        return creditProtectionCertificateMapper.checkAssertOnDealed(finprodId);
+    }
 }
