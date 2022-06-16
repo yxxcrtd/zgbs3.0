@@ -143,6 +143,7 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     头寸申购方式_代投代缴(DictCode.头寸申购方式,"06","代投代缴"),
     共通业务类型_中标结果维护自主投标(DictCode.共通业务类型,"TRD102","共通业务类型_中标结果维护-自主投标"),
     共通业务类型_中标结果维护代投代缴(DictCode.共通业务类型,"TRD103","共通业务类型_中标结果维护-代投代缴"),
+    共同业务类型_一级投标确认_申购_登记(DictCode.共通业务类型, "TRD95", "一级投标确认-申购-登记"),
             ;
     /**
      * 对应于数据字典code

@@ -1,12 +1,11 @@
 package com.joyintech.tams.cfets.risk.service;
 
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.RiskNodeConfigDtl;
@@ -15,6 +14,7 @@ import com.joyintech.tams.component.business.riskall.utils.RiskUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.trade.dao.CreditLinesDealsMapper;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
@@ -96,11 +96,11 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
     List<CreditLinesInputDto> buildCreditCfetsTrdFirstBidFirmInfoParam(Object data, RiskNodeConfigDtl dtl) {
         logger.debug("一级投标确认 构建授信计算参数:" + JsonUtils.object2Json(data));
         List<CreditLinesInputDto> result = new ArrayList<>();
+        CfetsTrdFirstBidFirmInfoDto dto = (CfetsTrdFirstBidFirmInfoDto) data;
         //这里处理授信
         CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, data);
-        CfetsTrdFirstBidFirmInfoDto dto = (CfetsTrdFirstBidFirmInfoDto) data;
         BeanUtil.copyPropertiesIgnoreNull(inputDto, dto);
-//        inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
+        inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
         inputDto.setTradeId(dto.getBidId());
         inputDto.setFinprodId(dto.getFinprodId());
         inputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
@@ -134,12 +134,12 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
     List<CreditLinesInputDto> buildCreditCfetsTrdBondFirstSubInfoParam(Object data, RiskNodeConfigDtl dtl) {
         logger.debug("一级申购 构建授信计算参数:" + JsonUtils.object2Json(data));
         List<CreditLinesInputDto> result = new ArrayList<>();
-        //这里处理授信
-        CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, data);
         CfetsTrdBondFirstSubInfoDto dto = (CfetsTrdBondFirstSubInfoDto) data;
         FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+        //这里处理授信
+        CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, data);
         BeanUtil.copyPropertiesIgnoreNull(inputDto, dto);
-//        inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
+        inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
         inputDto.setTradeId(dto.getBidId());
         inputDto.setFinprodId(dto.getFinprodId());
         inputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
@@ -149,6 +149,72 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
         inputDto.setTradeAmt(dto.getPayableAmount());
         if (dto.getSubscriptionAmount() != null) {
             inputDto.setShareAmt(dto.getSubscriptionAmount().divide(new BigDecimal(100), RoundingMode.HALF_UP));
+        }
+        result.add(inputDto);
+        return result;
+    }
+
+    /**
+     * 成交确认-一级申购 构建授信计算参数
+     *
+     * @param data 数据
+     * @param dtl  风控节点配置明细表
+     * @return java.util.List<com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto>
+     * @author jiangpeng
+     * @date 2022/6/14 15:51
+     */
+    List<CreditLinesInputDto> buildCreditCfetsTrdFirstBondInvestTradeParam(Object data, RiskNodeConfigDtl dtl) {
+        logger.debug("成交确认-一级申购 构建授信计算参数:" + JsonUtils.object2Json(data));
+        List<CreditLinesInputDto> result = new ArrayList<>();
+        CfetsTrdFirstBondInvestTradeDto dto = (CfetsTrdFirstBondInvestTradeDto) data;
+        CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, null);
+        BeanUtil.copyPropertiesIgnoreNull(inputDto, dto);
+        inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
+        inputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
+        inputDto.setEntrustId(dto.getRegIbuId());
+        inputDto.setTradeDate(dto.getTradeDate());
+        inputDto.setFinprodId(dto.getFinprodId());
+        if (StringUtil.isNotEmpty(dto.getCounterId())) {
+            inputDto.setCounterId(dto.getCounterId());
+        }
+        inputDto.setTradeId(dto.getTotleTradeId());
+        result.add(inputDto);
+        return result;
+    }
+
+    /**
+     * 中表结果维护 构建授信计算参数
+     *
+     * @param data 数据
+     * @param dtl  风控节点配置明细表
+     * @return java.util.List<com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto>
+     * @author jiangpeng
+     * @date 2022/6/14 15:51
+     */
+    List<CreditLinesInputDto> buildCfetsPrimaryBidManageSaveRequestParam(Object data, RiskNodeConfigDtl dtl) {
+        logger.debug("中表结果维护 构建授信计算参数:" + JsonUtils.object2Json(data));
+        List<CreditLinesInputDto> result = new ArrayList<>();
+        CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, data);
+        CfetsPrimaryBidManageSaveRequest dto = (CfetsPrimaryBidManageSaveRequest) data;
+
+        inputDto = new CreditLinesInputDto();
+        BeanUtil.copyPropertiesIgnoreNull(inputDto, dto);
+        inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
+        inputDto.setEntrustId(dto.getBidId());
+        inputDto.setPs(DictCodeList.交易方向_买入.getValue());
+        inputDto.setTradeDate(DateUtil.platDateFromCache());
+        inputDto.setCounterId(dto.getCounterId());
+        inputDto.setTradeId(dto.getTotalWinId());
+        inputDto.setTradeAmt(dto.getTotalBiddingNum());
+        //最新面值
+        BigDecimal newFaceValue = creditLinesDealsMapper.getFaceValue(inputDto);
+        if (newFaceValue == null) {
+            newFaceValue = new BigDecimal(100);
+        }
+        if (inputDto.getShareAmt() != null) {
+            inputDto.setTradeAmt(newFaceValue.multiply(inputDto.getShareAmt()));
+        } else if (inputDto.getTradeAmt() != null) {
+            inputDto.setTradeAmt(newFaceValue.multiply(ArithmeticUtil.divide(inputDto.getTradeAmt(), 100, 2)));
         }
         result.add(inputDto);
         return result;

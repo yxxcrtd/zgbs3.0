@@ -297,7 +297,14 @@
                         and teer.TOTLE_ID = #{totleId}
                     </if>
                    )
-        where issueDateEnd = #{issueDateEnd} and issueDateStart = #{issueDateStart}
+               <where>
+                   <if test="issueDateEnd != null ">
+                       and issueDateEnd = #{issueDateEnd}
+                   </if>
+                   <if test="issueDateStart != null">
+                       and issueDateStart = #{issueDateStart}
+                   </if>
+               </where>
     </select>
 
     <update id="updateBidOrder">
