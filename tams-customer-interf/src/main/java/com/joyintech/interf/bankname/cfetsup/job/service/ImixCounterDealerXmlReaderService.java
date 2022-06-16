@@ -168,7 +168,7 @@ public class ImixCounterDealerXmlReaderService {
 				if (future.get()) {
 					ct++;
 				}
-			} catch (ExecutionException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				// Sonar Fix modify by huwei 220607
 				Thread.currentThread().interrupt();
