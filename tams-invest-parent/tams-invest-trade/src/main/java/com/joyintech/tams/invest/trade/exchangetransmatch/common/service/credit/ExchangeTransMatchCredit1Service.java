@@ -283,14 +283,7 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
         calcFeeAmtPay(transDto, entrustDto,trdProductDeal);
         // 交易方向
         trdProductDeal.setPs(entrustDto.getPs());
-        // 到期收益率和行权收益率
-        this.calc(trdProductDeal);
         trdProductDeal.setTgBusiType(getTgBusiType(entrustDto.getPs()));
-
-        // 到期收益率
-        trdFinProductDealTotal.setYield(trdProductDeal.getYield());
-        // 行权收益率
-        trdFinProductDealTotal.setExerYield(trdProductDeal.getExerYield());
 
         return trdProductDeal;
     }
@@ -435,59 +428,6 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
         trdProductDeal.setFeeAmtUnpay(entrustDto.getMarchFeeAmtUnPay());
         // 总交易费用
         trdProductDeal.setFeeAmt(ArithmeticUtil.doAdd(entrustDto.getMarchFeeAmtPay(), entrustDto.getMarchFeeAmtUnPay()));
-    }
-    /**
-     * 计算债券到期收益率和行权收益率
-     * @param productDeal
-     */
-    public void calc(TrdProductDeal productDeal) {
-        // 设置计算参数
-        TrdBondInvestTradeDto dealParam = new TrdBondInvestTradeDto();
-        dealParam.setFinprodId(productDeal.getFinprodId());
-        dealParam.setTradeAmt(productDeal.getShareAmt().multiply(BigDecimal.valueOf(100)));
-        dealParam.setSettleDate(productDeal.getSettleDate());
-        dealParam.setVdate(productDeal.getVdate());
-        dealParam.setTradeMarket(productDeal.getTradeMarket());
-        dealParam.setTradeMarketMode(productDeal.getTradeMarketMode());
-        dealParam.setPs(productDeal.getPs());
-        dealParam.setUnitInt(productDeal.getUnitInt());
-        dealParam.setUnitFprice(productDeal.getUnitFprice());
-
-        // 设置计算类型为全价总额（根据全价总额计算到期收益率和行权收益率）
-        dealParam.setCalculateField("fpriceAmt");
-        dealParam.setFpriceAmt(productDeal.getFpriceAmt());
-        dealParam.setIntAmt(productDeal.getIntAmt());
-        dealParam.setInvAim(productDeal.getInvAim());
-
-        // 调用债券交易计算逻辑
-        AjaxResult ajaxResult = trdBondInvestTrade002Service.calculateData(dealParam);
-
-        if (ajaxResult != null && StringUtil.isNotEmpty(ajaxResult.getData())) {
-            Object result = ajaxResult.getData();
-            if(result instanceof Map) {
-                Map<String, Object> calcResult = (Map)result;
-                Object yield = calcResult.get("yield");
-                Object exerYield = calcResult.get("exerYield");
-                if(yield instanceof BigDecimal) {
-                    productDeal.setYield((BigDecimal)yield);
-                }
-                else if (yield != null) {
-                    productDeal.setYield(new BigDecimal(yield.toString()));
-                }
-                if(exerYield instanceof BigDecimal) {
-                    productDeal.setExerYield((BigDecimal)exerYield);
-                }
-                else if (exerYield != null) {
-                    productDeal.setExerYield(new BigDecimal(exerYield.toString()));
-                }
-                if (productDeal.getYield() != null){
-                    productDeal.setYield(productDeal.getYield().divide(BigDecimal.valueOf(100)));
-                }
-                if (productDeal.getExerYield() != null){
-                    productDeal.setExerYield(productDeal.getExerYield().divide(BigDecimal.valueOf(100)));
-                }
-            }
-        }
     }
 
     private TrdDealTotalAdd generateDealTotalAdd(ExchangeTransMatchCommonEntrustDto entrustDto, TrdFinProductDealTotal trdFinProductDealTotal) {
