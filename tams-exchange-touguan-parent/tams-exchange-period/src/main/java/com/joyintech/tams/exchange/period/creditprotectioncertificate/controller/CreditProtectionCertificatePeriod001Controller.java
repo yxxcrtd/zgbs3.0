@@ -148,7 +148,7 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
         //展示单位万元
         if(!CollectionUtils.isEmpty(res.getBillingDetails())){
             res.getBillingDetails().forEach(entity->{
-                entity.setDeliveryAmount(ArithmeticUtil.divide(entity.getDeliveryAmount(),10000,2));
+//                entity.setDeliveryAmount(ArithmeticUtil.divide(entity.getDeliveryAmount(),10000,2));
                 entity.setDeliverBondAmount(ArithmeticUtil.divide(entity.getDeliverBondAmount(),10000,2));
                 entity.setRepNomCapi(ArithmeticUtil.divide(entity.getRepNomCapi(),10000,2));
             });
