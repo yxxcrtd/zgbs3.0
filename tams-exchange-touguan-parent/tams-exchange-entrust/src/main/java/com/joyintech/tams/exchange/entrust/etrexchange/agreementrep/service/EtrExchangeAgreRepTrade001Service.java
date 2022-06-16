@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.background.component.order.exchange.common.dto.EtrPledgeDto;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
@@ -1405,6 +1406,32 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepHwayChgSecDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepHwayChgSecDto);
+            List<EtrPledgeDto> list=new ArrayList<>();
+            EtrPledgeDto etrPledge=new EtrPledgeDto();
+            if(StringUtil.isNotEmpty(agreRepHwayChgSecDto.getFinprodId())) {
+                BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepHwayChgSecDto);
+                etrPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getNewRepSecNum(),entity.getNewpledgeFaceValue()));
+                etrPledge.setFinprodId(entity.getNewfinprodId());
+                etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                list.add(etrPledge);
+                //换出券
+                if(entity.getOutRepSecNum()!=null){
+                    EtrPledgeDto outPledge=new EtrPledgeDto();
+                    outPledge.setEntrustId(entity.getEntrustId());
+                    outPledge.setFinprodId(entity.getOutfinprodId());
+                    // 质押面值
+                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    //质押率
+                    outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(),new BigDecimal(100),2));
+                    // 质押数量
+                    outPledge.setPledgeNumber(entity.getOutRepSecNum());
+                    // 质押金额
+                    outPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getOutRepSecNum(),entity.getOutPledgeFaceValue()));
+                    outPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+                    list.add(outPledge);
+                }
+                agreRepHwayChgSecDto.setList(list);
+            }
         }else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
 
             BeanUtil.copyProperties(agreRepOpenSecDto, etrSinglePortfolioDto);

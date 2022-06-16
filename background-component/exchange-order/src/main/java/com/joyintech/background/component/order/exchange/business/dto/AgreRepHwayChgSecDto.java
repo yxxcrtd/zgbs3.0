@@ -12,9 +12,11 @@ package com.joyintech.background.component.order.exchange.business.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import com.joyintech.background.component.common.pack.common.validation.annotation.Length;
 import com.joyintech.background.component.order.exchange.common.constant.DictCodeList;
+import com.joyintech.background.component.order.exchange.common.dto.EtrPledgeDto;
 import com.joyintech.background.component.order.exchange.common.dto.EtrSinglePortfolioDto;
 
 
@@ -138,6 +140,8 @@ public class AgreRepHwayChgSecDto extends EtrSinglePortfolioDto {
 	 * 旧质押券的金融产品代码
 	 */
 	private String oldFinprodId;
+
+	List<EtrPledgeDto> list;
 
 	public String getTradeId() {
 		return tradeId;
@@ -285,5 +289,13 @@ public class AgreRepHwayChgSecDto extends EtrSinglePortfolioDto {
 
 	public void setOldFinprodId(String oldFinprodId) {
 		this.oldFinprodId = oldFinprodId;
+	}
+
+	public List<EtrPledgeDto> getList() {
+		return list;
+	}
+
+	public void setList(List<EtrPledgeDto> list) {
+		this.list = list;
 	}
 }
