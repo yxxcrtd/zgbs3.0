@@ -184,6 +184,15 @@ public class MskCreditMarketInfo002Controller extends BaseController {
         return new Message<MskCreditInfoProSaveRequest>().success().setData(resultDto);
     }
 
+    @ApiOperation(value = "获取信用保护基本信息", notes = "获取信用保护基本信息")
+    @ResponseBody
+    @PostMapping("/getPrice")
+    public Message<MskCreditInfoProSaveRequest> getPrice(@RequestBody MskCreditInfoProSaveRequest request){
+
+        MskCreditInfoProSaveRequest resultDto = mskCreditMarketInfoPro001Service.getPrice(request);
+        return new Message<MskCreditInfoProSaveRequest>().success().setData(resultDto);
+    }
+
 
     /**
      *  获取流程中信息
