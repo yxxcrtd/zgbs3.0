@@ -106,6 +106,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
                 ptlSub.put("tradeId", baseBussinessDto.getTrdProductDeal2().getTradeId());
                 ptlSub.put("secAcctId", baseBussinessDto.getTrdProductDeal2().getSecManageAcctId());
                 ptlSub.put("secAmount", baseBussinessDto.getTrdProductDeal2().getShareAmt());
+                ptlSub.put(OWN_SEC_AMOUNT, baseBussinessDto.getTrdProductDeal2().getShareAmt());
                 ptlSubList.add(ptlSub);
             }
         }
