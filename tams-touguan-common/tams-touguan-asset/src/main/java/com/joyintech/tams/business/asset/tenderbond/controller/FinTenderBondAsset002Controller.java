@@ -78,7 +78,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.put("ISSUE_STAGE", this.getSelectDataFromDataDic(DictCode.发行阶段, null));
         params.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         params.put("REGIST_ORG", this.getSelectDataFromDataDic(DictCode.登记托管机构, null));
-        params.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.募集方式, null));
+        params.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.债券类资产募集方式, null));
         params.put("ISSUE_TYPE", this.getSelectDataFromDataDic(DictCode.新债_发行方式, null));
         params.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
         params.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
