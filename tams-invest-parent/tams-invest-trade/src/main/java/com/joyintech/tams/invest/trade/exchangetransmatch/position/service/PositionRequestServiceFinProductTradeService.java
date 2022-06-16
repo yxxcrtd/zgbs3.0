@@ -400,8 +400,6 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         resultMap.put(BUSI_ACT, getBusiAct(trdProductDeal));
         resultMap.put(PS, trdProductDeal.getPs());
         resultMap.put(TRADE_PLACE, trdProductDeal.getTradeMarket());
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建);
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建);
         resultMap.put(WORK_FLOW_ID, trdProductDeal.getWorkflowId());
         resultMap.put("ceSettleType", null);
         resultMap.put("cdate", DateUtil.format(trdProductDeal.getTradeDate()));
