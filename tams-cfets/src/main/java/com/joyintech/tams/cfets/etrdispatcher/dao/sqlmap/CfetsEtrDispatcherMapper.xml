@@ -1013,6 +1013,7 @@
     <select id="getEtrFxmrBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
             '02' firstBidStatus /*中标状态*/,
             BO.BID_ID   bidId,
             FP.FINPROD_ID finprodId,
@@ -1109,6 +1110,7 @@
         UNION ALL
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
+        #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
         '02' firstBidStatus /*中标状态*/,
         BO.BID_ID   bidId,
         FP.FINPROD_ID finprodId,
@@ -1206,6 +1208,7 @@
     <select id="getEtrSubBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(TFPDT.IS_CANCEL,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            #{BUSI_TYPE_POSITION_34} AS busiTypePosition,
             tpd.totle_trade_id totleTradeId,
             tpd.trade_id tradeId,
             FP.FINPROD_ID finprodId,
@@ -1255,6 +1258,7 @@
         UNION ALL
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
+        #{BUSI_TYPE_POSITION_34} AS busiTypePosition,
         tpd.totle_trade_id totleTradeId,
         tpd.trade_id tradeId,
         FP.FINPROD_ID finprodId,
@@ -1305,6 +1309,7 @@
     <select id="getEtrPrimaryBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(bo.IS_CANCEL,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
             CASE
                 WHEN brt.IS_WIN = 'Y' THEN '04'
                 WHEN brt.IS_WIN = 'N' THEN '03'
@@ -1391,6 +1396,7 @@
         UNION ALL
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
+        #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
         CASE
         WHEN brt.IS_WIN = 'Y' THEN '04'
         WHEN brt.IS_WIN = 'N' THEN '03'
@@ -1478,6 +1484,7 @@
     <select id="getEtrDispatcherFirstBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
             tpd.totle_trade_id totleTradeId,
             tpd.trade_id tradeId,
             CASE
@@ -1592,6 +1599,7 @@
         union all
         SELECT
             #{TRADE_FLOW_STATUS01} effectFlag,
+            #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
             tpd.totle_trade_id totleTradeId,
             tpd.trade_id tradeId,
             CASE
@@ -2145,6 +2153,8 @@
         select T.effectiveStatus,
         T.firstBidStatus,
         T.bidId,
+        T.busiCode,
+        T.busiTypePosition,
         T.finprodId,
         T.finprodMarketId,
         T.finprodAbbr,
@@ -2191,6 +2201,8 @@
         WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
         END           AS firstBidStatus/*中标状态*/,
         bo.BID_ID         AS bidId/*投标编号*/,
+        bo.BID_ID AS busiCode/*业务编号*/,
+        eea.BUSI_TYPE_POSITION AS busiTypePosition,
         fp.FINPROD_ID  finprodId,
         fp.FINPROD_MARKET_ID finprodMarketId,
         fp.FINPROD_ABBR finprodAbbr,
@@ -2281,6 +2293,9 @@
         LEFT JOIN
         ETR_ENTRUST ee
         ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
+        LEFT JOIN
+        ETR_ENTRUST_ADD eea
+        ON ee.ENTRUST_ID = eea.ENTRUST_ID
         left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         left join (select listagg(t0.PORTFOLIO_ID, ',')
@@ -2315,6 +2330,8 @@
         WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
         END         AS firstBidStatus/*中标状态*/,
         bo.BID_ID       AS bidId/*投标编号*/,
+        bo.BID_ID AS busiCode/*业务编号*/,
+        eea.BUSI_TYPE_POSITION AS busiTypePosition,
         fp.FINPROD_ID  finprodId,
         fp.FINPROD_MARKET_ID finprodMarketId,
         fp.FINPROD_ABBR finprodAbbr,
@@ -2405,6 +2422,9 @@
         LEFT JOIN
         ETR_ENTRUST ee
         ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
+        LEFT JOIN
+        ETR_ENTRUST_ADD eea
+        ON ee.ENTRUST_ID = eea.ENTRUST_ID
         left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         left join (select listagg(t0.PORTFOLIO_ID, ',')
@@ -2436,6 +2456,8 @@
         T.effectiveStatus,
         T.firstBidStatus,
         T.bidId,
+        T.busiCode,
+        T.busiTypePosition,
         T.finprodId,
         T.finprodMarketId,
         T.finprodAbbr,

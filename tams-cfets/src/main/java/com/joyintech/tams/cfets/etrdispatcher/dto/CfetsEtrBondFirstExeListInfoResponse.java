@@ -29,6 +29,12 @@ public class CfetsEtrBondFirstExeListInfoResponse {
     @ApiModelProperty(name = "bidId", value = "投标编号", example = "111")
     private String bidId;
 
+    @ApiModelProperty(name = "busiCode", value = "业务编号", example = "1")
+    private String busiCode;
+
+    @ApiModelProperty(name = "busiTypePosition", value = "业务类型", example = "A1")
+    private String busiTypePosition;
+
     @ApiModelProperty(required = false, name = "finprodId", value = "资产代码,系统内代码一般不用于显示")
     private String finprodId;
 
@@ -676,6 +682,22 @@ public class CfetsEtrBondFirstExeListInfoResponse {
 
     public void setPortfolioName(String portfolioName) {
         this.portfolioName = portfolioName;
+    }
+
+    public String getBusiCode() {
+        return busiCode;
+    }
+
+    public void setBusiCode(String busiCode) {
+        this.busiCode = busiCode;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 }
 
