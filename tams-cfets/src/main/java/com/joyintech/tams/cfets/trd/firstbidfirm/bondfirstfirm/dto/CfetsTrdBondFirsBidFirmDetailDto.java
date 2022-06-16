@@ -120,6 +120,9 @@ public class CfetsTrdBondFirsBidFirmDetailDto {
     }
 
     public String getIssueDateStr() {
+        if (null != this.getIssueDateStart() && null == this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart());
+        }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
         }

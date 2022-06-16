@@ -40,6 +40,9 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     @ApiModelProperty(name = "secAcctId", value = "证券账户code", example = "XXX证券账户")
     private String secAcctId;
 
+    @ApiModelProperty(name = "busiTypePosition", value = "业务类型", example = "A1")
+    private String busiTypePosition;
+
     @ApiModelProperty(name = "secAcctIdStr", value = "证券账户", example = "XXX证券账户")
     private String secAcctIdStr;
 
@@ -1811,5 +1814,15 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
 
     public void setDeliverySchedule(String deliverySchedule) {
         this.deliverySchedule = deliverySchedule;
+    }
+
+    @Override
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    @Override
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 }
