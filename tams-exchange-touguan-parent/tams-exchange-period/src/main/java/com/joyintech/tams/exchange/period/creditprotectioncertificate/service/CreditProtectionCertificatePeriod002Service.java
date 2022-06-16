@@ -1,10 +1,15 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.service;
 
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.service.DateCalService;
@@ -25,6 +30,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.entity.CommentFunction;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -113,12 +119,12 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         insertDate(baseBussinessDto, entity);
         if (!StringUtil.equalsIgnoreCase("save", entity.getOperateType())) {
             doOldPositionConfirm(entity, false);
-            String decisionAct = 系统动作_修改.getValue();
-            String systemAct = 系统动作_修改.getValue();
-            if ("new".equalsIgnoreCase(entity.getOptType())) {
-                systemAct = 系统动作_新建.getValue();
-                decisionAct = 系统动作_新建.getValue();
-            }
+//            String decisionAct = 系统动作_修改.getValue();
+//            String systemAct = 系统动作_修改.getValue();
+//            if ("new".equalsIgnoreCase(entity.getOptType())) {
+            String systemAct = 系统动作_新建.getValue();
+            String decisionAct = 系统动作_新建.getValue();
+//            }
             positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue());
         }
     }
@@ -162,7 +168,20 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
+            try {
+                positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
+            } catch (PositionException e) {
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                if (StringUtil.isNotBlank(message.getMessage())) {
+                    WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+                } else {
+                    if (!StringUtil.equals("Y", RequestUtil.getParam("softSkipMode"))) {
+                        BaseMap bm = (BaseMap) message.getData();
+                        StringBuffer messageStr = (StringBuffer) bm.get("message");
+                        WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                    }
+                }
+            }
         }
     }
 
