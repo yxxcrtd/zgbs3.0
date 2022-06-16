@@ -20,6 +20,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -223,4 +224,13 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.getManagers(param));
     }
 
+    public Page<SelectOptionDto> selectPortfolioIdList(CfetsSearchInfoRequest dto) {
+        Map<String, Object> param =new HashMap<>();
+        param.put("search",dto.getSearch());
+        param.put("platDate",DateUtil.platDateFromCache());
+        param.put("initValue",dto.getInitValue());
+        param.put("finprodId", dto.getFinprodId());
+        param.put("portfolioId", dto.getPortfolioId());
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.selectPortfolioIdList(param));
+    }
 }
