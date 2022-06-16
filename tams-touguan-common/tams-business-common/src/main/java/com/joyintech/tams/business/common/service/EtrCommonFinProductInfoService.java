@@ -72,9 +72,7 @@ public class EtrCommonFinProductInfoService extends BaseService {
             setGrade(finProductInfo);
             if (Objects.nonNull(pageCode) && Objects.nonNull(dtCode)) {
                 //查询对于业务场景展示表头
-                String spcdCode = getSpcdCodesByFinProduct(finProductInfo);
-                List<String> spcdCodeList = new ArrayList<>(Arrays.asList(spcdCode.split(COMM)));
-                List<CfgDataTableShow> byPageCodeAndDtCodes = cfgDataTableService.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodeList);
+                List<CfgDataTableShow> byPageCodeAndDtCodes = getTableShows(finProductInfo, pageCode, dtCode);
                 if (CollectionUtils.isNotEmpty(byPageCodeAndDtCodes)) {
                     //息票品种
                     String couponSpecies = finProductInfo.getCouponSpecies();
@@ -191,22 +189,29 @@ public class EtrCommonFinProductInfoService extends BaseService {
     }
 
     /**
-     * 处理列名
+     * 获取展示列
      *
-     * @param colName
-     * @param couponSpeciesFlag
+     * @param finProductInfo
+     * @param pageCode
+     * @param dtCode
      * @return
      */
-    private String getColName(String colName, Boolean couponSpeciesFlag) {
-        if (!colName.contains("/")) {
-            return colName;
-        }
-        String[] split = colName.split("/");
-        if (couponSpeciesFlag) {
-            return split[0];
-        } else {
-            return split[1];
-        }
+    private List<CfgDataTableShow> getTableShows(CfetsEtrFinProductInfoResponse finProductInfo, String pageCode, String dtCode) {
+        //查询对于业务场景展示表头
+        String spcdCode = getSpcdCodesByFinProduct(finProductInfo);
+        List<String> spcdCodeList = new ArrayList<>(Arrays.asList(spcdCode.split(COMM)));
+        List<CfgDataTableShow> byPageCodeAndDtCodes = cfgDataTableService.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodeList);
+        Map<String, CfgDataTableShow> collect = byPageCodeAndDtCodes.stream().collect(Collectors.toMap(CfgDataTableShow::getColCode, CfgDataTableShow -> CfgDataTableShow));
+        List<CfgDataTableShow> bySpcdCodesshowInvaim = cfgDataTableService.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodeList);
+        bySpcdCodesshowInvaim.stream().forEach(cfgDataTableShow -> {
+            CfgDataTableShow cfgDataTableShow1 = collect.get(cfgDataTableShow.getColCode());
+            if (Objects.nonNull(cfgDataTableShow1) && cfgDataTableShow1.getDisPlayed() == 1) {
+                cfgDataTableShow.setDisPlayed(1);
+            } else {
+                cfgDataTableShow.setDisPlayed(0);
+            }
+        });
+        return bySpcdCodesshowInvaim;
     }
 
 }
