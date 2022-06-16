@@ -81,6 +81,11 @@ $(function() {
 			$("#oType").attr("disabled",true);
 			$("#oCodeNameStr").attr("disabled",true);
 		}
+		var oType = $("#oType").val();
+		// 债项评级
+		if (oType === MAIN_GRADE_TYPE_02){
+			$("#oCodeType01").hide();
+		}
 		// 绑定按钮事件
 		$('#MstMarketManagement002_btn_save').click(function() {
 			saveOrSubmit('save');
