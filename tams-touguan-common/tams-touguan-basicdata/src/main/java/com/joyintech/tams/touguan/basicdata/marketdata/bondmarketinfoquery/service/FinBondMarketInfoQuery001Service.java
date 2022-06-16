@@ -184,6 +184,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
 
     /**
      * 加券前的校验
+     *
      * @param secId
      * @return
      */
@@ -252,6 +253,12 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             param.put("finprodType", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             detailQueryDto = finBondMarketInfoQueryMapper.queryFinProductForCoupons(param);
             if (Objects.nonNull(detailQueryDto)) {
+                if (StringUtil.equals(detailQueryDto.getBasis(), DictCodeList.计息基础_A_A_平均分配.getValue())) {
+                    detailQueryDto.setBasisStyle(DictCodeListExt1.利息分配方式_平均分配.getValue());
+                }
+                if (StringUtil.equals(detailQueryDto.getBasis(), DictCodeList.计息基础_A_A_按实际天数分配.getValue())) {
+                    detailQueryDto.setBasisStyle(DictCodeListExt1.利息分配方式_按照实际天数分配.getValue());
+                }
                 Map<String, Object> map = new HashMap<>();
                 //付息计划
                 map.put("cashId", detailQueryDto.getBasisStyle());
