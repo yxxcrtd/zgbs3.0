@@ -161,19 +161,30 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
     BaseMap generateCfetsPrimaryBidManage(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
         logger.debug("组装中标结果维护构造风险报文入参:" + businessJson);
         CfetsPrimaryBidManageSaveRequest dto = JsonUtils.json2Object(businessJson, CfetsPrimaryBidManageSaveRequest.class);
-        BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
+        // 接口字段名
+        String interfaceType = NodeConfigConstant.BOND001;
+        // 交易场所
+        String tradePlace = 交易场所_银行间.getValue();
+        if (!StringUtil.equals(dto.getTradeMarket(), 交易场所_银行间.getValue())
+                && !StringUtil.equals(dto.getTradeMarket(), 交易场所_商业银行柜台.getValue())) {
+            interfaceType = NodeConfigConstant.BOND002;
+            tradePlace = null;
+        }
+        // 申购方式
+        String purchModle = DictCodeListExt4.头寸申购方式_自主投标.getValue();
+        if (StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), dto.getBidModle())) {
+            purchModle = DictCodeListExt4.头寸申购方式_代投代缴.getValue();
+        }
+        BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
+                .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级投标.getValue())
                 .put(NodeConfigConstant.BUSI_ACT, 业务动作_中标结果维护.getValue())
+                .put(NodeConfigConstant.BID_RESULT, dto.getIsWin())
+                .put(NodeConfigConstant.PURCH_MODLE, purchModle)
+                .put(NodeConfigConstant.TRADE_PLACE, tradePlace)
                 .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                 .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
-                .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级投标.getValue())
-                .put(NodeConfigConstant.TRADE_PLACE, dto.getTradeMarket())
-                .put(NodeConfigConstant.PS, DictCodeList.交易方向_买入.getValue())
                 .put(NodeConfigConstant.IS_CHECK, isCheck)
                 .put(NodeConfigConstant.DATA, dto);
-        if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())
-                || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-            map.put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND002);
-        }
         return map;
     }
 
@@ -194,16 +205,14 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
         CfetsTrdFirstBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, CfetsTrdFirstBondInvestTradeDto.class);
         // 接口字段名
         String interfaceType = NodeConfigConstant.BOND001;
-        if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())
-                || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-            interfaceType = NodeConfigConstant.BOND002;
-        }
+        // 交易场所
+        String tradePlace = 交易场所_银行间.getValue();
         BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
+                .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级申购.getValue())
                 .put(NodeConfigConstant.BUSI_ACT, 业务动作_成交确认.getValue())
+                .put(NodeConfigConstant.TRADE_PLACE, tradePlace)
                 .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                 .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
-                .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级申购.getValue())
-                .put(NodeConfigConstant.TRADE_PLACE, dto.getTradeMarket())
                 .put(NodeConfigConstant.PS, dto.getPs())
                 .put(NodeConfigConstant.IS_CHECK, isCheck)
                 .put(NodeConfigConstant.DATA, dto);
@@ -249,7 +258,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
             busiAct = 交收操作类型_交收失败.getValue();
         }
         List<CfetsManualSettleInsertDto> list = cfetsManualSettleService.handleSettleData(allDto);
-        BeanUtil.copyPropertiesIgnoreNull(list.get(0).getTrdBankManualSettleInfo(),allDto);
+        BeanUtil.copyPropertiesIgnoreNull(list.get(0).getTrdBankManualSettleInfo(), allDto);
         BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
                 .put(NodeConfigConstant.BUSI_ACT, busiAct)
                 .put(NodeConfigConstant.PS, allDto.getPs())

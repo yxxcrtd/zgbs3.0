@@ -123,7 +123,7 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
-     * 债券成交确认
+     * 债券成交确认/一级申购成交确认
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteMethod(..))" +
             "|| execution(* com.joyintech.tams.cfets.trdconfirm..*.*.doCompleteBidMethod(..))")
@@ -157,6 +157,20 @@ public class CfetsTradeHandlerAop {
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doRevokeComplete(..))")
     protected void doRevokeComplete() {
+    }
+
+    /**
+     * 一级申购-撤销
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service.doComplete(..))")
+    protected void subRevoke() {
+    }
+
+    /**
+     * 一级投标-撤销
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm002Service.doComplete(..))")
+    protected void firmRevoke() {
     }
 
     /**
@@ -323,7 +337,7 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning(pointcut = "doCompleteRegRevoke() ")
+    @AfterReturning(pointcut = "doCompleteRegRevoke() ||subRevoke()||firmRevoke()")
     public void bondRevokeRegComplete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         OperationType op = (OperationType)args[1];

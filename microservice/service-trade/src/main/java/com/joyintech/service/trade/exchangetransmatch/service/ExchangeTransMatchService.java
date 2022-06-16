@@ -7,10 +7,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.trade.exchangetransmatch.dao.ExchangeTransMatchMapper;
 import com.joyintech.service.trade.exchangetransmatch.dto.*;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,6 +101,7 @@ public class ExchangeTransMatchService extends BaseService {
         map.put("SEC_TYPE_06", DictCodeListExt1.证券品种_股票.getValue());
         map.put("SEC_TYPE_02", DictCodeListExt1.证券品种_基金.getValue());
         map.put("SEC_TYPE_09", DictCodeListExt1.证券品种_回购.getValue());
+        map.put("SEC_TYPE_14", DictCodeListStl.证券品种_信用保护凭证.getValue());
 
         map.put("TARGET_CLASS_01", DictCodeListExt3.目标类型_数量.getValue());
         map.put("TARGET_CLASS_02", DictCodeListExt3.目标类型_金额.getValue());
@@ -158,6 +156,8 @@ public class ExchangeTransMatchService extends BaseService {
         map.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
         map.put("FINPROD_TYPE_TG_F06", DictCodeListExt1.金融产品类型_投管用_基金.getValue());
         map.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+        map.put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+
         return super.queryForPage(page, length, () -> exchangeTransMatchMapper.getBusiCode(map));
     }
 
