@@ -746,7 +746,9 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
             dto.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             dto.setIsOutTrade(DictCodeList.是否_是.getValue());
-            dto.setEntrustStatus(DictCodeListExt3.委托状态_流程中.getValue());
+            if (StringUtil.isEmpty(dto.getEntrustStatus())) {
+                dto.setEntrustStatus(DictCodeListExt3.委托状态_流程中.getValue());
+            }
             dto.setRecStatus(DictCodeListExt3.委托状态_流程中.getValue());
             BeanUtil.copyProperties(etrEntrust, dto);
             etrEntrust.setEntrustAmt(null);
@@ -841,7 +843,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
             dto.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             dto.setIsOutTrade(DictCodeList.是否_是.getValue());
-            dto.setEntrustStatus(DictCodeList.委托状态_待接收.getValue());
+            if (StringUtil.isEmpty(dto.getEntrustStatus())) {
+                dto.setEntrustStatus(DictCodeList.委托状态_待接收.getValue());
+            }
+
             dto.setRecStatus(DictCodeList.委托状态_待接收.getValue());
             BeanUtil.copyProperties(etrEntrust, dto);
             etrEntrust.setEntrustNum(dto.getTotalBiddingNum().divide(new BigDecimal(100)));
@@ -1177,7 +1182,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             EtrEntrust etrEntrust = new EtrEntrust();
             etrEntrust.setEntrustId(dto.getEntrustId());
             etrEntrust.setEntrustNum(ArithmeticUtil.divide(dto.getTotalBiddingNum(), 100, 4));
-            etrEntrust.setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());
+            etrEntrust.setEntrustStatus(dto.getEntrustStatus());
             etrEntrustMapper.updateByPrimaryKeySelective(etrEntrust);
 
             //更新委托表
@@ -1212,6 +1217,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 entrustDetail.setEntrustId(dto.getEntrustId());
                 entrustDetail.setPortfolioId(entry.getKey());
                 entrustDetail.setSecAcctId(entry.getValue().get(0).getSecAcctId());
+                entrustDetail.setInvAim(entry.getValue().get(0).getBusinessModel());
                 entrustDetail.setEntrustNum(ArithmeticUtil.divide(entry.getValue().get(0).getPortfolioTotalBidPrinAmt(), 100, 4));
                 etrEntrustDetailList.add(entrustDetail);
             }

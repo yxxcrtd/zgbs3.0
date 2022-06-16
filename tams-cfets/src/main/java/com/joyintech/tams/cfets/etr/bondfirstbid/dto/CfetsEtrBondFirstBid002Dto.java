@@ -248,6 +248,9 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     @ApiModelProperty(name = "intType", value = "利率类型")
     private String intType;
 
+    @ApiModelProperty(name = "entrustStatus", value = "指令状态")
+    private String entrustStatus;
+
     public String getElementId() {
         return elementId;
     }
@@ -592,5 +595,15 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setReferYield2(String referYield2) {
         this.referYield2 = referYield2;
+    }
+
+    @Override
+    public String getEntrustStatus() {
+        return entrustStatus;
+    }
+
+    @Override
+    public void setEntrustStatus(String entrustStatus) {
+        this.entrustStatus = entrustStatus;
     }
 }

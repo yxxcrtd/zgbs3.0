@@ -274,12 +274,12 @@
     </select>
     <select id="getBillingDetailsByFinprodMarketId"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
-        select p.PORTFOLIO_ID         portfolioId,
-               pp.PORTFOLIO_NAME      portfolioName,
-               sci.BUSI_ACCT_NO       acctNo,
-               nvl(p.AMOUNT, 0) * 100 repNomCapi,
-               nvl(p.AMOUNT, 0) * 100 deliverBondAmount,
-               p.SEC_ACCT_ID          secAcctId
+        select p.PORTFOLIO_ID    portfolioId,
+               pp.PORTFOLIO_NAME portfolioName,
+               sci.BUSI_ACCT_NO  acctNo,
+               nvl(p.AMOUNT, 0)  repNomCapi,
+               nvl(p.AMOUNT, 0)  deliverBondAmount,
+               p.SEC_ACCT_ID     secAcctId
         from PTL_SEC_POSITION_RULE p
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
@@ -292,12 +292,12 @@
     </select>
     <select id="getBillingDetailsByFinprodMarketIdOld"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
-        select p.PORTFOLIO_ID         portfolioId,
-               pp.PORTFOLIO_NAME      portfolioName,
-               sci.BUSI_ACCT_NO       acctNo,
-               nvl(p.AMOUNT, 0) * 100 repNomCapi,
-               nvl(p.AMOUNT, 0) * 100 deliverBondAmount,
-               p.SEC_ACCT_ID          secAcctId
+        select p.PORTFOLIO_ID    portfolioId,
+               pp.PORTFOLIO_NAME portfolioName,
+               sci.BUSI_ACCT_NO  acctNo,
+               nvl(p.AMOUNT, 0)  repNomCapi,
+               nvl(p.AMOUNT, 0)  deliverBondAmount,
+               p.SEC_ACCT_ID     secAcctId
         from PTL_SEC_POSITION p
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
@@ -318,7 +318,7 @@
         and fa.REF_SEC is not null
     </select>
     <select id="getAmountByPortfolioIdOld" resultType="java.math.BigDecimal">
-        select nvl(p.AMOUNT, 0)*100
+        select nvl(p.AMOUNT, 0)
         from PTL_SEC_POSITION p
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
@@ -331,7 +331,7 @@
     </select>
 
     <select id="getAmountByPortfolioId" resultType="java.math.BigDecimal">
-        select nvl(p.AMOUNT, 0)*100
+        select nvl(p.AMOUNT, 0)
         from PTL_SEC_POSITION_RULE p
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
@@ -358,7 +358,7 @@
         from FIN_PRODUCT
         where FINPROD_MARKET_ID = #{finprodId,jdbcType=VARCHAR}
           AND FINPROD_TYPE2 = 'F01'
-          AND TRADE_MARKET in('03','04')
+          AND TRADE_MARKET in ('03', '04')
     </select>
     <sql id="findPageQueryConditions">
         <if test="search != null and search != ''">

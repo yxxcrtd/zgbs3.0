@@ -330,7 +330,9 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             CreditProtectionCertificate002Dto request = creditProtectionCertificate002Service.getById(saveRequest.getFinprodMarketId());
             request.setOperateType(OperationType.DELETE.name());
             selectedItem.add(request);
+//            creditProtectionCertificate002Service.delete(request);
         }
+//        return new Message<AjaxResult>().success().setData(new AjaxResult("删除成功"));
         cpc004Dto.setOperateType(OperationType.DELETE.name());
         cpc004Dto.setSelectedItem(selectedItem);
         cpc004Dto.setRemark(cpc004Dto.getRemark());

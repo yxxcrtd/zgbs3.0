@@ -308,16 +308,11 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
     public TrdProductDeal createProductDeal(ExchangeTransMatchCommonDto transDto, ExchangeTransMatchCommonEntrustDto entrustDto,TrdFinProductDealTotal trdFinProductDealTotal) {
         TrdProductDeal trdProductDeal = new TrdProductDeal();
         BussinessCodeParameter codeParameter = new BussinessCodeParameter();
-        if (entrustDto.getPs().equals(DictCodeList.交易方向_买入.getValue())) {
-            codeParameter.setCommonBusinessType(DictCodeListStl.业务场景分类明细_信用保护凭证_买入);
-        }
-        if (entrustDto.getPs().equals(DictCodeList.交易方向_卖出.getValue())) {
-            codeParameter.setCommonBusinessType(DictCodeListStl.业务场景分类明细_信用保护凭证_卖出);
-        }
+        codeParameter.setCommonBusinessType(DictCodeListExt2.共通业务类型_信用保护凭证交易);
         // 交易编号
         trdProductDeal.setTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
         // 业务类型
-        trdProductDeal.setBusiType(null);
+        trdProductDeal.setBusiType(transDto.getBusiType());
         // 金融产品代码
         trdProductDeal.setFinprodId(entrustDto.getFinprodId());
         // 金融产品类型（投管分类）
