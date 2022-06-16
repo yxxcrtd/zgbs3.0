@@ -399,6 +399,9 @@ public class CommonAutoCouponService extends BaseService {
                 finProduct.setIsSus(interfPayhsrcsecinfo.getIssus());
                 finProduct.setDelistingDate(interfPayhsrcsecinfo.getDelistingDate());
                 // add by lizhi 20190603 是否永续债,Y是N否 end
+                if (StringUtil.isNotBlank(interfPayhsrcsecinfo.getIsRight())) {
+                    finProduct.setIsRight(interfPayhsrcsecinfo.getIsRight());
+                }
                 baseFinProductBaseInfoDto.setFinProduct(finProduct);
                 //new标的类金融产品附属
                 FinProductAdd finProductAdd = new FinProductAdd();
@@ -503,6 +506,7 @@ public class CommonAutoCouponService extends BaseService {
                     //              inputParaDto.setDictCode(BussinessDictCode.wind计息基础.getValue());
                     //              inputParaDto.setItemCode(interfPayhsrcsecinfo.getRatebasic());
                     finCashCalcRule.setBasis(interfPayhsrcsecinfo.getRatebasic());
+                    finCashCalcRule.setMarketBasis(interfPayhsrcsecinfo.getRatebasic());
                     finCashCalcRule.setYield(ArithmeticUtil.divide(interfFloatingcouponsrate.getRate(), new BigDecimal(100)));
                     if (DateUtil.compareDate(interfFloatingcouponsrate.getChangeDt(), interfPayhsrcsecinfo.getVdate()) == 0) {
                         finCashCalcRule.setIsInitial(DictCodeList.是否_是.getValue());
@@ -528,6 +532,7 @@ public class CommonAutoCouponService extends BaseService {
                     finCashCalcRule.setBaseType(BussinessDictCodeList.基数类型_实收资本.getValue());
                     finCashCalcRule.setBaseDateType(BussinessDictCodeList.基数日期类型_当日.getValue());
                     finCashCalcRule.setBasis(interfPayhsrcsecinfo.getRatebasic());
+                    finCashCalcRule.setMarketBasis(interfPayhsrcsecinfo.getRatebasic());
                     finCashCalcRule.setYield(interfPayhsrcsecinfo.getPaperir());
                     finCashCalcRule.setIsInitial(DictCodeList.是否_是.getValue());
                     finCashCalcRule.setFinprodId(finprodId);
@@ -731,6 +736,7 @@ public class CommonAutoCouponService extends BaseService {
                         finCashPlan.setBranch(branch);
                         finCashPlan.setPayType(BussinessDictCodeList.分红方式_现金分红.getValue());
                         finCashPlan.setRangeYield(interfPayhsrcsecschedule.getCouponrate());
+                        finCashPlan.setBasis(interfPayhsrcsecinfo.getRatebasic());
                         finCashPlanList.add(finCashPlan);
 //                    	}
                     }

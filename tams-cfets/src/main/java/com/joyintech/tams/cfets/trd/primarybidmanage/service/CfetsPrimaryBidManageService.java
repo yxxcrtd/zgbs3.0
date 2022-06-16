@@ -415,6 +415,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     }
                 }
             }
+            if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
+                // 匹配取消
+                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                        DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
+                // 老头寸处理
+                this.dealOldPosition(entity, true);
+            }
             updateCfetsOprHis(entity.getTotalWinId(),action);
         } else {
             action = OperationType.NEW.name();
@@ -945,7 +952,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     boolean isSubmit = true;
                     SysWflBusinessList sysWflBusinessList = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
                     if (StringUtil.equals(sysWflBusinessList.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
-                        isSubmit = false;
                         this.sendPositionMethod(entity, isSubmit, confirmOk);
                     } else {
                         this.sendPositionMethod(entity, isSubmit, confirmOk);
@@ -1717,7 +1723,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
         if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())){
             BigDecimal bidPrice = request.getAllocationDetails().get(0).getBidPrice();
-            bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"BP";
+            bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"元";
         }
         return bidPriceStr;
     }

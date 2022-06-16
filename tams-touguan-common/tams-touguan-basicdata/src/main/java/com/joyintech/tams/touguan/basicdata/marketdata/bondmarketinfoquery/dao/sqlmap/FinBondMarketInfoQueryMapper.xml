@@ -20,7 +20,7 @@
         CUSTOMER_INFO1.CUSTOMER_NAME issuerName,
         PAYHSRCSECINFO.SECTYPE,
         PAYHSRCSECINFO.SECTYPE2,
-        CASE PAYHSRCSECINFO.ISSUETYPE WHEN '01' THEN '1' ELSE '2' END AS ISSUETYPE,
+        PAYHSRCSECINFO.ISSUETYPE,
         PAYHSRCSECINFO.BLNAREA,
         PAYHSRCSECINFO.ISSUS,
         PAYHSRCSECINFO.ISSECBOND,
@@ -287,11 +287,7 @@
         CUSTOMER_INFO1.CUSTOMER_NAME issuerName,
         PAYHSRCSECINFO.SECTYPE,
         PAYHSRCSECINFO.SECTYPE2,
-        CASE
-        PAYHSRCSECINFO.ISSUETYPE
-        WHEN '01' THEN
-        '1' ELSE '2'
-        END AS ISSUETYPE,
+        PAYHSRCSECINFO.ISSUETYPE,
         PAYHSRCSECINFO.BLNAREA,
         PAYHSRCSECINFO.ISSUS,
         PAYHSRCSECINFO.ISSECBOND,
@@ -431,12 +427,7 @@
                TYPE_CONFIG.INPUT_VALUE_2                    SECTYPE,
                TYPE_CONFIG.INPUT_VALUE_3                    SECTYPE2,
                TYPE_CONFIG.INPUT_VALUE_4                    SECTYPE3,
-               CASE
-                   PAYHSRCSECINFO.ISSUETYPE
-                   WHEN '01' THEN
-                       '1'
-                   ELSE '2'
-                   END AS                                   ISSUETYPE,
+               PAYHSRCSECINFO.ISSUETYPE,
                PAYHSRCSECINFO.BLNAREA,
                PAYHSRCSECINFO.FACEVALUE,
                PAYHSRCSECINFO.ISSUS,
@@ -589,6 +580,7 @@
         T2.GUA_TYPE guarType,
         T2.ORIGINAL_OWNER originalOwner,
         T1.SPONSOR guarantor,
+        T12.BASIS,
         Case when T12.BASIS = 'A/A_B_COUP' THEN 'A/A'
         when T12.BASIS = 'A/A_B_DAY' THEN 'A/A'
         else T12.BASIS END  ratebasic,

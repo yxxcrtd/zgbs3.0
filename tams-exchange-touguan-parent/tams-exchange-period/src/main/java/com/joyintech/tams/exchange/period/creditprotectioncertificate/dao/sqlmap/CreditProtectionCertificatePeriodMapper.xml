@@ -121,8 +121,8 @@
         where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.P_TOTLE_TRADE_ID is null
-        <if test="businessCode != null and businessCode != ''">
-            and tfpdl.TOTLE_TRADE_ID like '%'|| #{businessCode,jdbcType=VARCHAR} ||'%'
+        <if test="search != null and search != ''">
+            and tfpdl.TOTLE_TRADE_ID like '%'|| #{search,jdbcType=VARCHAR} ||'%'
         </if>
         union all
         select tfpdl.TOTLE_TRADE_ID id,
@@ -134,8 +134,8 @@
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.TRADE_STATUS = '01'
         and tfpdl.P_TOTLE_TRADE_ID is null
-        <if test="businessCode != null and businessCode != ''">
-            and tfpdl.TOTLE_TRADE_ID like '%'|| #{businessCode,jdbcType=VARCHAR} ||'%'
+        <if test="search != null and search != ''">
+            and tfpdl.TOTLE_TRADE_ID like '%'|| #{search,jdbcType=VARCHAR} ||'%'
         </if>
     </select>
     <select id="findFinprodId" resultType="com.joyintech.framework.select.SelectOptionDto">
@@ -144,7 +144,6 @@
         where FINPROD_TYPE2 = 'F37'
         <if test="search != null and search != ''">
             and (instr(FINPROD_MARKET_ID, #{search}) > 0
-            or instr(FINPROD_ID, #{search}) > 0
             or instr(FINPROD_NAME, #{search}) > 0
             or instr(FINPROD_ABBR, #{search}) > 0)
         </if>

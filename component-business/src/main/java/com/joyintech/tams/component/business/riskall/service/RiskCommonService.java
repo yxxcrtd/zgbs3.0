@@ -189,21 +189,21 @@ public class RiskCommonService {
                 interfRiskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());
                 interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue());
                 // 处理差分预占参数，接口支持程度待确认
-                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
+                /*riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
                     item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
                     item.setDiffOccupyFlg(item.getEventId());
 //                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
-                });
+                });*/
             }
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占释放再实占.getValue())) {
                 interfRiskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资交易.getValue());
                 interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue());
                 // 处理差分实占参数，接口暂未支持
-                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
+               /* riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
                     item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
                     item.setDiffOccupyFlg(item.getEventId());
 //                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
-                });
+                });*/
             }
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占预占释放.getValue())) {
                 // 接口调用方式待梳理
