@@ -2,9 +2,14 @@ package com.joyintech.tams.settle.batch.datadeal.writer;
 
 import com.joyintech.batch.batchbase.baseclass.BaseWriter;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedToWriteEntity;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealWriteDto;
 import com.joyintech.tams.settle.batch.datadeal.dto.step2.StlDownDataDealWriteBaseDto;
 import org.apache.commons.collections.CollectionUtils;
@@ -12,7 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 结算数据批处理step2 Writer
@@ -42,6 +52,12 @@ public class StlDownDataDealWriter extends BaseWriter<NeedToWriteEntity> {
 	private ShareBonusRegMapper shareBonusRegMapper;
 	@Autowired
 	private MstFundBonusNoticeMapper mstFundBonusNoticeMapper;
+
+	@Autowired
+	private FinProductTypeMapper finProductTypeMapper;
+
+	@Autowired
+	private StlDownDataDealMapper stlDownDataDealMapper;
 	
 	@Override
     public void write(List<? extends NeedToWriteEntity> items) throws Exception {
@@ -118,7 +134,28 @@ public class StlDownDataDealWriter extends BaseWriter<NeedToWriteEntity> {
 		if(null != dataDealWriteBaseDto) {
 			// 成交数据明细表
 			SettleTransData settleTransData = dataDealWriteBaseDto.getSettleTransData();
-
+			// ZGCPCN-1441: 修改可转债和一级投标债成交明细赋值 modify by fuyongsheng 20220616 start
+			FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
+			finProductTypeKey.setBranch(0L);
+			finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
+			FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+			if((DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(settleTransData.getFinprodType2()) &&
+					!DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue().equals(finProductType.getType6()))
+				||
+				BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue().equals(settleTransData.getFinprodType2())){
+				settleTransData.setShareAmt(ArithmeticUtil.multiply(settleTransData.getShareAmt(), new BigDecimal(100)));
+			}
+			if(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue().equals(settleTransData.getFinprodType2())){
+				String finProdMarketId = settleTransData.getFinprodId().substring(4);
+				List<FinProduct> finProducts = stlDownDataDealMapper.getFinproduct(finProdMarketId, settleTransData.getFinprodType2());
+				List<FinProduct> sortedFinProducts = finProducts
+						.stream()
+						.sorted((x, y) -> y.getFinprodId().substring(y.getFinprodId().length() - 11, y.getFinprodId().length()-3)
+								.compareTo(x.getFinprodId().substring(x.getFinprodId().length() - 11, x.getFinprodId().length()-3)))
+						.collect(Collectors.toList());
+				settleTransData.setFinprodId(sortedFinProducts.get(0).getFinprodId());
+			}
+			// ZGCPCN-1441: 修改可转债和一级投标债成交明细赋值 modify by fuyongsheng 20220616 end
 			// 成交数据明细附属表
 			SettleTransDataAdd settleTransDataAdd = dataDealWriteBaseDto.getSettleTransDataAdd();
 

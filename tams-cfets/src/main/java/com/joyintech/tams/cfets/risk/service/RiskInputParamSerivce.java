@@ -14,6 +14,7 @@ import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfoService;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrRepoSaveRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
+import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoinfo003Service;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInsertDto;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
@@ -86,6 +87,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
     private CreditLinesDealsMapper creditLinesDealsMapper;
     @Autowired
     private CfetsEtrIbBondinfoService cfetsEtrIbBondinfoService;
+    @Autowired
+    private CfetsEtrIbRepoinfo003Service cfetsEtrIbRepoinfo003Service;
 
     /**
      * 构造风险报文入参
@@ -258,6 +261,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         // 银行间质押式回购-指令
         if (obj instanceof CfetsEtribRepoInfo003Dto || obj instanceof CfetsEtrRepoSaveRequest || StringUtil.equals(pageId, "CfetsEtrIbRepoinfo003")) {
             CfetsEtribRepoInfo003Dto dto = JsonUtils.json2Object(businessJson, CfetsEtribRepoInfo003Dto.class);
+            cfetsEtrIbRepoinfo003Service.packageEquity(dto,new ArrayList<>());
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.REPO001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
