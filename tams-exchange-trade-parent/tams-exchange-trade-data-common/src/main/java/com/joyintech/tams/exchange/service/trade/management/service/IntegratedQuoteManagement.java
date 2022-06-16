@@ -385,7 +385,12 @@ public class IntegratedQuoteManagement {
         BaseRepurchaseQuoteSendResponse sendBean;
         for (IntegratedEntrustVo integratedEntrust : entrustList) {
             int entrustStatus = integratedEntrust.getEntrustStatus();
-            sendBean = createSendQuoteByIntegratedEntrust(integratedEntrust);
+            Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
+            if (ObjectUtil.isNull(instruction)) {
+                log.warn("查询指令失败，无法组装我发起的协议回购行情 => 【entrustId = {}】，【instructionId = {}】", integratedEntrust.getId(), integratedEntrust.getInstructionId());
+                continue;
+            }
+            sendBean = createSendQuoteByIntegratedEntrust(integratedEntrust, instruction);
 
             if (EnumUtil.in(entrustStatus, REPORTED, REPORTED_TOBE_CANCEL)) {
                 sendBean.setRequestStatus(QuoteStatusEnum.TO_BE_CONFIRMED.getCode());
@@ -420,12 +425,7 @@ public class IntegratedQuoteManagement {
 ////        sendBean.setCpInvestorTypeStr();
 //    }
 
-    private BaseRepurchaseQuoteSendResponse createSendQuoteByIntegratedEntrust(IntegratedEntrustVo entrust) {
-
-        Instruction instruction = instructionService.findById(entrust.getInstructionId());
-        if (ObjectUtil.isNull(instruction)) {
-            log.warn("查询指令失败 => 【entrustId = {}】，【instructionId = {}】", entrust.getId(), entrust.getInstructionId());
-        }
+    private BaseRepurchaseQuoteSendResponse createSendQuoteByIntegratedEntrust(IntegratedEntrustVo entrust, Instruction instruction) {
 
         BaseRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse ;
         String ps = entrust.getPs();
