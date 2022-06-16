@@ -309,7 +309,7 @@ public class StlDataDealSzdJsmxProcessService {
 						// 业务场景明细分类
 						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_分销_结果.getValue());
 						// 金融产品代码
-						settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()+szdJsmx.getZqdm1()+".SH");
+						settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm1()+".SH");
 						// 金融产品类型(估值核算)
 						settleTransData.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
 						// 金融产品类型(投管分类)
