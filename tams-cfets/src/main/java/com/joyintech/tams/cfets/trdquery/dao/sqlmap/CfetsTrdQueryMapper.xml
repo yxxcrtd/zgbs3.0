@@ -3143,15 +3143,15 @@
             UNION ALL
             SELECT
                 CASE WHEN TFPDT.IS_CANCEL= 'Y' THEN #{STATUS_VALID_03} ELSE #{STATUS_VALID_01}	END as effectiveStatus,
-                SO.SETTLE_STATUS   cleanStatus,
+                DECODE(SO.SETTLE_STATUS,'01','S')   cleanStatus,
                 TMSI.SETTLE_STATUS	 settleStatus,
                 TFPDT.TOTLE_TRADE_ID	totleTradeId,
                 TFPDT.FINPROD_TYPE2	 finprodType2,
                 sdl1.item_value finprodType2Str,
                 CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END tgBusiType,
-                CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN '一级申购'
-                WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN '一级投标' END tgBusiTypeStr,
+                CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN '一级投标'
+                WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN '一级申购' END tgBusiTypeStr,
                 FP.FINPROD_ID AS finprodId,
                 FP.FINPROD_MARKET_ID finprodMarketId,
                 FP.FINPROD_ABBR	finprodAbbr,
@@ -3165,12 +3165,12 @@
                 ''  settleSpeedStr,
                 TFPDT.SEC_MANAGE_ACCT_ID as secManageAcctId,
                 T7.SEC_ACCT_NAME secManageAcctIdStr,
-                TFPDT.PRIN_AMT/10000 faceValue,
+                BO.WIN_PRIN_AMT/10000 faceValue,
                 case when BO.BID_MODLE IS NULL THEN TO_CHAR(ROUND(TFPDT.RATE,4), 'FM990.0000')
-                     when BO.BID_MODLE=#{WIN_TYPE_03} THEN TO_CHAR(ROUND(BO.WIN_PRICE,4), 'FM990.0000')
-                     when BO.BID_MODLE IN(#{WIN_TYPE_01},#{WIN_TYPE_02}) THEN TO_CHAR(ROUND(BRT.WIN_PRICE,4), 'FM990.0000') END tradeYield,
+                     when BO.BID_MODLE=#{WIN_TYPE_03} THEN decode(FPI.TENDER_TARGET,'01',to_char(BO.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BO.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BO.WIN_PRICE*10000,'fm999999990.90')||'BP')
+                     when BO.BID_MODLE IN(#{WIN_TYPE_01},#{WIN_TYPE_02}) THEN decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP') END tradeYield,
                 null termDays,
-                TFPDT.TRADE_AMT tradeAmt,
+                TFPDT.TRADE_AMT/10000 tradeAmt,
                 TFPDT.CCY ccy,
                 sdl7.item_value as ccyStr,
                 to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') as confirmTradeDate,
