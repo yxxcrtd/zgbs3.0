@@ -284,6 +284,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProduct.setIsChl(DictCodeList.是否_否.getValue());
         finProduct.setIsRight(finListedBondInfoQuery001Dto.getIsBondsWithRights());
         finProduct.setRegistOrg(finListedBondInfoQuery001Dto.getRegisteredCustodian());
+        finProduct.setIsSus(finListedBondInfoQuery001Dto.getIssus());
         baseFinProductBaseInfoDto.setFinProduct(finProduct);
         //new标的类金融产品附属
         FinProductAdd finProductAdd = new FinProductAdd();
@@ -291,6 +292,9 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductAdd.setWindId(secId);
         finProductAdd.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         finProductAdd.setCrossMarket(DictCodeList.是否_否.getValue());
+        finProductAdd.setIsSecBond(finListedBondInfoQuery001Dto.getIssecbond());
+        finProductAdd.setOriginalOwner(finListedBondInfoQuery001Dto.getOriginalOwner());
+        finProductAdd.setGuaType(finListedBondInfoQuery001Dto.getGuartype());
         //面值
         finProductAdd.setFaceValue(finListedBondInfoQuery001Dto.getFaceValue());
         // 20200819 债券自动加券优化-判断城投债级别 wangwei end

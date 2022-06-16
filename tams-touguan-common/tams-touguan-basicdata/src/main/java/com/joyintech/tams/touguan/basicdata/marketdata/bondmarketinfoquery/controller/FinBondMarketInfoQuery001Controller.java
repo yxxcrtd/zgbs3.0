@@ -58,7 +58,7 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
         initPageParams.put("BASIS", this.getSelectDataFromDataDic(DictCode.计息基础, null));
         initPageParams.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
         initPageParams.put("EXEC_MODE", this.getSelectDataFromDataDic(DictCode.行权方式, null));
-        initPageParams.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.募集方式, null));
+        initPageParams.put("RAISE_TYPE_BOND", this.getSelectDataFromDataDic(DictCode.债券类资产募集方式, null));
         initPageParams.put("BLN_AREA", this.getSelectDataFromDataDic(DictCode.境内外, null));
         initPageParams.put("CYY", this.getSelectDataFromDataDic(DictCode.币种, null));
         initPageParams.put("MAIN_GRADE_RESULT", this.getSelectDataFromDataDic(DictCode.评级结果, null));
