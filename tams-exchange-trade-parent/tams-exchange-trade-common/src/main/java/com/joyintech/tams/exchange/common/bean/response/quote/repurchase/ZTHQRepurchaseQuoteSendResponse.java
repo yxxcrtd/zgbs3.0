@@ -1,6 +1,8 @@
 package com.joyintech.tams.exchange.common.bean.response.quote.repurchase;
 
 
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -33,11 +35,11 @@ public class ZTHQRepurchaseQuoteSendResponse extends NonFirstBaseRepurchaseQuote
 
     @ApiModelProperty(name = "discountStr", value = "当前折算率（单位：%，保留两位小数）")
     private String discountStr;
-    @ApiModelProperty(name = "discountStr", value = "换出金额（单位：元，保留两位小数）")
+    @ApiModelProperty(name = "exchangeAmountStr", value = "换出金额（单位：元，保留两位小数）")
     private String exchangeAmountStr;
-    @ApiModelProperty(name = "discountStr", value = "换入债券数量（单位：万元，保留两位小数）")
+    @ApiModelProperty(name = "swapIntoBondsVolumeStr", value = "换入债券数量（单位：万元，保留两位小数）")
     private String swapIntoBondsVolumeStr;
-    @ApiModelProperty(name = "discountStr", value = "换出债券数量（单位：万元，保留两位小数）")
+    @ApiModelProperty(name = "swapOutBondsVolumeStr", value = "换出债券数量（单位：万元，保留两位小数）")
     private String swapOutBondsVolumeStr;
     @ApiModelProperty(name = "newDiscountStr", value = "新折算率（单位：%，保留两位小数）")
     private String newDiscountStr;
@@ -114,27 +116,27 @@ public class ZTHQRepurchaseQuoteSendResponse extends NonFirstBaseRepurchaseQuote
         this.exchangeAmountStr = exchangeAmountStr;
     }
 
-    public String getSwapIntoBondsVolumeStr() {
-        return swapIntoBondsVolumeStr;
-    }
-
-    public void setSwapIntoBondsVolumeStr(String swapIntoBondsVolumeStr) {
-        this.swapIntoBondsVolumeStr = swapIntoBondsVolumeStr;
-    }
-
-    public String getSwapOutBondsVolumeStr() {
-        return swapOutBondsVolumeStr;
-    }
-
-    public void setSwapOutBondsVolumeStr(String swapOutBondsVolumeStr) {
-        this.swapOutBondsVolumeStr = swapOutBondsVolumeStr;
-    }
-
     public String getNewDiscountStr() {
         return newDiscountStr;
     }
 
     public void setNewDiscountStr(String newDiscountStr) {
         this.newDiscountStr = newDiscountStr;
+    }
+
+    public String getSwapIntoBondsVolumeStr() {
+        if (ObjectUtil.isEmpty(this.getSwapIntoBondsVolume())) {
+            return null;
+        }
+
+        return NumberUtil.div(this.getSwapIntoBondsVolume(), 100,2).toString();
+    }
+
+    public String getSwapOutBondsVolumeStr() {
+        if (ObjectUtil.isEmpty(this.getSwapOutBondsVolume())) {
+            return null;
+        }
+
+        return NumberUtil.div(this.getSwapOutBondsVolume(), 100,2).toString();
     }
 }
