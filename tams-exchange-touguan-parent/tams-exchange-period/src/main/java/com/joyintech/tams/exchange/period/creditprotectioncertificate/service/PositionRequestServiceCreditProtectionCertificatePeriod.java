@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
 /**
@@ -62,6 +63,9 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
         resultMap.put("userId", LoginUserUtil.getUserName());
 //        resultMap.put("computerId","");
         resultMap.put(TOTAL_TRADE_ID, entity.getBusiCode());
+        if (系统动作_修改.getValue().equals((String) resultMap.get("decisionAct"))) {
+            resultMap.put(B_TOTAL_TRADE_ID, entity.getBusiCode());
+        }
         resultMap.put("modelType", DictCodeListExt1.子系统代码_交易.getValue());
 
         String balanceCheck = "Y";
