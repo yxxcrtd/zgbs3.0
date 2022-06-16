@@ -54,13 +54,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.joyintech</groupId>
-			<artifactId>tams-exchange-basicdata</artifactId>
-			<version>${exchange.basicdata.version}</version>
+			<artifactId>tams-exchange-period</artifactId>
+			<version>${exchange.period.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.joyintech</groupId>
 			<artifactId>tams-exchange-basicdata</artifactId>
-			<version>${exchange.period.version}</version>
+			<version>${exchange.basicdata.version}</version>
 		</dependency>
 		
 		<!-- 集成微服务端的代码 -->

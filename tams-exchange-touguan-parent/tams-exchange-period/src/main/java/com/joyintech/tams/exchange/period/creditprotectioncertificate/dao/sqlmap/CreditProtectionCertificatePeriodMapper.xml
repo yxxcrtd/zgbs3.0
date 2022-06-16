@@ -5,10 +5,10 @@
 
     <select id="findPage"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Response">
-        select *
+        select * from
         (select
         case when tfpdl.TRADE_STATUS = '01' then '01'
-            else '03' end validStatus,
+        else '03' end validStatus,
         tfpdl.TOTLE_TRADE_ID busiCode,
         tfpdl.TG_BUSI_TYPE paBussType,
         fp.FINPROD_MARKET_ID finprodMarketId,
@@ -18,17 +18,17 @@
         nvl(tfpdl.SHARE_AMT/10000,0) repNomCapi,
         fpd.REF_ENTITY refEntity,
         tfpdl.TG_BUSI_TYPE creditEvent,
-        tfpdl.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
-        tfpdl.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
-        tfpdl.SETTLE_METHOD settleMethod,
-        tfpdl.DELIVER_BOND deliverBond,
+        TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+        TDTA.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
+        tfpdl.M_DELIVERY_TYPE settleMethod,
+        TDTA.DELIVER_BOND deliverBond,
         tfpdl.TRADE_DATE deliverDate
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+        left join TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
         left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
-        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
-        and tfpdl.P_TOTLE_TRADE_ID is null
         <if test="busiCodeList.size() > 0">
             and tfpdl.TOTLE_TRADE_ID IN
             <foreach collection="busiCodeList" item="busiCode" open="(" close=")" separator=",">
@@ -41,14 +41,14 @@
                 #{finprodId,jdbcType=VARCHAR}
             </foreach>
         </if>
-        <if test="busiTypeList.size() > 0">
+        <if test="busiTypeList != null and busiTypeList.size() > 0">
             and tfpdl.TG_BUSI_TYPE IN
             <foreach collection="busiTypeList" item="busiType" open="(" close=")" separator=",">
                 #{busiType,jdbcType=VARCHAR}
             </foreach>
         </if>
         <if test="settleMethod != null and settleMethod != ''">
-            and tfpdl.SETTLE_METHOD = #{settleMethod,jdbcType=VARCHAR}
+            and tfpdl.M_DELIVERY_TYPE = #{settleMethod,jdbcType=VARCHAR}
         </if>
         union all
         select
@@ -62,18 +62,18 @@
         nvl(tfpdl.SHARE_AMT/10000,0) repNomCapi,
         fpd.REF_ENTITY refEntity,
         tfpdl.TG_BUSI_TYPE creditEvent,
-        tfpdl.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
-        tfpdl.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
-        tfpdl.SETTLE_METHOD settleMethod,
-        tfpdl.DELIVER_BOND deliverBond,
+        TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+        TDTA.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
+        tfpdl.M_DELIVERY_TYPE settleMethod,
+        TDTA.DELIVER_BOND deliverBond,
         tfpdl.TRADE_DATE deliverDate
         from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+        left join WFL_TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
         left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
-        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.TRADE_STATUS = '01'
-        and tfpdl.P_TOTLE_TRADE_ID is null
         <if test="busiCodeList.size() > 0">
             and tfpdl.TOTLE_TRADE_ID IN
             <foreach collection="busiCodeList" item="busiCode" open="(" close=")" separator=",">
@@ -86,29 +86,33 @@
                 #{finprodId,jdbcType=VARCHAR}
             </foreach>
         </if>
-        <if test="busiTypeList.size() > 0">
+        <if test="busiTypeList != null and busiTypeList.size() > 0">
             and tfpdl.TG_BUSI_TYPE IN
             <foreach collection="busiTypeList" item="busiType" open="(" close=")" separator=",">
                 #{busiType,jdbcType=VARCHAR}
             </foreach>
         </if>
         <if test="settleMethod != null and settleMethod != ''">
-            and tfpdl.SETTLE_METHOD = #{settleMethod,jdbcType=VARCHAR}
+            and tfpdl.M_DELIVERY_TYPE = #{settleMethod,jdbcType=VARCHAR}
         </if>
         ) T
-        <if test="validStatusList.size() > 0">
-            and T.validStatus in
-            <foreach collection="validStatusList" item="validStatus" open="(" close=")" separator=",">
-                #{validStatus,jdbcType=VARCHAR}
-            </foreach>
-        </if>
-        order by T.FINPROD_MARKET_ID
+        <where>
+            <if test="validStatusList.size() > 0">
+                and T.validStatus in
+                <foreach collection="validStatusList" item="validStatus" open="(" close=")" separator=",">
+                    #{validStatus,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <!-- 关键字 -->
+            <include refid="findPageQueryConditions"/>
+        </where>
+        order by T.finprodMarketId
     </select>
     <select id="findBusiCode" resultType="com.joyintech.framework.select.SelectOptionDto">
         select tfpdl.TOTLE_TRADE_ID id,
         tfpdl.TOTLE_TRADE_ID text
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
-        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.P_TOTLE_TRADE_ID is null
         <if test="businessCode != null and businessCode != ''">
@@ -120,7 +124,7 @@
         from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
         left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
-        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.TRADE_STATUS = '01'
         and tfpdl.P_TOTLE_TRADE_ID is null
@@ -131,17 +135,253 @@
     <select id="findFinprodId" resultType="com.joyintech.framework.select.SelectOptionDto">
         select FINPROD_MARKET_ID id, NVL(FINPROD_ABBR, FINPROD_NAME) text
         from FIN_PRODUCT
-        <where>
-            <if test="finprodType2 != null and finprodType2 != ''">
-                and FINPROD_TYPE2 = #{finprodType2}
-            </if>
-            <if test="search != null and search != ''">
-                and (instr(FINPROD_MARKET_ID, #{search}) > 0
-                or instr(FINPROD_ID, #{search}) > 0
-                or instr(FINPROD_NAME, #{search}) > 0
-                or instr(FINPROD_ABBR, #{search}) > 0)
-            </if>
-        </where>
+        where FINPROD_TYPE2 = 'F37'
+        <if test="search != null and search != ''">
+            and (instr(FINPROD_MARKET_ID, #{search}) > 0
+            or instr(FINPROD_ID, #{search}) > 0
+            or instr(FINPROD_NAME, #{search}) > 0
+            or instr(FINPROD_ABBR, #{search}) > 0)
+        </if>
     </select>
+    <select id="findFinprodDetail"
+            resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.FinprodLinkDto">
+        select f.FINPROD_ID        finprodId,
+               f.FINPROD_MARKET_ID finprodMarketId,
+               f.FINPROD_NAME      finprodName,
+               f.FINPROD_ABBR      finprodAbbr,
+               f.VDATE             vdate,
+               f.MDATE             mdate,
+               fa.REF_ENTITY       refEntity,
+               mci.CUSTOMER_NAME   refEntityStr,
+               f.TRADE_MARKET      tradeMarket,
+               fa.REF_SEC          refSec,
+               fa.SETTLE_METHOD    settleMethod
+        from FIN_PRODUCT f
+                 left join FIN_PRODUCT_ADD fa on fa.FINPROD_ID = f.FINPROD_ID
+                 left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fa.REF_ENTITY
+        where f.FINPROD_MARKET_ID = #{finprodId}
+          and f.FINPROD_TYPE2 = 'F37'
+    </select>
+    <select id="getEntityByBusinessCode"
+            resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto">
+        select fp.FINPROD_MARKET_ID            finprodMarketId,
+               fp.FINPROD_NAME                 finprodMarketName,
+               fp.VDATE                        vDate,
+               fp.MDATE                        mDate,
+               fpd.REF_ENTITY                  refEntity,
+               mci.CUSTOMER_NAME               refEntityStr,
+               tfpdl.TG_BUSI_TYPE              creditEvent,
+               tfpdl.TG_BUSI_TYPE              paBussType,
+               TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+               TDTA.CREDIT_EVENT_RESOLVE_DATE  creditEventResolveDate,
+               tfpdl.M_DELIVERY_TYPE           settleMethod,
+               TDTA.DELIVER_BOND               deliverBond,
+               tfpdl.TRADE_DATE                deliverDate,
+               tfpdl.TRADE_DATE                tradeDate,
+               tfpdl.TOTLE_TRADE_ID            busiCode,
+               fp.TRADE_MARKET                 tradeMarket
+        from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+                 left join TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fpd.REF_ENTITY
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+        union all
+        select fp.FINPROD_MARKET_ID            finprodMarketId,
+               fp.FINPROD_NAME                 finprodMarketName,
+               fp.VDATE                        vDate,
+               fp.MDATE                        mDate,
+               fpd.REF_ENTITY                  refEntity,
+               mci.CUSTOMER_NAME               refEntityStr,
+               tfpdl.TG_BUSI_TYPE              creditEvent,
+               tfpdl.TG_BUSI_TYPE              paBussType,
+               TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+               TDTA.CREDIT_EVENT_RESOLVE_DATE  creditEventResolveDate,
+               tfpdl.M_DELIVERY_TYPE           settleMethod,
+               TDTA.DELIVER_BOND               deliverBond,
+               tfpdl.TRADE_DATE                deliverDate,
+               tfpdl.TRADE_DATE                tradeDate,
+               tfpdl.TOTLE_TRADE_ID            busiCode,
+               fp.TRADE_MARKET                 tradeMarket
+        from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+                 left join WFL_TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fpd.REF_ENTITY
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+    </select>
+    <select id="getBillingDetailByBusinessCode"
+            resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
+        select TPDA.PORTFOLIO_ID           portfolioId,
+               pp.PORTFOLIO_NAME           portfolioName,
+               sci.BUSI_ACCT_NO            acctNo,
+               tfpdl.SEC_MANAGE_ACCT_ID    secManageAcctId,
+               nvl(tfpdl.SHARE_AMT, 0)     repNomCapi,
+               nvl(T.SHARE_AMT, 0)         deliverBondAmount,
+               DECODE(TG.M_DELIVERY_TYPE, '02', nvl(tfpdl.TRADE_AMT, 0),
+                      NVL(T.TRADE_AMT, 0)) deliveryAmount,
+               tfpdl.REMARK                remark
+        from TRD_PRODUCT_DEAL tfpdl
+                 left join TRD_FIN_PRODUCT_DEAL_TOTAL TG ON TG.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+                 LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPDA.TRADE_ID = tfpdl.TRADE_ID
+                 LEFT JOIN (SELECT T1.TOTLE_TRADE_ID,
+                                   T1.FINPROD_ID,
+                                   T1.SHARE_AMT,
+                                   T1.TRADE_AMT,
+                                   T1.SEC_MANAGE_ACCT_ID,
+                                   T2.PORTFOLIO_ID
+                            FROM TRD_PRODUCT_DEAL T1
+                                     LEFT JOIN TRD_PRODUCT_DEAL_ADD T2 ON T1.TRADE_ID = T2.TRADE_ID
+                            WHERE T1.FINPROD_TYPE2 = 'F01') T ON T.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+            AND TFPDL.SEC_MANAGE_ACCT_ID = T.SEC_MANAGE_ACCT_ID AND TPDA.PORTFOLIO_ID = T.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join PTL_PORTFOLIO pp on TPDA.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = tfpdl.SEC_MANAGE_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+          and tfpdl.FINPROD_TYPE2 = 'F37'
+        union all
+        select TPDA.PORTFOLIO_ID           portfolioId,
+               pp.PORTFOLIO_NAME           portfolioName,
+               sci.BUSI_ACCT_NO            acctNo,
+               tfpdl.SEC_MANAGE_ACCT_ID    secManageAcctId,
+               nvl(tfpdl.SHARE_AMT, 0)     repNomCapi,
+               nvl(T.SHARE_AMT, 0)         deliverBondAmount,
+               DECODE(TG.M_DELIVERY_TYPE, '02', nvl(tfpdl.TRADE_AMT, 0),
+                      NVL(T.TRADE_AMT, 0)) deliveryAmount,
+               tfpdl.REMARK                remark
+        from WFL_TRD_PRODUCT_DEAL tfpdl
+                 left join WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TG ON TG.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+                 LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD TPDA ON TPDA.TRADE_ID = tfpdl.TRADE_ID
+                 LEFT JOIN (SELECT T1.TOTLE_TRADE_ID,
+                                   T1.FINPROD_ID,
+                                   T1.SHARE_AMT,
+                                   T1.TRADE_AMT,
+                                   T1.SEC_MANAGE_ACCT_ID,
+                                   T2.PORTFOLIO_ID
+                            FROM WFL_TRD_PRODUCT_DEAL T1
+                                     LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD T2 ON T1.TRADE_ID = T2.TRADE_ID
+                            WHERE T1.FINPROD_TYPE2 = 'F01') T ON T.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+            AND TFPDL.SEC_MANAGE_ACCT_ID = T.SEC_MANAGE_ACCT_ID AND TPDA.PORTFOLIO_ID = T.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join PTL_PORTFOLIO pp on TPDA.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = tfpdl.SEC_MANAGE_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+          and tfpdl.FINPROD_TYPE2 = 'F37'
+    </select>
+    <select id="getBillingDetailsByFinprodMarketId"
+            resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
+        select p.PORTFOLIO_ID    portfolioId,
+               pp.PORTFOLIO_NAME portfolioName,
+               sci.BUSI_ACCT_NO  acctNo,
+               nvl(p.AMOUNT, 0)  repNomCapi,
+               nvl(p.AMOUNT, 0)  deliverBondAmount,
+               p.SEC_ACCT_ID     secAcctId
+        from PTL_SEC_POSITION_RULE p
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on p.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        where fp.FINPROD_MARKET_ID = #{finprodId}
+          and p.CDATE = #{tradeDate}
+          and p.HODING_TYPE = 'A_001'
+          and p.DATE_TYPE = 0
+    </select>
+    <select id="getBillingDetailsByFinprodMarketIdOld"
+            resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
+        select p.PORTFOLIO_ID    portfolioId,
+               pp.PORTFOLIO_NAME portfolioName,
+               sci.BUSI_ACCT_NO  acctNo,
+               nvl(p.AMOUNT, 0)  repNomCapi,
+               nvl(p.AMOUNT, 0)  deliverBondAmount,
+               p.SEC_ACCT_ID     secAcctId
+        from PTL_SEC_POSITION p
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on p.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        where fp.FINPROD_MARKET_ID = #{finprodId}
+          and p.CDATE = #{tradeDate}
+          and p.HODING_TYPE = '03'
+    </select>
+    <select id="getRefSecsByRefEntity" resultType="java.lang.String">
+        select distinct fa.REF_SEC
+        from FIN_PRODUCT f
+        left join FIN_PRODUCT_ADD fa on fa.FINPROD_ID = f.FINPROD_ID
+        where f.ISSUER in
+        <foreach collection="refEntityArray" item="refEntity" open="(" close=")" separator=",">
+            #{refEntity,jdbcType=VARCHAR}
+        </foreach>
+        and fa.REF_SEC is not null
+    </select>
+    <select id="getAmountByPortfolioIdOld" resultType="java.math.BigDecimal">
+        select nvl(p.AMOUNT, 0)
+        from PTL_SEC_POSITION p
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on p.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        where p.PORTFOLIO_ID = #{portfolioId}
+          and fp.FINPROD_MARKET_ID = #{finprodMarketId}
+          and p.CDATE = #{tradeDate}
+          and p.HODING_TYPE = '03'
+    </select>
+
+    <select id="getAmountByPortfolioId" resultType="java.math.BigDecimal">
+        select nvl(p.AMOUNT, 0)
+        from PTL_SEC_POSITION_RULE p
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on p.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        where p.PORTFOLIO_ID = #{portfolioId}
+          and fp.FINPROD_MARKET_ID = #{finprodMarketId}
+          and p.CDATE = #{tradeDate}
+          and p.HODING_TYPE = 'A_001'
+          and p.DATE_TYPE = 0
+    </select>
+    <select id="queryOptionsForRefSecs" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        T1.FINPROD_MARKET_ID id,
+        T1.FINPROD_ABBR text
+        FROM FIN_PRODUCT T1
+        where T1.FINPROD_MARKET_ID IN
+        <foreach collection="refSecs" item="refSec" open="(" close=")" separator=",">
+            #{refSec,jdbcType=VARCHAR}
+        </foreach>
+    </select>
+    <select id="getFinprodName" resultType="java.lang.String">
+        select NVL(FINPROD_ABBR, FINPROD_NAME)
+        from FIN_PRODUCT
+        where FINPROD_MARKET_ID = #{finprodId,jdbcType=VARCHAR}
+          AND FINPROD_TYPE2 = 'F01'
+          AND TRADE_MARKET in ('03', '04')
+    </select>
+    <sql id="findPageQueryConditions">
+        <if test="search != null and search != ''">
+            and (
+            T.validStatus|| '|' ||T.busiCode|| '|' ||T.paBussType|| '|' ||T.finprodMarketId|| '|'
+            ||T.finprodMarketName|| '|' ||T.vDateWhole|| '|' ||T.mDateWhole|| '|' ||
+            T.repNomCapi|| '|' ||T.refEntity|| '|' || T.creditEvent|| '|'|| T.creditEventHappenedDate|| '|'||
+            T.creditEventResolveDate|| '|' || T.settleMethod|| '|' || T.deliverBond|| '|' || T.deliverDate
+            like '%' || #{search} || '%'
+            )
+        </if>
+    </sql>
+    <!--
+    <select id="queryOptionsForRefSecs" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        CUSTOMER_ID id,
+        CUSTOMER_NAME text
+        FROM MST_CUSTOMER_INFO
+        where CUSTOMER_ID in
+        <foreach collection="refSecs" item="refSec" open="(" close=")" separator=",">
+            #{refSec,jdbcType=VARCHAR}
+        </foreach>
+    </select>
+    -->
 
 </mapper>

@@ -220,4 +220,13 @@
         WHERE
             SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectTrdProductDealByTotleTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+        SELECT
+            <include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Base_Column_List" />
+        FROM
+            TRD_PRODUCT_DEAL
+        WHERE
+            TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
+    </select>
 </mapper>

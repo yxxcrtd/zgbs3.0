@@ -21,14 +21,19 @@ public class CfetsEtrSecStockConfig extends BaseEntity {
     private List<List<String>> windtype;
 
     /**
-     * 资产四级分类
+     * 资产一级分类
      */
     private String windtypeone;
 
     /**
-     * 资产五级分类
+     * 资产二级分类
      */
     private String windtypetwo;
+
+    /**
+     * 资产三级分类
+     */
+    private String windtypethree;
 
 
     /**
@@ -110,6 +115,14 @@ public class CfetsEtrSecStockConfig extends BaseEntity {
 
     public void setWindtypetwo(String windtypetwo) {
         this.windtypetwo = windtypetwo;
+    }
+
+    public String getWindtypethree() {
+        return windtypethree;
+    }
+
+    public void setWindtypethree(String windtypethree) {
+        this.windtypethree = windtypethree;
     }
 
     /**

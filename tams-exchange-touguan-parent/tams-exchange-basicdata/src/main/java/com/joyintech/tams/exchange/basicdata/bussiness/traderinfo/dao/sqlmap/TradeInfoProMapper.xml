@@ -125,6 +125,9 @@
           inner JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
                and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
           where mdi.CUSTOMER_ID = #{customerId} and mdi.DEALER_NO = #{dealerNo}
+        <if test="isOur != null and isOur != ''">
+            and MDDI.IS_OUR = #{isOur}
+        </if>
     </select>
     <select id="existsTrader" resultType="java.lang.Integer">
          select count(1) from MST_DEALER_INFO mdi
@@ -195,6 +198,10 @@
                                  inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
         where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.DEALER_PARTY_NO = #{dealerPartyNo}
           and mddi.TRADER_NO = #{traderNo}
+    </select>
+
+    <select id="existsTraderSingle" resultType="java.lang.String">
+        select wm_concat(DEALER_NO) from MST_DEALER_INFO where  DEALER_NO = #{dealerNo}
     </select>
 
 </mapper>

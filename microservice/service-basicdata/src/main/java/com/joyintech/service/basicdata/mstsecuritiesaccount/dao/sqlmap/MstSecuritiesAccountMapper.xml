@@ -848,6 +848,7 @@
         from (
         select a.finprod_market_id,
         a.finprod_market_id || '|' || a.finprod_abbr as finprod_name,
+        a.FINPROD_NAME name,
         null as oth_code_type,
         a.finprod_type2,
         a.finprod_id,
@@ -872,11 +873,12 @@
         <if test="acctTradeMarket != null and acctTradeMarket != ''">
             and a.trade_market = #{acctTradeMarket}
         </if>
-        and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37})<!--  债券 -->
+        and a.finprod_type2 in (#{FINPROD_TYPE_TG_F37})<!--  不查找债券 -->
         and r.type_6 != #{type6_B14}
         union
         select distinct a.MARKET_ID as finprod_market_id,
         concat(concat(a.MARKET_ID,'|'),a.TERM_TYPE) as finprod_name,
+        null as name,
         null as oth_code_type,
         null as finprod_type2,
         a.TERM_TYPE as finprod_id,
@@ -895,7 +897,7 @@
         from MST_REPO_PRODUCT a
         ) t
         <where>
-            t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37})   <!--#{FINPROD_TYPE2}-->
+            t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37})   <!--#{FINPROD_TYPE2}-->
             <if test="acctTradeMarket != null and acctTradeMarket != ''">
                 and t.TRADE_MARKET = #{acctTradeMarket}
             </if>
@@ -909,8 +911,11 @@
                 and t.FINPROD_MARKET_ID = #{initValue}
             </if>
             <if test="search != null and !search.equals('')">
-                AND (t.finprod_market_id like concat('%',concat(#{search},'%')) OR t.finprod_name like
-                concat('%',concat(#{search},'%')))
+                AND (
+                    t.finprod_market_id like concat('%',concat(#{search},'%'))
+                OR t.finprod_name like concat('%',concat(#{search},'%'))
+                or t.name like concat('%',concat(#{search},'%'))
+                )
             </if>
         </where>
         ) aaa order by aaa.TRADE_MARKET,aaa.termType asc

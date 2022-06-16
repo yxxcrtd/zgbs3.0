@@ -8,7 +8,7 @@ import com.joyintech.tams.exchange.common.bean.HistoryTrade;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.PresentOrHistoryQryType;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.db.domain.TradeHistory;
@@ -155,7 +155,8 @@ public class TradeManagement {
                 trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 trade.setBondVolume(trade.getTradedPrice().multiply(BigDecimal.valueOf(trade.getTradedVolume())).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
                 trade.setTradedPrice(trade.getTradedPrice().multiply(BigDecimal.valueOf(100)));
-            } else if (投管业务类型_现券交易.getValue().equals(trade.getBusiTypeTg())) {
+            } else if (投管业务类型_现券交易.getValue().equals(trade.getBusiTypeTg())
+                    || 投管业务类型_信用保护凭证.getValue().equals(trade.getBusiTypeTg())) {
                 trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
             } else if (投管业务类型_通用式质押回购.getValue().equals(trade.getBusiTypeTg())) {
                 trade.setTradedBalance(trade.getTradedBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
@@ -184,7 +185,7 @@ public class TradeManagement {
 
     private void setFutureStockCode(List<Trade> list) {
         list.forEach(trade -> {
-            if (InvestmentAssetType.isFutures(trade.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(trade.getAssetType())) {
                 trade.setStockCode(StockCodeUtils.getStockCode(trade.getStockCode()));
             }
         });

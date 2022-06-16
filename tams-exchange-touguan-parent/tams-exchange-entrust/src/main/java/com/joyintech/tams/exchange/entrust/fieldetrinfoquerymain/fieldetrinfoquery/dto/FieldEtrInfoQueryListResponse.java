@@ -75,7 +75,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     private String effectFlag;
 
     @ApiModelProperty(name="etrPrice",value="指令价格",example="99")
-    private BigDecimal etrPrice;
+    private String etrPrice;
 
     @ApiModelProperty(name="exeProgress",value="执行进度%",example="50%")
     private BigDecimal exeProgress;
@@ -116,6 +116,13 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     @ApiModelProperty(name="assetType1",value="资产一级类型",example="质押式协议回购")
     private String assetType1;
 
+    @ApiModelProperty(name = "bidModle", value = "投标方式")
+    private String bidModle;
+
+    @ApiModelProperty(name = "isWin", value = "中标结果")
+    private String isWin;
+
+
     /**
      * 获取 otherEntrustStatus
      * @return otherEntrustStatus.
@@ -142,7 +149,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
      */
     public String getOtherFinprodType2() {
         if (StringUtil.equals(super.getFinprodType2(), BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue())){
-            return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, BussinessDictCodeList.平安资产类型_一级投标债券.getValue());
+            return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, BussinessDictCodeList.平安资产类型_债券.getValue());
         }
         else if (StringUtil.equals(getAssetType(), BussinessDictCodeList.平安资产类型_回购.getValue())
                 && StringUtil.equals(getAssetType1(), DictCodeList.回购类型_质押式协议回购.getValue())) {
@@ -259,11 +266,11 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
             return tips + numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(10000),2)) + "(万元)";
         }
-        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())){
-            return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
-        }else {
-            return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
+                StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
+            return tips + numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(100),2)) + "(万元)";
         }
+        return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
     }
     public BigDecimal getEntrustNum() {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
@@ -388,28 +395,41 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getOtherBusiTypePosition() {
-        return SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
+        String busiTypePosition = SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
+        if (StringUtil.isEmpty(busiTypePosition)) {
+            return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
+        }
+        return busiTypePosition;
     }
 
-    public BigDecimal getEtrPrice() {
-        if (etrPrice == null){
-            return null;
-        }
-        if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), this.getBusiTypePosition()) &&
-                StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), this.getPriceModel())){
-            return null;
-        }
-        if (StringUtil.equals(this.getBusiTypePosition(),DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
-            return null;
-        }
-        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
-            && StringUtils.equals("PRM03",this.getPriceModel())){
-            return new BigDecimal("0.00");
-        }
-        if(StringUtils.equals(getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
-            return etrPrice.setScale(3,BigDecimal.ROUND_HALF_UP);
-        }
-        return etrPrice.setScale(4, RoundingMode.HALF_UP);
+//    public BigDecimal getEtrPrice() {
+//        if (etrPrice == null){
+//            return null;
+//        }
+//        if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), this.getBusiTypePosition()) &&
+//                StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), this.getPriceModel())){
+//            return null;
+//        }
+//        if (StringUtil.equals(this.getBusiTypePosition(),DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+//            return null;
+//        }
+//        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
+//            && StringUtils.equals("PRM03",this.getPriceModel())){
+//            return new BigDecimal("0.00");
+//        }
+//        if(StringUtils.equals(getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+//            return etrPrice.setScale(3,BigDecimal.ROUND_HALF_UP);
+//        }
+//        return etrPrice.setScale(4, RoundingMode.HALF_UP);
+//    }
+
+
+    public String getEtrPrice() {
+        return etrPrice;
+    }
+
+    public void setEtrPrice(String etrPrice) {
+        this.etrPrice = etrPrice;
     }
 
     public String getEtrPriceStr() {
@@ -427,9 +447,9 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         return tips + getEtrPrice();
     }
 
-    public void setEtrPrice(BigDecimal etrPrice) {
-        this.etrPrice = etrPrice;
-    }
+//    public void setEtrPrice(BigDecimal etrPrice) {
+//        this.etrPrice = etrPrice;
+//    }
 
     public BigDecimal getExecFinishAmt() {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
@@ -609,5 +629,21 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
                 break;
         }
         return termDays;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
+    public String getIsWin() {
+        return isWin;
+    }
+
+    public void setIsWin(String isWin) {
+        this.isWin = isWin;
     }
 }

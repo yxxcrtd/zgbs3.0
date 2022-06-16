@@ -14,16 +14,24 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.intf.DataDictItem;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.util.*;
-
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.business.common.dto.CommonSearchInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
-import com.joyintech.tams.constant.*;
-import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FinProdResponse;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dao.FieldEtrInfoQueryMapper;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.EntrustQueryBean;
+import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListRequest;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListResponse;
+import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FinProdResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.TradeQueryBean;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -34,7 +42,13 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -178,6 +192,30 @@ public class FieldEtrInfoQueryService extends BaseService {
         } else {
             return pageLimit;
         }
+
+        List<FieldEtrInfoQueryListResponse> list = pageLimit.getRoot();
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(list)) {
+
+            for (FieldEtrInfoQueryListResponse response : list) {
+                //一级投标债券 重新计算执行进度和成交进度
+                if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
+                        StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+                    FieldEtrInfoQueryListResponse dto2 = fieldEtrInfoQueryMapper.getEtrFirstBidInfo(response.getEntrustId());
+                    if (dto2 != null) {
+                        response.setExecFinishAmt(dto2.getExecFinishAmt());
+                        response.setExecRemainderAmt(dto2.getExecRemainderAmt());
+                        response.setExeProgress(dto2.getExeProgress());
+                        response.setTransFinishAmt(dto2.getTransFinishAmt());
+                        response.setTransRemainderAmt(dto2.getTransRemainderAmt());
+                        response.setDealProgress(dto2.getDealProgress());
+                    }
+                }
+            }
+
+        }
+
+        pageLimit.setRoot(list);
+
         return pageLimit;
     }
 
@@ -185,6 +223,22 @@ public class FieldEtrInfoQueryService extends BaseService {
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
                 () -> fieldEtrInfoQueryMapper.findFinProdMarketIdList(pageParam));
+    }
+
+
+    /**
+     * 一级债券指令执行查询
+     * @param dto
+     * @return
+     */
+    public Page<FieldEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(CommonSearchInfoRequest dto) {
+        Map<String, Object> pageParam = BeanUtil.object2Map(dto);
+        List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
+        if (StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1) {
+            return new Page<FieldEtrBondFirstExeListInfoResponse>();
+        }
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
+                () -> fieldEtrInfoQueryMapper.getEtrBondFirstExeListInfo(pageParam));
     }
 
     public Page<EntrustQueryBean> getEtrDispatcherExeListInfo(CommonSearchInfoRequest dto) {
@@ -278,4 +332,5 @@ public class FieldEtrInfoQueryService extends BaseService {
             response.setTradedBalanceStr(ArithmeticUtil.divide(response.getClearBalance(), new BigDecimal(100), 2) + "(万元)");
         }
     }
+
 }

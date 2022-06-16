@@ -1109,6 +1109,7 @@
             and t1.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
             )
         </if>
+        and  (IS_EXIST_NEW is null or IS_EXIST_NEW = 'N')
     </select>
 
 
@@ -1122,4 +1123,13 @@
           and HODING_TYPE = #{holdingType,jdbcType=VARCHAR}
     </select>
     <!--// modify by etliu 20220226 end-->
+
+    <select id="selectTrdProductDealByTotleTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+        SELECT
+            <include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Base_Column_List" />
+        FROM
+            TRD_PRODUCT_DEAL
+        WHERE
+            TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
+    </select>
 </mapper>

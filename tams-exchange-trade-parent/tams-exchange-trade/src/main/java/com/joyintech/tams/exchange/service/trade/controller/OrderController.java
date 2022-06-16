@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+import static com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum.STANDARD_COUPONS_IN_AND_OUT;
 
 @RestController("OrderController_dtx")
 @RequestMapping("/trade/joyin")
@@ -84,7 +84,7 @@ public class OrderController {
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
 
-        if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
+        if (STANDARD_COUPONS_IN_AND_OUT.getCode().equals(instruction.getBusiTypeTg())) {
             order.setEntrustPrice(NumberUtil.div(order.getEntrustPrice(), 100));
         }
 
@@ -171,12 +171,6 @@ public class OrderController {
         BeanUtils.copyProperties(order, integratedEntrust);
         if (DictCodeListExt3.投管业务类型_解除质押.getValue().equals(instruction.getBusiTypeTg()) && order.getEntrustVolume() == 0) {
             integratedEntrust.setEntrustVolume(instruction.getEntrustNum());
-        }
-
-        if (StringUtil.isNotEmpty(order.getCounterId())) {
-            Map<String, Object> extend2 = Maps.newHashMap();
-            extend2.put("counterId", order.getCounterId());
-            integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
         }
 
         String entrustBs = EntrustPropUtils.getEntrustBs(instruction);

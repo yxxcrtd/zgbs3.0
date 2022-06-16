@@ -50,11 +50,11 @@ public class SaleInterfJob{
     	Map<String, String> res = new HashMap<>();
     	
     	String date = iPlatformDate.getSysDateStr();
-    	
-    	saleSystemInterfService.sendMarketIssueToSale(date);
+        // Sonar Fix modify by huwei 220608
+        Map<String, Object> result = saleSystemInterfService.sendMarketIssueToSale(date);
     	
     	//通知适配器生成文件
-        boolean flag = false;
+        boolean flag = (boolean) result.get("flag");
         
         if(flag){
         	res.put("status", DictCodeList.发送状态_发送成功.getValue());
@@ -76,11 +76,11 @@ public class SaleInterfJob{
     	Map<String, String> res = new HashMap<>();
     	
     	String date = iPlatformDate.getSysDateStr();
-    	
-    	saleSystemInterfService.sendProductInfoToSaleByDate(date);
+
+        Map<String, Object> result = saleSystemInterfService.sendProductInfoToSaleByDate(date);
     	
     	//通知适配器生成文件
-        boolean flag = false;
+        boolean flag = (boolean) result.get("flag");
         
         if(flag){
         	res.put("status", DictCodeList.发送状态_发送成功.getValue());
@@ -101,11 +101,12 @@ public class SaleInterfJob{
     	Map<String, String> res = new HashMap<>();
     	
     	String date = iPlatformDate.getSysDateStr();
-    	
-    	saleSystemInterfService.sendBonusPlanToSaleByDate(date);
+
+        // Sonar Fix modify by huwei 220608
+        Map<String, Object> result = saleSystemInterfService.sendBonusPlanToSaleByDate(date);
     	
     	//通知适配器生成文件
-        boolean flag = false;
+        boolean flag = (boolean) result.get("flag");
         
         if(flag){
         	res.put("status", DictCodeList.发送状态_发送成功.getValue());

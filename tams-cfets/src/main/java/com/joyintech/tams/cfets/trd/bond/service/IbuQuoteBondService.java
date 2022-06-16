@@ -15,6 +15,7 @@ import com.joyintech.service.bankuplink.bond.service.CfetsBondDealQuotedPriceSer
 import com.joyintech.service.bankuplink.ibu.service.IbuComponentCommonService;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
@@ -97,7 +98,7 @@ public class IbuQuoteBondService extends BaseService {
     @Autowired
     private CfetsEtrDispatcherService cfetsEtrDispatcherService;
 
-    @Autowired
+    @Autowired(required = false)
     private CfetsBondDealQuotedPriceService cfetsBondDealQuotedPriceService;
 
     @Autowired
@@ -117,7 +118,7 @@ public class IbuQuoteBondService extends BaseService {
     @Autowired
     private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private IbuComponentCommonService ibuComponentCommonService;
 
     @Autowired
@@ -344,6 +345,25 @@ public class IbuQuoteBondService extends BaseService {
             paramExer.put("finprodId",cfetsBondDealQuoteCommonDto.getFinprodId());
             Boolean flag=cfetsetrIbBondinfoMapper.queryAssetIsRight(paramExer);
             cfetsBondDealQuoteCommonDto.setExercisePlan(flag);
+            boolean priceIsNull = true;
+            // 行权净价为空的数据
+            if (!StringUtil.isNotEmpty(finExercisePlan)
+                    || !StringUtil.isNotEmpty(finExercisePlan.getExercisePrice())) {
+                priceIsNull = false;
+            }
+            cfetsBondDealQuoteCommonDto.setIsExercisePlanPrice(priceIsNull);
+            // 特殊债券信息查询
+            List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(cfetsBondDealQuoteCommonDto.getFinprodId()));
+            if (CollectionUtils.isNotEmpty(list)) {
+                cfetsBondDealQuoteCommonDto.setIsDefaultBondIndicator(list.get(0).getIsDefaultBondIndicator());
+                cfetsBondDealQuoteCommonDto.setIsSpecialDebt(list.get(0).getIsSpecialDebt());
+                cfetsBondDealQuoteCommonDto.setIsAbs(list.get(0).getIsAbs());
+                if (StringUtil.equals(cfetsBondDealQuoteCommonDto.getIsAbs(), DictCodeListExt1.是否_是.getValue())
+                        || StringUtil.equals(cfetsBondDealQuoteCommonDto.getIsDefaultBondIndicator(), DictCodeListExt1.是否_是.getValue())
+                        || StringUtil.equals(cfetsBondDealQuoteCommonDto.getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
+                    cfetsBondDealQuoteCommonDto.setIsSpecial(DictCodeListExt1.是否_是.getValue());
+                }
+            }
 
             //登记本方交易员应默认当前登录用户姓名
             cfetsBondDealQuoteCommonDto.setQuoteMySideTrader(cfetsBondDealQuoteCommonDto.getMySideTrader());
@@ -372,6 +392,9 @@ public class IbuQuoteBondService extends BaseService {
                 calRequest.setFpriceAmt(cfetsBondDealQuoteCommonDto.getFpriceAmt());
                 calRequest.setSecManageAcctId(cfetsBondDealQuoteCommonDto.getSecManageAcctId());
                 calRequest.setShareAmt(cfetsBondDealQuoteCommonDto.getShareAmt());
+                // TISHKS-1393:增加FinprodId赋值 modify by fuyongsheng start
+                calRequest.setFinprodId(cfetsBondDealQuoteCommonDto.getFinprodId());
+                // TISHKS-1393:增加FinprodId赋值 modify by fuyongsheng end
                 List<TrdTradeFeeDetail> trdTradeFeeDetails = ibuQuoteBondCalService.calFee(calRequest);
                 if(CollectionUtils.isNotEmpty(trdTradeFeeDetails)){
                     trdTradeFeeDetails.forEach(item ->{
@@ -429,10 +452,11 @@ public class IbuQuoteBondService extends BaseService {
         Map<String,Object> anchoringValueMap = handcalAnchoringValue(entrustDtos,"02");
         Set<String> set = anchoringValueMap.keySet();
         String calculateField = StringUtil.EMPTY;BigDecimal comparValue = null;
-        for (String key : set) {
+        // Sonar Fix modify by huwei 220608
+        if (set.iterator().hasNext()) {
+            String key = set.iterator().next();
             calculateField = key;
             comparValue = (BigDecimal)anchoringValueMap.get(key);
-            break;
         }
         for (CfetsBondDealEntrustOrderDto item : entrustDtos) {
             comparValue = ArithmeticUtil.round(comparValue,4, RoundingMode.HALF_UP);
@@ -835,7 +859,12 @@ public class IbuQuoteBondService extends BaseService {
             }
         }else{
             FinProduct finProduct = finProductMapper.selectByPrimaryKey(entrustDtos.get(0).getFinprodId());
-            if(StringUtil.equals(finProduct.getIsRight(), com.joyintech.tams.constant.DictCodeList.是否_是.getValue())){
+            // 查询行权净价为空的数据
+            Map<String, Object> param = new HashMap<>();
+            param.put("finprodId", entrustDtos.get(0).getFinprodId());
+            param.put("isNull", DictCodeList.是否_是.getValue());
+            FinExercisePlan finExercisePlan = cfetsetrIbBondinfoMapper.findAssetExercise(param);
+            if (StringUtil.equals(finProduct.getIsRight(), DictCodeList.是否_是.getValue()) && !StringUtil.isNotEmpty(finExercisePlan)) {
                 //锚定值非行权收益率，在交易执行面板，应该默认选择到期收益率
                 if(!groupByCalculateField.containsKey("03")){
                     translateKey = "02";
@@ -983,7 +1012,7 @@ public class IbuQuoteBondService extends BaseService {
         return cfetsEtrDispatcherService.refuseEntrust(param);
     }
 
-    public void doForcedFinish(Map<String,Object> param) throws Exception{
+    public CfetsEtribBondInfo003Dto doForcedFinish(Map<String,Object> param) throws Exception{
         setParam(param);
         List<CfetsBondDealEntrustOrderDto> entrustDtos = cfetsIbuQuoteBondMapper.listEntrust(param);
         if(entrustDtos != null && entrustDtos.size()>0){
@@ -1034,26 +1063,13 @@ public class IbuQuoteBondService extends BaseService {
                         recallEntrustIdList.add(etrDto);
                     }
                 }
-
-                //没有做过交易，直接关闭的
-                if(!com.joyintech.background.component.common.pack.common.util.StringUtil.isEmptyList(recallEntrustIdList)) {
-                    // add by yushilong 批量撤销预占 start
-                    EntrustRdsCommonAop.doListPreOccupy(recallEntrustIdList, com.joyintech.tams.constant.DictCodeList.平安资产类型_债券.getValue(),
-                            BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);
-                    // add by yushilong 批量撤销预占 end
-                }
-
-                //已经有委托完成度的
-                if(!com.joyintech.background.component.common.pack.common.util.StringUtil.isEmptyList(closeEntrustIdList)) {
-                    EntrustCompleteUtil.doComplete(closeEntrustIdList);
-                }
             }
             // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit end
             // add by zhangrui1 批量委托关闭 end
-            if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
+            if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                 //插入旧头寸
                 dtolist.forEach(item ->{
-                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), com.joyintech.tams.constant.DictCodeList.是否_是.getValue());
+                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), DictCodeList.是否_是.getValue());
                 });
             }
 
@@ -1063,7 +1079,11 @@ public class IbuQuoteBondService extends BaseService {
             dtolist.forEach(item ->{
                 cfetsEtrIbBondinfoService.forcedFinishOprHisMethod(item);
             });
+            CfetsEtribBondInfo003Dto info003Dto = new CfetsEtribBondInfo003Dto();
+            info003Dto.setSelectedItem(dtolist);
+            return info003Dto;
         }
+        return null;
     }
     /**
      * 强制完成check
@@ -1332,9 +1352,10 @@ public class IbuQuoteBondService extends BaseService {
             if(item.getStatisticalTimes()!=0){
                 quoteIds.add(item.getQuoteId());
             }
+            // Sonar Fix modify by huwei 220608
             if(StringUtil.isEmpty(item.getFinprodMarketId())||StringUtil.isEmpty(item.getFinprodName())||StringUtil.isEmpty(item.getPsStr())||StringUtil.isEmpty(item.getOuPartyName())
             ||StringUtil.isEmpty(item.getCpPartyName())||StringUtil.isEmpty(item.getCpTraderName())||null==item.getShareAmt()||null==item.getPrice()||null==item.getMatureYield()||StringUtil.isEmpty(item.getSettleTypeStr())
-            ||StringUtil.isEmpty(item.getSettleMethodStr())||StringUtil.isEmpty(item.getSettleTypeStr())){
+            ||StringUtil.isEmpty(item.getSettleMethodStr())){
                 result.put("messagesoft","存在必填项为空值");
                 break;
             }

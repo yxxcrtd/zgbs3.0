@@ -47,9 +47,9 @@
         B.EXERCISE_DATE exerciseDate,
         T9.PAY_CYCLE payCycle,
         MR.RATING mGradeResult,
-        T10.CUSTOMER_NAME mGradeOrgId,
+        MR.GRADE_ORG_ID mGradeOrgId,
         BR.RATING bGradeResult,
-        T11.CUSTOMER_NAME bGradeOrgId
+        BR.GRADE_ORG_ID bGradeOrgId
         FROM FIN_PRODUCT T1
         LEFT JOIN MST_CUSTOMER_INFO ON MST_CUSTOMER_INFO.CUSTOMER_ID = T1.ISSUER
         LEFT JOIN FIN_PRODUCT_ADD T2 ON T1.FINPROD_ID = T2.FINPROD_ID
@@ -83,7 +83,7 @@
         FROM MST_BOND_CREDIT_RATING MBCR
         WHERE MBCR.O_TYPE = '01' AND MBCR.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platDate},'YYYY-MM-DD')
         ) WHERE RANK=1
-        ) MR on T1.FINPROD_MARKET_ID = MR.ASSET_CODE
+        ) MR on  T1.ISSUER = MR.ASSET_CODE
         LEFT JOIN MST_CUSTOMER_INFO T10 ON T10.CUSTOMER_ID=MR.GRADE_ORG_ID
         LEFT JOIN (SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
         SELECT MBCR.O_CODE AS ASSET_CODE ,MBCR.GRADE_RESULT AS RATING,MBCR.GRADE_ORG_ID as GRADE_ORG_ID,
@@ -398,6 +398,38 @@
         </where>
     </select>
 
+    <select id="getBasicInfoByInterf" parameterType="Map" resultType="com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest">
+        SELECT
+            PAYHSRCSECINFO.SECID finprodMarketId,
+            PAYHSRCSECINFO.SECFULLNAME FINPROD_NAME,
+            PAYHSRCSECINFO.SECNAME FINPROD_ABBR,
+            PAYHSRCSECINFO.MARKET TRADE_MARKET,
+            PAYHSRCSECINFO.INSTITUTION REGIST_ORG,
+            PAYHSRCSECINFO.ISSUEPRICE ISSUE_PRICE,
+            PAYHSRCSECINFO.VDATE,
+            PAYHSRCSECINFO.MDATE,
+            PAYHSRCSECINFO.PUBENDDATE IDATE,
+            PAYHSRCSECINFO.DELISTING_DATE delistingDate,
+            PAYHSRCSECINFO.ISSUEAMT ISSUE_AMT,
+            PAYHSRCSECINFO.ISSUERSHORT ISSUER,
+            TYPE_CONFIG.INPUT_VALUE_2 TYPE_9,
+            TYPE_CONFIG.INPUT_VALUE_3 TYPE_10,
+            TYPE_CONFIG.INPUT_VALUE_4 TYPE_11,
+            PAYHSRCSECINFO.ISSUETYPE ISSUE_TYPE,
+            PAYHSRCSECINFO.ISSUS IS_SUS,
+
+            CASE WHEN ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y' ) THEN 'Y' ELSE 'N' END AS
+                IS_RIGHT,
+            'Y' IS_ALLOW_OVERWRITE
+
+        FROM
+            INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+                LEFT JOIN FIN_PRODUCT_TYPE_CONFIG TYPE_CONFIG ON TYPE_CONFIG.INPUT_VALUE_1 = 'F01'
+                AND TYPE_CONFIG.INPUT_VALUE_2 = PAYHSRCSECINFO.SECTYPE
+                AND TYPE_CONFIG.INPUT_VALUE_3 = PAYHSRCSECINFO.SECTYPE2
+        WHERE SECID =  #{finprodId}
+    </select>
+
     <select id = "selectCountByfinprodMarketId" resultType="java.lang.Integer">
         SELECT
             count( * )
@@ -509,8 +541,11 @@
     <select id = "selectIsIssueAsset" resultType="java.lang.Integer">
         SELECT count(1)
         FROM FIN_PRODUCT FP
-  INNER JOIN FIN_PRODUCT_ADD FPA
+        INNER JOIN FIN_PRODUCT_ADD FPA
           ON FPA.APPEAR_MARKET_ID = FP.FINPROD_MARKET_ID
+        INNER JOIN FIN_PRODUCT FPB
+                ON FPA.FINPROD_ID = FPB.FINPROD_ID
+               AND FPB.ISSUE_TYPE = '01'
         WHERE FP.FINPROD_ID = #{finprodId}
     </select>
 
@@ -1059,13 +1094,13 @@
     </select>
 
     <select id="getSearchTabInfoQueryOperate" resultType="com.joyintech.tams.business.asset.bond.dto.SearchInfoOperateListResponse">
-        SELECT rownum SEQ_NO,t.* from (select
+        SELECT distinct row_number() over( order by ORDER_TIME) SEQ_NO,t.* from (select
                his.ENTRUST_ID,
                FP.FINPROD_ABBR,
                his.OPER_TYPE,
                to_char( his.OPER_DATE, 'yyyy-MM-dd' ) OPER_DATE,
                to_char( his.OPER_TIME, 'hh24:mi:ss' ) OPER_TIME,
-               his.BUSI_DES,
+               his.BUSI_DES, his.OPER_TIME ORDER_TIME,
                CASE WHEN his.OPER_TYPE = '01' THEN
                         nvl(SU2.real_name,nvl(SUR.REAL_NAME,SUB.REAL_NAME))
                     ELSE SU.real_name
@@ -1080,7 +1115,7 @@
                     LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
            WHERE his.entrust_id = #{entrustId}
              AND his.BUSINESS_TYPE = #{busiType}
-           order by his.OPER_TIME desc) t
+             AND FP.FINPROD_TYPE = 'F01') t order by t.ORDER_TIME desc
     </select>
 
     <select id="getfinAssetRateAdjByProductId"   resultType="com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse">

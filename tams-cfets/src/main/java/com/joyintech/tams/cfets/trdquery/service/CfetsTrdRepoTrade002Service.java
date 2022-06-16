@@ -389,7 +389,7 @@ public class CfetsTrdRepoTrade002Service extends BaseService<CfetsTrdRepoTrade00
                 BigDecimal prinamt = interfOpicsTradRepo.getRepoamt();
                 BigDecimal subtract = com.joyintech.calculation.util.ArithmeticUtil.doAdd(prinamt,
                         inputDto.getTrdProductDeal().getPrinAmt());
-                if(subtract.compareTo(BigDecimal.ZERO)==-1||subtract.compareTo(BigDecimal.ZERO)==0){//小于0的话
+                if(subtract.compareTo(BigDecimal.ZERO) < 0 ||subtract.compareTo(BigDecimal.ZERO)==0){//小于0的话
                     record.setRepoamt(BigDecimal.ZERO);
                 }else{
                     record.setRepoamt(subtract);
@@ -411,7 +411,7 @@ public class CfetsTrdRepoTrade002Service extends BaseService<CfetsTrdRepoTrade00
         }
         // 撤销
         else {
-            this.doRevokeComplete(entity,"",true);
+            SpringContextUtil.getApplicationContext().getBean(CfetsTrdRepoTrade002Service.class).doRevokeComplete(entity,"",true);
             
             // 发送Murex接口处理
 //            this.sendMurex(input, true);
@@ -1064,6 +1064,7 @@ public class CfetsTrdRepoTrade002Service extends BaseService<CfetsTrdRepoTrade00
                         ptlTradeMapper.insertSelective(ptlTrade);
                     }*/
                 }
+                input.setBaseTradeProductDealDtos(baseTradeProductDealDtoList);
                 finProductTradeDto.setAssetType2(entity.getRepoType());
                 finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
                 finProductTradeDto.setBaseTradeProductDealDtos(baseTradeProductDealDtoList);

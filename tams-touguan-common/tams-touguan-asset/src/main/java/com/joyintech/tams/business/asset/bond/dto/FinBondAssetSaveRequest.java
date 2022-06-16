@@ -213,6 +213,9 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     @ApiModelProperty(name="isAddSec",value="是否加券(加券:Y)")
     private String isAddSec;
 
+    @ApiModelProperty(name="isAgainCalInt",value="是否点击确认")
+    private String isAgainCalInt;
+
     /**
      * 选择数据
      */
@@ -2120,5 +2123,13 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setSponsor(String sponsor) {
         this.sponsor = sponsor;
+    }
+
+    public String getIsAgainCalInt() {
+        return isAgainCalInt;
+    }
+
+    public void setIsAgainCalInt(String isAgainCalInt) {
+        this.isAgainCalInt = isAgainCalInt;
     }
 }

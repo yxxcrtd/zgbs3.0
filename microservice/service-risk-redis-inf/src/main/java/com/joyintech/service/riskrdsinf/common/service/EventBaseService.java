@@ -1435,7 +1435,7 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
         // add by zhangrui1 start
         boolean isDiffOcp = null != mapData && isDiffOcp(mapData);
         // add by zhangrui1 end
-        Map<String, IOcpRelParamItem> ocpPmItemMap = ocpRelParamObj == null ? new HashMap<>() : ocpRelParamObj.getItems();
+        Map<String, IOcpRelParamItem> ocpPmItemMap = ocpRelParamObj == null || ocpRelParamObj.getItems() == null ? new HashMap<>() : ocpRelParamObj.getItems();
         // 预占过的指标参数列表
         Set<String> indSet = CollectionUtils.isEmpty(
             ocpPmItemMap) ? new HashSet<>() : ocpPmItemMap.keySet();
@@ -1949,7 +1949,10 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
                     allItems.put(en.getKey(), temp);
                 }
                 else {
-                    item.setOccupyVal(item.getOccupyVal().add(temp.getOccupyVal()));
+                    // ZGCPCN-1150:使用计算工具类对计算做null保护 modify by fuyongsheng 20220609 start
+                    // item.setOccupyVal(item.getOccupyVal().add(temp.getOccupyVal()));
+                    item.setOccupyVal(ArithmeticUtil.doAdd(item.getOccupyVal(), temp.getOccupyVal()));
+                    // ZGCPCN-1150:使用计算工具类对计算做null保护 modify by fuyongsheng 20220609 end
                 }
             });
         });
@@ -2507,13 +2510,15 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
      * @return true:计算指标,false:不计算指标
      */
     protected boolean isCalcIndicator(List<IEvent> eventList){
-    	for(IEvent event:eventList){
-    		if (CommonUtil.isType(event.getIsCalcIndicator(), BussinessDictCodeListRds.是否_否)) {
-    			getLogger().info("风控事项 {} 不计算指标",event.getEventName());
-    			return false;
-    		}
-    	}
-    	return true;
+        Iterator<IEvent> iterator = eventList.iterator();
+        while (iterator.hasNext()){
+            IEvent event = iterator.next();
+            if (CommonUtil.isType(event.getIsCalcIndicator(), BussinessDictCodeListRds.是否_否)) {
+                getLogger().info("风控事项 {} 不计算指标",event.getEventName());
+                iterator.remove();
+            }
+        }
+        return !StringUtil.isEmptyList(eventList);
     }
 
     /**

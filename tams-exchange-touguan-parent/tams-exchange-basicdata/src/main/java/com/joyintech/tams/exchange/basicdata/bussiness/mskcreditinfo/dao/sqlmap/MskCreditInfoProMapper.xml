@@ -105,12 +105,10 @@
         </trim>
     </insert>
     <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
-
-     delete from MST_CREDIT_MARKET_INFO
+        delete
+        from MST_CREDIT_MARKET_INFO
         where SECID = #{secid,jdbcType=VARCHAR}
           and CDATE = #{cdate,jdbcType=VARCHAR}
-          and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
-
     </delete>
 
 
@@ -135,7 +133,7 @@
              MST_CREDIT_MARKET_INFO		m
          LEFT JOIN
              FIN_PRODUCT		f
-         ON	 f.FINPROD_ID=m.SECID
+         ON	 f.FINPROD_MARKET_ID=m.SECID
          LEFT JOIN
              INTERF_CREDITINFO	i
          ON	 i.SECID = m.SECID
@@ -184,7 +182,7 @@
         MST_CREDIT_MARKET_INFO		m
         LEFT JOIN
         FIN_PRODUCT		f
-        ON	 f.FINPROD_ID=m.SECID
+        ON	 f.FINPROD_MARKET_ID=m.SECID
         LEFT JOIN
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
@@ -249,7 +247,7 @@
         MST_CREDIT_MARKET_INFO		m
         LEFT JOIN
         FIN_PRODUCT		f
-        ON	 f.FINPROD_ID=m.SECID
+        ON	 f.FINPROD_MARKET_ID=m.SECID
         LEFT JOIN
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
@@ -257,8 +255,12 @@
         m.SECID=#{secId,jdbcType=VARCHAR}
         AND
         m.CDATE=#{valueDate,jdbcType=VARCHAR}
-        AND
-        m.VALUE_SOURCE=#{valueSource,jdbcType=VARCHAR}
+        <if test="valueSource != null and valueSource !=''">
+            and m.VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
+        </if>
+        <if test="mdprice != null and mdprice !=''">
+            and m.MDPRICE = #{mdprice,jdbcType=VARCHAR}
+        </if>
     </select>
 
 
@@ -316,12 +318,12 @@
         MST_CREDIT_MARKET_INFO		m
         LEFT JOIN
         FIN_PRODUCT		f
-        ON	 f.FINPROD_ID=m.SECID
+        ON	 f.FINPROD_MARKET_ID=m.SECID
         LEFT JOIN
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
         WHERE
-        m.SECID=#{secid,jdbcType=VARCHAR}
+        m.SECID=#{secid,jdbcType=VARCHAR} and m.CDATE = #{cdate,jdbcType=VARCHAR}
     </select>
 
     <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
@@ -334,16 +336,25 @@
     </resultMap>
 
     <select id="getFinprodMarketInfo" resultMap="finprodIdMap">
-    SELECT
-    distinct
-    FIN.FINPROD_MARKET_ID AS id,
-    FIN.FINPROD_MARKET_ID object,
-    FIN.FINPROD_ABBR AS text
-    FROM
-    FIN_PRODUCT  FIN
-    LEFT JOIN
-        INTERF_CREDITINFO	i
-        ON	 i.SECID = FIN.FINPROD_ID
+        SELECT DISTINCT id,object,text from (
+        select
+        FIN.FINPROD_MARKET_ID AS id,
+        FIN.FINPROD_MARKET_ID object,
+        FIN.FINPROD_ABBR AS text
+        FROM
+        FIN_PRODUCT  FIN  where FINPROD_TYPE2=#{finprodType2}
+
+        union all
+        select
+        i.SECID AS id,
+        i.SECID object,
+        i.SECNAME AS text
+        from   INTERF_CREDITINFO	i ) t
+        <where>
+            <if test="search != null and !search.equals('')">
+                AND (t.id like concat('%',concat(#{search},'%')) OR t.text like concat('%',concat(#{search},'%')))
+            </if>
+        </where>
     </select>
 
     <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" >
@@ -379,10 +390,12 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="valueSource != null">
+                VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR},
+            </if>
         </set>
         where SECID = #{secid,jdbcType=VARCHAR}
         and CDATE = #{cdate,jdbcType=VARCHAR}
-        and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
     </update>
 
 </mapper>

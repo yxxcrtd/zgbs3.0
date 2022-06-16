@@ -59,8 +59,8 @@ import java.util.stream.Collectors;
  * @see CfetsEntrustRdsCommonAop
  * @since 1.0
  */
-@Component
-@Aspect
+//@Component
+//@Aspect
 public class CfetsEntrustRdsCommonAop {
 
     public static final String DELETE = "delete";

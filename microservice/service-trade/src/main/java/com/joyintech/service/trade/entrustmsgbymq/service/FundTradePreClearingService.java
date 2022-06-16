@@ -130,6 +130,9 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 		// 金融产品临时交易表Entity
 		TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
 		BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, infContractDetailfile);
+		// ZGCPCN-1133:需登录交易状态 modify by fuyongsheng 20220606 start
+		trdProductTempDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
+		// ZGCPCN-1133:需登录交易状态 modify by fuyongsheng 20220606 end
 		// 金融产品交易DTO.关联系统交易编号 = 成交明细DTO.成交编号
 		if (StringUtils.isNotEmpty(infContractDetailfile.getDealNo())) {
 			trdProductTempDeal.setfTradeId(infContractDetailfile.getDealNo());
@@ -247,6 +250,7 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 			}
 		}
 		trdProductTempDeal.setTgBusiType(paBussType);
+		trdProductTempDeal.setBusiType(null == paBussType ? "BUSI_TYPE" : paBussType);
 		 // 本方交易员 根据委托代码获取委托指令分发信息的指定交易员
 		String trader = entrustMsgbyMQMapper.queryTradeId(infContractDetailfile.getEntrustId());
 		if (trader != null) {
@@ -267,7 +271,7 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 				null == trdProductTempDealTotalMapper.selectByPrimaryKey(trdTempDto.getTotleTradeId())){
 			// 写入金融产品临时汇总交易表
 			TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
-			BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdTempDto.getTrdProductTempDeal());
+			BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdProductTempDeal);
 			trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
 		}
 		// 多组合系列户指令需要登录临时汇总交易表 add by fuyongsheng 20220511 end

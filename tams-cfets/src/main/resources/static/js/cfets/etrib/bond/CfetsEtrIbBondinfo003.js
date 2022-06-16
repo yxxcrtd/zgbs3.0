@@ -6,6 +6,7 @@
     var ps = query("#ps").val();
     var riskFlag = 1;
     var calflag;
+    var rskApproval;
 
     function query(ele) {
         return $("#CfetsEtrIbBondinfo003_bodydiv " + ele);
@@ -670,6 +671,7 @@
         param.riskTrialRetDto = entity_RiskTrialRetList;
         param.elementId = 'CfetsEtrIbBondinfo003_btn_submit';
         param.isDzh = 'Y';
+        param.rskApproval = rskApproval;
         res.param = param;
         res.objects = objects;
         console.log(res);
@@ -729,12 +731,9 @@
             Joyin.error("券面总额与组合分配处的券面总额不一致")
             return false;
         }
-        if (riskFlag !== 0) {
-            Joyin.error("请先完成风险试算")
-            return false;
-        }
         var obj = getSubmitParam("submit");
         var errorMsg = "";
+        var confirmMsg = "";
         $.ajax({
             type: "POST",
             url: basePath + 'cfets/etrib/cfetsEtrIbBondinfo/checkSaveError',
@@ -748,6 +747,10 @@
                         $.each(result.data.errorList,function (index,item) {
                             errorMsg = errorMsg + item.message + "<br\>";
                         })
+                    }
+                    if(result.data && result.data.message && result.data.messageType === 'confirm') {
+                        confirmMsg = result.data.message;
+                        rskApproval = result.data.data;
                     }
                 }else {
                     errorMsg = result.message;
@@ -764,6 +767,12 @@
         if(errorMsg && errorMsg.length > 0) {
             Joyin.error(errorMsg);
             return false;
+        }
+        debugger;
+        if(confirmMsg && confirmMsg.length > 0) {
+            return Joyin.confirm(confirmMsg, function (){
+                saveOrSubmit('submit');
+            });
         }
         return true;
     }
@@ -851,7 +860,7 @@
         }
         $.ajax({
             type: "POST",
-            url: basePath + 'cfets/etrib/cfetsEtrIbBondinfo/doRiskcal',
+            url: basePath + 'riskTrial/doRiskcal/CfetsEtrBondInfo',
             dataType: "json",
             contentType: "application/json",
             async: false,
@@ -859,14 +868,16 @@
             success: function (result) {
                 if(result.code === '000') {
                     var data = result.data.data;
-                    if(data.riskTrialSpan) {
+                    if(data && data.riskTrialSpan) {
                         $("#riskTrialSpan").html("&nbsp;&nbsp;" + data.riskTrialSpan);
                     }
-                    entity_RiskTrialRetList = data.riskcalReturnList;
-                    if(entity_RiskTrialRetList) {
-                        $.each(entity_RiskTrialRetList, function (index, item) {
-                            item.conclusion = data.riskTrialSpan;
-                        })
+                    if(data){
+                        entity_RiskTrialRetList = data.riskcalReturnList;
+                        if(entity_RiskTrialRetList) {
+                            $.each(entity_RiskTrialRetList, function (index, item) {
+                                item.conclusion = data.riskTrialSpan;
+                            })
+                        }
                     }
                     tableRisk.clear();
                     tableRisk.addRow(entity_RiskTrialRetList);

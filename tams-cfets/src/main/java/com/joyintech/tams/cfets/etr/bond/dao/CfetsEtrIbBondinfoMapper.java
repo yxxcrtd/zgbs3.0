@@ -12,6 +12,7 @@ package com.joyintech.tams.cfets.etr.bond.dao;
 
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bond.dto.*;
+import com.joyintech.tams.common.base.entity.FinExercisePlan;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.common.base.entity.SppiImportData;
@@ -111,6 +112,16 @@ public interface CfetsEtrIbBondinfoMapper {
     List<CfetsEtrIbfindEtrinfoResponse> findEtrinfoPage(Map<String, Object> pageParam);
 
     FinProduct  findAssetInfo(String finprodId);
+
+    /**
+     * 查询最近的行权计划
+     *
+     * @param pageParam platDate 平台日 finprodId 资产代码 ps 交易方向
+     * @return com.joyintech.tams.common.base.entity.FinExercisePlan
+     * @author jiangpeng
+     * @date 2022/6/6 10:39
+     */
+    FinExercisePlan findAssetExercise(Map<String, Object> pageParam);
 
     Map queryPositionByEtrInfo(Map RequestDto);
 

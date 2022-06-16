@@ -2052,7 +2052,7 @@ public class StlDataDealSzdJsmxProcessService {
 				}
 
 				// 交易份额
-				settleTransData.setShareAmt(new BigDecimal(szdJsmx.getCjsl()).abs().divide(new BigDecimal(100)));
+				settleTransData.setShareAmt(new BigDecimal(szdJsmx.getSl()).abs());
 				// 全价总额
 				settleTransData.setFpriceAmt(new BigDecimal(szdJsmx.getQsje()).abs());
 
@@ -2082,7 +2082,7 @@ public class StlDataDealSzdJsmxProcessService {
 				// 交易平台
 				settleTransData.setTradePlat(null);
 				//普通二级市场交易业务
-				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02)){
+				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03)){
 					// 交易方向
 					if(StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())){
 						settleTransData.setPs(DictCodeList.交易方向_买入.getValue());

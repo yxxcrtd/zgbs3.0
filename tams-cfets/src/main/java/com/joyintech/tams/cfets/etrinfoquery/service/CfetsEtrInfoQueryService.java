@@ -14,16 +14,32 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.cfets.etrdispatcher.dao.CfetsEtrDispatcherMapper;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListResponse;
 import com.joyintech.tams.cfets.etrinfoquery.dao.CfetsEtrInfoQueryMapper;
 import com.joyintech.tams.cfets.etrinfoquery.dto.CfetsEtrInfoQueryListRequest;
 import com.joyintech.tams.cfets.etrinfoquery.dto.CfetsEtrInfoQueryListResponse;
-import com.joyintech.tams.constant.*;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -43,6 +59,9 @@ public class CfetsEtrInfoQueryService extends BaseService{
 
     @Autowired
     private CfetsEtrInfoQueryMapper cfetsEtrInfoQueryMapper;
+
+    @Autowired
+    private CfetsEtrDispatcherMapper cfetsEtrDispatcherMapper;
 
     /**
      * 指令列表分页查询
@@ -163,6 +182,28 @@ public class CfetsEtrInfoQueryService extends BaseService{
             return pageLimit;
         }
 
+        List<CfetsEtrInfoQueryListResponse> list = pageLimit.getRoot();
+        if (CollectionUtils.isNotEmpty(list)) {
+
+            for (CfetsEtrInfoQueryListResponse response : list) {
+                //一级投标债券 重新计算执行进度和成交进度
+                if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
+                        StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+                    CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
+                    if (dto2 != null) {
+                        response.setExecFinishAmt(ArithmeticUtil.divide(dto2.getExecFinishAmt(), BigDecimal.valueOf(10000),2));
+                        response.setExecRemainderAmt(ArithmeticUtil.divide(dto2.getExecRemainderAmt(), BigDecimal.valueOf(10000),2));
+                        response.setExeProgress(dto2.getExeProgress());
+                        response.setTransFinishAmt(ArithmeticUtil.divide(dto2.getTransFinishAmt(), BigDecimal.valueOf(10000),2));
+                        response.setTransRemainderAmt(ArithmeticUtil.divide(dto2.getTransRemainderAmt(), BigDecimal.valueOf(10000),2));
+                        response.setDealProgress(dto2.getDealProgress());
+                    }
+                }
+            }
+
+        }
+
+        pageLimit.setRoot(list);
         //将交易员和投资经理转为真实姓名
 //        List<CfetsEtrInfoQueryListResponse> list = pageLimit.getRoot();
 //        if(!list.isEmpty()){

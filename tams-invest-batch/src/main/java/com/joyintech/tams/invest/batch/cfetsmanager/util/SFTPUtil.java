@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.h2.util.New;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +146,8 @@ public class SFTPUtil {
 		try {
 			logger.info("SFTPUtil" + "远程目录:" + sftpBasePath + "/" + sftpDirectory + "/" + sftpFileName);
 			sftp.cd(sftpBasePath);
-			if (sftpDirectory != null && sftpDirectory != "") {
+			// Sonar Fix modify by huwei 220609
+			if (StringUtils.isNotEmpty(sftpDirectory)) {
 				sftp.cd(sftpDirectory);
 			}
 		} catch (SftpException e) {
@@ -199,21 +201,21 @@ public class SFTPUtil {
 			String localDirectory, String localFileName) throws SftpException, IOException {
 		String tempFilePath = null;
 
-		if (localFileName == null || localFileName == "") {
+		if (StringUtils.isEmpty(localFileName)) {
 			logger.info("SFTPUtil" + "SFTP本地文件名不能为空！");
 			throw new IOException("SFTP本地文件名不能为空！");
 		}
 
-		if (localBasePath == null || localBasePath == "") {
+		if (StringUtils.isEmpty(localBasePath)) {
 			logger.info("SFTPUtil" + "SFTP本地文件基本路径为空！");
-			if (localDirectory == null || localDirectory == "") {
+			if (StringUtils.isEmpty(localDirectory)) {
 				logger.info("SFTPUtil" + "SFTP本地文件相对目录为空！");
 				tempFilePath = "";
 			} else {
 				tempFilePath = localDirectory;
 			}
 		} else {
-			if (localDirectory == null || localDirectory == "") {
+			if (StringUtils.isEmpty(localDirectory)) {
 				logger.info("SFTPUtil" + "SFTP本地文件相对目录为空！");
 				tempFilePath = localBasePath;
 			} else {
@@ -316,13 +318,12 @@ public class SFTPUtil {
 			if(!file.isDirectory()) {
 				file .mkdirs();
 			}
-			OutputStream out = new FileOutputStream(new File(downPath+"/"+fileName));
-			HttpURLConnection connection=null;
+
 			//创建URL资源
 			URL urlResource = new URL(url);
 			
 			//建立http连接
-			connection = (HttpURLConnection)urlResource.openConnection();
+			HttpURLConnection connection = (HttpURLConnection)urlResource.openConnection();
 			
 			//设置允许输出
 			connection.setDoOutput(true);
@@ -362,14 +363,17 @@ public class SFTPUtil {
 	        //所读取的内容使用n来接收
 	        int n;
 	        //当没有读取完时,继续读取,循环
-	        while((n=is.read(buff))!=-1){
-	            //将字节数组的数据全部写入到输出流中
-	            out.write(buff,0,n);
-	        }
-	        //强制将缓存区的数据进行输出
-	        out.flush();
-	        //关流
-	        out.close();
+			try (OutputStream out = new FileOutputStream(new File(downPath+"/"+fileName))) {
+				while((n=is.read(buff))!=-1){
+					//将字节数组的数据全部写入到输出流中
+					out.write(buff,0,n);
+				}
+				//强制将缓存区的数据进行输出
+				out.flush();
+			} catch (Exception e) {
+				e.getStackTrace();
+			}
+
 	        is.close();
 	        CFETSFileUtil cfetsFileUtil = new CFETSFileUtil();
 	        return cfetsFileUtil.unzip(downPath+"/"+fileName, downPath);

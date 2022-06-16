@@ -221,6 +221,9 @@ var QueryFunc=function(){
     window.componentLoadCallback = function(isDone, pagePath, params){
         if(isDone){
             $("#bussRepAssetMngProdInfo_repAssetType_div").show();
+            // ZGCPCN-1184:画星星 modify by fuyongsheng 20220611 start
+            star();
+            // ZGCPCN-1184:画星星 modify by fuyongsheng 20220611 end
         }
     }
 

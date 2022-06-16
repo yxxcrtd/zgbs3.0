@@ -172,6 +172,11 @@ public class InterfRiskRdsDto implements IRiskRds {
     private String ignoreStatus;
 
     /**
+     * 是否无视违规
+     */
+    private String isIgnoreFoul;
+
+    /**
      * 期限品种 add by wz 20200509
      * @return
      */
@@ -1151,6 +1156,14 @@ public class InterfRiskRdsDto implements IRiskRds {
 
     public void setIgnoreStatus(String ignoreStatus) {
         this.ignoreStatus = ignoreStatus;
+    }
+
+    public String getIsIgnoreFoul() {
+        return isIgnoreFoul;
+    }
+
+    public void setIsIgnoreFoul(String isIgnoreFoul) {
+        this.isIgnoreFoul = isIgnoreFoul;
     }
 
     public BigDecimal getAmountEx() {

@@ -1,6 +1,7 @@
 package com.joyintech.tams.cfets.etrdispatcher.dto;
 
 import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsPledgeBondInfoDto;
@@ -198,6 +199,11 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     @ApiModelProperty(name = "registOrgStr", value = "登记托管机构", example = "字符串1")
     private String registOrgStr;
 
+    @ApiModelProperty(name = "deliveryResult", value = "交收状态")
+    private String deliveryResult;
+
+    @ApiModelProperty(name = "deliverySchedule", value = "交收进度")
+    private String deliverySchedule;
 
     public String getEffectFlag() {
         return effectFlag;
@@ -1228,97 +1234,270 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
         this.errorMsg = errorMsg;
     }
 
+    public String getRegistOrgStr() {
+        return registOrgStr;
+    }
+
+    public void setRegistOrgStr(String registOrgStr) {
+        this.registOrgStr = registOrgStr;
+    }
+
     /******* 一级投标 start********/
 
-    @ApiModelProperty(name="bidDate",value="投标日期，一级市场债使用",example="字符串1")
-    private Date bidDate;
-    @ApiModelProperty(name="allBidPrinAmt",value="投标券面总额汇总",example="字符串1")
-    private BigDecimal allBidPrinAmt;
-    @ApiModelProperty(name="bidprice",value="投标标位,多个字符串分割",example="字符串1")
-    private String bidprice;
-    @ApiModelProperty(name="payType",value="缴款方式",example="字符串1")
-    private String payType;
-    private String payTypeValue;
-    @ApiModelProperty(name="winPrinAmt",value="中标券面总额",example="字符串1")
-    private BigDecimal winPrinAmt;
-    @ApiModelProperty(name="winPrice",value="中标标位",example="字符串1")
-    private String winPrice;
-    @ApiModelProperty(name="winType",value="中标方式",example="字符串1")
-    private String winType;
-    private String winTypeValue;
-    @ApiModelProperty(name="payDate",value="缴款日",example="字符串1")
-    private Date payDate;
-    @ApiModelProperty(name="listingDate",value="上市日",example="字符串1")
-    private Date listingDate;
-    @ApiModelProperty(name="bidId",value="投标编号",example="字符串1")
+    @ApiModelProperty(name = "firstBidStatus", value = "中标状态", example = "A1")
+    private String firstBidStatus;
+
+    @ApiModelProperty(name = "firstBidStatusStr", value = "中标状态名称", example = "A1")
+    private String firstBidStatusStr;
+
+    @ApiModelProperty(name = "bidId", value = "投标编号", example = "111")
     private String bidId;
-    @ApiModelProperty(name = "isWin", value = "中标状态", example = "字符串1")
-    private String isWin;
-    @ApiModelProperty(name = "isWin", value = "中标状态字典值", example = "字符串1")
-    private String isWinValue;
 
-    public String getIsWin() {
-        return isWin;
+    @ApiModelProperty(name = "tenderTarget", value = "招标标的")
+    private String tenderTarget;
+
+    @ApiModelProperty(name = "tenderTargetStr", value = "招标标的字典值")
+    private String tenderTargetStr;
+
+    @ApiModelProperty(required = false, name = "issueDate", value = "投标日")
+    private Date issueDate;
+
+    @ApiModelProperty(name = "issueDateStart", value = "投标日开始日期,字符串", example = "2021-12-21")
+    private Date issueDateStart;
+
+    @ApiModelProperty(name = "issueDateEnd", value = "投标日结束日期,字符串", example = "2021-12-21")
+    private Date issueDateEnd;
+
+    @ApiModelProperty(required = false, name = "issueDateStr", value = "投标日格式化")
+    private String issueDateStr;
+
+    @ApiModelProperty(name = "etrBidPriceTotal", value = "指令投标券面总额(万元) 需前端转化", example = "1")
+    private BigDecimal etrBidPriceTotal;
+
+    @ApiModelProperty(name = "totalBiddingNum", value = "汇总投标券面总额")
+    private BigDecimal totalBiddingNum;
+
+    @ApiModelProperty(name="winPrinAmt",value="中标券面总额（万元）")
+    private BigDecimal winPrinAmt;
+
+    @ApiModelProperty(name = "bidPrinAmt", value = "投标券面总额", example = "1")
+    private BigDecimal bidPrinAmt;
+
+    @ApiModelProperty(name = "bidPrice", value = "投标标位", example = "1")
+    private String bidPrice;
+
+    @ApiModelProperty(name = "winPrice", value = "中标标位", example = "100.0000")
+    private String winPrice;
+
+    @ApiModelProperty(name = "winType", value = "中标方式")
+    private String winType;
+
+    @ApiModelProperty(name = "winTypeStr", value = "中标方式字符串")
+    private String winTypeStr;
+
+    @ApiModelProperty(name = "price", value = "净价", example = "1")
+    private BigDecimal price;
+
+    @ApiModelProperty(name = "payableAmount", value = "缴款金额", example = "1000.00")
+    private BigDecimal payableAmount;
+
+    @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
+    private BigDecimal settFeeAmt;
+
+    @ApiModelProperty(name = "payDate", value = "缴款日")
+    private Date payDate;
+
+    @ApiModelProperty(name = "payDateStr", value = "缴款日格式化,展示用")
+    private String payDateStr;
+
+    @ApiModelProperty(name = "assignRegdate", value = "债权债务登记日")
+    private Date assignRegdate;
+
+    @ApiModelProperty(name = "assignRegdateStr", value = "债权债务登记日格式化,展示用")
+    private String assignRegdateStr;
+
+    @ApiModelProperty(name = "listingDate", value = "上市日")
+    private Date listingDate;
+
+    @ApiModelProperty(name = "listingDateStr", value = "上市日日格式化,展示用", example = "2021-01-01")
+    private String listingDateStr;
+
+    @ApiModelProperty(name = "biddingMethod", value = "投标方式", example = "01")
+    private String biddingMethod;
+
+    @ApiModelProperty(name = "biddingMethodStr", value = "投标方式名称,展示用", example = "自主投标")
+    private String biddingMethodStr;
+
+    @ApiModelProperty(name = "payType", value = "缴款方式", example = "01")
+    private String payType;
+
+    @ApiModelProperty(name = "payTypeStr", value = "缴款方式名称,展示用", example = "一级分销")
+    private String payTypeStr;
+
+    @ApiModelProperty(name = "bidConfirmDate", value = "投标确认日")
+    private Date bidConfirmDate;
+
+    @ApiModelProperty(required = false, name = "bidConfirmDateStr", value = "投标确认日格式化")
+    private String bidConfirmDateStr;
+
+    @ApiModelProperty(name="tradeMarketMode",value="交易市场",example="ZC1")
+    private String tradeMarketMode;
+
+    @ApiModelProperty(name="tradeMarketModeStr",value="交易市场",example="ZC1")
+    private String tradeMarketModeStr;
+
+    @ApiModelProperty(name = "secAcctName", value = "证券账户名称,展示用")
+    private String secAcctName;
+
+    @ApiModelProperty(name = "secType", value = "债券分类")
+    private String secType;
+
+    @ApiModelProperty(name = "secTypeStr", value = "债券分类名称,展示用")
+    private String secTypeStr;
+
+    @ApiModelProperty(name = "subscriptionAmount", value = "认购量,需转化为万元", example = "1000.00")
+    private BigDecimal subscriptionAmount;
+
+    @ApiModelProperty(name = "issuer", value = "发行人id", example = "001")
+    private String issuer;
+
+    @ApiModelProperty(name = "issuerName", value = "发行人名称,展示用", example = "发行人1")
+    private String issuerName;
+
+    @ApiModelProperty(name = "ouPartyId", value = "本方id", example = "114912384")
+    private String ouPartyId;
+
+    @ApiModelProperty(name = "ouPartyIdAbbr", value = "本方简称", example = "广发银行")
+    private String ouPartyIdAbbr;
+
+    @ApiModelProperty(name = "ourTrader", value = "本方交易员id(申购人)", example = "001")
+    private String ourTrader;
+
+    @ApiModelProperty(name = "ourTraderName", value = "本方交易员名称", example = "交易员1")
+    private String ourTraderName;
+
+    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码,系统内代码一般不用于显示")
+    private String finprodId;
+
+    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码,显示用代码")
+    private String finprodMarketId;
+
+    @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称")
+    private String finprodAbbr;
+
+    public String getFirstBidStatus() {
+        return firstBidStatus;
     }
 
-    public void setIsWin(String isWin) {
-        this.isWin = isWin;
+    public void setFirstBidStatus(String firstBidStatus) {
+        this.firstBidStatus = firstBidStatus;
     }
 
-    public String getIsWinValue() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.中标状态, this.getIsWin());
+    public String getFirstBidStatusStr() {
+        if (StringUtil.isEmpty(getFirstBidStatus())) {
+            return "--";
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.一级投标中标状态, getFirstBidStatus());
     }
 
-    public void setIsWinValue(String isWinValue) {
-        this.isWinValue = isWinValue;
+    public void setFirstBidStatusStr(String firstBidStatusStr) {
+        this.firstBidStatusStr = firstBidStatusStr;
     }
 
-    public Date getBidDate() {
-        return bidDate;
+    public String getBidId() {
+        return bidId;
     }
 
-    public void setBidDate(Date bidDate) {
-        this.bidDate = bidDate;
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
+    }
+    public String getTenderTarget() {
+        return tenderTarget;
     }
 
-    public BigDecimal getAllBidPrinAmt() {
-        return allBidPrinAmt;
+    public void setTenderTarget(String tenderTarget) {
+        this.tenderTarget = tenderTarget;
     }
 
-    public void setAllBidPrinAmt(BigDecimal allBidPrinAmt) {
-        this.allBidPrinAmt = allBidPrinAmt;
+    public String getTenderTargetStr() {
+        if (StringUtil.isEmpty(getTenderTarget())) {
+            return "";
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getTenderTarget());
     }
 
-    public String getBidprice() {
-        return bidprice;
+    public void setTenderTargetStr(String tenderTargetStr) {
+        this.tenderTargetStr = tenderTargetStr;
     }
 
-    public void setBidprice(String bidprice) {
-        this.bidprice = bidprice;
+    public Date getIssueDate() {
+        return issueDate;
     }
 
-    public String getPayType() {
-        return payType;
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
     }
 
-    public void setPayType(String payType) {
-        this.payType = payType;
+    public Date getIssueDateStart() {
+        return issueDateStart;
     }
 
-    public String getPayTypeValue() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.缴款方式, this.payType);
+    public void setIssueDateStart(Date issueDateStart) {
+        this.issueDateStart = issueDateStart;
     }
 
-    public void setPayTypeValue(String payTypeValue) {
-        this.payTypeValue = payTypeValue;
+    public Date getIssueDateEnd() {
+        return issueDateEnd;
     }
 
-    public BigDecimal getWinPrinAmt() {
-        return winPrinAmt;
+    public void setIssueDateEnd(Date issueDateEnd) {
+        this.issueDateEnd = issueDateEnd;
     }
 
-    public void setWinPrinAmt(BigDecimal winPrinAmt) {
-        this.winPrinAmt = winPrinAmt;
+    public String getIssueDateStr() {
+        if (null == this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart());
+        }
+        if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
+        }
+        return issueDateStr;
+    }
+
+    public void setIssueDateStr(String issueDateStr) {
+        this.issueDateStr = issueDateStr;
+    }
+
+    public BigDecimal getEtrBidPriceTotal() {
+        return etrBidPriceTotal;
+    }
+
+    public void setEtrBidPriceTotal(BigDecimal etrBidPriceTotal) {
+        this.etrBidPriceTotal = etrBidPriceTotal;
+    }
+
+    public BigDecimal getTotalBiddingNum() {
+        return totalBiddingNum;
+    }
+
+    public void setTotalBiddingNum(BigDecimal totalBiddingNum) {
+        this.totalBiddingNum = totalBiddingNum;
+    }
+
+    public BigDecimal getBidPrinAmt() {
+        return bidPrinAmt;
+    }
+
+    public void setBidPrinAmt(BigDecimal bidPrinAmt) {
+        this.bidPrinAmt = bidPrinAmt;
+    }
+
+    public String getBidPrice() {
+        return bidPrice;
+    }
+
+    public void setBidPrice(String bidPrice) {
+        this.bidPrice = bidPrice;
     }
 
     public String getWinPrice() {
@@ -1329,12 +1508,28 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
         this.winPrice = winPrice;
     }
 
-    public String getWinType() {
-        return winType;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setWinType(String winType) {
-        this.winType = winType;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getPayableAmount() {
+        return payableAmount;
+    }
+
+    public void setPayableAmount(BigDecimal payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    public BigDecimal getSettFeeAmt() {
+        return settFeeAmt;
+    }
+
+    public void setSettFeeAmt(BigDecimal settFeeAmt) {
+        this.settFeeAmt = settFeeAmt;
     }
 
     public Date getPayDate() {
@@ -1345,6 +1540,37 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
         this.payDate = payDate;
     }
 
+    public String getPayDateStr() {
+
+        if (null != this.getPayDate()) {
+            return DateUtil.format(this.getPayDate());
+        }
+        return payDateStr;
+    }
+
+    public void setPayDateStr(String payDateStr) {
+        this.payDateStr = payDateStr;
+    }
+
+    public Date getAssignRegdate() {
+        return assignRegdate;
+    }
+
+    public void setAssignRegdate(Date assignRegdate) {
+        this.assignRegdate = assignRegdate;
+    }
+
+    public String getAssignRegdateStr() {
+        if (null != this.getAssignRegdate()) {
+            return DateUtil.format(this.getAssignRegdate());
+        }
+        return assignRegdateStr;
+    }
+
+    public void setAssignRegdateStr(String assignRegdateStr) {
+        this.assignRegdateStr = assignRegdateStr;
+    }
+
     public Date getListingDate() {
         return listingDate;
     }
@@ -1353,27 +1579,237 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
         this.listingDate = listingDate;
     }
 
-    public String getBidId() {
-        return bidId;
+    public String getListingDateStr() {
+        if (null != this.getListingDate()) {
+            return DateUtil.format(this.getListingDate());
+        }
+        return listingDateStr;
     }
 
-    public void setBidId(String bidId) {
-        this.bidId = bidId;
+    public void setListingDateStr(String listingDateStr) {
+        this.listingDateStr = listingDateStr;
     }
 
-    public String getWinTypeValue() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.中标方式, this.winType);
+    public String getBiddingMethod() {
+        return biddingMethod;
     }
 
-    public void setWinTypeValue(String winTypeValue) {
-        this.winTypeValue = winTypeValue;
+    public void setBiddingMethod(String biddingMethod) {
+        this.biddingMethod = biddingMethod;
     }
 
-    public String getRegistOrgStr() {
-        return registOrgStr;
+    public String getBiddingMethodStr() {
+        if (StringUtil.isEmpty(getBiddingMethod())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, getBiddingMethod());
     }
 
-    public void setRegistOrgStr(String registOrgStr) {
-        this.registOrgStr = registOrgStr;
+    public void setBiddingMethodStr(String biddingMethodStr) {
+        this.biddingMethodStr = biddingMethodStr;
+    }
+
+    public String getPayType() {
+        return payType;
+    }
+
+    public void setPayType(String payType) {
+        this.payType = payType;
+    }
+
+    public String getPayTypeStr() {
+        if (StringUtil.isEmpty(getPayType())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.缴款方式, getPayType());
+    }
+
+    public void setPayTypeStr(String payTypeStr) {
+        this.payTypeStr = payTypeStr;
+    }
+
+    public Date getBidConfirmDate() {
+        return bidConfirmDate;
+    }
+
+    public void setBidConfirmDate(Date bidConfirmDate) {
+        this.bidConfirmDate = bidConfirmDate;
+    }
+
+    public String getBidConfirmDateStr() {
+        if (null != this.getBidConfirmDate()) {
+            return DateUtil.format(this.getBidConfirmDate());
+        }
+        return bidConfirmDateStr;
+    }
+
+    public void setBidConfirmDateStr(String bidConfirmDateStr) {
+        this.bidConfirmDateStr = bidConfirmDateStr;
+    }
+
+    public String getWinType() {
+        return winType;
+    }
+
+    public void setWinType(String winType) {
+        this.winType = winType;
+    }
+
+    public String getWinTypeStr() {
+        return winTypeStr;
+    }
+
+    public void setWinTypeStr(String winTypeStr) {
+        this.winTypeStr = winTypeStr;
+    }
+
+    public String getTradeMarketMode() {
+        return tradeMarketMode;
+    }
+
+    public void setTradeMarketMode(String tradeMarketMode) {
+        this.tradeMarketMode = tradeMarketMode;
+    }
+
+    public String getTradeMarketModeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.交易市场, getTenderTarget());
+    }
+
+    public void setTradeMarketModeStr(String tradeMarketModeStr) {
+        this.tradeMarketModeStr = tradeMarketModeStr;
+    }
+    public String getSecAcctName() {
+        return secAcctName;
+    }
+
+    public void setSecAcctName(String secAcctName) {
+        this.secAcctName = secAcctName;
+    }
+
+    public String getSecType() {
+        return secType;
+    }
+
+    public void setSecType(String secType) {
+        this.secType = secType;
+    }
+
+    public String getSecTypeStr() {
+        if (StringUtil.isEmpty(getSecType())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, getSecType());
+    }
+
+    public void setSecTypeStr(String secTypeStr) {
+        this.secTypeStr = secTypeStr;
+    }
+
+    public BigDecimal getSubscriptionAmount() {
+        return subscriptionAmount;
+    }
+
+    public void setSubscriptionAmount(BigDecimal subscriptionAmount) {
+        this.subscriptionAmount = subscriptionAmount;
+    }
+
+    public String getIssuerName() {
+        return issuerName;
+    }
+
+    public void setIssuerName(String issuerName) {
+        this.issuerName = issuerName;
+    }
+
+    public String getOuPartyId() {
+        return ouPartyId;
+    }
+
+    public void setOuPartyId(String ouPartyId) {
+        this.ouPartyId = ouPartyId;
+    }
+
+    public String getOuPartyIdAbbr() {
+        return ouPartyIdAbbr;
+    }
+
+    public void setOuPartyIdAbbr(String ouPartyIdAbbr) {
+        this.ouPartyIdAbbr = ouPartyIdAbbr;
+    }
+
+    public String getOurTrader() {
+        return ourTrader;
+    }
+
+    public void setOurTrader(String ourTrader) {
+        this.ourTrader = ourTrader;
+    }
+
+    public String getOurTraderName() {
+        return ourTraderName;
+    }
+
+    public void setOurTraderName(String ourTraderName) {
+        this.ourTraderName = ourTraderName;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
+    }
+
+    @Override
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    @Override
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
+    }
+
+    @Override
+    public String getFinprodAbbr() {
+        return finprodAbbr;
+    }
+
+    @Override
+    public void setFinprodAbbr(String finprodAbbr) {
+        this.finprodAbbr = finprodAbbr;
+    }
+
+    public BigDecimal getWinPrinAmt() {
+        return winPrinAmt;
+    }
+
+    public void setWinPrinAmt(BigDecimal winPrinAmt) {
+        this.winPrinAmt = winPrinAmt;
+    }
+
+    public String getDeliveryResult() {
+        return deliveryResult;
+    }
+
+    public void setDeliveryResult(String deliveryResult) {
+        this.deliveryResult = deliveryResult;
+    }
+
+    public String getDeliverySchedule() {
+        return deliverySchedule;
+    }
+
+    public void setDeliverySchedule(String deliverySchedule) {
+        this.deliverySchedule = deliverySchedule;
     }
 }

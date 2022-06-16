@@ -45,7 +45,7 @@ public class MskCreditMarketInfoValidator implements BeanValidator {
 //                    resultList.add(new ValidMessage("修改/删除时,仅能修改/删除导入日为平台日的数据!"));
 //                }
                 
-                if(mskCreditMarketInfoPro001Service.selectByKey(mst.getSecid(), mst.getCdate(),mst.getValueSource()) == null){
+                if(mskCreditMarketInfoPro001Service.selectByKey(null,mst.getSecid(), mst.getCdate(),mst.getValueSource()) == null){
                     resultList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
                 }
                 if(StringUtil.isNotEmpty(mst.getProcessState())){
@@ -78,7 +78,7 @@ public class MskCreditMarketInfoValidator implements BeanValidator {
 //                map.put("secId", dto.getSecId());
 //                map.put("valueDate", dto.getValueDate());
                 // 判断新建的数据是否存在
-                if (mskCreditMarketInfoPro001Service.selectByKey(dto.getSecid(), dto.getCdate(),dto.getValueSource()) != null) {
+                if (mskCreditMarketInfoPro001Service.selectByKey(null,dto.getSecid(), dto.getCdate(),dto.getValueSource()) != null) {
                     StringBuffer sb = new StringBuffer();
                     sb.append(getMessage("MskCreditMarketInfo001.secId")).append(GlobalConstant.COLON).append(
                         dto.getSecid()).append(GlobalConstant.COMMA).append(getMessage("MskCreditMarketInfo001.valueDate")).append(

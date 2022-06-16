@@ -47,6 +47,7 @@ import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -144,6 +145,8 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
     private SysWflBusinessListMapper sysWflBusinessListMapper;
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
+    @Autowired(required = false)
+    private BasRiskMathCommService basRiskMathCommService;
     /**
      * 设置流程业务说明
      */
@@ -710,6 +713,10 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
                     cfetsOprHisInfoRequest.setOperType(DictCodeListExt3.操作类型_成交.getValue());
 				}
 			} else if (StringUtil.equals(entity.getQuotaPageModel(), "new")) {
+                //保存风险数据
+                if (StringUtil.equals(entity.getPs(), DictCodeList.交易方向_行权_回售.getValue()) && CollectionUtils.isNotEmpty(entity.getRiskTrialRetDto())) {
+                    basRiskMathCommService.insert(entity.getRiskTrialRetDto(), entity.getEntrustId());
+                }
 				// 新增
 				if (StringUtil.equals(entity.getOperatorType(), "save")) {
 					// 保存
@@ -763,7 +770,8 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
                 BussinessDictCodeList.交易方向_买入.getValue())) {
                 if (etrEntrustAdd != null && StringUtil.equals(etrEntrustAdd.getCalMode(),
                     BussinessDictCodeList.计算选择方式_净价.getValue())) {
-                    if (counterInfoDto.getUnitCprice() != null
+                    // Sonar Fix modify by huwei 220608
+                    if (counterInfoDto.getUnitCprice() != null && etrEntrust != null
                         && etrEntrust.getPrice() != null
                         && counterInfoDto.getUnitCprice().compareTo(
                             etrEntrust.getPrice()) > 0) {
@@ -811,7 +819,8 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
                 BussinessDictCodeList.交易方向_卖出.getValue())) {
                 if (etrEntrustAdd != null && StringUtil.equals(etrEntrustAdd.getCalMode(),
                     BussinessDictCodeList.计算选择方式_净价.getValue())) {
-                    if (counterInfoDto.getUnitCprice() != null
+                    // Sonar Fix modify by huwei 220608
+                    if (counterInfoDto.getUnitCprice() != null && etrEntrust != null
                         && etrEntrust.getPrice() != null
                         && counterInfoDto.getUnitCprice().compareTo(
                             etrEntrust.getPrice()) < 0) {

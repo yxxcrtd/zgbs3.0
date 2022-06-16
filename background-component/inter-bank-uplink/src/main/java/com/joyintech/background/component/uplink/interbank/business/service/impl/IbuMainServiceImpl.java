@@ -332,6 +332,7 @@ public class IbuMainServiceImpl extends BaseService<IbuQuoteBond> implements Ibu
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     log.error(e.getMessage());
+                    Thread.currentThread().interrupt();
                 }
                 timeUsed += checkInterval;
             }
@@ -1210,6 +1211,7 @@ public class IbuMainServiceImpl extends BaseService<IbuQuoteBond> implements Ibu
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     log.error(e.getMessage());
+                    Thread.currentThread().interrupt();
                 }
                 timeUsed += checkInterval;
             }
@@ -2061,11 +2063,12 @@ public class IbuMainServiceImpl extends BaseService<IbuQuoteBond> implements Ibu
             result.setErrMsg(validation.getErrMsg());
         } else {
             // 获取路由配置方案
-            IbuIntfScheme intfScheme = routeConfigSubService.getSchemeForAttr(inputBean.getAttrMap());
-            result = insertRepoDialogueQuoteWithCheck(inputBean, true);
-
-            if (intfScheme != null) {
-                result.setSendType(intfScheme.getSendType());
+            if(null !=inputBean){
+                IbuIntfScheme intfScheme = routeConfigSubService.getSchemeForAttr(inputBean.getAttrMap());
+                result = insertRepoDialogueQuoteWithCheck(inputBean, true);
+                if (intfScheme != null) {
+                    result.setSendType(intfScheme.getSendType());
+                }
             }
         }
 
@@ -2179,6 +2182,7 @@ public class IbuMainServiceImpl extends BaseService<IbuQuoteBond> implements Ibu
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     log.error(e.getMessage());
+                    Thread.currentThread().interrupt();
                 }
                 timeUsed += checkInterval;
             }
@@ -2775,8 +2779,6 @@ public class IbuMainServiceImpl extends BaseService<IbuQuoteBond> implements Ibu
      * 银行间上行错误码查询<br />
      * 根据传入的不为空的变量进行查询，需支持数据权限
      *
-     * @param pageNum                int 页码，从1开始
-     * @param pageSize               int 分页大小
      * @param ibuInrfErrMsgSearchDto IbuInrfErrMsgSearchDto 银行间上行错误码查询条件
      * @return List<IbuIntfErrMsgDto>
      */

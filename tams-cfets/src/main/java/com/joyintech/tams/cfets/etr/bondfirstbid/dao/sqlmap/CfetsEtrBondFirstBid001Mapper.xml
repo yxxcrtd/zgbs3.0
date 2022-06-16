@@ -38,7 +38,7 @@
                 aaa.remark,
                 aaa.payEdateStr,
                 aaa.etrDateStr,
-                TO_CHAR(aaa.issueDateStart, 'yyyy-MM-dd')  || '~' || TO_CHAR(aaa.issueDateEnd, 'yyyy-MM-dd')  issueDateStr
+                aaa.issueDateStr
 
         from (
         <choose>
@@ -60,8 +60,12 @@
         left join SYS_DATADICT_LIST tradeMarketSdl on aaa.tradeMarket=tradeMarketSdl.ITEM_CODE and tradeMarketSdl.DICT_CODE='TRADE_PLACE'
         <where>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
-                AND aaa.issueDateStart <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
-                AND aaa.issueDateEnd <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
+                AND (
+                (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd') and to_date(#{issueDateStart},
+                'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateStart)
+                OR (aaa.issueDateEnd <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd') and
+                to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd )
+                )
             </if>
             <!-- 组合匹配 -->
             <if test="portfolioIdList != null and portfolioIdList.size()>0">
@@ -181,7 +185,12 @@
             TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
-            TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr
+            TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
+            case
+            when fpi.ISSUE_CLASS ='01' THEN to_char(fpi.ISSUE_DATE,'yyyy-MM-dd')
+            when fpi.ISSUE_DATE is not  null then to_char(fpi.ISSUE_DATE,'yyyy-MM-dd')
+            else to_char(fpi.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(fpi.TENDER_EDATE,'yyyy-MM-dd')
+            end as issueDateStr
 
         FROM ETR_ENTRUST ee
         LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
@@ -299,7 +308,10 @@
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
-            '01' AS firstBidStatus,
+            CASE
+            WHEN fpi.ISSUE_CLASS = '01' THEN NULL
+            ELSE '01'
+            END AS firstBidStatus,
             ee.FINPROD_ID finprodId,
             fp.FINPROD_MARKET_ID finprodMarketId,
             fp.FINPROD_ABBR finprodAbbr,
@@ -347,7 +359,12 @@
             TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
-            TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr
+            TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
+            case
+            when fpi.ISSUE_CLASS ='01' THEN to_char(fpi.ISSUE_DATE,'yyyy-MM-dd')
+            when fpi.ISSUE_DATE is not  null then to_char(fpi.ISSUE_DATE,'yyyy-MM-dd')
+            else to_char(fpi.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(fpi.TENDER_EDATE,'yyyy-MM-dd')
+            end as issueDateStr
 
         FROM WFL_ETR_ENTRUST ee
         LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
@@ -576,6 +593,9 @@
             <if test="tradeMarket !=null and tradeMarket !=''">
                 AND aaa.tradeMarket=#{tradeMarket,jdbcType=VARCHAR}
             </if>
+            <if test="tradeplace !=null and tradeplace !=''">
+                AND aaa.tradeMarket=#{tradeplace,jdbcType=VARCHAR}
+            </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND aaa.finprodId in
                 <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -583,10 +603,12 @@
                 </foreach>
             </if>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
-                AND  (
-                    (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd') and to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd)
-                OR (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')  and to_date(#{issueDateEnd}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd )
-                    )
+                AND (
+                (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd') and to_date(#{issueDateStart},
+                'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateStart)
+                OR (aaa.issueDateEnd <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd') and
+                to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd )
+                )
             </if>
             <if test="issueStage != null and issueStage.size() > 0">
                 AND aaa.issueStage in
@@ -597,6 +619,7 @@
             <!-- 关键字模糊查询 -->
             <include refid="keywordsWhereIssue"></include>
         </where>
+        ORDER BY issueDateStr
         )
         <!--前端传入排序字段-->
         <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
@@ -648,7 +671,10 @@
             SEC_INFO.VARIETY_OF_COUPONS couponSpecies,
             SEC_INFO.RATE_TYPE intType,
             nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) AS issuePrice,
-            nvl(to_char(RDI_RELEASE_INFO.COUPON_RATE * 100 , 'FM9999999999999990.9990') , to_char(RELEASE_INFO.COUPON_RATE * 100 , 'FM9999999999999990.9990')) || ' %' AS referYieldStr,
+            CASE WHEN RDI_RELEASE_INFO.COUPON_RATE IS NOT NULL OR RELEASE_INFO.COUPON_RATE IS NOT NULL THEN
+            nvl(to_char(RDI_RELEASE_INFO.COUPON_RATE * 100 , 'FM9999999999999990.9990') , to_char(RELEASE_INFO.COUPON_RATE * 100 , 'FM9999999999999990.9990')) || ' %'
+            ELSE NULL
+            END AS referYieldStr,
             nvl(to_date(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyyMMdd'), RELEASE_INFO.INTEREST_ACCRUAL_DATE)  AS firstConfirmDate,
             nvl(ROUND(RDI_RELEASE_INFO.MIN_PER_TENDER_AMT,2), ROUND(RELEASE_INFO.MIN_PER_TENDER_AMT, 2)) AS minPamt,
             nvl(ROUND(RDI_RELEASE_INFO.MAX_PER_TENDER_AMT,2), ROUND(RELEASE_INFO.MAX_PER_TENDER_AMT, 2)) AS maxPamt,
@@ -672,12 +698,15 @@
                  LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO on CUSTOMER_INFO_ADD.CUSTOMER_ID = CUSTOMER_INFO.CUSTOMER_ID
                  LEFT JOIN FIN_PRODUCT PRODUCT on SEC_INFO.SEC_ID = PRODUCT.FINPROD_MARKET_ID
         <where>
-            SEC_INFO.TRADING_PLACES in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
+            <!-- 限制为银行间和商业柜台,上交所和深交所；排除交易所可转债，可交换债-->
             AND (
-                CASE
-                WHEN RELEASE_INFO.LISTING_DATE IS NOT NULL THEN RELEASE_INFO.LISTING_DATE -1
-                WHEN RELEASE_INFO.ISSUE_DATE IS NOT NULL THEN RELEASE_INFO.ISSUE_DATE
-                END <![CDATA[>=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+            SEC_INFO.TRADING_PLACES IN ('01', '02')
+            OR (SEC_INFO.TRADING_PLACES IN ('03', '04') AND SEC_INFO.SECONDARY_CLASSIFICATION NOT IN ('70','71') ))
+            AND (
+            CASE
+            WHEN RELEASE_INFO.LISTING_DATE IS NOT NULL THEN RELEASE_INFO.LISTING_DATE -1
+            WHEN RELEASE_INFO.ISSUE_DATE IS NOT NULL THEN RELEASE_INFO.ISSUE_DATE
+            END <![CDATA[>=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
             )
         </where>
     </sql>
@@ -707,9 +736,9 @@
             ISSUE.INT_TYPE as intType,
             ISSUE.ISSUE_PRICE as issuePrice,
             case
-                when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
+                WHEN PRODUCT.COUPON_SPECIES = '01' AND ISSUE.INT_TYPE = '02' AND SDLDATA.ITEM_VALUE IS NOT NULL AND ISSUE.bp IS NOT NULL THEN
                     SDLDATA.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
-                else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9990') || ' %'
+                WHEN ISSUE.REFER_YIELD IS NOT NULL THEN  to_char(ISSUE.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
                 end as referYieldStr,
             ISSUE.FIRST_CONFIRM_DATE firstConfirmDate,
             nvl(round(ISSUE.MIN_PER_TAMT / 100000000, 2), round(ISSUE.MIN_PAMT / 100000000, 2)) AS minPamt,
@@ -725,7 +754,7 @@
             ISSUE.ISSUE_STYLE as issueStyle,
             case
             when ISSUE.ISSUE_CLASS ='01' THEN to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
-            when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+            when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
             else to_char(ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-MM-dd')
             end as issueDateStr,
             nvl(TO_CHAR(ISSUE.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(ISSUE.PAY_DATE, 'yyyy-MM-dd')) AS payEdateStr,
@@ -737,19 +766,20 @@
         LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID
         LEFT JOIN MST_INT_RATE_INFO miri ON miri.INT_RATE_ID  = ISSUE.INT_RATE_ID AND miri.EFF_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')
         LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on ISSUE.INT_RATE_ID = SDLDATA.ITEM_CODE
-        <where>
-            PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
-            AND PRODUCT.TRADE_MARKET in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
-            AND (PRODUCT_ADD.ISSUE_STATUS != '02' OR PRODUCT_ADD.ISSUE_STATUS IS NULL ) <!-- 限制为发行状态不为发行失败-->
-            AND (
+            <where>
+                PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
+                <!-- 限制为银行间和商业柜台,上交所和深交所；排除交易所可转债，可交换债-->
+                AND (PRODUCT.TRADE_MARKET IN ('01', '02')
+                OR (PRODUCT.TRADE_MARKET IN ('03', '04') AND PRODUCT_TYPE.TYPE_10 NOT IN ('70','71') ))
+                AND (PRODUCT_ADD.ISSUE_STATUS != '02' OR PRODUCT_ADD.ISSUE_STATUS IS NULL ) <!-- 限制为发行状态不为发行失败-->
+                AND (
                 CASE
                 WHEN PRODUCT_ADD.LISTING_DATE IS NOT NULL THEN PRODUCT_ADD.LISTING_DATE -1
                 WHEN ISSUE.ISSUE_DATE IS NOT NULL THEN ISSUE.ISSUE_DATE
                 WHEN ISSUE.TENDER_EDATE IS NOT NULL THEN ISSUE.TENDER_EDATE
                 END <![CDATA[>=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
-            )
-        </where>
-
+                )
+            </where>
     </sql>
     <select id="selectEntrustById" resultType="com.joyintech.tams.common.base.entity.EtrEntrust" parameterType="java.lang.String" >
         select

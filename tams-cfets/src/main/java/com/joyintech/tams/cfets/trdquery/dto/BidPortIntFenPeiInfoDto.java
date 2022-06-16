@@ -1,5 +1,6 @@
 package com.joyintech.tams.cfets.trdquery.dto;
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModelProperty;
@@ -53,7 +54,7 @@ public class BidPortIntFenPeiInfoDto {
     private BigDecimal payAmt;
     //投标标位
     @ApiModelProperty(name="bidPrice",value="投标标位")
-    private BigDecimal bidPrice;
+    private String bidPrice;
     //业务模式
     @ApiModelProperty(name="invAim",value="业务模式")
     private String invAim;
@@ -101,6 +102,16 @@ public class BidPortIntFenPeiInfoDto {
 
     @ApiModelProperty(name="bidPrinAmt",value="指令投标券面总额")
     private BigDecimal bidPrinAmt;
+
+    private String bidModle;
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
 
     public String getDipType() {
         return dipType;
@@ -199,7 +210,7 @@ public class BidPortIntFenPeiInfoDto {
     }
 
     public String getAdjustmentStrategy() {
-        return SysDataUtil.getNameFromDataDict(DictCode.分配方式, getDipType());
+        return SysDataUtil.getNameFromDataDict(DictCode.调整策略, getDipType());
     }
 
     public void setAdjustmentStrategy(String adjustmentStrategy) {
@@ -207,7 +218,13 @@ public class BidPortIntFenPeiInfoDto {
     }
 
     public String getDipTypeStr() {
-         return SysDataUtil.getNameFromDataDict(DictCode.分配方式, getDipType());
+        String dipTypeStr = null;
+        if(StringUtil.equals(this.getBidModle(),"01")) {
+             dipTypeStr = SysDataUtil.getNameFromDataDict(DictCode.调整策略, getDipType());
+        }else {
+             dipTypeStr = SysDataUtil.getNameFromDataDict(DictCode.组合分配方式, getDipType());
+        }
+        return dipTypeStr;
     }
 
     public void setDipTypeStr(String dipTypeStr) {
@@ -230,11 +247,11 @@ public class BidPortIntFenPeiInfoDto {
         this.winCprice = winCprice;
     }
 
-    public BigDecimal getBidPrice() {
+    public String getBidPrice() {
         return bidPrice;
     }
 
-    public void setBidPrice(BigDecimal bidPrice) {
+    public void setBidPrice(String bidPrice) {
         this.bidPrice = bidPrice;
     }
 

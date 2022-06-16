@@ -75,10 +75,9 @@ public class PositionUtil {
                     // 头寸返回对象
                     BaseMap data = JsonUtils.json2Object(arr[1], BaseMap.class);
 
-                    StringBuffer strb = null;
+                    StringBuffer strb = new StringBuffer("【<br/>");
                     Map responseMap_data = (Map) data.get("data");
                     if (responseMap_data != null){
-                        strb = new StringBuffer("【<br/>");
                         List checkResults = (List) responseMap_data.get("checkResults");
                         if (checkResults != null) {
                             for (int i=0; i<checkResults.size();i++){
@@ -87,6 +86,7 @@ public class PositionUtil {
                                 String UNIT = flow.getString("UNIT");
                                 String PORTFOLIO_ID = flow.getString("PORTFOLIO_ID");
                                 String HODING_TYPE = flow.getString("HODING_TYPE");
+                                String MODEL_TYPE = flow.getString("MODEL_TYPE");
                                 PtlPortfolio obj = ptlPortfolioMapper.selectByPrimaryKey(PORTFOLIO_ID);
                                 String portfolioName = "";
                                 if (obj != null) {
@@ -100,6 +100,7 @@ public class PositionUtil {
                                 strb.append(")");
 //                                strb.append(CHECKBALANCE.toPlainString());
                                 strb.append("【");
+                                strb.append(SysDataUtil.getNameFromDataDict(DictCode.子系统代码, MODEL_TYPE));
                                 strb.append(SysDataUtil.getNameFromDataDict(DictCode.头寸资产类型, HODING_TYPE));
                                 strb.append("】余额不足，当前余额为：").append(CHECKBALANCE.toPlainString()).append(UNIT.toString());
                                 if ((i+1) == checkResults.size()){
@@ -170,14 +171,13 @@ public class PositionUtil {
                         BaseMap paramMap = BaseMap.newMap()
                                 .put("portfolioId", PORTFOLIO_ID)
                                 .put("ccy", DictCodeList.币种_人民币_CNY.getValue())
-                                .put("vdate", CDATE)
-                                ;
+                                .put("vdate", CDATE);
                         BigDecimal doAdd = BigDecimal.ZERO;
                         // 原投管余额
                         BigDecimal cashT = BigDecimal.ZERO;
-                        if (StringUtil.equals(DictCodeListExt1.子系统代码_委托.getValue(), tamsReq.getString("modelType"))){
+                        if (StringUtil.equals(DictCodeListExt1.子系统代码_委托.getValue(), flow.getString("MODEL_TYPE"))){
                             cashT = cashPositionService.etrQryCommandAvailableCash(paramMap);
-                        }else if (StringUtil.equals(DictCodeListExt1.子系统代码_交易.getValue(), tamsReq.getString("modelType"))){
+                        }else if (StringUtil.equals(DictCodeListExt1.子系统代码_交易.getValue(), flow.getString("MODEL_TYPE"))){
                             cashT = cashPositionService.trdQryCommandAvailableCash(paramMap);
                         }
                         // 头寸余额

@@ -102,6 +102,9 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
     @Autowired(required = false)
     private DateCalService dateCalService;
 
+    @Autowired
+    private FinProductMapper finProductMapper;
+
     /**
      * 指令管理查询
      *
@@ -303,39 +306,37 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
     }
     
     public Collection<CfetsEtrSecStockConfig> getAssetDetailBySeqno(CfetsEtrRepoPledgeAssetDetailRequest cfetsEtrRepoPledgeAssetDetailRequest) {
-    	Map<String, Object> pageParam = BeanUtil.object2Map(cfetsEtrRepoPledgeAssetDetailRequest);
+        Map<String, Object> pageParam = BeanUtil.object2Map(cfetsEtrRepoPledgeAssetDetailRequest);
+        // 查询质押库对应的自动入库配置
         List<EtrSecStockConfig> etrSecStockConfigList = cfetsEtrIbRepoinfoMapper.getAssetDetailBySeqno(pageParam);
-    	Map<String,CfetsEtrSecStockConfig> map = new HashMap<>();
-    	for(EtrSecStockConfig etrSecStockConfig:etrSecStockConfigList){
-            String key =etrSecStockConfig.getIsPpb()+etrSecStockConfig.getIsRight()+etrSecStockConfig.getIsSecBond()
-                    +etrSecStockConfig.getmGradeResult()+etrSecStockConfig.getSecGradeResult();
+        Map<String, CfetsEtrSecStockConfig> map = new HashMap<>();
+        for (EtrSecStockConfig etrSecStockConfig : etrSecStockConfigList) {
+            String key = etrSecStockConfig.getIsPpb() + etrSecStockConfig.getIsRight() + etrSecStockConfig.getIsSecBond()
+                    + etrSecStockConfig.getmGradeResult() + etrSecStockConfig.getSecGradeResult();
             CfetsEtrSecStockConfig cfetsEtrSecStockConfig = null;
-            if(!StringUtil.isNotEmpty(etrSecStockConfig.getWindtypeone())&&!StringUtil.isNotEmpty(etrSecStockConfig.getWindtypetwo())){
-                key = key+etrSecStockConfig.getWindtypeone();//二级分类与一级分类都为空时，单独处理  多一个null；
+            if (!StringUtil.isNotEmpty(etrSecStockConfig.getWindtypeone()) && !StringUtil.isNotEmpty(etrSecStockConfig.getWindtypetwo())) {
+                key = key + etrSecStockConfig.getWindtypeone();//二级分类与一级分类都为空时，单独处理  多一个null；
             }
-            if(map.containsKey(key)){
-                 cfetsEtrSecStockConfig = map.get(key);
-//                cfetsEtrSecStockConfig.
-//                List<>
-
-            }else{
-                 cfetsEtrSecStockConfig = new CfetsEtrSecStockConfig();
-                BeanUtil.copyPropertiesIgnoreNull(cfetsEtrSecStockConfig,etrSecStockConfig);
+            if (map.containsKey(key)) {
+                cfetsEtrSecStockConfig = map.get(key);
+            } else {
+                cfetsEtrSecStockConfig = new CfetsEtrSecStockConfig();
+                BeanUtil.copyPropertiesIgnoreNull(cfetsEtrSecStockConfig, etrSecStockConfig);
             }
             List<String> windtype = new ArrayList<>();
             windtype.add(etrSecStockConfig.getWindtypeone());
             windtype.add(etrSecStockConfig.getWindtypetwo());
-            if(cfetsEtrSecStockConfig.getWindtype()==null){
+            windtype.add(etrSecStockConfig.getWindtypethree());
+            if (cfetsEtrSecStockConfig.getWindtype() == null) {
                 List<List<String>> windtypeList = new ArrayList<>();
                 windtypeList.add(windtype);
                 cfetsEtrSecStockConfig.setWindtype(windtypeList);
-            }else{
+            } else {
                 cfetsEtrSecStockConfig.getWindtype().add(windtype);
             }
-            map.put(key,cfetsEtrSecStockConfig);
+            map.put(key, cfetsEtrSecStockConfig);
         }
-        Collection<CfetsEtrSecStockConfig> collection =map.values();
-        return collection;
+        return map.values();
     }
 
     /**
@@ -413,22 +414,29 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
     public int checkIsExistDetail(String pledgeStockId) {
         return cfetsEtrIbRepoinfoMapper.checkIsExistDetail(pledgeStockId);
     }
-    
+
+    /**
+     * 删除质押券库
+     * @author jiangpeng
+     * @date 2022/6/7 11:26
+     * @param pledgeStockId
+     */
     public void inserttotalq(String pledgeStockId) {
     	//先删后插
     	cfetsEtrIbRepoinfoMapper.deleteByPrimaryKey(pledgeStockId);
     	cfetsEtrIbRepoinfoMapper.delete(pledgeStockId);
     	cfetsEtrIbRepoinfoMapper.deleteEtrEntrustPledgeByPledgeStockId(pledgeStockId);
     }
+
     /**
-     * <一句话功能简述>
-     * <功能详细描述>
+     * 插入质押券库自动入库规则
+     *
      * @param dto
      * @see
      * @since 1.0
      */
     public void inserttotal(EtrSecStockConfig dto) {
-    	etrSecStockConfigMapper.insert(dto);
+        etrSecStockConfigMapper.insert(dto);
     }
     
     public void insertptl(PtlSecStock dto) {
@@ -803,9 +811,6 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
         param.put("platDate", iPlatformDate.getSysDateStr());
         if (StringUtil.equals(request.getPs(), DictCodeListExt3.交易方向_正回购.getValue())) {
             List<FinExercisePlan> finExercisePlans = cfetsIbuQuoteRepoMapper.findFinExercisePlan(param);
-            if (CollectionUtils.isEmpty(finExercisePlans)) {
-                return result;
-            }
             Date settlementStartDate = null;
             // 回购期限
             int repoTerm = request.getRepoTerm().intValue();
@@ -828,14 +833,25 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
                 SettlementEndDate =
                         dateCalService.calculationTradingDay(SettlementEndDate, 1, holidayList, "1");
             }
-            for (FinExercisePlan finExercisePlan : finExercisePlans) {
-                for (CfetsEtrRepoZLCXPositionResponse response : request.getCfetsEtrRepoZLCXPositionResponses()) {
-                    if (StringUtil.isNotEmpty(SettlementEndDate)
-                            && DateUtil.compareTo(SettlementEndDate, response.getMdate()) < 0) {
-                        result.setMessage("所选质押券" + response.getFinprodMarketId() +
-                                response.getFinprodAbbr() + "到期日为" + response.getMdate() + "，不可小于等于回购到期结算日", MessageType.错误消息);
-                        return result;
-                    }
+            for (CfetsEtrRepoZLCXPositionResponse response : request.getCfetsEtrRepoZLCXPositionResponses()) {
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(response.getFinprodId());
+//                if (StringUtil.isNotEmpty(SettlementEndDate)
+//                        && DateUtil.compareTo(finProduct.getDelistingDate(), SettlementEndDate) <= 0) {
+//                    result.setMessage("所选质押券【" + response.getFinprodAbbr() + "(" + response.getFinprodMarketId()
+//                            + ")】摘牌日为" + DateUtil.format(finProduct.getDelistingDate(), DateUtil.DEFAULT_DATE_FORMAT_CN) + "，不可小于等于回购到期结算日", MessageType.错误消息);
+//                    return result;
+//                }
+                if (StringUtil.isNotEmpty(SettlementEndDate)
+                        && DateUtil.compareTo(finProduct.getDelistingDate(), SettlementEndDate) <= 0) {
+                    result.setMessage("回购期限不可大于【质押券" + response.getFinprodAbbr() + "(" + response.getFinprodMarketId()
+                            + ")】】摘牌日", MessageType.错误消息);
+                    return result;
+                }
+                if (StringUtil.isEmptyList(finExercisePlans)){
+                    return result;
+                }
+                FinExercisePlan finExercisePlan = finExercisePlans.get(0);
+                if (StringUtil.isNotEmpty(finExercisePlan)) {
                     if (DateUtil.compareTo(finExercisePlan.getExerciseDate(), SettlementEndDate) < 0) {
                         result.setMessage("债券" + response.getFinprodMarketId() +
                                 response.getFinprodAbbr() + "已做赎回登记，是否确认继续质押", MessageType.确认消息);

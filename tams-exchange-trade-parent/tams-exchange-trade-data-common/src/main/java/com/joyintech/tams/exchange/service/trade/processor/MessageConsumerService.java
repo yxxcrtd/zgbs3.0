@@ -11,7 +11,7 @@ import com.joyintech.redis.core.data.RedisHash;
 import com.joyintech.tams.exchange.common.bean.investment.EntrustOpeBean;
 import com.joyintech.tams.exchange.common.constant.InstructionFlag;
 import com.joyintech.tams.exchange.common.constant.InstructionStatus;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.constant.joyin.AutoReceiveFlag;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
@@ -299,7 +299,7 @@ public class MessageConsumerService {
                 || DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
             return true;
         } else if (DictCodeListExt3.投管业务类型_竞价交易.getValue().equals(busiTypeTg)) {
-            return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
+            return InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
                     && InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1());
         }
 

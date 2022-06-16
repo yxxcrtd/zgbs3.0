@@ -36,9 +36,10 @@ public class EntrustPropUtils {
 
     /**
      * 获取委托属性，处理前端可能传入的 FI9-1
-     * @param instruction   指令对象
-     * @param entrustProp   订单上的委托属性
-     * @return  委托属性
+     *
+     * @param instruction 指令对象
+     * @param entrustProp 订单上的委托属性
+     * @return 委托属性
      */
     public static String getEntrustPropWithHandleNewBond(Instruction instruction, String entrustProp) {
         return getEntrustProp(instruction, entrustProp).split(StrUtil.DASHED)[0];
@@ -51,6 +52,10 @@ public class EntrustPropUtils {
         }
         //业务类型
         final String busiTypeTg = instruction.getBusiTypeTg();
+        //信用保护凭证
+        if (EntrustUtils.isCreditProtectionCertificate(busiTypeTg)) {
+            return EntrustProp.CREDIT_PROTECTION_CERTIFICATE.getValue();
+        }
         //申报类型
         final String dealMode = instruction.getDealMode();
         //新债业务
@@ -62,7 +67,7 @@ public class EntrustPropUtils {
         }
 
         //判断是否非交易业务
-        if (EntrustUtils.isNotTrade(busiTypeTg)) {
+        if (EntrustUtils.isNotBuyOrSellTrade(busiTypeTg)) {
             return decideEntrustProp(instruction.getPs());
         }
 

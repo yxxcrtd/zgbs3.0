@@ -18,6 +18,9 @@ public enum BusinessType {
     BOND_SELL("场内现券卖出", "26"),
     // add by etliu 20220531 end
 
+    CREDIT_PROTECTION_CERTIFICATE_BUY("信用保护凭证买入", "27"),
+    CREDIT_PROTECTION_CERTIFICATE_SELL("信用保护凭证卖出", "28"),
+
     SH_SELL_PROTOCOL_BACK_BEGIN("上交所协议正回购初始交易", "05"),
     SH_SELL_PROTOCOL_BACK_EXCHANGE("上交所协议正回购中途换券", "06"),
     SH_SELL_PROTOCOL_BACK_TERMINATE("上交所协议正回购提前购回", "07"),

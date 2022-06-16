@@ -1340,6 +1340,28 @@ from
         fin_product T1
         where T1.finprod_id = #{entrustId}
     </select>
+    <select id="findAssetExercise" resultType="com.joyintech.tams.common.base.entity.FinExercisePlan">
+    select
+        <include refid="com.joyintech.tams.common.base.dao.FinExercisePlanMapper.Base_Column_List" />
+    from FIN_EXERCISE_PLAN pd
+    where ROWNUM = 1
+        <if test="platDate != null">
+            and pd.exercise_date <![CDATA[>]]>#{platDate}
+        </if>
+        <if test="finprodId != null and finprodId != ''">
+            and pd.FINPROD_ID = #{finprodId}
+        </if>
+        <if test="ps != null and ps.equals('T03')">
+            and pd.exercise_type='02'
+        </if>
+        <if test="ps != null and ps.equals('T39')">
+            and pd.exercise_type='01'
+        </if>
+        <if test="isNull != null and isNull != ''">
+            and pd.EXERCISE_PRICE is null
+        </if>
+    order by pd.exercise_date desc
+    </select>
     <select id="queryPositionByEtrInfo" parameterType="Map" resultType="map">
         select
         sum(

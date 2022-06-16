@@ -281,8 +281,6 @@ public class CfetsTrdConfirmService extends BaseService{
     /**
      * 交易执行-成交确认
      */
-    @Transactional(rollbackFor = Exception.class)
-    @DTXTransaction
     public AjaxResult trdConfirmSaveMethod(CfetsTrdConfirmRegInfoListResponse dto){
         List<CfetsTrdConfirmRegInfoListResponse> selectedItem = dto.getSelectedItem();
         List<ValidMessage> messages = new ArrayList<>();
@@ -300,11 +298,7 @@ public class CfetsTrdConfirmService extends BaseService{
                         } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.登记资产类型_一级申购.getValue())
                                 || StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.CSTP资产类型_一级申购.getValue())) {
                             CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(item.getTotleTradeId(), DictCodeListExt1.生成方式_画面录入.getValue());
-                            cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW);
-                            FinProductAdd finProductAdd = new FinProductAdd();
-                            finProductAdd.setFinprodId(item.getFinprodId());
-                            finProductAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
-                            finProductAddMapper.updateByPrimaryKeySelective(finProductAdd);
+                            cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_画面录入.getValue());
                         } else {
                             CfetsTrdRepoTrade003Dto entity = packageRepoEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
                             //成交确认提交方法
@@ -853,15 +847,15 @@ public class CfetsTrdConfirmService extends BaseService{
             trdTradeFeeDetails.addAll(生成交易费用明细数据(regDeal.getTradeId(),deal.getTradeId()));
 
             //风险数据
-            if(StringUtil.equals(genType,DictCodeListExt1.生成方式_画面录入.getValue())){
-                CfetsTrdBondInvestTradeDto dto=new CfetsTrdBondInvestTradeDto();
-                BeanUtil.copyPropertiesIgnoreNull(dto,entity);
-                dto.setPortfolioId(regDeal.getPortfolioId());
-                dto.setTradeAmt(regDeal.getTradeAmt());
-                dto.setCpriceAmt(regDeal.getCpriceAmt());
-                dto.setFpriceAmt(regDeal.getFpriceAmt());
-                dtoList.add(dto);
-            }
+            CfetsTrdBondInvestTradeDto dto=new CfetsTrdBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(dto,entity);
+            dto.setPortfolioId(regDeal.getPortfolioId());
+            dto.setTradeAmt(regDeal.getTradeAmt());
+            dto.setCpriceAmt(regDeal.getCpriceAmt());
+            dto.setFpriceAmt(regDeal.getFpriceAmt());
+            dto.setEntrustId(regDeal.getEntrustId());
+            dto.setTotleTradeId(deal.getTradeId());
+            dtoList.add(dto);
         }
 
         entity.setPtlTrade(ptlTrades);
@@ -2843,7 +2837,7 @@ public class CfetsTrdConfirmService extends BaseService{
                     entity.getCfetsTrdConfirmMatchDto().setMatchStatus(BussinessDictCodeList.匹配状态_已匹配.getValue());
                 }
                 entity.setOprType(DictCodeListExt3.操作类型_手工匹配确认.getValue());
-                cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW);
+                cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_画面录入.getValue());
             }
         }catch (Exception e) {
             //若插入数据异常，提示错误信息
@@ -3128,7 +3122,7 @@ public class CfetsTrdConfirmService extends BaseService{
                     entity.setCfetsTrdConfirmMatchDto(matchDto);
                     entity.setOprType(DictCodeListExt3.操作类型_自动匹配确认.getValue());
                     //成交确认提交方法
-                    cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW);
+                    cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_接口接入.getValue());
                 }
             }catch (Exception e) {
                 //若插入数据异常，提示错误信息

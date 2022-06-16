@@ -3,11 +3,17 @@ package com.joyintech.tams.exchange.period.creditprotectioncertificate.dto;
 import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.Date;
+import java.util.List;
+
 public class CreditProtectionCertificatePeriod001Request {
 
 
     @ApiModelProperty(name="busiTypePosition",value="业务类型",example="206")
     private String businessType;
+
+    @ApiModelProperty(name="busiTypePosition",value="业务类型数组",example="206")
+    private List<String> businessTypeList;
 
     @ApiModelProperty(name="businessCode",value="业务编号",example="206")
     private String businessCode;
@@ -29,6 +35,18 @@ public class CreditProtectionCertificatePeriod001Request {
 
     @ApiModelProperty(name="pageMode",value="分页对象")
     private PageMode pageMode;
+
+    @ApiModelProperty(name="tradeDate",value="交易日期")
+    private Date tradeDate;
+
+
+    public Date getTradeDate() {
+        return tradeDate;
+    }
+
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
+    }
 
     public String getBusinessType() {
         return businessType;
@@ -92,6 +110,14 @@ public class CreditProtectionCertificatePeriod001Request {
 
     public void setFinprodName(String finprodName) {
         this.finprodName = finprodName;
+    }
+
+    public List<String> getBusinessTypeList() {
+        return businessTypeList;
+    }
+
+    public void setBusinessTypeList(List<String> businessTypeList) {
+        this.businessTypeList = businessTypeList;
     }
 }
 

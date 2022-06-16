@@ -9,6 +9,7 @@ import com.joyintech.tams.exchange.common.db.domain.Entrust;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrumentMarginRateBean;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.terminal.trade.EntrustIdManager;
@@ -235,7 +236,7 @@ public class CTPConverter {
         entrust.setLocalEntrustId(orderField.OrderRef);
         entrust.setBrokerEntrustId(orderField.OrderSysID);//需要补齐空格
         entrust.setCancelTime(orderField.CancelTime);
-        entrust.setAssetType(InvestmentAssetType.FUTURES.value);
+        entrust.setAssetType(InvestAssetTypeEnum.FUTURES.value);
         entrust.setNoCancelEntrust(true);
         if (Strings.isNullOrEmpty(entrust.getId())) {
             String id = entrustIdManager.getIdByLocalEntrustId(entrust.getAccountId(), orderField.OrderRef);
@@ -272,7 +273,7 @@ public class CTPConverter {
         trade.setTradeTime(tradeField.TradeTime);
         trade.setReportNo(String.valueOf(tradeField.SequenceNo));
         trade.setTradeType(TradeType.NORMAL.value);
-        trade.setAssetType(InvestmentAssetType.FUTURES.value);
+        trade.setAssetType(InvestAssetTypeEnum.FUTURES.value);
         trade.setNoCancelEntrust(true);
         if (Strings.isNullOrEmpty(trade.getEntrustId())) {
             String id = entrustIdManager.getIdByLocalEntrustId(trade.getAccountId(), tradeField.OrderRef);
@@ -314,7 +315,7 @@ public class CTPConverter {
         trade.setStockCode(orderField.InstrumentID);
         trade.setTradingDay(orderField.TradingDay);
         trade.setTradeType(TradeType.CANCEL.value);
-        trade.setAssetType(InvestmentAssetType.FUTURES.value);
+        trade.setAssetType(InvestAssetTypeEnum.FUTURES.value);
         trade.setNoCancelEntrust(true);
         if (Strings.isNullOrEmpty(trade.getEntrustId())) {
             String id = entrustIdManager.getIdByLocalEntrustId(trade.getAccountId(), orderField.OrderRef);

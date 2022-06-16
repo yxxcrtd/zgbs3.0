@@ -1,6 +1,7 @@
 package com.joyintech.tams.cfets.trd.bond.dto;
 
 import com.joyintech.background.component.common.pack.common.base.BaseEntity;
+import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -190,6 +191,9 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name="isExercisePlan",value="是否有未来回售行权计划")
     private boolean isExercisePlan;
 
+    @ApiModelProperty(name="isExercisePlanPrice",value="未来回售行权计划行权净价是否为空")
+    private boolean isExercisePlanPrice;
+
     @ApiModelProperty(name="secManageAcctId",value="证券账户")
     private String secManageAcctId;
 
@@ -214,7 +218,27 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name="softSkipMode",value="软控,是否确认")
     private String softSkipMode;
 
+    @ApiModelProperty(name = "isAbs", value = "是否资产支持证券 Y/N")
+    private String isAbs;
+
+    @ApiModelProperty(name = "isSpecialDebt", value = "债券是否特殊债 Y/N")
+    private String isSpecialDebt;
+
+    @ApiModelProperty(name = "isDefaultBondIndicator", value = "债券是否到期违约债 Y/N")
+    private String isDefaultBondIndicator;
+
+    @ApiModelProperty(name = "isSpecial", value = "是否锚定净价 Y/N")
+    private String isSpecial;
+
     private List<String> counterIdList;
+
+
+    private String rskApproval;
+
+    /**
+     * 风险试算实体类
+     */
+    private List<RiskTrialRetDto> riskTrialRetDto;
 
     public String getQuoteId() {
         return quoteId;
@@ -664,6 +688,14 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
         isExercisePlan = exercisePlan;
     }
 
+    public boolean getIsExercisePlanPrice() {
+        return isExercisePlanPrice;
+    }
+
+    public void setIsExercisePlanPrice(boolean isExercisePlanPrice) {
+        this.isExercisePlanPrice = isExercisePlanPrice;
+    }
+
     public String getAssetTypeOne() {
         return assetTypeOne;
     }
@@ -750,6 +782,62 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
 
     public void setSoftSkipMode(String softSkipMode) {
         this.softSkipMode = softSkipMode;
+    }
+
+    public String getIsSpecialDebt() {
+        return isSpecialDebt;
+    }
+
+    public void setIsSpecialDebt(String isSpecialDebt) {
+        this.isSpecialDebt = isSpecialDebt;
+    }
+
+    public String getIsDefaultBondIndicator() {
+        return isDefaultBondIndicator;
+    }
+
+    public void setIsDefaultBondIndicator(String isDefaultBondIndicator) {
+        this.isDefaultBondIndicator = isDefaultBondIndicator;
+    }
+
+    public String getIsAbs() {
+        return isAbs;
+    }
+
+    public void setIsAbs(String isAbs) {
+        this.isAbs = isAbs;
+    }
+
+    public String getIsSpecial() {
+        return isSpecial;
+    }
+
+    public void setIsSpecial(String isSpecial) {
+        this.isSpecial = isSpecial;
+    }
+
+    public List<RiskTrialRetDto> getRiskTrialRetDto() {
+        return riskTrialRetDto;
+    }
+
+    public void setRiskTrialRetDto(List<RiskTrialRetDto> riskTrialRetDto) {
+        this.riskTrialRetDto = riskTrialRetDto;
+    }
+
+    public boolean isExercisePlanPrice() {
+        return isExercisePlanPrice;
+    }
+
+    public void setExercisePlanPrice(boolean exercisePlanPrice) {
+        isExercisePlanPrice = exercisePlanPrice;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
     }
 }
 

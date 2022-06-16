@@ -1,24 +1,90 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import static com.joyintech.tams.constant.DictCodeListExt3.业务动作_交易下单;
+import static com.joyintech.tams.constant.DictCodeListExt3.业务动作_撤委托;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_中途换券;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_到期续做;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_到期购回;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_提前购回;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_正回购;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_解除质押;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券入库;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_逆回购;
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
+import static com.joyintech.tams.exchange.common.constant.EntrustStatus.CANCELED;
+import static com.joyintech.tams.exchange.common.constant.EntrustStatus.INVALID;
+import static com.joyintech.tams.exchange.common.constant.EntrustStatus.PART_TRADED_CANCELED;
+import static com.joyintech.tams.exchange.common.constant.EntrustStatus.SYSTEM_INVALID;
+import static com.joyintech.tams.exchange.common.constant.EntrustType.CANCEL;
+
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import com.google.common.collect.Maps;
+import com.joyintech.tams.exchange.service.trade.processor.msg.MsgReceiverManager;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
 import com.google.common.base.Strings;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.common.bean.TerminalId;
 import com.joyintech.tams.exchange.common.bean.TrdExchangeEntrustDto;
 import com.joyintech.tams.exchange.common.bean.TrdExchangeIntegratedEntrustDto;
 import com.joyintech.tams.exchange.common.bean.WorkflowBean;
-import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.constant.ApproveType;
+import com.joyintech.tams.exchange.common.constant.DBSaveType;
+import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.constant.EntrustStatus;
+import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.FullPriceConst;
+import com.joyintech.tams.exchange.common.constant.IDPrefix;
+import com.joyintech.tams.exchange.common.constant.InstructionStatus;
+import com.joyintech.tams.exchange.common.constant.OrderStatus;
+import com.joyintech.tams.exchange.common.constant.RiskType;
+import com.joyintech.tams.exchange.common.constant.TradeType;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
-import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.db.domain.AccountRiskParameter;
+import com.joyintech.tams.exchange.common.db.domain.BatchInfo;
+import com.joyintech.tams.exchange.common.db.domain.CancelEntrustBean;
+import com.joyintech.tams.exchange.common.db.domain.Entrust;
+import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
+import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.db.domain.Order;
+import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
+import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
-import com.joyintech.tams.exchange.common.utils.*;
-import com.joyintech.tams.exchange.datacommon.db.service.*;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.ErrorMsgUtils;
+import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.datacommon.db.service.AccountRiskParameterService;
+import com.joyintech.tams.exchange.datacommon.db.service.EntrustService;
+import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
+import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
+import com.joyintech.tams.exchange.datacommon.db.service.OrderService;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestRiskManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.ReviewManagement;
 import com.joyintech.tams.exchange.service.trade.position.service.PositionRequestServiceInstructionRequest;
@@ -30,29 +96,17 @@ import com.joyintech.tams.exchange.service.trade.processor.constants.Constants;
 import com.joyintech.tams.exchange.service.trade.processor.delay.DelayController;
 import com.joyintech.tams.exchange.service.trade.processor.delay.OrderRateController;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
+import com.joyintech.tams.exchange.service.trade.processor.msg.TradeMsgReceiver;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
 import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
-import static com.joyintech.tams.constant.DictCodeListExt3.*;
-import static com.joyintech.tams.exchange.common.constant.EntrustStatus.*;
-import static com.joyintech.tams.exchange.common.constant.EntrustType.CANCEL;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 
 @Component
 public class TradeMsgProcessor {
@@ -104,11 +158,25 @@ public class TradeMsgProcessor {
     private MessageSenderManagement messageSenderManagement;
     @Autowired
     private PortfolioTradeMessageHelper portfolioTradeMessageHelper;
+//    @Lazy
+//    @Autowired
+//    private TradeMsgReceiver tradeMsgReceiver;
+
+    @Autowired
+    private MsgReceiverManager msgReceiverManager;
 
     @Value("${yali.open:false}")
     private boolean yaliFlag;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+
+    private AtomicInteger brokerTradeId = new AtomicInteger(0);
+    private AtomicInteger localOffset = new AtomicInteger(9000);
+    private static int timeZoneOffset = 0;
+
+    static {
+        timeZoneOffset = TimeZone.getDefault().getRawOffset();
+    }
 
     public boolean handleFrozenPendingApprovalEntrust(Entrust entrust) {
         logger.info("handleFrozenPendingApprovalEntrust {}", entrust.getId());
@@ -324,7 +392,7 @@ public class TradeMsgProcessor {
         if (checkReview(integratedEntrust, instruction, processType))
             return;
         BigDecimal entrustBalance;
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType()) && InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType()) && InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
             entrustBalance = integratedEntrust.getEntrustBalance();
         } else {
             entrustBalance = TradeUtils.calculateBalance(integratedEntrust.getEntrustBs(), integratedEntrust.getEntrustPrice(), integratedEntrust.getEntrustVolume(), integratedEntrust.getAssetType(), integratedEntrust, null);
@@ -332,8 +400,80 @@ public class TradeMsgProcessor {
         // 区分委托是否是通过风控审批通过后调回的，若是则不需要再次冻结，不是则重新冻结
         if (MsgType.EXAMINE_SUCCESS == processType || frozenInstructionAndIntegratedEntrust(integratedEntrust, entrustBalance, instruction)) {
             integratedEntrust.setEntrustStatus(EntrustStatus.TOBE_REPORTED.value);
+
+            //信用保护凭证不走交易直连，走交易登记逻辑
+            if (StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), integratedEntrust.getBusiTypeTg())) {
+                this.integratedEntrustNonAgent(integratedEntrust);
+                return;
+            }
+
             agent.integratedEntrust(integratedEntrust);
         }
+    }
+
+    private void integratedEntrustNonAgent(IntegratedEntrust integratedEntrust) {
+        integratedEntrust.setLocalEntrustId(genLocalId());
+        integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
+//    	int dbSaveType =  DBSaveType.SINGLE.value ;//同步更新委托状态
+//    	integratedEntrustService.asyncUpdate(integratedEntrust, dbSaveType);
+
+        TerminalId terminalId = new TerminalId();
+        BeanUtils.copyProperties(integratedEntrust, terminalId);
+        terminalId.setId(integratedEntrust.getId());
+        integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
+
+        TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(integratedEntrust.getInstructionId());
+        tradeMsgReceiver.addMsg(MsgType.RESP_INTEGRATED, terminalId);
+
+        Trade trade = getTrade(integratedEntrust, Calendar.getInstance(), TradeType.NORMAL.value);
+
+        Map<String, Object> extend2 = Maps.newHashMap();
+        if (StringUtil.isNotEmpty(integratedEntrust.getExtend2())) {
+            extend2 = JsonUtils.getObjectFromJson(integratedEntrust.getExtend2(), Map.class);
+        }
+        extend2.put("brokerTradeId", trade.getBrokerTradeId());
+        integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
+
+        integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
+        tradeMsgReceiver.addMsg(MsgType.NOTIFY_INTEGRATED, integratedEntrust);
+
+        tradeMsgReceiver.addMsg(MsgType.NOTIFY_TRADE_RECORD, trade);
+    }
+
+    private Trade getTrade(EntrustInterface entrust, Calendar now, int tradeType) {
+        Trade trade = new Trade();
+        trade.setTradedVolume(entrust.getEntrustVolume());
+        trade.setAccountId(entrust.getAccountId());
+        trade.setTradingDay(entrust.getTradingDay());
+        trade.setMarket(entrust.getMarket());
+        trade.setFinanceAccount(entrust.getFinanceAccount());
+        trade.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
+        trade.setEntrustBs(entrust.getEntrustBs());
+        trade.setIsFullPrice(entrust.getIsFullPrice());
+        trade.setTradedPrice(entrust.getEntrustPrice());
+        trade.setTradedBalance(entrust.getEntrustBalance());
+        trade.setTradedVolume(entrust.getEntrustVolume());
+        trade.setBsFlag(entrust.getBsFlag());
+        trade.setAssetType(entrust.getAssetType());
+        trade.setTradeType(tradeType);
+        trade.setBrokerEntrustId(entrust.getBrokerEntrustId());
+        trade.setStockName(entrust.getStockName());
+        trade.setEntrustProp(entrust.getEntrustProp());
+        trade.setLocalEntrustId(entrust.getLocalEntrustId());
+        trade.setEntrustId(entrust.getId());
+        trade.setTradeTime(now.get(Calendar.HOUR_OF_DAY) + "" + now.get(Calendar.MINUTE) + "" + now.get(Calendar.SECOND));
+        trade.setBrokerTradeId(trade.getTradeTime() + brokerTradeId.incrementAndGet());
+        return trade;
+    }
+
+    private String genLocalId() {
+        int tempOffSet = localOffset.incrementAndGet();
+        if (tempOffSet > 9999) {
+            tempOffSet = 9000;
+            localOffset.set(9000);
+        }
+        long beginMill = System.currentTimeMillis() / (1000 * 3600 * 24) * (1000 * 3600 * 24) - timeZoneOffset;
+        return String.format("%s%04d", (System.currentTimeMillis() - beginMill) / 1000, tempOffSet);
     }
 
     public void frozenBalanceOrVolume(OrderInterface orderInterface, BigDecimal frozenBalance) {
@@ -682,7 +822,7 @@ public class TradeMsgProcessor {
             entrustDb.setCancelVolume(entrustDb.getEntrustVolume());
             FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(entrustDb.getStockCode());
             BigDecimal entrustBalance;
-            if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType()) && InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
+            if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType()) && InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
                 entrustBalance = ((IntegratedEntrust) entrustDb).getEntrustBalance();
             } else {
                 entrustBalance = TradeUtils.calculateBalance(entrustDb.getEntrustBs(), entrustDb.getEntrustPrice(), entrustDb.getEntrustVolume(), entrustDb.getAssetType(), entrustDb, futuresInstrument);
@@ -800,7 +940,7 @@ public class TradeMsgProcessor {
         if (InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
             logger.info("场内协议回购交易下单头寸检查，指令编号：{}，回购金额：{}", entrust.getInstructionId(), entrust.getEntrustBalance());
             instructionClone.setEntrustAmt(entrust.getEntrustBalance());
-        } else if (InvestmentAssetType.isBond(entrust.getAssetType()) && Objects.nonNull(entrust.getFullPrice()) && entrust.getFullPrice().compareTo(BigDecimal.ZERO) != 0) {
+        } else if (InvestAssetTypeEnum.isBond(entrust.getAssetType()) && Objects.nonNull(entrust.getFullPrice()) && entrust.getFullPrice().compareTo(BigDecimal.ZERO) != 0) {
             //全价金额
             instructionClone.setEntrustAmt(TradeUtils.multiply(entrust.getFullPrice(), entrust.getEntrustVolume(), 2));
         } else if (Objects.isNull(entrust.getEntrustBalance()) || entrust.getEntrustBalance().compareTo(BigDecimal.ZERO) == 0) {
@@ -835,7 +975,7 @@ public class TradeMsgProcessor {
             instructionClone.setEntrustNum(entrust.getEntrustVolume() - entrust.getTradedVolume());
 
             //组装撤单组合分配
-            List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildPortfolioCalculateResponse(entrust, instructionClone, PortfolioDetailBusiTypeEnum.CANCEL);
+            List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildCancelPortfolioCalculateResponse(entrust, instructionClone);
             if (CollectionUtils.isEmpty(portfolioCalculateResponses)) {
                 logger.error("【未组装撤单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】", instruction.getEntrustId(), entrust.getId());
                 return;

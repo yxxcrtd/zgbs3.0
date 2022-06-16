@@ -4,6 +4,7 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @ApiModel(value = "一级投标确认指令查询条件", description = "一级投标确认指令查询条件")
@@ -29,6 +30,9 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     @ApiModelProperty(name="tenderTarget",value="招标标的")
     private String tenderTarget;
+
+    @ApiModelProperty(name = "winPrice", value = "中标标位,etrAddSearch接口传值需要", example = "100.0000")
+    private BigDecimal winPrice;
 
     @ApiModelProperty(name = "entrustDateStart", value = "指令开始日期,字符串", example = "2021-12-21")
     private String entrustDateStart;
@@ -62,6 +66,9 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     @ApiModelProperty(name = "existEntrustIds", value = "etrAddSearch接口,已存在的指令代码,用于过滤申购产品列表中已添加的指令", example = "[WTBOND2022041801,WTBOND2022041802]")
     private List<String> existEntrustIds;
+
+    @ApiModelProperty(name="isEtrAddSearch",value="是否指令查询明细 etrAddSearch接口传值",example="Y")
+    private String isEtrAddSearch;
 
     public PageMode getPageMode() {
         return pageMode;
@@ -186,6 +193,14 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
         this.tenderTarget = tenderTarget;
     }
 
+    public BigDecimal getWinPrice() {
+        return winPrice;
+    }
+
+    public void setWinPrice(BigDecimal winPrice) {
+        this.winPrice = winPrice;
+    }
+
     public String getCounterId() {
         return counterId;
     }
@@ -208,5 +223,13 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     public void setExistEntrustIds(List<String> existEntrustIds) {
         this.existEntrustIds = existEntrustIds;
+    }
+
+    public String getIsEtrAddSearch() {
+        return isEtrAddSearch;
+    }
+
+    public void setIsEtrAddSearch(String isEtrAddSearch) {
+        this.isEtrAddSearch = isEtrAddSearch;
     }
 }

@@ -42,12 +42,22 @@
         ISSUE.RATE_GRADE rateGrade,
         ISSUE.BP bp,
         ISSUE.ISSUE_DATE issueDate,
-        ISSUE.MIN_PER_TAMT minPerTamt,
-        ISSUE.MAX_PER_UTAMT maxPerUtamt,
+        TO_CHAR(ROUND(ISSUE.MIN_PER_TAMT/100000000,2),'fm999999999999999999999990.0000') minPerTamt,
+        TO_CHAR(ROUND(ISSUE.MAX_PER_UTAMT/100000000,2),'fm999999999999999999999990.0000') maxPerUtamt,
         ISSUE.ISSUE_SDATE issueSdate,
         ISSUE.ISSUE_EDATE issueEdate,
         PRODUCT_ADD.BID_DATE bidDate,
-        case when ISSUE.ISSUE_STYLE = '02'then PRODUCT_ADD.BID_DATE else null end as settleDate,
+
+        case
+        when ISSUE.ISSUE_CLASS ='01' THEN to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        else to_char(ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+        end as bidDateStr,
+        case
+        when ISSUE.ISSUE_CLASS ='01' THEN to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        when ISSUE.ISSUE_DATE is not  null then to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.ISSUE_DATE,'yyyy-MM-dd')
+        else to_char(ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+        end as settleDate,
         PRODUCT_ADD.LISTING_DATE listingDate,
         ISSUE.ISSUE_CLASS issueClass,
         ISSUE.TENDER_TYPE tenderType,
@@ -55,7 +65,7 @@
         ISSUE.TENDER_SDATE tenderSdate,
         ISSUE.TENDER_EDATE tenderEdate,
         ISSUE.ISSUE_STYLE issueStyle,
-        TO_CHAR(ROUND(ISSUE.PLAN_ISSUE_AMT/100000000,2),'fm999999999999999999999990.00') || '亿元' planIssueAmt,
+        TO_CHAR(ROUND(ISSUE.PLAN_ISSUE_AMT/100000000,2),'fm999999999999999999999990.00') planIssueAmt,
         ISSUE.ADD_BATCH addBatch,
         ISSUE.PAY_DATE payDate,
         ISSUE.PAY_EDATE payEdate,

@@ -51,7 +51,12 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +65,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -507,6 +513,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                     }
                 }
                 finPayInterestStdInfoDto.setInvScheduleList(invScheduleList);
+                if (StringUtil.equals(finPayInterestStdInfoDto.getCouponSpecies(),DictCodeList.息票品种_利随本清.getValue())){
+                    finPayInterestStdInfoDto.setPayCycle(null);
+                }
                 dto.setFinPayInterestStdInfoDto(finPayInterestStdInfoDto);
             }
             //付息信息
@@ -539,7 +548,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 //                dto.setFinProductConvertible(finProductConvertibleDto);
 //            }
         } else {
-            return new FinBondAssetSaveRequest();
+            dto = finBondAssetMapper.getBasicInfoByInterf(map);
+            if(Objects.isNull(dto)){
+                return new FinBondAssetSaveRequest();
+            }
         }
         return dto;
     }
@@ -633,6 +645,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finProductAdd.setIsPpb(DictCodeList.是否_否.getValue());
         }
         finProductAdd.setFaceValue(BigDecimal.valueOf(100));
+        finProductAdd.setInvestNature(DictCodeList.投资性质_固定收益类.getValue());
         //----add by jjpei 20190727 添加投资性质----start----
 //        if(StringUtil.isNotBlank(dto.getType4())&&DictCodeList.WIND一级分类_含债券一级分类等_优先股.getValue().equals(dto.getType4())){
 //            finProductAdd.setInvestNature(DictCodeList.投资性质_权益类.getValue());
@@ -1679,4 +1692,48 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         return finBondAssetMapper.isTransInAssetTwo(finprodId);
     }
 
+    public MultipartFile downloadFileInfo(String seqNo) throws FileNotFoundException {
+        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
+        File pathFile = new SafelyFile(file.getPath());
+        MultipartFile multipartFile = createMultipartFile(pathFile);
+        return multipartFile;
+    }
+
+    private FileItem createFileItem(File file, String fieldName) {
+        FileItemFactory factory = new DiskFileItemFactory(16, null);
+        FileItem item = factory.createItem(fieldName, "text/plain", true, file.getName());
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            OutputStream os = item.getOutputStream();
+            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+            os.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return item;
+    }
+
+    private MultipartFile createMultipartFile(File file) {
+        try {
+            FileItem fileItem = null;
+            MultipartFile multipartFile = null;
+            fileItem = new DiskFileItem(file.getName(), Files.probeContentType(file.toPath()),
+                    false, file.getName(), (int) file.length(), file.getParentFile());
+            InputStream input = new FileInputStream(file);
+            OutputStream os = fileItem.getOutputStream();
+            IOUtils.copy(input, os);
+            multipartFile = new CommonsMultipartFile(fileItem);
+            os.close();
+            input.close();
+            return multipartFile;
+        } catch (Exception e) {
+            e.getStackTrace();
+            throw new RuntimeException("File转MultipartFile失败");
+        }
+    }
 }

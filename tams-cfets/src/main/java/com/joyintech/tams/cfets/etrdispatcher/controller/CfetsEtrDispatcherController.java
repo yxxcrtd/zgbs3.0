@@ -177,6 +177,29 @@ public class CfetsEtrDispatcherController extends BaseController {
     }
 
     /**
+     * 一级债券指令执行查询
+     *
+     * @param dto
+     * @return Page<CfetsEtrDispatcherExeListInfoResponse>
+     * @throws Exception Exception
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value = "一级债券指令执行查询", notes = "一级债券指令执行查询")
+    @PostMapping("/getEtrBondFirstExeListInfo")
+    @ResponseBody
+    public Message<Page<CfetsEtrBondFirstExeListInfoResponse>> getEtrBondFirstExeListInfo(@RequestBody CommonSearchInfoRequest dto)
+            throws Exception {
+        try {
+            Page<CfetsEtrBondFirstExeListInfoResponse> returnDto = cfetsEtrDispatcherService.getEtrBondFirstExeListInfo(dto);
+            return new Message<Page<CfetsEtrBondFirstExeListInfoResponse>>().success().setData(returnDto);
+        } catch (Exception e) {
+            logger.error("一级债券指令执行查询异常", e);
+            return new Message<Page<CfetsEtrBondFirstExeListInfoResponse>>().fail().setMessage("一级债券指令执行查询查询异常");
+        }
+    }
+
+    /**
      * 指令成交查询
      *
      * @param dto

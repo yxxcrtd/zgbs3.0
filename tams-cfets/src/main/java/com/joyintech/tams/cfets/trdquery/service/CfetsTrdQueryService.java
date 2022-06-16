@@ -350,10 +350,10 @@ public class CfetsTrdQueryService extends BaseService{
         String spcdCodeTemp = spcdCode;
         if (StringUtil.equals(spcdCode, DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
             //基本信息表单
-            spcdCode = spcdCodeTemp + ",B";
+            spcdCode = spcdCodeTemp + ",BB";
             List<CfgReadonlyFormShow> infoFormb = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             //其它表单
-            spcdCode = spcdCodeTemp + ",O";
+            spcdCode = spcdCodeTemp + ",BO";
             List<CfgReadonlyFormShow> infoFormo = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             //组合表格
             List<CfgDataTableShow> infoTableP;
@@ -404,20 +404,21 @@ public class CfetsTrdQueryService extends BaseService{
             List<BidPortIntFenPeiInfoDto> datalist = cfetsTrdQueryMapper.findYjtbFenPeiInfoList(pageParam);
             List<BidPortIntFenPeiInfoDto> datahlist = new ArrayList<>();
             BidPortIntFenPeiInfoDto bidPortIntFenPeiInfoDto = new BidPortIntFenPeiInfoDto();
-            BigDecimal winPrice = null;
-            BigDecimal totalWinPrinAmt = null;
-            BigDecimal bidPrinAmt = null;
-            for(BidPortIntFenPeiInfoDto fenPeiInfoDto:datalist){
-                if (null!=fenPeiInfoDto.getTotalWinPrinAmt() && fenPeiInfoDto.getTotalWinPrinAmt().compareTo(BigDecimal.ONE)!=0){
-                    winPrice = ArithmeticUtil.doAdd(winPrice,fenPeiInfoDto.getWinPrice());
-                    totalWinPrinAmt= ArithmeticUtil.doAdd(totalWinPrinAmt,fenPeiInfoDto.getTotalWinPrinAmt());
-                    bidPrinAmt= ArithmeticUtil.doAdd(bidPrinAmt,fenPeiInfoDto.getBidPrinAmt());
+            Map<String, List<BidPortIntFenPeiInfoDto>> collect = datalist.stream().collect(JoyinCollectors.groupingBy(item -> item.getBidPrice()));
+            for(String bidPrice : collect.keySet()) {
+                BigDecimal totalWinPrinAmt = null;
+                BigDecimal bidPrinAmt = null;
+                for (BidPortIntFenPeiInfoDto fenPeiInfoDto : collect.get(bidPrice)) {
+                    if (null != fenPeiInfoDto.getTotalWinPrinAmt() && fenPeiInfoDto.getTotalWinPrinAmt().compareTo(BigDecimal.ONE) != 0) {
+                        totalWinPrinAmt = ArithmeticUtil.doAdd(totalWinPrinAmt, fenPeiInfoDto.getTotalWinPrinAmt());
+                        bidPrinAmt = ArithmeticUtil.doAdd(bidPrinAmt, fenPeiInfoDto.getBidPrinAmt());
+                    }
                 }
+                bidPortIntFenPeiInfoDto.setBidPrice(bidPrice);
+                bidPortIntFenPeiInfoDto.setTotalWinPrinAmt(totalWinPrinAmt);
+                bidPortIntFenPeiInfoDto.setBidPrinAmt(bidPrinAmt);
+                datahlist.add(bidPortIntFenPeiInfoDto);
             }
-            bidPortIntFenPeiInfoDto.setWinPrice(winPrice);
-            bidPortIntFenPeiInfoDto.setTotalWinPrinAmt(totalWinPrinAmt);
-            bidPortIntFenPeiInfoDto.setBidPrinAmt(bidPrinAmt);
-            datahlist.add(bidPortIntFenPeiInfoDto);
             resultData.put(dtCode + "_dataform", dataform);
             resultData.put(dtCode + "_datalist", datalist);
             resultData.put(dtCode + "_datahlist", datahlist);
@@ -651,15 +652,18 @@ public class CfetsTrdQueryService extends BaseService{
 
         //表单data
         CfetsTrdQueryIbuInfoListResponse dataform=new CfetsTrdQueryIbuInfoListResponse();
-        pageParam.put("effectiveStatus",dto.getEffectiveStatus());
+        pageParam.put("effectiveStatus", dto.getEffectiveStatus() == null ? dto.getEffectFlag() : dto.getEffectiveStatus());
         //有效状态
         pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_03", DictCodeListExt1.有效状态_撤销.getValue());
         pageParam.put("STATUS_VALID_04", DictCodeListExt1.有效状态_流程中.getValue());
-        if(StringUtil.equals(dto.getFinprodType2(),"01")){
-            dataform=cfetsTrdQueryMapper.selectIbuBondFormDataByKey(pageParam);
-        }else{
-            dataform=cfetsTrdQueryMapper.selectIbuRepoFormDataByKey(pageParam);
+        pageParam.put("TRADE_FLOW_STATUS01", DictCodeListExt1.交易流程状态_流程中.getValue());
+        pageParam.put("TRADE_FLOW_STATUS02", DictCodeListExt1.交易流程状态_有效.getValue());
+        pageParam.put("TRADE_FLOW_STATUS03", DictCodeListExt1.交易流程状态_撤销.getValue());
+        if (StringUtil.equals(dto.getFinprodType2(), "01")) {
+            dataform = cfetsTrdQueryMapper.selectIbuBondFormDataByKey(pageParam);
+        } else {
+            dataform = cfetsTrdQueryMapper.selectIbuRepoFormDataByKey(pageParam);
         }
         //表格组合分配data
         List<CfetsPortfolioIdFenPeiInfoResponse> portIntFenPeiInfoDtoList =new ArrayList<>();
@@ -766,7 +770,6 @@ public class CfetsTrdQueryService extends BaseService{
             pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             pageParam.put("TRADE_PLACE_01", DictCodeListExt3.交易场所_银行间.getValue());
             pageParam.put("TRADE_PLACE_02", DictCodeListExt3.交易场所_商业银行柜台.getValue());
-            pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //成交编号
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdQueryMapper.queryAllCstpInfoList(pageParam));
 
@@ -957,7 +960,7 @@ public class CfetsTrdQueryService extends BaseService{
         }
 
         //有效状态
-        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
+//        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_03", DictCodeListExt1.有效状态_撤销.getValue());
 
         //平安业务类型
@@ -1004,7 +1007,6 @@ public class CfetsTrdQueryService extends BaseService{
         pageParam.put("WIN_TYPE_01",DictCodeListExt4.投标方式_自主投标.getValue());
         pageParam.put("WIN_TYPE_02",DictCodeListExt4.投标方式_代投代缴.getValue());
         pageParam.put("WIN_TYPE_03",DictCodeListExt4.投标方式_分销买入.getValue());
-        pageParam.put("TRADE_STATUS_01",DictCodeListExt1.交易状态_初始.getValue());
         pageParam.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
         pageParam.put("TRADE_PLACE_02",DictCodeListExt1.交易场所_商业银行柜台.getValue());
         pageParam.put("STATUS_VALID_01",DictCodeListExt1.有效状态_有效.getValue());
@@ -1082,7 +1084,7 @@ public class CfetsTrdQueryService extends BaseService{
         }
 
         //有效状态
-        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
+//        pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_03", DictCodeListExt1.有效状态_撤销.getValue());
 
 
@@ -1127,11 +1129,9 @@ public class CfetsTrdQueryService extends BaseService{
         pageParam.put("ISSUE_CLASS_02", DictCodeListExt4.新债_发行方式_招标发行.getValue());
         pageParam.put("ISSUE_CLASS_03",DictCodeListExt4.新债_发行方式_簿记建档.getValue());
         pageParam.put("ISSUE_CLASS_01",DictCodeListExt4.新债_发行方式_报价发行.getValue());
-        pageParam.put("PS_T01",DictCodeList.交易方向_买入.getValue());
         pageParam.put("WIN_TYPE_01",DictCodeListExt4.投标方式_自主投标.getValue());
         pageParam.put("WIN_TYPE_02",DictCodeListExt4.投标方式_代投代缴.getValue());
         pageParam.put("WIN_TYPE_03",DictCodeListExt4.投标方式_分销买入.getValue());
-        pageParam.put("TRADE_STATUS_01",DictCodeListExt1.交易状态_初始.getValue());
         pageParam.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
         pageParam.put("TRADE_PLACE_02",DictCodeListExt1.交易场所_商业银行柜台.getValue());
         pageParam.put("STATUS_VALID_01",DictCodeListExt1.有效状态_有效.getValue());

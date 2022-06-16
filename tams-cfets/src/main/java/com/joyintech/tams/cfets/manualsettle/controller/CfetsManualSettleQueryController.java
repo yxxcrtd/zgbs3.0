@@ -145,9 +145,10 @@ public class CfetsManualSettleQueryController extends BaseController {
         try {
             Map<String,Object> resultData = new HashMap<>();
             CfetsManualSettleDto settleDto = dto.getSelectedItem().get(0);
-            if (DictCodeListExt4.投标方式_分销买入.getValue().equals(settleDto.getBidModle())
+            if ((DictCodeListExt4.投标方式_分销买入.getValue().equals(settleDto.getBidModle())
                     || DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())
-                    || StringUtil.equals(settleDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())){
+                    || StringUtil.equals(settleDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())
+                    && !StringUtil.equals("01", dto.getPageFrom()))) {
                 CfetsTrdQueryTradeInfoListResponse response = new CfetsTrdQueryTradeInfoListResponse();
                 BeanUtil.copyPropertiesIgnoreNull(response,settleDto);
                 resultData =  cfetsTrdQueryService.selectManualSettleInfo(pageCode, dtCode, spcdCode, response);

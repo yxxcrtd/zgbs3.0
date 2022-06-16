@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.invest.batch.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodRunnerMapper">
+
+    <select id="selectRevokedList"
+            resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodReaderDto">
+        SELECT TOTLE_TRADE_ID bussinessCode,
+               CREATE_USER    createUser,
+               CREATE_DEPT    createDept,
+               CREATE_TIME    createTime
+        FROM TRD_FIN_PRODUCT_DEAL_TOTAL
+        WHERE TRADE_DATE = #{tradeDate}
+          AND FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
+          AND PS = #{PS_T07}
+          AND TG_BUSI_TYPE = #{PINAN_BUSINESS_TYPE_209}
+          AND IS_CANCEL = #{YSE_OR_NO_NO}
+          AND TRADE_STATUS = #{TRADE_STATUS_01}
+    </select>
+    <select id="selectExpireFinprodIdForOld"
+            resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodReaderDto">
+        SELECT DISTINCT F.FINPROD_ID finprodId
+        FROM FIN_PRODUCT F
+                 LEFT JOIN PTL_SEC_POSITION R ON R.FINPROD_ID = F.FINPROD_ID
+        WHERE F.FINPROD_TYPE2 = 'F37'
+          AND F.MDATE = #{executeDate}
+          AND R.HODING_TYPE = '03'
+          AND R.CDATE = #{executeDate}
+          AND R.AMOUNT > 0
+    </select>
+    <select id="selectExpireFinprodIdForNew"
+            resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodReaderDto">
+        SELECT DISTINCT F.FINPROD_ID finprodId
+        FROM FIN_PRODUCT F
+                 LEFT JOIN PTL_SEC_POSITION_RULE R ON R.FINPROD_ID = F.FINPROD_ID
+        WHERE F.FINPROD_TYPE2 = 'F37'
+          AND F.MDATE = #{executeDate}
+          AND R.HODING_TYPE = 'A_001'
+          AND R.CDATE = #{executeDate}
+          AND R.AMOUNT > 0
+          AND R.DATE_TYPE = 0
+    </select>
+    <select id="selectExpireDataForNew"
+            resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
+        SELECT R.PORTFOLIO_ID   portfolioId,
+               R.FINPROD_ID     finprodId,
+               R.AMOUNT         repNomCapi,
+               R.SEC_ACCT_ID    secAcctId,
+               F.MDATE          mdate,
+               F.VDATE          vdate,
+               F.TRADE_MARKET   tradeMarket,
+               sci.BUSI_ACCT_NO acctNo
+        FROM PTL_SEC_POSITION_RULE R
+                 LEFT JOIN FIN_PRODUCT F ON R.FINPROD_ID = F.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = R.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.REC_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on R.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        WHERE R.FINPROD_ID = #{finprodId}
+          AND R.CDATE = #{executeDate}
+          AND R.DATE_TYPE = 0
+    </select>
+    <select id="selectExpireDataForOld"
+            resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
+        SELECT R.PORTFOLIO_ID   portfolioId,
+               R.FINPROD_ID     finprodId,
+               R.AMOUNT         repNomCapi,
+               R.SEC_ACCT_ID    secAcctId,
+               F.MDATE          mdate,
+               F.VDATE          vdate,
+               F.TRADE_MARKET   tradeMarket,
+               sci.BUSI_ACCT_NO acctNo
+        FROM PTL_SEC_POSITION R
+                 LEFT JOIN FIN_PRODUCT F ON R.FINPROD_ID = F.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = R.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.REC_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on R.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        WHERE R.FINPROD_ID = #{finprodId}
+          AND R.CDATE = #{executeDate}
+    </select>
+    <select id="selectDetailsByTotleTradeId"
+            resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
+        SELECT T.FINPROD_ID         finprodId,
+               A.PORTFOLIO_ID       portfolioId,
+               T.SHARE_AMT          repNomCapi,
+               T.SEC_MANAGE_ACCT_ID secAcctId,
+               T.VDATE              vdate,
+               T.MDATE              mdate,
+               T.TRADE_MARKET       tradeMarket,
+               T.TRADE_ID           tradeId
+        FROM TRD_PRODUCT_DEAL T
+                 LEFT JOIN TRD_PRODUCT_DEAL_ADD A ON A.TRADE_ID = T.TRADE_ID
+        WHERE TOTLE_TRADE_ID = #{busiCode}
+    </select>
+</mapper>

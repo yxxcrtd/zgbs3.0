@@ -27,6 +27,7 @@ import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import com.joyintech.tams.exchange.common.dto.PortfolioInstructionContextDto;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PortfolioInfoRequest;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.币种_人民币;
 import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.是否_否;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
 
 /**
@@ -432,7 +434,7 @@ public class PortfolioManager extends BaseService {
             item.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
 
             // 处理分配比例
-            item.setDisRate(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? BigDecimal.ZERO : NumberUtil.div(item.getEntrustNum(), orderVolume));
+            item.setDisRate(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? BigDecimal.ZERO : NumberUtil.mul(NumberUtil.div(item.getEntrustNum(), orderVolume), 100));
         }
 
         // 恢复委托价格
@@ -443,7 +445,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void coverPrice(Instruction instruction, OrderPlaceBean order) {
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             BigDecimal fullPrice = order.getFullPrice();
             if (ObjectUtil.isNull(fullPrice) || fullPrice.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, StrUtil.format("全价不正确 =>【fullPrice = {}】", fullPrice));
@@ -453,7 +455,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price) {
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             list.forEach(item -> item.setEntrustPrice(price));
         }
         if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
@@ -480,20 +482,12 @@ public class PortfolioManager extends BaseService {
             return ResultBean.success(result);
         }
 
-        // 过滤公平相关指令
-        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
-        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
-        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
-        log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
-
-        List<FairPortfolioResponse> list = Lists.newArrayList();
-        simpleFiltingList.forEach(o -> {
-            FairPortfolioResponse response = new FairPortfolioResponse();
-            BeanUtils.copyProperties(o, response);
-
-            list.add(response);
-        });
-        result.setList(list);
+        if (!isGuardBond(instruction)) {
+            log.error("非担保债券，不应进入公平交易: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails(ErrorCode.getStr(ErrorCode.INSTRUCTIONS_NO_GUARD_BOND_ERROR));
+            return ResultBean.success(result);
+        }
 
         // 判断进入公平交易
         if (!EntrustUtils.isFairOrder(bean, instruction)) {
@@ -502,7 +496,6 @@ public class PortfolioManager extends BaseService {
             result.setInfoDetails(ErrorCode.getStr(ErrorCode.NOT_FAIR_INSTRUCTION_ERROR));
             return ResultBean.success(result);
         }
-
         // 行情数据
         ResultBean tickBean = quoteService.getTick(bean.getStockCode());
         if (ErrorCode.isFail(tickBean.getErrorCode())) {
@@ -521,7 +514,9 @@ public class PortfolioManager extends BaseService {
             02 忽略未接收的部分指令
          */
         if (EntrustUtils.isfairModeWithUnacceptInstructionForbid()) {
-            List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.WAIT_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), instruction.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+            List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                    .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.WAIT_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), instruction.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                    .collect(Collectors.toList());
 
             if (waitReceiveList.size() > 0) {
                 log.warn("未接收且影响公平交易的相关指令: {}", JsonUtils.getJsonFromObject(waitReceiveList));
@@ -531,9 +526,39 @@ public class PortfolioManager extends BaseService {
             }
         }
 
+        // 过滤公平相关指令
+        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
+        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
+        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(simpleFiltingList) || simpleFiltingList.size() < 2) {
+            log.error("不满足公平交易: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails("不满足公平交易");
+            return ResultBean.success(result);
+        }
+        log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
+
+        List<FairPortfolioResponse> list = Lists.newArrayList();
+        simpleFiltingList.forEach(o -> {
+            FairPortfolioResponse response = new FairPortfolioResponse();
+            BeanUtils.copyProperties(o, response);
+
+            list.add(response);
+        });
+        result.setList(list);
+
+
         // 获取公平交易相关指令
         TickBean tick = (TickBean) tickBean.getData();
-        List<PortfolioInstructionContextDto> fairList = getFairList(bean, instruction, tick, result);
+        List<PortfolioInstructionContextDto> fairList;
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
+            fairList = getBondFairList(bean, instruction, tick, result);
+        } else {
+            fairList = getFairList(bean, instruction, tick, result);
+        }
         log.debug("获取公平交易相关指令：{}", JSONUtil.toJsonStr(fairList));
 
         // 获取多组合的指令
@@ -593,21 +618,14 @@ public class PortfolioManager extends BaseService {
     /**
      * 获取公平交易相关指令
      */
-    public List<PortfolioInstructionContextDto> getFairList(OrderPlaceBean bean, Instruction instruction, TickBean tick, PortfolioAllocationResponse result) {
+    public List<PortfolioInstructionContextDto> getBondFairList(OrderPlaceBean bean, Instruction instruction, TickBean tick, PortfolioAllocationResponse result) {
         // 最新价
         BigDecimal lastPrice = TradeUtils.getBigDecimal(tick.getLastPrice(), 4);
-        // 涨停价
-        BigDecimal upperLimitPrice = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
-        // 跌停价
-        BigDecimal lowerLimitPrice = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
-
         // 构造返回列表
         List<PortfolioInstructionContextDto> resultList = new ArrayList<>();
 
         // 获取买卖方向
         String entrustBs = EntrustBsProp.getEntrustBs(instruction.getPs());
-        // 获取委托属性
-//        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, bean.getEntrustProp());
         // 获取委托价格
         BigDecimal entrustPrice;
         if (StringUtil.isNotEmpty(instruction.getIsNetPrice()) && StringUtil.equals(instruction.getIsNetPrice(), "N")) {
@@ -619,15 +637,9 @@ public class PortfolioManager extends BaseService {
         BigDecimal adjustedPrice = entrustPrice;
         // 市价订单
         // 如果是市价指令+限价订单时，委托价格不为0
-        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)
-                && !EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
-//            adjustedPrice = this.getMarketPrice(tick, entrustBs);
+        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)) {
             adjustedPrice = lastPrice;
         }
-        // 特殊处理 质押式回购交易，将委托价格设置为100
-//        if (EntrustUtils.isPledgeRepurchase(instruction)) {
-//            adjustedPrice = BigDecimal.valueOf(100L);
-//        }
         result.setPrice(adjustedPrice);
 
         // 过滤公平相关指令
@@ -645,20 +657,8 @@ public class PortfolioManager extends BaseService {
             tempList.add(tempIns);
         }
 
-        // 委托价格为0的指令（市价指令），将涨跌停价填充到委托价格
-//        for (Instruction ins : tempList) {
-//            if (isZeroPriceMarketInstruction(ins)) {
-//                ins.setEntrustPrice(lastPrice);
-//                log.debug("将最新价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
-////                ins.setEntrustPrice(this.getMarketPrice(tick, entrustBs));
-////                log.debug("将涨跌停价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
-//            }
-//        }
-
         // 系统参数：委托价格不优于指令价格时的处理模式:01-禁止
-        if (EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()
-                // 首次调用，特殊处理
-                || TradeUtils.isZero(entrustPrice)) {
+        if (EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
             // 01 若输入委托价格不是优于所有指令价格时，
             // 提示：“委托价格必须优于所有指令价格”，
             // 并自动将委托价格调整为能够满足所有指令价格的最低（高）价格
@@ -668,47 +668,33 @@ public class PortfolioManager extends BaseService {
             //卖出 取指令最高价； 不得小于跌停价；
             //注意：买入价格向上调/卖出价格向下调     给出提示“委托价格必须优于所有指令价格”且自动调回
             if (EntrustBs.isBuy(entrustBs)) {
-                BigDecimal min = tempList.stream()
-                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
-                        .map(o -> {
-                            if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
-                                return o.getFullPrice();
-                            } else {
-                                return o.getEntrustPrice();
-                            }
-                        })
-                        .min(Comparator.naturalOrder())
-                        .orElse(BigDecimal.ZERO);
-                if (min.compareTo(upperLimitPrice) > 0) {
-                    adjustedPrice = upperLimitPrice;
-                } else {
+                BigDecimal min = tempList.stream().filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value)).map(o -> {
+                    if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
+                        return o.getFullPrice();
+                    } else {
+                        return o.getEntrustPrice();
+                    }
+                }).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
+                if (min.compareTo(BigDecimal.ZERO) > 0) {
                     adjustedPrice = min;
                 }
-
                 // 调整后价格不能比委托价格更高
-                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) > 0) {
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && min.compareTo(entrustPrice) > 0) {
                     adjustedPrice = entrustPrice;
                 }
             } else {
-                BigDecimal max = tempList.stream()
-                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
-                        .map(o -> {
-                            if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
-                                return o.getFullPrice();
-                            } else {
-                                return o.getEntrustPrice();
-                            }
-                        })
-                        .max(Comparator.naturalOrder())
-                        .orElse(BigDecimal.ZERO);
-                if (max.compareTo(lowerLimitPrice) < 0) {
-                    adjustedPrice = lowerLimitPrice;
-                } else {
+                BigDecimal max = tempList.stream().filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value)).map(o -> {
+                    if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
+                        return o.getFullPrice();
+                    } else {
+                        return o.getEntrustPrice();
+                    }
+                }).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
+                if (max.compareTo(BigDecimal.ZERO) > 0) {
                     adjustedPrice = max;
                 }
-
                 // 调整后价格不能比委托价格更低
-                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) < 0) {
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && max.compareTo(entrustPrice) < 0) {
                     adjustedPrice = entrustPrice;
                 }
             }
@@ -723,7 +709,7 @@ public class PortfolioManager extends BaseService {
 
                 result.setPrice(adjustedPrice);
             }
-        } else if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
+        } else {
             // 02时，剔除该指令并继续时
             BigDecimal orderPrice = adjustedPrice;
             BigDecimal filterPrice = null;
@@ -804,6 +790,243 @@ public class PortfolioManager extends BaseService {
             bean.setEntrustVolume(totalLeftVolume);
         }
 
+        // 计算指令的委托数量
+        for (PortfolioInstructionContextDto context : resultList) {
+            Instruction ins = context.getInstruction();
+            // 最小步长
+            BigDecimal minStep = this.getMinStep(ins);
+            if (EntrustUtils.isPledgeRepurchase(ins)) {
+                minStep = minStep.divide(BigDecimal.valueOf(100L));
+            }
+            Long realVolume = 0L;
+            if (bean.getEntrustVolume() != 0L) {
+                if (EntrustUtils.isBond(ins)) {
+                    realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 1);
+                } else if (EntrustUtils.isPledgeRepurchase(ins)) {
+                    //通用质押式回购最小交易单元：深交所-1，上交所-10
+                    if (Market.SZSE.investValue.equals(ins.getTradeMarket())) {
+                        realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 0);
+                    } else {
+                        realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 1);
+                    }
+                } else if (EntrustUtils.isFutures(ins)) {
+                    realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 0);
+                } else {
+                    realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 2);
+                }
+            }
+
+            //指令数量分配：按照步长处理，四舍五入
+            realVolume = getRealVolume(minStep, realVolume);
+
+            context.setEntrustVolume(Math.min(context.getLeftVolume(), realVolume));
+            // 分配到指令的委托数量，借用转股数量字段
+            ins.setConNum(BigDecimal.valueOf(Math.min(context.getLeftVolume(), realVolume)));
+        }
+
+        // 计算总委托数量和总委托金额
+        long sumEntrustVolume = getTotalEntrustVolume(resultList);
+        result.setTotalEntrustVolume(sumEntrustVolume);
+        // 特殊处理 质押式回购交易，委托金额=委托数量*100
+        if (EntrustUtils.isPledgeRepurchase(instruction)) {
+            result.setTotalEntrustAmt(BigDecimal.valueOf(100L).multiply(BigDecimal.valueOf(sumEntrustVolume)));
+        } else {
+            result.setTotalEntrustAmt(result.getPrice().multiply(BigDecimal.valueOf(sumEntrustVolume)));
+        }
+        // 首次调用，特殊处理
+        if (bean.getEntrustVolume() == 0L) {
+            result.setTotalEntrustVolume(result.getTotalLeftVolume());
+            // 特殊处理 质押式回购交易，委托金额=委托数量*100
+            if (EntrustUtils.isPledgeRepurchase(instruction)) {
+                result.setTotalEntrustAmt(BigDecimal.valueOf(100L).multiply(BigDecimal.valueOf(result.getTotalLeftVolume())));
+            } else {
+                result.setTotalEntrustAmt(result.getPrice().multiply(BigDecimal.valueOf(result.getTotalLeftVolume())));
+            }
+        }
+        for (PortfolioInstructionContextDto context : resultList) {
+            // 分配到指令的委托数量比例，借用转股价格字段
+            context.getInstruction().setConPrice(ArithmeticUtil.divide(BigDecimal.valueOf(context.getEntrustVolume()), BigDecimal.valueOf(sumEntrustVolume), 4));
+        }
+        log.debug("公平委托相关指令: {}", JsonUtils.getJsonFromObject(resultList));
+
+        return resultList;
+    }
+
+    /**
+     * 获取公平交易相关指令
+     */
+    public List<PortfolioInstructionContextDto> getFairList(OrderPlaceBean bean, Instruction instruction, TickBean tick, PortfolioAllocationResponse result) {
+        // 涨停价
+        BigDecimal upperLimitPrice = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
+        // 跌停价
+        BigDecimal lowerLimitPrice = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
+
+        // 构造返回列表
+        List<PortfolioInstructionContextDto> resultList = new ArrayList<>();
+
+        // 获取买卖方向
+        String entrustBs = EntrustBsProp.getEntrustBs(instruction.getPs());
+        // 获取委托属性
+//        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, bean.getEntrustProp());
+        // 获取委托价格
+        BigDecimal entrustPrice = bean.getEntrustPrice();
+        // 调整后的价格
+        BigDecimal adjustedPrice = entrustPrice;
+        // 市价订单
+        // 如果是市价指令+限价订单时，委托价格不为0
+        if (
+//                EntrustUtils.isMarketPrice(instruction) &&
+                TradeUtils.isZero(entrustPrice)) {
+            adjustedPrice = this.getMarketPrice(tick, entrustBs);
+        }
+        // 特殊处理 质押式回购交易，将委托价格设置为100
+//        if (EntrustUtils.isPledgeRepurchase(instruction)) {
+//            adjustedPrice = BigDecimal.valueOf(100L);
+//        }
+        result.setPrice(adjustedPrice);
+
+        // 过滤公平相关指令
+        // 1. 同交易员 2. 同证券编码 3. 同交易方向
+        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
+        List<Instruction> questList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+        log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(questList));
+
+        // questList 是从内存拿出的数据，不能直接使用
+        List<Instruction> tempList = new ArrayList<>(questList.size());
+        Instruction tempIns = null;
+        for (Instruction ins : questList) {
+            tempIns = new Instruction();
+            BeanUtil.copyProperties(ins, tempIns);
+            tempList.add(tempIns);
+        }
+
+        // 委托价格为0的指令（市价指令），将涨跌停价填充到委托价格
+        for (Instruction ins : tempList) {
+            if (isZeroPriceMarketInstruction(ins)) {
+                ins.setEntrustPrice(this.getMarketPrice(tick, entrustBs));
+                log.debug("将涨跌停价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
+            }
+        }
+
+        // 系统参数：委托价格不优于指令价格时的处理模式:01-禁止
+        if (EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
+            // 01 若输入委托价格不是优于所有指令价格时，
+            // 提示：“委托价格必须优于所有指令价格”，
+            // 并自动将委托价格调整为能够满足所有指令价格的最低（高）价格
+            if (EntrustBs.isBuy(entrustBs)) {
+                BigDecimal min = tempList.stream()
+                        .map(Instruction::getEntrustPrice)
+                        .min(Comparator.naturalOrder())
+                        .orElse(upperLimitPrice);
+
+                if (min.compareTo(upperLimitPrice) > 0) {
+                    adjustedPrice = upperLimitPrice;
+                } else {
+                    adjustedPrice = min;
+                }
+
+                // 调整后价格不能比委托价格更高
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && min.compareTo(entrustPrice) > 0) {
+                    adjustedPrice = entrustPrice;
+                }
+            } else {
+                BigDecimal max = tempList.stream()
+                        .map(Instruction::getEntrustPrice)
+                        .max(Comparator.naturalOrder())
+                        .orElse(lowerLimitPrice);
+                if (max.compareTo(lowerLimitPrice) < 0) {
+                    adjustedPrice = lowerLimitPrice;
+                } else {
+                    adjustedPrice = max;
+                }
+                // 调整后价格不能比委托价格更低
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) < 0) {
+                    adjustedPrice = entrustPrice;
+                }
+            }
+
+            // 提示：“委托价格必须优于所有指令价格”
+            if (adjustedPrice.compareTo(entrustPrice) != 0) {
+                // 首次调用，特殊处理
+                if (!TradeUtils.isZero(entrustPrice)) {
+                    result.setInfoLevel("2");
+                    result.setInfoDetails("委托价格必须优于所有指令价格");
+                }
+
+                result.setPrice(adjustedPrice);
+            }
+        } else {
+            // 02时，剔除该指令并继续时
+            BigDecimal orderPrice = adjustedPrice;
+            for (Instruction ins : tempList) {
+                // 市价指令不参与剔除
+                if (EntrustUtils.isMarketPrice(ins)) {
+                    continue;
+                }
+                if (EntrustBs.isBuy(entrustBs)) {
+                    // 买入，过滤价格小于调整价
+                    if (ins.getEntrustPrice().compareTo(orderPrice) < 0) {
+                        ins.setEntrustClass(是否_否.getValue());
+                    }
+                } else {
+                    // 卖出，过滤价格大于调整价
+                    if (ins.getEntrustPrice().compareTo(orderPrice) > 0) {
+                        ins.setEntrustClass(是否_否.getValue());
+                    }
+                }
+            }
+
+            // 系统参数“委托价格不优于指令价格时的处理模式”为2.剔除该指令并继续时，
+            // 若委托价格选择市价，则限价指令数量调整为0，并不参与数量分配；
+            if (EntrustUtils.isMarketPriceByEntrustProp(bean.getEntrustProp())) {
+                for (Instruction ins : tempList) {
+                    if (!EntrustUtils.isMarketPrice(ins)) {
+                        ins.setEntrustClass(是否_否.getValue());
+                    }
+                }
+            }
+        }
+        /*
+            a)计算每条指令剩余数量：
+                数量指令，指令剩余数量即为实际指令剩余数量；
+                金额指令，根据指令剩余金额÷委托价格计算得到，需要取整；
+                    若委托价格模式为非限价时，股票、基金交易委托价格取涨跌停价格，
+                        买入取涨停价，
+                        卖出取跌停价；
+            b)计算总的指令剩余数：
+                每条指令剩余数量之和；
+            c)计算每条指令比例：
+                每条指令剩余数量÷总的指令剩余数量；
+            d)计算每条指令委托数量：
+                交易员输入的委托数量×每条指令比例，
+                以四舍五入的方式按最小交易单位取整，如股票计算得到的数量为555股，则实际委托数量为600股；若计算得到的委托数量大于指令剩余数量，则取委托数量取指令剩余数量；
+         */
+        BigDecimal price = adjustedPrice;
+        PortfolioInstructionContextDto dto = null;
+        for (Instruction ins : tempList) {
+            dto = new PortfolioInstructionContextDto();
+            dto.setInstruction(ins);
+            if (!EntrustUtils.isMarketPrice(instruction)) {
+                dto.setEntrustPrice(adjustedPrice);
+            }
+
+            if (EntrustUtils.isVolume(ins)) {
+                dto.setLeftVolume(ins.getEntrustNum() - ins.getEntrustLeftAmt().longValue() - ins.getFrozenQuantity().longValue());
+            } else {
+                dto.setLeftVolume(TradeUtils.divide(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2), price, 2).longValue());
+            }
+            if (是否_否.getValue().equals(ins.getEntrustClass())) {
+                dto.setLeftVolume(0L);
+            }
+            resultList.add(dto);
+        }
+        // 总剩余指令数量
+        Long totalLeftVolume = getTotalLeftVolume(resultList);
+        result.setTotalLeftVolume(totalLeftVolume);
+        // 首次调用，特殊处理
+        if (bean.getEntrustVolume() == 0L) {
+            bean.setEntrustVolume(totalLeftVolume);
+        }
 
         // 计算指令的委托数量
         for (PortfolioInstructionContextDto context : resultList) {
@@ -897,6 +1120,18 @@ public class PortfolioManager extends BaseService {
      */
     private long getTotalLeftVolume(List<PortfolioInstructionContextDto> list) {
         return list.stream().mapToLong(PortfolioInstructionContextDto::getLeftVolume).sum();
+    }
+
+    /**
+     * 计算总剩余委托数量
+     */
+    private BigDecimal getTotalLeftAmt(List<PortfolioInstructionContextDto> list) {
+        BigDecimal totalLeftAmt = BigDecimal.ZERO;
+        for (PortfolioInstructionContextDto dto : list) {
+            totalLeftAmt = totalLeftAmt.add(dto.getLeftAmt());
+        }
+
+        return totalLeftAmt;
     }
 
     private Long getEntrustVolume(Long totalLeftVolume, Long orderVolume, Long leftVolume, int unit) {
@@ -1047,8 +1282,7 @@ public class PortfolioManager extends BaseService {
 //        return list;
 //    }
 
-    private List<FairPortfolioResponse> getFairInstructionList(List<PortfolioInstructionContextDto> fairList,
-                                                               PortfolioAllocationResponse result, OrderPlaceBean bean) {
+    private List<FairPortfolioResponse> getFairInstructionList(List<PortfolioInstructionContextDto> fairList, PortfolioAllocationResponse result, OrderPlaceBean bean) {
         List<FairPortfolioResponse> list = new ArrayList<>();
 
         long sumEntrustVolume = 0;
@@ -1549,6 +1783,7 @@ public class PortfolioManager extends BaseService {
         log.info("checkFairOrder() called with parameters => 【bean = {}】", bean);
         OrderPlaceBean orderPlaceBean = new OrderPlaceBean();
         BeanUtils.copyProperties(bean, orderPlaceBean);
+
         // 方法返回
         PortfolioAllocationResponse result = new PortfolioAllocationResponse();
 
@@ -1561,21 +1796,12 @@ public class PortfolioManager extends BaseService {
             result.setInfoDetails(ErrorCode.getStr(ErrorCode.INSTRUCTIONS_NOT_EXIST));
             return ResultBean.success(result);
         }
-
-        // 过滤公平相关指令
-        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
-        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
-        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
-        log.info("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
-
-        List<FairPortfolioResponse> list = Lists.newArrayList();
-        simpleFiltingList.forEach(o -> {
-            FairPortfolioResponse response = new FairPortfolioResponse();
-            BeanUtils.copyProperties(o, response);
-
-            list.add(response);
-        });
-        result.setList(list);
+        if (!isGuardBond(instruction)) {
+            log.error("非担保债券，不应进入公平交易: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails(ErrorCode.getStr(ErrorCode.INSTRUCTIONS_NO_GUARD_BOND_ERROR));
+            return ResultBean.success(result);
+        }
 
         // 判断进入公平交易
         if (!EntrustUtils.isFairOrder(orderPlaceBean, instruction)) {
@@ -1595,37 +1821,102 @@ public class PortfolioManager extends BaseService {
                 return ResultBean.success(result);
             }
         }
+        // 获取公平交易相关指令
+        TickBean tick = (TickBean) tickBean.getData();
+        // 获取委托价格
+        BigDecimal entrustPrice;
+        if (StringUtil.isNotEmpty(instruction.getIsNetPrice()) && StringUtil.equals(instruction.getIsNetPrice(), "N")) {
+            entrustPrice = bean.getFullPrice();
+        } else {
+            entrustPrice = bean.getEntrustPrice();
+        }
+        // 最新价
+        BigDecimal lastPrice = TradeUtils.getBigDecimal(tick.getLastPrice(), 4);
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
+            if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)) {
+                entrustPrice = lastPrice;
+            }
+        } else {
+            if (TradeUtils.isZero(entrustPrice)) {
+                // 获取买卖方向
+                String entrustBs = EntrustBsProp.getEntrustBs(instruction.getPs());
+                entrustPrice = this.getMarketPrice(tick, entrustBs);
+            }
+        }
+
+        //当前指令剩余量
+        long num;
+        if (EntrustUtils.isVolume(instruction)) {
+            num = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
+        } else {
+            BigDecimal amt = TradeUtils.subtract(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), 2);
+            num = TradeUtils.divide(amt, entrustPrice, 2).longValue();
+        }
+        if (num <= 0) {
+            log.error("指令剩余数量不足: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails("指令剩余数量不足");
+            return ResultBean.success(result);
+        }
 
         // 系统参数：未接收指令的公平处理模式 01：是；02：否
         if (EntrustUtils.isfairModeWithUnacceptInstructionForbid()) {
-            List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.WAIT_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), instruction.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+            List<Instruction> waitReceiveList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                    .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.WAIT_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), instruction.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                    .collect(Collectors.toList());
             if (waitReceiveList.size() > 0) {
                 log.error("未接收且影响公平交易的相关指令: {}", JsonUtils.getJsonFromObject(waitReceiveList));
-                result.setInfoLevel("1");
+                result.setInfoLevel("2");
                 result.setInfoDetails(ErrorCode.getStr(ErrorCode.FAIR_INSTRUCTIONS_UNACCEPT_ERROR));
                 return ResultBean.success(result);
             }
         }
 
-        // 获取公平交易相关指令
-        TickBean tick = (TickBean) tickBean.getData();
-        Long fairTotalLeftVolume = getFairTotalLeftVolume(orderPlaceBean, instruction, tick);
-        result.setTotalLeftVolume(fairTotalLeftVolume);
+        // 过滤公平相关指令
+        // 1. 同交易员 2. 同证券编码 3. 同交易方向；交易方向是【买入，卖出，正回购，逆回购】
+        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
+        List<Instruction> simpleFiltingList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                .collect(Collectors.toList());
+        log.info("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
+        if (CollectionUtils.isEmpty(simpleFiltingList) || simpleFiltingList.size() < 2) {
+            log.error("不满足公平交易: InstructionId [{}]", instructionId);
+            result.setInfoLevel("1");
+            result.setInfoDetails("不满足公平交易");
+            return ResultBean.success(result);
+        }
 
+        List<PortfolioInstructionContextDto> resultList;
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) || EntrustUtils.isPledgeRepurchase(instruction)) {
+            resultList = getBondFairTotalLeftVolume(orderPlaceBean, instruction, tick);
+        } else {
+            resultList = getFairTotalLeftVolume(orderPlaceBean, instruction, tick);
+        }
+
+        result.setTotalEntrustAmt(getTotalLeftAmt(resultList));
+        result.setTotalLeftVolume(getTotalLeftVolume(resultList));
+
+        result.setInfoLevel("0");
         return ResultBean.success(result);
 
+    }
+
+    private boolean isGuardBond(Instruction instruction) {
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)
+                && 投管业务类型_现券交易.getValue().equals(instruction.getBusiTypeTg())
+                && StringUtil.equals(instruction.getIsNoGuard(), "Y")) {
+            return false;
+        }
+        return true;
     }
 
     /**
      * 获取公平交易相关指令
      */
-    public Long getFairTotalLeftVolume(OrderPlaceBean bean, Instruction instruction, TickBean tick) {
+    public List<PortfolioInstructionContextDto> getBondFairTotalLeftVolume(OrderPlaceBean bean, Instruction instruction, TickBean tick) {
         // 最新价
         BigDecimal lastPrice = TradeUtils.getBigDecimal(tick.getLastPrice(), 4);
-        // 涨停价
-        BigDecimal upperLimitPrice = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
-        // 跌停价
-        BigDecimal lowerLimitPrice = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
 
         // 构造返回列表
         List<PortfolioInstructionContextDto> resultList = new ArrayList<>();
@@ -1643,15 +1934,16 @@ public class PortfolioManager extends BaseService {
         BigDecimal adjustedPrice = entrustPrice;
         // 市价订单
         // 如果是市价指令+限价订单时，委托价格不为0
-        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)
-                && !EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
+        if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)) {
             adjustedPrice = lastPrice;
         }
 
         // 过滤公平相关指令
         // 1. 同交易员 2. 同证券编码 3. 同交易方向
         // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
-        List<Instruction> questList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+        List<Instruction> questList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream()
+                .filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item) && isGuardBond(item))
+                .collect(Collectors.toList());
         log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(questList));
 
         // questList 是从内存拿出的数据，不能直接使用
@@ -1666,51 +1958,41 @@ public class PortfolioManager extends BaseService {
         // 系统参数：委托价格不优于指令价格时的处理模式:01-禁止
         if (EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid() || TradeUtils.isZero(entrustPrice)) {
             if (EntrustBs.isBuy(entrustBs)) {
-                BigDecimal min = tempList.stream()
-                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
-                        .map(o -> {
-                            if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
-                                return o.getFullPrice();
-                            } else {
-                                return o.getEntrustPrice();
-                            }
-                        })
-                        .min(Comparator.naturalOrder())
-                        .orElse(BigDecimal.ZERO);
-                if (min.compareTo(upperLimitPrice) > 0) {
-                    adjustedPrice = upperLimitPrice;
-                } else {
+                BigDecimal min = tempList.stream().filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value)).map(o -> {
+                    if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
+                        return o.getFullPrice();
+                    } else {
+                        return o.getEntrustPrice();
+                    }
+                }).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
+
+                if (min.compareTo(BigDecimal.ZERO) > 0) {
                     adjustedPrice = min;
                 }
 
                 // 调整后价格不能比委托价格更高
-                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) > 0) {
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && min.compareTo(entrustPrice) > 0) {
                     adjustedPrice = entrustPrice;
                 }
             } else {
-                BigDecimal max = tempList.stream()
-                        .filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value))
-                        .map(o -> {
-                            if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
-                                return o.getFullPrice();
-                            } else {
-                                return o.getEntrustPrice();
-                            }
-                        })
-                        .max(Comparator.naturalOrder())
-                        .orElse(BigDecimal.ZERO);
-                if (max.compareTo(lowerLimitPrice) < 0) {
-                    adjustedPrice = lowerLimitPrice;
-                } else {
+                BigDecimal max = tempList.stream().filter(o -> StringUtil.equals(o.getPriceMode(), InstructionPriceMode.FIXED.value)).map(o -> {
+                    if (StringUtil.isNotEmpty(o.getIsNetPrice()) && StringUtil.equals(o.getIsNetPrice(), "N")) {
+                        return o.getFullPrice();
+                    } else {
+                        return o.getEntrustPrice();
+                    }
+                }).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
+
+                if (max.compareTo(BigDecimal.ZERO) > 0) {
                     adjustedPrice = max;
                 }
 
                 // 调整后价格不能比委托价格更低
-                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) < 0) {
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && max.compareTo(entrustPrice) < 0) {
                     adjustedPrice = entrustPrice;
                 }
             }
-        } else if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
+        } else {
             // 02时，剔除该指令并继续时
             BigDecimal orderPrice = adjustedPrice;
             BigDecimal filterPrice = null;
@@ -1752,18 +2034,172 @@ public class PortfolioManager extends BaseService {
             price = BigDecimal.valueOf(100L);
         }
         PortfolioInstructionContextDto dto = null;
-        tempList = tempList.stream().filter(o -> !StringUtil.equals(o.getEntrustClass(), 是否_否.getValue())).collect(Collectors.toList());
         for (Instruction ins : tempList) {
             dto = new PortfolioInstructionContextDto();
-            if (EntrustUtils.isVolume(ins)) {
-                dto.setLeftVolume(ins.getEntrustNum() - ins.getEntrustLeftAmt().longValue() - ins.getFrozenQuantity().longValue());
+            if (StringUtil.equals(ins.getEntrustClass(), 是否_否.getValue())) {
+                dto.setLeftVolume(0L);
+                dto.setLeftAmt(BigDecimal.ZERO);
             } else {
-                dto.setLeftVolume(TradeUtils.divide(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2), price, 2).longValue());
+                if (EntrustUtils.isVolume(ins)) {
+                    dto.setLeftVolume(ins.getEntrustNum() - ins.getEntrustLeftAmt().longValue() - ins.getFrozenQuantity().longValue());
+                    dto.setLeftAmt(TradeUtils.multiply(price, dto.getLeftVolume(), 2));
+                } else {
+                    dto.setLeftAmt(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2));
+                    dto.setLeftVolume(TradeUtils.divide(dto.getLeftAmt(), price, 2).longValue());
+                }
             }
             resultList.add(dto);
         }
 
-        return getTotalLeftVolume(resultList);
+        return resultList;
+
+//        if (instruction.volumeInstruction()) {
+//            return BigDecimal.valueOf(getTotalLeftVolume(resultList));
+//        }
+//
+//        return getTotalLeftAmt(resultList);
+    }
+
+    /**
+     * 获取公平交易相关指令
+     */
+    public List<PortfolioInstructionContextDto> getFairTotalLeftVolume(OrderPlaceBean bean, Instruction instruction, TickBean tick) {
+        // 涨停价
+        BigDecimal upperLimitPrice = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
+        // 跌停价
+        BigDecimal lowerLimitPrice = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
+        // 构造返回列表
+        List<PortfolioInstructionContextDto> resultList = new ArrayList<>();
+        // 获取买卖方向
+        String entrustBs = EntrustBsProp.getEntrustBs(instruction.getPs());
+        // 获取委托价格
+        BigDecimal entrustPrice = bean.getEntrustPrice();
+        // 调整后的价格
+        BigDecimal adjustedPrice = entrustPrice;
+        // 市价订单
+        // 如果是市价指令+限价订单时，委托价格不为0
+        if (
+//                EntrustUtils.isMarketPrice(instruction) &&
+                TradeUtils.isZero(entrustPrice)) {
+            adjustedPrice = this.getMarketPrice(tick, entrustBs);
+        }
+
+        // 过滤公平相关指令
+        // 1. 同交易员 2. 同证券编码 3. 同交易方向
+        // 4. 指令状态——已接收 5. 交易平台——沪深竞价撮合平台,新债平台（匹配成交||未指定） 6. 指令进度——未100%
+        List<Instruction> questList = instructionService.queryInstructionByUserIdAndStockCode(instruction.getTradeId(), instruction.getFinprodMarketId()).stream().filter(item -> instruction.getPs().equals(item.getPs()) && InvestmentUtils.filterFairInstructionByPs(item.getPs()) && InstructionStatus.ALREADY_RECEIVE.value.equals(item.getEntrustStatus()) && InvestmentUtils.filterFairInstructionByTradePlatAndDealMode(item.getTradePlat(), item.getDealMode()) && !InvestmentUtils.isInstructionProcessComplete(item)).collect(Collectors.toList());
+        log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(questList));
+
+        // questList 是从内存拿出的数据，不能直接使用
+        List<Instruction> tempList = new ArrayList<>(questList.size());
+        Instruction tempIns = null;
+        for (Instruction ins : questList) {
+            tempIns = new Instruction();
+            BeanUtil.copyProperties(ins, tempIns);
+            tempList.add(tempIns);
+        }
+
+        // 委托价格为0的指令（市价指令），将涨跌停价填充到委托价格
+        for (Instruction ins : tempList) {
+            if (isZeroPriceMarketInstruction(ins)) {
+                ins.setEntrustPrice(this.getMarketPrice(tick, entrustBs));
+                log.debug("将涨跌停价[{}]填充到委托价格为0的市价指令[{}]", ins.getEntrustPrice(), ins.getEntrustId());
+            }
+        }
+
+        // 系统参数：委托价格不优于指令价格时的处理模式:01-禁止
+        if (EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
+            // 01 若输入委托价格不是优于所有指令价格时，
+            // 提示：“委托价格必须优于所有指令价格”，
+            // 并自动将委托价格调整为能够满足所有指令价格的最低（高）价格
+            if (EntrustBs.isBuy(entrustBs)) {
+                BigDecimal min = tempList.stream()
+                        .map(Instruction::getEntrustPrice)
+                        .min(Comparator.naturalOrder())
+                        .orElse(upperLimitPrice);
+
+                if (min.compareTo(upperLimitPrice) > 0) {
+                    adjustedPrice = upperLimitPrice;
+                } else {
+                    adjustedPrice = min;
+                }
+
+                // 调整后价格不能比委托价格更高
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && min.compareTo(entrustPrice) > 0) {
+                    adjustedPrice = entrustPrice;
+                }
+            } else {
+                BigDecimal max = tempList.stream()
+                        .map(Instruction::getEntrustPrice)
+                        .max(Comparator.naturalOrder())
+                        .orElse(lowerLimitPrice);
+                if (max.compareTo(lowerLimitPrice) < 0) {
+                    adjustedPrice = lowerLimitPrice;
+                } else {
+                    adjustedPrice = max;
+                }
+                // 调整后价格不能比委托价格更低
+                if (entrustPrice.compareTo(BigDecimal.ZERO) != 0 && adjustedPrice.compareTo(entrustPrice) < 0) {
+                    adjustedPrice = entrustPrice;
+                }
+            }
+        } else {
+            // 02时，剔除该指令并继续时
+            BigDecimal orderPrice = adjustedPrice;
+            for (Instruction ins : tempList) {
+                // 市价指令不参与剔除
+                if (EntrustUtils.isMarketPrice(ins)) {
+                    continue;
+                }
+                if (EntrustBs.isBuy(entrustBs)) {
+                    // 买入，过滤价格小于调整价
+                    if (ins.getEntrustPrice().compareTo(orderPrice) < 0) {
+                        ins.setEntrustClass(是否_否.getValue());
+                    }
+                } else {
+                    // 卖出，过滤价格大于调整价
+                    if (ins.getEntrustPrice().compareTo(orderPrice) > 0) {
+                        ins.setEntrustClass(是否_否.getValue());
+                    }
+                }
+            }
+            // 系统参数“委托价格不优于指令价格时的处理模式”为2.剔除该指令并继续时，
+            // 若委托价格选择市价，则限价指令数量调整为0，并不参与数量分配；
+            if (EntrustUtils.isMarketPriceByEntrustProp(bean.getEntrustProp())) {
+                for (Instruction ins : tempList) {
+                    if (!EntrustUtils.isMarketPrice(ins)) {
+                        ins.setEntrustClass(是否_否.getValue());
+                    }
+                }
+            }
+        }
+
+        BigDecimal price = adjustedPrice;
+        PortfolioInstructionContextDto dto = null;
+        for (Instruction ins : tempList) {
+            dto = new PortfolioInstructionContextDto();
+
+            if (EntrustUtils.isVolume(ins)) {
+                dto.setLeftVolume(ins.getEntrustNum() - ins.getEntrustLeftAmt().longValue() - ins.getFrozenQuantity().longValue());
+                dto.setLeftAmt(TradeUtils.multiply(price, dto.getLeftVolume(), 2));
+            } else {
+                dto.setLeftAmt(TradeUtils.subtract(ins.getEntrustAmt(), ins.getEntrustLeftAmt(), ins.getFrozenQuantity(), 2));
+                dto.setLeftVolume(TradeUtils.divide(dto.getLeftAmt(), price, 2).longValue());
+            }
+            if (是否_否.getValue().equals(ins.getEntrustClass())) {
+                dto.setLeftVolume(0L);
+                dto.setLeftAmt(BigDecimal.ZERO);
+            }
+            resultList.add(dto);
+        }
+
+        return resultList;
+
+//        if (instruction.volumeInstruction()) {
+//            return BigDecimal.valueOf(getTotalLeftVolume(resultList));
+//        }
+//
+//        return getTotalLeftAmt(resultList);
     }
 }
 

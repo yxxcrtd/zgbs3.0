@@ -164,7 +164,7 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                         //最新价从行情取
                         EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
                         if (hqResponse != null) {
-                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(3, BigDecimal.ROUND_HALF_UP) : new BigDecimal(0.00);
+                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(3, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
                             entity.setPrice(lastPrice);
                         }
                         returnList.add(entity);
@@ -594,7 +594,8 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
+//                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd,r.getPositionsAmt(),4).multiply(new BigDecimal("100"));
                 r.setFloatingPL(floatPL);
 
             });
@@ -658,7 +659,7 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
         //4、标准券可用/折算率和 A对应的再折算前持仓 比较
         //canSecNum = ArithmeticUtil.divide(canSecNum, scale, 0);
         BigDecimal miniSecNum = canSecNum;
-        if (secNum.compareTo(canSecNum) == -1) {
+        if (secNum.compareTo(canSecNum) < 0) {
             miniSecNum = secNum;
         }
         //5、较小值/债券的折算率

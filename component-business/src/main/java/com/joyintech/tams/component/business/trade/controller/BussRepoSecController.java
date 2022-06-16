@@ -253,7 +253,8 @@ public class BussRepoSecController extends BaseController {
                 notEmptyCheck(data == null ? null : data.get(param), fields.get(0).toString(), fields.get(1).toString(), messages);
             }
         }
-        if (!(StringUtil.equals(data ==null?null :(String)data.get("ps"), DictCodeList.回购拆借方向_逆回购.getValue()))
+        // Sonar Fix modify by huwei 220608
+        if (null == data || !(StringUtil.equals(data.get("ps"), DictCodeList.回购拆借方向_逆回购.getValue()))
             && !(StringUtil.isNotEmpty(data.get("secAcctId")) || StringUtil.isNotEmpty(data.get("chlId")) ||
                     StringUtil.isNotEmpty(data.get("securitiesCust")))){
             messages.add(new ValidMessage("BUS_REPO_SEC_001",getMessage("BUS_REPO_SEC_002")));

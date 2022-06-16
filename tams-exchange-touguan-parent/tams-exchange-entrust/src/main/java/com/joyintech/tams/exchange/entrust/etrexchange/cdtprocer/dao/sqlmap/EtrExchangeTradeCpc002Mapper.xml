@@ -53,7 +53,7 @@
         T1.PRICE as price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM as entrustNum
+        ,nvl(T1.ENTRUST_NUM,0)/10000 as entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -194,8 +194,8 @@
         ,
         T1.PRICE as price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
-        ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        ,T1.ENTRUST_AMT entrustAmt,
+        nvl(T1.ENTRUST_NUM,0)/10000 entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -355,6 +355,10 @@
         select
         <include refid="com.joyintech.tams.common.base.dao.EtrEntrustAddMapper.Base_Column_List"></include>
         from wfl_etr_entrust_add WHERE ENTRUST_ID = #{entrustId}
+    </select>
+
+    <select id="isOverMDate" resultType="java.lang.String">
+        select FINPROD_ID from FIN_PRODUCT where FINPROD_ID = #{finprodId} and MDATE &lt; to_date(#{nowDate},'yyyy-MM-dd')
     </select>
 
     <sql id="etrExchangeQueryAnd">
@@ -534,7 +538,7 @@
         on FP.FINPROD_ID = FPT.FINPROD_ID
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
-        AND FP.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37})<!--  债券 -->
+        AND FP.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F37})<!--  债券 -->
         <!--AND FPT.type_6 != #{type6_B14}  非可转债 -->
         <if test="portfolioIdList != null and portfolioIdList.size()>0">
             <foreach collection="portfolioIdList" open="AND TEMP.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
@@ -587,7 +591,7 @@
         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID
-        WHERE a.TRADE_DATE =#{cdate} AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
+        WHERE a.TRADE_DATE =#{cdate} AND c.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F37} AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
         AND a.PS IN (#{PS_T01},#{PS_T02},#{PS_T04})
         AND a.IS_CANCEL=#{YN_N}
         <if test="portfolioIdList != null">
@@ -617,7 +621,11 @@
         LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID
-        WHERE a.TRADE_DATE =#{cdate} AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
+        WHERE a.TRADE_DATE =#{cdate}
+        <!--add wsz ZGCPCN-1249 修改持仓查询信息 start-->
+        AND c.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F37}
+        <!--add wsz ZGCPCN-1249 修改持仓查询信息 end-->
+        AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
         AND a.PS IN (#{PS_T01},#{PS_T02},#{PS_T04})
         AND a.IS_CANCEL=#{YN_N}
         <if test="portfolioIdList != null">
@@ -645,8 +653,8 @@
         from PTL_SEC_UNITCOST a
         LEFT JOIN FIN_PRODUCT b ON a.FINPROD_ID =b.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE c ON a.FINPROD_ID =c.FINPROD_ID
-        WHERE   (( b.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37})
-        AND b.TRADE_MARKET in(#{FINPROD_TYPE_TG_F01},#{FINPROD_TYPE_TG_F37}) )
+        WHERE   (( b.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37})
+        AND b.TRADE_MARKET in(#{FINPROD_TYPE_TG_F37}) )
         or (b.TRADE_MARKET in (#{SVR_TRADE_MARKET_03} ,#{SVR_TRADE_MARKET_04})))
         AND a.CDATE =#{cdate}
         <if test="portfolioIdList != null">

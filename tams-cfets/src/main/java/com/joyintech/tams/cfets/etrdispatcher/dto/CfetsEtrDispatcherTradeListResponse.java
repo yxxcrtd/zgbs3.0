@@ -140,6 +140,9 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     @ApiModelProperty(name="tradePlat",value="交易平台")
     private String tradePlat;
 
+    @ApiModelProperty(name = "bidModle", value = "投标方式")
+    private String bidModle;
+
     @Override
     public String getTradePlat() {
         return tradePlat;
@@ -487,10 +490,7 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     }
 
     public String getIssueDateStr() {
-        if (getIssueDate() == null) {
-            return "";
-        }
-        return DateUtil.format(getIssueDate(), "yyyy-MM-dd");
+        return issueDateStr;
     }
 
     public void setIssueDateStr(String issueDateStr) {
@@ -503,5 +503,13 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
 
     public void setTraderId(String traderId) {
         this.traderId = traderId;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
     }
 }

@@ -66,6 +66,21 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
     public Page<EtrCreditProtectionCertificateResponse> selectEtrExchange(EtrCreditProtectionCertificateRequest request) {
         Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("userId", SecurityUtil.getLoginUser().getUserName());
+        if(Objects.equals(param.get("sort"), "dealPercentAge")){
+            param.put("sort", "dealPercent");
+        }
+        if(Objects.equals(param.get("sort"), "entrustStatusString")){
+            param.put("sort", "entrustStatus");
+        }
+        if(Objects.equals(param.get("sort"), "implementPercentAge")){
+            param.put("sort", "ImplementPercent");
+        }
+        if(Objects.equals(param.get("sort"), "psStr")){
+            param.put("sort", "ps");
+        }
+        if(Objects.equals(param.get("sort"), "priceModelString")){
+            param.put("sort", "priceModel");
+        }
         param.put("sysDate", iPlatformDate.getSysDateStr());
         param.put("ENTRUST_BUSS_TYPE_30",DictCodeListExt3.上农商_指令业务类型_信用保护凭证指令.getValue());
         param.put("PRICE_MODEL_PRM02", DictCodeListExt2.价格模式_限价指令.getValue());
@@ -84,6 +99,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
             param.put("finprodMarketIds", null);
         }
         return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeCpc002Mapper.selectEtrExchanges(param));
+
     }
 
     /**
@@ -164,7 +180,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                         //最新价从行情取
                         EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
                         if (hqResponse != null) {
-                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : new BigDecimal(0.00);
+                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
                             entity.setPrice(lastPrice);
                         }
                         returnList.add(entity);

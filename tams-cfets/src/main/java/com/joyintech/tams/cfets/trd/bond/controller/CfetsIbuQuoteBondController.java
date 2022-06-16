@@ -267,6 +267,19 @@ public class CfetsIbuQuoteBondController extends BaseController {
 		}
 	}
 
+	@ApiOperation(value = "结算金额反算", notes = "结算金额反算全价、应计利息、应计利息总额")
+	@PostMapping("/calculationByFpriceAmt")
+	@ResponseBody
+	public Message<CalRespone> calculationByFpriceAmt(@RequestBody CalRequest calRequest) {
+		try {
+			CalRespone calculation = ibuQuoteBondCalService.calculationByFpriceAmt(calRequest);
+			return new Message<CalRespone>().success().setData(calculation);
+		} catch (Exception e) {
+			logger.error("结算金额反算异常", e);
+			return new Message<CalRespone>().fail().setMessage("结算金额反算异常");
+		}
+	}
+
 
 	@ApiOperation(value = "自动分配", notes = "自动分配")
 	@PostMapping("/autoAllocation")
@@ -363,6 +376,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 			return new Message<AjaxResult>().success().setData(m);
 		}
 		catch (Exception e){
+            logger.error("风险试算异常",e);
 			return new Message<AjaxResult>().fail().setMessage("风险试算异常");
 		}
 	}
@@ -384,7 +398,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "报价批量撤回检查", notes = "报价批量撤回检查")
 	@ResponseBody
-	@RequestMapping("/checkOperationAllowList")
+	@PostMapping("/checkOperationAllowList")
 	public Message<AjaxResult> checkOperationAllowList(@RequestBody List<CfetsBondCheckRequst> cfetsBondCheckRequsts) {
 		AjaxResult aj = null;
 		for(CfetsBondCheckRequst cfetsBondCheckRequst:cfetsBondCheckRequsts){
@@ -401,7 +415,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "报价检查", notes = "报价修改、复制、回退、回复、删除、撤回检查")
 	@ResponseBody
-	@RequestMapping("/checkOperationAllow")
+	@PostMapping("/checkOperationAllow")
 	public Message<AjaxResult> checkOperationAllow(@RequestBody CfetsBondCheckRequst cfetsBondCheckRequst) {
 		BondQuoteInfoDto bondQuoteInfoDto = new BondQuoteInfoDto();
 		BeanUtil.copyPropertiesIgnoreNull(bondQuoteInfoDto,cfetsBondCheckRequst);
@@ -410,7 +424,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "报价撤回", notes = "报价撤回")
 	@ResponseBody
-	@RequestMapping("doReCall")
+	@PostMapping("doReCall")
 	public Message<AjaxResult> doReCall(@RequestBody CfetsBondCheckRequst cfetsBondCheckRequst) throws Exception{
 		AjaxResult ar = null;
 		BondQuoteInfoDto bondQuote = new BondQuoteInfoDto();
@@ -429,7 +443,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "报价批量撤回", notes = "报价批量撤回")
 	@ResponseBody
-	@RequestMapping("doReCallList")
+	@PostMapping("doReCallList")
 	public Message<AjaxResult> doReCallList(@RequestBody List<CfetsBondCheckRequst> cfetsBondCheckRequsts) throws Exception{
 		AjaxResult ar = null;
 		try{
@@ -449,7 +463,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "回退", notes = "回退")
 	@ResponseBody
-	@RequestMapping("doBack")
+	@PostMapping("doBack")
 	public Message<AjaxResult> doBack(@RequestBody CfetsBondCheckRequst cfetsBondCheckRequst) {
 		AjaxResult ar = null;
 		BondQuoteInfoDto bondQuote = new BondQuoteInfoDto();
@@ -463,7 +477,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "报价删除", notes = "报价删除")
 	@ResponseBody
-	@RequestMapping("doDel")
+	@PostMapping("doDel")
 	public Message<AjaxResult> doDel(@RequestBody CfetsBondCheckRequst cfetsBondCheckRequst) {
 		AjaxResult ar = null;
 		BondQuoteInfoDto bondQuote = new BondQuoteInfoDto();
@@ -479,7 +493,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "强制完成检查", notes = "强制完成检查")
 	@ResponseBody
-	@RequestMapping("/doForcedFinishCheck")
+	@PostMapping("/doForcedFinishCheck")
 	public Message<AjaxResult> doForcedFinishCheck(@RequestBody Map<String,Object> param) {
 		BondQuoteInfoDto bondQuoteInfoDto = new BondQuoteInfoDto();
 		AjaxResult ar = null;
@@ -491,7 +505,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "强制完成", notes = "强制完成")
 	@ResponseBody
-	@RequestMapping("doForcedFinish")
+	@PostMapping("doForcedFinish")
 	public Message<AjaxResult> doForcedFinish(@RequestBody Map<String,Object> param) {
 		AjaxResult ar = null;
 		List<String> entrustIds = StringUtil.splitToList(",",(String)param.get("entrustIds"));
@@ -512,7 +526,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "失败", notes = "失败")
 	@ResponseBody
-	@RequestMapping("/selectErrlog")
+	@PostMapping("/selectErrlog")
 	public Message<AjaxResult> selectErrlog(String quoteId) {
 		AjaxResult ar = new AjaxResult();
 		ar.setData(cfetsQuotedCommonService.selectErrlog(quoteId));
@@ -521,7 +535,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "指令列表导出", notes = "指令列表导出")
 	@ResponseBody
-	@RequestMapping("exportEntrust")
+	@PostMapping("exportEntrust")
 	public void export(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response){
 		// 导出
 		ExcelUitl.doExport(requestDto, response, "指令列表", () -> {
@@ -553,7 +567,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "当日报价导出", notes = "当日报价导出")
 	@ResponseBody
-	@RequestMapping("exportDayPrice")
+	@PostMapping("exportDayPrice")
 	public void exportDayPrice(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response){
 		// 导出
 		ExcelUitl.doExport(requestDto, response, "当日报价", () -> {
@@ -579,7 +593,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "当日登记导出", notes = "当日登记导出")
 	@ResponseBody
-	@RequestMapping("exportDayRegDeal")
+	@PostMapping("exportDayRegDeal")
 	public void exportDayRegDeal(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response){
 		// 导出
 		ExcelUitl.doExport(requestDto, response, "当日登记", () -> {
@@ -710,7 +724,7 @@ public class CfetsIbuQuoteBondController extends BaseController {
 
 	@ApiOperation(value = "交易类型按钮点击检查", notes = "交易类型按钮点击检查")
 	@ResponseBody
-	@RequestMapping("/radioPartyIdCheck")
+	@PostMapping("/radioPartyIdCheck")
 	public Message<AjaxResult> radioPartyIdCheck(@RequestBody  CfetsBondDealQuoteCommonDto cfetsBondDealQuoteCommonDto) {
 		return new Message<AjaxResult>().success().setData(cfetsQuotedCommonService.radioPartyIdCheck(cfetsBondDealQuoteCommonDto));
 	}

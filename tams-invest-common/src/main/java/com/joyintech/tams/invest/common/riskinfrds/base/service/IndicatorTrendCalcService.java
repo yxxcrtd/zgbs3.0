@@ -984,7 +984,7 @@ public class IndicatorTrendCalcService {
             Set<IOcpTrend> ocpSet = indTrend.getOcpSet();
             if (!CollectionUtils.isEmpty(ocpSet)) {
                 for (IOcpTrend item : ocpSet) {
-                    if (ocpTrend.equals(item)) {
+                    if (ocpTrend.equalsW(item)) {
                         ocpSet.remove(item);
                         break;
                     }

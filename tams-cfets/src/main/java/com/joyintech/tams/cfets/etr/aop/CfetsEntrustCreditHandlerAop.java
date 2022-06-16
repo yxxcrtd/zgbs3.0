@@ -36,8 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Component
-@Aspect
+//@Component
+//@Aspect
 public class CfetsEntrustCreditHandlerAop {
 
     @Autowired

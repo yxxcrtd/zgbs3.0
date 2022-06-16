@@ -106,6 +106,8 @@ public class PositionRequestManualSettleService {
             this.bond003(entity, resultMap, trdProductTempDealList);
         } else if (INTERF_TYPE_REPO002.equals(interType)) {
             this.repo002(entity, resultMap);
+        } else if (INTERF_TYPE_CERTIFICATE001.equals(interType)) {
+            this.certificate001(entity, resultMap);
         }
         if(StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))){
             PositionHttpRequest.send(resultMap);
@@ -463,6 +465,66 @@ public class PositionRequestManualSettleService {
             list.add(map);
             resultMap.put("ptlRelieveSecList", list);
         }
+    }
+
+    /**
+     * 信用保护凭证
+     *
+     * @param entity
+     * @param resultMap
+     */
+    private void certificate001(ManualSettleDto entity, Map<String, Object> resultMap) {
+        InfContractDetailfile infContractDetailfile = manualSettleMapper.selectInfContractDetailfile(entity.getEntrustNo(), entity.getDealNo());
+        //业务动作
+        if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_交收.getValue())) {
+            resultMap.put("busiAct", DictCodeListExt3.业务动作_交收确认.getValue());
+        } else if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
+            resultMap.put("busiAct", DictCodeListExt3.业务动作_交收回溯.getValue());
+        } else if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_交收失败.getValue())) {
+            resultMap.put("busiAct", DictCodeListExt3.业务动作_交收失败.getValue());
+        }
+        resultMap.put("interfaceType", INTERF_TYPE_CERTIFICATE001);
+        // 业务类型
+        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
+        //交易方向
+        resultMap.put("ps", infContractDetailfile.getPs());
+        //交易场所
+        resultMap.put("tradePlace", entity.getTradeMarket());
+        //决策动作
+        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
+        //系统动作
+        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
+        //流程编号
+        resultMap.put("workFlowId", null);
+        //信用事件结算方式
+        resultMap.put("ceSettleType", null);
+        //日期
+        resultMap.put("cdate", entity.getTradeDate());
+        //币种
+        resultMap.put("ccy", infContractDetailfile.getCcy());
+        //前次交易编号
+        resultMap.put("bTotalTradeId", null);
+
+        Map<String,Object> paraMap = new HashMap<>();
+        paraMap.put("dealNo", entity.getTradeId());
+        List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
+        //组合数据集
+        List<Map<String, Object>> ptlList = new ArrayList<>(4);
+        for (PortfolioCalculateDto dto : list){
+            Map<String, Object> plt = new HashMap<>(8);
+            plt.put("portfolioId", dto.getPortfolioId());
+            plt.put("finprodId", entity.getFinprodId());
+            plt.put("tradeId", entity.getTradeId());
+            plt.put("etrId", infContractDetailfile.getEntrustId());
+            plt.put("etrSecAmount", dto.getEtrSecAmount());
+            plt.put("cashAcctId", dto.getCashAcctId());
+            plt.put("secAcctId", dto.getSecAcctId());
+            plt.put("secAmount", dto.getSecAmount());
+            plt.put("cashAmount", dto.getCashAmount());
+            ptlList.add(plt);
+
+        }
+        resultMap.put("ptlList", ptlList);
     }
 
     /**

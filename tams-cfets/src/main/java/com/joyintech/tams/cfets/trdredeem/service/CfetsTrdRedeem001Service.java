@@ -18,9 +18,8 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealDbDto;
 import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
@@ -32,6 +31,7 @@ import com.joyintech.tams.cfets.trdredeem.dto.CfetsTrdRedeemDealRegisterQuoteDto
 import com.joyintech.tams.cfets.trdredeem.dto.CfetsTrdRedeemRegInfoListResponse;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
@@ -76,25 +76,16 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
     private BaseGetBusinessId baseGetBusinessId;
 
     @Autowired
-    private IbuQuoteBondService ibuQuoteBondService;
-
-    @Autowired
     private RegFinProductDealTotalMapper regFinProductDealTotalMapper;
 
     @Autowired
     private RegFinProductDealTotalAddMapper regFinProductDealTotalAddMapper;
 
     @Autowired
-    private RegTradeFeeTotalMapper regTradeFeeTotalMapper;
-
-    @Autowired
     private RegFinProductDealMapper regFinProductDealMapper;
 
     @Autowired
     private RegFinProductDealAddMapper regFinProductDealAddMapper;
-
-    @Autowired
-    private RegTradeFeeMapper regTradeFeeMapper;
 
     @Autowired
     private WflRegFinProductDealTotalMapper wflRegFinProductDealTotalMapper;
@@ -115,13 +106,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
     private WflRegTradeFeeMapper wflRegTradeFeeMapper;
 
     @Autowired
-    private JoyinbusinessCommonService joyinbusinessCommonService;
-
-    @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
-
-    @Autowired
-    private EtrEntrustMapper etrEntrustMapper;
 
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
@@ -130,7 +115,10 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
     private BaseEtrInvestInfoService baseEtrInvestInfoServiceImpl;
 
     @Autowired
-    private CfetsIbuQuoteBondEtrMapper cfetsIbuQuoteBondEtrMapper;
+    private FinProductAddMapper finProductAddMapper;
+
+    @Autowired
+    private DateCalService dateCalService;
 
     /**
      * 提交保存check 必填项
@@ -198,7 +186,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
      * @return
      */
     public CfetsTrdRedeemDealCommonDto initReg(CfetsTrdRedeemDealCommonDto cfetsBondDealQuoteCommonDto){
-        String quoteId = cfetsBondDealQuoteCommonDto.getQuoteId();
+        /*String quoteId = cfetsBondDealQuoteCommonDto.getQuoteId();
         if(StringUtil.equals(cfetsBondDealQuoteCommonDto.getValidStatus(), BussinessDictCodeList.有效状态_流程中.getValue())){
             cfetsBondDealQuoteCommonDto = null;//cfetsIbuQuoteBondMapper.getWflCfetsBondDealQuoteCommonDto(quoteId);
             if(null!=cfetsBondDealQuoteCommonDto){
@@ -209,7 +197,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
             if(null!=cfetsBondDealQuoteCommonDto){
                 cfetsBondDealQuoteCommonDto.setPtlAllocatios(cfetsIbuQuoteBondMapper.listPtlAllocationDto(quoteId));
             }
-        }
+        }*/
         return cfetsBondDealQuoteCommonDto;
     }
 
@@ -228,6 +216,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
             //头寸
           //  PositionHttpRequest.send(preparePosition(cfetsBondDealDbDto,type));
         }
+        //履历表 -> AOP
 
     }
 
@@ -270,8 +259,8 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
         deleteBussFlowData(entity.getWorkflowId());
         //登录db
         insert(cfetsBondDealDbDto,operationType);
-        //履历表
-        updateCfetsOprHis(entity.getTotleTradeId(),operationType);
+        // 更新摘牌日
+        updateSecDelistingDate(entity,operationType);
         //头寸
         /*if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
             PositionHttpRequest.sendRevoke(cfetsBondDealDbDto.getRegFinProductDealTotal().getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),"Bond001");
@@ -280,6 +269,54 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
         }*/
         //处理指令执行进度
         //insertEtrFinishStatus(cfetsBondDealDbDto,operationType);
+    }
+
+    /**
+     * 更新摘牌日
+     *
+     * @param entity
+     * @param operationType
+     * @author jiangpeng
+     * @date 2022/6/6 18:00
+     */
+    private void updateSecDelistingDate(CfetsTrdRedeemDealRegisterQuoteDto entity, OperationType operationType) {
+        // 如果赎回比例!=100% 不用处理
+        if (BigDecimalUtil.ACompareToB(entity.getRedeemRate(), new BigDecimal(100), 4) != 0) {
+            return;
+        }
+        Date theoreticalExerciseDate = entity.getTheoreticalExerciseDate();
+        if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
+            // 1.赎回登记交易提交并审批生效后，更新债券标的的摘牌日：0
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
+            // 1.1 更新原摘牌日
+            FinProductAdd finProductAdd = new FinProductAdd();
+            finProductAdd.setFinprodId(entity.getFinprodId());
+            finProductAdd.setOldDelistingDate(DateUtil.format(finProduct.getDelistingDate()));
+            finProductAddMapper.updateByPrimaryKey(finProductAdd);
+            // 1.2 更新摘牌日
+            // 交易日历取得
+            List<String> dealCalendarHolidayList = dateCalService.getDealCalendarHoliday(DateUtil.addDay(theoreticalExerciseDate, -8),
+                    theoreticalExerciseDate, "03");
+            Date tempdate = DateUtil.addDay(theoreticalExerciseDate, -1);
+            String dateStr = DateUtil.format(tempdate);
+            while (dealCalendarHolidayList.indexOf(dateStr) >= 0) {
+                tempdate = DateUtil.addDay(tempdate, -1);
+                dateStr = DateUtil.format(tempdate);
+            }
+            finProduct.setDelistingDate(tempdate);
+            finProductMapper.updateByPrimaryKeySelective(finProduct);
+        } else {
+            // 2.赎回登记交易撤销并审批生效后，需恢复债券标的的摘牌日：
+            FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(entity.getFinprodId());
+            // 1.1 更新摘牌日
+            FinProduct finProduct = new FinProduct();
+            finProduct.setFinprodId(entity.getFinprodId());
+            finProduct.setDelistingDate(DateUtil.parse(finProductAdd.getOldDelistingDate()));
+            finProductMapper.updateByPrimaryKeySelective(finProduct);
+            // 1.2 更新原摘牌日
+            finProductAdd.setOldDelistingDate(null);
+            finProductAddMapper.updateByPrimaryKey(finProductAdd);
+        }
     }
 
     /**
@@ -674,20 +711,6 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
         return result;
     }
 
-    /**
-     * 处理履历
-     */
-    private void updateCfetsOprHis(String totleTradeId,OperationType operationType){
-        CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(totleTradeId);
-        if(operationType.equals(OperationType.NEW)){
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-        }else if(operationType.equals(OperationType.REVOKE)){
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_撤回.getValue());
-        }
-        oprHisReq.setBusiDes("赎回登记");
-        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-    }
     /**
      * 查询该资产对应的组合分配列表
      * @return

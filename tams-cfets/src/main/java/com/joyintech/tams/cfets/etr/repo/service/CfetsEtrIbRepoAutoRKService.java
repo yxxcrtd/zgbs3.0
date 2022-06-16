@@ -3,7 +3,10 @@ package com.joyintech.tams.cfets.etr.repo.service;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.cfets.etr.repo.dao.CfetsEtrIbRepoinfoMapper;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoLibDto;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoRkDto;
@@ -14,6 +17,8 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +26,8 @@ import java.util.*;
 
 @Service
 public class CfetsEtrIbRepoAutoRKService extends BaseService {
+
+    private Logger logger = LoggerFactory.getLogger(CfetsEtrIbRepoAutoRKService.class);
 
     @Autowired
     private CfetsEtrIbRepoinfoMapper cfetsEtrIbRepoinfoMapper;
@@ -30,6 +37,9 @@ public class CfetsEtrIbRepoAutoRKService extends BaseService {
 
     @Autowired
     private CfetsIbRepoLibService cfetsIbRepoLibService;
+
+    @Autowired
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
     /**
      * 平台日期
      */
@@ -37,6 +47,15 @@ public class CfetsEtrIbRepoAutoRKService extends BaseService {
     private IPlatformDate iPlatformDate;
 
     public void autoInLibrary(String userId, String finprodId, List<String> portfolioIds, String finprodType2, String ps) {
+        logger.debug("质押券自动入库 userId:" + userId + " finprodId:" + finprodId +
+                " portfolioIds:" + JsonUtils.object2Json(portfolioIds) + " finprodType2:" + finprodType2 + " ps:" + ps);
+        List<FinProductSpecialDto> finProductSpecialDtos = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(finprodId));
+        finProductSpecialDtos.forEach(finProductSpecialDto->{
+            if (StringUtil.equals(finProductSpecialDto.getIsDefaultBondIndicator(), DictCodeList.是否_是.getValue())) {
+                logger.debug(finprodId + " 到期违约债不自动入库");
+                return;
+            }
+        });
         String repo_pledge_model = CacheUtil.getSysParam("repo_pledge_model");
         Map<String, Object> param = new HashMap<>();
         if (!StringUtil.equals(repo_pledge_model, "03")) {
@@ -148,14 +167,20 @@ public class CfetsEtrIbRepoAutoRKService extends BaseService {
                                    List<CfetsEtrIbRepoLibDto> pledgeBondList, String portfolioId, String finprodId, String userId) {
         for (CfetsEtrSecStockConfig config : configs) {
             boolean isTrue = true;
-            // 三级分类
+            // 二级分类
             if (StringUtil.isNotEmpty(config.getWindtypeone())
                     && !StringUtil.equals(config.getWindtypeone(), findprodInfo.getWindtypeone())) {
                 isTrue = false;
                 continue;
             }
-            // 四级分类
+            // 三级分类
             if (StringUtil.isNotEmpty(config.getWindtypetwo())
+                    && !StringUtil.equals(config.getWindtypetwo(), findprodInfo.getWindtypetwo())) {
+                isTrue = false;
+                continue;
+            }
+            // 四级分类
+            if (StringUtil.isNotEmpty(config.getWindtypethree())
                     && !StringUtil.equals(config.getWindtypetwo(), findprodInfo.getWindtypetwo())) {
                 isTrue = false;
                 continue;

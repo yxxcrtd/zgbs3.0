@@ -27,6 +27,7 @@ import com.joyintech.tams.exchange.common.bean.investment.ReqRiskTrigger;
 import com.joyintech.tams.exchange.common.bean.investment.RiskOccupyBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.exception.PositionExchangeException;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.FairPortfolioResponse;
@@ -171,7 +172,7 @@ public class FairOrderHelper {
     }
 
     public boolean createFairOrder(Order order, Instruction instruction) {
-        // 判断order是否要做公平交易
+        logger.info("{createFairOrder()】 判断order是否要做公平交易：instructionId={}", instruction.getEntrustId());
         if (!Strings.isNullOrEmpty(order.getAlgorithmId())
                 || !EntrustUtils.isFairOrder(order.getEntrustProp())
                 || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
@@ -182,33 +183,39 @@ public class FairOrderHelper {
         ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
 
         PortfolioAllocationResponse portfolioAllocationResponse = Convert.convert(PortfolioAllocationResponse.class, resultBean.getData());
-        List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
-        Map<String, List<Instruction>> instructionMap = instructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
-        if (instructionMap.size() <= 1) {
-        	// 走普通委托
-        	return false;
-        }
-
-        if (StrUtil.isNotEmpty(portfolioAllocationResponse.getInfoLevel())) {
+        if (StrUtil.isNotEmpty(portfolioAllocationResponse.getInfoLevel())
+                && portfolioAllocationResponse.getInfoLevel().equals("1")) {
             logger.info("fair order failed");
             order.setOrderStatus(OrderStatus.STOP.value);
-            return true;
+            return false;
         }
 
-
-        //卖出价格不得小于最优价，买入不得高于最优价
-        BigDecimal price = portfolioAllocationResponse.getPrice();
-        if (order.getEntrustBs().equals(EntrustBs.SELL.value)
-                && TradeUtils.lessThan(order.getOrderPrice(), price)) {
-            order.setErrorCode(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.value);
-            order.setErrorMsg(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.errorMsg);
-            return true;
-        } else if (order.getEntrustBs().equals(EntrustBs.BUY.value)
-                && TradeUtils.bigThan(order.getOrderPrice(), price)) {
-            order.setErrorCode(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.value);
-            order.setErrorMsg(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.errorMsg);
-            return true;
+        List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
+        if (CollectionUtils.isEmpty(instructions)) {
+            return false;
         }
+        long totoleNum = instructions.stream().map(Instruction::getTermDays).reduce(BigDecimal.ZERO, BigDecimal::add).longValue();
+        if (totoleNum == 0) {
+            return false;
+        }
+        Map<String, List<Instruction>> instructionMap = instructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
+        if (instructionMap.size() <= 1) {
+            // 走普通委托
+            return false;
+        }
+
+//        if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid() && totoleNum == 0) {
+//            //卖出价格不得小于最优价，买入不得高于最优价
+//            if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {
+//                order.setErrorCode(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.value);
+//                order.setErrorMsg(INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR.errorMsg);
+//                return true;
+//            } else if (order.getEntrustBs().equals(EntrustBs.BUY.value)) {
+//                order.setErrorCode(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.value);
+//                order.setErrorMsg(INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR.errorMsg);
+//                return true;
+//            }
+//        }
 
         order.setBusinessFlag(BusinessFlag.FAIR.value);
         orderService.asyncUpdate(order);
@@ -231,7 +238,8 @@ public class FairOrderHelper {
         ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
 
         PortfolioAllocationResponse portfolioAllocationResponse = Convert.convert(PortfolioAllocationResponse.class, resultBean.getData());
-        if (StrUtil.isNotEmpty(portfolioAllocationResponse.getInfoLevel())) {
+        if (StrUtil.isNotEmpty(portfolioAllocationResponse.getInfoLevel()) &&
+                StringUtil.equals(portfolioAllocationResponse.getInfoLevel(), "1")) {
             return ListUtil.empty();
         }
         return portfolioAllocationResponse.getList();
@@ -261,7 +269,6 @@ public class FairOrderHelper {
 
     //下委托及风险审批
     public void handleFairOrder(Order order, WorkflowBean workflow) {
-
         List<FairPortfolioResponse> fairInstructions = getFairInstructions(order);
         // fairInstructions是根据组合维度的生成的，需要根据指令代码重新聚合，注意字段借用
         Map<String, List<Instruction>> instructionMap = fairInstructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
@@ -315,15 +322,15 @@ public class FairOrderHelper {
     private int dealEntrustVolume(Map<String, Double> volumeMap, double totalVolume, double totalOrderVolume, Entrust entrust) {
         double leftVolume = volumeMap.get(entrust.getInstructionId());
         int realVolume = 0;
-        if (InvestmentAssetType.BOND.value.equals(entrust.getAssetType())) {
+        if (InvestAssetTypeEnum.BOND.value.equals(entrust.getAssetType())) {
             realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 1);
-        } else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(entrust.getAssetType())) {
+        } else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(entrust.getAssetType())) {
             if (Market.SZSE.value.equals(entrust.getMarket())) {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 1);
             } else {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 3);
             }
-        } else if (InvestmentAssetType.FUTURES.value.equals(entrust.getAssetType())) {
+        } else if (InvestAssetTypeEnum.FUTURES.value.equals(entrust.getAssetType())) {
             realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 0);
         } else {
             realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 2);
@@ -558,15 +565,15 @@ public class FairOrderHelper {
             fairEntrust.setParentOrderId(order.getId());
             double leftVolume = volumeMap.get(instruction.getEntrustId());
             int realVolume = 0;
-            if (InvestmentAssetType.BOND.value.equals(fairEntrust.getAssetType())) {
+            if (InvestAssetTypeEnum.BOND.value.equals(fairEntrust.getAssetType())) {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 1);
-            } else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(fairEntrust.getAssetType())) {
+            } else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(fairEntrust.getAssetType())) {
                 if (Market.SZSE.value.equals(fairEntrust.getMarket())) {
                     realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 1);
                 } else {
                     realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 3);
                 }
-            } else if (InvestmentAssetType.FUTURES.value.equals(fairEntrust.getAssetType())) {
+            } else if (InvestAssetTypeEnum.FUTURES.value.equals(fairEntrust.getAssetType())) {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 0);
             } else {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 2);

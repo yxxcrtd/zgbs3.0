@@ -22,6 +22,7 @@ import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.trade.dto.BussTrdAvailableCashQuery;
 import com.joyintech.tams.component.business.trade.dto.TrdInvestPersonInfo002Dto;
+import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.common.BussRepoSecDto;
 import com.joyintech.tams.invest.common.dto.cstp.InterfTradRepoasstDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
@@ -224,6 +225,12 @@ public class CfetsTrdRepoTrade002Dto extends TrdProductDeal implements ProcessEn
      */
     List<CfetsPledgeInfoResponse> cfetsPledgeInfoList;
 
+
+    /**
+     *
+     * 交易明细
+     */
+    List<BaseTradeProductDealDto> baseTradeProductDealDtos;
 
     public String getParentPageId() {
         return parentPageId;
@@ -2114,5 +2121,13 @@ public class CfetsTrdRepoTrade002Dto extends TrdProductDeal implements ProcessEn
 
     public void setCfetsPledgeInfoList(List<CfetsPledgeInfoResponse> cfetsPledgeInfoList) {
         this.cfetsPledgeInfoList = cfetsPledgeInfoList;
+    }
+
+    public List<BaseTradeProductDealDto> getBaseTradeProductDealDtos() {
+        return baseTradeProductDealDtos;
+    }
+
+    public void setBaseTradeProductDealDtos(List<BaseTradeProductDealDto> baseTradeProductDealDtos) {
+        this.baseTradeProductDealDtos = baseTradeProductDealDtos;
     }
 }

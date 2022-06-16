@@ -11,6 +11,7 @@
 package com.joyintech.tams.cfets.etrdispatcher.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherAutoRequest;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse;
 import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherExeListInfoResponse;
@@ -116,7 +117,44 @@ public interface CfetsEtrDispatcherMapper {
 
     List<CfetsEtrDispatcherExeListInfoResponse> getEtrDispatcherExeListInfo(Map<String, Object> pageParam);
 
+    /**
+     * 一级债券指令执行查询
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrBondFirstExeListInfoResponse> getEtrBondFirstExeListInfo(Map<String, Object> pageParam);
+
     List<CfetsEtrDispatcherDealListInfoResponse> getEtrDispatcherDealListInfo(Map<String, Object> pageParam);
+
+
+    /**
+     * 一级债券指令成交查询
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrDispatcherDealListInfoResponse> getEtrDispatcherFirstBidDealListInfo(Map<String, Object> pageParam);
+
+    /**
+     * 一级债券指令成交查询  未中标
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrDispatcherDealListInfoResponse> getEtrPrimaryBidDealListInfo(Map<String, Object> pageParam);
+
+    /**
+     * 一级债券指令成交查询  一级申购
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrDispatcherDealListInfoResponse> getEtrSubBidDealListInfo(Map<String, Object> pageParam);
+
+    /**
+     * 一级债券指令成交查询  一级申购
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrDispatcherDealListInfoResponse> getEtrFxmrBidDealListInfo(Map<String, Object> pageParam);
+
 
     /**
      * 指令分发成交信息
@@ -240,4 +278,6 @@ public interface CfetsEtrDispatcherMapper {
      * @return
      */
     CfetsEtrDispatcherTradeListResponse getEtrFirstBidInfo(@Param("entrustId") String entrustId);
+
+
 }

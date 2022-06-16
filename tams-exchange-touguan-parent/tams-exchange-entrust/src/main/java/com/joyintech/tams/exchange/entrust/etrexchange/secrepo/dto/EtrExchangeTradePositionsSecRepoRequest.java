@@ -11,6 +11,7 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto;
 
 import com.joyintech.tams.business.common.dto.PageMode;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePositionsCommonResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -57,6 +58,17 @@ public class EtrExchangeTradePositionsSecRepoRequest {
 
     @ApiModelProperty(name="finprodMarketIds",value="多个市场代码",example="A,B")
     private String finprodMarketIds;
+
+    @ApiModelProperty(name="queryList",value="导出时传入整个列表",example="A1")
+    private List<EtrExchangeTradePositionsSecRepoResponse> queryList;
+
+    public List<EtrExchangeTradePositionsSecRepoResponse> getQueryList() {
+        return queryList;
+    }
+
+    public void setQueryList(List<EtrExchangeTradePositionsSecRepoResponse> queryList) {
+        this.queryList = queryList;
+    }
 
     @ApiModelProperty(name="从pageMode获取",value="从pageMode获取")
     public String getSort() {

@@ -7,9 +7,8 @@ public class Const {
 	private Const() {}
 	
 	public static final SimpleDateFormat DateFmt = new SimpleDateFormat("yyyy-MM-dd");
-	public static final SimpleDateFormat DateTimeFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
-	public static final long MillisOfDay = 24 * 60 * 60 * 1000;
+
+	public static final long MillisOfDay = 24 * 60 * 60 * (long)1000;
 	
 	 /**
      * 成功时的状态码

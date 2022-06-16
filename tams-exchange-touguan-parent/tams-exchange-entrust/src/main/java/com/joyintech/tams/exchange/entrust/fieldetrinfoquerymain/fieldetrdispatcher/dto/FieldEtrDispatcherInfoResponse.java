@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto;
 
-import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.constant.DictCode;
@@ -47,6 +48,10 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
 
     @ApiModelProperty(name="bidPriceList",value="投标标位",example="List<EtrEntrustBidPrice>")
     private List<EtrEntrustBidPrice> bidPriceList;
+
+    @ApiModelProperty(name="biddingProductDtos",value="投标产品列表")
+    private List<FieldEtrBiddingProductDto> biddingProductDtos;
+
     //债券一级投标 end
 
     //债券交易 start
@@ -146,6 +151,39 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
 
     @ApiModelProperty(name="oldPledStrdPrinAmt",value="原券面金额",example="10000")
     private BigDecimal oldPledStrdPrinAmt;
+
+    @ApiModelProperty(name="counterName",value="交易对手名称")
+    private String counterName;
+
+    @ApiModelProperty(name="issueClass",value="发行方式")
+    private String issueClass;
+
+    @ApiModelProperty(name="issueClassStr",value="发行方式字符串")
+    private String issueClassStr;
+
+    @ApiModelProperty(name="tenderTarget",value="招标标的")
+    private String tenderTarget;
+
+    @ApiModelProperty(name="tenderTargetStr",value="招标标的字符串")
+    private String tenderTargetStr;
+
+    @ApiModelProperty(name="issueDate",value="发行日")
+    private Date issueDate;
+
+    @ApiModelProperty(name="tenderSdate",value="投标起始日")
+    private Date tenderSdate;
+
+    @ApiModelProperty(name="tenderEdate",value="投标截止日")
+    private Date tenderEdate;
+
+    @ApiModelProperty(name="payEdate",value="缴款截止日")
+    private Date payEdate;
+
+    @ApiModelProperty(name="payEdateStr",value="缴款截止日格式化")
+    private String payEdateStr;
+
+    @ApiModelProperty(name="issueDateStr",value="发行日格式化")
+    private String issueDateStr;
 
     private String declaType;
 
@@ -436,7 +474,7 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
     public BigDecimal getUnitPrice() {
         if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getAssetType())
                 && StringUtils.equals("PRM03",this.getPriceModel())){
-            return new BigDecimal(0.00);
+            return BigDecimal.valueOf(0.00);
         }
         return unitPrice;
     }
@@ -636,5 +674,115 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
 
     public void setDeclaTypeStr(String declaTypeStr) {
         this.declaTypeStr = declaTypeStr;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
+    }
+
+    public String getIssueClass() {
+        return issueClass;
+    }
+
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
+    }
+
+    public String getIssueClassStr() {
+        if (StringUtil.isEmpty(getIssueClass())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, getIssueClass());
+    }
+
+    public void setIssueClassStr(String issueClassStr) {
+        this.issueClassStr = issueClassStr;
+    }
+
+    public String getTenderTarget() {
+        return tenderTarget;
+    }
+
+    public void setTenderTarget(String tenderTarget) {
+        this.tenderTarget = tenderTarget;
+    }
+    public String getTenderTargetStr() {
+        if (StringUtil.isEmpty(getIssueClass())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getIssueClass());
+    }
+
+    public void setTenderTargetStr(String tenderTargetStr) {
+        this.tenderTargetStr = tenderTargetStr;
+    }
+
+    public Date getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public Date getTenderSdate() {
+        return tenderSdate;
+    }
+
+    public void setTenderSdate(Date tenderSdate) {
+        this.tenderSdate = tenderSdate;
+    }
+
+    public Date getTenderEdate() {
+        return tenderEdate;
+    }
+
+    public void setTenderEdate(Date tenderEdate) {
+        this.tenderEdate = tenderEdate;
+    }
+
+    public Date getPayEdate() {
+        return payEdate;
+    }
+
+    public void setPayEdate(Date payEdate) {
+        this.payEdate = payEdate;
+    }
+
+    public String getPayEdateStr() {
+        if (null != this.getPayEdate()) {
+            return DateUtil.format(this.getPayEdate());
+        }
+        return payEdateStr;
+    }
+
+    public void setPayEdateStr(String payEdateStr) {
+        this.payEdateStr = payEdateStr;
+    }
+
+    public String getIssueDateStr() {
+        if (null != this.getIssueDate()) {
+            return DateUtil.format(this.getIssueDate());
+        }
+        if (null != this.getTenderSdate() &&  null != this.getTenderEdate()) {
+            return DateUtil.format(this.getTenderSdate())+"~"+DateUtil.format(this.getTenderEdate());
+        }
+        return issueDateStr;
+    }
+
+    public void setIssueDateStr(String issueDateStr) {
+        this.issueDateStr = issueDateStr;
+    }
+
+    public List<FieldEtrBiddingProductDto> getBiddingProductDtos() {
+        return biddingProductDtos;
+    }
+
+    public void setBiddingProductDtos(List<FieldEtrBiddingProductDto> biddingProductDtos) {
+        this.biddingProductDtos = biddingProductDtos;
     }
 }

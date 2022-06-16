@@ -293,6 +293,11 @@ public class Algorithm implements Serializable, KeyMethodInterface<String>, Orde
 
     }
 
+    @Override
+    public String getBusiTypeTg() {
+        return null;
+    }
+
     public Integer getLimitAction() {
         return limitAction;
     }

@@ -7,6 +7,7 @@ import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -38,10 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -137,10 +135,8 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             if (StringUtil.isNotEmpty(workflowId)) {
                 //流程代办checkImportData
                 entity = creditProtectionCertificate002Service.getBussinessEntityByWorkflowId(workflowId);
-                if (StringUtil.isNotEmpty(entity)){
-                    entity.setFinprodMarketId(entity.getFinprodMarketId()+entity.getTradeMarketId());
-                }
             }
+            entity = creditProtectionCertificate002Service.getProcessEntity(entity);
             return new Message<CreditProtectionCertificate002Dto>().success().setData(entity);
         } catch(Exception e){
             e.printStackTrace();
@@ -298,7 +294,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
         params.setBusinessCode(CreditProtectionCertificate002Dto::getFinprodMarketId);
-        params.setBusinessType(DictCodeList.共通业务类型_基金类资产信息.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证标的.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {
             return WorkFlowUtil.concatComment("资产代码"+
@@ -334,7 +330,9 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             CreditProtectionCertificate002Dto request = creditProtectionCertificate002Service.getById(saveRequest.getFinprodMarketId());
             request.setOperateType(OperationType.DELETE.name());
             selectedItem.add(request);
+//            creditProtectionCertificate002Service.delete(request);
         }
+//        return new Message<AjaxResult>().success().setData(new AjaxResult("删除成功"));
         cpc004Dto.setOperateType(OperationType.DELETE.name());
         cpc004Dto.setSelectedItem(selectedItem);
         cpc004Dto.setRemark(cpc004Dto.getRemark());

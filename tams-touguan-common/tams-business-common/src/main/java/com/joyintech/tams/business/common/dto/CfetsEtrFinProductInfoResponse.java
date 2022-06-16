@@ -162,15 +162,13 @@ public class CfetsEtrFinProductInfoResponse {
      * 每标位最低投标量
      */
     @ApiModelProperty(name = "minPerTamt", value = "每标位最低投标量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal minPerTamt;
+    private String minPerTamt;
 
     /**
      * 每标位最高投标量
      */
     @ApiModelProperty(name = "maxPerUtamt", value = "每标位最高投标量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal maxPerUtamt;
+    private String maxPerUtamt;
 
     /**
      * 单笔最低认购量
@@ -243,7 +241,19 @@ public class CfetsEtrFinProductInfoResponse {
      * 增发投标日
      */
     @ApiModelProperty(name = "settleDate", value = "增发投标日")
-    private Date settleDate;
+    private String settleDate;
+
+    /**
+     * 投标日
+     */
+    @ApiModelProperty(name = "bidDate", value = "投标日")
+    private Date bidDate;
+
+    /**
+     * 投标日
+     */
+    @ApiModelProperty(name = "bidDateStr", value = "投标日")
+    private String bidDateStr;
 
     /**
      * 投标起始日
@@ -426,6 +436,9 @@ public class CfetsEtrFinProductInfoResponse {
     private String couponSpecies;
 
     public String getTitle() {
+        if (StringUtil.isBlank(getFinprodMarketId()) && StringUtil.isBlank(getFinprodAbbr())) {
+            return title;
+        }
         return getFinprodMarketId() + getFinprodAbbr();
     }
 
@@ -492,19 +505,28 @@ public class CfetsEtrFinProductInfoResponse {
         this.addBatch = addBatch;
     }
 
-    public BigDecimal getMinPerTamt() {
+    public String getMinPerTamt() {
         return minPerTamt;
     }
 
-    public void setMinPerTamt(BigDecimal minPerTamt) {
+
+    public String getMinPerTamtStr() {
+        return StringUtil.isNotBlank(getMinPerTamt()) ? getMinPerTamt() + "亿元" : "";
+    }
+
+    public void setMinPerTamt(String minPerTamt) {
         this.minPerTamt = minPerTamt;
     }
 
-    public BigDecimal getMaxPerUtamt() {
+    public String getMaxPerUtamt() {
         return maxPerUtamt;
     }
 
-    public void setMaxPerUtamt(BigDecimal maxPerUtamt) {
+    public String getMaxPerUtamtStr() {
+        return StringUtil.isNotBlank(getMaxPerUtamt()) ? getMaxPerUtamt() + "亿元" : "";
+    }
+
+    public void setMaxPerUtamt(String maxPerUtamt) {
         this.maxPerUtamt = maxPerUtamt;
     }
 
@@ -533,12 +555,11 @@ public class CfetsEtrFinProductInfoResponse {
         this.maxPamt = maxPamt;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    public Date getSettleDate() {
+    public String getSettleDate() {
         return settleDate;
     }
 
-    public void setSettleDate(Date settleDate) {
+    public void setSettleDate(String settleDate) {
         this.settleDate = settleDate;
     }
 
@@ -617,6 +638,10 @@ public class CfetsEtrFinProductInfoResponse {
         return planIssueAmt;
     }
 
+    public String getPlanIssueAmtStr() {
+        return StringUtil.isNotBlank(getPlanIssueAmt()) ? getPlanIssueAmt() + "亿元" : "";
+    }
+
     public void setPlanIssueAmt(String planIssueAmt) {
         this.planIssueAmt = planIssueAmt;
     }
@@ -667,12 +692,20 @@ public class CfetsEtrFinProductInfoResponse {
         return zxGrade;
     }
 
+    public String getZxGradeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.评级结果, getZxGrade());
+    }
+
     public void setZxGrade(String zxGrade) {
         this.zxGrade = zxGrade;
     }
 
     public String getZtGrade() {
         return ztGrade;
+    }
+
+    public String getZtGradeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.评级结果, getZtGrade());
     }
 
     public void setZtGrade(String ztGrade) {
@@ -1013,5 +1046,21 @@ public class CfetsEtrFinProductInfoResponse {
 
     public void setZxGradeOrgId(String zxGradeOrgId) {
         this.zxGradeOrgId = zxGradeOrgId;
+    }
+
+    public Date getBidDate() {
+        return bidDate;
+    }
+
+    public void setBidDate(Date bidDate) {
+        this.bidDate = bidDate;
+    }
+
+    public String getBidDateStr() {
+        return bidDateStr;
+    }
+
+    public void setBidDateStr(String bidDateStr) {
+        this.bidDateStr = bidDateStr;
     }
 }

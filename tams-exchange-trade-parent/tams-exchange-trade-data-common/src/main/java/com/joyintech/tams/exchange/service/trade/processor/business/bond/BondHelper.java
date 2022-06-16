@@ -10,6 +10,7 @@ import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
@@ -174,7 +175,7 @@ public class BondHelper {
             return trade.getTradedBalance();
         }
 
-        if (InvestmentAssetType.isBond(instruction.getAssetType())
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)
                 && !EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
             BigDecimal minPrice = instruction.queryMinPrice(trade.getEntrustProp());
@@ -190,7 +191,7 @@ public class BondHelper {
      * 债券净价成交转换为全价处理
      */
 //    public BigDecimal getFullPriceByTradePrice(Trade trade, String isFullPrice, Instruction instruction) {
-//        if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
+//        if (!InvestAssetTypeEnum.isBond(instruction.getAssetType())) {
 //            return BigDecimal.ZERO;
 //        }
 //        if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp()) || trade.getTradedPrice().doubleValue() == 0) {
@@ -210,7 +211,7 @@ public class BondHelper {
 //        return trade.getTradedPrice();
 //    }
     public BigDecimal getFullPriceByTradePrice(Trade trade, String isFullPrice, Instruction instruction) {
-        if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
+        if (!InvestAssetTypeEnum.isBond(instruction.getAssetType())) {
             return BigDecimal.ZERO;
         }
         if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp()) || trade.getTradedPrice().doubleValue() == 0) {
@@ -225,7 +226,7 @@ public class BondHelper {
          * 委托记录中：委托价格（全价），买入冻结金额（全价），成交金额（全价）
          * 成交记录中：委托价格（全价），成交价格（全价），成交金额（全价），实时冻结解冻金额（全价）
          */
-        if (InvestmentAssetType.isBond(instruction.getAssetType())
+        if (InvestAssetTypeEnum.isBond(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)
                 && !EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
             BigDecimal minPrice = instruction.queryMinPrice(trade.getEntrustProp());
@@ -252,11 +253,11 @@ public class BondHelper {
             return balance;
         }
         // 质押式竞价回购，金额计算
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(volume * 100).setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         //债券指令 全部按照净价处理
-        if (InvestmentAssetType.BOND.value.equals(assetType)) {
+        if (InvestAssetTypeEnum.BOND.value.equals(assetType)) {
             return TradeUtils.multiply(entrustPrice, volume, 2);
         }
         return balance;
@@ -268,11 +269,11 @@ public class BondHelper {
             return balance;
         }
         // 质押式竞价回购，金额计算
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(orderInterface.getAssetType())) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(orderInterface.getAssetType())) {
             return new BigDecimal(entrustVolume * 100).setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         //债券指令全部按照全价处理
-        if (InvestmentAssetType.BOND.value.equals(orderInterface.getAssetType())) {
+        if (InvestAssetTypeEnum.BOND.value.equals(orderInterface.getAssetType())) {
             return TradeUtils.multiply(orderInterface.getFullPrice(), entrustVolume, 2);
         }
         return balance;

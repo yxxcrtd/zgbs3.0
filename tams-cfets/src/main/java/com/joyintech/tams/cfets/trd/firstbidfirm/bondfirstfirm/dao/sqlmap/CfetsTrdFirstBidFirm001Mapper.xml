@@ -60,6 +60,7 @@
         fp.FINPROD_MARKET_ID                     finprodMarketId,
         fp.FINPROD_ABBR                          finprodAbbr,
         fpi.TENDER_TARGET                        tenderTarget,
+        fpi.ISSUE_CLASS                          issueClass,
         CASE
             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
             THEN fpi.ISSUE_DATE
@@ -70,7 +71,7 @@
             END           AS issueDateStart/*投标日 开始*/,
             CASE
             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-            THEN fpi.ISSUE_DATE
+            THEN null
             WHEN (fpi.ISSUE_CLASS = '02' AND
             (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
             OR fpi.ISSUE_CLASS = '03'
@@ -95,6 +96,7 @@
         to_char(eea.TRANSMIT_TIME, 'hh24:mi')    transmitTimeSer,
         ee.UPDATE_TIME                           lastModifiedDate,
         ee.ENTRUST_ID                            entrustId,
+        teer.TOTLE_ID                            totleId,
         hisInfo.REMARK                                remark
         from ETR_ENTRUST ee
         left join (select listagg(t0.PORTFOLIO_ID, ',') within group (order by t0.ENTRUST_ID)   AS PORTFOLIO_ID,
@@ -152,9 +154,20 @@
         LEFT JOIN
         FIN_PRODUCT_ISSUE t3
         ON t3.FINPROD_ID = t2.FINPROD_ID
+        <where>
+            <if test="tenderTarget != null and tenderTarget != '' and winPrice != null ">
+                (#{tenderTarget} = '01' and t0.BID_PRICE*100 <![CDATA[<=]]> #{winPrice} ) or
+                (#{tenderTarget} = '02' and t0.BID_PRICE <![CDATA[>=]]> #{winPrice} ) or
+                (#{tenderTarget} = '03' and t0.BID_PRICE*10000 <![CDATA[<=]]> #{winPrice} )
+            </if>
+        </where>
         group by t0.ENTRUST_ID) bobp
         ON bobp.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN TOTAL_ETR_ENTRUST_REL teer ON teer.ENTRUST_ID  = ee.ENTRUST_ID
         where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
+        <if test="isEtrAddSearch != null and isEtrAddSearch != ''">
+            and bobp.BID_PRICE is not null
+        </if>
         order by decode(ee.ENTRUST_STATUS, '04', 2, '05', 3, '06', 4, 1) asc,fpi.ISSUE_DATE,ee.ENTRUST_DATE,eea.TRANSMIT_TIME
     </sql>
 
@@ -172,6 +185,7 @@
         T.finprodMarketId,
         T.finprodAbbr,
         T.tenderTarget,
+        T.issueClass,
         T.issueDateStart,
         T.issueDateEnd,
         T.bidPrice,
@@ -187,6 +201,7 @@
         T.transmitTimeSer,
         T.lastModifiedDate,
         T.entrustId,
+        T.totleId,
         T.remark,
         (nvl(T.entrustNum,0) - nvl(T.finishAmt,0)) avaNum,
         (nvl(T.entrustNum,0) - nvl(T.finishDealAmt,0)) avaDealAmt
@@ -233,14 +248,17 @@
                     #{item}
                 </foreach>
             </if>
-            <if test="counterId != null and counterId != '' ">
+            <if test="counterId != null and counterId != '' and isEtrAddSearch == null">
                 AND T.counterId = #{counterId}
             </if>
-            <if test="issueDateStart != null and !issueDateStart.isEmpty() ">
-                AND T.issueDate >= to_date(#{issueDateStart}, 'yyyy-MM-dd')
+            <if test="isEtrAddSearch != null and isEtrAddSearch != '' and counterId != null and counterId != '' ">
+                AND ( T.counterId = #{counterId} OR T.counterId is null )
             </if>
-            <if test="issueDateEnd != null and !issueDateEnd.isEmpty() ">
-                AND T.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
+            <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
+                AND  (
+                (T.issueDateStart <![CDATA[<=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd') and to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> T.issueDateEnd)
+                OR (T.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')  and to_date(#{issueDateEnd}, 'yyyy-MM-dd') <![CDATA[<=]]> T.issueDateEnd )
+                )
             </if>
             <if test="entrustDateStart != null and !entrustDateStart.isEmpty() ">
                 AND T.entrustDate >= to_date(#{entrustDateStart}, 'yyyy-MM-dd')
@@ -262,6 +280,13 @@
             <if test="entrustIdList != null and entrustIdList.size()>0">
                 AND
                 <foreach collection="entrustIdList" open=" T.entrustId in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+                /*指令代码查询*/
+            </if>
+            <if test="existEntrustIds != null and existEntrustIds.size()>0">
+                AND
+                <foreach collection="existEntrustIds" open=" T.entrustId not in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
                 /*指令代码查询*/
@@ -288,21 +313,23 @@
                 END           AS issueDateStart/*投标日 开始*/,
             CASE
                 WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                    THEN fpi.ISSUE_DATE
+                    THEN null
                 WHEN (fpi.ISSUE_CLASS = '02' AND
                       (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                     OR fpi.ISSUE_CLASS = '03'
-                    THEN fpi.TENDER_SDATE
+                    THEN fpi.TENDER_EDATE
                 END           AS issueDateEnd/*投标日 结束*/,
             fpi.PAY_EDATE                            payEdate,
             ee.ENTRUST_DATE                          entrustDate,
             ee.COUNTER_ID                            counterId,
             mcp.COUNTER_NAME                         counterName,
-            ee.REMARK            remark
+            hisInfo.REMARK            remark
         FROM ETR_ENTRUST ee
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = ee.FINPROD_ID
                  left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
                  LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+                 left join ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+                 on ee.ENTRUST_ID = hisInfo.ENTRUST_ID
         WHERE ee.ENTRUST_ID  = #{entrustId}
     </select>
 
@@ -359,10 +386,12 @@
                             WHEN bo.IS_CANCEL = 'Y' THEN '03'
                             ELSE '02' END AS effectiveStatus/*有效状态*/,
                         CASE
-                            WHEN brt.IS_WIN = 'Y' THEN '04'
-                            WHEN brt.IS_WIN = 'N' THEN '03'
-                            WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
-                            END           AS firstBidStatus/*中标状态*/,
+                        WHEN (bobrt.BID_MODLE IS NOT NULL AND bobrt.BID_MODLE = '03') OR bobrt.IS_WIN = 'Y' THEN '04'
+                        WHEN bobrt.BID_MODLE IS NULL THEN '01'
+                        WHEN bobrt.IS_WIN = 'N' THEN '03'
+                        WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
+                        ELSE '05'
+                        END AS firstBidStatus,
                         bo.BID_ID         AS bidId/*投标编号*/,
                         fp.FINPROD_ID  finprodId,
                         fp.FINPROD_MARKET_ID finprodMarketId,
@@ -378,11 +407,11 @@
                             END           AS issueDateStart/*投标日 开始*/,
                         CASE
                             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                                THEN fpi.ISSUE_DATE
+                                THEN null
                             WHEN (fpi.ISSUE_CLASS = '02' AND
                                   (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                                 OR fpi.ISSUE_CLASS = '03'
-                                THEN fpi.TENDER_SDATE
+                                THEN fpi.TENDER_EDATE
                             END           AS issueDateEnd/*投标日 结束*/,
                         ee.ENTRUST_NUM *100   AS etrBidPriceTotal/*指令投标券面总额*/,
                         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
@@ -405,7 +434,7 @@
                         bo.COUNTER_ID     AS counterId/*交易对手*/,
                         mcp.COUNTER_NAME  AS counterName,
                         bo.REMARK         AS remark/*备注*/,
-                        null                 dealDate/*成交日期*/
+                        bo.BID_DATE          dealDate/*成交日期*/
                  FROM BID_ORDER bo
                           LEFT JOIN
                       (select listagg(case
@@ -442,7 +471,15 @@
                           LEFT JOIN
                       ETR_ENTRUST ee
                       ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-                    left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+                    left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
+                    LEFT JOIN (
+                    SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
+                    LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+                    LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+                    AND brt.FINPROD_ID = bo.FINPROD_ID
+                    WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+                    GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
+                    ) bobrt ON 	bobrt.FINPROD_ID = fp.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
                 <where>
                     bo.TRADE_STATUS = '01'
                     <if test="entrustId != null and entrustId != '' ">
@@ -452,11 +489,7 @@
                 </where>
                  union all
                  SELECT '01'            AS effectiveStatus/*有效状态*/,
-                        CASE
-                            WHEN brt.IS_WIN = 'Y' THEN '04'
-                            WHEN brt.IS_WIN = 'N' THEN '03'
-                            WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
-                            END         AS firstBidStatus/*中标状态*/,
+                        '01'            AS firstBidStatus/*中标状态*/,
                         bo.BID_ID       AS bidId/*投标编号*/,
                         fp.FINPROD_ID  finprodId,
                         fp.FINPROD_MARKET_ID finprodMarketId,
@@ -472,11 +505,11 @@
                             END         AS issueDateStart/*投标日 开始*/,
                         CASE
                             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                                THEN fpi.ISSUE_DATE
+                                THEN null
                             WHEN (fpi.ISSUE_CLASS = '02' AND
                                   (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                                 OR fpi.ISSUE_CLASS = '03'
-                                THEN fpi.TENDER_SDATE
+                                THEN fpi.TENDER_EDATE
                             END         AS issueDateEnd/*投标日 结束*/,
                         ee.ENTRUST_NUM*100  AS etrBidPriceTotal/*指令投标券面总额*/,
                         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
@@ -499,7 +532,7 @@
                         bo.COUNTER_ID     AS counterId/*交易对手*/,
                         mcp.COUNTER_NAME  AS counterName,
                         bo.REMARK       AS remark/*备注*/,
-                        null               dealDate/*成交日期*/
+                        bo.BID_DATE            dealDate/*成交日期*/
                  FROM WFL_BID_ORDER bo
                           LEFT JOIN
                       (select listagg(case
@@ -536,7 +569,7 @@
                           LEFT JOIN
                       ETR_ENTRUST ee
                       ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
-                    left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+                    left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
                     <where>
                         <if test="entrustId != null and entrustId != '' ">
                             AND ee.ENTRUST_ID = #{entrustId}
@@ -565,6 +598,7 @@
            sum(T.etrBidPriceTotal) etrBidPriceTotal,
            T.totalBiddingNum,
            T.bidprice,
+           T.bidPriceNum,
            T.biddingMethod,
            T.payType,
            T.bidCfmDate,
@@ -594,14 +628,16 @@
                      END           AS bidDateStart/*投标日 开始*/,
                  CASE
                      WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                         THEN fpi.ISSUE_DATE
+                         THEN null
                      WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                          OR fpi.ISSUE_CLASS = '03'
-                         THEN fpi.TENDER_SDATE
+                         THEN fpi.TENDER_EDATE
                      END           AS bidDateEnd/*投标日 结束*/,
-                 ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+                 ee.ENTRUST_NUM*100   etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
-                 bobp.BID_PRICE    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                bobp.BID_PRICE    AS bidPriceAndUntil,
+                 bobp.bidPriceNum    AS bidPriceNum,
                  bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                  bo.PAY_TYPE       AS payType/*缴款方式*/,
                  bo.BID_DATE       AS bidCfmDate/*投标确认日*/,
@@ -618,7 +654,15 @@
                                    when t3.TENDER_TARGET = '03'
                                        then to_char(t0.BID_PRICE * 10000, 'FM9999999990.90') || 'BP'
                                    end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
-                       t0.BID_ID
+                       listagg(case
+                           when t3.TENDER_TARGET = '01'
+                               then to_char(t0.BID_PRICE * 100, 'FM999999990.9990')
+                           when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999990.9990')
+                           when t3.TENDER_TARGET = '03'
+                               then to_char(t0.BID_PRICE * 10000, 'FM9999999990.90')
+                           end, ',') within group (order by t0.ENTRUST_ID) AS bidPriceNum,
+                       t0.BID_ID,
+                        decode(t3.TENDER_TARGET,'01','%','02','元','03','BP',null) until
                 from BID_ORDER_BID_PRICE t0
                          LEFT JOIN BID_ORDER t1 on t1.BID_ID = t0.BID_ID
                          LEFT JOIN FIN_PRODUCT t2
@@ -626,7 +670,7 @@
                          LEFT JOIN
                      FIN_PRODUCT_ISSUE t3
                      ON t3.FINPROD_ID = t2.FINPROD_ID
-                group by t0.BID_ID) bobp
+                group by t0.BID_ID,t3.TENDER_TARGET) bobp
                ON bobp.BID_ID = bo.BID_ID
                    LEFT JOIN
                FIN_PRODUCT fp
@@ -702,14 +746,16 @@
                      END           AS bidDateStart/*投标日 开始*/,
                  CASE
                      WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                         THEN fpi.ISSUE_DATE
+                         THEN null
                      WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                          OR fpi.ISSUE_CLASS = '03'
-                         THEN fpi.TENDER_SDATE
+                         THEN fpi.TENDER_EDATE
                      END           AS bidDateEnd/*投标日 结束*/,
-                 ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+                 ee.ENTRUST_NUM*100   etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
-                 bobp.BID_PRICE    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                bobp.BID_PRICE    AS bidPriceAndUntil,
+                 bobp.bidPriceNum    AS bidPriceNum,
                  bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                  bo.PAY_TYPE       AS payType/*缴款方式*/,
                  bo.BID_DATE       AS bidCfmDate/*投标确认日*/,
@@ -726,7 +772,15 @@
                                    when t3.TENDER_TARGET = '03'
                                        then to_char(t0.BID_PRICE * 10000, 'FM99999999990.90') || 'BP'
                                    end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
-                       t0.BID_ID
+                       listagg(case
+                           when t3.TENDER_TARGET = '01'
+                               then to_char(t0.BID_PRICE * 100, 'FM999999990.9990')
+                           when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999990.9990')
+                           when t3.TENDER_TARGET = '03'
+                               then to_char(t0.BID_PRICE * 10000, 'FM9999999990.90')
+                           end, ',') within group (order by t0.ENTRUST_ID) AS bidPriceNum,
+                       t0.BID_ID,
+                        decode(t3.TENDER_TARGET,'01','%','02','元','03','BP',null) until
                 from WFL_BID_ORDER_BID_PRICE t0
                          LEFT JOIN WFL_BID_ORDER t1 on t1.BID_ID = t0.BID_ID
                          LEFT JOIN FIN_PRODUCT t2
@@ -734,7 +788,7 @@
                          LEFT JOIN
                      FIN_PRODUCT_ISSUE t3
                      ON t3.FINPROD_ID = t2.FINPROD_ID
-                group by t0.BID_ID) bobp
+                group by t0.BID_ID,t3.TENDER_TARGET) bobp
                ON bobp.BID_ID = bo.BID_ID
                    LEFT JOIN
                FIN_PRODUCT fp
@@ -818,8 +872,11 @@
          </if>
      </where>
     group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId, T.finprodAbbr, T.tenderTarget, T.bidDateStart,
-             T.bidDateEnd, T.etrBidPriceTotal, T.totalBiddingNum, T.bidprice, T.biddingMethod, T.payType, T.bidCfmDate, T.tradeMarket,
+             T.bidDateEnd, T.etrBidPriceTotal, T.totalBiddingNum, T.bidprice,T.bidPriceNum,T.bidPriceAndUntil, T.biddingMethod, T.payType, T.bidCfmDate, T.tradeMarket,
              T.counterId, T.counterName, T.remark
+    <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+        order by ${pageMode.sort} ${pageMode.direction}
+    </if>
     </select>
 
     <!-- 投标 关键字 -->
@@ -833,7 +890,9 @@
             like '%' || #{search} || '%'
             or decode(T.etrBidPriceTotal,0,'0.00',to_char(T.etrBidPriceTotal/10000,'FM99999999999990.90'))=#{search} or to_char(T.etrBidPriceTotal)=#{search}
             or decode(T.totalBiddingNum,0,'0.00',to_char(T.totalBiddingNum/10000,'FM9999999999990.90'))=#{search} or to_char(T.totalBiddingNum)=#{search}
-            or decode(T.bidprice,0,'0.00',to_char(T.bidprice,'FM999999999990.9990'))=#{search} or to_char(T.bidprice)=#{search}
+            or (INSTR(t.bidPriceNum,concat(#{search},','))>0 OR  INSTR(t.bidPriceNum,concat(#{search},','))>0 OR t.bidPriceNum = #{search} )
+            or (INSTR(t.bidPriceAndUntil,concat(#{search},','))>0 OR  INSTR(t.bidPriceAndUntil,concat(#{search},','))>0 OR t.bidPriceAndUntil = #{search} )
+            or (INSTR(t.bidPrice,concat(#{search},','))>0 OR  INSTR(t.bidPrice,concat(#{search},','))>0 OR t.bidPrice = #{search} )
             or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidCfmDate,'yyyy-MM-dd'),'-','/')=#{search}
@@ -882,11 +941,7 @@
              SELECT CASE
                         WHEN bo.IS_CANCEL = 'Y' THEN '03'
                         ELSE '02' END AS validStatus/*有效状态*/,
-                    CASE
-                        WHEN brt.IS_WIN = 'Y' THEN '04'
-                        WHEN brt.IS_WIN = 'N' THEN '03'
-                        WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
-                        END           AS firstBidStatus/*中标状态*/,
+                    '04'              AS firstBidStatus/*中标状态*/,
                     bo.BID_ID         AS bidId/*投标编号*/,
                      fp.FINPROD_ID finprodId,
                      fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
@@ -902,15 +957,17 @@
                         END           AS bidDateStart/*投标日 开始*/,
                     CASE
                         WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                            THEN fpi.ISSUE_DATE
+                            THEN null
                         WHEN (fpi.ISSUE_CLASS = '02' AND
                               (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                             OR fpi.ISSUE_CLASS = '03'
-                            THEN fpi.TENDER_SDATE
+                            THEN fpi.TENDER_EDATE
                         END           AS bidDateEnd/*投标日 结束*/,
-                    ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+                    ee.ENTRUST_NUM*100   etrBidPriceTotal/*指令投标券面总额*/,
                     bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
-                    bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+                    bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                    bobp.BID_PRICE    AS bidPriceAndUntil,
+                    bobp.bidPriceNum    AS bidPriceNum,
                     bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                     bo.PAY_TYPE       AS payType/*缴款方式*/,
                     case
@@ -940,7 +997,15 @@
                                       when t3.TENDER_TARGET = '03'
                                           then to_char(t0.BID_PRICE * 10000, 'FM99990.90') || 'BP'
                                       end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
-                          t0.BID_ID
+                       listagg(case
+                           when t3.TENDER_TARGET = '01'
+                               then to_char(t0.BID_PRICE * 100, 'FM999999990.9990')
+                           when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999990.9990')
+                           when t3.TENDER_TARGET = '03'
+                               then to_char(t0.BID_PRICE * 10000, 'FM9999999990.90')
+                           end, ',') within group (order by t0.ENTRUST_ID) AS bidPriceNum,
+                          t0.BID_ID,
+                            decode(t3.TENDER_TARGET,'01','%','02','元','03','BP',null) until
                    from BID_ORDER_BID_PRICE t0
                             LEFT JOIN BID_ORDER t1 on t1.BID_ID = t0.BID_ID
                             LEFT JOIN FIN_PRODUCT t2
@@ -948,7 +1013,7 @@
                             LEFT JOIN
                         FIN_PRODUCT_ISSUE t3
                         ON t3.FINPROD_ID = t2.FINPROD_ID
-                   group by t0.BID_ID) bobp
+                   group by t0.BID_ID,t3.TENDER_TARGET) bobp
                   ON bobp.BID_ID = bo.BID_ID
                       LEFT JOIN
                   FIN_PRODUCT fp
@@ -1005,11 +1070,7 @@
                 </if>
              union all
              SELECT '01'            AS validStatus/*有效状态*/,
-                    CASE
-                        WHEN brt.IS_WIN = 'Y' THEN '04'
-                        WHEN brt.IS_WIN = 'N' THEN '03'
-                        WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
-                        END         AS firstBidStatus/*中标状态*/,
+                    '01'            AS firstBidStatus/*中标状态*/,
                     bo.BID_ID       AS bidId/*投标编号*/,
                      fp.FINPROD_ID finprodId,
                      fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
@@ -1025,15 +1086,17 @@
                         END         AS bidDateStart/*投标日 开始*/,
                     CASE
                         WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
-                            THEN fpi.ISSUE_DATE
+                            THEN null
                         WHEN (fpi.ISSUE_CLASS = '02' AND
                               (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
                             OR fpi.ISSUE_CLASS = '03'
-                            THEN fpi.TENDER_SDATE
+                            THEN fpi.TENDER_EDATE
                         END         AS bidDateEnd/*投标日 结束*/,
-                    ee.ENTRUST_NUM  AS etrBidPriceTotal/*指令投标券面总额*/,
+                    ee.ENTRUST_NUM*100 etrBidPriceTotal/*指令投标券面总额*/,
                     bo.WIN_PRIN_AMT AS bidPriceTotal/*券面总额*/,
-                    bobp.BID_PRICE  AS bidprice/*投标标位, 多个逗号分隔展示*/,
+                    bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
+                    bobp.BID_PRICE    AS bidPriceAndUntil,
+                    bobp.bidPriceNum    AS bidPriceNum,
                     bo.BID_MODLE    AS biddingMethod/*投标方式*/,
                     bo.PAY_TYPE     AS payType/*缴款方式*/,
                     case
@@ -1063,7 +1126,14 @@
                                       when t3.TENDER_TARGET = '03'
                                           then to_char(t0.BID_PRICE * 10000, 'FM9999990.90') || 'BP'
                                       end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
-                          t0.BID_ID
+                       listagg(case
+                           when t3.TENDER_TARGET = '01'
+                               then to_char(t0.BID_PRICE * 100, 'FM999999990.9990')
+                           when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999990.9990')
+                           when t3.TENDER_TARGET = '03'
+                               then to_char(t0.BID_PRICE * 10000, 'FM9999999990.90')
+                           end, ',') within group (order by t0.ENTRUST_ID) AS bidPriceNum,
+                          t0.BID_ID,decode(t3.TENDER_TARGET,'01','%','02','元','03','BP',null) until
                    from WFL_BID_ORDER_BID_PRICE t0
                             LEFT JOIN WFL_BID_ORDER t1 on t1.BID_ID = t0.BID_ID
                             LEFT JOIN FIN_PRODUCT t2
@@ -1071,7 +1141,7 @@
                             LEFT JOIN
                         FIN_PRODUCT_ISSUE t3
                         ON t3.FINPROD_ID = t2.FINPROD_ID
-                   group by t0.BID_ID) bobp
+                   group by t0.BID_ID,t3.TENDER_TARGET) bobp
                   ON bobp.BID_ID = bo.BID_ID
                       LEFT JOIN
                   FIN_PRODUCT fp
@@ -1155,9 +1225,12 @@
             </if>
         </where>
     group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId,
-             T.finprodAbbr, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice, T.biddingMethod,
+             T.finprodAbbr, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice,T.bidPriceAndUntil,T.bidPriceNum, T.biddingMethod,
              T.payType, T.winPrice, T.price, T.payableAmount, T.settFeeAmt, T.payDate, T.assignRegdate, T.listingDate,
              T.bidCfmDate, T.counterName,T.remark, T.dealDate,T.tradeMarket,T.tenderTarget,T.counterId
+    <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+        order by ${pageMode.sort} ${pageMode.direction}
+    </if>
     </select>
 
     <!-- 分销买入 关键字 -->
@@ -1171,7 +1244,9 @@
             like '%' || #{search} || '%'
             or decode(T.etrBidPriceTotal,0,'0.00',to_char(T.etrBidPriceTotal/10000,'FM99999999999990.90'))=#{search} or to_char(T.etrBidPriceTotal)=#{search}
             or decode(T.bidPriceTotal,0,'0.00',to_char(T.bidPriceTotal/10000,'FM9999999999990.90'))=#{search} or to_char(T.bidPriceTotal)=#{search}
-            or decode(T.bidprice,0,'0.00',to_char(T.bidprice,'FM999999999990.9990'))=#{search} or to_char(T.bidprice)=#{search}
+            or (INSTR(t.bidPriceNum,concat(#{search},','))>0 OR  INSTR(t.bidPriceNum,concat(#{search},','))>0 OR t.bidPriceNum = #{search} )
+            or (INSTR(t.bidPriceAndUntil,concat(#{search},','))>0 OR  INSTR(t.bidPriceAndUntil,concat(#{search},','))>0 OR t.bidPriceAndUntil = #{search} )
+            or (INSTR(t.bidPrice,concat(#{search},','))>0 OR  INSTR(t.bidPrice,concat(#{search},','))>0 OR t.bidPrice = #{search} )
             or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.bidCfmDate,'yyyy-MM-dd'),'-','/')=#{search}

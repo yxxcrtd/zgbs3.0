@@ -233,12 +233,16 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
         config.setInputValue2(dto.getType9());
         config.setInputValue3(dto.getType10());
-        List<FinProductTypeConfig> resultTypeList = assetCommonMapper.getAssetThreeType(config);
-        if(CollectionUtils.isNotEmpty(resultTypeList)) {
-            dto.setType9(resultTypeList.get(0).getInputValue2());
-            dto.setType10(resultTypeList.get(0).getInputValue3());
-            dto.setType11(resultTypeList.get(0).getInputValue4());
+        // add by caiqun 20220602 start wind一级分类、wind二级分类都为空时，则不查资产分类表
+        if(!(StringUtil.isEmpty(dto.getType9()) && StringUtil.isEmpty(dto.getType10()))){
+            List<FinProductTypeConfig> resultTypeList = assetCommonMapper.getAssetThreeType(config);
+            if(CollectionUtils.isNotEmpty(resultTypeList)) {
+                dto.setType9(resultTypeList.get(0).getInputValue2());
+                dto.setType10(resultTypeList.get(0).getInputValue3());
+                dto.setType11(resultTypeList.get(0).getInputValue4());
+            }
         }
+        // add by caiqun 20220602 end wind一级分类、wind二级分类都为空时，则不查资产分类表
         FinProductAddDto addDto = finTenderBondAssetMapper.getProductAddFromInterface(param);
         addDto.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         if(addDto != null) {
@@ -403,6 +407,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        param.put("includeInterface",'Y');
         param.put("platDate", DateUtil.platDateFromCache());
         PageHelper.startPage((Integer) param.get("pageNo"), (Integer) param.get("pageSize"));
         List<SelectOptionDto> list = finTenderBondAssetMapper.getAppearMarketIdForSelect(param);
@@ -526,6 +531,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         List<ValidMessage> validList = new ArrayList<>();
         Map<String, String> param = new HashMap<>();
         param.put("finprodMarketId", dto.getFinprodMarketId());
+        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
             validList.add(new ValidMessage("资产代码已存在"));
         }
@@ -558,6 +564,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());
+                param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
                 if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
                     validList.add(new ValidMessage("资产代码已存在"));
                 }

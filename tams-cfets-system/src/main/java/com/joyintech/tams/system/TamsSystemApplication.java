@@ -139,6 +139,11 @@ public class TamsSystemApplication extends WebApplication {
 		return SwaggerConfig.createDocket("中标结果维护", "com.joyintech.tams.cfets.trd.primarybidmanage");
 	}
 
+	@Bean
+	public Docket cfetsEtrInfoQuery() {
+		return SwaggerConfig.createDocket("银行间指令查询", "com.joyintech.tams.cfets.etrinfoquery");
+	}
+
 	public static void main(String[] args) throws Exception {
     	initLog();
     	initSpring(args);

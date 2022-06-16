@@ -3,10 +3,14 @@ package com.joyintech.tams.cfets.etr.bondfirstbid.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.component.business.trade.dto.BussEtrInvestPersonInfoDto;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -45,6 +49,12 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     private String issueClass;
 
     /**
+     *  发行方式字符串
+     */
+    @ApiModelProperty(name="issueClassStr",value="发行方式字符串")
+    private String issueClassStr;
+
+    /**
      * 发行价格
      */
     @ApiModelProperty(name = "issuePrice", value = "发行价格")
@@ -57,12 +67,20 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     @ApiModelProperty(name = "referYield", value = "收益率，利息贴现为参考收益率，附息为票面利率")
     private String referYield;
 
+    @ApiModelProperty(name = "referYield2", value = "票面利率")
+    private String referYield2;
 
     /**
      *  招标标的
      */
     @ApiModelProperty(name="tenderTarget",value="招标标的")
     private String tenderTarget;
+
+    /**
+     *  招标标的字符串
+     */
+    @ApiModelProperty(name="tenderTargetStr",value="招标标的字符串")
+    private String tenderTargetStr;
 
     /**
      *  投标起始日
@@ -83,16 +101,34 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     private Date payEdate;
 
     /**
+     *  缴款截止日格式化
+     */
+    @ApiModelProperty(name="payEdateStr",value="缴款截止日格式化")
+    private String payEdateStr;
+
+    /**
+     *  指令日期格式化
+     */
+    @ApiModelProperty(name="entrustDateStr",value="指令日期格式化")
+    private String entrustDateStr;
+
+    /**
      *  发行日
      */
     @ApiModelProperty(name="issueDate",value="发行日")
     private Date issueDate;
+
+    @ApiModelProperty(name="issueDateStr",value="发行日格式化")
+    private String issueDateStr;
 
     /**
      *  缴款日
      */
     @ApiModelProperty(name="payDate",value="缴款日")
     private Date payDate;
+
+    @ApiModelProperty(name="payDateStr",value="缴款日格式化")
+    private String payDateStr;
 
     /**
      * 风险试算实体类
@@ -199,6 +235,21 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
      */
     @ApiModelProperty(name = "systemAct", value = "系统动作")
     private String systemAct;
+
+    @ApiModelProperty(name = "invManagerName", value = "投资经理名称")
+    private String invManagerName;
+
+    @ApiModelProperty(name = "ccyStr", value = "币种名称")
+    private String ccyStr;
+
+    @ApiModelProperty(name = "couponSpecies", value = "息票品种")
+    private String couponSpecies;
+
+    @ApiModelProperty(name = "intType", value = "利率类型")
+    private String intType;
+
+    @ApiModelProperty(name = "entrustStatus", value = "指令状态")
+    private String entrustStatus;
 
     public String getElementId() {
         return elementId;
@@ -432,5 +483,127 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setSystemAct(String systemAct) {
         this.systemAct = systemAct;
+    }
+
+    public String getIssueClassStr() {
+        if (StringUtil.isEmpty(getIssueClass())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, getIssueClass());
+    }
+
+    public void setIssueClassStr(String issueClassStr) {
+        this.issueClassStr = issueClassStr;
+    }
+
+    public String getTenderTargetStr() {
+        if (StringUtil.isEmpty(getTenderTarget())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getTenderTarget());
+    }
+
+    public void setTenderTargetStr(String tenderTargetStr) {
+        this.tenderTargetStr = tenderTargetStr;
+    }
+
+    public String getPayEdateStr() {
+        if (null != this.getPayEdate()) {
+            return DateUtil.format(this.getPayEdate());
+        }
+        return payEdateStr;
+    }
+
+    public void setPayEdateStr(String payEdateStr) {
+        this.payEdateStr = payEdateStr;
+    }
+
+    public String getEntrustDateStr() {
+        if (null != this.getEntrustDate()) {
+            return DateUtil.format(this.getEntrustDate());
+        }
+        return entrustDateStr;
+    }
+
+    public void setEntrustDateStr(String entrustDateStr) {
+        this.entrustDateStr = entrustDateStr;
+    }
+
+    public String getIssueDateStr() {
+        if (null != this.getIssueDate()) {
+            return DateUtil.format(this.getIssueDate());
+        }
+        if (null != this.getTenderSdate() &&  null != this.getTenderEdate()) {
+            return DateUtil.format(this.getTenderSdate())+"~"+DateUtil.format(this.getTenderEdate());
+        }
+        return issueDateStr;
+    }
+
+    public void setIssueDateStr(String issueDateStr) {
+        this.issueDateStr = issueDateStr;
+    }
+
+    public String getPayDateStr() {
+        if (null != this.getPayDate()) {
+            return DateUtil.format(this.getPayDate());
+        }
+        return payDateStr;
+    }
+
+    public void setPayDateStr(String payDateStr) {
+        this.payDateStr = payDateStr;
+    }
+
+    public String getInvManagerName() {
+        return invManagerName;
+    }
+
+    public void setInvManagerName(String invManagerName) {
+        this.invManagerName = invManagerName;
+    }
+
+    public String getCcyStr() {
+        if (StringUtil.isEmpty(getCcy())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.币种, getCcy());
+    }
+
+    public void setCcyStr(String ccyStr) {
+        this.ccyStr = ccyStr;
+    }
+
+    public String getCouponSpecies() {
+        return couponSpecies;
+    }
+
+    public void setCouponSpecies(String couponSpecies) {
+        this.couponSpecies = couponSpecies;
+    }
+
+    public String getIntType() {
+        return intType;
+    }
+
+    public void setIntType(String intType) {
+        this.intType = intType;
+    }
+
+    public String getReferYield2() {
+        return referYield2;
+    }
+
+    public void setReferYield2(String referYield2) {
+        this.referYield2 = referYield2;
+    }
+
+    @Override
+    public String getEntrustStatus() {
+        return entrustStatus;
+    }
+
+    @Override
+    public void setEntrustStatus(String entrustStatus) {
+        this.entrustStatus = entrustStatus;
     }
 }

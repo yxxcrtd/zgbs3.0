@@ -141,7 +141,8 @@ public final class Base64Utils {
 
 			bytes[j] = (byte) ((b1 << 2) | (b2 >> 4));
 			bytes[j + 1] = (byte) ((b2 << 4) | (b3 >> 2));
-			bytes[j + 2] = (byte) ((b3 << 6) | b4);
+			// Sonar Fix modify by huwei 220607
+			bytes[j + 2] = (byte) ((b3 << 6) | b4 & 0xff);
 		}
 
 		if (data[data.length - 2] == '=') {
@@ -164,7 +165,8 @@ public final class Base64Utils {
 
 			bytes[bytes.length - 3] = (byte) ((b1 << 2) | (b2 >> 4));
 			bytes[bytes.length - 2] = (byte) ((b2 << 4) | (b3 >> 2));
-			bytes[bytes.length - 1] = (byte) ((b3 << 6) | b4);
+			// Sonar Fix modify by huwei 220607
+			bytes[bytes.length - 1] = (byte) ((b3 << 6) | b4 & 0xff);
 		}
 
 		return bytes;
@@ -202,7 +204,8 @@ public final class Base64Utils {
 
 			bytes[j] = (byte) ((b1 << 2) | (b2 >> 4));
 			bytes[j + 1] = (byte) ((b2 << 4) | (b3 >> 2));
-			bytes[j + 2] = (byte) ((b3 << 6) | b4);
+			// Sonar Fix modify by huwei 220607
+			bytes[j + 2] = (byte) ((b3 << 6) | b4 & 0xff);
 		}
 
 		if (data.charAt(data.length() - 2) == '=') {
@@ -225,7 +228,8 @@ public final class Base64Utils {
 
 			bytes[bytes.length - 3] = (byte) ((b1 << 2) | (b2 >> 4));
 			bytes[bytes.length - 2] = (byte) ((b2 << 4) | (b3 >> 2));
-			bytes[bytes.length - 1] = (byte) ((b3 << 6) | b4);
+			// Sonar Fix modify by huwei 220607
+			bytes[bytes.length - 1] = (byte) ((b3 << 6) | b4 & 0xff);
 		}
 
 		return bytes;

@@ -1,6 +1,7 @@
 package com.joyintech.tams.cfets.trd.primarybidmanage.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModel;
@@ -55,7 +56,13 @@ public class CfetsPrimaryBidManageResponse {
     private String tenderTargetStr;
 
     @ApiModelProperty(name="bidDate",value="投标日")
-    private Date bidDate;
+    private String bidDate;
+
+    @ApiModelProperty(name="bidDateStart",value="投标日")
+    private Date bidDateStart;
+
+    @ApiModelProperty(name="bidDateEnd",value="投标日")
+    private Date bidDateEnd;
 
     @ApiModelProperty(name="totalBiddingNum",value="汇总投标券面总额(万元)")
     private BigDecimal totalBiddingNum;
@@ -85,7 +92,10 @@ public class CfetsPrimaryBidManageResponse {
     private BigDecimal winPrinamt;
 
     @ApiModelProperty(name="winPrice",value="中标标位")
-    private String winPrice;
+    private BigDecimal winPrice;
+
+    @ApiModelProperty(name="winPriceStr",value="中标标位")
+    private String winPriceStr;
 
     @ApiModelProperty(name="payAmt",value="缴款金额（元）")
     private BigDecimal payAmt;
@@ -114,9 +124,20 @@ public class CfetsPrimaryBidManageResponse {
     @ApiModelProperty(name="tradeMarketStr",value="交易场所")
     private String tradeMarketStr;
 
+    @ApiModelProperty(name="counterId",value="交易对手code")
+    private String counterId;
+
+    @ApiModelProperty(name="counterName",value="交易对手")
+    private String counterName;
+
     @ApiModelProperty(name="remark",value="备注")
     private String remark ;
 
+    @ApiModelProperty(name="bidModle",value="投标方式")
+    private String bidModle;
+
+    @ApiModelProperty(name="bidModleStr",value="投标方式Str")
+    private String bidModleStr;
 
     public String getIsWin() {
         return isWin;
@@ -165,15 +186,33 @@ public class CfetsPrimaryBidManageResponse {
     public void setTenderTargetStr(String tenderTargetStr) {
         this.tenderTargetStr = tenderTargetStr;
     }
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
-    public Date getBidDate() {
-        return bidDate;
+
+    public String getBidDate() {
+        return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) + "~"
+              +DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN);
     }
 
-    public void setBidDate(Date bidDate) {
+    public void setBidDate(String bidDate) {
         this.bidDate = bidDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    public Date getBidDateStart() {
+        return bidDateStart;
+    }
+
+    public void setBidDateStart(Date bidDateStart) {
+        this.bidDateStart = bidDateStart;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    public Date getBidDateEnd() {
+        return bidDateEnd;
+    }
+
+    public void setBidDateEnd(Date bidDateEnd) {
+        this.bidDateEnd = bidDateEnd;
+    }
 
     public BigDecimal getTotalBiddingNum() {
         return totalBiddingNum;
@@ -287,12 +326,20 @@ public class CfetsPrimaryBidManageResponse {
         this.winPrinamt = winPrinamt;
     }
 
-    public String getWinPrice() {
+    public BigDecimal getWinPrice() {
         return winPrice;
     }
 
-    public void setWinPrice(String winPrice) {
+    public void setWinPrice(BigDecimal winPrice) {
         this.winPrice = winPrice;
+    }
+
+    public String getWinPriceStr() {
+        return winPriceStr;
+    }
+
+    public void setWinPriceStr(String winPriceStr) {
+        this.winPriceStr = winPriceStr;
     }
 
     public BigDecimal getPayAmt() {
@@ -373,5 +420,37 @@ public class CfetsPrimaryBidManageResponse {
 
     public void setTotalWinId(String totalWinId) {
         this.totalWinId = totalWinId;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
+    }
+
+    public String getBidModleStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, this.getBidModle());
+    }
+
+    public void setBidModleStr(String bidModleStr) {
+        this.bidModleStr = bidModleStr;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
     }
 }

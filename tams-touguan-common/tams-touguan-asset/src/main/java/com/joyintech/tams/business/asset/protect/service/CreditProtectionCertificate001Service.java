@@ -22,11 +22,14 @@ import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CreditProtectionCertificate001Service extends BaseService implements BaseProcessService<CreditProtectionCertificateDto> {
@@ -49,30 +52,26 @@ public class CreditProtectionCertificate001Service extends BaseService implement
         pageParam.put("finprodType", DictCodeListExt1.金融产品类型_信用保护凭证.getValue());//现金流业务类型
         pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodIdAbrr()));
         pageParam.put("refSec", StringUtil.splitToList(null, request.getRefSec())); //参考债项
-        if (CollectionUtils.isNotEmpty(request.getVdate())) {
-            String vdateStart = request.getVdate().get(0);
-            if (StringUtil.isNotEmpty(vdateStart)){
-                pageParam.put("vdateStart",vdateStart);
-            }
-            String vdateEnd = request.getVdate().get(1);
-            if (StringUtil.isNotEmpty(vdateEnd)){
-                pageParam.put("vdateEnd",vdateEnd);
-            }
-        }
-        if (CollectionUtils.isNotEmpty(request.getMdate())) {
-            String mdateStart = request.getMdate().get(0);
-            if (StringUtil.isNotEmpty(mdateStart)){
-                pageParam.put("mdateStart",mdateStart);
-            }
-            String mdateEnd = request.getMdate().get(1);
-            if (StringUtil.isNotEmpty(mdateEnd)){
-                pageParam.put("mdateEnd",mdateEnd);
-            }
-        }
 
         Page<CreditProtectionCertificateDto> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> creditProtectionCertificateMapper.queryForPage(pageParam));
+
+        List<CreditProtectionCertificateDto> list = page.getRoot();
+        if(!list.isEmpty()){
+            list.forEach(v->{
+                if(StringUtils.isNotEmpty(v.getRefSec())) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("finprodType2", DictCodeListExt1.金融产品类型_债券.getValue());
+                    params.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+                    params.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+                    params.put("refList", StringUtil.splitToList(null, v.getRefSec()));
+                    List<String> refList = creditProtectionCertificateMapper.getRefList(params);
+                    v.setRefSec(refList.stream().collect(Collectors.joining(",")));
+                }
+            });
+            page.setRoot(list);
+        }
         return page;
     }
 

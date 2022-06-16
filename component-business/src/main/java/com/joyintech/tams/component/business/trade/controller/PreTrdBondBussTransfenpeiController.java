@@ -107,7 +107,8 @@ public class PreTrdBondBussTransfenpeiController extends BaseController {
     public AjaxResult check(@RequestBody Map<String, Object> map) {
         AjaxResult result = new AjaxResult();
         List<ValidMessage> messages = new ArrayList<>();
-        Map<String, String> data = (HashMap<String, String>) map.get("data");
+        // Sonar Fix modify by huwei 220608
+        Map<String, String> data = null == map.get("data") ? new HashMap<>() : (Map<String, String>) map.get("data");
         if(!(StringUtil.isNotEmpty(data.get("secAcctId")) || StringUtil.isNotEmpty(data.get("chlId")))){
             messages.add(new ValidMessage("BUS_REPO_SEC_001",getMessage("BUS_REPO_SEC_002")));
         }
@@ -118,7 +119,7 @@ public class PreTrdBondBussTransfenpeiController extends BaseController {
         for (String param : validParams) {
             if (map.get(param) != null) {
                 List<String> fields = (List<String>) map.get(param);
-                notEmptyCheck(data == null ? null : data.get(param), fields.get(0).toString(), fields.get(1).toString(), messages);
+                notEmptyCheck(data.get(param), fields.get(0).toString(), fields.get(1).toString(), messages);
             }
         }
         if (messages.size() > 0) {

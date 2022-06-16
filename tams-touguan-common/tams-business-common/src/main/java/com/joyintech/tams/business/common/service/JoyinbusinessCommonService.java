@@ -11,10 +11,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
-import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
-import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
-import com.joyintech.tams.business.common.dto.SecInfoModelDto;
-import com.joyintech.tams.business.common.dto.SecManageAcctIdRequestDto;
+import com.joyintech.tams.business.common.dto.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -83,14 +80,29 @@ public class JoyinbusinessCommonService extends BaseService {
         return super.queryForPage(entrustIdRequestDto.getPageMode().getPageNo(), entrustIdRequestDto.getPageMode().getPageSize(),
                 () ->joyinbusinessCommonMapper.getEntrustId(pageParam));
     }
+
+    /**
+     * 查询债券基本信息
+     *
+     * @param dto
+     * @return com.joyintech.framework.grid.Page<com.joyintech.framework.select.SelectOptionDto>
+     * @author jiangpeng
+     * @date 2022/6/8 10:05
+     */
     public Page<SelectOptionDto> getfinprodIdForAdd(CfetsSearchInfoRequest dto) {
-        Map<String, Object> param =new HashMap<>();
-        param.put("search",dto.getSearch());
-        param.put("assestType", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue()));
-        param.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
-        param.put("TRADE_PLACE_02",DictCodeListExt1.交易场所_商业银行柜台.getValue());
-        param.put("platDate",DateUtil.platDateFromCache());
-        param.put("initValue",dto.getInitValue());
+        Map<String, Object> param = new HashMap<>();
+        param.put("search", dto.getSearch());
+        List<String> assestTypes = new ArrayList<>();
+        assestTypes.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        // 部分接口不需要查询新债信息
+        if (!StringUtil.equals(dto.getIsNewBond(), DictCodeList.是否_否.getValue())) {
+            assestTypes.add(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        }
+        param.put("assestType", assestTypes);
+        param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
+        param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("platDate", DateUtil.platDateFromCache());
+        param.put("initValue", dto.getInitValue());
         if (StringUtil.isNotEmpty(dto.getDealType()) && StringUtil.equals(dto.getDealType(), "01")) {
             //需要查询债券资产和回购期限
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdOfBondAndRepo(param));
@@ -102,17 +114,16 @@ public class JoyinbusinessCommonService extends BaseService {
             //需要查询债券资产、回购期限、项目类资产、公募基金、计划类净值型、计划类利率型、计划类货币型、存款
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdForAll(param));
         }
-        if(StringUtil.isNotEmpty(dto.getPs()) && (StringUtil.equals(dto.getPs(),DictCodeList.交易方向_行权_回售.getValue())
-                                                   ||StringUtil.equals(dto.getPs(),DictCodeList.交易方向_行权_赎回.getValue()))){
-            param.put("ps",dto.getPs());
+        if (StringUtil.isNotEmpty(dto.getPs()) && (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue())
+                || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_赎回.getValue()))) {
+            param.put("ps", dto.getPs());
             String userId = SecurityUtil.getLoginUser().getUserName();
-            if (StringUtil.equals(dto.getPs(),DictCodeList.交易方向_行权_回售.getValue()) && StringUtils.isNotEmpty(userId)) {
+            if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue()) && StringUtils.isNotEmpty(userId)) {
                 param.put("userId", SecurityUtil.getLoginUser().getUserName());
             }
-            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.getRightfinprodIdForAdd(param));
-
-        }else{
-            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.getfinprodIdForAdd(param));
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getRightfinprodIdForAdd(param));
+        } else {
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdForAdd(param));
         }
     }
 
@@ -141,10 +152,15 @@ public class JoyinbusinessCommonService extends BaseService {
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.selectPortfolioIdList(param));
         }
         String userId = SecurityUtil.getLoginUser().getUserName();
-        if (StringUtils.isNotEmpty(userId)) {
+        if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(dto.getFinprodId()) && StringUtils.isNotEmpty(dto.getPortfolioId())) {
+            param.put("userId", userId);
+            param.put("finprodId", dto.getFinprodId());
+            param.put("portfolioId", dto.getPortfolioId());
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.selectPortfolioIdList(param));
+        } else if (StringUtils.isNotEmpty(userId)) {
             param.put("userId", SecurityUtil.getLoginUser().getUserName());
-            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.selectPortfolioIdList(param));
-        }else{
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.selectPortfolioIdList(param));
+        } else {
             return null;
         }
     }
@@ -167,10 +183,12 @@ public class JoyinbusinessCommonService extends BaseService {
     public Boolean updateCfetsOprHis(CfetsOprHisInfoRequest dto) {
         dto.setSeqNo(IDGenerator.generate(32));
         dto.setOperDate(new Date());
-        dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
-        dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
-        dto.setCreateDept(CommonUtil.getDeptCode());
-        dto.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+        if (StringUtil.isEmpty(dto.getUserId())) {
+            dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+            dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+            dto.setCreateDept(CommonUtil.getDeptCode());
+            dto.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+        }
         List<CfetsOprHisInfoRequest> wflDto = new ArrayList<>();
         if (StringUtil.isNotEmpty(dto.getWorkflowId())) {
             wflDto = joyinbusinessCommonMapper.findCfetsOprHisByWorkflowId(dto.getWorkflowId());
@@ -251,6 +269,7 @@ public class JoyinbusinessCommonService extends BaseService {
     public List<SelectOptionDto> queryMySideOrCount(CfetsSearchInfoRequest dto) {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("search", dto.getSearch());
+        param.put("initValue", dto.getInitValue());
         param.put("sysDate", iPlatformDate.getSysDate());
         if (StringUtil.isNotEmpty(dto.getDateType()) && StringUtil.equals(dto.getDateType(), "01")) {
             //查询历史数据，不需要当日日期
@@ -326,7 +345,7 @@ public class JoyinbusinessCommonService extends BaseService {
         String pendingPeriodStr1 = "";
         String pendingPeriodStr2 = "";
         // 到期展示--
-        if (cDate.compareTo(tDate) == 1){
+        if (cDate.compareTo(tDate) == 0){
             return "--";
         }else{
             // 含权债TDTAE取值时，如当前计算日以后存在回售或赎回行权计划的且理论行权日不为到期日的，
@@ -493,5 +512,17 @@ public class JoyinbusinessCommonService extends BaseService {
      */
     public String qryPortfolioCashAcctId(Map<String, Object> map) {
         return joyinbusinessCommonMapper.qryPortfolioCashAcctId(map);
+    }
+
+    /**
+     * 查询债券的特殊债券信息
+     *
+     * @param finprodIds 资产代码
+     * @return com.joyintech.tams.business.common.dto.FinProductSpecialDto
+     * @author jiangpeng
+     * @date 2022/6/1 14:41
+     */
+    public List<FinProductSpecialDto> queryFinProductSpecialByFinprodIds(List<String> finprodIds) {
+        return joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(finprodIds);
     }
 }

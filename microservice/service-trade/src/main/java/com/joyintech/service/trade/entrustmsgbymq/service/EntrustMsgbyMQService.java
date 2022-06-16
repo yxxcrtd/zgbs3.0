@@ -86,8 +86,8 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 
 		}catch (Exception e){
 			logger.error("成交消息接收失败-错误信息:{}" + e.getMessage());
-			logger.error("成交消息接收失败-错误信息:{}" + e);
-			e.printStackTrace();
+			logger.error("成交消息接收失败-错误信息:{}" , e);
+//			e.printStackTrace();
 			logger.error("成交消息接收失败-错误信息:{},消息内容:{}", e.getLocalizedMessage(), tradeMessageStr);
 			//throw new Exception("成交消息接收失败");
 		}
@@ -197,8 +197,8 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 			}
 		}catch (Exception e){
             logger.error("成交消息接收失败-错误信息:{}" + e.getMessage());
-            logger.error("成交消息接收失败-错误信息:{}" + e);
-            e.printStackTrace();
+            logger.error("成交消息接收失败-错误信息:{}" , e);
+            // e.printStackTrace();
             logger.error("执行进度接收失败-错误信息:{},消息内容:{}", e.getLocalizedMessage(), tradeMessageStr);
             //throw new Exception("执行进度消息接收失败");
 		}
@@ -272,8 +272,8 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 
 		}catch (Exception e){
 			logger.error("手工交收消息接收失败-错误信息:{}" + e.getMessage());
-			logger.error("手工交收消息接收失败-错误信息:{}" + e);
-			e.printStackTrace();
+			logger.error("手工交收消息接收失败-错误信息:{}" , e);
+//			e.printStackTrace();
 			logger.error("手工交收消息接收失败-错误信息:{},消息内容:{}", e.getLocalizedMessage(), tradeMessageStr);
 			//throw new Exception("成交消息接收失败");
 		}

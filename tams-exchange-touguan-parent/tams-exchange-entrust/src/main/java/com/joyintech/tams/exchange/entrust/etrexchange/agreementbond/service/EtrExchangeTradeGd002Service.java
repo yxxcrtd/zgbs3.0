@@ -94,18 +94,18 @@ public class EtrExchangeTradeGd002Service extends BaseService<EtrExchangeTradeJj
                     //价格（净价） / 回购利率
                     if (tmp.get("entrustPrice") != null) {
 //                        dto.setnPrice(new BigDecimal((Double)tmp.get("entrustPrice")));
-                        dto.setnPrice(ArithmeticUtil.round(new BigDecimal((Double) tmp.get("entrustPrice")), 4, null));
+                        dto.setnPrice(ArithmeticUtil.round(BigDecimal.valueOf((Double) tmp.get("entrustPrice")), 4, null));
                     }
                     //全价
                     if (tmp.get("fullPrice") != null) {
 //                        dto.setfPrice(new BigDecimal((Double)tmp.get("fullPrice")));
-                        dto.setfPrice(ArithmeticUtil.round(new BigDecimal((Double) tmp.get("fullPrice")), 4, null));
+                        dto.setfPrice(ArithmeticUtil.round(BigDecimal.valueOf((Double) tmp.get("fullPrice")), 4, null));
                     }
 
                     //收益率
                     if (tmp.get("expireIncomeRate") != null) {
 //                        dto.setYield(new BigDecimal((Double)tmp.get("expireIncomeRate")));
-                        dto.setYield(ArithmeticUtil.round(new BigDecimal((Double) tmp.get("expireIncomeRate")), 4, null));
+                        dto.setYield(ArithmeticUtil.round(BigDecimal.valueOf((Double) tmp.get("expireIncomeRate")), 4, null));
                     }
 
                     //订单编号

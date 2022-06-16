@@ -28,6 +28,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.service.MskCreditMarketInfoPro001Service;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
@@ -76,7 +77,7 @@ public class MskCreditMarketInfo002Controller extends BaseController {
             StringUtil.isNotEmpty(secId) && StringUtil.isNotEmpty(valueDate)
             && StringUtil.isNotEmpty(valueSource)) {
             //通过主键查询数据
-            MskCreditInfoProSaveRequest dto = mskCreditMarketInfoPro001Service.selectByKey(
+            MskCreditInfoProSaveRequest dto = mskCreditMarketInfoPro001Service.selectByKey(null,
                     secId, valueDate, valueSource);
             model.put(GlobalConstant.ENTITY, dto);
         }
@@ -115,8 +116,8 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     public Message<AjaxResult> check(@RequestBody MskCreditInfoProSaveRequest dto, BindingResult result) {
         AjaxResult res= new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
-        if(mskCreditMarketInfoPro001Service.selectByKey(dto.getSecid(), dto.getCdate(),dto.getValueSource()) != null){
-            errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0006")));
+        if(!StringUtil.equals(dto.getOperateStatus(), OperationType.MODIFY.name()) && mskCreditMarketInfoPro001Service.selectByKey(null, dto.getSecid(), dto.getCdate(),null) != null){
+            errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0006","同一资产","同一交易日期")));
             res.setErrorList(errorList);
             res.setMessageType(MessageType.错误消息);
             return new Message<AjaxResult>().success().setData(res);
@@ -175,12 +176,11 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     @ResponseBody
     @PostMapping("/getBasicInfo")
     public Message<MskCreditInfoProSaveRequest> getBasicInfo(@RequestBody MskCreditInfoProSaveRequest request){
-        String secid = null;
-        if (StringUtil.isNotEmpty(request.getSecid())) {
-            secid = request.getSecid();
-        }
-        MskCreditInfoProSaveRequest resultDto = mskCreditMarketInfoPro001Service.getBasicInfos(
-                secid,null);
+//        String secid = null;
+//        if (StringUtil.isNotEmpty(request.getSecid())) {
+//            secid = request.getSecid();
+//        }
+        MskCreditInfoProSaveRequest resultDto = mskCreditMarketInfoPro001Service.getBasicInfos(request);
         return new Message<MskCreditInfoProSaveRequest>().success().setData(resultDto);
     }
 

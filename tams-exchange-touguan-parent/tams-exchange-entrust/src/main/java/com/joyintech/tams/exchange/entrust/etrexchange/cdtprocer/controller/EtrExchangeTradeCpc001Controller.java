@@ -19,7 +19,9 @@ import com.joyintech.tams.constant.*;
 import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAop;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateApplyRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.service.EtrExchangeTradeCpc001Service;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeMiniLimitPriceRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.FinprodMarketInfoRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.MinNumStepRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.controller.EtrExchangeTradeSec001Controller;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -27,6 +29,7 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinPirceDto;
+import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -202,16 +205,7 @@ public class EtrExchangeTradeCpc001Controller extends BaseController {
             workflowId = workflowId.replaceAll("\"","");
             EtrCreditProtectionCertificateApplyRequest entity = new EtrCreditProtectionCertificateApplyRequest();
             if (StringUtil.isNotEmpty(workflowId)) {
-                //流程代办checkImportData
-                entity = etrExchangeTradeCpc001Service.getBussinessEntityByWorkflowId(
-                        workflowId);
-                //add by chenjiaxing 流程中不显示资产名称 start
-                String[] secIds = StringUtil.split(entity.getFinprodId(),"_");
-                if(secIds!=null){
-                    if(secIds.length == 2 && StringUtil.isEmpty(entity.getStockId())){
-                        entity.setStockId(secIds[1]);
-                    }
-                }
+                entity = etrExchangeTradeCpc001Service.getBussinessEntityByWorkflowId(workflowId);
             }
             return new Message<EtrCreditProtectionCertificateApplyRequest>().success().setData(entity);
         } catch(Exception e){
@@ -391,13 +385,15 @@ public class EtrExchangeTradeCpc001Controller extends BaseController {
             return ajax;
         }
         AjaxResult ajaxResult = new AjaxResult();
-        if (StringUtil.isNotEmpty(ajax) && StringUtil.isNotEmpty(ajax.getMessageType())
-                && StringUtil.isNotEmpty(ajax.getData())) {
-            if (ajax.getMessageType().equals("错误消息")){
-                ajaxResult.setMessageType(MessageType.错误消息);
+        if(ajax != null){
+            if (StringUtil.isNotEmpty(ajax) && StringUtil.isNotEmpty(ajax.getMessageType())
+                    && StringUtil.isNotEmpty(ajax.getData())) {
+                if (ajax.getMessageType().equals("错误消息")){
+                    ajaxResult.setMessageType(MessageType.错误消息);
+                }
+                ajaxResult.setData(ajax.getData());
+                return ajaxResult;
             }
-            ajaxResult.setData(ajax.getData());
-            return ajaxResult;
         }
         return ajaxResult;
     }
@@ -743,6 +739,42 @@ public class EtrExchangeTradeCpc001Controller extends BaseController {
 
     }
 
+    //add wsz 20220610 添加方法查询最小交易额
+    @ApiOperation(value = "最小价格", notes = "最小价格")
+    @PostMapping("/getMinTrdUnitLimit")
+    @ResponseBody
+    public Message<MinTrdUnitLimitDto> getMinTrdUnitLimit(@RequestBody EtrExchangeMiniLimitPriceRequest request){
+        try {
+            MinTrdUnitLimitDto minNum= etrExchangeTradeCpc001Service.getMinTrdUnitLimitPrice(request);
+            return new Message<MinTrdUnitLimitDto>().success().setData(minNum);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Message<MinTrdUnitLimitDto>().fail().setMessage("查询失败");
+        }
+    }
+
+    /**
+     * 获取最小交易单元
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "获取最小交易单元", notes = "获取最小交易单元")
+    @ResponseBody
+    @PostMapping("/getMinNumStep")
+    public Message<String> getMinNumStep(@RequestBody MinNumStepRequest request){
+        try{
+            Map<String, Object> param = BeanUtil.object2Map(request);
+            BigDecimal minNum = etrExchangeTradeCpc001Service.getMinNumStep(param);
+            if(minNum == null) {
+                minNum= BigDecimal.ZERO;
+            }
+            String minNumStr=minNum.setScale(2).toString();
+            return new Message<>(minNumStr);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<String>().fail().setMessage("查询异常");
+        }
+    }
 
 
 }

@@ -548,7 +548,12 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
                     }
                     etrDistributeMapper.insertSelective(etrDistribute);
                 }
-            }else if (!DictCodeListExt3.委托状态_待分发.getValue().equals(dto.getEtrEntrust().getEntrustStatus())) {
+            } else if (StringUtil.equals(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), dto.getEtrEntrust().getFinprodType2()) &&
+                    (StringUtil.equals(DictCodeList.委托状态_已退回.getValue(), dto.getEtrEntrust().getEntrustStatus())
+                            || StringUtil.equals(DictCodeList.委托状态_已撤回.getValue(), dto.getEtrEntrust().getEntrustStatus()))) {
+                dto.getEtrEntrust().setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());
+            } else if (!StringUtil.equals(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), dto.getEtrEntrust().getFinprodType2()) &&
+                    !DictCodeListExt3.委托状态_待分发.getValue().equals(dto.getEtrEntrust().getEntrustStatus())) {
                 dto.getEtrEntrust().setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());
             }
             etrEntrustMapper.insertSelective(dto.getEtrEntrust());
@@ -1046,14 +1051,26 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
                     }
                 }
                 else {
+//                    if(etrEntrustAdd != null){
+//                        if (StringUtils.equals(DictCodeListExt3.平安资产类型_期货.getValue(), etrEntrustAdd.getAssetType())) {
+//                            if (StringUtils.equals(DictCodeListExt3.平安资产类型_期货.getValue(), etrEntrustAdd.getAssetType())) {
+//                                委托额度 = etrEntrust.getEntrustNum();
+//                            } else {
+//                                委托额度 = etrEntrust.getEntrustAmt();
+//                            }
+//                        }
+//                    }else{
+//                        委托额度 = etrEntrust.getEntrustAmt();
+//                    }
                 	// 如果是期货 则按数量来判断  add by lijie2 20201120 start
-					if (StringUtils.equals(DictCodeListExt3.平安资产类型_期货.getValue(), etrEntrustAdd.getAssetType())) {
-						委托额度 = etrEntrust.getEntrustNum();
-					} else {
-						//add by lijie2 20201120 end
-						// 如果不存在目标类型，则按照原来的逻辑获取委托额度
-						委托额度 = etrEntrust.getEntrustAmt();
-					}
+                    if (etrEntrustAdd != null
+                            && StringUtils.equals(DictCodeListExt3.平安资产类型_期货.getValue(), etrEntrustAdd.getAssetType())) {
+                        委托额度 = etrEntrust.getEntrustNum();
+                    } else {
+                        //add by lijie2 20201120 end
+                        // 如果不存在目标类型，则按照原来的逻辑获取委托额度
+                        委托额度 = etrEntrust.getEntrustAmt();
+                    }
                     if (委托额度 == null) {
                         委托额度 = etrEntrust.getEntrustNum();
                     }

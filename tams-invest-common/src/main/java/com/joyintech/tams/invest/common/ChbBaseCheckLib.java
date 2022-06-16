@@ -43,7 +43,8 @@ public class ChbBaseCheckLib {
     public static final String PATTERN_ALL = "^[\\u4e00-\\u9fef-\\u3400-\\u4db5-\\u20000-\\u2a6d6-\\u2a700-\\u2b734-\\u2b740-\\u2b81d-\\u2b820-\\u2cea1-\\u2ceb0-\\u2ebe0-\\uf900-\\ufad9\\ue815-\\ue86f\\u00b7\\u0020-\\u0026-\\u0028-\\u007B-\\u007D-\\u007E-\\u2000-\\u2040-\\u2160-\\u216B-\\u3000-\\u301F-\\uFF00-\\uFF65-\\uFFE0-\\uFFEF]{0,}$";
     public static final String PATTERN_COMMON="^[\\u0020-\\u0026-\\u0028-\\u002F-\\u003A-\\u003F\\u0040\\u005B-\\u005F\\u0060\\u007B\\u007D\\u007E\\u0030-\\u0039-\\u0041-\\u005A-\\u0061-\\u007A]{0,}$";
     public static final String PATTERN_NOCHINESE="^[\\u0020-\\u0026-\\u0028-\\u007B-\\u007D-\\u007E-\\u2000-\\u2040-\\u2160-\\u216B-\\u3000-\\u301F-\\uFF00-\\uFF65-\\uFFE0-\\uFFEF]{0,}$";
-    public static final String PATTERN_NOSYMBOL="(((\\d+%)|(\\d+%-\\d+%)):[\\u4e00-\\u9fef-\\u3400-\\u4db5-\\u20000-\\u2a6d6-\\u2a700-\\u2b734-\\u2b740-\\u2b81d-\\u2b820-\\u2cea1-\\u2ceb0-\\u2ebe0-\\uf900-\\ufad9\\ue815-\\ue86f\\u00b7\\u0020-\\u0026-\\u0028-\\u007B-\\u007D-\\u007E-\\u2000-\\u2040-\\u2160-\\u216B-\\u3000-\\u301F-\\uFF00-\\uFF65-\\uFFE0-\\uFFEF&&[^\\u0025\\u003A-\\u003B\\u002D]]+;)*(((\\d+%)|(\\d+%-\\d+%)):[\\u4e00-\\u9fef-\\u3400-\\u4db5-\\u20000-\\u2a6d6-\\u2a700-\\u2b734-\\u2b740-\\u2b81d-\\u2b820-\\u2cea1-\\u2ceb0-\\u2ebe0-\\uf900-\\ufad9\\ue815-\\ue86f\\u00b7\\u0020-\\u0026-\\u0028-\\u007B-\\u007D-\\u007E-\\u2000-\\u2040-\\u2160-\\u216B-\\u3000-\\u301F-\\uFF00-\\uFF65-\\uFFE0-\\uFFEF&&[^\\u0025\\u003A-\\u003B\\u002D]]+)";
+    //public static final String PATTERN_NOSYMBOL="(((\\d+%)|(\\d+%-\\d+%)):[\\u4e00-\\u9fef-\\u3400-\\u4db5-\\u20000-\\u2a6d6-\\u2a700-\\u2b734-\\u2b740-\\u2b81d-\\u2b820-\\u2cea1-\\u2ceb0-\\u2ebe0-\\uf900-\\ufad9\\ue815-\\ue86f\\u00b7\\u0020-\\u0026-\\u0028-\\u007B-\\u007D-\\u007E-\\u2000-\\u2040-\\u2160-\\u216B-\\u3000-\\u301F-\\uFF00-\\uFF65-\\uFFE0-\\uFFEF&&[^\\u0025\\u003A-\\u003B\\u002D]]+;)*(((\\d+%)|(\\d+%-\\d+%)):[\\u4e00-\\u9fef-\\u3400-\\u4db5-\\u20000-\\u2a6d6-\\u2a700-\\u2b734-\\u2b740-\\u2b81d-\\u2b820-\\u2cea1-\\u2ceb0-\\u2ebe0-\\uf900-\\ufad9\\ue815-\\ue86f\\u00b7\\u0020-\\u0026-\\u0028-\\u007B-\\u007D-\\u007E-\\u2000-\\u2040-\\u2160-\\u216B-\\u3000-\\u301F-\\uFF00-\\uFF65-\\uFFE0-\\uFFEF&&[^\\u0025\\u003A-\\u003B\\u002D]]+)";
+    public static final String PATTERN_NOSYMBOL="(((\\d+%)|(\\d+%-\\d+%)):[\\u4e00-\\u9fef-\\u3400-\\u4db5-\\u20000-\\u2a6d6-\\u2a700-\\u2b734-\\u2b740-\\u2b81d-\\u2b820-\\u2cea1-\\u2ceb0-\\u2ebe0-\\uf900-\\ufad9\\ue815-\\ue86f\\u00b7\\u0020-\\u0026-\\u0028-\\u007B-\\u007D-\\u007E-\\u2000-\\u2040-\\u2160-\\u216B-\\u3000-\\u301F-\\uFF00-\\uFF65-\\uFFE0-\\uFFEF&&[^\\u0025\\u003A-\\u003B\\u002D]]+;)";
 
     /**
      * 根据指定的规则，判断数据是否为空
@@ -994,25 +995,27 @@ public class ChbBaseCheckLib {
                 }else{
                     //单元切割后是2个部分，获取数值和文字
                     //数值
-                    String  pattenOne=invTaypePatten.get(0);
-                    if(pattenOne.contains(GlobalConstant.SPLIT)){
-                        //表示为区间
-                        List<String>  pattenOneSection=Arrays.asList(pattenOne.split(GlobalConstant.SPLIT));
-                        //校验区间
-                        if(!pattenOneSection.get(0).matches(regex)||
-                                !pattenOneSection.get(1).matches(regex)){
-                            flag=false;
-                            break;
+                    if(invTaypePatten!=null){
+                        String  pattenOne=invTaypePatten.get(0);
+                        if(pattenOne.contains(GlobalConstant.SPLIT)){
+                            //表示为区间
+                            List<String>  pattenOneSection=Arrays.asList(pattenOne.split(GlobalConstant.SPLIT));
+                            //校验区间
+                            if(!pattenOneSection.get(0).matches(regex)||
+                                    !pattenOneSection.get(1).matches(regex)){
+                                flag=false;
+                                break;
+                            }
+                        }else{
+                            //不是区间，单个数字百分号
+                            if(!pattenOne.matches(regex)){
+                                flag=false;
+                                break;
+                            }
                         }
-                    }else{
-                        //不是区间，单个数字百分号
-                        if(!pattenOne.matches(regex)){
-                            flag=false;
-                            break;
-                        }
+                        //文字
+                        //String  pattenTwo=invTaypePatten.get(1);
                     }
-                    //文字
-                    //String  pattenTwo=invTaypePatten.get(1);
                 }
             }
         }

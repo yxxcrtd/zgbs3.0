@@ -34,13 +34,15 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmMatchDto;
 import com.joyintech.tams.cfets.trdquery.dao.CfetsTrdQueryMapper;
@@ -357,6 +359,9 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
 
     @Autowired
     private CfetsQuotedCommonService cfetsQuotedCommonService;
+
+    @Autowired
+    private CfetsTrdBondFirstSub002Service cfetsTrdBondFirstSub002Service;
 
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
@@ -1072,7 +1077,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
      * @see
      * @since 1.0
      */
-    public void doCompleteRevoke(CfetsTrdBondInvestTradeDto entity,String settleRemark,Boolean isNeedDealPosition) {
+    public TrdBondInvestTradeDto doCompleteRevoke(CfetsTrdBondInvestTradeDto entity,String settleRemark,Boolean isNeedDealPosition) {
         // 调用基础组合.【金融产品交易组件.查询金融产品交易信息】获取原交易信息
         if (entity.getTotleTradeId().lastIndexOf('R') == entity.getTotleTradeId().length() - 1) {
             entity.setTotleTradeId(entity.getTotleTradeId().substring(0, entity.getTotleTradeId().length() - 1));
@@ -1082,6 +1087,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         List<String> totleIdList = new ArrayList(totleIdList1);
 
         List<BaseTradeProductDealDto> baseTradeProductDealDtos = baseTradeProductDealService.selectTotalDeal(totleIdList);
+        List<TrdBondInvestTradeDto> list = new ArrayList<>();
 
         FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
         for (BaseTradeProductDealDto baseTradeProductDealDto : baseTradeProductDealDtos) {
@@ -1154,8 +1160,12 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 }
 
             }
+            TrdBondInvestTradeDto bondDto=new  TrdBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(bondDto, baseTradeProductDealDto);
+            bondDto.setTotleTradeId(cetradeid);
+            bondDto.setFinprodId(entity.getFinprodId());
+            list.add(bondDto);
         }
-
         // add by etliu 20210927 start
         if (entity != null) {
             if (StringUtil.isBlank(entity.getoFinprodId())
@@ -1206,6 +1216,9 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         String exeId = cfetsTrdQueryMapper.seleteByTrdId(bizCode);
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
 
+        if(StringUtil.equals(entity.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+            cfetsTrdBondFirstSub002Service.dorevoke(entity.getBidId(), entity.getRemark(), true, DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
+        }
        //发送头寸
         if(isNeedDealPosition) {
             String ps = entity.getPs();
@@ -1233,6 +1246,10 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             paramMap.put("remark", DictCodeListExt3.交收状态_交收失败.getCodeName());
             cfetsTrdQueryMapper.updateInterfTradSecdealByTradeId(paramMap);
         }
+        TrdBondInvestTradeDto tradeDto = new TrdBondInvestTradeDto();
+        BeanUtil.copyPropertiesIgnoreNull(tradeDto,entity);
+        tradeDto.setTrdBondInvestTradeDtoList(list);
+        return tradeDto;
     }
 
     /**
@@ -1472,7 +1489,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 BigDecimal prinamt = interfTradSecdeal.getPrinamt();
                 BigDecimal subtract = ArithmeticUtil.doAdd(prinamt,
                     ArithmeticUtil.multiply(inputDto.getTrdProductDeal().getShareAmt(), new BigDecimal(100)));
-                if (subtract.compareTo(BigDecimal.ZERO) == -1 || subtract.compareTo(BigDecimal.ZERO) == 0) {// 小于0的话
+                if (subtract.compareTo(BigDecimal.ZERO) < 0 || subtract.compareTo(BigDecimal.ZERO) == 0) {// 小于0的话
                     record.setPrinamt(BigDecimal.ZERO);
                 }
                 else {
@@ -1516,7 +1533,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         }
         // 撤销
         else {
-            this.doCompleteRevoke(entity,"",true);
+            SpringContextUtil.getApplicationContext().getBean(CfetsTrdBondInvestTrade002Service.class).doCompleteRevoke(entity,"",true);
 
             //补充  如果是撤销将交易ID赋值为null
             Map<String, Object> map = new HashMap<>();

@@ -48,7 +48,8 @@ public class TradePreCommonService {
      */
     public void executePosition(FinProductTradeDto finProductTradeDto, String acctNo){
         // 生成的临时交易表数据已经是组合维度的数据,无需拆分 modify by fuyongsheng 20220511 start
-        if(!CollectionUtils.isEmpty(finProductTradeDto.getBaseTradeProductDealDtos())&& StringUtil.isNotEmpty(finProductTradeDto.getBaseTradeProductDealDtos().get(0).getEntrustId())){
+        if(!CollectionUtils.isEmpty(finProductTradeDto.getBaseTradeProductDealDtos())
+                && StringUtil.isNotEmpty(finProductTradeDto.getBaseTradeProductDealDtos().get(0).getEntrustId())){
 //            EtrEntrust etrEntrust=etrEntrustMapper.selectByPrimaryKey(finProductTradeDto.getBaseTradeProductDealDtos().get(0).getEntrustId());
 //            //系列户,循环掉之前的方法
 //            if(StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass())) {

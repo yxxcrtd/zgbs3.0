@@ -5,6 +5,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
@@ -126,7 +127,19 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
     @Autowired(required = false)
     private BusiProductRatingService busiProductRatingService;
 
-
+    /**
+     * 指令查询参数初始化
+     *
+     * @param param
+     */
+    private void setParam(Map<String, Object> param) {
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
+        param.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("ENTRUST_STATUS_08", DictCodeListExt3.委托状态_流程中.getValue());
+        param.put("FINPROD_TYPE2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        String loginUserId = LoginUserUtil.getUserName();
+        param.put("loginUserId", loginUserId);
+    }
 
     /**
      * 指令信息查询
@@ -378,11 +391,16 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, productInfoRequest);
 
         dto.setIssueClass(finProductInfo.getIssueClass());
+        dto.setFinprodMarketId(finProductInfo.getFinprodMarketId());
+        dto.setFinprodAbbr(finProductInfo.getFinprodAbbr());
         if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
             dto.setIssueDate(finProductInfo.getIssueDate());
             dto.setPayDate(finProductInfo.getPayDate());
             dto.setIssuePrice(new BigDecimal(finProductInfo.getIssuePrice()));
             dto.setReferYield(finProductInfo.getReferYield());
+            dto.setTenderTarget(finProductInfo.getTenderTarget());
+            dto.setTenderSdate(finProductInfo.getTenderSdate());
+            dto.setTenderEdate(finProductInfo.getTenderEdate());
 
         }else {
             //查询所有的对手方
@@ -400,8 +418,6 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
             dto.setTenderTarget(finProductInfo.getTenderTarget());
         }
 
-        dto.setFinprodAbbr(finProductInfo.getFinprodAbbr());
-        dto.setFinprodMarketId(finProductInfo.getFinprodMarketId());
 
         List<CfetsBiddingProductDto> biddingProductList = new ArrayList<>();
         //查询指令明细信息
@@ -422,6 +438,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
 
                 //查询指令标位信息
                 List<EtrEntrustBidPrice> bidPrices = cfetsEtrBondFirstBid001Mapper.selectBidPriceById(entrustId);
+                Integer rownum = 1;
                 for (EtrEntrustBidPrice bidPrice : bidPrices) {
                     CfetsBiddingProductDto productDto = new CfetsBiddingProductDto();
                     productDto.setPortfolioId(bidPrice.getPortfolioId());
@@ -437,7 +454,8 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
                         productDto.setBusinessModel(etrEntrustDetail.getInvAim());
                         productDto.setPortfolioTotalBidPrinAmt(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), BigDecimal.valueOf(100)));
                     }
-
+                    productDto.setRownum(rownum.toString());
+                    rownum ++ ;
                     biddingProductList.add(productDto);
                 }
             }
@@ -507,36 +525,72 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
      * @return
      */
     public AjaxResult modifyDelegateCheckMethod(CfetsEtrBondFirstBidReqDto dto) {
-        if(!StringUtil.isNotEmpty(dto)|| StringUtil.isEmptyList(dto.getSelectedItem())){
-            AjaxResult res=new AjaxResult();
-            ValidMessage  validMessage= new ValidMessage();
+        if (!StringUtil.isNotEmpty(dto) || StringUtil.isEmptyList(dto.getSelectedItem())) {
+            AjaxResult res = new AjaxResult();
+            ValidMessage validMessage = new ValidMessage();
             validMessage.setMessage(getMessage("COMMON_E_0002"));
             res.setErrorList(Arrays.asList(validMessage));
             return res;
         }
         List<CfetsEtrBondFirstBidReqDto> selectedItem = dto.getSelectedItem();
-        AjaxResult ajaxResult=new AjaxResult();
-        if(StringUtil.isNotEmpty(selectedItem)){
-            if(selectedItem.size()>1){
-                AjaxResult res=new AjaxResult();
-                ValidMessage  validMessage= new ValidMessage();
+        AjaxResult ajaxResult = new AjaxResult();
+        if (StringUtil.isNotEmpty(selectedItem)) {
+            if (selectedItem.size() > 1) {
+                AjaxResult res = new AjaxResult();
+                ValidMessage validMessage = new ValidMessage();
                 validMessage.setMessage("委托指令修改仅允许一条数据");
                 res.setErrorList(Arrays.asList(validMessage));
                 return res;
             }
-            for(CfetsEtrBondFirstBidReqDto Item:selectedItem){
-                if(!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托接收状态_已撤回.getValue())
-                        && !StringUtil.equals(Item.getEntrustStatus(),BussinessDictCodeList.委托状态_已退回.getValue())
-                ){
-                    AjaxResult res=new AjaxResult();
-                    ValidMessage  validMessage= new ValidMessage();
-                    validMessage.setMessage("只有指令状态为已撤回、已退回的指令允许修改");
+            for (CfetsEtrBondFirstBidReqDto Item : selectedItem) {
+                AjaxResult res = new AjaxResult();
+                ValidMessage validMessage = new ValidMessage();
+
+                //查询指令信息
+                Map<String, Object> params = new HashMap<>();
+                params.put("entrustId", Item.getEntrustId());
+                this.setParam(params);
+                CfetsEtrIBondFirstBidFindEtrInfoDto etrInfoDto = cfetsEtrBondFirstBid001Mapper.
+                        findEtrInfoPage(params).stream().findFirst().orElse(null);
+                if (etrInfoDto == null) {
+                    validMessage.setMessage("该指令信息不存在");
                     res.setErrorList(Arrays.asList(validMessage));
                     return res;
                 }
-            };
+
+                //报价发行
+                if (StringUtil.isNotEmpty(etrInfoDto.getIssueClass())
+                        && StringUtil.equals(DictCodeListExt4.新债_发行方式_报价发行.getValue(), etrInfoDto.getIssueClass())) {
+                    if (!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已撤回.getValue())
+                            && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已退回.getValue())) {
+                        validMessage.setMessage("只可对已退回、已撤回的指令进行修改操作");
+                        res.setErrorList(Arrays.asList(validMessage));
+                        return res;
+                    }
+                } else {
+                    if (StringUtil.equals(DictCodeList.一级投标中标状态_已投标.getValue(), etrInfoDto.getFirstBidStatus())) {
+                        validMessage.setMessage("债券已投标，不可修改指令");
+                        res.setErrorList(Arrays.asList(validMessage));
+                        return res;
+                    }
+
+                    if (!StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_待分发.getValue())
+                            && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_待接收.getValue())
+                            && !(StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已接收.getValue()) &&
+                            StringUtil.equals(etrInfoDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue()))
+                            && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已撤回.getValue())
+                            && !StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_已退回.getValue())) {
+                        validMessage.setMessage("只可对未投标债券已接收指令和待分发、待接收、已退回、已撤回的指令进行修改操作");
+                        res.setErrorList(Arrays.asList(validMessage));
+                        return res;
+                    }
+
+                }
+
+            }
+
         }
-        return new AjaxResult();
+        return ajaxResult;
     }
 
     /**

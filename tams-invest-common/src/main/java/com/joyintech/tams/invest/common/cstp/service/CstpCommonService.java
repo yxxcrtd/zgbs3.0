@@ -384,7 +384,7 @@ public class CstpCommonService{
     }
 
     public boolean excuteQuotePositionData(String entrustId,String execId,boolean isRevoke,String tradeId){
-    	if(!StringUtil.isNotEmpty(execId)||!StringUtil.isNotEmpty(execId)){
+    	if(!StringUtil.isNotEmpty(entrustId)||!StringUtil.isNotEmpty(execId)){
     		return false;
     	}
     	String quoteId = cstpCommonMapper.selectQuoId(execId);

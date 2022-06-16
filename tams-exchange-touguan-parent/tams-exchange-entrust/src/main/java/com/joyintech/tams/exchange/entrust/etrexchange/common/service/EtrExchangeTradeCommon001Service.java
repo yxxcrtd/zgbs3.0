@@ -40,6 +40,7 @@ import com.joyintech.framework.base.intf.DataDictItem;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
@@ -102,6 +103,7 @@ import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCash
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -683,7 +685,11 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             etrCommandDispatcherService.pushCommandMsg(param);
         }
         //处理履历
-        updateCfetsOprHis(dto.getEntrustId(), dto.getOptType());
+        if (OperationType.MODIFY.equals(arg1)) {
+            updateCfetsOprHis(dto.getEntrustId(), ENTRUST_RECORD_MODIFY, dto.getCreateUser(), dto.getCreateDept());
+        } else {
+            updateCfetsOprHis(dto.getEntrustId(), dto.getOptType(), dto.getCreateUser(), dto.getCreateDept());
+        }
         //插入风险试算
         basRiskMathCommService.insert(dto.getRiskTrialRetDto(),dto.getEntrustId());
     }
@@ -777,7 +783,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             restTemplate.postForObject(ServiceApplication.BASICDATA_SERVICE_NAME + "/InterfSysTrdConfig/insertCounterTraderId", map,
                     Object.class);
         }
-        if (!StringUtil.equals("revoke", entity.getOperateType()) && !StringUtil.equals("delete", entity.getOperateType())) {
+        if (!StringUtil.equals("revoke", entity.getOperateType()) && !StringUtil.equals("delete", entity.getOperateType()) && !StringUtil.equals("save", entity.getOperateType())) {
             //退回的移到备份表
             doInsertBackupQuery(entity);
             // 先删除流程中数据
@@ -1645,7 +1651,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         result.put("cpriceAmt", cpriceAmt);
         result.put("fprice", fprice);
         result.put("fpriceAmt", fpriceAmt);
-        result.put("yield", yield == null ? new BigDecimal(0.00) : yield);
+        result.put("yield", yield == null ? BigDecimal.valueOf(0.00) : yield);
         result.put("exerYield", exerYield);
         return result;
     }
@@ -1698,7 +1704,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                     }
                     //价格（净价） / 回购利率
                     if ((Double) tmp.get("entrustPrice") != null) {
-                        dto.setEntrustPrice(new BigDecimal((Double) tmp.get("entrustPrice")));
+                        dto.setEntrustPrice(BigDecimal.valueOf((Double) tmp.get("entrustPrice")));
                     }
                     //对手方交易席位
                     dto.setOppositeSeat((String) tmp.get("propSeatNo"));
@@ -1751,17 +1757,17 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
 
                     //价格（净价） / 回购利率
                     if (tmp.get("entrustPrice") != null) {
-                        dto.setnPrice(new BigDecimal((Double) tmp.get("entrustPrice")));
+                        dto.setnPrice(BigDecimal.valueOf((Double) tmp.get("entrustPrice")));
                     }
 
                     //全价
                     if (tmp.get("fullPrice") != null) {
-                        dto.setfPrice(new BigDecimal((Double) tmp.get("fullPrice")));
+                        dto.setfPrice(BigDecimal.valueOf((Double) tmp.get("fullPrice")));
                     }
 
                     //收益率
                     if (tmp.get("expireIncomeRate") != null) {
-                        dto.setYield(new BigDecimal((Double) tmp.get("expireIncomeRate")));
+                        dto.setYield(BigDecimal.valueOf((Double) tmp.get("expireIncomeRate")));
                     }
 
                     //订单编号
@@ -1794,11 +1800,11 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                     dto.setMarket((String) tmp.get("market"));
                     //收盘价
                     if (tmp.get("entrustPrice") != null) {
-                        dto.setClosingPrice(new BigDecimal((Double) tmp.get("entrustPrice")));
+                        dto.setClosingPrice(BigDecimal.valueOf((Double) tmp.get("entrustPrice")));
                     }
                     //日均价
                     if (tmp.get("fullPrice") != null) {
-                        dto.setDailyAvgPrice(new BigDecimal((Double) tmp.get("fullPrice")));
+                        dto.setDailyAvgPrice(BigDecimal.valueOf((Double) tmp.get("fullPrice")));
                     }
 
                     list.add(dto);
@@ -2080,7 +2086,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             baseEtrCashPositionCommService.entrustCloseExecute(entity.getEntrustId(), DictCodeList.是否_是.getValue());
         }
         //处理履历
-        updateCfetsOprHis(entity.getEntrustId(), "close");
+        updateCfetsOprHis(entity.getEntrustId(), "close",null,null);
         positionRequestService.sendClose(entity);
     }
 
@@ -2104,7 +2110,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
 //			positionRequestService.sendRevoke(entity);
         }
         //处理履历
-        updateCfetsOprHis(entity.getEntrustId(), "revoke");
+        updateCfetsOprHis(entity.getEntrustId(), "revoke",null,null);
         //撤回删除风险试算
         //etrExchangeTradeCommonMapper.deleteRskIsupTrial(entity.getEntrustId());
 //        restTemplate.postForObject(
@@ -2335,7 +2341,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         /********************************/
         setAssetTypeById(entity);
         //设置默认最小价差、最小交易单位；否则指令组件抛异常；
-        paraDto.setMinDiffPrice(new BigDecimal(0.001).setScale(3, BigDecimal.ROUND_HALF_UP));
+        paraDto.setMinDiffPrice(BigDecimal.valueOf(0.001).setScale(3, BigDecimal.ROUND_HALF_UP));
         paraDto.setMinDealUnit(new BigDecimal(1));
 
         Map<String, UnitEnum> numUnit = new HashMap<String, UnitEnum>();
@@ -2520,7 +2526,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             }
             if (StringUtils.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), ps) ||
                     StringUtils.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), ps)) {
-                if (null != entrustAmt) {//entrustAmt 代表标准券数量
+                if (null != entrustNum) {//entrustAmt 代表标准券数量
                     // modify by etliu 20220303 start
                     // 质押式回购出入库计算时，原公式：标准券数量=质押数量*标准折算率，改成：标准券数量=质押数量*标准折算率*面值/100  ---需求张琼
 //                    BigDecimal 百元券面 = trdCommonBaseService.getFaceValue(finprodId, DateUtil.platDateFromCache());
@@ -4344,7 +4350,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                 return finProductConvertible.getConPrice();
             }
         }
-        return new BigDecimal(0.00);
+        return BigDecimal.valueOf(0.00);
     }
 
 
@@ -4558,14 +4564,14 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                 confirmMsg += "最低交易数量"
                         + getNumAndUnit(minTrdUnitLimitDto.getMinNum(), minTrdUnitLimitDto.getMinNumUnit());
             }
-            if (flag1 && flag2 && flag1 && null != minTrdUnitLimitDto.getMinNum()
+            if (flag1 && flag2  && null != minTrdUnitLimitDto.getMinNum()
                     && null != minTrdUnitLimitDto.getMinAmt()) {
                 confirmMsg += "，";
             }
             if (flag2 && null != minTrdUnitLimitDto.getMinAmt()) {
                 confirmMsg += "最低交易金额" + getNumAndUnit(minTrdUnitLimitDto.getMinAmt());
             }
-            if (flag1 && flag2 && flag1 && null != minTrdUnitLimitDto.getMinNum()
+            if (flag1 && flag2 && null != minTrdUnitLimitDto.getMinNum()
                     && null != minTrdUnitLimitDto.getMinAmt()) {
                 confirmMsg += "，应至少不低于其中一个！";
             }
@@ -4586,14 +4592,14 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                 confirmMsg += "最大交易数量"
                         + getNumAndUnit(maxNum, minTrdUnitLimitDto.getMaxNumUnit());
             }
-            if (flag3 && flag4 && flag3 && null != minTrdUnitLimitDto.getMaxNum()
+            if (flag3 && flag4  && null != minTrdUnitLimitDto.getMaxNum()
                     && null != minTrdUnitLimitDto.getMaxAmt()) {
                 confirmMsg += "，";
             }
             if (flag4 && null != minTrdUnitLimitDto.getMaxAmt()) {
                 confirmMsg += "最大交易金额" + getNumAndUnit(maxAmt);
             }
-            if (flag3 && flag4 && flag3 && null != minTrdUnitLimitDto.getMaxNum()
+            if (flag3 && flag4  && null != minTrdUnitLimitDto.getMaxNum()
                     && null != minTrdUnitLimitDto.getMaxAmt()) {
                 confirmMsg += "，应至少不超过其中一个！";
             }
@@ -5875,13 +5881,17 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     /**
      * 处理履历
      */
-    public void updateCfetsOprHis(String entrustId, String optType) {
+    public void updateCfetsOprHis(String entrustId, String optType,String optUser,String optDept) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
-        if (ENTRUST_RECORD_NEW.equals(optType)) {
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-        } else if (ENTRUST_RECORD_NEW.equals(optType)) {
+        oprHisReq.setUserId(optUser);
+        oprHisReq.setCreateUser(optUser);
+        oprHisReq.setCreateDept(optDept);
+        oprHisReq.setUpdateUser(optUser);
+        if (ENTRUST_RECORD_MODIFY.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
+        } else if (ENTRUST_RECORD_NEW.equals(optType)) {
+            oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
         } else if ("close".equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_关闭.getValue());
         } else if ("revoke".equals(optType)) {
@@ -6169,7 +6179,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
 
     public static void main(String[] args) {
         BigDecimal a=new BigDecimal(3000000);
-        BigDecimal b=new BigDecimal(208.00);
+        BigDecimal b=BigDecimal.valueOf(208.00);
 
         System.out.println(ArithmeticUtil.divide(a, b, 0, RoundingMode.DOWN));
     }

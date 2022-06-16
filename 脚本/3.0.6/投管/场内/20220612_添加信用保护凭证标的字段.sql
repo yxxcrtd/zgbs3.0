@@ -1,0 +1,2 @@
+ALTER TABLE FIN_PRODUCT_ADD add BASIS  VARCHAR(50) ;
+comment on column FIN_PRODUCT_ADD.BASIS is  '年度计费天数';

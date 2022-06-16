@@ -71,6 +71,11 @@ public abstract class EtrSubComponentService<V extends EtrBaseDto> implements Et
         return settings.get();
     }
 
+    public void unload() {
+        settings.remove();
+    }
+
+
     /**
      * {@inheritDoc}
      */

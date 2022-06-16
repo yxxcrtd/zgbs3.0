@@ -17,10 +17,12 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.domain.Message;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.common.vo.EntrustVo;
 import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
@@ -153,7 +155,7 @@ public class EntrustManagement extends BaseService {
 
     private void setFutureOrderStockCode(List<Order> orderListWithOutFair) {
         orderListWithOutFair.forEach(order -> {
-            if (InvestmentAssetType.isFutures(order.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(order.getAssetType())) {
                 order.setStockCode(StockCodeUtils.getStockCode(order.getStockCode()));
             }
         });
@@ -161,7 +163,7 @@ public class EntrustManagement extends BaseService {
 
     private void setFutureEntrustStockCode(List<Entrust> entrustList) {
         entrustList.forEach(entrust -> {
-            if (InvestmentAssetType.isFutures(entrust.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(entrust.getAssetType())) {
                 entrust.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
             }
         });
@@ -258,7 +260,7 @@ public class EntrustManagement extends BaseService {
                 entrust.setEntrustPriceView(o.getEntrustPrice());
             }
 
-            if ((投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestmentAssetType.isBond(entrust.getAssetType()))
+            if ((投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestAssetTypeEnum.isBond(entrust.getAssetType()))
                     || 投管业务类型_协议现券.getValue().equals(entrust.getBusiTypeTg())) {
                 //可转债券大宗交易、协议现券 委托价格展示全价
                 entrust.setEntrustPrice(entrust.getFullPrice());
@@ -267,6 +269,14 @@ public class EntrustManagement extends BaseService {
                 entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setFrozenVolumeView(BigDecimal.valueOf(entrust.getFrozenVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setCancelVolumeView(BigDecimal.valueOf(entrust.getCancelVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+            } else if (投管业务类型_信用保护凭证.getValue().equals(entrust.getBusiTypeTg())) {
+                entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                //成交编号 借用reportNo字段
+                String extend2 = entrust.getExtend2();
+                if (StringUtil.isNotEmpty(extend2) && extend2.contains("brokerTradeId")) {
+                    Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
+                    entrust.setReportNo((String)map.get("brokerTradeId"));
+                }
             }
 
             entrusts.add(entrust);

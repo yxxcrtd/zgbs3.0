@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -655,9 +658,22 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
     protected void occupyCreditLines(List<CreditLinesInputDto> inputDtoList, String occupyType,Date tradeDate) {
         logger.info("==========批量接口处理数据开始==========");
         for (CreditLinesInputDto inputDto : inputDtoList){
-
-            dealEachTradeInfo(inputDto,occupyType);
-
+            // 处理风险4合一接口，软控、硬控参数 传递 -> 授信占用额度控制是否为软控(Y 是 N 否)
+            if (StringUtil.equals(inputDto.getCreditControl(),DictCodeListRsk.风险控制类别_软控.getValue())){
+                CREDIT_SOFT_SKIP_MODE = DictCodeList.是否_是.getValue();
+            }else if (StringUtil.equals(inputDto.getCreditControl(),DictCodeListRsk.风险控制类别_硬控.getValue())){
+                CREDIT_SOFT_SKIP_MODE = DictCodeList.是否_否.getValue();
+            }
+            // check时无业务编号，生成随机编号，用作占用记录和输出结果做对应
+            if(StringUtil.isEmpty(inputDto.getTradeId())) {
+                inputDto.setTradeId(IDGenerator.generate());
+            }
+            CreditLinesOutputDto outputDto = dealEachTradeInfo(inputDto,occupyType);
+            if (Objects.nonNull(outputDto)){
+                outputDto.setTradeId(inputDto.getTradeId());
+                outputDto.setOccupyType(inputDto.getCreditCallType());
+                creditLinesOutputDtoList.add(outputDto);
+            }
         }
         logger.info("==========批量接口处理数据结束==========");
     }
@@ -1013,6 +1029,13 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
     }
     @Override
     protected void batchInsertCredit() {
+        // 处理硬控状态下，check时额度满足，占用时额度不满足的异常处理
+        for (CreditLinesOutputDto outputDto: creditLinesOutputDtoList){
+            if (StringUtil.isNotEmpty(outputDto.getErrMessage())){
+                throw new BusinessException("MSG:" + outputDto.getErrMessage());
+            }
+        }
+
         List<CreditLines> 额度明细 = this.getCreditLinesList();
 
         if(!StringUtil.isEmptyList(creditUsingSeriesList)){
@@ -1765,8 +1788,6 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
         // TISHKS-947:子期次占用母计划额度 modify by fuyongsheng 20220506 end
         // 处理结果记录，输出参数实体
         CreditLinesOutputDto outputDto = new CreditLinesOutputDto();
-        // 单个处理结果放入集合
-        creditLinesOutputDtoList.add(outputDto);
         // STEP  1 处理基础数据（资产授信数据，额度校验规则、机构授信数据）
         findBasicData(inputDto);
         if(StringUtil.isNotEmpty(inputDto.getZhiYaQuan())){
@@ -1859,5 +1880,68 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
             e.printStackTrace();
         }
         return getCreditLinesList();
+    }
+
+    public void buildRtnResult(){
+        if (StringUtil.isEmptyList(creditLinesOutputDtoList)){
+            return;
+        }
+        // 资产授信占用明细 转map
+        Map<String,CreditUsingAst> usingAstMap
+                = creditUsingAstList.stream().collect(Collectors.toMap(CreditUsingAst::getTradeId, Function.identity()));
+        // 资产授信占用明细 转map
+        Map<String,CreditUsingSeries> usingSeriesMap
+                = creditUsingSeriesList.stream().collect(Collectors.toMap(CreditUsingSeries::getTradeId, Function.identity()));
+        // 机构占用明细 转map
+        Map<String,CreditUsingCustomerMst> usingCustomerMstMap
+                = creditUsingCustomerMstList.stream().collect(Collectors.toMap(CreditUsingCustomerMst::getTradeId, Function.identity()));
+        for (CreditLinesOutputDto outputDto:creditLinesOutputDtoList){
+            // 资产授信
+            CreditUsingAst creditUsingAst = usingAstMap.get(outputDto.getTradeId());
+            if (Objects.nonNull(creditUsingAst)){
+                // 获取对应的额度信息
+                CreditLines creditLines = creditLinesMap.get(creditUsingAst.getCreditLinesId());
+                // 资产代码
+                outputDto.setAssetCode(creditUsingAst.getFinprodId());
+                // 资产授信-占用前
+                outputDto.setBeforeOccupyAst(getAmount(creditLines.getHapCreditAmt()).subtract(getAmount(creditUsingAst.getAmount())));
+                // 资产授信-占用
+                outputDto.setOccupyAssetAmt(creditUsingAst.getAmount());
+                // 资产授信-占用后
+                outputDto.setAfterOccupyAst(ArithmeticUtil.subtract(creditLines.getCreditAmt(),creditLines.getHapCreditAmt()));
+            }
+            // 系列授信
+            CreditUsingSeries creditUsingSeries = usingSeriesMap.get(outputDto.getTradeId());
+            if (Objects.nonNull(creditUsingSeries)){
+                // 获取对应的额度信息
+                CreditLines creditLines = creditLinesMap.get(creditUsingSeries.getCreditLinesId());
+                // 资产代码
+                outputDto.setAssetCode(creditUsingSeries.getFinprodId());
+                // 资产授信-占用前
+                outputDto.setBeforeOccupyAst(getAmount(creditLines.getHapCreditAmt()).subtract(getAmount(creditUsingSeries.getAmount())));
+                // 资产授信-占用
+                outputDto.setOccupyAssetAmt(creditUsingSeries.getAmount());
+                // 资产授信-占用后
+                outputDto.setAfterOccupyAst(ArithmeticUtil.subtract(creditLines.getCreditAmt(),creditLines.getHapCreditAmt()));
+            }
+            // 机构授信
+            CreditUsingCustomerMst creditUsingCustomerMst = usingCustomerMstMap.get(outputDto.getTradeId());
+            if (Objects.nonNull(creditUsingCustomerMst)){
+                // 获取对应的额度信息
+                CreditLines creditLines = creditLinesMap.get(creditUsingCustomerMst.getCreditLinesId());
+                // 市场机构代码
+                outputDto.setCustomerId(creditUsingCustomerMst.getCustomerId());
+                // 机构授信-占用前
+                outputDto.setBeforeOccupyOrg(getAmount(creditLines.getHapCreditAmt()).subtract(getAmount(creditUsingCustomerMst.getAmount())));
+                // 机构授信-占用
+                outputDto.setOccupyAssetAmt(creditUsingCustomerMst.getAmount());
+                // 机构授信-占用后
+                outputDto.setAfterOccupyAst(ArithmeticUtil.subtract(creditLines.getCreditAmt(),creditLines.getHapCreditAmt()));
+            }
+            outputDto.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
+            if (StringUtil.isNotEmpty(outputDto.getErrMessage())){
+                outputDto.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
+            }
+        }
     }
 }

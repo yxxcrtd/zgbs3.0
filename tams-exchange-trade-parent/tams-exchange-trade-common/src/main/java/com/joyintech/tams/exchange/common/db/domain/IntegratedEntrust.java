@@ -184,7 +184,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
     private String tradeId;
 
-    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员ID")
+    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员名称")
     private String tradeName;
 
     @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
@@ -200,13 +200,13 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     private String investorName;
 
 
-    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
+    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员ID")
     private String propTradeId;
 
-    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员")
+    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员名称")
     private String propTradeName;
 
-    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
+    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商ID")
     private String propDealerId;
 
     @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
@@ -397,6 +397,17 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     private String targetType;
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
+
+    // 信用保护凭证使用 --start
+    @ApiModelProperty(name = "counterName", value = "交易对手名称")
+    private String counterName;
+
+    @ApiModelProperty(name = "propAcctNo", value = "对手资金账户")
+    private String propAcctNo;
+
+    @ApiModelProperty(name = "propAcctName", value = "对手资金账户名称")
+    private String propAcctName;
+    // 信用保护凭证使用 --end
 
     public String getSoftSkipMode() {
         return softSkipMode;
@@ -1179,19 +1190,34 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     }
 
     public String getCounterId() {
-        if(StringUtil.isNotEmpty(counterId)){
-            return counterId;
-        }
-        if (StringUtil.isNotEmpty(extend2) && extend2.contains("counterId")) {
-            Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
-            return (String)map.get("counterId");
-        }
-
-        return "";
+        return counterId;
     }
 
     public void setCounterId(String counterId) {
         this.counterId = counterId;
     }
 
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
+    }
+
+    public String getPropAcctNo() {
+        return propAcctNo;
+    }
+
+    public void setPropAcctNo(String propAcctNo) {
+        this.propAcctNo = propAcctNo;
+    }
+
+    public String getPropAcctName() {
+        return propAcctName;
+    }
+
+    public void setPropAcctName(String propAcctName) {
+        this.propAcctName = propAcctName;
+    }
 }

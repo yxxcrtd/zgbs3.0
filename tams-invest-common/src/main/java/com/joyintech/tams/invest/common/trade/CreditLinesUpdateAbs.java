@@ -97,6 +97,8 @@ public abstract class CreditLinesUpdateAbs implements CreditLinesUpdate, BeanVal
 
     protected abstract void batchInsertCredit();
 
+    protected abstract void buildRtnResult();
+
     List<CreditLines> getCreditLinesList(){
         return new ArrayList<>(this.creditLinesMap.values());
     }
@@ -109,6 +111,7 @@ public abstract class CreditLinesUpdateAbs implements CreditLinesUpdate, BeanVal
         logger.info("==========批量Check接口调用 start==========");
         this.isSave = false;
         occupyCreditLines(inputDtoList, DictCodeListRsk.授信占用类别_预占.getValue(),null);
+        buildRtnResult();
         logger.info("==========批量Check接口调用 end==========");
         return creditLinesOutputDtoList;
     }

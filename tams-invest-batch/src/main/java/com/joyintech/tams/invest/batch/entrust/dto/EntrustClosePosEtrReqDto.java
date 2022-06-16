@@ -4,6 +4,7 @@ package com.joyintech.tams.invest.batch.entrust.dto;
  * 头寸信息查询，请求参数
  */
 public class EntrustClosePosEtrReqDto {
+
     /**
      * 业务类型
      */
@@ -27,22 +28,29 @@ public class EntrustClosePosEtrReqDto {
 
     /**
      * 金融产品类型
+     *
      * @return
      */
     private String finprodType2;
 
     /**
      * 交易场所
+     *
      * @return
      */
     private String tradeMarket;
 
     /**
      * 业务类型
+     *
      * @return
      */
     private String busiTypePosition;
 
+    /**
+     * 发行方式
+     */
+    private String issueClass;
 
     public String getBusiType() {
         return busiType;
@@ -106,5 +114,13 @@ public class EntrustClosePosEtrReqDto {
 
     public void setBusiTypePosition(String busiTypePosition) {
         this.busiTypePosition = busiTypePosition;
+    }
+
+    public String getIssueClass() {
+        return issueClass;
+    }
+
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
     }
 }

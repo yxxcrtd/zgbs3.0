@@ -97,7 +97,10 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.activiti.engine.impl.util.CollectionUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -125,6 +128,10 @@ import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcServic
 @Service("etrExchangeTradeSecRepo001Service")
 public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrExchangeTradeSaveSecRepoRequest>
         implements BaseProcessService<EtrExchangeTradeSaveSecRepoRequest> {
+    /**
+     * 日志
+     */
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     public static String queryIntegratedTick = "/joyin/quote/tick";
     /**
@@ -236,6 +243,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
     public void doComplete(EtrExchangeTradeSaveSecRepoRequest dto, OperationType arg1) {
         // TODO Auto-generated method stub
         Map<String, Object> map = new HashMap<>();
+        if (!CollectionUtils.isEmpty(dto.getPortfolioList())) {
+            dto.setPortfolioId(dto.getPortfolioList().get(0).getPortfolioId());
+            dto.setAcctNo(dto.getPortfolioList().get(0).getAcctNo());
+            dto.setSecAcctId(dto.getPortfolioList().get(0).getSecAcctId());
+        }
         // 新增交易对手席位
         if (StringUtil.isNotEmpty(dto.getCounterId()) && StringUtil.isNotEmpty(dto.getSeatId())) {
             map.put("counterId", dto.getCounterId());
@@ -471,6 +483,13 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
 
     @Override
     public void doUpdate(EtrExchangeTradeSaveSecRepoRequest entity) {
+
+        if (!CollectionUtils.isEmpty(entity.getPortfolioList())) {
+            entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
+            entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
+            entity.setSecAcctId(entity.getPortfolioList().get(0).getSecAcctId());
+        }
+
         // nothing to do just for aspect
         Map<String, Object> map = new HashMap<>();
         // 新增交易对手席位
@@ -626,6 +645,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
 
     @Override
     public void doInsert(EtrExchangeTradeSaveSecRepoRequest entity, OperationType type) {
+        if (!CollectionUtils.isEmpty(entity.getPortfolioList())) {
+            entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
+            entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
+            entity.setSecAcctId(entity.getPortfolioList().get(0).getSecAcctId());
+        }
         if ("save".equals(entity.getOperateType())) {
             return;
         }
@@ -1184,15 +1208,31 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 case "02":
                     // 全价总额==>到期收益率
                     yieldPriceInParameter.setFullPrice(fprice);
-                    yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
-                    yield = yieldPriceOutParameter.getMatYield();
+
+                    // modify by etliu 20220602 start
+                    // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                    try {
+                        yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
+                        yield = yieldPriceOutParameter.getMatYield();
+                    } catch (Exception e) {
+                        logger.debug("02根据全价总额计算到期收益率异常:{}", e);
+                    }
+                    // modify by etliu 20220602 end
+
                     if (secInfoModelDto.getNextExeDate() != null) {
                         // 全价总额==>行权收益率
                         yieldPriceInParameter.setNextExeDate(toLocalDate(secInfoModelDto.getNextExeDate()));
                         yieldPriceInParameter.setNextExePrice(secInfoModelDto.getNextExercisePrice());
                         if (yieldPriceInParameter.getNextExePrice() != null) {
-                            yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
-                            exerYield = yieldPriceOutParameter.getExeYield();
+                            // modify by fuyongsheng 20220606 start
+                            // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                            try {
+                                yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
+                                exerYield = yieldPriceOutParameter.getExeYield();
+                            } catch (Exception e) {
+                                logger.debug("02根据全价总额计算行权收益率异常:{}", e);
+                            }
+                            // modify by fuyongsheng 20220606 end
                         }
                     }
                     break;
@@ -1200,16 +1240,30 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 case "03":
                     // 到期收益率==>全价总额
                     priceYieldInParameter.setMatYield(yield);
-                    priceYieldOutParameter = priceByYieldCalculator.calculate(priceYieldInParameter);
-                    fprice = priceYieldOutParameter.getFullPrice();
+                    // modify by fuyongsheng 20220606 start
+                    // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                    try {
+                        priceYieldOutParameter = priceByYieldCalculator.calculate(priceYieldInParameter);
+                        fprice = priceYieldOutParameter.getFullPrice();
+                    } catch (Exception e) {
+                        logger.debug("03根据到期收益率计算全价总额异常:{}", e);
+                    }
+                    // modify by fuyongsheng 20220606 end
                     // 全价总额==>行权收益率
                     if (secInfoModelDto.getNextExeDate() != null) {
                         yieldPriceInParameter.setFullPrice(fprice);
                         yieldPriceInParameter.setNextExeDate(toLocalDate(secInfoModelDto.getNextExeDate()));
                         yieldPriceInParameter.setNextExePrice(secInfoModelDto.getNextExercisePrice());
                         if (yieldPriceInParameter.getNextExePrice() != null) {
-                            yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
-                            exerYield = yieldPriceOutParameter.getExeYield();
+                            // modify by fuyongsheng 20220606 start
+                            // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                            try {
+                                yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
+                                exerYield = yieldPriceOutParameter.getExeYield();
+                            } catch (Exception e) {
+                                logger.debug("03根据全价总额计算行权收益率异常:{}", e);
+                            }
+                            // modify by fuyongsheng 20220606 end
                         }
                     }
                     break;
@@ -1220,12 +1274,26 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         priceYieldInParameter.setMatYield(exerYield);
                         yieldPriceInParameter.setNextExeDate(toLocalDate(secInfoModelDto.getNextExeDate()));
                         yieldPriceInParameter.setNextExePrice(secInfoModelDto.getNextExercisePrice());
-                        priceYieldOutParameter = priceByYieldCalculator.calculate(priceYieldInParameter);
-                        fprice = priceYieldOutParameter.getFullPrice();
+                        // modify by fuyongsheng 20220606 start
+                        // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                        try {
+                            priceYieldOutParameter = priceByYieldCalculator.calculate(priceYieldInParameter);
+                            fprice = priceYieldOutParameter.getFullPrice();
+                        } catch (Exception e) {
+                            logger.debug("04根据行权收益率计算全价总额异常:{}", e);
+                        }
+                        // modify by fuyongsheng 20220606 end
                         // 全价总额==>到期收益率
                         yieldPriceInParameter.setFullPrice(fprice);
-                        yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
-                        yield = yieldPriceOutParameter.getMatYield();
+                        // modify by fuyongsheng 20220606 start
+                        // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+                        try {
+                            yieldPriceOutParameter = yieldByPriceCalculator.calculate(yieldPriceInParameter);
+                            yield = yieldPriceOutParameter.getMatYield();
+                        } catch (Exception e) {
+                            logger.debug("04全价总额计算到期收益率异常:{}", e);
+                        }
+                        // modify by fuyongsheng 20220606 end
                     }
                     break;
                 default:
@@ -1261,9 +1329,12 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         result.put("intAmt", intAmt);
         result.put("cprice", cprice);
         result.put("cpriceAmt", cpriceAmt);
-        result.put("fprice", fprice);
+        // modify by fuyongsheng 20220606 start
+        // 3.0.6场内 ZGCPCN-1117:【场内债券指令】点击风险试算时，提示服务器异常
+        result.put("fprice", fprice == null ? BigDecimal.ZERO : fprice);
+        // modify by fuyongsheng 20220606 end
         result.put("fpriceAmt", fpriceAmt);
-        result.put("yield", yield == null ? new BigDecimal(0.00) : yield);
+        result.put("yield", yield == null ? BigDecimal.valueOf(0.00) : yield);
         result.put("exerYield", exerYield);
         return result;
     }
@@ -1465,7 +1536,8 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(StringUtil.equals(entity.getPriceModel(),DictCodeListExt2.价格模式_市价指令.getValue())){
                     checkPrice = BigDecimal.ZERO;
                 }else if(entity.getRepoRate() != null && StringUtil.equals(entity.getPriceModel(),DictCodeListExt2.价格模式_限价指令.getValue())){
-                    checkPrice = ArithmeticUtil.divide(entity.getRepoRate(),new BigDecimal("100"),2,RoundingMode.HALF_UP);
+                   // checkPrice = ArithmeticUtil.divide(entity.getRepoRate(),new BigDecimal("100"),2,RoundingMode.HALF_UP);
+                    checkPrice = entity.getRepoRate();
                 }
             }
             //
@@ -1522,16 +1594,16 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         else if(StringUtil.equals(trdPriceTimeConfig.getPriceTimeType(),DictCodeListExt3.价格申报范围类型_开盘集合竞价.getValue())){
             if(StringUtil.equals(finprodType,DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
                 if(quotation!=null&&quotation.getPreClosePrice()!=null
-                        &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice()))>0
-                            ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice()))<0)){
-                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice())+"]之外"));
+                        &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.3),quotation.getPreClosePrice()))>0
+                            ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.7),quotation.getPreClosePrice()))<0)){
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.7),quotation.getPreClosePrice())+","+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(1.3),quotation.getPreClosePrice())+"]之外"));
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
                 if(quotation!=null&&quotation.getPreClosePrice()!=null
-                        &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice()))>0
+                        &&(checkPrice.compareTo(ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,new BigDecimal(2),quotation.getPreClosePrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice())+"]之外"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,new BigDecimal(2),quotation.getPreClosePrice())+"]之外"));
                 }
             }
         }
@@ -1544,27 +1616,27 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         ||(StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())
                             &&StringUtil.equals(finProductType.getType7(), DictCodeList.WIND二级分类_含债券二级分类等_政策银行债.getValue()))){
                     if(quotation!=null&&quotation.getLastPrice()!=null
-                            &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice()))>0
-                            ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice())+"]之外"));
+                            &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.1),quotation.getLastPrice()))>0
+                            ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.9),quotation.getLastPrice()))<0)){
+                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.9),quotation.getLastPrice())+","+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(1.1),quotation.getLastPrice())+"]之外"));
                     }
                 }else{
                     if(quotation!=null&&quotation.getLastPrice()!=null
-                            &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()))>0
-                            ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()))<0)){
+                            &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.2),quotation.getLastPrice()))>0
+                            ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.8),quotation.getLastPrice()))<0)){
                         if(quotation.getLastPrice().compareTo(BigDecimal.ZERO)==0){
                             validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+BigDecimal.ZERO+"]之外"));
                         }else{
-                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ ArithmeticUtil.round(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()), NumberEnum.MONEY)+","+ArithmeticUtil.round(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()),NumberEnum.MONEY)+"]之外"));
+                            validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ ArithmeticUtil.round(ArithmeticUtil.multiply(BigDecimal.valueOf(0.8),quotation.getLastPrice()), NumberEnum.MONEY)+","+ArithmeticUtil.round(ArithmeticUtil.multiply(BigDecimal.valueOf(1.2),quotation.getLastPrice()),NumberEnum.MONEY)+"]之外"));
                         }
                     }
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
                 if(quotation!=null&&quotation.getLastPrice()!=null
-                        &&(checkPrice.compareTo(ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice()))>0
+                        &&(checkPrice.compareTo(ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.01),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice())+"]之外"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.01),quotation.getLastPrice())+"]之外"));
                 }
             }
         }
@@ -1614,7 +1686,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         /********************************/
         setAssetTypeById(entity);
         //设置默认最小价差、最小交易单位；否则指令组件抛异常；
-        paraDto.setMinDiffPrice(new BigDecimal(0.001).setScale(3, BigDecimal.ROUND_HALF_UP));
+        paraDto.setMinDiffPrice(BigDecimal.valueOf(0.001).setScale(3, BigDecimal.ROUND_HALF_UP));
         paraDto.setMinDealUnit(new BigDecimal(1));
 
         Map<String, UnitEnum> numUnit = new HashMap<String, UnitEnum>();
@@ -2348,9 +2420,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
     public void updateCfetsOprHis(String entrustId, String optType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
-        if (ENTRUST_RECORD_NEW.equals(optType)) {
+        /*if (ENTRUST_RECORD_NEW.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-        } else if (ENTRUST_RECORD_NEW.equals(optType)) {
+        } else*/ if (ENTRUST_RECORD_NEW.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
         } else if ("close".equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_关闭.getValue());

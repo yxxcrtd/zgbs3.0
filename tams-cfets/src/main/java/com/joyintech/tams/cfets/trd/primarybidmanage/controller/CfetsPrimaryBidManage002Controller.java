@@ -1,25 +1,27 @@
 package com.joyintech.tams.cfets.trd.primarybidmanage.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ValidUtils;
+import com.joyintech.tams.cfets.risk.aop.CfetsTradeHandlerAop;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageValidatorService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.constant.*;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -235,16 +237,20 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(CfetsPrimaryBidManageSaveRequest::getTotalWinId);
-        params.setBusinessType(DictCodeListExt3.共通业务类型_一级市场债中标结果维护.getValue());
+        params.setBusinessCode(CfetsPrimaryBidManageSaveRequest::getBidId);
+        if (StringUtil.equals(dto.getBidModle(),DictCodeListExt4.投标方式_自主投标.getValue())) {
+            params.setBusinessType(DictCodeListExt4.共通业务类型_中标结果维护自主投标.getValue());
+        }else{
+            params.setBusinessType(DictCodeListExt4.共通业务类型_中标结果维护代投代缴.getValue());
+        }
         // 设置流程业务说明
         params.setComment(entity -> {
-            return WorkFlowUtil.concatComment("中标日期"+
-                    GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
-                    "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidTypeStr()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+dto.getAllocationDetails().get(0).getBidPrice()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+dto.getWinPrinamt()+GlobalConstant.CLOSE_PARENTHESIS);
+            return WorkFlowUtil.concatComment("中标日期" +
+                    GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
+                    "资产简称" + GlobalConstant.OPEN_PARENTHESIS + entity.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS
+                    + "中标方式" + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType()) + GlobalConstant.CLOSE_PARENTHESIS
+                    + "中标标位" + GlobalConstant.OPEN_PARENTHESIS + cfetsPrimaryBidManageService.getBidPriceStr(entity) + GlobalConstant.CLOSE_PARENTHESIS
+                    + "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(dto.getWinPrinamt(), BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS);
         });
         ProcessParameter<CfetsPrimaryBidManageSaveRequest> parameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
         parameter.setOperationType(OperationType.NEW);
@@ -312,6 +318,9 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
             dto.setCalculateField("03");
             if (StringUtil.isNotEmpty(dto.getFinprodId())){
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+                if (!StringUtil.isNotEmpty(finProduct.getCirculationCode())){
+                     return new Message<CalcPriceAndYieldResponse>().success().setData(null);
+                }
                if (StringUtil.equals( finProduct.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
                   dto.setFinprodId("F01_"+finProduct.getCirculationCode());
                }
@@ -340,6 +349,42 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         }catch (Exception e){
             e.printStackTrace();
             return new Message<BigDecimal>().fail().setData(null);
+        }
+    }
+
+
+    @ResponseBody
+    @ApiOperation(value = "风险试算", notes = "风险试算")
+    @PostMapping("doRiskcal")
+    public Message<AjaxResult> doRiskcal(@RequestBody CfetsPrimaryBidManageSaveRequest dto){
+        try {
+            String message = cfetsPrimaryBidManageService.doRiskcalCheckMethod(dto);
+            if (StringUtil.isNotEmpty(message)) {
+                AjaxResult ar = new AjaxResult();
+                List<ValidMessage> warnList = new ArrayList<>();
+                warnList.add(new ValidMessage(message));
+                ar.setErrorList(warnList);
+                ar.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().setData(ar);
+            }
+            AjaxResult ajaxResult = CfetsTradeHandlerAop.doRiskcal(dto, this.getPageId());
+            return new Message<AjaxResult>().setData(ajaxResult);
+        } catch (Exception e) {
+            logger.error("风险试算", e);
+            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
+        }
+    }
+
+    @PostMapping("/getManagers")
+    @ApiOperation(value = "投资经理查询", notes = "投资经理查询")
+    @ResponseBody
+    public Message<Page<SelectOptionDto>> getManagers(@RequestBody SelectOptionCommonRequest item) {
+        try {
+            Page<SelectOptionDto> list = cfetsPrimaryBidManage001Service.getManager(item);
+            return new Message<Page<SelectOptionDto>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
         }
     }
 }

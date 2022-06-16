@@ -15,6 +15,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.Switches;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
@@ -283,7 +284,7 @@ public class CommonCheckHelper {
 
             return ErrorCode.INSTRUCTIONS_PRICE_ERROR;
         }
-        if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
             if (Strings.isNullOrEmpty(instruction.getDerivativeBsDir()) || Strings.isNullOrEmpty(instruction.getDerivativeOcFlag())) {
                 return ErrorCode.INSTRUCTIONS_DERIVATIVE_BS_OC_ERROR;
             }
@@ -309,26 +310,28 @@ public class CommonCheckHelper {
      */
     private boolean checkOrderPrice(Instruction instruction, OrderInterface order, BigDecimal orderPrice) {
         //债券买卖
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             String priceMode = instruction.getPriceMode();
             String isFullPrice = order.getIsFullPrice();
             if (StringUtil.equals(priceMode, InstructionPriceMode.SPECIFIED.value)) {
-                if (StringUtil.equals(FullPriceConst.NET_PRICE.value, isFullPrice)) {
-                    return !TradeUtils.equals(orderPrice, instruction.getEntrustPrice());
-                } else {
+                if (StringUtil.equals(FullPriceConst.FULL_PRICE.value, isFullPrice)) {
                     return !TradeUtils.equals(orderPrice, instruction.getFullPrice());
+                } else {
+                    return !TradeUtils.equals(orderPrice, instruction.getEntrustPrice());
                 }
             } else if (StringUtil.equals(priceMode, InstructionPriceMode.FIXED.value)) {
-                if (StringUtil.equals(FullPriceConst.NET_PRICE.value, isFullPrice)) {
-                    return checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice);
-                } else {
+                if (StringUtil.equals(FullPriceConst.FULL_PRICE.value, isFullPrice)) {
                     return checkPriceFixed(order, instruction.getFullPrice(), orderPrice);
+                } else {
+                    return checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice);
                 }
             }
         }
 
         //其他交易
-        if (instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(orderPrice, instruction.getEntrustPrice()) || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice))) {
+        if (instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(orderPrice, instruction.getEntrustPrice())
+                || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice))) {
             return true;
         }
 
@@ -337,12 +340,16 @@ public class CommonCheckHelper {
 
     //超限返回true
     private boolean checkPriceFixed(OrderInterface order, BigDecimal fixedPrice, BigDecimal orderPrice) {
-        return order.getEntrustBs().equals(EntrustBs.SELL.value) && TradeUtils.bigThan(fixedPrice, orderPrice) || order.getEntrustBs().equals(EntrustBs.BUY.value) && TradeUtils.lessThan(fixedPrice, orderPrice);
+        return order.getEntrustBs().equals(EntrustBs.SELL.value) && TradeUtils.bigThan(fixedPrice, orderPrice)
+                || order.getEntrustBs().equals(EntrustBs.BUY.value) && TradeUtils.lessThan(fixedPrice, orderPrice);
     }
 
     public void marketPriceCheck(Order order, Instrument instrument, Instruction instruction) {
         // 科创板 盘后定价 填写保护价格 不需要反向填充涨跌停价格
-        if (EntrustProp.NORMAL_AFTER_SET_PRICE.getValue().equals(order.getEntrustProp()) && Objects.nonNull(instrument) && SubStockType.KCB.value.equals(instrument.getSubStockType()) && order.getOrderPrice().compareTo(BigDecimal.ZERO) > 0) {
+        if (EntrustProp.NORMAL_AFTER_SET_PRICE.getValue().equals(order.getEntrustProp())
+                && Objects.nonNull(instrument)
+                && SubStockType.KCB.value.equals(instrument.getSubStockType())
+                && order.getOrderPrice().compareTo(BigDecimal.ZERO) > 0) {
             return;
         }
 
@@ -364,8 +371,8 @@ public class CommonCheckHelper {
                 order.setOrderPrice(price);
 
                 //资产类型是债券
-                if (InvestmentAssetType.isBond(order.getAssetType()) && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
-
+                if (InvestAssetTypeEnum.isBond(order.getAssetType())
+                        && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
                     EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
                     dto.setPrice(price);
                     dto.setEntrustVolume(order.getOrderVolume());

@@ -172,7 +172,7 @@ public class ClientService {
             return this.serverLocation = "http://localhost:8099/cfetsrepo/secrepoQuote/";
         } else if(StringUtil.equals("FxSecdialogQuote",sendType)) {//现券对话报价新平台
             return this.serverLocation = "http://localhost:8090/cfets/dialogQuote/";
-        }else if(StringUtil.equals("FxSecrepoQuote",sendType)) {//请求报价新平台
+        }else if(StringUtil.equals("FxSecRequestQuote",sendType)) {//请求报价新平台  Sonar Fix modify by huwei 220607
             return this.serverLocation = "http://localhost:8090/cfets/dialogQuote/";
         }
         return null;

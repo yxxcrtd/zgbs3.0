@@ -942,6 +942,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
         if (CollectionUtils.isEmpty(conceptTypes)) {
             return null;
         }
+        if (conceptTypes.size() == 1) {
+            return SysDataUtil.getNameFromDataDict(DictCode.概念标识, conceptTypes.get(0));
+        }
         StringBuilder builder = new StringBuilder();
         conceptTypes.stream().forEach(conceptType -> builder.append(SysDataUtil.getNameFromDataDict(DictCode.概念标识, conceptType)).append(","));
         return builder.toString();

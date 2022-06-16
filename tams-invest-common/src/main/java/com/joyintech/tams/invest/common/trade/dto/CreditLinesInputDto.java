@@ -151,6 +151,15 @@ public class CreditLinesInputDto extends BaseEntity {
     //债转股 股票净价
     private BigDecimal zhaiZhuanGuDanJia;
 
+    /**
+     * 风险控制类别
+     * 风险控制类别_软控(DictCode.风险控制类别,"01","软控"),
+     * 风险控制类别_硬控(DictCode.风险控制类别,"02","硬控"),
+     * @return
+     */
+    private String creditControl;
+
+
     public String getZhaiZhuanGuId() {
         return zhaiZhuanGuId;
     }
@@ -469,5 +478,13 @@ public class CreditLinesInputDto extends BaseEntity {
 
     public void setZhiYaQuan(String zhiYaQuan) {
         ZhiYaQuan = zhiYaQuan;
+    }
+
+    public String getCreditControl() {
+        return creditControl;
+    }
+
+    public void setCreditControl(String creditControl) {
+        this.creditControl = creditControl;
     }
 }

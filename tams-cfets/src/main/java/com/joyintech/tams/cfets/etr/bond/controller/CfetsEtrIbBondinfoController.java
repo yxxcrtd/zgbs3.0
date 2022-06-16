@@ -109,39 +109,14 @@ public class CfetsEtrIbBondinfoController  extends BaseController{
      */
     @Autowired
     private BaseGetBusinessId bussGetBussinessIdService;
-    @Autowired
-    private CommonBusinessService commonBusinessService;
+
     @Autowired
     private CfetsEtrIbBondinfo002Service cfetsEtrIbBondinfo002Service;
     @Autowired
     private CfetsEtribBondInfo003Service cfetsEtrIbBondinfo003Service;
     @Autowired
     private CfetsEtrIbBondinfoService cfetsEtrIbBondinfoService;
-    /**
-     * 债券投资委托service
-     */
-    @Autowired
-    private EtrInvestBondInfoService etrInvestBondInfoService;
-    /**
-     * 委托共通
-     */
-    @Autowired
-    private EtrCommonService etrCommonService;
-    /**
-     * 指令分发service注入
-     */
-    @Autowired
-    private TrdCommandDispatcher001Service trdCommandDispatcher001Service;
-    /**
-     * 投资委托信息Service
-     */
-    @Autowired
-    private BaseEtrInvestInfoServiceImpl etrInvestInfoServiceImpl;
-    /**
-     * 委托指令Mapper
-     */
-    @Autowired
-    private EtrEntrustMapper etrEntrustMapper;
+
     @Autowired
     private JoyinbusinessCommonService joyinbusinessCommonService;
     /**
@@ -254,15 +229,7 @@ public class CfetsEtrIbBondinfoController  extends BaseController{
                 }
                 // ----------add by zhangrui1 20200715 预占功能 end----------
             }
-            if (StringUtil.equals(BussinessConstant.SUBMIT, allDto.getOperateType())) {
-                AjaxResult ar = EntrustRdsCommonAop.doListPreOccupy(
-                        dataList, DictCodeList.平安资产类型_债券.getValue(),
-                        BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue(),
-                        true, null);
-                if (StringUtil.isNotEmpty(ar)) {
-                    return new Message<AjaxResult>().success().setData(ar);
-                }
-            }
+
             EntrustRdsCommonAop.riskListToChildren(allDto.getRiskTrialRetDto(), allDto.getEtrInvestBondInfoDtos(),
                     (dto, list) -> dto.setRiskTrialRetDto(list));
 
@@ -570,7 +537,7 @@ public class CfetsEtrIbBondinfoController  extends BaseController{
     }
 
 
-    @ApiOperation(value = "查询资产是否行权债", notes = "查询资产是否行权债")
+    @ApiOperation(value = "查询资产是否行权债", notes = "查询资产是否行权债且行权净价不为空")
     @PostMapping("/queryAssetIsRight/{secId:.+}")
     @ResponseBody
     public Message<Boolean> queryAssetIsRight(@PathVariable String secId) {

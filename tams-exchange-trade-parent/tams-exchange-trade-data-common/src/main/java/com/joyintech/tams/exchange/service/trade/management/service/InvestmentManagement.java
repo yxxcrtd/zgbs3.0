@@ -315,7 +315,7 @@ public class InvestmentManagement extends BaseService {
                     if (Objects.nonNull(instructionList)) {
                         instructionList.forEach(instruction -> {
                             MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean;
-                            if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+                            if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
                                 minPriceAndMinTrdUnitLimitBean = futuresInstrumentService.queryMinPriceAndMinTrdUnitLimitByFuture(instruction);
                                 instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
                                 Instruction instructionClone = instruction.cloneInstruction();
@@ -472,8 +472,9 @@ public class InvestmentManagement extends BaseService {
             long entrustNum = instruction.getEntrustNum();
             //计算剩余数量=指令数量-冻结数量-成交数量
             long leftVolume = entrustNum - frozenQuantity - entrustLeftAmt;
-            if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg()) ||
-                    投管业务类型_现券交易.getValue().equals(instruction.getBusiTypeTg())) {
+            if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())
+                    || 投管业务类型_现券交易.getValue().equals(instruction.getBusiTypeTg())
+                    || 投管业务类型_信用保护凭证.getValue().equals(instruction.getBusiTypeTg())) {
                 //计算指令数量（展示）
                 instruction.setEntrustNumView(BigDecimal.valueOf(entrustNum).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 instruction.setLeftVolume(leftVolume);
@@ -501,7 +502,7 @@ public class InvestmentManagement extends BaseService {
                 continue;
             }
 
-            /*if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+            /*if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
                 minPriceAndMinTrdUnitLimitBean = futuresInstrumentService.queryMinPriceAndMinTrdUnitLimitByFuture(instruction);
                 instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
                 Instruction instructionClone = instruction.cloneInstruction();
@@ -572,6 +573,8 @@ public class InvestmentManagement extends BaseService {
             } else {
                 minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimit));
             }
+            
+            minPriceAndMinTrdUnitLimitBean.setSubStockType(instrument.getSubStockType());
 
             logger.info("填充最小价差等交易属性信息 => 【minPriceAndMinTrdUnitLimitBean = {}】", minPriceAndMinTrdUnitLimitBean);
             instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);

@@ -169,6 +169,21 @@ public class IntegratedEntrustUtils {
     public static boolean isFixedIncome(String entrustProp) {
         return isFixedIncome_BS(entrustProp) || isFixedIncome_BaoJia(entrustProp) || isFixedIncome_ChenJiao(entrustProp);
     }
+    
+    /***
+     * @Description: 是CDS
+     * @Param: [bsFlag]
+     * @return: boolean
+     * @Author: MAXX
+     * @Date: 2020/3/31
+     */
+    public static boolean isCDS(String entrustProp) {
+    	if (!Strings.isNullOrEmpty(entrustProp)) {
+            if (entrustProp.equals(EntrustProp.CREDIT_PROTECTION_CERTIFICATE.value))
+                return true;
+        }
+        return false;
+    }
 
     /***
      * @Description: 是否固收_最优价成交申报

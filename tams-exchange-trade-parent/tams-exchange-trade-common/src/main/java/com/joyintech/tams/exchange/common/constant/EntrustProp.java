@@ -119,7 +119,11 @@ public enum EntrustProp implements IEnum<String> {
     FTDC_OPT_BIDPRICE1PLUSONETICKS("买一价浮动上浮1个ticks", "FUD"),
     FTDC_OPT_BidPrice1PlusTwoTicks("买一价浮动上浮2个ticks", "FUE"),
     FTDC_OPT_BIDPRICE1PLUSTHREETICKS("买一价浮动上浮3个ticks", "FUF"),
-    FTDC_OPT_FIVELEVELPRICE("五档价", "FUG");
+    FTDC_OPT_FIVELEVELPRICE("五档价", "FUG"),
+
+
+    CREDIT_PROTECTION_CERTIFICATE("信用保护凭证", "EX019"),
+    ;
 
     private static Set<String> marketPriceSet = new HashSet<>();
 

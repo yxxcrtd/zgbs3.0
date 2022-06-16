@@ -10,10 +10,8 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid002Service;
@@ -22,6 +20,7 @@ import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
@@ -34,7 +33,6 @@ import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,37 +86,13 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @ApiOperation(value = "新建/修改/查看页面初始化", notes = "新建/修改/查看页面初始化")
     public Message<Map<String, Object>> init(@RequestBody Map<String, Object> map) {
         Map<String, Object> params = new HashMap<>();
-       // String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
-        //String workflowId = "00000000000000000000000000059700";
         String workflowId = "null".equals(map.get(GlobalConstant.WORKFLOW_ID)) ? null : (String) map.get(GlobalConstant.WORKFLOW_ID);
         boolean todoList = false;
         CfetsEtrBondFirstBid002Dto entity = new CfetsEtrBondFirstBid002Dto();
         // 待办中过来
         if (StringUtil.isNotEmpty(workflowId)) {
             todoList = true;
-//            ProcessMark processMark = cfetsEtrBondFirstBid002Service.getFirstBidBusinessInfo(workflowId);
-//            entity = cfetsEtrBondFirstBid002Service.getBussinessEntity(processMark);
             entity = cfetsEtrBondFirstBid002Service.getBussinessEntityByWorkflowId(workflowId);
-            if (CollectionUtils.isNotEmpty(entity.getBiddingProductList())) {
-                for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {
-                    List<String> portfolioIdList = new ArrayList<>();
-                    portfolioIdList.add(productDto.getPortfolioId());
-                    BaseMap cashMap = positionInfoService.queryEtrAvailableCash(
-                            portfolioIdList,
-                            null,
-                            null,
-                            entity.getCcy(),
-                            null,
-                           entity.getFinprodId()
-                    );
-
-                    //添加头寸信息
-                    productDto.setCashT(cashMap.getBigDecimal("cashT"));
-                    productDto.setCashT1(cashMap.getBigDecimal("cashT1"));
-                    productDto.setRealCash(cashMap.getBigDecimal("realCash"));
-                    productDto.setSecDesirableCash(cashMap.getBigDecimal("secDesirableCash"));
-                }
-            }
 
         }
         //数据字典初始化数据
@@ -171,16 +145,18 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
                 || StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
             //根据指令代码获取指令信息
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(cfetsDto.getEntrustId());
-            //风控通过且投标量没有改高，不走流程直接更新原指令信息
-            if (StringUtil.equals(cfetsDto.getCfetsEtribdoRiskcalReturn().getRiskTrialSpan(), "试算通过")
-                    && etrEntrust != null
-                    && (cfetsDto.getTotalBiddingNum().compareTo(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100))) < 1)
-            ) {
-                CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
-                cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
-                AjaxResult m = new AjaxResult("一级指令修改直接通过成功！");
-                return new Message<AjaxResult>().success().setData(m);
+            cfetsDto.setEntrustStatus(etrEntrust.getEntrustStatus());
+            if (etrEntrust != null && !(StringUtil.equals(DictCodeList.委托状态_已退回.getValue(), etrEntrust.getEntrustStatus())
+                    || StringUtil.equals(DictCodeList.委托状态_已撤回.getValue(), etrEntrust.getEntrustStatus()))) {
+                //投标量没有改高，不走流程直接更新原指令信息
+                if (cfetsDto.getTotalBiddingNum().compareTo(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100))) < 1) {
+                    CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
+                    cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
+                    AjaxResult m = new AjaxResult("一级指令修改直接通过成功！");
+                    return new Message<AjaxResult>().success().setData(m);
+                }
             }
+
         }
 
         CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);

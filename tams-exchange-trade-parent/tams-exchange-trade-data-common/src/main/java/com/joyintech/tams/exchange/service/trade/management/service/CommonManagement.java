@@ -22,16 +22,13 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.system.syspara.dto.SysParaSet001Dto;
 import com.joyintech.system.syspara.service.SysParaSet001Service;
 import com.joyintech.tams.common.base.entity.TrdPriceTimeConfig;
-import com.joyintech.tams.common.util.JacksonUtil;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.SysParamBean;
 import com.joyintech.tams.exchange.common.bean.investment.PtlAuthInfo;
-import com.joyintech.tams.exchange.common.bean.request.CheckTradeInfoRequest;
-import com.joyintech.tams.exchange.common.bean.request.DeviationDegreeRequest;
-import com.joyintech.tams.exchange.common.bean.request.EtrDispatcherInfoRequest;
-import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
+import com.joyintech.tams.exchange.common.bean.request.*;
+import com.joyintech.tams.exchange.common.bean.response.CounterAcctResponse;
 import com.joyintech.tams.exchange.common.bean.response.ExchangeContextResponse;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.cache.MinPriceService;
@@ -587,7 +584,7 @@ public class CommonManagement extends BaseService {
     }
 
     public Message checkSelfDealerTraderInfo(CheckTradeInfoRequest dto) {
-        Map<String,String> map = Maps.newHashMap();
+        Map<String, String> map = Maps.newHashMap();
         map.put("code", "200");
         TradeInfoProRequest request = new TradeInfoProRequest();
         request.setAcctNo(dto.getAcctNo());
@@ -680,5 +677,23 @@ public class CommonManagement extends BaseService {
             resultBean = ResultBean.error(ErrorCode.API_RETURN_ERROR);
         }
         return resultBean;
+    }
+
+    public List<CounterAcctResponse> selectCounterAcctNoInfo(CounterAcctRequest dto) {
+        logger.info(">>>>>>调用投管接口查询对手方资金账户信息<<<<<<");
+        Map<String, Object> params = BeanUtil.object2Map(dto);
+        String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getCounterAcctNoInfo;
+        logger.info("doPost() called with parameters => 【url = {}】, 【params = {}】", url, params);
+        List<Object> list = Lists.newArrayList();
+        try {
+            if (isSingle) {
+                list.addAll(simpleRestTemplate.postForObject(url, params, List.class));
+            } else {
+                list.addAll(restTemplate.postForObject(url, params, List.class));
+            }
+        } catch (Exception e) {
+            logger.error("doPost() called with exception => 【url = {}】, 【params = {}】", url, params, e);
+        }
+        return JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(list), CounterAcctResponse.class);
     }
 }

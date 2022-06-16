@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -130,9 +131,11 @@ public class ImixCounterDealerXmlReaderService {
 					+ ".xml.zip";
 		}
 
-		File[] membersFile = null;
-		membersFile = getMembersFile();
-
+		// Sonar Fix modify by huwei 220607
+		File[] membersFile = getMembersFile();
+		if (StringUtils.isEmpty(membersFile)) {
+			membersFile = new File[]{};
+		}
 
 		ExecutorService es = Executors.newCachedThreadPool();
 		
@@ -165,8 +168,10 @@ public class ImixCounterDealerXmlReaderService {
 				if (future.get()) {
 					ct++;
 				}
-			} catch (Exception e) {
-				log.error("",e);
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+				// Sonar Fix modify by huwei 220607
+				Thread.currentThread().interrupt();
 			}
 		}
 		es.shutdown();

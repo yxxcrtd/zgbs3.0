@@ -4,6 +4,7 @@ import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.file.SafelyFile;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
@@ -24,9 +25,9 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.tams.systemtools.dao.JoyinFSMapper;
+import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
@@ -89,15 +90,24 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     /**
      * 保存操作类型
      *
-     * @param tradeId
-     * @param remark
+     * @param dto
      * @param operType
      */
-    public void saveOperate(String tradeId, String remark, DictCodeListExt3 operType) {
+    public void saveOperate(CreditProtectionCertificate002Dto dto, DictCodeListExt3 operType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(tradeId);
+        //add wsz 修改 ZGCPCN-1333 start
+        oprHisReq.setEntrustId(dto.getFinprodMarketId());
+        //add wsz 修改 ZGCPCN-1333 end
         oprHisReq.setOperType(operType.getValue());
-        oprHisReq.setBusiDes(remark);
+        oprHisReq.setBusiDes(dto.getRemark());
+
+        // modify by yangxunpeng ZGCPCN-1352 start
+        oprHisReq.setUserId(dto.getUpdateUser());
+        oprHisReq.setCreateUser(dto.getCreateUser());
+        oprHisReq.setCreateDept(dto.getCreateDept());
+        oprHisReq.setUpdateUser(dto.getUpdateUser());
+        // modify by yangxunpeng ZGCPCN-1352 end
+
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
@@ -105,19 +115,19 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     public void doComplete(CreditProtectionCertificate002Dto dto, OperationType type) {
         if (OperationType.DELETE == type) {
             this.delete(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_放弃);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_放弃);
         } else if (OperationType.NEW == type && "auto".equals(dto.getOperateType2())) {
             this.insert(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_自动加券);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_自动加券);
         } else if (OperationType.NEW == type && StringUtil.isEmpty(dto.getOperateType2())) {
             this.insert(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_新建);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_新建);
         } else if (OperationType.MODIFY == type && "cover".equals(dto.getOperateType2())) {
             this.update(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_资讯数据覆盖);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_资讯数据覆盖);
         } else if (OperationType.MODIFY == type && StringUtil.isEmpty(dto.getOperateType2())) {
             this.update(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_修改);
+            this.saveOperate(dto, DictCodeListExt3.操作类型_修改);
         }
     }
 
@@ -149,6 +159,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         productAdd.setFinprodId(dto.getFinprodId());
         BigDecimal cash = StringUtil.isNotEmpty(dto.getNomCapi())? dto.getNomCapi().multiply(new BigDecimal(10000)):new BigDecimal(0.00);
         productAdd.setNomCapi(cash);
+        productAdd.setBasis(dto.getBasis());
         finProductAddMapper.insert(productAdd);
         //3.保存融产品分类表
         FinProductType finProductType = new FinProductType();
@@ -158,56 +169,56 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         finProductType.setType7(DictCodeList.信用保护凭证类型_信用保护凭证.getValue());
         finProductType.setType8(DictCodeList.平安资产类型_信用保护凭证.getValue());
         finProductTypeMapper.insert(finProductType);
-        //新增现金流信息
-        String cashId = CommonUtil.generateCashFlowCode(dto.getFinprodId(),
-                DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
-                DictCodeListExt1.现金流二级类型_本金.getValue());
-        FinCashInfo finCashInfo = new FinCashInfo();
-        finCashInfo.setCashId(cashId);
-        finCashInfo.setCashType1(DictCodeListExt1.现金流一级类型_本金.getValue());
-        finCashInfo.setCashType2(DictCodeListExt1.现金流二级类型_本金.getValue());
-        finCashInfo.setFinprodId(dto.getFinprodId());
-        finCashInfo.setFinprodType(DictCodeListExt1.现金流业务类型_金融产品.getValue());
-        finCashInfo.setBranch(0l);
-        BeanUtil.copyPropertiesIgnoreNull(finCashInfo, dto);
-        finCashInfoMapper.insert(finCashInfo);
-        //添加现金流计算规则
-        FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
-        BeanUtil.copyPropertiesIgnoreNull(finCashCalcRule, dto);
-        finCashCalcRule.setCashId(cashId);
-        finCashCalcRule.setEffDate(dto.getVdate());
-        finCashCalcRule.setEffDate(dto.getVdate());
-        finCashCalcRule.setBaseType(DictCodeList.基数类型_实收资本.getValue());
-        finCashCalcRule.setBaseDateType(DictCodeList.基数日期类型_当日.getValue());
-        finCashCalcRule.setBasis(dto.getBasis());
-        finCashCalcRule.setFinprodId(dto.getFinprodId());
-        finCashCalcRule.setBranch(0l);
-        finCashCalcRuleMapper.insert(finCashCalcRule);
-        //添加资金流计划
-        FinCashPlan finCashPlan = new FinCashPlan();
-        finCashPlan.setCashId(cashId);
-        finCashPlan.setCashNum(0l);
-        finCashPlan.setCashType(DictCodeList.现金流类型_到期还本.getValue());
-        finCashPlan.setVdateUnadjust(dto.getVdate());
-        finCashPlan.setMdateUnadjust(dto.getMdate());
-        finCashPlan.setPayDateUnadjust(dto.getMdate());
-        finCashPlan.setVdate(dto.getVdate());
-        finCashPlan.setMdate(dto.getMdate());
-        finCashPlan.setPayDate(dto.getMdate());
-        Long day = DateUtil.getBetweenDayNumber(DateUtil.format(dto.getVdate()),DateUtil.format(dto.getMdate()));
-        finCashPlan.setTermdays(day);
-        finCashPlan.setVdateTerm(dto.getVdate());
-        finCashPlan.setMdateTerm(dto.getMdate());
-        finCashPlan.setIntPrinAmt(cash);
-        finCashPlan.setCashBaseamt(cash);
-        finCashPlan.setCashUnitType(DictCodeList.现金流单位_总额.getValue());
-        finCashPlan.setFinprodId(dto.getFinprodId());
-        finCashPlan.setFinprodType(dto.getFinprodType());
-        finCashPlan.setFinprodType2(dto.getFinprodType2());
-        finCashPlan.setPayType(DictCodeList.支付方式_现金.getValue());
-        finCashPlan.setBranch(0l);
-        finCashPlan.setBasis(dto.getBasis());
-        finCashPlanMapper.insert(finCashPlan);
+//        //新增现金流信息
+//        String cashId = CommonUtil.generateCashFlowCode(dto.getFinprodId(),
+//                DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
+//                DictCodeListExt1.现金流二级类型_本金.getValue());
+//        FinCashInfo finCashInfo = new FinCashInfo();
+//        finCashInfo.setCashId(cashId);
+//        finCashInfo.setCashType1(DictCodeListExt1.现金流一级类型_本金.getValue());
+//        finCashInfo.setCashType2(DictCodeListExt1.现金流二级类型_本金.getValue());
+//        finCashInfo.setFinprodId(dto.getFinprodId());
+//        finCashInfo.setFinprodType(DictCodeListExt1.现金流业务类型_金融产品.getValue());
+//        finCashInfo.setBranch(0l);
+//        BeanUtil.copyPropertiesIgnoreNull(finCashInfo, dto);
+//        finCashInfoMapper.insert(finCashInfo);
+//        //添加现金流计算规则
+//        FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
+//        BeanUtil.copyPropertiesIgnoreNull(finCashCalcRule, dto);
+//        finCashCalcRule.setCashId(cashId);
+//        finCashCalcRule.setEffDate(dto.getVdate());
+//        finCashCalcRule.setEffDate(dto.getVdate());
+//        finCashCalcRule.setBaseType(DictCodeList.基数类型_实收资本.getValue());
+//        finCashCalcRule.setBaseDateType(DictCodeList.基数日期类型_当日.getValue());
+//        finCashCalcRule.setBasis(dto.getBasis());
+//        finCashCalcRule.setFinprodId(dto.getFinprodId());
+//        finCashCalcRule.setBranch(0l);
+//        finCashCalcRuleMapper.insert(finCashCalcRule);
+//        //添加资金流计划
+//        FinCashPlan finCashPlan = new FinCashPlan();
+//        finCashPlan.setCashId(cashId);
+//        finCashPlan.setCashNum(0l);
+//        finCashPlan.setCashType(DictCodeList.现金流类型_到期还本.getValue());
+//        finCashPlan.setVdateUnadjust(dto.getVdate());
+//        finCashPlan.setMdateUnadjust(dto.getMdate());
+//        finCashPlan.setPayDateUnadjust(dto.getMdate());
+//        finCashPlan.setVdate(dto.getVdate());
+//        finCashPlan.setMdate(dto.getMdate());
+//        finCashPlan.setPayDate(dto.getMdate());
+//        Long day = DateUtil.getBetweenDayNumber(DateUtil.format(dto.getVdate()),DateUtil.format(dto.getMdate()));
+//        finCashPlan.setTermdays(day);
+//        finCashPlan.setVdateTerm(dto.getVdate());
+//        finCashPlan.setMdateTerm(dto.getMdate());
+//        finCashPlan.setIntPrinAmt(cash);
+//        finCashPlan.setCashBaseamt(cash);
+//        finCashPlan.setCashUnitType(DictCodeList.现金流单位_总额.getValue());
+//        finCashPlan.setFinprodId(dto.getFinprodId());
+//        finCashPlan.setFinprodType(dto.getFinprodType());
+//        finCashPlan.setFinprodType2(dto.getFinprodType2());
+//        finCashPlan.setPayType(DictCodeList.支付方式_现金.getValue());
+//        finCashPlan.setBranch(0l);
+//        finCashPlan.setBasis(dto.getBasis());
+//        finCashPlanMapper.insert(finCashPlan);
         //附件
         MstFileInputParameter mstFileInputParameter = dto.getMstFileInputParameter();
         if (StringUtil.isNotEmpty(mstFileInputParameter)
@@ -226,29 +237,32 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      */
     public void delete(CreditProtectionCertificate002Dto dto) {
         //1.删除融产品分类表
+        //add wsz 修改 ZGCPCN-1333 start
+        String finprodId = this.getFinprodId(dto.getFinprodMarketId());
         FinProductTypeKey typeKey = new FinProductTypeKey();
         typeKey.setBranch(0l);
-        typeKey.setFinprodId(dto.getFinprodId());
+        typeKey.setFinprodId(finprodId);
         finProductTypeMapper.deleteByPrimaryKey(typeKey);
         //3.删除金融产品标的附属表
-        finProductAddMapper.deleteByPrimaryKey(dto.getFinprodId());
+        finProductAddMapper.deleteByPrimaryKey(finprodId);
         //4.删除金融产品标的表
-        finProductMapper.deleteByPrimaryKey(dto.getFinprodId());
-        //5.删除现金流信息
-        String cashId = CommonUtil.generateCashFlowCode(dto.getFinprodId(),
-                DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
-                DictCodeListExt1.现金流二级类型_本金.getValue());
-        finCashInfoMapper.deleteByPrimaryKey(cashId);
-        //6.删除现金流计算规则
-        FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
-        finCashCalcRule.setCashId(cashId);
-        finCashCalcRule.setEffDate(dto.getVdate());
-        finCashCalcRuleMapper.deleteByPrimaryKey(finCashCalcRule);
-        //7.删除资金流计划
-        FinCashPlan finCashPlan = new FinCashPlan();
-        finCashPlan.setCashId(cashId);
-        finCashPlan.setMdate(dto.getMdate());
-        finCashPlanMapper.deleteByPrimaryKey(finCashPlan);
+        finProductMapper.deleteByPrimaryKey(finprodId);
+        //add wsz 修改 ZGCPCN-1333 end
+//        //5.删除现金流信息
+//        String cashId = CommonUtil.generateCashFlowCode(dto.getFinprodId(),
+//                DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
+//                DictCodeListExt1.现金流二级类型_本金.getValue());
+//        finCashInfoMapper.deleteByPrimaryKey(cashId);
+//        //6.删除现金流计算规则
+//        FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
+//        finCashCalcRule.setCashId(cashId);
+//        finCashCalcRule.setEffDate(dto.getVdate());
+//        finCashCalcRuleMapper.deleteByPrimaryKey(finCashCalcRule);
+//        //7.删除资金流计划
+//        FinCashPlan finCashPlan = new FinCashPlan();
+//        finCashPlan.setCashId(cashId);
+//        finCashPlan.setMdate(dto.getMdate());
+//        finCashPlanMapper.deleteByPrimaryKey(finCashPlan);
     }
 
     /**
@@ -280,7 +294,11 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             newPathFile.mkdir();
         }
         File folder = new SafelyFile(newPathFile,newfileName);
-        folder.createNewFile();
+        //修改上传文件
+        if (!folder.getParentFile().exists())
+            folder.getParentFile().mkdirs();
+        if (!folder.exists())
+            folder.createNewFile();
         FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
         SysUploadFileInfo fileInfo = new SysUploadFileInfo();
         String uuid = UUID.randomUUID().toString().replace("-", "");
@@ -332,6 +350,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
 //            return getById(finprodId);
 //        } else {//从接口中获取
         CreditProtectionCertificate002Dto dto = interfCreditInfoMapper.getFromInterface(param);
+        if(Objects.isNull(dto)){
+            return new CreditProtectionCertificate002Dto();
+        }
             if(StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
                 dto.setCalendarId("04");
             }else if(StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
@@ -354,8 +375,17 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         param.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
-        param.put("finprodMarketId", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue()+"_"+finprodId);
+        //add wsz 修改bug ZGCPCN-1211 20220610 【信用保护凭证标的】信用保护凭证指令资产代码输入资产代码，点击查看，无法查看标的详情 start
+        if(!Objects.isNull(finprodId) && !finprodId.contains(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+            param.put("finprodMarketId", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue()+"_"+finprodId);
+        } else {
+            param.put("finprodMarketId", finprodId);
+        }
+        //add wsz 修改bug ZGCPCN-1211 20220610 【信用保护凭证标的】信用保护凭证指令资产代码输入资产代码，点击查看，无法查看标的详情 end
         entity = creditProtectionCertificateMapper.getByFinProdId(param);
+        if(Objects.isNull(entity)){
+            return null;
+        }
         BigDecimal cash = StringUtil.isNotEmpty(entity.getNomCapi())? entity.getNomCapi().divide(new BigDecimal(10000)):new BigDecimal(0.00);
         entity.setNomCapi(cash);
         List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
@@ -376,6 +406,50 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         return entity;
     }
 
+    public CreditProtectionCertificate002Dto getProcessEntity(CreditProtectionCertificate002Dto entity){
+        //add wsz 修改现实问题 ZGCPCN-1356 start
+        CreditProtectionCertificate002Dto entity2 = null;
+        if(StringUtil.isNotEmpty(entity.getFinprodId())) {
+            entity2 = this.getById(entity.getFinprodId());
+        }
+        if(!Objects.isNull(entity2)){
+            BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
+        } else {
+            entity.setRefSecList(this.getRefList(entity));
+            entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
+            entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
+            List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
+            MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
+            mstFileInputParameter.setFileList(uploadInfo);
+            mstFileInputParameter.setBussinessId(entity.getFinprodId());
+            entity.setMstFileInputParameter(mstFileInputParameter);
+        }
+        //add wsz 修改现实问题 ZGCPCN-1356 end
+        return entity;
+    }
+
+    public String getRefList(CreditProtectionCertificate002Dto entity){
+        if(!StringUtils.isNotEmpty(entity.getRefSec())){
+            return null;
+        }
+        Map<String,Object> params = new HashMap<>();
+        params.put("finprodType2", DictCodeListExt1.金融产品类型_债券.getValue());
+        params.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        params.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        params.put("refList", StringUtil.splitToList(null, entity.getRefSec()));
+        List<String> refList = creditProtectionCertificateMapper.getRefList(params);
+        return refList.stream().collect(Collectors.joining(","));
+    }
+
+    public String getMstCustomerInfo(String customerId){
+        if(!StringUtils.isNotEmpty(customerId)){
+            return null;
+        }
+        Map<String,Object> params = new HashMap<>();
+        params.put("customerId", customerId);
+        return creditProtectionCertificateMapper.getMstCustomerInfo(params);
+    }
+
     @Override
     public void doInsert(CreditProtectionCertificate002Dto entity, OperationType type) {
 
@@ -394,6 +468,13 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     @Override
     public void doBack(CreditProtectionCertificate002Dto entity) {
 
+    }
+
+    public String getFinprodId(String finprodId){
+        if(!Objects.isNull(finprodId)&&!finprodId.contains(DictCodeList.信用保护凭证类型_信用保护凭证.getValue())){
+            return DictCodeList.信用保护凭证类型_信用保护凭证.getValue()+"_"+ finprodId;
+        }
+        return finprodId;
     }
 
 
@@ -433,12 +514,43 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
                 }
             }
         }
+        if (StringUtil.equals(operateType, "submit")) {
+            this.emptyCheck(dto, validList);
+            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+            }
+        }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             this.emptyCheck(dto, validList);
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",DictCodeList.是否_否.getValue());
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+            }
+            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+                }
             }
         }
         return validList;
@@ -458,14 +570,22 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",DictCodeList.是否_否.getValue());
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息,无法修改"));
             }
         }
         if (StringUtil.equals(operateType, OperationType.DELETE.name())) {
             //删除时，需要判断当前资产是否存在指令及交易数据，如存在，则不允许删除；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), null,null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",null);
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
@@ -480,6 +600,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      * @return
      */
     public String getFinprodId(CreditProtectionCertificate002Dto dto) {
+        if(!dto.getFinprodMarketId().contains(".")){
+            return String.format("%s_%s%s", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),dto.getFinprodMarketId(),dto.getTradeMarketId());
+        }
         return String.format("%s_%s", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),dto.getFinprodMarketId());
     }
 

@@ -68,6 +68,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     @ApiModelProperty(name="tenderTarget",value="招标标的")
     private String tenderTarget;
 
+    @ApiModelProperty(name="issueClass",value="发行方式")
+    private String issueClass;
+
     @ApiModelProperty(name="tenderTargetStr",value="招标标的字典值")
     private String tenderTargetStr;
 
@@ -155,6 +158,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     @ApiModelProperty(name = "cfetsTrdFirstBidFirmEntrustDtos", value = "指令明细信息")
     private List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtos;
+
+    @ApiModelProperty(name = "totleId", value = "汇总代码：汇总指令关系表，用于指令汇总", example = "true/fasle")
+    private String totleId;
 
     public String getEntrustStatus() {
         return entrustStatus;
@@ -305,7 +311,18 @@ public class CfetsTrdFirstBidFirmEntrustDto {
         this.issueDate = issueDate;
     }
 
+    public String getIssueClass() {
+        return issueClass;
+    }
+
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
+    }
+
     public String getIssueDateStr() {
+        if (null == this.getIssueDateEnd() && null != this.getIssueDateEnd()) {
+            return DateUtil.format(this.getIssueDateStart());
+        }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart()) + "~" + DateUtil.format(this.getIssueDateEnd());
         }
@@ -399,7 +416,7 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     public String getLastModifiedDateStr() {
         if (null != this.getLastModifiedDate()) {
-            return DateUtil.format(this.getEntrustDate());
+            return DateUtil.format(this.getLastModifiedDate());
         }
         //取最近一次修改日期，如未修改，默认为等于指令日期
         if (null != this.getEntrustDate()) {
@@ -536,5 +553,13 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     public void setOperateSide(String operateSide) {
         this.operateSide = operateSide;
+    }
+
+    public String getTotleId() {
+        return totleId;
+    }
+
+    public void setTotleId(String totleId) {
+        this.totleId = totleId;
     }
 }

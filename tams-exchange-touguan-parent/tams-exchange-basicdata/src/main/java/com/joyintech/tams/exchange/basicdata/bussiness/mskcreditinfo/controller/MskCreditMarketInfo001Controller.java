@@ -153,7 +153,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
-                if(mskCreditMarketInfoPro001Service.selectByKey(entity.getSecid(), entity.getCdate(),entity.getValueSource()) == null){
+                if(mskCreditMarketInfoPro001Service.selectByKey(null,entity.getSecid(), entity.getCdate(),entity.getValueSource()) == null){
                     errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
@@ -189,12 +189,12 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                     wr.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(wr);
                 }
-                if(mskCreditMarketInfoPro001Service.selectByKey((String) param.get("secid"), (String)param.get("cdate"),(String)param.get("valueSource")) == null){
-                    errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
-                    wr.setErrorList(errorList);
-                    wr.setMessageType(MessageType.错误消息);
-                    return new Message<AjaxResult>().success().setData(wr);
-                }
+//                if(!mskCreditMarketInfoPro001Service.selectByKeys(null,(String) param.get("secid"), (String)param.get("cdate"),(String)param.get("valueSource"))){
+//                    errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
+//                    wr.setErrorList(errorList);
+//                    wr.setMessageType(MessageType.错误消息);
+//                    return new Message<AjaxResult>().success().setData(wr);
+//                }
            // }
        // }
         return new Message<AjaxResult>().success().setData(wr);
@@ -209,13 +209,18 @@ public class MskCreditMarketInfo001Controller extends BaseController {
      * @throws Exception 异常
      */
     @ResponseBody
-    @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Validated({
+    @PostMapping("/delete")
+    @ApiOperation(value = "删除", notes = "删除")
+    public Message<AjaxResult> delete(@RequestBody @Validated({
             ValidateGroupDelete.class}) MskCreditInfoProSaveRequest dto, BindingResult br)
             throws Exception {
         if (br.hasErrors()) {
-            return new AjaxResult(br);
+            return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
+        for (MskCreditInfoProSaveRequest saveRequest:dto.getSelectedItem()){
+            saveRequest.setOperateType(OperationType.DELETE.name());
+        }
+        dto.setOperateType(OperationType.DELETE.name());
         ProcessParameter<MskCreditInfoProSaveRequest> processParameter = new ProcessParameter<MskCreditInfoProSaveRequest>();
         WorkFlowParameter<MskCreditInfoProSaveRequest> params = new WorkFlowParameter<MskCreditInfoProSaveRequest>();
         params.setPageId("MstCreditMarketInfo002");
@@ -233,7 +238,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
         String msg = mskCreditMarketInfoPro001Service.start(processParameter,
                 dto.getSelectedItem().toArray(
                         new MskCreditInfoProSaveRequest[dto.getSelectedItem().size()]));
-        return new AjaxResult(msg);
+        return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
 
     }
 

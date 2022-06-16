@@ -115,6 +115,8 @@ public class RiskTrialDayTimeProcessorService extends BaseService {
 				}
 			} catch (InterruptedException e) {
 				logger.error("线程池获取错误信息对象超时！", e);
+				// Sonar Fix modify by huwei 220609
+				Thread.currentThread().interrupt();
 			} catch (ExecutionException e) {
 				logger.error("线程池获取错误信息对象执行异常！", e);
 			}

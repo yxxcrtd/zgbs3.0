@@ -121,13 +121,11 @@ public class CfetsEtrIbRepoRkController extends BaseController {
      * 删除
      * @param dto
      * @return
-     * @throws Exception
      */
     @ResponseBody
     @PostMapping(ACTION_DELETE)
     @ApiOperation(value = "删除质押券库", notes = "删除质押券库")
-    public Message<AjaxResult> delete(@RequestBody CfetsEtrIbRepoRkDto dto, BindingResult br)
-        throws Exception {
+    public Message<AjaxResult> delete(@RequestBody CfetsEtrIbRepoRkDto dto, BindingResult br) {
         try{
             if (br.hasErrors()) {
                 return new Message<AjaxResult>().setData(new AjaxResult(br));
@@ -145,27 +143,25 @@ public class CfetsEtrIbRepoRkController extends BaseController {
      *
      * @param RepoInfoDto EtrInvestRepoInfoDto
      * @param br msg
-     * @throws Exception 异常
      */
     @ResponseBody
-    @PostMapping("save")
+    @PostMapping(PAGE_SAVE)
     @ApiOperation(value = "质押券库保存", notes = "自动入库提交")
-    public Message<AjaxResult> save(@RequestBody CfetsEtrIbRepoRkDto RepoInfoDto, BindingResult br)
-            throws Exception {
-        try{
+    public Message<AjaxResult> save(@RequestBody CfetsEtrIbRepoRkDto RepoInfoDto, BindingResult br) {
+        try {
             if (br.hasErrors()) {
                 return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
             }
             // 临时主键
             // 业务代码生成参数
             //前台默认
-    //        BussinessCodeParameter parameter = new BussinessCodeParameter();
-    //        parameter.setSeqNo("0666");
-    //        RepoInfoDto.setPledgeStockId(baseGetBusinessId.buildBussinessCode(parameter));
+            //        BussinessCodeParameter parameter = new BussinessCodeParameter();
+            //        parameter.setSeqNo("0666");
+            //        RepoInfoDto.setPledgeStockId(baseGetBusinessId.buildBussinessCode(parameter));
 //            String generatedId = IDGenerator.generate();
             List<EtrSecStockConfig> etrSecStockConfigList = new ArrayList<>();
-            for(CfetsEtrSecStockConfig cfetsEtrSecStockConfig:RepoInfoDto.getCfetsEtrSecStockConfig()){
-                if(StringUtil.isEmptyList(cfetsEtrSecStockConfig.getWindtype())){
+            for (CfetsEtrSecStockConfig cfetsEtrSecStockConfig : RepoInfoDto.getCfetsEtrSecStockConfig()) {
+                if (StringUtil.isEmptyList(cfetsEtrSecStockConfig.getWindtype())) {
                     EtrSecStockConfig etrSecStockConfig = new EtrSecStockConfig();
                     etrSecStockConfig.setPledgeStockId(RepoInfoDto.getPledgeStockId());
                     etrSecStockConfig.setConfigId(IDGenerator.generate());
@@ -177,8 +173,8 @@ public class CfetsEtrIbRepoRkController extends BaseController {
                     etrSecStockConfig.setWindtypeone(null);
                     etrSecStockConfig.setWindtypetwo(null);
                     etrSecStockConfigList.add(etrSecStockConfig);
-                }else{
-                    for(int i = 0; i < cfetsEtrSecStockConfig.getWindtype().size(); i++){
+                } else {
+                    for (int i = 0; i < cfetsEtrSecStockConfig.getWindtype().size(); i++) {
                         EtrSecStockConfig etrSecStockConfig = new EtrSecStockConfig();
                         etrSecStockConfig.setPledgeStockId(RepoInfoDto.getPledgeStockId());
                         etrSecStockConfig.setConfigId(IDGenerator.generate());
@@ -189,6 +185,7 @@ public class CfetsEtrIbRepoRkController extends BaseController {
                         etrSecStockConfig.setSecGradeResult(cfetsEtrSecStockConfig.getSecGradeResult());
                         etrSecStockConfig.setWindtypeone(cfetsEtrSecStockConfig.getWindtype().get(i).get(0));
                         etrSecStockConfig.setWindtypetwo(cfetsEtrSecStockConfig.getWindtype().get(i).get(1));
+                        etrSecStockConfig.setWindtypethree(cfetsEtrSecStockConfig.getWindtype().get(i).get(2));
                         etrSecStockConfigList.add(etrSecStockConfig);
                     }
                 }
@@ -203,9 +200,9 @@ public class CfetsEtrIbRepoRkController extends BaseController {
                 RepoInfoDto.getPtlSecStock().get(i).setPledgeStockName(RepoInfoDto.getPledgeStockName());
                 RepoInfoDto.getPtlSecStock().get(i).setPledgeStockId(RepoInfoDto.getPledgeStockId());
             }
-             cfetsEtrIbRepoRKService.doComplete(RepoInfoDto, OperationType.NEW);
+            cfetsEtrIbRepoRKService.doComplete(RepoInfoDto, OperationType.NEW);
             return new Message<AjaxResult>().success().setData(new AjaxResult("保存成功"));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return new Message<AjaxResult>().fail().setData(new AjaxResult("删除失败"));
         }

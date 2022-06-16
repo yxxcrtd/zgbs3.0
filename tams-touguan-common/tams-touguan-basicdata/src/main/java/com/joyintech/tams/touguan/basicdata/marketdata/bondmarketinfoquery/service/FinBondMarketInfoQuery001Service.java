@@ -183,6 +183,30 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     }
 
     /**
+     * 加券前的校验
+     * @param secId
+     * @return
+     */
+    public List<ValidMessage> addCouponsValid(String secId) {
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2(secId, DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        List<ValidMessage> validMessages = new ArrayList<>();
+        if (Objects.nonNull(finProduct)) {
+            validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
+            return validMessages;
+        }
+        //校验
+        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.selectWindBondAssetBySecId(secId);
+        if (Objects.isNull(interfPayhsrcsecinfoDto)) {
+            validMessages.add(new ValidMessage("未查询到该待上市债券信息，无法加券，请手工维护"));
+            return validMessages;
+        }
+        //校验必填项
+        addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
+        return validMessages;
+    }
+
+
+    /**
      * 加券市场信息查询
      *
      * @param secId
@@ -344,35 +368,47 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getInterestrate())) {
             getValidMessages("利率类型", validMessages);
         }
+        if (StringUtil.isNotBlank(interfPayhsrcsecinfoDto.getInterestrate()) && DictCodeList.利率类型_浮动利率.getValue().equals(interfPayhsrcsecinfoDto.getInterestrate())) {
+            if (Objects.isNull(interfPayhsrcsecinfoDto.getCoefficient())) {
+                getValidMessages("系数", validMessages);
+            }
+            if (Objects.isNull(interfPayhsrcsecinfoDto.getSpreadrate8())) {
+                getValidMessages("利差", validMessages);
+            }
+            if (Objects.isNull(interfPayhsrcsecinfoDto.getBaseRateAccuracy())) {
+                getValidMessages("基准利率精度", validMessages);
+            }
+            if (Objects.isNull(interfPayhsrcsecinfoDto.getFirstRateDeterminationDate())) {
+                getValidMessages("首次利率确定日", validMessages);
+            }
+            if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getResettype())) {
+                getValidMessages("基准利率调整规则", validMessages);
+            }
+            if (StringUtil.isNotBlank(interfPayhsrcsecinfoDto.getResettype()) &&
+                    DictCodeList.重置类型_基准利率调整规则_基准利率变动后固定间隔生效.getValue().equals(interfPayhsrcsecinfoDto.getResettype())) {
+                if (Objects.isNull(interfPayhsrcsecinfoDto.getObservebefday())) {
+                    getValidMessages("延后时间", validMessages);
+                }
+                if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getObservebefunit())) {
+                    getValidMessages("延后时间单位", validMessages);
+                }
+            }
+        }
+
         if (Objects.isNull(interfPayhsrcsecinfoDto.getPaperir())) {
             getValidMessages("票面利率", validMessages);
         }
-        if (Objects.isNull(interfPayhsrcsecinfoDto.getToprate())) {
-            getValidMessages("利率上限", validMessages);
-        }
-        if (Objects.isNull(interfPayhsrcsecinfoDto.getBottomrate())) {
-            getValidMessages("利率下限", validMessages);
-        }
-        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getResettype())) {
-            getValidMessages("基准利率调整规则", validMessages);
-        }
-        if (Objects.isNull(interfPayhsrcsecinfoDto.getObservebefday())) {
-            getValidMessages("延后时间", validMessages);
-        }
-        if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getObservebefunit())) {
-            getValidMessages("延后时间单位", validMessages);
-        }
+//        if (Objects.isNull(interfPayhsrcsecinfoDto.getToprate())) {
+//            getValidMessages("利率上限", validMessages);
+//        }
+//        if (Objects.isNull(interfPayhsrcsecinfoDto.getBottomrate())) {
+//            getValidMessages("利率下限", validMessages);
+//        }
         if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getWorkdayrule())) {
             getValidMessages("营业日准则", validMessages);
         }
         if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getPaycycle())) {
             getValidMessages("付息频率", validMessages);
-        }
-        if (Objects.isNull(interfPayhsrcsecinfoDto.getCoefficient())) {
-            getValidMessages("系数", validMessages);
-        }
-        if (Objects.isNull(interfPayhsrcsecinfoDto.getSpreadrate8())) {
-            getValidMessages("利差", validMessages);
         }
         if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getCalloption())) {
             getValidMessages("是否可赎回", validMessages);
@@ -385,12 +421,6 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         }
         if (Objects.isNull(interfPayhsrcsecinfoDto.getDelistingDate())) {
             getValidMessages("摘牌日", validMessages);
-        }
-        if (Objects.isNull(interfPayhsrcsecinfoDto.getBaseRateAccuracy())) {
-            getValidMessages("基准利率精度", validMessages);
-        }
-        if (Objects.isNull(interfPayhsrcsecinfoDto.getFirstRateDeterminationDate())) {
-            getValidMessages("首次利率确定日", validMessages);
         }
     }
 

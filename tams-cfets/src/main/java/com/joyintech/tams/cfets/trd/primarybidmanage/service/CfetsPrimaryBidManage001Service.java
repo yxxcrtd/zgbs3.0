@@ -2,10 +2,13 @@ package com.joyintech.tams.cfets.trd.primarybidmanage.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMapper;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
@@ -42,7 +45,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
      * 基础--中债报送(资产)
      */
     @Autowired(required = false)
-    private JoyinbusinessCommonService joyinbusinessCommonService;
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
     @Autowired
     private IPlatformDate iplatformDate;
@@ -89,8 +92,13 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         pageParam.put("COMMON_BUSINESS_TYPE_TRD97", BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
         List<String> isWinList = StringUtil.splitToList(null, request.getIsWin());
         pageParam.put("isWinList", isWinList);
-        pageParam.put("sort",request.getPageMode().getSort());
+        if (StringUtil.isNotEmpty(request.getPageMode().getSort()) && StringUtil.equals(request.getPageMode().getSort(),"bidDate")){
+            pageParam.put("sort","bidDateStart");
+        }else{
+            pageParam.put("sort",request.getPageMode().getSort());
+        }
         pageParam.put("direction",request.getPageMode().getDirection());
+        pageParam.put("userId",SecurityUtil.getLoginUser().getUserName());
         Page<CfetsPrimaryBidManageCfmResponse> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> cfetsPrimaryBidManageMapper.selectCfmForPage(pageParam));
@@ -184,6 +192,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         pageParam.put("winTypeList", StringUtil.splitToList(null, request.getWinType()));
         pageParam.put("payTypeList", StringUtil.splitToList(null, request.getPayType()));
         pageParam.put("bidTypeList", StringUtil.splitToList(null, request.getBidType()));
+        pageParam.put("isWinList", StringUtil.splitToList(null, request.getIsWin()));
         pageParam.put("platDate", DateUtil.format(DateUtil.platDateFromCache()));
         pageParam.put("sort",request.getPageMode().getSort());
         pageParam.put("direction",request.getPageMode().getDirection());
@@ -206,6 +215,12 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> cfetsPrimaryBidManageMapper.selectDetailForPage(pageParam));
         return page;
+    }
+
+    public Page<SelectOptionDto> getManager(SelectOptionCommonRequest dto) {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("manager", dto.getSearch());
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.getManagers(param));
     }
 
 }

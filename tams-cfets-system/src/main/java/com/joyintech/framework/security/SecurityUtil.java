@@ -99,12 +99,11 @@ public final class SecurityUtil implements SecurityService {
             if(!authenticated) {
                 Cookie[] cookie = RequestUtil.getCurrentRequest().getCookies();
                 if(null != cookie) {
-                    for (Cookie c : cookie) {
-                        SessionDAO sessionDao = SpringContextUtil.getBean(SessionDAO.class);
-                        Session session = sessionDao.readSession(c.getValue());
-                        authenticated = null != session.getAttribute("__" + c.getValue());
-                        break;
-                    }
+                    // Sonar Fix modify by huwei 220609
+                    Cookie c = cookie[0];
+                    SessionDAO sessionDao = SpringContextUtil.getBean(SessionDAO.class);
+                    Session session = sessionDao.readSession(c.getValue());
+                    authenticated = null != session.getAttribute("__" + c.getValue());
                 }
             }
             return authenticated;
@@ -201,16 +200,16 @@ public final class SecurityUtil implements SecurityService {
                 }
                 Cookie[] cookie = RequestUtil.getCurrentRequest().getCookies();
                 if(null != cookie) {
-                    for (Cookie c : cookie) {
-                        SessionDAO sessionDao = SpringContextUtil.getBean(SessionDAO.class);
-                        session = sessionDao.readSession(c.getValue());
-                        if ("__sk_user_orgType_".equals(sessionKey)) {
-                        	return session.getAttribute("__sk_user_orgType_");
-                        } else if (GlobalConstant.SESSION_INSTITUTION_CODE.equals(sessionKey)) {
-                            return session.getAttribute(GlobalConstant.SESSION_INSTITUTION_CODE);
-                        }
-                        return session.getAttribute("__" + c.getValue());
+                    // Sonar Fix modify by huwei 220609
+                    Cookie c = cookie[0];
+                    SessionDAO sessionDao = SpringContextUtil.getBean(SessionDAO.class);
+                    session = sessionDao.readSession(c.getValue());
+                    if ("__sk_user_orgType_".equals(sessionKey)) {
+                        return session.getAttribute("__sk_user_orgType_");
+                    } else if (GlobalConstant.SESSION_INSTITUTION_CODE.equals(sessionKey)) {
+                        return session.getAttribute(GlobalConstant.SESSION_INSTITUTION_CODE);
                     }
+                    return session.getAttribute("__" + c.getValue());
                 }
             }
         } catch (Exception e) {

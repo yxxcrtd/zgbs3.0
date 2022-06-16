@@ -6,8 +6,8 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.trade.buyoutrepo.dao.TrdOutRightRepoTradeMapper;
-import com.joyintech.service.trade.buyoutrepo.service.TrdOutRightRepoTradeService;
 import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
@@ -15,8 +15,8 @@ import com.joyintech.tams.business.common.dto.PositionRulePtlData;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo004Mapper;
-import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.manualsettle.dto.*;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
@@ -137,24 +137,12 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
     private CfetsEtrIbRepoAutoRKService cfetsEtrIbRepoAutoRKService;
     @Autowired(required = false)
     private BaseTradeProductDealCommServiceImpl baseTradeProductDealCommServiceImpl;
-
-    @Autowired
-    private TrdOutRightRepoTradeService trdOutRightRepoTradeService;
-
-    @Autowired
-    private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
-
     @Autowired
     private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
     @Autowired
     private TrdProductTempDealTotalMapper trdProductTempDealTotalMapper;
-
     @Autowired
     BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
-
-    @Autowired(required = false)
-    private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
-
     @Autowired
     private RegFinProductDealMapper regFinProductDealMapper;
 
@@ -176,7 +164,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
     /**
      * {@linkplain}
      */
-    @Autowired
+    @Autowired(required = false)
     private TrdOutRightRepoTradeMapper trdOutRightRepoTradeMapper;
 
     @Autowired
@@ -187,9 +175,6 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
 
     @Autowired(required = false)
     private BaseTradeProductDealCommService baseTradeProductDealCommService;
-
-    @Autowired(required = false)
-    private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
 
 
     /**
@@ -318,7 +303,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
      * @param cfetsManualSettleDto
      * @return List<CfetsManualSettleInsertDto>
      */
-    private List<CfetsManualSettleInsertDto> handleSettleData(CfetsManualSettleDto cfetsManualSettleDto) {
+    public List<CfetsManualSettleInsertDto> handleSettleData(CfetsManualSettleDto cfetsManualSettleDto) {
 
         List<CfetsManualSettleInsertDto> empList = new ArrayList<CfetsManualSettleInsertDto>();
         //手工交收入库dto
@@ -403,6 +388,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             trdBankManualSettleInfo.setSettleDate(platformDateImpl.getSysDate());
             //交收数量
             trdBankManualSettleInfo.setSettleNum(cfetsManualSettleDto.getSettleNum());
+
             //交收金额
             if(StringUtil.equals(cfetsManualSettleDto.getTgBusiType(),DictCodeListExt3.头寸业务类型_现券交易.getValue())
                     && StringUtil.equals(cfetsManualSettleDto.getPs(),DictCodeList.交易方向_买入.getValue())){
@@ -424,6 +410,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             trdBankManualSettleInfo.setFinprodId(cfetsManualSettleDto.getFinprodId());
             trdBankManualSettleInfo.setSettleAmt(cfetsManualSettleDto.getSettleAmt());
             trdBankManualSettleInfo.setTradeId(cfetsManualSettleDto.getTradeId());
+            //业务类别
+            trdBankManualSettleInfo.setBusiType(cfetsManualSettleDto.getTgBusiType());
+            trdBankManualSettleInfo.setSettleDate(platformDateImpl.getSysDate());
             //交收状态
             trdBankManualSettleInfo.setSettleStatus(DictCodeListExt3.交收状态_未交收.getValue());
             if(StringUtil.equals(buttonType,DictCodeListExt3.交收操作类型_交收.getValue())  ||StringUtil.equals(buttonType,DictCodeListExt3.交收操作类型_交收修改.getValue())){
@@ -1087,6 +1076,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         CfetsTrdRepoTrade002Dto revokeEntity = new CfetsTrdRepoTrade002Dto();
                         revokeEntity.setTotleTradeId(entity.getTradeId());
                         revokeEntity.setTgBusiType(entity.getTgBusiType());
+                        revokeEntity.setPs(entity.getPs());
                         // 登记编号存在时,为登记,反之为报价
                         cfetsTrdRepoTrade002Service.doRevokeComplete(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId));
                     }
@@ -1110,7 +1100,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         for(CfetsManualSettleDealInfo dealInfo : listTemp){
                             this.closeDelegateMethod(dealInfo.getEntrustId(),"","交收失败");
                         }
-                        this.closeDelegate(listTemp,entity.getRemark(),entity.getTgBusiType());
+                        SpringContextUtil.getApplicationContext().getBean(CfetsManualSettleService.class).closeDelegate(listTemp,entity.getRemark(),entity.getTgBusiType());
                     }
                 }
             }
@@ -1251,8 +1241,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
      * @see
      * @since 1.0
      */
-    private void closeDelegate(List<CfetsManualSettleDealInfo> listTemp,String remark,String tgBusiType) throws Exception {
+    public CfetsEtribBondInfo003Dto closeDelegate(List<CfetsManualSettleDealInfo> listTemp, String remark, String tgBusiType) throws Exception {
         List<String> entrustIdList = listTemp.stream().map(CfetsManualSettleDealInfo::getEntrustId).collect(Collectors.toList());
+        List<CfetsEtribBondInfo003Dto> dtoList = new ArrayList<>();
         // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit start
         if(CollectionUtils.isNotEmpty(entrustIdList)){
             Map<String, BigDecimal> etrFinishMap = EntrustCompleteUtil.getEtrFinishAmtList(entrustIdList);
@@ -1268,8 +1259,11 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 else if(entrustIdList.contains(etrDto.getEntrustId())){
                     recallEntrustIdList.add(etrDto);
                 }
+                CfetsEtribBondInfo003Dto tradeDto = new CfetsEtribBondInfo003Dto();
+                BeanUtil.copyPropertiesIgnoreNull(tradeDto,etrDto);
+                dtoList.add(tradeDto);
             }
-
+/*
             //没有做过交易，直接关闭的
             if(!StringUtil.isEmptyList(recallEntrustIdList)) {
                 // add by yushilong 批量撤销预占 start
@@ -1281,7 +1275,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             //已经有委托完成度的
             if(!StringUtil.isEmptyList(closeEntrustIdList)) {
                 EntrustCompleteUtil.doComplete(closeEntrustIdList);
-            }
+            }*/
 
         }
 
@@ -1289,6 +1283,23 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         this.closeDelegatePositionMethod(listTemp,tgBusiType);
         //更新操作日志
         this.closeDelegatOprHisMethod(listTemp,remark);
+
+        CfetsEtribBondInfo003Dto tradeDto = new CfetsEtribBondInfo003Dto();
+        if (!StringUtil.isEmptyList(dtoList)){
+            String finprodType2 = dtoList.get(0).getFinprodType2();
+            if (StringUtil.equals(finprodType2,DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                || StringUtil.equals(finprodType2,DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+                tradeDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
+            }else if (StringUtil.equals(finprodType2,DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())){
+                tradeDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+                tradeDto.setPs(DictCodeList.回购拆借方向_逆回购.getValue());
+            }else if (StringUtil.equals(finprodType2,DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())){
+                tradeDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+                tradeDto.setPs(DictCodeList.回购拆借方向_正回购.getValue());
+            }
+        }
+        tradeDto.setSelectedItem(dtoList);
+        return tradeDto;
     }
 
     /**

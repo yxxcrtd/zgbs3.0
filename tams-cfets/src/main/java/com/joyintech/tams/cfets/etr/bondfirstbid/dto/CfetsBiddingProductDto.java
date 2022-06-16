@@ -1,5 +1,8 @@
 package com.joyintech.tams.cfets.etr.bondfirstbid.dto;
 
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
@@ -30,6 +33,12 @@ public class CfetsBiddingProductDto {
     private BigDecimal bidPrice;
 
     /**
+     * 投标标位字符串
+     */
+    @ApiModelProperty(name="bidPrice",value="投标标位字符串，前端展示用",example="1")
+    private String bidPriceStr;
+
+    /**
      * 投标券面总额
      */
     @ApiModelProperty(name="bidPrinAmt",value="投标券面总额",example="1")
@@ -41,6 +50,9 @@ public class CfetsBiddingProductDto {
     @ApiModelProperty(name="businessModel",value="业务模式",example="A1")
     private String businessModel;
 
+    @ApiModelProperty(name="businessModelStr",value="业务模式字符串",example="A1")
+    private String businessModelStr;
+
     /**
      * 组合汇总投标券面总额
      */
@@ -50,7 +62,7 @@ public class CfetsBiddingProductDto {
     /**
      * 证券托管户
      */
-    @ApiModelProperty(name="secManageAcctId",value="证券托管户",example="1")
+    @ApiModelProperty(name="secAcctId",value="证券托管户",example="1")
     private String secAcctId;
 
     /**
@@ -82,6 +94,10 @@ public class CfetsBiddingProductDto {
      */
     @ApiModelProperty(name="secDesirableCash",value="券商户可取现金（元）")
     private BigDecimal secDesirableCash;
+
+    @ApiModelProperty(name="rownum",value="序号")
+    private String rownum;
+
 
     public String getPortfolioId() {
         return portfolioId;
@@ -177,5 +193,32 @@ public class CfetsBiddingProductDto {
 
     public void setSecDesirableCash(BigDecimal secDesirableCash) {
         this.secDesirableCash = secDesirableCash;
+    }
+
+    public String getBusinessModelStr() {
+        if (StringUtil.isEmpty(getBusinessModel())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, getBusinessModel());
+    }
+
+    public void setBusinessModelStr(String businessModelStr) {
+        this.businessModelStr = businessModelStr;
+    }
+
+    public String getRownum() {
+        return rownum;
+    }
+
+    public void setRownum(String rownum) {
+        this.rownum = rownum;
+    }
+
+    public String getBidPriceStr() {
+        return bidPriceStr;
+    }
+
+    public void setBidPriceStr(String bidPriceStr) {
+        this.bidPriceStr = bidPriceStr;
     }
 }

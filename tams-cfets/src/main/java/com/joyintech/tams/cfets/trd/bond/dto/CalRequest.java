@@ -43,6 +43,15 @@ public class CalRequest {
     @ApiModelProperty(required = true,name="secManageAcctId",value="证券账户代码")
     private String secManageAcctId;
 
+    @ApiModelProperty(name="unitInt",value="应计利息")
+    private BigDecimal unitInt;
+
+    @ApiModelProperty(name="cpriceAmt",value="净价总额")
+    private BigDecimal cpriceAmt;
+
+    @ApiModelProperty(name="tradeMarketMode",value="交易市场 一级市场 二级市场")
+    private String tradeMarketMode;
+
 
     public String getCalculateField() {
         return calculateField;
@@ -122,6 +131,30 @@ public class CalRequest {
 
     public void setSecManageAcctId(String secManageAcctId) {
         this.secManageAcctId = secManageAcctId;
+    }
+
+    public BigDecimal getUnitInt() {
+        return unitInt;
+    }
+
+    public void setUnitInt(BigDecimal unitInt) {
+        this.unitInt = unitInt;
+    }
+
+    public BigDecimal getCpriceAmt() {
+        return cpriceAmt;
+    }
+
+    public void setCpriceAmt(BigDecimal cpriceAmt) {
+        this.cpriceAmt = cpriceAmt;
+    }
+
+    public String getTradeMarketMode() {
+        return tradeMarketMode;
+    }
+
+    public void setTradeMarketMode(String tradeMarketMode) {
+        this.tradeMarketMode = tradeMarketMode;
     }
 }
 

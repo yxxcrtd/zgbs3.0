@@ -4,6 +4,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
@@ -411,6 +412,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         calRequest.setSecManageAcctId(dto.getProductDtos().get(0).getSecManageAcctId());
         calRequest.setShareAmt(dto.getSubscriptionAmount());
         calRequest.setFinprodId(dto.getFinprodId());
+        calRequest.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
         List<TrdTradeFeeDetail> trdTradeFeeDetails = ibuQuoteBondCalService.calFee(calRequest);
         if (CollectionUtils.isNotEmpty(trdTradeFeeDetails)) {
             trdTradeFeeDetails.forEach(item -> {
@@ -845,8 +847,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             String confirmOk = entity.getConfirmOk();
             entity.setConfirmOk(null);
             ProcessMark newEntity;
-            //处理指令执行进度
-            this.insertEtrFinishStatus(entity, OperationType.NEW);
             // 发头寸
             try {
                 if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
@@ -946,16 +946,16 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     /**
      * 撤销，共外部调用
      *
-     * @param totleTradeId
-     * @param remark
-     * @param isNeedDealPosition
-     * @param tgBusiType
+     * @param bidId              投标编号
+     * @param remark             备注
+     * @param isNeedDealPosition 是否需要撤销持仓
+     * @param tgBusiType         业务类型
      * @author jiangpeng
      * @date 2022/5/12 14:53
      */
-    public void dorevoke(String totleTradeId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
-        CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(totleTradeId);
-        entity.setBidId(totleTradeId);
+    public void dorevoke(String bidId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
+        CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(bidId);
+        entity.setBidId(bidId);
         this.insertData(entity, OperationType.REVOKE);
         try {
             if (isNeedDealPosition) {
@@ -986,8 +986,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     public void doBack(CfetsTrdBondFirstSubInfoDto entity) {
         // 删除流程中表数据
         this.deleteWflDataByWorkflowId(entity.getWorkflowId());
-        // 老头寸处理
-        this.dealOldPosition(entity, true);
+        if (cfetsTrdBondFirstSub002Mapper.selectBidOrders(entity.getBidId()) == 0) {
+            // 老头寸处理
+            this.dealOldPosition(entity, true);
+        }
     }
 
 
@@ -1660,6 +1662,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     trdProductDeal.setPrinAmt(deal.getSubscriptionAmount());
                     trdProductDeal.setTradeDate(entity.getTradeDate());
                     trdProductDeal.setSettleDate(entity.getTradeDate());
+                    trdProductDeal.setTradeMarket(BussinessDictCodeList.交易场所_银行间.getValue());
                     trdProductDeal.setSecManageAcctId(deal.getSecManageAcctId());
                     baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
                     TrdProductDealAdd add = new TrdProductDealAdd();
@@ -1736,6 +1739,30 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         str += StringUtil.isNotEmpty(issuer) ? "-" + issuer : "";
         str += StringUtil.isNotEmpty(SubscriptionAmount) ? "-" + SubscriptionAmount : "";
         return str;
+    }
+
+    public String doRiskcalCheckMethod(CfetsTrdBondFirstSubInfoDto dto) {
+        if (StringUtil.isEmptyList(dto.getProductDtos())) {
+            return "组合分配列表不能为空";
+        }
+        List<String> messages = new ArrayList<>();
+        if (StringUtil.isNotEmpty(dto.getProductDtos())) {
+            for (CfetsTrdBondFirstSubEntrustDto item : dto.getEntrustDtos()) {
+                if (!StringUtil.isNotEmpty(item.getPortfolioId())) {
+                    messages.add("请输入组合名称。");
+                }
+                if (!StringUtil.isNotEmpty(item.getEntrustNum())) {
+                    messages.add("请输入券面总额。");
+                }
+            }
+        }
+        if (!StringUtil.isNotEmpty(dto.getFinprodId())) {
+            messages.add("请输入资产代码。");
+        }
+        if (messages.size() > 0) {
+            return StringUtil.joinString(messages, GlobalConstant.VERTICAL_LINE);
+        }
+        return null;
     }
 }
 

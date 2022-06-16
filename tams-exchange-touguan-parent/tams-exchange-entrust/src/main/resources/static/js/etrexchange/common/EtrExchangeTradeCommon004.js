@@ -743,8 +743,9 @@
             var finprodType2 = $("#finprodType2_" + currentTab).val();
             var jJHQXX = queryJJHQXX(secId, secName, finprodType2);
             var ps = $("#ps_" + currentTab).val();
+            console.log(finprodType2);
             if (finprodType2 == FINPROD_TYPE_TG_F06 || finprodType2 == FINPROD_TYPE_TG_F10) {
-                if (ps == PS_T01) {
+                /*if (ps == PS_T01) {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#limitUp_jj");
                     return jJHQXX.ceiling.toFixed(2);
                 } else if (ps == PS_T02) {
@@ -753,10 +754,11 @@
                 } else {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
                     return jJHQXX.ceiling.toFixed(2);
-                }
-            } else {
-                //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
+                }*/
                 return jJHQXX.ceiling.toFixed(2);
+            } else {
+                // rent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
+                return jJHQXX.latest.toFixed(2);
             }
         } else if (currentTab == "dz") {
             var secId = $("#secId_" + currentTab).val();
@@ -766,7 +768,7 @@
 
             var ps = $("#ps_" + currentTab).val();
             if (finprodType2 == FINPROD_TYPE_TG_F06 || finprodType2 == FINPROD_TYPE_TG_F10) {
-                if (ps == PS_T01) {
+               /* if (ps == PS_T01) {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#limitUp_jj");
                     return jJHQXX.ceiling.toFixed(2);
                 } else if (ps == PS_T02) {
@@ -775,7 +777,8 @@
                 } else {
                     //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
                     return jJHQXX.ceiling.toFixed(2);
-                }
+                }*/
+                return jJHQXX.ceiling.toFixed(2);
             } else {
                 //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
                 return jJHQXX.latest.toFixed(2);
@@ -899,7 +902,7 @@
                     if (ps == PS_T04) {
                         $("#portfolioId_div_" + currentTab).show();
                     }
-                    if (secId) {
+                    //if (secId) {
                         // if(parent.EtrExchangeTradeJjHq) {
                         //     if (useInterfQuoteFlag) {
                         //         parent.EtrExchangeTradeJjHq.queryJJHQXXByWS(secId, object.finprodName, object.finprodType2);
@@ -916,11 +919,11 @@
                         }else if(ps == PS_T04){
                         	linkToBondSubscribe();
                         }   */
-                    } else {
+                  //  } else {
                         // if(parent.EtrExchangeTradeJjHq) {
                         //     parent.EtrExchangeTradeJjHq.updateLevel2();
                         // }
-                    }
+                   // }
                 }
             }
         } else if (currentTab == 'dz') {
@@ -968,7 +971,27 @@
                     type9 = '';
                 }
             }
-        } else {
+            var param1 = {};
+            var finprodId = $("#finprodId_" + currentTab).val();
+            param1.secId = secId;
+            Joyin.ajaxSync(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/IsBondAsset', param1, function(result) {
+                if(result.data=='2') {     //2 返回2代表所选资产是债券且中债sppi通过
+                    $("#businessModelDiv_"+ currentTab).show();
+                    //$("#businessModel_" + currentTab).val("").trigger('change');
+                    $("#businessModel_" + currentTab).prop("disabled", true);
+                }else if(result.data=='3'){ //3 返回3代表所选资产是债券且中债sppi不通过
+                    $("#businessModelDiv_"+ currentTab).show();
+                    $("#businessModel_" + currentTab).val("FVTPL").trigger('change');
+                    $("#businessModel_" + currentTab).prop("disabled", true);
+                }else if(result.data=="4"){
+                    Joyin.error("当前资产未进行SPPI测试，无法进行指令提交/保存。");
+                    $("#secId_" + currentTab).val("").trigger('change');
+                }else if(result.data=='1'){
+                    $("#businessModelDiv_"+ currentTab).hide();
+                }
+            });
+        }
+        else {
             $("#finprodId_" + currentTab).val('').trigger('change');
             $("#finprodName_" + currentTab).val('').trigger('change');
             $("#tradeMarket_" + currentTab).val('').trigger('change');
@@ -1145,6 +1168,25 @@
                     }
                 }
             }
+            // ZGCPCN-1269:对价格模式为收盘价固定价格的竞价股票指令处理 modify by fuyongsheng 20220611 start
+            if(!init && currentTab === "jj" && priceModel === DECLA_TYPE_PRM10){
+                var currentDate = new Date();
+                // 15:00 时间戳
+                var time1500 = new Date(currentDate.getFullYear(),currentDate.getMonth(),currentDate.getDate(),15,0,0).getTime();
+                // 当前时间为15:00前时，指令价格处理同股票市价指令时处理（指令价格只读，显示0，小数位按照股票最小价差显示）
+                if(currentDate.getTime()<time1500){
+                    $("#entrustPrice_jj").attr("disabled", true);
+                    $("#entrustPrice_jj").val(zeroPrice).trigger('change');
+                }else{ // 当前时间为15:00-15:30时，指令价格只读，显示最新价
+                    var secId = $("#secId_" + currentTab).val();
+                    var secName = $("#secName_" + currentTab).val();
+                    var finprodType2 = $("#finprodType2_" + currentTab).val();
+                    var jJHQXX = queryJJHQXX(secId, secName, finprodType2);
+                    $("#entrustPrice_jj").val(formatPrice(jJHQXX.latest.toFixed(2))).trigger('blur').trigger('change');
+                    $("#entrustPrice_jj").attr("disabled", true);
+                }
+            }
+            // ZGCPCN-1269:对价格模式为收盘价固定价格的竞价股票指令处理 modify by fuyongsheng 20220611 end
         } else {
             if (finprodType2 == FINPROD_TYPE_TG_F01 && isStandardPs(ps)) {
                 $("#price_" + currentTab).val('').trigger('blur').trigger('change');
@@ -2384,11 +2426,12 @@
         }
         // if 画面.金融产品类型（债券） = 质押式回购
         else if (finprodType2 == FINPROD_TYPE_TG_ZYSHG || finprodType2 == FINPROD_TYPE_TG_F02 || finprodType2 == FINPROD_TYPE_TG_F03) {
-            if (currentTab == 'dz' && tradeMarket == TRADE_PLACE_03) {
+           /* if (currentTab == 'dz' && tradeMarket == TRADE_PLACE_03) {
                 $("#entrustNumUnit_" + currentTab).text("张");
             } else {
                 $("#entrustNumUnit_" + currentTab).text("张");
-            }
+            }*/
+            $("#entrustNumUnit_" + currentTab).text("张");
         }
         if (currentTab == 'dz') {
             if (finprodType2 == FINPROD_TYPE_TG_ZYSHG) {//大宗质押式回购 指令价格单位 % 特殊处理
@@ -2822,15 +2865,23 @@
         }
     }
 
-    //根据是否纳入金额结算 设置清算速度
-    var setSettleSpeed = function (isNetSett) {
-        if (isNetSett == YES_OR_NO_Y) {
-            $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_02).trigger('change');
-        } else {
+    // modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0 start
+    //根据是否非担保 设置清算速度
+    // var setSettleSpeed = function (isNetSett) {
+    var setSettleSpeed = function (isNoGuard) {
+        // if (isNetSett == YES_OR_NO_Y) {
+        //     $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_02).trigger('change');
+        // } else {
+        //     $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_01).trigger('change');
+        // }
+        if (isNoGuard == YES_OR_NO_Y) {
             $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_01).trigger('change');
+        } else {
+            $("#settleSpeed_" + currentTab).val(ACCOUNT_SPEED_02).trigger('change');
         }
         $("#settleSpeed_" + currentTab).attr("disabled", true);
     }
+    // modify by etliu 20220601:【3.0.6场内 ZGCPCN-1087：【协议现券指令】指令新建时，清算速度为T+1，提交到审批人待办中，清算速度变成了T+0 end
 
 
     /**
@@ -3380,7 +3431,7 @@
                 } else {
                     $("#riskTrialSpan").html("&nbsp;&nbsp;" + riskTrialSpan);
                 }
-                setRiskFlag(0);
+                // setRiskFlag(0);
             }
             linkEntrustNumUnit();
             if (ps == PS_T04 && finprodType2 == FINPROD_TYPE_TG_F10) {
@@ -3395,6 +3446,10 @@
             if(ps == PS_T97){
                 $("#invAim_div_" + currentTab).hide();
                 $("#businessModelDiv_"+ currentTab).hide();
+            }
+            var priceModel = $("#priceModel_" + currentTab).val();
+            if(priceModel == PRICE_MODEL_PRM10){
+                $("#entrustPrice_" + currentTab).attr('disabled', 'disabled');
             }
         }
     var addMinPriceStep = function (type, num, input) {
@@ -3488,7 +3543,9 @@
         var finprodId = $('#finprodId_' + currentTab).val();
         var finprodType2 = $('#finprodType2_' + currentTab).val();
         if (finprodId != "" && FINPROD_TYPE_TG_ZYSHG != finprodType2) {
-            var url = "invest/asset/bond/FinBondTargetAsset002/init"; // 默认债券标的
+            // var url = "invest/asset/bond/FinBondTargetAsset002/init"; // 默认债券标的"zq2022041801.SH"
+            //新 债券信息页面
+            var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
             if (FINPROD_TYPE_TG_F06 == finprodType2) {
                 var flagStr = finprodId.substr(finprodId.length - 2, finprodId.length);
                 // 场内基金标的
@@ -4351,7 +4408,7 @@
                         }
                     }
                     if (!checkFlag) {
-                        Joyin.error("系列户才能下指令")
+                        Joyin.error("修改时组合分配必须为系列户")
                         return false;
                     }
                 }

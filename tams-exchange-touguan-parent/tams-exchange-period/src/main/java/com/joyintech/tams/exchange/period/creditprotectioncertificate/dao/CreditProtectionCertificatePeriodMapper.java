@@ -1,9 +1,13 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Response;
+import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.*;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -22,4 +26,45 @@ public interface CreditProtectionCertificatePeriodMapper {
     List<SelectOptionDto> findBusiCode(Map<String, Object> paramsMap);
 
     List<SelectOptionDto> findFinprodId(Map<String, Object> paramsMap);
+
+    FinprodLinkDto findFinprodDetail(CreditProtectionCertificatePeriod001Request params);
+
+    CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(@Param("businessCode") String businessCode);
+
+    String getFinprodName(@Param("finprodId") String finprodId);
+
+    List<BillingDetailsDto> getBillingDetailByBusinessCode(@Param("businessCode") String businessCode);
+
+    /**
+     * 新头寸 查询新建明细
+     * @param params
+     * @return
+     */
+    List<BillingDetailsDto> getBillingDetailsByFinprodMarketId(CreditProtectionCertificatePeriod001Request params);
+
+    /**
+     * 老头寸 查询新建明细
+     * @param params
+     * @return
+     */
+    List<BillingDetailsDto> getBillingDetailsByFinprodMarketIdOld(CreditProtectionCertificatePeriod001Request params);
+
+    /**
+     * 发行人=参考实体的债券
+     */
+    List<String> getRefSecsByRefEntity(@Param("refEntityArray") String[] refEntityArray);
+
+    /**
+     * 通过组合代码查询可用数量
+     * @return
+     */
+    BigDecimal getAmountByPortfolioIdOld(@Param("finprodMarketId") String finprodMarketId, @Param("portfolioId") String portfolioId, @Param("tradeDate") Date tradeDate);
+
+    /**
+     * 通过组合代码查询可用数量
+     * @return
+     */
+    BigDecimal getAmountByPortfolioId(@Param("finprodMarketId") String finprodMarketId, @Param("portfolioId") String portfolioId, @Param("tradeDate") Date tradeDate);
+
+    List<SelectOptionDto> queryOptionsForRefSecs(@Param("refSecs") List<String> refSecs);
 }

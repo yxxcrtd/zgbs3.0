@@ -42,6 +42,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     MIN_TRD_UNIT_LIMIT_ERROR(26, "未找到最小交易单元"),
 
+    MIN_TRD_NUM_LIMIT_ERROR(27, "未找到最小交易数量"),
+
     DB_ERROR(100, "数据库返回错误"),
 
     CHECK_ERROR(101, "校验失败"),
@@ -176,6 +178,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     NOT_EXIST_FAIR_INSTRUCTION_ERROR(4018, "没有符合公平交易的指令，无法进行公平交易！"),
 
+    NOT_FAIR_ORDER_ERROR(4019, "不符合公平交易条件，无法进行公平交易！"),
+
     INSTRUCTIONS_DERIVATIVE_BS_OC_ERROR(4030, "指令中衍生品买卖方向和开平仓标志不能为空"),
 
     INSTRUCTIONS_DERIVATIVE_BS_OC_NOT_MATCH_ERROR(4031, "指令中衍生品买卖方向和开平标志不匹配"),
@@ -199,6 +203,8 @@ public enum ErrorCode implements IEnum<Integer> {
     INSTRUCTIONS_BUY_OPTIMAL_PRICE_ERROR(4057, "公平交易买入或正回购委托价格不得超过最优价"),
 
     INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR(4058, "公平交易卖出或逆回购委托价格不得低于最优价"),
+
+    INSTRUCTIONS_NO_GUARD_BOND_ERROR(4059, "非担保债券不支持公平交易"),
 
     APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR(4997, "分发指令数据存在不合法"),
 

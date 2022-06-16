@@ -19,13 +19,16 @@ import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
@@ -42,7 +45,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
-import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+import static com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE;
+import static com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum.STANDARD_COUPONS_IN_AND_OUT;
 
 /**
  * 报单通用检查
@@ -137,8 +141,11 @@ public class CommonCheckKit extends BaseCheckKit {
      * 检查账号及终端登录情况
      */
     private void checkAccountAndAgent(Instruction instruction) throws BusinessResultException {
+        //信用保护凭证不依赖终端
+        if (StringUtil.equals(CREDIT_PROTECTION_CERTIFICATE.getCode(), instruction.getBusiTypeTg())) {
+            return;
+        }
         String acctNo = instruction.getAcctNo();
-
         Account account = accountManager.getAccountById(acctNo);
         if (ObjectUtil.isNull(account)) {
             throw new BusinessResultException(ErrorCode.ACCOUNT_NOT_LOGIN);
@@ -198,6 +205,9 @@ public class CommonCheckKit extends BaseCheckKit {
         // 最低交易金额（元）MIN_AMT （最低申报金额）
         checkMinNum(order, instruction, instrument);
 
+        // 价格模式（固定价格或限价）校验
+        checkPriceWithPriceMode(order, instruction);
+
         // 涨跌停或有效申报价格校验
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
         // 申报类不需要check最小价差和涨跌停
@@ -205,10 +215,36 @@ public class CommonCheckKit extends BaseCheckKit {
             return;
         }
         //质押券出入库不需要check折算率
-        if (StringUtil.equals(instruction.getBusiTypeTg(), 投管业务类型_质押券出入库.getValue())) {
+        if (StringUtil.equals(instruction.getBusiTypeTg(), STANDARD_COUPONS_IN_AND_OUT.getCode())) {
             return;
         }
         checkLimitPrice(order, instruction, instrument, tickBean);
+    }
+
+    private void checkPriceWithPriceMode(BaseOrderRequest order, Instruction instruction) {
+        BigDecimal entrustPrice = order.getEntrustPrice();
+        BigDecimal instructionPrice = instruction.getEntrustPrice();
+        if (instruction.convertibleBond() || (instruction.newBond() && instruction.fullPrice())) {
+            entrustPrice = order.getFullPrice();
+            instructionPrice = instruction.getFullPrice();
+        }
+
+        String priceMode = instruction.getPriceMode();
+        String errorMsg = null;
+        if (InstructionPriceMode.SPECIFIED.codeEquals(priceMode) && !TradeUtils.equals(entrustPrice, instructionPrice)) {
+            errorMsg = StrUtil.format("指定价指令，委托价格[{}]不等于指令价格[{}]", entrustPrice, instructionPrice);
+        } else if (InstructionPriceMode.FIXED.codeEquals(priceMode)) {
+            if (PsEnum.SELL.codeEquals(instruction.getPs()) && TradeUtils.bigThan(instructionPrice, entrustPrice)) {
+                errorMsg = StrUtil.format("卖出限价指令，委托价格[{}]小于指令价格[{}]", entrustPrice, instructionPrice);
+            } else if (PsEnum.BUY.codeEquals(instruction.getPs()) && TradeUtils.lessThan(instructionPrice, entrustPrice)) {
+                errorMsg = StrUtil.format("买入限价指令，委托价格[{}]大于指令价格[{}]", entrustPrice, instructionPrice);
+            }
+        }
+
+        if (StrUtil.isNotEmpty(errorMsg)) {
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
+        }
     }
 
     /**
@@ -232,6 +268,10 @@ public class CommonCheckKit extends BaseCheckKit {
     }
 
     private void checkMinStepWithBuy(BaseOrderRequest order, Instruction instruction) {
+        if (order.isFairOrderFlag()) {
+            log.info("【公平交易】不检查委托数量是否符合最小买入单位整数倍");
+            return;
+        }
         String entrustBs = EntrustPropUtils.getEntrustBs(instruction);
         long entrustVolume = order.getEntrustVolume();
         MinTrdUnitLimit minTrdUnitLimit = getMinTrdUnitLimit(order, instruction);
@@ -243,14 +283,22 @@ public class CommonCheckKit extends BaseCheckKit {
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
 
-        if (InvestmentAssetType.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
-                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
-                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+        //判断是否万元单位
+        if (isWanyuanUnit(instruction, minTrdUnitLimit)) {
             minStep = minStep / 100;
         }
 
         if (EntrustBs.isBuy(entrustBs) && entrustVolume % minStep != 0) {
-            String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep);
+            String busiTypeTg = instruction.getBusiTypeTg();
+            String errorMsg;
+            if (DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg)
+                    || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)
+                    || DictCodeListExt3.投管业务类型_信用保护凭证.getValue().equals(busiTypeTg)) {
+                errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入单位[{}]万元整数倍",
+                        (ArithmeticUtil.divide(BigDecimal.valueOf(entrustVolume), new BigDecimal(100), 2)), ArithmeticUtil.divide(BigDecimal.valueOf(minStep), new BigDecimal(100), 2));
+            } else {
+                errorMsg = StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep);
+            }
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
@@ -264,11 +312,17 @@ public class CommonCheckKit extends BaseCheckKit {
         BigDecimal lowerLimitPrice = NumberUtil.round(tick.getLowerLimitPrice(), round, RoundingMode.UP);
         BigDecimal upperLimitPrice = NumberUtil.round(tick.getUpperLimitPrice(), round, RoundingMode.DOWN);
 
-        if (isNoLimitPrice(tick) || EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.BOND, InvestmentAssetType.PLEDGE_REPURCHASE)) {
+        if (isNoLimitPrice(tick) || EnumUtil.in(instruction.getAssetType(), InvestAssetTypeEnum.BOND, InvestAssetTypeEnum.PLEDGE_REPURCHASE)) {
             String errorMsg = priceHelper.checkPrice(order, instruction, instrument, tick);
             if (StrUtil.isNotEmpty(errorMsg)) {
                 addCheckResult("委托价格", entrustPrice, errorMsg);
             }
+            return;
+        }
+
+        if (EntrustUtils.isNotBuyOrSellTrade(instruction.getBusiTypeTg())
+                || EnumUtil.in(instruction.getAssetType(), InvestAssetTypeEnum.BOND)) {
+            log.info("【非买卖交易和债券交易】不需要检查价格是否满足涨跌停价：busiTypeTg={}", instruction.getBusiTypeTg());
             return;
         }
         if (lowerLimitPrice.compareTo(entrustPrice) > 0
@@ -302,7 +356,7 @@ public class CommonCheckKit extends BaseCheckKit {
         long entrustVolume = order.getEntrustVolume();
         BigDecimal entrustBalance = NumberUtil.mul(entrustVolume, order.getEntrustPrice());
 
-        if (!EntrustBs.isBuy(entrustBs)) {
+        if (!EntrustBs.isBuy(entrustBs) && EntrustUtils.isOddLotsTrade(instruction.getBusiTypeTg(), order.getEntrustProp())) {
             return;
         }
         long minNum;
@@ -312,23 +366,28 @@ public class CommonCheckKit extends BaseCheckKit {
             minNum = minTrdUnitLimit.getMinNum();
         }
 
-        if (InvestmentAssetType.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
-                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
-                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+        //判断是否万元单位
+        if (isWanyuanUnit(instruction, minTrdUnitLimit)) {
             minNum = minNum / 100;
         }
 
         BigDecimal minAmt = minTrdUnitLimit.getMinAmt();
-        
-        if (!(entrustVolume < minNum) || !(entrustBalance.compareTo(minAmt) < 0)) {
-        	return ;
+
+        //大宗交易委托数量和交易金额至少满足一个就行
+        if (EntrustUtils.isBulk(instruction.getBusiTypeTg())) {
+            if (!(entrustVolume < minNum) || !(entrustBalance.compareTo(minAmt) < 0 || minAmt.compareTo(BigDecimal.ZERO) == 0)) {
+                return;
+            }
         }
-        
+
         if (entrustVolume < minNum) {
             String busiTypeTg = instruction.getBusiTypeTg();
             String errorMsg = "";
-            if (DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg) || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)) {
-                errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入数量限制[{}]万元", (ArithmeticUtil.divide(BigDecimal.valueOf(entrustVolume), new BigDecimal(100), 2)), ArithmeticUtil.divide(BigDecimal.valueOf(minNum), new BigDecimal(100), 2));
+            if (DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg)
+                    || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)
+                    || DictCodeListExt3.投管业务类型_信用保护凭证.getValue().equals(busiTypeTg)) {
+                errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入数量限制[{}]万元",
+                        (ArithmeticUtil.divide(BigDecimal.valueOf(entrustVolume), new BigDecimal(100), 2)), ArithmeticUtil.divide(BigDecimal.valueOf(minNum), new BigDecimal(100), 2));
             } else {
                 errorMsg = StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}]", entrustVolume, minNum);
             }
@@ -340,6 +399,19 @@ public class CommonCheckKit extends BaseCheckKit {
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
+    }
+
+    private boolean isWanyuanUnit(Instruction instruction, MinTrdUnitLimit minTrdUnitLimit) {
+        if (InvestAssetTypeEnum.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+                && InvestmentAssetType1.isBiddingRepo(instruction.getAssetType1())
+                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+            return true;
+        }
+        if (StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), instruction.getBusiTypeTg())) {
+            return true;
+        }
+
+        return false;
     }
 
     @SuppressWarnings("unused")

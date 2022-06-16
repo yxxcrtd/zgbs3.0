@@ -58,12 +58,11 @@ public interface CfetsEtrIbRepoinfoMapper {
      * @return
      */
     List<SelectOptionDto> getSecManageAcctId(Map<String, Object> param);
-    
 
-    
+
     /**
-     * <一句话功能简述>
-     * <功能详细描述>
+     * 查询质押库对应的自动入库配置
+     *
      * @param param
      * @return
      * @see

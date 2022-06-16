@@ -5,7 +5,7 @@
     var cluflag;
     var businessId;
     var riskFlag = 0;
-
+    var rskApproval;
 
     /**
      * 画星星
@@ -529,6 +529,7 @@
         param.cfetsEtribdoRiskcalResponse = riskResultResponse;
         param.elementId = 'CfetsEtrIbRepoinfo003_btn_submit';
         param.pageId = "CfetsEtrIbRepoinfo003";
+        param.rskApproval = rskApproval;
         if(param.price) {
             param.price = param.price / 100;
         }
@@ -576,13 +577,14 @@
                 return false;
             }
         }
-        if(riskFlag === 1) {
-            Joyin.error("请先完成风险试算")
-            return false;
-        }
+        // if(riskFlag === 1) {
+        //     Joyin.error("请先完成风险试算")
+        //     return false;
+        // }
 
         var obj = getSubmitParam("submit");
         var errorMsg = "";
+        var confirmMsg = "";
         $.ajax({
             type: "POST",
             url: basePath + 'cfets/etrib/cfetsEtrIbRepoinfo/checkSaveError',
@@ -597,6 +599,9 @@
                             errorMsg = errorMsg + item.message + "<br\>";
                         })
                     }
+                    if(result.data && result.data.message && result.data.messageType === 'confirm') {
+                        confirmMsg = result.data.message;
+                    }
                 }else {
                     errorMsg = result.message;
                 }
@@ -605,6 +610,12 @@
         if(errorMsg && errorMsg.length > 0) {
             Joyin.error(errorMsg);
             return false;
+        }
+        if(confirmMsg && confirmMsg.length > 0) {
+            rskApproval = result.data.data;
+            return Joyin.confirm(confirmMsg, function (){
+                saveOrSubmit('submit');
+            });
         }
         return true;
     }
@@ -654,7 +665,7 @@
         var param = JSON.parse(JSON.stringify(object))
         $.ajax({
             type: "POST",
-            url: basePath + 'cfets/etrib/cfetsEtrIbRepoinfo/doRiskcal',
+            url: basePath + 'riskTrial/doRiskcal/CfetsEtrIbRepoinfo003',
             dataType: "json",
             contentType: "application/json",
             async: false,
@@ -662,15 +673,17 @@
             success: function (result) {
                 if(result.code === '000') {
                     var data = result.data.data;
-                    if(data.riskTrialSpan) {
+                    if(data && data.riskTrialSpan) {
                         $("#riskTrialSpan").html("&nbsp;&nbsp;" + data.riskTrialSpan);
                     }
-                    riskResultResponse = data;;
-                    entity_RiskTrialRetList = data.riskcalReturnList;
-                    if(entity_RiskTrialRetList) {
-                        $.each(entity_RiskTrialRetList, function (index, item) {
-                            item.conclusion = data.riskTrialSpan;
-                        })
+                    if(data){
+                        riskResultResponse = data;
+                        entity_RiskTrialRetList = data.riskcalReturnList;
+                        if(entity_RiskTrialRetList) {
+                            $.each(entity_RiskTrialRetList, function (index, item) {
+                                item.conclusion = data.riskTrialSpan;
+                            })
+                        }
                     }
                     tableRisk.clear();
                     tableRisk.addRow(entity_RiskTrialRetList);

@@ -30,6 +30,19 @@
 			 	where ENTRUST_ID=#{entrustId} and TRADE_STATUS not in (#{QUOTE_STUTAS_IBU_08},#{QUOTE_STUTAS_IBU_14},#{QUOTE_STUTAS_IBU_15})
 			 	)
 	</select>
+
+	<select id="checkFirstBidDataStatus" resultType="java.lang.Integer">
+		select count(*) from (
+								 select ENTRUST_ID from WFL_ETR_ENTRUST
+								 where ENTRUST_ID=#{entrustId}
+								 union all
+								 select ENTRUST_ID from  WFL_BID_ORDER_BID_PRICE
+								 where ENTRUST_ID=#{entrustId}
+								 union all
+								 select ENTRUST_ID from  BID_ORDER_BID_PRICE
+								 where ENTRUST_ID=#{entrustId}
+							 )
+	</select>
 	<select id="checkRegDataStatus" resultType="java.lang.Integer">
 		select count(*) from (
 		select ENTRUST_ID from wfl_reg_fin_product_deal
@@ -38,5 +51,32 @@
 		select ENTRUST_ID from reg_fin_product_deal
 		where ENTRUST_ID= #{entrustId}  and trade_status='01' and is_cancel='N'
 		)
+	</select>
+
+	<select id="selectBidInfo" parameterType="Map" resultType="com.joyintech.service.entrust.common.dto.EtrBondFirstBidInfoDto">
+		SELECT
+			ee.ENTRUST_STATUS entrustStatus,
+			CASE
+				WHEN fpi.ISSUE_CLASS = '01' THEN NULL
+				WHEN (bobrt.BID_MODLE IS NOT NULL AND bobrt.BID_MODLE = '03') OR bobrt.IS_WIN = 'Y' THEN '04'
+				WHEN bobrt.BID_MODLE IS NULL THEN '01'
+				WHEN bobrt.IS_WIN = 'N' THEN '03'
+				WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
+				ELSE '05'
+				END AS firstBidStatus,
+			ee.PS ps
+		FROM ETR_ENTRUST ee
+				 LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = ee.FINPROD_ID
+				 LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
+
+				 LEFT JOIN (
+			SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID,bobp.ENTRUST_ID   FROM  BID_ORDER bo
+																					   LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+																					   LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+				AND brt.FINPROD_ID = bo.FINPROD_ID
+			WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+			GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
+		) bobrt ON 	bobrt.FINPROD_ID = fp.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
+		where ee.ENTRUST_ID=#{entrustId}
 	</select>
 </mapper>

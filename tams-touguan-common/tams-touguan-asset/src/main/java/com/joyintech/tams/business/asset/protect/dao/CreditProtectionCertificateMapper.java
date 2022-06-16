@@ -27,6 +27,8 @@ public interface CreditProtectionCertificateMapper {
 
     List<String> getRefList(Map<String, Object> pageParam);
 
+    String getMstCustomerInfo(Map<String, Object> pageParam);
+
     int insertFileSelective(SysUploadFileInfo var1);
 
     int updateFileByPrimaryKey(SysUploadFileInfo var1);
@@ -58,10 +60,10 @@ public interface CreditProtectionCertificateMapper {
     /**
      * 删除时判断金融产品代码是否使用过
      *
-     * @param finprodId
+     * @param
      * @return
      */
-    Integer countFinprodIdUse(@Param("finprodId") String finprodId, @Param("isCancel") String isCancel, @Param("ps") String ps);
+    Integer countFinprodIdUse(Map<String, Object> map);
 
     /**
      * 根据行内三级分类获取wind分类
