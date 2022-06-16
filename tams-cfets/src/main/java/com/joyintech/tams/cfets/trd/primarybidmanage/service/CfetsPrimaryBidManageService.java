@@ -415,6 +415,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     }
                 }
             }
+            if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
+                // 匹配取消
+                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                        DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
+                // 老头寸处理
+                this.dealOldPosition(entity, true);
+            }
             updateCfetsOprHis(entity.getTotalWinId(),action);
         } else {
             action = OperationType.NEW.name();
