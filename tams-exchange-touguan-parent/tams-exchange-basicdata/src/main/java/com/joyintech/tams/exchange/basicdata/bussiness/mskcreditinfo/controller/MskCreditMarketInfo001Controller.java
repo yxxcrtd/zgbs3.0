@@ -142,7 +142,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                 parameter.setPageId("MstCreditMarketInfo002");
                 parameter.setBusinessDataPk1(entity.getSecid());
                 if (mskCreditMarketInfoPro001Service.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！,不可删除!")));
+                    errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
