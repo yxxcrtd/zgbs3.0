@@ -6,6 +6,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dto.BaseExportRequest;
@@ -26,6 +27,7 @@ import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -141,6 +144,14 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
             if (StringUtil.isNotEmpty(deliverBondStr)) {
                 res.setDeliverBond(deliverBondStr);
             }
+        }
+        //展示单位万元
+        if(!CollectionUtils.isEmpty(res.getBillingDetails())){
+            res.getBillingDetails().forEach(entity->{
+                entity.setDeliveryAmount(ArithmeticUtil.divide(entity.getDeliveryAmount(),10000,2));
+                entity.setDeliverBondAmount(ArithmeticUtil.divide(entity.getDeliverBondAmount(),10000,2));
+                entity.setRepNomCapi(ArithmeticUtil.divide(entity.getRepNomCapi(),10000,2));
+            });
         }
         return new Message<CreditProtectionCertificatePeriodSaveDto>().success().setData(res);
     }
