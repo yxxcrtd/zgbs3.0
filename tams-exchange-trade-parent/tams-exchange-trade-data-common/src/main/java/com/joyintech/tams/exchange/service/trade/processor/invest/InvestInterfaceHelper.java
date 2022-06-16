@@ -12,15 +12,19 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.google.common.collect.Lists;
 import com.joyintech.background.component.common.pack.common.base.BaseService;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.OthCodeBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.request.DeviationDegreeRequest;
 import com.joyintech.tams.exchange.common.bean.request.EtrDispatcherInfoRequest;
+import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
+import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.domain.Message;
@@ -28,6 +32,7 @@ import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.BidPriceConInfoRequest;
 import com.joyintech.tams.exchange.common.response.BidPriceConInfoResponse;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +44,10 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
+import static com.joyintech.tams.exchange.common.constant.ErrorCode.REQ_PARAMETER_ERROR;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
 
 /**
@@ -75,13 +82,29 @@ public class InvestInterfaceHelper extends BaseService {
     @Value("${application.micorservice.contextPath.single:false}")
     private boolean isSingle;
 
+    public List<TradeInfoProResponse> getCounterDealerTraderInfo(TradeInfoProRequest dto) {
+        dto.setIsOur(null);
+        List<TradeInfoProResponse> list = getDealerTraderInfo(dto);
+
+        return list.stream().filter(o -> StringUtil.isEmpty(o.getIsOur()) || StringUtil.equals(o.getIsOur(), "N")).collect(Collectors.toList());
+    }
+
+    public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest request) {
+        List<TradeInfoProResponse> list = ListUtil.list(false);
+        if (ObjectUtil.isNull(request)) {
+            return list;
+        }
+
+        String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getDealerTraderInfo;
+        return postForList(url, BeanUtil.object2Map(request), TradeInfoProResponse.class);
+    }
 
     /**
      * SPPI检查-债券现券买入指令提交校验时对于使权不重大的购入价条件判断
      */
     public ResultBean getBidPriceConInfo(BidPriceConInfoRequest request) {
         if (ObjectUtil.isNull(request)) {
-            return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
+            return ResultBean.error(REQ_PARAMETER_ERROR);
         }
 
         String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getBidPriceConInfo;

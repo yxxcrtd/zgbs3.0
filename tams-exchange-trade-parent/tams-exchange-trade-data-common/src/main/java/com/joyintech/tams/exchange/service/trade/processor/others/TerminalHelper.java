@@ -21,6 +21,7 @@ import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
+import com.joyintech.tams.exchange.service.trade.processor.invest.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.LoginJob;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
@@ -65,6 +66,8 @@ public class TerminalHelper {
     private TerminalMappingService terminalMappingService;
     @Autowired
     private CommonManagement commonManagement;
+    @Autowired
+    private InvestInterfaceHelper investInterfaceHelper;
 
     private final int batchSize = 1000; // 委托成交比对时，分页发送数据大小
 
@@ -110,14 +113,18 @@ public class TerminalHelper {
         TradeAgent tradeAgent = tradeAgentManager.findAgentByAccountId(accountId);
         if (Objects.nonNull(tradeAgent)) {
             return tradeAgent.reqEntrusts(accountId);
-        } else throw new Exception(ErrorCode.TERMINAL_NOT_ONLINE.errorMsg);
+        } else {
+            throw new Exception(ErrorCode.TERMINAL_NOT_ONLINE.errorMsg);
+        }
     }
 
     public List<Trade> queryTradeFromTerminal(String accountId) throws Exception {
         TradeAgent tradeAgent = tradeAgentManager.findAgentByAccountId(accountId);
         if (Objects.nonNull(tradeAgent)) {
             return tradeAgent.reqTrades(accountId);
-        } else throw new Exception(ErrorCode.TERMINAL_NOT_ONLINE.errorMsg);
+        } else {
+            throw new Exception(ErrorCode.TERMINAL_NOT_ONLINE.errorMsg);
+        }
     }
 
     public List<IntegratedQuote> queryIntegratedQuote(int quoteType, String stockCode, String accountId, String oppositeLiaisonTel, String liaisonTel, int pageSize, String posStr) {
@@ -137,14 +144,24 @@ public class TerminalHelper {
                 logger.warn("not found agent from accountAgents because no terminal login with trade !!!");
             }
         }
-        if (!Strings.isNullOrEmpty(stockCode)) quoteQryBean.setStockCode(stockCode);
-        if (!Strings.isNullOrEmpty(oppositeLiaisonTel)) quoteQryBean.setOppositeLiaisonTel(oppositeLiaisonTel);
-        if (!Strings.isNullOrEmpty(liaisonTel)) quoteQryBean.setOppositeLiaisonTel(liaisonTel);
+        if (!Strings.isNullOrEmpty(stockCode)) {
+            quoteQryBean.setStockCode(stockCode);
+        }
+        if (!Strings.isNullOrEmpty(oppositeLiaisonTel)) {
+            quoteQryBean.setOppositeLiaisonTel(oppositeLiaisonTel);
+        }
+        if (!Strings.isNullOrEmpty(liaisonTel)) {
+            quoteQryBean.setOppositeLiaisonTel(liaisonTel);
+        }
         if (pageSize > 0) {
-            if (pageSize > 1000) pageSize = 1000;
+            if (pageSize > 1000) {
+                pageSize = 1000;
+            }
             quoteQryBean.setPageSize(pageSize);
         }
-        if (!Strings.isNullOrEmpty(posStr)) quoteQryBean.setPostStr(posStr);
+        if (!Strings.isNullOrEmpty(posStr)) {
+            quoteQryBean.setPostStr(posStr);
+        }
         quoteQryBean.setQuoteType(quoteType);
         if (Objects.nonNull(tradeAgent)) {
             try {
@@ -262,8 +279,11 @@ public class TerminalHelper {
             TradeAgent agent = tradeAgentManager.findAgentByAccountId(accountId);
             if (Objects.nonNull(agent)) {
                 String agentType = agent.getAccountMap().get(accountId).getAgentType();
-                if (AgentType.UFX.value.equals(agentType)) rowCount = 1000;
-                else rowCount = 100;
+                if (AgentType.UFX.value.equals(agentType)) {
+                    rowCount = 1000;
+                } else {
+                    rowCount = 100;
+                }
                 List<Instrument> instrumentList;
                 for (Market market : Market.values()) {
                     do {
@@ -403,18 +423,22 @@ public class TerminalHelper {
         return list;
     }
 
-    public static RepurchaseQuoteReceiveResponse convertIntegratedRepurchaseQuoteBean2RepurchaseQuoteReceiveResponse(IntegratedRepurchaseQuoteBean source) {
+    public RepurchaseQuoteReceiveResponse convertIntegratedRepurchaseQuoteBean2RepurchaseQuoteReceiveResponse(IntegratedRepurchaseQuoteBean source) {
         if (source == null) {
             return null;
         }
         RepurchaseQuoteReceiveResponse repurchaseQuoteReceiveResponse = new RepurchaseQuoteReceiveResponse();
         repurchaseQuoteReceiveResponse.setRequestNo(String.valueOf(source.getEntrustNo()));
         repurchaseQuoteReceiveResponse.setRequestType(null);
+        //        repurchaseQuoteReceiveResponse.setRequestTypeStr();
         repurchaseQuoteReceiveResponse.setBs(source.getEntrustBs());
+        //        repurchaseQuoteReceiveResponse.setBsStr();
         repurchaseQuoteReceiveResponse.setTradeMarket(null);
+        //        repurchaseQuoteReceiveResponse.setTradeMarketStr();
         repurchaseQuoteReceiveResponse.setStockCode(source.getStockCode());
         repurchaseQuoteReceiveResponse.setStockName(source.getStockName());
         repurchaseQuoteReceiveResponse.setPledgeNumber(BigDecimal.valueOf(source.getImpawnAmount()));
+        //        repurchaseQuoteReceiveResponse.setPledgeNumberStr();
         repurchaseQuoteReceiveResponse.setRepoAmount(BigDecimal.valueOf(source.getImpawnBalance()));
         repurchaseQuoteReceiveResponse.setRepoRate(BigDecimal.valueOf(source.getExpireYearRate()));
         repurchaseQuoteReceiveResponse.setDiscount(BigDecimal.valueOf(source.getFunderRatio()));
@@ -436,28 +460,61 @@ public class TerminalHelper {
 //        repurchaseQuoteReceiveResponse.setTransCode(null);
         repurchaseQuoteReceiveResponse.setmIntAmt(BigDecimal.valueOf(source.getProfit()));
         repurchaseQuoteReceiveResponse.setBackBalance(BigDecimal.valueOf(source.getSettleBalance()));
-        repurchaseQuoteReceiveResponse.setTraderCode(source.getTraderId());
-        repurchaseQuoteReceiveResponse.setMemberId(source.getAgencyNo());
-        repurchaseQuoteReceiveResponse.setInvestorId(null);
-        repurchaseQuoteReceiveResponse.setInvestorType(null);
-        repurchaseQuoteReceiveResponse.setCpTraderCode(source.getOppoTraderId());
-        repurchaseQuoteReceiveResponse.setCpMemberId(source.getOppoAgency());
-        repurchaseQuoteReceiveResponse.setCpInvestorId(null);
-        repurchaseQuoteReceiveResponse.setCpInvestorType(null);
         repurchaseQuoteReceiveResponse.setCpClientName(source.getPropAccountName());
         repurchaseQuoteReceiveResponse.setOrigSerialNo(null);
         repurchaseQuoteReceiveResponse.setRemark(source.getRemark());
         repurchaseQuoteReceiveResponse.setAccount(source.getFundAccount());
 //        repurchaseQuoteReceiveResponse.setAccountName();
-//        repurchaseQuoteReceiveResponse.setRequestTypeStr();
-//        repurchaseQuoteReceiveResponse.setBsStr();
-//        repurchaseQuoteReceiveResponse.setTradeMarketStr();
-//        repurchaseQuoteReceiveResponse.setPledgeNumberStr();
-//        repurchaseQuoteReceiveResponse.setInvestorTypeStr();
-//        repurchaseQuoteReceiveResponse.setCpInvestorTypeStr();
         repurchaseQuoteReceiveResponse.setBrokerId(source.getBrokerId());
         repurchaseQuoteReceiveResponse.setBrokerName(source.getBrokerName());
+
+        repurchaseQuoteReceiveResponse.setTraderCode(source.getTraderId());
+        repurchaseQuoteReceiveResponse.setCpTraderCode(source.getOppoTraderId());
+        fillDealerInfo(source, repurchaseQuoteReceiveResponse);
         return repurchaseQuoteReceiveResponse;
+    }
+
+    private void fillDealerInfo(IntegratedRepurchaseQuoteBean source, RepurchaseQuoteReceiveResponse repurchaseQuoteReceiveResponse) {
+        TradeInfoProRequest dto = new TradeInfoProRequest();
+        dto.setTradePlace(Market.getInvestValue(source.getStockCode().split(StrUtil.DOT)[1]));
+
+        String traderId = source.getTraderId();
+        if (StrUtil.isNotEmpty(traderId)) {
+            dto.setDealerNo(traderId);
+            dto.setIsOur("Y");
+            List<TradeInfoProResponse> list = investInterfaceHelper.getDealerTraderInfo(dto);
+            if (CollUtil.isEmpty(list)) {
+                repurchaseQuoteReceiveResponse.setTraderCodeStr(traderId);
+                logger.error("本方交易商、交易主体、交易员信息不存在 => 【dealerNo = {}】，【market = {}】", traderId, dto.getTradePlace());
+                return;
+            }
+            TradeInfoProResponse proResponse = list.get(0);
+            repurchaseQuoteReceiveResponse.setTraderCodeStr(proResponse.getTraderName());
+            repurchaseQuoteReceiveResponse.setMemberId(proResponse.getDealerNo());
+            repurchaseQuoteReceiveResponse.setMemberIdStr(proResponse.getDealerName());
+            repurchaseQuoteReceiveResponse.setInvestorId(proResponse.getDealerPartyNo());
+            repurchaseQuoteReceiveResponse.setInvestorIdStr(proResponse.getDealerPartyName());
+            repurchaseQuoteReceiveResponse.setInvestorType(proResponse.getDealerPartyType());
+        }
+
+        String oppoTraderId = source.getOppoTraderId();
+        if (StrUtil.isNotEmpty(oppoTraderId)) {
+            dto.setDealerNo(oppoTraderId);
+            List<TradeInfoProResponse> list = investInterfaceHelper.getCounterDealerTraderInfo(dto);
+            if (CollUtil.isEmpty(list)) {
+                repurchaseQuoteReceiveResponse.setCpTraderCodeStr(oppoTraderId);
+                logger.error("对方交易商、交易主体、交易员信息不存在 => 【dealerNo = {}】，【market = {}】", oppoTraderId, dto.getTradePlace());
+                return;
+            }
+            TradeInfoProResponse proResponse = list.get(0);
+            repurchaseQuoteReceiveResponse.setCpTraderCodeStr(proResponse.getTraderName());
+            repurchaseQuoteReceiveResponse.setCpMemberId(proResponse.getDealerNo());
+            repurchaseQuoteReceiveResponse.setCpMemberIdStr(proResponse.getDealerName());
+            repurchaseQuoteReceiveResponse.setCpInvestorId(proResponse.getDealerPartyNo());
+            repurchaseQuoteReceiveResponse.setCpInvestorIdStr(proResponse.getDealerPartyName());
+            repurchaseQuoteReceiveResponse.setCpInvestorType(proResponse.getDealerPartyType());
+        }
+
     }
 
     public List<IntegratedRepurchaseQuoteBean> sendIntegratedRepurchaseQuote(int actionIn, String entrustProp, String accountId, int pageSize) {

@@ -30,6 +30,7 @@ import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
+import com.joyintech.tams.exchange.service.trade.processor.invest.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
 import org.apache.commons.collections4.CollectionUtils;
@@ -394,7 +395,7 @@ public class IntegratedQuoteManagement {
                 sendBean.setRequestStatus(QuoteStatusEnum.DEAL_DONE.getCode());
             }
 
-            fillRepurchaseQuoteSendResponseDescription(sendBean);
+//            fillRepurchaseQuoteSendResponseDescription(sendBean);
 
             if (EnumUtil.in(entrustStatus, REPORTED, REPORTED_TOBE_CANCEL, CANCELED, PART_TRADED_CANCELED, PART_SUCCESS, PART_TRADED_CANCELED, SUCCEEDED)) {
                 retList.add(sendBean);
@@ -410,14 +411,14 @@ public class IntegratedQuoteManagement {
 
     }
 
-    private void fillRepurchaseQuoteSendResponseDescription(BaseRepurchaseQuoteSendResponse sendBean) {
-        sendBean.setRequestStatusStr(EnumUtil.getDescriptionByCode(QuoteStatusEnum.class, sendBean.getRequestStatus()));
-        sendBean.setRequestTypeStr(EnumUtil.getDescriptionByCode(RepurchaseTypeEnum.class, sendBean.getRequestType()));
-        sendBean.setBsStr(EnumUtil.getDescriptionByCode(RepoBsEnum.class, sendBean.getBs()));
-//        sendBean.setPledgeNumberStr();
-//        sendBean.setInvestorTypeStr();
-//        sendBean.setCpInvestorTypeStr();
-    }
+//    private void fillRepurchaseQuoteSendResponseDescription(BaseRepurchaseQuoteSendResponse sendBean) {
+//        sendBean.setRequestStatusStr(EnumUtil.getDescriptionByCode(QuoteStatusEnum.class, sendBean.getRequestStatus()));
+//        sendBean.setRequestTypeStr(EnumUtil.getDescriptionByCode(RepurchaseTypeEnum.class, sendBean.getRequestType()));
+//        sendBean.setBsStr(EnumUtil.getDescriptionByCode(RepoBsEnum.class, sendBean.getBs()));
+////        sendBean.setPledgeNumberStr();
+////        sendBean.setInvestorTypeStr();
+////        sendBean.setCpInvestorTypeStr();
+//    }
 
     private BaseRepurchaseQuoteSendResponse createSendQuoteByIntegratedEntrust(IntegratedEntrustVo entrust) {
 
@@ -455,21 +456,18 @@ public class IntegratedQuoteManagement {
             ZTHQRepurchaseQuoteSendResponse sendResponse = (ZTHQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
 
             sendResponse.setDiscount(entrust.getDiscount());
-            if ("31".equals(instruction.getEntrustBussType())) {
-                sendResponse.setExchangeAmount(instruction.getEntrustAmt());
-            } else{
-                List<InstructionPledge> pledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instruction.getEntrustId());
-                InstructionPledge swapInPledge = pledges.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_IN.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
-                if (ObjectUtil.isNotNull(swapInPledge)) {
-                    sendResponse.setNewDiscount(swapInPledge.getPledgeRatio());
-                    sendResponse.setSwapIntoBonds(swapInPledge.getFinprodMarketId());
-                    sendResponse.setSwapIntoBondsVolume(swapInPledge.getPledgeNumber());
-                }
-                InstructionPledge swapOutPledge = pledges.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_OUT.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
-                if (ObjectUtil.isNotNull(swapOutPledge)) {
-                    sendResponse.setSwapOutBonds(swapOutPledge.getFinprodMarketId());
-                    sendResponse.setSwapOutBondsVolume(swapOutPledge.getPledgeNumber());
-                }
+            sendResponse.setExchangeAmount(instruction.getEntrustAmt());
+            List<InstructionPledge> pledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instruction.getEntrustId());
+            InstructionPledge swapInPledge = pledges.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_IN.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+            if (ObjectUtil.isNotNull(swapInPledge)) {
+                sendResponse.setNewDiscount(swapInPledge.getPledgeRatio());
+                sendResponse.setSwapIntoBonds(swapInPledge.getFinprodMarketId());
+                sendResponse.setSwapIntoBondsVolume(swapInPledge.getPledgeNumber());
+            }
+            InstructionPledge swapOutPledge = pledges.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_OUT.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+            if (ObjectUtil.isNotNull(swapOutPledge)) {
+                sendResponse.setSwapOutBonds(swapOutPledge.getFinprodMarketId());
+                sendResponse.setSwapOutBondsVolume(swapOutPledge.getPledgeNumber());
             }
         }
 
@@ -525,14 +523,24 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setStockName(entrust.getStockName());
         baseRepurchaseQuoteSendResponse.setPledgeNumber(BigDecimal.valueOf(entrust.getEntrustVolume()));
         baseRepurchaseQuoteSendResponse.setCounterId(entrust.getCounterId());
-        baseRepurchaseQuoteSendResponse.setTraderCode(entrust.getTradeName());
-        baseRepurchaseQuoteSendResponse.setMemberId(entrust.getDealerName());
-        baseRepurchaseQuoteSendResponse.setInvestorType(entrust.getOwnerType());
-        baseRepurchaseQuoteSendResponse.setCpTraderCode(entrust.getPropTradeName());
-        baseRepurchaseQuoteSendResponse.setCpMemberId(entrust.getPropDealerName());
-        baseRepurchaseQuoteSendResponse.setCpInvestorId(entrust.getPropInvestorName());
+        baseRepurchaseQuoteSendResponse.setTraderCode(entrust.getTradeId());
+        baseRepurchaseQuoteSendResponse.setTraderCodeStr(entrust.getTradeName());
+        baseRepurchaseQuoteSendResponse.setMemberId(entrust.getDealerId());
+        baseRepurchaseQuoteSendResponse.setMemberIdStr(entrust.getDealerName());
         baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
+        baseRepurchaseQuoteSendResponse.setInvestorIdStr(entrust.getInvestorName());
+        baseRepurchaseQuoteSendResponse.setInvestorType(entrust.getOwnerType());
+        baseRepurchaseQuoteSendResponse.setInvestorTypeStr(InvestorType.getInvestorTypeName(entrust.getOwnerType()));
+        baseRepurchaseQuoteSendResponse.setCpTraderCode(entrust.getPropTradeId());
+        baseRepurchaseQuoteSendResponse.setCpTraderCodeStr(entrust.getPropTradeName());
+        baseRepurchaseQuoteSendResponse.setCpMemberId(entrust.getPropDealerId());
+        baseRepurchaseQuoteSendResponse.setCpMemberIdStr(entrust.getPropDealerName());
+        baseRepurchaseQuoteSendResponse.setCpInvestorId(entrust.getPropInvestorId());
+        baseRepurchaseQuoteSendResponse.setCpInvestorIdStr(entrust.getPropInvestorName());
+        baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
+        baseRepurchaseQuoteSendResponse.setInvestorIdStr(entrust.getInvestorName());
         baseRepurchaseQuoteSendResponse.setCpInvestorType(entrust.getPropOwnerType());
+        baseRepurchaseQuoteSendResponse.setCpInvestorTypeStr(InvestorType.getInvestorTypeName(entrust.getPropOwnerType()));
         baseRepurchaseQuoteSendResponse.setCpClientName(entrust.getPortfolioName());
         baseRepurchaseQuoteSendResponse.setRemark(entrust.getRemark());
 

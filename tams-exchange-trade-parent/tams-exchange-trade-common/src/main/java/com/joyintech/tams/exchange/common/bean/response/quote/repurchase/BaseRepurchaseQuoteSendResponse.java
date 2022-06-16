@@ -1,6 +1,13 @@
 package com.joyintech.tams.exchange.common.bean.response.quote.repurchase;
 
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.google.common.base.MoreObjects;
+import com.joyintech.tams.exchange.common.enums.exchange.QuoteStatusEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -32,21 +39,37 @@ public class BaseRepurchaseQuoteSendResponse {
 
     @ApiModelProperty(name = "traderCode", value = "本方交易员")
     private String traderCode;
+    @ApiModelProperty(name = "traderCodeStr", value = "本方交易员名称")
+    private String traderCodeStr;
     @ApiModelProperty(name = "memberId", value = "本方交易商")
     private String memberId;
-    @ApiModelProperty(name = "investorId", value = "本方交易主体")
+    @ApiModelProperty(name = "memberIdStr", value = "本方交易商名称")
+    private String memberIdStr;
+    @ApiModelProperty(name = "investorId", value = "本方交易主体（深交所展示，否则为空）")
     private String investorId;
-    @ApiModelProperty(name = "investorType", value = "本方交易主体类型")
+    @ApiModelProperty(name = "investorIdStr", value = "本方交易主体（深交所展示，否则为空）")
+    private String investorIdStr;
+    @ApiModelProperty(name = "investorType", value = "本方交易主体类型（深交所展示，否则为空）")
     private String investorType;
+    @ApiModelProperty(name = "investorTypeStr", value = "本方交易主体类型（1.自营 2.资管 3.机构经纪 4.个人经纪）")
+    private String investorTypeStr;
 
     @ApiModelProperty(name = "cpTraderCode", value = "对手方交易员")
     private String cpTraderCode;
+    @ApiModelProperty(name = "cpTraderCodeStr", value = "对手方交易员名称")
+    private String cpTraderCodeStr;
     @ApiModelProperty(name = "cpMemberId", value = "对手方交易商")
     private String cpMemberId;
-    @ApiModelProperty(name = "cpInvestorId", value = "对手方交易主体")
+    @ApiModelProperty(name = "cpMemberIdStr", value = "对手方交易商名称")
+    private String cpMemberIdStr;
+    @ApiModelProperty(name = "cpInvestorId", value = "对手方交易主体（深交所展示，否则为空）")
     private String cpInvestorId;
-    @ApiModelProperty(name = "cpInvestorType", value = "对手方交易主体类型")
+    @ApiModelProperty(name = "cpInvestorIdStr", value = "对手方交易主体（深交所展示，否则为空）")
+    private String cpInvestorIdStr;
+    @ApiModelProperty(name = "cpInvestorType", value = "对手方交易主体类型（深交所展示，否则为空）")
     private String cpInvestorType;
+    @ApiModelProperty(name = "cpInvestorTypeStr", value = "对手方交易主体类型（1.自营 2.资管 3.机构经纪 4.个人经纪）")
+    private String cpInvestorTypeStr;
     @ApiModelProperty(name = "cpClientName", value = "对手方客户名称")
     private String cpClientName;
 
@@ -62,10 +85,13 @@ public class BaseRepurchaseQuoteSendResponse {
     @ApiModelProperty(name = "pledgeNumberStr", value = "质押数量（单位：万元，保留两位小数）")
     private String pledgeNumberStr;
 
-    @ApiModelProperty(name = "investorTypeStr", value = "本方交易主体类型（1.自营 2.资管 3.机构经纪 4.个人经纪）")
-    private String investorTypeStr;
-    @ApiModelProperty(name = "cpInvestorTypeStr", value = "对手方交易主体类型（1.自营 2.资管 3.机构经纪 4.个人经纪）")
-    private String cpInvestorTypeStr;
+    public Integer getRequestStatus() {
+        return requestStatus;
+    }
+
+    public void setRequestStatus(Integer requestStatus) {
+        this.requestStatus = requestStatus;
+    }
 
     public String getRequestType() {
         return requestType;
@@ -123,12 +149,28 @@ public class BaseRepurchaseQuoteSendResponse {
         this.traderCode = traderCode;
     }
 
+    public String getTraderCodeStr() {
+        return traderCodeStr;
+    }
+
+    public void setTraderCodeStr(String traderCodeStr) {
+        this.traderCodeStr = traderCodeStr;
+    }
+
     public String getMemberId() {
         return memberId;
     }
 
     public void setMemberId(String memberId) {
         this.memberId = memberId;
+    }
+
+    public String getMemberIdStr() {
+        return memberIdStr;
+    }
+
+    public void setMemberIdStr(String memberIdStr) {
+        this.memberIdStr = memberIdStr;
     }
 
     public String getInvestorId() {
@@ -139,12 +181,28 @@ public class BaseRepurchaseQuoteSendResponse {
         this.investorId = investorId;
     }
 
+    public String getInvestorIdStr() {
+        return investorIdStr;
+    }
+
+    public void setInvestorIdStr(String investorIdStr) {
+        this.investorIdStr = investorIdStr;
+    }
+
     public String getInvestorType() {
         return investorType;
     }
 
     public void setInvestorType(String investorType) {
         this.investorType = investorType;
+    }
+
+    public String getInvestorTypeStr() {
+        return investorTypeStr;
+    }
+
+    public void setInvestorTypeStr(String investorTypeStr) {
+        this.investorTypeStr = investorTypeStr;
     }
 
     public String getCpTraderCode() {
@@ -155,12 +213,28 @@ public class BaseRepurchaseQuoteSendResponse {
         this.cpTraderCode = cpTraderCode;
     }
 
+    public String getCpTraderCodeStr() {
+        return cpTraderCodeStr;
+    }
+
+    public void setCpTraderCodeStr(String cpTraderCodeStr) {
+        this.cpTraderCodeStr = cpTraderCodeStr;
+    }
+
     public String getCpMemberId() {
         return cpMemberId;
     }
 
     public void setCpMemberId(String cpMemberId) {
         this.cpMemberId = cpMemberId;
+    }
+
+    public String getCpMemberIdStr() {
+        return cpMemberIdStr;
+    }
+
+    public void setCpMemberIdStr(String cpMemberIdStr) {
+        this.cpMemberIdStr = cpMemberIdStr;
     }
 
     public String getCpInvestorId() {
@@ -171,12 +245,28 @@ public class BaseRepurchaseQuoteSendResponse {
         this.cpInvestorId = cpInvestorId;
     }
 
+    public String getCpInvestorIdStr() {
+        return cpInvestorIdStr;
+    }
+
+    public void setCpInvestorIdStr(String cpInvestorIdStr) {
+        this.cpInvestorIdStr = cpInvestorIdStr;
+    }
+
     public String getCpInvestorType() {
         return cpInvestorType;
     }
 
     public void setCpInvestorType(String cpInvestorType) {
         this.cpInvestorType = cpInvestorType;
+    }
+
+    public String getCpInvestorTypeStr() {
+        return cpInvestorTypeStr;
+    }
+
+    public void setCpInvestorTypeStr(String cpInvestorTypeStr) {
+        this.cpInvestorTypeStr = cpInvestorTypeStr;
     }
 
     public String getCpClientName() {
@@ -195,20 +285,29 @@ public class BaseRepurchaseQuoteSendResponse {
         this.remark = remark;
     }
 
-    public String getRequestTypeStr() {
-        return requestTypeStr;
+    public String getRequestStatusStr() {
+        if (ObjectUtil.isEmpty(this.getRequestStatus())) {
+            return null;
+        }
+        String description = EnumUtil.getDescriptionByCode(QuoteStatusEnum.class, this.getRequestStatus());
+        return description == null ? String.valueOf(this.getRequestStatus()) : description;
     }
 
-    public void setRequestTypeStr(String requestTypeStr) {
-        this.requestTypeStr = requestTypeStr;
+    public String getRequestTypeStr() {
+        if (StrUtil.isEmpty(this.getRequestType())) {
+            return null;
+        }
+        String description = EnumUtil.getDescriptionByCode(RepurchaseTypeEnum.class, this.getRequestType());
+        return description == null ? this.getRequestType() : description;
     }
+
 
     public String getBsStr() {
-        return bsStr;
-    }
-
-    public void setBsStr(String bsStr) {
-        this.bsStr = bsStr;
+        if (StrUtil.isEmpty(this.getBs())) {
+            return null;
+        }
+        String description = EnumUtil.getDescriptionByCode(RepoBsEnum.class, this.getBs());
+        return description == null ? this.getBs() : description;
     }
 
     public String getPledgeNumberStr() {
@@ -219,35 +318,38 @@ public class BaseRepurchaseQuoteSendResponse {
         this.pledgeNumberStr = pledgeNumberStr;
     }
 
-    public String getInvestorTypeStr() {
-        return investorTypeStr;
-    }
-
-    public void setInvestorTypeStr(String investorTypeStr) {
-        this.investorTypeStr = investorTypeStr;
-    }
-
-    public String getCpInvestorTypeStr() {
-        return cpInvestorTypeStr;
-    }
-
-    public void setCpInvestorTypeStr(String cpInvestorTypeStr) {
-        this.cpInvestorTypeStr = cpInvestorTypeStr;
-    }
-
-    public Integer getRequestStatus() {
-        return requestStatus;
-    }
-
-    public void setRequestStatus(Integer requestStatus) {
-        this.requestStatus = requestStatus;
-    }
-
-    public String getRequestStatusStr() {
-        return requestStatusStr;
-    }
-
-    public void setRequestStatusStr(String requestStatusStr) {
-        this.requestStatusStr = requestStatusStr;
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("requestStatus", requestStatus)
+                .add("requestType", requestType)
+                .add("bs", bs)
+                .add("stockCode", stockCode)
+                .add("stockName", stockName)
+                .add("pledgeNumber", pledgeNumber)
+                .add("counterId", counterId)
+                .add("traderCode", traderCode)
+                .add("traderCodeStr", traderCodeStr)
+                .add("memberId", memberId)
+                .add("memberIdStr", memberIdStr)
+                .add("investorId", investorId)
+                .add("investorIdStr", investorIdStr)
+                .add("investorType", investorType)
+                .add("investorTypeStr", investorTypeStr)
+                .add("cpTraderCode", cpTraderCode)
+                .add("cpTraderCodeStr", cpTraderCodeStr)
+                .add("cpMemberId", cpMemberId)
+                .add("cpMemberIdStr", cpMemberIdStr)
+                .add("cpInvestorId", cpInvestorId)
+                .add("cpInvestorIdStr", cpInvestorIdStr)
+                .add("cpInvestorType", cpInvestorType)
+                .add("cpInvestorTypeStr", cpInvestorTypeStr)
+                .add("cpClientName", cpClientName)
+                .add("remark", remark)
+                .add("requestStatusStr", requestStatusStr)
+                .add("requestTypeStr", requestTypeStr)
+                .add("bsStr", bsStr)
+                .add("pledgeNumberStr", pledgeNumberStr)
+                .toString();
     }
 }

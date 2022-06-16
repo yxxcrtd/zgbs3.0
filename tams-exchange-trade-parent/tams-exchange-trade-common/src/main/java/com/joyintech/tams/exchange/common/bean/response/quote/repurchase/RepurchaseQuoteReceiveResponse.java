@@ -1,7 +1,12 @@
 package com.joyintech.tams.exchange.common.bean.response.quote.repurchase;
 
 
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.MoreObjects;
+import com.joyintech.tams.exchange.common.constant.Market;
+import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -96,21 +101,38 @@ public class RepurchaseQuoteReceiveResponse {
 
     @ApiModelProperty(name = "traderCode", value = "本方交易员")
     private String traderCode;
+    @ApiModelProperty(name = "traderCodeStr", value = "本方交易员名称")
+    private String traderCodeStr;
     @ApiModelProperty(name = "memberId", value = "本方交易商")
     private String memberId;
+    @ApiModelProperty(name = "memberIdStr", value = "本方交易商名称")
+    private String memberIdStr;
     @ApiModelProperty(name = "investorId", value = "本方交易主体（深交所展示，否则为空）")
     private String investorId;
+    @ApiModelProperty(name = "investorIdStr", value = "本方交易主体（深交所展示，否则为空）")
+    private String investorIdStr;
     @ApiModelProperty(name = "investorType", value = "本方交易主体类型（深交所展示，否则为空）")
     private String investorType;
 
+    @ApiModelProperty(name = "investorTypeStr", value = "本方交易主体类型（1.自营 2.资管 3.机构经纪 4.个人经纪）")
+    private String investorTypeStr;
+
     @ApiModelProperty(name = "cpTraderCode", value = "对手方交易员")
     private String cpTraderCode;
+    @ApiModelProperty(name = "cpTraderCodeStr", value = "对手方交易员名称")
+    private String cpTraderCodeStr;
     @ApiModelProperty(name = "cpMemberId", value = "对手方交易商")
     private String cpMemberId;
+    @ApiModelProperty(name = "cpMemberIdStr", value = "对手方交易商名称")
+    private String cpMemberIdStr;
     @ApiModelProperty(name = "cpInvestorId", value = "对手方交易主体（深交所展示，否则为空）")
     private String cpInvestorId;
+    @ApiModelProperty(name = "cpInvestorIdStr", value = "对手方交易主体（深交所展示，否则为空）")
+    private String cpInvestorIdStr;
     @ApiModelProperty(name = "cpInvestorType", value = "对手方交易主体类型（深交所展示，否则为空）")
     private String cpInvestorType;
+    @ApiModelProperty(name = "cpInvestorTypeStr", value = "对手方交易主体类型（1.自营 2.资管 3.机构经纪 4.个人经纪）")
+    private String cpInvestorTypeStr;
     @ApiModelProperty(name = "cpClientName", value = "对手方客户名称")
     private String cpClientName;
 
@@ -140,11 +162,6 @@ public class RepurchaseQuoteReceiveResponse {
     private String tradeMarketStr;
     @ApiModelProperty(name = "pledgeNumberStr", value = "质押数量（单位：万元，保留两位小数）")
     private String pledgeNumberStr;
-
-    @ApiModelProperty(name = "investorTypeStr", value = "本方交易主体类型（1.自营 2.资管 3.机构经纪 4.个人经纪）")
-    private String investorTypeStr;
-    @ApiModelProperty(name = "cpInvestorTypeStr", value = "对手方交易主体类型（1.自营 2.资管 3.机构经纪 4.个人经纪）")
-    private String cpInvestorTypeStr;
 
     public String getRequestNo() {
         return requestNo;
@@ -378,12 +395,28 @@ public class RepurchaseQuoteReceiveResponse {
         this.traderCode = traderCode;
     }
 
+    public String getTraderCodeStr() {
+        return traderCodeStr;
+    }
+
+    public void setTraderCodeStr(String traderCodeStr) {
+        this.traderCodeStr = traderCodeStr;
+    }
+
     public String getMemberId() {
         return memberId;
     }
 
     public void setMemberId(String memberId) {
         this.memberId = memberId;
+    }
+
+    public String getMemberIdStr() {
+        return memberIdStr;
+    }
+
+    public void setMemberIdStr(String memberIdStr) {
+        this.memberIdStr = memberIdStr;
     }
 
     public String getInvestorId() {
@@ -394,12 +427,28 @@ public class RepurchaseQuoteReceiveResponse {
         this.investorId = investorId;
     }
 
+    public String getInvestorIdStr() {
+        return investorIdStr;
+    }
+
+    public void setInvestorIdStr(String investorIdStr) {
+        this.investorIdStr = investorIdStr;
+    }
+
     public String getInvestorType() {
         return investorType;
     }
 
     public void setInvestorType(String investorType) {
         this.investorType = investorType;
+    }
+
+    public String getInvestorTypeStr() {
+        return investorTypeStr;
+    }
+
+    public void setInvestorTypeStr(String investorTypeStr) {
+        this.investorTypeStr = investorTypeStr;
     }
 
     public String getCpTraderCode() {
@@ -410,12 +459,28 @@ public class RepurchaseQuoteReceiveResponse {
         this.cpTraderCode = cpTraderCode;
     }
 
+    public String getCpTraderCodeStr() {
+        return cpTraderCodeStr;
+    }
+
+    public void setCpTraderCodeStr(String cpTraderCodeStr) {
+        this.cpTraderCodeStr = cpTraderCodeStr;
+    }
+
     public String getCpMemberId() {
         return cpMemberId;
     }
 
     public void setCpMemberId(String cpMemberId) {
         this.cpMemberId = cpMemberId;
+    }
+
+    public String getCpMemberIdStr() {
+        return cpMemberIdStr;
+    }
+
+    public void setCpMemberIdStr(String cpMemberIdStr) {
+        this.cpMemberIdStr = cpMemberIdStr;
     }
 
     public String getCpInvestorId() {
@@ -426,12 +491,28 @@ public class RepurchaseQuoteReceiveResponse {
         this.cpInvestorId = cpInvestorId;
     }
 
+    public String getCpInvestorIdStr() {
+        return cpInvestorIdStr;
+    }
+
+    public void setCpInvestorIdStr(String cpInvestorIdStr) {
+        this.cpInvestorIdStr = cpInvestorIdStr;
+    }
+
     public String getCpInvestorType() {
         return cpInvestorType;
     }
 
     public void setCpInvestorType(String cpInvestorType) {
         this.cpInvestorType = cpInvestorType;
+    }
+
+    public String getCpInvestorTypeStr() {
+        return cpInvestorTypeStr;
+    }
+
+    public void setCpInvestorTypeStr(String cpInvestorTypeStr) {
+        this.cpInvestorTypeStr = cpInvestorTypeStr;
     }
 
     public String getCpClientName() {
@@ -474,54 +555,6 @@ public class RepurchaseQuoteReceiveResponse {
         this.accountName = accountName;
     }
 
-    public String getRequestTypeStr() {
-        return requestTypeStr;
-    }
-
-    public void setRequestTypeStr(String requestTypeStr) {
-        this.requestTypeStr = requestTypeStr;
-    }
-
-    public String getBsStr() {
-        return bsStr;
-    }
-
-    public void setBsStr(String bsStr) {
-        this.bsStr = bsStr;
-    }
-
-    public String getTradeMarketStr() {
-        return tradeMarketStr;
-    }
-
-    public void setTradeMarketStr(String tradeMarketStr) {
-        this.tradeMarketStr = tradeMarketStr;
-    }
-
-    public String getPledgeNumberStr() {
-        return pledgeNumberStr;
-    }
-
-    public void setPledgeNumberStr(String pledgeNumberStr) {
-        this.pledgeNumberStr = pledgeNumberStr;
-    }
-
-    public String getInvestorTypeStr() {
-        return investorTypeStr;
-    }
-
-    public void setInvestorTypeStr(String investorTypeStr) {
-        this.investorTypeStr = investorTypeStr;
-    }
-
-    public String getCpInvestorTypeStr() {
-        return cpInvestorTypeStr;
-    }
-
-    public void setCpInvestorTypeStr(String cpInvestorTypeStr) {
-        this.cpInvestorTypeStr = cpInvestorTypeStr;
-    }
-
     public String getBrokerId() {
         return brokerId;
     }
@@ -536,6 +569,39 @@ public class RepurchaseQuoteReceiveResponse {
 
     public void setBrokerName(String brokerName) {
         this.brokerName = brokerName;
+    }
+
+    public String getRequestTypeStr() {
+        if (StrUtil.isEmpty(this.getRequestType())) {
+            return null;
+        }
+        String description = EnumUtil.getDescriptionByCode(RepurchaseTypeEnum.class, this.getRequestType());
+        return description == null ? this.getRequestType() : description;
+    }
+
+
+    public String getBsStr() {
+        if (StrUtil.isEmpty(this.getBs())) {
+            return null;
+        }
+        String description = EnumUtil.getDescriptionByCode(RepoBsEnum.class, this.getBs());
+        return description == null ? this.getBs() : description;
+    }
+
+    public String getTradeMarketStr() {
+        if (StrUtil.isEmpty(this.getTradeMarket())) {
+            return null;
+        }
+        String description =  cn.hutool.core.util.EnumUtil.getFieldBy(Market::getDescription, Market::getInvestValue, this.getTradeMarket());
+        return description == null ? this.getTradeMarket() : description;
+    }
+
+    public String getPledgeNumberStr() {
+        return pledgeNumberStr;
+    }
+
+    public void setPledgeNumberStr(String pledgeNumberStr) {
+        this.pledgeNumberStr = pledgeNumberStr;
     }
 
     @Override
@@ -570,26 +636,32 @@ public class RepurchaseQuoteReceiveResponse {
                 .add("mIntAmt", mIntAmt)
                 .add("backBalance", backBalance)
                 .add("traderCode", traderCode)
+                .add("traderCodeStr", traderCodeStr)
                 .add("memberId", memberId)
+                .add("memberIdStr", memberIdStr)
                 .add("investorId", investorId)
+                .add("investorIdStr", investorIdStr)
                 .add("investorType", investorType)
+                .add("investorTypeStr", investorTypeStr)
                 .add("cpTraderCode", cpTraderCode)
+                .add("cpTraderCodeStr", cpTraderCodeStr)
                 .add("cpMemberId", cpMemberId)
+                .add("cpMemberIdStr", cpMemberIdStr)
                 .add("cpInvestorId", cpInvestorId)
+                .add("cpInvestorIdStr", cpInvestorIdStr)
                 .add("cpInvestorType", cpInvestorType)
+                .add("cpInvestorTypeStr", cpInvestorTypeStr)
                 .add("cpClientName", cpClientName)
                 .add("origSerialNo", origSerialNo)
                 .add("remark", remark)
                 .add("account", account)
                 .add("accountName", accountName)
+                .add("brokerId", brokerId)
+                .add("brokerName", brokerName)
                 .add("requestTypeStr", requestTypeStr)
                 .add("bsStr", bsStr)
                 .add("tradeMarketStr", tradeMarketStr)
                 .add("pledgeNumberStr", pledgeNumberStr)
-                .add("investorTypeStr", investorTypeStr)
-                .add("cpInvestorTypeStr", cpInvestorTypeStr)
-                .add("brokerId", brokerId)
-                .add("brokerName", brokerName)
                 .toString();
     }
 }
