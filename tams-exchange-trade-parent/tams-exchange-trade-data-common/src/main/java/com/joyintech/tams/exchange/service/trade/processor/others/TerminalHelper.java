@@ -468,7 +468,6 @@ public class TerminalHelper {
         repurchaseQuoteReceiveResponse.setBrokerId(source.getBrokerId());
         repurchaseQuoteReceiveResponse.setBrokerName(source.getBrokerName());
 
-        repurchaseQuoteReceiveResponse.setTraderCode(source.getTraderId());
         repurchaseQuoteReceiveResponse.setCpTraderCode(source.getOppoTraderId());
         fillDealerInfo(source, repurchaseQuoteReceiveResponse);
         return repurchaseQuoteReceiveResponse;
@@ -478,35 +477,16 @@ public class TerminalHelper {
         TradeInfoProRequest dto = new TradeInfoProRequest();
         dto.setTradePlace(Market.getInvestValue(source.getStockCode().split(StrUtil.DOT)[1]));
 
-        String traderId = source.getTraderId();
-        if (StrUtil.isNotEmpty(traderId)) {
-            dto.setDealerNo(traderId);
-            dto.setIsOur("Y");
-            List<TradeInfoProResponse> list = investInterfaceHelper.getDealerTraderInfo(dto);
-            if (CollUtil.isEmpty(list)) {
-                repurchaseQuoteReceiveResponse.setTraderCodeStr(traderId);
-                logger.error("本方交易商、交易主体、交易员信息不存在 => 【dealerNo = {}】，【market = {}】", traderId, dto.getTradePlace());
-                return;
-            }
-            TradeInfoProResponse proResponse = list.get(0);
-            repurchaseQuoteReceiveResponse.setTraderCodeStr(proResponse.getTraderName());
-            repurchaseQuoteReceiveResponse.setMemberId(proResponse.getDealerNo());
-            repurchaseQuoteReceiveResponse.setMemberIdStr(proResponse.getDealerName());
-            repurchaseQuoteReceiveResponse.setInvestorId(proResponse.getDealerPartyNo());
-            repurchaseQuoteReceiveResponse.setInvestorIdStr(proResponse.getDealerPartyName());
-            repurchaseQuoteReceiveResponse.setInvestorType(proResponse.getDealerPartyType());
-        }
-
         String oppoTraderId = source.getOppoTraderId();
         if (StrUtil.isNotEmpty(oppoTraderId)) {
             dto.setDealerNo(oppoTraderId);
-            List<TradeInfoProResponse> list = investInterfaceHelper.getCounterDealerTraderInfo(dto);
-            if (CollUtil.isEmpty(list)) {
+            List<TradeInfoProResponse> counterList = investInterfaceHelper.getCounterDealerTraderInfo(dto);
+            if (CollUtil.isEmpty(counterList)) {
                 repurchaseQuoteReceiveResponse.setCpTraderCodeStr(oppoTraderId);
                 logger.error("对方交易商、交易主体、交易员信息不存在 => 【dealerNo = {}】，【market = {}】", oppoTraderId, dto.getTradePlace());
                 return;
             }
-            TradeInfoProResponse proResponse = list.get(0);
+            TradeInfoProResponse proResponse = counterList.get(0);
             repurchaseQuoteReceiveResponse.setCpTraderCodeStr(proResponse.getTraderName());
             repurchaseQuoteReceiveResponse.setCpMemberId(proResponse.getDealerNo());
             repurchaseQuoteReceiveResponse.setCpMemberIdStr(proResponse.getDealerName());
@@ -514,6 +494,23 @@ public class TerminalHelper {
             repurchaseQuoteReceiveResponse.setCpInvestorIdStr(proResponse.getDealerPartyName());
             repurchaseQuoteReceiveResponse.setCpInvestorType(proResponse.getDealerPartyType());
         }
+
+        dto.setDealerNo(null);
+        dto.setAcctNo(source.getFundAccount());
+        dto.setIsOur("Y");
+        List<TradeInfoProResponse> list = investInterfaceHelper.getDealerTraderInfo(dto);
+        if (CollUtil.isEmpty(list)) {
+            logger.error("本方交易商、交易主体、交易员信息不存在 => 【accountId = {}】，【market = {}】", source.getFundAccount(), dto.getTradePlace());
+            return;
+        }
+        TradeInfoProResponse proResponse = list.get(0);
+        repurchaseQuoteReceiveResponse.setTraderCode(proResponse.getTraderNo());
+        repurchaseQuoteReceiveResponse.setTraderCodeStr(proResponse.getTraderName());
+        repurchaseQuoteReceiveResponse.setMemberId(proResponse.getDealerNo());
+        repurchaseQuoteReceiveResponse.setMemberIdStr(proResponse.getDealerName());
+        repurchaseQuoteReceiveResponse.setInvestorId(proResponse.getDealerPartyNo());
+        repurchaseQuoteReceiveResponse.setInvestorIdStr(proResponse.getDealerPartyName());
+        repurchaseQuoteReceiveResponse.setInvestorType(proResponse.getDealerPartyType());
 
     }
 
