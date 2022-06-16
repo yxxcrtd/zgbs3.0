@@ -167,14 +167,14 @@ public class CreditProtectionCertificate001Controller extends BaseController {
                 parameter.setPageId("CreditProtectionCertificate002");
                 parameter.setBusinessDataPk1(entity.getFinprodMarketId());
                 if (creditProtectionCertificate001Service.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可删除!")));
+                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
                 Integer count = creditProtectionCertificate001Service.countFinprodIdUse(entity.getFinprodMarketId());
                 if (Objects.nonNull(count) && count > 0) {
-                    errorList.add(new ValidMessage("", getMessage("存在流程中/待执行指令交易数据,不可删除!")));
+                    errorList.add(new ValidMessage("", getMessage("存在流程中/待执行指令交易数据!")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);

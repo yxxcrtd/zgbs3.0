@@ -1935,9 +1935,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (!StringUtil.isNotEmpty(dto.getBidDateStart())) {
             errorList.add(new ValidMessage("投标日开始日不可为空!"));
         }
-        if (!StringUtil.isNotEmpty(dto.getBidDateEnd())) {
-            errorList.add(new ValidMessage("投标日结束日不可为空!"));
-        }
+//        if (!StringUtil.isNotEmpty(dto.getBidDateEnd())) {
+//            errorList.add(new ValidMessage("投标日结束日不可为空!"));
+//        }
         // 投标方式
         if (StringUtil.isEmpty(dto.getBiddingMethod())) {
             errorList.add(new ValidMessage("投标方式不可为空!"));
