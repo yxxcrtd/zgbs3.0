@@ -135,6 +135,7 @@
         AND (T1.TRADE_MARKET IN ('01', '02')
         OR (T1.TRADE_MARKET IN ('03', '04') AND T2.TYPE_10 NOT IN ('70','71') ))
         AND T1.FINPROD_TYPE2 = #{assestType}
+        AND (T3.ISSUE_STATUS != '02' OR T3.ISSUE_STATUS IS NULL )
         AND (
         (((CASE
         WHEN fpi.ISSUE_CLASS IN ('02', '03') AND T3.LISTING_DATE IS NOT NULL THEN
