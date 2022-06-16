@@ -35,7 +35,7 @@
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.FinCashCalcRule" >
     	<!-- 一体化对应etliu -->
         insert into FIN_CASH_CALC_RULE (CASH_ID, EFF_DATE, <!-- RELAESE_DATE, --> CALC_TYPE, 
-        BASE_TYPE, BASE_DATE_TYPE, BASIS, YIELD, IS_INITIAL, 
+        BASE_TYPE, BASE_DATE_TYPE, BASIS, MARKET_BASIS, YIELD, IS_INITIAL,
         FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, BRANCH, 
         REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, 
         UPDATE_USER, UPDATE_TIME)
@@ -45,7 +45,8 @@
 	            #{calcType,jdbcType=VARCHAR}, 
 	            #{baseType,jdbcType=VARCHAR}, 
 	            #{baseDateType,jdbcType=VARCHAR}, 
-	            #{basis,jdbcType=VARCHAR}, 
+	            #{basis,jdbcType=VARCHAR},
+                #{marketBasis,jdbcType=VARCHAR},
 	            #{yield,jdbcType=DECIMAL}, 
 	            #{isInitial,jdbcType=VARCHAR},
 	            #{finprodId,jdbcType=VARCHAR}, 
