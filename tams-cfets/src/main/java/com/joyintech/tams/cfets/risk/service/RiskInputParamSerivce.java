@@ -26,10 +26,7 @@ import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSa
 import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealRegisterQuoteDto;
 import com.joyintech.tams.cfets.trd.repo.dto.RepoPtlAllocationDto;
-import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
-import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmManualMatchInfoRequest;
-import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
-import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdRepoTrade003Dto;
+import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdRepoTrade002Dto;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
@@ -232,8 +229,11 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (obj instanceof CfetsManualSettleDto || StringUtil.equals(pageId, "CfetsManualSettle")) {
             return riskInputParamGenerateBusinessSerivce.generateCfetsManualSettle(decisionAct, flowStatus, isCheck, businessJson);
         }
-        // 成交确认-现券交易
+        // 成交确认-现券交易/一级申购撤销
         if (obj instanceof CfetsTrdBondInvestTradeDto) {
+            if(StringUtil.isNotEmpty(pageId)) {
+                return riskInputParamGenerateBusinessSerivce.generateCfetsTrdBondInvestTradeResponse(decisionAct, flowStatus, isCheck, businessJson);
+            }
             CfetsTrdBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, CfetsTrdBondInvestTradeDto.class);
 
             BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
@@ -248,7 +248,6 @@ public class RiskInputParamSerivce extends RiskCommonService {
             if (StringUtil.equals(dto.getPs(), 交易方向_行权回售.getValue())) {
                 map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
             }
-            return map;
         }
         if (obj instanceof TrdBondInvestTradeDto) {//交易撤销
             TrdBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, TrdBondInvestTradeDto.class);
@@ -381,9 +380,13 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (obj instanceof CfetsTrdFirstBondInvestTradeDto) {
             return riskInputParamGenerateBusinessSerivce.generateCfetsTrdFirstBondInvestTrade(decisionAct, flowStatus, isCheck, businessJson);
         }
+        // 发行失败
+        if (obj instanceof CfetsTrdConfirmRegInfoListResponse) {
+            return riskInputParamGenerateBusinessSerivce.generateCfetsTrdConfirmRegInfoListResponse(decisionAct, flowStatus, isCheck, businessJson);
+        }
         // 中标结果维护
         if (obj instanceof CfetsPrimaryBidManageSaveRequest || StringUtil.equals(pageId, "CfetsPrimaryBidManage002")) {
-            return riskInputParamGenerateBusinessSerivce.generateCfetsPrimaryBidManage(decisionAct, flowStatus, isCheck, businessJson);
+            return riskInputParamGenerateBusinessSerivce.generateCfetsPrimaryBidManage(decisionAct, flowStatus, isCheck, businessJson, pageId);
         }
         /***************** 交收 *********************/
         // 见上方交收统一处理
@@ -491,31 +494,16 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (data instanceof CfetsTrdFirstBondInvestTradeDto) {
             list = riskInputBuildRiskRdsParamSerivce.buildRiskRdsCfetsTrdFirstBondInvestTradeParam(data, dtl, isCheck);
         }
+        // 成交确认-发行失败
+        if (data instanceof CfetsTrdConfirmRegInfoListResponse) {
+            list = riskInputBuildRiskRdsParamSerivce.buildRiskRdsCfetsTrdConfirmRegInfoListResponseParam(data, dtl, isCheck);
+        }
+        // 中标结果维护
         if (data instanceof CfetsPrimaryBidManageSaveRequest) {
             list = riskInputBuildRiskRdsParamSerivce.buildRiskRdsCfetsPrimaryBidManageSaveRequestParam(data, dtl, isCheck);
         }
         if (data instanceof CfetsTrdBondInvestTradeDto) {//银行间债券成交确认
-            InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
-            CfetsTrdBondInvestTradeDto entity = (CfetsTrdBondInvestTradeDto) data;
-            riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
-            List<TrdBondInvestTradeDto> list1 = new ArrayList<>();
-            for (CfetsTrdBondInvestTradeDto item : entity.getDtoList()) {
-                TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
-                BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
-                list1.add(bondDto);
-            }
-            if (CollectionUtils.isEmpty(list1) && !CollectionUtils.isEmpty(entity.getBussTrdTransfenpeiDto())) {//处理撤销时
-                for (BussTrdTransfenpeiDto item : entity.getBussTrdTransfenpeiDto()) {
-                    TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
-                    BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
-                    bondDto.setTotleTradeId(item.getTradeId());
-                    list1.add(bondDto);
-                }
-            }
-            if (CollectionUtils.isEmpty(list1) && CollectionUtils.isNotEmpty(entity.getTradeDtoList())) {
-                list1.addAll(entity.getTradeDtoList());
-            }
-            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
+            list = riskInputBuildRiskRdsParamSerivce.buildRiskRdsCfetsTrdBondInvestTradeParam(data, dtl, isCheck);
         }
         if (data instanceof TrdBondInvestTradeDto) {//银行间债券交易撤销
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
@@ -671,6 +659,10 @@ public class RiskInputParamSerivce extends RiskCommonService {
         // 成交确认-一级申购
         if (data instanceof CfetsTrdFirstBondInvestTradeDto) {
             result.addAll(riskInputBuildCreditParamSerivce.buildCreditCfetsTrdFirstBondInvestTradeParam(data, dtl));
+        }
+        // 成交确认-发行失败
+        if (data instanceof CfetsTrdConfirmRegInfoListResponse) {
+            result.addAll(riskInputBuildCreditParamSerivce.buildCreditCfetsTrdConfirmRegInfoListResponseParam(data, dtl));
         }
         // 一级投标指令
         if (data instanceof CfetsEtrBondFirstBidSaveRequest) {

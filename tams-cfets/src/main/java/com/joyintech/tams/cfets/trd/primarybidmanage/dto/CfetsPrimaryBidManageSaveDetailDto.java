@@ -99,6 +99,8 @@ public class CfetsPrimaryBidManageSaveDetailDto {
     @ApiModelProperty(name="bobpId",value="组合+指令代码")
     private String bobpId;
 
+    private String finprodId;
+
     public String getTotalWinId() {
         return totalWinId;
     }
@@ -285,5 +287,13 @@ public class CfetsPrimaryBidManageSaveDetailDto {
 
     public void setBidId(String bidId) {
         this.bidId = bidId;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }
