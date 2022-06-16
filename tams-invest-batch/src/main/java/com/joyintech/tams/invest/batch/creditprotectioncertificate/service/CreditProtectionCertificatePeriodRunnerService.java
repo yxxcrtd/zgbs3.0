@@ -341,7 +341,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
         resultMap.put(TOTAL_TRADE_ID, writerDto.getBussinessCode());
         resultMap.put("modelType", DictCodeListExt1.子系统代码_交易.getValue());
         resultMap.put("balanceCheck", "N");
-        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue());
+        resultMap.put(BUSI_TYPE, DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue());
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_交易登记.getValue());
         resultMap.put(PS, DictCodeList.交易方向_到期.getValue());
 
@@ -356,7 +356,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
         for (CreditProtectionCertificatePeriodExpireDataDto expireDataDto : expireDatas) {
             Map<String, Object> ptl = new HashMap<>();
             ptl.put("portfolioId", expireDataDto.getPortfolioId());
-            ptl.put("finprodId", expireDataDto.getFinprodId());
+            ptl.put(FINPROD_ID, expireDataDto.getFinprodId());
             ptl.put("tradeId", expireDataDto.getTradeId());
             ptl.put("cashAcctId", expireDataDto.getAcctNo());
             ptl.put("secAcctId", expireDataDto.getSecAcctId());
