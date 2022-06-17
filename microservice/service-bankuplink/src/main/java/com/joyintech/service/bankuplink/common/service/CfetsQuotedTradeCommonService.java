@@ -224,6 +224,7 @@ public class CfetsQuotedTradeCommonService{
             // 一级申购下行数据只有银行间债券,此处处理添加后缀
             interfCstpBjfxjg.setInstrumentId(interfCstpBjfxjg.getInstrumentId() + ".IB");
             InterfCstpBjfxjg finalInterfCstpBjfxjg = interfCstpBjfxjg;
+            getLogger().info("一级申购 下行接口数据:" + JsonUtils.object2Json(interfCstpBjfxjg));
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {

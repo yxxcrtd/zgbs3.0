@@ -322,8 +322,8 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             AjaxResult res= new AjaxResult();
             List<ValidMessage> errorList = new ArrayList<>();
             dto.setOperateType("revoke");
-            List<ValidMessage> valid = cfetsPrimaryBidManageValidatorService.valid(dto);
-            errorList.addAll(valid);
+//            List<ValidMessage> valid = cfetsPrimaryBidManageValidatorService.valid(dto);
+//            errorList.addAll(valid);
             if(CollectionUtils.isNotEmpty(dto.getSelectedItem())) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("CfetsPrimaryBidManage002");
