@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1299,16 +1300,26 @@ public class KCBPTradeApi {
             if (data.size() > 0) {
             	if(Market.isSzMarket(integratedRepurchaseQuoteQryBean.getMarket())) {
             		integratedRepurchaseQuoteBeans = KCBPConverter.convertToIntegratedRepurchaseQuoteResponseSZ(integratedRepurchaseQuoteQryBean, data);
-            		Map<String,IntegratedRepurchaseQuotePledgeBean> pledgeMap = this.getPledgeMap(integratedRepurchaseQuoteQryBean);
+            		Map<String,List<IntegratedRepurchaseQuotePledgeBean>> pledgeMap = this.getPledgeMap(integratedRepurchaseQuoteQryBean);
             		for(IntegratedRepurchaseQuoteBean integratedRepurchaseQuoteBean:integratedRepurchaseQuoteBeans) {
             			String execid = integratedRepurchaseQuoteBean.getExecid();
-            			IntegratedRepurchaseQuotePledgeBean integratedRepurchaseQuotePledgeBean = pledgeMap.get(execid);
-            			if(integratedRepurchaseQuotePledgeBean!=null) {
-            				integratedRepurchaseQuoteBean.setDeliverySide(integratedRepurchaseQuotePledgeBean.getDeliverySide());
-            				integratedRepurchaseQuoteBean.setStockCode(integratedRepurchaseQuotePledgeBean.getStkcode());
-            				integratedRepurchaseQuoteBean.setImpawnAmount(Integer.parseInt(integratedRepurchaseQuotePledgeBean.getOrderqty()));
-            				integratedRepurchaseQuoteBean.setStkprop(integratedRepurchaseQuotePledgeBean.getStkprop());
+            			List<IntegratedRepurchaseQuotePledgeBean> integratedRepurchaseQuotePledgeBeanList = pledgeMap.get(execid);
+            			StringBuffer stockCodes=new StringBuffer();
+            			Integer volumes=0;
+            			for(IntegratedRepurchaseQuotePledgeBean integratedRepurchaseQuotePledgeBean : integratedRepurchaseQuotePledgeBeanList) {
+            				if("01".equals(integratedRepurchaseQuotePledgeBean.getDeliverySide())) {
+            					integratedRepurchaseQuoteBean.setSwapIntoBonds(integratedRepurchaseQuotePledgeBean.getStkcode());
+            					integratedRepurchaseQuoteBean.setSwapIntoBondsVolume(new BigDecimal(integratedRepurchaseQuotePledgeBean.getOrderqty()));
+            				}else if("02".equals(integratedRepurchaseQuotePledgeBean.getDeliverySide())) {
+            					integratedRepurchaseQuoteBean.setSwapOutBonds(integratedRepurchaseQuotePledgeBean.getStkcode());
+            					integratedRepurchaseQuoteBean.setSwapOutBondsVolume(new BigDecimal(integratedRepurchaseQuotePledgeBean.getOrderqty()));
+            				}else {
+            					stockCodes.append(integratedRepurchaseQuotePledgeBean.getStkcode()).append(",");
+            					volumes+=Integer.parseInt(integratedRepurchaseQuotePledgeBean.getOrderqty());
+            				}
             			}
+            			integratedRepurchaseQuoteBean.setStockCode(stockCodes.toString());
+        				integratedRepurchaseQuoteBean.setImpawnAmount(volumes);
             		}
             	}else {
             		integratedRepurchaseQuoteBeans = KCBPConverter.convertToIntegratedRepurchaseQuoteResponse(integratedRepurchaseQuoteQryBean, data);
@@ -1319,8 +1330,8 @@ public class KCBPTradeApi {
         kcbpTradeResponse.resQueryIntegratedRepurchaseQuote(integratedRepurchaseQuoteBeans, requestId);
     }
 
-    private Map<String,IntegratedRepurchaseQuotePledgeBean> getPledgeMap(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean){
-    	Map<String,IntegratedRepurchaseQuotePledgeBean> retMap = null;
+    private Map<String,List<IntegratedRepurchaseQuotePledgeBean>> getPledgeMap(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean){
+    	Map<String,List<IntegratedRepurchaseQuotePledgeBean>> retMap = null;
     	KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(integratedRepurchaseQuoteQryBean.getAccountId());
         Map<String, String> parameters = Maps.newHashMap(kcbpAccount.getHeadMessages());
         parameters.put("funcid", "411055");
