@@ -332,6 +332,11 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     @ApiModelProperty(name = "cancelBalance", value = "撤单金额")
     public BigDecimal cancelBalance;
 
+    @ApiModelProperty(required = true, name = "ownerTypeStr", value = "本方报价所有者类型")
+    private String ownerTypeStr;
+    @ApiModelProperty(required = true, name = "propOwnerTypeStr", value = "对手方报价所有者类型")
+    private String propOwnerTypeStr;
+
     public String getSoftSkipMode() {
         return softSkipMode;
     }
@@ -1173,5 +1178,21 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
 
     public void setCapDays(String capDays) {
         this.capDays = capDays;
+    }
+
+    public String getOwnerTypeStr() {
+        return ownerTypeStr;
+    }
+
+    public void setOwnerTypeStr(String ownerTypeStr) {
+        this.ownerTypeStr = ownerTypeStr;
+    }
+
+    public String getPropOwnerTypeStr() {
+        return propOwnerTypeStr;
+    }
+
+    public void setPropOwnerTypeStr(String propOwnerTypeStr) {
+        this.propOwnerTypeStr = propOwnerTypeStr;
     }
 }
