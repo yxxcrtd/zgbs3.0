@@ -2527,12 +2527,12 @@
         <if test="counterIdList!=null and counterIdList.size() > 0">
             AND 1 != 1
         </if>
-        <if test="matchStatusList != null and matchStatusList.size() > 0">
+       <!-- <if test="matchStatusList != null and matchStatusList.size() > 0">
             AND TMI.MATCH_STATUS in
             <foreach collection="matchStatusList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
-        </if>
+        </if>-->
         ) aaa
         left join SYS_DATADICT_LIST sdlMatch on aaa.matchStatus=sdlMatch.ITEM_CODE and sdlMatch.DICT_CODE='CSTP_MATCH_STATUS'
         left join SYS_DATADICT_LIST sdl on aaa.businesstype=sdl.ITEM_CODE and sdl.DICT_CODE='CSTP_BUSINESS_TYPE'
@@ -3206,7 +3206,7 @@
             LEFT JOIN BID_ORDER BO
                 ON	 BO.TRADE_STATUS = #{TRADE_STATUS_01}
                 AND	 BO.IS_CANCEL = 'N'
-                AND	 (BO.BID_ID=TFPDT.B_TRADE_ID OR BO.BID_ID=BRT.BID_ID OR BO.BID_ID=TMI.PRE_TRADE_ID)
+                AND	 (BO.BID_ID=TFPDT.B_TRADE_ID OR BO.BID_ID=BRT.BID_ID OR BO.BID_ID=TMI.PRE_TRADE_ID OR BO.BID_ID=TFPDT.P_TOTLE_TRADE_ID)
             LEFT JOIN TRD_MANUAL_SETTLE_INFO TMSI
             ON		TMSI.TRADE_ID = TFPDT.TOTLE_TRADE_ID
             LEFT JOIN STL_ORDERS SO
