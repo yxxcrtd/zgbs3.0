@@ -248,6 +248,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             if (StringUtil.equals(dto.getPs(), 交易方向_行权回售.getValue())) {
                 map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
             }
+            return map;
         }
         if (obj instanceof TrdBondInvestTradeDto) {//交易撤销
             TrdBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, TrdBondInvestTradeDto.class);

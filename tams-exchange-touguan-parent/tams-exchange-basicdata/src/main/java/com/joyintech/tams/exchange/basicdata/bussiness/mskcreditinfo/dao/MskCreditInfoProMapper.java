@@ -39,5 +39,7 @@ public interface MskCreditInfoProMapper {
 
     MskCreditInfoProSaveRequest getBasicInfo(Map<String, Object> map);
 
+    MskCreditInfoProSaveRequest getPrice(Map<String, Object> map);
+
     List<SelectOptionDto> getFinprodMarketInfo(Map<String, Object> pageParam);
 }

@@ -436,6 +436,10 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         return guarType;
     }
 
+    public String getGuarTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_担保方式, this.getGuarType());
+    }
+
     public void setGuarType(String guarType) {
         this.guarType = guarType;
     }

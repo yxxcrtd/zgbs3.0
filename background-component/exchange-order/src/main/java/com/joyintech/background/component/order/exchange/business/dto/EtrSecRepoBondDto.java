@@ -56,6 +56,16 @@ public class EtrSecRepoBondDto extends EtrSinglePortfolioDto {
      */
     private String dealMode;
 
+    private String remark;
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public String getDealMode() {
         return dealMode;
     }
