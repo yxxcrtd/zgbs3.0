@@ -296,7 +296,7 @@
                ON TMI.PRE_TRADE_ID = BO.BID_ID
         WHERE
                BO.TRADE_STATUS = #{TRADE_STATUS_01}
-           AND FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_01})
+           AND FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
             <if test="sysDate != null and !sysDate.equals('')">
               AND BO.BID_DATE = #{sysDate}
             </if>
