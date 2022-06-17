@@ -6,7 +6,7 @@ import com.joyintech.background.component.common.pack.common.base.BaseEntity;
 
 public class EtrPledgeComponent  extends BaseEntity {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -487538125526493753L;
 
@@ -122,4 +122,14 @@ public class EtrPledgeComponent  extends BaseEntity {
 	public void setFinprodId(String finprodId) {
 		this.finprodId = finprodId;
 	}
+
+	private String displaceDir;
+
+    public String getDisplaceDir() {
+        return displaceDir;
+    }
+
+    public void setDisplaceDir(String displaceDir) {
+        this.displaceDir = displaceDir;
+    }
 }
