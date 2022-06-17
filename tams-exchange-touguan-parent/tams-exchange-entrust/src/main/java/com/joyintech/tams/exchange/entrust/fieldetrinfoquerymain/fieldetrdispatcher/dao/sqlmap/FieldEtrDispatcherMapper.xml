@@ -464,7 +464,7 @@
         SELECT
             eebp.PORTFOLIO_ID portfolioId,
             pp.PORTFOLIO_NAME portfolioName,
-            eed.ACCT_NO acctNo,
+            sci.ACCT_NAME acctNo,
             eebp.BID_PRICE bidPrice,
             eebp.BID_PRIN_AMT*100 bidPrinAmt,
             eed.ENTRUST_NUM*100 portfolioTotalBidPrinAmt,
@@ -472,13 +472,14 @@
         FROM ETR_ENTRUST_BID_PRICE eebp
                  LEFT JOIN ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID = eebp.ENTRUST_ID
                  LEFT JOIN PTL_PORTFOLIO pp ON eebp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = eed.ACCT_NO
         WHERE eebp.ENTRUST_ID = #{entrustId}
         UNION ALL
 
         SELECT
             eebp.PORTFOLIO_ID portfolioId,
             pp.PORTFOLIO_NAME portfolioName,
-            eed.ACCT_NO acctNo,
+            sci.ACCT_NAME acctNo,
             eebp.BID_PRICE bidPrice,
             eebp.BID_PRIN_AMT*100 bidPrinAmt,
             eed.ENTRUST_NUM*100 portfolioTotalBidPrinAmt,
@@ -486,6 +487,7 @@
         FROM WFL_ETR_ENTRUST_BID_PRICE eebp
                  LEFT JOIN WFL_ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID = eebp.ENTRUST_ID
                  LEFT JOIN PTL_PORTFOLIO pp ON eebp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = eed.ACCT_NO
         WHERE eebp.ENTRUST_ID = #{entrustId}
     </select>
     <select id="getEtrDispatcherInfo"
