@@ -372,7 +372,7 @@
             </foreach>
         </if>
         <if test="winTypeList != null and winTypeList.size() > 0">
-            AND BO.WIN_TYPE in
+            AND BRT.WIN_TYPE in
             <foreach collection="winTypeList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
@@ -413,8 +413,155 @@
                 #{item}
             </foreach>
         </if>
+        <if test="counterIdList != null and counterIdList.size() > 0">
+            AND BRT.COUNTER_ID IN
+            <foreach collection="counterIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
         <if test="bidId != null and bidId != ''">
-            AND BO.BID_ID = #{bidId}
+            AND BO.BID_ID like '%'||#{bidId}||'%'
+        </if>
+        <if test="isWinList != null and isWinList.size() > 0">
+            AND (CASE WHEN BO.IS_WIN = 'Y' THEN '04'
+            WHEN BO.IS_WIN = 'N' THEN '03'
+            ELSE '02' END) IN
+            <foreach collection="isWinList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        UNION ALL
+        SELECT
+        BRT.TOTAL_WIN_ID  totalWinId,
+        '04'  status,
+        CASE WHEN BRT.IS_WIN = 'N' THEN '03'
+        WHEN BRT.IS_WIN = 'Y' THEN '04'
+        ELSE '02' END isWin,
+        BO.BID_ID   bidId,
+        BRT.FINPROD_ID  finprodId,
+        FP.FINPROD_MARKET_ID finprodMarketId,
+        FP.FINPROD_ABBR  finprodAbbr,
+        FPI.TENDER_TARGET  tenderTarget,
+        FPI.TENDER_SDATE   bidDateStart,
+        FPI.TENDER_EDATE   bidDateEnd,
+        BO.WIN_PRIN_AMT/10000   totalBiddingNum,
+        BOBP.BID_PRICE          bidPrice,
+        BO.WIN_TYPE             winType,
+        BO.BID_MODLE            bidModle,
+        BO.PAY_TYPE             payType,
+        BRT.WIN_TYPE            bidType,
+        BRT.WIN_PRINAMT/10000   winPrinamt,
+        BRT.WIN_PRICE           winPrice,
+        CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
+        decode(FPI.TENDER_TARGET,'01', to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
+        ELSE '' END winPriceStr,
+        BRD.PAY_AMT             payAmt,
+        BRT.SETT_FEE_AMT        settFeeAmt,
+        decode(BO.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
+        decode(BO.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
+        decode(BO.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+        decode(BO.IS_WIN,'Y', BRT.WIN_DATE )           winDate,
+        TFPDT.TRADE_DATE        tradeDate,
+        FP.TRADE_MARKET         tradeMarket,
+        BRT.COUNTER_ID          counterId,
+        MCP.COUNTER_NAME        counterName,
+        BRT.REMARK              remark
+        FROM BID_ORDER BO
+        INNER JOIN (SELECT * FROM (SELECT BRT.*
+        ,ROW_NUMBER() OVER(PARTITION BY BRT.BID_ID ORDER BY BRT.WIN_DATE DESC) RANK
+        FROM WFL_BID_RESULT_TOTAL BRT
+        ) WHERE RANK=1
+        ) BRT ON BO.BID_ID = BRT.BID_ID
+        LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
+        LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BRT.COUNTER_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN (
+        SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BID_PRICE,'fm999999990.9990')||'元','03',to_char(BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        from BID_ORDER_BID_PRICE BOBP
+        LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
+        LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
+        group by BOBP.BID_ID
+        ) BOBP ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
+        FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT GROUP BY B_TRADE_ID
+        )TFPDT ON BO.BID_ID = TFPDT.B_TRADE_ID
+        AND TFPDT.SHARE_AMT = BRT.WIN_PRINAMT
+        LEFT JOIN (
+        SELECT TOTAL_WIN_ID,SUM(BRD.PAY_AMT) PAY_AMT
+        from WFL_BID_RESULT_DETAIL BRD
+        group by TOTAL_WIN_ID
+        ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        WHERE 1=1
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND FP.FINPROD_MARKET_ID IN
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="tradeMarketList != null and tradeMarketList.size() > 0">
+            AND FP.TRADE_MARKET IN
+            <foreach collection="tradeMarketList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="tenderTargetList != null and tenderTargetList.size() > 0">
+            AND FPI.TENDER_TARGET in
+            <foreach collection="tenderTargetList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="winTypeList != null and winTypeList.size() > 0">
+            AND BRT.WIN_TYPE in
+            <foreach collection="winTypeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="bidDateStart != null and bidDateStart != ''">
+            <![CDATA[AND  BO.BID_DATE >= TO_DATE(#{bidDateStart},'YYYY-MM-DD') ]]>
+        </if>
+        <if test="bidDateEnd != null and bidDateEnd != ''">
+            <![CDATA[AND  BO.BID_DATE <= TO_DATE(#{bidDateEnd},'YYYY-MM-DD')]]>
+        </if>
+        <if test="winDateStart != null and winDateStart != ''">
+            <![CDATA[AND  BRT.WIN_DATE  >= TO_DATE(#{winDateStart},'YYYY-MM-DD') ]]>
+        </if>
+        <if test="winDateEnd != null and winDateEnd != ''">
+            <![CDATA[AND  BRT.WIN_DATE  <= TO_DATE(#{winDateEnd},'YYYY-MM-DD')]]>
+        </if>
+        <if test="payDateStart != null and payDateStart != ''">
+            <![CDATA[AND  BRT.PAY_DATE  >= TO_DATE(#{payDateStart},'YYYY-MM-DD') ]]>
+        </if>
+        <if test="payDateEnd != null and payDateEnd != ''">
+            <![CDATA[AND  BRT.PAY_DATE  <= TO_DATE(#{payDateEnd},'YYYY-MM-DD')]]>
+        </if>
+        <if test="listingDateStart != null and listingDateStart != ''">
+            <![CDATA[AND  FPA.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
+        </if>
+        <if test="listingDateEnd != null and listingDateEnd != ''">
+            <![CDATA[AND  FPA.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
+        </if>
+        <if test="payTypeList != null and payTypeList.size() > 0">
+            AND BO.PAY_TYPE in
+            <foreach collection="payTypeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="bidTypeList != null and bidTypeList.size() > 0">
+            AND BRT.WIN_TYPE in
+            <foreach collection="bidTypeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="counterIdList != null and counterIdList.size() > 0">
+            AND BRT.COUNTER_ID IN
+            <foreach collection="counterIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="bidId != null and bidId != ''">
+            AND BO.BID_ID like '%'||#{bidId}||'%'
         </if>
         <if test="isWinList != null and isWinList.size() > 0">
             AND (CASE WHEN BO.IS_WIN = 'Y' THEN '04'
@@ -425,11 +572,12 @@
             </foreach>
         </if>
         ) ss
+        left join SYS_DATADICT_LIST sdl_isWin on ss.isWin=sdl_isWin.ITEM_CODE and sdl_isWin.DICT_CODE='FIRST_BID_STATUS'
         left join SYS_DATADICT_LIST sdl_status on ss.status=sdl_status.ITEM_CODE and sdl_status.DICT_CODE='STATUS_VALID'
         left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
         left join SYS_DATADICT_LIST sdl_tt on ss.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
         left join SYS_DATADICT_LIST sdl_wt on ss.winType=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
-        left join SYS_DATADICT_LIST sdl_ept on ss.payType=sdl_ept.ITEM_CODE and sdl_ept.DICT_CODE='ETR_PAY_TYPE'
+        left join SYS_DATADICT_LIST sdl_ept on ss.payType=sdl_ept.ITEM_CODE and sdl_ept.DICT_CODE='COMMON_PAY_TYPE'
         left join SYS_DATADICT_LIST sdl_bt on ss.bidType=sdl_bt.ITEM_CODE and sdl_bt.DICT_CODE='BID_TYPE'
         <!-- 关键字模糊查询 -->
         <include refid="keywordsWhere"></include>)
@@ -441,7 +589,7 @@
 
     <sql id="keywordsWhere">
         <if test="search != null and search != ''">
-            <where>( sdl_status.ITEM_VALUE || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
+            <where>( sdl_isWin.ITEM_VALUE || '|' ||sdl_status.ITEM_VALUE || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
                 || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
                 || '|' || sdl_ept.ITEM_VALUE ||'|' || sdl_bt.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.winPrice
                 || '|' || ss.remark  like '%' || #{search} || '%'

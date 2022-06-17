@@ -62,8 +62,8 @@ public class PortfolioTradeMessageHelper {
         List<PortfolioTradeMessage> portfolioTradeMessages = Lists.newArrayList();
 
         BigDecimal tradedPrice = trade.getTradedPrice();
-        if(InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
-                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)){
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             tradedPrice = trade.getFullPrice();
         }
 
@@ -99,6 +99,10 @@ public class PortfolioTradeMessageHelper {
             portfolioTradeMessage.setPortfolioId(detail.getPortfolioId());
             portfolioTradeMessage.setPortfolioName(detail.getPortfolioName());
             portfolioTradeMessage.setTradeNum(detail.getTargetNum());
+            //信用保护凭证数量转成面额
+            if (InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType())) {
+                portfolioTradeMessage.setTradeNum(detail.getTargetNum().multiply(BigDecimal.valueOf(100)));
+            }
             portfolioTradeMessage.setTradeAmt(detail.getTargetAmt());
             portfolioTradeMessage.setTargetType(detail.getTargetType());
 
@@ -124,8 +128,8 @@ public class PortfolioTradeMessageHelper {
 
         List<PortfolioCalculateResponse> calculateResponses = Lists.newArrayList();
         BigDecimal tradedPrice = entrust.getEntrustPrice();
-        if(InvestAssetTypeEnum.BOND.codeEquals(instructionClone.getAssetType())
-                && EnumUtil.in(instructionClone.getPs(), InstructionPs.BUY, InstructionPs.SELL)){
+        if (InvestAssetTypeEnum.BOND.codeEquals(instructionClone.getAssetType())
+                && EnumUtil.in(instructionClone.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             tradedPrice = entrust.getFullPrice();
         }
         //1、调用通用分配接口，构建组合分配
