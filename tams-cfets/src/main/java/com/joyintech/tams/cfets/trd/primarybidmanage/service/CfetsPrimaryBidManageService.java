@@ -943,8 +943,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     @Override
     public void doUpdate(CfetsPrimaryBidManageSaveRequest entity) {
         if (entity.getOperateType().equals("submit")) {
-            wflBidResultTotalMapper.deleteByWorkflowId(workflowId);
-            wflBidResultDetailMapper.deleteByWorkflowId(workflowId);
+            wflBidResultTotalMapper.deleteByWorkflowId(entity.getWorkflowId());
+            wflBidResultDetailMapper.deleteByWorkflowId(entity.getWorkflowId());
             beforeWorkFlow(entity);
             // 发头寸
             String confirmOk = RequestUtil.getParam("confirmOk");
