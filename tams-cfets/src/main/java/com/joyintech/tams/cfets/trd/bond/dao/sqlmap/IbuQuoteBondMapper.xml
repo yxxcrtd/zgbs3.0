@@ -2265,7 +2265,7 @@ SELECT
         from IBU_QUOTE_ETR_RE t
         left join IBU_QUOTE_BOND IQB on t.QUOTE_ID = IQB.QUOTE_ID
         where IQB.SEND_STATUS = '01'
-        ) IBQER on rfpd.ENTRUST_ID = ee.ENTRUST_ID
+        ) IBQER on IBQER.ENTRUST_ID = ee.ENTRUST_ID
         left join WFL_IBU_QUOTE_ETR_RE wiqer on wiqer.ENTRUST_ID = ee.ENTRUST_ID
         <if test="totleTradeId != null and totleTradeId != ''">
             and wiqer.QUOTE_ID != #{totleTradeId}
