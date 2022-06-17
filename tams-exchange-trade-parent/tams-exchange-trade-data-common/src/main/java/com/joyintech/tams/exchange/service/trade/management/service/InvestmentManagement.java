@@ -602,39 +602,39 @@ public class InvestmentManagement extends BaseService {
         for (String id : ids) {
             List<InstructionPledge> instructionPledges = instructionPledgeService.queryInstructionPledgesByInstructionId(id);
             if (CollUtil.isNotEmpty(instructionPledges)) {
-                InstructionPledge instructionPledge = instructionPledges.get(0);
-                String market = StockCodeUtils.getMarket(instructionPledge.getFinprodMarketId());
-                if (Market.isShMarket(market)) {
-                    pledges.addAll(getShInstructionPledges(instructionPledges));
-                } else {
-                    //当前债券
-                    List<InstructionPledge> pledgeList = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "00")).collect(Collectors.toList());
-                    pledges.addAll(getSzInstructionPledges(pledgeList));
+//                InstructionPledge instructionPledge = instructionPledges.get(0);
+//                String market = StockCodeUtils.getMarket(instructionPledge.getFinprodMarketId());
+//                if (Market.isShMarket(market)) {
+//                    pledges.addAll(getShInstructionPledges(instructionPledges));
+//                } else {
+                //当前债券
+                List<InstructionPledge> pledgeList = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "00")).collect(Collectors.toList());
+                pledges.addAll(getSzInstructionPledges(pledgeList));
 
-                    //换入债券
-                    Optional<InstructionPledge> pledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
-                    //换出债券
-                    Optional<InstructionPledge> oldPledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "02")).findFirst();
+                //换入债券
+                Optional<InstructionPledge> pledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
+                //换出债券
+                Optional<InstructionPledge> oldPledgeOptional = instructionPledges.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "02")).findFirst();
 
-                    if (pledgeOptional.isPresent()) {
-                        InstructionPledge pledge = new InstructionPledge();
-                        BeanUtils.copyProperties(pledgeOptional.get(), pledge);
+                if (pledgeOptional.isPresent()) {
+                    InstructionPledge pledge = new InstructionPledge();
+                    BeanUtils.copyProperties(pledgeOptional.get(), pledge);
 
-                        if (oldPledgeOptional.isPresent()) {
-                            InstructionPledge oldPledge = oldPledgeOptional.get();
-                            pledge.setOldFinprodId(oldPledge.getFinprodId());
-                            pledge.setOldFinprodAbbr(oldPledge.getFinprodAbbr());
-                            pledge.setOldFinprodMarketId(oldPledge.getFinprodMarketId());
-                            pledge.setOldTradeMarket(oldPledge.getTradeMarket());
-                            pledge.setOldPledgeFaceValue(oldPledge.getPledgeFaceValue());
-                            pledge.setOldPledgeAmt(oldPledge.getPledgeAmt());
-                            pledge.setOldPledgeNumber(oldPledge.getPledgeNumber());
-                            pledge.setOldPledgeRatio(oldPledge.getPledgeRatio());
-                        }
-
-                        pledges.add(pledge);
+                    if (oldPledgeOptional.isPresent()) {
+                        InstructionPledge oldPledge = oldPledgeOptional.get();
+                        pledge.setOldFinprodId(oldPledge.getFinprodId());
+                        pledge.setOldFinprodAbbr(oldPledge.getFinprodAbbr());
+                        pledge.setOldFinprodMarketId(oldPledge.getFinprodMarketId());
+                        pledge.setOldTradeMarket(oldPledge.getTradeMarket());
+                        pledge.setOldPledgeFaceValue(oldPledge.getPledgeFaceValue());
+                        pledge.setOldPledgeAmt(oldPledge.getPledgeAmt());
+                        pledge.setOldPledgeNumber(oldPledge.getPledgeNumber());
+                        pledge.setOldPledgeRatio(oldPledge.getPledgeRatio());
                     }
+
+                    pledges.add(pledge);
                 }
+//                }
             }
         }
         return pledges;
