@@ -2480,7 +2480,7 @@
         LEFT JOIN FIN_PRODUCT_TYPE FPT
         ON		FPT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN TRDQUTO_MATCH_INFO TMI
-        ON		TMI.EXE_ID = ICB.TRD_ID
+        ON		TMI.CSTP_TRADE_ID = ICB.TRD_ID
         WHERE  FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
         <if test="sysDate != null and !sysDate.equals('')">
             AND to_date(to_char(to_date(ICB.SUBSCRIPTION_TIME,'yyyy-MM-dd HH24:mi:ss'),'yyyy-MM-dd'),'yyyy-MM-dd') = #{sysDate,jdbcType=DATE}
