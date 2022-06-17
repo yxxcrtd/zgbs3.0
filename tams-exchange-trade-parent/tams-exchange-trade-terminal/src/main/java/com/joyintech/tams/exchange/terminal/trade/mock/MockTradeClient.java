@@ -456,8 +456,10 @@ public class MockTradeClient implements ITradeRequest {
         double tradeBalance = 0;
         if (integratedEntrust.getEntrustVolume() % 300 == 0
                 || IntegratedEntrustUtils.isFixedIncome(integratedEntrust.getEntrustProp())
-                || IntegratedEntrustUtils.isProtocolBack_SZ(integratedEntrust.getEntrustProp())
-                || IntegratedEntrustUtils.isProtocolBack_SH(integratedEntrust.getEntrustProp())) {//全部成交 数量是300的倍数全部成交
+                || EntrustUtils.isPledgeAgreementRepurchase(integratedEntrust.getBusiTypeTg())
+//                || IntegratedEntrustUtils.isProtocolBack_SZ(integratedEntrust.getEntrustProp())
+//                || IntegratedEntrustUtils.isProtocolBack_SH(integratedEntrust.getEntrustProp())
+        ) {//全部成交 数量是300的倍数全部成交
             integratedEntrust.setEntrustStatus(EntrustStatus.SUCCEEDED.value);
             tradeVolume = integratedEntrust.getEntrustVolume();
             if (integratedEntrust.getCompactTerm() != 0) {

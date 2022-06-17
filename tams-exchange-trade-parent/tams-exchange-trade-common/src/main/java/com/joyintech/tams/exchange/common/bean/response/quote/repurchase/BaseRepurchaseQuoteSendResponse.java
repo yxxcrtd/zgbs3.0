@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.common.bean.response.quote.repurchase;
 
 
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.MoreObjects;
@@ -311,11 +312,11 @@ public class BaseRepurchaseQuoteSendResponse {
     }
 
     public String getPledgeNumberStr() {
-        return pledgeNumberStr;
-    }
+        if (ObjectUtil.isEmpty(this.getPledgeNumber())) {
+            return null;
+        }
 
-    public void setPledgeNumberStr(String pledgeNumberStr) {
-        this.pledgeNumberStr = pledgeNumberStr;
+        return NumberUtil.div(this.getPledgeNumber(), 100,2).toString();
     }
 
     @Override

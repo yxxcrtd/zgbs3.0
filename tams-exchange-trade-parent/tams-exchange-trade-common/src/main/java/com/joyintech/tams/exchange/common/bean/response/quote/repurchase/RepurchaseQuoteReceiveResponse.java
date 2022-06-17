@@ -1,10 +1,13 @@
 package com.joyintech.tams.exchange.common.bean.response.quote.repurchase;
 
 
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.MoreObjects;
 import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseDQXZTypeEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import io.swagger.annotations.ApiModel;
@@ -69,6 +72,10 @@ public class RepurchaseQuoteReceiveResponse {
     @ApiModelProperty(name = "swapIntoBondsVolume", value = "换入质押券数量")
     private BigDecimal swapIntoBondsVolume;
 
+    @ApiModelProperty(name = "swapIntoBondsVolumeStr", value = "换入质押券数量（万元）")
+    private BigDecimal swapIntoBondsVolumeStr;
+
+
     @ApiModelProperty(name = "swapOutBonds", value = "换出质押券代码")
     private String swapOutBonds;
 
@@ -77,6 +84,9 @@ public class RepurchaseQuoteReceiveResponse {
 
     @ApiModelProperty(name = "swapOutBondsVolume", value = "换出质押券数量")
     private BigDecimal swapOutBondsVolume;
+
+    @ApiModelProperty(name = "swapOutBondsVolumeStr", value = "换出质押券数量（万元）")
+    private BigDecimal swapOutBondsVolumeStr;
 
     @ApiModelProperty(name = "origBonds", value = "原质押券代码（中途换券展示）")
     private String origBonds;
@@ -87,11 +97,17 @@ public class RepurchaseQuoteReceiveResponse {
     @ApiModelProperty(name = "origBondsVolume", value = "原质押券数量")
     private BigDecimal origBondsVolume;
 
+    @ApiModelProperty(name = "origBondsVolumeStr", value = "原质押券数量（万元）")
+    private BigDecimal origBondsVolumeStr;
+
     @ApiModelProperty(name = "origRepoAmount", value = "原回购金额")
     private BigDecimal origRepoAmount;
 
     @ApiModelProperty(name = "transCode", value = "到期续作类型（0-非第三方，1-第三方）")
     private String transCode;
+
+    @ApiModelProperty(name = "transCodeStr", value = "到期续作类型（0-非第三方，1-第三方）")
+    private String transCodeStr;
 
     @ApiModelProperty(name = "mIntAmt", value = "回购利息")
     private BigDecimal mIntAmt;
@@ -597,11 +613,43 @@ public class RepurchaseQuoteReceiveResponse {
     }
 
     public String getPledgeNumberStr() {
-        return pledgeNumberStr;
+        if (ObjectUtil.isEmpty(this.getPledgeNumber())) {
+            return null;
+        }
+
+        return NumberUtil.div(this.getPledgeNumber(), 100,2).toString();
     }
 
-    public void setPledgeNumberStr(String pledgeNumberStr) {
-        this.pledgeNumberStr = pledgeNumberStr;
+    public String getSwapIntoBondsVolumeStr() {
+        if (ObjectUtil.isEmpty(this.getSwapIntoBondsVolume())) {
+            return null;
+        }
+
+        return NumberUtil.div(this.getSwapIntoBondsVolume(), 100,2).toString();
+    }
+
+    public String getSwapOutBondsVolumeStr() {
+        if (ObjectUtil.isEmpty(this.getSwapOutBondsVolume())) {
+            return null;
+        }
+
+        return NumberUtil.div(this.getSwapOutBondsVolume(), 100,2).toString();
+    }
+
+    public String getOrigBondsVolumeStr() {
+        if (ObjectUtil.isEmpty(this.getOrigBondsVolume())) {
+            return null;
+        }
+
+        return NumberUtil.div(this.getOrigBondsVolume(), 100,2).toString();
+    }
+
+    public String getTransCodeStr() {
+        if (StrUtil.isEmpty(this.getTransCode())) {
+            return null;
+        }
+        String description =  EnumUtil.getDescriptionByCode(RepurchaseDQXZTypeEnum.class, this.getTransCode());
+        return description == null ? this.getTransCode() : description;
     }
 
     @Override
