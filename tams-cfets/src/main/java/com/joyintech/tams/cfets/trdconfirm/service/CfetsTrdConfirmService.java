@@ -1101,6 +1101,7 @@ public class CfetsTrdConfirmService extends BaseService{
         List<TrdProductDeal> deals = new ArrayList<>();
         entity.setTrdProductDeals(deals);
 
+        List<CfetsTrdBondInvestTradeDto> dtoList = new ArrayList<>();
         //根据报价编号查询所有报价记明细
         List<CfetsRegFinProductDealDto>  regDealList=cfetsTrdConfirmMapper.findAllIbuDealList(dtoReg.getTotleTradeId());
         for(CfetsRegFinProductDealDto regDeal:regDealList){
@@ -1161,12 +1162,22 @@ public class CfetsTrdConfirmService extends BaseService{
             生成交易扩展表(regDeal, deal.getTradeId(), paTrdProductDeals);
 
             trdTradeFeeDetails.addAll(生成交易Ibu费用明细数据(regDeal,deal.getTradeId()));
+            //风险数据
+            CfetsTrdBondInvestTradeDto dto=new CfetsTrdBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(dto,entity);
+            dto.setPortfolioId(regDeal.getPortfolioId());
+            dto.setTradeAmt(regDeal.getTradeAmt());
+            dto.setCpriceAmt(regDeal.getCpriceAmt());
+            dto.setFpriceAmt(regDeal.getFpriceAmt());
+            dto.setEntrustId(regDeal.getEntrustId());
+            dto.setTotleTradeId(deal.getTradeId());
+            dtoList.add(dto);
 
         }
 
         entity.setPtlTrade(ptlTrades);
         // 组合交易表Entity 构造结束----------------------------------------------------------
-
+        entity.setDtoList(dtoList);
 
         // =====================划款指令信息=====================
         List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();

@@ -25,7 +25,7 @@
         <result column="MBPVALUE" property="mbpvalue" jdbcType="DECIMAL" />
         <result column="VAR" property="var" jdbcType="DECIMAL" />
         <result column="CVAR" property="cvar" jdbcType="DECIMAL" />
-        <result column="MDURATION" property="mduration" jdbcType="DECIMAL" />
+        <result column="MDURATION" property="mklDuration" jdbcType="DECIMAL" />
         <result column="IMPLICIT_GRADE" property="implicitGrade" jdbcType="VARCHAR" />
         <result column="IMPLICIT_HGRADE" property="implicitHgrade" jdbcType="VARCHAR" />
         <result column="NETVALUATION_EXERCISE" property="netvaluationExercise" jdbcType="DECIMAL" />
@@ -82,7 +82,7 @@
             #{interestCnvxty,jdbcType=DECIMAL}, #{bpyield,jdbcType=DECIMAL}, #{inputType,jdbcType=VARCHAR}, 
             #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
             #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{mbpvalue,jdbcType=DECIMAL}, 
-            #{var,jdbcType=DECIMAL}, #{cvar,jdbcType=DECIMAL}, #{mduration,jdbcType=DECIMAL}, 
+            #{var,jdbcType=DECIMAL}, #{cvar,jdbcType=DECIMAL}, #{mklDuration,jdbcType=DECIMAL},
             #{implicitGrade,jdbcType=VARCHAR}, #{implicitHgrade,jdbcType=VARCHAR}, #{netvaluationExercise,jdbcType=DECIMAL}, 
             #{netvaluationRecommended,jdbcType=DECIMAL})
     </insert>
@@ -158,7 +158,7 @@
             <if test="cvar != null" >
                 CVAR,
             </if>
-            <if test="mduration != null" >
+            <if test="mklDuration != null" >
                 MDURATION,
             </if>
             <if test="implicitGrade != null" >
@@ -244,8 +244,8 @@
             <if test="cvar != null" >
                 #{cvar,jdbcType=DECIMAL},
             </if>
-            <if test="mduration != null" >
-                #{mduration,jdbcType=DECIMAL},
+            <if test="mklDuration != null" >
+                #{mklDuration,jdbcType=DECIMAL},
             </if>
             <if test="implicitGrade != null" >
                 #{implicitGrade,jdbcType=VARCHAR},
@@ -329,8 +329,8 @@
             <if test="cvar != null" >
                 CVAR = #{cvar,jdbcType=DECIMAL},
             </if>
-            <if test="mduration != null" >
-                MDURATION = #{mduration,jdbcType=DECIMAL},
+            <if test="mklDuration != null" >
+                MDURATION = #{mklDuration,jdbcType=DECIMAL},
             </if>
             <if test="implicitGrade != null" >
                 IMPLICIT_GRADE = #{implicitGrade,jdbcType=VARCHAR},
@@ -368,7 +368,7 @@
             MBPVALUE = #{mbpvalue,jdbcType=DECIMAL},
             VAR = #{var,jdbcType=DECIMAL},
             CVAR = #{cvar,jdbcType=DECIMAL},
-            MDURATION = #{mduration,jdbcType=DECIMAL},
+            MDURATION = #{mklDuration,jdbcType=DECIMAL},
             IMPLICIT_GRADE = #{implicitGrade,jdbcType=VARCHAR},
             IMPLICIT_HGRADE = #{implicitHgrade,jdbcType=VARCHAR},
             NETVALUATION_EXERCISE = #{netvaluationExercise,jdbcType=DECIMAL},

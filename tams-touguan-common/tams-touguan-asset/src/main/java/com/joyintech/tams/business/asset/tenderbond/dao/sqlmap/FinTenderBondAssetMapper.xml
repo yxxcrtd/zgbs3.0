@@ -335,7 +335,7 @@
             ri.LISTING_CODE as appearMarketId
         FROM INTERF_WIND_UNRELEASE_SEC_INFO sec
         LEFT JOIN INTERF_WIND_RELEASE_INFO ri ON sec.SEC_ID = ri.SEC_ID
-        LEFT JOIN (select SECURITY_ID||'.IB' SEC_ID,* from INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in ('同业存单','公司短期融资券'))  pri ON pri.SEC_ID = ri.SEC_ID
+        LEFT JOIN (select (SECURITY_ID||'.IB') as SEC_ID,t.* from INTERF_RDI_RELEASE_INFO t where t.SECURITY_TYPE in ('同业存单','公司短期融资券'))  pri ON pri.SEC_ID = ri.SEC_ID
         where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04}) AND ROWNUM=1
     </select>
 
@@ -388,7 +388,7 @@
         </if>
         ) ri
         LEFT JOIN INTERF_WIND_UNRELEASE_SEC_INFO sec on ri.SEC_ID = sec.SEC_ID
-        LEFT JOIN (select SECURITY_ID||'.IB' SEC_ID,* from INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in ('同业存单','公司短期融资券'))  pri ON pri.SEC_ID = ri.SEC_ID
+        LEFT JOIN (select (SECURITY_ID||'.IB') as SEC_ID,t.* from INTERF_RDI_RELEASE_INFO t where t.SECURITY_TYPE in ('同业存单','公司短期融资券'))  pri ON pri.SEC_ID = ri.SEC_ID
         where ri.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR}  and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04}) AND ROWNUM=1
     </select>
 
