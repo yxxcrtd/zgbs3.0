@@ -430,12 +430,12 @@
 
     <select id="getTrdProductDealsByEntrustId" resultType = "com.joyintech.tams.common.base.entity.TrdProductDeal">
         SELECT
-        tpda.PORTFOLIO_ID,
-        tpd.SHARE_AMT
+            tpda.PORTFOLIO_ID,
+            tpd.SHARE_AMT
         FROM
-        TRD_PRODUCT_DEAL tpd
+            TRD_PRODUCT_DEAL tpd
         LEFT JOIN
-        TRD_PRODUCT_DEAL_ADD tpda
+            TRD_PRODUCT_DEAL_ADD tpda ON tpd.TRADE_ID = tpda.TRADE_ID
         <where>
             tpda.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
         </where>
