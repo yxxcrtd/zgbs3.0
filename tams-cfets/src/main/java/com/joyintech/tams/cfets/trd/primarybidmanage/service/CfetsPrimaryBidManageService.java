@@ -867,7 +867,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             req.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
         } else {
             req.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
-            req.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+            req.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             req.setbTotalTradeId(entity.getBidId());
         }
         req.setCdate(iplatformDate.getSysDate());
@@ -943,13 +943,14 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     @Override
     public void doUpdate(CfetsPrimaryBidManageSaveRequest entity) {
         if (entity.getOperateType().equals("submit")) {
-            doDelete(entity.getWorkflowId());
+            wflBidResultTotalMapper.deleteByWorkflowId(workflowId);
+            wflBidResultDetailMapper.deleteByWorkflowId(workflowId);
             beforeWorkFlow(entity);
             // 发头寸
             String confirmOk = RequestUtil.getParam("confirmOk");
             try {
                 if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
-                    boolean isSubmit = true;
+                    boolean isSubmit = false;
                     SysWflBusinessList sysWflBusinessList = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
                     if (StringUtil.equals(sysWflBusinessList.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
                         this.sendPositionMethod(entity, isSubmit, confirmOk);
