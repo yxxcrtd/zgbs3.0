@@ -1,36 +1,48 @@
-package com.joyintech.tams.exchange.service.trade.check.chain.impl;
+package com.joyintech.tams.exchange.service.trade.check.business;
 
 import com.joyintech.tams.exchange.common.constant.joyin.DictCode;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
-import com.joyintech.tams.exchange.service.trade.check.chain.AbstractChain;
-import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
+import com.joyintech.tams.exchange.service.trade.check.business.CheckBean;
+import com.joyintech.tams.exchange.service.trade.check.business.ICheck;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * 共通检查
- *
  * @author lifangpeng
- * @date 2022/4/1 14:18
+ * @date 2022/6/17 9:32
  */
-@Component
-public class CommonCheckChain extends AbstractChain<CheckChainBean> {
+public abstract class AbstractCheck implements ICheck {
     @Autowired
     private CommonManagement commonManagement;
 
+
     @Override
-    public void doChain(CheckChainBean chainBean) {
+    public void check(CheckBean chainBean) {
+        //公共信息检查
+        doCommonCheck(chainBean);
+
+        //具体业务信息检查
+        doBusinessCheck(chainBean);
+    }
+
+    protected void doBusinessCheck(CheckBean chainBean) {
+        Map<String, Object> checkRsp = chainBean.getCheckRsp();
+        if (CollectionUtils.isEmpty(chainBean.getDetailList())) {
+            checkRsp.put("instructionDetail", "指令组合明细不能为空");
+        }
+    }
+
+
+    private void doCommonCheck(CheckBean chainBean) {
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
         if (StringUtils.isBlank(instruction.getEntrustId())) {
@@ -90,7 +102,7 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         }
         if (Objects.isNull(instruction.getVdate())) {
             checkRsp.put("vdate", "委托开始日不能为空");
-        }else if (instruction.getVdate().compareTo(commonManagement.getPlatDate()) < 0) {
+        } else if (instruction.getVdate().compareTo(commonManagement.getPlatDate()) < 0) {
             //交易日期不得早于平台日
             checkRsp.put("vdate", "委托开始日不得早于平台日");
         }
@@ -145,10 +157,6 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
             checkRsp.put("targetType", "目标类型取值不合法:" + instruction.getTargetType());
         }
 
-        if (CollectionUtils.isEmpty(chainBean.getDetailList())) {
-            checkRsp.put("instructionDetail", "指令组合明细不能为空");
-        }
-
         if (DictCodeListExt3.目标类型_数量.getValue().equals(instruction.getTargetType())) {
             if (instruction.getEntrustNum() == 0) {
                 checkRsp.put("entrustNum", "数量单指令数量不能为0");
@@ -170,5 +178,4 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         }
 
     }
-
 }

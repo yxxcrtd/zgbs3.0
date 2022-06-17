@@ -34,7 +34,7 @@ public class BusinessCheckListener implements ApplicationRunner {
                     throw new RuntimeException(message);
                 }
                 for (String action : actions) {
-                    CheckActions.I.put(action, (IBusinessCheck) bean);
+                    CheckActions.I.put(action, (ICheck) bean);
                 }
             });
         }

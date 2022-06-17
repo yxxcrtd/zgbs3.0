@@ -4,15 +4,14 @@ import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
-import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
-import com.joyintech.tams.exchange.service.trade.check.chain.impl.BusinessCheckChain;
-import com.joyintech.tams.exchange.service.trade.check.chain.impl.CommonCheckChain;
+import com.joyintech.tams.exchange.service.trade.check.business.BusinessCheckHandler;
+import com.joyintech.tams.exchange.service.trade.check.business.CheckBean;
+import com.joyintech.tams.exchange.service.trade.check.business.CheckResult;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
 
@@ -25,19 +24,9 @@ import java.util.Map;
 @Component
 public class AppointInstructionCheck {
     @Autowired
-    private CommonCheckChain commonCheckChain;
-    @Autowired
-    private BusinessCheckChain businessCheckChain;
+    private BusinessCheckHandler businessCheckHandler;
 
-
-    @PostConstruct
-    public void initialize() {
-        commonCheckChain.nextChain(businessCheckChain);
-    }
-
-    public CheckResult checkAppointInstruction(List<Instruction> instructionList,
-                                               Map<String, List<InstructionDetail>> detailMap,
-                                               Map<String, List<InstructionPledge>> pledgeMap) {
+    public CheckResult checkAppointInstruction(List<Instruction> instructionList, Map<String, List<InstructionDetail>> detailMap, Map<String, List<InstructionPledge>> pledgeMap) {
         if (CollectionUtils.isEmpty(instructionList)) {
             return new CheckResult(1, "指令信息不能为空");
         }
@@ -64,8 +53,7 @@ public class AppointInstructionCheck {
 
     private Map<String, Object> doCheck(Instruction instruction, List<InstructionDetail> detailList, List<InstructionPledge> pledgeList) {
         Map<String, Object> checkRsp = Maps.newHashMap();
-        CheckChainBean checkChainBean = new CheckChainBean(checkRsp, instruction, detailList, pledgeList);
-        commonCheckChain.execute(checkChainBean);
+        businessCheckHandler.doCheck(new CheckBean(checkRsp, instruction, detailList, pledgeList));
 
         return checkRsp;
     }

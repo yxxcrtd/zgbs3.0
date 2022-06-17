@@ -1,4 +1,4 @@
-package com.joyintech.tams.exchange.service.trade.check;
+package com.joyintech.tams.exchange.service.trade.check.business;
 
 import java.io.Serializable;
 import java.util.Map;

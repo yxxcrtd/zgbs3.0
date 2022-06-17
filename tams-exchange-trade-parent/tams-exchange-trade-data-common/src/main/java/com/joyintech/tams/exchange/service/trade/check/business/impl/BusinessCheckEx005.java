@@ -4,9 +4,9 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.service.trade.check.business.AbstractCheck;
 import com.joyintech.tams.exchange.service.trade.check.business.Check;
-import com.joyintech.tams.exchange.service.trade.check.business.IBusinessCheck;
-import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
+import com.joyintech.tams.exchange.service.trade.check.business.CheckBean;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -21,10 +21,12 @@ import java.util.Objects;
  */
 @Check(action = "EX005")
 @Component
-public class BusinessCheckEx005 implements IBusinessCheck {
+public class BusinessCheckEx005 extends AbstractCheck {
 
     @Override
-    public void check(CheckChainBean chainBean) {
+    public void doBusinessCheck(CheckBean chainBean) {
+        super.doBusinessCheck(chainBean);
+
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
         String ps = instruction.getPs();

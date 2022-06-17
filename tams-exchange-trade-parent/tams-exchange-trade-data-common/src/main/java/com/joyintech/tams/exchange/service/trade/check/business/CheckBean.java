@@ -1,9 +1,10 @@
-package com.joyintech.tams.exchange.service.trade.check.chain;
+package com.joyintech.tams.exchange.service.trade.check.business;
 
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  * @author lifangpeng
  * @date 2022/4/1 14:40
  */
-public class CheckChainBean extends ChainBean {
+public class CheckBean implements Serializable {
     private static final long serialVersionUID = -3450358632920513923L;
 
     private Map<String, Object> checkRsp;
@@ -19,8 +20,8 @@ public class CheckChainBean extends ChainBean {
     private List<InstructionDetail> detailList;
     private List<InstructionPledge> pledgeList;
 
-    public CheckChainBean(Map<String, Object> checkRsp, Instruction instruction, List<InstructionDetail> detailList,
-                          List<InstructionPledge> pledgeList) {
+    public CheckBean(Map<String, Object> checkRsp, Instruction instruction, List<InstructionDetail> detailList,
+                     List<InstructionPledge> pledgeList) {
         this.checkRsp = checkRsp;
         this.instruction = instruction;
         this.detailList = detailList;

@@ -43,7 +43,7 @@ import com.joyintech.tams.exchange.common.request.InstructionQueryRequest;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.check.AppointInstructionCheck;
-import com.joyintech.tams.exchange.service.trade.check.CheckResult;
+import com.joyintech.tams.exchange.service.trade.check.business.CheckResult;
 import com.joyintech.tams.exchange.service.trade.processor.MessageConsumerService;
 import com.joyintech.tams.exchange.service.trade.processor.constants.Constants;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgReceiverManager;

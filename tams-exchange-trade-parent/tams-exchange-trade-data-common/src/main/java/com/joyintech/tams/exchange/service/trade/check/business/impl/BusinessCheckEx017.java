@@ -7,9 +7,9 @@ import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCode;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.service.trade.check.business.AbstractCheck;
 import com.joyintech.tams.exchange.service.trade.check.business.Check;
-import com.joyintech.tams.exchange.service.trade.check.business.IBusinessCheck;
-import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
+import com.joyintech.tams.exchange.service.trade.check.business.CheckBean;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -23,10 +23,12 @@ import java.util.Map;
  */
 @Check(action = "EX017")
 @Component
-public class BusinessCheckEx017 implements IBusinessCheck {
+public class BusinessCheckEx017 extends AbstractCheck {
 
     @Override
-    public void check(CheckChainBean chainBean) {
+    public void doBusinessCheck(CheckBean chainBean) {
+        super.doBusinessCheck(chainBean);
+
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
         if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
