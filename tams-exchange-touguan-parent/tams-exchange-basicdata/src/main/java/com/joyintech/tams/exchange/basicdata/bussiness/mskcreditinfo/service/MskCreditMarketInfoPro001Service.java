@@ -5,6 +5,7 @@ import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -120,6 +121,13 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
 
     @Override
     public void doComplete(MskCreditInfoProSaveRequest mskCreditInfoProSaveRequest, OperationType operationType) {
+        // modify by etliu 20220617 start
+        // 3.0.6场内 ZGCPCN-1448: 2、估价收益率显示错误（例如新建时填的是4，新建成功后，列表展示为400）；
+        if (mskCreditInfoProSaveRequest.getMyield() != null) {
+            mskCreditInfoProSaveRequest.setMyield(ArithmeticUtil.divide(mskCreditInfoProSaveRequest.getMyield(), BigDecimal.valueOf(100), 6));
+        }
+        // modify by etliu 20220617 end
+
         if (OperationType.DELETE == operationType) {
             this.delete(mskCreditInfoProSaveRequest);
         } else if (OperationType.MODIFY == operationType) {
