@@ -580,6 +580,15 @@
         </if>
     </select>
 
+    <select id="getPrice" parameterType="Map" resultType="com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateHoldResponse">
+        SELECT
+            max( MDPRICE ) price
+        FROM
+            MST_CREDIT_MARKET_INFO
+        WHERE
+            SECID=#{secid,jdbcType=VARCHAR} and CDATE &lt;= #{nowDate,jdbcType=VARCHAR}
+    </select>
+
     <!-- 当日交易数据查询 -->
     <select id="selectCurrTrdData" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
         select
