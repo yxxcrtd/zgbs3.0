@@ -556,7 +556,7 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setBackDate(entrust.getBackDate());
         baseRepurchaseQuoteSendResponse.setCapDays(instruction.getCapDays().intValue());
         baseRepurchaseQuoteSendResponse.setDiscount(entrust.getDiscount());
-        baseRepurchaseQuoteSendResponse.setmIntAmt(NumberUtil.div(entrust.getBackBalance(), entrust.getEntrustBalance()));
+        baseRepurchaseQuoteSendResponse.setmIntAmt(NumberUtil.sub(entrust.getBackBalance(), entrust.getEntrustBalance()));
         baseRepurchaseQuoteSendResponse.setRepoAmount(entrust.getEntrustBalance());
         baseRepurchaseQuoteSendResponse.setRepoRate(entrust.getEntrustPrice());
         baseRepurchaseQuoteSendResponse.setRepoMdate(DateUtil.format(instruction.getRepoMdate()));
