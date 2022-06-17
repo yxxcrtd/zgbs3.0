@@ -2052,7 +2052,7 @@ public class StlDataDealSzdJsmxProcessService {
 				}
 
 				// 交易份额
-				settleTransData.setShareAmt(new BigDecimal(szdJsmx.getSl()).abs());
+				settleTransData.setShareAmt(ArithmeticUtil.multiply(new BigDecimal(szdJsmx.getSl()).abs(), new BigDecimal(100)));
 				// 全价总额
 				settleTransData.setFpriceAmt(new BigDecimal(szdJsmx.getQsje()).abs());
 
