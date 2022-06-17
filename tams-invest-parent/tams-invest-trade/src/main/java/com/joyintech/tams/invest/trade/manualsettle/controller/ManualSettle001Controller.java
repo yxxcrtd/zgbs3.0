@@ -17,10 +17,7 @@ import com.joyintech.tams.invest.trade.manualsettle.dto.ManualSettleFlowDto;
 import com.joyintech.tams.invest.trade.manualsettle.service.ManualSettleService;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
-import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -45,10 +42,7 @@ import java.util.List;
 @RequestMapping("/invest/trade/manualsettle/ManualSettle001")
 public class ManualSettle001Controller extends BaseController {
 
-    private static Logger logger = LoggerFactory.getLogger(ManualSettle001Controller.class);
-
     private static final IDictCode[] DICT_CODES = new DictCode[]{DictCode.交易场所, DictCode.交收状态, DictCode.交收业务类别};
-
     @Autowired
     private ManualSettleService manualSettleService;
 
@@ -94,29 +88,29 @@ public class ManualSettle001Controller extends BaseController {
     @ResponseBody
     @RequestMapping("settle")
     public AjaxResult settle(@RequestBody @Validated({
-            ValidateGroupDelete.class}) ManualSettleDto dto, BindingResult br) {
-        try {
-            if (br.hasErrors()) {
-                return new AjaxResult(br);
-            }
-            ProcessParameter<ManualSettleDto> processParameter = new ProcessParameter<>();
-            WorkFlowParameter<ManualSettleDto> params = new WorkFlowParameter<>();
-            params.setPageId("ManualSettle001");
-            params.setElementId(dto.getElementId());
-            params.setBusinessCode(item -> item.getSettleSeqNo());
-            params.setBusinessType(DictCodeList.共通业务类型_债券类资产信息.getValue());
-            // 设置流程业务说明, entity即传入的dto
-            params.setComment(entity -> WorkFlowUtil.concatComment(getMessage("FinBondTargetAsset002.finprodId") +
+            ValidateGroupDelete.class}) ManualSettleDto dto, BindingResult br)
+            throws Exception {
+        if (br.hasErrors()) {
+            return new AjaxResult(br);
+        }
+        ProcessParameter<ManualSettleDto> processParameter = new ProcessParameter<ManualSettleDto>();
+        WorkFlowParameter<ManualSettleDto> params = new WorkFlowParameter<ManualSettleDto>();
+        params.setPageId("ManualSettle001");
+        params.setElementId(dto.getElementId());
+        params.setBusinessCode(item -> item.getSettleSeqNo());
+        params.setBusinessType(DictCodeList.共通业务类型_债券类资产信息.getValue());
+        // 设置流程业务说明, entity即传入的dto
+        params.setComment(entity -> {
+            return WorkFlowUtil.concatComment(getMessage("FinBondTargetAsset002.finprodId") +
                     GlobalConstant.OPEN_PARENTHESIS + GlobalConstant.CLOSE_PARENTHESIS +
                     getMessage("FinBondTargetAsset002.finprodName") + GlobalConstant.OPEN_PARENTHESIS +
-                    GlobalConstant.CLOSE_PARENTHESIS));
-            processParameter.setWorkFlowParameter(params);
-            String msg = manualSettleService.start(processParameter, dto.getSelectedItem().toArray(new ManualSettleDto[dto.getSelectedItem().size()]));
-            return new AjaxResult("处理完成");
-        } catch (WorkFlowException e) {
-            logger.error("交收异常：", e);
-            return new AjaxResult(e.getMessage());
-        }
+                    GlobalConstant.CLOSE_PARENTHESIS);
+        });
+        processParameter.setWorkFlowParameter(params);
+        String msg = manualSettleService.start(processParameter,
+                dto.getSelectedItem().toArray(
+                        new ManualSettleDto[dto.getSelectedItem().size()]));
+        return new AjaxResult("处理完成");
     }
 
     /**
