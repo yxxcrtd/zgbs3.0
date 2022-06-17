@@ -256,6 +256,21 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             param.put("flag","Y");
         }
         dto.setIssueDto(finTenderBondAssetMapper.getProductIssueFromInterface(param));
+        if(Objects.nonNull(dto.getIssueDto())) {
+            String issueMethod = dto.getIssueDto().getIssueClass();
+            if(StringUtil.isNotEmpty(issueMethod)) {
+                issueMethod = issueMethod.trim();
+            }
+            if ("0".equals(issueMethod)) {
+                dto.getIssueDto().setTenderType(DictCodeListExt4.招标方式_单一价格招标.getValue());
+                dto.getIssueDto().setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+            }else if("5".equals(issueMethod)){
+                dto.getIssueDto().setTenderType(DictCodeListExt4.招标方式_数量招标.getValue());
+                dto.getIssueDto().setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+            }else if("6".equals(issueMethod)){
+                dto.getIssueDto().setIssueClass(DictCodeListExt4.新债_发行方式_报价发行.getValue());
+            }
+        }
         return dto;
     }
 

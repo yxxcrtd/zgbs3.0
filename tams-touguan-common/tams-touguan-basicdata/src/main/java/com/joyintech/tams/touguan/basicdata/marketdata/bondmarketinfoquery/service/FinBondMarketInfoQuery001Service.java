@@ -238,6 +238,11 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             param.put("scheduTypeList", scheduTypeList);
             List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(param);
             detailQueryDto.setBondMarketInvRepayDtos(bondMarketInvRepayDtos);
+            //还本付息计划信息
+            List<FinBondMarketCashPlanDto> allBondMarketPlanDtos = new ArrayList<>();
+            allBondMarketPlanDtos.addAll(detailQueryDto.getBondMarketCashPlanDtos());
+            allBondMarketPlanDtos.addAll(detailQueryDto.getBondMarketInvRepayDtos());
+            detailQueryDto.setAllBondMarketPlanDtos(allBondMarketPlanDtos);
         } else {
             param.put("FINPROD_TYPE2_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
             param.put("FIN_CASH_BUSINESS_TYPE_01", DictCodeListExt1.现金流业务类型_金融产品.getValue());

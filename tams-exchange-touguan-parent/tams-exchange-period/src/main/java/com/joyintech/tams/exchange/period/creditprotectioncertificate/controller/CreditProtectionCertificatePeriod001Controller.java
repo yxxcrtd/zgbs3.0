@@ -198,7 +198,7 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
                 return new Message<AjaxResult>().fail().setMessage("请选择一条数据！");
             }
             if (StringUtil.equals(dto.getPaBussType(), DictCodeListExt1.平安业务类型_到期.getValue())
-                    || !DateUtil.isSameDay(dto.getCreditEventHappenedDate(), DateUtil.now())) {
+                    || !DateUtil.isSameDay(dto.getDeliverDate(), iPlatformDate.getSysDate())) {
                 return new Message<AjaxResult>().fail().setMessage("只有当日的信用事件结算的存续期记录允许撤销！");
             }
             if (!StringUtil.equals(dto.getValidStatus(), DictCodeListExt1.有效状态_有效.getValue())) {

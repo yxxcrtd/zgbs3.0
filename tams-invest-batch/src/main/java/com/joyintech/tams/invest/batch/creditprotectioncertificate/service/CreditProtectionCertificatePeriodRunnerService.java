@@ -361,7 +361,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptl.put("cashAcctId", expireDataDto.getAcctNo());
             ptl.put("secAcctId", expireDataDto.getSecAcctId());
             ptl.put("secAmount", expireDataDto.getRepNomCapi());
-            ptl.put("cashAmount", BigDecimal.ZERO);
+            ptl.put("cashAmount", expireDataDto.getRepNomCapi());
             ptlList.add(ptl);
         }
         resultMap.put("ptlList", ptlList);

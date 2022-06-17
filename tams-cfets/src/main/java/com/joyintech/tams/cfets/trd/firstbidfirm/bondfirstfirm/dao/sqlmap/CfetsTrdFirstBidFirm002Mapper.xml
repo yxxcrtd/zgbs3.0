@@ -183,10 +183,10 @@
         and ROWNUM = 1
     </select>
 
-    <select id="selectBidFirmCountByEntrustId" resultType="java.lang.Integer">
-        select count(*)
+    <select id="selectBidFirmCountByEntrustId" resultType="java.lang.String">
+        select distinct ENTRUST_ID
         from (
-        select distinct bo.BID_ID
+        select distinct bo.BID_ID,bobp.ENTRUST_ID
         from BID_ORDER bo
         left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
         where bo.IS_CANCEL = 'N'
@@ -204,10 +204,11 @@
             </foreach>
         </if>
         union all
-        select distinct bo.BID_ID
+        select distinct bo.BID_ID,bobp.ENTRUST_ID
         from Wfl_BID_ORDER bo
         left join Wfl_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
-        where
+        where bo.IS_CANCEL = 'N'
+        and bo.TRADE_STATUS = '01'
         <if test="bidModles != null and bidModles.size()>0">
             and bo.BID_MODLE in
             <foreach collection="bidModles" open=" (" close=") " separator="," item="item">
@@ -457,7 +458,11 @@
                bobp.ACCT_NO/*资金账户*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
                nvl(nvl(eebp.BID_PRIN_AMT,0)*100 - nvl(T.finshNum,0),0) avaNum /*剩余券面总额*/,
-               bobp.BID_PRICE/*标位*/,
+               case
+                   when fpi.TENDER_TARGET = '01' then bobp.BID_PRICE * 100
+                   when fpi.TENDER_TARGET = '02' then bobp.BID_PRICE
+                   when fpi.TENDER_TARGET = '03' then bobp.BID_PRICE * 10000
+                   end              BID_PRICE/*标位*/,
                eebp.BID_PRIN_AMT*100 ENTRUST_NUM,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,

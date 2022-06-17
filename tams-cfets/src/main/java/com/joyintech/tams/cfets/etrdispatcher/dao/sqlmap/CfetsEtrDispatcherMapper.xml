@@ -2615,6 +2615,7 @@
         /*ete.entrust_num entrustNum,*/
         case when eted.BUSI_TYPE_POSITION in ('EX017','EX005')  THEN round(ete.entrust_num/100,4)
         when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
+        when eted.BUSI_TYPE_POSITION in ('EX019') THEN round(ete.entrust_num/10000,4)
         else ete.entrust_num end entrustNum,
         case
         when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
@@ -2722,6 +2723,7 @@
 <!--         ete.entrust_num entrustNum,-->
         case when eted.BUSI_TYPE_POSITION in ('EX017','EX005') THEN round(ete.entrust_num/100,4)
         when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
+        when eted.BUSI_TYPE_POSITION in ('EX019') THEN round(ete.entrust_num/10000,4)
         else ete.entrust_num end entrustNum,
         case
         when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)

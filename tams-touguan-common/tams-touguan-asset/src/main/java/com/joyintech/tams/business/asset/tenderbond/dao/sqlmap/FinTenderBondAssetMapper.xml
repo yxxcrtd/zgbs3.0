@@ -317,10 +317,8 @@
             sec.CURRENCY as ccy ,
             sec.IS_BONDS_WITH_RIGHTS as isRight,
             sec.TRADING_CALENDAR as calendarId,
-            sec.IS_SEC_BOND isSecBond,
-            sec.IS_SUS isSus,
-            sec.ORIGINAL_OWNER originalOwner,
-            sec.GUARTYPE
+            sec.IS_BONDS_WITH_RIGHTS isRight,
+            sec.IS_SUS isSus
         FROM INTERF_WIND_UNRELEASE_SEC_INFO sec
         where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
     </select>
@@ -329,15 +327,15 @@
     <select id="getProductAddFromInterface" resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinProductAddDto">
         SELECT
             sec.CROSS_MARKET_CODE as crossMarketCode,
-            sec.IS_SUS isSus,
+            sec.IS_SEC_BOND  isSecBond,
             sec.ORIGINAL_OWNER originalOwner,
-            sec.GUARTYPE,
+            sec.GUARTYPE guaType,
             case when sec.CROSS_MARKET_CODE is null then 'N' else 'Y' end as crossMarket,
             ri.LISTING_DATE as listingDate,
             ri.LISTING_CODE as appearMarketId
         FROM INTERF_WIND_UNRELEASE_SEC_INFO sec
         LEFT JOIN INTERF_WIND_RELEASE_INFO ri ON sec.SEC_ID = ri.SEC_ID
-        LEFT JOIN (select * from INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in ('CD','14'))  pri ON pri.SECURITY_ID = sec.SEC_ID
+        LEFT JOIN (select (SECURITY_ID||'.IB') as SEC_ID,t.* from INTERF_RDI_RELEASE_INFO t where t.SECURITY_TYPE in ('同业存单','公司短期融资券'))  pri ON pri.SEC_ID = ri.SEC_ID
         where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04}) AND ROWNUM=1
     </select>
 
@@ -390,7 +388,7 @@
         </if>
         ) ri
         LEFT JOIN INTERF_WIND_UNRELEASE_SEC_INFO sec on ri.SEC_ID = sec.SEC_ID
-        LEFT JOIN (select * from INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in ('CD','14'))  pri ON pri.SECURITY_ID = ri.SEC_ID
+        LEFT JOIN (select (SECURITY_ID||'.IB') as SEC_ID,t.* from INTERF_RDI_RELEASE_INFO t where t.SECURITY_TYPE in ('同业存单','公司短期融资券'))  pri ON pri.SEC_ID = ri.SEC_ID
         where ri.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR}  and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04}) AND ROWNUM=1
     </select>
 

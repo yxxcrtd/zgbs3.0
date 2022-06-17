@@ -82,6 +82,7 @@
         ,T2.EXP_CON_NUM
         ,T2.DEAL_MODE dealMode
         ,T2.PRICE_TYPE priceType
+        ,T1.REMARK remark
         FROM
         ETR_ENTRUST T1
         INNER JOIN ETR_ENTRUST_ADD T2 ON
@@ -224,6 +225,7 @@
         ,T2.EXP_CON_NUM
         ,T2.DEAL_MODE dealMode
         ,T2.PRICE_TYPE priceType
+        ,T1.REMARK remark
         FROM
         WFL_ETR_ENTRUST T1
         INNER JOIN WFL_ETR_ENTRUST_ADD T2 ON
@@ -576,6 +578,15 @@
         <if test="assetType != null and assetType !=''">
             AND FPT.TYPE_8 = #{assetType,jdbcType=VARCHAR}
         </if>
+    </select>
+
+    <select id="getPrice" parameterType="Map" resultType="com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateHoldResponse">
+        SELECT
+            max( MDPRICE ) price
+        FROM
+            MST_CREDIT_MARKET_INFO
+        WHERE
+            SECID=#{secid,jdbcType=VARCHAR} and CDATE &lt;= #{nowDate,jdbcType=VARCHAR}
     </select>
 
     <!-- 当日交易数据查询 -->

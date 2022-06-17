@@ -296,7 +296,7 @@
                ON TMI.PRE_TRADE_ID = BO.BID_ID
         WHERE
                BO.TRADE_STATUS = #{TRADE_STATUS_01}
-           AND FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_01})
+           AND FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
             <if test="sysDate != null and !sysDate.equals('')">
               AND BO.BID_DATE = #{sysDate}
             </if>
@@ -2480,7 +2480,7 @@
         LEFT JOIN FIN_PRODUCT_TYPE FPT
         ON		FPT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN TRDQUTO_MATCH_INFO TMI
-        ON		TMI.EXE_ID = ICB.TRD_ID
+        ON		TMI.CSTP_TRADE_ID = ICB.TRD_ID
         WHERE  FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
         <if test="sysDate != null and !sysDate.equals('')">
             AND to_date(to_char(to_date(ICB.SUBSCRIPTION_TIME,'yyyy-MM-dd HH24:mi:ss'),'yyyy-MM-dd'),'yyyy-MM-dd') = #{sysDate,jdbcType=DATE}
@@ -3206,7 +3206,7 @@
             LEFT JOIN BID_ORDER BO
                 ON	 BO.TRADE_STATUS = #{TRADE_STATUS_01}
                 AND	 BO.IS_CANCEL = 'N'
-                AND	 (BO.BID_ID=TFPDT.B_TRADE_ID OR BO.BID_ID=BRT.BID_ID OR BO.BID_ID=TMI.PRE_TRADE_ID)
+                AND	 (BO.BID_ID=TFPDT.B_TRADE_ID OR BO.BID_ID=BRT.BID_ID OR BO.BID_ID=TMI.PRE_TRADE_ID OR BO.BID_ID=TFPDT.P_TOTLE_TRADE_ID)
             LEFT JOIN TRD_MANUAL_SETTLE_INFO TMSI
             ON		TMSI.TRADE_ID = TFPDT.TOTLE_TRADE_ID
             LEFT JOIN STL_ORDERS SO
@@ -3293,7 +3293,7 @@
                 || '|' || aaa.tgBusiTypeStr || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr
                 || '|' || aaa.psStr|| '|' || aaa.tradeMarketStr|| '|' || aaa.tradeMarketModeStr
                 || '|' || aaa.settleSpeedStr  || '|' || aaa.secManageAcctIdStr || '|' || aaa.ccyStr
-                || '|' || aaa.execid   || '|' || aaa.counterIdStr || '|' || aaa.remark
+                || '|' || aaa.execid   || '|' || aaa.counterIdStr || '|' || aaa.remark || '|' || aaa.bidId
                 like '%' || #{search} || '%')
                 or to_char(aaa.faceValue,'FM9999999999999990.90')=#{search} or to_char(aaa.faceValue)=#{search}
                 or aaa.tradeYield=#{search} or  aaa.tradeYield =#{search}||'%'
@@ -4874,7 +4874,7 @@
                 AND	BRBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
                 AND	BRBP.SEC_ACCT_ID = TPD.SEC_MANAGE_ACCT_ID
         LEFT JOIN PTL_PORTFOLIO  PP
-            ON	 BRBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
+            ON	 BRBP.PORTFOLIO_ID = PP.PORTFOLIO_ID
         LEFT JOIN ETR_ENTRUST EE
             ON		EE.ENTRUST_ID = TPDA.ENTRUST_ID
         LEFT JOIN  ETR_ENTRUST_DETAIL EED
