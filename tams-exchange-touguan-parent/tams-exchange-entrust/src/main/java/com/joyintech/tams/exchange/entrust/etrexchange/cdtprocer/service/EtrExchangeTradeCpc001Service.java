@@ -679,6 +679,9 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrSecRepoBondDto.setPrice(dto.getPrice());
             BigDecimal cash = StringUtil.isNotEmpty(dto.getEntrustNum())? dto.getEntrustNum().multiply(new BigDecimal(10000)):BigDecimal.valueOf(0.00);
             etrSecRepoBondDto.setEntrustAmt(dto.getEntrustAmt());
+            //添加修改备注 wsz add ZGCPCN-1467 start
+            etrSecRepoBondDto.setRemark(dto.getRemark());
+            //添加修改备注 wsz add ZGCPCN-1467 end
             etrSecRepoBondDto.setEntrustNum(cash);
             etrSecRepoBondDto.setCalMode(dto.getCalculateField());// 计算方式
             etrSecRepoBondDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）

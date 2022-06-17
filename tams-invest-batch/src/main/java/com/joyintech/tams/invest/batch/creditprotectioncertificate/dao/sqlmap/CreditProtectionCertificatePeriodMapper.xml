@@ -56,7 +56,9 @@
                  left join PTL_PORTFOLIO pp on R.PORTFOLIO_ID = pp.PORTFOLIO_ID
         WHERE R.FINPROD_ID = #{finprodId}
           AND R.CDATE = #{executeDate}
+          AND R.HODING_TYPE = 'A_001'
           AND R.DATE_TYPE = 0
+          AND R.AMOUNT > 0
     </select>
     <select id="selectExpireDataForOld"
             resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
@@ -75,6 +77,8 @@
                  left join PTL_PORTFOLIO pp on R.PORTFOLIO_ID = pp.PORTFOLIO_ID
         WHERE R.FINPROD_ID = #{finprodId}
           AND R.CDATE = #{executeDate}
+          AND R.HODING_TYPE = '03'
+          AND R.AMOUNT > 0
     </select>
     <select id="selectDetailsByTotleTradeId"
             resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
