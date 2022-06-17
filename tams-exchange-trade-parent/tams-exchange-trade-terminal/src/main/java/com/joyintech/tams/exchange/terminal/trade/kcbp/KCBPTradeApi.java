@@ -1304,22 +1304,15 @@ public class KCBPTradeApi {
             		for(IntegratedRepurchaseQuoteBean integratedRepurchaseQuoteBean:integratedRepurchaseQuoteBeans) {
             			String execid = integratedRepurchaseQuoteBean.getExecid();
             			List<IntegratedRepurchaseQuotePledgeBean> integratedRepurchaseQuotePledgeBeanList = pledgeMap.get(execid);
-            			StringBuffer stockCodes=new StringBuffer();
-            			Integer volumes=0;
             			for(IntegratedRepurchaseQuotePledgeBean integratedRepurchaseQuotePledgeBean : integratedRepurchaseQuotePledgeBeanList) {
-            				if("01".equals(integratedRepurchaseQuotePledgeBean.getDeliverySide())) {
+            				if("1".equals(integratedRepurchaseQuotePledgeBean.getDeliverySide())) {
             					integratedRepurchaseQuoteBean.setSwapIntoBonds(integratedRepurchaseQuotePledgeBean.getStkcode());
             					integratedRepurchaseQuoteBean.setSwapIntoBondsVolume(new BigDecimal(integratedRepurchaseQuotePledgeBean.getOrderqty()));
-            				}else if("02".equals(integratedRepurchaseQuotePledgeBean.getDeliverySide())) {
+            				}else if("2".equals(integratedRepurchaseQuotePledgeBean.getDeliverySide())) {
             					integratedRepurchaseQuoteBean.setSwapOutBonds(integratedRepurchaseQuotePledgeBean.getStkcode());
             					integratedRepurchaseQuoteBean.setSwapOutBondsVolume(new BigDecimal(integratedRepurchaseQuotePledgeBean.getOrderqty()));
-            				}else {
-            					stockCodes.append(integratedRepurchaseQuotePledgeBean.getStkcode()).append(",");
-            					volumes+=Integer.parseInt(integratedRepurchaseQuotePledgeBean.getOrderqty());
             				}
             			}
-            			integratedRepurchaseQuoteBean.setStockCode(stockCodes.toString());
-        				integratedRepurchaseQuoteBean.setImpawnAmount(volumes);
             		}
             	}else {
             		integratedRepurchaseQuoteBeans = KCBPConverter.convertToIntegratedRepurchaseQuoteResponse(integratedRepurchaseQuoteQryBean, data);
