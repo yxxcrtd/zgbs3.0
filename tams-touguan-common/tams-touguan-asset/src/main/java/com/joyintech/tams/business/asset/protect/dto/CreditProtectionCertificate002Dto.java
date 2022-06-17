@@ -1,5 +1,6 @@
 package com.joyintech.tams.business.asset.protect.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
@@ -135,7 +136,7 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     /**
      * 计息基础 - 计费年度天数
      */
-    @ApiModelProperty(name="basis",value="计费年度天数",required = true)
+    @ApiModelProperty(name="basis",value="计费年度天数")
     private String basis;
     /**
      * 结算方式
@@ -215,8 +216,9 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     /**
      * 附件
      */
-    @ApiModelProperty(name="mstFileInputParameter",value="附件")
-    private MstFileInputParameter mstFileInputParameter;
+    @JsonProperty(value = "MstFileInputParameter")
+    @ApiModelProperty(name="MstFileInputParameter",value="附件")
+    private MstFileInputParameter MstFileInputParameter;
 
     private String isOrNoStr;
     private String settleMethodStr;
@@ -571,10 +573,10 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     }
 
     public MstFileInputParameter getMstFileInputParameter() {
-        return mstFileInputParameter;
+        return MstFileInputParameter;
     }
 
     public void setMstFileInputParameter(MstFileInputParameter mstFileInputParameter) {
-        this.mstFileInputParameter = mstFileInputParameter;
+        MstFileInputParameter = mstFileInputParameter;
     }
 }

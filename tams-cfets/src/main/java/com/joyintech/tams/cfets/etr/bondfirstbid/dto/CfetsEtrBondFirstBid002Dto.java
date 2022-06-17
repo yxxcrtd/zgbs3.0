@@ -67,6 +67,8 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     @ApiModelProperty(name = "referYield", value = "收益率，利息贴现为参考收益率，附息为票面利率")
     private String referYield;
 
+    @ApiModelProperty(name = "referYield2", value = "票面利率")
+    private String referYield2;
 
     /**
      *  招标标的
@@ -239,6 +241,15 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     @ApiModelProperty(name = "ccyStr", value = "币种名称")
     private String ccyStr;
+
+    @ApiModelProperty(name = "couponSpecies", value = "息票品种")
+    private String couponSpecies;
+
+    @ApiModelProperty(name = "intType", value = "利率类型")
+    private String intType;
+
+    @ApiModelProperty(name = "entrustStatus", value = "指令状态")
+    private String entrustStatus;
 
     public String getElementId() {
         return elementId;
@@ -560,5 +571,39 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setCcyStr(String ccyStr) {
         this.ccyStr = ccyStr;
+    }
+
+    public String getCouponSpecies() {
+        return couponSpecies;
+    }
+
+    public void setCouponSpecies(String couponSpecies) {
+        this.couponSpecies = couponSpecies;
+    }
+
+    public String getIntType() {
+        return intType;
+    }
+
+    public void setIntType(String intType) {
+        this.intType = intType;
+    }
+
+    public String getReferYield2() {
+        return referYield2;
+    }
+
+    public void setReferYield2(String referYield2) {
+        this.referYield2 = referYield2;
+    }
+
+    @Override
+    public String getEntrustStatus() {
+        return entrustStatus;
+    }
+
+    @Override
+    public void setEntrustStatus(String entrustStatus) {
+        this.entrustStatus = entrustStatus;
     }
 }

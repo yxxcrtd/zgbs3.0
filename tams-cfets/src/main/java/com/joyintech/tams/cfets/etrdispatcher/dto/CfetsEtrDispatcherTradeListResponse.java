@@ -490,10 +490,7 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     }
 
     public String getIssueDateStr() {
-        if (getIssueDate() == null) {
-            return "";
-        }
-        return DateUtil.format(getIssueDate(), "yyyy-MM-dd");
+        return issueDateStr;
     }
 
     public void setIssueDateStr(String issueDateStr) {

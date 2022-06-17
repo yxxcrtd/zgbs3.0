@@ -38,8 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
-import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
 
 /**
  * 组合分配
@@ -146,14 +145,21 @@ public class PortfolioAssignHelper {
             return ResultBean.error(ErrorCode.MIN_TRD_NUM_LIMIT_ERROR);
         }
 
+        //质押式回购、信用保护凭证的交易量是对金额控制的，因此要转换成数量
+        if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())
+                || StringUtil.equals(投管业务类型_信用保护凭证.getValue(), instruction.getBusiTypeTg())) {
+            minNum = minNum.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
+        }
+
         // 可分配到最小交易数量的组合数量
         int minNumAssignableCount = Math.min(NumberUtil.div(orginVolume, minNum, 2).intValue(), instructionDetails.size());
-        
+
         // 剩余待分配数量（去掉最小交易数据量）
         BigDecimal orginVolumeWithOutMinNum = NumberUtil.sub(orginVolume, NumberUtil.mul(minNumAssignableCount, minNum));
 
-        //质押式回购的步长是对金额控制的，因此要转换成数量
-        if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
+        //质押式回购、信用保护凭证的步长是对金额控制的，因此要转换成数量
+        if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())
+                || StringUtil.equals(投管业务类型_信用保护凭证.getValue(), instruction.getBusiTypeTg())) {
             minStep = minStep.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
         }
 
@@ -217,11 +223,11 @@ public class PortfolioAssignHelper {
             currVolume = detail.getEntrustNum();
             assignVolume = NumberUtil.div(NumberUtil.mul(currVolume, totalVolume), instructionVolume, 0);
             assignVolume = TradeUtils.subtractMod(assignVolume, minStep);
-            
-            if(i+minNum.intValue()<instructionDetails.size()) {//没有分到最小交易数量的不分
-            	assignVolume=BigDecimal.ZERO;
+
+            if (i + minNum.intValue() < instructionDetails.size()) {//没有分到最小交易数量的不分
+                assignVolume = BigDecimal.ZERO;
             }
-            
+
             portfolioDetail.setTargetNum(assignVolume);
             // 更新指令委托总数
             instructionVolume = instructionVolume.subtract(currVolume);
@@ -286,14 +292,14 @@ public class PortfolioAssignHelper {
             detail.setTargetNum(NumberUtil.sub(detail.getTargetNum(), historyNum));
             detail.setTargetAmt(NumberUtil.round(NumberUtil.mul(detail.getTargetNum(), price), AMT_SCALE));
         }
-        
+
         //----------最小交易数量修改------------
-        for (int i=0;i<list.size();i++) {
-        	if(i+minNumAssignableCount>=list.size()) {
-        		PortfolioDetail detail = list.get(i);
-        		detail.setTargetNum(NumberUtil.add(detail.getTargetNum(), minNum));
-        		detail.setTargetAmt(NumberUtil.round(NumberUtil.mul(detail.getTargetNum(), price), AMT_SCALE));
-        	}
+        for (int i = 0; i < list.size(); i++) {
+            if (i + minNumAssignableCount >= list.size()) {
+                PortfolioDetail detail = list.get(i);
+                detail.setTargetNum(NumberUtil.add(detail.getTargetNum(), minNum));
+                detail.setTargetAmt(NumberUtil.round(NumberUtil.mul(detail.getTargetNum(), price), AMT_SCALE));
+            }
         }
 
         Map<String, PortfolioDetail> portfolioDetailMap = list.stream().collect(Collectors.toMap(PortfolioDetail::getPortfolioId, item -> item, (o1, o2) -> o1));

@@ -413,16 +413,20 @@
                                 OR fpi.ISSUE_CLASS = '03'
                                 THEN fpi.TENDER_EDATE
                             END           AS issueDateEnd/*投标日 结束*/,
-                        ee.ENTRUST_NUM *100   AS etrBidPriceTotal/*指令投标券面总额*/,
+                        bobp2.amt * 100   etrBidPriceTotal/*指令投标券面总额*/,
                         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
                         bo.WIN_PRIN_AMT   AS totalBiddingNum/*券面总额*/,
-                        bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+                        CASE
+                            when fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || '%'
+                            when fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || '元'
+                            when fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || 'BP'
+                            end AS bidprice /*投标标位, 多个逗号分隔展示*/,
                         bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                         bo.PAY_TYPE       AS payType/*缴款方式*/,
                         case
-                            when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-                            when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-                            when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                            when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM999,999,999,999,990.9990') || '%'
+                            when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM999,999,999,999,990.9990') || '元'
+                            when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM999,999,999,999,990.90') || 'BP'
                             end              winPrice/*中标标位*/,
                         bo.UNIT_CPRICE       price/*净价*/,
                         bo.PAYABLE_AMOUNT    payableAmount/*缴款金额*/,
@@ -439,11 +443,11 @@
                           LEFT JOIN
                       (select listagg(case
                                           when t3.TENDER_TARGET = '01'
-                                              then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                                              then to_char(t0.BID_PRICE * 100, 'FM999,999,999,999,990.9990')
                                           when t3.TENDER_TARGET = '02'
-                                              then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+                                              then to_char(t0.BID_PRICE, 'FM999,999,999,999,990.9990')
                                           when t3.TENDER_TARGET = '03'
-                                              then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                                              then to_char(t0.BID_PRICE * 10000, 'FM999,999,999,999,990.90')
                                           end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
                           t0.BID_ID
                        from BID_ORDER_BID_PRICE t0
@@ -461,6 +465,12 @@
                           LEFT JOIN
                           (select distinct ENTRUST_ID, BID_ID from BID_ORDER_BID_PRICE) bobp1
                           ON bobp1.BID_ID = bo.BID_ID
+                        LEFT JOIN (select sum(eebp.BID_PRIN_AMT) amt,bobp.BID_ID
+                        from ETR_ENTRUST_BID_PRICE eebp
+                        left join BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
+                        and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                        group by bobp.BID_ID
+                        ) bobp2 ON bobp2.BID_ID = bo.BID_ID
                           LEFT JOIN
                       FIN_PRODUCT_ISSUE fpi
                       ON fpi.FINPROD_ID = fp.FINPROD_ID
@@ -511,16 +521,20 @@
                                 OR fpi.ISSUE_CLASS = '03'
                                 THEN fpi.TENDER_EDATE
                             END         AS issueDateEnd/*投标日 结束*/,
-                        ee.ENTRUST_NUM*100  AS etrBidPriceTotal/*指令投标券面总额*/,
+                        bobp2.amt * 100   etrBidPriceTotal/*指令投标券面总额*/,
                         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
                         bo.WIN_PRIN_AMT AS totalBiddingNum/*券面总额*/,
-                        bobp.BID_PRICE  AS bidprice/*投标标位, 多个逗号分隔展示*/,
+                        CASE
+                            when fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || '%'
+                            when fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || '元'
+                            when fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || 'BP'
+                            end AS bidprice /*投标标位, 多个逗号分隔展示*/,
                         bo.BID_MODLE    AS biddingMethod/*投标方式*/,
                         bo.PAY_TYPE     AS payType/*缴款方式*/,
                         case
-                            when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-                            when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-                            when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                            when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM999,999,999,999,990.9990') || '%'
+                            when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM999,999,999,999,990.9990') || '元'
+                            when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM999,999,999,999,990.90') || 'BP'
                             end            winPrice/*中标标位*/,
                         bo.UNIT_CPRICE     price/*净价*/,
                         bo.PAYABLE_AMOUNT  payableAmount/*缴款金额*/,
@@ -537,11 +551,11 @@
                           LEFT JOIN
                       (select listagg(case
                                           when t3.TENDER_TARGET = '01'
-                                              then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                                              then to_char(t0.BID_PRICE * 100, 'FM999,999,999,999,990.9990')
                                           when t3.TENDER_TARGET = '02'
-                                              then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+                                              then to_char(t0.BID_PRICE, 'FM999,999,999,999,990.9990')
                                           when t3.TENDER_TARGET = '03'
-                                              then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                                              then to_char(t0.BID_PRICE * 10000, 'FM999,999,999,999,990.90')
                                           end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
                           t0.BID_ID
                        from WFL_BID_ORDER_BID_PRICE t0
@@ -559,6 +573,12 @@
                           LEFT JOIN
                           (select distinct ENTRUST_ID, BID_ID from WFL_BID_ORDER_BID_PRICE) bobp1
                           ON bobp1.BID_ID = bo.BID_ID
+                        LEFT JOIN (select sum(eebp.BID_PRIN_AMT) amt,bobp.BID_ID
+                        from ETR_ENTRUST_BID_PRICE eebp
+                        left join WFL_BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
+                        and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                        group by bobp.BID_ID
+                        ) bobp2 ON bobp2.BID_ID = bo.BID_ID
                           LEFT JOIN
                       FIN_PRODUCT_ISSUE fpi
                       ON fpi.FINPROD_ID = fp.FINPROD_ID
@@ -633,7 +653,7 @@
                          OR fpi.ISSUE_CLASS = '03'
                          THEN fpi.TENDER_EDATE
                      END           AS bidDateEnd/*投标日 结束*/,
-                 ee.ENTRUST_NUM*100   etrBidPriceTotal/*指令投标券面总额*/,
+                 bobp1.amt * 100   etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                 bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
                 bobp.BID_PRICE    AS bidPriceAndUntil,
@@ -675,9 +695,12 @@
                    LEFT JOIN
                FIN_PRODUCT fp
                ON fp.FINPROD_ID = bo.FINPROD_ID
-                   LEFT JOIN
-               (select distinct ENTRUST_ID,BID_ID from BID_ORDER_BID_PRICE) bobp1
-               ON bobp1.BID_ID = bo.BID_ID
+                LEFT JOIN (select sum(eebp.BID_PRIN_AMT) amt,bobp.BID_ID
+                    from ETR_ENTRUST_BID_PRICE eebp
+                    left join BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
+                    and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                    group by bobp.BID_ID
+                ) bobp1 ON bobp1.BID_ID = bo.BID_ID
                    LEFT JOIN
                FIN_PRODUCT_ISSUE fpi
                ON fpi.FINPROD_ID = fp.FINPROD_ID
@@ -685,9 +708,6 @@
                BID_RESULT_TOTAL brt
                ON brt.FINPROD_ID = fp.FINPROD_ID
                    AND brt.BID_ID = bo.BID_ID
-                   LEFT JOIN
-               ETR_ENTRUST ee
-               ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
                    LEFT JOIN MST_COUNTER_PARTY mcp
                              ON mcp.COUNTER_ID = bo.COUNTER_ID
           WHERE bo.BID_MODLE IN ('01', '02')
@@ -751,7 +771,7 @@
                          OR fpi.ISSUE_CLASS = '03'
                          THEN fpi.TENDER_EDATE
                      END           AS bidDateEnd/*投标日 结束*/,
-                 ee.ENTRUST_NUM*100   etrBidPriceTotal/*指令投标券面总额*/,
+                bobp1.amt * 100   etrBidPriceTotal/*指令投标券面总额*/,
                  bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
                 bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
                 bobp.BID_PRICE    AS bidPriceAndUntil,
@@ -793,9 +813,12 @@
                    LEFT JOIN
                FIN_PRODUCT fp
                ON fp.FINPROD_ID = bo.FINPROD_ID
-                   LEFT JOIN
-               (select distinct ENTRUST_ID,BID_ID from WFL_BID_ORDER_BID_PRICE) bobp1
-               ON bobp1.BID_ID = bo.BID_ID
+                LEFT JOIN (select sum(eebp.BID_PRIN_AMT) amt,bobp.BID_ID
+                    from ETR_ENTRUST_BID_PRICE eebp
+                    left join WFL_BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
+                    and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                    group by bobp.BID_ID
+                ) bobp1 ON bobp1.BID_ID = bo.BID_ID
                    LEFT JOIN
                FIN_PRODUCT_ISSUE fpi
                ON fpi.FINPROD_ID = fp.FINPROD_ID
@@ -803,9 +826,6 @@
                BID_RESULT_TOTAL brt
                ON brt.FINPROD_ID = fp.FINPROD_ID
                    AND brt.BID_ID = bo.BID_ID
-                   LEFT JOIN
-               ETR_ENTRUST ee
-               ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
                    LEFT JOIN MST_COUNTER_PARTY mcp
                              ON mcp.COUNTER_ID = bo.COUNTER_ID
           WHERE bo.BID_MODLE IN ('01', '02')
@@ -963,7 +983,7 @@
                             OR fpi.ISSUE_CLASS = '03'
                             THEN fpi.TENDER_EDATE
                         END           AS bidDateEnd/*投标日 结束*/,
-                    ee.ENTRUST_NUM*100   etrBidPriceTotal/*指令投标券面总额*/,
+                    bobp1.amt * 100   etrBidPriceTotal/*指令投标券面总额*/,
                     bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
                     bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
                     bobp.BID_PRICE    AS bidPriceAndUntil,
@@ -1018,9 +1038,12 @@
                       LEFT JOIN
                   FIN_PRODUCT fp
                   ON fp.FINPROD_ID = bo.FINPROD_ID
-                      LEFT JOIN
-                      (select distinct ENTRUST_ID, BID_ID from BID_ORDER_BID_PRICE) bobp1
-                      ON bobp1.BID_ID = bo.BID_ID
+                    LEFT JOIN (select sum(eebp.BID_PRIN_AMT) amt,bobp.BID_ID
+                        from ETR_ENTRUST_BID_PRICE eebp
+                        left join BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
+                        and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                        group by bobp.BID_ID
+                    ) bobp1 ON bobp1.BID_ID = bo.BID_ID
                       LEFT JOIN
                   FIN_PRODUCT_ISSUE fpi
                   ON fpi.FINPROD_ID = fp.FINPROD_ID
@@ -1028,9 +1051,6 @@
                   BID_RESULT_TOTAL brt
                   ON brt.FINPROD_ID = fp.FINPROD_ID
                       AND brt.BID_ID = bo.BID_ID
-                      LEFT JOIN
-                  ETR_ENTRUST ee
-                  ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
                    LEFT JOIN MST_COUNTER_PARTY mcp
                              ON mcp.COUNTER_ID = bo.COUNTER_ID
              WHERE bo.BID_MODLE IN ('03')
@@ -1092,7 +1112,7 @@
                             OR fpi.ISSUE_CLASS = '03'
                             THEN fpi.TENDER_EDATE
                         END         AS bidDateEnd/*投标日 结束*/,
-                    ee.ENTRUST_NUM*100 etrBidPriceTotal/*指令投标券面总额*/,
+                    bobp1.amt * 100   etrBidPriceTotal/*指令投标券面总额*/,
                     bo.WIN_PRIN_AMT AS bidPriceTotal/*券面总额*/,
                     bobp.bidPriceNum||bobp.until    AS bidPrice/*投标标位, 多个逗号分隔展示*/,
                     bobp.BID_PRICE    AS bidPriceAndUntil,
@@ -1146,9 +1166,12 @@
                       LEFT JOIN
                   FIN_PRODUCT fp
                   ON fp.FINPROD_ID = bo.FINPROD_ID
-                      LEFT JOIN
-                      (select distinct ENTRUST_ID, BID_ID from WFL_BID_ORDER_BID_PRICE) bobp1
-                      ON bobp1.BID_ID = bo.BID_ID
+                    LEFT JOIN (select sum(eebp.BID_PRIN_AMT) amt,bobp.BID_ID
+                        from ETR_ENTRUST_BID_PRICE eebp
+                        left join WFL_BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
+                        and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                        group by bobp.BID_ID
+                    ) bobp1 ON bobp1.BID_ID = bo.BID_ID
                       LEFT JOIN
                   FIN_PRODUCT_ISSUE fpi
                   ON fpi.FINPROD_ID = fp.FINPROD_ID
@@ -1156,9 +1179,6 @@
                   BID_RESULT_TOTAL brt
                   ON brt.FINPROD_ID = fp.FINPROD_ID
                       AND brt.BID_ID = bo.BID_ID
-                      LEFT JOIN
-                  ETR_ENTRUST ee
-                  ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
                    LEFT JOIN MST_COUNTER_PARTY mcp
                              ON mcp.COUNTER_ID = bo.COUNTER_ID
              WHERE bo.BID_MODLE IN ('03')

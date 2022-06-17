@@ -630,7 +630,7 @@ public class StlDataDealSzdSjsmxProcessService {
         // 交易方向
         settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
         // 金融产品代码
-        settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()+szdSjsmx.getMxzqdm()+".SZ");
+        settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue() + GlobalConstant.UNDER_LINE + szdSjsmx.getMxzqdm()+".SZ");
         // 金融产品类型(估值核算)
         settleTransData.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         // 金融产品类型(投管分类)

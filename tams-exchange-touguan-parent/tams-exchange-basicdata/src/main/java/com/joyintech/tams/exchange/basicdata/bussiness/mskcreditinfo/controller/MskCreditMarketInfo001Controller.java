@@ -142,7 +142,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                 parameter.setPageId("MstCreditMarketInfo002");
                 parameter.setBusinessDataPk1(entity.getSecid());
                 if (mskCreditMarketInfoPro001Service.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！,不可删除!")));
+                    errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
@@ -209,13 +209,18 @@ public class MskCreditMarketInfo001Controller extends BaseController {
      * @throws Exception 异常
      */
     @ResponseBody
-    @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Validated({
+    @PostMapping("/delete")
+    @ApiOperation(value = "删除", notes = "删除")
+    public Message<AjaxResult> delete(@RequestBody @Validated({
             ValidateGroupDelete.class}) MskCreditInfoProSaveRequest dto, BindingResult br)
             throws Exception {
         if (br.hasErrors()) {
-            return new AjaxResult(br);
+            return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
+        for (MskCreditInfoProSaveRequest saveRequest:dto.getSelectedItem()){
+            saveRequest.setOperateType(OperationType.DELETE.name());
+        }
+        dto.setOperateType(OperationType.DELETE.name());
         ProcessParameter<MskCreditInfoProSaveRequest> processParameter = new ProcessParameter<MskCreditInfoProSaveRequest>();
         WorkFlowParameter<MskCreditInfoProSaveRequest> params = new WorkFlowParameter<MskCreditInfoProSaveRequest>();
         params.setPageId("MstCreditMarketInfo002");
@@ -233,7 +238,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
         String msg = mskCreditMarketInfoPro001Service.start(processParameter,
                 dto.getSelectedItem().toArray(
                         new MskCreditInfoProSaveRequest[dto.getSelectedItem().size()]));
-        return new AjaxResult(msg);
+        return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
 
     }
 

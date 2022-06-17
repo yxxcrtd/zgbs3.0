@@ -40,10 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -691,10 +688,11 @@ public class FinBondAsset002Controller extends BaseController{
      */
     @ApiOperation(value = "附件下载", notes = "附件下载")
     @ResponseBody
-    @PostMapping( "/downloadFile")
-    public Message<MultipartFile> downloadFile(String seqNo) {
+    @PostMapping( "/downloadFile/{seqNo}")
+    public Message<MultipartFile> downloadFile(@PathVariable("seqNo") String seqNo) {
         try {
             logger.info("文件下载开始");
+            seqNo = seqNo.replaceAll("\"","");
             if (StringUtil.isNotEmpty(seqNo)) {
                 MultipartFile fileInfo = finBondAssetService.downloadFileInfo(seqNo);
                 return new Message<MultipartFile>().success().setData(fileInfo);

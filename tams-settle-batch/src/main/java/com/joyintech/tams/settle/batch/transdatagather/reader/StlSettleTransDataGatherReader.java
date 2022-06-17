@@ -7,10 +7,7 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.SettleTransData;
-import com.joyintech.tams.common.base.entity.SettleTransDataTotal;
-import com.joyintech.tams.common.base.entity.SettleTransDataTotalAdd;
-import com.joyintech.tams.common.base.entity.SettleTransDataTotalPledge;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDataDealProcessCommonService;
@@ -300,6 +297,9 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         unitCprice = ArithmeticUtil.divide(totalFpriceamt, totalShareAmt, 8);
                         dealTotal.setUnitCprice(unitCprice);
                         dealTotal.setUnitFprice(unitCprice);
+                    }
+                    else if(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(settleTransDataDto.getFinprodType2())){
+                        dealTotal.setUnitCprice(list.get(0).getUnitCprice());
                     }
                     //单位面值  空
                     // 交易份额

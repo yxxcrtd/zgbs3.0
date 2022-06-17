@@ -6,6 +6,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dto.BaseExportRequest;
@@ -15,6 +16,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodMapper;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Request;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Response;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
@@ -25,6 +27,7 @@ import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +79,9 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
 
     @Autowired
     private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private CreditProtectionCertificatePeriodMapper creditProtectionCertificatePeriodMapper;
 
     @ApiOperation(value = "查询画面初始化参数", notes = "查询画面初始化参数")
     @PostMapping("/getPageParams")
@@ -132,6 +139,20 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
         if (null == res) {
             res = new CreditProtectionCertificatePeriodSaveDto();
         }
+        if (StringUtil.isNotEmpty(res.getDeliverBond())) {
+            String deliverBondStr = creditProtectionCertificatePeriodMapper.getFinprodName(res.getDeliverBond());
+            if (StringUtil.isNotEmpty(deliverBondStr)) {
+                res.setDeliverBond(deliverBondStr);
+            }
+        }
+        //展示单位万元
+        if(!CollectionUtils.isEmpty(res.getBillingDetails())){
+            res.getBillingDetails().forEach(entity->{
+//                entity.setDeliveryAmount(ArithmeticUtil.divide(entity.getDeliveryAmount(),10000,2));
+                entity.setDeliverBondAmount(ArithmeticUtil.divide(entity.getDeliverBondAmount(),10000,2));
+                entity.setRepNomCapi(ArithmeticUtil.divide(entity.getRepNomCapi(),10000,2));
+            });
+        }
         return new Message<CreditProtectionCertificatePeriodSaveDto>().success().setData(res);
     }
 
@@ -177,7 +198,7 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
                 return new Message<AjaxResult>().fail().setMessage("请选择一条数据！");
             }
             if (StringUtil.equals(dto.getPaBussType(), DictCodeListExt1.平安业务类型_到期.getValue())
-                    || !DateUtil.isSameDay(dto.getCreditEventHappenedDate(), DateUtil.now())) {
+                    || !DateUtil.isSameDay(dto.getDeliverDate(), iPlatformDate.getSysDate())) {
                 return new Message<AjaxResult>().fail().setMessage("只有当日的信用事件结算的存续期记录允许撤销！");
             }
             if (!StringUtil.equals(dto.getValidStatus(), DictCodeListExt1.有效状态_有效.getValue())) {

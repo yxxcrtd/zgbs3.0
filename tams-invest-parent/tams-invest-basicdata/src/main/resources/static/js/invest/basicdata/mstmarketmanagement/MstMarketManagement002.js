@@ -45,7 +45,6 @@ $(function() {
         });
     };
 	$("#oCodeNameStr").change(function (){
-		debugger
 		var data = $('#oCodeNameStr').select2('data')[0];
 		if (data){
 			$("#oCode").val(data.id);
@@ -62,14 +61,15 @@ $(function() {
 		$('#directionChange').attr('required',true);
     	// 债项评级
     	if (oType === MAIN_GRADE_TYPE_02){
-    		$("#gradeExpectation").val("");
-    		$("#directionChange").val("");
+    		$("#gradeExpectation").val('').textSelect('setValue','');
+			$("#directionChange").val('').textSelect('setValue','');
 			/*变动方向*/
 			$('#directionChange').attr('required',false);
 			$("#oCodeType01").hide();
 		}
 		$("#oCode").val('');
 		$("#oCodeName").val('');
+		$("#oCodeNameStr").val('').text('');
 		star();
 	});
 
@@ -80,6 +80,11 @@ $(function() {
 		if (pageModel === PAGE_MODEL_EDIT){
 			$("#oType").attr("disabled",true);
 			$("#oCodeNameStr").attr("disabled",true);
+		}
+		var oType = $("#oType").val();
+		// 债项评级
+		if (oType === MAIN_GRADE_TYPE_02){
+			$("#oCodeType01").hide();
 		}
 		// 绑定按钮事件
 		$('#MstMarketManagement002_btn_save').click(function() {

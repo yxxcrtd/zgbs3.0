@@ -774,4 +774,14 @@
 		WHERE
 			JGDDBH = #{applyTradeId}
 	</select>
+
+	<select id="getFinproduct" resultType="com.joyintech.tams.common.base.entity.FinProduct">
+		SELECT
+		<include refid="com.joyintech.tams.common.base.dao.FinProductMapper.Base_Column_List" />
+		FROM
+		FIN_PRODUCT
+		WHERE
+		FINPROD_MARKET_ID = #{finProdMarketId,jdbcType=VARCHAR}
+		AND FINPROD_TYPE2 = #{finprodType2,jdbcType=VARCHAR}
+	</select>
 </mapper>

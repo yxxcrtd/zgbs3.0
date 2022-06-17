@@ -20,6 +20,7 @@ import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
@@ -144,16 +145,18 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
                 || StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
             //根据指令代码获取指令信息
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(cfetsDto.getEntrustId());
-            //风控通过且投标量没有改高，不走流程直接更新原指令信息
-            if (StringUtil.equals(cfetsDto.getCfetsEtribdoRiskcalReturn().getRiskTrialSpan(), "试算通过")
-                    && etrEntrust != null
-                    && (cfetsDto.getTotalBiddingNum().compareTo(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100))) < 1)
-            ) {
-                CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
-                cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
-                AjaxResult m = new AjaxResult("一级指令修改直接通过成功！");
-                return new Message<AjaxResult>().success().setData(m);
+            cfetsDto.setEntrustStatus(etrEntrust.getEntrustStatus());
+            if (etrEntrust != null && !(StringUtil.equals(DictCodeList.委托状态_已退回.getValue(), etrEntrust.getEntrustStatus())
+                    || StringUtil.equals(DictCodeList.委托状态_已撤回.getValue(), etrEntrust.getEntrustStatus()))) {
+                //投标量没有改高，不走流程直接更新原指令信息
+                if (cfetsDto.getTotalBiddingNum().compareTo(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100))) < 1) {
+                    CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
+                    cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
+                    AjaxResult m = new AjaxResult("一级指令修改直接通过成功！");
+                    return new Message<AjaxResult>().success().setData(m);
+                }
             }
+
         }
 
         CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);

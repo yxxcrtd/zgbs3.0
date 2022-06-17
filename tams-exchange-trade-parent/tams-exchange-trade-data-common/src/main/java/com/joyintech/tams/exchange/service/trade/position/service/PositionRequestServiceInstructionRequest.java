@@ -609,7 +609,8 @@ public class PositionRequestServiceInstructionRequest {
                 bean = new PositionRequestBaseBean(entity);
                 bean.setPortfolioId(item.getPortfolioId());
                 bean.setCashAmount(item.getEntrustAmt());
-                bean.setSecAmount(BigDecimal.valueOf(item.getEntrustNum()));
+                BigDecimal entrustNum = commonPositionEngineService.multiplyWithOneHundred(item.getEntrustNum());
+                bean.setSecAmount(entrustNum);
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
                 map.put("etrSecAmount", item.getInstructionTotalAmt());

@@ -7,6 +7,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
@@ -19,6 +20,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -32,10 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 信用保护凭证标的
@@ -88,6 +87,8 @@ public class CreditProtectionCertificate001Controller extends BaseController {
         initPageParams.put("PAY_TYPE", this.getSelectDataFromDataDic(DictCode.支付方式, null));
         initPageParams.put("MARKET_INSTI_TYPE_SCA", this.getSelectDataFromDataDic(DictCode.市场机构机构类型, null));
         initPageParams.put("BASIS", this.getSelectDataFromDataDic(DictCode.计息基础, null));
+        //刷新时间
+        initPageParams.put("CreditProtectionCertificate001_list_refresh_period", CacheUtil.getSysParam("CreditProtectionCertificate001_list_refresh_period"));
         //交易日历
 
         //pageId
@@ -169,11 +170,19 @@ public class CreditProtectionCertificate001Controller extends BaseController {
                 parameter.setPageId("CreditProtectionCertificate002");
                 parameter.setBusinessDataPk1(entity.getFinprodMarketId());
                 if (creditProtectionCertificate001Service.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可删除!")));
+                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
+                Integer count = creditProtectionCertificate001Service.countFinprodIdUse(entity.getFinprodMarketId());
+                if (Objects.nonNull(count) && count > 0) {
+                    errorList.add(new ValidMessage("", getMessage("存在流程中/待执行指令交易数据!")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
+
             }
         }
         AjaxResult ajaxResult = commonCheck(result, "revoke");

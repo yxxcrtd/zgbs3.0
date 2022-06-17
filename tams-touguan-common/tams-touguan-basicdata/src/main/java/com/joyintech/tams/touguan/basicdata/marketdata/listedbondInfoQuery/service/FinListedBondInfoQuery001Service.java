@@ -284,6 +284,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProduct.setIsChl(DictCodeList.是否_否.getValue());
         finProduct.setIsRight(finListedBondInfoQuery001Dto.getIsBondsWithRights());
         finProduct.setRegistOrg(finListedBondInfoQuery001Dto.getRegisteredCustodian());
+        finProduct.setIsSus(finListedBondInfoQuery001Dto.getIssus());
         baseFinProductBaseInfoDto.setFinProduct(finProduct);
         //new标的类金融产品附属
         FinProductAdd finProductAdd = new FinProductAdd();
@@ -291,6 +292,9 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductAdd.setWindId(secId);
         finProductAdd.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         finProductAdd.setCrossMarket(DictCodeList.是否_否.getValue());
+        finProductAdd.setIsSecBond(finListedBondInfoQuery001Dto.getIssecbond());
+        finProductAdd.setOriginalOwner(finListedBondInfoQuery001Dto.getOriginalOwner());
+        finProductAdd.setGuaType(finListedBondInfoQuery001Dto.getGuartype());
         //面值
         finProductAdd.setFaceValue(finListedBondInfoQuery001Dto.getFaceValue());
         // 20200819 债券自动加券优化-判断城投债级别 wangwei end
@@ -327,6 +331,16 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setFinprodId(finProdId);
         finProductIssue.setIssueClass(finListedBondInfoQuery001Dto.getIssueMethod());
         finProductIssue.setTenderType(finListedBondInfoQuery001Dto.getBiddingMethod());
+        String issueMethod = finListedBondInfoQuery001Dto.getIssueMethod();
+        if ("0".equals(issueMethod)) {
+            finProductIssue.setTenderType(DictCodeListExt4.招标方式_单一价格招标.getValue());
+            finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        }else if("5".equals(issueMethod)){
+            finProductIssue.setTenderType(DictCodeListExt4.招标方式_数量招标.getValue());
+            finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        }else if("6".equals(issueMethod)){
+            finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_报价发行.getValue());
+        }
         finProductIssue.setTenderTarget(finListedBondInfoQuery001Dto.getTenderTarget());
         //计划发行量
         finProductIssue.setPlanIssueAmt(Objects.nonNull(finListedBondInfoQuery001Dto.getIssueSize()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssueSize()) : null);

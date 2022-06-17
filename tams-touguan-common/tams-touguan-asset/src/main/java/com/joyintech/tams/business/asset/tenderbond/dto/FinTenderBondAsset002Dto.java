@@ -234,7 +234,6 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
      */
     @ApiModelProperty(name="isRight",value="是否含权")
     private String isRight;
-
     /**
      * 本金收益特征
      */
@@ -1264,4 +1263,5 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
     public void setCirculationDate(Date circulationDate) {
         this.circulationDate = circulationDate;
     }
+
 }

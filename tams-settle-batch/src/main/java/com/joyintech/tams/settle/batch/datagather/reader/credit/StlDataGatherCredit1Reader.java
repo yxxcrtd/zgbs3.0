@@ -2,6 +2,7 @@ package com.joyintech.tams.settle.batch.datagather.reader.credit;
 
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.settle.batch.datagather.reader.StlDataGatherReader;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import java.util.Map;
 public class StlDataGatherCredit1Reader extends StlDataGatherReader {
     @Override
     protected void setSearchParam(Map<String, Object> searchParam) {
-        searchParam.put("busiType", DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
+        searchParam.put("busiType", DictCodeListStl.共通业务类型_信用保护凭证交易.getValue());
         searchParam.put("psList", Arrays.asList(DictCodeList.交易方向_买入.getValue(), DictCodeList.交易方向_卖出.getValue()));
     }
 

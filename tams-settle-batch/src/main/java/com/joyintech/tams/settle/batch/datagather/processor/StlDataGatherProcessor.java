@@ -8,10 +8,8 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
 import com.joyintech.tams.settle.batch.datagather.dao.StlDataGatherMapper;
 import com.joyintech.tams.settle.batch.datagather.dto.*;
@@ -69,9 +67,9 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
         List<SettleTransDataDto> reRankSettleTransDataList = this.reRankSettleTransDataList(settleTransDataList);
         // modify by etliu 20211227 start
         // GZYHTZJY-777:回售交易当日无法得到成交的清算数据，导致无法匹配到对应的上行委托或指令
-        // 筛选普通处理的成交明细汇总数据(除债回售、可转债申购、新股申购、配债、配股之外的数据)
+        // 筛选普通处理的成交明细汇总数据(除债回售、可转债申购、新股申购、配债、配股、一级投标债之外的数据)
         List<SettleTransDataDto> normalSettleTransDataList = filterNormalSettleTransDataList(reRankSettleTransDataList);
-        // 筛选需特殊处理的成交明细汇总数据(债回售、可转债申购、新股申购、配债、配股的数据)
+        // 筛选需特殊处理的成交明细汇总数据(债回售、可转债申购、新股申购、配债、配股、一级投标债的数据)
         List<SettleTransDataDto> specailSettleTransDataList = filterSpecialSettleTransDataList(reRankSettleTransDataList);
 
         // 需要更新状态的指令
@@ -80,12 +78,12 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
 
         List<ExchangeTransMatchCommonDto> exchangeTransMatchCommons = new ArrayList<>();
 
-        // 处理除债回售、可转债申购、新股申购、配债、配股之外的数据
+        // 处理除债回售、可转债申购、新股申购、配债、配股、一级投标债之外的数据
         this.handleNormalTrade(normalSettleTransDataList, exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
 
         // modify by etliu 20211227 start
         // GZYHTZJY-777:回售交易当日无法得到成交的清算数据，导致无法匹配到对应的上行委托或指令
-        // 债回售、可转债申购、新股申购、配债、配股需要特殊处理
+        // 债回售、可转债申购、新股申购、配债、配股、一级投标债需要特殊处理
         this.handleSpecailTrade(specailSettleTransDataList, exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
         // modify by etliu 20211227 end
 
@@ -126,6 +124,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 )
                         || StringUtil.equals(DictCodeListExt3.交易方向_配债.getValue(), x.getPs())
                         || StringUtil.equals(DictCodeListExt2.交易方向_配股.getValue(), x.getPs())
+                        || StringUtil.equals(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), x.getFinprodType2())
                 )
         ).collect(Collectors.toList());
     }
@@ -146,6 +145,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 )
                         || StringUtil.equals(DictCodeListExt3.交易方向_配债.getValue(), x.getPs())
                         || StringUtil.equals(DictCodeListExt2.交易方向_配股.getValue(), x.getPs())
+                        || StringUtil.equals(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), x.getFinprodType2())
                 )
         ).collect(Collectors.toList());
     }
@@ -296,7 +296,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
 
     // modify by etliu 20211227 start
     /**
-     * 债回售、可转债申购、新股申购、配债、配股需要特殊处理
+     * 债回售、可转债申购、新股申购、配债、配股、一级投标债需要特殊处理
      * @param specailSettleTransDataList
      * @param exchangeTransMatchCommons
      * @param needUpdateStatusEntrustIdList
@@ -308,7 +308,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             return;
         }
 
-        // 查询债回售、可转债申购、新股申购、配债、配股对应指令
+        // 查询债回售、可转债申购、新股申购、配债、配股、一级投标债对应指令
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("dataList", specailSettleTransDataList);
         paramMap.put("finprodTypeList", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), DictCodeListExt1.金融产品类型_投管用_股票.getValue()));
@@ -316,6 +316,24 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 DictCodeListExt3.交易方向_配债.getValue(), DictCodeListExt2.交易方向_配股.getValue()));
 
         List<EtrEntrustDto> etrEntrustDtoList = stlDataGatherMapper.selectSpecialEtrEntrustData(paramMap);
+
+        List<EtrEntrustDto> etrEntrustDtoFirstBondList = new ArrayList<>();
+        paramMap.put("finprodTypeList", Collections.singletonList(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()));
+        paramMap.put("psList", Collections.singletonList(DictCodeList.交易方向_买入.getValue()));
+        List<EtrEntrustDto> etrEntrustDtoList1 = stlDataGatherMapper.selectSpecialEtrEntrustData(paramMap);
+        if(CollectionUtils.isNotEmpty(etrEntrustDtoList1)){
+            for(EtrEntrustDto etrEntrustDto : etrEntrustDtoList1){
+                Map<String, Object> map = new HashMap<>();
+                map.put("entrustId", etrEntrustDto.getEntrustId());
+                map.put("BID_MODLE_03", DictCodeListExt4.投标方式_分销买入.getValue());
+                List<BidOrderBidPrice> bidPrices = stlDataGatherMapper.selectBidOrderBidPrices(map);
+                if(CollectionUtils.isNotEmpty(bidPrices)){
+                    etrEntrustDtoFirstBondList.add(etrEntrustDto);
+                }
+            }
+        }
+        etrEntrustDtoList.addAll(etrEntrustDtoFirstBondList);
+
         if (StringUtil.isEmptyList(etrEntrustDtoList)) {
             return;
         }
@@ -400,6 +418,20 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                             && DateUtil.compareTo(x.getEntrustDate(), currFinProductOthCode.getDeclaredEndDate()) <= 0).collect(Collectors.toList());
 
                     this.handleMatch(settleTransDataDto, resulstEntrustList, exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
+                }
+            }
+        }
+        // 债券一级投标
+        List<SettleTransDataDto> jytbSettleTransDataList = specailSettleTransDataList.stream().filter(
+                x -> StringUtil.equals(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), x.getFinprodType2())
+        ).collect(Collectors.toList());
+        if (!StringUtil.isEmptyList(jytbSettleTransDataList)) {
+            for (SettleTransDataDto settleTransDataDto: jytbSettleTransDataList)
+            {
+                String busiKey = StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(),settleTransDataDto.getPs()),"_");
+                if (etrEntrustMap.containsKey(busiKey)) {
+                    List<EtrEntrustDto> currEntrustList = etrEntrustMap.get(busiKey);
+                    this.handleMatch(settleTransDataDto, currEntrustList, exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
                 }
             }
         }

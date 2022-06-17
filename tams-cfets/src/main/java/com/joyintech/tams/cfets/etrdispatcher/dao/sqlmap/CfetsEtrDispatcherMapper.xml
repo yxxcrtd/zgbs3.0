@@ -17,9 +17,10 @@
         decode(ETR_ENTRUST.ENTRUST_STATUS,'09',1,'02',2,'03',3,'04',4,'06',5,'05',6,'07',7) entrustStatusOrder,
         case
         when FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01'  THEN
-        FIN_PRODUCT_ISSUE.ISSUE_DATE
-        else nvl(FIN_PRODUCT_ISSUE.ISSUE_DATE,FIN_PRODUCT_ISSUE.TENDER_EDATE)
-        end as issueDate,
+        to_char(FIN_PRODUCT_ISSUE.ISSUE_DATE, 'yyyy-mm-dd')
+        when FIN_PRODUCT_ISSUE.ISSUE_DATE is not null then to_char(FIN_PRODUCT_ISSUE.ISSUE_DATE, 'yyyy-mm-dd')
+        else to_char(FIN_PRODUCT_ISSUE.TENDER_SDATE,'yyyy-MM-dd') || '~' || to_char(FIN_PRODUCT_ISSUE.TENDER_EDATE,'yyyy-MM-dd')
+        end as issueDateStr,
         CASE WHEN FIN_PRODUCT_ISSUE.ISSUE_CLASS IN ('02', '03') THEN '01'
         ELSE NULL
         END AS firstBidStatus,
@@ -66,7 +67,7 @@
         /*nvl(btm1.OUTPUT_VALUE_1,btm.busi_type) busiTypePosition,*/
         CASE
         WHEN ETR_ENTRUST.TRADE_MARKET in  ('03','04') then ETR_ENTRUST_ADD.BUSI_TYPE_POSITION
-        else nvl(btm1.OUTPUT_VALUE_1,btm.busi_type) end busiTypePosition,
+        else btm.busi_type end busiTypePosition,
         nvl(SECT.sec_acct_name, ssai.sec_acct_name) secAcctId,
         DECODE( ETR_ENTRUST_ADD.SETTLE_SPREED, 0, '01', 1, '02', 2, '03')  AS settleSpeed,
         CASE WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN ('F01', 'F02', 'F03', 'F04', 'F05', 'F06', 'F09') THEN '' ELSE TO_CHAR(ETR_ENTRUST_ADD.TERM_DAYS)  END AS termDays,
@@ -297,15 +298,19 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON ETR_ENTRUST_ADD.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN SYS_USER su1 ON ETR_ENTRUST.INV_MANAGER_ID = su1.USER_NAME
         LEFT JOIN FIN_PRODUCT_ISSUE ON FIN_PRODUCT_ISSUE.FINPROD_ID  = FIN_PRODUCT.FINPROD_ID
-        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps, INPUT_VALUE_3 AS issueClass, OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
-            ON ETR_ENTRUST_ADD.ASSET_TYPE = btm.Finprod_Type_Tg AND ETR_ENTRUST.Ps = btm.ps  AND (btm.issueClass = FIN_PRODUCT_ISSUE.ISSUE_CLASS  OR btm.issueClass IS NULL )
-        LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm1 ON  ( ETR_ENTRUST.FINPROD_TYPE2 = btm1.INPUT_VALUE_2 OR  btm1.INPUT_VALUE_2 IS NULL)
-        AND ( ETR_ENTRUST.Ps = btm1.INPUT_VALUE_3 OR  btm1.INPUT_VALUE_3 IS NULL)
-        AND ( ETR_ENTRUST.TRADE_PLAT = btm1.INPUT_VALUE_1 OR  btm1.INPUT_VALUE_1 IS NULL)
+        LEFT JOIN FIN_PRODUCT_TYPE fpt ON fpt.FINPROD_ID = ETR_ENTRUST.FINPROD_ID
+        LEFT JOIN (select INPUT_VALUE_1  as Finprod_Type_Tg,
+        INPUT_VALUE_2  as ps,
+        INPUT_VALUE_3  as issueClass,
+        OUTPUT_VALUE_1 as busi_type
+        from FIN_PRODUCT_TYPE_CONFIG
+        where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
+        ON fpt.TYPE_8 = btm.Finprod_Type_Tg AND ETR_ENTRUST.Ps = btm.ps
+        AND ((FIN_PRODUCT.FINPROD_TYPE2 = 'F32' and btm.issueClass = FIN_PRODUCT_ISSUE.ISSUE_CLASS) or
+        FIN_PRODUCT.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
         LEFT JOIN (SELECT ENTRUST_ID, SUM(NVL(FINISH_AMT,0)) FINISH_AMT FROM ETR_FINISH_STATUS GROUP BY ENTRUST_ID) T10 ON ETR_ENTRUST.ENTRUST_ID = T10.ENTRUST_ID
         left join (select ENTRUST_ID,sum(nvl(FINISH_AMT,0)) as FINISH_AMT from ETR_FINISH_STATUS where ENTRUST_ID != TRADE_ID group by ENTRUST_ID) ETR_FINISH_STATUS_A
         on ETR_FINISH_STATUS_A.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
-        LEFT JOIN FIN_PRODUCT_TYPE fpt ON fpt.FINPROD_ID  = ETR_ENTRUST.FINPROD_ID
         LEFT JOIN (
             SELECT ENTRUST_ID,
                 wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID ) PORTFOLIO_ID,
@@ -401,8 +406,8 @@
                 AND fpt.TYPE_9  = #{TYPE_9}
             </if>
             <if test="busiTypePosition != null and busiTypePosition!='' ">
-                AND (btm.busi_type = #{busiTypePosition} OR btm1.OUTPUT_VALUE_1 = #{busiTypePosition}
-                    or ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = #{busiTypePosition}
+                AND (btm.busi_type = #{busiTypePosition}
+                or ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = #{busiTypePosition}
                 )
             </if>
             <if test="finprodMarketIdList != null and finprodMarketIdList.size()>0">
@@ -513,7 +518,7 @@
                     OR t.termDays||'' = #{search}
                     OR t.exeProgress||'' = #{search}
                     OR t.dealProgress||'' = #{search}
-                    OR TO_CHAR(t.issueDate,'yyyy-MM-dd') ||''= #{search}
+                    OR issueDateStr like '%' || #{search} || '%'
                     OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{search}
                     OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{year}||'-'||#{search}
                     OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{search}
@@ -1008,6 +1013,7 @@
     <select id="getEtrFxmrBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
             '02' firstBidStatus /*中标状态*/,
             BO.BID_ID   bidId,
             FP.FINPROD_ID finprodId,
@@ -1104,6 +1110,7 @@
         UNION ALL
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
+        #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
         '02' firstBidStatus /*中标状态*/,
         BO.BID_ID   bidId,
         FP.FINPROD_ID finprodId,
@@ -1201,6 +1208,7 @@
     <select id="getEtrSubBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(TFPDT.IS_CANCEL,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            #{BUSI_TYPE_POSITION_34} AS busiTypePosition,
             tpd.totle_trade_id totleTradeId,
             tpd.trade_id tradeId,
             FP.FINPROD_ID finprodId,
@@ -1250,6 +1258,7 @@
         UNION ALL
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
+        #{BUSI_TYPE_POSITION_34} AS busiTypePosition,
         tpd.totle_trade_id totleTradeId,
         tpd.trade_id tradeId,
         FP.FINPROD_ID finprodId,
@@ -1300,6 +1309,7 @@
     <select id="getEtrPrimaryBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(bo.IS_CANCEL,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
             CASE
                 WHEN brt.IS_WIN = 'Y' THEN '04'
                 WHEN brt.IS_WIN = 'N' THEN '03'
@@ -1386,6 +1396,7 @@
         UNION ALL
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
+        #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
         CASE
         WHEN brt.IS_WIN = 'Y' THEN '04'
         WHEN brt.IS_WIN = 'N' THEN '03'
@@ -1473,6 +1484,7 @@
     <select id="getEtrDispatcherFirstBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT
             decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+            #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
             tpd.totle_trade_id totleTradeId,
             tpd.trade_id tradeId,
             CASE
@@ -1587,6 +1599,7 @@
         union all
         SELECT
             #{TRADE_FLOW_STATUS01} effectFlag,
+            #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
             tpd.totle_trade_id totleTradeId,
             tpd.trade_id tradeId,
             CASE
@@ -2140,6 +2153,8 @@
         select T.effectiveStatus,
         T.firstBidStatus,
         T.bidId,
+        T.busiCode,
+        T.busiTypePosition,
         T.finprodId,
         T.finprodMarketId,
         T.finprodAbbr,
@@ -2186,6 +2201,8 @@
         WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
         END           AS firstBidStatus/*中标状态*/,
         bo.BID_ID         AS bidId/*投标编号*/,
+        bo.BID_ID AS busiCode/*业务编号*/,
+        eea.BUSI_TYPE_POSITION AS busiTypePosition,
         fp.FINPROD_ID  finprodId,
         fp.FINPROD_MARKET_ID finprodMarketId,
         fp.FINPROD_ABBR finprodAbbr,
@@ -2276,6 +2293,9 @@
         LEFT JOIN
         ETR_ENTRUST ee
         ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
+        LEFT JOIN
+        ETR_ENTRUST_ADD eea
+        ON ee.ENTRUST_ID = eea.ENTRUST_ID
         left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         left join (select listagg(t0.PORTFOLIO_ID, ',')
@@ -2310,6 +2330,8 @@
         WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
         END         AS firstBidStatus/*中标状态*/,
         bo.BID_ID       AS bidId/*投标编号*/,
+        bo.BID_ID AS busiCode/*业务编号*/,
+        eea.BUSI_TYPE_POSITION AS busiTypePosition,
         fp.FINPROD_ID  finprodId,
         fp.FINPROD_MARKET_ID finprodMarketId,
         fp.FINPROD_ABBR finprodAbbr,
@@ -2400,6 +2422,9 @@
         LEFT JOIN
         ETR_ENTRUST ee
         ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
+        LEFT JOIN
+        ETR_ENTRUST_ADD eea
+        ON ee.ENTRUST_ID = eea.ENTRUST_ID
         left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = bo.COUNTER_ID
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         left join (select listagg(t0.PORTFOLIO_ID, ',')
@@ -2431,6 +2456,8 @@
         T.effectiveStatus,
         T.firstBidStatus,
         T.bidId,
+        T.busiCode,
+        T.busiTypePosition,
         T.finprodId,
         T.finprodMarketId,
         T.finprodAbbr,
@@ -2588,6 +2615,7 @@
         /*ete.entrust_num entrustNum,*/
         case when eted.BUSI_TYPE_POSITION in ('EX017','EX005')  THEN round(ete.entrust_num/100,4)
         when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
+        when eted.BUSI_TYPE_POSITION in ('EX019') THEN round(ete.entrust_num/10000,4)
         else ete.entrust_num end entrustNum,
         case
         when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)

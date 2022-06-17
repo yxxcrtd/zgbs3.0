@@ -39,8 +39,8 @@ import java.util.Map;
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
 
-//@Component
-//@Aspect
+@Component
+@Aspect
 public class CfetsEntrustHanderAop {
     /**
      * 日志
@@ -117,8 +117,9 @@ public class CfetsEntrustHanderAop {
             } else if (StringUtil.isNotEmpty(outputDto.getConfirmMsg())) {
                 result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
                 if(StringUtil.equals(outputDto.getRskStatus(),试算结果_风险审批.getValue())) {
-                    result.setData(是否_是);
+                    result.setData(是否_是.getValue());
                 }
+                result.setData(是否_是.getValue());
                 ajaxResultMessage.setData(result);
             }
         } catch (Exception e) {

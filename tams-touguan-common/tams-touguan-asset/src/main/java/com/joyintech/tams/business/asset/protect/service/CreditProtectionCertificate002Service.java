@@ -21,6 +21,7 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -31,16 +32,20 @@ import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,6 +91,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
 
     @Autowired
     private JoyinFSMapper joyinFSMapper;
+
+    @Autowired
+    private CommonBusinessService commonBusinessService;
 
     /**
      * 保存操作类型
@@ -152,6 +160,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         dto.setFinprodId(getFinprodId(dto));
         FinProduct finProduct = new FinProduct();
         BeanUtil.copyPropertiesIgnoreNull(finProduct, dto);
+        //add wsz ZGCPCN-1460 修改默认币种为 CNY（人名币） satrt
+        finProduct.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+        //add wsz ZGCPCN-1460 修改默认币种为 CNY（人名币） end
         finProductMapper.insert(finProduct);
         //2.保存金融产品标的附属表
         FinProductAdd productAdd = new FinProductAdd();
@@ -406,6 +417,37 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         return entity;
     }
 
+    public CreditProtectionCertificate002Dto getProcessEntity(CreditProtectionCertificate002Dto entity){
+        //add wsz 修改现实问题 ZGCPCN-1356 start
+        CreditProtectionCertificate002Dto entity2 = null;
+        if(StringUtil.isNotEmpty(entity.getFinprodId())) {
+            entity2 = this.getById(entity.getFinprodId());
+        }
+        if(!Objects.isNull(entity2)){
+            BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
+        } else {
+            entity.setRefSecList(this.getRefList(entity));
+            entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
+            entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
+            List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
+            MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
+            mstFileInputParameter.setFileList(uploadInfo);
+            mstFileInputParameter.setBussinessId(entity.getFinprodId());
+            entity.setMstFileInputParameter(mstFileInputParameter);
+        }
+        if(StringUtils.isNotEmpty(entity.getFinprodMarketId())&&!entity.getFinprodMarketId().contains(".")){
+            String markId = "";
+            if(StringUtils.isEmpty(entity.getTradeMarketId())){
+                markId = ".";
+            } else {
+                markId = entity.getTradeMarketId();
+            }
+            entity.setFinprodMarketId(entity.getFinprodMarketId()+markId);
+        }
+        //add wsz 修改现实问题 ZGCPCN-1356 end
+        return entity;
+    }
+
     public String getRefList(CreditProtectionCertificate002Dto entity){
         if(!StringUtils.isNotEmpty(entity.getRefSec())){
             return null;
@@ -483,21 +525,52 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());
                 if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
-                    validList.add(new ValidMessage("资产代码已存在"));
+                    validList.add(new ValidMessage("资产代码不能重复！"));
                 }
                 String finprodId = getFinprodId(dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
                 if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
-                    validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+                    validList.add(new ValidMessage("资产代码不能重复！"));
+                }
+            }
+        }
+        if (StringUtil.equals(operateType, "submit") && !Objects.equals(dto.getOperateStatus(),OperationType.MODIFY.name())) {
+            this.emptyCheck(dto, validList);
+            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码不能重复！"));
+                }
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("资产代码不能重复！"));
                 }
             }
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             this.emptyCheck(dto, validList);
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",DictCodeList.是否_否.getValue());
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
+            }
+            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码不能重复！"));
+                }
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("资产代码不能重复！"));
+                }
             }
         }
         return validList;
@@ -517,16 +590,25 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),null);
-            if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",DictCodeList.是否_否.getValue());
+            map.put("ps",null);
+            int transInAsset = commonBusinessService.isTransInAsset(dto.getFinprodId());
+            int count = creditProtectionCertificateMapper.countForInProcess(dto.getFinprodId());
+            if (transInAsset> 0 ||  count > 0) {
+                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
             }
         }
         if (StringUtil.equals(operateType, OperationType.DELETE.name())) {
             //删除时，需要判断当前资产是否存在指令及交易数据，如存在，则不允许删除；
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(dto.getFinprodId(), null,null);
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId",dto.getFinprodId());
+            map.put("isCancel",null);
+            map.put("ps",null);
+            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可删除"));
             }
         }
         return validList;
@@ -539,6 +621,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      * @return
      */
     public String getFinprodId(CreditProtectionCertificate002Dto dto) {
+        if(!dto.getFinprodMarketId().contains(".")){
+            return String.format("%s_%s%s", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),dto.getFinprodMarketId(),dto.getTradeMarketId());
+        }
         return String.format("%s_%s", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),dto.getFinprodMarketId());
     }
 
@@ -575,4 +660,38 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         ValidUtils.valid(dto, validList);
     }
 
+    /**
+     * 检查资产是否存在成交数据
+     * @param finprodId
+     * @return
+     */
+    public int checkAssertOnDealed(String finprodId) {
+        return creditProtectionCertificateMapper.checkAssertOnDealed(finprodId);
+    }
+
+    public MultipartFile downloadFileInfo(String seqNo) throws FileNotFoundException {
+        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
+        File pathFile = new SafelyFile(file.getPath());
+        MultipartFile multipartFile = createMultipartFile(pathFile);
+        return multipartFile;
+    }
+
+    private MultipartFile createMultipartFile(File file) {
+        try {
+            FileItem fileItem = null;
+            MultipartFile multipartFile = null;
+            fileItem = new DiskFileItem(file.getName(), Files.probeContentType(file.toPath()),
+                    false, file.getName(), (int) file.length(), file.getParentFile());
+            InputStream input = new FileInputStream(file);
+            OutputStream os = fileItem.getOutputStream();
+            IOUtils.copy(input, os);
+            multipartFile = new CommonsMultipartFile(fileItem);
+            os.close();
+            input.close();
+            return multipartFile;
+        } catch (Exception e) {
+            e.getStackTrace();
+            throw new RuntimeException("File转MultipartFile失败");
+        }
+    }
 }

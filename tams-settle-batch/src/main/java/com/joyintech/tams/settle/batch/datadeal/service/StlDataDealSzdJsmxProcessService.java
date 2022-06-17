@@ -309,7 +309,7 @@ public class StlDataDealSzdJsmxProcessService {
 						// 业务场景明细分类
 						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_分销_结果.getValue());
 						// 金融产品代码
-						settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()+szdJsmx.getZqdm1()+".SH");
+						settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm1()+".SH");
 						// 金融产品类型(估值核算)
 						settleTransData.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
 						// 金融产品类型(投管分类)
@@ -2052,7 +2052,7 @@ public class StlDataDealSzdJsmxProcessService {
 				}
 
 				// 交易份额
-				settleTransData.setShareAmt(new BigDecimal(szdJsmx.getCjsl()).abs());
+				settleTransData.setShareAmt(ArithmeticUtil.multiply(new BigDecimal(szdJsmx.getSl()).abs(), new BigDecimal(100)));
 				// 全价总额
 				settleTransData.setFpriceAmt(new BigDecimal(szdJsmx.getQsje()).abs());
 
@@ -2082,7 +2082,7 @@ public class StlDataDealSzdJsmxProcessService {
 				// 交易平台
 				settleTransData.setTradePlat(null);
 				//普通二级市场交易业务
-				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02)){
+				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03)){
 					// 交易方向
 					if(StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())){
 						settleTransData.setPs(DictCodeList.交易方向_买入.getValue());

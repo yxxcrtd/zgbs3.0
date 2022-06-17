@@ -169,11 +169,24 @@ public class CfgDataTableService {
         CfgDataTableShowFlag flag = cfgDataTableFlagMapper.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodes, userId);
         if (null == flag) {
 //            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_NO, USER_ID,showInvaimOrBussinssmodel);
-            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_NO, USER_ID,null);
+            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_NO, USER_ID, null);
         } else {
 //            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_IS, userId,showInvaimOrBussinssmodel);
-            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_IS, userId,null);
+            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_IS, userId, null);
         }
         return list;
+    }
+
+
+    /**
+     * 根据pageCode，dtCode和spcdCode查询页面展示设置
+     *
+     * @param pageCode
+     * @param dtCode
+     * @param spcdCodes
+     * @return
+     */
+    public List<CfgDataTableShow> getBySpcdCodesshowInvaim(String pageCode, String dtCode, List<String> spcdCodes) {
+        return cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_NO, USER_ID, null);
     }
 }

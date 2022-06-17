@@ -169,8 +169,15 @@
         ETR_ENTRUST.ENTRUST_ID = ETR_ENTRUST_ADD.ENTRUST_ID
         LEFT JOIN OPT_TARGET_INFO ON ETR_ENTRUST_ADD.ASSET_TYPE_10 = OPT_TARGET_INFO.TARGET_ID
         <if test="userId != null and userId!='' ">
+            LEFT JOIN (
+            select ENTRUST_ID ,PORTFOLIO_ID
+            from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY
+            ol.ENTRUST_ID) ds
+            from ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1 ) det2 ON det2.ENTRUST_ID =
+            ETR_ENTRUST.ENTRUST_ID
             INNER JOIN PTL_PORTFOLIO_AUTHORITY
-            ON PTL_PORTFOLIO.PORTFOLIO_ID = PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID
+            ON (PTL_PORTFOLIO.PORTFOLIO_ID = PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID OR
+            PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID = det2.PORTFOLIO_ID)
         </if>
         /*LEFT JOIN (SELECT listagg(BID_PRICE, ',') within group (order by BID_PRICE) BID_PRICE,
         ENTRUST_ID as ENTRUST_ID FROM ETR_ENTRUST_BID_PRICE GROUP BY ENTRUST_ID) EEBP
@@ -467,8 +474,14 @@
         AND (WFL_ETR_ENTRUST.Ps = btm.INPUT_VALUE_3 OR btm.INPUT_VALUE_3 is null)
         AND (WFL_ETR_ENTRUST.TRADE_PLAT = btm.INPUT_VALUE_1 OR btm.INPUT_VALUE_1 IS NULL)
         <if test="userId != null and userId!='' ">
+            LEFT JOIN (select ENTRUST_ID ,PORTFOLIO_ID
+            from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY
+            ol.ENTRUST_ID) ds
+            from WFL_ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1 ) det2 ON det2.ENTRUST_ID =
+            WFL_ETR_ENTRUST.ENTRUST_ID
             INNER JOIN PTL_PORTFOLIO_AUTHORITY
-            ON PTL_PORTFOLIO.PORTFOLIO_ID = PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID
+            ON (PTL_PORTFOLIO.PORTFOLIO_ID = PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID OR
+            PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID = det2.PORTFOLIO_ID)
         </if>
        /* LEFT JOIN (SELECT listagg(BID_PRICE, ',') within group (order by BID_PRICE) BID_PRICE,
         ENTRUST_ID as ENTRUST_ID FROM ETR_ENTRUST_BID_PRICE GROUP BY ENTRUST_ID) EEBP
@@ -1656,16 +1669,16 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
         LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
-        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID  = fpt.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on tpd.FINPROD_ID = FTP.FINPROD_ID
         left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
+        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
-        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND	BO.BID_ID = BRT.BID_ID
+        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = BRT.BID_ID
         LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID = #{entrustId}
-        WHERE tpd.TRADE_ID  = (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
-        OR tpd.B_TRADE_ID = (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
+        WHERE tpd.TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
+        OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
         union all
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
@@ -1679,16 +1692,16 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
         LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
-        LEFT JOIN FIN_PRODUCT_TYPE fpt  ON tpd.FINPROD_ID = fpt.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on tpd.FINPROD_ID = FTP.FINPROD_ID
         left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
+        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
-        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND	BO.BID_ID = BRT.BID_ID
+        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = BRT.BID_ID
         LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID = #{entrustId}
-        WHERE tpd.TRADE_ID  = (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
-        OR tpd.B_TRADE_ID = (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
+        WHERE tpd.TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
+        OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
     </select>
 
     <sql id="etrDispatcherDealListInfo">

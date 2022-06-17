@@ -1703,4 +1703,16 @@
 			AND std.SETTLE_SPEED = #{ACCOUNT_SPEED_01}
 		</where>
 	</select>
+
+	<select id="selectBidOrderBidPrices" resultType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
+		SELECT
+			bobp.ENTRUST_ID
+		FROM
+			BID_ORDER_BID_PRICE bobp
+		LEFT JOIN
+			BID_ORDER bo ON bobp.BID_ID = bo.BID_ID
+		WHERE
+			bobp.ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
+			AND bo.BID_MODLE = #{BID_MODLE_03}
+	</select>
 </mapper>

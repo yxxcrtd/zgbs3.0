@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
 /**
@@ -62,6 +63,9 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
         resultMap.put("userId", LoginUserUtil.getUserName());
 //        resultMap.put("computerId","");
         resultMap.put(TOTAL_TRADE_ID, entity.getBusiCode());
+        if (系统动作_修改.getValue().equals((String) resultMap.get("decisionAct"))) {
+            resultMap.put(B_TOTAL_TRADE_ID, entity.getBusiCode());
+        }
         resultMap.put("modelType", DictCodeListExt1.子系统代码_交易.getValue());
 
         String balanceCheck = "Y";
@@ -70,7 +74,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
         }
 
         resultMap.put("balanceCheck", balanceCheck);
-        resultMap.put(BUSI_TYPE, DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
+        resultMap.put(BUSI_TYPE, DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue());
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_交易登记.getValue());
         if (StringUtil.equals(entity.getPaBussType(), DictCodeListExt1.平安业务类型_到期.getValue())) {
             resultMap.put(PS, DictCodeList.交易方向_到期.getValue());
@@ -82,7 +86,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
 
         resultMap.put(WORK_FLOW_ID, entity.getWorkflowId());
         resultMap.put("ceSettleType", entity.getSettleMethod());
-        resultMap.put("cDate", DateUtil.format(entity.getTradeDate()));
+        resultMap.put("cdate", DateUtil.format(entity.getTradeDate()));
         resultMap.put(CCY, DictCodeList.币种_人民币_CNY.getValue());
 
         List<Map<String, Object>> ptlList = new ArrayList<>();
@@ -101,15 +105,18 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
             ptlList.add(ptl);
             if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
                 Map<String, Object> ptlSub = new HashMap<>();
-                ptlSub.put("portfolioId", baseBussinessDto.getTrdProductDeal().getPortfolioId());
-                ptlSub.put(FINPROD_ID, baseBussinessDto.getTrdProductDeal().getFinprodId());
-                ptlSub.put("tradeId", baseBussinessDto.getTrdProductDeal().getTradeId());
-                ptlSub.put("secAcctId", baseBussinessDto.getTrdProductDeal().getSecManageAcctId());
-                ptlSub.put("secAmount", baseBussinessDto.getTrdProductDeal().getShareAmt());
+                ptlSub.put("portfolioId", baseBussinessDto.getTrdProductDeal2().getPortfolioId());
+                ptlSub.put(FINPROD_ID, baseBussinessDto.getTrdProductDeal2().getFinprodId());
+                ptlSub.put("tradeId", baseBussinessDto.getTrdProductDeal2().getTradeId());
+                ptlSub.put("secAcctId", baseBussinessDto.getTrdProductDeal2().getSecManageAcctId());
+                ptlSub.put("secAmount", baseBussinessDto.getTrdProductDeal2().getShareAmt());
+                ptlSub.put(OWN_SEC_AMOUNT, baseBussinessDto.getTrdProductDeal2().getShareAmt());
                 ptlSubList.add(ptlSub);
             }
         }
+        if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
+            resultMap.put(PTL_SUB_LIST, ptlSubList);
+        }
         resultMap.put(PTL_LIST, ptlList);
-        resultMap.put(PTL_SUB_LIST, ptlSubList);
     }
 }

@@ -51,7 +51,7 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
         initPageParams.put("BASIS", this.getSelectDataFromDataDic(DictCode.计息基础, null));
         initPageParams.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
         initPageParams.put("EXEC_MODE", this.getSelectDataFromDataDic(DictCode.行权方式, null));
-        initPageParams.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.募集方式, null));
+        initPageParams.put("RAISE_TYPE_BOND", this.getSelectDataFromDataDic(DictCode.债券类资产募集方式, null));
         initPageParams.put("BLN_AREA", this.getSelectDataFromDataDic(DictCode.境内外, null));
         initPageParams.put("CYY", this.getSelectDataFromDataDic(DictCode.币种, null));
         initPageParams.put("MAIN_GRADE_RESULT", this.getSelectDataFromDataDic(DictCode.评级结果, null));
@@ -63,7 +63,7 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
         initPageParams.put("CALC_RULE", this.getSelectDataFromDataDic(DictCode.推算方式, null));
         initPageParams.put("CASH_CLASS_TYPE", this.getSelectDataFromDataDic(DictCode.现金流类型, null));
         initPageParams.put("SVR_BASIS_TYPE", this.getSelectDataFromDataDic(DictCode.基准利率, null));
-        initPageParams.put("SVR_GUA_TYPE", this.getSelectDataFromDataDic(DictCode.担保方式, null));
+        initPageParams.put("SVR_GUA_TYPE", this.getSelectDataFromDataDic(DictCode.新债_担保方式, null));
         initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
         initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));

@@ -60,10 +60,10 @@ public interface CreditProtectionCertificateMapper {
     /**
      * 删除时判断金融产品代码是否使用过
      *
-     * @param finprodId
+     * @param
      * @return
      */
-    Integer countFinprodIdUse(@Param("finprodId") String finprodId, @Param("isCancel") String isCancel, @Param("ps") String ps);
+    Integer countFinprodIdUse(Map<String, Object> map);
 
     /**
      * 根据行内三级分类获取wind分类
@@ -73,4 +73,7 @@ public interface CreditProtectionCertificateMapper {
     FinProductTypeConfig getWindType(FinProductTypeConfig param);
 
 
+    int countForInProcess(@Param("finprodId") String finprodId);
+
+    int checkAssertOnDealed(String finprodId);
 }

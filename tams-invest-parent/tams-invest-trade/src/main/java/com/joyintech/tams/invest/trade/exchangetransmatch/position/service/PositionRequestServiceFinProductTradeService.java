@@ -166,7 +166,7 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         pltMap.put("etrId", trdProductDealAdd.getEntrustId());
         EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
         if(etrEntrust != null){
-            pltMap.put("etrSecAmount", ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), new BigDecimal(100)));
+            pltMap.put("etrSecAmount", etrEntrust.getEntrustNum());
         }
         pltMap.put("ordId", null);
         pltMap.put("ordSecAmount", null);
@@ -177,11 +177,11 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         pltMap.put("cashAcctId", exchangeTransMatchCommonMapper.queryAccountNo(dealEntity.getSecManageAcctId()));
         // ZGTFCP-1699: 修改资金账户赋值 modify by fuyongsheng 20220323 end
         pltMap.put("secAcctId", dealEntity.getSecManageAcctId());
-        pltMap.put("secAmount", ArithmeticUtil.multiply(dealEntity.getShareAmt(), new BigDecimal(100)));
+        pltMap.put("secAmount", dealEntity.getShareAmt());
         pltMap.put("cashAmount", dealEntity.getTradeAmt());
         pltMap.put("invAim", dealEntity.getInvAim());
         pltMap.put("integrateSecAmount", BigDecimal.ZERO);
-        pltMap.put("ownSecAmount", ArithmeticUtil.multiply(dealEntity.getShareAmt(), new BigDecimal(100)));
+        pltMap.put("ownSecAmount", dealEntity.getShareAmt());
         ptlList.add(pltMap);
         resultMap.put("ptlList", ptlList);
     }
@@ -400,8 +400,6 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         resultMap.put(BUSI_ACT, getBusiAct(trdProductDeal));
         resultMap.put(PS, trdProductDeal.getPs());
         resultMap.put(TRADE_PLACE, trdProductDeal.getTradeMarket());
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建);
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建);
         resultMap.put(WORK_FLOW_ID, trdProductDeal.getWorkflowId());
         resultMap.put("ceSettleType", null);
         resultMap.put("cdate", DateUtil.format(trdProductDeal.getTradeDate()));

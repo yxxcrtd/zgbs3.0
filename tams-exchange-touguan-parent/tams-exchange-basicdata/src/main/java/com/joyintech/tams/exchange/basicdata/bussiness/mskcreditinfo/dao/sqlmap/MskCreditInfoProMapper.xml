@@ -299,6 +299,14 @@
         order by pm.create_time desc
     </select>
 
+    <select id="getPrice" parameterType="Map" resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+        SELECT
+            max( MDPRICE ) MDPRICE
+        FROM
+            MST_CREDIT_MARKET_INFO
+        WHERE
+            SECID=#{secid,jdbcType=VARCHAR} and CDATE &lt;= #{nowDate,jdbcType=VARCHAR}
+    </select>
 
     <select id="getBasicInfo" parameterType="Map" resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
              SELECT

@@ -41,6 +41,10 @@ public class NodeConfigConstant {
      */
     public static final String TRADE_PLACE = "tradePlace";
     /**
+     * 投标结果 数据字典 DictCode.是否
+     */
+    public static final String BID_RESULT = "bidResult";
+    /**
      * 交易方向 数据字典 DictCode.交易方向
      */
     public static final String PS = "ps";
@@ -60,6 +64,11 @@ public class NodeConfigConstant {
      * 场内现券
      */
     public static final String BOND002 = "Bond002";
+
+    /**
+     * 质押式双边回购
+     */
+    public static final String REPO001 = "REPO001";
     /**
      * 质押式回购
      */

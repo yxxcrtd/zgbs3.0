@@ -130,20 +130,22 @@ public class PositionRequestServiceTradSaveCpcRequest {
             fillAttributes(entity);
             for (EtrExchangeTradePortfolioSecRepoRequest item : entity.getPortfolioList()) {
                 bean = new PositionRequestBaseBean(item);
-                BigDecimal price = Objects.isNull(entity.getPrice()) ? new BigDecimal(0) : entity.getPrice();
-                bean.setCashAmount(price.multiply(item.getEntrustNum()).setScale(2, RoundingMode.HALF_UP));
-                BigDecimal secAmount = commonPositionEngineService.getSecAmountByBondUnit(item.getEntrustNum());
-                bean.setSecAmount(secAmount.setScale(2, RoundingMode.HALF_UP));
+//                BigDecimal price = Objects.isNull(entity.getPrice()) ? new BigDecimal(0) : entity.getPrice();
+//                bean.setCashAmount(price.multiply(item.getEntrustNum()).setScale(2, RoundingMode.HALF_UP));
+//                BigDecimal secAmount = commonPositionEngineService.getSecAmountByBondUnit(item.getEntrustNum());
+//                bean.setSecAmount(secAmount.setScale(2, RoundingMode.HALF_UP));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
-                map.put("etrSecAmount", entity.getEntrustNum());
+                map.put("etrSecAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
+                map.put("secAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
                 map.put("tradeId", "");
                 ptlList.add(map);
+
                 Map<String, Object> map2 = new HashMap<>();
                 map2.put("portfolioId", bean.getPortfolioId());
                 map2.put("finprodId", bean.getFinprodId());
                 map2.put("secAcctId", bean.getSecAcctId());
-                map2.put("secAmount", bean.getSecAmount());
+                map2.put("secAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
                 map2.put("tradeId", "");
                 ptlSubList.add(map2);
             }

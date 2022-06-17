@@ -53,8 +53,10 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,11 +67,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -1692,15 +1692,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         return finBondAssetMapper.isTransInAssetTwo(finprodId);
     }
 
-    public MultipartFile downloadFileInfo(String seqNo) {
+    public MultipartFile downloadFileInfo(String seqNo) throws FileNotFoundException {
         SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
         File pathFile = new SafelyFile(file.getPath());
-        FileItem fileItem = createFileItem(pathFile, pathFile.getName());
-        MultipartFile multipartFile = null;
-        //  生成文件夹
-        if (pathFile.exists()){
-            multipartFile = new CommonsMultipartFile(fileItem);
-        }
+        MultipartFile multipartFile = createMultipartFile(pathFile);
         return multipartFile;
     }
 
@@ -1721,5 +1716,24 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             e.printStackTrace();
         }
         return item;
+    }
+
+    private MultipartFile createMultipartFile(File file) {
+        try {
+            FileItem fileItem = null;
+            MultipartFile multipartFile = null;
+            fileItem = new DiskFileItem(file.getName(), Files.probeContentType(file.toPath()),
+                    false, file.getName(), (int) file.length(), file.getParentFile());
+            InputStream input = new FileInputStream(file);
+            OutputStream os = fileItem.getOutputStream();
+            IOUtils.copy(input, os);
+            multipartFile = new CommonsMultipartFile(fileItem);
+            os.close();
+            input.close();
+            return multipartFile;
+        } catch (Exception e) {
+            e.getStackTrace();
+            throw new RuntimeException("File转MultipartFile失败");
+        }
     }
 }

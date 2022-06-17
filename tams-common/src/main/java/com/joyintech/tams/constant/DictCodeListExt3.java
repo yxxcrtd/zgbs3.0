@@ -1641,13 +1641,13 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     项目类计提区间倒减方式_倒减科目余额(DictCode.项目类计提区间倒减方式,"01","倒减科目余额"),
 	项目类计提区间倒减方式_倒减前一日计算结果(DictCode.项目类计提区间倒减方式,"02","倒减前一日计算结果"),
 	//20210922 从DictCodeList迁移过来  by yflv end
-	
+
 	//20211008 从DictCodeList迁移过来  by yflv start
 	估值来源_第三方估值_OTH(DictCode.估值来源,"OTH","第三方估值(OTH)"),
 	估值市价_第三方估值(DictCode.估值市价, "13", "第三方估值"),
 	评级对象显示类型_发行人评级(DictCode.评级对象显示类型,"91","发行人评级"),
 	//20211008 从DictCodeList迁移过来  by yflv end
-	
+
 	//20211213 从DictCodeList迁移过来  by yflv start
 	CSTP资产类型_现券买卖(DictCode.CSTP资产类型,"BOND","现券买卖"),
 	CSTP资产类型_质押式回购(DictCode.CSTP资产类型,"REPO","质押式回购"),
@@ -1665,7 +1665,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     对账状态结果_待处理(DictCode.对账状态结果,"2","待处理"),
     对账状态结果_手工完成(DictCode.对账状态结果,"3","手工完成"),
     //add by chenjiaxing 20211015 end
-	
+
 	下行交易匹配状态_未匹配(DictCode.下行交易匹配状态,"0","未匹配"),
     下行交易匹配状态_部分匹配(DictCode.下行交易匹配状态,"1","部分匹配"),
     下行交易匹配状态_匹配完成(DictCode.下行交易匹配状态,"2","匹配完成"),
@@ -1729,7 +1729,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     头寸业务类型_证银转账(DictCode.头寸业务类型, "33", "证银转账"),
     头寸业务类型_债券一级申购(DictCode.头寸业务类型, "34", "债券一级申购"),
     头寸业务类型_信用保护凭证交易(DictCode.头寸业务类型, "35", "信用保护凭证交易"),
-
+    头寸业务类型_信用保护凭证存续期(DictCode.头寸业务类型, "36", "信用保护凭证存续期"),
     /**
      * 头寸业务动作
      */
@@ -1776,7 +1776,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     资产类型_在途资金(DictCode.头寸资产类型, "C_08", "在途资金"),
     资产类型_手工调整资金(DictCode.头寸资产类型, "C_09", "手工调整资金"),
     资产类型_实时净申赎资金(DictCode.头寸资产类型, "C_10", "实时净申赎资金"),
-    
+
     资产类型_资产账户持仓(DictCode.头寸资产类型,"A_001","资产账户持仓"),
 
 
@@ -1837,6 +1837,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     资产类型_通用回购融资券可用持仓(DictCode.头寸资产类型,"A_148","通用回购融资券可用持仓"),
     资产类型_通用回购融资券折算前额度(DictCode.头寸资产类型,"A_158","资产类型_通用回购融资券折算前额度"),
     资产类型_通用回购融资券折算后额度(DictCode.头寸资产类型,"A_159","资产类型_通用回购融资券折算后额度"),
+    资产类型_场内信用保护凭证可用持仓(DictCode.头寸资产类型,"A_160","资产类型_场内信用保护凭证可用持仓"),
 
 
 
@@ -1970,10 +1971,10 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
 
     平安业务类型_质押式正回购到期(DictCode.平安业务类型,"52","质押式正回购到期"),
     平安业务类型_质押式逆回购到期(DictCode.平安业务类型,"51","质押式逆回购到期"),
-    
+
     共通业务类型_可转债申购交易(DictCode.共通业务类型,"TRD62","可转债申购交易"),
     持仓类型_场内上市前冻结(DictCode.持仓类型,"15","场内上市前冻结"),
-    
+
     产品数据来源_母行代销TA(DictCode.产品数据来源, "01", "母行代销TA"),
 	产品数据来源_三方分销TA(DictCode.产品数据来源, "02", "三方分销TA"),
 	结算方式_头寸引擎_净额结算(DictCode.结算方式_头寸引擎, "01", "净额结算"),

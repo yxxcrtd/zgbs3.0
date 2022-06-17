@@ -7,10 +7,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListStl;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -86,6 +83,8 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
                 baseTradeProductDealDto.setTrdDealTotalAdd(this.generateDealTotalAdd(entrustDtoTmp,baseTradeProductDealDto.getTrdFinProductDealTotal()));
                 //生成金融产品交易信息
                 baseTradeProductDealDto.setTrdProductDeal(this.genTrdProductDeal(transDto,entrustDtoTmp,baseTradeProductDealDto.getTrdFinProductDealTotal()));
+                //生成金融产品交易附属表信息
+                baseTradeProductDealDto.setTrdProductDealAdd(this.genTrdProductDealAdd(transDto,entrustDtoTmp,baseTradeProductDealDto.getTrdProductDeal()));
                 //生成组合交易表数据
                 baseTradeProductDealDto.setPtlTrade(this.generatePtlTrade(entrustDtoTmp,baseTradeProductDealDto.getTrdProductDeal()));
                 //生成费用信息list
@@ -105,6 +104,8 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
             baseTradeProductDealDto.setTrdDealTotalAdd(this.generateDealTotalAdd(entrustDto,baseTradeProductDealDto.getTrdFinProductDealTotal()));
             // TODO 生成金融产品交易信息
             baseTradeProductDealDto.setTrdProductDeal(this.genTrdProductDeal(transDto,entrustDto,baseTradeProductDealDto.getTrdFinProductDealTotal()));
+            //生成金融产品交易附属表信息
+            baseTradeProductDealDto.setTrdProductDealAdd(this.genTrdProductDealAdd(transDto,entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
             // TODO 生成组合交易表数据
             baseTradeProductDealDto.setPtlTrade(this.generatePtlTrade(entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
             // TODO 生成费用信息list
@@ -282,14 +283,7 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
         calcFeeAmtPay(transDto, entrustDto,trdProductDeal);
         // 交易方向
         trdProductDeal.setPs(entrustDto.getPs());
-        // 到期收益率和行权收益率
-        this.calc(trdProductDeal);
         trdProductDeal.setTgBusiType(getTgBusiType(entrustDto.getPs()));
-
-        // 到期收益率
-        trdFinProductDealTotal.setYield(trdProductDeal.getYield());
-        // 行权收益率
-        trdFinProductDealTotal.setExerYield(trdProductDeal.getExerYield());
 
         return trdProductDeal;
     }
@@ -307,16 +301,11 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
     public TrdProductDeal createProductDeal(ExchangeTransMatchCommonDto transDto, ExchangeTransMatchCommonEntrustDto entrustDto,TrdFinProductDealTotal trdFinProductDealTotal) {
         TrdProductDeal trdProductDeal = new TrdProductDeal();
         BussinessCodeParameter codeParameter = new BussinessCodeParameter();
-        if (entrustDto.getPs().equals(DictCodeList.交易方向_买入.getValue())) {
-            codeParameter.setCommonBusinessType(DictCodeListStl.业务场景分类明细_信用保护凭证_买入);
-        }
-        if (entrustDto.getPs().equals(DictCodeList.交易方向_卖出.getValue())) {
-            codeParameter.setCommonBusinessType(DictCodeListStl.业务场景分类明细_信用保护凭证_卖出);
-        }
+        codeParameter.setCommonBusinessType(DictCodeListExt2.共通业务类型_信用保护凭证交易);
         // 交易编号
         trdProductDeal.setTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
         // 业务类型
-        trdProductDeal.setBusiType(null);
+        trdProductDeal.setBusiType(transDto.getBusiType());
         // 金融产品代码
         trdProductDeal.setFinprodId(entrustDto.getFinprodId());
         // 金融产品类型（投管分类）
@@ -440,59 +429,6 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
         // 总交易费用
         trdProductDeal.setFeeAmt(ArithmeticUtil.doAdd(entrustDto.getMarchFeeAmtPay(), entrustDto.getMarchFeeAmtUnPay()));
     }
-    /**
-     * 计算债券到期收益率和行权收益率
-     * @param productDeal
-     */
-    public void calc(TrdProductDeal productDeal) {
-        // 设置计算参数
-        TrdBondInvestTradeDto dealParam = new TrdBondInvestTradeDto();
-        dealParam.setFinprodId(productDeal.getFinprodId());
-        dealParam.setTradeAmt(productDeal.getShareAmt().multiply(BigDecimal.valueOf(100)));
-        dealParam.setSettleDate(productDeal.getSettleDate());
-        dealParam.setVdate(productDeal.getVdate());
-        dealParam.setTradeMarket(productDeal.getTradeMarket());
-        dealParam.setTradeMarketMode(productDeal.getTradeMarketMode());
-        dealParam.setPs(productDeal.getPs());
-        dealParam.setUnitInt(productDeal.getUnitInt());
-        dealParam.setUnitFprice(productDeal.getUnitFprice());
-
-        // 设置计算类型为全价总额（根据全价总额计算到期收益率和行权收益率）
-        dealParam.setCalculateField("fpriceAmt");
-        dealParam.setFpriceAmt(productDeal.getFpriceAmt());
-        dealParam.setIntAmt(productDeal.getIntAmt());
-        dealParam.setInvAim(productDeal.getInvAim());
-
-        // 调用债券交易计算逻辑
-        AjaxResult ajaxResult = trdBondInvestTrade002Service.calculateData(dealParam);
-
-        if (ajaxResult != null && StringUtil.isNotEmpty(ajaxResult.getData())) {
-            Object result = ajaxResult.getData();
-            if(result instanceof Map) {
-                Map<String, Object> calcResult = (Map)result;
-                Object yield = calcResult.get("yield");
-                Object exerYield = calcResult.get("exerYield");
-                if(yield instanceof BigDecimal) {
-                    productDeal.setYield((BigDecimal)yield);
-                }
-                else if (yield != null) {
-                    productDeal.setYield(new BigDecimal(yield.toString()));
-                }
-                if(exerYield instanceof BigDecimal) {
-                    productDeal.setExerYield((BigDecimal)exerYield);
-                }
-                else if (exerYield != null) {
-                    productDeal.setExerYield(new BigDecimal(exerYield.toString()));
-                }
-                if (productDeal.getYield() != null){
-                    productDeal.setYield(productDeal.getYield().divide(BigDecimal.valueOf(100)));
-                }
-                if (productDeal.getExerYield() != null){
-                    productDeal.setExerYield(productDeal.getExerYield().divide(BigDecimal.valueOf(100)));
-                }
-            }
-        }
-    }
 
     private TrdDealTotalAdd generateDealTotalAdd(ExchangeTransMatchCommonEntrustDto entrustDto, TrdFinProductDealTotal trdFinProductDealTotal) {
         TrdDealTotalAdd trdDealTotalAdd =  new TrdDealTotalAdd();
@@ -609,4 +545,14 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
         return trdFinProductDealTotal;
     }
 
+    /**
+     * 金融产品交易附属表
+     */
+    public TrdProductDealAdd genTrdProductDealAdd(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto,TrdProductDeal trdProductDeal) {
+        TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
+        BeanUtil.copyPropertiesIgnoreNull(trdProductDealAdd, trdProductDeal);
+        trdProductDealAdd.setEntrustId(entrustDto.getEntrustId());
+        trdProductDealAdd.setPortfolioId(entrustDto.getPortfolioId());
+        return trdProductDealAdd;
+    }
 }

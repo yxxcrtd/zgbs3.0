@@ -82,6 +82,7 @@
         ,T2.EXP_CON_NUM
         ,T2.DEAL_MODE dealMode
         ,T2.PRICE_TYPE priceType
+        ,T1.REMARK remark
         FROM
         ETR_ENTRUST T1
         INNER JOIN ETR_ENTRUST_ADD T2 ON
@@ -224,6 +225,7 @@
         ,T2.EXP_CON_NUM
         ,T2.DEAL_MODE dealMode
         ,T2.PRICE_TYPE priceType
+        ,T1.REMARK remark
         FROM
         WFL_ETR_ENTRUST T1
         INNER JOIN WFL_ETR_ENTRUST_ADD T2 ON
@@ -355,6 +357,10 @@
         select
         <include refid="com.joyintech.tams.common.base.dao.EtrEntrustAddMapper.Base_Column_List"></include>
         from wfl_etr_entrust_add WHERE ENTRUST_ID = #{entrustId}
+    </select>
+
+    <select id="isOverMDate" resultType="java.lang.String">
+        select FINPROD_ID from FIN_PRODUCT where FINPROD_ID = #{finprodId} and MDATE &lt; to_date(#{nowDate},'yyyy-MM-dd')
     </select>
 
     <sql id="etrExchangeQueryAnd">

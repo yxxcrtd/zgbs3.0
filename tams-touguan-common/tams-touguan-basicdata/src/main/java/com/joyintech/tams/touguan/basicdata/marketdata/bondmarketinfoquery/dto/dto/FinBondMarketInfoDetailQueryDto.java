@@ -188,6 +188,8 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "observeBefDay", value = "延后时间单位")
     private String observeBefUnit;
 
+    private String basis;
+
     @ApiModelProperty(name = "ratebasic", value = "计息基础")
     private String ratebasic;
 
@@ -1048,5 +1050,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setIsWind(String isWind) {
         this.isWind = isWind;
+    }
+
+    public String getBasis() {
+        return basis;
+    }
+
+    public void setBasis(String basis) {
+        this.basis = basis;
     }
 }
