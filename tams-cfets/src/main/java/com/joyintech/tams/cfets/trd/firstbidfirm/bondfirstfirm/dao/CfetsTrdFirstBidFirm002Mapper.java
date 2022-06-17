@@ -47,7 +47,7 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @author jiangpeng
      * @date 2022/5/17 16:27
      */
-    int selectBidFirmCountByEntrustId(Map<String, Object> param);
+    List<String> selectBidFirmCountByEntrustId(Map<String, Object> param);
 
     /**
      * 按同资产+同一投标日+同一交易对手维度查询指令数据

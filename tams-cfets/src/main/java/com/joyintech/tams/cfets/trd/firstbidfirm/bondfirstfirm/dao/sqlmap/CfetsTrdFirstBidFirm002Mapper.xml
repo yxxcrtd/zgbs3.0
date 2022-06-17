@@ -183,10 +183,10 @@
         and ROWNUM = 1
     </select>
 
-    <select id="selectBidFirmCountByEntrustId" resultType="java.lang.Integer">
-        select count(*)
+    <select id="selectBidFirmCountByEntrustId" resultType="java.lang.String">
+        select distinct ENTRUST_ID
         from (
-        select distinct bo.BID_ID
+        select distinct bo.BID_ID,bobp.ENTRUST_ID
         from BID_ORDER bo
         left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
         where bo.IS_CANCEL = 'N'
@@ -204,10 +204,11 @@
             </foreach>
         </if>
         union all
-        select distinct bo.BID_ID
+        select distinct bo.BID_ID,bobp.ENTRUST_ID
         from Wfl_BID_ORDER bo
         left join Wfl_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
-        where
+        where bo.IS_CANCEL = 'N'
+        and bo.TRADE_STATUS = '01'
         <if test="bidModles != null and bidModles.size()>0">
             and bo.BID_MODLE in
             <foreach collection="bidModles" open=" (" close=") " separator="," item="item">
