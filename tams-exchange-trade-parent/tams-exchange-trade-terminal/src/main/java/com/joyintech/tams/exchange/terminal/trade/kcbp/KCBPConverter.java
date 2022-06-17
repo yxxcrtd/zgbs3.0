@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.terminal.trade.kcbp;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1247,8 +1248,8 @@ public class KCBPConverter {
         return integratedFixedIncomeQuoteBeans;
     }
     
-    public static Map<String,IntegratedRepurchaseQuotePledgeBean> convertToIntegratedRepurchaseQuoteResponsePledgeMap(List<List<String>> data) {
-    	Map<String,IntegratedRepurchaseQuotePledgeBean> retMap = new HashMap<String,IntegratedRepurchaseQuotePledgeBean>();
+    public static Map<String,List<IntegratedRepurchaseQuotePledgeBean>> convertToIntegratedRepurchaseQuoteResponsePledgeMap(List<List<String>> data) {
+    	Map<String,List<IntegratedRepurchaseQuotePledgeBean>> retMap = new HashMap<String,List<IntegratedRepurchaseQuotePledgeBean>>();
         List<String> columnNames = data.get(0);
         for (int i = 1; i < data.size(); i++) {
             List<String> content = data.get(i);
@@ -1284,7 +1285,14 @@ public class KCBPConverter {
                     }
                 }
             }
-            retMap.put(execid, integratedRepurchaseQuotePledgeBean);
+            List<IntegratedRepurchaseQuotePledgeBean> integratedRepurchaseQuotePledgeBeanList = retMap.get(execid);
+            if(integratedRepurchaseQuotePledgeBeanList!=null && integratedRepurchaseQuotePledgeBeanList.size()>0) {
+            	integratedRepurchaseQuotePledgeBeanList.add(integratedRepurchaseQuotePledgeBean);
+            }else {
+            	integratedRepurchaseQuotePledgeBeanList = new ArrayList<IntegratedRepurchaseQuotePledgeBean>();
+            	integratedRepurchaseQuotePledgeBeanList.add(integratedRepurchaseQuotePledgeBean);
+            }
+            retMap.put(execid, integratedRepurchaseQuotePledgeBeanList);
         }
         return retMap;
     }

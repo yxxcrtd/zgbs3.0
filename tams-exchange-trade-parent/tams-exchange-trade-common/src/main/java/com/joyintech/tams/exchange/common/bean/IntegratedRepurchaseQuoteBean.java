@@ -1,6 +1,8 @@
 package com.joyintech.tams.exchange.common.bean;
 
 
+import java.math.BigDecimal;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -105,8 +107,74 @@ public class IntegratedRepurchaseQuoteBean {
     private String deliverySide;
     @ApiModelProperty(name = "stkprop", value = "股份性质")
     private String stkprop;
+    
+    @ApiModelProperty(name = "swapIntoBonds", value = "换入质押券代码")
+    private String swapIntoBonds;
 
-    public String getStkprop() {
+    @ApiModelProperty(name = "swapIntoBondsName", value = "换入质押券名称")
+    private String swapIntoBondsName;
+
+    @ApiModelProperty(name = "swapIntoBondsVolume", value = "换入质押券数量")
+    private BigDecimal swapIntoBondsVolume;
+
+    @ApiModelProperty(name = "swapOutBonds", value = "换出质押券代码")
+    private String swapOutBonds;
+
+    @ApiModelProperty(name = "swapOutBondsName", value = "换出质押券名称")
+    private String swapOutBondsName;
+
+    @ApiModelProperty(name = "swapOutBondsVolume", value = "换出质押券数量")
+    private BigDecimal swapOutBondsVolume;
+
+    public String getSwapIntoBonds() {
+		return swapIntoBonds;
+	}
+
+	public void setSwapIntoBonds(String swapIntoBonds) {
+		this.swapIntoBonds = swapIntoBonds;
+	}
+
+	public String getSwapIntoBondsName() {
+		return swapIntoBondsName;
+	}
+
+	public void setSwapIntoBondsName(String swapIntoBondsName) {
+		this.swapIntoBondsName = swapIntoBondsName;
+	}
+
+	public BigDecimal getSwapIntoBondsVolume() {
+		return swapIntoBondsVolume;
+	}
+
+	public void setSwapIntoBondsVolume(BigDecimal swapIntoBondsVolume) {
+		this.swapIntoBondsVolume = swapIntoBondsVolume;
+	}
+
+	public String getSwapOutBonds() {
+		return swapOutBonds;
+	}
+
+	public void setSwapOutBonds(String swapOutBonds) {
+		this.swapOutBonds = swapOutBonds;
+	}
+
+	public String getSwapOutBondsName() {
+		return swapOutBondsName;
+	}
+
+	public void setSwapOutBondsName(String swapOutBondsName) {
+		this.swapOutBondsName = swapOutBondsName;
+	}
+
+	public BigDecimal getSwapOutBondsVolume() {
+		return swapOutBondsVolume;
+	}
+
+	public void setSwapOutBondsVolume(BigDecimal swapOutBondsVolume) {
+		this.swapOutBondsVolume = swapOutBondsVolume;
+	}
+
+	public String getStkprop() {
 		return stkprop;
 	}
 
