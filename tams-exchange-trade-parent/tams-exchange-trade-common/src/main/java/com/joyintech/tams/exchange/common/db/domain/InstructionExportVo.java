@@ -22,6 +22,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @ApiModel(value = "指令导出信息", description = "指令导出信息")
@@ -423,6 +424,9 @@ public class InstructionExportVo {
 
     @ApiModelProperty(name = "minPriceAndMinTrdUnitLimitBean", value = "最小价差、买卖单位及交易上下限控制")
     private MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean;
+
+    @ApiModelProperty(name = "pledges", value = "质押券信息")
+    public List<InstructionPledge> pledges;
 
     @Id
     public String getEntrustId() {
@@ -1304,5 +1308,17 @@ public class InstructionExportVo {
 
     public void setQuoteRequestId(String quoteRequestId) {
         this.quoteRequestId = quoteRequestId;
+    }
+
+    public List<InstructionPledge> getPledges() {
+        return pledges;
+    }
+
+    public void setPledges(List<InstructionPledge> pledges) {
+        this.pledges = pledges;
+    }
+
+    public void setLeftVolume(long leftVolume) {
+        this.leftVolume = leftVolume;
     }
 }

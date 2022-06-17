@@ -431,6 +431,9 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @ApiModelProperty(name = "quoteRequestId", value = "行情请求编号")
     private String quoteRequestId;
 
+    @ApiModelProperty(name = "pledges", value = "质押券信息")
+    public List<InstructionPledge> pledges;
+
     @Id
     public String getEntrustId() {
         return entrustId;
@@ -1452,5 +1455,13 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
                 InstructionPs.PZ, InstructionPs.RESALE,
                 InstructionPs.SEAL, InstructionPs.UNSEAL);
 //        return EntrustUtils.isNotTrade(this.getBusiTypeTg());
+    }
+
+    public List<InstructionPledge> getPledges() {
+        return pledges;
+    }
+
+    public void setPledges(List<InstructionPledge> pledges) {
+        this.pledges = pledges;
     }
 }
