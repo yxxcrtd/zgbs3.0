@@ -1,5 +1,6 @@
 package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service;
 
+import com.google.common.base.Joiner;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
@@ -343,15 +344,17 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 entrustIdList.add(entrustDto.getEntrustId());
             }
         }
-        if (StringUtil.isNotEmpty(errorList)) {
+        if (CollectionUtils.isNotEmpty(errorList)) {
             ajaxResult.setErrorList(errorList);
         } else {
             // 3.指令不存在流程中或有效的投标方式为自主投标和代投代缴的投标确认数据，不满足弹出提示
             Map<String, Object> param = new HashMap<>();
             param.put("bidModles", Arrays.asList(DictCodeListExt4.投标方式_自主投标.getValue(), DictCodeListExt4.投标方式_代投代缴.getValue()));
             param.put("entrustIdList", entrustIdList);
-            if (cfetsTrdFirstBidFirm002Mapper.selectBidFirmCountByEntrustId(param) > 0) {
-                errorList.add(new ValidMessage("指令存在流程中或有效的投标方式为自主投标和代投代缴的投标确认数据,不可执行投标确认操作!"));
+            List<String> entrustIds = cfetsTrdFirstBidFirm002Mapper.selectBidFirmCountByEntrustId(param);
+            if (CollectionUtils.isNotEmpty(entrustIds)) {
+                String entrustIdsStr = Joiner.on(",").join(entrustIds);
+                errorList.add(new ValidMessage("所选指令已存在投标方式为自主投标或代投代缴的流程中或有效的投标确认数据！指令代码：" + entrustIdsStr));
             }
         }
         if (CollectionUtils.isNotEmpty(errorList)) {
