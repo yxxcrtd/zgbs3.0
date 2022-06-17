@@ -420,7 +420,7 @@
                             when fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || '%'
                             when fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || '元'
                             when fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || 'BP'
-                            end AS bidprice /*投标标位, 多个逗号分隔展示*/
+                            end AS bidprice /*投标标位, 多个逗号分隔展示*/,
                         bo.BID_MODLE      AS biddingMethod/*投标方式*/,
                         bo.PAY_TYPE       AS payType/*缴款方式*/,
                         case
@@ -528,7 +528,7 @@
                             when fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || '%'
                             when fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || '元'
                             when fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL then bobp.BID_PRICE || 'BP'
-                            end AS bidprice /*投标标位, 多个逗号分隔展示*/
+                            end AS bidprice /*投标标位, 多个逗号分隔展示*/,
                         bo.BID_MODLE    AS biddingMethod/*投标方式*/,
                         bo.PAY_TYPE     AS payType/*缴款方式*/,
                         case
