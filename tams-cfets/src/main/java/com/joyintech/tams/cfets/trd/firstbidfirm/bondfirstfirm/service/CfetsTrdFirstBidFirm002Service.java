@@ -957,13 +957,13 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         // 【交易金额】 =基本信息.券面总额*金额信息.净价/100
         if (StringUtil.isNotEmpty(dto.getBidPriceTotal()) && StringUtil.isNotEmpty(dto.getPrice())) {
-            dto.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getBidPriceTotal(), dto.getPrice()), new BigDecimal(100), 4));
+            dto.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getBidPriceTotal(), dto.getPrice()), new BigDecimal(100), 2));
         } else {
             dto.setTradeAmt(null);
         }
         // 【应计利息总额】 =基本信息.券面总额*金额信息.应计利息/100
         if (StringUtil.isNotEmpty(dto.getBidPriceTotal())) {
-            dto.setIntAmtTatol(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getBidPriceTotal(), dto.getIntAmt()), new BigDecimal(100), 4));
+            dto.setIntAmtTatol(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getBidPriceTotal(), dto.getIntAmt()), new BigDecimal(100), 2));
         }
         // 【全价】 =金额信息.净价+金额信息.应计利息
         if (StringUtil.isNotEmpty(dto.getPrice())) {
@@ -1133,7 +1133,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         for (CfetsTrdFirstBidFirmProductDto item : dto.getProductDtos()) {
             index++;
             // 占比值 根据每条数据的“剩余指令额度/指令剩余额度汇总*基本信息中券面总额”计算
-            BigDecimal proportion = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getAvaNum(), dto.getBidPriceTotal()), avaNumTotal, 4);
+            BigDecimal proportion = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getAvaNum(), dto.getBidPriceTotal()), avaNumTotal, 2);
             proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
             // 记录剩余指令额度
             item.setAvaNumTemp(item.getAvaNum());
@@ -1179,7 +1179,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 自动计算的计算结果需要为最小变动单位1000的整数倍，且每条数据的券面总额须小于等于剩余指令额度
         BigDecimal minChangeUnit = subMinChangeUnit;
         // 平均值计算
-        BigDecimal avg = ArithmeticUtil.divide(dto.getBidPriceTotal(), dto.getProductDtos().size(), 4);
+        BigDecimal avg = ArithmeticUtil.divide(dto.getBidPriceTotal(), dto.getProductDtos().size(), 2);
         avg = ArithmeticUtil.multiply(ArithmeticUtil.divide(avg, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
 //        // 剩余尾差
         BigDecimal tailDifference = dto.getBidPriceTotal();
@@ -1243,7 +1243,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 记录指令投标券面总额
             item.setAvaNumTemp(item.getEtrBidPriceTotal());
             // 占比值 根据每条数据的“指令投标券面总额/基本信息.指令投标券面总额*基本信息.汇总投标券面总额”计算
-            BigDecimal proportion = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getEtrBidPriceTotal(), dto.getTotalBiddingNum()), dto.getEtrBidPriceTotal(), 4);
+            BigDecimal proportion = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getEtrBidPriceTotal(), dto.getTotalBiddingNum()), dto.getEtrBidPriceTotal(), 2);
             proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
             // 最后一位时
             if (index == dto.getProductDtos().size()) {
@@ -2269,7 +2269,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 总交易费用 = 画面.投标产品列表.结算服务费
             total.setFeeAmt(item.getSettFeeAmt());
             // 交易份额 = 画面.投标产品列表.券面总额/100
-            total.setShareAmt(ArithmeticUtil.divide(item.getBidPriceTotal(), new BigDecimal(100), 6));
+            total.setShareAmt(ArithmeticUtil.divide(item.getBidPriceTotal(), new BigDecimal(100), 4));
             // 证券管理户代码 "银行间时，为画面.投标产品列表.证券账户； 交易所时，为画面.投标产品列表.资金账户对应的证券账户"
             total.setSecManageAcctId(item.getSecManageAcctId());
             total.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
@@ -3910,8 +3910,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 trdProductDeal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
                 trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
                 trdProductDeal.setSettleDate(entity.getTradeDate());
-                trdProductDeal.setPrinAmt(ArithmeticUtil.divide(deal.getBidPriceTotal(), BigDecimal.valueOf(100), 6));
-                trdProductDeal.setShareAmt(ArithmeticUtil.divide(deal.getBidPriceTotal(), BigDecimal.valueOf(100), 6));
+                trdProductDeal.setPrinAmt(ArithmeticUtil.divide(deal.getBidPriceTotal(), BigDecimal.valueOf(100), 4));
+                trdProductDeal.setShareAmt(ArithmeticUtil.divide(deal.getBidPriceTotal(), BigDecimal.valueOf(100), 4));
                 trdProductDeal.setTradeDate(entity.getTradeDate());
                 trdProductDeal.setSettleDate(entity.getTradeDate());
                 trdProductDeal.setSecManageAcctId(deal.getSecManageAcctId());
