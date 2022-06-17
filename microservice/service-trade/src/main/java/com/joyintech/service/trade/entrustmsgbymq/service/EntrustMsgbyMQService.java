@@ -33,7 +33,7 @@ import com.joyintech.tams.common.base.entity.InfContractDetailfile;
 import com.rabbitmq.client.Channel;
 
 /**
- * 
+ *
  * 委托成交消息主推接口Service
  * 〈功能详细描述〉
  * @author tanxaun
@@ -45,7 +45,7 @@ import com.rabbitmq.client.Channel;
 @Service
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(EntrustMsgbyMQService.class);
 
     /**
@@ -92,12 +92,12 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 			//throw new Exception("成交消息接收失败");
 		}
     }
-    
+
     /**
      * 委托成交消息入库
-     * 
+     *
      * @param tradeMessage
-     * @return 
+     * @return
      * @throws Exception Exception
      * @see
      * @since 1.0
@@ -160,6 +160,9 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 			infContractDetailfile.setCounterId(tradeMessage.getCounterId());
 		}
 
+		//质押品列表
+		infContractDetailfile.setPledgeList(tradeMessage.getPledgeTradeMessages());
+
     	mapper.insertSelective(infContractDetailfile);
 
 		// 下单成交组合明细数据入库 add by fuyongsheng 20220511 start
@@ -183,6 +186,7 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 			}
 		}
 		// 下单成交组合明细数据入库 add by fuyongsheng 20220511 end
+
 
 		tradePreClearingService.tradePreClearing(infContractDetailfile);
     }

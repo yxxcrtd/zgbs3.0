@@ -43,14 +43,14 @@ public class TradeMessage implements Cloneable, Serializable {
     /**
      * 质押券列表
      */
-    private List<PledgeListDto> pledgeList;
+    private List<PledgeListDto> pledgeTradeMessages;
 
-    public List<PledgeListDto> getPledgeList() {
-        return pledgeList;
+    public List<PledgeListDto> getPledgeTradeMessages() {
+        return pledgeTradeMessages;
     }
 
-    public void setPledgeList(List<PledgeListDto> pledgeList) {
-        this.pledgeList = pledgeList;
+    public void setPledgeTradeMessages(List<PledgeListDto> pledgeTradeMessages) {
+        this.pledgeTradeMessages = pledgeTradeMessages;
     }
 
     public List<PortfolioTradeMessage> getPortfolioTradeMessages() {
