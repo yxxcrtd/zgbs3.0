@@ -98,7 +98,7 @@ public class MstBondValuationInfo extends MstBondValuationInfoKey {
      * 麦考利久期
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
-    private BigDecimal mduration;
+    private BigDecimal mklDuration;
 
     /**
      * 市价隐含评级（中债）
@@ -366,16 +366,16 @@ public class MstBondValuationInfo extends MstBondValuationInfoKey {
      * 取得 麦考利久期
      * @return 麦考利久期
      */
-    public BigDecimal getMduration() {
-        return mduration;
+    public BigDecimal getMklDuration() {
+        return mklDuration;
     }
 
     /**
      * 设置 麦考利久期
-     * @param mduration 麦考利久期
+     * @param mklDuration 麦考利久期
      */
-    public void setMduration(BigDecimal mduration) {
-        this.mduration = mduration;
+    public void setMklDuration(BigDecimal mklDuration) {
+        this.mklDuration = mklDuration;
     }
 
     /**
