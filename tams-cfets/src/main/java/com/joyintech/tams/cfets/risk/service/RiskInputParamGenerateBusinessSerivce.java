@@ -11,6 +11,8 @@ import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
@@ -158,7 +160,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
      * @author jiangpeng
      * @date 2022/6/10 11:43
      */
-    BaseMap generateCfetsPrimaryBidManage(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
+    BaseMap generateCfetsPrimaryBidManage(String decisionAct, String flowStatus, boolean isCheck, String businessJson, String pageId) {
         logger.debug("组装中标结果维护构造风险报文入参:" + businessJson);
         CfetsPrimaryBidManageSaveRequest dto = JsonUtils.json2Object(businessJson, CfetsPrimaryBidManageSaveRequest.class);
         // 接口字段名
@@ -175,10 +177,18 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
         if (StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), dto.getBidModle())) {
             purchModle = DictCodeListExt4.头寸申购方式_代投代缴.getValue();
         }
+        // 中标/未中标 check没传该字段的值,未中标时check特殊处理,通过pageId判断
+        // 投标结果
+        String bidResult = dto.getIsWin();
+        if (StringUtil.equals(pageId, "CfetsPrimaryBidManage001") && StringUtil.isEmpty(dto.getIsWin())) {
+            bidResult = DictCodeList.是否_否.getValue();
+        } else if (StringUtil.isEmpty(dto.getIsWin())) {
+            bidResult = DictCodeList.是否_是.getValue();
+        }
         BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
                 .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级投标.getValue())
                 .put(NodeConfigConstant.BUSI_ACT, 业务动作_中标结果维护.getValue())
-                .put(NodeConfigConstant.BID_RESULT, dto.getIsWin())
+                .put(NodeConfigConstant.BID_RESULT, bidResult)
                 .put(NodeConfigConstant.PURCH_MODLE, purchModle)
                 .put(NodeConfigConstant.TRADE_PLACE, tradePlace)
                 .put(NodeConfigConstant.DECISION_ACT, decisionAct)
@@ -213,6 +223,67 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
                 .put(NodeConfigConstant.TRADE_PLACE, tradePlace)
                 .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                 .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                .put(NodeConfigConstant.PS, dto.getPs())
+                .put(NodeConfigConstant.IS_CHECK, isCheck)
+                .put(NodeConfigConstant.DATA, dto);
+        return map;
+    }
+
+
+    /**
+     * 组装成交确认-发行失败构造风险报文入参
+     *
+     * @param decisionAct  系统动作
+     * @param flowStatus   流程节点
+     * @param isCheck      是否校验
+     * @param businessJson Json数据
+     * @return com.joyintech.tams.business.common.pojo.BaseMap
+     * @author jiangpeng
+     * @date 2022/6/10 11:43
+     */
+    BaseMap generateCfetsTrdConfirmRegInfoListResponse(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
+        logger.debug("组装成交确认-发行失败构造风险报文入参:" + businessJson);
+        CfetsTrdConfirmRegInfoListResponse dto = JsonUtils.json2Object(businessJson, CfetsTrdConfirmRegInfoListResponse.class);
+        // 接口字段名
+        String interfaceType = NodeConfigConstant.BOND001;
+        // 交易场所
+        String tradePlace = 交易场所_银行间.getValue();
+        BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, interfaceType)
+                .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券一级申购.getValue())
+                .put(NodeConfigConstant.BUSI_ACT, 业务动作_发行失败.getValue())
+                .put(NodeConfigConstant.TRADE_PLACE, tradePlace)
+                .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                .put(NodeConfigConstant.IS_CHECK, isCheck)
+                .put(NodeConfigConstant.DATA, dto);
+        return map;
+    }
+
+
+    /**
+     * 组装成交确认撤销-现券/一级申购 构造风险报文入参
+     *
+     * @param decisionAct  系统动作
+     * @param flowStatus   流程节点
+     * @param isCheck      是否校验
+     * @param businessJson Json数据
+     * @param pageId       判断是否一级申购撤销
+     * @return com.joyintech.tams.business.common.pojo.BaseMap
+     * @author jiangpeng
+     * @date 2022/6/10 11:43
+     */
+    BaseMap generateCfetsTrdBondInvestTradeResponse(String decisionAct, String flowStatus, boolean isCheck, String businessJson) {
+        logger.debug("组装成交确认撤销-现券/一级申购构造风险报文入参:" + businessJson);
+        CfetsTrdBondInvestTradeDto dto = JsonUtils.json2Object(businessJson, CfetsTrdBondInvestTradeDto.class);
+        String busiType = 头寸业务类型_债券一级申购.getValue();
+        // 交易场所
+        String tradePlace = 交易场所_银行间.getValue();
+        BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
+                .put(NodeConfigConstant.BUSI_ACT, 业务动作_成交确认.getValue())
+                .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                .put(NodeConfigConstant.BUSI_TYPE, busiType)
+                .put(NodeConfigConstant.TRADE_PLACE, tradePlace)
                 .put(NodeConfigConstant.PS, dto.getPs())
                 .put(NodeConfigConstant.IS_CHECK, isCheck)
                 .put(NodeConfigConstant.DATA, dto);

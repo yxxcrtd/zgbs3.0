@@ -103,6 +103,17 @@ public class CfetsPrimaryBidManageRequest {
     @ApiModelProperty(name="tradeMarket",value="交易场所code")
     private String tradeMarket;
 
+    @ApiModelProperty(name="counterId",value="交易对手")
+    private String counterId;
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
     public String getSearch() {
         return search;
     }

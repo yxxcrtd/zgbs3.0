@@ -95,9 +95,22 @@ public class CfetsTradeHandlerAop {
     /**
      * 交易登记check、对话报价提交check
      */
-    @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.check(..))"+
-        "|| execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage001Controller.unWinCheck(..))")
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.check(..))")
     protected void doCheck() {
+    }
+
+    /**
+     * 成交确认-发行失败
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm.controller.CfetsTrdConfirmController.issuingFail(..))")
+    protected void issuingFail() {
+    }
+
+    /**
+     * 中标结果维护 未中标
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.primarybidmanage.controller.CfetsPrimaryBidManage001Controller.unWinCheck(..))")
+    protected void unWinCheck() {
     }
 
     /**
@@ -151,12 +164,27 @@ public class CfetsTradeHandlerAop {
     protected void doCompleteRegRevoke() {
     }
 
+    /**
+     * 债券回售登记撤销
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService.doComplete(..))")
+    protected void doCompletePrimaryRevoke() {
+    }
+
 
     /**
      * 交易撤销
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doRevokeComplete(..))")
     protected void doRevokeComplete() {
+    }
+
+
+    /**
+     * 一级申购成交确认撤销
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trdquery..*.*.doCompleteBidRevoke(..))")
+    protected void doCompleteBidRevoke() {
     }
 
     /**
@@ -196,6 +224,18 @@ public class CfetsTradeHandlerAop {
     @AfterReturning(pointcut = "doCheck()", returning = "ajaxResultMessage")
     public void doCheck(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
         checkCommon(joinPoint,ajaxResultMessage,系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+    }
+
+
+    /**
+     * 中标结果维护 未中标check
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning(pointcut = "unWinCheck()", returning = "ajaxResultMessage")
+    public void unWinCheck(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
+        checkCommon(joinPoint,ajaxResultMessage,系统动作_新建.getValue(), 流程节点_流程提交.getValue(), "CfetsPrimaryBidManage001");
     }
 
     /**
@@ -277,6 +317,19 @@ public class CfetsTradeHandlerAop {
         }
     }
 
+
+    /**
+     * 交易新建
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning("issuingFail()")
+    public void occupyOnIssuingFail(JoinPoint joinPoint) throws BusinessException {
+        Object[] args = joinPoint.getArgs();
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+    }
+
     /**
      * 交易更新
      *
@@ -321,6 +374,18 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
+     * 一级申购成交确认撤销
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning("doCompleteBidRevoke()")
+    public void revokeBidComplete(JoinPoint joinPoint) throws BusinessException {
+        Object[] args = joinPoint.getArgs();
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), "doCompleteBidRevoke");
+    }
+
+    /**
      * 债券交易撤销
      *
      * @param joinPoint
@@ -337,7 +402,7 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning(pointcut = "doCompleteRegRevoke() ||subRevoke()||firmRevoke()")
+    @AfterReturning(pointcut = "doCompleteRegRevoke() ||subRevoke()||firmRevoke()||doCompletePrimaryRevoke()")
     public void bondRevokeRegComplete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         OperationType op = (OperationType)args[1];
