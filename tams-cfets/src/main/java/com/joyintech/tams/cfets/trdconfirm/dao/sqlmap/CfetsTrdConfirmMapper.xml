@@ -1318,7 +1318,7 @@
         select distinct null                    as                                   execid,
                 'BID'                           as                                   businesstype,
                 fp.finprod_id                   as                                   finprodId,
-                fp.finprod_market_id            as                                   finprodMarketId,
+                CONCAT(icb.INSTRUMENT_ID, '.IB')                                     finprodMarketId,
                 icb.INSTRUMENT_SHORT_NAME       as                                   finprodAbbr,
                 'T01'                           as                                   ps,
                 null                                                                 settleSpeed,
@@ -1330,9 +1330,9 @@
                     when icb.SPREAD is not null then icb.SPREAD
                     when icb.COUPON_RATE is not null then icb.COUPON_RATE  end tradeYield,
                 case
-                when icb.ISSUE_PRICE is not null then to_char(icb.ISSUE_PRICE,'FM990.9990') || '元'
-                when icb.SPREAD is not null then to_char(icb.SPREAD,'FM990.90') || 'BP'
-                when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYieldStr,
+                when icb.ISSUE_PRICE is not null then to_char(icb.ISSUE_PRICE,'FM99999999990.9990') || '元'
+                when icb.SPREAD is not null then to_char(icb.SPREAD,'FM99999999990.90') || 'BP'
+                when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM99999999990.9990') ||'%' end tradeYieldStr,
                 null                                                                 termDays,
                 icb.ACTUAL_FEE                  as                                   tradeAmt,
                 null                            as                                   quoteid,
