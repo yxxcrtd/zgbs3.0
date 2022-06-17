@@ -553,4 +553,12 @@
         from BID_RESULT_TOTAL
         where BID_ID = #{bidId}
     </select>
+
+    <select id="selectByFinprodMarketId" resultType="com.joyintech.tams.common.base.entity.FinProduct">
+        select
+        <include refid="com.joyintech.tams.common.base.dao.FinProductMapper.Base_Column_List" />
+        from FIN_PRODUCT
+        where FINPROD_MARKET_ID in (select CIRCULATION_CODE from FIN_PRODUCT where FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR})
+        and ROWNUM = 1
+    </select>
 </mapper>

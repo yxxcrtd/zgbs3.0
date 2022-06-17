@@ -997,7 +997,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 || StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
             //CASE WHEN （标的类金融产品发行信息.招标标的 IN（利率，利差） AND 标的类金融产品.上市流通日期 IS NOT NULL）
             if (StringUtil.isNotEmpty(dto.getCirculationDate())) {
-                FinProduct finProduct2 = finProductMapper.selectByFinprodMarketId(dto.getFinprodMarketId());
+                FinProduct finProduct2 = cfetsTrdFirstBidFirm002Mapper.selectByFinprodMarketId(dto.getFinprodMarketId());
                 calRequest.setFinprodId(finProduct2.getFinprodId());
                 //THEN 参照原债券二级交易画面，到期收益率反算净价的算法，计算净价
                 if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {

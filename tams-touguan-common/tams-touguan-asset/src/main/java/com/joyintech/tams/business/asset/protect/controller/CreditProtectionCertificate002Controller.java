@@ -281,11 +281,11 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             dto.setFinprodId(creditProtectionCertificate002Service.getFinprodId(dto));
         }
         //文件信息
-        if (CollectionUtils.isNotEmpty(dto.getFileArray())
+        if (StringUtil.isNotEmpty(dto.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(dto.getMstFileInputParameter().getFileList())
                 && StringUtil.isNotEmpty(dto.getFinprodId())) {
             // 将附件和当前业务对象绑定（更新附件的业务代码）
             fileAttachmentProcess.updateBussinessNo(
-                    dto.getFileArray().stream().map(UploadFile::getFileNo).collect(
+                    dto.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
                             Collectors.toList()),
                     dto.getFinprodId());
         }
@@ -358,6 +358,31 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             return new Message<AjaxResult>().fail().setData(new AjaxResult("流程发起失败"));
         }
 
+    }
+
+    /**
+     * 附件下载
+     * @param seqNo  入参
+     * @return 处理结果
+     * @throws IOException 异常信息
+     */
+    @ApiOperation(value = "附件下载", notes = "附件下载")
+    @ResponseBody
+    @PostMapping( "/downloadFile/{seqNo}")
+    public Message<MultipartFile> downloadFile(@PathVariable("seqNo") String seqNo) {
+        try {
+            logger.info("文件下载开始");
+            seqNo = seqNo.replaceAll("\"","");
+            if (StringUtil.isNotEmpty(seqNo)) {
+                MultipartFile fileInfo = creditProtectionCertificate002Service.downloadFileInfo(seqNo);
+                return new Message<MultipartFile>().success().setData(fileInfo);
+            }
+            logger.info("文件下载结束");
+        }catch (Exception e){
+            logger.error("文件下载异常", e);
+            return new Message<MultipartFile>().fail().setMessage("文件下载异常");
+        }
+        return null;
     }
 
 }
