@@ -404,6 +404,8 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         mstFileInputParameter.setFileList(uploadInfo);
         mstFileInputParameter.setBussinessId(entity.getFinprodId());
         entity.setMstFileInputParameter(mstFileInputParameter);
+        entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
+        entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
         //查询参考债券
         if(StringUtils.isNotEmpty(entity.getRefSec())){
             Map<String,Object> params = new HashMap<>();
@@ -412,7 +414,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             params.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
             params.put("refList", StringUtil.splitToList(null, entity.getRefSec()));
             List<String> refList = creditProtectionCertificateMapper.getRefList(params);
-            entity.setRefSecList(refList.stream().collect(Collectors.joining(",")));
+            entity.setRefSecLists(refList.stream().collect(Collectors.joining(",")));
         }
         return entity;
     }
@@ -426,7 +428,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         if(!Objects.isNull(entity2)){
             BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
         } else {
-            entity.setRefSecList(this.getRefList(entity));
+            entity.setRefSecLists(this.getRefList(entity));
             entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
             entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
             List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());

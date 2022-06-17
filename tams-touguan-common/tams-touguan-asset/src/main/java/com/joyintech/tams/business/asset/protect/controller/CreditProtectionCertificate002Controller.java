@@ -3,11 +3,9 @@ package com.joyintech.tams.business.asset.protect.controller;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -39,7 +37,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -269,14 +270,13 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     @PostMapping("/save")
     @ApiOperation(value = "新建/修改", notes = "新建/修改")
     public Message<AjaxResult> save(@RequestBody CreditProtectionCertificate002Dto dto, BindingResult br) {
-//        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
-//        creditProtectionCertificate002Service.insert(dto);
-//        return new Message<AjaxResult>().success().setData(new AjaxResult("成功"));
         if (br.hasErrors()) {
             return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
         //生成金融产品代码
-        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
+        if(!dto.getFinprodMarketId().contains(".")){
+            dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
+        }
         if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
             dto.setFinprodId(creditProtectionCertificate002Service.getFinprodId(dto));
         }
