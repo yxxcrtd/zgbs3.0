@@ -9,22 +9,33 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirst
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmProductDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdBondInvestTradeDto;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
+import com.joyintech.tams.common.base.dao.BidOrderMapper;
+import com.joyintech.tams.common.base.entity.BidOrder;
+import com.joyintech.tams.common.base.entity.BidOrderBidPrice;
 import com.joyintech.tams.common.base.entity.RiskNodeConfigDtl;
 import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
 import com.joyintech.tams.component.business.riskall.utils.RiskUtil;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
+import com.joyintech.tams.component.business.trade.dto.BussTrdTransfenpeiDto;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
+import com.joyintech.tams.invest.common.trade.dao.CreditLinesDealsMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +53,12 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
 
     @Autowired
     private InterfRiskRdsService interfRiskRdsService;
+
+    @Autowired
+    private CreditLinesDealsMapper creditLinesDealsMapper;
+
+    @Autowired
+    private BidOrderMapper bidOrderMapper;
 
     /**
      * 构建指标计算参数-一级申购
@@ -198,6 +215,62 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
     }
 
     /**
+     * 构建指标计算参数-成交确认-发行失败
+     *
+     * @param data    数据
+     * @param dtl     风险配置
+     * @param isCheck 是否校验
+     * @return java.util.List<java.util.Map < java.lang.String, java.lang.Object>>
+     * @author jiangpeng
+     * @date 2022/6/15 19:44
+     */
+    List<Map<String, Object>> buildRiskRdsCfetsTrdConfirmRegInfoListResponseParam(Object data, RiskNodeConfigDtl dtl, Boolean isCheck) {
+        logger.debug("构建指标计算参数-成交确认-发行失败:" + JsonUtils.object2Json(data));
+        InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
+        CfetsTrdConfirmRegInfoListResponse entity = (CfetsTrdConfirmRegInfoListResponse) data;
+        riskRdsDto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
+        riskRdsDto.setEventStatus(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
+        Map<String, TrdBondInvestTradeDto> map = new HashMap<>();
+        List<CfetsTrdConfirmRegInfoListResponse> selectedItem = entity.getSelectedItem();
+        List<String> finprodIds = new ArrayList<>();
+        if (StringUtil.isNotEmpty(selectedItem)) {
+            selectedItem.forEach(item -> {
+                if (!finprodIds.contains(item.getFinprodId())) {
+                    finprodIds.add(item.getFinprodId());
+                }
+            });
+        }
+        Map<String, Object> param = new HashMap<>();
+        param.put("finprodIds", finprodIds);
+        param.put("isCancel", DictCodeList.是否_否.getValue());
+        param.put("tradeStatus", DictCodeListExt1.交易状态_初始.getValue());
+        List<BidOrderBidPrice> bidOrderBidPrices = creditLinesDealsMapper.selectBidOrderBidPriceByFinprodIds(param);
+        for (BidOrderBidPrice bidOrderBidPrice : bidOrderBidPrices) {
+            TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
+            if (map.get(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId()) == null) {
+                BeanUtil.copyPropertiesIgnoreNull(bondDto, bidOrderBidPrice);
+                bondDto.setShareAmt(ArithmeticUtil.divide(bidOrderBidPrice.getSubscriptionAmount(), BigDecimal.valueOf(100), 6));
+                bondDto.setFpriceAmt(bidOrderBidPrice.getPayableAmount());
+                bondDto.setTradeId(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId());
+                BidOrder bidOrder = bidOrderMapper.selectByPrimaryKey(bidOrderBidPrice.getBidId());
+                bondDto.setFinprodId(bidOrder.getFinprodId());
+            } else {
+                bondDto = map.get(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId());
+                // 认购量
+                bondDto.setShareAmt(ArithmeticUtil.doAdd(bondDto.getShareAmt(),
+                        ArithmeticUtil.divide(bidOrderBidPrice.getSubscriptionAmount(), BigDecimal.valueOf(100), 6)));
+                // 应缴款金额
+                bondDto.setTradeAmt(ArithmeticUtil.doAdd(bondDto.getTradeAmt(), bidOrderBidPrice.getPayableAmount()));
+//                bondDto.setEntrustId(entity.getRegIbuId() + item.getPortfolioId());
+                bondDto.setTradeId(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId());
+            }
+            map.put(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId(), bondDto);
+        }
+        List<TrdBondInvestTradeDto> list = new ArrayList<>(map.values());
+        return interfRiskRdsService.getRiskRdsListData(riskRdsDto, list, null);
+    }
+
+    /**
      * 构建指标计算参数-中表结果维护
      *
      * @param data    数据
@@ -222,7 +295,65 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
             item.setBidId(dto.getBidId());
             item.setBidDate(dto.getPayDate());
         });
-        return interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getAllocationDetails(), null);
+        Map<String, CfetsPrimaryBidManageSaveDetailDto> map = new HashMap<>();
+        dto.getAllocationDetails().forEach(item -> {
+            CfetsPrimaryBidManageSaveDetailDto bondDto = new CfetsPrimaryBidManageSaveDetailDto();
+            if (map.get(dto.getBidId() + item.getPortfolioId()) == null) {
+                BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
+                bondDto.setBidDate(dto.getPayDate());
+                bondDto.setEntrustId(dto.getBidId() + item.getPortfolioId());
+                bondDto.setBidId(dto.getBidId() + "-" + item.getPortfolioId());
+                bondDto.setFinprodId(dto.getFinprodId());
+            } else {
+                bondDto = map.get(dto.getBidId() + item.getPortfolioId());
+                bondDto.setTotalBidPrinamt(ArithmeticUtil.doAdd(bondDto.getTotalBidPrinamt(), item.getTotalBidPrinamt()));
+                bondDto.setTheWinPrinamt(ArithmeticUtil.doAdd(bondDto.getTheWinPrinamt(), item.getTheWinPrinamt()));
+                bondDto.setActWinPrinamt(ArithmeticUtil.doAdd(bondDto.getActWinPrinamt(), item.getActWinPrinamt()));
+                bondDto.setPayAmt(ArithmeticUtil.doAdd(bondDto.getPayAmt(), item.getPayAmt()));
+                bondDto.setSettFeeAmt(ArithmeticUtil.doAdd(bondDto.getSettFeeAmt(), item.getSettFeeAmt()));
+                bondDto.setBidDate(dto.getPayDate());
+                bondDto.setEntrustId(dto.getBidId() + item.getPortfolioId());
+                bondDto.setBidId(dto.getBidId() + "-" + item.getPortfolioId());
+            }
+            map.put(dto.getBidId() + item.getPortfolioId(), bondDto);
+        });
+        List<CfetsPrimaryBidManageSaveDetailDto> list = new ArrayList<>(map.values());
+        return interfRiskRdsService.getRiskRdsListData(riskRdsDto, list, null);
+    }
+
+    /**
+     * 构建指标计算参数-银行间债券成交确认
+     *
+     * @param data    数据
+     * @param dtl     风险配置
+     * @param isCheck 是否校验
+     * @return java.util.List<java.util.Map < java.lang.String, java.lang.Object>>
+     * @author jiangpeng
+     * @date 2022/6/15 19:44
+     */
+    List<Map<String, Object>> buildRiskRdsCfetsTrdBondInvestTradeParam(Object data, RiskNodeConfigDtl dtl, Boolean isCheck) {
+        logger.debug("构建指标计算参数-银行间债券成交确认:" + JsonUtils.object2Json(data));
+        InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
+        CfetsTrdBondInvestTradeDto entity = (CfetsTrdBondInvestTradeDto) data;
+        riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
+        List<TrdBondInvestTradeDto> list1 = new ArrayList<>();
+        for (CfetsTrdBondInvestTradeDto item : entity.getDtoList()) {
+            TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
+            list1.add(bondDto);
+        }
+        if (CollectionUtils.isEmpty(list1) && !CollectionUtils.isEmpty(entity.getBussTrdTransfenpeiDto())) {//处理撤销时
+            for (BussTrdTransfenpeiDto item : entity.getBussTrdTransfenpeiDto()) {
+                TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
+                BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
+                bondDto.setTotleTradeId(item.getTradeId());
+                list1.add(bondDto);
+            }
+        }
+        if (CollectionUtils.isEmpty(list1) && CollectionUtils.isNotEmpty(entity.getTradeDtoList())) {
+            list1.addAll(entity.getTradeDtoList());
+        }
+        return interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
     }
 
 }

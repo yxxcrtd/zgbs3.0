@@ -331,6 +331,16 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setFinprodId(finProdId);
         finProductIssue.setIssueClass(finListedBondInfoQuery001Dto.getIssueMethod());
         finProductIssue.setTenderType(finListedBondInfoQuery001Dto.getBiddingMethod());
+        String issueMethod = finListedBondInfoQuery001Dto.getIssueMethod();
+        if ("0".equals(issueMethod)) {
+            finProductIssue.setTenderType(DictCodeListExt4.招标方式_单一价格招标.getValue());
+            finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        }else if("5".equals(issueMethod)){
+            finProductIssue.setTenderType(DictCodeListExt4.招标方式_数量招标.getValue());
+            finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        }else if("6".equals(issueMethod)){
+            finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_报价发行.getValue());
+        }
         finProductIssue.setTenderTarget(finListedBondInfoQuery001Dto.getTenderTarget());
         //计划发行量
         finProductIssue.setPlanIssueAmt(Objects.nonNull(finListedBondInfoQuery001Dto.getIssueSize()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssueSize()) : null);

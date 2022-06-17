@@ -1706,7 +1706,7 @@
 
 	<select id="selectBidOrderBidPrices" resultType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
 		SELECT
-			<include refid="com.joyintech.tams.common.base.dao.BidOrderBidPriceMapper.Base_Column_List" />
+			bobp.ENTRUST_ID
 		FROM
 			BID_ORDER_BID_PRICE bobp
 		LEFT JOIN

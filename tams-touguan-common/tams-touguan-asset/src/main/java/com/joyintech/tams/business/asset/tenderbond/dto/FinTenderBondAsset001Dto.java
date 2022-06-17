@@ -342,7 +342,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getIssueTypeValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.issueType);
+        return SysDataUtil.getNameFromDataDict(DictCode.债券类资产募集方式, this.issueType);
     }
 
     public void setIssueTypeValue(String issueTypeValue) {

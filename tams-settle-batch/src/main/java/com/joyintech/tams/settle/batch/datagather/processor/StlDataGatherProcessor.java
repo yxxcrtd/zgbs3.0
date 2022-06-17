@@ -421,7 +421,20 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 }
             }
         }
-
+        // 债券一级投标
+        List<SettleTransDataDto> jytbSettleTransDataList = specailSettleTransDataList.stream().filter(
+                x -> StringUtil.equals(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), x.getFinprodType2())
+        ).collect(Collectors.toList());
+        if (!StringUtil.isEmptyList(jytbSettleTransDataList)) {
+            for (SettleTransDataDto settleTransDataDto: jytbSettleTransDataList)
+            {
+                String busiKey = StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(),settleTransDataDto.getPs()),"_");
+                if (etrEntrustMap.containsKey(busiKey)) {
+                    List<EtrEntrustDto> currEntrustList = etrEntrustMap.get(busiKey);
+                    this.handleMatch(settleTransDataDto, currEntrustList, exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
+                }
+            }
+        }
     }
 
     /**

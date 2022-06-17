@@ -73,4 +73,7 @@ public interface CreditProtectionCertificateMapper {
     FinProductTypeConfig getWindType(FinProductTypeConfig param);
 
 
+    int countForInProcess(@Param("finprodId") String finprodId);
+
+    int checkAssertOnDealed(String finprodId);
 }

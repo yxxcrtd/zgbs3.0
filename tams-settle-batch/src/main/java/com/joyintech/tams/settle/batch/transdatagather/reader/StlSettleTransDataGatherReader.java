@@ -301,6 +301,10 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         dealTotal.setUnitCprice(unitCprice);
                         dealTotal.setUnitFprice(unitCprice);
                     }
+                    else if(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(settleTransDataDto.getFinprodType2())){
+                        unitCprice = ArithmeticUtil.divide(totalFpriceamt, totalShareAmt, 8);
+                        dealTotal.setUnitCprice(unitCprice);
+                    }
                     //单位面值  空
                     // 交易份额
                     dealTotal.setShareAmt(totalShareAmt);

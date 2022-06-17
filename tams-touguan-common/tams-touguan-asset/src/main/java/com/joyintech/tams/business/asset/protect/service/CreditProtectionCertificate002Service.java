@@ -21,6 +21,7 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -31,16 +32,20 @@ import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,6 +91,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
 
     @Autowired
     private JoyinFSMapper joyinFSMapper;
+
+    @Autowired
+    private CommonBusinessService commonBusinessService;
 
     /**
      * 保存操作类型
@@ -583,8 +591,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             map.put("finprodId",dto.getFinprodId());
             map.put("isCancel",DictCodeList.是否_否.getValue());
             map.put("ps",null);
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
-            if (Objects.nonNull(count) && count > 0) {
+            int transInAsset = commonBusinessService.isTransInAsset(dto.getFinprodId());
+            int count = creditProtectionCertificateMapper.countForInProcess(dto.getFinprodId());
+            if (transInAsset> 0 ||  count > 0) {
                 validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
             }
         }
@@ -596,7 +605,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             map.put("ps",null);
             Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
             if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
+                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可删除"));
             }
         }
         return validList;
@@ -648,4 +657,38 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         ValidUtils.valid(dto, validList);
     }
 
+    /**
+     * 检查资产是否存在成交数据
+     * @param finprodId
+     * @return
+     */
+    public int checkAssertOnDealed(String finprodId) {
+        return creditProtectionCertificateMapper.checkAssertOnDealed(finprodId);
+    }
+
+    public MultipartFile downloadFileInfo(String seqNo) throws FileNotFoundException {
+        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
+        File pathFile = new SafelyFile(file.getPath());
+        MultipartFile multipartFile = createMultipartFile(pathFile);
+        return multipartFile;
+    }
+
+    private MultipartFile createMultipartFile(File file) {
+        try {
+            FileItem fileItem = null;
+            MultipartFile multipartFile = null;
+            fileItem = new DiskFileItem(file.getName(), Files.probeContentType(file.toPath()),
+                    false, file.getName(), (int) file.length(), file.getParentFile());
+            InputStream input = new FileInputStream(file);
+            OutputStream os = fileItem.getOutputStream();
+            IOUtils.copy(input, os);
+            multipartFile = new CommonsMultipartFile(fileItem);
+            os.close();
+            input.close();
+            return multipartFile;
+        } catch (Exception e) {
+            e.getStackTrace();
+            throw new RuntimeException("File转MultipartFile失败");
+        }
+    }
 }

@@ -2,10 +2,7 @@ package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao;
 
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
-import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.WflTrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -169,4 +166,14 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/6/9 15:38
      */
     int selectResultCount(Map<String, Object> param);
+
+    /**
+     * 查询是否存在已中标结果维护数据
+     *
+     * @param param
+     * @return int
+     * @author jiangpeng
+     * @date 2022/6/9 15:38
+     */
+    FinProduct selectByFinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
 }
