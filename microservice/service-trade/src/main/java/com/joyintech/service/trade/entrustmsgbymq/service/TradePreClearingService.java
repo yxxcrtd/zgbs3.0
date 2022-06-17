@@ -1237,8 +1237,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
         }
         // 本方交易员
-        String trader = entrustMsgbyMQMapper.queryTradeId(infContractDetailfile.getEntrustId());
-        dto.setTrader(trader);
+//        String trader = entrustMsgbyMQMapper.queryTradeId(infContractDetailfile.getEntrustId());
+        dto.setTrader(infContractDetailfile.getTradeId());
+        dto.setCounterId(infContractDetailfile.getCounterId());
 
         if(dto.getCcy() == null){
             dto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
