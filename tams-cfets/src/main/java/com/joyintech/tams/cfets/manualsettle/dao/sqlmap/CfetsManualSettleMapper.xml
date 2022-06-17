@@ -648,11 +648,11 @@
     <select id="findBidFirmPortIntFenPeiInfoList" resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
         select tpda.ENTRUST_ID                           entrustId,
                pp.PORTFOLIO_NAME                         portfolioName,
-               tpd.SHARE_AMT*100                         qtyd,
-               tpd.FEE_AMT_UNPAY                         jsFeeAmt,
-               tpd.CPRICE_AMT                            tradeAmt,
-               tpd.INT_AMT                               intAmt,
-               tpd.TRADE_AMT                             payAmt,
+               bobp.THE_WIN_PRIN_AMT                     qtyd,
+               bobp.SETT_FEE_AMT                         jsFeeAmt,
+               bobp.TRADE_AMT                            tradeAmt,
+               bobp.INT_AMT                              intAmt,
+               bobp.PAYABLE_AMOUNT                       payAmt,
                 case
                     when bobp.BID_PRICE is null then null
                     when fpi.TENDER_TARGET = '01' then to_char(bobp.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
