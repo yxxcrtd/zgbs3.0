@@ -707,17 +707,10 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
                 busiTypePosition=DictCodeListExt3.投管业务类型_中途换券.getValue();
             }
         } else if (DictCodeListExt3.交易方向_解除质押.getValue().equals(dto.getPs())) {
-            if(null!=dto.getOutAmt()&&dto.getOutAmt().compareTo(BigDecimal.ZERO)==1){
-                dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue());
-                dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue());
-                businessType = DictCodeListExt3.共通业务类型_协议回购中途换券指令.getValue();
-                busiTypePosition=DictCodeListExt3.投管业务类型_中途换券.getValue();
-            }else{
-                dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
-                dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
-                businessType = DictCodeListExt3.共通业务类型_协议回购中途换券指令.getValue();
-                busiTypePosition=DictCodeListExt3.投管业务类型_中途换券.getValue();
-            }
+            dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue());
+            dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue());
+            businessType = DictCodeListExt3.共通业务类型_协议回购解除质押指令.getValue();
+            busiTypePosition=DictCodeListExt3.投管业务类型_解除质押.getValue();
         } else if (DictCodeListExt3.交易方向_到期续做.getValue().equals(dto.getPs())) {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue());
