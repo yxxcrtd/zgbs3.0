@@ -308,6 +308,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "bondMarketInvRepayDtos", value = "还本计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos;
 
+    @ApiModelProperty(name = "allBondMarketPlanDtos", value = "计划信息")
+    private List<FinBondMarketCashPlanDto> allBondMarketPlanDtos;
+
     public String getSecId() {
         return secId;
     }
@@ -1058,5 +1061,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setBasis(String basis) {
         this.basis = basis;
+    }
+
+    public List<FinBondMarketCashPlanDto> getAllBondMarketPlanDtos() {
+        return allBondMarketPlanDtos;
+    }
+
+    public void setAllBondMarketPlanDtos(List<FinBondMarketCashPlanDto> allBondMarketPlanDtos) {
+        this.allBondMarketPlanDtos = allBondMarketPlanDtos;
     }
 }

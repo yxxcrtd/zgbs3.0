@@ -1,6 +1,7 @@
 package com.joyintech.service.trade.conbond.service;
 
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.trade.conbond.dao.TrdConBondMapper;
 import com.joyintech.service.trade.conbond.dto.TrdConBondDto;
@@ -105,11 +106,13 @@ public class PositionRequestTrdConBondService {
         ptlCash.put("tradeId", entity.getTrdProductDeal().getTradeId());
         ptlCash.put("etrId", entity.getEntrustId());
         //网下申购，普通申购传50万，优先配售用券面总额
-        if (StringUtil.isNotBlank(entity.getPurchType()) && StringUtil.equals(entity.getPurchType(), DictCodeListExt2.申购类型_优先配售.getValue())) {
-            ptlCash.put("cashAmount", entity.getTradeAmt());
-        }else {
-            ptlCash.put("cashAmount", new BigDecimal("500000"));
-        }
+//        if (StringUtil.isNotBlank(entity.getPurchType()) && StringUtil.equals(entity.getPurchType(), DictCodeListExt2.申购类型_优先配售.getValue())) {
+//            ptlCash.put("cashAmount", entity.getTradeAmt());
+//        }else {
+//            ptlCash.put("cashAmount", new BigDecimal("500000"));
+//        }
+        // 中签券面-保证金金额
+        ptlCash.put("cashAmount", ArithmeticUtil.subtract(entity.getWinlotteryAmt(),entity.getDepositAmt()));
 
         ptlCashList.add(ptlCash);
         resultMap.put("ptlCashList", ptlCashList);
