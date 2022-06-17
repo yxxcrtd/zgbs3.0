@@ -178,11 +178,14 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                             continue;
                         }
                         //最新价从行情取
-                        EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
-                        if (hqResponse != null) {
-                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
-                            entity.setPrice(lastPrice);
+                        //add wsz 获取 最新估价 作为最新价 start
+                        EtrCreditProtectionCertificateHoldResponse priceEntity = this.getPrice(entity);
+                        if(!Objects.isNull(priceEntity)){
+                           entity.setPrice(priceEntity.getPrice());
+                        } else {
+                            entity.setPrice(new BigDecimal(0.00));
                         }
+                        //add wsz 获取 最新估价 作为最新价end
                         returnList.add(entity);
                     }
                     result.setRoot(returnList);
@@ -211,6 +214,14 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
             logger.info(ex.getMessage());
         }
         return null;
+    }
+
+    public EtrCreditProtectionCertificateHoldResponse getPrice(EtrCreditProtectionCertificateHoldResponse request) {
+        Map<String,Object> map= new HashMap<>();
+        map.put("secid",request.getFinprodMarketId());
+        Date platDate = DateUtil.platDateFromCache();
+        map.put("nowDate",DateUtil.format(platDate));
+        return etrExchangeTradeCpc002Mapper.getPrice(map);
     }
 
     private Page<EtrCreditProtectionCertificateHoldResponse> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap,
