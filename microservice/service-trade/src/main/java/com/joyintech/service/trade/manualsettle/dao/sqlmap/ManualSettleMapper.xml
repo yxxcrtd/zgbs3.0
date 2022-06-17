@@ -94,7 +94,7 @@
         LEFT JOIN FIN_PRODUCT FP ON FDP.PLEDGE_FINPROD_ID = FP.FINPROD_ID
         WHERE FDP.BRANCH = 0
         GROUP BY FDP.FINPROD_ID
-        ) PN on PN.FINPROD_ID = T1.FINPROD_ID
+        ) PN on PN.FINPROD_ID = T1.TRADE_ID
         <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 end-->
         <where>
             <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 start-->
