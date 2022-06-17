@@ -3293,7 +3293,7 @@
                 || '|' || aaa.tgBusiTypeStr || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr
                 || '|' || aaa.psStr|| '|' || aaa.tradeMarketStr|| '|' || aaa.tradeMarketModeStr
                 || '|' || aaa.settleSpeedStr  || '|' || aaa.secManageAcctIdStr || '|' || aaa.ccyStr
-                || '|' || aaa.execid   || '|' || aaa.counterIdStr || '|' || aaa.remark
+                || '|' || aaa.execid   || '|' || aaa.counterIdStr || '|' || aaa.remark || '|' || aaa.bidId
                 like '%' || #{search} || '%')
                 or to_char(aaa.faceValue,'FM9999999999999990.90')=#{search} or to_char(aaa.faceValue)=#{search}
                 or aaa.tradeYield=#{search} or  aaa.tradeYield =#{search}||'%'
