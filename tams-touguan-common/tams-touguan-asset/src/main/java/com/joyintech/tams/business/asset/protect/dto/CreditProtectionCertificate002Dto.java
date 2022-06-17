@@ -216,9 +216,8 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     /**
      * 附件
      */
-    @JsonProperty(value = "MstFileInputParameter")
-    @ApiModelProperty(name="MstFileInputParameter",value="附件")
-    private MstFileInputParameter MstFileInputParameter;
+    @ApiModelProperty(name="mstFileInputParameter",value="附件")
+    private MstFileInputParameter mstFileInputParameter;
 
     private String isOrNoStr;
     private String settleMethodStr;
@@ -583,10 +582,10 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     }
 
     public MstFileInputParameter getMstFileInputParameter() {
-        return MstFileInputParameter;
+        return mstFileInputParameter;
     }
 
     public void setMstFileInputParameter(MstFileInputParameter mstFileInputParameter) {
-        MstFileInputParameter = mstFileInputParameter;
+        this.mstFileInputParameter = mstFileInputParameter;
     }
 }

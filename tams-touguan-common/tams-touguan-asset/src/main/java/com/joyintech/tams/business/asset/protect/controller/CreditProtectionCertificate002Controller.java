@@ -35,6 +35,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -252,7 +253,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     @ApiOperation(value = "附件删除", notes = "附件删除")
     @ResponseBody
     @PostMapping(value = "/deleteFile")
-    public Message<AjaxResult> UploadFile(SysUploadFileInfo file) {
+    public Message<AjaxResult> deleteFile(SysUploadFileInfo file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
                 AjaxResult ajaxResult = creditProtectionCertificate002Service.delFileInfo(file);
@@ -369,20 +370,20 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     @ApiOperation(value = "附件下载", notes = "附件下载")
     @ResponseBody
     @PostMapping( "/downloadFile/{seqNo}")
-    public Message<MultipartFile> downloadFile(@PathVariable("seqNo") String seqNo) {
+    public void downloadFile(@PathVariable("seqNo") String seqNo, HttpServletResponse request) {
         try {
             logger.info("文件下载开始");
             seqNo = seqNo.replaceAll("\"","");
             if (StringUtil.isNotEmpty(seqNo)) {
-                MultipartFile fileInfo = creditProtectionCertificate002Service.downloadFileInfo(seqNo);
-                return new Message<MultipartFile>().success().setData(fileInfo);
+                creditProtectionCertificate002Service.downloadFileInfo(seqNo,request);
+                return;
             }
             logger.info("文件下载结束");
         }catch (Exception e){
             logger.error("文件下载异常", e);
-            return new Message<MultipartFile>().fail().setMessage("文件下载异常");
+            return;
         }
-        return null;
+        return;
     }
 
 }

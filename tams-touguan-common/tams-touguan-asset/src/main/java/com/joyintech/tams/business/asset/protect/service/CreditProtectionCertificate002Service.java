@@ -1,6 +1,5 @@
 package com.joyintech.tams.business.asset.protect.service;
 
-import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.file.SafelyFile;
@@ -8,6 +7,7 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.protect.dao.CreditProtectionCertificateMapper;
@@ -43,6 +43,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -295,7 +297,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         String newfileName = fileNameList.get(0)+"_"+ com.joyintech.framework.util.DateUtil.format(com.joyintech.framework.util.DateUtil.now(), com.joyintech.framework.util.DateUtil.DATETIME_FORMAT_WITH_SSS_YEAR1)+"."+fileNameList.get(1);
         // 本地路径
         String localPath = CacheUtil.getSysParam("upload_file_path") + File.separator;
-        String nowDateStr = com.joyintech.framework.util.DateUtil.format(com.joyintech.framework.util.DateUtil.now(), com.joyintech.framework.util.DateUtil.DEFAULT_DATE_FORMAT_EN);
+        String nowDateStr = com.joyintech.framework.util.DateUtil.format(com.joyintech.framework.util.DateUtil.now(), DateUtil.DEFAULT_DATE_FORMAT_EN);
         List<String> nowDateList = StringUtil.splitToList("-",nowDateStr);
         String newPath = localPath + nowDateList.get(0) + File.separator
                 + nowDateList.get(1)  + File.separator + nowDateList.get(2)+ File.separator;
@@ -305,7 +307,6 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             newPathFile.mkdir();
         }
         File folder = new SafelyFile(newPathFile,newfileName);
-        //修改上传文件
         if (!folder.getParentFile().exists())
             folder.getParentFile().mkdirs();
         if (!folder.exists())
@@ -671,11 +672,42 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         return creditProtectionCertificateMapper.checkAssertOnDealed(finprodId);
     }
 
-    public MultipartFile downloadFileInfo(String seqNo) throws FileNotFoundException {
-        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
-        File pathFile = new SafelyFile(file.getPath());
-        MultipartFile multipartFile = createMultipartFile(pathFile);
-        return multipartFile;
+    public void downloadFileInfo(String seqNo, HttpServletResponse response) throws FileNotFoundException {
+        ServletOutputStream out = null;
+        FileInputStream ips = null;
+        try {
+            //获取文件存放的路径
+            SysUploadFileInfo fileInfo = joyinFSMapper.selectByPrimaryKey(seqNo);
+            File file = new SafelyFile(fileInfo.getPath());
+            String fileName=file.getName();
+            //获取到文字 数据库里对应的附件名字加上老的文件名字：filename 截取到后面的文件类型 例：txt 组成一个新的文件名字：newFileName
+            if(!file.exists()) {
+                //如果文件不存在就跳出
+                return;
+            }
+            ips = new FileInputStream(file);
+            response.setContentType("multipart/form-data");
+            //为文件重新设置名字，采用数据库内存储的文件名称
+            response.addHeader("Content-Disposition", "attachment; fileName=\"" + new String(fileName.getBytes("UTF-8"),"ISO8859-1") + "\"");
+            out = response.getOutputStream();
+            //读取文件流
+            int len = 0;
+            byte[] buffer = new byte[1024 * 10];
+            while ((len = ips.read(buffer)) != -1){
+                out.write(buffer,0,len);
+            }
+            out.flush();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            try {
+                out.close();
+                ips.close();
+            } catch (IOException e) {
+                System.out.println("关闭流出现异常");
+                e.printStackTrace();
+            }
+        }
     }
 
     private MultipartFile createMultipartFile(File file) {
