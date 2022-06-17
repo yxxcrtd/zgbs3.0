@@ -146,7 +146,7 @@ public class FinTenderBondAsset003Controller extends BaseController {
         WorkFlowParameter<FinTenderBondAsset003Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(FinTenderBondAsset003Dto::getFinprodMarketId);
+        params.setBusinessCode(FinTenderBondAsset003Dto::getFinprodId);
         params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
             processParameter.setOperationType(OperationType.NEW);

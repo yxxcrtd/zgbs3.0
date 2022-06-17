@@ -155,10 +155,11 @@ public class FinTenderBondAsset002Controller extends BaseController {
         WorkFlowParameter<FinTenderBondAsset002Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
+        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodId);
         params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
             processParameter.setOperationType(OperationType.NEW);
+            dto.setFinprodId(finTenderBoundAssetService.getFinprodId(dto));
         } else if (StringUtil.equals(dto.getOperateType(), OperationType.MODIFY.name())) {
             processParameter.setOperationType(OperationType.MODIFY);
         } else {
@@ -182,7 +183,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         WorkFlowParameter<FinTenderBondAsset002Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
         params.setElementId(asset004Dto.getElementId());
-        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
+        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodId);
         params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         FinTenderBondAsset002Dto dto = finTenderBoundAssetService.getById(asset004Dto.getFinprodId());
         dto.setRemark(asset004Dto.getRemark());

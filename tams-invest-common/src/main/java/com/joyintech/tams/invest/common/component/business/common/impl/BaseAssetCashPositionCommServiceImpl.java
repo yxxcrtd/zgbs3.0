@@ -595,7 +595,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
         }
 
         if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
-                && "ISSUE_CLASS_01".equals(assetType2)// 发行方式 报价发行
+                && ("ISSUE_CLASS_01".equals(assetType2) || "ISSUE_CLASS_02".equals(assetType2))// 发行方式 标志是否为一级投标
                 && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
             // 成交 增加在途持仓
             if ("02".equals(stage)) {
@@ -1752,7 +1752,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             //add by  liutf 20200108 end
             // add by jiangpeng on 20220428 新增一级申购业务处理 start
             else if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
-                    && "ISSUE_CLASS_01".equals(assetType2)// 发行方式 报价发行
+                    && ("ISSUE_CLASS_01".equals(assetType2) || "ISSUE_CLASS_02".equals(assetType2))// 发行方式 标志是否为一级投标
                     && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
                 resultDto.setCdate(stlPayOrder.getSettleDate());
                 resultDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
