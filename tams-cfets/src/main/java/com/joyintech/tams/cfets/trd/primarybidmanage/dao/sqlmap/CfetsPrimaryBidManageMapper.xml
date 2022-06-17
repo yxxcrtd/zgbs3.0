@@ -309,7 +309,7 @@
             BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
-            BRT.WIN_PRINAMT/10000   winPrinamt,
+            decode(BO.IS_WIN,'Y',BRT.WIN_PRINAMT/10000)   winPrinamt,
             BRT.WIN_PRICE           winPrice,
             CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
                  decode(FPI.TENDER_TARGET,'01', to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
@@ -450,7 +450,7 @@
         BO.BID_MODLE            bidModle,
         BO.PAY_TYPE             payType,
         BRT.WIN_TYPE            bidType,
-        BRT.WIN_PRINAMT/10000   winPrinamt,
+        decode(BRT.IS_WIN,'Y',BRT.WIN_PRINAMT/10000)  winPrinamt,
         BRT.WIN_PRICE           winPrice,
         CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
         decode(FPI.TENDER_TARGET,'01', to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
@@ -628,7 +628,7 @@
             BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
-            BRT.WIN_PRINAMT/10000   winPrinamt,
+            decode(BO.IS_WIN,'Y',BRT.WIN_PRINAMT/10000)   winPrinamt,
             BRT.WIN_PRICE           winPrice,
             CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
               decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
@@ -690,7 +690,7 @@
             BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
-            BRT.WIN_PRINAMT/10000   winPrinamt,
+           decode(BRT.IS_WIN,'Y',BRT.WIN_PRINAMT/10000)   winPrinamt,
             BRT.WIN_PRICE           winPrice,
             CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
                  decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
