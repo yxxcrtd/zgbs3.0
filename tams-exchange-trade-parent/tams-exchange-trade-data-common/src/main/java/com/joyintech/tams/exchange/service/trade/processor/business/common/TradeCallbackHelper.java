@@ -286,7 +286,8 @@ public class TradeCallbackHelper {
         if (tradeRecord.getTradeType() == TradeType.NORMAL.value) {
             transactionHelper.setTradeRecord(tradeRecord);
             //质押出入库，返回的标准券代码不用再次处理，只需要处理原始合约代码成交
-            if (entrust.getStockCode().equals(tradeRecord.getStockCode())) {
+            if (EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                    || entrust.getStockCode().equals(tradeRecord.getStockCode())) {
                 processNormalTrade(entrust, tradeRecord, order, instruction);
             } else {
                 logger.info("成交 [{}] 中合约代码  [{}] 和委托 [{}] 中合约代码 [{}] 不一致 entrustProp [{}], 无需处理该笔成交", tradeRecord.getBrokerTradeId(), tradeRecord.getStockCode(), entrust.getId(), entrust.getStockCode(), entrust.getEntrustProp());
