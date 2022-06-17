@@ -6,7 +6,7 @@
         SELECT rownum SEQ_NO,t.* from (select
         his.ENTRUST_ID,
 		his.OPER_TYPE,
-        p.FINPROD_ABBR as finprodAbbr,
+        nvl(p.FINPROD_ABBR,p1.FINPROD_ABBR) as finprodAbbr,
 		to_char( his.OPER_DATE, 'yyyy-MM-dd' ) OPER_DATE,
 		to_char( his.OPER_TIME, 'hh24:mi:ss' ) OPER_TIME,
 		his.BUSI_DES,
@@ -23,6 +23,14 @@
             and FINPROD_TYPE2='F01'
         </if>
             ) p on his.ENTRUST_ID=p.FINPROD_MARKET_ID
+        LEFT JOIN (select * from FIN_PRODUCT where 1=1
+        <if test="busiType !=null and busiType == 'TRD99'">
+            and FINPROD_TYPE2='F32'
+        </if>
+        <if test="busiType !=null and busiType == 'FINASSET01'">
+            and FINPROD_TYPE2='F01'
+        </if>
+        ) p1 on his.ENTRUST_ID=p.FINPROD_ID
         LEFT JOIN ETR_ENTRUST EE ON his.ENTRUST_ID = EE.ENTRUST_ID
         LEFT JOIN REG_FIN_PRODUCT_DEAL_TOTAL reg on reg.TOTLE_TRADE_ID= his.ENTRUST_ID
         LEFT JOIN ibu_quote_bond iqb on iqb.QUOTE_ID= his.ENTRUST_ID
