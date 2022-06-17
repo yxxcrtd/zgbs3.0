@@ -467,6 +467,9 @@ public class InvestmentManagement extends BaseService {
                 continue;
             }
             List<InstructionPledge> pledgeList = listMap.get(instruction.getEntrustId());
+            if (CollectionUtils.isEmpty(pledgeList)) {
+                continue;
+            }
             instruction.setPledges(pledgeList);
 
             if (StringUtil.equals(投管业务类型_首期.getValue(), busiTypeTg)) {
