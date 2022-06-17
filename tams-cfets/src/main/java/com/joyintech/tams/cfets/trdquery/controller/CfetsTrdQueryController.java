@@ -273,7 +273,7 @@ public class CfetsTrdQueryController extends BaseController {
                                                    @RequestBody CfetsTrdQueryCstpInfoListResponse dto) throws Exception {
         try {
             Map<String,Object> resultData = new HashMap<>();
-            if (StringUtil.equals(spcdCode, DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
+            if (StringUtil.equals(dto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
                 resultData = cfetsTrdQueryService.findBidCstpInfo(pageCode,dtCode,spcdCode,dto);
             }else{
                 resultData = cfetsTrdQueryService.findCstpInfo(pageCode,dtCode,spcdCode,dto);

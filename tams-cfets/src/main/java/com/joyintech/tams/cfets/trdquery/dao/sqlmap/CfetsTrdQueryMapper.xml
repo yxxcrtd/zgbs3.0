@@ -2446,7 +2446,7 @@
         union all
         SELECT TMI.MATCH_STATUS	matchStatus,
                ICB.TRD_ID execid,
-               FPT.TYPE_9  businesstype,
+               'BOND1'  businesstype,
       		   ICB.INSTRUMENT_ID  finprodId,
                FP.FINPROD_MARKET_ID  finprodMarketId,
                ICB.INSTRUMENT_SHORT_NAME finprodAbbr,
