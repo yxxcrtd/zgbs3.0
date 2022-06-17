@@ -16,6 +16,7 @@ import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.common.utils.ConvertListUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
@@ -430,15 +431,18 @@ public class TerminalHelper {
         RepurchaseQuoteReceiveResponse repurchaseQuoteReceiveResponse = new RepurchaseQuoteReceiveResponse();
         repurchaseQuoteReceiveResponse.setRequestNo(String.valueOf(source.getEntrustNo()));
         repurchaseQuoteReceiveResponse.setRequestType(null);
-        //        repurchaseQuoteReceiveResponse.setRequestTypeStr();
         repurchaseQuoteReceiveResponse.setBs(source.getEntrustBs());
-        //        repurchaseQuoteReceiveResponse.setBsStr();
         repurchaseQuoteReceiveResponse.setTradeMarket(null);
-        //        repurchaseQuoteReceiveResponse.setTradeMarketStr();
-        repurchaseQuoteReceiveResponse.setStockCode(source.getStockCode());
-        repurchaseQuoteReceiveResponse.setStockName(source.getStockName());
+        if (RepurchaseTypeEnum.中途换券.codeEquals(repurchaseQuoteReceiveResponse.getRequestType())) {
+            repurchaseQuoteReceiveResponse.setOrigBonds(source.getStockCode());
+            repurchaseQuoteReceiveResponse.setOrigBondsName(source.getStockName());
+//        repurchaseQuoteReceiveResponse.setOrigBondsVolume();
+//        repurchaseQuoteReceiveResponse.setOrigRepoAmount();
+        } else {
+            repurchaseQuoteReceiveResponse.setStockCode(source.getStockCode());
+            repurchaseQuoteReceiveResponse.setStockName(source.getStockName());
+        }
         repurchaseQuoteReceiveResponse.setPledgeNumber(BigDecimal.valueOf(source.getImpawnAmount()));
-        //        repurchaseQuoteReceiveResponse.setPledgeNumberStr();
         repurchaseQuoteReceiveResponse.setRepoAmount(BigDecimal.valueOf(source.getImpawnBalance()));
         repurchaseQuoteReceiveResponse.setRepoRate(BigDecimal.valueOf(source.getExpireYearRate()));
         repurchaseQuoteReceiveResponse.setDiscount(BigDecimal.valueOf(source.getFunderRatio()));
@@ -447,17 +451,17 @@ public class TerminalHelper {
         repurchaseQuoteReceiveResponse.setBackDate(String.valueOf(source.getSettleEndDate()));
         repurchaseQuoteReceiveResponse.setRepoMdate(String.valueOf(source.getRepurchaseDate()));
         repurchaseQuoteReceiveResponse.setCapDays(source.getFundUsedDays());
-//        repurchaseQuoteReceiveResponse.setSwapIntoBonds();
-//        repurchaseQuoteReceiveResponse.setSwapIntoBondsName();
-//        repurchaseQuoteReceiveResponse.setSwapIntoBondsVolume();
-//        repurchaseQuoteReceiveResponse.setSwapOutBonds();
-//        repurchaseQuoteReceiveResponse.setSwapOutBondsName();
-//        repurchaseQuoteReceiveResponse.setSwapOutBondsVolume();
-//        repurchaseQuoteReceiveResponse.setOrigBonds();
-//        repurchaseQuoteReceiveResponse.setOrigBondsName();
-//        repurchaseQuoteReceiveResponse.setOrigBondsVolume();
-//        repurchaseQuoteReceiveResponse.setOrigRepoAmount();
-//        repurchaseQuoteReceiveResponse.setTransCode(null);
+        repurchaseQuoteReceiveResponse.setSwapIntoBonds(source.getSwapIntoBonds());
+        Instrument swapIntoBondInstrument = instrumentService.queryByInnerCode(source.getSwapIntoBonds());
+        repurchaseQuoteReceiveResponse.setSwapIntoBondsName(ObjectUtil.isNotNull(swapIntoBondInstrument) ? swapIntoBondInstrument.getStockName() : source.getSwapIntoBonds());
+        repurchaseQuoteReceiveResponse.setSwapIntoBondsVolume(source.getSwapIntoBondsVolume());
+        repurchaseQuoteReceiveResponse.setSwapOutBonds(source.getSwapOutBonds());
+        Instrument swapOutBondInstrument = instrumentService.queryByInnerCode(source.getSwapOutBonds());
+        repurchaseQuoteReceiveResponse.setSwapOutBondsName(ObjectUtil.isNotNull(swapOutBondInstrument) ? swapOutBondInstrument.getStockName() : source.getSwapOutBonds());
+        repurchaseQuoteReceiveResponse.setSwapOutBondsVolume(source.getSwapOutBondsVolume());
+        if (RepurchaseTypeEnum.到期续做.codeEquals(repurchaseQuoteReceiveResponse.getRequestType())) {
+             repurchaseQuoteReceiveResponse.setTransCode(null);
+        }
         repurchaseQuoteReceiveResponse.setmIntAmt(BigDecimal.valueOf(source.getProfit()));
         repurchaseQuoteReceiveResponse.setBackBalance(BigDecimal.valueOf(source.getSettleBalance()));
         repurchaseQuoteReceiveResponse.setCpClientName(source.getPropAccountName());
