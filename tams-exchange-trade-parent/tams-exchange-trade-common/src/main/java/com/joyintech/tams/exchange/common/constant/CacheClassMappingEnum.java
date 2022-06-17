@@ -1,6 +1,8 @@
 package com.joyintech.tams.exchange.common.constant;
 
-public enum CacheClassMappingEnum {
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
+public enum CacheClassMappingEnum implements IEnum<String> {
 
     ENTRUST("普通委托", "com.joyintech.tams.exchange.common.db.domain.Entrust", "com.joyintech.tams.exchange.datacommon.db.service.impl.EntrustServiceImpl"),
     INTEGRATED_ENTRUST("综合委托", "com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust", "com.joyintech.tams.exchange.datacommon.db.service.impl.IntegratedEntrustServiceImpl"),
@@ -10,7 +12,9 @@ public enum CacheClassMappingEnum {
     INSTRUMENT("合约", "com.joyintech.tams.exchange.common.db.domain.Instrument", "com.joyintech.tams.exchange.datacommon.db.service.impl.InstrumentServiceImpl"),
     INSTRUCTION("指令", "com.joyintech.tams.exchange.common.db.domain.Instruction", "com.joyintech.tams.exchange.datacommon.db.service.impl.InstructionServiceImpl"),
     INSTRUCTION_PLEDGE("指令抵押", "com.joyintech.tams.exchange.common.db.domain.InstructionPledge", "com.joyintech.tams.exchange.datacommon.db.service.impl.InstructionPledgeServiceImpl"),
-    FUTURES_INSTRUMENT("期货合约", "com.joyintech.tams.exchange.common.db.domain.FuturesInstrument", "com.joyintech.tams.exchange.datacommon.db.service.impl.FuturesInstrumentServiceImpl");
+    INSTRUCTION_DETAIL("指令明细", "com.joyintech.tams.exchange.common.db.domain.InstructionDetail", "com.joyintech.tams.exchange.datacommon.db.service.impl.InstructionDetailServiceImpl"),
+//    FUTURES_INSTRUMENT("期货合约", "com.joyintech.tams.exchange.common.db.domain.FuturesInstrument", "com.joyintech.tams.exchange.datacommon.db.service.impl.FuturesInstrumentServiceImpl"),
+    ;
 
     public final String name;
     public final String beanPath;
@@ -59,5 +63,15 @@ public enum CacheClassMappingEnum {
             }
         }
         return null;
+    }
+
+    @Override
+    public String getCode() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return beanPath;
     }
 }
