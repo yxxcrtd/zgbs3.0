@@ -200,7 +200,7 @@
         ELSE FP.FINPROD_MARKET_ID
         END             AS secId,
         FP.FINPROD_ABBR AS secName,
-        floor(NVL(TEMP.AMOUNT, 0)/100)     AS positionsNum,
+        floor(NVL(TEMP.AMOUNT, 0)/10000)     AS positionsNum,
         invaim.INV_AIM as invAim,
         invaim.BUSINESS_MODEL as businessModel,
         TEMP.ptlPositionsNum AS ptlPositionsNum,
