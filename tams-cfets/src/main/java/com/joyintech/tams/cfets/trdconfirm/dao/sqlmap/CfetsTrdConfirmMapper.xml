@@ -1318,7 +1318,7 @@
         select distinct null                    as                                   execid,
                 'BID'                           as                                   businesstype,
                 fp.finprod_id                   as                                   finprodId,
-                icb.INSTRUMENT_ID               as                                   finprodMarketId,
+                CONCAT(icb.INSTRUMENT_ID, '.IB')                                     finprodMarketId,
                 icb.INSTRUMENT_SHORT_NAME       as                                   finprodAbbr,
                 'T01'                           as                                   ps,
                 null                                                                 settleSpeed,
@@ -1330,9 +1330,9 @@
                     when icb.SPREAD is not null then icb.SPREAD
                     when icb.COUPON_RATE is not null then icb.COUPON_RATE  end tradeYield,
                 case
-                when icb.ISSUE_PRICE is not null then to_char(icb.ISSUE_PRICE,'FM990.9990') || '元'
-                when icb.SPREAD is not null then to_char(icb.SPREAD,'FM990.90') || 'BP'
-                when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYieldStr,
+                when icb.ISSUE_PRICE is not null then to_char(icb.ISSUE_PRICE,'FM99999999990.9990') || '元'
+                when icb.SPREAD is not null then to_char(icb.SPREAD,'FM99999999990.90') || 'BP'
+                when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM99999999990.9990') ||'%' end tradeYieldStr,
                 null                                                                 termDays,
                 icb.ACTUAL_FEE                  as                                   tradeAmt,
                 null                            as                                   quoteid,
@@ -1354,7 +1354,7 @@
                 null                            as                                   pledgeFaceValues,
                 null                            as                                   mtradeAmt
         from INTERF_CSTP_BJFXJG icb
-                 left join fin_product fp on icb.INSTRUMENT_ID = fp.finprod_market_id
+                 left join fin_product fp on CONCAT(icb.INSTRUMENT_ID,'.IB') = fp.finprod_market_id
                  LEFT JOIN SYS_USER_ADD sua ON icb.SUBMIT_USER = sua.IBU_TRADER
                  LEFT JOIN SYS_USER su ON sua.USER_ID = su.USER_ID
                  LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit ON icb.SUBSCRIBE_INSTITUTION_ID = mccit.PARTY_ID
@@ -1365,11 +1365,11 @@
             AND 'BID' = #{regAssetType,jdbcType=VARCHAR}
         </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
-            AND (icb.INSTRUMENT_ID  in
+            AND (fp.finprod_market_id  in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
-            or icb.INSTRUMENT_ID in
+            or fp.finprod_market_id in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
                 CONCAT(#{item},'.IB')
             </foreach>

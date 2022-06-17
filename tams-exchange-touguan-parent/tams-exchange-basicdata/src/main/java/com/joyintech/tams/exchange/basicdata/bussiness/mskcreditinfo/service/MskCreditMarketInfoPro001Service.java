@@ -165,6 +165,13 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
         map.put("cdate",request.getCdate());
         return mskCreditInfoProMapper.getBasicInfo(map);
     }
+    public MskCreditInfoProSaveRequest getPrice(MskCreditInfoProSaveRequest request) {
+        Map<String,Object> map= new HashMap<>();
+        map.put("secid",request.getSecid());
+        Date platDate = DateUtil.platDateFromCache();
+        map.put("nowDate",DateUtil.format(platDate));
+        return mskCreditInfoProMapper.getPrice(map);
+    }
 
     public Page<SelectOptionDto> getFinprodMarketInfo(MskCreditInfoProSaveRequest request) {
         Map<String, Object> pageParam = BeanUtil.object2Map(request);

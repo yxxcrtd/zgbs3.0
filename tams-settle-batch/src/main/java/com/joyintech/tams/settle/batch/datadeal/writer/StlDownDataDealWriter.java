@@ -135,16 +135,6 @@ public class StlDownDataDealWriter extends BaseWriter<NeedToWriteEntity> {
 			// 成交数据明细表
 			SettleTransData settleTransData = dataDealWriteBaseDto.getSettleTransData();
 			// ZGCPCN-1441: 修改可转债和一级投标债成交明细赋值 modify by fuyongsheng 20220616 start
-			FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
-			finProductTypeKey.setBranch(0L);
-			finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
-			FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
-			if((DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(settleTransData.getFinprodType2()) &&
-					!DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue().equals(finProductType.getType6()))
-				||
-				BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue().equals(settleTransData.getFinprodType2())){
-				settleTransData.setShareAmt(ArithmeticUtil.multiply(settleTransData.getShareAmt(), new BigDecimal(100)));
-			}
 			if(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue().equals(settleTransData.getFinprodType2())){
 				String finProdMarketId = settleTransData.getFinprodId().substring(4);
 				List<FinProduct> finProducts = stlDownDataDealMapper.getFinproduct(finProdMarketId, settleTransData.getFinprodType2());

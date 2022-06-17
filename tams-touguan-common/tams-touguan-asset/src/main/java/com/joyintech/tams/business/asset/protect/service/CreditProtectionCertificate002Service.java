@@ -160,6 +160,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         dto.setFinprodId(getFinprodId(dto));
         FinProduct finProduct = new FinProduct();
         BeanUtil.copyPropertiesIgnoreNull(finProduct, dto);
+        //add wsz ZGCPCN-1460 修改默认币种为 CNY（人名币） satrt
+        finProduct.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+        //add wsz ZGCPCN-1460 修改默认币种为 CNY（人名币） end
         finProductMapper.insert(finProduct);
         //2.保存金融产品标的附属表
         FinProductAdd productAdd = new FinProductAdd();

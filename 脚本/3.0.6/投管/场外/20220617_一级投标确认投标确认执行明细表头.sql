@@ -1,0 +1,1 @@
+UPDATE CFG_DATATABLE_SHOW SET EXTENDCFG = '{"colAlign": "left","dataType":"date","format":"yyyy-MM-dd"}' WHERE PAGECODE = 'TenderBondFirm' AND DTCODE = 'BIDORDERTRANSLIST' AND SPCDCODE = '01' AND COLCODE = 'bidConfirmDate' ;

@@ -233,6 +233,16 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
         }
     }
 
+
+    public void deal() {
+
+
+
+
+    }
+
+
+
     /**
      * 根据id返回上市流通信息
      *

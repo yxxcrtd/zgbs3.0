@@ -7,6 +7,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
@@ -86,6 +87,8 @@ public class CreditProtectionCertificate001Controller extends BaseController {
         initPageParams.put("PAY_TYPE", this.getSelectDataFromDataDic(DictCode.支付方式, null));
         initPageParams.put("MARKET_INSTI_TYPE_SCA", this.getSelectDataFromDataDic(DictCode.市场机构机构类型, null));
         initPageParams.put("BASIS", this.getSelectDataFromDataDic(DictCode.计息基础, null));
+        //刷新时间
+        initPageParams.put("CreditProtectionCertificate001_list_refresh_period", CacheUtil.getSysParam("CreditProtectionCertificate001_list_refresh_period"));
         //交易日历
 
         //pageId
