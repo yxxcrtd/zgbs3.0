@@ -431,11 +431,19 @@ public class PositionRequestTradeReportService {
                     }
                     // ZGTFCP-1900:修改解除质押字段赋值 modify by fuyongsheng 20220327 end
                 }else{
-                    ptlSec.put("finprodId", entity.getFinDealPledge().getPledgeFinprodId());
-                    // 本方券券面总额
-                    ptlSec.put("ownSecAmount", ArithmeticUtil.multiply(entity.getFinDealPledge().getPledgeNumber(), new BigDecimal(100)));
-                    // 券面总额
-                    ptlSec.put("secAmount", ArithmeticUtil.multiply(entity.getFinDealPledge().getPledgeNumber(), new BigDecimal(100)));
+                    if(entity.getFinDealPledge() != null) {
+                        ptlSec.put("finprodId", entity.getFinDealPledge().getPledgeFinprodId());
+                        // 本方券券面总额
+                        ptlSec.put("ownSecAmount", ArithmeticUtil.multiply(entity.getFinDealPledge().getPledgeNumber(), new BigDecimal(100)));
+                        // 券面总额
+                        ptlSec.put("secAmount", ArithmeticUtil.multiply(entity.getFinDealPledge().getPledgeNumber(), new BigDecimal(100)));
+                    }else if(entity.getFinDealPledgeList() != null && entity.getFinDealPledgeList().size() > 0){
+                        ptlSec.put("finprodId", entity.getFinDealPledgeList().get(0).getPledgeFinprodId());
+                        // 本方券券面总额
+                        ptlSec.put("ownSecAmount", ArithmeticUtil.multiply(entity.getFinDealPledgeList().get(0).getPledgeNumber(), new BigDecimal(100)));
+                        // 券面总额
+                        ptlSec.put("secAmount", ArithmeticUtil.multiply(entity.getFinDealPledgeList().get(0).getPledgeNumber(), new BigDecimal(100)));
+                    }
                 }
                 ptlSecList.add(ptlSec);
             }

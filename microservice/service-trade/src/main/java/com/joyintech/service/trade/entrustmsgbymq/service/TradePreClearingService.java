@@ -821,7 +821,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             finProductTypeMapper.insertSelective(trdTempDto.getFinProductType());
             // 写入回购质押品表
             if (DictCodeList.回购类型_质押式协议回购.getValue().equals(trdTempDto.getFinProductType().getType6())) {
-                if(trdTempDto.getFinDealPledge().getPledgeFinprodId() != null) {
+                if(trdTempDto.getFinDealPledge() != null && trdTempDto.getFinDealPledge().getPledgeFinprodId() != null) {
                     finDealPledgeMapper.insertSelective(trdTempDto.getFinDealPledge());
                 }
             }

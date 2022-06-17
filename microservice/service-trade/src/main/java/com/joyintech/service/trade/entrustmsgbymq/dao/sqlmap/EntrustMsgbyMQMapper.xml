@@ -38,6 +38,7 @@
 		  AND v.TRADE_PLACE = #{tradeMarket}
 		  AND t.ACCT_NO = #{acctNo}
 		  AND PSA.PORTFOLIO_ID = #{portfolioId}
+		  AND ROWNUM = 1
 		ORDER BY t.ACCT_NO
 	</select>
 

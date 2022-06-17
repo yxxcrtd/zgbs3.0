@@ -342,7 +342,7 @@ public class TradeCallbackHelper {
         List<InstructionPledge> instructionPledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instructionId);
         for (InstructionPledge pledge : instructionPledges) {
             message = new PledgeTradeMessage();
-            message.setFinprodMarketId(pledge.getFinprodMarketId());
+            message.setFinprodMarketId(pledge.getFinprodId());
             message.setPledgeNumber(pledge.getPledgeNumber());
             message.setDisplaceDir(pledge.getDisplaceDir());
             pledgeTradeMessages.add(message);
