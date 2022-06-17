@@ -430,7 +430,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 
     /**
      * 债券_银行间_委托借一次性通道卖出
-     * 
+     *
      * @param finProductTradeDto
      * @param 持仓类型 持仓类型
      * @param etrPositionHoldDto 流水容器
@@ -501,7 +501,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 
     /**
      * 债券_银行间_委托借一次性划款通道买入
-     * 
+     *
      * @param finProductTradeDto
      * @param 持仓类型 持仓类型
      * @param etrPositionHoldDto 流水容器
@@ -585,7 +585,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 
     /**
      * 债券_银行间_委托借逐笔划款通道卖出
-     * 
+     *
      * @param finProductTradeDto
      * @param 持仓类型 持仓类型
      * @param etrPositionHoldDto 流水容器
@@ -657,7 +657,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 
     /**
      * 债券_银行间_委托借逐笔划款通道买入
-     * 
+     *
      * @param finProductTradeDto
      * @param 持仓类型 持仓类型
      * @param etrPositionHoldDto 流水容器
@@ -736,7 +736,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 
     /**
      * 债券_银行间_委托直投卖出
-     * 
+     *
      * @param finProductTradeDto
      * @param 持仓类型
      * @param etrPositionHoldDto 流水容器
@@ -862,7 +862,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 
     /**
      * 债券_银行间_委托直投买入
-     * 
+     *
      * @param finProductTradeDto
      * @param 持仓类型
      * @param etrPositionHoldDto 流水容器
@@ -913,7 +913,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                         finProductTradeDto.getTrdProductDeal().getCcy(), finProductTradeDto.getTrdProductDeal().getSecManageAcctId(),
                         finProductTradeDto.getTrdProductDeal().getCounterId(),etrCashPositionFlowDto);
             }
-        
+
             // 设置账号
             etrCashPositionFlowDto.setAcctId(账号);
         }
@@ -1100,6 +1100,54 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         }
     }
 
+    /**
+     * 一级投标债指令头寸处理
+     *
+     * @param finProductTradeDto
+     * @param 持仓类型
+     * @param etrPositionHoldDto
+     * @author jiangpeng
+     * @date 2022/6/17 15:30
+     */
+    private static void 一级投标债_场外_买入(BaseTradeProductDealDto finProductTradeDto, DictCodeList 持仓类型,
+                                    EtrPositionHoldDto etrPositionHoldDto) {
+        // 委托代码
+        String entrustId = finProductTradeDto.getEntrustId();
+        BigDecimal 交易日数量 = finProductTradeDto.getTrdProductDeal().getShareAmt();
+        BigDecimal 交易日减少金额 = finProductTradeDto.getTrdProductDeal().getFpriceAmt().negate();
+        // 交易生成的现金流水
+        EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDto(
+                finProductTradeDto);
+        etrCashPositionFlowDto.setOrderId(finProductTradeDto.getEntrustId());
+        // 交易场所为一级市场且是交易所的交易，付款账户为托管户 add by 马数凯 20210430
+        String 账号;
+        if (StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarketMode(), DictCodeListExt1.交易市场_一级市场.getValue())) {
+            账号 = EtrCommonCashPositionDealService.select组合托管户(finProductTradeDto.getTrdProductDealAdd().getPortfolioId(),
+                    finProductTradeDto.getTrdProductDeal().getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue());
+        } else {
+            账号 = gen账号(finProductTradeDto.getTrdProductDeal().getTradeMarket(),
+                    finProductTradeDto.getTrdProductDeal().getChlId(), finProductTradeDto.getTrdProductDealAdd().getPortfolioId(),
+                    finProductTradeDto.getTrdProductDeal().getCcy(), finProductTradeDto.getTrdProductDeal().getSecManageAcctId(),
+                    finProductTradeDto.getTrdProductDeal().getCounterId(), etrCashPositionFlowDto);
+        }
+        // 设置账号
+        etrCashPositionFlowDto.setAcctId(账号);
+        etrCashPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
+        // 有委托
+        if (StringUtil.isNotEmpty(entrustId)) {
+            // 持仓流水dto处理
+            etrCashPositionFlowDto.setAmount(交易日减少金额);
+            // 添加现金流水到目标dto
+            etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
+            // 交收时交割日减少(交易金额-交易券面总额*委托全价/债券面值）
+            if (StringUtil.equals(finProductTradeDto.getStage(), "03")) {
+                etrPositionHoldDto.getPtlCashPositionFlows().add(gen冲销现金流水生成(etrCashPositionFlowDto, entrustId,
+                        交易日数量, finProductTradeDto.getTrdProductDeal().getSettleDate(),
+                        finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign()));
+            }
+        }
+    }
+
     private static void 预增现金处理(EtrPositionHoldDto etrPositionHoldDto, TrdProductDeal deal, TrdProductDealAdd dealAdd,
                                List<StlPayOrdersDto> stlPayOrdersDtos, EtrCashPositionFlowDto etrCashPositionFlowDto) {
         stlPayOrdersDtos.forEach(stlPayOrdersDto -> {
@@ -1153,7 +1201,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 
     /**
      * 获取现金流水需要的账号
-     * 
+     *
      * @param tradePlace 交易场所
      * @param chlId 通道代码
      * @param portfolioId 组合代码
@@ -1230,7 +1278,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
           }
       }
    }
-    
+
     public static void deal债券EntrustStart(EntrustCommonDto entrustCommonDto, EtrPositionHoldDto etrPositionHoldDto) {
         if (entrustCommonDto != null) {
             EtrEntrust etrEntrust = entrustCommonDto.getEtrEntrust();
@@ -1288,7 +1336,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         String ps = etrEntrust.getPs();
         BigDecimal etrFinish = EtrCommonCashPositionDealService.getEtrFinishAmt(etrEntrust.getEntrustId());
         // BigDecimal 委托全价 = gen委托全价(etrEntrust.getEntrustId(),entrustCommonDto.getEtrEntrust().getEntrustDate());
-       
+
         Map<String, Object> map = new HashMap<>();
         map.put("entrustId", etrEntrust.getEntrustId());
         map.put("portfolioId", etrEntrust.getPortfolioId());
@@ -1377,7 +1425,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 
     /**
      * 获取委托全价
-     * 
+     *
      * @param entrustId 委托代码
      * @param dealDate 日期
      * @return 委托全价
@@ -1396,7 +1444,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
             return new BigDecimal(0);
         }
         //产品化_债券二级指令 如果entrustCommonDto为空，则赋值为流程中的数据  add by zhangpei 20201119 end
-        
+
         // 价格模式_指定价格(DictCode.价格模式,"PRM01","指定价格"),
         // 价格模式_限价指令(DictCode.价格模式,"PRM02","限价指令"),
         // 价格模式_市价指令(DictCode.价格模式,"PRM03","市价指令"),
@@ -1422,7 +1470,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
             	 boolean isJiaoYiSuo = true;
                  if (!StringUtil.equals(DictCodeListExt1.交易场所_上海证券交易所.getValue(), entrustCommonDto.getEtrEntrust().getTradeMarket())
                      && !StringUtil.equals(DictCodeListExt1.交易场所_深圳证券交易所.getValue(), entrustCommonDto.getEtrEntrust().getTradeMarket())) {
-                     // 应计利息根据后台估值核算中前一个自然日的数据计算，等于后台的应计利息总额/后台的债券持仓总数量                   
+                     // 应计利息根据后台估值核算中前一个自然日的数据计算，等于后台的应计利息总额/后台的债券持仓总数量
                      isJiaoYiSuo = false;
                  }
                 // 如果交易场所为上交所、深交所的情况
@@ -1481,7 +1529,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 
     /**
      * gen冲销现金流水生成
-     * 
+     *
      * @param etrCashPositionFlowDto 正常流水
      * @param entrustId 委托代码
      * @return 冲销流水
@@ -1551,7 +1599,13 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         String tradePlace = finProductTradeDto.getTrdProductDeal().getTradeMarket();
         // 交易方向
         String ps = finProductTradeDto.getTrdProductDeal().getPs();
-        if (StringUtil.equals(tradePlace, DictCodeListExt1.交易场所_上海证券交易所.getValue())
+        // 银行间分销买入
+        if (StringUtil.isNotEmpty(finProductTradeDto.getAssetType2())
+                && "ISSUE_CLASS_02".equals(finProductTradeDto.getAssetType2())) {
+            if (StringUtil.equals(ps, DictCodeList.交易方向_买入.getValue())) {
+                一级投标债_场外_买入(finProductTradeDto, 持仓类型, etrPositionHoldDto);
+            }
+        }else if (StringUtil.equals(tradePlace, DictCodeListExt1.交易场所_上海证券交易所.getValue())
                 || StringUtil.equals(tradePlace, DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
             if (StringUtil.equals(ps, DictCodeList.交易方向_买入.getValue())) {
                 一级投标债_场内_买入(finProductTradeDto, 持仓类型, etrPositionHoldDto);
