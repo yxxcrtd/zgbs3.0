@@ -60,7 +60,7 @@ $(function() {
 		/*变动方向*/
 		$('#directionChange').attr('required',true);
     	// 债项评级
-    	if (oType === MAIN_GRADE_TYPE_02){
+    	if (oType === MAIN_GRADE_TYPE_02 && pageModel === PAGE_MODEL_NEW){
     		$("#gradeExpectation").val('').textSelect('setValue','');
 			$("#directionChange").val('').textSelect('setValue','');
 			/*变动方向*/

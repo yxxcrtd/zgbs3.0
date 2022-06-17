@@ -88,6 +88,12 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     private String refEntity;
 
     /**
+     * 参考实体
+     */
+    @ApiModelProperty(name = "refEntityStr",value = "参考实体")
+    private String refEntityStr;
+
+    /**
      * 信用事件
      */
     @ApiModelProperty(name = "creditEvent",value = "信用事件")
@@ -323,5 +329,13 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
 
     public void setSettleMethodStr(String settleMethodStr) {
         this.settleMethodStr = settleMethodStr;
+    }
+
+    public String getRefEntityStr() {
+        return refEntityStr;
+    }
+
+    public void setRefEntityStr(String refEntityStr) {
+        this.refEntityStr = refEntityStr;
     }
 }

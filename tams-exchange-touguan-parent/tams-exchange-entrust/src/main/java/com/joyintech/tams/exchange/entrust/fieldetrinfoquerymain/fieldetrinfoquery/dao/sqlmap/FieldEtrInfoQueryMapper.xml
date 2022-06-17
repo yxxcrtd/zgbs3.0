@@ -37,19 +37,21 @@
         END AS otherPs,
         ETR_ENTRUST_ADD.BUSI_PS busiPs,
         ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        decode(
-        btm.OUTPUT_VALUE_1,
-        'EX004',
-        '',
-        decode(
-        ETR_ENTRUST_ADD.ASSET_TYPE,
-        'F01',
-        NVL(ETR_ENTRUST.ENTRUST_AMT, ETR_ENTRUST.ENTRUST_NUM),
-        'F10',
-        NVL( ETR_ENTRUST.ENTRUST_NUM * 100, 0 ),
-        NVL( ETR_ENTRUST.ENTRUST_AMT, ETR_ENTRUST.ENTRUST_NUM )
-        )
-        )entrustAmt,
+        CASE WHEN ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34') THEN TO_CHAR(ETR_ENTRUST.ENTRUST_NUM*100)
+        ELSE decode(
+            btm.OUTPUT_VALUE_1,
+            'EX004',
+            '',
+            decode(
+            ETR_ENTRUST_ADD.ASSET_TYPE,
+            'F01',
+            NVL(ETR_ENTRUST.ENTRUST_AMT, ETR_ENTRUST.ENTRUST_NUM),
+            'F10',
+            NVL( ETR_ENTRUST.ENTRUST_NUM * 100, 0 ),
+            NVL( ETR_ENTRUST.ENTRUST_AMT, ETR_ENTRUST.ENTRUST_NUM )
+            )
+            )
+        END AS entrustAmt,
         decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),'F10',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),NVL(ETR_FINISH_STATUSA.FINISH_AMT,0)) finishAmt,
@@ -119,7 +121,7 @@
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi') transmitTimeSer,
         ETR_ENTRUST.PRICE_MODEL priceModel,
-        sci.ACCT_NAME trdAcctId,
+        nvl(detail.ACCT_NAME, sci.ACCT_NAME) trdAcctId,
         case when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017'  then ROUND(ETR_ENTRUST.ENTRUST_NUM/100,2)
         when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018'  then 0
         when  ETR_ENTRUST_ADD.BUSI_TYPE_POSITION in ('01', '34') then null
@@ -141,11 +143,18 @@
             SELECT
                 EED.ENTRUST_ID,
                 wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
+                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+                wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+                wm_concat (sci.ACCT_NO) AS ACCT_NO,
+                wm_concat (sci.ACCT_NAME) AS ACCT_NAME
             FROM ETR_ENTRUST_DETAIL EED
             left join
             (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
         FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON
+        sci.ACCT_NO = ssai.TRD_ACCT_ID
         GROUP BY EED.ENTRUST_ID ) detail ON ETR_ENTRUST.ENTRUST_ID = detail.ENTRUST_ID
 
         /* LEFT JOIN
@@ -290,11 +299,10 @@
                 AND PTL_PORTFOLIO_AUTHORITY.USER_ID = #{userId}
             </if>
             <if test="trdAcctId != null and trdAcctId!='' ">
-                AND sci.ACCT_NO = #{trdAcctId}
+                AND (sci.ACCT_NO = #{trdAcctId} OR detail.ACCT_NO  LIKE concat(concat('%',#{trdAcctId,jdbcType=VARCHAR}),'%') )
             </if>
             <if test="trdAcctName != null and trdAcctName!='' ">
                 AND ssai.SEC_ACCT_NAME = #{trdAcctName}
-                LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
             </if>
         </where>
         union all
@@ -332,19 +340,22 @@
         END AS otherPs,
         WFL_ETR_ENTRUST_ADD.BUSI_PS busiPs,
         WFL_ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        decode(
-        ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
-        'EX004',
-        '',
-        decode(
-        WFL_ETR_ENTRUST_ADD.ASSET_TYPE,
-        'F01',
-        NVL(WFL_ETR_ENTRUST.ENTRUST_AMT, WFL_ETR_ENTRUST.ENTRUST_NUM),
-        'F10',
-        NVL( WFL_ETR_ENTRUST.ENTRUST_NUM * 100, 0 ),
-        NVL( WFL_ETR_ENTRUST.ENTRUST_AMT, WFL_ETR_ENTRUST.ENTRUST_NUM )
-        )
-        )entrustAmt,
+        CASE WHEN WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34') THEN TO_CHAR(WFL_ETR_ENTRUST.ENTRUST_NUM*100)
+        ELSE
+            decode(
+            WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
+            'EX004',
+            '',
+            decode(
+            WFL_ETR_ENTRUST_ADD.ASSET_TYPE,
+            'F01',
+            NVL(WFL_ETR_ENTRUST.ENTRUST_AMT, WFL_ETR_ENTRUST.ENTRUST_NUM),
+            'F10',
+            NVL( WFL_ETR_ENTRUST.ENTRUST_NUM * 100, 0 ),
+            NVL( WFL_ETR_ENTRUST.ENTRUST_AMT, WFL_ETR_ENTRUST.ENTRUST_NUM )
+            )
+            )
+        END AS entrustAmt,
         /*decode(WFL_ETR_ENTRUST_ADD.ASSET_TYPE,'F01',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),'F10',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),NVL(ETR_FINISH_STATUSA.FINISH_AMT,0)) */
@@ -421,7 +432,7 @@
         NULL transmitTime,
         NULL transmitTimeSer,
         WFL_ETR_ENTRUST.PRICE_MODEL priceModel,
-        sci.ACCT_NAME trdAcctId,
+        nvl(detail.ACCT_NAME, sci.ACCT_NAME) trdAcctId,
         case when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then ROUND(WFL_ETR_ENTRUST.ENTRUST_NUM/100,2)
         when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then 0
         when  WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION in ('01', '34') then null
@@ -443,11 +454,18 @@
             SELECT
                 EED.ENTRUST_ID,
                 wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
-            FROM ETR_ENTRUST_DETAIL EED
+                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+                wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+                wm_concat (sci.ACCT_NO) AS ACCT_NO,
+                wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+            FROM WFL_ETR_ENTRUST_DETAIL EED
             left join
             (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
             FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+            LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+            EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+            LEFT JOIN STL_CAPACCT_INFO sci ON
+            sci.ACCT_NO = ssai.TRD_ACCT_ID
             GROUP BY EED.ENTRUST_ID ) detail ON WFL_ETR_ENTRUST.ENTRUST_ID = detail.ENTRUST_ID
         /*LEFT JOIN
         (SELECT
@@ -579,7 +597,7 @@
                 AND PTL_PORTFOLIO_AUTHORITY.USER_ID = #{userId}
             </if>
             <if test="trdAcctId != null and trdAcctId!='' ">
-                AND sci.ACCT_NO = #{trdAcctId}
+                AND (sci.ACCT_NO = #{trdAcctId} OR detail.ACCT_NO  LIKE concat(concat('%',#{trdAcctId,jdbcType=VARCHAR}),'%') )
             </if>
         </where>
         ) t
@@ -1946,7 +1964,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
                             from TRD_PRODUCT_DEAL t1
                                      left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
                             where t1.IS_CANCEL = 'N'
-                              and t1.TRADE_STATUS != '03'
+                              and t1.TRADE_STATUS = '01'
                             group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         where ee.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
     </select>
