@@ -358,6 +358,7 @@ public class TradeMessage extends BasicMessage {
 
                 IntegratedEntrust integratedEntrust = (IntegratedEntrust)entrust;
                 tradeMessage.setTradeId(integratedEntrust.getTradeId());
+                tradeMessage.setCounterId(integratedEntrust.getCounterId());
                 tradeMessage.setInvestorId(integratedEntrust.getInvestorId());
                 tradeMessage.setDealerId(integratedEntrust.getDealerId());
                 tradeMessage.setPropDealerId(integratedEntrust.getPropDealerId());

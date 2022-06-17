@@ -135,9 +135,15 @@ public class MessageSenderHelper {
         }
         // 协议回购的特殊处理
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
-            tradeMessage.setValueDate(((IntegratedEntrust) entrust).getFirstSettleDate());
-            tradeMessage.setMaturityDate(((IntegratedEntrust) entrust).getBackDate());
-            tradeMessage.setCounterId((((IntegratedEntrust) entrust).getLiaisonName()));
+            IntegratedEntrust entrust1 = (IntegratedEntrust) entrust;
+            tradeMessage.setValueDate(entrust1.getFirstSettleDate());
+            tradeMessage.setMaturityDate(entrust1.getBackDate());
+            tradeMessage.setCounterId((entrust1.getCounterId()));
+            tradeMessage.setTradeId((entrust1.getTradeId()));
+            tradeMessage.setInvestorId(entrust1.getInvestorId());
+            tradeMessage.setDealerId(entrust1.getDealerId());
+            tradeMessage.setPropDealerId(entrust1.getPropDealerId());
+            tradeMessage.setPropInvestorId(entrust1.getPropInvestorId());
 
             // 金融产品代码
             // 确保协议回购，无抵押券时才组装相关的finprodId
@@ -153,7 +159,7 @@ public class MessageSenderHelper {
             if (EntrustProp.isRepurchase_First(entrust.getEntrustProp())) {
                 tradeMessage.setTrdMatchID(trade.getBrokerTradeId());
             } else {
-                tradeMessage.setTrdMatchID(((IntegratedEntrust) entrust).getOrigSerialNo());
+                tradeMessage.setTrdMatchID(entrust1.getOrigSerialNo());
             }
 
             // 折算比例
