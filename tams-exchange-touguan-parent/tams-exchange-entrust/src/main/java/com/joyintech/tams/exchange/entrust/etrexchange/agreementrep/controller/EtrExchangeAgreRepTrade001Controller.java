@@ -20,6 +20,7 @@ import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.*;
+import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.enums.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service.EtrExchangeAgreRepTrade001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service.EtrExchangeAgreRepTrade002Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.*;
@@ -223,7 +224,46 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         initPageParams.put("REQUEST_TYPE", select);
         setAssetTypeSelectOptions(initPageParams);
 
+        setHqQuestTypeSelectOptions(initPageParams);
+
         return new Message<Map<String, Object>>(initPageParams).success();
+    }
+
+    private void setHqQuestTypeSelectOptions(Map<String, Object> initPageParams) {
+        // 非公开行情请求类型下拉列表数据
+        List<SelectOptionDto> options = new ArrayList();
+        SelectOptionDto option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.首期.getCode());
+        option.setText(RepurchaseTypeEnum.首期.getDescription());
+        options.add(option);
+
+        option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.提前购回.getCode());
+        option.setText(RepurchaseTypeEnum.提前购回.getDescription());
+        options.add(option);
+
+        option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.中途换券.getCode());
+        option.setText(RepurchaseTypeEnum.中途换券.getDescription());
+        options.add(option);
+
+        option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.到期续做.getCode());
+        option.setText(RepurchaseTypeEnum.到期续做.getDescription());
+        options.add(option);
+
+        option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.解除质押.getCode());
+        option.setText(RepurchaseTypeEnum.解除质押.getDescription());
+        options.add(option);
+
+        SelectDto select = new SelectDto();
+        select.setCode("HQ_REQUEST_TYPE");
+        select.setName("请求类型");
+        select.setOptions(options);
+        initPageParams.put("HQ_REQUEST_TYPE", select);
+        setAssetTypeSelectOptions(initPageParams);
+
     }
 
     private void setAssetTypeSelectOptions(Map<String, Object> initPageParams) {
