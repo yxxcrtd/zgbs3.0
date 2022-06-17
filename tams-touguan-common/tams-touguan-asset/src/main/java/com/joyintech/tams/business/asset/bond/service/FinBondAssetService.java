@@ -18,7 +18,9 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
@@ -64,11 +66,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -1692,32 +1700,77 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         return finBondAssetMapper.isTransInAssetTwo(finprodId);
     }
 
-    public MultipartFile downloadFileInfo(String seqNo) throws FileNotFoundException {
-        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
-        File pathFile = new SafelyFile(file.getPath());
-        MultipartFile multipartFile = createMultipartFile(pathFile);
-        return multipartFile;
-    }
+//    public MultipartFile downloadFileInfo(String seqNo) throws FileNotFoundException {
+//        ServletOutputStream out = null;
+//        FileInputStream ips = null;
+//        try{
+//            SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
+//            File pathFile = new SafelyFile(file.getPath());
+//            if(!pathFile.exists()) {
+//                return null;
+//            }
+//            ips = new FileInputStream(pathFile);
+//            List<Map<String, Object>> list = null; //此处为业务需要
+//            int len = 0;
+//            byte[] buffer = new byte[1024 * 10];
+//            while ((len = ips.read(buffer)) != -1){
+//                out.write(buffer,0,len);
+//            }
+//            out.flush();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }finally {
+//            try {
+//                out.close();
+//                ips.close();
+//            } catch (IOException e) {
+//                System.out.println("关闭流出现异常");
+//                e.printStackTrace();
+//            }
+//        }
+////        MultipartFile multipartFile = createMultipartFile(pathFile);
+////        return multipartFile;
+//    }
 
-    private FileItem createFileItem(File file, String fieldName) {
-        FileItemFactory factory = new DiskFileItemFactory(16, null);
-        FileItem item = factory.createItem(fieldName, "text/plain", true, file.getName());
-        int bytesRead = 0;
-        byte[] buffer = new byte[8192];
+
+    public void  downloadFileInfo(String seqNo, HttpServletResponse response) throws IOException {
+        ServletOutputStream out = null;
+        FileInputStream ips = null;
         try {
-            FileInputStream fis = new FileInputStream(file);
-            OutputStream os = item.getOutputStream();
-            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
-                os.write(buffer, 0, bytesRead);
+             //获取文件存放的路径
+            SysUploadFileInfo fileInfo = joyinFSMapper.selectByPrimaryKey(seqNo);
+            File file = new SafelyFile(fileInfo.getPath());
+            String fileName=file.getName();
+             //获取到文字 数据库里对应的附件名字加上老的文件名字：filename 截取到后面的文件类型 例：txt 组成一个新的文件名字：newFileName
+             if(!file.exists()) {
+                //如果文件不存在就跳出
+                return;
             }
-            os.close();
-            fis.close();
-        } catch (IOException e) {
+            ips = new FileInputStream(file);
+            response.setContentType("multipart/form-data");
+                    //为文件重新设置名字，采用数据库内存储的文件名称
+            response.addHeader("Content-Disposition", "attachment; fileName=\"" + new String(fileName.getBytes("UTF-8"),"ISO8859-1") + "\"");
+            out = response.getOutputStream();
+            //读取文件流
+            int len = 0;
+            byte[] buffer = new byte[1024 * 10];
+            while ((len = ips.read(buffer)) != -1){
+                out.write(buffer,0,len);
+            }
+            out.flush();
+        }catch (Exception e){
             e.printStackTrace();
+        }finally {
+            try {
+                out.close();
+                ips.close();
+            } catch (IOException e) {
+                System.out.println("关闭流出现异常");
+                e.printStackTrace();
+            }
         }
-        return item;
     }
-
+    
     private MultipartFile createMultipartFile(File file) {
         try {
             FileItem fileItem = null;

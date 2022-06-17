@@ -43,6 +43,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -689,20 +690,20 @@ public class FinBondAsset002Controller extends BaseController{
     @ApiOperation(value = "附件下载", notes = "附件下载")
     @ResponseBody
     @PostMapping( "/downloadFile/{seqNo}")
-    public Message<MultipartFile> downloadFile(@PathVariable("seqNo") String seqNo) {
+    public void downloadFile(@PathVariable("seqNo") String seqNo, HttpServletResponse request) {
         try {
             logger.info("文件下载开始");
             seqNo = seqNo.replaceAll("\"","");
             if (StringUtil.isNotEmpty(seqNo)) {
-                MultipartFile fileInfo = finBondAssetService.downloadFileInfo(seqNo);
-                return new Message<MultipartFile>().success().setData(fileInfo);
+                finBondAssetService.downloadFileInfo(seqNo,request);
+                return ;
             }
             logger.info("文件下载结束");
         }catch (Exception e){
             logger.error("文件下载异常", e);
-            return new Message<MultipartFile>().fail().setMessage("文件下载异常");
+            return ;
         }
-        return null;
+        return ;
     }
 
     /**
