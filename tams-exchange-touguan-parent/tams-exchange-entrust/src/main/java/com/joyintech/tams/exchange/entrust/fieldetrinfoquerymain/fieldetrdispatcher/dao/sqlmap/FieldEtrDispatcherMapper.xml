@@ -543,7 +543,8 @@
             to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
             to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
             /*ete.entrust_num entrustNum,*/
-            case when #{busiTypePosition} in ('EX017','EX005','EX019') then ete.entrust_num/100
+            case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
+            case when #{busiTypePosition} in ('EX019') then ete.entrust_num/10000
             when #{busiTypePosition} in ('01') then ete.entrust_num*100
             else ete.entrust_num
             end as entrustNum,
@@ -562,7 +563,7 @@
             pss.pledge_stock_name pledgeStockName,
             eted.ASSET_TYPE assetType,
             su.REAL_NAME invManagerId,
-            eted.TARGET_TYPE targetType, 
+            eted.TARGET_TYPE targetType,
             mcp.COUNTER_NAME counterId,
             eted.COUNTER_SEAT counterSeat,
             eted.COUNTER_CON_NO counterConNo,
@@ -570,14 +571,14 @@
             ete.COUNTER_TRADER counterTrader,
             FPC.CON_SHARE_ID conId,
             T5.FINPROD_NAME conName,
-            eted.EXP_CON_VALUE expConValue, 
+            eted.EXP_CON_VALUE expConValue,
             eted.EXP_CON_NUM expConNum,
             eted.PREB preb,
             eted.PREC prec,
             fpt.TYPE_11 secType,
             sci.ACCT_NAME dealCurAcct,
             eted.REQUEST_ID requestId,
-            eted.CAP_DAYS capDays, 
+            eted.CAP_DAYS capDays,
             to_char(eted.VPAY_DATE,'yyyy-MM-dd') vpayDate,
             to_char(eted.MPAY_DATE,'yyyy-MM-dd') mpayDate,
             eted.M_INT_AMT mIntAmt,
@@ -691,7 +692,8 @@
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
         /*ete.entrust_num entrustNum,*/
-        case when #{busiTypePosition} in ('EX017','EX005','EX019') then ete.entrust_num/100
+        case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
+        case when #{busiTypePosition} in ('EX019') then ete.entrust_num/10000
         when #{busiTypePosition} in ('01') then ete.entrust_num*100
         else ete.entrust_num
         end as entrustNum,
@@ -718,14 +720,14 @@
         ete.COUNTER_TRADER counterTrader,
         FPC.CON_SHARE_ID conId,
         T5.FINPROD_NAME conName,
-        eted.EXP_CON_VALUE expConValue, 
+        eted.EXP_CON_VALUE expConValue,
         eted.EXP_CON_NUM expConNum,
         eted.PREB preb,
         eted.PREC prec,
         fpt.TYPE_11 secType,
         sci.ACCT_NAME dealCurAcct,
         eted.REQUEST_ID requestId,
-        eted.CAP_DAYS capDays, 
+        eted.CAP_DAYS capDays,
         to_char(eted.VPAY_DATE,'yyyy-MM-dd') vpayDate,
         to_char(eted.MPAY_DATE,'yyyy-MM-dd') mpayDate,
         eted.M_INT_AMT mIntAmt,
@@ -796,7 +798,7 @@
         fp.finprod_market_id finprodMarketId,
         fp.finprod_abbr finprodAbbr,
         tpd.ps ps,
-        tpd.TRADE_MARKET tradeMarket,  
+        tpd.TRADE_MARKET tradeMarket,
         ssai.sec_acct_name secAcctId,
         ssai.TRD_ACCT_ID trdAcctId,
         tpd.FINPROD_TYPE2 finprodType2,
@@ -996,7 +998,7 @@
         tpdp.trade_id tradeId,
         tpdp.ENTRUST_ID entrustId,
         tpdp.ACCT_ID acctId,
-        tpdp.TRADE_MARKET tradeMarket, 
+        tpdp.TRADE_MARKET tradeMarket,
         to_char(tpdp.trade_date,'yyyy-MM-dd') exeDate,
         to_char(tpdp.settle_date,'yyyy-MM-dd') tradeDate,
         #{quoteType} busiType,
@@ -1036,7 +1038,7 @@
         EE.PRICE price,
         EE.ENTRUST_AMT entrustAmt,
         EE.ENTRUST_STATUS entrustStatus,
-        EFS.FINISH_AMT finishAmt, 
+        EFS.FINISH_AMT finishAmt,
         to_char(EE.ENTRUST_DATE,'yyyy-MM-dd')  entrustDate,
         to_char(EEA.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,
         DECODE(EE.ENTRUST_NUM,null,null,ROUND(EE.ENTRUST_AMT/EE.ENTRUST_NUM,4)) clinchPrice,
@@ -1045,10 +1047,10 @@
           THEN ROUND(EFS.ENT_FINISH_AMT/EE.ENTRUST_NUM,4)
           ELSE ROUND(EFS.ENT_FINISH_AMT/EE.ENTRUST_AMT,4)
         END dealPercent,
-        EEA.TRADER trader, 
+        EEA.TRADER trader,
         tpdp.FINPROD_TYPE2
     </sql>
-    
+
     <select id="getEtrDispatcherExeListInfo"
             resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto.FieldEtrDispatcherExeListInfoResponse">
         SELECT
