@@ -63,7 +63,7 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
         initPageParams.put("CALC_RULE", this.getSelectDataFromDataDic(DictCode.推算方式, null));
         initPageParams.put("CASH_CLASS_TYPE", this.getSelectDataFromDataDic(DictCode.现金流类型, null));
         initPageParams.put("SVR_BASIS_TYPE", this.getSelectDataFromDataDic(DictCode.基准利率, null));
-        initPageParams.put("SVR_GUA_TYPE", this.getSelectDataFromDataDic(DictCode.担保方式, null));
+        initPageParams.put("SVR_GUA_TYPE", this.getSelectDataFromDataDic(DictCode.新债_担保方式, null));
         initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
         initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
