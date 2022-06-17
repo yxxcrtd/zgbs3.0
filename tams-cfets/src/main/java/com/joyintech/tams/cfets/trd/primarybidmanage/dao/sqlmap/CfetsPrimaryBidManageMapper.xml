@@ -673,7 +673,7 @@
         UNION ALL
         SELECT
             BRT.TOTAL_WIN_ID  totalWinId,
-            BRT.STATUS       status,
+            '04'       status,
             CASE WHEN BRT.IS_WIN = 'N' THEN '03'
             WHEN BRT.IS_WIN = 'Y' THEN '04'
             ELSE '02' END isWin,
