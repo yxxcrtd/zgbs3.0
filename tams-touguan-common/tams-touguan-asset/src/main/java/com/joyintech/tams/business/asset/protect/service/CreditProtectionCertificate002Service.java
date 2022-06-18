@@ -686,12 +686,13 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
                 return;
             }
             ips = new FileInputStream(file);
+            response.reset();
 //            response.setContentType("multipart/form-data");
             response.setContentType("application/octet-stream");
             //为文件重新设置名字，采用数据库内存储的文件名称
 //            response.addHeader("Content-Disposition", "attachment; fileName=\"" + new String(fileName.getBytes("UTF-8"),"ISO8859-1") + "\"");
             response.addHeader("Content-Disposition",
-                    "attachment;filename=" + java.net.URLEncoder.encode(fileName, "UTF-8"));
+                    "attachment;filename=" + new String(fileName.getBytes()));
             response.addHeader("Content-Length", "" + file.length());
             out = response.getOutputStream();
             //读取文件流
@@ -702,7 +703,6 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             }
             out.flush();
         }catch (Exception e){
-            e.printStackTrace();
         }finally {
             try {
                 out.close();
