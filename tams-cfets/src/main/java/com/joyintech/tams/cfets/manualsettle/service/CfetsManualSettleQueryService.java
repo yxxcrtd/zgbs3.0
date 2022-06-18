@@ -310,10 +310,13 @@ public class CfetsManualSettleQueryService extends BaseService{
             List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCodeTemp + "FXP", EFFERANGE_NO, USER_ID);
             List<PortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsManualSettleMapper.findBidFirmPortIntFenPeiInfoList(pageParam);
             BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
+            BigDecimal qty = BigDecimal.ZERO;
             for (PortIntFenPeiInfoDto item : portIntFenPeiInfoDtoList) {
                 etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, item.getUnFinshAmt());
+                qty = ArithmeticUtil.doAdd(qty, item.getQtyd());
             }
             respond.setEtrBidPriceTotal(etrBidPriceTotal);
+            respond.setQty(qty);
             resultData.put("talbeForm", infoForm4);
             resultData.put("infoData", respond);
             resultData.put("infoData1", respond);

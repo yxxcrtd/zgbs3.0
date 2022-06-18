@@ -2594,7 +2594,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     } else {
                         BeanUtil.copyPropertiesIgnoreNull(productDto, item);
                     }
-                    map.put(item.getEntrustId() + item.getPortfolioId(), secIdProduct);
+                    map.put(item.getEntrustId() + item.getPortfolioId(), productDto);
                     productDtoMapMap.put(item.getSecManageAcctId(), map);
                 }
         );
@@ -2605,6 +2605,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         for (CfetsTrdFirstBidFirmProductDto item : productDtos) {
             item.setList(new ArrayList<>(productDtoMapMap.get(item.getSecManageAcctId()).values()));
         }
+        logger.debug("汇总结果:{}",JsonUtils.object2Json(productDtos));
         return productDtos;
     }
 
@@ -3529,6 +3530,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额不可为空!"));
             } else if (BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), BigDecimal.ZERO, 4) <= 0
                     || BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), item.getEtrBidPriceTotal(), 4) > 0) {
+                // 投标产品列表中汇总投标券面总额要小于等于指令投标券面总额
                 errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额必须大于0，小于等于指令投标券面总额!"));
             }
             // 指令投标券面总额
@@ -3546,10 +3548,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 投资经理
             if (!StringUtil.isNotEmpty(item.getInvManagerName())) {
                 errorList.add(new ValidMessage("投标产品列表中投资经理不可为空!"));
-            }
-            // 投标产品列表中汇总投标券面总额要小于等于指令投标券面总额
-            if (BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), item.getEtrBidPriceTotal(), 4) > 0) {
-                errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额要小于等于指令投标券面总额!"));
             }
         }
         return errorList;

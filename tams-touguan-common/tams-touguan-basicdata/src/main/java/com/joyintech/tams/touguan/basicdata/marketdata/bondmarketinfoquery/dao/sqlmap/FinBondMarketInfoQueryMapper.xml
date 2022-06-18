@@ -436,12 +436,7 @@
                PAYHSRCSECINFO.BLNAREA,
                PAYHSRCSECINFO.FACEVALUE,
                PAYHSRCSECINFO.ISSUS,
-               CASE
-
-                   WHEN (PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y') THEN
-                       'Y'
-                   ELSE 'N'
-                   END AS                                   ISRIGHT,
+               PAYHSRCSECINFO.IS_DEBT_WITH_RIGTHS                          ISRIGHT,
                'Y'                                          ISAUTOUPDATE,
                PAYHSRCSECINFO.IS_NETPRICE,
                PAYHSRCSECINFO.CCY,
@@ -503,7 +498,8 @@
                PAYHSRCSECINFO.WORKDAYRULE,
                PAYHSRCSECINFO.REMARK,
                PAYHSRCSECINFO.PAPERIR yield,
-               'Y' ISWIND
+               'Y' ISWIND,
+               PAYHSRCSECINFO.ORIGINAL_OWNER as originalOwner
         FROM INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
 
                  LEFT JOIN MST_CUSTOMER_INFO_ADD CUSTOMER_INFO_ADD on PAYHSRCSECINFO.ISSUERSHORT = CUSTOMER_INFO_ADD.INSITITUTE_CODE
