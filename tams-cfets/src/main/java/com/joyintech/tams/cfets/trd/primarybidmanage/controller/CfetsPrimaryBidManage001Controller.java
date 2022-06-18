@@ -18,10 +18,7 @@ import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidMana
 import com.joyintech.tams.common.base.entity.BidOrder;
 import com.joyintech.tams.common.base.entity.BidResultTotal;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -331,6 +328,11 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                     parameter.setBusinessDataPk1(request.getTotalWinId());
                     if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
                         errorList.add(new ValidMessage("存在流程中数据，不可进行中标结果维护！"));
+                        break;
+                    }
+                    if (request.getStatus().equals(DictCodeListExt1.有效状态_有效.getValue())) {
+                        errorList.add(new ValidMessage("仅可对有效已中标或未中标的数据进行撤销，请重新选择"));
+                        break;
                     }
                 }
             }
