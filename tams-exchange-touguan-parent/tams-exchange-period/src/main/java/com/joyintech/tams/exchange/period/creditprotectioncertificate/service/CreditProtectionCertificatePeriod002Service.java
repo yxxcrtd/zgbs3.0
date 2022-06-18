@@ -25,6 +25,7 @@ import com.joyintech.tams.invest.common.autoperiod.common.service.InvestPeriodCo
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -112,6 +113,9 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     @Autowired
     private InvestPeriodCommonService investPeriodCommonService;
 
+    @Autowired
+    private CommonPositionService commonPositionService;
+
     @Override
     public void doComplete(CreditProtectionCertificatePeriodSaveDto entity, OperationType operationType) {
         BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
@@ -192,7 +196,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
     @Override
     public void doBack(CreditProtectionCertificatePeriodSaveDto entity) {
-        doOldPositionSubmit(entity, true);
+//        doOldPositionSubmit(entity, true);
         AllTradeCommonUtil.deletePositionReal(entity.getBusiCode());
     }
 
@@ -867,13 +871,13 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             }
         }
         for (EtrSecPositionFlow etrSecPositionFlow : etrSecPositionFlows) {
-            etrSecPositionFlowMapper.insertSelective(etrSecPositionFlow);
+            commonPositionService.insertEtrSecPositionFlow(etrSecPositionFlow);
         }
         for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
-            ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
+            commonPositionService.insertPtlSecPositionFlow(ptlSecPositionFlow);
         }
         for (EtrCashPositionFlow etrCashPositionFlow : etrCashPositionFlows) {
-            etrCashPositionFlowMapper.insertSelective(etrCashPositionFlow);
+            commonPositionService.insertEtrCashPositionFlow(etrCashPositionFlow);
         }
     }
 
@@ -995,13 +999,13 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             ptlCashPositionFlows.add(ptlCashPositionFlow);
         }
         for (EtrCashPositionFlow etrCashPositionFlow : etrCashPositionFlows) {
-            etrCashPositionFlowMapper.insertSelective(etrCashPositionFlow);
+            commonPositionService.insertEtrCashPositionFlow(etrCashPositionFlow);
         }
         for (PtlCashPositionFlow ptlCashPositionFlow : ptlCashPositionFlows) {
-            ptlCashPositionFlowMapper.insertSelective(ptlCashPositionFlow);
+            commonPositionService.insertPtlCashPositionFlow(ptlCashPositionFlow);
         }
         for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
-            ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
+            commonPositionService.insertPtlSecPositionFlow(ptlSecPositionFlow);
         }
     }
 }
