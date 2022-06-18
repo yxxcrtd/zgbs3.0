@@ -399,12 +399,12 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getOtherBusiTypePosition() {
-        logger.info("=========业务类型==========");
-        logger.info(this.getBusiTypePosition());
+        logger.error("=========业务类型==========");
+        logger.error(this.getBusiTypePosition());
         String busiTypePosition = SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
-        logger.info("busiTypePosition="+busiTypePosition);
+        logger.error("busiTypePosition111="+busiTypePosition);
         if (StringUtil.isEmpty(busiTypePosition)) {
-            logger.info("busiTypePosition2222="+SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition()));
+            logger.error("busiTypePosition2222="+SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition()));
             return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
         }
         return busiTypePosition;
