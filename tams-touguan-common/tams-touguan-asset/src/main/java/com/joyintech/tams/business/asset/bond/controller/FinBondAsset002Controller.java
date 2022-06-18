@@ -212,9 +212,9 @@ public class FinBondAsset002Controller extends BaseController{
                 //流程代办checkImportData
                 entity = finBondAssetService.getBussinessEntityByWorkflowId(workflowId);
                 if (StringUtil.isNotEmpty(entity)){
-                    entity.setType9(entity.getTypeTwo());
-                    entity.setType10(entity.getTypeThree());
-                    entity.setType11(entity.getTypeFour());
+                    if(StringUtil.isEmpty(entity.getType9())) entity.setType9(entity.getTypeTwo());
+                    if(StringUtil.isEmpty(entity.getType10())) entity.setType10(entity.getTypeThree());
+                    if(StringUtil.isEmpty(entity.getType11())) entity.setType11(entity.getTypeFour());
                     finBondAssetService.getIssues(entity);
                 }
 
