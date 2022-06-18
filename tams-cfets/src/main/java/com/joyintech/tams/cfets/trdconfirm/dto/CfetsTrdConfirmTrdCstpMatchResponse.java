@@ -88,8 +88,11 @@ public class CfetsTrdConfirmTrdCstpMatchResponse {
     @ApiModelProperty(name="printAmt",value="券面总额",example="1")
     private BigDecimal printAmt;
 
+    @ApiModelProperty(name="tradeYieldStr",value="成交价",example="1")
+    private String tradeYieldStr;
+
     @ApiModelProperty(name="tradeYield",value="成交价",example="1")
-    private String tradeYield;
+    private BigDecimal tradeYield;
 
     @ApiModelProperty(name="termDays",value="期限（天）",example="1")
     private BigDecimal termDays;
@@ -286,12 +289,20 @@ public class CfetsTrdConfirmTrdCstpMatchResponse {
         this.printAmt = printAmt;
     }
 
-    public String getTradeYield() {
+    public BigDecimal getTradeYield() {
         return tradeYield;
     }
 
-    public void setTradeYield(String tradeYield) {
+    public void setTradeYield(BigDecimal tradeYield) {
         this.tradeYield = tradeYield;
+    }
+
+    public String getTradeYieldStr() {
+        return tradeYieldStr;
+    }
+
+    public void setTradeYieldStr(String tradeYieldStr) {
+        this.tradeYieldStr = tradeYieldStr;
     }
 
     public BigDecimal getTermDays() {
