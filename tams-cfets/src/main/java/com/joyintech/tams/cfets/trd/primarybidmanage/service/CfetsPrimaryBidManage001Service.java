@@ -187,7 +187,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
                 pageParam.put("listingDateEnd",listingDateEnd);
             }
         }
-        pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodId()));
+        pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodMarketId()));
         pageParam.put("tradeMarketList", StringUtil.splitToList(null, request.getTradeMarket()));
         pageParam.put("tenderTargetList", StringUtil.splitToList(null, request.getTenderTarget()));
         pageParam.put("winTypeList", StringUtil.splitToList(null, request.getWinType()));
