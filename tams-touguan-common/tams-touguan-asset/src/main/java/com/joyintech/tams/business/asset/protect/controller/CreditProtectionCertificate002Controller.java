@@ -230,7 +230,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
      */
     @ApiOperation(value = "附件上传", notes = "附件上传")
     @ResponseBody
-    @PostMapping(value = "/UploadFile")
+    @PostMapping(value = "/uploadFile")
     public Message<SysUploadFileInfo> UploadFile(MultipartFile file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
