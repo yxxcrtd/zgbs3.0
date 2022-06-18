@@ -3,11 +3,9 @@ package com.joyintech.tams.business.asset.protect.controller;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -37,9 +35,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -228,7 +230,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
      */
     @ApiOperation(value = "附件上传", notes = "附件上传")
     @ResponseBody
-    @PostMapping(value = "/UploadFile")
+    @PostMapping(value = "/uploadFile")
     public Message<SysUploadFileInfo> UploadFile(MultipartFile file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
@@ -251,7 +253,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     @ApiOperation(value = "附件删除", notes = "附件删除")
     @ResponseBody
     @PostMapping(value = "/deleteFile")
-    public Message<AjaxResult> UploadFile(SysUploadFileInfo file) {
+    public Message<AjaxResult> deleteFile(SysUploadFileInfo file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
                 AjaxResult ajaxResult = creditProtectionCertificate002Service.delFileInfo(file);
@@ -269,14 +271,13 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     @PostMapping("/save")
     @ApiOperation(value = "新建/修改", notes = "新建/修改")
     public Message<AjaxResult> save(@RequestBody CreditProtectionCertificate002Dto dto, BindingResult br) {
-//        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
-//        creditProtectionCertificate002Service.insert(dto);
-//        return new Message<AjaxResult>().success().setData(new AjaxResult("成功"));
         if (br.hasErrors()) {
             return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
         //生成金融产品代码
-        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
+        if(!dto.getFinprodMarketId().contains(".")){
+            dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
+        }
         if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
             dto.setFinprodId(creditProtectionCertificate002Service.getFinprodId(dto));
         }
@@ -369,20 +370,20 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     @ApiOperation(value = "附件下载", notes = "附件下载")
     @ResponseBody
     @PostMapping( "/downloadFile/{seqNo}")
-    public Message<MultipartFile> downloadFile(@PathVariable("seqNo") String seqNo) {
+    public void downloadFile(@PathVariable("seqNo") String seqNo, HttpServletResponse request) {
         try {
             logger.info("文件下载开始");
             seqNo = seqNo.replaceAll("\"","");
             if (StringUtil.isNotEmpty(seqNo)) {
-                MultipartFile fileInfo = creditProtectionCertificate002Service.downloadFileInfo(seqNo);
-                return new Message<MultipartFile>().success().setData(fileInfo);
+                creditProtectionCertificate002Service.downloadFileInfo(seqNo,request);
+                return;
             }
             logger.info("文件下载结束");
         }catch (Exception e){
             logger.error("文件下载异常", e);
-            return new Message<MultipartFile>().fail().setMessage("文件下载异常");
+            return;
         }
-        return null;
+        return;
     }
 
 }

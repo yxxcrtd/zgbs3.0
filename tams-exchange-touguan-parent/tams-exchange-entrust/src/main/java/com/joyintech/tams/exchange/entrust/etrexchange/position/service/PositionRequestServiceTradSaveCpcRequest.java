@@ -136,8 +136,9 @@ public class PositionRequestServiceTradSaveCpcRequest {
 //                bean.setSecAmount(secAmount.setScale(2, RoundingMode.HALF_UP));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
-                map.put("etrSecAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
+//                map.put("etrSecAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
                 map.put("secAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
+                map.put("cashAmount", entity.getEntrustAmt());
                 map.put("tradeId", "");
                 ptlList.add(map);
 

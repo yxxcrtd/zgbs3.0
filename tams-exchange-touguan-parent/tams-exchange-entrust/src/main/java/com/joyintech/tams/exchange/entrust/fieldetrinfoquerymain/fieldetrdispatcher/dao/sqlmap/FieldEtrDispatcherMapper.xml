@@ -544,7 +544,7 @@
             to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
             /*ete.entrust_num entrustNum,*/
             case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
-            case when #{busiTypePosition} in ('EX019') then ete.entrust_num/10000
+            when #{busiTypePosition} in ('EX019') then ete.entrust_num/10000
             when #{busiTypePosition} in ('01') then ete.entrust_num*100
             else ete.entrust_num
             end as entrustNum,
@@ -693,7 +693,7 @@
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
         /*ete.entrust_num entrustNum,*/
         case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
-        case when #{busiTypePosition} in ('EX019') then ete.entrust_num/10000
+        when #{busiTypePosition} in ('EX019') then ete.entrust_num/10000
         when #{busiTypePosition} in ('01') then ete.entrust_num*100
         else ete.entrust_num
         end as entrustNum,

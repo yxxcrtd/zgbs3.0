@@ -144,4 +144,11 @@ public interface FinTenderBondAssetMapper {
      * @return
      */
     FinTenderBondAsset003Dto getByFinProductId(@Param("finprodId") String finprodId);
+
+    /**
+     * 判断资产代码是否存在
+     * @param param
+     * @return
+     */
+    String selectExistFinprodId(Map<String, Object> param);
 }

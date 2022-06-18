@@ -216,9 +216,8 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     /**
      * 附件
      */
-    @JsonProperty(value = "MstFileInputParameter")
-    @ApiModelProperty(name="MstFileInputParameter",value="附件")
-    private MstFileInputParameter MstFileInputParameter;
+    @ApiModelProperty(name="mstFileInputParameter",value="附件")
+    private MstFileInputParameter mstFileInputParameter;
 
     private String isOrNoStr;
     private String settleMethodStr;
@@ -226,6 +225,8 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     private String issuershortStr;
     private String tradeMarketStr;
     private String refSecList;
+
+    private String refSecLists;
 
     public String getIsOrNoStr() {
         return isOrNoStr;
@@ -273,6 +274,14 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
 
     public void setRefSecList(String refSecList) {
         this.refSecList = refSecList;
+    }
+
+    public String getRefSecLists() {
+        return refSecLists;
+    }
+
+    public void setRefSecLists(String refSecLists) {
+        this.refSecLists = refSecLists;
     }
 
     public String getFinprodId() {
@@ -573,10 +582,10 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     }
 
     public MstFileInputParameter getMstFileInputParameter() {
-        return MstFileInputParameter;
+        return mstFileInputParameter;
     }
 
     public void setMstFileInputParameter(MstFileInputParameter mstFileInputParameter) {
-        MstFileInputParameter = mstFileInputParameter;
+        this.mstFileInputParameter = mstFileInputParameter;
     }
 }
