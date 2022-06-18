@@ -127,5 +127,5 @@ public interface EtrExchangeAgreRepTradeMapper {
      * @param map
      * @return
      */
-    List<EtrExchangeAgreRepCurrResp> selectCurrPledgeList(Map<String, Object> map);
+    List<EtrExchangeAgreOutRepResp> selectCurrPledgeList(Map<String, Object> map);
 }

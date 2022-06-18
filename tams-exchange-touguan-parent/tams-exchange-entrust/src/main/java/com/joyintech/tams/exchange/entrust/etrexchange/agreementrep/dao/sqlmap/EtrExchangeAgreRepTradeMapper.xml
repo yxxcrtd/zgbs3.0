@@ -1112,11 +1112,11 @@
 
     </select>
 
-    <select id="selectCurrPledgeList" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepCurrResp">
+    <select id="selectCurrPledgeList" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreOutRepResp">
         SELECT
-            FP.FINPROD_MARKET_ID  finprodMarketId,
-            FP.FINPROD_MARKET_ID  finprodMarketId,
-            B.PLEDGE_NUMBER	 repSecNum,
+            FP.FINPROD_MARKET_ID  id,
+            FP.finprod_market_id || '|' || FP.finprod_abbr as text,
+            B.PLEDGE_NUMBER	 repSecNum
         FROM
             FIN_TRADE_PRODUCT A
                 INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH

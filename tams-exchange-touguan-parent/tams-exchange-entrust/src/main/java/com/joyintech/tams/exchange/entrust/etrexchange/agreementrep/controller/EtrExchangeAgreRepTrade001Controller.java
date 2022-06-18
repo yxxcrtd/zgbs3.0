@@ -1307,7 +1307,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     @ApiOperation(value = "当前质押信息查询列表", notes = "当前质押信息查询列表")
     @ResponseBody
     @PostMapping("selectCurrPledgeList/{tradeId}")
-    public Message<List<EtrExchangeAgreRepCurrResp>> selectCurrPledgeList(@ApiParam(value = "委托编号", required = false) @PathVariable String   tradeId) {
-        return new Message<List<EtrExchangeAgreRepCurrResp>>().success().setData(etrExchangeAgreRepTrade001Service.selectCurrPledgeList(tradeId));
+    public Message<List<EtrExchangeAgreOutRepResp>> selectCurrPledgeList(@ApiParam(value = "委托编号", required = false) @PathVariable String   tradeId) {
+        return new Message<List<EtrExchangeAgreOutRepResp>>().success().setData(etrExchangeAgreRepTrade001Service.selectCurrPledgeList(tradeId));
     }
 }
