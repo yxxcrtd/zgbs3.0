@@ -688,6 +688,9 @@ public class TradeQueryBean implements Serializable {
         if (StringUtil.isEmpty(busiTypeTg)) {
             return null;
         }
+        if (StringUtil.equals(busiTypeTg,"01")){
+            return "一级投标";
+        }
         DictCodeListExt3 dictCode = DictCodeListExt3.from(DictCode.投管业务类型, busiTypeTg);
         if (Objects.nonNull(dictCode)) {
             return dictCode.getCodeName();
