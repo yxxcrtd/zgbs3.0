@@ -248,7 +248,7 @@ public class FinTenderBondAssetBatchService {
         productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
         finProductAddMapper.updateForTenderBound(productAdd);
         //记录操作日志
-        saveOperate(dto.getFinprodMarketId(), "");
+        saveOperate(dto.getFinprodId(), "");
         //发送头寸
         dto.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
         this.sendPosition(dto, plateDate, seqList);
