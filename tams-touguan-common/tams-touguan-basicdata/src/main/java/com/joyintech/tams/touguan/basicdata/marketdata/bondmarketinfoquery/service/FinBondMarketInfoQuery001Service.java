@@ -325,6 +325,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(operType.getValue());
+        oprHisReq.setBusiType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         oprHisReq.setBusiDes(remark);
         oprHisReq.setWorkflowId(workFlowId);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
