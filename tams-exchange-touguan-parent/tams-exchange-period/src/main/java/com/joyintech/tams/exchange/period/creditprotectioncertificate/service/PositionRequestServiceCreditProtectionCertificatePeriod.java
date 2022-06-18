@@ -102,7 +102,6 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
             ptl.put("secAmount", baseBussinessDto.getTrdProductDeal().getShareAmt());
             ptl.put("cashAmount", baseBussinessDto.getTrdProductDeal().getTradeAmt());
             ptl.put("cashAcctId", baseBussinessDto.getBillingDetail().getAcctNo());
-            ptlList.add(ptl);
             if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
                 Map<String, Object> ptlSub = new HashMap<>();
                 ptlSub.put("portfolioId", baseBussinessDto.getTrdProductDeal2().getPortfolioId());
@@ -112,7 +111,10 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
                 ptlSub.put("secAmount", baseBussinessDto.getTrdProductDeal2().getShareAmt());
                 ptlSub.put(OWN_SEC_AMOUNT, baseBussinessDto.getTrdProductDeal2().getShareAmt());
                 ptlSubList.add(ptlSub);
+
+                ptl.put("cashAmount", baseBussinessDto.getTrdProductDeal2().getTradeAmt());
             }
+            ptlList.add(ptl);
         }
         if (StringUtil.equals(entity.getSettleMethod(), DictCodeListExt4.结算方式_标的_实物结算.getValue())) {
             resultMap.put(PTL_SUB_LIST, ptlSubList);
