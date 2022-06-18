@@ -299,6 +299,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "yield", value = "初始利率")
     private BigDecimal yield;
 
+    @ApiModelProperty(name = "originalOwner", value = "原始权益人")
+    private String originalOwner;
+
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
@@ -1069,5 +1072,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setAllBondMarketPlanDtos(List<FinBondMarketCashPlanDto> allBondMarketPlanDtos) {
         this.allBondMarketPlanDtos = allBondMarketPlanDtos;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
     }
 }

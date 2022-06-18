@@ -220,6 +220,11 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         param.put("platformDate", iPlatformDate.getSysDateStr());
         FinBondMarketInfoDetailQueryDto detailQueryDto = finBondMarketInfoQueryMapper.queryFinBondMarketForCoupons(param);
         if (Objects.nonNull(detailQueryDto)) {
+            if (DictCodeListExt3.交易场所_上海证券交易所.getValue().equals(detailQueryDto.getMarket())) {
+                detailQueryDto.setIsNoGuard(DictCodeList.是否_是.getValue());
+            } else {
+                detailQueryDto.setIsNoGuard(DictCodeList.是否_否.getValue());
+            }
             detailQueryDto.setMarketBasis(detailQueryDto.getRatebasic());
             //行权计划信息
             List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(secId);
