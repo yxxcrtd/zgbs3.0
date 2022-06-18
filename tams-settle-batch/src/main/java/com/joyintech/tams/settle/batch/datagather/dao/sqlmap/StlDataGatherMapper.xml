@@ -1583,6 +1583,46 @@
 			</if>
 		</where>
 	</select>
+
+	<!--ZGCPCN-1469:一级投标债查询指令特殊处理,关联ETR_ENTRUST_DETAIL表 modify by fuyongsheng 20220617 start-->
+	<select id="selectFirstBondEtrEntrustData" resultType="com.joyintech.tams.settle.batch.datagather.dto.EtrEntrustDto">
+		SELECT
+			T1.ENTRUST_ID,
+			T1.FINPROD_ID,
+			T1.PS,
+			T1.ENTRUST_DATE,
+			T2.SEC_ACCT_ID,
+			T2.ACCT_NO DEAL_CUR_ACCT,
+			T2.ENTRUST_NUM ,
+			T2.ENTRUST_AMT
+		FROM
+			ETR_ENTRUST T1
+		LEFT JOIN
+			ETR_ENTRUST_DETAIL T2 ON T2.ENTRUST_ID = T1.ENTRUST_ID
+		<where>
+			T1.TRADE_MARKET in ('03', '04')
+			<if test="dataList != null and dataList.size() > 0">
+				AND T1.FINPROD_ID IN
+				<foreach collection="dataList" item="currData" open=" (" close=")" separator=",">
+					#{currData.finprodId,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			<if test="finprodTypeList != null and finprodTypeList.size()>0">
+				AND T1.FINPROD_TYPE2  IN
+				<foreach item="item" index="index" collection="finprodTypeList" open="(" separator=","  close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="psList != null and psList.size()>0">
+				AND T1.PS  IN
+				<foreach item="item" index="index" collection="psList" open="(" separator=","  close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	<!--ZGCPCN-1469:一级投标债查询指令特殊处理,关联ETR_ENTRUST_DETAIL表 modify by fuyongsheng 20220617 end-->
+
 	<!--查询行权-回售计划-->
 	<select id="selectFinExercisePlanData" resultType="com.joyintech.tams.common.base.entity.FinExercisePlan">
 		SELECT

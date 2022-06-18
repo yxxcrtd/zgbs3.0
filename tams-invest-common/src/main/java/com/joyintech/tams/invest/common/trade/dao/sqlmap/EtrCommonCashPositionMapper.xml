@@ -707,6 +707,10 @@
         SELECT * FROM ETR_SEC_POSITION_FLOW WHERE TRADE_ID = #{totleId}
     </select>
 
+    <select id="selectAllPositionByFinprodId" resultType="com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto">
+        SELECT * FROM ETR_SEC_POSITION_FLOW WHERE FINPROD_ID = #{finprodId}
+    </select>
+
     <select id="selectAllCashPositionByTotle" resultType="com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto">
         SELECT * FROM ETR_CASH_POSITION_FLOW WHERE ORDER_ID like 'O'||#{totleId}||'%'
     </select>

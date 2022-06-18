@@ -160,7 +160,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                                      List<ExchangeTransMatchCommonDto>  exchangeTransMatchCommons,
                                      List<String> needUpdateStatusEntrustIdList) {
         List<EtrEntrustDto> etrEntrustDtos = stlDataGatherMapper.listEtrEntrust(getFinprodType(),this.getBatchExecuteInfo().getExecuteDate());
-        logger.debug("指令匹配数据:" + JSON.toJSONString(etrEntrustDtos));
+        logger.debug("handleNormalTrade指令匹配数据:" + JSON.toJSONString(etrEntrustDtos));
         Map<String, List<EtrEntrustDto>> etrEntrustMap = etrEntrustDtos.stream().collect(Collectors.groupingBy(EtrEntrustDto::getBusiKey, Collectors.toList()));
         if(StringUtil.isEmptyList(etrEntrustDtos)){
             return;
@@ -320,7 +320,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
         List<EtrEntrustDto> etrEntrustDtoFirstBondList = new ArrayList<>();
         paramMap.put("finprodTypeList", Collections.singletonList(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()));
         paramMap.put("psList", Collections.singletonList(DictCodeList.交易方向_买入.getValue()));
-        List<EtrEntrustDto> etrEntrustDtoList1 = stlDataGatherMapper.selectSpecialEtrEntrustData(paramMap);
+        List<EtrEntrustDto> etrEntrustDtoList1 = stlDataGatherMapper.selectFirstBondEtrEntrustData(paramMap);
         if(CollectionUtils.isNotEmpty(etrEntrustDtoList1)){
             for(EtrEntrustDto etrEntrustDto : etrEntrustDtoList1){
                 Map<String, Object> map = new HashMap<>();

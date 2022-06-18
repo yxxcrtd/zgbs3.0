@@ -305,6 +305,38 @@
         </where>
     </sql>
 
+    <sql id="queryCondition3">
+        <where>
+            <if test="entrustId != null and entrustId != ''">
+                AND BO.BID_ID = #{entrustId}
+            </if>
+            <if test="accountId != null and accountId != ''">
+                AND BRBP.ACCT_NO like '%'|| #{accountId} ||'%'
+            </if>
+            <if test="market != null and market != ''">
+                AND BRBP.SEC_ACCT_ID like '%'||#{market}||'%'
+            </if>
+            <if test="stockCode != null and stockCode != ''">
+                AND BRBP.SEC_ACCT_NAME like %'||#{stockCode}||'%'
+            </if>
+            <if test="entrustProp != null and entrustProp != ''">
+                AND 1!=1
+            </if>
+            <if test="startDay != null and startDay != ''">
+                AND BO.PAY_DATE &gt;= #{startDay}
+            </if>
+            <if test="endDay != null and endDay != ''">
+                AND BO.PAY_DATE &lt;= #{endDay}
+            </if>
+            <if test="portfolioList != null and portfolioList.size()>0">
+                AND BRBP.PORTFOLIO_ID in
+                <foreach collection="portfolioList" item="portfolioCode" index="index" open="(" close=")" separator=",">
+                    #{portfolioCode,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
     <!--GZYHTZJY-126:修改查询语句,关联资产表,获取正确的资产简称 fuyongsheng 20211030 edit start-->
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.joyintech.tams.exchange.common.db.domain.TradeExample">
@@ -390,6 +422,7 @@
 
     <select id="selectTradeByPage" resultMap="QueryResultMap"
             parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
+        SELECT * FROM (
         SELECT
         <include refid="Query_Column_List"/>
         FROM T_TRADE A
@@ -402,7 +435,49 @@
         OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
         LEFT JOIN STL_CAPACCT_INFO SCI ON A.FINANCE_ACCOUNT = SCI.ACCT_NO
         <include refid="queryCondition2"/>
-        ORDER BY A.CREATE_TIME DESC
+        union all
+        SELECT
+            BO.BID_ID ID,
+            BO.BID_ID INSTRUCTION_ID,
+            '' PARENT_ORDER_ID,
+            '' ENTRUST_ID,
+            BRBP.ACCT_NO ACCOUNT_ID,
+            '' FINANCE_ACCOUNT, BRBP.ACCT_NAME ACCOUNT_NAME,
+            DECODE(FP.TRADE_MARKET,'03','SH','04','SZ') MARKET,
+            FP.FINPROD_TYPE2 ASSET_TYPE,
+            BRBP.SEC_ACCT_ID STOCK_CODE,
+            BRBP.SEC_ACCT_NAME STOCK_NAME,
+            '' BUSINESS_FLAG,
+            '01' ENTRUST_TYPE, '' ENTRUST_PROP,
+            'T01' BS_FLAG, null TRADE_TYPE, BRBP.THE_WIN_PRIN_AMT TRADED_BALANCE,
+            NVL(BRBP.CLEAR_BALANCE,0)/NVL(BO.WIN_PRICE,0) TRADED_VOLUME, BO.WIN_PRICE TRADED_PRICE,
+            BRBP.CLEAR_BALANCE CLEAR_BALANCE, to_char(BO.PAY_DATE,'yyyy-MM-dd') TRADE_TIME,
+            null DISCOUNT, null TRANS_CODE, null PROP_SEAT_NO, null TRADING_DAY, null LOCAL_ENTRUST_ID, null BROKER_ENTRUST_ID, null BROKER_TRADE_ID,
+            null REPORT_NO, BO.CREATE_TIME CREATE_TIME, BO.UPDATE_TIME UPDATE_TIME, null OFFSET_FLAG, null HEDGE_FLAG, BRBP.PORTFOLIO_ID PORTFOLIO_ID, BRBP.CLEAR_BALANCE FULL_PRICE,
+            'T01' ENTRUST_BS,BRBP.PORTFOLIO_NAME PORTFOLIO_NAME,BRBP.SEC_ACCT_ID SEC_ACCT_ID,BRBP.SEC_ACCT_NAME SEC_ACCT_NAME, null TRADE_PLAT, FP.FINPROD_TYPE2 FINPROD_TYPE2,BRBP.INV_MANAGER_ID INV_MANAGER_ID,'T01' PS,
+            '01' BUSI_TYPE_TG,null EXTEND1,null EXTEND2, null ENTRUST_CLASS,null IS_FULL_PRICE,null NET_PRICE,null NET_BALANCE,
+            '一级投标'  BUSI_TYPE_TG_STR, BO.COUNTER_ID COUNTER_ID,MCCI.COUNTER_NAME COUNTER_NAME,null PROP_ACCT_NO,null PROP_ACCT_NAME,
+            null  DELIVERY_RESULT,null DELIVERY_SCHEDULE
+        FROM BID_ORDER BO
+        LEFT JOIN (SELECT BRBP.BID_ID,wm_concat(BRBP.ACCT_NO) ACCT_NO,  wm_concat(SCI.ACCT_NAME) ACCT_NAME,
+                          wm_concat(BRBP.SEC_ACCT_ID) SEC_ACCT_ID,wm_concat(SSAI.SEC_ACCT_NAME) SEC_ACCT_NAME,
+                          SUM(EE.ENTRUST_NUM) ENTRUST_NUM,SUM(BRBP.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT
+                          ,SUM(NVL(BRBP.INT_AMT,0)+NVL(BRBP.WIN_CPRICE,0)) CLEAR_BALANCE,wm_concat(BRBP.PORTFOLIO_ID) PORTFOLIO_ID,
+                           wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,wm_concat(EE.INV_MANAGER_ID) INV_MANAGER_ID
+        FROM BID_ORDER_BID_PRICE BRBP
+        LEFT JOIN STL_SEC_ACCT_INFO SSAI ON SSAI.SEC_ACCT_ID = BRBP.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO SCI ON SCI.ACCT_NO = BRBP.ACCT_NO
+        LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRBP.ENTRUST_ID
+        LEFT JOIN PTL_PORTFOLIO PP ON BRBP.PORTFOLIO_ID = PP.PORTFOLIO_ID
+        GROUP BY BRBP.BID_ID ) BRBP ON BRBP.BID_ID = BO.BID_ID
+        LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = BO.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN MST_COUNTER_PARTY MCCI ON BO.COUNTER_ID= MCCI.COUNTER_ID
+        LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on BO.OUR_TRADER=m1.PARTY_ID
+        LEFT JOIN SYS_USER su ON su.USER_NAME = BO.OUR_TRADER
+        WHERE  BO.TRADE_STATUS = '01' AND  FP.TRADE_MARKET IN ('03','04')
+        <include refid="queryCondition3"/>)
+        ORDER BY CREATE_TIME DESC
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">

@@ -4857,7 +4857,8 @@
             BRD.INV_AIM invAim,
             BRD.SEC_ACCT_ID secManageAcctId,
             STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
-            SU.REAL_NAME invManagerId
+            SU.REAL_NAME invManagerId,
+            BO.BID_MODLE BidModle
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
         LEFT JOIN TRD_PRODUCT_DEAL TPD
                ON TPD.TOTLE_TRADE_ID = TFPDT.TOTLE_TRADE_ID
