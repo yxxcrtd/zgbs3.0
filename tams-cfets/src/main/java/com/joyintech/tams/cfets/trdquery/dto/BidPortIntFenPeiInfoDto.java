@@ -32,7 +32,7 @@ public class BidPortIntFenPeiInfoDto {
 
     //中标标位
     @ApiModelProperty(name="winPrice",value="中标标位")
-    private BigDecimal winPrice;
+    private String winPrice;
 
     @ApiModelProperty(name="winCprice",value="中标净价(元)")
     private BigDecimal winCprice;
@@ -231,11 +231,11 @@ public class BidPortIntFenPeiInfoDto {
         this.dipTypeStr = dipTypeStr;
     }
 
-    public BigDecimal getWinPrice() {
+    public String getWinPrice() {
         return winPrice;
     }
 
-    public void setWinPrice(BigDecimal winPrice) {
+    public void setWinPrice(String winPrice) {
         this.winPrice = winPrice;
     }
 
