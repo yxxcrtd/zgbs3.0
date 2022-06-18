@@ -52,14 +52,17 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
             if (StringUtil.isNotEmpty(cdateStart)){
                 pageParam.put("cdateStart",cdateStart);
             }
-            String cdateEnd = request.getDate().get(1);
-            if (StringUtil.isNotEmpty(cdateEnd)){
-                pageParam.put("cdateEnd",cdateEnd);
+            if (request.getDate().size() > 1) {
+                String cdateEnd = request.getDate().get(1);
+                if (StringUtil.isNotEmpty(cdateEnd)){
+                    pageParam.put("cdateEnd",cdateEnd);
+                }
             }
-        }else{
-            pageParam.put("cdateEnd",DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN));
-            pageParam.put("cdateStart",DateUtil.addDay(DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN), -1));
         }
+//        else{
+//            pageParam.put("cdateEnd",DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN));
+//            pageParam.put("cdateStart",DateUtil.addDay(DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN), -1));
+//        }
         Page<MskCreditInfoProSaveRequest> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> mskCreditInfoProMapper.queryForPage(pageParam));

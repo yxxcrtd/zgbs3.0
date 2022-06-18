@@ -123,4 +123,14 @@ public interface BaseAssetCashPositionCommMapper {
      * @return
      */
     List<TrdProductDeal> selectTrdProductDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+
+
+    /**
+     * 根据金融产品代码查询流水
+     *
+     * @param finprodId
+     * @return
+     */
+    List<PtlSecPositionFlow> selectByFinproductId(@Param("finprodId") String finprodId);
+
 }
