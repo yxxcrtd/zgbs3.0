@@ -201,6 +201,7 @@ public class CfetsSettleService extends BaseService {
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("batchDate", batchDate);
         paramMap.put("createrUser", "SYSTEM");
+        paramMap.put("productIdList", productIdList);
         List<CfetsSettleReaderResult> insertDtoLists = this.createTodayTodoSettleData(paramMap);
         //插入银行间手工交收相关表
         for (CfetsSettleReaderResult cfetsManualSettleInsertDto : insertDtoLists) {
@@ -467,7 +468,7 @@ public class CfetsSettleService extends BaseService {
                 , DictCodeListExt1.平安业务类型_正回购到期.getValue(), DictCodeListExt1.平安业务类型_买断式正回购.getValue(), DictCodeListExt1.平安业务类型_买断式逆回购.getValue()
                 , DictCodeListExt1.平安业务类型_买断式正回购到期.getValue(), DictCodeListExt1.平安业务类型_买断式逆回购到期.getValue(), DictCodeListExt2.平安业务类型_债券借贷融入.getValue()
                 , DictCodeListExt2.平安业务类型_债券借贷融出.getValue(), DictCodeListExt2.平安业务类型_债券借贷融入到期.getValue(), DictCodeListExt2.平安业务类型_债券借贷融出到期.getValue()
-                , DictCodeListExt4.平安业务类型_一级申购.getValue(), DictCodeListExt4.平安业务类型_中标结果维护.getValue()));
+                , DictCodeListExt4.平安业务类型_一级申购.getValue(), DictCodeListExt4.平安业务类型_中标结果维护.getValue(), DictCodeListExt4.平安业务类型_债券分销买入确认.getValue()));
         //收付方向
         param.put("feePs02", DictCodeListExt1.收付方向_支出.getValue());
         //结算状态
