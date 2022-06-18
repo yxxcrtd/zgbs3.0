@@ -465,7 +465,7 @@ public class IntegratedQuoteManagement {
         else if (RepurchaseTypeEnum.提前购回.getBusiTypeTgCode().equals(busiTypeTg)) {
             baseRepurchaseQuoteSendResponse = new TQGHRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.提前购回.getCode());
-            ((NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
+            ((TQGHRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
 
             fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
 
@@ -488,7 +488,7 @@ public class IntegratedQuoteManagement {
         else if (RepurchaseTypeEnum.到期续做.getBusiTypeTgCode().equals(busiTypeTg)) {
             baseRepurchaseQuoteSendResponse = new DQXZRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.到期续做.getCode());
-            ((NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
+            ((DQXZRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
 
             fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
 
@@ -520,7 +520,7 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
         baseRepurchaseQuoteSendResponse.setInvestorIdStr(entrust.getInvestorName());
         baseRepurchaseQuoteSendResponse.setInvestorType(entrust.getOwnerType());
-        baseRepurchaseQuoteSendResponse.setInvestorTypeStr(InvestorType.getInvestorTypeName(entrust.getOwnerType()));
+        baseRepurchaseQuoteSendResponse.setInvestorTypeStr(entrust.getOwnerType());
         baseRepurchaseQuoteSendResponse.setCpTraderCode(entrust.getPropTradeId());
         baseRepurchaseQuoteSendResponse.setCpTraderCodeStr(entrust.getPropTradeName());
         baseRepurchaseQuoteSendResponse.setCpMemberId(entrust.getPropDealerId());
@@ -530,7 +530,7 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
         baseRepurchaseQuoteSendResponse.setInvestorIdStr(entrust.getInvestorName());
         baseRepurchaseQuoteSendResponse.setCpInvestorType(entrust.getPropOwnerType());
-        baseRepurchaseQuoteSendResponse.setCpInvestorTypeStr(InvestorType.getInvestorTypeName(entrust.getPropOwnerType()));
+        baseRepurchaseQuoteSendResponse.setCpInvestorTypeStr(entrust.getPropOwnerType());
         baseRepurchaseQuoteSendResponse.setCpClientName(entrust.getPortfolioName());
         baseRepurchaseQuoteSendResponse.setRemark(entrust.getRemark());
         baseRepurchaseQuoteSendResponse.setBs(entrust.getPs());
