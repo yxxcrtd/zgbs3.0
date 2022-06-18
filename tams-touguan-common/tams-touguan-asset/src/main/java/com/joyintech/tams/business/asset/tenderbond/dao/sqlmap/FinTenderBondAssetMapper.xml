@@ -380,8 +380,8 @@
             nvl(ri.BID_END_DATE,ri.ADDITIONAL_TENDER_END_DATE)  as tenderEdate
         FROM (select * from (select * from INTERF_WIND_RELEASE_INFO where 1=1
         <if test="flag != null and flag !=''">
-            and nvl(ISSUE_DATE,nvl(BID_DATE,ADDITIONAL_TENDER_DATE)) >= TO_DATE(#{platformDate},'YYYY-MM-DD')
-            and SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} order by nvl(ISSUE_DATE,nvl(BID_DATE,ADDITIONAL_TENDER_DATE)) asc ) where ROWNUM=1
+            and nvl(ISSUE_DATE,nvl(BID_BEGIN_DATE,ADDITIONAL_TENDER_BEGIN_DATE)) >= TO_DATE(#{platformDate},'YYYY-MM-DD')
+            and SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} order by nvl(ISSUE_DATE,nvl(BID_BEGIN_DATE,ADDITIONAL_TENDER_BEGIN_DATE)) asc ) where ROWNUM=1
         </if>
         <if test="flag == null or flag ==''">
             )
@@ -393,15 +393,27 @@
     </select>
 
     <select id="selectFinprodId" resultType="java.lang.String">
+        select t.* from (
+            select T1.FINPROD_ID from FIN_PRODUCT T1
+            where  1=1
+                <if test="finprodType2 !=null and finprodType2 !=''">
+                    AND T1.FINPROD_TYPE2 = #{finprodType2}
+                </if>
+                <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
+                    AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+                </if>
+                AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR} order by T1.CREATE_TIME desc
+        ) t where ROWNUM=1
+    </select>
+
+    <select id="selectExistFinprodId" resultType="java.lang.String">
         select T1.FINPROD_ID from FIN_PRODUCT T1
-        where  1=1
-            <if test="finprodType2 !=null and finprodType2 !=''">
-                AND T1.FINPROD_TYPE2 = #{finprodType2}
-            </if>
-            <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
-                AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
-            </if>
-            AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR} AND ROWNUM=1
+        INNER JOIN FIN_PRODUCT_ISSUE i on T1.FINPROD_ID=i.FINPROD_ID
+        where T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
+          and i.ISSUE_STYLE=#{issueStyle,jdbcType=VARCHAR}
+          and i.ADD_BATCH=#{addBatch}
+          AND T1.FINPROD_TYPE2 = #{finprodType2}
+          AND ROWNUM=1
     </select>
 
     <select id="selectBondCreditRating" resultType="com.joyintech.tams.business.asset.tenderbond.dto.MstBondCreditRatingDto">

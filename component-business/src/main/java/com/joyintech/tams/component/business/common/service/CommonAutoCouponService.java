@@ -26,10 +26,7 @@ import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.report.asset.bond.dto.BussFinBondRepInfoDto;
 import com.joyintech.tams.component.business.report.asset.fund.dto.BussRepFundInfoDto;
 import com.joyintech.tams.component.business.report.asset.project.dto.BussRepEquityInfoDto;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.common.calculator.AdjustedTradeDayCal;
@@ -408,6 +405,11 @@ public class CommonAutoCouponService extends BaseService {
                 finProductAdd.setFinprodId(finprodId);
                 finProductAdd.setWindId(secid);
                 finProductAdd.setIsAutoUpdate(DictCodeList.是否_是.getValue());
+                if (DictCodeListExt3.交易场所_上海证券交易所.getValue().equals(interfPayhsrcsecinfo.getMarket())) {
+                    finProductAdd.setIsNoGuard(DictCodeList.是否_是.getValue());
+                } else {
+                    finProductAdd.setIsNoGuard(DictCodeList.是否_否.getValue());
+                }
                 // add by lizhi 20190603 面值 start
                 finProductAdd.setFaceValue(interfPayhsrcsecinfo.getFacevalue());
                 // add by lizhi 20190603 面值 end

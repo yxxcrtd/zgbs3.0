@@ -527,7 +527,7 @@ public class PositionRequestTradeRestService {
         pltMap.put("ordSecAmount", BigDecimal.ZERO);
         pltMap.put("cashAcctId", accountNo);
         pltMap.put("secAcctId", trdProductDealTotal.getSecManageAcctId());
-        pltMap.put("secAmount", trdProductDeal.getShareAmt());
+        pltMap.put("secAmount", ArithmeticUtil.multiply(trdProductDeal.getShareAmt(), new BigDecimal(100)));
         pltMap.put("cashAmount", trdProductDeal.getTradeAmt());
         pltMap.put("invAim", trdProductDeal.getInvAim());
         pltMap.put("integrateSecAmount", BigDecimal.ZERO);

@@ -1240,26 +1240,31 @@
 
     <select id="getCustomer" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT
-        CUSTOMER_ID id,
-        CUSTOMER_NAME text
-        FROM MST_CUSTOMER_INFO
+        i.CUSTOMER_ID id,
+        i.CUSTOMER_NAME text
+        FROM MST_CUSTOMER_INFO i
+        LEFT JOIN MST_CUSTOMER_INFO_ADD a on i.CUSTOMER_ID=a.CUSTOMER_ID
         <where>
             <if test="search != null and search != ''">
                 (
-                CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 OR
-                CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 OR
-                CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                OR
+                a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 )
             </if>
             <if test="initValue != null and initValue != ''">
                 (
-                CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                 OR
-                CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                 OR
-                CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                OR
+                a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{initValue,jdbcType=VARCHAR}, '%'))
                 )
             </if>
             <if test="IS_ISSUER != null and IS_ISSUER != ''">

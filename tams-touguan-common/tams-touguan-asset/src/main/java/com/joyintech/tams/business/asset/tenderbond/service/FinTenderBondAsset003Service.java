@@ -76,12 +76,6 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     private AutoPeriodCommonService autoPeriodCommonService;
 
     @Autowired
-    private FinBondAssetService finBondAssetService;
-
-    @Autowired
-    private FinBondAssetValidatorService finBondAssetValidatorService;
-
-    @Autowired
     private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
 
     @Resource
@@ -99,9 +93,9 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     @Override
     public void doInsert(FinTenderBondAsset003Dto entity, OperationType type) {
         if (OperationType.REVOKE == type) {
-            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "上市流通撤销原因：" + entity.getRevokeReason(), DictCodeListExt3.操作类型_上市流通撤销,entity.getWorkflowId());
+            finTenderBoundAssetService.saveOperate(entity.getFinprodId(), "上市流通撤销原因：" + entity.getRevokeReason(), DictCodeListExt3.操作类型_上市流通撤销,entity.getWorkflowId());
         } else {
-            finTenderBoundAssetService.saveOperate(entity.getFinprodMarketId(), "", DictCodeListExt3.操作类型_上市流通,entity.getWorkflowId());
+            finTenderBoundAssetService.saveOperate(entity.getFinprodId(), "", DictCodeListExt3.操作类型_上市流通,entity.getWorkflowId());
         }
         if (type == OperationType.REVOKE) return;
         Map<String, String> param = new HashMap();
@@ -232,15 +226,6 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             }
         }
     }
-
-
-    public void deal() {
-
-
-
-
-    }
-
 
 
     /**

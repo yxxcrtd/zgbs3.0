@@ -247,6 +247,12 @@ public class CfetsTrdQueryCstpInfoListResponse {
     @ApiModelProperty(name="mdeliveryType",value="到期结算方式",example="字符串1")
     private String mdeliveryType;
 
+    @ApiModelProperty(name="tgBusiTypeStr",value="业务类型",example="字符串1")
+    private String tgBusiTypeStr;
+
+    @ApiModelProperty(name="tgBusiType",value="业务类型",example="字符串1")
+    private String tgBusiType;
+
     public String getMatchStatus() {
         return matchStatus;
     }
@@ -274,7 +280,9 @@ public class CfetsTrdQueryCstpInfoListResponse {
     public String getBusinesstypeStr() {
         if(StringUtil.equals("BOND",getBusinesstype())){
             return "现券买卖";
-        }else {
+        }else if(StringUtil.equals("BOND1",getBusinesstype())){
+            return "债券";
+        }else{
             return "质押式回购";
         }
         //return SysDataUtil.getNameFromDataDict(DictCode.CSTP资产类型, getBusinesstype());
@@ -834,5 +842,21 @@ public class CfetsTrdQueryCstpInfoListResponse {
 
     public void setTenderTarget(String tenderTarget) {
         this.tenderTarget = tenderTarget;
+    }
+
+    public String getTgBusiTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getTgBusiType());
+    }
+
+    public void setTgBusiTypeStr(String tgBusiTypeStr) {
+        this.tgBusiTypeStr = tgBusiTypeStr;
+    }
+
+    public String getTgBusiType() {
+        return tgBusiType;
+    }
+
+    public void setTgBusiType(String tgBusiType) {
+        this.tgBusiType = tgBusiType;
     }
 }

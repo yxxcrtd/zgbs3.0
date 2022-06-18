@@ -17,6 +17,7 @@
         fp.MDATE mDateWhole,
         nvl(tfpdl.SHARE_AMT/10000,0) repNomCapi,
         fpd.REF_ENTITY refEntity,
+        mci.CUSTOMER_NAME refEntityStr,
         tfpdl.TG_BUSI_TYPE creditEvent,
         TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
         TDTA.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
@@ -27,6 +28,7 @@
         left join TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
         left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+        left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fpd.REF_ENTITY
         where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         <if test="busiCodeList.size() > 0">
@@ -61,6 +63,7 @@
         fp.MDATE mDateWhole,
         nvl(tfpdl.SHARE_AMT/10000,0) repNomCapi,
         fpd.REF_ENTITY refEntity,
+        mci.CUSTOMER_NAME refEntityStr,
         tfpdl.TG_BUSI_TYPE creditEvent,
         TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
         TDTA.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
@@ -71,6 +74,7 @@
         left join WFL_TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
         left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+        left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fpd.REF_ENTITY
         where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.TRADE_STATUS = '01'
@@ -108,7 +112,7 @@
         </where>
         <!--前端传入排序字段-->
         <if test="pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
-            order by T.${pageMode.sort}  ${pageMode.direction}
+            order by T.${pageMode.sort} ${pageMode.direction}
         </if>
         <if test="pageMode.sort == null or pageMode.sort == '' or pageMode.direction == null or pageMode.direction == ''">
             order by T.finprodMarketId
@@ -116,7 +120,7 @@
     </select>
     <select id="findBusiCode" resultType="com.joyintech.framework.select.SelectOptionDto">
         select tfpdl.TOTLE_TRADE_ID id,
-        tfpdl.TOTLE_TRADE_ID text
+        '' text
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
         where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
@@ -126,7 +130,7 @@
         </if>
         union all
         select tfpdl.TOTLE_TRADE_ID id,
-        tfpdl.TOTLE_TRADE_ID text
+        '' text
         from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
         left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
@@ -372,6 +376,7 @@
             ||T.finprodMarketName|| '|' ||T.vDateWhole|| '|' ||T.mDateWhole|| '|' ||
             T.repNomCapi|| '|' ||T.refEntity|| '|' || T.creditEvent|| '|'|| T.creditEventHappenedDate|| '|'||
             T.creditEventResolveDate|| '|' || T.settleMethod|| '|' || T.deliverBond|| '|' || T.deliverDate
+            '|' || T.refEntityStr
             like '%' || #{search} || '%'
             )
         </if>

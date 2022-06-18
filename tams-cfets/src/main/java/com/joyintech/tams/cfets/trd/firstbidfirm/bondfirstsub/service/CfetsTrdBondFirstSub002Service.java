@@ -1031,7 +1031,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                         new ValidMessage("所选对象存在流程中的数据!"));
             }
             if (joyinbusinessCommonService.countMatchInfo(item.getBidId(), DictCodeList.确认状态_未确认.getValue()) > 0
-                    && (StringUtil.equals(DictCodeList.是否_否.getValue(), requst.getIsSure()) || StringUtil.isEmpty(requst.getIsSure()))) {
+                    && !StringUtil.equals(DictCodeList.是否_是.getValue(), requst.getIsSure()) ) {
                 //如勾选数据已生成匹配待确认的记录
                 msg += item.getBidId() + "存在已匹配待确认记录，是否确认撤销?/n";
             }
@@ -1040,7 +1040,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 errorList.add(new ValidMessage(item.getBidId() + "发行状态不为空不可撤销"));
             }
         }
-        if (StringUtil.isNotEmpty(errorList)) {
+        if (CollectionUtils.isNotEmpty(errorList)) {
             ajaxResult.setErrorList(errorList);
             ajaxResult.setMessageType(MessageType.错误消息);
         } else {

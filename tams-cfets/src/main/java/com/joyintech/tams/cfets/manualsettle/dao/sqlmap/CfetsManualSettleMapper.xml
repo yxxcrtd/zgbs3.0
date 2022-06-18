@@ -667,7 +667,7 @@
                null                     actWinPrinamt,
                null                           winPrice,
                null                          unitPrice,
-               eed.ENTRUST_NUM*100           unFinshAmt
+               eebp.BID_PRIN_AMT*100           unFinshAmt
         from TRD_PRODUCT_DEAL tpd
                  left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
                  left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tpd.TOTLE_TRADE_ID = tfpdt.TOTLE_TRADE_ID
@@ -679,7 +679,7 @@
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp.SEC_ACCT_ID
                  left join ETR_ENTRUST ee on ee.ENTRUST_ID = tpda.ENTRUST_ID
                  left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
-                 left join ETR_ENTRUST_DETAIL eed on eed.PORTFOLIO_ID = tpda.PORTFOLIO_ID and eed.ENTRUST_ID = tpda.ENTRUST_ID
+                 left join ETR_ENTRUST_BID_PRICE eebp on eebp.PORTFOLIO_ID = tpda.PORTFOLIO_ID and eebp.ENTRUST_ID = tpda.ENTRUST_ID and eebp.BID_PRICE = bobp.BID_PRICE
         where tpd.TOTLE_TRADE_ID = #{tradeId} and TPD.Trade_Status='01' and tfpdt.BUSI_TYPE = 'TRD97'
         union all
         select tpda.ENTRUST_ID                          entrustId,
@@ -708,7 +708,7 @@
                     when fpi.TENDER_TARGET = '03' then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
                 end              winPrice/*中标标位*/,
                brd.WIN_CPRICE                           unitPrice,
-               eed.ENTRUST_NUM*100                      unFinshAmt
+               eebp.BID_PRIN_AMT*100           unFinshAmt
         from TRD_PRODUCT_DEAL tpd
                  left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
                  left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tpd.TOTLE_TRADE_ID = tfpdt.TOTLE_TRADE_ID
@@ -720,7 +720,7 @@
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = brd.SEC_ACCT_ID
                  left join ETR_ENTRUST ee on ee.ENTRUST_ID = tpda.ENTRUST_ID
                  left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
-                 left join ETR_ENTRUST_DETAIL eed on eed.PORTFOLIO_ID = tpda.PORTFOLIO_ID and eed.ENTRUST_ID = tpda.ENTRUST_ID
+                 left join ETR_ENTRUST_BID_PRICE eebp on eebp.PORTFOLIO_ID = tpda.PORTFOLIO_ID and eebp.ENTRUST_ID = tpda.ENTRUST_ID and eebp.BID_PRICE = brd.BID_PRICE
         where tpd.TOTLE_TRADE_ID = #{tradeId} and TPD.Trade_Status='01' and tfpdt.BUSI_TYPE = 'TRD61'
     </select>
 
@@ -1560,7 +1560,7 @@
                 END                       AS bidDateEnd/*投标日 结束*/,
                 case when tfpdt.BUSI_TYPE = 'TRD61' then brt.PAY_DATE else bo.PAY_DATE end                 payDate,
                 case when tfpdt.BUSI_TYPE = 'TRD61' then brt.CREDITOR_DEBT_DATE else bo.ASSIGN_REGDATE end assignRegdate,
-                bo.ONMARKET_DATE                                                                     listingDate,
+                case when tfpdt.BUSI_TYPE = 'TRD97' then bo.ONMARKET_DATE else decode(bo.IS_WIN,'Y',FPA.LISTING_DATE) end  listingDate,
                 bo.BID_MODLE                                                                         bidModle,
                 bo.PAY_TYPE                                                                          payType,
                 null                                                                                 etrBidPriceTotal,
@@ -1589,6 +1589,7 @@
                 tfpdt.BUSI_TYPE busiType
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdt.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
         left join SYS_USER su on su.USER_NAME = tfpdt.TRADER
         left join MST_COUNTER_PARTY mcp on mcp.COUNTER_ID = tfpdt.COUNTER_ID
         left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = tfpdt.FINPROD_ID

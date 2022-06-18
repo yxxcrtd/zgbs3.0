@@ -1979,6 +1979,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         } else if (DictCodeList.交易方向_申购.getValue().equals(infContractDetailfile.getPs())) {
             infContractDetailfile.setSettleDay(null);
         }
+        //ZGCPCN-1416
+        dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
 
         dto.setFpriceAmt(dto.getTradeAmt());
 

@@ -10,17 +10,18 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateInsertRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateRequest;
 import com.joyintech.tams.business.asset.protect.service.CreditProtectionCertificate001Service;
+import com.joyintech.tams.business.asset.protect.service.CreditProtectionCertificate002Service;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -57,6 +58,9 @@ public class CreditProtectionCertificate001Controller extends BaseController {
 
     @Autowired
     private CreditProtectionCertificate001Service creditProtectionCertificate001Service;
+
+    @Autowired
+    private CreditProtectionCertificate002Service creditProtectionCertificate002Service;
 
     @ResponseBody
     @PostMapping("/getPageParams")
@@ -175,9 +179,9 @@ public class CreditProtectionCertificate001Controller extends BaseController {
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
-                Integer count = creditProtectionCertificate001Service.countFinprodIdUse(entity.getFinprodMarketId());
+                Integer count = creditProtectionCertificate002Service.checkAssertOnDealed(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue() + "_"+ entity.getFinprodMarketId());
                 if (Objects.nonNull(count) && count > 0) {
-                    errorList.add(new ValidMessage("", getMessage("存在流程中/待执行指令交易数据!")));
+                    errorList.add(new ValidMessage("", getMessage("仅支持对无交易记录的信用保护凭证标的进行删除")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
