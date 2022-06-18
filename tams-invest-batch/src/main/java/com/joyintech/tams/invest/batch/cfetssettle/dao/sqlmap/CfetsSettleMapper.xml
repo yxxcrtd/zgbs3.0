@@ -93,6 +93,13 @@
 			</foreach>
 			)
 		</if>
+		<if test="productIdList != null and productIdList.size() > 0">
+			AND T4.PORTFOLIO_ID IN(
+			<foreach item="item" index="index" collection="productIdList" separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
 		AND	T1.TRADE_STATUS =#{TRADE_STATUS_01}
 		AND T1.Is_Cancel =#{isCalcN}
 		AND T1.SETTLE_DATE = #{batchDate}
@@ -161,6 +168,13 @@
 		<if test="tgBusiTypes != null and tgBusiTypes.size() > 0">
 			AND T1.TG_BUSI_TYPE IN(
 			<foreach item="item" index="index" collection="tgBusiTypes" separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
+		<if test="productIdList != null and productIdList.size() > 0">
+			AND T4.PORTFOLIO_ID IN(
+			<foreach item="item" index="index" collection="productIdList" separator=",">
 				#{item}
 			</foreach>
 			)
