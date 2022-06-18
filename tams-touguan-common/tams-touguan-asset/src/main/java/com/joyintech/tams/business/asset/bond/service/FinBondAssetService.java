@@ -5,6 +5,7 @@ import com.joyintech.calculation.shell.PriceByYieldCalculator;
 import com.joyintech.calculation.shell.YieldByPriceCalculator;
 import com.joyintech.calculation.shell.param.*;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.file.SafelyFile;
@@ -19,6 +20,7 @@ import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.common.base.dao.*;
@@ -204,6 +206,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 int count1 = this.isTransInAssetTwo(finBondAssetSaveRequest.getFinprodId());
                 if (count1 > 0){
                     return "存在流程中/待执行指令交易数据，不可修改";
+                }
+                if (finBondAssetSaveRequest.getOperateStatus().equals("NEW")&&
+                        selectCountByfinprodId(finBondAssetSaveRequest.getFinprodId()) > 0) {
+                    return "资产代码不能重复!";
                 }
             }
         return null;
