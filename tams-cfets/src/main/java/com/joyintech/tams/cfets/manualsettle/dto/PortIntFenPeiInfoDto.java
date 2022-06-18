@@ -138,6 +138,9 @@ public class PortIntFenPeiInfoDto {
         this.portfolioName = portfolioName;
     }
 
+    /**
+     * 券面总额
+     */
     public BigDecimal getQtyd() {
         return qtyd;
     }

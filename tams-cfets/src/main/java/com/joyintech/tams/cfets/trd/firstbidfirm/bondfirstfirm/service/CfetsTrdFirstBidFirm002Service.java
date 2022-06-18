@@ -2594,7 +2594,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     } else {
                         BeanUtil.copyPropertiesIgnoreNull(productDto, item);
                     }
-                    map.put(item.getEntrustId() + item.getPortfolioId(), secIdProduct);
+                    map.put(item.getEntrustId() + item.getPortfolioId(), productDto);
                     productDtoMapMap.put(item.getSecManageAcctId(), map);
                 }
         );
@@ -2605,6 +2605,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         for (CfetsTrdFirstBidFirmProductDto item : productDtos) {
             item.setList(new ArrayList<>(productDtoMapMap.get(item.getSecManageAcctId()).values()));
         }
+        logger.debug("汇总结果:{}",JsonUtils.object2Json(productDtos));
         return productDtos;
     }
 
