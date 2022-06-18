@@ -138,10 +138,12 @@ public class StlDownDataDealWriter extends BaseWriter<NeedToWriteEntity> {
 			if(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue().equals(settleTransData.getFinprodType2())){
 				String finProdMarketId = settleTransData.getFinprodId().substring(4);
 				List<FinProduct> finProducts = stlDownDataDealMapper.getFinproduct(finProdMarketId, settleTransData.getFinprodType2());
+				// 实例：FinprodId = F32_2121211_20220618142523.IB
+				// 取时间戳最新的那条
 				List<FinProduct> sortedFinProducts = finProducts
 						.stream()
-						.sorted((x, y) -> y.getFinprodId().substring(y.getFinprodId().length() - 11, y.getFinprodId().length()-3)
-								.compareTo(x.getFinprodId().substring(x.getFinprodId().length() - 11, x.getFinprodId().length()-3)))
+						.sorted((x, y) -> y.getFinprodId().substring(y.getFinprodId().length() - 17, y.getFinprodId().length()-3)
+								.compareTo(x.getFinprodId().substring(x.getFinprodId().length() - 17, x.getFinprodId().length()-3)))
 						.collect(Collectors.toList());
 				settleTransData.setFinprodId(sortedFinProducts.get(0).getFinprodId());
 			}
