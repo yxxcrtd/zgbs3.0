@@ -13,10 +13,7 @@ package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dao;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto;
-import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade002Dto;
-import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade003Dto;
-import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeOnWayRep002Dto;
+import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.*;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -118,4 +115,17 @@ public interface EtrExchangeAgreRepTradeMapper {
      * @return 市场代码信息
      */
     List<String> selectFinprodMarketIdData(Map<String, Object> map);
+
+    /**
+     * 质押券查询下拉框
+     * @param map
+     * @return
+     */
+    EtrExchangeAgreRepCurrResp selectCurrPledgeInfo(Map<String, Object> map);
+    /**
+     * 质押券查询列表
+     * @param map
+     * @return
+     */
+    List<EtrExchangeAgreRepCurrResp> selectCurrPledgeList(Map<String, Object> map);
 }

@@ -34,6 +34,7 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepCurrResp;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePortfolioRequest;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
@@ -2713,5 +2714,33 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         etrEntrustDetail.setTargetType(etrEntrustAdd.getTargetType());
         etrEntrustDetailList.add(etrEntrustDetail);
         return etrEntrustDetailList;
+    }
+
+    /**
+     * 质押券下拉框
+     * @param dto
+     * @return
+     */
+    public EtrExchangeAgreRepCurrResp selectCurrPledgeInfo(String tradeId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        map.put("BACK_LEND_DIRECTION_03", DictCodeList.回购拆借方向_正回购.getValue());
+        map.put("BACK_LEND_DIRECTION_04", DictCodeList.回购拆借方向_逆回购.getValue());
+        map.put("tradeId",tradeId);
+        return etrExchangeAgreRepTradeMapper.selectCurrPledgeInfo(map);
+    }
+
+    /**
+     * 质押券下拉框列表
+     * @param dto
+     * @return
+     */
+    public List<EtrExchangeAgreRepCurrResp> selectCurrPledgeList(String tradeId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        map.put("BACK_LEND_DIRECTION_03", DictCodeList.回购拆借方向_正回购.getValue());
+        map.put("BACK_LEND_DIRECTION_04", DictCodeList.回购拆借方向_逆回购.getValue());
+        map.put("tradeId",tradeId);
+        return etrExchangeAgreRepTradeMapper.selectCurrPledgeList(map);
     }
 }

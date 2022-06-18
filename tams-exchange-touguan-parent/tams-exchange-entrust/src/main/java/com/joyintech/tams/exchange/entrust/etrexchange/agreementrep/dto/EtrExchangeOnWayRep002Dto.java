@@ -221,6 +221,11 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
      * 对手方交易主体
      */
     private String counterInvestorName;
+    /**
+     * 首期成交编号
+     */
+    private String firstTradeId;
+
 
 
 
@@ -560,5 +565,13 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
 
     public void setCounterInvestorName(String counterInvestorName) {
         this.counterInvestorName = counterInvestorName;
+    }
+
+    public String getFirstTradeId() {
+        return firstTradeId;
+    }
+
+    public void setFirstTradeId(String firstTradeId) {
+        this.firstTradeId = firstTradeId;
     }
 }

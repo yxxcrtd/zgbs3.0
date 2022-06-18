@@ -1284,4 +1284,30 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         Page<SelectOptionDto> tempList = etrExchangeTradeCommon002Service.getId(request);
         return new Message<Page<SelectOptionDto>>().success().setData(tempList);
     }
+
+    /**
+     * 质押券查询下拉框
+     *
+     * @param tradeId
+     * @return
+     */
+    @ApiOperation(value = "当前质押信息查询", notes = "当前质押信息查询")
+    @ResponseBody
+    @PostMapping("selectCurrPledgeInfo/{tradeId}")
+    public Message<EtrExchangeAgreRepCurrResp> selectCurrPledgeInfo(@ApiParam(value = "委托编号", required = false) @PathVariable String   tradeId) {
+        return new Message<EtrExchangeAgreRepCurrResp>().success().setData(etrExchangeAgreRepTrade001Service.selectCurrPledgeInfo(tradeId));
+    }
+
+    /**
+     * 质押券查询下拉框
+     *
+     * @param tradeId
+     * @return
+     */
+    @ApiOperation(value = "当前质押信息查询列表", notes = "当前质押信息查询列表")
+    @ResponseBody
+    @PostMapping("selectCurrPledgeList/{tradeId}")
+    public Message<List<EtrExchangeAgreRepCurrResp>> selectCurrPledgeList(@ApiParam(value = "委托编号", required = false) @PathVariable String   tradeId) {
+        return new Message<List<EtrExchangeAgreRepCurrResp>>().success().setData(etrExchangeAgreRepTrade001Service.selectCurrPledgeList(tradeId));
+    }
 }
