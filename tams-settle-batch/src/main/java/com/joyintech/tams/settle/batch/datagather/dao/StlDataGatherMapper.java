@@ -246,6 +246,14 @@ public interface StlDataGatherMapper {
     List<EtrEntrustDto> selectSpecialEtrEntrustData(Map<String, Object> paramMap);
 
     /**
+     * 查询一级投标债对应指令
+     * @param paramMap paramMap
+     * @return 一级投标债对应指令
+     */
+    List<EtrEntrustDto> selectFirstBondEtrEntrustData(Map<String, Object> paramMap);
+
+
+    /**
      * 查询行权-回售计划
      * @param paramMap paramMap
      * @return 行权-回售计划

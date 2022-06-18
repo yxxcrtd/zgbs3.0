@@ -124,6 +124,7 @@ public class ExchangeTransMatchService extends BaseService {
         )
                 || com.joyintech.framework.util.StringUtil.equals(DictCodeListExt3.交易方向_配债.getValue(), ps)
                 || com.joyintech.framework.util.StringUtil.equals(DictCodeListExt2.交易方向_配股.getValue(), ps)
+                || com.joyintech.framework.util.StringUtil.equals(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), finprodType)
         ){
             map.put("dealDate", null);
         }
