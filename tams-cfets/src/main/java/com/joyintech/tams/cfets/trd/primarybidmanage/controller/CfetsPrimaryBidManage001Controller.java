@@ -330,7 +330,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                         errorList.add(new ValidMessage("存在流程中数据，不可进行中标结果维护！"));
                         break;
                     }
-                    if (request.getStatus().equals(DictCodeListExt1.有效状态_有效.getValue())) {
+                    if (!request.getStatus().equals(DictCodeListExt1.有效状态_有效.getValue())) {
                         errorList.add(new ValidMessage("仅可对有效已中标或未中标的数据进行撤销，请重新选择"));
                         break;
                     }
