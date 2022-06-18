@@ -16,10 +16,13 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.*;
+import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.controller.FieldEtrInfoQueryController;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -37,6 +40,7 @@ import java.util.Locale;
  */
 @ApiModel(value="场内指令分发返回数据",description="场内指令分发返回数据")
 public class FieldEtrInfoQueryListResponse extends EtrEntrust {
+    private static final Logger logger = LoggerFactory.getLogger(FieldEtrInfoQueryListResponse.class);
 
     @ApiModelProperty(name="portfolioName",value="组合名称",example="字符串1")
     private String portfolioName;
@@ -268,7 +272,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         }
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
                 StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
-            return tips + numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(10000),2)) + "(万元)";
+            return tips + numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(1),2)) + "(元)";
         }
         return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
     }
@@ -395,8 +399,12 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getOtherBusiTypePosition() {
+        logger.info("=========业务类型==========");
+        logger.info(this.getBusiTypePosition());
         String busiTypePosition = SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
+        logger.info("busiTypePosition="+busiTypePosition);
         if (StringUtil.isEmpty(busiTypePosition)) {
+            logger.info("busiTypePosition2222="+SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition()));
             return SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
         }
         return busiTypePosition;
