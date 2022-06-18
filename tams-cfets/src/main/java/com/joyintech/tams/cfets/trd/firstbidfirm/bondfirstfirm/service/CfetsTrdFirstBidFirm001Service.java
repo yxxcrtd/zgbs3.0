@@ -14,7 +14,6 @@ import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.CfgDataTableService;
@@ -246,14 +245,6 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
         // 接受委托
         etrInvesInfo.receptionDelegate(list);
-        List<String> entrustIds = StringUtil.splitToList(",", (String) param.get("entrustIds"));
-        for (String entrustId : entrustIds) {
-            //更新操作记录日志
-            CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-            oprHisReq.setEntrustId(entrustId);
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
-            joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-        }
         return errorList;
     }
 
