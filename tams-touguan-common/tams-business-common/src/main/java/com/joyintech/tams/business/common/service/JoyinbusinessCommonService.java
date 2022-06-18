@@ -93,7 +93,9 @@ public class JoyinbusinessCommonService extends BaseService {
         Map<String, Object> param = new HashMap<>();
         param.put("search", dto.getSearch());
         List<String> assestTypes = new ArrayList<>();
-        assestTypes.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        if (!StringUtil.equals(dto.getIsOnlyNewBond(), DictCodeList.是否_否.getValue())) {
+            assestTypes.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        }
         // 部分接口不需要查询新债信息
         if (!StringUtil.equals(dto.getIsNewBond(), DictCodeList.是否_否.getValue())) {
             assestTypes.add(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
