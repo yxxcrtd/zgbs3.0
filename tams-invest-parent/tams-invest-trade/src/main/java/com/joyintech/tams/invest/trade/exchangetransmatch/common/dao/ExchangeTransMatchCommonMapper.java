@@ -23,6 +23,13 @@ public interface ExchangeTransMatchCommonMapper {
     List<ExchangeTransMatchCommonEntrustDto> getEtrEntrustByIdList(Map<String,Object> entrustMap);
 
     /**
+     * 查询一级投标债委托信息--根据idlIST
+     * @param entrustMap
+     * @return
+     */
+    List<ExchangeTransMatchCommonEntrustDto> getFirstBondEtrEntrustByIdList(Map<String,Object> entrustMap);
+
+    /**
      * 查询回购质押品汇总信息信息
      * @param entrustMap
      * @return
@@ -184,4 +191,11 @@ public interface ExchangeTransMatchCommonMapper {
      * @return
      */
     List<TrdProductDeal> getTrdProductDealsByEntrustId(@Param("entrustId") String entrustId);
+
+    /**
+     * 根据指令编号、证券账户查询交易
+     * @param entrustId
+     * @return
+     */
+    List<TrdProductDeal> getFirstBondTrdProductDeals(@Param("entrustId") String entrustId, @Param("secAcctId") String secAcctId);
 }

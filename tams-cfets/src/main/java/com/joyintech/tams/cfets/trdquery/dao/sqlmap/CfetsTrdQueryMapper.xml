@@ -4778,7 +4778,7 @@
         FP.FINPROD_MARKET_ID finprodMarketId,
         FP.FINPROD_ABBR finprodAbbr,
         TFPDT.TRADER trader,
-        m1.PARTY_ABBR as traderidStr,
+        su.REAL_NAME as traderidStr,
         TFPDT.COUNTER_ID  counterId,
         mcci.counter_name as counterIdStr,
         FPI.TENDER_TARGET tenderTarget,
@@ -4787,24 +4787,28 @@
         TFPDT.TRADE_MARKET_MODE tradeMarketMode,
         BRT.PAY_DATE  payDate,
         BRT.CREDITOR_DEBT_DATE assignRegdate,
-        BO.ONMARKET_DATE onmarketDate,
+        case when TFPDT.BUSI_TYPE = 'TRD97' then BO.ONMARKET_DATE else decode(BO.IS_WIN,'Y',FPA.LISTING_DATE) end onmarketDate,
         BO.BID_MODLE  bidModle,
         BO.PAY_TYPE payType,
-        EEBP.WIN_PRIN_AMT/10000 bidPrinAmt,
-        TFPDT.PRIN_AMT/10000 prinAmt,
-        BRT.WIN_PRICE  winPrice,
+        EEBP.TOTAL_BID_PRINAMT/10000 bidPrinAmt,
+        EEBP.ACT_WIN_PRINAMT/10000 prinAmt,
+        CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
+        decode(FPI.TENDER_TARGET,'01', to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
+        ELSE '' END  winPrice,
         TFPDT.FEE_AMT  settleFeeAmt,
         BO.BID_ID   bidId,
         TFPDT.REMARK remark,
-        TFPDT.UNIT_CPRICE unitCprice,
+        NVL(TFPDT.UNIT_CPRICE,EEBP.WIN_CPRICE)  unitCprice,
         TFPDT.UNIT_INT unitInt,
-        TFPDT.UNIT_FPRICE unitFprice,
+        NVL(TFPDT.UNIT_FPRICE,EEBP.UNIT_FPRICE) unitFprice,
         TFPDT.CPRICE_AMT cpriceAmt,
         TFPDT.INT_AMT intAmt,
         TFPDT.TRADE_AMT tradeAmt
 	FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
 	LEFT JOIN FIN_PRODUCT FP
 	ON		FP.FINPROD_ID = TFPDT.FINPROD_ID
+    LEFT JOIN FIN_PRODUCT_ADD FPA
+    ON		FP.FINPROD_ID = FPA.FINPROD_ID
 	LEFT JOIN FIN_PRODUCT_ISSUE FPI
 	ON		FPI.FINPROD_ID = FP.FINPROD_ID
 	LEFT JOIN BID_RESULT_TOTAL BRT
@@ -4815,18 +4819,14 @@
         AND	BO.IS_CANCEL = 'N'
         AND	BO.BID_ID = BRT.BID_ID
         AND	BO.BID_MODLE IN(#{WIN_TYPE_01},#{WIN_TYPE_02})
-    LEFT JOIN ( select  TPD.TOTLE_TRADE_ID ,BRBP.BID_ID, SUM(BRBP.WIN_PRIN_AMT)  WIN_PRIN_AMT
-                from TRD_PRODUCT_DEAL TPD
-                LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
-                ON  TPDA.TRADE_ID = TPD.TRADE_ID
-                 LEFT JOIN BID_ORDER_BID_PRICE BRBP
-                               ON  BRBP.ENTRUST_ID = TPDA.ENTRUST_ID
-                               AND	BRBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
-                               AND	BRBP.SEC_ACCT_ID = TPD.SEC_MANAGE_ACCT_ID
-                GROUP BY TPD.TOTLE_TRADE_ID,BRBP.BID_ID
-    ) EEBP ON TFPDT.TOTLE_TRADE_ID = EEBP.TOTLE_TRADE_ID AND BO.BID_ID = EEBP.BID_ID
+    LEFT JOIN ( select BRD.TOTAL_WIN_ID , SUM(BRD.TOTAL_BID_PRINAMT)  TOTAL_BID_PRINAMT, SUM(BRD.ACT_WIN_PRINAMT)  ACT_WIN_PRINAMT
+                  , SUM(BRD.WIN_CPRICE)  WIN_CPRICE,SUM(nvl(BRD.WIN_CPRICE, 0) + nvl(BRD.INT_AMT, 0)) UNIT_FPRICE
+                  from BID_RESULT_DETAIL BRD
+                GROUP BY BRD.TOTAL_WIN_ID
+    ) EEBP ON BRT.TOTAL_WIN_ID = EEBP.TOTAL_WIN_ID
       LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on TFPDT.TRADER=m1.PARTY_ID
       LEFT JOIN MST_COUNTER_PARTY mcci ON TFPDT.COUNTER_ID = mcci.counter_id
+      LEFT JOIN SYS_USER su ON su.USER_NAME = TFPDT.TRADER
       WHERE TFPDT.TRADE_STATUS = #{TRADE_STATUS_01}
         <if test="tradeId != null and tradeId != ''">
             AND TFPDT.TOTLE_TRADE_ID IN (SELECT TOTLE_TRADE_ID FROM TRD_PRODUCT_DEAL WHERE TRADE_ID = #{tradeId})
@@ -4841,11 +4841,15 @@
             BRT.WIN_TYPE   dipType,
             EEBP.ENTRUST_ID  entrustId,
             PP.PORTFOLIO_NAME portfolioName,
-            BRBP.WIN_PRIN_AMT/10000 winPrinAmt,
+            BRD.TOTAL_BID_PRINAMT/10000 winPrinAmt,
             BRD.THE_WIN_PRINAMT/10000 theWinPrinamt,
             BRD.ACT_WIN_PRINAMT/10000 actWinPrinamt,
-            BRD.BID_PRICE  bidPrice,
-            BRD.WIN_PRICE winPrice,
+            CASE WHEN BRD.BID_PRICE IS NOT NULL THEN
+            decode(FPI.TENDER_TARGET,'01', to_char(BRD.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRD.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BRD.BID_PRICE*10000,'fm999999990.90')||'BP')
+            ELSE '' END bidPrice,
+            CASE WHEN BRD.WIN_PRICE IS NOT NULL THEN
+            decode(FPI.TENDER_TARGET,'01', to_char(BRD.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRD.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRD.WIN_PRICE*10000,'fm999999990.90')||'BP')
+            ELSE '' END  winPrice,
             BRD.WIN_CPRICE winCprice,
             BRD.INT_AMT intAmt,
             BRD.PAY_AMT  payAmt,
@@ -4853,7 +4857,8 @@
             BRD.INV_AIM invAim,
             BRD.SEC_ACCT_ID secManageAcctId,
             STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
-            SU.REAL_NAME invManagerId
+            SU.REAL_NAME invManagerId,
+            BO.BID_MODLE BidModle
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
         LEFT JOIN TRD_PRODUCT_DEAL TPD
                ON TPD.TOTLE_TRADE_ID = TFPDT.TOTLE_TRADE_ID
@@ -4877,6 +4882,8 @@
                 AND	BRBP.ENTRUST_ID = TPDA.ENTRUST_ID
                 AND	BRBP.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
                 AND	BRBP.SEC_ACCT_ID = TPD.SEC_MANAGE_ACCT_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI
+        ON		FPI.FINPROD_ID = TFPDT.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO  PP
             ON	 BRBP.PORTFOLIO_ID = PP.PORTFOLIO_ID
         LEFT JOIN ETR_ENTRUST EE
@@ -4924,7 +4931,8 @@
             TFPDT.PRIN_AMT/10000 subAmt,
             TFPDT.TRADE_AMT payAmt,
             TFPDT.FEE_AMT settleFeeAmt,
-            TFPDT.REMARK remark
+            TFPDT.REMARK remark,
+            BO.BID_MODLE BidModle
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
         LEFT JOIN FIN_PRODUCT FP
                ON FP.FINPROD_ID = TFPDT.FINPROD_ID

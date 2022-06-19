@@ -55,6 +55,58 @@
 
     </select>
 
+    <select id="getFirstBondEtrEntrustByIdList" resultType="com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDto">
+        SELECT * FROM (
+            SELECT
+                T2.TARGET_TYPE targetType,
+                T2.TRADER trader,
+                T2.DEAL_MODE,
+                NVL(EED.ENTRUST_NUM,0) - NVL(S.MARCH_QTY_EN,0)  remainEntrustNum,
+                NVL(EED.ENTRUST_AMT,0) - NVL(S.MARCH_AMT_EN,0) remainEntrustAmt,
+                EED.SEC_ACCT_ID
+                T1.*
+            FROM
+                 ETR_ENTRUST T1
+            LEFT JOIN
+                ETR_ENTRUST_ADD T2 ON T1.ENTRUST_ID = T2.ENTRUST_ID
+            LEFT JOIN
+                ETR_ENTRUST_DETAIL EED ON T1.ENTRUST_ID = EED.ENTRUST_ID
+            LEFT JOIN
+            (
+                SELECT
+                    ENTRUNST_TRADE_ID,
+                    SEC_ACCT_ID,
+                    NVL(SUM(MARCH_QTY_EN), 0) MARCH_QTY_EN,
+                    NVL(SUM(MARCH_AMT_EN), 0) MARCH_AMT_EN
+                FROM
+                    SETTLE_TRANS_DATA_TOTAL_MATCH
+                GROUP BY
+                    ENTRUNST_TRADE_ID,
+                    SEC_ACCT_ID
+            ) S ON S.ENTRUNST_TRADE_ID = T1.ENTRUST_ID AND S.SEC_ACCT_ID = EED.SEC_ACCT_ID
+            <where>
+                <if test="entrustIdList!=null and entrustIdList.size()>0 ">
+                    AND (T1.ENTRUST_ID IN
+                    <foreach item="item" index="index" collection="entrustIdList" open="(" close=")" separator=",">
+                        <if test="(index % 998) == 0">
+                            null) or T1.ENTRUST_ID in (
+                        </if>
+                        #{item,jdbcType=VARCHAR}
+                    </foreach>)
+                </if>
+                <if test="entrustId !=null and entrustId != ''">
+                    AND T1.ENTRUST_ID = #{entrustId}
+                </if>
+                AND T1.ENTRUST_STATUS = #{ENTRUST_STATUS_03}
+            </where>
+        ) T
+        WHERE
+            (T.targetType = #{TARGET_CLASS_01} AND T.remainEntrustNum > 0
+            OR
+            T.targetType = #{TARGET_CLASS_02} AND T.remainEntrustAmt > 0
+            )
+    </select>
+
     <select id="getNextWorkDay" parameterType="java.util.Map" resultType="java.util.Date">
         SELECT
         	MIN(B.CDATE)
@@ -438,6 +490,20 @@
             TRD_PRODUCT_DEAL_ADD tpda ON tpd.TRADE_ID = tpda.TRADE_ID
         <where>
             tpda.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+        </where>
+    </select>
+
+    <select id="getFirstBondTrdProductDeals" resultType = "com.joyintech.tams.common.base.entity.TrdProductDeal">
+        SELECT
+            tpda.PORTFOLIO_ID,
+            tpd.SHARE_AMT
+        FROM
+            TRD_PRODUCT_DEAL tpd
+        LEFT JOIN
+            TRD_PRODUCT_DEAL_ADD tpda ON tpd.TRADE_ID = tpda.TRADE_ID
+        <where>
+            tpda.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+            AND tpd.SEC_MANAGE_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
         </where>
     </select>
 </mapper>

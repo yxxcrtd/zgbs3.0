@@ -33,6 +33,8 @@ public interface CreditProtectionCertificateMapper {
 
     int updateFileByPrimaryKey(SysUploadFileInfo var1);
 
+    int selectCountByfinprodId(@Param("finprodId") String finprodId);
+
     /**
      * 查询资产代码列表
      *
@@ -49,6 +51,7 @@ public interface CreditProtectionCertificateMapper {
      */
     List<String> getBusinessData(WflValidInputParameter wflValidInputParameter);
 
+    List<String> getBusinessDatas(WflValidInputParameter wflValidInputParameter);
     /**
      * 查询金融产品代码
      *

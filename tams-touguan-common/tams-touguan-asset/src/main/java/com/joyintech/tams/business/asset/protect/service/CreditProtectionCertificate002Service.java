@@ -3,8 +3,8 @@ package com.joyintech.tams.business.asset.protect.service;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.file.SafelyFile;
-import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.jdbc.datasource.DataSource;
+import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
@@ -14,7 +14,6 @@ import com.joyintech.tams.business.asset.protect.dao.CreditProtectionCertificate
 import com.joyintech.tams.business.asset.protect.dao.InterfCreditInfoMapper;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate002Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
-import com.joyintech.tams.business.asset.tenderbond.dto.FinProductAddDto;
 import com.joyintech.tams.business.asset.tenderbond.service.FinTenderBondAssetService;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
@@ -28,8 +27,8 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.tams.systemtools.dao.JoyinFSMapper;
-import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
@@ -39,6 +38,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -510,8 +511,18 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     public List<ValidMessage> valid(CreditProtectionCertificate002Dto dto) {
         List<ValidMessage> validList = new ArrayList<>();
         String operateType = dto.getOperateType();
+        String operateStatus = dto.getOperateStatus();
         if (StringUtil.isEmpty(dto.getWorkflowId()) &&  isInProcess(dto.getFinprodMarketId(), "CreditProtectionCertificate002")) {
             validList.add(new ValidMessage("存在流程中的数据"));
+        }
+        if(StringUtil.equals(operateStatus, OperationType.NEW.name())&&
+                StringUtil.equals(operateType, "submit") ){
+            if(StringUtils.isNotEmpty(dto.getTradeMarketId())){
+                boolean bool = isInProcessSubmit(dto.getWorkflowId(),
+                        dto.getFinprodMarketId()+dto.getTradeMarketId(),
+                        "CreditProtectionCertificate002");
+
+            }
         }
         if (StringUtil.isEmpty(operateType)) {
             validList.add(new ValidMessage("操作类型不能为空"));
@@ -652,6 +663,49 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         return Boolean.FALSE;
     }
 
+    public Boolean isInProcessSubmit(String workflowId, String pk1, String pageId) {
+        if (StringUtil.isEmpty(pk1)) return Boolean.FALSE;
+        WflValidInputParameter wflValidInputParameter = new WflValidInputParameter();
+        wflValidInputParameter.setPageId(pageId);
+        wflValidInputParameter.setBusinessDataPk1(pk1);
+        wflValidInputParameter.setSeachMode("01");
+        wflValidInputParameter.setWorkflowId(workflowId);
+        List<String> result = creditProtectionCertificateMapper.getBusinessDatas(wflValidInputParameter);
+        if (CollectionUtils.isNotEmpty(result)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @DataSource(DataSourceType.MASERT)
+    public String checkForSubmit(FlowEntity entity, boolean isMutiApproval) {
+        Map<String, String> param = new HashMap<>();
+        CreditProtectionCertificate002Dto dto = new CreditProtectionCertificate002Dto();
+        if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
+            dto = this.getBussinessEntityByWorkflowId(entity.getWorkflowId());
+        }
+        param.put("finprodMarketId", dto.getFinprodMarketId());
+        if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+            return "资产代码不能重复!";
+        }
+        String finprodId = getFinprodId(dto);
+        FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+        if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+            return "资产代码不能重复!";
+        }
+        return null;
+    }
+
+    /**
+     * 校验金融产品代码不重复
+     * @param finprodId
+     * @return
+     */
+    public int selectCountByfinprodId(String finprodId) {
+        return creditProtectionCertificateMapper.selectCountByfinprodId(finprodId);
+    }
 
     /**
      * 空检查
@@ -686,9 +740,14 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
                 return;
             }
             ips = new FileInputStream(file);
-            response.setContentType("multipart/form-data");
+            response.reset();
+//            response.setContentType("multipart/form-data");
+            response.setContentType("application/octet-stream");
             //为文件重新设置名字，采用数据库内存储的文件名称
-            response.addHeader("Content-Disposition", "attachment; fileName=\"" + new String(fileName.getBytes("UTF-8"),"ISO8859-1") + "\"");
+//            response.addHeader("Content-Disposition", "attachment; fileName=\"" + new String(fileName.getBytes("UTF-8"),"ISO8859-1") + "\"");
+            response.addHeader("Content-Disposition",
+                    "attachment;filename=" + new String(fileName.getBytes()));
+            response.addHeader("Content-Length", "" + file.length());
             out = response.getOutputStream();
             //读取文件流
             int len = 0;
@@ -698,7 +757,6 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             }
             out.flush();
         }catch (Exception e){
-            e.printStackTrace();
         }finally {
             try {
                 out.close();

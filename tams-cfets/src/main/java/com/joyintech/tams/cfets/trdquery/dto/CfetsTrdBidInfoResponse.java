@@ -110,7 +110,7 @@ public class CfetsTrdBidInfoResponse {
     private BigDecimal prinAmt;
 
     @ApiModelProperty(name="winPrice",value="中标标位")
-    private BigDecimal winPrice;
+    private String winPrice;
 
     @ApiModelProperty(name="unitCprice",value="中标净价")
     private BigDecimal unitCprice;
@@ -368,7 +368,7 @@ public class CfetsTrdBidInfoResponse {
     public void setTradeMarketMode(String tradeMarketMode) {
         this.tradeMarketMode = tradeMarketMode;
     }
-
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getPayDate() {
         return payDate;
     }
@@ -377,6 +377,7 @@ public class CfetsTrdBidInfoResponse {
         this.payDate = payDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getAssignRegdate() {
         return assignRegdate;
     }
@@ -441,11 +442,11 @@ public class CfetsTrdBidInfoResponse {
         this.prinAmt = prinAmt;
     }
 
-    public BigDecimal getWinPrice() {
+    public String getWinPrice() {
         return winPrice;
     }
 
-    public void setWinPrice(BigDecimal winPrice) {
+    public void setWinPrice(String winPrice) {
         this.winPrice = winPrice;
     }
 
