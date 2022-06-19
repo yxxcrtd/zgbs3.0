@@ -653,13 +653,12 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrCashPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
             // if 画面.全价不为空，则数量 = 画面.全价*画面.数量 else 投资指令DTO.指令金额
             if (null != dto.getFprice()) {
-                etrCashPositionFlowDtoUnit.setAmount(dto.getEntrustNum().multiply(dto.getPrice()).multiply(new BigDecimal(-1)));
+                etrCashPositionFlowDtoUnit.setAmount(dto.getEntrustNum().multiply(dto.getPrice()).multiply(new BigDecimal(1)));
             } else {
                 if (StringUtil.isNotEmpty(etrSinglePortfolioDto.getEntrustAmt())) {
-                    etrCashPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustAmt().multiply(new BigDecimal(-1)));// 数量
+                    etrCashPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustAmt().multiply(new BigDecimal(1)));// 数量
                 }
             }
-//            etrCashPositionFlowDtoUnit.setAmount(ArithmeticUtil.multiply(etrCashPositionFlowDtoUnit.getAmount(),BigDecimal.valueOf(100)));
             etrCashPositionFlowDtoUnit.setOrderId(etrSinglePortfolioDto.getEntrustId());// 业务编号
             etrCashPositionFlowDtoUnit.setChlFinprodId(null);// 通道金融产品代码
             etrCashPositionFlowDtoUnit.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());// 冲正标识
