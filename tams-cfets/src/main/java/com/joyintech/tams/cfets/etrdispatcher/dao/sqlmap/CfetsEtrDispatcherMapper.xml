@@ -1042,7 +1042,11 @@
             TFPDT.PRIN_AMT  totalBiddingNum,
             BO.BID_MODLE biddingMethod,
             BO.PAY_TYPE payType,
-            bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+            CASE
+            WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+            WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+            WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+            END bidprice /*投标标位, 多个逗号分隔展示*/,
             CASE
                 WHEN fpi.TENDER_TARGET = '01' THEN to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
                 WHEN fpi.TENDER_TARGET = '02' THEN to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
@@ -1087,11 +1091,11 @@
                  LEFT JOIN MST_COUNTER_PARTY mcci ON TFPDT.COUNTER_ID = mcci.counter_id
                  LEFT JOIN (select listagg(case
                                                when t3.TENDER_TARGET = '01'
-                                                   then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                                                   then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
                                                when t3.TENDER_TARGET = '02'
-                                                   then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+                                                   then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
                                                when t3.TENDER_TARGET = '03'
-                                                   then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                                                   then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
                                                end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
             t0.BID_ID
                             from BID_ORDER_BID_PRICE t0
@@ -1139,7 +1143,11 @@
         TFPDT.PRIN_AMT  totalBiddingNum,
         BO.BID_MODLE biddingMethod,
         BO.PAY_TYPE payType,
-        bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+        CASE
+        WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+        WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+        WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+        END bidprice /*投标标位, 多个逗号分隔展示*/,
         CASE
         WHEN fpi.TENDER_TARGET = '01' THEN to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
         WHEN fpi.TENDER_TARGET = '02' THEN to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
@@ -1184,11 +1192,11 @@
         LEFT JOIN MST_COUNTER_PARTY mcci ON TFPDT.COUNTER_ID = mcci.counter_id
         LEFT JOIN (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '02'
-        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.BID_ID
         from BID_ORDER_BID_PRICE t0
@@ -1339,7 +1347,11 @@
                     THEN fpi.TENDER_EDATE
                 END           AS issueDateEnd/*投标日 结束*/,
             BO.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额(万元)*/,
-            bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+            CASE
+            WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+            WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+            WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+            END bidprice /*投标标位, 多个逗号分隔展示*/,
             bo.BID_MODLE      AS biddingMethod/*投标方式*/,
             bo.PAY_TYPE       AS payType/*缴款方式*/,
             bo.WIN_TYPE       AS winType/*中标方式*/,
@@ -1373,11 +1385,11 @@
                  LEFT JOIN
              (select listagg(case
                                  when t3.TENDER_TARGET = '01'
-                                     then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                                     then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
                                  when t3.TENDER_TARGET = '02'
-                                     then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+                                     then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
                                  when t3.TENDER_TARGET = '03'
-                                     then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                                     then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
                                  end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
             t0.BID_ID
               from BID_ORDER_BID_PRICE t0
@@ -1426,7 +1438,11 @@
         THEN fpi.TENDER_EDATE
         END           AS issueDateEnd/*投标日 结束*/,
         BO.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额(万元)*/,
-        bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+        CASE
+        WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+        WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+        WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+        END bidprice /*投标标位, 多个逗号分隔展示*/,
         bo.BID_MODLE      AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE       AS payType/*缴款方式*/,
         bo.WIN_TYPE       AS winType/*中标方式*/,
@@ -1460,11 +1476,11 @@
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '02'
-        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.BID_ID
         from BID_ORDER_BID_PRICE t0
@@ -1520,7 +1536,11 @@
                     THEN fpi.TENDER_EDATE
                 END           AS issueDateEnd/*投标日 结束*/,
             ee.ENTRUST_NUM *100   AS etrBidPriceTotal/*指令投标券面总额*/,
-            bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+            CASE
+                WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+                WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+                WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+                END bidprice /*投标标位, 多个逗号分隔展示*/,
             bo.BID_MODLE      AS biddingMethod/*投标方式*/,
             bo.PAY_TYPE       AS payType/*缴款方式*/,
             bo.WIN_TYPE       AS winType/*中标方式*/,
@@ -1565,11 +1585,11 @@
             LEFT JOIN
             (select listagg(case
             when t3.TENDER_TARGET = '01'
-            then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+            then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
             when t3.TENDER_TARGET = '02'
-            then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+            then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
             when t3.TENDER_TARGET = '03'
-            then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+            then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
             end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
             t0.BID_ID
             from BID_ORDER_BID_PRICE t0
@@ -1635,7 +1655,11 @@
                     THEN fpi.TENDER_EDATE
                 END           AS issueDateEnd/*投标日 结束*/,
             ee.ENTRUST_NUM *100   AS etrBidPriceTotal/*指令投标券面总额*/,
-            bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+            CASE
+                WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+                WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+                WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+                END bidprice /*投标标位, 多个逗号分隔展示*/,
             bo.BID_MODLE      AS biddingMethod/*投标方式*/,
             bo.PAY_TYPE       AS payType/*缴款方式*/,
             bo.WIN_TYPE       AS winType/*中标方式*/,
@@ -1680,11 +1704,11 @@
             LEFT JOIN
             (select listagg(case
             when t3.TENDER_TARGET = '01'
-            then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+            then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
             when t3.TENDER_TARGET = '02'
-            then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+            then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
             when t3.TENDER_TARGET = '03'
-            then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+            then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
             end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
             t0.BID_ID
             from BID_ORDER_BID_PRICE t0
@@ -2226,7 +2250,11 @@
         ee.ENTRUST_NUM *100   AS etrBidPriceTotal/*指令投标券面总额*/,
         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
         bo.WIN_PRIN_AMT   AS totalBiddingNum/*券面总额*/,
-        bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+        CASE
+        WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+        WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+        WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+        END bidprice /*投标标位, 多个逗号分隔展示*/,
         bo.BID_MODLE      AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE       AS payType/*缴款方式*/,
         case
@@ -2261,11 +2289,11 @@
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '02'
-        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.BID_ID
         from BID_ORDER_BID_PRICE t0
@@ -2355,7 +2383,11 @@
         ee.ENTRUST_NUM*100  AS etrBidPriceTotal/*指令投标券面总额*/,
         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
         bo.WIN_PRIN_AMT AS totalBiddingNum/*券面总额*/,
-        bobp.BID_PRICE  AS bidprice/*投标标位, 多个逗号分隔展示*/,
+        CASE
+        WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+        WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+        WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+        END bidprice /*投标标位, 多个逗号分隔展示*/,
         bo.BID_MODLE    AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE     AS payType/*缴款方式*/,
         case
@@ -2390,11 +2422,11 @@
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '02'
-        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.BID_ID
         from WFL_BID_ORDER_BID_PRICE t0
