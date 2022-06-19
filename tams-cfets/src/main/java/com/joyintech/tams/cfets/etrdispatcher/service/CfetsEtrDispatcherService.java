@@ -856,7 +856,7 @@ public class CfetsEtrDispatcherService extends BaseService {
 //                }
 //            }
 
-            if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_自主投标.getValue()) && StringUtil.equals(dto.getIsWin(), DictCodeList.是否_是)) {
+            if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_自主投标.getValue()) && StringUtil.equals(dto.getIsWin(), DictCodeList.是否_否.getValue())) {
                 //未中标查询中标结果明细
                 page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrPrimaryBidDealListInfo(pageParam));
             }else if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_分销买入.getValue())) {
