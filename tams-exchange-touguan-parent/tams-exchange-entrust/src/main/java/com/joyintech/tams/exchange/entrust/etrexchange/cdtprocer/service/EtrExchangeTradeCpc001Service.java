@@ -244,9 +244,27 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
 //                }
 //            }
 //        }
+        this.getSecIdZJH(entity);
         positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct );
 
     }
+
+    //add wsz ZGCPCN-1501 修改 在申购情况下 传值托管户 start
+    public EtrCreditProtectionCertificateApplyRequest getSecIdZJH(EtrCreditProtectionCertificateApplyRequest entity){
+        if(Objects.equals(entity.getPs(), DictCodeList.交易方向_申购.getValue())){
+            for (EtrExchangeTradePortfolioSecRepoRequest item : entity.getPortfolioList()) {
+                //查询托管户
+                Map<String, Object> map = new HashMap<>();
+                map.put("portfolioId", item.getPortfolioId());
+                List<String> list = etrExchangeTradeCpc002Mapper.getSecAcctIdZJH(map);
+                if(!list.isEmpty()&&list.size()>0){
+                    item.setAcctNo(list.get(0));
+                }
+            }
+        }
+        return entity;
+    }
+    //add wsz ZGCPCN-1501 修改 在申购情况下 传值托管户 end
 
     @Override
     public void doDelete(String workflowId) {
@@ -314,6 +332,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
                 }
                 try {
                     entity.setPositionSeqno(null);
+                    this.getSecIdZJH(entity);
                     positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct);
                 } catch (PositionException e) {
                     Message message = PositionUtil.ajaxErrorReturn(e);

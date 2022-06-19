@@ -363,6 +363,16 @@
         select FINPROD_ID from FIN_PRODUCT where FINPROD_ID = #{finprodId} and MDATE &lt; to_date(#{nowDate},'yyyy-MM-dd')
     </select>
 
+    <select id="getSecAcctIdZJH" resultType="java.lang.String">
+        select ACCT_NO
+            from PTL_CAPACCT_INFO
+        <where> ACCT_TYPE = 'A01'
+            <if test="portfolioId != null and portfolioId !=''">
+                AND PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
     <sql id="etrExchangeQueryAnd">
         <if test="search != null and search != ''">
             and (
