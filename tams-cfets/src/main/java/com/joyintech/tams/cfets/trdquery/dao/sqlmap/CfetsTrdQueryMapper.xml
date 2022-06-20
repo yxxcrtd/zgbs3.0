@@ -2692,14 +2692,15 @@
 			ICB.SUBMIT_USER  submitUser,
 			ICB.SUBSCRIPTION_AMOUNT*100000000  subAmt,
 			ICB.ACTUAL_FEE   payAmt,
-            ICB.ISSUER   issuer,
+            FP.ISSUER   issuer,
 			ICB.ISSUER_21_FIRM_ID  issuer21FirmId,
-			ICB.ISSUE_CLASS   issueClass,
+            FPI.ISSUE_CLASS   issueClass,
 			ICB.REAL_ISSUESIZE*100000000  issueAmt,
 			ICB.INSTRUMENT_STATUS   instrumentStatus
         FROM  INTERF_CSTP_BJFXJG ICB
         LEFT JOIN FIN_PRODUCT FP
                ON FP.FINPROD_MARKET_ID = ICB.INSTRUMENT_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI on FPI.FINPROD_ID=FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE FPT
                ON FPT.FINPROD_ID = FP.FINPROD_ID
         WHERE ICB.TRD_ID = #{quoteId,jdbcType=VARCHAR}
@@ -3148,7 +3149,7 @@
             SELECT
                 CASE WHEN TFPDT.IS_CANCEL= 'Y' THEN #{STATUS_VALID_03} ELSE #{STATUS_VALID_01}	END as effectiveStatus,
                 DECODE(SO.SETTLE_STATUS,'01','S')   cleanStatus,
-                TMSI.SETTLE_STATUS	 settleStatus,
+                NVL(TMSI.SETTLE_STATUS,"01")	 settleStatus,
                 TFPDT.TOTLE_TRADE_ID	totleTradeId,
                 TFPDT.FINPROD_TYPE2	 finprodType2,
                 sdl1.item_value finprodType2Str,
@@ -3174,7 +3175,7 @@
                      when BO.BID_MODLE=#{WIN_TYPE_03} THEN decode(FPI.TENDER_TARGET,'01',to_char(BO.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BO.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BO.WIN_PRICE*10000,'fm999999990.90')||'BP')
                      when BO.BID_MODLE IN(#{WIN_TYPE_01},#{WIN_TYPE_02}) THEN decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP') END tradeYield,
                 null termDays,
-                TFPDT.TRADE_AMT/10000 tradeAmt,
+                TFPDT.TRADE_AMT tradeAmt,
                 TFPDT.CCY ccy,
                 sdl7.item_value as ccyStr,
                 to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') as confirmTradeDate,

@@ -452,26 +452,6 @@
             return false;
         }
         var obj = getSubmitParam("submit");
-        //风险校验
-        var riskFlag = false;
-        $.ajax({
-            type: "POST",
-            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond',
-            dataType: "json",
-            contentType: "application/json",
-            async: false,
-            data: JSON.stringify(obj),
-            success: function (result) {
-                console.log(result);//只记录不影响提交
-                if(result.code === '200') {
-                    riskFlag = true;
-                }
-            }
-        });
-      /*  if(!riskFlag) {
-            return false;
-        }*/
-        var obj = getSubmitParam("submit");
         var errorMsg = "";
         var confirmMsg = "";
         Joyin.ajaxJson(basePath + 'cfets/bond/IbuQuoteBond004/check', obj, function (result) {
@@ -700,10 +680,19 @@
     $('#IbuQuoteBond004_btn_riskcal').click(function () {
         var object = $.serializeToObject('#submitForm');
         var param = JSON.parse(JSON.stringify(object));
-        param.ptlAllocations = param.cfetsBondDealDialogueQuoteDtoList;
+        param.ptlAllocatios = param.cfetsBondDealDialogueQuoteDtoList;
+        if ( param.ptlAllocatios) {
+            $.each(param.ptlAllocatios, function (index, obj) {
+                obj.shareAmt = JoyinMath.doMul(obj.shareAmt, 10000);
+                obj.avaNum = JoyinMath.doMul(obj.avaNum, 10000);
+                obj.avaNumOld = JoyinMath.doMul(obj.avaNumOld, 10000);
+                obj.ourEntNum = JoyinMath.doMul(obj.ourEntNum, 10000);
+                obj.lendinEntNum = JoyinMath.doMul(obj.lendinEntNum, 10000);
+            });
+        }
         $.ajax({
             type: "POST",
-            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond',
+            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond004',
             dataType: "json",
             contentType: "application/json",
             async: false,

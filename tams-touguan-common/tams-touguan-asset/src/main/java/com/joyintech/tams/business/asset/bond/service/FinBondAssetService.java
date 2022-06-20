@@ -207,10 +207,6 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 if (count1 > 0){
                     return "存在流程中/待执行指令交易数据，不可修改";
                 }
-                if (finBondAssetSaveRequest.getOperateStatus().equals("NEW")&&
-                        selectCountByfinprodId(finBondAssetSaveRequest.getFinprodId()) > 0) {
-                    return "资产代码不能重复!";
-                }
             }
         return null;
     }
