@@ -17,10 +17,18 @@ import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditPro
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodWriterDto;
 import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
+import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlCashPositionInfoServiceImpl;
+import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlSecPositionInfoServiceImpl;
 import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
+import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +94,13 @@ public class CreditProtectionCertificatePeriodRunnerService {
 
     @Autowired
     private CommonPositionService commonPositionService;
+
+    @Autowired
+    private BasePtlSecPositionInfoServiceImpl basePtlSecPositionInfoServiceImpl;
+
+    @Autowired
+    private BasePtlCashPositionInfoServiceImpl basePtlCashPositionInfoServiceImpl;
+
 
 
     public void dealExpireData(CreditProtectionCertificatePeriodWriterDto writerDto) throws BatchException {
@@ -324,12 +339,24 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow2.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
             ptlSecPositionFlows.add(ptlSecPositionFlow3);
         }
-        for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
-            commonPositionService.insertPtlSecPositionFlow(ptlSecPositionFlow);
-        }
+
+        EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
+        etrPositionHoldDto.setPtlSecPositionFlows(new ArrayList<EtrSecPositionFlowDto>());
+        etrPositionHoldDto.setPtlCashPositionFlows(new ArrayList<EtrCashPositionFlowDto>());
+
         for (EtrSecPositionFlow etrSecPositionFlow : etrSecPositionFlows) {
-            commonPositionService.insertEtrSecPositionFlow(etrSecPositionFlow);
+//            commonPositionService.insertEtrSecPositionFlow(etrSecPositionFlow);
+            EtrSecPositionFlowDto etrSecPositionFlowDto = new EtrSecPositionFlowDto();
+            BeanUtils.copyProperties(etrSecPositionFlow, etrSecPositionFlowDto);
+            etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
         }
+        for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
+//            commonPositionService.insertPtlSecPositionFlow(ptlSecPositionFlow);
+            PtlSecPositionFlowDto ptlSecPositionFlowDto = new PtlSecPositionFlowDto();
+            BeanUtils.copyProperties(ptlSecPositionFlow, ptlSecPositionFlowDto);
+            basePtlSecPositionInfoServiceImpl.inertSecPositionFlow(ptlSecPositionFlowDto);
+        }
+        EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
     }
 
 
