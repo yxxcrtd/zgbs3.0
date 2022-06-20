@@ -324,6 +324,8 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
         trdProductDeal.setFinprodType(dealDto.getFinprodType());
         // 分支序号
         trdProductDeal.setBranch(0L);
+        // 交易模式
+        trdProductDeal.setBusinessModel(entrustDto.getBusinessModel());
         // 交易日
         trdProductDeal.setTradeDate(dealDto.getTradeDate());
         // 起息日
