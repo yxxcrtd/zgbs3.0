@@ -1620,8 +1620,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             for (CfetsTrdFirstBidFirmTotalDto item : dto.getBidTotalList()) {
                 Map<String, String> map = new HashMap<>();
                 // 中标标位
-                BigDecimal bidPrice = BigDecimal.ZERO;
-                bidPrice = this.toFormatBidPrice(dto.getTenderTarget(), bidPrice, "2");
+                BigDecimal bidPrice = this.toFormatBidPrice(dto.getTenderTarget(), item.getBidPrice(), "2");
                 if (!StringUtil.isNotEmpty(minBidPrice)
                         || BigDecimalUtil.ACompareToB(minBidPrice, bidPrice, 6) > 0) {
                     minBidPrice = bidPrice;
