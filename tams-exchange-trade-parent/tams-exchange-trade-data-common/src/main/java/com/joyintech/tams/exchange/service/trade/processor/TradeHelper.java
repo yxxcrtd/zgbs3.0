@@ -373,7 +373,7 @@ public class TradeHelper {
         if (Objects.isNull(account)) {
             if (EntrustUtils.isCreditProtectionCertificate(order.getBusiTypeTg())) {
                 logger.warn("【簿记功能】不需要填充账号信息： {}", order.getBusiTypeTg());
-                return true;
+                return false;
             }
             order.setErrorCode(ErrorCode.ACCOUNT_NOT_LOGIN.value);
             order.setErrorMsg(ErrorCode.ACCOUNT_NOT_LOGIN.errorMsg);

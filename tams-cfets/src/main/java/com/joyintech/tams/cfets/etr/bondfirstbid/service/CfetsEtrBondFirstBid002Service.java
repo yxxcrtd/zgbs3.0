@@ -742,8 +742,11 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         try {
             dto.setOperateType(dto.getOperateType());
             BaseEtrInvestInfoDto entity = new BaseEtrInvestInfoDto();
-            EtrEntrust etrEntrust = new EtrEntrust();
 
+            List<CfetsBiddingProductDto> biddingProductList = dto.getBiddingProductList();
+            Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = biddingProductList.stream().collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
+
+            EtrEntrust etrEntrust = new EtrEntrust();
             dto.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             dto.setIsOutTrade(DictCodeList.是否_是.getValue());
             if (StringUtil.isEmpty(dto.getEntrustStatus())) {
@@ -755,6 +758,15 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             etrEntrust.setEntrustNum(dto.getTotalBiddingNum().divide(new BigDecimal(100)));
             etrEntrust.setPs(DictCodeList.交易方向_买入.getValue());
             etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
+            if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                    || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+                if (portfolioIdMap.size() > 1) {
+                    etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
+                }else {
+                    etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_单组合单资产指令.getValue());
+                }
+            }
+
             etrEntrust.setVdate(dto.getVdate());
             etrEntrust.setMdate(dto.getMdate());
             //委托附属表
@@ -771,7 +783,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
             //委托投标标位表
             List<EtrEntrustBidPrice> bidPriceList = new ArrayList<>();
-            List<CfetsBiddingProductDto> biddingProductList = dto.getBiddingProductList();
+
             if (!StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                 for (CfetsBiddingProductDto productDto : biddingProductList) {
                     EtrEntrustBidPrice bidPrice = new EtrEntrustBidPrice();
@@ -785,7 +797,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
             //委托指令明细
             List<EtrEntrustDetail> etrEntrustDetailList = new ArrayList<>();
-            Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = biddingProductList.stream().collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
+
             for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : portfolioIdMap.entrySet()) {
                 EtrEntrustDetail entrustDetail = new EtrEntrustDetail();
                 entrustDetail.setEntrustId(dto.getEntrustId());
@@ -840,8 +852,11 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         try {
             dto.setOperateType(dto.getOperateType());
             BaseEtrInvestInfoDto entity = new BaseEtrInvestInfoDto();
-            EtrEntrust etrEntrust = new EtrEntrust();
 
+            List<CfetsBiddingProductDto> biddingProductList = dto.getBiddingProductList();
+            Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = biddingProductList.stream().collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
+
+            EtrEntrust etrEntrust = new EtrEntrust();
             dto.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             dto.setIsOutTrade(DictCodeList.是否_是.getValue());
             if (StringUtil.isEmpty(dto.getEntrustStatus())) {
@@ -856,6 +871,16 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             etrEntrust.setEntrustNum(dto.getTotalBiddingNum().divide(new BigDecimal(100)));
             etrEntrust.setPs(DictCodeList.交易方向_买入.getValue());
             etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
+            if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                    || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+                if (portfolioIdMap.size() > 1) {
+                    etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
+                }else {
+                    etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_单组合单资产指令.getValue());
+                }
+            }
+
+
             if (etrEntrust.getEntrustDate() == null) {
                 etrEntrust.setEntrustDate(iPlatformDate.getSysDate());
             }
@@ -880,8 +905,6 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 etrEntrustAdd.setTransmitTime(new Date());
             }
 
-            List<CfetsBiddingProductDto> biddingProductList = dto.getBiddingProductList();
-
             //委托投标标位表
             List<EtrEntrustBidPrice> bidPriceList = new ArrayList<>();
             if (!StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
@@ -897,7 +920,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
             //委托指令明细
             List<EtrEntrustDetail> etrEntrustDetailList = new ArrayList<>();
-            Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = biddingProductList.stream().collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
+
             for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : portfolioIdMap.entrySet()) {
                 EtrEntrustDetail entrustDetail = new EtrEntrustDetail();
                 entrustDetail.setEntrustId(dto.getEntrustId());

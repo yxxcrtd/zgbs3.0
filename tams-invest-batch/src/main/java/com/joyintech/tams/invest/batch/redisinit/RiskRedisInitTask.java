@@ -135,21 +135,6 @@ public class RiskRedisInitTask extends BatchBaseService{
             }else {
                 result.setStatus(BatchStatus.COMPLETED);
             }
-
-            if (StringUtil.isNotEmpty(CacheUtil.getSysParam(BussinessConstantRds.IS_REPEATED_REIDSBATCH))
-                && StringUtil.equals(CacheUtil.getSysParam(BussinessConstantRds.IS_REPEATED_REIDSBATCH), DictCodeList.是否_是.getValue()) ) {
-                logger.info("批处理-指标参数重新更新redis开始");
-                Map<String, Object> paramsTwo = new HashMap<>();
-                paramsTwo.put(BatchConstant.KEY_PRODID_LIST, this.getProductIdList());
-                paramsTwo.put("sysDate", platDataUtil.getSysDate(batchExecuteInfo.getCreateUser()));
-                step1Reader.setParams(paramsTwo);
-                step1Processor.setParams(paramsTwo);
-                step1Writer.setParams(paramsTwo);
-                result = batchBuilder.init(this)
-                    .batch("step1", step1Reader, step1Processor, step1Writer)
-                    .builder(this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId())
-                    .run();
-            }
         }
         catch (Exception e) {
             logger.error(e.getMessage(),e);
