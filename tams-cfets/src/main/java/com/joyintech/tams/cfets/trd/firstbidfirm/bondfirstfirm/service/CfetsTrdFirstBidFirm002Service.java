@@ -3924,6 +3924,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 if (isBack) {
                     trdProductDeal.setShareAmt(trdProductDeal.getShareAmt().negate());
                     trdProductDeal.setPrinAmt(trdProductDeal.getPrinAmt().negate());
+                    trdProductDeal.setFpriceAmt(trdProductDeal.getFpriceAmt().negate());
                 }
                 baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
                 TrdProductDealAdd add = new TrdProductDealAdd();
