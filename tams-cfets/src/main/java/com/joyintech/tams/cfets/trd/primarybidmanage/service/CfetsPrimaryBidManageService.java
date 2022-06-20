@@ -47,12 +47,15 @@ import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommServi
 import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
+import com.joyintech.tams.invest.common.component.base.entrust.dto.BaseEtrFinishAmtDto;
+import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
@@ -178,6 +181,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     @Autowired
     private FinProductTypeMapper finProductTypeMapper;
 
+    /**
+     * 投资委托信息Service
+     */
+    @Autowired
+    private BaseEtrInvestInfoServiceImpl etrInvestInfoServiceImpl;
 
     /**
      * 默认设置
@@ -446,6 +454,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             updateCfetsOprHis(entity.getTotalWinId(),action);
         }
+        baseTradeCommExecute(entity, type);
     }
 
     private void doCompleteInsert(CfetsPrimaryBidManageSaveRequest entity) {
@@ -1759,5 +1768,62 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"元";
         }
         return bidPriceStr;
+    }
+
+    /**
+     * 处理指令完成情况
+     *
+     * @param dto  交易数据
+     * @param type 操作类型
+     * @return java.util.List<java.lang.String>
+     * @author jiangpeng
+     * @date 2022/4/7 20:07
+     */
+    public List<String> baseTradeCommExecute(CfetsPrimaryBidManageSaveRequest dto, OperationType type) {
+        if (dto == null) {
+            return null;
+        }
+        List<String> entrustIdList = new ArrayList<>();
+        for (TrdProductDeal trdProductDeal : dto.getBaseBidManageBaseInfoDto().getTrdProductDealList()) {
+            if (StringUtil.isEmpty(trdProductDeal.getEntrustId())) {
+                continue;
+            }
+            EtrFinishStatusDto status = new EtrFinishStatusDto();
+            status.setEntrustId(trdProductDeal.getEntrustId());
+            status.setTradeId(trdProductDeal.getTradeId());
+            status.setFinishDate(trdProductDeal.getTradeDate());
+            status.setFinishAmt(trdProductDeal.getShareAmt());
+            status.setTrader(trdProductDeal.getTrader());
+            // 调用委托完成状况查询
+            entrustIdList.add(status.getEntrustId());
+            if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)) {
+                etrFinishStatusMapper.deleteByPrimaryKey(status);
+            } else {
+                // 遍历List<委托完成状况表Entity>，保存到“委托完成状况表”
+                etrFinishStatusMapper.insertSelective(status);
+            }
+        }
+        if (CollectionUtils.isEmpty(entrustIdList)) {
+            return null;
+        }
+        if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)) {
+            for (String entrustId : entrustIdList) {
+                // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“已接收”
+                etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_已接收.getValue());
+            }
+        } else {
+            List<BaseEtrFinishAmtDto> etrFinishAmtDtoList = etrInvestInfoServiceImpl.queryDelegateStatus(entrustIdList);
+            List<String> finishEtrList = new ArrayList<>();
+            // 判断委托代码的完成额度是否大于等于100
+            for (BaseEtrFinishAmtDto etrFinishAmtDto : etrFinishAmtDtoList) {
+                if (etrFinishAmtDto.getSumFinishPercent().compareTo(BigDecimal.valueOf(100)) >= 1) {
+                    // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“已完成”
+                    etrInvestInfoServiceImpl.updateDelegateStatus(etrFinishAmtDto.getEntrustId(), DictCodeList.委托状态_已完成.getValue());
+                    finishEtrList.add(etrFinishAmtDto.getEntrustId());
+                }
+            }
+            return finishEtrList;
+        }
+        return null;
     }
 }
