@@ -1751,7 +1751,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             ips = new FileInputStream(file);
             response.setContentType("multipart/form-data");
                     //为文件重新设置名字，采用数据库内存储的文件名称
-            response.addHeader("Content-Disposition", "attachment; fileName=\"" + new String(fileName.getBytes("UTF-8"),"ISO8859-1") + "\"");
+            response.addHeader("Content-Disposition", "attachment; fileName=" + URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
             out = response.getOutputStream();
             //读取文件流
             int len = 0;
