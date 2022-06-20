@@ -141,7 +141,7 @@
 		tpda.OUT_DEALER_NO counterDealerId,/**对手方交易商代码*/
 		tpd.COUNTER_TRADER counterTrader,/**对手方交易员*/
 		tpd.TRADER  ourTrader, /*本方交易员*/
-		tpd.COUNTER_ID counterId,/*交易对手*/
+		A.counter_id counterId,/*交易对手*/
 		FTP.MDATE repoMdate /*回购到期日*/
 		FROM ETR_ENTRUST A
 		LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
