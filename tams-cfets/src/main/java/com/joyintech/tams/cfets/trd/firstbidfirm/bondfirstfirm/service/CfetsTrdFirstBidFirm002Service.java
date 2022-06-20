@@ -1640,7 +1640,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 }
                 // 标的类金融产品发行信息.投标步长 IS NOT NULL AND 标的类金融产品发行信息.连续投标限制=是 AND 汇总投标列表.投标标位的差值为1个投标步长
                 if (StringUtil.isNotEmpty(finProductIssue.getTenderUnit()) && StringUtil.equals(finProductIssue.getSeriYN(), DictCodeList.是否_是.getValue())
-                        && BigDecimalUtil.ACompareToB(ArithmeticUtil.subtract(lastBidPrice, bidPrice), finProductIssue.getTenderUnit(), 2) > 0) {
+                        && lastBidPrice != null && BigDecimalUtil.ACompareToB(ArithmeticUtil.subtract(lastBidPrice, bidPrice).abs(),
+                        finProductIssue.getTenderUnit(), 6) == 0) {
                     CheckMassgeInfo checkMassgeInfo = new CheckMassgeInfo();
                     checkMassgeInfo.setPrimaryKey(item.getBidPrice().toPlainString());
                     checkMassgeInfo.setFeild("bidPrice");

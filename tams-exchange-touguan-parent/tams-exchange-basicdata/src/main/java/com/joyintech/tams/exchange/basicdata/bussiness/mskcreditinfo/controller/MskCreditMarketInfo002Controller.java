@@ -162,17 +162,20 @@ public class MskCreditMarketInfo002Controller extends BaseController {
         WorkFlowParameter<MskCreditInfoProSaveRequest> params = new WorkFlowParameter<MskCreditInfoProSaveRequest>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        if (StringUtil.isEmpty(dto.getSecid())) {
-            dto.setSecid(IDGenerator.generate());
-        }
+//        if (StringUtil.isEmpty(dto.getSecid())) {
+//            dto.setSecid(IDGenerator.generate());
+//        }
         params.setBusinessCode(dto.getSecid());
         params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证行情.getValue());
 
         params.setComment(entity1 -> {
-            return WorkFlowUtil.concatComment("资产代码"+
-                    GlobalConstant.OPEN_PARENTHESIS+entity1.getSecid()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"估值日期"+GlobalConstant.OPEN_PARENTHESIS+entity1.getCdate()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"估值来源"+GlobalConstant.OPEN_PARENTHESIS+entity1.getValueSourceStr()+GlobalConstant.CLOSE_PARENTHESIS);
+//            return WorkFlowUtil.concatComment("资产代码"+
+//                    GlobalConstant.OPEN_PARENTHESIS+entity1.getSecid()+GlobalConstant.CLOSE_PARENTHESIS
+//                    +"估值日期"+GlobalConstant.OPEN_PARENTHESIS+entity1.getCdate()+GlobalConstant.CLOSE_PARENTHESIS
+//                    +"估值来源"+GlobalConstant.OPEN_PARENTHESIS+entity1.getValueSourceStr()+GlobalConstant.CLOSE_PARENTHESIS);
+            return WorkFlowUtil.concatComment("资产代码" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity1.getSecid(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                    , "估值日期" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity1.getCdate(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                    , "估值来源" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity1.getValueSourceStr(), "") + GlobalConstant.CLOSE_PARENTHESIS);
         });
         processParameter.setWorkFlowParameter(params);
         Date sysDate = DateUtil.platDateFromCache();// 获取平台日期
