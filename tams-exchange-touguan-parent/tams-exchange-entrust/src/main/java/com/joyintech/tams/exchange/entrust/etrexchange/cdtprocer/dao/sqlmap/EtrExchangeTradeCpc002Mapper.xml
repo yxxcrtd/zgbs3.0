@@ -592,6 +592,9 @@
         <if test="assetType != null and assetType !=''">
             AND FPT.TYPE_8 = #{assetType,jdbcType=VARCHAR}
         </if>
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort}  ${direction}
+        </if>
     </select>
 
     <select id="getPrice" parameterType="Map" resultType="com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateHoldResponse">
