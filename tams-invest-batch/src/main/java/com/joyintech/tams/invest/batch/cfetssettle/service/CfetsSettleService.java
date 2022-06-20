@@ -264,6 +264,8 @@ public class CfetsSettleService extends BaseService {
                 if (StringUtil.isNotEmpty(cashAcctId)) {
                     positionRulePtlData.setCashAcctId(cashAcctId); // 托管户
                 }
+            } else {
+                logger.debug("汇总编号{}不存在组合",dto.getTotleTradeId());
             }
             if (StringUtil.isNotEmpty(dto.getPortfolioId()) && StringUtil.isNotEmpty(dto.getFinprodId())) {
                 Map<String, Object> map = new HashMap<String, Object>();
@@ -273,6 +275,8 @@ public class CfetsSettleService extends BaseService {
                 if (StringUtil.isNotEmpty(secAcctId)) {
                     positionRulePtlData.setSecAcctId(secAcctId); // 证券账户
                 }
+            } else {
+                logger.debug("汇总编号" + dto.getTotleTradeId() + "不存在组合" + dto.getPortfolioId() + "或资产" + dto.getFinprodId());
             }
             positionRulePtlData.setSecAmount(dto.getShareAmt());
             positionRulePtlData.setCashAmount(dto.getTradeAmt());
