@@ -1,0 +1,49 @@
+--产品总资产 CPZZC
+DECLARE
+    V_CONTENT_01_02_03 CLOB:= 'WITH  temp  as(
+      SELECT
+       DISTINCT t1.PORTFOLIO_ID,
+      nvl(TDY_ASSET_VALUE,0) as AMOUNT
+       from PTL_PORTFOLIO_VALUATION t1
+       where  t1.CDATE=date''${valDate}''-1
+   )
+ SELECT PORTFOLIO_ID RKEY,sum(AMOUNT) RVALUE FROM temp
+ group by PORTFOLIO_ID
+  union all
+    select m.PTL_BAG_ID as RKEY,
+     (
+      SELECT sum(AMOUNT) FROM (
+       SELECT PORTFOLIO_ID,AMOUNT FROM temp
+       ) t1 where t1.PORTFOLIO_ID in (select t1.PORTFOLIO_ID from RSK_PORTFOLIO_PACKAGE_DTL t1
+       inner join PTL_PORTFOLIO t2 on t1.PORTFOLIO_ID=t2.PORTFOLIO_ID and t2.MDATE>date''${valDate}'' where t1.PTL_BAG_ID=m.PTL_BAG_ID)
+     ) AS RVALUE
+     from RSK_PORTFOLIO_PACKAGE m';
+BEGIN
+    UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_01_02_03 WHERE PARA_CODE = 'CPZZC' and PARA_GRANULARITY IN ('01','02','03');
+END;
+/
+
+--产品净资产  CPJZCJZ
+DECLARE
+    V_CONTENT_01_02_03 CLOB:= 'WITH  temp  as(
+      SELECT
+       DISTINCT t1.PORTFOLIO_ID,
+        nvl(TDY_ASSET_NETVALUE,0) as AMOUNT
+       from PTL_PORTFOLIO_VALUATION t1
+       where  t1.CDATE=date''${valDate}''-1
+ )
+ SELECT PORTFOLIO_ID RKEY,sum(AMOUNT) RVALUE FROM temp
+ group by PORTFOLIO_ID
+union all
+   select m.PTL_BAG_ID as RKEY,
+   (
+        SELECT sum(AMOUNT) FROM (
+          SELECT PORTFOLIO_ID,AMOUNT FROM temp
+       ) t1 where t1.PORTFOLIO_ID in (select t1.PORTFOLIO_ID from RSK_PORTFOLIO_PACKAGE_DTL t1
+       inner join PTL_PORTFOLIO t2 on t1.PORTFOLIO_ID=t2.PORTFOLIO_ID and t2.MDATE>date''${valDate}'' where t1.PTL_BAG_ID=m.PTL_BAG_ID)
+   ) AS RVALUE
+   from RSK_PORTFOLIO_PACKAGE m';
+BEGIN
+    UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_01_02_03 WHERE PARA_CODE = 'CPJZCJZ' and PARA_GRANULARITY IN ('01','02','03');
+END;
+/
