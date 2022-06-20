@@ -137,8 +137,8 @@ public class PositionRequestServiceTradSaveCpcRequest {
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
 //                map.put("etrSecAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
-                map.put("secAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
-                map.put("cashAmount", entity.getEntrustAmt());
+                map.put("secAmount", ArithmeticUtil.multiply(item.getEntrustNum(),BigDecimal.valueOf(10000)));
+                map.put("cashAmount", item.getEntrustAmt());
                 map.put("tradeId", "");
                 ptlList.add(map);
 
@@ -146,7 +146,7 @@ public class PositionRequestServiceTradSaveCpcRequest {
                 map2.put("portfolioId", bean.getPortfolioId());
                 map2.put("finprodId", bean.getFinprodId());
                 map2.put("secAcctId", bean.getSecAcctId());
-                map2.put("secAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
+                map2.put("secAmount", ArithmeticUtil.multiply(item.getEntrustNum(),BigDecimal.valueOf(10000)));
                 map2.put("tradeId", "");
                 ptlSubList.add(map2);
             }
