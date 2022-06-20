@@ -1668,7 +1668,7 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     }
 
     public String getWinTypeStr() {
-        return winTypeStr;
+        return SysDataUtil.getNameFromDataDict(DictCode.中标方式, this.getWinType());
     }
 
     public void setWinTypeStr(String winTypeStr) {

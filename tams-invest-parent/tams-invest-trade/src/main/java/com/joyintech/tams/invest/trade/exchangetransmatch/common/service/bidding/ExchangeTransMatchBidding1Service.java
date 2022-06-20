@@ -65,7 +65,9 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         //生成金融产品汇总交易信息
         TrdFinProductDealTotal trdFinProductDealTotal = this.genTrdFinProductDealTotal(transDto,entrustDto);
 
-        if (DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(entrustDto.getEntrustClass())) {
+        if (DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(entrustDto.getEntrustClass())
+                && CollectionUtils.isNotEmpty(entrustDto.getEntrustDetailDtoList())
+                && entrustDto.getEntrustDetailDtoList().size()>1) {
             for (ExchangeTransMatchCommonEntrustDetailDto detailDto : entrustDto.getEntrustDetailDtoList()) {
                 if(detailDto.getMarchQty() == null || detailDto.getMarchQty().compareTo(BigDecimal.ZERO) <= 0){
                     continue;
@@ -85,6 +87,8 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
                 baseTradeProductDealDto.setTrdDealTotalAdd(this.generateDealTotalAdd(entrustDtoTmp,baseTradeProductDealDto.getTrdFinProductDealTotal()));
                 //生成金融产品交易信息
                 baseTradeProductDealDto.setTrdProductDeal(this.genTrdProductDeal(transDto,entrustDtoTmp,baseTradeProductDealDto.getTrdFinProductDealTotal()));
+                //生成金融产品交易附属表信息
+                baseTradeProductDealDto.setTrdProductDealAdd(this.genTrdProductDealAdd(transDto,entrustDtoTmp,baseTradeProductDealDto.getTrdProductDeal()));
                 //生成组合交易表数据
                 baseTradeProductDealDto.setPtlTrade(this.generatePtlTrade(entrustDtoTmp,baseTradeProductDealDto.getTrdProductDeal()));
                 //生成费用信息list
@@ -98,7 +102,12 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
             }
         }
 
-        if (DictCodeListExt3.投资指令类型_单组合单资产指令.getValue().equals(entrustDto.getEntrustClass())) {
+        // ZGCPCN-1551:modify by fuyongsheng 20220620 start
+        if (DictCodeListExt3.投资指令类型_单组合单资产指令.getValue().equals(entrustDto.getEntrustClass()) ||
+                (DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(entrustDto.getEntrustClass())
+                        && CollectionUtils.isNotEmpty(entrustDto.getEntrustDetailDtoList())
+                        && entrustDto.getEntrustDetailDtoList().size() == 1)) {
+            // ZGCPCN-1551:modify by fuyongsheng 20220620 end
             ExchangeTransMatchBaseTradeDto baseTradeProductDealDto = new ExchangeTransMatchBaseTradeDto();
             // TODO 金融产品汇总交易信息
             baseTradeProductDealDto.setTrdFinProductDealTotal(trdFinProductDealTotal);
@@ -106,6 +115,8 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
             baseTradeProductDealDto.setTrdDealTotalAdd(this.generateDealTotalAdd(entrustDto,baseTradeProductDealDto.getTrdFinProductDealTotal()));
             // TODO 生成金融产品交易信息
             baseTradeProductDealDto.setTrdProductDeal(this.genTrdProductDeal(transDto,entrustDto,baseTradeProductDealDto.getTrdFinProductDealTotal()));
+            //生成金融产品交易附属表信息
+            baseTradeProductDealDto.setTrdProductDealAdd(this.genTrdProductDealAdd(transDto,entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
             // TODO 生成组合交易表数据
             baseTradeProductDealDto.setPtlTrade(this.generatePtlTrade(entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
             // TODO 生成费用信息list
@@ -632,5 +643,16 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         trdFinProductDealTotal.setDeliveryType("券款兑付");
         // TODO 交收方式  席位号  委托代码
         return trdFinProductDealTotal;
+    }
+
+    /**
+     * 金融产品交易附属表
+     */
+    public TrdProductDealAdd genTrdProductDealAdd(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto,TrdProductDeal trdProductDeal) {
+        TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
+        BeanUtil.copyPropertiesIgnoreNull(trdProductDealAdd, trdProductDeal);
+        trdProductDealAdd.setEntrustId(entrustDto.getEntrustId());
+        trdProductDealAdd.setPortfolioId(entrustDto.getPortfolioId());
+        return trdProductDealAdd;
     }
 }

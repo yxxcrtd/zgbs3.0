@@ -265,8 +265,17 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         if (StringUtil.isNotEmpty(request.getBidId())) {
             Map<String, Object> param = BeanUtil.object2Map(request);
             CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageMapper.selectBidOrderInfo(param);
+            List<CfetsPrimaryBidManageSaveDetailDto> details =new  ArrayList<>();
             List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBidOrderDtail(param);
-            response.setAllocationDetails(detailDtos);
+            if (StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
+                    StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())){
+                details.addAll(detailDtos.stream().sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice)
+                        ).collect(Collectors.toList()));
+            }else if (StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())){
+                details.addAll(detailDtos.stream().sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice).reversed()
+                        ).collect(Collectors.toList()));
+            }
+            response.setAllocationDetails(details);
             return response;
         }
         return null;
@@ -660,7 +669,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             TrdProductDeal trdProductDeal = new TrdProductDeal();
             BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
             bussinessCodeParameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
-            bussinessCodeParameter.setType1(DictCodeList.业务编号一级分类_同业借款);
             trdProductDeal.setTradeId((baseGetBusinessId != null && baseGetBusinessId.buildBussinessCode(bussinessCodeParameter) != null)? baseGetBusinessId.buildBussinessCode(bussinessCodeParameter): IDGenerator.generate().substring(0, 30));
             trdProductDeal.setSecManageAcctId(secAcctId);
             trdProductDeal.setFinprodId(dto.getFinprodId());
