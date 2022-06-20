@@ -859,6 +859,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
          ||StringUtil.equals(entity.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue()) ){
             req.setInterfaceType("Bond002");//报文类型
             req.setTradePlace(entity.getTradeMarket());
+            req.setPayType(entity.getPayType());//缴款方式
             FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
             finProductTypeKey.setFinprodId(entity.getFinprodId());
             finProductTypeKey.setBranch(0L);

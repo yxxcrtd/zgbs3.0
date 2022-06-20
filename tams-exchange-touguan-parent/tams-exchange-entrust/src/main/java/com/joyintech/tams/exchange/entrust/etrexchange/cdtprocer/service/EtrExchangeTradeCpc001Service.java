@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.service;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.joyintech.background.component.common.pack.common.security.User;
 import com.joyintech.background.component.order.exchange.business.dto.EtrBlockTradeStockDto;
 import com.joyintech.background.component.order.exchange.business.dto.EtrSecRepoBondDto;
@@ -28,6 +29,7 @@ import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -42,6 +44,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dao.EtrExchangeTradeCpc002Mapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateApplyRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrZJHCheckTGHResponse;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeMiniLimitPriceRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.position.service.PositionRequestServiceTradSaveCpcRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeOperateSecRepoRequest;
@@ -79,6 +82,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
 import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
@@ -100,6 +104,8 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
     private EtrComponentCommService<EtrBlockTradeStockDto> componentService;
     @Autowired
     private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
+    @Autowired
+    private TamsBusinessCommonService tamsBusinessCommonService;
     /**
      * 指令废弃表
      */
@@ -253,19 +259,27 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
     public EtrCreditProtectionCertificateApplyRequest getSecIdZJH(EtrCreditProtectionCertificateApplyRequest entity){
         if(Objects.equals(entity.getPs(), DictCodeList.交易方向_申购.getValue())){
             for (EtrExchangeTradePortfolioSecRepoRequest item : entity.getPortfolioList()) {
-                //查询托管户
-                Map<String, Object> map = new HashMap<>();
-                map.put("portfolioId", item.getPortfolioId());
-                List<String> list = etrExchangeTradeCpc002Mapper.getSecAcctIdZJH(map);
-                if(!list.isEmpty()&&list.size()>0){
-                    item.setAcctNo(list.get(0));
+                String acctNo = tamsBusinessCommonService.selectProdTghCapacctNo(item.getPortfolioId());
+                if(!Objects.isNull(acctNo)){
+                    item.setAcctNo(acctNo);
                 }
             }
         }
         return entity;
     }
     //add wsz ZGCPCN-1501 修改 在申购情况下 传值托管户 end
-
+    public Map<String,Object> getZJHCheckTGH(List<String> requestList){
+        if(requestList.isEmpty()){
+            return null;
+        }
+        Map<String,Object> map = Maps.newHashMap();
+        Map<String, List<EtrZJHCheckTGHResponse>> listMap = etrExchangeTradeCpc002Mapper.getSecAcctIdZJH(requestList)
+                .stream().collect(Collectors.groupingBy(EtrZJHCheckTGHResponse::getPortfolioId));
+        for(Map.Entry<String, List<EtrZJHCheckTGHResponse>> entry:listMap.entrySet()){
+            map.put(entry.getKey(),entry.getValue().get(0).getAcctNo());
+        }
+        return map;
+    }
     @Override
     public void doDelete(String workflowId) {
         doDeleteFlow(workflowId);
@@ -425,6 +439,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrSecRepoBondDto.setMatureYield(ArithmeticUtil.divide(dto.getYield(), new BigDecimal(100), 8)); // 到期收益率
             etrSecRepoBondDto.setFullPrice(dto.getFprice()); // 全价
             etrSecRepoBondDto.setPrice(dto.getPrice());
+            etrSecRepoBondDto.setRemark(dto.getRemark());
             etrSecRepoBondDto.setEntrustNum(cash);
             etrSecRepoBondDto.setEntrustAmt(dto.getEntrustAmt());
             etrSecRepoBondDto.setCalMode(dto.getCalculateField());// 计算方式

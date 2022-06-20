@@ -331,7 +331,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                 for (CfetsPrimaryBidManageSaveRequest request:dto.getSelectedItem()) {
                     parameter.setBusinessDataPk1(request.getBidId());
                     if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
-                        errorList.add(new ValidMessage("存在流程中数据，不可进行中标结果维护！"));
+                        errorList.add(new ValidMessage("存在流程中数据，不可撤销，请重新选择"));
                         break;
                     }
                     if (!request.getStatus().equals(DictCodeListExt1.有效状态_有效.getValue())) {
