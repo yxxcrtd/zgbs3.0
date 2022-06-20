@@ -1673,8 +1673,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         WHERE iqer.entrust_id = #{entrustId}
     </select>
 
-    <select id="getEtrDispatcherDealListInfo"
-            resultMap="TradeResultMap">
+    <select id="getEtrDispatcherDealListInfo"  resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.TradeQueryBean">
         SELECT distinct
         decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
         <include refid="etrDispatcherDealListInfo"/>

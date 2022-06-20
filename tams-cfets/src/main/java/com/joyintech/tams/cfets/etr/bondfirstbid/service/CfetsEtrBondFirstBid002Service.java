@@ -766,6 +766,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
             etrEntrustAdd.setEntrustId(dto.getEntrustId());
             etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_债券.getValue());
+            etrEntrustAdd.setTargetType(DictCodeListExt3.目标类型_数量.getValue());
             entity.setEtrEntrustAdd(etrEntrustAdd);
 
             //委托投标标位表
@@ -867,6 +868,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
             etrEntrustAdd.setEntrustId(dto.getEntrustId());
             etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_债券.getValue());
+            etrEntrustAdd.setTargetType(DictCodeListExt3.目标类型_数量.getValue());
             entity.setEtrEntrustAdd(etrEntrustAdd);
             //指令下达时间
             if (StringUtil.isNotEmpty(dto.getTransmitTime())) {
@@ -1189,6 +1191,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
             etrEntrustAdd.setEntrustId(dto.getEntrustId());
             etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_债券.getValue());
+            etrEntrustAdd.setTargetType(DictCodeListExt3.目标类型_数量.getValue());
             //更新委托附属表
             etrEntrustAddMapper.updateByPrimaryKeySelective(etrEntrustAdd);
 

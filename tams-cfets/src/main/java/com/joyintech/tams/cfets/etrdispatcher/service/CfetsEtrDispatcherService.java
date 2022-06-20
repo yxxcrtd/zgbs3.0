@@ -480,7 +480,23 @@ public class CfetsEtrDispatcherService extends BaseService {
                     response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     response.setDealProgress(ArithmeticUtil.divide(response.getTransFinishAmt(),ArithmeticUtil.doAdd(response.getTransFinishAmt(),response.getTransRemainderAmt()),4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")));
+                //add wsz 3.0.6场内 ZGCPCN-1511 start
+                } else if (StringUtil.equals(response.getFinprodType2(), DictCodeListExt2.平安资产类型_信用保护凭证.getValue())) {
+                    DecimalFormat df = new DecimalFormat("0.##");
+                    BigDecimal finishAmt = ArithmeticUtil.multiply(response.getExecFinishAmt(),new BigDecimal(100));
+                    BigDecimal remainderAmt1 = ArithmeticUtil.doAdd (response.getExecFinishAmt(),response.getExecRemainderAmt());
+                    BigDecimal remainderAmt2 = ArithmeticUtil.subtract(finishAmt, remainderAmt1);
+                    BigDecimal transFinishAmt = ArithmeticUtil.multiply(response.getTransFinishAmt(),new BigDecimal(100));
+                    BigDecimal tremainderAmt1 = ArithmeticUtil.doAdd (response.getTransFinishAmt(),response.getTransRemainderAmt());
+                    BigDecimal tremainderAmt2 = ArithmeticUtil.subtract(transFinishAmt, tremainderAmt1);
+                    response.setExecFinishAmt(finishAmt);
+                    response.setExecRemainderAmt(remainderAmt2);
+                    response.setTransFinishAmt(transFinishAmt);
+                    response.setTransRemainderAmt(tremainderAmt2);
+                    response.setExeProgress(ArithmeticUtil.multiply(response.getExeProgress(), new BigDecimal(100)));
+                    response.setDealProgress(ArithmeticUtil.multiply(response.getDealProgress(), new BigDecimal(100)));
                 }
+                //add wsz 3.0.6场内 ZGCPCN-1511 end
                 if(StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
                         StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
                     CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
@@ -856,7 +872,7 @@ public class CfetsEtrDispatcherService extends BaseService {
 //                }
 //            }
 
-            if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_自主投标.getValue()) && StringUtil.equals(dto.getIsWin(), DictCodeList.是否_是)) {
+            if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_自主投标.getValue()) && StringUtil.equals(dto.getIsWin(), DictCodeList.是否_否.getValue())) {
                 //未中标查询中标结果明细
                 page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrPrimaryBidDealListInfo(pageParam));
             }else if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_分销买入.getValue())) {

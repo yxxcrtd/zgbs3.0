@@ -709,6 +709,21 @@ public class TradeQueryBean implements Serializable {
     @ApiModelProperty(name = "etrBidPriceTotal", value = "指令投标券面总额(万元) 需前端转化", example = "1")
     private BigDecimal etrBidPriceTotal;
 
+    @ApiModelProperty(name = "effectFlag", value = "有效状态code", example = "01")
+    private String effectFlag;
+
+    public String getEffectFlag() {
+        return effectFlag;
+    }
+
+    public void setEffectFlag(String effectFlag) {
+        this.effectFlag = effectFlag;
+    }
+
+    public String getOtherEffectFlag() {
+        return SysDataUtil.getNameFromDataDict(DictCode.交易流程状态, this.getEffectFlag());
+    }
+
     public String getFinprodId() {
         return finprodId;
     }
