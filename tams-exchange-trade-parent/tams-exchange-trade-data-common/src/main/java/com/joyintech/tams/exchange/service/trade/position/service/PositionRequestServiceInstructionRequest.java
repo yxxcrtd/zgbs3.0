@@ -620,7 +620,7 @@ public class PositionRequestServiceInstructionRequest {
                 bean.setSecAmount(entrustNum);
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
-                map.put("etrSecAmount", item.getInstructionTotalAmt());
+                map.put(ETR_SEC_AMOUNT, item.getEtrSecAmount());
                 ptlList.add(map);
             }
             resultMap.put(PTL_LIST, ptlList);
