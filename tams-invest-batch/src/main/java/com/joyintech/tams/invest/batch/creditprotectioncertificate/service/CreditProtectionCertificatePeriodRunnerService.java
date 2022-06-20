@@ -400,7 +400,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
     }
 
     public void doRevokePositionForNew(String busiCode) {
-        PositionHttpRequest.dorevoke(busiCode, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue(), DictCodeList.交易方向_到期.getValue());
+        PositionHttpRequest.dorevoke(busiCode, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), DictCodeList.交易方向_到期.getValue());
     }
 
     public void doRevokePositionForOld(String busiCode) {

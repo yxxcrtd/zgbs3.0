@@ -358,6 +358,8 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         trdProductDeal.setBranch(0L);
         // 交易日
         trdProductDeal.setTradeDate(transDto.getTradeDate());
+        // 业务模式
+        trdProductDeal.setBusinessModel(entrustDto.getBusinessModel());
         // 起息日
         trdProductDeal.setVdate(null);
         // 到期日

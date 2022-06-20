@@ -205,6 +205,9 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
     @Override
     public void doDelete(String workflowId) {
+        CreditProtectionCertificatePeriodSaveDto entity = getBussinessEntityByWorkflowId(workflowId);
+//        doOldPositionSubmit(entity, true);
+        positionRequestService.sendDelete(entity);
         baseTradeProductDealCommServiceImpl.delete(workflowId);
     }
 
