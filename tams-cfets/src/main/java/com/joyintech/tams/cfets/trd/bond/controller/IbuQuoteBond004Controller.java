@@ -132,6 +132,7 @@ public class IbuQuoteBond004Controller extends BaseController {
         model.addAttribute("PS_T03", DictCodeList.交易方向_行权_回售.getValue());
         model.addAttribute("quotaPageModel","new");
         model.addAttribute("ptlAllocatios", JsonUtils.object2Json(cfetsBondDealQuoteCommonDto.getPtlAllocatios()));
+        model.addAttribute("entity_RiskTrialRetList",  JsonUtils.object2Json(cfetsBondDealQuoteCommonDto.getRiskTrialRetDto()));
         //分配方式
         model.addAttribute("distribution",cfetsBondDealQuoteCommonDto.getDistribution());
         //卖空模式
@@ -199,7 +200,7 @@ public class IbuQuoteBond004Controller extends BaseController {
     @ResponseBody
     public Message<AjaxResult> check(@RequestBody CfetsBondDealQuoteCommonDto cfetsBondDealQuoteCommonDto){
         //check必填项
-        AjaxResult ajaxResult = cfetsBondDealQuotedPrice004Service.checkNotEmpty(cfetsBondDealQuoteCommonDto);
+       AjaxResult ajaxResult = cfetsBondDealQuotedPrice004Service.checkNotEmpty(cfetsBondDealQuoteCommonDto);
         if(CollectionUtils.isEmpty(ajaxResult.getErrorList())){
             ajaxResult = cfetsQuotedCommonServiceVue.checkcheckAnchoring(cfetsBondDealQuoteCommonDto);
         }

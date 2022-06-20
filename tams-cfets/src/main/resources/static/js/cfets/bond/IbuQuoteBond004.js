@@ -373,6 +373,7 @@
         }
         object.workflowId = workflowId;
         object.rskApproval = rskApproval;
+        object.riskTrialRetDto = entity_RiskTrialRetList;
         return object;
     }
 

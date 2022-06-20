@@ -2275,7 +2275,7 @@
         mcp.COUNTER_NAME  AS counterName,
         bo.REMARK         AS remark/*备注*/,
         bo.CREATE_TIME     purchaseDate/*申购日期*/,
-        ssai.SEC_ACCT_NAME   secAcctName/*证券账户*/,
+        bobp2.SEC_ACCT_NAME   secAcctName/*证券账户*/,
         fpt.TYPE_11          secType/*资产分类*/,
         bobp2.PORTFOLIO_ID      portfolioId/*组合代码*/,
         bobp2.PORTFOLIO_NAME    portfolioName/*组合名称*/,
@@ -2332,14 +2332,16 @@
         within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_ID,
         listagg(pp.PORTFOLIO_NAME, ',')
         within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_NAME,
+        listagg(ssai.SEC_ACCT_NAME, ',')
+        within group (order by t0.ENTRUST_ID, t0.BID_ID) AS SEC_ACCT_NAME,
         t0.ENTRUST_ID                                               ENTRUST_ID,
-        t0.BID_ID                                                   BID_ID,
-        eed.SEC_ACCT_ID
+        t0.BID_ID                                                   BID_ID
         from BID_ORDER_BID_PRICE t0
         left join ETR_ENTRUST_DETAIL eed
         on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
         left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
-        group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+        group by t0.ENTRUST_ID, t0.BID_ID) bobp2
         on bo.BID_ID = bobp2.BID_ID
         left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
         left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
@@ -2408,7 +2410,7 @@
         mcp.COUNTER_NAME  AS counterName,
         bo.REMARK       AS remark/*备注*/,
         bo.CREATE_TIME     purchaseDate/*申购日期*/,
-        ssai.SEC_ACCT_NAME   secAcctName/*证券账户*/,
+        bobp2.SEC_ACCT_NAME   secAcctName/*证券账户*/,
         fpt.TYPE_11          secType/*资产分类*/,
         bobp2.PORTFOLIO_ID      portfolioId/*组合代码*/,
         bobp2.PORTFOLIO_NAME    portfolioName/*组合名称*/,
@@ -2465,14 +2467,16 @@
         within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_ID,
         listagg(pp.PORTFOLIO_NAME, ',')
         within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_NAME,
+        listagg(ssai.SEC_ACCT_NAME, ',')
+        within group (order by t0.ENTRUST_ID, t0.BID_ID) AS SEC_ACCT_NAME,
         t0.ENTRUST_ID                                               ENTRUST_ID,
-        t0.BID_ID                                                   BID_ID,
-        eed.SEC_ACCT_ID
+        t0.BID_ID                                                   BID_ID
         from WFL_BID_ORDER_BID_PRICE t0
         left join ETR_ENTRUST_DETAIL eed
         on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
         left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
-        group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+        group by t0.ENTRUST_ID, t0.BID_ID) bobp2
         on bo.BID_ID = bobp2.BID_ID
         left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
         left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID

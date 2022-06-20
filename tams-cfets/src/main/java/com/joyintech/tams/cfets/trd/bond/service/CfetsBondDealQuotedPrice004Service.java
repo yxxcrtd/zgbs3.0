@@ -15,6 +15,7 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.exception.BusinessException;
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
@@ -28,6 +29,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealDbDto;
@@ -38,6 +40,7 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -59,6 +62,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.constant.ProcessState;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -73,6 +77,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_行权回售;
 import static com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service.getBussinessCodeParameter;
 
 /**
@@ -434,6 +439,60 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
 
     }
 
+    private Map<String, Object> getEtrLimitSwitch(String workflowId, CfetsBondDealRegisterQuoteDto dto,
+                                                  CommonBusinessService commonBusinessService) throws WorkFlowException {
+        BigDecimal amount = dto.getTradeAmt();
+        if (amount == null) {
+            amount = dto.getShareAmt();
+        }
+        Map<String, Object> params = CommonBusinessService.setParams(dto.getCounterId(), amount, LoginUserUtil.getUserName(),
+                BussinessDictCodeList.平安资产类型_债券.getValue(), null, dto.getTradeMarket(), dto.getPs()
+                , dto.getFinprodId(), workflowId
+        );
+        // add by zhangrui1 风险审批修改 start
+        params.put("riskTrialRetDto", dto.getRiskTrialRetDto());
+        // add by zhangrui1 风险审批修改 end
+        return commonBusinessService.是否需要上级审批_委托用(params);
+    }
+
+    @Override
+    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
+        CfetsBondDealRegisterQuoteDto dto = this.getBussinessEntity(entity);
+        if(!StringUtil.equals(dto.getPs(),交易方向_行权回售.getValue())) return null;
+        CommonBusinessService commonBusinessService = SpringContextUtil.getBean(CommonBusinessService.class);
+        if (taskId != null) {
+            try {
+                if(StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH_IS_TOTAL), "Y")){
+                    return getEtrLimitSwitch(entity.getWorkflowId(), dto, commonBusinessService);
+                }else{
+//           		BussinessConstant.是否需要上级审批
+                    List<PtlAllocationDto> etribRepoInfo003DtoList = dto.getPtlAllocatios();
+                    Map<String, Object> result = new HashMap<>();
+                    for(PtlAllocationDto ptlAllocationDto : etribRepoInfo003DtoList){
+                        CfetsBondDealRegisterQuoteDto quoteDto = new CfetsBondDealRegisterQuoteDto();
+                        BeanUtil.copyPropertiesIgnoreNull(quoteDto,dto);
+                        quoteDto.setTradeAmt(ptlAllocationDto.getShareAmt());
+                        if(Objects.isNull(quoteDto.getTradeAmt())) {
+                            quoteDto.setTradeAmt(ptlAllocationDto.getFpriceAmt());
+                        }
+                        result = getEtrLimitSwitch(entity.getWorkflowId(), quoteDto, commonBusinessService);
+                        if((boolean)result.get(BussinessConstant.是否需要上级审批)==true){
+                            return result;
+                        }
+                    }
+                    return result;
+                }
+            }
+            catch (WorkFlowException e) {
+                // 未设置授权或设置成不授权时，抛出异常，当前用户只能退回
+                throw new WorkFlowException(e);
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
     /**
      * 处理旧头寸
      *
@@ -603,7 +662,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                 //PositionHttpRequest.sendRevoke(cfetsBondDealDbDto.getRegFinProductDealTotal().getpTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),"Bond001");
                 String busiType = StringUtil.EMPTY;
                 String ps = cfetsBondDealDbDto.getRegFinProductDealTotal().getPs();
-                if (StringUtil.equals(ps, BussinessDictCodeList.交易方向_行权回售.getValue())) {
+                if (StringUtil.equals(ps, 交易方向_行权回售.getValue())) {
                     busiType = DictCodeListExt3.头寸业务类型_债券行权交易.getValue();
                 } else {
                     busiType = DictCodeListExt3.头寸业务类型_现券交易.getValue();
@@ -750,7 +809,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
     public void doDelete(String workflowId) {
         CfetsBondDealRegisterQuoteDto entity = getBussinessEntityByWorkflowId(workflowId);
         String busiType = StringUtil.EMPTY;
-        if (StringUtil.equals(entity.getPs(), BussinessDictCodeList.交易方向_行权回售.getValue())) {
+        if (StringUtil.equals(entity.getPs(), 交易方向_行权回售.getValue())) {
             busiType = DictCodeListExt3.头寸业务类型_债券行权交易.getValue();
         } else {
             busiType = DictCodeListExt3.头寸业务类型_现券交易.getValue();
@@ -1123,7 +1182,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                 balanceCheck = DictCodeList.是否_否.getValue();
             }
             result.put("balanceCheck", balanceCheck);
-            if (StringUtil.equals(ps, BussinessDictCodeList.交易方向_行权回售.getValue())) {
+            if (StringUtil.equals(ps, 交易方向_行权回售.getValue())) {
                 result.put("busiType", DictCodeListExt3.头寸业务类型_债券行权交易.getValue());
             } else {
                 result.put("busiType", DictCodeListExt3.头寸业务类型_现券交易.getValue());
@@ -1168,7 +1227,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                     pltMap.put("secAmount", ArithmeticUtil.multiply(regFinProductDeal.getShareAmt(), new BigDecimal(100))); //券面总额
                     pltMap.put("cashAmount", regFinProductDeal.getTradeAmt().setScale(2, RoundingMode.DOWN));
                     RegFinProductDealAdd regFinProductDealAdd = regFinProductDealAddMap.get(regFinProductDeal.getTradeId()).get(0);
-                    if (StringUtil.equals(ps, BussinessDictCodeList.交易方向_卖出.getValue()) || StringUtil.equals(ps, BussinessDictCodeList.交易方向_行权回售.getValue())) {
+                    if (StringUtil.equals(ps, BussinessDictCodeList.交易方向_卖出.getValue()) || StringUtil.equals(ps, 交易方向_行权回售.getValue())) {
                         pltMap.put("ownSecAmount", ArithmeticUtil.multiply(regFinProductDealAdd.getOurShareAmt(), new BigDecimal(100)));
                         pltMap.put("integrateSecAmount", ArithmeticUtil.multiply(regFinProductDealAdd.getLendinShareAmt(), new BigDecimal(100)));
                     }
@@ -1210,7 +1269,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
         try {
             String busiType = StringUtil.EMPTY;
             String ps = cfetsBondDealDbDto.getRegFinProductDealTotal().getPs();
-            if (StringUtil.equals(ps, BussinessDictCodeList.交易方向_行权回售.getValue())) {
+            if (StringUtil.equals(ps, 交易方向_行权回售.getValue())) {
                 busiType = DictCodeListExt3.头寸业务类型_债券行权交易.getValue();
             } else if (StringUtil.isNotEmpty(tgBusiType) && (StringUtil.equals(DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), tgBusiType) || StringUtil.equals(DictCodeListExt3.头寸业务类型_质押式回购到期.getValue(), tgBusiType))) {
                 busiType = tgBusiType;

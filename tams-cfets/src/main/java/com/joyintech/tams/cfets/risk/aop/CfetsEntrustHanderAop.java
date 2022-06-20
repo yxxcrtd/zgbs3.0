@@ -119,7 +119,6 @@ public class CfetsEntrustHanderAop {
                 if(StringUtil.equals(outputDto.getRskStatus(),试算结果_风险审批.getValue())) {
                     result.setData(是否_是.getValue());
                 }
-                result.setData(是否_是.getValue());
                 ajaxResultMessage.setData(result);
             }
         } catch (Exception e) {
