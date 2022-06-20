@@ -722,7 +722,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             //获取文件存放的路径
             SysUploadFileInfo fileInfo = joyinFSMapper.selectByPrimaryKey(seqNo);
             File file = new SafelyFile(fileInfo.getPath());
-            String fileName=file.getName();
+            String fileName=fileInfo.getFileName();
             //获取到文字 数据库里对应的附件名字加上老的文件名字：filename 截取到后面的文件类型 例：txt 组成一个新的文件名字：newFileName
             if(!file.exists()) {
                 //如果文件不存在就跳出
