@@ -629,25 +629,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      * @date 2022/5/18 10:23
      */
     private CfetsTrdFirstBidFirmInfoDto dealInfoSelfOrAgency(CfetsTrdFirstBidFirmInfoDto dto) {
-        List<CfetsTrdFirstBidFirmProductDto> list = dto.getProductDtos();
-        // 投标标的升序
-        Comparator<CfetsTrdFirstBidFirmProductDto> byBidPrice = null;
-        //招标标的为利率和利差时从小到大排列
-        if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())
-                || StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
-            byBidPrice = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getBidPrice);
-        } else {
-            //招标标的为价格时，从大到小排列
-            byBidPrice = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getBidPrice).reversed();
-        }
-        // 指令代码升序
-        Comparator<CfetsTrdFirstBidFirmProductDto> byEntIdDESC = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getEntrustId, String.CASE_INSENSITIVE_ORDER);
-        // 组合名称升序
-        Comparator<CfetsTrdFirstBidFirmProductDto> byPNameDESC = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getPortfolioName, String.CASE_INSENSITIVE_ORDER);
-        // 联合排序
-        Comparator<CfetsTrdFirstBidFirmProductDto> finalComparator = byBidPrice.thenComparing(byEntIdDESC).thenComparing(byPNameDESC);
-        // 排序
-        list = list.stream().sorted(finalComparator).collect(Collectors.toList());
+        List<CfetsTrdFirstBidFirmProductDto> list = this.productDtosSort(dto);
         //缴款方式
         dto.setPayType(this.getPayType(dto.getBiddingMethod()));
         BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
@@ -667,6 +649,36 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         dto.setProductDtos(list);
         dto.setBidTotalList(this.createBidTotalList(dto));
         return dto;
+    }
+
+    /**
+     * 投标产品列表排序
+     *
+     * @param dto
+     * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmProductDto>
+     * @author jiangpeng
+     * @date 2022/6/20 15:27
+     */
+    private List<CfetsTrdFirstBidFirmProductDto> productDtosSort(CfetsTrdFirstBidFirmInfoDto dto) {
+        List<CfetsTrdFirstBidFirmProductDto> list = dto.getProductDtos();
+        // 投标标的升序
+        Comparator<CfetsTrdFirstBidFirmProductDto> byBidPrice = null;
+        //招标标的为利率和利差时从小到大排列
+        if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())
+                || StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+            byBidPrice = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getBidPrice);
+        } else {
+            //招标标的为价格时，从大到小排列
+            byBidPrice = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getBidPrice).reversed();
+        }
+        // 指令代码升序
+        Comparator<CfetsTrdFirstBidFirmProductDto> byEntIdDESC = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getEntrustId, String.CASE_INSENSITIVE_ORDER);
+        // 组合名称升序
+        Comparator<CfetsTrdFirstBidFirmProductDto> byPNameDESC = Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getPortfolioName, String.CASE_INSENSITIVE_ORDER);
+        // 联合排序
+        Comparator<CfetsTrdFirstBidFirmProductDto> finalComparator = byBidPrice.thenComparing(byEntIdDESC).thenComparing(byPNameDESC);
+        // 排序
+        return list.stream().sorted(finalComparator).collect(Collectors.toList());
     }
 
     /**
@@ -910,6 +922,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         List<CfetsTrdFirstBidFirmInfoDto> listTmp = cfetsTrdFirstBidFirm002Mapper.viewPage(pageParam);
         if (StringUtil.isNotEmpty(listTmp)) {
             viewInfo = listTmp.get(0);
+            viewInfo.setProductDtos(this.productDtosSort(viewInfo));
             viewInfo.setBidTotalList(this.createBidTotalList(viewInfo));
         }
         BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
@@ -1464,6 +1477,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         List<CfetsTrdFirstBidFirmTotalDto> totalDtoList = new ArrayList<>();
         for (CfetsTrdFirstBidFirmTotalDto totalDto : totalDtoMap.values()) {
             totalDtoList.add(totalDto);
+        }
+        //招标标的为利率和利差时从小到大排列
+        if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())
+                || StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+            totalDtoList.sort(Comparator.comparing(CfetsTrdFirstBidFirmTotalDto::getBidPrice));
+        } else {
+            //招标标的为价格时，从大到小排列
+            totalDtoList.sort(Comparator.comparing(CfetsTrdFirstBidFirmTotalDto::getBidPrice).reversed());
         }
         return totalDtoList;
     }

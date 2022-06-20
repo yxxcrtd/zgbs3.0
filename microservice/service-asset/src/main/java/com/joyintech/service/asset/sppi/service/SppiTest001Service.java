@@ -22,6 +22,7 @@ import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
@@ -171,6 +172,7 @@ public class SppiTest001Service extends BaseService<SppiTest001Dto> {
                 Map<String, Object> param = new HashMap<>();
                 param.put("finprodId", list.get(0));
                 param.put("TYPE_TOUGUAN_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                param.put("TYPE_TOUGUAN_F32", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             	List<FinProduct> finProducts =  sppiTest001Mapper.getBondAssetInfo(param);
             	if(StringUtil.isEmptyList(finProducts)) {
             		message.add(list.get(0) + "不存在对应债券");

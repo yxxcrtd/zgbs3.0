@@ -191,7 +191,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             }
             return map;
         }
-        if (obj instanceof CfetsBondDealQuoteCommonDto || StringUtil.equals(pageId, "IbuQuoteBond004")) {
+/*        if (obj instanceof CfetsBondDealQuoteCommonDto || StringUtil.equals(pageId, "IbuQuoteBond004")) {
             CfetsBondDealQuoteCommonDto allDto = JsonUtils.json2Object(businessJson, CfetsBondDealQuoteCommonDto.class);
             CfetsBondDealRegisterQuoteDto dto = new CfetsBondDealRegisterQuoteDto();
             BeanUtil.copyPropertiesIgnoreNull(dto, allDto);
@@ -208,7 +208,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 map.put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_债券行权交易.getValue());
             }
             return map;
-        }
+        }*/
         if (obj instanceof CfetsBondDealRegisterQuoteDto || StringUtil.equals(pageId, "IbuQuoteBond004")) {
             CfetsBondDealRegisterQuoteDto dto = JsonUtils.json2Object(businessJson, CfetsBondDealRegisterQuoteDto.class);
             BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
@@ -952,6 +952,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
             Map<String, Object> map = BeanUtil.object2Map(data);
             dto.setCounterId((String) map.get("counterId"));
             dto.setPrinAmt((BigDecimal) map.get("tradeAmt"));
+            if(Objects.isNull(dto.getPrinAmt())) {
+                dto.setPrinAmt((BigDecimal) map.get("shareAmt"));
+            }
             dto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             dto.setTradeMarket((String) map.get("tradeMarket"));
             dto.setPs((String) map.get("ps"));
