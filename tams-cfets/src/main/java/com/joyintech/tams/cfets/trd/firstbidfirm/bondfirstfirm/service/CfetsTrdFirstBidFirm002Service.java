@@ -1465,6 +1465,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         for (CfetsTrdFirstBidFirmTotalDto totalDto : totalDtoMap.values()) {
             totalDtoList.add(totalDto);
         }
+        //招标标的为利率和利差时从小到大排列
+        if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())
+                || StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+            totalDtoList.sort(Comparator.comparing(CfetsTrdFirstBidFirmTotalDto::getBidPrice));
+        } else {
+            //招标标的为价格时，从大到小排列
+            totalDtoList.sort(Comparator.comparing(CfetsTrdFirstBidFirmTotalDto::getBidPrice).reversed());
+        }
         return totalDtoList;
     }
 
