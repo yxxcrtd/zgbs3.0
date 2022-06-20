@@ -15,6 +15,7 @@ import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageValidatorService;
+import com.joyintech.tams.common.base.dao.BidResultTotalMapper;
 import com.joyintech.tams.common.base.entity.BidOrder;
 import com.joyintech.tams.common.base.entity.BidResultTotal;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
@@ -74,6 +75,9 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
 
     @Autowired
     private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private BidResultTotalMapper bidResultTotalMapper;
 
     @ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/init")
@@ -332,6 +336,11 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                     }
                     if (!request.getStatus().equals(DictCodeListExt1.有效状态_有效.getValue())) {
                         errorList.add(new ValidMessage("仅可对有效已中标或未中标的数据进行撤销，请重新选择"));
+                        break;
+                    }
+                    BidResultTotal bidResultTotal = bidResultTotalMapper.selectByPrimaryKey(request.getTotalWinId());
+                    if (DateUtil.compareDate(iPlatformDate.getSysDate(),bidResultTotal.getWinDate()) != 0) {
+                        errorList.add(new ValidMessage("投标方式为自主投标的已中标有效数据，仅支持当日撤销"));
                         break;
                     }
                 }
