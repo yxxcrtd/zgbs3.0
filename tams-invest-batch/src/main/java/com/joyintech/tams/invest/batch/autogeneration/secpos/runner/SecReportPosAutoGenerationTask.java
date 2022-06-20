@@ -14,7 +14,6 @@ import com.joyintech.batch.batchbase.baseclass.BatchBaseService;
 import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.constant.BatchDictCodeList;
-import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -56,7 +55,7 @@ public class SecReportPosAutoGenerationTask extends BatchBaseService {
      */
     @Autowired
     private SecPosAutoGenerationService secPosAutoGenerationService;
-    
+
     /**
      * PlatformDate
      */
@@ -73,6 +72,7 @@ public class SecReportPosAutoGenerationTask extends BatchBaseService {
      */
     @Override
     public JobExecution execute() throws BatchException {
+        logger.info("=========secReportPosAutoGenerationTask========start===========");
         JobExecution result = new JobExecution(1l);
         result.setStatus(BatchStatus.FAILED);
         SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
@@ -83,54 +83,53 @@ public class SecReportPosAutoGenerationTask extends BatchBaseService {
         // 自动批处理，取平台日期为跑批日，手动批处理，取画面选择日期为跑批日
         Date batchDate = batchExecuteInfo.getExecuteDate();
         if (StringUtil.equals(BatchDictCodeList.批处理启动模式_自动.getValue(),
-            batchExecuteInfo.getStartMode())) {
+                batchExecuteInfo.getStartMode())) {
             batchDate = platformDateService.getSysDate();
         }
         try {
             //add by lpf for 组合持仓报表批处理改造 S 将产品分为指定日期范围内的导入估值表 和没导入估值表的产品
             //add by lpf for 估值穿透改造 S 将产品分为指定日期范围内的导入估值表 和没导入估值表的产品
-            String deptCode=null;
-            if(MultilevelDataAuthorityUtil.isEnabled()){
-               deptCode = batchExecuteInfo.getCreateUser() != null?MultilevelDataAuthorityUtil.getOrganizationCode(batchExecuteInfo.getCreateUser()):null;
+            String deptCode = null;
+            if (MultilevelDataAuthorityUtil.isEnabled()) {
+                deptCode = batchExecuteInfo.getCreateUser() != null ? MultilevelDataAuthorityUtil.getOrganizationCode(batchExecuteInfo.getCreateUser()) : null;
             }
-            List<Map<String,Object>> importValTableProdList = valRiftService.selectImportValTableProdList(batchDate,this.getProductIdList(),deptCode);
+            List<Map<String, Object>> importValTableProdList = valRiftService.selectImportValTableProdList(batchDate, this.getProductIdList(), deptCode);
             List<String> importProdList = new ArrayList<>();
             List<String> unImportProdList = new ArrayList<>();
             Date minDate = batchDate;
-            if(!StringUtil.isEmptyList(importValTableProdList)){
-                for (Map<String,Object> entry:importValTableProdList) {
+            if (!StringUtil.isEmptyList(importValTableProdList)) {
+                for (Map<String, Object> entry : importValTableProdList) {
                     //导入了估值表的产品寻找最小跑批日
-                    if(StringUtil.isNotEmpty(entry.get("valDate"))){
-                        if(minDate.compareTo((Date)entry.get("valDate"))>0){
-                            minDate = (Date)entry.get("valDate");
+                    if (StringUtil.isNotEmpty(entry.get("valDate"))) {
+                        if (minDate.compareTo((Date) entry.get("valDate")) > 0) {
+                            minDate = (Date) entry.get("valDate");
                         }
-                        importProdList.add((String)entry.get("finprodId"));
-                    }
-                    else {
-                        unImportProdList.add((String)entry.get("finprodId"));
+                        importProdList.add((String) entry.get("finprodId"));
+                    } else {
+                        unImportProdList.add((String) entry.get("finprodId"));
                     }
                 }
             }
 
             //未导入估值表的产品仅跑跑批日当日
-            if(!StringUtil.isEmptyList(unImportProdList)){
+            if (!StringUtil.isEmptyList(unImportProdList)) {
                 secPosAutoGenerationService.autoSecReportGeneration(batchDate, unImportProdList);
             }
             //导入估值表的产品循环最小跑批日到当前跑批日
-            if(!StringUtil.isEmptyList(importProdList)){
+            if (!StringUtil.isEmptyList(importProdList)) {
                 Date currentDate = minDate;
-                for(int i = 0; i<= DateUtil.getBetweenDayNumber(minDate,batchDate); i++){
+                for (int i = 0; i <= DateUtil.getBetweenDayNumber(minDate, batchDate); i++) {
                     secPosAutoGenerationService.autoSecReportGeneration(currentDate, importProdList);
-                    currentDate = DateUtil.addDay(currentDate,1);
+                    currentDate = DateUtil.addDay(currentDate, 1);
                 }
             }
             //add by lpf for 组合持仓报表批处理改造 E
 //            secPosAutoGenerationService.autoSecReportGeneration(batchDate, this.getProductIdList(),batchExecuteInfo.getStartMode());
             result.setStatus(BatchStatus.COMPLETED);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
+        logger.info("=========secReportPosAutoGenerationTask========end===========");
         return result;
     }
 }
