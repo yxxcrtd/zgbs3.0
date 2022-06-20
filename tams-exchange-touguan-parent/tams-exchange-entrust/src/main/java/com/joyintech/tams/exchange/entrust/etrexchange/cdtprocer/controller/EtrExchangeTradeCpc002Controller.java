@@ -169,7 +169,7 @@ public class EtrExchangeTradeCpc002Controller extends BaseController {
     @ApiOperation(value = "持仓列表导出", notes = "持仓列表导出")
     public void exportPosition(@RequestBody EtrExchangeTradeExportSecRepoRequest requestDto, HttpServletResponse response) {
         // 导出
-        ExcelUitl.doExport(requestDto, response, "持仓列表", () -> {
+        ExcelUitl.doExport(requestDto, response, "信用保护凭证指令-持仓列表", () -> {
             EtrCreditProtectionCertificateHoldRequest dto = requestDto.getDto(EtrCreditProtectionCertificateHoldRequest.class);
             List dataList = etrExchangeTradeCpc002Service.findPositionsPage(dto).getRoot();
             return dataList;
