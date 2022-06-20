@@ -6,6 +6,7 @@ import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateHoldResponse;
 import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditProtectionCertificateResponse;
+import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrZJHCheckTGHResponse;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -57,7 +58,7 @@ public interface EtrExchangeTradeCpc002Mapper {
 
     List<String> isOverMDate(Map<String, Object> map);
 
-    List<String> getSecAcctIdZJH(Map<String, Object> map);
+    List<EtrZJHCheckTGHResponse> getSecAcctIdZJH(@Param("portfolioIds") List<String> portfolioIds);
 
     /**
      * 查询前一日持仓指标
