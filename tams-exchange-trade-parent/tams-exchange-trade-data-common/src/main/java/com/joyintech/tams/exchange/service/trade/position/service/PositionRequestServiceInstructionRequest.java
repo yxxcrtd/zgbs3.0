@@ -8,6 +8,7 @@ import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -607,7 +608,13 @@ public class PositionRequestServiceInstructionRequest {
             List<Map<String, Object>> ptlList = new ArrayList<>(calculateSize);
             for (PortfolioCalculateResponse item : calculates) {
                 bean = new PositionRequestBaseBean(entity);
-                bean.setPortfolioId(item.getPortfolioId());
+                String portfolioId = item.getPortfolioId();
+                bean.setPortfolioId(portfolioId);
+                if (InstructionPs.APPLY.codeEquals(entity.getPs())) {
+                    String capacctNo = tamsBusinessCommonService.selectProdTghCapacctNo(portfolioId);
+                    log.info("信用保护凭证-申购-托管账户：portfolioId={}，capacctNo={}", portfolioId, capacctNo);
+                    bean.setCashAcctId(capacctNo);
+                }
                 bean.setCashAmount(item.getEntrustAmt());
                 BigDecimal entrustNum = commonPositionEngineService.multiplyWithOneHundred(item.getEntrustNum());
                 bean.setSecAmount(entrustNum);
