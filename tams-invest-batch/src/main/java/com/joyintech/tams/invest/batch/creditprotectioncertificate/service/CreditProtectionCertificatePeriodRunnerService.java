@@ -19,6 +19,7 @@ import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresource
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
 import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
@@ -82,6 +83,9 @@ public class CreditProtectionCertificatePeriodRunnerService {
 
     @Autowired
     private BaseGetBussinessId baseGetBussinessId;
+
+    @Autowired
+    private CommonPositionService commonPositionService;
 
 
     public void dealExpireData(CreditProtectionCertificatePeriodWriterDto writerDto) throws BatchException {
@@ -321,10 +325,10 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlows.add(ptlSecPositionFlow3);
         }
         for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
-            ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
+            commonPositionService.insertPtlSecPositionFlow(ptlSecPositionFlow);
         }
         for (EtrSecPositionFlow etrSecPositionFlow : etrSecPositionFlows) {
-            etrSecPositionFlowMapper.insertSelective(etrSecPositionFlow);
+            commonPositionService.insertEtrSecPositionFlow(etrSecPositionFlow);
         }
     }
 

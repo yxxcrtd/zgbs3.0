@@ -24,6 +24,7 @@ import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
 import com.joyintech.tams.component.business.asset.dto.FinInterestFactorDto;
 import com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -192,6 +193,10 @@ public class FinBondAsset002Controller extends BaseController{
                 CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE)==null? 
                         DictCodeListExt1.是或否_是.getValue(): CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE));
         //add by lizhi 是否显示中债信息开关 2020年2月28日  end
+
+        // 加券按钮
+        initPageParams.put("IS_ADDBOND_SHOW_CFETSETRREPO", CacheUtil.getSysParam("IS_ADDBOND_SHOW_CFETSETRREPO"));
+
         return new Message<Map<String, Object>>(initPageParams).success();
     }
 
@@ -269,6 +274,17 @@ public class FinBondAsset002Controller extends BaseController{
             if (finBondAssetService.selectCountByfinprodId(finProdId) > 0) {
                 validList.add(new ValidMessage("",
                         getMessage("资产代码不能重复!")));
+                ajax.setErrorList(validList);
+                ajax.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().success().setData(ajax);
+            }
+        }
+        if (StringUtil.equals(dto.getOperateStatus(), "NEW")) {
+            WflValidInputParameter parameter = new WflValidInputParameter();
+            parameter.setPageId("FinBondAsset002");
+            parameter.setBusinessDataPk1(dto.getFinprodMarketId() + dto.getTradeMarketId());
+            if (finBondAssetService.isInWflProcess(parameter)) {
+                validList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！不可提交!")));
                 ajax.setErrorList(validList);
                 ajax.setMessageType(MessageType.错误消息);
                 return new Message<AjaxResult>().success().setData(ajax);

@@ -111,6 +111,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
     @Autowired
     private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
 
+    @Autowired
+    private PaTrdFinProductDealTotalMapper paTrdFinProductDealTotalMapper;
+
     /**
      * 临时划款指令表
      */
@@ -854,6 +857,20 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
                 StlPayOrders stlPayOrders = new StlPayOrders();
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrders, stlPayTempOrders);
                 stlPayOrdersMapper.insertSelective(stlPayOrders);
+
+                // 写入金融产品临时汇总交易表
+                TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
+                BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdTempDto.getTrdProductTempDeal());
+                // ZGCPCN-652: busiType不能为null   2022/5/20 start
+                if (StringUtil.isEmpty(trdFinProductDealTotal.getBusiType())) {
+                    trdFinProductDealTotal.setBusiType("busiType");
+                }
+                trdFinProductDealTotal.setTotleTradeId(trdTempDto.getTradeId());
+                // ZGCPCN-652: busiType不能为null   2022/5/20 end
+                InfContractDetailfile infContractDetailfileTemp = infContractDetailfileMapper.selectByPrimaryKey(infContractDetailfile.getSeqno());
+                trdFinProductDealTotal.setShareAmt(infContractDetailfileTemp.getShareAmt());
+                trdFinProductDealTotal.setTradeAmt(infContractDetailfileTemp.getTradeAmt());
+                trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
             }
         }
         // 质押式回购

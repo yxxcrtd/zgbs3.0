@@ -57,6 +57,8 @@ public interface EtrExchangeTradeCpc002Mapper {
 
     List<String> isOverMDate(Map<String, Object> map);
 
+    List<String> getSecAcctIdZJH(Map<String, Object> map);
+
     /**
      * 查询前一日持仓指标
      * @param baseMap

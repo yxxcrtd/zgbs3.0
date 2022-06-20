@@ -1,6 +1,7 @@
 package com.joyintech.tams.business.asset.protect.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
@@ -10,6 +11,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjRequest;
+import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate002Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate004Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
@@ -20,6 +22,7 @@ import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -266,6 +269,22 @@ public class CreditProtectionCertificate002Controller extends BaseController {
         return null;
     }
 
+    @ApiOperation(value = "保存check", notes = "保存check")
+    @PostMapping("/saveCheck")
+    @ResponseBody
+    public Message<AjaxResult> saveCheck(@RequestBody FinBondAssetSaveRequest dto, BindingResult result) {
+        AjaxResult ajax = new AjaxResult();
+        List<ValidMessage> validList = new ArrayList<>();
+        String finProdId = commonBusinessService.getFinProdId(dto.getFinprodMarketId() + dto.getTradeMarketId(), DictCodeListExt1.金融产品类型_信用保护凭证.getValue(), null);
+        if (creditProtectionCertificate002Service.selectCountByfinprodId(finProdId) > 0) {
+            validList.add(new ValidMessage("",
+                    getMessage("资产代码不能重复!")));
+            ajax.setErrorList(validList);
+            ajax.setMessageType(MessageType.错误消息);
+            return new Message<AjaxResult>().success().setData(ajax);
+        }
+        return new Message<AjaxResult>().success().setData(commonCheck(result, dto.getOperateType()));
+    }
 
     @ResponseBody
     @PostMapping("/save")
