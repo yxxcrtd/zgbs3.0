@@ -243,8 +243,9 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                 r.setFloating(floatFd);
                 BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(),
                         ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100"))), 2);
-                r.setFloatingPL(floatPL);
-
+                //add wsz 20220620 修改持仓浮动盈亏百分比 start
+                r.setFloatingPL(ArithmeticUtil.multiply(floatPL,new BigDecimal(100)));
+                //add wsz 20220620 修改持仓浮动盈亏百分比 end
             });
         }
         return pages;
