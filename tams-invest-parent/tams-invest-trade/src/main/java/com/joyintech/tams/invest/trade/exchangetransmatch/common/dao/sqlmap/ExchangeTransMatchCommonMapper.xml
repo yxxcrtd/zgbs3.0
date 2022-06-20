@@ -63,10 +63,29 @@
                 T2.DEAL_MODE,
                 NVL(EED.ENTRUST_NUM,0) - NVL(S.MARCH_QTY_EN,0)  remainEntrustNum,
                 NVL(EED.ENTRUST_AMT,0) - NVL(S.MARCH_AMT_EN,0) remainEntrustAmt,
-                EED.SEC_ACCT_ID
-                T1.*
+                EED.SEC_ACCT_ID,
+                EED.PORTFOLIO_ID,
+                T1.ENTRUST_ID,
+                T1.FINPROD_ID,
+                T1.FINPROD_TYPE2,
+                T1.TRADE_MARKET,
+                T1.TRADE_PLAT,
+                T1.TRADE_MARKET_MODE,
+                T1.PS,
+                T1.CCY,
+                T1.INV_AIM,
+                T1.COUNTER_ID,
+                T1.IS_OUT_TRADE,
+                T1.ENTRUST_DATE,
+                T1.VDATE,
+                T1.MDATE,
+                T1.ENTRUST_AMT,
+                T1.ENTRUST_NUM,
+                T1.PRICE,
+                T1.ENTRUST_CLASS,
+                T1.BUSINESS_MODEL
             FROM
-                 ETR_ENTRUST T1
+                ETR_ENTRUST T1
             LEFT JOIN
                 ETR_ENTRUST_ADD T2 ON T1.ENTRUST_ID = T2.ENTRUST_ID
             LEFT JOIN
