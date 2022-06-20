@@ -11,14 +11,17 @@
 package com.joyintech.tams.business.asset.bond.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjRequest;
@@ -62,7 +65,10 @@ public class FinBondAsset003Controller extends BaseController{
 
     @Autowired
     private FinBondAsset002Service finBondAsset002Service;
-    
+
+    @Autowired
+    private FinBondAssetService finBondAssetService;
+
     @Autowired
     private IPlatformDate iPlatformDate;
     
@@ -201,10 +207,19 @@ public class FinBondAsset003Controller extends BaseController{
     @PostMapping("/check")
     public Message<AjaxResult> check(@RequestBody FinAssetRateAdjResponse response, BindingResult result) {
         List<ValidMessage> validMessages = finAssetRateAdjValidatorService.valid(response);
+        AjaxResult ajax = new AjaxResult();
         if (CollectionUtils.isNotEmpty(validMessages)){
-            AjaxResult ajax = new AjaxResult();
             ajax.setErrorList(validMessages);
             return Message.success("保存check报错",ajax);
+        }
+        WflValidInputParameter parameter = new WflValidInputParameter();
+        parameter.setPageId("FinBondAsset002");
+        parameter.setBusinessDataPk1(response.getFinprodMarketId());
+        if (finBondAssetService.isInWflProcess(parameter)) {
+            validMessages.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！不可删除!")));
+            ajax.setErrorList(validMessages);
+            ajax.setMessageType(MessageType.错误消息);
+            return new Message<AjaxResult>().success().setData(ajax);
         }
         return Message.success("保存check",commonCheck(result, response.getOperateType()));
     }
