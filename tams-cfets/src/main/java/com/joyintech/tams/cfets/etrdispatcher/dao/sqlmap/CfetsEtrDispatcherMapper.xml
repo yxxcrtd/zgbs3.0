@@ -1354,18 +1354,18 @@
             END bidprice /*投标标位, 多个逗号分隔展示*/,
             bo.BID_MODLE      AS biddingMethod/*投标方式*/,
             bo.PAY_TYPE       AS payType/*缴款方式*/,
-            bo.WIN_TYPE       AS winType/*中标方式*/,
-            BRT.WIN_PRINAMT   AS winPrinamt/*中标券面总额(万元)*/,
+            BRT.WIN_TYPE       AS winType/*中标方式*/,
+            decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT)   AS winPrinamt/*中标券面总额(万元)*/,
             CASE
-                WHEN fpi.TENDER_TARGET = '01' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-                WHEN fpi.TENDER_TARGET = '02' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-                WHEN fpi.TENDER_TARGET = '03' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                WHEN fpi.TENDER_TARGET = '02' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+                WHEN fpi.TENDER_TARGET = '03' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
                 END winPrice /*中标标位*/,
-            bo.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
-            bo.PAY_DATE          payDate/*缴款日*/,
-            bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
-            bo.ONMARKET_DATE     listingDate/*上市日*/,
-            bo.BID_DATE       AS bidConfirmDate/*中标日期*/,
+            BRT.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
+            decode(BO.IS_WIN, 'Y', BRT.PAY_DATE)          payDate/*缴款日*/,
+            decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE)    assignRegdate/*债权债务登记日*/,
+            decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE)     listingDate/*上市日*/,
+            decode(BO.IS_WIN, 'Y', BRT.WIN_DATE)       AS bidConfirmDate/*中标日期*/,
             to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') tradeDate,
             BRT.COUNTER_ID          counterId,
             mcp.counter_name counterName,
@@ -1445,18 +1445,18 @@
         END bidprice /*投标标位, 多个逗号分隔展示*/,
         bo.BID_MODLE      AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE       AS payType/*缴款方式*/,
-        bo.WIN_TYPE       AS winType/*中标方式*/,
-        BRT.WIN_PRINAMT   AS winPrinamt/*中标券面总额(万元)*/,
+        BRT.WIN_TYPE       AS winType/*中标方式*/,
+        decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT)   AS winPrinamt/*中标券面总额(万元)*/,
         CASE
-        WHEN fpi.TENDER_TARGET = '01' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-        WHEN fpi.TENDER_TARGET = '02' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-        WHEN fpi.TENDER_TARGET = '03' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        WHEN fpi.TENDER_TARGET = '02' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+        WHEN fpi.TENDER_TARGET = '03' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
         END winPrice /*中标标位*/,
-        bo.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
-        bo.PAY_DATE          payDate/*缴款日*/,
-        bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
-        bo.ONMARKET_DATE     listingDate/*上市日*/,
-        bo.BID_DATE       AS bidConfirmDate/*中标日期*/,
+        BRT.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
+        decode(BO.IS_WIN, 'Y', BRT.PAY_DATE)          payDate/*缴款日*/,
+        decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE)    assignRegdate/*债权债务登记日*/,
+        decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE)     listingDate/*上市日*/,
+        decode(BO.IS_WIN, 'Y', BRT.WIN_DATE)       AS bidConfirmDate/*中标日期*/,
         to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') tradeDate,
         BRT.COUNTER_ID          counterId,
         mcp.counter_name counterName,
@@ -1543,21 +1543,21 @@
                 END bidprice /*投标标位, 多个逗号分隔展示*/,
             bo.BID_MODLE      AS biddingMethod/*投标方式*/,
             bo.PAY_TYPE       AS payType/*缴款方式*/,
-            bo.WIN_TYPE       AS winType/*中标方式*/,
+            BRT.WIN_TYPE       AS winType/*中标方式*/,
             bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额(万元)*/,
-            brt.WIN_PRINAMT   AS winPrinamt/*中标券面总额(万元)*/,
+            decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT)   AS winPrinamt/*中标券面总额(万元)*/,
             CASE
-                WHEN fpi.TENDER_TARGET = '01' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-                WHEN fpi.TENDER_TARGET = '02' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-                WHEN fpi.TENDER_TARGET = '03' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                WHEN fpi.TENDER_TARGET = '02' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+                WHEN fpi.TENDER_TARGET = '03' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
                 END winPrice /*中标标位*/,
             bo.UNIT_CPRICE       price/*净价*/,
-            bo.PAYABLE_AMOUNT    payableAmount/*缴款金额*/,
-            bo.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
-            bo.PAY_DATE          payDate/*缴款日*/,
-            bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
-            bo.ONMARKET_DATE     listingDate/*上市日*/,
-            bo.BID_DATE       AS bidConfirmDate/*中标日期*/,
+            BRD.PAY_AMT    payableAmount/*缴款金额*/,
+            BRT.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
+            decode(BO.IS_WIN, 'Y', BRT.PAY_DATE)          payDate/*缴款日*/,
+            decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE)    assignRegdate/*债权债务登记日*/,
+            decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE)     listingDate/*上市日*/,
+            decode(BO.IS_WIN, 'Y', BRT.WIN_DATE)       AS bidConfirmDate/*中标日期*/,
             bo.BID_ID            bidId/*投标编号*/,
             to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
             tpd.counter_id counterId,
@@ -1578,6 +1578,7 @@
             AND	BO.IS_CANCEL = 'N'
             AND	BO.BID_ID = BRT.BID_ID
             LEFT JOIN FIN_PRODUCT FP ON	FP.FINPROD_ID = TFPDT.FINPROD_ID
+            LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
             LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
             LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
             LEFT JOIN(select distinct ENTRUST_ID, BID_ID from BID_ORDER_BID_PRICE) bobp1 ON bobp1.BID_ID = bo.BID_ID
@@ -1662,21 +1663,21 @@
                 END bidprice /*投标标位, 多个逗号分隔展示*/,
             bo.BID_MODLE      AS biddingMethod/*投标方式*/,
             bo.PAY_TYPE       AS payType/*缴款方式*/,
-            bo.WIN_TYPE       AS winType/*中标方式*/,
+            brt.WIN_TYPE       AS winType/*中标方式*/,
             bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额(万元)*/,
-            brt.WIN_PRINAMT   AS winPrinamt/*中标券面总额(万元)*/,
+            decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT)   AS winPrinamt/*中标券面总额(万元)*/,
             CASE
-                WHEN fpi.TENDER_TARGET = '01' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-                WHEN fpi.TENDER_TARGET = '02' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-                WHEN fpi.TENDER_TARGET = '03' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+                WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                WHEN fpi.TENDER_TARGET = '02' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+                WHEN fpi.TENDER_TARGET = '03' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
                 END winPrice /*中标标位*/,
             bo.UNIT_CPRICE       price/*净价*/,
-            bo.PAYABLE_AMOUNT    payableAmount/*缴款金额*/,
-            bo.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
-            bo.PAY_DATE          payDate/*缴款日*/,
-            bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
-            bo.ONMARKET_DATE     listingDate/*上市日*/,
-            bo.BID_DATE       AS bidConfirmDate/*中标日期*/,
+            BRD.PAY_AMT    payableAmount/*缴款金额*/,
+            BRT.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
+            decode(BO.IS_WIN, 'Y', BRT.PAY_DATE)          payDate/*缴款日*/,
+            decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE)    assignRegdate/*债权债务登记日*/,
+            decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE)     listingDate/*上市日*/,
+            decode(BO.IS_WIN, 'Y', BRT.WIN_DATE)       AS bidConfirmDate/*中标日期*/,
             bo.BID_ID            bidId/*投标编号*/,
             to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
             tpd.counter_id counterId,
@@ -1697,6 +1698,7 @@
             AND	BO.IS_CANCEL = 'N'
             AND	BO.BID_ID = BRT.BID_ID
             LEFT JOIN FIN_PRODUCT FP ON	FP.FINPROD_ID = TFPDT.FINPROD_ID
+            LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
             LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
             LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
             LEFT JOIN(select distinct ENTRUST_ID, BID_ID from BID_ORDER_BID_PRICE) bobp1 ON bobp1.BID_ID = bo.BID_ID
