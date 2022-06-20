@@ -47,8 +47,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.joyintech.tams.constant.DictCodeListExt3.流程节点_流程提交;
-import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_关闭;
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 
 /**
  * reader相关业务处理
@@ -577,17 +576,22 @@ public class CfetsSettleService extends BaseService {
      * @param cfetsManualSettleInsertDto
      */
     private void updateOccupy(CfetsSettleReaderResult cfetsManualSettleInsertDto) {
-        String url;
-        Message<AjaxResult> message;
-        url = String.format("/riskTrial/doOccupy/%s/%s/%s", "CfetsManualSettle", 系统动作_关闭.getValue(), 流程节点_流程提交.getValue());
-        if (isSingle) {
-            message = simpleRestTemplate.postForObject(tamsSerever + url, cfetsManualSettleInsertDto, Message.class);
-        } else {
-            message = restTemplate.postForObject(tamsSerever + url, cfetsManualSettleInsertDto, Message.class);
-        }
-        logger.info("风险占用更新结果：{}", JsonUtils.object2Json(message));
-        if (Objects.nonNull(message) && !"000".equals(message.getCode())) {
-            logger.error("风险占用更新异常：totalTradeId {}", cfetsManualSettleInsertDto.getTotalTradeId());
+        try {
+            cfetsManualSettleInsertDto.setButtonType(交收操作类型_交收.getValue());
+            cfetsManualSettleInsertDto.setTradeId(cfetsManualSettleInsertDto.getTotalTradeId());
+            Message<AjaxResult> message;
+            String url = String.format("/riskTrial/doOccupy/%s/%s/%s", "CfetsManualSettle", 系统动作_关闭.getValue(), 流程节点_审批生效.getValue());
+            if (isSingle) {
+                message = simpleRestTemplate.postForObject(tamsSerever + url, cfetsManualSettleInsertDto, Message.class);
+            } else {
+                message = restTemplate.postForObject(tamsSerever + url, cfetsManualSettleInsertDto, Message.class);
+            }
+            logger.info("风险占用更新结果：{}", JsonUtils.object2Json(message));
+            if (Objects.nonNull(message) && !"000".equals(message.getCode())) {
+                logger.error("风险占用更新异常：totalTradeId {}", cfetsManualSettleInsertDto.getTotalTradeId());
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
