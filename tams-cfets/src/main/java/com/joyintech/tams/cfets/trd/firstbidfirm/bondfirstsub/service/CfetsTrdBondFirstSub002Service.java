@@ -1033,7 +1033,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             if (joyinbusinessCommonService.countMatchInfo(item.getBidId(), DictCodeList.确认状态_未确认.getValue()) > 0
                     && !StringUtil.equals(DictCodeList.是否_是.getValue(), requst.getIsSure()) ) {
                 //如勾选数据已生成匹配待确认的记录
-                msg += item.getBidId() + "存在已匹配待确认记录，是否确认撤销?/n";
+                msg += item.getBidId() + "存在已匹配待确认记录，是否确认撤销?";
             }
             //如勾选数据发行状态不为空不可撤销
             if (StringUtil.isNotEmpty(item.getIssueStatus())) {
