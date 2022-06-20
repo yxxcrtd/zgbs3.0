@@ -531,7 +531,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
     private MinTrdUnitLimitDto getMinTrdUnitLimit(ExchangeTransMatchCommonEntrustDto entrustDto){
         String tradePlat = DictCodeListExt3.交易平台_新债平台.getValue().equals(entrustDto.getTradePlat())
                 ? entrustDto.getDealMode() : entrustDto.getTradePlat();
-        return trdCommonBaseService.getMinTrdUnitLimit(entrustDto.getFinprodId(), tradePlat,
+        String finprodId = DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(entrustDto.getFinprodType2())
+                ? StringUtil.EMPTY : entrustDto.getFinprodId();
+        return trdCommonBaseService.getMinTrdUnitLimit(finprodId, tradePlat,
                 entrustDto.getTradeMarket(), entrustDto.getFinprodType2(),entrustDto.getPs());
     }
 
