@@ -66,12 +66,14 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     /**
      * 产品起息日
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "vDateWhole",value = "产品起息日")
     private String vDateWhole;
 
     /**
      * 产品到期日
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "mDateWhole",value = "产品到期日")
     private String mDateWhole;
 

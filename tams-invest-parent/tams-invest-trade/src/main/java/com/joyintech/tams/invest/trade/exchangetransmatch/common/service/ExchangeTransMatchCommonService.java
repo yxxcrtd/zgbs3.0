@@ -516,8 +516,10 @@ public class ExchangeTransMatchCommonService extends BaseService {
                             BigDecimal.ZERO : portfolioMatchFeeAmtUnPayMap.get(entrustDetailDto.getPortfolioId()));
                 }
                 logger.debug("【指令编号:{},证券账户:{},最终结果为:{}】", item.getEntrustId(), item.getSecAcctId(), JSON.toJSONString(entrustDetailDtoList));
-                item.setEntrustDetailDtoList(entrustDetailDtoList);
             }
+            // ZGCPCN-1551:modify by fuyongsheng 20220620 start
+            item.setEntrustDetailDtoList(entrustDetailDtoList);
+            // ZGCPCN-1551:modify by fuyongsheng 20220620 end
         });
     }
 
