@@ -1749,9 +1749,14 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 return;
             }
             ips = new FileInputStream(file);
-            response.setContentType("multipart/form-data");
-                    //为文件重新设置名字，采用数据库内存储的文件名称
-            response.addHeader("Content-Disposition", "attachment; fileName=" + URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
+            response.reset();
+//            response.setContentType("multipart/form-data");
+            response.setContentType("application/octet-stream");
+            //为文件重新设置名字，采用数据库内存储的文件名称
+//            response.addHeader("Content-Disposition", "attachment; fileName=\"" + new String(fileName.getBytes("UTF-8"),"ISO8859-1") + "\"");
+            response.addHeader("Content-Disposition",
+                    "attachment;filename=" + new String(fileName.getBytes()));
+            response.addHeader("Content-Length", "" + file.length());
             out = response.getOutputStream();
             //读取文件流
             int len = 0;
@@ -1772,7 +1777,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             }
         }
     }
-    
+
     private MultipartFile createMultipartFile(File file) {
         try {
             FileItem fileItem = null;
