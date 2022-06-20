@@ -107,7 +107,7 @@ public class PositionRequestServiceTradSaveCpcRequest {
         // 流程编号	指令的工作流ID
         resultMap.put(WORK_FLOW_ID, entity.getWorkflowId());
         // 日期
-        resultMap.put("cdate", DateUtil.format(entity.getVdate()));
+        resultMap.put("cdate", DateUtil.format(entity.getEntrustDate()));
         // 币种
         if (StringUtils.isNotEmpty(entity.getCcy())) {
             resultMap.put(CCY, entity.getCcy());
