@@ -846,9 +846,12 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             dto.setIsOutTrade(DictCodeList.是否_是.getValue());
             if (StringUtil.isEmpty(dto.getEntrustStatus())) {
                 dto.setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());
+                dto.setRecStatus(DictCodeListExt3.委托状态_待分发.getValue());
             }
-
-            dto.setRecStatus(DictCodeListExt3.委托状态_待分发.getValue());
+            if (StringUtil.equals(dto.getEntrustStatus(), DictCodeListExt3.委托状态_流程中.getValue())) {
+                dto.setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());
+                dto.setRecStatus(DictCodeListExt3.委托状态_待分发.getValue());
+            }
             BeanUtil.copyProperties(etrEntrust, dto);
             etrEntrust.setEntrustNum(dto.getTotalBiddingNum().divide(new BigDecimal(100)));
             etrEntrust.setPs(DictCodeList.交易方向_买入.getValue());
