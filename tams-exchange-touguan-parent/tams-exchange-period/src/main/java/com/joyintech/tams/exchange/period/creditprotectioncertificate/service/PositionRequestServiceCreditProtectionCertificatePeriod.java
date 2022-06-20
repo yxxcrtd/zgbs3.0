@@ -48,13 +48,27 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
         PositionHttpRequest.send(resultMap);
     }
 
+    /**
+     * doDelete时使用---作废指令-共通接口
+     *
+     * @param entity
+     */
+    public void sendDelete(CreditProtectionCertificatePeriodSaveDto entity) {
+        log.info("sendDelete() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
+        String ps = "T100";
+        if (StringUtil.equals(entity.getPaBussType(), DictCodeListExt1.平安业务类型_到期.getValue())) {
+            ps = DictCodeList.交易方向_到期.getValue();
+        }
+        PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_TRD, DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), ps);
+    }
+
     public void sendRevokeCreditProtectionCertificatePeriod(CreditProtectionCertificatePeriodSaveDto entity) {
         log.info("sendRevokeCreditProtectionCertificatePeriod() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         String ps = "T100";
         if (StringUtil.equals(entity.getPaBussType(), DictCodeListExt1.平安业务类型_到期.getValue())) {
             ps = DictCodeList.交易方向_到期.getValue();
         }
-        PositionHttpRequest.dorevoke(entity.getBusiCode(), DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue(), ps);
+        PositionHttpRequest.dorevoke(entity.getBusiCode(), DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), ps);
     }
 
     private void period001(CreditProtectionCertificatePeriodSaveDto entity, Map<String, Object> resultMap) {
