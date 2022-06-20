@@ -285,7 +285,7 @@
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
         select p.PORTFOLIO_ID    portfolioId,
                pp.PORTFOLIO_NAME portfolioName,
-               sci.BUSI_ACCT_NO  acctNo,
+               sci.ACCT_NO  acctNo,
                nvl(p.AMOUNT, 0)  repNomCapi,
                nvl(p.AMOUNT, 0)  deliverBondAmount,
                p.SEC_ACCT_ID     secAcctId
@@ -303,7 +303,7 @@
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
         select p.PORTFOLIO_ID    portfolioId,
                pp.PORTFOLIO_NAME portfolioName,
-               sci.BUSI_ACCT_NO  acctNo,
+               sci.ACCT_NO  acctNo,
                nvl(p.AMOUNT, 0)  repNomCapi,
                nvl(p.AMOUNT, 0)  deliverBondAmount,
                p.SEC_ACCT_ID     secAcctId
@@ -375,7 +375,7 @@
             T.validStatus|| '|' ||T.busiCode|| '|' ||T.paBussType|| '|' ||T.finprodMarketId|| '|'
             ||T.finprodMarketName|| '|' ||T.vDateWhole|| '|' ||T.mDateWhole|| '|' ||
             T.repNomCapi|| '|' ||T.refEntity|| '|' || T.creditEvent|| '|'|| T.creditEventHappenedDate|| '|'||
-            T.creditEventResolveDate|| '|' || T.settleMethod|| '|' || T.deliverBond|| '|' || T.deliverDate
+            T.creditEventResolveDate|| '|' || T.settleMethod|| '|' || T.deliverBond|| '|' || T.deliverDate||
             '|' || T.refEntityStr
             like '%' || #{search} || '%'
             )

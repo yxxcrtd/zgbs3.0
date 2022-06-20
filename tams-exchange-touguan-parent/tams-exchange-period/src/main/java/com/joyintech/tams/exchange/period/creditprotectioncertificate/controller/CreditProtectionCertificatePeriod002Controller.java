@@ -129,6 +129,13 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             String newSecPositionSwitch = CacheUtil.getSysParam("NEW_SEC_POSITION_SWITCH");
             Date platformDate = DateUtil.platDateFromCache();
             for (BillingDetailsDto billingDetail : billingDetails) {
+                if (billingDetail.getRepNomCapi().compareTo(BigDecimal.ZERO) <= 0) {
+                    ValidMessage validMessage = new ValidMessage();
+                    validMessage.setField("repNomCapi");
+                    validMessage.setMessage("名义本金需大于零");
+                    validMessages.add(validMessage);
+                    break;
+                }
                 BigDecimal amount;
                 if (DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
                     amount = creditProtectionCertificatePeriodMapper.getAmountByPortfolioIdOld(dto.getFinprodMarketId(), billingDetail.getPortfolioId(), platformDate);

@@ -7,10 +7,10 @@
             <Cell order="3" name="资金账户">fundAccount</Cell>
             <Cell order="4" name="类型">cashFlowTypeStr</Cell>
             <Cell order="5" name="交易方向">psStr</Cell>
-            <Cell order="6" name="资产标的">assetSign</Cell>
-            <Cell order="7" name="现金流">cashFlow</Cell>
-            <Cell order="8" name="币种">ccy</Cell>
-            <Cell order="9" name="组合系列">portfolioSeriesStr</Cell>
+            <Cell order="6" name="费用类型">feetypeStr</Cell>
+            <Cell order="7" name="资产标的">assetSign</Cell>
+            <Cell order="8" name="现金流">cashFlow</Cell>
+            <Cell order="9" name="币种">ccy</Cell>
         </Row>
     </Worksheet>
 </Workbook>

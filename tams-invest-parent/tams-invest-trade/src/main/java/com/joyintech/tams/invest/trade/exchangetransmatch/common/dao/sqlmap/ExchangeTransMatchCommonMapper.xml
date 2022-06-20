@@ -490,6 +490,10 @@
             TRD_PRODUCT_DEAL_ADD tpda ON tpd.TRADE_ID = tpda.TRADE_ID
         <where>
             tpda.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+            <!--ZGCPCN-1498:查询非撤销有效数据 modify by fuyongsheng 20220620 start-->
+            AND tpd.IS_CANCEL = 'N'
+            AND tpd.TRADE_STATUS = '01'
+            <!--ZGCPCN-1498:查询非撤销有效数据 modify by fuyongsheng 20220620 end-->
         </where>
     </select>
 
@@ -504,6 +508,10 @@
         <where>
             tpda.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
             AND tpd.SEC_MANAGE_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
+            <!--ZGCPCN-1498:查询非撤销有效数据 modify by fuyongsheng 20220620 start-->
+            AND tpd.IS_CANCEL = 'N'
+            AND tpd.TRADE_STATUS = '01'
+            <!--ZGCPCN-1498:查询非撤销有效数据 modify by fuyongsheng 20220620 end-->
         </where>
     </select>
 </mapper>
