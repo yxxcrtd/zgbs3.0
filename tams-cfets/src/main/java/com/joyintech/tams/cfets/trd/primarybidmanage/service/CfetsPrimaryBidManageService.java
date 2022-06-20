@@ -660,7 +660,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             TrdProductDeal trdProductDeal = new TrdProductDeal();
             BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
             bussinessCodeParameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
-            bussinessCodeParameter.setType1(DictCodeList.业务编号一级分类_同业借款);
             trdProductDeal.setTradeId((baseGetBusinessId != null && baseGetBusinessId.buildBussinessCode(bussinessCodeParameter) != null)? baseGetBusinessId.buildBussinessCode(bussinessCodeParameter): IDGenerator.generate().substring(0, 30));
             trdProductDeal.setSecManageAcctId(secAcctId);
             trdProductDeal.setFinprodId(dto.getFinprodId());
