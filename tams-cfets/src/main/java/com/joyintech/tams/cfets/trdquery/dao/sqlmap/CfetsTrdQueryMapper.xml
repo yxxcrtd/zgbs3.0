@@ -2692,14 +2692,15 @@
 			ICB.SUBMIT_USER  submitUser,
 			ICB.SUBSCRIPTION_AMOUNT*100000000  subAmt,
 			ICB.ACTUAL_FEE   payAmt,
-            ICB.ISSUER   issuer,
+            FP.ISSUER   issuer,
 			ICB.ISSUER_21_FIRM_ID  issuer21FirmId,
-			ICB.ISSUE_CLASS   issueClass,
+            FPI.ISSUE_CLASS   issueClass,
 			ICB.REAL_ISSUESIZE*100000000  issueAmt,
 			ICB.INSTRUMENT_STATUS   instrumentStatus
         FROM  INTERF_CSTP_BJFXJG ICB
         LEFT JOIN FIN_PRODUCT FP
                ON FP.FINPROD_MARKET_ID = ICB.INSTRUMENT_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI on FPI.FINPROD_ID=FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE FPT
                ON FPT.FINPROD_ID = FP.FINPROD_ID
         WHERE ICB.TRD_ID = #{quoteId,jdbcType=VARCHAR}

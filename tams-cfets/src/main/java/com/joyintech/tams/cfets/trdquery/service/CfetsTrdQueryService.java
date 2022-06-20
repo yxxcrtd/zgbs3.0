@@ -898,7 +898,11 @@ public class CfetsTrdQueryService extends BaseService{
         resultData.put(dtCode+"_formf",infoFormf);
 
         Map<String, Object> pageParam = new HashMap<>();
-        pageParam.put("quoteId",dto.getQuoteId());
+        if (StringUtil.isNotEmpty(dto.getQuoteId())) {
+            pageParam.put("quoteId", dto.getQuoteId());
+        }else{
+            pageParam.put("quoteId", dto.getExecid());
+        }
         //获取登录用户的ID
         String userId = SecurityUtil.getLoginUser().getUserName();
         //判断角色配置
@@ -915,7 +919,10 @@ public class CfetsTrdQueryService extends BaseService{
             //投资经理
             pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
         }
-        CfetsTrdQueryCstpInfoListResponse dataform = cfetsTrdQueryMapper.selectCstpBidFormDataByKey(pageParam);
+        CfetsTrdQueryCstpInfoListResponse dataform = null;
+        if (StringUtil.isNotEmpty(dto.getQuoteId())) {
+            dataform = cfetsTrdQueryMapper.selectCstpBidFormDataByKey(pageParam);
+        }
         //表格质押券data
         resultData.put(dtCode+"_dataform",dataform);
         return resultData;
