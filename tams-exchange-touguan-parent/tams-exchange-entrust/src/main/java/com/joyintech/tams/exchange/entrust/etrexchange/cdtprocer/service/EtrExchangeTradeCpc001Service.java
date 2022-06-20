@@ -353,7 +353,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
 
     @Override
     public void doComplete(EtrCreditProtectionCertificateApplyRequest dto, OperationType arg1) {
-        BigDecimal cash = StringUtil.isNotEmpty(dto.getEntrustNum())? dto.getEntrustNum().multiply(new BigDecimal(10000)):BigDecimal.valueOf(0.00);
+        BigDecimal cash = StringUtil.isNotEmpty(dto.getEntrustNum())? dto.getEntrustNum().multiply(new BigDecimal(100)):BigDecimal.valueOf(0.00);
 
         BaseEtrInvestInfoDto entity = new BaseEtrInvestInfoDto();
         EntrustCommonDto entrustCommonDto = new EntrustCommonDto();
@@ -547,7 +547,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         /**
         if(DictCodeListExt3.上农商_指令业务类型_信用保护凭证指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())){
             etrSinglePortfolioDto.setPrice(dto.getRepoRate());
-            etrSinglePortfolioDto.setEntrustAmt(ArithmeticUtil.multiply(dto.getRepoAmt(),new BigDecimal(10000)));
+            etrSinglePortfolioDto.setEntrustAmt(ArithmeticUtil.multiply(dto.getRepoAmt(),new BigDecimal(100)));
             etrSinglePortfolioDto.setEntrustNum(ArithmeticUtil.divide(etrSinglePortfolioDto.getEntrustAmt(),new BigDecimal(100),2, RoundingMode.HALF_UP));
         }*/
 
@@ -716,7 +716,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
                 etrEntrustDetail.setPortfolioId(item.getPortfolioId());
                 etrEntrustDetail.setEntrustId(etrEntrust.getEntrustId());
                 etrEntrustDetail.setEntrustAmt(item.getEntrustAmt());
-                BigDecimal cash = StringUtil.isNotEmpty(item.getEntrustNum())? item.getEntrustNum().multiply(new BigDecimal(10000)):BigDecimal.valueOf(0.00);
+                BigDecimal cash = StringUtil.isNotEmpty(item.getEntrustNum())? item.getEntrustNum().multiply(new BigDecimal(100)):BigDecimal.valueOf(0.00);
                 etrEntrustDetail.setEntrustNum(cash);
                 etrEntrustDetail.setDisRate(item.getDisRate());
                 etrEntrustDetail.setTargetType(dto.getTargetType());
@@ -752,7 +752,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrSecRepoBondDto.setMatureYield(ArithmeticUtil.divide(dto.getYield(), new BigDecimal(100), 8)); // 到期收益率
             etrSecRepoBondDto.setFullPrice(dto.getFprice()); // 全价
             etrSecRepoBondDto.setPrice(dto.getPrice());
-            BigDecimal cash = StringUtil.isNotEmpty(dto.getEntrustNum())? dto.getEntrustNum().multiply(new BigDecimal(10000)):BigDecimal.valueOf(0.00);
+            BigDecimal cash = StringUtil.isNotEmpty(dto.getEntrustNum())? dto.getEntrustNum().multiply(new BigDecimal(100)):BigDecimal.valueOf(0.00);
             etrSecRepoBondDto.setEntrustAmt(dto.getEntrustAmt());
             //添加修改备注 wsz add ZGCPCN-1467 start
             etrSecRepoBondDto.setRemark(dto.getRemark());
