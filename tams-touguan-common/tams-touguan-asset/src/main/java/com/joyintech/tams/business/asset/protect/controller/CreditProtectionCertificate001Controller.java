@@ -186,6 +186,14 @@ public class CreditProtectionCertificate001Controller extends BaseController {
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
+                //复原流程中得数据 判定 - add wsz 20220620
+                Integer counts = creditProtectionCertificate001Service.countFinprodIdUse(entity.getFinprodMarketId());
+                if (Objects.nonNull(counts) && counts > 0) {
+                    errorList.add(new ValidMessage("", getMessage("所选对象存在流程中的数据！")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
 
             }
         }

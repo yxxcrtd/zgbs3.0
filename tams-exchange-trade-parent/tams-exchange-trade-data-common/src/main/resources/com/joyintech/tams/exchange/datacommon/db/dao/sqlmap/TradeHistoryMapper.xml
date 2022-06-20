@@ -334,7 +334,7 @@
         BRBP.CLEAR_BALANCE TRADED_BALANCE,
         to_char(BO.PAY_DATE,'yyyy-MM-dd') TRADING_DAY,
         to_char(BO.PAY_DATE,'yyyy-MM-dd') DEAL_TIME,
-        null  DELIVERY_RESULT,null DELIVERY_SCHEDULE
+        null  DELIVERY_RESULT,null DELIVERY_SCHEDULE,BO.CREATE_TIME
         FROM BID_ORDER BO
         LEFT JOIN (SELECT BRBP.BID_ID,wm_concat(BRBP.ACCT_NO) ACCT_NO,  wm_concat(SCI.ACCT_NAME) ACCT_NAME,
         wm_concat(BRBP.SEC_ACCT_ID) SEC_ACCT_ID,wm_concat(SSAI.SEC_ACCT_NAME) SEC_ACCT_NAME,
@@ -360,7 +360,7 @@
             AND TO_CHAR(BO.PAY_DATE, 'YYYYMMDD') &lt;= #{endDay}
         </if>
         )
-        order by STD.CREATE_TIME desc
+        order by CREATE_TIME desc
     </select>
 
     <delete id="deleteByExample" parameterType="com.joyintech.tams.exchange.common.db.domain.TradeHistoryExample">
