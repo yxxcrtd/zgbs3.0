@@ -41,14 +41,14 @@
     </select>
     <select id="selectExpireDataForNew"
             resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
-        SELECT R.PORTFOLIO_ID   portfolioId,
-               R.FINPROD_ID     finprodId,
-               R.AMOUNT         repNomCapi,
-               R.SEC_ACCT_ID    secAcctId,
-               F.MDATE          mdate,
-               F.VDATE          vdate,
-               F.TRADE_MARKET   tradeMarket,
-               sci.ACCT_NO acctNo
+        SELECT R.PORTFOLIO_ID portfolioId,
+               R.FINPROD_ID   finprodId,
+               sum(R.AMOUNT)       repNomCapi,
+               R.SEC_ACCT_ID  secAcctId,
+               F.MDATE        mdate,
+               F.VDATE        vdate,
+               F.TRADE_MARKET tradeMarket,
+               sci.ACCT_NO    acctNo
         FROM PTL_SEC_POSITION_RULE R
                  LEFT JOIN FIN_PRODUCT F ON R.FINPROD_ID = F.FINPROD_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = R.SEC_ACCT_ID
@@ -59,17 +59,18 @@
           AND R.HODING_TYPE = 'A_001'
           AND R.DATE_TYPE = 0
           AND R.AMOUNT > 0
+        group by R.PORTFOLIO_ID, R.FINPROD_ID, R.SEC_ACCT_ID, F.MDATE, F.VDATE, F.TRADE_MARKET, sci.ACCT_NO
     </select>
     <select id="selectExpireDataForOld"
             resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
-        SELECT R.PORTFOLIO_ID   portfolioId,
-               R.FINPROD_ID     finprodId,
-               R.AMOUNT         repNomCapi,
-               R.SEC_ACCT_ID    secAcctId,
-               F.MDATE          mdate,
-               F.VDATE          vdate,
-               F.TRADE_MARKET   tradeMarket,
-               sci.ACCT_NO acctNo
+        SELECT R.PORTFOLIO_ID portfolioId,
+               R.FINPROD_ID   finprodId,
+               sum(R.AMOUNT)  repNomCapi,
+               R.SEC_ACCT_ID  secAcctId,
+               F.MDATE        mdate,
+               F.VDATE        vdate,
+               F.TRADE_MARKET tradeMarket,
+               sci.ACCT_NO    acctNo
         FROM PTL_SEC_POSITION R
                  LEFT JOIN FIN_PRODUCT F ON R.FINPROD_ID = F.FINPROD_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = R.SEC_ACCT_ID
@@ -79,6 +80,7 @@
           AND R.CDATE = #{executeDate}
           AND R.HODING_TYPE = '03'
           AND R.AMOUNT > 0
+        group by R.PORTFOLIO_ID, R.FINPROD_ID, R.SEC_ACCT_ID, F.MDATE, F.VDATE, F.TRADE_MARKET, sci.ACCT_NO
     </select>
     <select id="selectDetailsByTotleTradeId"
             resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto">
