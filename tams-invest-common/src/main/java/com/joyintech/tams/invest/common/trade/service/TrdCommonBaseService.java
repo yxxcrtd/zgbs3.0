@@ -1571,6 +1571,8 @@ public class TrdCommonBaseService extends BaseService {
                     || StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
                     || StringUtils.equals(finprodType2, "ZYSHG")) {
                 assetType = DictCodeList.平安资产类型_质押式回购.getValue();
+            } else if(StringUtils.equals(finprodType2, DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+                assetType = DictCodeListExt2.平安资产类型_一级市场债.getValue();
             }
         }
         return assetType;

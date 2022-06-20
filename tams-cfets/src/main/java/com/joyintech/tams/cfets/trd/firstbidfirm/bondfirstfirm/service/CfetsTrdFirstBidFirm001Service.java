@@ -882,8 +882,8 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
                 bidFirmSum.setFinishDealAmt(sumFinishDealAmt);
                 bidFirmSum.setAvaNum(sumAvaNum);
                 bidFirmSum.setAvaDealAmt(sumAvaDealAmt);
-                bidFirmSum.setTransactioncom(ArithmeticUtil.divide(sumFinishAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
-                bidFirmSum.setTradeFinishPercent(ArithmeticUtil.divide(sumFinishDealAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
+                bidFirmSum.setTransactioncom(ArithmeticUtil.divide(sumFinishAmt, sumEntrustNum, 4).multiply(new BigDecimal("100")));
+                bidFirmSum.setTradeFinishPercent(ArithmeticUtil.divide(sumFinishDealAmt, sumEntrustNum, 4).multiply(new BigDecimal("100")));
                 bidFirmSum.setFinprodId(bidFirmDetail.get(0).getFinprodId());
                 bidFirmSum.setFinprodMarketId(bidFirmDetail.get(0).getFinprodMarketId());
                 bidFirmSum.setFinprodAbbr(bidFirmDetail.get(0).getFinprodAbbr());
