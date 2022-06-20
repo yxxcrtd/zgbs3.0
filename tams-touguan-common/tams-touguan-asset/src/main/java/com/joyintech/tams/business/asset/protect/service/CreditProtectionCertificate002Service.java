@@ -600,7 +600,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         List<ValidMessage> validList = new ArrayList<>();
         String operateType = dto.getOperateType();
         if (isInProcess(dto.getFinprodMarketId(), "CreditProtectionCertificate002")) {
-            validList.add(new ValidMessage("存在流程中的数据"));
+            validList.add(new ValidMessage("所选对象存在流程中的数据！"));
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
@@ -612,17 +612,6 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             int count = creditProtectionCertificateMapper.countForInProcess(dto.getFinprodId());
             if (transInAsset> 0 ||  count > 0) {
                 validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可修改"));
-            }
-        }
-        if (StringUtil.equals(operateType, OperationType.DELETE.name())) {
-            //删除时，需要判断当前资产是否存在指令及交易数据，如存在，则不允许删除；
-            Map<String, Object> map = new HashMap<>();
-            map.put("finprodId",dto.getFinprodId());
-            map.put("isCancel",null);
-            map.put("ps",null);
-            Integer count = creditProtectionCertificateMapper.countFinprodIdUse(map);
-            if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在流程中/待执行指令交易数据，不可删除"));
             }
         }
         return validList;

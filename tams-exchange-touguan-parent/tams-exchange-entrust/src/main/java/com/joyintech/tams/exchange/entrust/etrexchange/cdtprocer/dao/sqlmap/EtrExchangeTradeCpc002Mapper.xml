@@ -24,7 +24,7 @@
         END AS finishAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( (nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ) *100)/10000, 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
+        ROUND( (nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ) )/100, 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
         END AS avaNum,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
@@ -32,7 +32,7 @@
         END AS finishDealAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( (nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 )*100)/10000, 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
+        ROUND( (nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ))/100, 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
         END AS avaDealAmt,
         nvl(detail.PORTFOLIO_ID,T5.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,T5.PORTFOLIO_NAME) portfolioName,
@@ -53,7 +53,7 @@
         T1.PRICE as price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
-        ,nvl(T1.ENTRUST_NUM,0)/10000 as entrustNum
+        ,nvl(T1.ENTRUST_NUM,0)/100 as entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -167,7 +167,7 @@
         END AS finishAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( (nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 )*100)/10000, 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
+        ROUND( (nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ))/100, 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ORDER_FINISH_AMT, 0 ), 4 )
         END AS avaNum,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
@@ -175,7 +175,7 @@
         END AS finishDealAmt,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( (nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 )*100)/10000, 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
+        ROUND( (nvl( T1.ENTRUST_NUM, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ))/100, 4 ) ELSE ROUND( nvl( T1.ENTRUST_AMT, 0 ) - nvl( T4.ENT_FINISH_AMT, 0 ), 4 )
         END AS avaDealAmt,
         nvl(detail.PORTFOLIO_ID,T5.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,T5.PORTFOLIO_NAME) portfolioName,
@@ -196,7 +196,7 @@
         T1.PRICE as price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt,
-        nvl(T1.ENTRUST_NUM,0)/10000 entrustNum
+        nvl(T1.ENTRUST_NUM,0)/100 entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -409,7 +409,7 @@
         ELSE FP.FINPROD_MARKET_ID
         END             AS secId,
         FP.FINPROD_ABBR AS secName,
-        round(TEMP.AMOUNT/10000,2)     AS positionsNum,
+        round(TEMP.AMOUNT/100,2)     AS positionsNum,
         invaim.INV_AIM as invAim,
         invaim.BUSINESS_MODEL as businessModel,
         invaim.TRADE_PLAT tradePlat,
