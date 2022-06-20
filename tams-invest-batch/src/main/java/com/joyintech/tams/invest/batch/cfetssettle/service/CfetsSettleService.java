@@ -188,7 +188,10 @@ public class CfetsSettleService extends BaseService {
      * @since 1.0
      */
     public void autoSettle(Date batchDate, List<String> productIdList) {
-        logger.info("日终自动交收开启");
+//        if (!StringUtil.equals(CacheUtil.getSysParam("auto_settle_flag"), "Y")) {
+//            logger.info("日终自动交收系统参数未开启");
+//            return;
+//        }
 //        //删除当日手工交收数据
 //        //删除交收流水表
 //        cfetsSettleMapper.deleteTodayCfetsSettleFlow(paramMap);
@@ -265,7 +268,7 @@ public class CfetsSettleService extends BaseService {
                     positionRulePtlData.setCashAcctId(cashAcctId); // 托管户
                 }
             } else {
-                logger.debug("汇总编号{}不存在组合",dto.getTotleTradeId());
+                logger.error("汇总编号{}不存在组合",dto.getTotleTradeId());
             }
             if (StringUtil.isNotEmpty(dto.getPortfolioId()) && StringUtil.isNotEmpty(dto.getFinprodId())) {
                 Map<String, Object> map = new HashMap<String, Object>();
@@ -276,7 +279,7 @@ public class CfetsSettleService extends BaseService {
                     positionRulePtlData.setSecAcctId(secAcctId); // 证券账户
                 }
             } else {
-                logger.debug("汇总编号" + dto.getTotleTradeId() + "不存在组合" + dto.getPortfolioId() + "或资产" + dto.getFinprodId());
+                logger.error("汇总编号" + dto.getTotleTradeId() + "不存在组合" + dto.getPortfolioId() + "或资产" + dto.getFinprodId());
             }
             positionRulePtlData.setSecAmount(dto.getShareAmt());
             positionRulePtlData.setCashAmount(dto.getTradeAmt());
@@ -611,6 +614,8 @@ public class CfetsSettleService extends BaseService {
                 if (StringUtil.isNotEmpty(cashAcctId)) {
                     positionRulePtlData.setCashAcctId(cashAcctId); // 托管户
                 }
+            }else {
+                logger.error("汇总编号" + dto.getTotleTradeId() + "不存在组合");
             }
             if (StringUtil.isNotEmpty(dto.getPortfolioId()) && StringUtil.isNotEmpty(dto.getFinprodId())) {
                 Map<String, Object> map = new HashMap<String, Object>();
@@ -620,6 +625,8 @@ public class CfetsSettleService extends BaseService {
                 if (StringUtil.isNotEmpty(secAcctId)) {
                     positionRulePtlData.setSecAcctId(secAcctId); // 证券账户
                 }
+            }else {
+                logger.error("汇总编号" + dto.getTotleTradeId() + "不存在组合" + dto.getPortfolioId() + "或资产" + dto.getFinprodId());
             }
             positionRulePtlData.setSecAmount(ArithmeticUtil.multiply(dto.getShareAmt(), new BigDecimal(100)));
             positionRulePtlData.setCashAmount(dto.getTradeAmt());
@@ -687,6 +694,8 @@ public class CfetsSettleService extends BaseService {
                 if (StringUtil.isNotEmpty(cashAcctId)) {
                     positionRulePtlData.setCashAcctId(cashAcctId); // 托管户
                 }
+            }else {
+                logger.error("汇总编号" + dto.getTotleTradeId() + "不存在组合");
             }
             if (StringUtil.isNotEmpty(dto.getPortfolioId()) && StringUtil.isNotEmpty(dto.getFinprodId())) {
                 Map<String, Object> map = new HashMap<String, Object>();
@@ -696,6 +705,8 @@ public class CfetsSettleService extends BaseService {
                 if (StringUtil.isNotEmpty(secAcctId)) {
                     positionRulePtlData.setSecAcctId(secAcctId); // 证券账户
                 }
+            }else {
+                logger.error("汇总编号" + dto.getTotleTradeId() + "不存在组合" + dto.getPortfolioId() + "或资产" + dto.getFinprodId());
             }
             positionRulePtlData.setSecAmount(ArithmeticUtil.multiply(dto.getShareAmt(), new BigDecimal(100)));
             positionRulePtlData.setCashAmount(dto.getTradeAmt());
