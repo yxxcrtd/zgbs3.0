@@ -23,6 +23,8 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ValidUtils;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
+import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -56,7 +58,11 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     @Autowired
     private MskCreditMarketInfoPro001Service mskCreditMarketInfoPro001Service;
 
-
+    /**
+     * {@link MstWorkflowCommonService}
+     */
+    @Autowired
+    private MstWorkflowCommonService mstWorkflowCommonService;
 
     @ApiOperation(value="新建页面初始化参数", notes = "新建页面初始化参数")
     @PostMapping("/getInitPageParams")
@@ -116,12 +122,26 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     public Message<AjaxResult> check(@RequestBody MskCreditInfoProSaveRequest dto, BindingResult result) {
         AjaxResult res= new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
+
+        if (StringUtil.isNotBlank(dto.getSecid()) && StringUtil.isNotBlank(dto.getCdate())) {
+            //流程验证
+            WflValidInputParameter wflValidInputParameter = new WflValidInputParameter();
+            wflValidInputParameter.setPageId(dto.getPageId());
+            wflValidInputParameter.setWorkflowId(dto.getWorkflowId());
+            wflValidInputParameter.setBusinessDataPk1(dto.getSecid());
+            wflValidInputParameter.setBusinessDataPk2(dto.getCdate());
+
+            if (mstWorkflowCommonService.isInWflProcess((wflValidInputParameter))) {
+                errorList.add(new ValidMessage(getMessage("COMMON_E_0012",
+                        dto.getSecid() + "," + dto.getCdate())));
+            }
+        }
+
         if(!StringUtil.equals(dto.getOperateStatus(), OperationType.MODIFY.name()) && mskCreditMarketInfoPro001Service.selectByKey(null, dto.getSecid(), dto.getCdate(),null) != null){
             errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0006","同一资产","同一交易日期")));
-            res.setErrorList(errorList);
-            res.setMessageType(MessageType.错误消息);
-            return new Message<AjaxResult>().success().setData(res);
         }
+
+        res.setErrorList(errorList);
         return new Message<AjaxResult>().success().setData(res);
     }
     /**
@@ -133,8 +153,7 @@ public class MskCreditMarketInfo002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("save")
-    public Message<AjaxResult> save(@RequestBody @Validated({
-        ValidateGroupEdit.class}) MskCreditInfoProSaveRequest dto, BindingResult br)
+    public Message<AjaxResult> save(@RequestBody MskCreditInfoProSaveRequest dto, BindingResult br)
         throws Exception {
         if (br.hasErrors()) {
             return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
