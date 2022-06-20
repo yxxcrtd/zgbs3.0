@@ -192,6 +192,10 @@ public class FinBondAsset002Controller extends BaseController{
                 CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE)==null? 
                         DictCodeListExt1.是或否_是.getValue(): CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE));
         //add by lizhi 是否显示中债信息开关 2020年2月28日  end
+
+        // 加券按钮
+        initPageParams.put("IS_ADDBOND_SHOW_CFETSETRREPO", CacheUtil.getSysParam("IS_ADDBOND_SHOW_CFETSETRREPO"));
+
         return new Message<Map<String, Object>>(initPageParams).success();
     }
 
