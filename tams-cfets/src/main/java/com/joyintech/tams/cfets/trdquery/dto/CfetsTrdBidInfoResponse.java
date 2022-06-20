@@ -386,6 +386,7 @@ public class CfetsTrdBidInfoResponse {
         this.assignRegdate = assignRegdate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getOnmarketDate() {
         return onmarketDate;
     }
