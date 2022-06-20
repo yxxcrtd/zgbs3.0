@@ -4932,7 +4932,7 @@
             fpi.ISSUE_PRICE  issuePrice,
             fpi.REFER_YIELD  rate,
             T1.SHARE_AMT*100  subAmt,
-            T1.TRADE_AMT payAmt,
+            T1.TRADE_AMT tradeAmt,
             T1.FEE_AMT settleFeeAmt,
             T1.REMARK remark,
             bo.BID_MODLE BidModle
