@@ -175,6 +175,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     @Autowired
     private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
 
+    @Autowired
+    private FinProductTypeMapper finProductTypeMapper;
+
+
     /**
      * 默认设置
      */
@@ -843,7 +847,27 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
         //调用头寸
         CfetsBondPositionRequest req = new CfetsBondPositionRequest();
-        req.setInterfaceType("Bond001");//报文类型
+        if (StringUtil.equals(entity.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
+         ||StringUtil.equals(entity.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue()) ){
+            req.setInterfaceType("Bond002");//报文类型
+            req.setTradePlace(entity.getTradeMarket());
+            FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
+            finProductTypeKey.setFinprodId(entity.getFinprodId());
+            finProductTypeKey.setBranch(0L);
+            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+            String[] arrzqtype = {BussinessDictCodeList.行内资产三级分类_国债.getValue(),
+                    BussinessDictCodeList.行内资产三级分类_地方政府债.getValue(), BussinessDictCodeList.行内资产三级分类_政策性金融债.getValue()};
+            // 交易所分销买入且缴款方式为一级分销时，国债、地方政府债、政策性金融债采用净额结算，其他的采用逐笔全额结算。
+            if (StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue())
+                    && Arrays.asList(arrzqtype).contains(finProductType.getType10())) {
+                req.setDeliveryType(DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue());//结算方式
+            } else {
+                req.setDeliveryType(DictCodeListExt3.结算方式_头寸引擎_逐笔全额结算.getValue());//结算方式
+            }
+        }else{
+            req.setInterfaceType("Bond001");//报文类型
+            req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
+        }
         req.setUserId(SecurityUtil.getLoginUser().getUserName());
         req.setTotalTradeId(entity.getBidId());
         req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
@@ -852,7 +876,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         String balanceCheck = DictCodeList.是否_是.getValue();
         req.setBalanceCheck(balanceCheck);
         req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
-        req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
         req.setBusiAct(DictCodeListExt3.业务动作_中标结果维护.getValue());
         req.setPs(DictCodeList.交易方向_买入.getValue());
         req.setFinprodId(entity.getFinprodId());

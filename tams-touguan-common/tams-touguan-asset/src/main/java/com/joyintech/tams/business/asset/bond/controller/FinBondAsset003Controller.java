@@ -216,7 +216,7 @@ public class FinBondAsset003Controller extends BaseController{
         parameter.setPageId("FinBondAsset002");
         parameter.setBusinessDataPk1(response.getFinprodMarketId());
         if (finBondAssetService.isInWflProcess(parameter)) {
-            validMessages.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！不可删除!")));
+            validMessages.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！不可修改!")));
             ajax.setErrorList(validMessages);
             ajax.setMessageType(MessageType.错误消息);
             return new Message<AjaxResult>().success().setData(ajax);
