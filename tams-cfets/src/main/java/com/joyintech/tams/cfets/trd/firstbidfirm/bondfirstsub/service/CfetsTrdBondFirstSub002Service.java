@@ -1043,7 +1043,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if (CollectionUtils.isNotEmpty(errorList)) {
             ajaxResult.setErrorList(errorList);
             ajaxResult.setMessageType(MessageType.错误消息);
-        } else {
+        } else if (StringUtil.isNotEmpty(msg)) {
             ajaxResult.setMessage(msg, MessageType.确认消息);
         }
         return ajaxResult;
