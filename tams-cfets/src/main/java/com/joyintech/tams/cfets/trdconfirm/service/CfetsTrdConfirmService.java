@@ -673,6 +673,7 @@ public class CfetsTrdConfirmService extends BaseService{
         //根据汇总交易编号查询登记数据
         CfetsTrdConfirmRegInfoListResponse dtoReg=cfetsTrdConfirmMapper.selectRegInfoByKey(totleTradeId);
         CfetsTrdBondInvestTradeDto entity=new CfetsTrdBondInvestTradeDto();
+        entity.setTradeDate(iPlatformDate.getSysDate());
         entity.setRegIbuId(totleTradeId);
         BeanUtil.copyPropertiesIgnoreNull(entity,dtoReg);
         if (baseGetBusinessId != null) {
@@ -807,6 +808,7 @@ public class CfetsTrdConfirmService extends BaseService{
         for(CfetsRegFinProductDealDto regDeal:regDealList){
             TrdProductDeal deal = new TrdProductDeal();
             BeanUtil.copyPropertiesIgnoreNull(deal, regDeal);
+            deal.setTradeDate(iPlatformDate.getSysDate());
             deal.setTradeId(baseGetBusinessId.buildBussinessCode(getBussinessCodeParameter(deal.getPs())));
             // 交易本金 = 画面.净价总额
             deal.setPrinAmt(regDeal.getCpriceAmt());
