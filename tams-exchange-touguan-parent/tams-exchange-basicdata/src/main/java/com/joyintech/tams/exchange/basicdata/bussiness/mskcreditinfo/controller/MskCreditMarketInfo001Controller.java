@@ -141,6 +141,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("MstCreditMarketInfo002");
                 parameter.setBusinessDataPk1(entity.getSecid());
+                parameter.setBusinessDataPk2(entity.getCdate());
                 if (mskCreditMarketInfoPro001Service.isInWflProcess(parameter)) {
                     errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！")));
                     res.setErrorList(errorList);
@@ -177,6 +178,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("MstCreditMarketInfo002");
                 parameter.setBusinessDataPk1((String) param.get("secid"));
+                parameter.setBusinessDataPk2((String) param.get("cdate"));
                 if (mskCreditMarketInfoPro001Service.isInWflProcess(parameter)) {
                     errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！,不可修改!")));
                     wr.setErrorList(errorList);
@@ -228,10 +230,13 @@ public class MskCreditMarketInfo001Controller extends BaseController {
         params.setBusinessCode(item -> item.getSecid());
         params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证行情.getValue());
         params.setComment(entity1 -> {
-            return WorkFlowUtil.concatComment("资产代码"+
-                    GlobalConstant.OPEN_PARENTHESIS+entity1.getSecid()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"估值日期"+GlobalConstant.OPEN_PARENTHESIS+entity1.getCdate()+GlobalConstant.CLOSE_PARENTHESIS
-                     +"估值来源"+GlobalConstant.OPEN_PARENTHESIS+entity1.getValueSourceStr()+GlobalConstant.CLOSE_PARENTHESIS);
+//            return WorkFlowUtil.concatComment("资产代码"+
+//                    GlobalConstant.OPEN_PARENTHESIS+entity1.getSecid()+GlobalConstant.CLOSE_PARENTHESIS
+//                    +"估值日期"+GlobalConstant.OPEN_PARENTHESIS+entity1.getCdate()+GlobalConstant.CLOSE_PARENTHESIS
+//                     +"估值来源"+GlobalConstant.OPEN_PARENTHESIS+entity1.getValueSourceStr()+GlobalConstant.CLOSE_PARENTHESIS);
+            return WorkFlowUtil.concatComment("资产代码" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity1.getSecid(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                    , "估值日期" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity1.getCdate(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                    , "估值来源" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity1.getValueSourceStr(), "") + GlobalConstant.CLOSE_PARENTHESIS);
         });
         processParameter.setWorkFlowParameter(params);
         processParameter.setOperationType(OperationType.DELETE);

@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -9,6 +10,7 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.system.user.dto.SysUserDto;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -21,6 +23,7 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -188,5 +191,12 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
         pageParam.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         return this.queryForPageForSelectReturn(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),() -> mskCreditInfoProMapper.getFinprodMarketInfo(pageParam));
+    }
+
+    @Override
+    public String generateTitle(MskCreditInfoProSaveRequest entity, OperationType type) {
+        return WorkFlowUtil.concatComment("资产代码" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity.getSecid(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                , "估值日期" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity.getCdate(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                , "估值来源" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity.getValueSourceStr(), "") + GlobalConstant.CLOSE_PARENTHESIS);
     }
 }
