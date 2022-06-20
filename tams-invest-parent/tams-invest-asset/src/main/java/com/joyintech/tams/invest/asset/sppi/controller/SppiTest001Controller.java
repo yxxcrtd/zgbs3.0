@@ -20,6 +20,7 @@ import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.asset.sppi.dto.SppiTemplateDto;
 import com.joyintech.tams.invest.asset.sppi.dto.SppiTest001Dto;
@@ -64,6 +65,7 @@ public class SppiTest001Controller extends BaseController {
         SelectOptionDto projectSelectDto = new SelectOptionDto();
         SelectOptionDto planSelectDto = new SelectOptionDto();
         SelectOptionDto firstBidSelectDto = new SelectOptionDto();
+        SelectOptionDto firstBidSelectDto1 = new SelectOptionDto();
 
         bondSelectDto.setId(DictCodeList.平安资产类型_债券.getValue());
         bondSelectDto.setText(DictCodeList.平安资产类型_债券.getCodeName());
@@ -73,7 +75,10 @@ public class SppiTest001Controller extends BaseController {
         planSelectDto.setText(DictCodeList.平安资产类型_计划类资产_利率型.getCodeName());
         firstBidSelectDto.setId(DictCodeList.平安资产类型_一级市场债.getValue());
         firstBidSelectDto.setText(DictCodeList.平安资产类型_一级市场债.getCodeName());
-        List<SelectOptionDto> assetTypeList = Arrays.asList(bondSelectDto, projectSelectDto, planSelectDto,firstBidSelectDto);
+
+        firstBidSelectDto1.setId(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        firstBidSelectDto1.setText(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getCodeName());
+        List<SelectOptionDto> assetTypeList = Arrays.asList(bondSelectDto, projectSelectDto, planSelectDto, firstBidSelectDto, firstBidSelectDto1);
         model.addAttribute("ASSET_TYPES", JsonUtils.objectArray2Json(assetTypeList.toArray()));
 
         model.addAttribute("SPPI_TESTING", DictCodeListExt3.SPPI测试状态_测试中.getValue());
@@ -97,6 +102,7 @@ public class SppiTest001Controller extends BaseController {
     /**
      * 查询适用于SPPI测试的资产标的列表<br />
      * 仅能查询出债券类资产、项目类资产、计划类利率型资产
+     *
      * @param paramMap Map&lt;String, Object&gt;
      * @return List&lt;SelectOptionDto&gt;
      */
@@ -127,7 +133,7 @@ public class SppiTest001Controller extends BaseController {
 
         return result;
     }
-    
+
     /**
      * 导入数据文件之前检查数据
      *
@@ -136,10 +142,10 @@ public class SppiTest001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "checkConfirmMsgForImportData")
-    public AjaxResult checkConfirmMsgForImportData(String fileName)  {
+    public AjaxResult checkConfirmMsgForImportData(String fileName) {
         return service.checkConfirmMsgForImportData(fileName);
     }
-    
+
     /**
      * 导入数据文件
      *

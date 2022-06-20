@@ -275,6 +275,6 @@
         on t1.finprod_id = a.finprod_id and a.rowno = 1
 		where
 		(t1.FINPROD_MARKET_ID like concat(#{finprodId},'%'))
-		AND (t1.Finprod_Type2 in (#{TYPE_TOUGUAN_F01}))
+		AND (t1.Finprod_Type2 in (#{TYPE_TOUGUAN_F01}, #{TYPE_TOUGUAN_F32}))
 	</select>
 </mapper>
