@@ -5184,7 +5184,8 @@
                         then nvl(fpi.REFER_YIELD,0)*100 end rateYleid,
                 bo.SUBSCRIPTION_AMOUNT subAmt,
                 bo.PAYABLE_AMOUNT  payableAmount,
-                bo.SETT_FEE_AMT  settleFeeAmt
+                bo.SETT_FEE_AMT  settleFeeAmt,
+                bo.remark  remark
          from BID_ORDER bo
          left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
          left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
@@ -5214,7 +5215,8 @@
                         then nvl(fpi.REFER_YIELD,0)*100 end rateYleid,
                 wbo.SUBSCRIPTION_AMOUNT subAmt,
                 wbo.PAYABLE_AMOUNT  payableAmount,
-                wbo.SETT_FEE_AMT  settleFeeAmt
+                wbo.SETT_FEE_AMT  settleFeeAmt,
+                wbo.remark remark
          from WFL_BID_ORDER wbo
          left join FIN_PRODUCT fp on fp.FINPROD_ID = wbo.FINPROD_ID
          left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
