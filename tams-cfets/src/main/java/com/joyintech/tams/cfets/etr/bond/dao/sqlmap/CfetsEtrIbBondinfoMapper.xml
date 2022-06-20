@@ -481,13 +481,18 @@ from
                     SELECT FINPROD_ID, PORTFOLIO_ID, INV_AIM
                     FROM (
                         select
-                        a.BUSINESS_MODEL as INV_AIM , a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
+                        a.INV_AIM , a.TRADE_DATE ,nvl(T1.FINPROD_ID, a.FINPROD_ID) FINPROD_ID,b.PORTFOLIO_ID,
                         ROW_NUMBER () over(
                         PARTITION BY a.TRADE_ID
                         ORDER BY a.TRADE_DATE DESC
                         ) rn
                         from TRD_PRODUCT_DEAL a
                         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+                         left join (select fp.FINPROD_ID, fp1.FINPROD_ID CIRCULATION_CODE
+                                    from FIN_PRODUCT fp
+                                             left join FIN_PRODUCT fp1 on fp.FINPROD_MARKET_ID = fp1.CIRCULATION_CODE
+                                    where fp1.CIRCULATION_CODE is not null) T1
+                                   on a.FINPROD_ID = T1.FINPROD_ID or a.FINPROD_ID = T1.CIRCULATION_CODE
                         WHERE 1=1
                         <if test="finprodId != null and finprodId != ''">
                             AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
@@ -501,9 +506,14 @@ from
                         AND a.TRADE_DATE &lt;= to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') - 1
                     ) WHERE rn = 1
                     UNION
-                    SELECT a.FINPROD_ID, b.PORTFOLIO_ID, a.BUSINESS_MODEL as INV_AIM
+                    SELECT nvl(T1.FINPROD_ID, a.FINPROD_ID) FINPROD_ID, b.PORTFOLIO_ID, a.INV_AIM
                     from TRD_PRODUCT_DEAL a
                     LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+                     left join (select fp.FINPROD_ID, fp1.FINPROD_ID CIRCULATION_CODE
+                                from FIN_PRODUCT fp
+                                         left join FIN_PRODUCT fp1 on fp.FINPROD_MARKET_ID = fp1.CIRCULATION_CODE
+                                where fp1.CIRCULATION_CODE is not null) T1
+                               on a.FINPROD_ID = T1.FINPROD_ID or a.FINPROD_ID = T1.CIRCULATION_CODE
                     WHERE 1=1
                     <if test="finprodId != null and finprodId != ''">
                         AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
@@ -600,7 +610,24 @@ from
         a.PS ,
         a.UNIT_CPRICE AS PRICE,
         a.SHARE_AMT AS AMT
-        from TRD_PRODUCT_DEAL a
+        from (
+        SELECT nvl(T1.FINPROD_ID, T.FINPROD_ID) FINPROD_ID,
+               T.PS,
+               T.INV_AIM,
+               T.UNIT_CPRICE,
+               T.SHARE_AMT,
+               T.TRADE_ID,
+               T.TRADE_DATE,
+               T.CREATE_TIME,
+               T.IS_CANCEL,
+               T.TRADE_STATUS
+        from TRD_PRODUCT_DEAL T
+                 left join (select fp.FINPROD_ID, fp1.FINPROD_ID CIRCULATION_CODE
+                            from FIN_PRODUCT fp
+                                     left join FIN_PRODUCT fp1 on fp.FINPROD_MARKET_ID = fp1.CIRCULATION_CODE
+                            where fp1.CIRCULATION_CODE is not null) T1
+                           on T.FINPROD_ID = T1.FINPROD_ID or T.FINPROD_ID = T1.CIRCULATION_CODE
+        ) a
         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID AND c.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F01}
         LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID

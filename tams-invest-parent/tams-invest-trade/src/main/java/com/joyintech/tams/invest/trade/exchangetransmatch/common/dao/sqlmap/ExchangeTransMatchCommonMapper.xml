@@ -83,7 +83,11 @@
                 T1.ENTRUST_NUM,
                 T1.PRICE,
                 T1.ENTRUST_CLASS,
-                T1.BUSINESS_MODEL
+                T1.BUSINESS_MODEL,
+                T1.PRICE_MODEL,
+                T1.ENTRUST_TYPE,
+                T1.STOCK_ID,
+                T1.UPDATE_TIME
             FROM
                 ETR_ENTRUST T1
             LEFT JOIN
