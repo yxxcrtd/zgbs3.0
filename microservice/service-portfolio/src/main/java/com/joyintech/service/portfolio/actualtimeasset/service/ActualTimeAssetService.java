@@ -64,8 +64,8 @@ public class ActualTimeAssetService extends BaseService<ActualTimeAssetDto> {
      */
     public List<SelectOptionDto> getAssetsInfo(Map<String,Object> map) {
         //不显示的资产类型
-        List<String> noShowType8List = Arrays.asList(DictCodeListExt2.平安资产类型_外汇即期.getValue(), DictCodeListExt2.平安资产类型_外汇掉期.getValue(), 
-            DictCodeListExt2.平安资产类型_债券借贷.getValue(), DictCodeListExt2.平安资产类型_外汇远期.getValue(), 
+        List<String> noShowType8List = Arrays.asList(DictCodeListExt2.平安资产类型_外汇即期.getValue(), DictCodeListExt2.平安资产类型_外汇掉期.getValue(),
+            DictCodeListExt2.平安资产类型_债券借贷.getValue(), DictCodeListExt2.平安资产类型_外汇远期.getValue(),
             DictCodeListExt2.平安资产类型_一级市场债.getValue());
         map.put("noShowType8List", noShowType8List);
         // 多级法人改造 add by jingqiongqiong 20200615
@@ -104,18 +104,19 @@ public class ActualTimeAssetService extends BaseService<ActualTimeAssetDto> {
         List<String> etrHodingTypeList = Arrays.asList(DictCodeListExt1.持仓类型_委托指令可用.getValue(), DictCodeList.持仓类型_质押.getValue());
         pageParam.put("etrHodingTypeList", etrHodingTypeList);
         //资产类型特殊处理分类
-        List<String> type8List = Arrays.asList(DictCodeList.平安资产类型_质押式回购.getValue(), DictCodeList.平安资产类型_买断式回购.getValue(), 
+        List<String> type8List = Arrays.asList(DictCodeList.平安资产类型_质押式回购.getValue(), DictCodeList.平安资产类型_买断式回购.getValue(),
             DictCodeList.平安资产类型_拆借.getValue(), DictCodeListExt2.平安资产类型_利率互换.getValue(), DictCodeListExt2.平安资产类型_期权.getValue(),
                 BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         pageParam.put("type8List", type8List);
         //不显示的资产类型
-        List<String> noShowType8List = Arrays.asList(DictCodeListExt2.平安资产类型_外汇即期.getValue(), DictCodeListExt2.平安资产类型_外汇掉期.getValue(), 
-            DictCodeListExt2.平安资产类型_债券借贷.getValue(), DictCodeListExt2.平安资产类型_外汇远期.getValue(), 
+        List<String> noShowType8List = Arrays.asList(DictCodeListExt2.平安资产类型_外汇即期.getValue(), DictCodeListExt2.平安资产类型_外汇掉期.getValue(),
+            DictCodeListExt2.平安资产类型_债券借贷.getValue(), DictCodeListExt2.平安资产类型_外汇远期.getValue(),
             DictCodeListExt2.平安资产类型_一级市场债.getValue());
         pageParam.put("noShowType8List", noShowType8List);
-        
+
         pageParam.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_通道.getValue());
         pageParam.put("finprodType2_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        pageParam.put("finprodType2_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         pageParam.put("finprodType2_F07", DictCodeList.平安资产类型_质押式回购.getValue());
         pageParam.put("finprodType2_F10", DictCodeList.平安资产类型_买断式回购.getValue());
         pageParam.put("finprodType2_F20", DictCodeList.平安资产类型_现金资产.getValue());
@@ -145,7 +146,7 @@ public class ActualTimeAssetService extends BaseService<ActualTimeAssetDto> {
                 // ZGZGST-1408: 市值=当前持仓数量*最近估值全价；当前持仓数量=券面总额/100 fuyongsheng 20210830 add end
 			}
 		}
-        
+
         return pageList;
       //update zhangweiqi SNSTZJY-2370 按照实际持仓最大的优先扣减指令持仓  2020-12-15 end
     }

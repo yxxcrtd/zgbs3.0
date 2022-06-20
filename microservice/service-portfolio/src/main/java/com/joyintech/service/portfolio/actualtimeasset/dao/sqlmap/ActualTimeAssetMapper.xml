@@ -14,14 +14,14 @@
               (
 				select portfolioId,portfolioName,secAcctId,secAcctName,finprodId,finprodMarketId,finprodAbbr, type9, type10, type11, type12, type8, type7, type6,
 					case when type8 in ('F01','F04','F11') or (type8 = 'F02' and tradeMarket in ('03','04','09')) then marketPrice else 1 end as marketPrice,
-					case when type8 in (#{finprodType2_F01},#{finprodType2_F10}) then (PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06)*100 else (PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06) end as actualPositionAmount,
+					case when type8 in (#{finprodType2_F01},#{finprodType2_F10},#{finprodType2_F37}) then (PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06)*100 else (PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06) end as actualPositionAmount,
 					<!-- etliu modify 20210227 start -->
-					case when type8 in (#{finprodType2_F01},#{finprodType2_F10}) then (PTL_FLOW_AMOUNT01-PTL_FLOW_AMOUNT10 + PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06 - PTL_AMOUNT04 + PTL_AMOUNT08 + andOneDataAmout)*100
+					case when type8 in (#{finprodType2_F01},#{finprodType2_F10},#{finprodType2_F37}) then (PTL_FLOW_AMOUNT01-PTL_FLOW_AMOUNT10 + PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06 - PTL_AMOUNT04 + PTL_AMOUNT08 + andOneDataAmout)*100
 					<!-- etliu modify 20210227 end -->
 						else (PTL_FLOW_AMOUNT01 + PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06 - PTL_AMOUNT04 + PTL_AMOUNT08) end as tradePositionAmount,
-					case when type8 in (#{finprodType2_F01},#{finprodType2_F10}) then ETR_FLOW_AMOUNTE01*100 else ETR_FLOW_AMOUNTE01 end as instructionsAmount,
-					case when type8 in (#{finprodType2_F01},#{finprodType2_F10}) then ETR_FLOW_AMOUNT04*100 else ETR_FLOW_AMOUNT04 end as preReductionAmount,
-					case when type8 in (#{finprodType2_F01},#{finprodType2_F10}) then (PTL_AMOUNT04)*100 else (PTL_AMOUNT04) end as pledgeAmount
+					case when type8 in (#{finprodType2_F01},#{finprodType2_F10},#{finprodType2_F37}) then ETR_FLOW_AMOUNTE01*100 else ETR_FLOW_AMOUNTE01 end as instructionsAmount,
+					case when type8 in (#{finprodType2_F01},#{finprodType2_F10},#{finprodType2_F37}) then ETR_FLOW_AMOUNT04*100 else ETR_FLOW_AMOUNT04 end as preReductionAmount,
+					case when type8 in (#{finprodType2_F01},#{finprodType2_F10},#{finprodType2_F37}) then (PTL_AMOUNT04)*100 else (PTL_AMOUNT04) end as pledgeAmount
 				from
 				(
 					select t.PORTFOLIO_ID portfolioId, pp.PORTFOLIO_NAME portfolioName, nvl(nvl(chl.FINPROD_MARKET_ID, chl1.FINPROD_MARKET_ID), t.SEC_ACCT_ID) secAcctId, nvl(t4.SEC_ACCT_NAME, nvl(chl.FINPROD_ABBR, chl1.FINPROD_ABBR)) secAcctName,
@@ -580,7 +580,7 @@
     </select>
       <select id="getTradePosition" resultType="com.joyintech.service.portfolio.actualtimeasset.dto.ActualTimeAssetDto">
         select portfolio_id, sec_acct_id ,finprod_id,actualPositionAmount from (
-        select portfolio_id, sec_acct_id ,finprod_id,actualPositionAmount from 
+        select portfolio_id, sec_acct_id ,finprod_id,actualPositionAmount from
          ( select portfolio_id,
                                        sec_acct_id,
                                        finprod_id,
@@ -624,7 +624,7 @@
 						</if>
 						group by portfolio_id, sec_acct_id, finprod_id
                                  ) t
-                                
+
                                  order by actualPositionAmount desc
                                  ) where rownum=1
 
@@ -663,7 +663,7 @@
 		)A
 	</select>
        <select id="getTradeAmount" resultType="java.math.BigDecimal">
-        SELECT 
+        SELECT
 			 NVL(SUM(CASE WHEN hoding_type = '03' THEN AMOUNT end),0)+
 			 NVL(SUM(CASE WHEN hoding_type = '05' THEN AMOUNT end),0) -
 			 NVL(SUM(CASE WHEN hoding_type = '06' THEN AMOUNT end),0)  actualPositionAmount
@@ -689,6 +689,6 @@
 						 close=")">
 					#{secHodingType,jdbcType=VARCHAR}
 				</foreach>
-			</if>	
+			</if>
        </select>
 </mapper>

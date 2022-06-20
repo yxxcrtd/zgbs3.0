@@ -678,8 +678,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         if (StringUtil.isEmpty(finprodLinkDto.getRefSec())) {
             if (StringUtil.isNotEmpty(finprodLinkDto.getRefEntity())) {
                 String[] refEntityArray = StringUtil.split(finprodLinkDto.getRefEntity(), ",");
-                List<String> refSecsList = creditProtectionCertificatePeriodMapper.getRefSecsByRefEntity(refEntityArray);
-                refSecsList.forEach(refSecsD -> refSecs.addAll(Arrays.asList(StringUtil.split(refSecsD, ","))));
+                refSecs.addAll(creditProtectionCertificatePeriodMapper.getRefSecsByRefEntity(refEntityArray));
             }
         } else {
             refSecs.addAll(Arrays.asList(StringUtil.split(finprodLinkDto.getRefSec(), ",")));
