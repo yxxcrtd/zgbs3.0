@@ -99,10 +99,10 @@ public class PortfolioTradeMessageHelper {
             portfolioTradeMessage.setPortfolioId(detail.getPortfolioId());
             portfolioTradeMessage.setPortfolioName(detail.getPortfolioName());
             portfolioTradeMessage.setTradeNum(detail.getTargetNum());
-            //信用保护凭证数量转成面额
-            if (InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType())) {
-                portfolioTradeMessage.setTradeNum(detail.getTargetNum().multiply(BigDecimal.valueOf(100)));
-            }
+//            //信用保护凭证数量转成面额
+//            if (InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType())) {
+//                portfolioTradeMessage.setTradeNum(detail.getTargetNum().multiply(BigDecimal.valueOf(100)));
+//            }
             portfolioTradeMessage.setTradeAmt(detail.getTargetAmt());
             portfolioTradeMessage.setTargetType(detail.getTargetType());
 

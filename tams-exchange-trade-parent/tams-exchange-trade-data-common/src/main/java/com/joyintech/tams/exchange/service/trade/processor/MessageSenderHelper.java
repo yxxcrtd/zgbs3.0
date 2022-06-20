@@ -69,10 +69,10 @@ public class MessageSenderHelper {
         if (entrust instanceof IntegratedEntrust) {
             tradeMessage.setCounterId(((IntegratedEntrust) entrust).getCounterId());
         }
-        if (EntrustUtils.isCreditProtectionCertificate(instruction.getBusiTypeTg())) {
-            tradeMessage.setDealVolume((double) trade.getTradedVolume() * 100);
-            tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume() * 100);
-        }
+//        if (EntrustUtils.isCreditProtectionCertificate(instruction.getBusiTypeTg())) {
+//            tradeMessage.setDealVolume((double) trade.getTradedVolume() * 100);
+//            tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume() * 100);
+//        }
         String finprodId = instruction.getFinprodId();
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
             tradeMessage.setValueDate(((IntegratedEntrust) entrust).getFirstSettleDate());
@@ -123,10 +123,10 @@ public class MessageSenderHelper {
         //委托数量
         tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume());
 
-        if (EntrustUtils.isCreditProtectionCertificate(instruction.getBusiTypeTg())) {
-            tradeMessage.setDealVolume((double) trade.getTradedVolume() * 100);
-            tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume() * 100);
-        }
+//        if (EntrustUtils.isCreditProtectionCertificate(instruction.getBusiTypeTg())) {
+//            tradeMessage.setDealVolume((double) trade.getTradedVolume() * 100);
+//            tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume() * 100);
+//        }
 
         if (entrust instanceof IntegratedEntrust) {
             tradeMessage.setCounterId(((IntegratedEntrust) entrust).getCounterId());

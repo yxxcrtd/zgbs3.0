@@ -34,7 +34,7 @@ public class BusinessCheckEx019 implements IBusinessCheck {
         if (!EnumUtil.in(instruction.getPs(), BUY, SELL, APPLY)) {
             checkRsp.put("ps", StrUtil.format("信用保护凭证交易方向只支持申购、买入或卖出：{}", instruction.getPs()));
         }
-        //指令数量单位是元，转换成张
-        instruction.setEntrustNum(instruction.getEntrustNum() / 100);
+//        //指令数量单位是元，转换成张
+//        instruction.setEntrustNum(instruction.getEntrustNum() / 100);
     }
 }

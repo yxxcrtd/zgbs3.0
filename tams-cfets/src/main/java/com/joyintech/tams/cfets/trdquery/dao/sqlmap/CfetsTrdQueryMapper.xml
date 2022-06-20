@@ -3149,7 +3149,7 @@
             SELECT
                 CASE WHEN TFPDT.IS_CANCEL= 'Y' THEN #{STATUS_VALID_03} ELSE #{STATUS_VALID_01}	END as effectiveStatus,
                 DECODE(SO.SETTLE_STATUS,'01','S')   cleanStatus,
-                NVL(TMSI.SETTLE_STATUS,"01")	 settleStatus,
+                NVL(TMSI.SETTLE_STATUS,'01')	 settleStatus,
                 TFPDT.TOTLE_TRADE_ID	totleTradeId,
                 TFPDT.FINPROD_TYPE2	 finprodType2,
                 sdl1.item_value finprodType2Str,
