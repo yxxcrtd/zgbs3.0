@@ -125,7 +125,7 @@
 				 (
 				PORTFOLIO_ID in (select PORTFOLIO_ID from FIN_PRODUCT_ADD where FIN_PRODUCT_ADD.FINPROD_ID in <foreach collection="productIdList" item="obj" index="index" separator="," open="(" close=")">
 				<if test="(index % 500) == 499">
-					null) OR and PORTFOLIO_ID IN (
+					null) OR PORTFOLIO_ID IN (
 				</if>
 				#{obj}
 			</foreach>
@@ -136,7 +136,7 @@
 				PORTFOLIO_ID in
 				<foreach collection="productIdList" item="obj" index="index" separator="," open="(" close=")">
 					<if test="(index % 500) == 499">
-						null) OR and PORTFOLIO_ID IN (
+						null) OR PORTFOLIO_ID IN (
 					</if>
 					#{obj}
 				</foreach>
