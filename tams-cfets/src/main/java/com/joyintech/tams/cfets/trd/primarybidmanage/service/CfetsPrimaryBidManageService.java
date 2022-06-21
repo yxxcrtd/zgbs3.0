@@ -499,9 +499,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             ptlTradeMapper.insertSelective(ptlTrade);
         }
         //委托完成状况表
-        for(EtrFinishStatus etrFinishStatus: dto.getEtrFinishStatusList()) {
-            etrFinishStatusMapper.insertSelective(etrFinishStatus);
-        }
+//        for(EtrFinishStatus etrFinishStatus: dto.getEtrFinishStatusList()) {
+//            etrFinishStatusMapper.insertSelective(etrFinishStatus);
+//        }
         //结算指令表
         for(StlOrders stlOrders: dto.getStlOrdersList()) {
             stlOrdersMapper.insertSelective(stlOrders);
@@ -750,13 +750,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdTradeFeeDetail.setIsPayWithTrade(DictCodeList.是否_否.getValue());
             trdTradeFeeDetail.setFeeAmt(settFeeAmt);
             //委托完成状况表
-            EtrFinishStatus  etrFinishStatus = new EtrFinishStatus();
-            etrFinishStatus.setEntrustId(entrustId);
-            etrFinishStatus.setTradeId(secAcctIdTotleTradeId.get(secAcctId));
-            etrFinishStatus.setFinishDate(iplatformDate.getSysDate());
-            etrFinishStatus.setTrader(dto.getOuTraderId());
-            etrFinishStatus.setTranFinishAmt(trdProductDeal.getPrinAmt());
-            etrFinishStatusList.add(etrFinishStatus);
+//            EtrFinishStatus  etrFinishStatus = new EtrFinishStatus();
+//            etrFinishStatus.setEntrustId(entrustId);
+//            etrFinishStatus.setTradeId(secAcctIdTotleTradeId.get(secAcctId));
+//            etrFinishStatus.setFinishDate(iplatformDate.getSysDate());
+//            etrFinishStatus.setTrader(dto.getOuTraderId());
+//            etrFinishStatus.setTranFinishAmt(trdProductDeal.getPrinAmt());
+//            etrFinishStatusList.add(etrFinishStatus);
             BussSettleOrderParameterDto bussSettleOrderParameterDto = new BussSettleOrderParameterDto();
             bussSettleOrderParameterDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
             bussSettleOrderParameterDto.setBankLendingType(null);
@@ -792,7 +792,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         baseBidManageBaseInfoDto.setTrdTradeFeeTotalList(trdTradeFeeTotalList);
         baseBidManageBaseInfoDto.setTrdTradeFeeDetailList(trdTradeFeeDetailList);
         baseBidManageBaseInfoDto.setPtlTradeList(ptlTradeList);
-        baseBidManageBaseInfoDto.setEtrFinishStatusList(etrFinishStatusList);
+//        baseBidManageBaseInfoDto.setEtrFinishStatusList(etrFinishStatusList);
         baseBidManageBaseInfoDto.setStlOrdersList(stlOrdersList);
         baseBidManageBaseInfoDto.setBussTrdTransferOrderList(bussTrdTransferOrderList);
         dto.setBaseBidManageBaseInfoDto(baseBidManageBaseInfoDto);
@@ -1761,11 +1761,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
         if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利差.getValue())){
             BigDecimal bidPrice = ArithmeticUtil.multiply(request.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(10000));
-            bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"BP";
+            bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"BP";
         }
         if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())){
             BigDecimal bidPrice = request.getAllocationDetails().get(0).getBidPrice();
-            bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"元";
+            bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"元";
         }
         return bidPriceStr;
     }
