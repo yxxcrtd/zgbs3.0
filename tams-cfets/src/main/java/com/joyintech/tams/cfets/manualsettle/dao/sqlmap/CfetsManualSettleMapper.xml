@@ -1553,7 +1553,7 @@
                 END                       AS bidDateStart/*投标日 开始*/,
                 CASE
                     WHEN fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND fpi.TENDER_TYPE IN (#{TENDER_TYPE_01}, #{TENDER_TYPE_02})
-                    THEN fpi.ISSUE_DATE
+                    THEN null
                     WHEN (fpi.ISSUE_CLASS = #{ISSUE_CLASS_02} AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN (#{TENDER_TYPE_03}, #{TENDER_TYPE_04})))
                     OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
                     THEN fpi.TENDER_EDATE
