@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * 场内指令分发
@@ -401,10 +402,10 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     public String getOtherBusiTypePosition() {
         logger.error("=========业务类型==========");
         logger.error(this.getBusiTypePosition());
-        String busiTypePosition = SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.getBusiTypePosition());
+        String busiTypePosition = SysDataUtil.getNameFromDataDict(DictCode.头寸业务类型, this.busiTypePosition);
         logger.error("busiTypePosition111="+busiTypePosition);
-        if (StringUtil.isEmpty(busiTypePosition)) {
-            logger.error("busiTypePosition2222="+SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition()));
+        if (StringUtil.isEmpty(busiTypePosition) || Objects.equals(busiTypePosition,this.busiTypePosition)) {
+            logger.error("busiTypePosition2222="+SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.busiTypePosition));
             return SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
         }
         return busiTypePosition;
