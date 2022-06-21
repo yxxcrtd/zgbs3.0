@@ -3043,4 +3043,38 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
             BussinessDictCodeListRds.是否_否.getValue());
     }
     // add by zhangrui1 委托完成标识 end
+
+    /**
+     * 将newMap内容覆盖到targetMap中去
+     *
+     * @param targetMap 目标MAP
+     * @param newMap 变化MAP
+     */
+    protected void mergeMap(final Map<String, Map<String, IValue<Object>>> targetMap, Map<String, Map<String, IValue<Object>>> newMap) {
+        if (CollectionUtils.isEmpty(newMap)) {
+            return;
+        }
+        newMap.entrySet().forEach(en -> {
+            String key = en.getKey();
+            Map<String, IValue<Object>> temp = targetMap.getOrDefault(key, new HashMap<>());
+            Map<String, IValue<Object>> old = en.getValue();
+            if (!CollectionUtils.isEmpty(old) && !CollectionUtils.isEmpty(temp)) {
+                old.entrySet().forEach(item -> {
+                    String code = item.getKey();
+//                    if (temp.containsKey(code) && item.getValue() != null) {
+//                        temp.put(code, item.getValue());
+//                    }
+                    //ZGZGST-2925 多个组合都需要缓存同一个指标参数到本地的时候，第一个组合缓存后会导致后续组合的指标参数不能被缓存到
+                    if (item.getValue() != null) {
+                        temp.put(code, item.getValue());
+                    }
+                });
+            }
+            else if (CollectionUtils.isEmpty(temp)) {
+                temp.putAll(old);
+            }
+            if (!checkUpRdsParam(key)) return;
+            targetMap.put(key, temp);
+        });
+    }
 }

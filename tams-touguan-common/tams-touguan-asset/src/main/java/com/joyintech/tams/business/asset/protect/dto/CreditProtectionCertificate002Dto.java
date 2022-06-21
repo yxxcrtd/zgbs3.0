@@ -6,6 +6,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.tams.business.common.dto.CommonMstFileInputParameter;
 import com.joyintech.tams.component.business.core.dto.FileCommonDto;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
@@ -217,7 +218,7 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
      * 附件
      */
     @ApiModelProperty(name="mstFileInputParameter",value="附件")
-    private MstFileInputParameter mstFileInputParameter;
+    private CommonMstFileInputParameter mstFileInputParameter;
 
     private String isOrNoStr;
     private String settleMethodStr;
@@ -581,11 +582,11 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
         this.fileArray = fileArray;
     }
 
-    public MstFileInputParameter getMstFileInputParameter() {
+    public CommonMstFileInputParameter getMstFileInputParameter() {
         return mstFileInputParameter;
     }
 
-    public void setMstFileInputParameter(MstFileInputParameter mstFileInputParameter) {
+    public void setMstFileInputParameter(CommonMstFileInputParameter mstFileInputParameter) {
         this.mstFileInputParameter = mstFileInputParameter;
     }
 }
