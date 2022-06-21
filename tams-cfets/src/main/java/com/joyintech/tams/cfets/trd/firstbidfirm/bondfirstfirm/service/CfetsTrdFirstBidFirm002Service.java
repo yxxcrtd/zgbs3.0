@@ -1583,8 +1583,16 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         boolean flag = false;
         if (StringUtil.equals("1", dto.getEditFeild())) {
             // 标的类金融产品发行信息.最高投标总量 IS NOT NULL AND 汇总投标券面总额（万元）*10000 + 系统中该资产的有效、流程中的汇总券面总额 > 标的类金融产品发行信息.最高投标总量
+            BigDecimal totalBiddingNum = BigDecimal.ZERO;
+            if (!flag && (StringUtil.isNotEmpty(finProductIssue.getMaxTotalTender()))) {
+                Map<String, Object> param = new HashMap<>();
+                param.put("finprodId",dto.getFinprodId());
+                param.put("WIN_TYPE_01",DictCodeListExt4.投标方式_自主投标.getValue());
+                totalBiddingNum=  cfetsTrdFirstBidFirm002Mapper.selectSumTotalBidNumByFinprodId(param);
+                totalBiddingNum = ArithmeticUtil.doAdd(totalBiddingNum, dto.getTotalBiddingNum());
+            }
             if (!flag && (StringUtil.isNotEmpty(finProductIssue.getMaxTotalTender())
-                    && BigDecimalUtil.ACompareToB(dto.getTotalBiddingNum(), finProductIssue.getMaxTotalTender(), 4) > 0)) {
+                    && BigDecimalUtil.ACompareToB(totalBiddingNum, finProductIssue.getMaxTotalTender(), 4) > 0)) {
                 CheckMassgeInfo checkMassgeInfo = new CheckMassgeInfo();
                 checkMassgeInfo.setPrimaryKey(dto.getTotalBiddingNum().toPlainString());
                 checkMassgeInfo.setFeild("totalBiddingNum");
@@ -3732,12 +3740,23 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 posport.setSecAcctId(productDto.getSecManageAcctId()); // 证券户
             }
             if (StringUtil.isNotEmpty(productDto.getPortfolioId())) {
+                if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                        || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())
+                        || StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue())) {
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("portfolioId", productDto.getPortfolioId());
+                    map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+                    String cashAcctId = joyinbusinessCommonService.qryPortfolioCashAcctId(map);
+                    if (StringUtil.isNotEmpty(cashAcctId)) {
+                        posport.setCashAcctId(cashAcctId); // 托管户
+                    }
+                }
+            } else {
                 Map<String, Object> map = new HashMap<String, Object>();
-                map.put("portfolioId", productDto.getPortfolioId());
-                map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
-                String cashAcctId = joyinbusinessCommonService.qryPortfolioCashAcctId(map);
+                map.put("secAcctId", productDto.getSecManageAcctId());
+                String cashAcctId = joyinbusinessCommonService.qryCashAcctIdBySecAcctId(map);
                 if (StringUtil.isNotEmpty(cashAcctId)) {
-                    posport.setCashAcctId(cashAcctId); // 托管户
+                    posport.setCashAcctId(cashAcctId); // 证券账户对应的资金账户
                 }
             }
             posport.setCashAmount(productDto.getTradeAmt());
