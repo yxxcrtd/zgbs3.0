@@ -422,7 +422,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
         }
         // 下一个交易日
-        Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
+        Date nextWorkDate = getNextWorkDay(dto.getTradeDate(), calendarId);
 
         //金融产品交易
         TrdProductDeal trdProductDeal = new TrdProductDeal();
@@ -586,7 +586,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
         }
         // 下一个交易日
-        Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
+        Date nextWorkDate = getNextWorkDay(dto.getTradeDate(), calendarId);
 
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
         trdFinProductDealTotal.setTotleTradeId(dto.getBusiCode());
@@ -735,7 +735,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
         }
         // 下一个交易日
-        Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
+        Date nextWorkDate = getNextWorkDay(entity.getTradeDate(), calendarId);
 
         if (StringUtil.equals(DictCodeListExt4.结算方式_标的_现金结算.getValue(), entity.getSettleMethod())) {
             for (BillingDetailsDto billingDetail : billingDetails) {
@@ -936,7 +936,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
         }
         // 下一个交易日
-        Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
+        Date nextWorkDate = getNextWorkDay(entity.getTradeDate(), calendarId);
 
         for (BillingDetailsDto billingDetail : billingDetails) {
             //交易持仓流水&交易持仓：增加可用T+1信用保护凭证'名义本金'

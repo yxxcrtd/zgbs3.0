@@ -298,6 +298,7 @@
           and p.CDATE = #{tradeDate}
           and p.HODING_TYPE = 'A_001'
           and p.DATE_TYPE = 0
+          and p.AMOUNT > 0
     </select>
     <select id="getBillingDetailsByFinprodMarketIdOld"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
@@ -315,6 +316,7 @@
         where fp.FINPROD_MARKET_ID = #{finprodId}
           and p.CDATE = #{tradeDate}
           and p.HODING_TYPE = '03'
+          and p.AMOUNT > 0
     </select>
     <select id="getRefSecsByRefEntity" resultType="java.lang.String">
         select distinct f.FINPROD_MARKET_ID

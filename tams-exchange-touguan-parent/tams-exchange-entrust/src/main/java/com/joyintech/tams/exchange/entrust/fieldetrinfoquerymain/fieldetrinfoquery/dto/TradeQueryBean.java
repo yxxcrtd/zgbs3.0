@@ -6,6 +6,8 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -711,6 +713,60 @@ public class TradeQueryBean implements Serializable {
 
     @ApiModelProperty(name = "effectFlag", value = "有效状态code", example = "01")
     private String effectFlag;
+
+    @ApiModelProperty(name="ps",value="交易方向",example="T01")
+    private String ps;
+
+    @ApiModelProperty(name="otherPs",value="交易方向",example="买入")
+    private String otherPs;
+
+    @ApiModelProperty(name="busiPs",value="回购方向",example="回购/拆借方向")
+    private String busiPs;
+
+    @ApiModelProperty(name="winPrice",value="中标标位")
+    private String winPrice;
+
+    public String getWinPrice() {
+        return winPrice;
+    }
+
+    public void setWinPrice(String winPrice) {
+        this.winPrice = winPrice;
+    }
+
+    public String getBusiPs() {
+        return busiPs;
+    }
+
+    public void setBusiPs(String busiPs) {
+        this.busiPs = busiPs;
+    }
+
+    public String getPs() {
+        return ps;
+    }
+
+    public void setPs(String ps) {
+        this.ps = ps;
+    }
+
+    public String getOtherPs() {
+        if (StringUtils.equals(DictCodeListExt3.交易方向_提前购回.getValue(), this.getPs())
+                || StringUtils.equals(DictCodeListExt3.交易方向_到期购回.getValue(), this.getPs())
+                || StringUtils.equals(DictCodeListExt3.交易方向_中途换券.getValue(), this.getPs())
+                || StringUtils.equals(DictCodeListExt3.交易方向_解除质押.getValue(), this.getPs())
+                || StringUtils.equals(DictCodeListExt3.交易方向_到期续做.getValue(), this.getPs())) {
+            if (StringUtils.equals(DictCodeList.回购拆借方向_正回购.getValue(), this.getBusiPs())) {
+                return DictCodeList.回购拆借方向_正回购.getCodeName();
+            }
+            if (StringUtils.equals(DictCodeList.回购拆借方向_逆回购.getValue(), this.getBusiPs())) {
+                return DictCodeList.回购拆借方向_逆回购.getCodeName();
+            }
+        } else {
+            return  SysDataUtil.getNameFromDataDict(DictCode.交易方向, this.getPs());
+        }
+        return otherPs;
+    }
 
     public String getEffectFlag() {
         return effectFlag;
