@@ -11,6 +11,8 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.EtrEntrustOperHisDto;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
@@ -188,7 +190,14 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         this.setParam(pageParam);
         PageMode pageMode = this.setPageMode(dto.getPageMode());
         logger.debug("查询指令,入参:" + JsonUtils.object2Json(pageParam));
-        return super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listEntrust(pageParam));
+        Page<CfetsTrdBondFirstSubEntrustDto> page =
+                super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listEntrust(pageParam));
+        page.getRoot().forEach(item -> {
+                    List<EtrEntrustOperHisDto> list = joyinbusinessCommonService.selectCfetsOprHisByEntrustId(item.getEntrustId());
+                    item.setRemarks(list);
+                }
+        );
+        return page;
     }
 
     /**

@@ -176,4 +176,14 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/6/9 15:38
      */
     FinProduct selectByFinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
+
+    /**
+     * 根据资产代码查询自主投标生效及流程中总汇总投标券面总额
+     *
+     * @param param
+     * @return com.joyintech.tams.common.base.entity.FinProduct
+     * @author jiangpeng
+     * @date 2022/6/21 11:29
+     */
+    BigDecimal selectSumTotalBidNumByFinprodId(Map<String, Object> param);
 }

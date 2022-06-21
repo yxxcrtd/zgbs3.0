@@ -323,7 +323,10 @@ public class StlDataDealSzdSjsmxProcessService {
             // 交收方式
             settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsmx.getMxjsfs()));
             //交收结果
-            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdSjsmx.getJgdm()));
+            // ZGCPCN-1574:sjsmx交收结果都是正常交收 modify by fuyongsheng 20220621 start
+            // settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdSjsmx.getJgdm()));
+            settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_正常交收.getValue());
+            // ZGCPCN-1574:sjsmx交收结果都是正常交收 modify by fuyongsheng 20220621 end
             // 成交编号
             String generate = IDGenerator.generate();
             settleTransData.setTradeId(generate);
