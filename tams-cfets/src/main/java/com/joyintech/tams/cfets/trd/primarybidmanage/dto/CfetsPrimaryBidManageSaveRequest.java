@@ -168,6 +168,27 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
      @ApiModelProperty(name="bidModle",value="投标方式")
      private String bidModle;
 
+     @ApiModelProperty(name = "softSkipMode", value = "是否忽略头寸软控,编辑页面/提交用", example = "Y")
+     private String softSkipMode;
+
+     @ApiModelProperty(name = "systemAct", value = "头寸_系统动作,编辑页面/提交用", example = "Y")
+     private String systemAct;
+
+     public String getSoftSkipMode() {
+         return softSkipMode;
+     }
+
+     public void setSoftSkipMode(String softSkipMode) {
+         this.softSkipMode = softSkipMode;
+     }
+
+     public String getSystemAct() {
+         return systemAct;
+     }
+
+     public void setSystemAct(String systemAct) {
+         this.systemAct = systemAct;
+     }
 
      private BaseBidManageBaseInfoDto baseBidManageBaseInfoDto;
 
