@@ -210,7 +210,7 @@ public class BidPortIntFenPeiInfoDto {
     }
 
     public String getAdjustmentStrategy() {
-        return SysDataUtil.getNameFromDataDict(DictCode.调整策略, getDipType());
+        return SysDataUtil.getNameFromDataDict(DictCode.中标方式, getDipType());
     }
 
     public void setAdjustmentStrategy(String adjustmentStrategy) {

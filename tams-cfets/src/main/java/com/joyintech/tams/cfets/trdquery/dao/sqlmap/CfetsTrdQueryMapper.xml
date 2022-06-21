@@ -4800,7 +4800,7 @@
         CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
         decode(FPI.TENDER_TARGET,'01', to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
         ELSE '' END  winPrice,
-        TFPDT.FEE_AMT  settleFeeAmt,
+        TFPDT.FEE_AMT/10000  settleFeeAmt,
         BO.BID_ID   bidId,
         TFPDT.REMARK remark,
         NVL(TFPDT.UNIT_CPRICE,EEBP.WIN_CPRICE)  unitCprice,
