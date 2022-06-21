@@ -7,7 +7,7 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.service.portfolio.actualtimeasset.dao;
 
 import java.math.BigDecimal;
@@ -48,7 +48,7 @@ public interface ActualTimeAssetMapper {
      * @since 1.0
      */
     List<SelectOptionDto> getSecAcct(Map<String, Object> map);
-    
+
     /**
      * 资产代码下拉框
      * <功能详细描述>
@@ -58,26 +58,33 @@ public interface ActualTimeAssetMapper {
      * @since 1.0
      */
     List<SelectOptionDto> getAssetsInfo(Map<String, Object> map);
-    
+
     /**
      * 获取实际持仓列表  获取实际持仓最大的
      * @param map
      * @return
      */
     ActualTimeAssetDto getTradePosition(Map<String,Object> map);
-    
+
     /**
      * 获取指令当日持仓汇总
      * @param map
      * @return
      */
     BigDecimal getEtrAmount(Map<String,Object> map);
-    
+
     /**
      * 获取交易当日持仓汇总
      * @param map
      * @return
      */
     BigDecimal getTradeAmount(Map<String,Object> map);
-    
+
+    /**
+     * 信用保护凭证最新行情查询
+     * @param params
+     * @return
+     */
+    BigDecimal getNewPriceForCreditAssert(Map<String, String> params);
+
 }

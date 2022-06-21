@@ -7,6 +7,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.EntrustQryBean;
 import com.joyintech.tams.exchange.common.bean.EntrustQueryBean;
 import com.joyintech.tams.exchange.common.constant.EntrustType;
+import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrustHistory;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrustHistoryExample;
@@ -141,8 +142,13 @@ public class IntegratedEntrustHistoryServiceImpl implements IntegratedEntrustHis
             if (InvestAssetTypeEnum.isFutures(entrustQueryBean.getAssetType())) {
                 entrustQueryBean.setStockCode(StockCodeUtils.getStockCode(entrustQueryBean.getStockCode()));
             }
-            if("EX005".equals(entrustQueryBean.getBusiTypeTg())){
-                entrustQueryBean.setEntrustPrice(entrustQueryBean.getEntrustPrice().multiply(BigDecimal.valueOf(100)));
+            if (BussTypeEnum.STANDARD_COUPONS_IN_AND_OUT.codeEquals(entrustQueryBean.getBusiTypeTg())) {
+                entrustQueryBean.setEntrustPriceView(entrustQueryBean.getEntrustPrice().multiply(BigDecimal.valueOf(100)));
+            }
+            if (BussTypeEnum.COUPON.codeEquals(entrustQueryBean.getBusiTypeTg())
+                    || BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.codeEquals(entrustQueryBean.getBusiTypeTg())) {
+                entrustQueryBean.setEntrustVolume(entrustQueryBean.getEntrustVolume() / 100);
+                entrustQueryBean.setTradedVolume(entrustQueryBean.getTradedVolume() / 100);
             }
         });
         return new PageInfo<>(entrustQueryBeanList);

@@ -691,4 +691,11 @@
 				</foreach>
 			</if>
        </select>
+    <select id="getNewPriceForCreditAssert" resultType="java.math.BigDecimal">
+        SELECT m.MDPRICE
+        FROM MST_CREDIT_MARKET_INFO m
+        where m.SECID = #{secId,jdbcType=VARCHAR}
+          AND m.CDATE = #{valueDate,jdbcType=VARCHAR}
+          and m.VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
+    </select>
 </mapper>
