@@ -18,7 +18,7 @@
     <sql id="Base_Column_List" >
         PORTFOLIO_ID PORTFOLIO_ID, ACCT_ID ACCT_ID, HODING_TYPE HODING_TYPE, CDATE CDATE, 
         CCY CCY, AMOUNT AMOUNT, CHL_FINPROD_ID CHL_FINPROD_ID, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, 
-        CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME,is_Exist_New is_Exist_New
+        CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -52,14 +52,12 @@
         insert into ETR_CASH_POSITION (PORTFOLIO_ID, ACCT_ID, HODING_TYPE, 
             CDATE, CCY, AMOUNT, 
             CHL_FINPROD_ID, CREATE_USER, CREATE_DEPT, 
-            CREATE_TIME, UPDATE_USER, UPDATE_TIME,
-            is_Exist_New
+            CREATE_TIME, UPDATE_USER, UPDATE_TIME
             )
         values (#{portfolioId,jdbcType=VARCHAR}, #{acctId,jdbcType=VARCHAR}, #{hodingType,jdbcType=VARCHAR}, 
             #{cdate,jdbcType=DATE}, #{ccy,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, 
             #{chlFinprodId,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
-            #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
-            #{isExistNew,jdbcType=VARCHAR}
+            #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.EtrCashPosition" >
@@ -101,9 +99,6 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
-            <if test="isExistNew != null" >
-                is_Exist_New,
-            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="portfolioId != null" >
@@ -142,17 +137,13 @@
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="isExistNew != null" >
-                #{isExistNew,jdbcType=VARCHAR},
-            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.EtrCashPosition" >
         insert into ETR_CASH_POSITION(PORTFOLIO_ID, ACCT_ID, HODING_TYPE, CDATE, CCY, AMOUNT, 
-        CHL_FINPROD_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,is_Exist_New)
+        CHL_FINPROD_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
         select PORTFOLIO_ID, ACCT_ID, HODING_TYPE, CDATE, CCY, AMOUNT, 
-            CHL_FINPROD_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME,
-            , #{isExistNew,jdbcType=VARCHAR} is_Exist_New
+            CHL_FINPROD_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
              from ETR_CASH_POSITION
              where 1 = 1 and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR} and ACCT_ID = #{acctId,jdbcType=VARCHAR} and HODING_TYPE = #{hodingType,jdbcType=VARCHAR} and CDATE = #{cdate,jdbcType=DATE} and CCY = #{ccy,jdbcType=VARCHAR}
     </insert>
@@ -171,9 +162,6 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="isExistNew != null" >
-                is_Exist_New = #{isExistNew,jdbcType=VARCHAR},
-            </if>
         </set>
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
           and ACCT_ID = #{acctId,jdbcType=VARCHAR}
@@ -186,8 +174,7 @@
         set AMOUNT = #{amount,jdbcType=DECIMAL},
             CHL_FINPROD_ID = #{chlFinprodId,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
-            is_Exist_New = #{isExistNew,jdbcType=VARCHAR}
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
           and ACCT_ID = #{acctId,jdbcType=VARCHAR}
           and HODING_TYPE = #{hodingType,jdbcType=VARCHAR}

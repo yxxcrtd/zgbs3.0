@@ -299,6 +299,14 @@ public class CfetsManualSettleQueryService extends BaseService{
         if (StringUtil.equals(respond.getBusiType(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue())) {
             // 基本信息
             List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "FXB");
+            if(!StringUtil.isNotEmpty(respond.getBidDateEnd())){
+                infoForm.forEach(form->{
+                    if(StringUtil.equals("投标日",form.getColname())){
+                        form.setColcode("bidDateStart");
+                        form.setExtendcfg("{\"colAlign\": \"left\",\"dataType\":\"date\"}");
+                    }
+                });
+            }
             resultData.put("infoForm", infoForm);
             // 金额信息
             List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "FXA");
@@ -329,6 +337,14 @@ public class CfetsManualSettleQueryService extends BaseService{
         } else {
             // 基本信息
             List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "ZBB");
+            if(!StringUtil.isNotEmpty(respond.getBidDateEnd())){
+                infoForm.forEach(form->{
+                    if(StringUtil.equals("投标日",form.getColname())){
+                        form.setColcode("bidDateStart");
+                        form.setExtendcfg("{\"colAlign\": \"left\",\"dataType\":\"date\"}");
+                    }
+                });
+            }
             resultData.put("infoForm", infoForm);
             // 金额信息
             List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "ZBA");

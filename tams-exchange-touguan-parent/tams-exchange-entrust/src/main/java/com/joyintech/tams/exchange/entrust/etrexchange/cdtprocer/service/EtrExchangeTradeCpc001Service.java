@@ -685,18 +685,25 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             /********************** 持仓流水DTO构造 *************************************/
             etrCashPositionFlowDtoUnit.setSeqno(getSeqNo());
             etrCashPositionFlowDtoUnit.setPortfolioId(etrSinglePortfolioDto.getPortfolioId());// 组合代码
-            etrCashPositionFlowDtoUnit.setAcctId(etrSinglePortfolioDto.getDealCurAcct());// 资金账户
+            if (DictCodeList.交易方向_申购.getValue().equals(etrSinglePortfolioDto.getPs())) {
+                //申购传托管户 ZGCPCN-1573
+                String acctId = tamsBusinessCommonService.selectProdTghCapacctNo(etrSinglePortfolioDto.getPortfolioId());
+                etrCashPositionFlowDtoUnit.setAcctId(StringUtils.isEmpty(acctId) ? etrSinglePortfolioDto.getDealCurAcct() : acctId);// 资金账户
+            } else {
+                etrCashPositionFlowDtoUnit.setAcctId(etrSinglePortfolioDto.getDealCurAcct());// 资金账户
+            }
             etrCashPositionFlowDtoUnit.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());// 持仓类型
             etrCashPositionFlowDtoUnit.setCdate(iPlatformDate.getSysDate());// 日期
             etrCashPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
             // if 画面.全价不为空，则数量 = 画面.全价*画面.数量 else 投资指令DTO.指令金额
-            if (null != dto.getFprice()) {
-                etrCashPositionFlowDtoUnit.setAmount(dto.getEntrustNum().multiply(dto.getPrice()).multiply(new BigDecimal(1)));
-            } else {
-                if (StringUtil.isNotEmpty(etrSinglePortfolioDto.getEntrustAmt())) {
-                    etrCashPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustAmt().multiply(new BigDecimal(1)));// 数量
-                }
-            }
+//            if (null != dto.getFprice()) {
+//                etrCashPositionFlowDtoUnit.setAmount(dto.getEntrustNum().multiply(dto.getPrice()).multiply(new BigDecimal(1)));
+//            } else {
+//                if (StringUtil.isNotEmpty(etrSinglePortfolioDto.getEntrustAmt())) {
+//                    etrCashPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustAmt().multiply(new BigDecimal(1)));// 数量
+//                }
+//            }
+            etrCashPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustAmt().multiply(new BigDecimal(-1)));// 数量
             etrCashPositionFlowDtoUnit.setOrderId(etrSinglePortfolioDto.getEntrustId());// 业务编号
             etrCashPositionFlowDtoUnit.setChlFinprodId(null);// 通道金融产品代码
             etrCashPositionFlowDtoUnit.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());// 冲正标识

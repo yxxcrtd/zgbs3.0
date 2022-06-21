@@ -9,13 +9,13 @@
         ,T1.ENTRUST_STATUS entrustStatus,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( decode(nvl( T4.ORDER_FINISH_AMT, 0 ),0,0, nvl( T4.ORDER_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_NUM, 1 )) * 100, 4 )
+        ROUND( decode(nvl( T4.ORDER_FINISH_AMT, 0 ),0,0, nvl( T4.ORDER_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_NUM, 1 )) , 4 )
         ELSE ROUND( decode(nvl( T4.ORDER_FINISH_AMT, 0 ),0,0, nvl( T4.ORDER_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_AMT, 1 )), 4 )
         END AS implementPercent,
         CASE
 
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( decode(nvl( T4.ENT_FINISH_AMT, 0 ),0 ,0 , nvl( T4.ENT_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_NUM, 1 )) * 100, 4 )
+        ROUND( decode(nvl( T4.ENT_FINISH_AMT, 0 ),0 ,0 , nvl( T4.ENT_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_NUM, 1 )) , 4 )
         ELSE ROUND( decode(nvl( T4.ENT_FINISH_AMT, 0 ),0,0, nvl( T4.ENT_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_AMT, 1 )), 4 )
         END AS dealPercent,
         CASE
@@ -153,12 +153,12 @@
         ,T1.ENTRUST_STATUS entrustStatus,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( decode(nvl( T4.ORDER_FINISH_AMT, 0 ),0,0, nvl( T4.ORDER_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_NUM, 1 )) * 100, 4 )
+        ROUND( decode(nvl( T4.ORDER_FINISH_AMT, 0 ),0,0, nvl( T4.ORDER_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_NUM, 1 )) , 4 )
         ELSE ROUND( decode(nvl( T4.ORDER_FINISH_AMT, 0 ),0,0, nvl( T4.ORDER_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_AMT, 1 )), 4 )
         END AS implementPercent,
         CASE
         WHEN T2.TARGET_TYPE = '01' THEN
-        ROUND( decode(nvl( T4.ENT_FINISH_AMT, 0 ),0,0, nvl( T4.ENT_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_NUM, 1 )) * 100, 4 )
+        ROUND( decode(nvl( T4.ENT_FINISH_AMT, 0 ),0,0, nvl( T4.ENT_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_NUM, 1 )) , 4 )
         ELSE ROUND( decode(nvl( T4.ENT_FINISH_AMT, 0 ),0,0, nvl( T4.ENT_FINISH_AMT, 0 )/ nvl( T1.ENTRUST_AMT, 1 )), 4 )
         END AS dealPercent,
         CASE
@@ -580,13 +580,14 @@
             AND FP.FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR}
         </if>
         <if test="finprodMarketIds != null and finprodMarketIds.size() > 0">
-            AND (FP.FINPROD_MARKET_ID in
+            AND
+            <!--(FP.FINPROD_MARKET_ID in
             <foreach item="item" index="index" collection="finprodMarketIds" open="(" separator="," close=")">
                 #{item, jdbcType=VARCHAR}
-            </foreach>
-            ) OR (FP.FINPROD_ID in
-            <foreach item="item" index="index" collection="finprodMarketIds" open="(" separator="," close=")">
-                #{item, jdbcType=VARCHAR}
+            </foreach> ) OR -->
+        (FP.FINPROD_ID in
+           <foreach item="item" index="index" collection="finprodMarketIds" open="(" separator="," close=")">
+               #{item, jdbcType=VARCHAR}
             </foreach>)
         </if>
         <if test="assetType != null and assetType !=''">
