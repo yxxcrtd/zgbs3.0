@@ -100,6 +100,13 @@ public class CfetsTradeHandlerAop {
     }
 
     /**
+     * 交易登记、对话报价待办事项提交check
+     */
+    @Pointcut("execution(* com.joyintech.tams.cfets.trd..*.*.checkByHome(..))")
+    protected void checkByHome() {
+    }
+
+    /**
      * 成交确认-发行失败
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.trdconfirm.controller.CfetsTrdConfirmController.issuingFail(..))")
@@ -225,6 +232,37 @@ public class CfetsTradeHandlerAop {
     public void doCheck(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
         checkCommon(joinPoint,ajaxResultMessage,系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
     }
+
+    /**
+     * 交易新建/修改时提交check
+     *
+     * @param joinPoint
+     * @throws BusinessException
+     */
+    @AfterReturning(pointcut = "checkByHome()", returning = "ajaxResult")
+    public void checkByHome(JoinPoint joinPoint, AjaxResult ajaxResult) throws BusinessException {
+        if (ajaxResult == null){
+            return;
+        }
+        if (!StringUtil.isEmptyList(ajaxResult.getErrorList())) {
+            return;
+        }
+        Message<AjaxResult> ajaxResultMessage = new Message<AjaxResult>();
+        ajaxResultMessage.setData(ajaxResult);
+        checkCommon(joinPoint,ajaxResultMessage,系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        AjaxResult ar = ajaxResultMessage.getData();
+        if (ar != null && !StringUtil.isEmptyList(ar.getErrorList())){
+            ajaxResult.setErrorList(ar.getErrorList());
+            return;
+        }
+        String message = ajaxResult.getMessage() == null ? "" : ajaxResult.getMessage();
+        if (ar != null && ar.getMessage() != null){
+            message += ar.getMessage();
+        }
+        ajaxResult.setMessage(message,MessageType.确认消息);
+    }
+
+
 
 
     /**

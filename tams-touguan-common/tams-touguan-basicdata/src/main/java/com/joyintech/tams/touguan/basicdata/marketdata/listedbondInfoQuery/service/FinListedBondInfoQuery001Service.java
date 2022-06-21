@@ -293,6 +293,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductAdd.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         finProductAdd.setCrossMarket(DictCodeList.是否_否.getValue());
         finProductAdd.setIsSecBond(finListedBondInfoQuery001Dto.getIssecbond());
+        finProductAdd.setListingDate(finListedBondInfoQuery001Dto.getListingDate());
         finProductAdd.setOriginalOwner(finListedBondInfoQuery001Dto.getOriginalOwner());
         finProductAdd.setGuaType(finListedBondInfoQuery001Dto.getGuartype());
         //面值
@@ -306,7 +307,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //金融产品分类
         FinProductType finProductType = new FinProductType();
         finProductType.setFinprodId(finProdId);
-        finProductType.setBranch(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalBatches()) ? finListedBondInfoQuery001Dto.getAdditionalBatches().longValue() : 0L);
+        finProductType.setBranch(0L);
         //取债券资料表系统债券类型
         finProductType.setType4(finListedBondInfoQuery001Dto.getPrimaryClassification());
         //取债券资料表系统债券类型2
@@ -347,7 +348,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setIssueStyle(finListedBondInfoQuery001Dto.getReleaseType());
         finProductIssue.setAddBatch(0L);
         finProductIssue.setIssuePrice(Objects.nonNull(finListedBondInfoQuery001Dto.getIssuePx()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()) : null);
-        finProductIssue.setReferYield(Objects.nonNull(finListedBondInfoQuery001Dto.getCouponRate()) ? new BigDecimal(finListedBondInfoQuery001Dto.getCouponRate()) : null);
+        finProductIssue.setReferYield(Objects.nonNull(finListedBondInfoQuery001Dto.getCouponRate()) ? new BigDecimal(finListedBondInfoQuery001Dto.getCouponRate()).divide(new BigDecimal(100)) : null);
         finProductIssue.setRateGrade(finListedBondInfoQuery001Dto.getDecimalPlaces());
         finProductIssue.setBp(Objects.nonNull(finListedBondInfoQuery001Dto.getSpread()) ? new BigDecimal(finListedBondInfoQuery001Dto.getSpread()) : null);
         finProductIssue.setIssueDate(finListedBondInfoQuery001Dto.getIssueDate());
