@@ -156,6 +156,8 @@ public class CfetsEtrIbBondinfoController  extends BaseController{
         initPageParams.put("PRICE_MODEL", this.getSelectDataFromDataDic(DictCode.价格模式, null));
         initPageParams.put("ACCOUNT_SPEED", this.getSelectDataFromDataDic(DictCode.清算速度, null));
         initPageParams.put("PS", this.getSelectDataFromDataDic(DictCode.交易方向, null));
+        // 加券按钮
+        initPageParams.put("IS_ADDBOND_SHOW_CFETSETRREPO", CacheUtil.getSysParam("IS_ADDBOND_SHOW_CFETSETRREPO"));
         //pageId
         initPageParams.put("pageId", "CfetsEtrIbBondinfo003");
         return new Message<Map<String, Object>>(initPageParams).success();
