@@ -349,11 +349,12 @@
         $('#ManualSettle001_btn_settlefail').click(function () {
             settle("04");
         })
-        $('#settleStatus_div').find('input[name="settleStatus"]').click(function () {
-            settleStatus = $(this).val();
-            isQuickFlag = true;
-            table.table == null ? table.load() : table.reload();
-        })
+        // ZGCPCN-1553
+        // $('#settleStatus_div').find('input[name="settleStatus"]').click(function () {
+        //     settleStatus = $(this).val();
+        //     isQuickFlag = true;
+        //     table.table == null ? table.load() : table.reload();
+        // })
 
         /**
          * 刷新列表
