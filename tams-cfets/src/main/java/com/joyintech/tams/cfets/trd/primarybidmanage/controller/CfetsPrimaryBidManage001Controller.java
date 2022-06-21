@@ -20,6 +20,7 @@ import com.joyintech.tams.common.base.entity.BidOrder;
 import com.joyintech.tams.common.base.entity.BidResultTotal;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.*;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -88,7 +89,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
         model.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         model.put("BID_STATUS", this.getSelectDataFromDataDic(DictCode.中标方式, null));
         model.put("WIN_TYPE", this.getSelectDataFromDataDic(DictCode.投标方式, null));
-        model.put("PAY_TYPE", this.getSelectDataFromDataDic(DictCode.缴款方式, null));
+        model.put("PAY_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.缴款方式, null));
         model.put("BID_TYPE", this.getSelectDataFromDataDic(DictCode.中标方式, null));
         model.put("CfetsPrimaryBidManage_list_refresh_period", CacheUtil.getSysParam("CfetsPrimaryBidManage_list_refresh_period"));
         return Message.success("查询页面初始化参数",model);
