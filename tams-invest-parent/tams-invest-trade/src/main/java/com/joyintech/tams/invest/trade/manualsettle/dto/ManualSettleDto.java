@@ -240,8 +240,8 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
     }
 
     public String getSettleDateStr(){
-        if(null!=getSettleTime()){
-            return DateUtil.format(getSettleTime(),"yyyy-MM-dd");
+        if(null!=getSettleDate()){
+            return DateUtil.format(getSettleDate(),"yyyy-MM-dd");
         }
         return StringUtil.EMPTY;
     }
