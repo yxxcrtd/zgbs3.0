@@ -261,8 +261,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                         ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(),
-                        ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100"))), 2);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, r.getPositionsNum(), 2);
                 //add wsz 20220620 修改持仓浮动盈亏百分比 start
                 r.setFloatingPL(ArithmeticUtil.multiply(floatPL,new BigDecimal(100)));
                 //add wsz 20220620 修改持仓浮动盈亏百分比 end
