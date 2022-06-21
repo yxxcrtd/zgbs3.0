@@ -220,7 +220,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private Integer medianMaxBidMarked;
 
     @ApiModelProperty(name = "maxTenderPxDiffer", value = "最大投标标位差（个）")
-    private Integer maxTenderPxDiffer;
+    private String maxTenderPxDiffer;
 
     @ApiModelProperty(name = "continuousTenderLimit", value = "连续投标限制")
     private String continuousTenderLimit;
@@ -755,11 +755,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.medianMaxBidMarked = medianMaxBidMarked;
     }
 
-    public Integer getMaxTenderPxDiffer() {
+    public String getMaxTenderPxDiffer() {
         return maxTenderPxDiffer;
     }
 
-    public void setMaxTenderPxDiffer(Integer maxTenderPxDiffer) {
+    public void setMaxTenderPxDiffer(String maxTenderPxDiffer) {
         this.maxTenderPxDiffer = maxTenderPxDiffer;
     }
 
