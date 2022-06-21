@@ -726,6 +726,17 @@ public class TradeQueryBean implements Serializable {
     @ApiModelProperty(name="winPrice",value="中标标位")
     private String winPrice;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型")
+    private String busiTypePosition;
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
     public String getWinPrice() {
         return winPrice;
     }

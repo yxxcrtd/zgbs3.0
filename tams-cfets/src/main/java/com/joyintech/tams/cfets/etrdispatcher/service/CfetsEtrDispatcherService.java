@@ -1895,8 +1895,9 @@ public class CfetsEtrDispatcherService extends BaseService {
         }
 
         if (StringUtil.isNotEmpty(infoData.getCouponSpecies()) && StringUtil.isNotEmpty(infoData.getIntType())) {
-            if (StringUtil.equals(DictCodeList.息票品种_附息.getValue(),infoData.getCouponSpecies()) &&
-                    StringUtil.equals(DictCodeList.利率类型_固定利率.getValue(),infoData.getCouponSpecies())) {
+            if (StringUtil.equals(DictCodeList.息票品种_利随本清.getValue(),infoData.getCouponSpecies()) ||
+                    (StringUtil.equals(DictCodeList.息票品种_附息.getValue(),infoData.getCouponSpecies()) &&
+                    StringUtil.equals(DictCodeList.利率类型_固定利率.getValue(),infoData.getCouponSpecies()))) {
                 infoForm.addAll(cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",01")));
             }else {
                 infoForm.addAll(cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode.concat(",02")));
@@ -1972,8 +1973,9 @@ public class CfetsEtrDispatcherService extends BaseService {
             dto.setPayDate(finProductInfo.getPayDate());
             dto.setIssuePrice(new BigDecimal(finProductInfo.getIssuePrice()));
             if (StringUtil.isNotEmpty(dto.getCouponSpecies()) && StringUtil.isNotEmpty(dto.getIntType())) {
-                if (StringUtil.equals(DictCodeList.息票品种_附息.getValue(),dto.getCouponSpecies()) &&
-                        StringUtil.equals(DictCodeList.利率类型_固定利率.getValue(),dto.getCouponSpecies())) {
+                if (StringUtil.equals(DictCodeList.息票品种_利随本清.getValue(),dto.getCouponSpecies()) ||
+                        (StringUtil.equals(DictCodeList.息票品种_附息.getValue(),dto.getCouponSpecies()) &&
+                        StringUtil.equals(DictCodeList.利率类型_固定利率.getValue(),dto.getCouponSpecies()))) {
                     dto.setReferYield2(etrInfoDto.getBidPriceStr());
                 }else {
                     dto.setReferYield(etrInfoDto.getBidPriceStr());
