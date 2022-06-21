@@ -18,13 +18,12 @@
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
-        <result column="IS_EXIST_NEW" property="isExistNew" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         PORTFOLIO_ID PORTFOLIO_ID, SEC_ACCT_ID SEC_ACCT_ID, FINPROD_ID FINPROD_ID, BRANCH BRANCH, 
         INV_AIM INV_AIM, HODING_TYPE HODING_TYPE, CDATE CDATE, AMOUNT AMOUNT, CCY CCY, P_FINPROD_ID P_FINPROD_ID, 
         FACE_VALUE FACE_VALUE, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
-        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, IS_EXIST_NEW IS_EXIST_NEW
+        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -64,13 +63,13 @@
             CDATE, AMOUNT, CCY, 
             P_FINPROD_ID, FACE_VALUE, CREATE_USER, 
             CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
-            UPDATE_TIME, IS_EXIST_NEW)
+            UPDATE_TIME)
         values (#{portfolioId,jdbcType=VARCHAR}, #{secAcctId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, 
             #{branch,jdbcType=DECIMAL}, #{invAim,jdbcType=VARCHAR}, #{hodingType,jdbcType=VARCHAR}, 
             #{cdate,jdbcType=DATE}, #{amount,jdbcType=DECIMAL}, #{ccy,jdbcType=VARCHAR}, 
             #{pFinprodId,jdbcType=VARCHAR}, #{faceValue,jdbcType=DECIMAL}, #{createUser,jdbcType=VARCHAR}, 
             #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
-            #{updateTime,jdbcType=TIMESTAMP}, #{isExistNew,jdbcType=VARCHAR})
+            #{updateTime,jdbcType=TIMESTAMP})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.PtlSecPosition" >
         insert into PTL_SEC_POSITION
@@ -123,9 +122,6 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
-            <if test="isExistNew != null" >
-                is_Exist_New,
-            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="portfolioId != null" >
@@ -176,9 +172,6 @@
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="isExistNew != null" >
-                #{isExistNew,jdbcType=VARCHAR},
-            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.PtlSecPosition" >
@@ -212,9 +205,6 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="isExistNew != null" >
-                IS_EXIST_NEW = #{isExistNew,jdbcType=VARCHAR},
-            </if>
         </set>
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
           and SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
@@ -231,8 +221,7 @@
             P_FINPROD_ID = #{pFinprodId,jdbcType=VARCHAR},
             FACE_VALUE = #{faceValue,jdbcType=DECIMAL},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
-            IS_EXIST_NEW = #{isExistNew,jdbcType=VARCHAR}
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
           and SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
           and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
