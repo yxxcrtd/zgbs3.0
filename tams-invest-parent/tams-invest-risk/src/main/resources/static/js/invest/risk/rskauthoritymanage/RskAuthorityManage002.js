@@ -226,7 +226,7 @@ $(function() {
             }
              // 资产类型改为授权类型 modify by renping 2019-08-06  end
              //------------modify by jjpei 20190710------隐藏授权类型，且默认为授权-------------
-             ,{field:'authorizeType' ,title: 'RskAuthorityManage001.authorizeType',visible:false, edit:true
+             ,{field:'authorizeType' ,title: 'RskAuthorityManage001.authorizeType', edit:true
             	 ,editOption:{type:'select',id:"authorizeType",formatoption:true,result: AUTHORIZE_TYPE,initValue:AUTHORIZE_TYPE_02}, sortable:false
              }
              ,{field:'authorizeLimitAmt' , title: 'RskAuthorityManage001.authorizeLimitAmt',width:257 , edit:true, type:"number", digit: 6,sortable:false
