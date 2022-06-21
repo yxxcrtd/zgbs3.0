@@ -457,7 +457,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      */
     private void saveOperate(String tradeId, String remark, DictCodeListExt3 operType, String workFlowId) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(tradeId);
+        String finProdId = commonBusinessService.getFinProdId(tradeId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), StringUtil.EMPTY);
+        oprHisReq.setEntrustId(finProdId);
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
         oprHisReq.setWorkflowId(workFlowId);
