@@ -1,8 +1,10 @@
 package com.joyintech.tams.business.common.service;
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.ArithmeticUtil;
@@ -37,6 +39,12 @@ public class JoyinbusinessCommonService extends BaseService {
     private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
+
+    /**
+     * FileAttachmentProcess
+     */
+    @Autowired(required = false)
+    private FileAttachmentProcess fileAttachmentProcess;
 
     /**
      * 根据条件查询证券账户
@@ -526,5 +534,34 @@ public class JoyinbusinessCommonService extends BaseService {
      */
     public List<FinProductSpecialDto> queryFinProductSpecialByFinprodIds(List<String> finprodIds) {
         return joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(finprodIds);
+    }
+
+    /**
+     * 根据业务编号获取附件信息
+     * @param businessId 业务编号
+     * @return 附件信息
+     */
+    public CommonMstFileInputParameter selectFileInfoByBusId(String businessId) {
+        List<UploadFile> files = fileAttachmentProcess.fetchByBusinessCode(businessId);
+
+        CommonMstFileInputParameter result = new CommonMstFileInputParameter();
+        List<CommonUploadFileInfo> fileList = new ArrayList<>();
+        CommonUploadFileInfo tempFileInfo;
+        if (!StringUtil.isEmptyList(files)) {
+            for (UploadFile uploadFile : files) {
+                tempFileInfo = new CommonUploadFileInfo();
+                tempFileInfo.setSeqNo(uploadFile.getFileNo());
+                tempFileInfo.setFileName(uploadFile.getFileName());
+                tempFileInfo.setPath(uploadFile.getTargetFile().getPath());
+                tempFileInfo.setBusinessId(businessId);
+                tempFileInfo.setSize(ArithmeticUtil.divide(BigDecimal.valueOf(uploadFile.getTargetFile().length()), 1024, 2));
+                fileList.add(tempFileInfo);
+            }
+        }
+
+        result.setFileList(fileList);
+        result.setBussinessId(businessId);
+
+        return result;
     }
 }

@@ -3763,8 +3763,8 @@
         </if>
         UNION ALL
         SELECT CASE WHEN TFPDT.IS_CANCEL= 'Y' THEN #{STATUS_VALID_03} ELSE #{STATUS_VALID_01}  END as effectiveStatus,
-        SO.SETTLE_STATUS cleanStatus,
-        TMSI.SETTLE_STATUS settleStatus,
+        DECODE(SO.SETTLE_STATUS,'01','S') cleanStatus,
+        NVL(TMSI.SETTLE_STATUS,'01')  settleStatus,
         TPD.TOTLE_TRADE_ID totleTradeId,
         TPD.TRADE_ID     busiCode,
         TPDA.ENTRUST_ID  entrustId,
@@ -3783,16 +3783,18 @@
         '买入' psStr,
         FP.TRADE_MARKET  tradeMarket,
         sdl4.item_value tradeMarketStr,
-        TPD.TRADE_MARKET_MODE tradeMarketMode,
+        TFPDT.TRADE_MARKET_MODE tradeMarketMode,
         sdl6.item_value tradeMarketModeStr,
         null settleSpeed,
         '' settleSpeedStr,
         TPD.SEC_MANAGE_ACCT_ID secManageAcctId,
         T7.SEC_ACCT_NAME  secManageAcctIdStr,
-        TPD.PRIN_AMT/10000 faceValue,
-        CASE WHEN BO.BID_MODLE IS NULL THEN TO_CHAR(ROUND(TFPDT.RATE,4),'FM990.0000')
-             WHEN BO.BID_MODLE=#{WIN_TYPE_03} THEN TO_CHAR(ROUND(BO.WIN_PRICE,4),'FM990.0000')
-             WHEN BO.BID_MODLE IN (#{WIN_TYPE_01},#{WIN_TYPE_02}) THEN TO_CHAR(ROUND(BRT.WIN_PRICE,4),'FM990.0000') END tradeYield,
+        CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
+            WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END faceValue,
+        case WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN to_char(FPI.REFER_YIELD*100,'fm999999990.9990')||'%'
+            when BO.BID_MODLE IS NULL THEN TO_CHAR(ROUND(TFPDT.RATE,4), 'FM990.0000')
+            when BO.BID_MODLE=#{WIN_TYPE_03} THEN decode(FPI.TENDER_TARGET,'01',to_char(BO.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BO.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BO.WIN_PRICE*10000,'fm999999990.90')||'BP')
+            when BO.BID_MODLE IN(#{WIN_TYPE_01},#{WIN_TYPE_02}) THEN decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP') END tradeYield,
         null termDays,
         TPD.TRADE_AMT tradeAmt,
         TPD.CCY ccy,
@@ -3838,8 +3840,8 @@
         ON		SO.TRADE_ID = TFPDT.TOTLE_TRADE_ID
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FPT.TYPE_8
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = TPD.PS
-        LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = TPD.TRADE_MARKET
-        LEFT JOIN SYS_DATADICT_LIST sdl6 on sdl6.dict_code ='SHARES_TRADE_MARKET' and sdl6.item_code = TPD.TRADE_MARKET_MODE
+        LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = TFPDT.TRADE_MARKET
+        LEFT JOIN SYS_DATADICT_LIST sdl6 on sdl6.dict_code ='SHARES_TRADE_MARKET' and sdl6.item_code = TFPDT.TRADE_MARKET_MODE
         LEFT JOIN SYS_DATADICT_LIST sdl7 on sdl7.dict_code ='CCY' and sdl7.item_code = TPD.ccy
         LEFT JOIN MST_COUNTER_PARTY T6 ON TPD.COUNTER_ID = T6.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON TPD.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID

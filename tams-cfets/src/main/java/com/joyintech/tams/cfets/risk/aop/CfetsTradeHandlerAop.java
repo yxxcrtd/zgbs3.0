@@ -272,7 +272,7 @@ public class CfetsTradeHandlerAop {
             } else if (StringUtil.isNotEmpty(outputDto.getConfirmMsg())) {
                 result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
                 if(StringUtil.equals(outputDto.getRskStatus(),试算结果_风险审批.getValue())) {
-                    result.setData(是否_是);
+                    result.setData(是否_是.getValue());
                 }
                 ajaxResultMessage.setData(result);
             }

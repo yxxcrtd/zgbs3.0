@@ -52,6 +52,8 @@ public class EntrustClosePosEtrReqDto {
      */
     private String issueClass;
 
+    private String finprodId;
+
     public String getBusiType() {
         return busiType;
     }
@@ -122,5 +124,13 @@ public class EntrustClosePosEtrReqDto {
 
     public void setIssueClass(String issueClass) {
         this.issueClass = issueClass;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }

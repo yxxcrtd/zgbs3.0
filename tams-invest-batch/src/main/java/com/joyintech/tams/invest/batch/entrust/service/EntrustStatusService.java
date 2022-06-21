@@ -268,8 +268,16 @@ public class EntrustStatusService {
             param.put("ps",cfetsEntrustClosePosEtrReqDto.getPs());
             param.put("tradeMarket",cfetsEntrustClosePosEtrReqDto.getTradeMarket());
             param.put("assetType",cfetsEntrustClosePosEtrReqDto.getFinprodType2());
+            param.put("finprodId",cfetsEntrustClosePosEtrReqDto.getFinprodId());
+
             List<Map<String,Object>> list = new ArrayList<>();
-            list.add(param);
+            Map<String,Object> param1 = new HashMap<>();
+            param1.put("entrustId",cfetsEntrustClosePosEtrReqDto.getCloseId());
+            param1.put("ps",cfetsEntrustClosePosEtrReqDto.getPs());
+            param1.put("tradeMarket",cfetsEntrustClosePosEtrReqDto.getTradeMarket());
+            param1.put("assetType",cfetsEntrustClosePosEtrReqDto.getFinprodType2());
+            param1.put("finprodId",cfetsEntrustClosePosEtrReqDto.getFinprodId());
+            list.add(param1);
             param.put("selectedItem",list);
             if (isSingle) {
                 message = simpleRestTemplate.postForObject(url, param, Message.class);

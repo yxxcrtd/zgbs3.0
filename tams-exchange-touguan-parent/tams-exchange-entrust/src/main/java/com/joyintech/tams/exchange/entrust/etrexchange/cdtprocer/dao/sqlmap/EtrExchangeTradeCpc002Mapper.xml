@@ -363,14 +363,18 @@
         select FINPROD_ID from FIN_PRODUCT where FINPROD_ID = #{finprodId} and MDATE &lt; to_date(#{nowDate},'yyyy-MM-dd')
     </select>
 
-    <select id="getSecAcctIdZJH" resultType="java.lang.String">
+    <select id="getSecAcctIdZJH" resultType="com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrZJHCheckTGHResponse">
         select ACCT_NO
             from PTL_CAPACCT_INFO
         <where> ACCT_TYPE = 'A01'
-            <if test="portfolioId != null and portfolioId !=''">
-                AND PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+            <if test="portfolioIds != null and portfolioIds.size() > 0">
+                AND PORTFOLIO_ID in
+                <foreach item="item" index="index" collection="portfolioIds" open="(" separator="," close=")">
+                    #{item, jdbcType=VARCHAR}
+                </foreach>
             </if>
         </where>
+        order by CREATE_TIME desc
     </select>
 
     <sql id="etrExchangeQueryAnd">
@@ -587,6 +591,9 @@
         </if>
         <if test="assetType != null and assetType !=''">
             AND FPT.TYPE_8 = #{assetType,jdbcType=VARCHAR}
+        </if>
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort}  ${direction}
         </if>
     </select>
 

@@ -28,6 +28,7 @@ import java.util.List;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_行权回售;
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_行权赎回;
 
 /**
  * 构造风险报文入参
@@ -319,7 +320,7 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
                 || StringUtil.equals(allDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
             interfaceType = NodeConfigConstant.BOND002;
         }
-        if (StringUtil.equals(allDto.getPs(), 交易方向_行权回售.getValue())) {
+        if (StringUtil.equals(allDto.getPs(), 交易方向_行权回售.getValue()) || StringUtil.equals(allDto.getPs(), 交易方向_行权赎回.getValue())) {
             busiType = 头寸业务类型_债券行权交易.getValue();
         }
         if (StringUtil.equals(allDto.getButtonType(), 交收操作类型_回溯.getValue())) {
