@@ -159,7 +159,7 @@
         <where>
             COUNTER_TYPE = #{counterType}
             <if test="counterId != null and counterId != ''">
-               AND T1.COUNTER_ID = #{counterId}
+               AND (T1.COUNTER_ID = #{counterId} OR T1.PARTY_ID = #{counterId})
             </if>
         </where>
     </select>

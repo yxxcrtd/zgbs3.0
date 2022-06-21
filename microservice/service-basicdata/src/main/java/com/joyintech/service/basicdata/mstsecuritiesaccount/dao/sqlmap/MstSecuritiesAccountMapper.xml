@@ -847,7 +847,8 @@
         t.termType
         from (
         select a.finprod_market_id,
-        a.finprod_market_id || '|' || a.finprod_abbr as finprod_name,
+        <!--a.finprod_market_id || '|' || a.finprod_abbr as finprod_name,-->
+        a.finprod_abbr as finprod_name,
         a.FINPROD_NAME name,
         null as oth_code_type,
         a.finprod_type2,
