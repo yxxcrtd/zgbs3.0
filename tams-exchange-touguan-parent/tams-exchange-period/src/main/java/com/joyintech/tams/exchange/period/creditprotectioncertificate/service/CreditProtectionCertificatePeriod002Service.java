@@ -834,6 +834,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 BeanUtils.copyProperties(etrSecPositionFlow, etrSecPositionFlow2);
                 etrSecPositionFlow2.setSeqno(IDGenerator.generate());
                 etrSecPositionFlow2.setAmount(isRevoke ? billingDetail.getDeliverBondAmount() : billingDetail.getDeliverBondAmount().negate());
+                etrSecPositionFlow2.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + "_" + entity.getDeliverBond());
                 etrSecPositionFlows.add(etrSecPositionFlow2);
 
                 //交易持仓流水&交易持仓：扣减可用T+0信用保护凭证'名义本金'
@@ -864,6 +865,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 BeanUtils.copyProperties(ptlSecPositionFlow, ptlSecPositionFlow2);
                 ptlSecPositionFlow2.setSeqno(IDGenerator.generate());
                 ptlSecPositionFlow2.setAmount(isRevoke ? billingDetail.getDeliverBondAmount() : billingDetail.getDeliverBondAmount().negate());
+                ptlSecPositionFlow2.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + "_" + entity.getDeliverBond());
                 ptlSecPositionFlows.add(ptlSecPositionFlow2);
 
                 //指令现金流水&指令现金：增加预增T+1交付金额
@@ -980,6 +982,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 BeanUtils.copyProperties(ptlSecPositionFlow2, ptlSecPositionFlow4);
                 ptlSecPositionFlow4.setSeqno(IDGenerator.generate());
                 ptlSecPositionFlow4.setAmount(isRevoke ? billingDetail.getDeliverBondAmount() : billingDetail.getDeliverBondAmount().negate());
+                ptlSecPositionFlow4.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + "_" + entity.getDeliverBond());
                 ptlSecPositionFlows.add(ptlSecPositionFlow4);
             }
 
