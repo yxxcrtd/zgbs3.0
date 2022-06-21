@@ -57,137 +57,137 @@
     <!--ͨ查询可用持仓数量 2019/10/14 add by yanya-->
     <select id="selectAvailablePositionAmount" parameterType="com.joyintech.tams.invest.common.trade.dto.EtrSecPositionDto" resultType="java.math.BigDecimal">
       	select
-        	sum(t.amount) as amount 
-        from etr_sec_position t 
-        where 
-        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}  
+        	sum(t.amount) as amount
+        from etr_sec_position t
+        where
+        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
         	<if test="secAcctId != null and secAcctId != '' ">
-        		and t.sec_acct_id = #{secAcctId} 
+        		and t.sec_acct_id = #{secAcctId}
 			</if>
 			<if test="finprodId != null and finprodId != '' ">
-        		and t.finprod_id = #{finprodId,jdbcType=VARCHAR} 
+        		and t.finprod_id = #{finprodId,jdbcType=VARCHAR}
 			</if>
         	<if test="branch != null ">
-        		and t.branch = #{branch,jdbcType=DECIMAL} 
+        		and t.branch = #{branch,jdbcType=DECIMAL}
 			</if>
             <if test="invAim!=null and invAim!='' ">
                 and t.INV_AIM = #{invAim}
             </if>
         	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
-        	and t.cdate = #{cdate,jdbcType=DATE} 
+        	and t.cdate = #{cdate,jdbcType=DATE}
      </select>
-     
+
      <!--ͨ查询指令持仓 2019/10/14 add by yanya-->
      <select id="selectCommandPosition" parameterType="com.joyintech.tams.common.base.entity.EtrSecPositionFlow" resultType="com.joyintech.tams.common.base.entity.EtrSecPosition">
      	select
-        	t.amount as amount 
-        from etr_sec_position t 
-        where 
-        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}  
-        	and t.sec_acct_id = #{secAcctId,jdbcType=VARCHAR}  
-        	and t.finprod_id = #{finprodId,jdbcType=VARCHAR}  
-        	and t.branch = #{branch,jdbcType=DECIMAL} 
-        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}  
-        	and t.cdate = #{cdate,jdbcType=DATE} 
+        	t.amount as amount
+        from etr_sec_position t
+        where
+        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
+        	and t.sec_acct_id = #{secAcctId,jdbcType=VARCHAR}
+        	and t.finprod_id = #{finprodId,jdbcType=VARCHAR}
+        	and t.branch = #{branch,jdbcType=DECIMAL}
+        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
+        	and t.cdate = #{cdate,jdbcType=DATE}
      </select>
 
     <!-- 查询指令持仓流水 2019/12/15 add by yjm-->
     <select id="selectCommandPositionFlow" parameterType="com.joyintech.tams.common.base.entity.EtrSecPositionFlow" resultType="java.math.BigDecimal">
      	select
         	sum(t.amount) as amount
-        from etr_sec_position_flow t 
-        where         
-        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}  
-        	and t.sec_acct_id = #{secAcctId,jdbcType=VARCHAR}  
-        	and t.finprod_id = #{finprodId,jdbcType=VARCHAR}  
-        	and t.branch = #{branch,jdbcType=DECIMAL} 
-        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}  
-        	and t.cdate = #{cdate,jdbcType=DATE} 
+        from etr_sec_position_flow t
+        where
+        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
+        	and t.sec_acct_id = #{secAcctId,jdbcType=VARCHAR}
+        	and t.finprod_id = #{finprodId,jdbcType=VARCHAR}
+        	and t.branch = #{branch,jdbcType=DECIMAL}
+        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
+        	and t.cdate = #{cdate,jdbcType=DATE}
         	and t.trade_id = #{tradeId}
      </select>
-     
+
      <!--ͨ更新指令持仓 2019/10/14 add by yanya-->
      <update id="updateCommandPosition" parameterType="com.joyintech.tams.common.base.entity.EtrSecPositionFlow">
         update etr_sec_position t
-        set t.amount = t.amount + #{amount,jdbcType=DECIMAL} 
-        where portfolio_id = #{portfolioId,jdbcType=VARCHAR} 
-          and sec_acct_id = #{secAcctId,jdbcType=VARCHAR} 
-          and finprod_id = #{finprodId,jdbcType=VARCHAR} 
-          and branch = #{branch,jdbcType=DECIMAL} 
-          and hoding_type = #{hodingType,jdbcType=VARCHAR} 
-          and cdate = #{cdate,jdbcType=DATE} 
+        set t.amount = t.amount + #{amount,jdbcType=DECIMAL}
+        where portfolio_id = #{portfolioId,jdbcType=VARCHAR}
+          and sec_acct_id = #{secAcctId,jdbcType=VARCHAR}
+          and finprod_id = #{finprodId,jdbcType=VARCHAR}
+          and branch = #{branch,jdbcType=DECIMAL}
+          and hoding_type = #{hodingType,jdbcType=VARCHAR}
+          and cdate = #{cdate,jdbcType=DATE}
     </update>
-    
+
     <!--ͨ查询指令持仓最大日期 2019/10/14 add by yanya-->
     <select id="selectCommandPositionMaxDate" parameterType="com.joyintech.tams.common.base.entity.EtrSecPositionFlow" resultType="java.util.Date">
      	select
-        	max(cdate) as cdate 
-        from etr_sec_position t 
-        where 
-        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}  
-        	and t.sec_acct_id = #{secAcctId,jdbcType=VARCHAR}  
-        	and t.finprod_id = #{finprodId,jdbcType=VARCHAR}  
-        	and t.branch = #{branch,jdbcType=DECIMAL} 
+        	max(cdate) as cdate
+        from etr_sec_position t
+        where
+        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
+        	and t.sec_acct_id = #{secAcctId,jdbcType=VARCHAR}
+        	and t.finprod_id = #{finprodId,jdbcType=VARCHAR}
+        	and t.branch = #{branch,jdbcType=DECIMAL}
         	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
         	<!--and t.cdate = #{cdate,jdbcType=DATE} -->
         	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
      </select>
-     
+
      <!--ͨ根据区间日期更新指令持仓 2019/10/14 add by yanya-->
      <update id="updateCommandPositionByCDate">
         update etr_sec_position t
-        set t.amount = t.amount + #{amount,jdbcType=DECIMAL} 
-        where portfolio_id = #{portfolioId,jdbcType=VARCHAR} 
-          and sec_acct_id = #{secAcctId,jdbcType=VARCHAR} 
-          and finprod_id = #{finprodId,jdbcType=VARCHAR} 
-          and branch = #{branch,jdbcType=DECIMAL} 
-          and hoding_type = #{hodingType,jdbcType=VARCHAR} 
-          and cdate <![CDATA[   >=  ]]> #{minDate,jdbcType=DATE} 
-          and cdate <![CDATA[   <=  ]]> #{maxDate,jdbcType=DATE} 
+        set t.amount = t.amount + #{amount,jdbcType=DECIMAL}
+        where portfolio_id = #{portfolioId,jdbcType=VARCHAR}
+          and sec_acct_id = #{secAcctId,jdbcType=VARCHAR}
+          and finprod_id = #{finprodId,jdbcType=VARCHAR}
+          and branch = #{branch,jdbcType=DECIMAL}
+          and hoding_type = #{hodingType,jdbcType=VARCHAR}
+          and cdate <![CDATA[   >=  ]]> #{minDate,jdbcType=DATE}
+          and cdate <![CDATA[   <=  ]]> #{maxDate,jdbcType=DATE}
     </update>
-    
+
     <!--ͨ查询指令可用现金 2019/10/14 add by yanya-->
     <select id="selectCommandAvailableCash" parameterType="com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto" resultType="java.math.BigDecimal">
     	select
-        	sum(t.amount) as amount 
+        	sum(t.amount) as amount
         from ETR_CASH_POSITION t
-        where 
-        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR} 
+        where
+        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
         	<if test="acctId != null and acctId != '' ">
-        		and t.acct_id = #{acctId,jdbcType=VARCHAR} 
+        		and t.acct_id = #{acctId,jdbcType=VARCHAR}
         	</if>
         	<if test="chlFinprodId != null and chlFinprodId != '' ">
-        		and t.chl_finprod_id = #{chlFinprodId,jdbcType=VARCHAR} 
+        		and t.chl_finprod_id = #{chlFinprodId,jdbcType=VARCHAR}
         	</if>
-        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR} 
-        	and t.cdate = #{cdate,jdbcType=DATE} 
-        	and t.ccy = #{ccy,jdbcType=VARCHAR} 
+        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
+        	and t.cdate = #{cdate,jdbcType=DATE}
+        	and t.ccy = #{ccy,jdbcType=VARCHAR}
         	<if test="acctType != null and acctType.size() > 0 ">
-        		and t.acct_id in ( 
-        			select t1.acct_no from ptl_capacct_info t1 
-        			where t1.acct_type in 
+        		and t.acct_id in (
+        			select t1.acct_no from ptl_capacct_info t1
+        			where t1.acct_type in
         			<foreach collection="acctType" item="item" open="(" close=")" separator=",">
 						#{item}
 					</foreach>
-					 and t1.portfolio_id = #{portfolioId,jdbcType=VARCHAR} 
+					 and t1.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
         		)
         	</if>
     </select>
-    
+
     <!--ͨ指令现金余额数据 2019/10/14 add by yanya-->
     <select id="selectCommandBalance" parameterType="com.joyintech.tams.common.base.entity.EtrCashPositionFlow" resultType="com.joyintech.tams.common.base.entity.EtrCashPosition">
      	select
-        	t.amount as amount 
-        from etr_cash_position t 
-        where 
-        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR} 
+        	t.amount as amount
+        from etr_cash_position t
+        where
+        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
         	and t.acct_id = #{acctId,jdbcType=VARCHAR}
         	<if test="chlFinprodId != null and !chlFinprodId.isEmpty()">
         	    and t.chl_finprod_id = #{chlFinprodId,jdbcType=VARCHAR}
             </if>
-        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}  
-        	and t.cdate = #{cdate,jdbcType=DATE} 
-        	and t.ccy = #{ccy,jdbcType=VARCHAR} 
+        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
+        	and t.cdate = #{cdate,jdbcType=DATE}
+        	and t.ccy = #{ccy,jdbcType=VARCHAR}
      </select>
 
     <!--ͨ查询手工调整流水-->
@@ -220,50 +220,50 @@
         </if>
         and (t.is_exist_new is null or  t.is_exist_new!='Y')
     </select>
-     
+
     <!--ͨ指令现金余额数据 2019/10/14 add by yanya-->
     <update id="updateCommandBalance" parameterType="com.joyintech.tams.common.base.entity.EtrCashPositionFlow">
      	update etr_cash_position t
         set t.amount = t.amount + #{amount,jdbcType=DECIMAL}
-        where 
-        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR} 
+        where
+        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
         	and t.acct_id = #{acctId,jdbcType=VARCHAR}
             <if test="chlFinprodId != null and !chlFinprodId.isEmpty()">
                 and t.chl_finprod_id = #{chlFinprodId,jdbcType=VARCHAR}
             </if>
         	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
-        	and t.cdate = #{cdate,jdbcType=DATE} 
-        	and t.ccy = #{ccy,jdbcType=VARCHAR} 
+        	and t.cdate = #{cdate,jdbcType=DATE}
+        	and t.ccy = #{ccy,jdbcType=VARCHAR}
      </update>
-     
+
      <!--ͨ指令现金余额数据 2019/10/14 add by yanya-->
     <select id="selectCommandBalanceMaxCdate" parameterType="com.joyintech.tams.common.base.entity.EtrCashPositionFlow" resultType="java.util.Date">
      	select
-        	max(t.cdate) as cdate 
-        from etr_cash_position t 
-        where 
-        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR} 
-        	and t.acct_id = #{acctId,jdbcType=VARCHAR} 
-        	and t.chl_finprod_id = #{chlFinprodId,jdbcType=VARCHAR} 
-        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}  
-        	and t.cdate <![CDATA[   >=  ]]> #{cdate,jdbcType=DATE}  
-        	and t.ccy = #{ccy,jdbcType=VARCHAR} 
+        	max(t.cdate) as cdate
+        from etr_cash_position t
+        where
+        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
+        	and t.acct_id = #{acctId,jdbcType=VARCHAR}
+        	and t.chl_finprod_id = #{chlFinprodId,jdbcType=VARCHAR}
+        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
+        	and t.cdate <![CDATA[   >=  ]]> #{cdate,jdbcType=DATE}
+        	and t.ccy = #{ccy,jdbcType=VARCHAR}
      </select>
-     
+
      <!--ͨ指令现金余额数据 2019/10/14 add by yanya-->
     <update id="updateCommandBalanceByCDate">
      	update etr_cash_position t
         set t.amount = t.amount + #{amount,jdbcType=DECIMAL}
-        where 
-        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR} 
-        	and t.acct_id = #{acctId,jdbcType=VARCHAR} 
-        	and t.chl_finprod_id = #{chlFinprodId,jdbcType=VARCHAR} 
-        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}  
-        	and cdate <![CDATA[   >=  ]]> #{minDate,jdbcType=DATE} 
-          	and cdate <![CDATA[   <=  ]]> #{maxDate,jdbcType=DATE} 
-        	and t.ccy = #{ccy,jdbcType=VARCHAR} 
+        where
+        	t.portfolio_id = #{portfolioId,jdbcType=VARCHAR}
+        	and t.acct_id = #{acctId,jdbcType=VARCHAR}
+        	and t.chl_finprod_id = #{chlFinprodId,jdbcType=VARCHAR}
+        	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
+        	and cdate <![CDATA[   >=  ]]> #{minDate,jdbcType=DATE}
+          	and cdate <![CDATA[   <=  ]]> #{maxDate,jdbcType=DATE}
+        	and t.ccy = #{ccy,jdbcType=VARCHAR}
      </update>
-    
+
     <resultMap id="findEntrust_mapper" type="com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto">
         <id column="ENTRUST_ID" />
         <association property="etrEntrust" resultMap="EntrustMapMapper" />
@@ -445,7 +445,7 @@
             inner join FIN_PRODUCT fp
             on msp.STOCK_COOD = fp.FINPROD_MARKET_ID
             and fp.FINPROD_ID=#{finprodId}
-            and msp.TRADE_DATE<![CDATA[<=]]>#{dealDate}
+            and msp.TRADE_DATE <![CDATA[<=]]>#{dealDate}
             order by msp.TRADE_DATE desc
         )
         where rn = 1
@@ -459,14 +459,14 @@
             inner join FIN_PRODUCT fp
             on msp.SHARES_ID = fp.FINPROD_MARKET_ID
             and fp.FINPROD_ID=#{finprodId}
-            and msp.DEAL_DATE<![CDATA[<=]]>#{dealDate}
+            and msp.DEAL_DATE <![CDATA[<=]]>#{dealDate}
             order by msp.DEAL_DATE desc
         )
         where rn = 1
     </select>
-    
+
     <select id="selectByPrimaryKey" resultMap="com.joyintech.tams.common.base.dao.PtlSecValutionMapper.BaseResultMap" parameterType="com.joyintech.tams.common.base.entity.PtlSecValutionKey" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.PtlSecValutionMapper.Base_Column_List" />
         from PTL_SEC_VALUTION
         where CDATE = #{cdate,jdbcType=DATE}
@@ -475,8 +475,8 @@
           and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
           and INV_AIM = #{invAim,jdbcType=VARCHAR}
     </select>
-    
-    <select id="selectPtlSecValutionData" parameterType="com.joyintech.tams.common.base.entity.PtlSecValutionKey" 
+
+    <select id="selectPtlSecValutionData" parameterType="com.joyintech.tams.common.base.entity.PtlSecValutionKey"
             resultType="com.joyintech.tams.common.base.entity.PtlSecValution">
         select
             TDY_INTINCEXP as tdyIntincexp,
@@ -501,25 +501,25 @@
     </select>
     <!-- 通过委托代码查询首次回购最大净价  -->
     <select id="selectFirstUnitCpriceMax" resultType="java.math.BigDecimal">
-        select 
-        	eea.first_unit_cprice2 
+        select
+        	eea.first_unit_cprice2
        	from ETR_ENTRUST_ADD eea
         where eea.entrust_id=#{entrustId}
     </select>
 
     <select id="selectFinProduct" parameterType="java.lang.String" resultType="java.lang.String">
-    	select fp.FINPROD_ID from 
+    	select fp.FINPROD_ID from
 		FIN_PRODUCT fp   --标的类金融产品
 		inner join FIN_PRODUCT_TYPE fpt --金融产品分类表
 		on fp.finprod_id=fpt.finprod_id
 		where fp.finprod_type2='F01'
 		and fp.finprod_id=#{finprodId}
 		and fp.trade_market in ('03','04')
-		and (fpt.type_7='11' or 
-		(fpt.type_6='B13 ' and fp.finprod_market_id like '123%')) 																										
+		and (fpt.type_7='11' or
+		(fpt.type_6='B13 ' and fp.finprod_market_id like '123%'))
     </select>
     <select id="selectFinTradeProduct" parameterType="java.lang.String" resultType="java.lang.String">
-	    select ftp.finprod_id from 
+	    select ftp.finprod_id from
 		FIN_TRADE_PRODUCT ftp  --交易类金融产品
 		inner join FIN_PRODUCT_TYPE fpt --金融产品分类表
 		on ftp.finprod_id=fpt.finprod_id
@@ -586,9 +586,6 @@
 
     <update id="updatePosition" parameterType="map">
         UPDATE ETR_CASH_POSITION SET AMOUNT = AMOUNT + #{amount}
-        <if test="isExistNew != null and isExistNew!=''">
-            ,is_Exist_New=#{isExistNew}
-        </if>
         where CDATE between TO_DATE(#{minDate}, 'yyyy-MM-dd') AND TO_DATE(#{maxDate}, 'yyyy-MM-dd')
         <include refid="whereSql"/>
     </update>
@@ -635,9 +632,6 @@
 
     <update id="updateSecPosition" parameterType="map">
         UPDATE ETR_SEC_POSITION SET AMOUNT = AMOUNT + #{amount}
-        <if test="isExistNew != null and isExistNew!=''">
-            ,is_Exist_New=#{isExistNew}
-        </if>
         where CDATE between TO_DATE(#{minDate}, 'yyyy-MM-dd') AND TO_DATE(#{maxDate}, 'yyyy-MM-dd')
         <include refid="whereSql"/>
     </update>
@@ -894,9 +888,6 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="isExistNew != null" >
-                is_Exist_New = #{isExistNew,jdbcType=VARCHAR},
-            </if>
         </set>
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
         and ACCT_ID = #{acctId,jdbcType=VARCHAR}
@@ -925,9 +916,6 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="isExistNew != null" >
-                is_Exist_New = #{isExistNew,jdbcType=VARCHAR},
-            </if>
         </set>
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
         and SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
@@ -938,12 +926,12 @@
         and CDATE = #{cdate,jdbcType=DATE}
     </update>
     <!--add by etliu 汇总表更新并发问题解决 20210511 end-->
-    
+
     <select id="selectSumStandardTicket" resultType="java.math.BigDecimal">
 		select sum(T.AMOUNT) AMOUNT from PTL_SEC_POSITION_FLOW T
 		         where TRADE_ID IN (
-		         SELECT TRADE_ID FROM ETR_FINISH_STATUS 
-		         WHERE ENTRUST_ID = #{entrustId,jdbcType=VARCHAR} 
+		         SELECT TRADE_ID FROM ETR_FINISH_STATUS
+		         WHERE ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
 		         AND TRADE_ID != #{entrustId,jdbcType=VARCHAR}
 		<if test="ps != null and ps != '' and ps == 'T69'">
 			 AND FINPROD_ID ='XN_PRODID999'
@@ -979,7 +967,7 @@
                and deal.is_cancel = #{YES_OR_NO_N}
         </if>
           )
-    </select>	
+    </select>
     <select id="selectSumShareAmt"  resultType="java.math.BigDecimal">
       select sum(T.AMOUNT) AMOUNT
                   from PTL_SEC_POSITION_FLOW T
@@ -1010,7 +998,7 @@
             inner join FIN_PRODUCT fp
             on msp.STOCK_COOD = fp.FINPROD_MARKET_ID
             and fp.FINPROD_ID=#{finprodId}
-            and msp.TRADE_DATE<![CDATA[<=]]>#{dealDate}
+            and msp.TRADE_DATE <![CDATA[<=]]>#{dealDate}
             order by msp.TRADE_DATE desc
         )
         where rn = 1
@@ -1024,7 +1012,7 @@
             inner join FIN_PRODUCT fp
             on msp.SHARES_ID = fp.FINPROD_MARKET_ID
             and fp.FINPROD_ID=#{finprodId}
-            and msp.DEAL_DATE<![CDATA[<=]]>#{dealDate}
+            and msp.DEAL_DATE <![CDATA[<=]]>#{dealDate}
             order by msp.DEAL_DATE desc
         )
         where rn = 1

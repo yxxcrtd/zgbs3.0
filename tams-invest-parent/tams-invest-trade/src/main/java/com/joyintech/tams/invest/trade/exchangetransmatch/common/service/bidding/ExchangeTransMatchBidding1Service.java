@@ -355,6 +355,9 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
     public TrdProductDeal createProductDeal(ExchangeTransMatchCommonDto transDto, ExchangeTransMatchCommonEntrustDto entrustDto,TrdFinProductDealTotal trdFinProductDealTotal) {
         TrdProductDeal trdProductDeal = new TrdProductDeal();
         BussinessCodeParameter codeParameter = new BussinessCodeParameter();
+        if (StringUtil.equals(DictCodeList.交易方向_买入.getValue(), entrustDto.getPs())) {
+            codeParameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
+        }
         // 交易编号
         trdProductDeal.setTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
         // 业务类型
@@ -552,6 +555,9 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
 
         BussinessCodeParameter codeParameter = new BussinessCodeParameter();
+        if (StringUtil.equals(DictCodeList.交易方向_买入.getValue(), entrustDto.getPs())) {
+            codeParameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
+        }
         // 汇总交易编号
         trdFinProductDealTotal.setTotleTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
         // 业务类型

@@ -2,10 +2,7 @@ package com.joyintech.tams.invest.batch.creditprotectioncertificate.service;
 
 import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.JoyinRestTemplate;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -289,6 +286,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             etrSecPositionFlow.setHodingType(DictCodeList.持仓类型_实际.getValue());
             etrSecPositionFlow.setCdate(iPlatformDate.getSysDate());
             etrSecPositionFlow.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
+            etrSecPositionFlow.setAmount(ArithmeticUtil.divide(etrSecPositionFlow.getAmount(), 100, 4));
             etrSecPositionFlow.setpFinprodId(null);
             etrSecPositionFlow.setTradeId(expireData.getTradeId());
             etrSecPositionFlow.setOffsetId(expireData.getTradeId());
@@ -312,6 +310,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
             ptlSecPositionFlow.setCdate(iPlatformDate.getSysDate());
             ptlSecPositionFlow.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
+            ptlSecPositionFlow.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow.getAmount(), 100, 4));
             ptlSecPositionFlow.setpFinprodId(null);
             ptlSecPositionFlow.setTradeId(expireData.getTradeId());
             ptlSecPositionFlow.setOffsetId(expireData.getTradeId());
@@ -329,6 +328,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow2.setSeqno(IDGenerator.generate());
             ptlSecPositionFlow2.setCdate(nextWorkDate);
             ptlSecPositionFlow2.setAmount(isRevoke ? expireData.getRepNomCapi().negate() : expireData.getRepNomCapi());
+            ptlSecPositionFlow2.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow2.getAmount(), 100, 4));
             ptlSecPositionFlows.add(ptlSecPositionFlow2);
 
             PtlSecPositionFlow ptlSecPositionFlow3 = new PtlSecPositionFlow();
@@ -336,7 +336,8 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow3.setSeqno(IDGenerator.generate());
             ptlSecPositionFlow3.setHodingType(DictCodeList.持仓类型_实际.getValue());
             ptlSecPositionFlow3.setCdate(nextWorkDate);
-            ptlSecPositionFlow2.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
+            ptlSecPositionFlow3.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
+            ptlSecPositionFlow3.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow3.getAmount(), 100, 4));
             ptlSecPositionFlows.add(ptlSecPositionFlow3);
         }
 

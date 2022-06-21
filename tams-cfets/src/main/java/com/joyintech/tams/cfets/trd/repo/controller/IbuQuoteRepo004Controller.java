@@ -133,6 +133,7 @@ public class IbuQuoteRepo004Controller extends BaseController {
     @ResponseBody
     public Message<AjaxResult> check(@RequestBody CfetsRepoDealQuoteCommonDto cfetsRepoDealQuoteCommonDto) {
         //check必填项
+        cfetsRepoDealQuoteCommonDto.setPageId("IbuQuoteRepo004");
         AjaxResult ajaxResult = cfetsRepoQuotedPrice004Service.checkSave(cfetsRepoDealQuoteCommonDto);
         return new Message<AjaxResult>().success().setData(ajaxResult);
     }
