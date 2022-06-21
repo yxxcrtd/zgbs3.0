@@ -2343,7 +2343,6 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
         group by t0.ENTRUST_ID, t0.BID_ID) bobp2
         on bo.BID_ID = bobp2.BID_ID
-        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
         left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
         left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
         left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
@@ -2478,7 +2477,6 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
         group by t0.ENTRUST_ID, t0.BID_ID) bobp2
         on bo.BID_ID = bobp2.BID_ID
-        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = bobp2.SEC_ACCT_ID
         left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
         left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
         left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
