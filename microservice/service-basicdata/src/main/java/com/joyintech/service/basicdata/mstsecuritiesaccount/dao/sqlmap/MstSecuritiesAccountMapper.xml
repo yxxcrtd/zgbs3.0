@@ -598,10 +598,10 @@
         </if>
         <choose>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '04'.toString()">
-                and (a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 债券 、股票 、基金 -->
+                and ((a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '02'.toString()">
-                and (a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 债券 、股票 、基金 -->
+                and ((a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '03'.toString()">
                 and a.finprod_type2='F01' and r.type_6='B14'
