@@ -8,7 +8,7 @@ insert into SETTLE_DATA_RULE values('005','JSMX','JSMX02','01','业务类型','Y
 insert into SETTLE_DATA_RULE values('007','JSMX','JSMX03','01','业务类型','YWLX','011','债转股','', 'system', '00001', sysdate, 'system', sysdate);
 insert into SETTLE_DATA_RULE values('008','JSMX','JSMX03','01','业务类型','YWLX','020','新股网上申购业务','', 'system', '00001', sysdate, 'system', sysdate);
 insert into SETTLE_DATA_RULE values('009','JSMX','JSMX03','01','业务类型','YWLX','035','新股网上发行业务','', 'system', '00001', sysdate, 'system', sysdate);
-insert into SETTLE_DATA_RULE values('010','JSMX','JSMX03','01','业务类型','YWLX','301','要约收购及债券回售','', 'system', '00001', sysdate, 'system', sysdate);
+insert into SETTLE_DATA_RULE values('010','JSMX','JSMX03','01','业务类型','YWLX','305','要约收购及债券回售','', 'system', '00001', sysdate, 'system', sysdate);
 insert into SETTLE_DATA_RULE values('011','JSMX','JSMX03','01','业务类型','YWLX','601','固定收益证券综合电子平台国债现券交易','', 'system', '00001', sysdate, 'system', sysdate);
 insert into SETTLE_DATA_RULE values('012','JSMX','JSMX03','01','业务类型','YWLX','605','固定收益证券综合电子平台实施非担保交收的债券交易','', 'system', '00001', sysdate, 'system', sysdate);
 insert into SETTLE_DATA_RULE values('013','JSMX','JSMX03','01','业务类型','YWLX','611','公司债现券交易','', 'system', '00001', sysdate, 'system', sysdate);
