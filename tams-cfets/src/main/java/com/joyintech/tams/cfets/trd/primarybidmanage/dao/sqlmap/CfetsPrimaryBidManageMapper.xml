@@ -18,6 +18,8 @@
         FPI.TENDER_TARGET tenderTarget,
         FPI.TENDER_SDATE   bidDateStart,
         FPI.TENDER_EDATE   bidDateEnd,
+        FPI.ISSUE_DATE   issueDate,
+        FPI.ISSUE_CLASS  issueClass,
         BOBP.ENTRUST_NUM/100 bidPrinAmt,
         BO.WIN_PRIN_AMT/10000 totalBiddingNum,
         BOBP.BID_PRICE bidPrice,
@@ -143,6 +145,7 @@
                 or to_char(ss.bidDateStart,'YYYY-MM-DD')=#{search}
                 or to_char(ss.bidDateEnd,'YYYY-MM-DD')=#{search}
                 or to_char(ss.bidDateStart,'YYYY-MM-DD')||'-'||to_char(ss.bidDateEnd,'YYYY-MM-DD')=#{search}
+                or to_char(ss.issueDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.bidCfmDate,'YYYY-MM-DD')=#{search}
                 )
             </where>
@@ -160,6 +163,8 @@
         FPI.TENDER_TARGET tenderTarget,
         FPI.TENDER_SDATE   bidDateStart,
         FPI.TENDER_EDATE   bidDateEnd,
+        FPI.ISSUE_DATE   issueDate,
+        FPI.ISSUE_CLASS  issueClass,
         TO_CHAR(BOBP.ENTRUST_NUM/100,'fm999999990.90')  bidPrinAmtStr,
         TO_CHAR(BO.WIN_PRIN_AMT/10000,'fm999999990.90') totalBiddingNumStr,
         BOBP.BID_PRICE    bidPrice,
@@ -304,6 +309,8 @@
             FPI.TENDER_TARGET  tenderTarget,
             FPI.TENDER_SDATE   bidDateStart,
             FPI.TENDER_EDATE   bidDateEnd,
+            FPI.ISSUE_DATE   issueDate,
+            FPI.ISSUE_CLASS  issueClass,
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,
@@ -441,6 +448,8 @@
         FPI.TENDER_TARGET  tenderTarget,
         FPI.TENDER_SDATE   bidDateStart,
         FPI.TENDER_EDATE   bidDateEnd,
+        FPI.ISSUE_DATE   issueDate,
+        FPI.ISSUE_CLASS  issueClass,
         BO.WIN_PRIN_AMT/10000   totalBiddingNum,
         BOBP.BID_PRICE          bidPrice,
         BO.WIN_TYPE             winType,
@@ -595,6 +604,7 @@
                 or to_char(ss.settFeeAmt)=#{search}
                 or to_char(ss.totalBiddingNum)=#{search}
                 or to_char(ss.bidDateStart,'YYYY-MM-DD')||'-'||to_char(ss.bidDateEnd,'YYYY-MM-DD')=#{search}
+                or to_char(ss.issueDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.payDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.creditorDebtDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.listingDate,'YYYY-MM-DD')=#{search}
@@ -619,6 +629,8 @@
             FPI.TENDER_TARGET  tenderTarget,
             FPI.TENDER_SDATE   bidDateStart,
             FPI.TENDER_EDATE   bidDateEnd,
+            FPI.ISSUE_DATE   issueDate,
+            FPI.ISSUE_CLASS  issueClass,
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,
@@ -681,6 +693,8 @@
             FPI.TENDER_TARGET  tenderTarget,
             FPI.TENDER_SDATE   bidDateStart,
             FPI.TENDER_EDATE   bidDateEnd,
+            FPI.ISSUE_DATE   issueDate,
+            FPI.ISSUE_CLASS  issueClass,
             BO.WIN_PRIN_AMT/10000   totalBiddingNum,
             BOBP.BID_PRICE          bidPrice,
             BO.WIN_TYPE             winType,

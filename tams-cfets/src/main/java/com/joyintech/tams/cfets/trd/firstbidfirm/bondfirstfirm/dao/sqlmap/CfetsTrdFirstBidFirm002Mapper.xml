@@ -338,8 +338,8 @@
                        OR fpi.ISSUE_CLASS = '03'
                        THEN fpi.TENDER_EDATE
                    END           AS bidDateEnd/*投标日 结束*/,
-               bo.PAY_DATE          payDate/*缴款日*/,
-               fpi.PAY_EDATE          payEdate/*缴款截止日*/,
+               case when fpi.PAY_EDATE is not null then fpi.PAY_EDATE else fpi.PAY_DATE end payEdate/*缴款截止日*/,
+               case when fpi.PAY_DATE is not null then fpi.PAY_DATE else fpi.PAY_EDATE end payDate/*缴款日*/,
                bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,

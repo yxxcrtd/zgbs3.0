@@ -424,16 +424,18 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, minTrdUnitLimitDto.getMinNum());
                     }
                 }
+                logger.debug("【指令编号:{},证券账户:{},循环一轮后 portfolioMatchQtyMap:{}, 剩余数量为:{}】", item.getEntrustId(),
+                        item.getSecAcctId(), JSON.toJSONString(portfolioMatchQtyMap), remainMatchQty);
                 // 3、如循环一轮后仍有剩余数量,则按照 各组合剩余分配数量比例 进行拆分,拆分结果需满足最小交易单元的整数倍
                 if(remainMatchQty.compareTo(BigDecimal.ZERO) > 0){
-                    logger.debug("【指令编号:{},证券账户:{},循环一轮后剩余数量为:{}】", item.getEntrustId(), item.getSecAcctId(), remainMatchQty);
                     BigDecimal minStep = minTrdUnitLimitDto.getMinStep();
+                    // 按比例拆分分配总数
+                    BigDecimal rateMatchQtyTotal = BigDecimal.ZERO;
                     for (Map.Entry<String, BigDecimal> portfolioEntry : portfolioRemainQtyList) {
                         BigDecimal portfolioRemainQty = portfolioRemainQtyMap.get(portfolioEntry.getKey());
-                        // 分配比例
-                        BigDecimal ratio = ArithmeticUtil.divide(portfolioRemainQty, portfolioRemainQtyTotal, 4);
                         // 临时分配数量
-                        BigDecimal matchQtyTemp = ArithmeticUtil.multiply(remainMatchQty, ratio);
+                        BigDecimal matchQtyTemp = ArithmeticUtil.divide(ArithmeticUtil.multiply(remainMatchQty, portfolioRemainQty),
+                                portfolioRemainQtyTotal, 4);
                         // 最小交易单元整数倍
                         BigDecimal stepTimes = ArithmeticUtil.divide(matchQtyTemp, minStep, 0, RoundingMode.FLOOR);
                         // 分配数量
@@ -441,13 +443,17 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         // 合并分配结果
                         portfolioMatchQtyMap.put(portfolioEntry.getKey(), ArithmeticUtil.doAdd(matchQty,
                                 portfolioMatchQtyMap.get(portfolioEntry.getKey())));
-                        // 剩余分配数量
-                        remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, matchQty);
+                        rateMatchQtyTotal = ArithmeticUtil.doAdd(rateMatchQtyTotal, matchQty);
                     }
+                    // ZGCPCN-1579:计算比例拆分之后剩余分配数量 modify by fuyongsheng 20220621 start
+                    // 按比例拆分之后剩余分配数量
+                    remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, rateMatchQtyTotal);
+                    // ZGCPCN-1579:计算比例拆分之后剩余分配数量 modify by fuyongsheng 20220621 end
                 }
+                logger.debug("【指令编号:{},证券账户:{},比例拆分完后 portfolioMatchQtyMap:{}, 剩余尾差数量为:{}】", item.getEntrustId(),
+                        item.getSecAcctId(), JSON.toJSONString(portfolioMatchQtyMap), remainMatchQty);
                 // 4、如按比例拆分完,仍有剩余数量尾差,则按照最小交易单元按顺序依次分配,直至分配完为止
                 if(remainMatchQty.compareTo(BigDecimal.ZERO) > 0){
-                    logger.debug("【指令编号:{},证券账户:{},比例拆分完后剩余尾差数量为:{}】", item.getEntrustId(), item.getSecAcctId(), remainMatchQty);
                     // 尾差分配数量Map
                     Map<String, BigDecimal> tailMatchQtyMap = new HashMap<>();
                     for (Map.Entry<String, BigDecimal> portfolioEntry : portfolioRemainQtyList) {

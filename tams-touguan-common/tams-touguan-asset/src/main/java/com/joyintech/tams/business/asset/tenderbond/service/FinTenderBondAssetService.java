@@ -334,6 +334,8 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         if(Objects.nonNull(resultType)) {
             finProductType.setType6(resultType.getOutputValue1());
             finProductType.setType7(resultType.getOutputValue2());
+            finProductType.setType4(resultType.getOutputValue1());
+            finProductType.setType5(resultType.getOutputValue2());
         }
         finProductTypeMapper.insert(finProductType);
     }

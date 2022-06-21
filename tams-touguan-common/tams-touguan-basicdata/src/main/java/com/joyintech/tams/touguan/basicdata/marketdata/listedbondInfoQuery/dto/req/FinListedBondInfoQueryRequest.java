@@ -120,6 +120,9 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "search", value = "关键词")
     private String search;
 
+    @ApiModelProperty(name = "additionalBatches", value = "增发批次")
+    private Integer additionalBatches;
+
     public PageMode getPageMode() {
         return pageMode;
     }
@@ -391,5 +394,13 @@ public class FinListedBondInfoQueryRequest {
 
     public void setSecondaryClassifications(List<String> secondaryClassifications) {
         this.secondaryClassifications = secondaryClassifications;
+    }
+
+    public Integer getAdditionalBatches() {
+        return additionalBatches;
+    }
+
+    public void setAdditionalBatches(Integer additionalBatches) {
+        this.additionalBatches = additionalBatches;
     }
 }

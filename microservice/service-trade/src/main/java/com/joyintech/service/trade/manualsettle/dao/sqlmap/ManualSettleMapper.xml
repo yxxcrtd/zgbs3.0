@@ -52,7 +52,7 @@
             T1.ENTRUST_NO entrustNo,
             T4.COUNTER_NAME counterName,
         T1.DEAL_NO dealNo,
-        decode( T1.SETTLE_STATUS,'01',1,'02',3,'03',2,'04',4) sort
+        decode( T1.SETTLE_STATUS,'01',1,'02',3,'03',2,'04',4,5) sort
         FROM TRD_MANUAL_SETTLE_INFO T1
         LEFT JOIN  ETR_ENTRUST etr ON T1.ENTRUST_NO = etr.ENTRUST_ID
         LEFT JOIN  FIN_PRODUCT  T2 ON T1.FINPROD_ID = T2.FINPROD_ID
@@ -222,24 +222,32 @@
     </select>
     <select id="findPageExport" resultType="com.joyintech.service.trade.manualsettle.dto.ManualSettleDto">
         select rownum,a.* from (SELECT
-        T5.SEQ_NO SEQ_NO,
-        T5.SETTLE_TIME SETTLE_TIME,
-        T5.OPER_TYPE OPER_TYPE,
         T1.SETTLE_SEQ_NO SETTLE_SEQ_NO,
         T1.SETTLE_STATUS settleStatus,
         T1.ORDER_ID orderId,
         T1.TRADE_ID tradeId,
         T1.TRADE_DATE tradeDate,
         T1.SETTLE_DATE settleDate,
+        T5.SETTLE_TIME settleTime,
         T1.PORTFOLIO_ID portfolioId,
+        CASE
+        WHEN etr.ENTRUST_CLASS = '02' THEN detail.PORTFOLIO_NAME
+        ELSE T3.PORTFOLIO_NAME
+        END portfolioName,
         concat(concat(sci.BUSI_ACCT_NO,':'),sci.ACCT_NAME) acctNo,
         concat(concat(ssai.SEC_ACCT_ID,':'),ssai.SEC_ACCT_NAME) secAcctId,
         T1.TRADE_MARKET tradeMarket,
         T1.TRADE_PLAT tradePlat,
         T1.FINPROD_ID finprodId,
-        T1.PRIN prin,
+        CASE WHEN etr.FINPROD_TYPE2 = 'F01' or etr.FINPROD_TYPE2 = 'F37' THEN T2.FINPROD_MARKET_ID ELSE NULL END finprodMarketId,
+        CASE WHEN etr.FINPROD_TYPE2 = 'F01' or etr.FINPROD_TYPE2 = 'F37' THEN T2.FINPROD_ABBR ELSE NULL END finprodName,
+        CASE WHEN etr.FINPROD_TYPE2 = 'F01' THEN T1.SETTLE_NUM
+        WHEN etr.FINPROD_TYPE2 = 'F37' THEN T1.SETTLE_NUM/100 ELSE NULL END settleNum,
+        CASE WHEN etr.FINPROD_TYPE2 = 'F01' or etr.FINPROD_TYPE2 = 'F37' THEN T1.SETTLE_AMT ELSE NULL END settleAmt,
+        etr.FINPROD_TYPE2,
+        CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.PRIN ELSE NULL END prin,
         CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.M_TRADE_AMT ELSE NULL END mTradeAmt,
-        T1.PLEDGE_NUMBER pledgeNumber,
+        CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.PLEDGE_NUMBER ELSE NULL END pledgeNumber,
         CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.PLEDGE_ID ELSE NULL END pledgeId,
         CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.B_PLEDGE_ID ELSE NULL END bPledgeId,
         CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F1.FINPROD_ABBR ELSE NULL END pledgeName,
@@ -248,41 +256,47 @@
         T1.BUSI_TYPE busiType,
         T1.COUNTER_ID counterId,
         T1.ENTRUST_NO entrustNo,
-        CASE WHEN etr.FINPROD_TYPE2 = 'F01' THEN T2.FINPROD_MARKET_ID ELSE NULL END finprodMarketId,
-        CASE WHEN etr.FINPROD_TYPE2 = 'F01' THEN T2.FINPROD_ABBR ELSE NULL END finprodName,
-        CASE WHEN etr.FINPROD_TYPE2 = 'F01' THEN T1.SETTLE_NUM ELSE NULL END settleNum,
-        CASE WHEN etr.FINPROD_TYPE2 = 'F01' THEN T1.SETTLE_AMT ELSE NULL END settleAmt,
-        T3.PORTFOLIO_NAME portfolioName,
         T4.COUNTER_NAME counterName,
         T1.DEAL_NO dealNo,
-        T6.REAL_NAME operator,
         decode( T1.SETTLE_STATUS,'01',1,'02',3,'03',2,'04',4) sort
         FROM TRD_MANUAL_SETTLE_INFO T1
         LEFT JOIN  ETR_ENTRUST etr ON T1.ENTRUST_NO = etr.ENTRUST_ID
         LEFT JOIN  FIN_PRODUCT  T2 ON T1.FINPROD_ID = T2.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO T3 ON T1.PORTFOLIO_ID = T3.PORTFOLIO_ID
         Left join MST_COUNTER_PARTY T4 ON T4.COUNTER_ID = T1.COUNTER_ID
+
         LEFT JOIN  STL_CAPACCT_INFO  sci ON T1.ACCT_NO = sci.ACCT_NO
         LEFT JOIN  STL_SEC_ACCT_INFO ssai ON T1.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN  FIN_PRODUCT  F1 ON T1.PLEDGE_ID = F1.FINPROD_ID
         LEFT JOIN  FIN_PRODUCT  F2 ON T1.B_PLEDGE_ID = F2.FINPROD_ID
+        LEFT JOIN (
+        SELECT
+        ENTRUST_ID,
+        wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+        FROM
+        ETR_ENTRUST_DETAIL
+        LEFT JOIN
+        PTL_PORTFOLIO
+        ON
+        ETR_ENTRUST_DETAIL.portfolio_id = PTL_PORTFOLIO.portfolio_id
+        GROUP BY
+        ENTRUST_ID
+        ) detail ON T1.ENTRUST_NO = detail.ENTRUST_ID
         left join TRD_MANUAL_SETTLE_FLOW T5 on T5.SETTLE_SEQ_NO = T1.SETTLE_SEQ_NO
-        LEFT JOIN SYS_USER T6 ON T5.UPDATE_USER = T6.USER_NAME
         <where>
             <if test="userName != null and userName != ''">
-                AND T1.PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userName})
+                AND etr.PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userName})
             </if>
             <if test="portfolioId != null and !portfolioId.isEmpty()">
-                AND (
-                T1.PORTFOLIO_ID IN
-                <foreach collection="portfolioId" item="item" open="(" close=")" separator=",">
-                    #{item}
+                AND
+                <foreach collection="portfolioId" item="item" index = "index" open="(" close=")">
+                    <if test="index== 0">
+                        EXISTS (select 1 from ETR_ENTRUST_DETAIL det where det.ENTRUST_ID = T1.ENTRUST_NO AND det.PORTFOLIO_ID = #{item})
+                    </if>
+                    <if test="index!= 0">
+                        OR  EXISTS (select 1 from ETR_ENTRUST_DETAIL det where det.ENTRUST_ID = T1.ENTRUST_NO AND det.PORTFOLIO_ID = #{item})
+                    </if>
                 </foreach>
-                OR T1.PORTFOLIO_ID IN
-                <foreach collection="portfolioId" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-                )
             </if>
             <if test="tradeMarket != null and tradeMarket != ''">
                 and T1.TRADE_MARKET =#{tradeMarket}
@@ -309,7 +323,7 @@
                 and T1.SETTLE_DATE &lt;= to_date(#{settleDateEnd}, 'yyyy-MM-dd')
             </if>
         </where>
-        order by sort,T1.SETTLE_SEQ_NO,T1.UPDATE_TIME desc)a
+        order by sort,T1.UPDATE_TIME desc) a
     </select>
 
     <select id="selectInfContractDetailfile" resultType="com.joyintech.tams.common.base.entity.InfContractDetailfile">

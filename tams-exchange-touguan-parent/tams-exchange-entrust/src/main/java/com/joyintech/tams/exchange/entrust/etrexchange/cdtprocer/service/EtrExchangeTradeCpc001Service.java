@@ -628,13 +628,32 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
      * @param dto
      */
     public void doInsetOrUpdateForEtrPositionHoldMulti(EtrCreditProtectionCertificateApplyRequest dto) {
-        if (StringUtil.equals(dto.getIsMulti(), DictCodeList.是否_是.getValue())) {
-            List<EtrCreditProtectionCertificateApplyRequest> EtrExchangeTrade001DtoList = new ArrayList<>();
+        Map<String,List<EtrExchangeTradePortfolioSecRepoRequest>> groupMap= dto.getPortfolioList().stream().collect(
+                Collectors.groupingBy(item->item.getAcctNo()));
+        if(groupMap.keySet().size() > 1 && dto.getPortfolioList().size()>1) {
             for (EtrExchangeTradePortfolioSecRepoRequest item : dto.getPortfolioList()) {
                 EtrCreditProtectionCertificateApplyRequest etrExchangeTrade001Dto = this.genEtrExchangeTradeSaveSecRepoRequest(dto, item);
                 doInsetOrUpdateForEtrPositionHold(etrExchangeTrade001Dto);
             }
         } else {
+            EtrExchangeTradePortfolioSecRepoRequest item=dto.getPortfolioList().get(0);
+            BigDecimal totalEntrustAmt = null;
+            if(dto.getPortfolioList().get(0).getEntrustAmt()!=null){
+                totalEntrustAmt = dto.getPortfolioList().stream().map(EtrExchangeTradePortfolioSecRepoRequest::getEntrustAmt).reduce(BigDecimal::add).get();
+            }
+            BigDecimal totalEntrustNum = dto.getPortfolioList().stream().map(EtrExchangeTradePortfolioSecRepoRequest::getEntrustNum).reduce(BigDecimal::add).get();
+            dto.setEntrustAmt(totalEntrustAmt);
+            dto.setEntrustNum(totalEntrustNum);
+            dto.setVdate(dto.getEntrustDate());
+            dto.setMdate(dto.getEntrustDate());
+            dto.setAcctNo(item.getAcctNo());
+            dto.setSecAcctId(item.getSecAcctId());
+            dto.setStockId(dto.getStockId());
+            dto.setInvManagerId(LoginUserUtil.getUserName());// 投资经理
+            dto.setCreateUser(LoginUserUtil.getUserName());// 用户名
+            dto.setCreateDept(LoginUserUtil.getDeptCode());// 用户部门
+            dto.setCreateTime(new Date());// 创建时间
+            dto.setPortfolioId(item.getPortfolioId()); //让指令分发能查出来
             doInsetOrUpdateForEtrPositionHold(dto);
         }
 

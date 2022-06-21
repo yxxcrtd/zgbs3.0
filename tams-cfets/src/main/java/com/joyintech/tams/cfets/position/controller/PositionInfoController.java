@@ -30,7 +30,7 @@ public class PositionInfoController {
     @PostMapping("/queryTrdPositionHead")
     @ResponseBody
     public Message<List<BaseMap>> queryTrdPositionHead(@RequestBody PositionInfoRequestDto requestDto){
-        List<BaseMap> list = new ArrayList<>();
+        List<BaseMap> list;
         try{
             list = positionInfoService.queryTrdPositionHead(requestDto);
         }catch (Exception e){
