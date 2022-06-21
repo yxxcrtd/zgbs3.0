@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.invest.batch.autogeneration.secpos.runner;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.batch.batchbase.baseclass.BatchBaseService;
 import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
@@ -94,6 +95,7 @@ public class SecReportPosAutoGenerationTask extends BatchBaseService {
                 deptCode = batchExecuteInfo.getCreateUser() != null ? MultilevelDataAuthorityUtil.getOrganizationCode(batchExecuteInfo.getCreateUser()) : null;
             }
             List<Map<String, Object>> importValTableProdList = valRiftService.selectImportValTableProdList(batchDate, this.getProductIdList(), deptCode);
+            logger.info("=========secReportPosAutoGenerationTask========importValTableProdList:{}", JSON.toJSONString(importValTableProdList));
             List<String> importProdList = new ArrayList<>();
             List<String> unImportProdList = new ArrayList<>();
             Date minDate = batchDate;
@@ -112,6 +114,8 @@ public class SecReportPosAutoGenerationTask extends BatchBaseService {
             }
 
             //未导入估值表的产品仅跑跑批日当日
+            logger.info("=========secReportPosAutoGenerationTask========unImportProdList:{}", JSON.toJSONString(unImportProdList));
+            logger.info("=========secReportPosAutoGenerationTask========importProdList:{}", JSON.toJSONString(importProdList));
             if (!StringUtil.isEmptyList(unImportProdList)) {
                 secPosAutoGenerationService.autoSecReportGeneration(batchDate, unImportProdList);
             }
