@@ -12,6 +12,7 @@ package com.joyintech.tams.cfets.trdquery.controller;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
@@ -21,6 +22,10 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsBondFirstSubCheckDetaileRequst;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
+import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListRequest;
 import com.joyintech.tams.cfets.trdquery.dto.*;
 import com.joyintech.tams.cfets.trdquery.service.CfetsTrdBondInvestTrade002Service;
@@ -33,6 +38,7 @@ import com.joyintech.tams.component.business.core.service.MstWorkflowCommonServi
 import com.joyintech.tams.component.business.settle.BussSettleOrderCommService;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.BussTrdTransferOrderBase;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
@@ -90,6 +96,12 @@ public class CfetsTrdQueryController extends BaseController {
      */
     @Autowired
     private TrdCommonBaseService trdCommonBaseService;
+    @Autowired
+    private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
+
+    @Autowired
+    private CfetsTrdBondFirstSub002Service cfetsTrdBondFirstSub002Service;
+
 
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
@@ -430,7 +442,36 @@ public class CfetsTrdQueryController extends BaseController {
         List<CfetsTrdQueryTradeInfoListResponse> list=input.getSelectedItem();
         String msg="";
         for(CfetsTrdQueryTradeInfoListResponse item:list){
-            if(StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_债券.getValue())){
+            if (StringUtil.equals(item.getFinprodType2(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+                List<CfetsTrdBondFirstSubInfoDto> cfetsTrdBondFirstSubInfoDtos = new ArrayList<>();
+                WflValidInputParameter wflValidInputParameter = new WflValidInputParameter();
+                wflValidInputParameter.setPageId("TenderBondSub002");
+                wflValidInputParameter.setBusinessDataPk1(input.getBidId());
+                ProcessMark processMark = cfetsRepoQuotedPrice004Service.getBusinessInfoByPageIdAndPk(wflValidInputParameter);
+                CfetsTrdBondFirstSubInfoDto dto = cfetsTrdBondFirstSub002Service.getBussinessEntity(processMark);
+                dto.setBidId(input.getBidId());
+                dto.setRemark(StringUtil.join("申购撤销原因：", input.getRemark()));
+                dto.setOperateType("revoke");
+                cfetsTrdBondFirstSubInfoDtos.add(dto);
+                ProcessParameter<CfetsTrdBondFirstSubInfoDto> processParameter = new ProcessParameter<>();
+                WorkFlowParameter<CfetsTrdBondFirstSubInfoDto> workFlowParameter = new WorkFlowParameter<>();
+                workFlowParameter.setPageId("TenderBondSub002");
+                workFlowParameter.setElementId("TenderBondSub002_btn_revoke");
+                workFlowParameter.setBusinessCode(CfetsTrdBondFirstSubInfoDto::getBidId);
+                workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
+                workFlowParameter.setComment(entity -> "申购编号 (" + entity.getBidId() + ")");
+                processParameter.setPageId(workFlowParameter.getPageId());
+                processParameter.setWorkFlowParameter(workFlowParameter);
+                processParameter.setOperationType(OperationType.REVOKE);
+                try {
+                    msg = cfetsTrdBondFirstSub002Service.start(processParameter,
+                            cfetsTrdBondFirstSubInfoDtos.toArray(new CfetsTrdBondFirstSubInfoDto[cfetsTrdBondFirstSubInfoDtos.size()]));
+                    return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+                } catch (Exception e) {
+                    logger.error("当日申购撤销失败", e);
+                    return PositionUtil.ajaxErrorReturn(e);
+                }
+            }else if(StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_债券.getValue())){
                 //债券
                 String operateType = item.getOperateType();
                 String totleTradeId = item.getTotleTradeId();
