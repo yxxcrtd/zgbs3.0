@@ -58,7 +58,7 @@ public class SecPosAutoGenerationService {
 
     @Autowired
     private AssetTargetDbMapper assetTargetDbMapper;
-    
+
     @Autowired
     private CommonProductRatingService commonProductRatingService;
     /**
@@ -97,9 +97,9 @@ public class SecPosAutoGenerationService {
         paramMap.put("POSITION_TYPE_06", DictCodeList.持仓类型_融出.getValue());
         secPosAutoGenerationMapper.insertTodaySecPosDetailData(paramMap);
         //add for 华兴 by liupengfei E
-		
+
 		secPosAutoGenerationMapper.deleteTodayStaSecPosData(paramMap);
-        
+
         secPosAutoGenerationMapper.insertTodayStaSecPosData(paramMap);
     }
 
@@ -125,13 +125,13 @@ public class SecPosAutoGenerationService {
             paramMap.put("productIdList", null);
         }
         paramMap.put("lastDate", DateUtil.addDay(batchDate, -1));
-        
+
         //查询产品风险等级评定排序sql片段
         Map<String,Object> sqlSortMap = new HashMap<String,Object>();
         sqlSortMap.put("oType", "98");
         String sqlSortString = commonProductRatingService.getProductRatingOrderSql(sqlSortMap);
         paramMap.put("sqlSortString", sqlSortString);
-        
+
         //塞入字典值
         paramMap.put("PETE_DIMENTION_01", DictCodeListExt3.穿透维度_不穿透.getValue());
         paramMap.put("PETE_DIMENTION_02", DictCodeListExt3.穿透维度_穿透.getValue());
@@ -141,7 +141,7 @@ public class SecPosAutoGenerationService {
         paramMap.put("YES_OR_NO_N", DictCodeList.是否_否.getValue());
         paramMap.put("YES_OR_NO_Y", DictCodeList.是否_是.getValue());
         paramMap.put("INSTITUTION_INDUSTRY_FIRST_LEVEL_10", DictCodeList.机构所属行业一级分类_金融业.getValue());
-        
+
         paramMap.put("NATURE_ORG_01", DictCodeListExt3.融资人性质_企业类_事业类_债务人或保证人.getValue());
         paramMap.put("NATURE_ORG_02", DictCodeListExt3.融资人性质_商业银行.getValue());
         paramMap.put("NATURE_ORG_03", DictCodeListExt3.融资人性质_非银金融机构.getValue());
@@ -149,7 +149,7 @@ public class SecPosAutoGenerationService {
         paramMap.put("NATURE_ORG_05", DictCodeListExt3.融资人性质_金融机构.getValue());
         paramMap.put("NATURE_ORG_06", DictCodeListExt3.融资人性质_其他证券化.getValue());
         paramMap.put("NATURE_ORG_07", DictCodeListExt3.融资人性质_企事业法人_金融机构.getValue());
-        
+
         paramMap.put("CUSTOM_ASSET_TYPE_THREE_12", DictCodeListExt3.行内资产三级分类_资产支持证券.getValue());
         paramMap.put("CUSTOM_ASSET_TYPE_FOUR_015", DictCodeListExt3.行内资产四级分类_短融.getValue());
         paramMap.put("CUSTOM_ASSET_TYPE_FOUR_016", DictCodeListExt3.行内资产四级分类_超短融.getValue());
@@ -169,27 +169,27 @@ public class SecPosAutoGenerationService {
         BigDecimal underlyingBshareScale = BigDecimal.ZERO;
         //底层资产汇总List
         List<AssetTargetDbDto> underlyingAssetsSumList = new ArrayList<AssetTargetDbDto>();
-        
+
         if(!StringUtil.isEmptyList(secPosDataList) &&secPosDataList.size()>0) {
             Map<String,Object> noPassBshareScaleMap = new HashMap<String, Object>();
             Map<String,Object> isPassBshareScaleMap = new HashMap<String, Object>();
-            
+
             //先按组合ID汇总资产规模
             for(AssetTargetDbDto dto:secPosDataList) {
                 if(StringUtil.isNotEmpty(dto.getRiskAssetType2())) {
                     if(StringUtil.equals(dto.getIsPerne(), DictCodeListExt3.穿透维度_不穿透.getValue())) {
-                        noPassBshareScale = (BigDecimal)noPassBshareScaleMap.get(dto.getPortfolioId());  
+                        noPassBshareScale = (BigDecimal)noPassBshareScaleMap.get(dto.getPortfolioId());
                         noPassBshareScale = ArithmeticUtil.doAdd(noPassBshareScale,dto.getBshareScale());
-                        
+
                         noPassBshareScaleMap.put(dto.getPortfolioId(), noPassBshareScale);
-                    } else if (StringUtil.equals(dto.getIsPerne(), DictCodeListExt3.穿透维度_穿透.getValue()))                        
-                        isPassBshareScale = (BigDecimal)isPassBshareScaleMap.get(dto.getPortfolioId());  
+                    } else if (StringUtil.equals(dto.getIsPerne(), DictCodeListExt3.穿透维度_穿透.getValue()))
+                        isPassBshareScale = (BigDecimal)isPassBshareScaleMap.get(dto.getPortfolioId());
                         isPassBshareScale = ArithmeticUtil.doAdd(isPassBshareScale,dto.getBshareScale());
-                        
+
                         isPassBshareScaleMap.put(dto.getPortfolioId(), isPassBshareScale);
-                    } 
+                    }
                 }
-            
+
             if(!StringUtil.isEmptyList(underlyingAssetsData) &&underlyingAssetsData.size()>0) {
                 //按组合ID汇总资产总规模
                 Map<String,Object> underlyingBshareScaleMap = new HashMap<String, Object>();
@@ -203,10 +203,10 @@ public class SecPosAutoGenerationService {
                         underlyingBshareScaleSumDto.setBshareScale(dto.getBshareScale());
                         underlyingBshareScaleMap.put(dto.getPortfolioId(), underlyingBshareScaleSumDto);
                     }
-                    
+
                     underlyingBshareScale = ArithmeticUtil.doAdd(underlyingBshareScale,dto.getBshareScale());
                 }
-                
+
                 //再次循环计算出集中度和风险评定等级
                 for(AssetTargetDbDto dto:underlyingAssetsData) {
                     AssetTargetDbDto underlyingBshareScaleSumDto = (AssetTargetDbDto)underlyingBshareScaleMap.get(dto.getPortfolioId());
@@ -215,32 +215,32 @@ public class SecPosAutoGenerationService {
                         dto.setCrn(crn);
                         String assetRiskType = this.getDtoAssetRiskType(dto);
                         dto.setAssetRiskType(assetRiskType);
-                        
+
                         BigDecimal assetRiskTypevalue = ArithmeticUtil.doAdd(StringUtil.isNotEmpty(underlyingBshareScaleSumDto.getAssetRiskType())?
                             new BigDecimal(underlyingBshareScaleSumDto.getAssetRiskType()): BigDecimal.ZERO,
                             ArithmeticUtil.multiply(crn,StringUtil.isNotEmpty(assetRiskType)?new BigDecimal(assetRiskType): BigDecimal.ZERO));
-                        underlyingBshareScaleSumDto.setAssetRiskType(assetRiskTypevalue.toString()); 
+                        underlyingBshareScaleSumDto.setAssetRiskType(assetRiskTypevalue.toString());
                     }
                     //如果不是债券，rate(票面利率%)和BShareFaceValue(持仓券面总额)设置成空
                     if(!StringUtil.equals(dto.getPinanAssetType(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
                         dto.setRate(null);
                         dto.setBshareFaceValue(null);
                     }
-                    assetTargetDbMapper.insert(dto);  
+                    assetTargetDbMapper.insert(dto);
                 }
-                
+
                 for(String key:underlyingBshareScaleMap.keySet()) {
                     AssetTargetDbDto underlyingBshareScaleSumDto = (AssetTargetDbDto)underlyingBshareScaleMap.get(key);
                     String assetRiskType = underlyingBshareScaleSumDto.getAssetRiskType();
                     if(StringUtil.isNotEmpty(assetRiskType)) {
-                        underlyingBshareScaleSumDto.setAssetRiskType(this.IRConvert(new BigDecimal(assetRiskType))); 
+                        underlyingBshareScaleSumDto.setAssetRiskType(this.IRConvert(new BigDecimal(assetRiskType)));
                     }
                     underlyingBshareScaleSumDto.setCrn(ArithmeticUtil.divide(underlyingBshareScaleSumDto.getBshareScale(), underlyingBshareScale, 2));
                     underlyingAssetsSumList.add(underlyingBshareScaleSumDto);
                 }
-                
+
             }
-            
+
             for(AssetTargetDbDto item:secPosDataList) {
                 //剩余期限计算
                 if(item.getMdate()!=null){
@@ -301,11 +301,11 @@ public class SecPosAutoGenerationService {
                             //剩余行权日期计算
                             item.setLastExPeriod(calculationExPeriodDays(item.getFinprodId(), DateUtil.format(item.getVdate()), DateUtil.format(batchDate), item.getBranch(), DateUtil.format(finExercisePlanList.get(0).getExerciseDate())));
                             //含权信息获取
-                            if (item.getIsSus().equals(DictCodeList.是否_是.getValue())) {
+                            if (DictCodeList.是否_是.getValue().equals(item.getIsSus())) {
                                 //含权信息 = 数据字典.行权信息.永续
                                 item.setExInfo(DictCodeListExt3.含权信息_永续.getCodeName());
                             }
-                            if (item.getIsRight().equals(DictCodeList.是否_是.getValue())) {
+                            if (DictCodeList.是否_是.getValue().equals(item.getIsRight())) {
                                 if (finExercisePlanList.size() == 1 && finExercisePlanList.get(0).getExerciseType().equals(DictCodeList.行权方式_赎回.getValue())) {
                                     item.setExInfo(DictCodeListExt3.含权信息_赎回权.getCodeName());
                                 }
@@ -330,27 +330,27 @@ public class SecPosAutoGenerationService {
 
                         }
                     }
-                    
-                    
+
+
                 }
-                
+
               //计算集中度
                 if(StringUtil.isNotEmpty(item.getRiskAssetType2())) {
                     BigDecimal crn = BigDecimal.ZERO;
                     if(StringUtil.equals(item.getIsPerne(), DictCodeListExt3.穿透维度_不穿透.getValue())) {
                         noPassBshareScale = (BigDecimal)noPassBshareScaleMap.get(item.getPortfolioId());
-                        crn = ArithmeticUtil.divide(item.getBshareScale(), noPassBshareScale, 2); 
+                        crn = ArithmeticUtil.divide(item.getBshareScale(), noPassBshareScale, 2);
                     } else {
                         isPassBshareScale = (BigDecimal)isPassBshareScaleMap.get(item.getPortfolioId());
                         crn = ArithmeticUtil.divide(item.getBshareScale(), isPassBshareScale, 2);
                     }
-                    
+
                     item.setCrn(crn);
 
                     //设置资产风险等级
                     item.setAssetRiskType(getDtoAssetRiskType(item));
                 }
-                
+
                 for(AssetTargetDbDto underlyingAssetsSumDto : underlyingAssetsSumList) {
                     if(StringUtil.equals(item.getPortfolioId(), underlyingAssetsSumDto.getPortfolioId())
                         && StringUtil.equals(item.getIsPerne(), DictCodeListExt3.穿透维度_不穿透.getValue())) {
@@ -586,7 +586,7 @@ public class SecPosAutoGenerationService {
         List<CommonProductRatingDto> ratingResultList = secPosAutoGenerationMapper.getBestProductRating(mapRating);
         return  ratingResultList;
     }
-    
+
     private String getDtoAssetRiskType(AssetTargetDbDto dto) {
         String assetRiskType = "";
         if(StringUtil.isNotEmpty(dto.getGradeResult())) {
@@ -595,11 +595,11 @@ public class SecPosAutoGenerationService {
              if(StringUtil.equals(dto.getIsRight(),DictCodeList.是否_是.getValue())
                  || StringUtil.equals(dto.getCustomAssetTypeFour(),DictCodeListExt3.行内资产四级分类_金融机构次级债.getValue())
                  ) {
-                 
+
                  if(!StringUtil.equals(dto.getGradeResult(),"01")) {
                      gradeResult = ArithmeticUtil.subtract(gradeResult, BigDecimal.ONE);
                  }
-                 
+
              }
              //根据资产风险等级映射表传入风险等级资产一、二级分类、集中度、评级类型、融资人性质/资产类型、评级结果 查询资产等级 ※如果没找到资产等级降一级继续匹配，当都匹配不了则为空
              Map<String,Object> paramsMap = new HashMap<String, Object>();
@@ -610,7 +610,7 @@ public class SecPosAutoGenerationService {
              paramsMap.put("inOrOut", StringUtil.isNotEmpty(dto.getInOrOut())?dto.getInOrOut():"");
              paramsMap.put("crn", StringUtil.isNotEmpty(dto.getCrn())?dto.getCrn():BigDecimal.ZERO);
              paramsMap.put("natureOrg", StringUtil.isNotEmpty(dto.getNatureOrg())?dto.getNatureOrg():"");
-             
+
             List<String> assetRiskTypeList = new ArrayList<>();
             if(!StringUtil.isEmpty(dto.getRiskAssetType1())){
                 assetRiskTypeList = secPosAutoGenerationMapper.getAssetRiskTypeList(paramsMap);
@@ -618,45 +618,45 @@ public class SecPosAutoGenerationService {
              if(!StringUtil.isEmptyList(assetRiskTypeList)) {
                  assetRiskType = assetRiskTypeList.get(0);
              }
-             
+
              if((StringUtil.equals(dto.getCustomAssetTypeFive(),DictCodeListExt3.行内资产五级分类_上市银行优先股.getValue())
                  || StringUtil.equals(dto.getIsSus(),DictCodeList.是否_是.getValue()))
                  && StringUtil.isNotEmpty(assetRiskType)) {
                  if(!StringUtil.equals(dto.getGradeResult(),"01")) {
                  }
-                 
+
              }
         }
 
-        
+
         return assetRiskType;
     }
-    
+
     /**
      * 组合资产最终风险等级按PR1=[0，1.25]、PR2=(1.25，2.25]、PR3=(2.25，3.25]、PR4=(3.25，4.25]、PR5=(4.25，∞）
      */
     private String IRConvert(BigDecimal IR) {
         String newIR = "0";
-        
-        if(BigDecimal.ZERO.compareTo(IR)<=0 
+
+        if(BigDecimal.ZERO.compareTo(IR)<=0
             && BigDecimal.valueOf(1.25).compareTo(IR)>=0) {
             newIR = "01";
-        } 
+        }
         else if (BigDecimal.valueOf(1.25).compareTo(IR)<0
             && BigDecimal.valueOf(2.25).compareTo(IR)>=0) {
             newIR = "02";
-        } 
+        }
         else if (BigDecimal.valueOf(2.25).compareTo(IR)<0
             && BigDecimal.valueOf(3.25).compareTo(IR)>=0) {
             newIR = "03";
-        } 
+        }
         else if (BigDecimal.valueOf(3.25).compareTo(IR)<0
             && BigDecimal.valueOf(4.25).compareTo(IR)>=0) {
             newIR = "04";
-        } 
+        }
         else if (BigDecimal.valueOf(4.25).compareTo(IR)<0) {
             newIR = "05";
-        } 
-        return newIR; 
+        }
+        return newIR;
     }
 }
