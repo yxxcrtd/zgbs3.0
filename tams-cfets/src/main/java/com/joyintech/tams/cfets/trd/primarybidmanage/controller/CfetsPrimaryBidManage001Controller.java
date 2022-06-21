@@ -91,6 +91,8 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
         model.put("WIN_TYPE", this.getSelectDataFromDataDic(DictCode.投标方式, null));
         model.put("PAY_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.缴款方式, null));
         model.put("BID_TYPE", this.getSelectDataFromDataDic(DictCode.中标方式, null));
+        model.put("CfetsPrimaryBidCfmManage_list_refresh_period", CacheUtil.getSysParam("CfetsPrimaryBidCfmManage_list_refresh_period"));
+        model.put("CfetsPrimaryBidDetailManage_list_refresh_period", CacheUtil.getSysParam("CfetsPrimaryBidDetailManage_list_refresh_period"));
         model.put("CfetsPrimaryBidManage_list_refresh_period", CacheUtil.getSysParam("CfetsPrimaryBidManage_list_refresh_period"));
         return Message.success("查询页面初始化参数",model);
     }
