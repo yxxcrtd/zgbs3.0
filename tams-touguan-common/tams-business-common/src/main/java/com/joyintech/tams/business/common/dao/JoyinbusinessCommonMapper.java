@@ -273,4 +273,21 @@ public interface JoyinbusinessCommonMapper {
      * @date 2022/6/2 14:54
      */
     FinCashCalcRule selectBasisByFinprodId(@Param("finprodId") String finprodId, @Param("sysDate") Date sysDate);
+
+    /**
+     * 查询新操作记录
+     * @param entrustId 交易编号
+     * @return
+     */
+    List<EtrEntrustOperHisDto> selectCfetsOprHisByEntrustId(@Param("entrustId") String entrustId);
+
+    /**
+     * 根据证券账户查询产品资金账户
+     *
+     * @param param
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2022/6/21 10:40
+     */
+    String qryCashAcctIdBySecAcctId(Map<String, Object> param);
 }
