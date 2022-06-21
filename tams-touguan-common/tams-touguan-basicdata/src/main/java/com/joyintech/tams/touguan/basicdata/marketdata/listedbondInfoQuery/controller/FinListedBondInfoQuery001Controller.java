@@ -110,9 +110,11 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
     @ResponseBody
     @PostMapping("/detail")
     @ApiOperation(value = "待上市债券市场加券信息查询", notes = "待上市债券市场加券信息查询")
-    public Message<FinListedBondInfoQuery001Dto> detail(@RequestParam("secId") String secId) {
+    public Message<FinListedBondInfoQuery001Dto> detail(@RequestParam("secId") String secId,
+                                                        @RequestParam(value = "additionalBatches", required = false) Integer additionalBatches) {
         FinListedBondInfoQueryRequest request = new FinListedBondInfoQueryRequest();
         request.setSecId(secId);
+        request.setAdditionalBatches(additionalBatches);
         return Message.success("success", finListedBondInfoQuery001Service.queryFinWindMarketForCoupons(request));
     }
 
