@@ -29,10 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 组合持仓分析报表自动生成批处理
@@ -101,14 +98,16 @@ public class SecReportPosAutoGenerationTask extends BatchBaseService {
             Date minDate = batchDate;
             if (!StringUtil.isEmptyList(importValTableProdList)) {
                 for (Map<String, Object> entry : importValTableProdList) {
-                    //导入了估值表的产品寻找最小跑批日
-                    if (StringUtil.isNotEmpty(entry.get("valDate"))) {
-                        if (minDate.compareTo((Date) entry.get("valDate")) > 0) {
-                            minDate = (Date) entry.get("valDate");
+                    if(Objects.nonNull(entry)){
+                        //导入了估值表的产品寻找最小跑批日
+                        if (StringUtil.isNotEmpty(entry.get("valDate"))) {
+                            if (minDate.compareTo((Date) entry.get("valDate")) > 0) {
+                                minDate = (Date) entry.get("valDate");
+                            }
+                            importProdList.add((String) entry.get("finprodId"));
+                        } else {
+                            unImportProdList.add((String) entry.get("finprodId"));
                         }
-                        importProdList.add((String) entry.get("finprodId"));
-                    } else {
-                        unImportProdList.add((String) entry.get("finprodId"));
                     }
                 }
             }
