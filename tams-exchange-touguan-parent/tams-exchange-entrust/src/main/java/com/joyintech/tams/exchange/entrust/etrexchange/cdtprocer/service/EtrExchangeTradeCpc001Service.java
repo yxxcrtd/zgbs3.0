@@ -675,7 +675,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrSecPositionFlowDtoUnit.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());// 持仓类型
             etrSecPositionFlowDtoUnit.setCdate(iPlatformDate.getSysDate());// 日期
             etrSecPositionFlowDtoUnit.setCcy(DictCodeList.币种_人民币_CNY.getValue());// 币种
-            etrSecPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustNum().multiply(new BigDecimal(-1)));// 数量
+            etrSecPositionFlowDtoUnit.setAmount(etrSinglePortfolioDto.getEntrustNum().multiply(new BigDecimal(-1)).multiply(BigDecimal.valueOf(100)));// 数量 入库 张
 //            etrSecPositionFlowDtoUnit.setAmount(ArithmeticUtil.multiply(etrSinglePortfolioDto.getEntrustNum(),BigDecimal.valueOf(100),BigDecimal.valueOf(-1)));// 数量
             etrSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
             etrSecPositionFlowDtoUnit.setTradeId(etrSinglePortfolioDto.getEntrustId());// 指令编号

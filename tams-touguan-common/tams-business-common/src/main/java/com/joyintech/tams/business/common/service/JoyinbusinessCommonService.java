@@ -22,6 +22,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.jasypt.commons.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -563,5 +564,26 @@ public class JoyinbusinessCommonService extends BaseService {
         result.setBussinessId(businessId);
 
         return result;
+    }
+
+    /**
+     * 查询新操作记录
+     * @param entrustId 交易编号
+     * @return
+     */
+    public List<EtrEntrustOperHisDto> selectCfetsOprHisByEntrustId(@Param("entrustId") String entrustId){
+        return joyinbusinessCommonMapper.selectCfetsOprHisByEntrustId(entrustId);
+    }
+
+    /**
+     * 根据证券账户查询产品资金账户
+     *
+     * @param map
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2022/6/21 10:40
+     */
+    public String qryCashAcctIdBySecAcctId(Map<String, Object> map) {
+        return joyinbusinessCommonMapper.qryCashAcctIdBySecAcctId(map);
     }
 }
