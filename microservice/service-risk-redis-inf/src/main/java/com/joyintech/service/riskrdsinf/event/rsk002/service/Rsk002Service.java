@@ -13,7 +13,10 @@ package com.joyintech.service.riskrdsinf.event.rsk002.service;
 import java.util.*;
 
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
+import com.joyintech.service.riskrdsinf.common.service.OccupyReleasService;
+import com.joyintech.service.riskrdsinf.event.rsk005.service.Rsk005Service;
 import com.joyintech.tams.invest.common.riskinfrds.info.entity.IProdInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -45,7 +48,7 @@ import com.joyintech.tams.invest.common.riskinfrds.prod.entity.IPtlIndicator;
  */
 @Service
 @INF("RSK002")
-public class Rsk002Service extends EventBaseService<Rsk002InEntity> {
+public class Rsk002Service extends OccupyReleasService<Rsk002InEntity> {
 
     /**
      * {@inheritDoc}
@@ -59,16 +62,6 @@ public class Rsk002Service extends EventBaseService<Rsk002InEntity> {
         // add by zhangrui 有预占的实占试算 end
         // 做过预占的风险试算直接通过
         if (isPreOcp(request)) {
-            // add by zhangrui 有预占的实占试算 start
-            /**
-            // 状态
-            response.setBodyField(RSKSTATUS, BussinessDictCodeListRds.指标状态_通过.getValue());
-            // 提示信息
-            setRtnMsg(response, "交易已预占，试算通过");
-            // 试算结果
-            response.setBodyField(RSK_LIST, new ArrayList<>());
-            return null;
-            */
             // 预占/实占编号
             String occupyCode = (String)request.getBodyField("preOccupyCode");
             // 预占实占参数信息
@@ -215,6 +208,32 @@ public class Rsk002Service extends EventBaseService<Rsk002InEntity> {
         log("涉及的指标参数有：【{}】", paraList.entrySet(), en->en != null ? en.getKey() : "");
         // 输出.head.返回备注信息
         setRemark(response,"涉及的指标参数有：", paraList.entrySet(), en->en != null ? en.getKey() : "",paramMap);
+        // 预占/实占编号
+        String eventId = (String)request.getBodyField(EVENT_ID);
+        // 预占实占参数信息
+        IOccupyRelParam ocpParam = getOccupy(eventId, StringUtil.equals(request.getBodyField(EVENT_TYPE),"0") ? PRE_OCCUPY : REL_OCCUPY);
+        // 差分试算，编号相同，有相同编号占用的情况下，在释放的基础上进行试算 start
+        Map<String, Map<String, IValue<Object>>> oldParaValMap = new HashMap<>();
+        // 若占用（预占、实占）信息存在则表示该指令或交易非首次提交，需要在释放原先占用的基础上进行试算、但释放结果不能写redis
+        if (ocpParam != null) {
+            getLogger().info("该笔指令或交易已存在占用信息");
+            // add by zhangrui1 差分预占 start
+            if (!isDiffOcp(request.getBody())) {
+                // add by zhangrui1 差分预占 end
+                // 预占信息存在时，在释放原来占用的基础上进行试算
+                request.getBody().put("revokeFlg", BussinessDictCodeListRds.是否_是.getValue());
+                // 只走释放逻辑计算释放后的指标参数值，不写Redis
+                request.getBody().put("writeRedis", BussinessDictCodeListRds.是否_否.getValue());
+                super.handle(request,response);
+                // 从线程变量中取得 释放后的指标参数值（临时值、未写入Redis）
+                String occupyCode = (String)request.getBodyField(EVENT_ID);
+                // 从线程变量中取得 释放后的指标参数值（临时值、未写入Redis）
+                Object obj = getServiceInfo(occupyCode);
+                if (obj != null){
+                    oldParaValMap.putAll((Map<String, Map<String, IValue<Object>>>) obj);
+                }
+            }
+        }
         // 执行事务处理（Redis操作）
         handleByLock(() -> {
             // add by zhangrui1 start
@@ -235,9 +254,8 @@ public class Rsk002Service extends EventBaseService<Rsk002InEntity> {
                 }
                 //----update by zxjjpei 20200318 若存在固定值参数则让通过 end---
             }
-            // add by zhangrui1 一级投标的修改预占试算 start
-            removeBeforePre(paraValMap, preOcpParam, mapData);
-            // add by zhangrui1 一级投标的修改预占试算 end
+            // 将释放之后的指标参数值覆盖到从Redis中取得的
+            mergeMap(paraValMap,oldParaValMap);
             // 计算参数值
             Map<String, Map<String, IValue<Object>>> newValMap = calcParamVal(eveList,
                 paraValMap, getRelParam(mapData, preOcpParam), CALC_SCENE_OCP_DIFF, mapData,
@@ -317,6 +335,11 @@ public class Rsk002Service extends EventBaseService<Rsk002InEntity> {
         handleResponse(response, assetInfo, 0);
         // add by zhangrui1 试算返回值增加资产名称 end
         return null;
+    }
+
+    @Override
+    protected void saveData(Map<String, Object> mapDatas, boolean isApprove, String user) throws InterfException {
+
     }
 
     /**

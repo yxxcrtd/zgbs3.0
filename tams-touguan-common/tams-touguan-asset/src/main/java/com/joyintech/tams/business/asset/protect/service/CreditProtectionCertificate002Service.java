@@ -16,6 +16,7 @@ import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
 import com.joyintech.tams.business.asset.tenderbond.service.FinTenderBondAssetService;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.CommonMstFileInputParameter;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.*;
@@ -25,7 +26,6 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.tams.systemtools.dao.JoyinFSMapper;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.entity.FlowEntity;
@@ -234,7 +234,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
 //        finCashPlan.setBasis(dto.getBasis());
 //        finCashPlanMapper.insert(finCashPlan);
         //附件
-        MstFileInputParameter mstFileInputParameter = dto.getMstFileInputParameter();
+        CommonMstFileInputParameter mstFileInputParameter = dto.getMstFileInputParameter();
         if (StringUtil.isNotEmpty(mstFileInputParameter)
                 && CollectionUtils.isNotEmpty(mstFileInputParameter.getFileList())){
             for (SysUploadFileInfo fileInfo:mstFileInputParameter.getFileList()){
@@ -401,11 +401,11 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         }
         BigDecimal cash = StringUtil.isNotEmpty(entity.getNomCapi())? entity.getNomCapi().divide(new BigDecimal(10000)):new BigDecimal(0.00);
         entity.setNomCapi(cash);
-        List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
-        MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
-        mstFileInputParameter.setFileList(uploadInfo);
-        mstFileInputParameter.setBussinessId(entity.getFinprodId());
-        entity.setMstFileInputParameter(mstFileInputParameter);
+//        List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
+//        MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
+//        mstFileInputParameter.setFileList(uploadInfo);
+//        mstFileInputParameter.setBussinessId(entity.getFinprodId());
+        entity.setMstFileInputParameter(joyinbusinessCommonService.selectFileInfoByBusId(entity.getFinprodId()));
         entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
         entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
         //查询参考债券
@@ -422,33 +422,37 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     }
 
     public CreditProtectionCertificate002Dto getProcessEntity(CreditProtectionCertificate002Dto entity){
-        //add wsz 修改现实问题 ZGCPCN-1356 start
-        CreditProtectionCertificate002Dto entity2 = null;
-        if(StringUtil.isNotEmpty(entity.getFinprodId())) {
-            entity2 = this.getById(entity.getFinprodId());
-        }
-        if(!Objects.isNull(entity2)){
-            BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
-        } else {
-            entity.setRefSecLists(this.getRefList(entity));
-            entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
-            entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
-            List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
-            MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
-            mstFileInputParameter.setFileList(uploadInfo);
-            mstFileInputParameter.setBussinessId(entity.getFinprodId());
-            entity.setMstFileInputParameter(mstFileInputParameter);
-        }
-        if(StringUtils.isNotEmpty(entity.getFinprodMarketId())&&!entity.getFinprodMarketId().contains(".")){
-            String markId = "";
-            if(StringUtils.isEmpty(entity.getTradeMarketId())){
-                markId = ".";
-            } else {
-                markId = entity.getTradeMarketId();
-            }
-            entity.setFinprodMarketId(entity.getFinprodMarketId()+markId);
-        }
-        //add wsz 修改现实问题 ZGCPCN-1356 end
+//        //add wsz 修改现实问题 ZGCPCN-1356 start
+//        CreditProtectionCertificate002Dto entity2 = null;
+//        if(StringUtil.isNotEmpty(entity.getFinprodId())) {
+//            entity2 = this.getById(entity.getFinprodId());
+//        }
+//        if(!Objects.isNull(entity2)){
+//            BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
+//        } else {
+//            entity.setRefSecLists(this.getRefList(entity));
+//            entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
+//            entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
+////            List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
+////            MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
+////            mstFileInputParameter.setFileList(uploadInfo);
+////            mstFileInputParameter.setBussinessId(entity.getFinprodId());
+////            entity.setMstFileInputParameter(mstFileInputParameter);
+//            entity.setMstFileInputParameter(joyinbusinessCommonService.selectFileInfoByBusId(entity.getFinprodId()));
+//        }
+//        if(StringUtils.isNotEmpty(entity.getFinprodMarketId())&&!entity.getFinprodMarketId().contains(".")){
+//            String markId = "";
+//            if(StringUtils.isEmpty(entity.getTradeMarketId())){
+//                markId = ".";
+//            } else {
+//                markId = entity.getTradeMarketId();
+//            }
+//            entity.setFinprodMarketId(entity.getFinprodMarketId()+markId);
+//        }
+//        //add wsz 修改现实问题 ZGCPCN-1356 end
+        entity.setRefSecLists(this.getRefList(entity));
+        entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
+        entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
         return entity;
     }
 
@@ -670,20 +674,23 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @DataSource(DataSourceType.MASERT)
     public String checkForSubmit(FlowEntity entity, boolean isMutiApproval) {
-        Map<String, String> param = new HashMap<>();
-        CreditProtectionCertificate002Dto dto = new CreditProtectionCertificate002Dto();
-        if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
-            dto = this.getBussinessEntityByWorkflowId(entity.getWorkflowId());
+        if (entity.getOperType() == OperationType.NEW) {
+            Map<String, String> param = new HashMap<>();
+            CreditProtectionCertificate002Dto dto = new CreditProtectionCertificate002Dto();
+            if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
+                dto = this.getBussinessEntityByWorkflowId(entity.getWorkflowId());
+            }
+            param.put("finprodMarketId", dto.getFinprodMarketId());
+            if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
+                return "资产代码不能重复!";
+            }
+            String finprodId = getFinprodId(dto);
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+            if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                return "资产代码不能重复!";
+            }
         }
-        param.put("finprodMarketId", dto.getFinprodMarketId());
-        if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
-            return "资产代码不能重复!";
-        }
-        String finprodId = getFinprodId(dto);
-        FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
-        if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
-            return "资产代码不能重复!";
-        }
+
         return null;
     }
 

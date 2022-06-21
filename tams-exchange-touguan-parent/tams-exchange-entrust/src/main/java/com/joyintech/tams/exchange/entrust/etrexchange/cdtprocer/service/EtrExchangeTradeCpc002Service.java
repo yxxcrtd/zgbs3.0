@@ -161,6 +161,25 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                 }
                 param.put("A_001", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                 param.put("NO_TRADE_BUSINESS_ETR", TempConstant.NO_TRADE_BUSINESS_ETR);
+                if(Objects.equals(param.get("sort"), "finprodType2Str")){
+                    param.put("sort","finprodType2");
+                } else if (Objects.equals(param.get("sort"), "tradeMarketStr")) {
+                    param.put("sort","tradeMarket");
+                } else if (Objects.equals(param.get("sort"), "businessModelStr")){
+                    param.put("sort","businessModel");
+                }
+                if(Objects.equals(param.get("sort"), "sellNum")){
+                    param.put("sort","");
+                }
+                if(Objects.equals(param.get("sort"), "positionUnitCost")){
+                    param.put("sort","");
+                }
+                if(Objects.equals(param.get("sort"), "positionsAmt")){
+                    param.put("sort","");
+                }
+                if(Objects.equals(param.get("sort"), "price")){
+                    param.put("sort","");
+                }
                 // 浮动盈亏计算修改 modify by yufei 20200806 start
                 Page<EtrCreditProtectionCertificateHoldResponse> result = new Page<>();
                 List<EtrCreditProtectionCertificateHoldResponse> queryList = etrExchangeTradeCpc002Mapper.findPositionsPage(param);
@@ -208,6 +227,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                 Map<String, EtrExchangeUnitCostDto> unitCostMap = calcEachCostAmtMap(DateUtil.parse(platDate), pList, fList, "");
                 // 计算单位成本、计算持仓成本、最新净价、持仓市值、浮动盈亏
                 return calculationAmount(unitCostMap, result, platDate);
+
             }
         } catch (Exception ex) {
             ex.printStackTrace();

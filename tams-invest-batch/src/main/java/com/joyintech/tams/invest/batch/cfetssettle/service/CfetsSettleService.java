@@ -236,12 +236,12 @@ public class CfetsSettleService extends BaseService {
                     || StringUtil.equals(cfetsManualSettleInsertDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())) {
                 sendRepoPositionMethod(cfetsManualSettleInsertDto, batchDate);
             }
-            if (StringUtil.equals(cfetsManualSettleInsertDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+            if (StringUtil.equals(cfetsManualSettleInsertDto.getBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
                 // 一级申购发送头寸报文
                 this.sendBidPositionMethod(cfetsManualSettleInsertDto, batchDate);
             }
-            if (StringUtil.equals(cfetsManualSettleInsertDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
-                // 一级申购发送头寸报文
+            if (StringUtil.equals(cfetsManualSettleInsertDto.getBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
+                // 一级投标发送头寸报文
                 this.sendBidFirmPositionMethod(cfetsManualSettleInsertDto, batchDate);
             }
 
@@ -645,7 +645,7 @@ public class CfetsSettleService extends BaseService {
         //指令或交易标识	ETR:指令,TRD:交易
         req.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
         //用户名	当前操作用户
-        req.setUserId(SecurityUtil.getLoginUser().getUserName());
+        req.setUserId("SYSTEM");
         //汇总交易编号	单交易时传交易编号
         req.setbTotalTradeId(cfetsManualSettleInsertDto.getTradeId());
         //汇总交易编号
@@ -726,7 +726,7 @@ public class CfetsSettleService extends BaseService {
         //指令或交易标识	ETR:指令,TRD:交易
         req.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
         //用户名	当前操作用户
-        req.setUserId(SecurityUtil.getLoginUser().getUserName());
+        req.setUserId("SYSTEM");
         //汇总交易编号	单交易时传交易编号
         req.setbTotalTradeId(cfetsManualSettleInsertDto.getTradeId());
         //汇总交易编号

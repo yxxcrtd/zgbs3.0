@@ -280,20 +280,20 @@ public class RiskCommonService {
 
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_预占释放再预占.getValue())) {
                 // 处理差分预占参数，接口支持程度待确认
-                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
-                    item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
-                    item.setDiffOccupyFlg(item.getEventId());
-                    item.setEntrustCode(item.getEventId());
-//                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
-                });
+//                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
+//                    item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
+//                    item.setDiffOccupyFlg(item.getEventId());
+//                    item.setEntrustCode(item.getEventId());
+////                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
+//                });
             }
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占释放再实占.getValue())) {
                 // 处理差分预占参数，接口支持程度待确认
-                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
-                    item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
-                    item.setDiffOccupyFlg(item.getEventId());
-//                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
-                });
+//                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
+//                    item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
+//                    item.setDiffOccupyFlg(item.getEventId());
+////                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
+//                });
             }
             try {
                 List<Map<String, Object>> sourceList = riskCommonInputDto.getRiskRdsDtoList().stream().map(JsonUtils::object2Map).collect(Collectors.toList());
