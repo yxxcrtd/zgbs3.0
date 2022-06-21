@@ -1293,15 +1293,15 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             }
 
             //付息频率
-            if (dto.getPayCycle().equals("月")||dto.getPayCycle().equals("季")||dto.getPayCycle().equals("年")||dto.getPayCycle().equals("半年")) {
-                dto.setPayCycle(dto.getPayCycle()+"付");
+            if ("月".equals(dto.getPayCycle())||"季".equals(dto.getPayCycle())||"年".equals(dto.getPayCycle())||"半年".equals(dto.getPayCycle())) {
+                dto.setPayCycle(dto.getPayCycle() + "付");
             }
 
             //如果估价净价（行权）、估价净价（推荐）为空，显示为--
-            if (dto.getPriceXq().equals("元")) {
+            if ("元".equals(dto.getPriceXq())) {
                 dto.setPriceXq("--");
             }
-            if (dto.getPriceTj().equals("元")) {
+            if ("元".equals(dto.getPriceTj())) {
                 dto.setPriceTj("--");
             }
             //下一行权日若无，则显示为“—”  计划行权日>交易日取最小
@@ -1322,7 +1322,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 dto.setXqdate("--");
             }
 //            如果估值收益率没有数据，则显示为空
-            if (dto.getGzRate().equals("%")) {
+            if ("%".equals(dto.getGzRate())) {
                 dto.setGzRate(" ");
             }
 //            若为含权债，显示为含权债的行权方式；若有多个行权方式，用分号“;”隔开    非含权债，显示为“无”

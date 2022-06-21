@@ -953,4 +953,20 @@
         where EFF_DATE <![CDATA[<=]]> #{sysDate} and FINPROD_ID = #{finprodId}) T
         left join FIN_CASH_CALC_RULE fccr on fccr.CASH_ID = T.CASH_ID and T.num = 1
     </select>
+    <select id="selectCfetsOprHisByEntrustId" resultType="com.joyintech.tams.business.common.dto.EtrEntrustOperHisDto">
+        select his.ENTRUST_ID entrustId,sdl.ITEM_VALUE operType,to_char(his.OPER_TIME, 'yyyy-MM-dd') operDate,to_char(his.OPER_TIME, 'hh24:mi:ss') operTime,
+       his.BUSI_DES busiDes,his.USER_ID userId,su.REAL_NAME userName
+        from ETR_ENTRUST_OPER_HIS his
+                 left join SYS_DATADICT_LIST sdl on sdl.ITEM_CODE = his.OPER_TYPE and sdl.DICT_CODE = 'OPR_TYPE'
+                 left join SYS_USER su on su.USER_NAME = his.USER_ID
+        where his.BUSI_DES is not null
+              and his.ENTRUST_ID = #{entrustId}
+        order by his.OPER_TIME desc
+    </select>
+
+    <!--根据证券账户查询产品资金账户-->
+    <select id="qryCashAcctIdBySecAcctId" resultType="java.lang.String">
+		select TRD_ACCT_ID from STL_SEC_ACCT_INFO where SEC_ACCT_ID = #{secAcctId}
+            and rownum=1
+    </select>
 </mapper>

@@ -14,6 +14,7 @@ import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dto.EtrEntrustOperHisDto;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.CfgDataTableService;
@@ -464,7 +465,14 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     public Page<CfetsTrdFirstBidFirmEntrustDto> pageEntrust(CfetsTrdBondFirstBidFirmEntrustRequest dto) {
         Map<String, Object> param = BeanUtil.object2Map(dto);
         this.setParam(param);
-        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.listEntrust(param));
+        Page<CfetsTrdFirstBidFirmEntrustDto> page
+                = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.listEntrust(param));
+        page.getRoot().forEach(item -> {
+                    List<EtrEntrustOperHisDto> list = joyinbusinessCommonService.selectCfetsOprHisByEntrustId(item.getEntrustId());
+                    item.setRemarks(list);
+                }
+        );
+        return page;
     }
 
     /**
@@ -476,7 +484,12 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     public List<CfetsTrdFirstBidFirmEntrustDto> listEntrust(CfetsTrdBondFirstBidFirmEntrustRequest dto) {
         Map<String, Object> param = BeanUtil.object2Map(dto);
         this.setParam(param);
-        return cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
+        List<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
+        list.forEach(item -> {
+            List<EtrEntrustOperHisDto> list1 = joyinbusinessCommonService.selectCfetsOprHisByEntrustId(item.getEntrustId());
+            item.setRemarks(list1);
+        });
+        return list;
     }
 
     /**
