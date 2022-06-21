@@ -2,7 +2,10 @@
 
  import com.joyintech.framework.annotation.PageId;
  import com.joyintech.framework.base.BaseEntity;
+ import com.joyintech.framework.util.DateUtil;
+ import com.joyintech.framework.util.StringUtil;
  import com.joyintech.tams.component.business.riskrds.dto.PageModel;
+ import com.joyintech.tams.constant.DictCodeListExt4;
  import com.joyintech.workflow.engine.annotation.PrimaryKey;
  import com.joyintech.workflow.engine.dto.ProcessEntity;
  import io.swagger.annotations.ApiModel;
@@ -173,6 +176,10 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
 
      @ApiModelProperty(name = "systemAct", value = "头寸_系统动作,编辑页面/提交用", example = "Y")
      private String systemAct;
+
+     private Date issueDate;
+
+     private String issueClass;
 
      public String getSoftSkipMode() {
          return softSkipMode;
@@ -516,5 +523,24 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
 
      public void setBidModle(String bidModle) {
          this.bidModle = bidModle;
+     }
+
+     public Date getIssueDate() {
+         if (StringUtil.equals(this.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())){
+             return issueDate;
+         }
+         return null;
+     }
+
+     public void setIssueDate(Date issueDate) {
+         this.issueDate = issueDate;
+     }
+
+     public String getIssueClass() {
+         return issueClass;
+     }
+
+     public void setIssueClass(String issueClass) {
+         this.issueClass = issueClass;
      }
  }
