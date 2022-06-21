@@ -747,7 +747,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setFinprodId(entity.getFinprodId());
                 etrSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
                 etrSecPositionFlow.setInvAim(null);
-                etrSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                etrSecPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
                 etrSecPositionFlow.setCdate(entity.getTradeDate());
                 etrSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi() : billingDetail.getRepNomCapi().negate());
                 //入库 张
@@ -818,7 +818,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setFinprodId(entity.getFinprodId());
                 etrSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
                 etrSecPositionFlow.setInvAim(null);
-                etrSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
+                etrSecPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
                 etrSecPositionFlow.setCdate(entity.getTradeDate());
                 etrSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi() : billingDetail.getRepNomCapi().negate());
                 etrSecPositionFlow.setAmount(ArithmeticUtil.divide(etrSecPositionFlow.getAmount(), 100, 4));
