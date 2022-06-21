@@ -608,8 +608,8 @@ from
         a.FINPROD_ID ,
         a.INV_AIM ,
         a.PS ,
-        a.UNIT_CPRICE AS PRICE,
-        a.SHARE_AMT AS AMT
+        nvl(a.UNIT_CPRICE,0) AS PRICE,
+        nvl(a.SHARE_AMT,0) AS AMT
         from (
         SELECT nvl(T1.FINPROD_ID, T.FINPROD_ID) FINPROD_ID,
                T.PS,
