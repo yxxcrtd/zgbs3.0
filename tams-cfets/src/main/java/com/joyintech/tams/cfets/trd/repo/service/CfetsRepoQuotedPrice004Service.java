@@ -473,7 +473,8 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
         cfetsSearchInfoRequest.setDealType("01");
         cfetsSearchInfoRequest.setInitValue(entity.getCounterId());
         List<SelectOptionDto> list = joyinbusinessCommonService.queryMySideOrCount(cfetsSearchInfoRequest);
-        if (StringUtil.isNotEmpty(list.get(0).getObject())
+        if (CollectionUtils.isNotEmpty(list)
+                && StringUtil.isNotEmpty(list.get(0).getObject())
                 && StringUtil.equals(CacheUtil.getSysParam("EXPORT_SHOW"), "01")
                 && !StringUtil.isNotEmpty(entity.getCounterTrader())
                 && StringUtil.equals(entity.getQuoteStyle(), BussinessDictCodeList.报价方式_对话报价.getValue())) {

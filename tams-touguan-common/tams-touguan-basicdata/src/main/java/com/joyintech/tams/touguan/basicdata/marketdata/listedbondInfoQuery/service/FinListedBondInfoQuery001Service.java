@@ -293,6 +293,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductAdd.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         finProductAdd.setCrossMarket(DictCodeList.是否_否.getValue());
         finProductAdd.setIsSecBond(finListedBondInfoQuery001Dto.getIssecbond());
+        finProductAdd.setListingDate(finListedBondInfoQuery001Dto.getListingDate());
         finProductAdd.setOriginalOwner(finListedBondInfoQuery001Dto.getOriginalOwner());
         finProductAdd.setGuaType(finListedBondInfoQuery001Dto.getGuartype());
         //面值
@@ -335,19 +336,19 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         if ("0".equals(issueMethod)) {
             finProductIssue.setTenderType(DictCodeListExt4.招标方式_单一价格招标.getValue());
             finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
-        }else if("5".equals(issueMethod)){
+        } else if ("5".equals(issueMethod)) {
             finProductIssue.setTenderType(DictCodeListExt4.招标方式_数量招标.getValue());
             finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
-        }else if("6".equals(issueMethod)){
+        } else if ("6".equals(issueMethod)) {
             finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_报价发行.getValue());
         }
         finProductIssue.setTenderTarget(finListedBondInfoQuery001Dto.getTenderTarget());
         //计划发行量
-        finProductIssue.setPlanIssueAmt(Objects.nonNull(finListedBondInfoQuery001Dto.getIssueSize()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssueSize()) : null);
+        finProductIssue.setPlanIssueAmt(Objects.nonNull(finListedBondInfoQuery001Dto.getIssueSize()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssueSize()).multiply(new BigDecimal(100000000)) : null);
         finProductIssue.setIssueStyle(finListedBondInfoQuery001Dto.getReleaseType());
         finProductIssue.setAddBatch(0L);
         finProductIssue.setIssuePrice(Objects.nonNull(finListedBondInfoQuery001Dto.getIssuePx()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()) : null);
-        finProductIssue.setReferYield(Objects.nonNull(finListedBondInfoQuery001Dto.getCouponRate()) ? new BigDecimal(finListedBondInfoQuery001Dto.getCouponRate()) : null);
+        finProductIssue.setReferYield(Objects.nonNull(finListedBondInfoQuery001Dto.getCouponRate()) ? new BigDecimal(finListedBondInfoQuery001Dto.getCouponRate()).divide(new BigDecimal(100)) : null);
         finProductIssue.setRateGrade(finListedBondInfoQuery001Dto.getDecimalPlaces());
         finProductIssue.setBp(Objects.nonNull(finListedBondInfoQuery001Dto.getSpread()) ? new BigDecimal(finListedBondInfoQuery001Dto.getSpread()) : null);
         finProductIssue.setIssueDate(finListedBondInfoQuery001Dto.getIssueDate());
@@ -363,18 +364,18 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         }
         finProductIssue.setPayEdate(finListedBondInfoQuery001Dto.getEventDate());
         finProductIssue.setAssignRegdate(finListedBondInfoQuery001Dto.getDebtRegistrationDate());
-        finProductIssue.setMinPamt(finListedBondInfoQuery001Dto.getSingleMinSubAmt());
-        finProductIssue.setMaxPamt(finListedBondInfoQuery001Dto.getSingleMaxSubAmt());
-        finProductIssue.setMaxTotalamt(finListedBondInfoQuery001Dto.getMaxSubAmt());
-        finProductIssue.setMinPerTamt(finListedBondInfoQuery001Dto.getMinPerTenderAmt());
-        finProductIssue.setMaxPerUtamt(finListedBondInfoQuery001Dto.getMaxPerTenderAmt());
+        finProductIssue.setMinPamt(Objects.nonNull(finListedBondInfoQuery001Dto.getSingleMinSubAmt()) ? finListedBondInfoQuery001Dto.getSingleMinSubAmt().multiply(new BigDecimal(100000000)) : null);
+        finProductIssue.setMaxPamt(Objects.nonNull(finListedBondInfoQuery001Dto.getSingleMaxSubAmt()) ? finListedBondInfoQuery001Dto.getSingleMaxSubAmt().multiply(new BigDecimal(100000000)) : null);
+        finProductIssue.setMaxTotalamt(Objects.nonNull(finListedBondInfoQuery001Dto.getMaxSubAmt()) ? finListedBondInfoQuery001Dto.getMaxSubAmt().multiply(new BigDecimal(100000000)) : null);
+        finProductIssue.setMinPerTamt(Objects.nonNull(finListedBondInfoQuery001Dto.getMinPerTenderAmt()) ? finListedBondInfoQuery001Dto.getMinPerTenderAmt().multiply(new BigDecimal(100000000)) : null);
+        finProductIssue.setMaxPerUtamt(Objects.nonNull(finListedBondInfoQuery001Dto.getMaxPerTenderAmt()) ? finListedBondInfoQuery001Dto.getMaxPerTenderAmt().multiply(new BigDecimal(100000000)) : null);
         finProductIssue.setMinTamt(finListedBondInfoQuery001Dto.getMinTenderPxForPlan());
         finProductIssue.setMaxTamt(finListedBondInfoQuery001Dto.getMaxTenderPxForPlan());
         finProductIssue.setTenderUnit(finListedBondInfoQuery001Dto.getTenderStep());
         finProductIssue.setMaxTenderUnit(Objects.nonNull(finListedBondInfoQuery001Dto.getMedianMaxBidMarked()) ? new BigDecimal(finListedBondInfoQuery001Dto.getMedianMaxBidMarked()) : null);
         finProductIssue.setMaxTenderPlus(Objects.nonNull(finListedBondInfoQuery001Dto.getMaxTenderPxDiffer()) ? new BigDecimal(finListedBondInfoQuery001Dto.getMaxTenderPxDiffer()) : null);
         finProductIssue.setSeriYN(finListedBondInfoQuery001Dto.getContinuousTenderLimit());
-        finProductIssue.setMaxTotalTender(finListedBondInfoQuery001Dto.getMaxTotalTenderAmt());
+        finProductIssue.setMaxTotalTender(Objects.nonNull(finListedBondInfoQuery001Dto.getMaxTotalTenderAmt()) ? finListedBondInfoQuery001Dto.getMaxTotalTenderAmt().multiply(new BigDecimal(100000000)) : null);
         finProductIssue.setPayCycle(finListedBondInfoQuery001Dto.getInterestPaymentFrequency());
         finProductIssue.setIntType(finListedBondInfoQuery001Dto.getRateType());
         baseFinProductBaseInfoDto.setFinProductIssue(finProductIssue);

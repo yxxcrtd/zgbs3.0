@@ -319,7 +319,7 @@
                     OR fpi.ISSUE_CLASS = '03'
                     THEN fpi.TENDER_EDATE
                 END           AS issueDateEnd/*投标日 结束*/,
-            fpi.PAY_EDATE                            payEdate,
+            case when fpi.PAY_EDATE is not null then fpi.PAY_EDATE else fpi.PAY_DATE end payEdate/*缴款截止日*/,
             ee.ENTRUST_DATE                          entrustDate,
             ee.COUNTER_ID                            counterId,
             mcp.COUNTER_NAME                         counterName,
