@@ -251,6 +251,9 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
 //            }
 //        }
         this.getSecIdZJH(entity);
+        if(!Objects.isNull(entity.getEntrustDate())){
+            entity.setVdate(entity.getEntrustDate());
+        }
         positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct );
 
     }
@@ -325,6 +328,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             //保存不需要处理头寸
             if (!StringUtil.equals(entity.getOperateType(), "save")) {
                 //增加调用头寸引擎代码start
+                entity.setVdate(entity.getEntrustDate());
                 String decisionAct = 系统动作_修改.getValue();
                 String systemAct = 系统动作_修改.getValue();
                 EtrEntrust etrEntrust = etrEntrustBackupMapper.selectByPrimaryKey(entity.getEntrustId());
