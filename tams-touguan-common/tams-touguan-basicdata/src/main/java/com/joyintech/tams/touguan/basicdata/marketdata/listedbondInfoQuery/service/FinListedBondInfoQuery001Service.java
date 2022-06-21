@@ -170,12 +170,13 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * 加券
      *
      * @param secId
+     * @param additionalBatches
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public AjaxResult addCoupons(String secId) {
+    public AjaxResult addCoupons(String secId, Integer additionalBatches) {
         AjaxResult ajaxResult = new AjaxResult();
-        logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]", secId);
+        logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]；additionalBatches: [{}]", secId, additionalBatches);
         List<ValidMessage> validMessages = new ArrayList<>();
         FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         //该债券信息在系统中已存在，无法加券！
@@ -188,6 +189,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //债券信息查询
         FinListedBondInfoQueryRequest request = new FinListedBondInfoQueryRequest();
         request.setSecId(secId);
+        request.setAdditionalBatches(additionalBatches);
         FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = queryFinWindMarketForCoupons(request);
         if (Objects.isNull(finListedBondInfoQuery001Dto)) {
             validMessages.add(new ValidMessage("未查询到该待上市债券信息，无法加券，请手工维护"));
