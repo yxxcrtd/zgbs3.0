@@ -17,7 +17,6 @@ import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoinfo003Service;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInsertDto;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
 import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
@@ -26,6 +25,7 @@ import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSa
 import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealRegisterQuoteDto;
 import com.joyintech.tams.cfets.trd.repo.dto.RepoPtlAllocationDto;
+import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoDealQuotedPrice002Service;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdRepoTrade002Dto;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
@@ -41,7 +41,6 @@ import com.joyintech.tams.component.business.riskall.service.RiskNodeConfigServi
 import com.joyintech.tams.component.business.riskall.utils.RiskUtil;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
-import com.joyintech.tams.component.business.trade.dto.BussTrdTransfenpeiDto;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListRsk;
@@ -86,6 +85,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
     private CfetsEtrIbBondinfoService cfetsEtrIbBondinfoService;
     @Autowired
     private CfetsEtrIbRepoinfo003Service cfetsEtrIbRepoinfo003Service;
+    @Autowired
+    private CfetsRepoDealQuotedPrice002Service cfetsRepoDealQuotedPrice002Service;
 
     /**
      * 构造风险报文入参
@@ -284,7 +285,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         // 银行间质押式回购-对话/请求登记、对话报价（上行）check
         if (obj instanceof CfetsRepoDealQuoteCommonDto) {
             CfetsRepoDealQuoteCommonDto dto = JsonUtils.json2Object(businessJson, CfetsRepoDealQuoteCommonDto.class);
-            if (!StringUtil.equals(dto.getOperatorType(), "done")) {
+            if (StringUtil.equals(dto.getPageId(), "IbuQuoteRepo004")) {
                 return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.REPO001)
                         .put(NodeConfigConstant.BUSI_ACT, 业务动作_交易登记.getValue())
                         .put(NodeConfigConstant.DECISION_ACT, decisionAct)
@@ -294,11 +295,23 @@ public class RiskInputParamSerivce extends RiskCommonService {
                         .put(NodeConfigConstant.PS, dto.getPs())
                         .put(NodeConfigConstant.IS_CHECK, isCheck)
                         .put(NodeConfigConstant.DATA, dto);
-            } else {
+            } else if (StringUtil.equals(dto.getPageId(), "CfetsQuoteRepo003")){
                 // 对话报价成交check
+                if (StringUtil.equals(dto.getOperatorType(), "done")){
+                    return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.REPO001)
+                            .put(NodeConfigConstant.BUSI_ACT, 业务动作_对话报价.getValue())
+                            .put(NodeConfigConstant.DECISION_ACT, 系统动作_成交.getValue())
+                            .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                            .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_质押式回购首期.getValue())
+                            .put(NodeConfigConstant.TRADE_PLACE, 交易场所_银行间.getValue())
+                            .put(NodeConfigConstant.PS, dto.getPs())
+                            .put(NodeConfigConstant.IS_CHECK, isCheck)
+                            .put(NodeConfigConstant.DATA, dto);
+                }
+                // 对话报价check
                 return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.REPO001)
                         .put(NodeConfigConstant.BUSI_ACT, 业务动作_对话报价.getValue())
-                        .put(NodeConfigConstant.DECISION_ACT, 系统动作_成交.getValue())
+                        .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                         .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
                         .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_质押式回购首期.getValue())
                         .put(NodeConfigConstant.TRADE_PLACE, 交易场所_银行间.getValue())
@@ -321,20 +334,21 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     .put(NodeConfigConstant.DATA, dto);
 
         }
-        // 银行间质押式回购-对话报价（上行）成交
+        // 银行间质押式回购-对话报价（上行）待办事项提交check
         if (obj instanceof CfetsRepoDealQuotedPrice001Dto || StringUtil.equals(pageId, "IbuQuoteRepo003")) {
-//            CfetsRepoDealQuotedPrice001Dto dto = JsonUtils.json2Object(businessJson, CfetsRepoDealQuotedPrice001Dto.class);
-//            if (StringUtil.equals(dto.getOperatorType(),"done")){
-//                return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.REPO001)
-//                        .put(NodeConfigConstant.BUSI_ACT, 业务动作_对话报价.getValue())
-//                        .put(NodeConfigConstant.DECISION_ACT, 系统动作_成交.getValue())
-//                        .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
-//                        .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_质押式回购首期.getValue())
-//                        .put(NodeConfigConstant.TRADE_PLACE, 交易场所_银行间.getValue())
-//                        .put(NodeConfigConstant.PS, dto.getPs())
-//                        .put(NodeConfigConstant.IS_CHECK, isCheck)
-//                        .put(NodeConfigConstant.DATA, dto);
-//            }
+            CfetsRepoDealQuotedPrice001Dto dto = JsonUtils.json2Object(businessJson, CfetsRepoDealQuotedPrice001Dto.class);
+            CfetsRepoDealQuoteCommonDto cfetsRepoDealQuoteCommonDto = cfetsRepoDealQuotedPrice002Service.back2PageDto(dto);
+            if (!StringUtil.equals(cfetsRepoDealQuoteCommonDto.getOperatorType(),"done")){
+                return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.REPO001)
+                        .put(NodeConfigConstant.BUSI_ACT, 业务动作_对话报价.getValue())
+                        .put(NodeConfigConstant.DECISION_ACT, decisionAct)
+                        .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
+                        .put(NodeConfigConstant.BUSI_TYPE, 头寸业务类型_质押式回购首期.getValue())
+                        .put(NodeConfigConstant.TRADE_PLACE, 交易场所_银行间.getValue())
+                        .put(NodeConfigConstant.PS, dto.getPs())
+                        .put(NodeConfigConstant.IS_CHECK, isCheck)
+                        .put(NodeConfigConstant.DATA, cfetsRepoDealQuoteCommonDto);
+            }
         }
         // 银行间交易 - 成交确认 || 手工匹配
         if (obj instanceof CfetsTrdRepoTrade003Dto || StringUtil.equals(pageId, "CfetsTrdConfirm")) {

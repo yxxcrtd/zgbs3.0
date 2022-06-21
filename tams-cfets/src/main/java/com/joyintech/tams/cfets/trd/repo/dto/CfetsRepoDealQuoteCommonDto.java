@@ -183,6 +183,11 @@ public class CfetsRepoDealQuoteCommonDto extends BaseEntity implements ProcessEn
      */
     private Long bVersion;
 
+    /**
+     * 画面Id
+     */
+    private String pageId;
+
     public String getQuoteId() {
         return quoteId;
     }
@@ -613,6 +618,14 @@ public class CfetsRepoDealQuoteCommonDto extends BaseEntity implements ProcessEn
 
     public void setbVersion(Long bVersion) {
         this.bVersion = bVersion;
+    }
+
+    public String getPageId() {
+        return pageId;
+    }
+
+    public void setPageId(String pageId) {
+        this.pageId = pageId;
     }
 }
 
