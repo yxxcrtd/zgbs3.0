@@ -1080,9 +1080,11 @@ public class StlDataGatherService {
         paramDto.setParamDataList(dtoList);
         paramDto.setNeedUpdateStatusEntrustIdList(needUpdateStatusEntrustIdList);
         logger.debug("调用成交匹配:" + JsonUtils.object2Json(paramDto));
-        if (CollectionUtils.isEmpty(dtoList)) {
-            return;
-        }
+        // ZGCPCN-1583:dtoList为空时需要更新指令状态,不能return modify by fuyongsheng 20220621 start
+//        if (CollectionUtils.isEmpty(dtoList)) {
+//            return;
+//        }
+        // ZGCPCN-1583:dtoList为空时需要更新指令状态,不能return modify by fuyongsheng 20220621 end
         // 调用债券交易计算逻辑
         if (isSingle) {
             simpleRestTemplate.postForObject(tamsSerever + "/invest/trade/exchangetransmatch/ExchangeTransMatchCommon/transactionMacthBatch", paramDto, Map.class);

@@ -13,6 +13,7 @@ import com.joyintech.tams.invest.batch.creditprotectioncertificate.reader.Credit
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.reader.CreditProtectionCertificatePeriodReader2;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.writer.CreditProtectionCertificatePeriodWriter1;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.writer.CreditProtectionCertificatePeriodWriter2;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -63,6 +64,7 @@ public class CreditProtectionCertificatePeriodRunner extends BatchBaseService {
 
     @Override
     public JobExecution execute() throws BatchException {
+        logger.error("信用保护凭证自动生成..........");
         SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
         if (batchExecuteInfo == null) {
             logger.info("无启动参数，批处理退出。");
@@ -82,10 +84,15 @@ public class CreditProtectionCertificatePeriodRunner extends BatchBaseService {
         process2.setParams(params);
         writer2.setParams(params);
 
-        return batchBuilder.init(this)
-                .batch("step1", (BaseReader) reader1, (BaseProcessor) process1, (BaseWriter) writer1)
-                .batch("step2", (BaseReader) reader2, (BaseProcessor) process2, (BaseWriter) writer2)
-                .builder(this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId())
-                .run();
+        try {
+            return batchBuilder.init(this)
+                    .batch("step1", (BaseReader) reader1, (BaseProcessor) process1, (BaseWriter) writer1)
+                    .batch("step2", (BaseReader) reader2, (BaseProcessor) process2, (BaseWriter) writer2)
+                    .builder(this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId())
+                    .run();
+        } catch (Exception e) {
+            logger.error("信用保护凭证自动生成错误", e);
+            throw new BatchException(RiskUtil.getLogString(e));
+        }
     }
 }
