@@ -23,7 +23,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
-import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,6 @@ import org.springframework.stereotype.Service;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
-import com.joyintech.tams.common.base.entity.FinProductAdd;
-import com.joyintech.tams.common.base.entity.FinProductType;
-import com.joyintech.tams.common.base.entity.FinProductTypeKey;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -56,6 +54,10 @@ public class CommonPositionEngineService {
     private InterfPositionConfigMapper interfPositionConfigMapper;
     @Autowired
     private FinProductAddMapper finProductAddMapper;
+
+    @Autowired
+    private FinProductMapper finProductMapper;
+
     @Autowired
     private FinProductTypeMapper finProductTypeMapper;
 
@@ -69,13 +71,32 @@ public class CommonPositionEngineService {
      */
     public String getDeliveryType(String finprodId) {
         String deliveryType = StringUtil.EMPTY;
-        FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
-        if(finProductAdd!=null){
-            String isNoGuard = finProductAdd.getIsNoGuard();
-            if (StringUtil.isNotEmpty(isNoGuard) && isNoGuard.contains(DictCodeList.是否_否.getValue())) {
-                deliveryType = DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue();
-            } else {
-                deliveryType = DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue();
+        FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+        // ZGCPCN-1580:一级投标债结算方式赋值 modify by fuyongsheng 20220621 start
+        if(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(finProduct.getFinprodType2())){
+            FinProductTypeKey key = new FinProductTypeKey();
+            key.setFinprodId(finprodId);
+            key.setBranch(0L);
+            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
+            if(null != finProductType){
+                if(DictCodeList.WIND一级分类_含债券中债_国债.getValue().equals(finProductType.getType6())
+                    || DictCodeList.WIND一级分类_含债券中债_地方政府债.getValue().equals(finProductType.getType6())
+                    || DictCodeList.WIND一级分类_含债券中债_政策性金融债.getValue().equals(finProductType.getType6())){
+                    deliveryType = DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue();
+                }else{
+                    deliveryType = DictCodeListExt3.结算方式_头寸引擎_逐笔全额结算.getValue();
+                }
+            }
+            // ZGCPCN-1580:一级投标债结算方式赋值 modify by fuyongsheng 20220621 end
+        } else{
+            FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
+            if(finProductAdd!=null){
+                String isNoGuard = finProductAdd.getIsNoGuard();
+                if (StringUtil.isNotEmpty(isNoGuard) && isNoGuard.contains(DictCodeList.是否_否.getValue())) {
+                    deliveryType = DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue();
+                } else {
+                    deliveryType = DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue();
+                }
             }
         }
         return deliveryType;
