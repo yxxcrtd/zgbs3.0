@@ -171,7 +171,6 @@ public class RiskInputParamGenerateBusinessSerivce extends RiskCommonService {
         if (!StringUtil.equals(dto.getTradeMarket(), 交易场所_银行间.getValue())
                 && !StringUtil.equals(dto.getTradeMarket(), 交易场所_商业银行柜台.getValue())) {
             interfaceType = NodeConfigConstant.BOND002;
-            tradePlace = null;
         }
         // 申购方式
         String purchModle = DictCodeListExt4.头寸申购方式_自主投标.getValue();
