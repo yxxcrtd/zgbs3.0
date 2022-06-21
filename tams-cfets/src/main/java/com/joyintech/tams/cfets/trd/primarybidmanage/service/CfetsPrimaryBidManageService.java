@@ -369,8 +369,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
             bidResultTotalMapper.updateByPrimaryKeySelective(bidResultTotal);
             cfetsPrimaryBidManageMapper.updateBidOrder(entity.getBidId());
+            BaseBidManageBaseInfoDto  baseInfoDto = new BaseBidManageBaseInfoDto();
             if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                 List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
+                List<TrdProductDeal> trdProductDeals = new ArrayList<>();
                 for (TrdFinProductDealTotal trdFinProductDealTotal : trdFinProductDealTotalList) {
                     TrdFinProductDealTotal trdFinProductDealTotalRevoke = new TrdFinProductDealTotal();
                     trdFinProductDealTotalRevoke.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
@@ -401,6 +403,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                             trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
                             trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
                             trdProductDealMapper.insert(trdProductDeal);
+                            trdProductDeals.add(trdProductDeal);
                             /**交易附属表 **/
                             TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getTradeId());
                             if (trdProductDealAdd != null) {
@@ -434,6 +437,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                             stlOrdersMapper.insert(stlOrders);
                         }
                     }
+                    baseInfoDto.setTrdProductDealList(trdProductDeals);
+                    entity.setBaseBidManageBaseInfoDto(baseInfoDto);
                 }
             }
             if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
