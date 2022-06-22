@@ -301,6 +301,11 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     else if(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(settleTransDataDto.getFinprodType2())){
                         dealTotal.setUnitCprice(list.get(0).getUnitCprice());
                     }
+                    // ZGCPCN-1606:一级投标债价格使用unitCprice modify by fuyongsheng 20220622 start
+                    else if(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(settleTransDataDto.getFinprodType2())){
+                        dealTotal.setUnitCprice(settleTransDataDto.getUnitCprice());
+                    }
+                    // ZGCPCN-1606:一级投标债价格使用unitCprice modify by fuyongsheng 20220622 end
                     //单位面值  空
                     // 交易份额
                     dealTotal.setShareAmt(totalShareAmt);

@@ -1,5 +1,8 @@
 package com.joyintech.tams.common.base.entity;
 
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeListRsk;
+
 import java.util.Date;
 
 /**
@@ -127,7 +130,7 @@ public class RiskNodeConfigDtl {
      * @return INDICATOR_CONTROL 指标控制：00：不控 01：软控 02：硬控
      */
     public String getIndicatorControl() {
-        return indicatorControl;
+        return CacheUtil.getSysParam("IS_RISKMATH_SOFTCONTROL");
     }
 
     /**
@@ -191,7 +194,7 @@ public class RiskNodeConfigDtl {
      * @return CREDIT_CONTROL 授信控制：00：不控 01：软控 02：硬控
      */
     public String getCreditControl() {
-        return creditControl;
+        return Boolean.parseBoolean(CacheUtil.getSysParam("IS_CREDIT_SOFTCONTROL")) ? DictCodeListRsk.风险控制类别_软控.getValue() : DictCodeListRsk.风险控制类别_硬控.getValue();
     }
 
     /**
@@ -223,7 +226,7 @@ public class RiskNodeConfigDtl {
      * @return AUTHORIZE_CONTROL 授权控制：00：不控 01：软控 02：硬控
      */
     public String getAuthorizeControl() {
-        return authorizeControl;
+        return Boolean.parseBoolean(CacheUtil.getSysParam("IS_AUTHORIZATION_SOFTCONTROL")) ? DictCodeListRsk.风险控制类别_软控.getValue() : DictCodeListRsk.风险控制类别_硬控.getValue();
     }
 
     /**
@@ -255,7 +258,7 @@ public class RiskNodeConfigDtl {
      * @return NAME_LIST_CONTROL 名单控制：00：不控 01：软控 02：硬控
      */
     public String getNameListControl() {
-        return nameListControl;
+        return Boolean.parseBoolean(CacheUtil.getSysParam("IS_NAME_SOFTCONTROL")) ? DictCodeListRsk.风险控制类别_软控.getValue() : DictCodeListRsk.风险控制类别_硬控.getValue();
     }
 
     /**

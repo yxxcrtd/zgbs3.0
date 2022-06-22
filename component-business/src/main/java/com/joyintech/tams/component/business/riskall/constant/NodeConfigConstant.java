@@ -74,5 +74,15 @@ public class NodeConfigConstant {
      */
     public static final String REPO003 = "REPO003";
 
+    /**
+     * 指令
+     */
+    public static final String ENTRUST = "0";
+
+    /**
+     * 交易
+     */
+    public static final String TRADE = "1";
+
 
 }
