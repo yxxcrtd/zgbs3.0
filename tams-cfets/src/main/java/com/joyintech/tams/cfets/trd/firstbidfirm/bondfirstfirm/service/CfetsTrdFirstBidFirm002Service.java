@@ -3295,12 +3295,17 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         Set<String> set = new HashSet<>();
         //递增维度
         BigDecimal addDimension = minChangeUnit;
+        // 标记是否存在递增维度大于剩余指令额度
+        boolean flag = false;
         // 降序
         productDtos.sort(Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getAvaNum).reversed());
         while (tailDifference.compareTo(BigDecimal.ZERO) > 0 && size > 0) {
-            if (tailDifference.compareTo(minChangeUnit) > 0) {
+            if (tailDifference.compareTo(minChangeUnit) > 0 && !(flag && set.size() != 1)) {
                 addDimension = ArithmeticUtil.divide(tailDifference, new BigDecimal(size), 2, RoundingMode.HALF_UP);
                 addDimension = ArithmeticUtil.multiply(ArithmeticUtil.divide(addDimension, minChangeUnit, 0, RoundingMode.DOWN), minChangeUnit);
+            }
+            if (flag && set.size() != 1) {
+                addDimension = minChangeUnit;
             }
             for (CfetsTrdFirstBidFirmProductDto item : productDtos) {
                 // 分配值
@@ -3316,8 +3321,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     }
                     continue;
                 }
+                if (BigDecimalUtil.ACompareToB(addDimension, item.getAvaNumTemp(), 2) > 0) {
+                    flag = true;
+                }
                 // 处理尾差值的不同
-                if (BigDecimalUtil.ACompareToB(addDimension, minChangeUnit, 2) > 0) {
+                if (!flag) {
                     assign = addDimension;
                 } else if (BigDecimalUtil.ACompareToB(item.getAvaNumTemp(), minChangeUnit, 4) >= 0
                         && BigDecimalUtil.ACompareToB(tailDifference, minChangeUnit, 4) >= 0) {
