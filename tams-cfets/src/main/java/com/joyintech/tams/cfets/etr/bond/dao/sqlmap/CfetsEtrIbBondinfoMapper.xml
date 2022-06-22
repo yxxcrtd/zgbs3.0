@@ -750,28 +750,32 @@ from
         MCI.CUSTOMER_NAME issuer,
         TO_CHAR(t1.VDATE,'yyyy-MM-dd') vdate,
         TO_CHAR(t1.MDATE,'yyyy-MM-dd') mdate,
-        TO_CHAR(MBVI.LAST_PERIOD,'fm99990.00') ||'年' lastqx,
+        CASE WHEN MBVI.LAST_PERIOD IS NOT NULL THEN TO_CHAR(MBVI.LAST_PERIOD,'fm99990.00') ||'年' END  lastqx,
         MBVI.VALUE_SOURCE valueSource,
         TO_CHAR(MBVI.VALUE_DATE,'yyyy-MM-dd') valueDate,
         TO_CHAR(t4.PAY_DATE,'yyyy-MM-dd') lastPaydate,
         sd.ITEM_VALUE rateType,
-        TO_CHAR(ROUND(fccc.YIELD*100,4),'fm990.0000') ||'%' rate,
+        CASE
+            WHEN fccc.YIELD IS NOT NULL THEN TO_CHAR(ROUND(fccc.YIELD*100,4),'fm990.0000') ||'%'
+            END rate,
         MBCR.O_TYPE otype,
         sd1.ITEM_VALUE zxGrade,
         sd2.ITEM_VALUE ztGrade,
         t1.IS_RIGHT xqFlg,
         TO_CHAR(B.EXERCISE_DATE,'yyyy-MM-dd') xqdate,
-        TO_CHAR(MBVI.NETVALUATION_EXERCISE,'fm99990.0000') ||'元' priceXq,
-        TO_CHAR(MBVI.NETPRICE,'fm99990.0000') ||'元' priceTj,
+        CASE WHEN MBVI.NETVALUATION_EXERCISE IS NOT NULL THEN TO_CHAR(MBVI.NETVALUATION_EXERCISE,'fm99990.0000') ||'元' END priceXq,
+        CASE WHEN MBVI.NETPRICE IS NOT NULL THEN TO_CHAR(MBVI.NETPRICE,'fm99990.0000') ||'元' END priceTj,
         PJ.INNEROUTER inOrOut,
-        TO_CHAR(ROUND(MBVI.BPYIELD*100,4),'fm99990.0000') ||'%' gzRate,
+        CASE WHEN MBVI.BPYIELD IS NOT NULL THEN TO_CHAR(ROUND(MBVI.BPYIELD*100,4),'fm99990.0000') ||'%' END gzRate,
         sdltwo.ITEM_VALUE type2,
         sdlIssueType.ITEM_VALUE issueType,
         MCI2.CUSTOMER_NAME sponsorName,
         sdlCouponSpecies.ITEM_VALUE couponSpecies,
         sdlPayCycle.ITEM_VALUE payCycle,
         FCCR.BASIS basis,
-        TO_CHAR(ROUND(t1.ISSUE_AMT/10000,2),'fm999999999999999999999990.00') || '万元' issueAmt,
+        CASE
+            WHEN t1.ISSUE_AMT IS NOT NULL THEN TO_CHAR(ROUND(t1.ISSUE_AMT/10000,2),'fm999,999,999,999,999,999,999,990.00') || '万元'
+            END issueAmt,
         TO_CHAR(ROUND(MBVI.M_DURATION,2),'fm9999999999999990.00') mDuration,
         TO_CHAR(ROUND(MBVI.INTEREST_DURATION,2),'fm9999999999999990.00') interestDuration,
         TO_CHAR(ROUND(MBVI.SDURATION,2),'fm9999999999999990.00') sDuration,
@@ -779,7 +783,9 @@ from
         TO_CHAR(ROUND(MBVI.BPVALUE,4),'fm9999999999999990.0000') bpvalue,
         CASE WHEN T2.TYPE_6 = 'B13' THEN TO_CHAR(ROUND(TO_NUMBER(t1.MDATE-t1.VDATE),2),'FM99990.00')||'天'
             else TO_CHAR(months_between(t1.MDATE,t1.VDATE)/12,'FM99990.00')||'年' end as deadline,
-        TO_CHAR(ROUND(MBMI.MARKET_AMT/10000,2),'fm999999999999999999999990.00') || '万元' as secMarketAmt
+        CASE
+            WHEN MBMI.MARKET_AMT IS NOT NULL THEN TO_CHAR(ROUND(MBMI.MARKET_AMT/10000,2),'fm999,999,999,999,999,999,999,990.00') || '万元'
+            END as secMarketAmt
         FROM FIN_PRODUCT t1
         LEFT JOIN FIN_PRODUCT_TYPE t2 ON t1.FINPROD_ID = t2.FINPROD_ID
         LEFT JOIN MST_BOND_MARKET_INFO MBMI on t1.FINPROD_MARKET_ID=MBMI.SEC_ID
