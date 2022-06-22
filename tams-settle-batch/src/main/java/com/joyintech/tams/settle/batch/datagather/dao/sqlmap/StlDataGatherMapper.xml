@@ -1619,6 +1619,31 @@
 					#{item}
 				</foreach>
 			</if>
+			AND EXISTS (
+				SELECT
+					bobp.ENTRUST_ID
+				FROM
+					BID_ORDER_BID_PRICE bobp
+				LEFT JOIN
+					BID_ORDER bo ON bobp.BID_ID = bo.BID_ID
+				WHERE
+					bobp.ENTRUST_ID = T1.ENTRUST_ID
+					AND bobp.IS_WIN = #{IS_WIN_Y}
+					AND bo.BID_MODLE = #{BID_MODLE_03}
+				UNION
+				SELECT
+					brd.ENTRUST_ID
+				FROM
+					BID_RESULT_DETAIL brd
+				LEFT JOIN
+					BID_RESULT_TOTAL brt ON brd.TOTAL_WIN_ID = brt.TOTAL_WIN_ID
+				INNER JOIN
+					BID_ORDER bo ON brt.BID_ID = bo.BID_ID
+				WHERE
+					brd.ENTRUST_ID = T1.ENTRUST_ID
+					AND brt.IS_WIN = #{IS_WIN_Y}
+					AND bo.BID_MODLE = #{BID_MODLE_03}
+			)
 		</where>
 	</select>
 	<!--ZGCPCN-1469:一级投标债查询指令特殊处理,关联ETR_ENTRUST_DETAIL表 modify by fuyongsheng 20220617 end-->
@@ -1745,26 +1770,6 @@
 	</select>
 
 	<select id="selectBidEntrustIds" resultType="java.lang.String">
-		SELECT
-			bobp.ENTRUST_ID
-		FROM
-			BID_ORDER_BID_PRICE bobp
-		LEFT JOIN
-			BID_ORDER bo ON bobp.BID_ID = bo.BID_ID
-		WHERE
-			bobp.ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
-			AND bo.BID_MODLE = #{BID_MODLE_03}
-		UNION
-		SELECT
-			brd.ENTRUST_ID
-		FROM
-			BID_RESULT_DETAIL brd
-		LEFT JOIN
-			BID_RESULT_TOTAL brt ON brd.TOTAL_WIN_ID = brt.TOTAL_WIN_ID
-		INNER JOIN
-			BID_ORDER bo ON brt.BID_ID = bo.BID_ID
-		WHERE
-			brd.ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
-		  	AND bo.BID_MODLE = #{BID_MODLE_03}
+
 	</select>
 </mapper>
