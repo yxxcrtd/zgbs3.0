@@ -339,6 +339,10 @@
         where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04}) AND ROWNUM=1
     </select>
 
+    <select id="getCount" resultType="java.lang.Integer">
+        select count(*) from INTERF_WIND_RELEASE_INFO where  SEC_ID=#{finprodMarketId,jdbcType=VARCHAR}
+    </select>
+
     <!--从接口表中获取标的发行信息数据数据-->
     <select id="getProductIssueFromInterface" resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinProductIssueDto">
         SELECT

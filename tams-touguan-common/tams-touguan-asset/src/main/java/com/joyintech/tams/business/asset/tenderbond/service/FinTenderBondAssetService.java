@@ -252,8 +252,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             dto.setProductAddDto(addDto);
         }
         //dto.setCapiIncomeFeature(DictCodeList.是否_否.getValue());
-        if(list.size() > 1 ) {
-            param.put("flag","Y");
+        Integer qty = finTenderBondAssetMapper.getCount(dto.getFinprodMarketId());
+        if(Objects.nonNull(qty) && qty >1) {
+            param.put("flag", "Y");
         }
         dto.setIssueDto(finTenderBondAssetMapper.getProductIssueFromInterface(param));
         if(Objects.nonNull(dto.getIssueDto())) {

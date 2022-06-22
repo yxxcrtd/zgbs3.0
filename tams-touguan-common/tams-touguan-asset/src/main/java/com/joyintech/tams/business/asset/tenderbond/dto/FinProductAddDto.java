@@ -63,7 +63,7 @@ public class FinProductAddDto {
     /**
      * 是否接口自动更新
      */
-    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖",required = true)
+    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖")
     private String isAutoUpdate;
 
     /**

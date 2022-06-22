@@ -151,4 +151,12 @@ public interface FinTenderBondAssetMapper {
      * @return
      */
     String selectExistFinprodId(Map<String, Object> param);
+
+    /**
+     * 查询是否有多条发行信息
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    Integer  getCount(@Param("finprodMarketId") String finprodMarketId);
 }
