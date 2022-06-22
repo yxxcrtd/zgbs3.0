@@ -5,6 +5,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.constant.joyin.*;
+import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
@@ -389,6 +390,10 @@ public class TradeQueryBean implements Serializable {
     }
 
     public long getTradedVolume() {
+        if (BussTypeEnum.COUPON.codeEquals(busiTypeTg)
+                || BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.codeEquals(busiTypeTg)) {
+            return tradedVolume / 100;
+        }
         return tradedVolume;
     }
 
@@ -688,7 +693,7 @@ public class TradeQueryBean implements Serializable {
         if (StringUtil.isEmpty(busiTypeTg)) {
             return null;
         }
-        if (StringUtil.equals(busiTypeTg,"01")){
+        if (StringUtil.equals(busiTypeTg, "01")) {
             return "一级投标";
         }
         DictCodeListExt3 dictCode = DictCodeListExt3.from(DictCode.投管业务类型, busiTypeTg);
