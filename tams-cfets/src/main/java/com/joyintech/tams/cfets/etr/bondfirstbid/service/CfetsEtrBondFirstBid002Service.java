@@ -494,7 +494,12 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 dto.setTenderSdate(finProductInfo.getTenderSdate());
                 dto.setTenderEdate(finProductInfo.getTenderEdate());
                 dto.setIssueDate(finProductInfo.getIssueDate());
-                dto.setPayEdate(finProductInfo.getPayEdate());
+                if (finProductInfo.getPayEdate() != null) {
+                    dto.setPayEdate(finProductInfo.getPayEdate());
+                }else {
+                    dto.setPayEdate(finProductInfo.getPayDate());
+                }
+
                 dto.setCounterName(counterMap.get(dto.getCounterId()));
             }
         }
@@ -1018,7 +1023,12 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 dto.setTenderSdate(finProductInfo.getTenderSdate());
                 dto.setTenderEdate(finProductInfo.getTenderEdate());
                 dto.setIssueDate(finProductInfo.getIssueDate());
-                dto.setPayEdate(finProductInfo.getPayEdate());
+                if (finProductInfo.getPayEdate() != null) {
+                    dto.setPayEdate(finProductInfo.getPayEdate());
+                }else {
+                    dto.setPayEdate(finProductInfo.getPayDate());
+                }
+
                 dto.setCounterId(cfetsDto.getCounterId());
                 dto.setCounterName(counterMap.get(cfetsDto.getCounterId()));
                 dto.setTenderTarget(finProductInfo.getTenderTarget());
