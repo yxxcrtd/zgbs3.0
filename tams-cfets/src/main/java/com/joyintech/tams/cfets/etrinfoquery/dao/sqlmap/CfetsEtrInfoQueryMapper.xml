@@ -255,7 +255,7 @@
         LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
         LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
         AND brt.FINPROD_ID = bo.FINPROD_ID
-        WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+        WHERE bo.TRADE_STATUS = '01'
         GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
         ) bobrt ON 	bobrt.FINPROD_ID = FIN_PRODUCT.FINPROD_ID AND bobrt.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
     <where>
