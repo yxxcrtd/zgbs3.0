@@ -320,7 +320,6 @@ $(function () {
     	}
     }
 
-
     $('#startDate').on('change', function () {
     	//期限开始日
     	var srartDate = $('#startDate').val();
@@ -502,20 +501,46 @@ $(function () {
         });
     });
 
+	var clearPublishTypeChange = function() {
+		var publishType = $('#BussBenchMarkInfo_publishType').val();
+		//是否区间披露为 是
+		if(publishType == '01'){
+			//利率类型、利率、浮动利率、系数、利差、业绩基准重置规则不可见
+			$('#BussBenchMarkInfo_rateType').val('').trigger('change');
+			$('#BussBenchMarkInfo_rate').val('').trigger('change');
+			$('#BussBenchMarkInfo_indexId').val('').trigger('change');
+			$('#BussBenchMarkInfo_coefficient').val('').trigger('change');
+			$('#BussBenchMarkInfo_spreadRate').val('').trigger('change');
+			$('#BussBenchMarkInfo_resetType').val('').trigger('change');
+		}else{
+			$('#BussBenchMarkInfo_rateLower').val('').trigger('change');
+			$('#BussBenchMarkInfo_rateLimit').val('').trigger('change');
+		}
+	}
+
+	var getSaveObject = function() {
+		var object = $.serializeToObject('#PeriodicManagement002_Form');
+
+		object.operateType = "new";
+		object.pageModel = pageModel;
+		object.periodProdId =$('#periodProdId').val();
+		if (object.periodProdId == null || object.periodProdId == "") {
+			object.periodProdId =$('#periodProdId2').val();
+		}
+		var finFloatCalcRuleDetailList = table.getAllRows();
+		object.finFloatCalcRuleDetailList = finFloatCalcRuleDetailList;
+		return object;
+	}
 
     function saveOrSubmit(operateType) {
-    	var object = $.serializeToObject('#PeriodicManagement002_Form');
-    	object.operateType = "new";
-        object.pageModel = pageModel;
-        object.periodProdId =$('#periodProdId').val();
-        if (object.periodProdId == null || object.periodProdId == "") {
-        	object.periodProdId =$('#periodProdId2').val();
-		}
-        var finFloatCalcRuleDetailList = table.getAllRows();
-        object.finFloatCalcRuleDetailList = finFloatCalcRuleDetailList;
+    	var object = getSaveObject();
+
     	Joyin.ajaxJson(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/check', object, function(result){
     		Joyin.confirm(result.data, function() {
-            	if(operateType== 'save') {
+				clearPublishTypeChange();
+				object = getSaveObject();
+
+				if(operateType== 'save') {
                     WorkFlow.doSaveList(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/save', object, "PeriodicManagement002_btn_save");
                 }else {
                     WorkFlow.doSubmitList(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/save', object, "PeriodicManagement002_btn_submit");
