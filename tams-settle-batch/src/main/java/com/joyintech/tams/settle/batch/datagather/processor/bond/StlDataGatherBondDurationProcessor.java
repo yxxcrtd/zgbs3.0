@@ -93,6 +93,13 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                     param.put("hodingType", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                     param.put("dateType", StlDataGatherConstant.DATE_TYPE_T_0);
                     ptlSecPositions = stlDataGatherMapper.listPtlSecPositionRule(param);
+                    // ZGCPCN-1599:查询新头寸需要除以100 modify by fuyongsheng 20220622 start
+                    if(CollectionUtils.isNotEmpty(ptlSecPositions)){
+                        for(PtlSecPosition ptlSecPosition : ptlSecPositions){
+                            ptlSecPosition.setAmount(ArithmeticUtil.divide(ptlSecPosition.getAmount(), new BigDecimal(100), 4));
+                        }
+                    }
+                    // ZGCPCN-1599:查询新头寸需要除以100 modify by fuyongsheng 20220622 end
                 }
                 // ZGTFCP-1363:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220321 end
             // }
@@ -318,12 +325,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
         // 分支序号
         dealTotal.setBranch(0L);
         // 交易日
-        // dealTotal.setTradeDate(settleTransData.getTradeDate());
-        if(DictCodeList.交易方向_行权_赎回.getValue().equals(settleTransData.getPs())){
-            dealTotal.setTradeDate(settleTransData.getSettleDate());
-        }else{
-            dealTotal.setTradeDate(settleTransData.getMdate2());
-        }
+        dealTotal.setTradeDate(settleTransData.getTradeDate());
         // 起息日
         dealTotal.setVdate(settleTransData.getVdate());
         // 到期日
@@ -435,12 +437,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
         // 分支序号
         trdProductDeal.setBranch(0L);
         // 交易日
-        // trdProductDeal.setTradeDate(settleTransData.getTradeDate());
-        if(DictCodeList.交易方向_行权_赎回.getValue().equals(settleTransData.getPs())){
-            trdProductDeal.setTradeDate(settleTransData.getSettleDate());
-        }else{
-            trdProductDeal.setTradeDate(settleTransData.getMdate2());
-        }
+        trdProductDeal.setTradeDate(settleTransData.getTradeDate());
         // ZGZGST-4231:赋值起息日和到期日 fuyongsheng modify start
         // 起息日
         // trdProductDeal.setVdate(null);

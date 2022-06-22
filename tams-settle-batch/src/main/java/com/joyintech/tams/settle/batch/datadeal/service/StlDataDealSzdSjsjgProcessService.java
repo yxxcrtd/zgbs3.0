@@ -1513,8 +1513,9 @@ public class StlDataDealSzdSjsjgProcessService {
         // ImplCalendar implCalendar = new ImplCalendar();
         // settleTransData.setTradeDate(DateUtil.parse(implCalendar.calcDate(szdSjsjg.getJgqsrq(), 1,
         //        BussinessDictCodeListRds.操作符_加.getValue(), BussinessDictCodeListRds.特征值偏移单位_自然日.getValue())));
-        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+        // settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
         // modify by fuyongsheng 交易日无需+1自然日 end
+        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
         // 交割日期
         settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
         // 交易币种
@@ -1613,6 +1614,13 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setIntAmt(ArithmeticUtil.subtract(szdSjsjg.getJgsfje().abs(), settleTransData.getCpriceAmt()));
             // 全价总额 abs(清算数据Entity.收付净额)
             settleTransData.setFpriceAmt(szdSjsjg.getJgsfje().abs());
+            settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+            // 交割日期
+            if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), settleTransData.getSettleMode())){
+                settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
+            }else{
+                settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+            }
         }
         // 印花税
         settleTransData.setStampFee(BigDecimal.ZERO);
