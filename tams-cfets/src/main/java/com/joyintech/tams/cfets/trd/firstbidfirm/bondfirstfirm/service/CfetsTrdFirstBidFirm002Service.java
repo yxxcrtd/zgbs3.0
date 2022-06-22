@@ -1012,7 +1012,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 //THEN 参照原债券二级交易画面，到期收益率反算净价的算法，计算净价
                 if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
                     // 招标标的=利率时，将中标标位作为到期收益率计算；
-                    calRequest.setMatureYield(dto.getWinPrice());
+                    calRequest.setMatureYield(ArithmeticUtil.divide(dto.getWinPrice(), BigDecimal.valueOf(100), 6));
                 } else {
                     //招标标的=利差时，取现金流利率信息表.基准编号当天的利率（结合现金流利率信息表.基准利率精度）*现金流利率信息表.系数+投标标位（作为利差）作为到期收益率计算。
                     Map<String, Object> pageParam = new HashMap<>();
