@@ -421,6 +421,7 @@ $(function () {
     		//修改bug【强化测试】期次管理修改期次画面，期次开始日字段应置灰不可修改，目前未置灰。 add by wangcheng 20191030
     		$('#startDate').trigger('change').prop('disabled', true);
     		$('#periodId').trigger('change').prop('disabled', true);
+			$('#finprodId').trigger('change').prop('disabled', true);
     	}
     	//修改bug 待处理数据确认时 期次代码、期次开始日、期次结束日、投资周期置灰不可修改 add by wangcheng 20191101 start
     	if($('#operateType').val() == 'confrim'  || $('#operateType').val() == 'new'){
