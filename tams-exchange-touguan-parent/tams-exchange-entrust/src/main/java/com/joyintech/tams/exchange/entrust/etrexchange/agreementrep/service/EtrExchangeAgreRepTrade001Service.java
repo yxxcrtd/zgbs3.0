@@ -2308,7 +2308,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 if (StringUtil.isNotBlank(entity.getWorkflowId())) {
                     doDeleteWflEntity(entity.getWorkflowId());
                 }
-                doInsertWflEntity(entity);
+                //doInsertWflEntity(entity);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new BusinessException("MSG:指令提交发生异常，异常信息：" + e.getMessage());

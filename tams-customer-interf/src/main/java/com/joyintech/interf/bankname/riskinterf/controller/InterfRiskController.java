@@ -106,7 +106,8 @@ public class InterfRiskController {
 
 		}
         catch (Exception e) {
-            logger.info("==========风险三合一服务异常结束 Exception==========\r\n {}", e.getMessage());
+			//e.printStackTrace();
+            logger.error("==========风险三合一服务异常结束 Exception==========\r\n {}", e);
             if("指标状态_不通过".equals(e.getMessage())) {
 				String resStr = JsonUtils.object2Json(szcliendata.getBody());
 				logger.info("返回报文:{}", resStr);

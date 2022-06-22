@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.entrust.common.service;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.Lists;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
@@ -24,6 +25,7 @@ import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangePortfolioAlloca
 import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangeProtfolioDetailRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
+import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -136,6 +138,8 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private FinTradeProductMapper finTradeProductMapper;
 
     /**
      * 金融产品分类
@@ -903,30 +907,38 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 }
             }
             // 逆回购，到期续做 -> 新的首期
-            if (StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue())
-                    && StringUtil.equals(inputDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-                creditLinesInputDto = new CreditLinesInputDto();
-                creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
-                creditLinesInputDto.setTradeId(inputDto.getEntrustId());
-                creditLinesInputDto.setTradeDate(DateUtil.parse(inputDto.getVdate()));
-                creditLinesInputDto.setTradeStatus(status);
-                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
-                creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
-                creditLinesInputDto.setPsPayment(DictCodeList.回购类型_质押式协议回购.getValue());
-                creditLinesInputDto.setSaleCode(inputDto.getRepPs());
-                creditLinesInputDto.setPs(DictCodeList.交易方向_到期.getValue());
-                creditLinesInputDto.setCounterId(inputDto.getCounterId());
+            if (StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue())) {
+                CreditLinesInputDto creditLinesInputDto1 = new CreditLinesInputDto();
+                creditLinesInputDto1.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
+                creditLinesInputDto1.setTradeId(inputDto.getEntrustId());
+                creditLinesInputDto1.setTradeDate(DateUtil.parse(inputDto.getVdate()));
+                creditLinesInputDto1.setTradeStatus(status);
+                creditLinesInputDto1.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+                creditLinesInputDto1.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
+                creditLinesInputDto1.setPsPayment(DictCodeList.回购类型_质押式协议回购.getValue());
+                creditLinesInputDto1.setSaleCode(inputDto.getRepPs());
+                creditLinesInputDto1.setPs(DictCodeList.交易方向_到期.getValue());
+                creditLinesInputDto1.setCounterId(inputDto.getCounterId());
                 //if (riskCreditListCommonValidatorService.checkCallCredit(inputDto.getFinprodId())) {
-                    creditLinesInputDto.setTradeAmt(inputDto.getOrigPrintAmt());
-                    creditLinesInputDto.setShareAmt(inputDto.getOrigPrintAmt());
+                if(StringUtil.isNotEmpty(inputDto.getInitialNum())) {
+                    FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
+                    finTradeProductKey.setBranch(0L);
+                    finTradeProductKey.setFinprodId(inputDto.getInitialNum());
+                    FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+                    if(Objects.nonNull(finTradeProduct)) {
+                        creditLinesInputDto1.setTradeAmt(finTradeProduct.getmTradeAmt());
+                        creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
+                    }
+                }
                 //}
-                if(StringUtil.isEmpty(creditLinesInputDto.getCounterId())) {
+                if(StringUtil.isEmpty(creditLinesInputDto1.getCounterId())) {
                     return null;
                 }
+                if(Objects.nonNull(creditLinesInputDto)) {
+                    creditLinesInputDto.setInputDtoList(Lists.newArrayList(creditLinesInputDto1));
+                }
             }
-            if(Objects.isNull(creditLinesInputDto.getTradeAmt()) && Objects.isNull(creditLinesInputDto.getShareAmt())) {
-                return null;
-            }
+
         }
         if (object instanceof EtrExchangeTradeSaveSecRepoRequest) {
             EtrExchangeTradeSaveSecRepoRequest inputDto = (EtrExchangeTradeSaveSecRepoRequest) object;

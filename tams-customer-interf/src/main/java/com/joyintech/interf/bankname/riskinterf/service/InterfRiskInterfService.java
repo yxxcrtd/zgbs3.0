@@ -529,7 +529,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                 finDto.setMarketCode(null);
 
                 //获得指令的期限。mdate-vdate是实际账款天数，不等于期限
-                if(StringUtil.isNotEmpty(etrEntrustAdd)) {
+                if(StringUtil.isNotEmpty(etrEntrustAdd) && Objects.nonNull(etrEntrustAdd.getTermDays())) {
                     finDto.setOneDay(etrEntrustAdd.getTermDays());
                     finDto.setVarietyCode(String.valueOf(etrEntrustAdd.getTermDays()));
                 }

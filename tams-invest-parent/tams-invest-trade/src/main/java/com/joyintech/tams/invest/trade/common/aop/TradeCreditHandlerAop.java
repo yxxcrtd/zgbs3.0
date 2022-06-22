@@ -5,6 +5,9 @@ import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
+import com.joyintech.tams.common.base.entity.FinTradeProduct;
+import com.joyintech.tams.common.base.entity.FinTradeProductKey;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.joyintech.tams.constant.DictCodeListExt1.金融产品类型_投管用_债券质押式正回购;
 import static com.joyintech.tams.constant.DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购;
@@ -34,6 +38,8 @@ public class TradeCreditHandlerAop {
 
     @Autowired
     private TradeCommonService tradeCommonService;
+    @Autowired
+    private FinTradeProductMapper finTradeProductMapper;
 
     @Pointcut("execution(* com.joyintech.tams.invest.trade..*.*.check(..))")
     protected void checkPoint(){
@@ -264,7 +270,17 @@ public class TradeCreditHandlerAop {
                 }
                 tradeCommonService.executeOccupyCreditLines(settleDto, DictCodeListExt1.交易状态_撤销.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");
                 //TODO 这里需要处理将首期实占重新占回,这个逻辑只在协议回购中存的到期续作中存在
-
+                if(StringUtil.equals(mapTrd.get("busiType"),"09") || StringUtil.equals(mapTrd.get("busiType"),"15") ||
+                        StringUtil.equals(mapTrd.get("busiType"),"20") || StringUtil.equals(mapTrd.get("busiType"),"24")) {
+                    FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
+                    finTradeProductKey.setBranch(0L);
+                    finTradeProductKey.setFinprodId(settleDto.getFinprodId());
+                    FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+                    if(Objects.nonNull(finTradeProduct)) {
+                        settleDto.setSettleAmt(finTradeProduct.getmPrinAmt());
+                    }
+                    tradeCommonService.executeOccupyCreditLines(settleDto, DictCodeListExt1.交易状态_初始.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");
+                }
             }else {
                 tradeCommonService.executeOccupyCreditLines(args[0], DictCodeListExt1.交易状态_初始.getValue(), DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");
             }

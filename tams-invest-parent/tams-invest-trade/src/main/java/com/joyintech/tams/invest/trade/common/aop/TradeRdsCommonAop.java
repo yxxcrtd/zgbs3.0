@@ -13,6 +13,9 @@ package com.joyintech.tams.invest.trade.common.aop;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
+import com.joyintech.tams.common.base.entity.FinTradeProduct;
+import com.joyintech.tams.common.base.entity.FinTradeProductKey;
 import com.joyintech.tams.component.business.riskrds.constant.InterfUtil;
 import com.joyintech.tams.component.business.riskrds.constant.PageFieldToInterfFactory;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
@@ -96,6 +99,10 @@ public class TradeRdsCommonAop {
  // add by etliu 20210129 end
 
     // add by zhangrui1 start
+    @Autowired
+    private FinTradeProductMapper finTradeProductMapper;
+
+
     /**
      * 线程缓存
      */
@@ -333,7 +340,20 @@ public class TradeRdsCommonAop {
                 // 实占释放
                 revokeManualSettle(mapTrd, infCode, BussinessDictCodeListRds.事件类型_投资交易.getValue(),assetType,joinPoint);
                 //TODO 到期续作失败时占回原实占
-
+                if(StringUtil.equals(mapTrd.get("busiType"),"09") || StringUtil.equals(mapTrd.get("busiType"),"15") ||
+                        StringUtil.equals(mapTrd.get("busiType"),"20") || StringUtil.equals(mapTrd.get("busiType"),"24")) {
+                    FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
+                    finTradeProductKey.setBranch(0L);
+                    if(StringUtil.isNotEmpty(mapTrd.get("finprodId"))) {
+                        finTradeProductKey.setFinprodId(String.valueOf(mapTrd.get("finprodId")));
+                        FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+                        if(Objects.nonNull(finTradeProduct)) {
+                            mapTrd.put("tradeAmt",finTradeProduct.getmTradeAmt());
+                            mapTrd.put("tradeNum",finTradeProduct.getPrin());
+                            revokeManualSettle(mapTrd, BussinessDictCodeListRds.接口系统ID_实占接口.getValue(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),assetType,joinPoint);
+                        }
+                    }
+                }
                 // 预占释放
                 Map<String, Object> etrMap = new HashMap<>(mapTrd);
                 // 预占编号
