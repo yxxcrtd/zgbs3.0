@@ -80,7 +80,6 @@ import org.springframework.validation.BindingResult;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -226,6 +225,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         //退回的移到备份表
         doInsertBackupQuery(entity);
         doInsertFlow(entity);
+        this.getSecIdZJH(entity);
         //插入和修改时，指令持仓流水 、现金流水处理,支持多组合
         doInsetOrUpdateForEtrPositionHoldMulti(entity);
         //增加调用头寸引擎代码start
@@ -250,7 +250,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
 //                }
 //            }
 //        }
-        this.getSecIdZJH(entity);
+
         if(!Objects.isNull(entity.getEntrustDate())){
             entity.setVdate(entity.getEntrustDate());
         }
@@ -306,6 +306,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             doDeleteFlow(entity.getWorkflowId());
             // 重新insert
             doInsertFlow(entity);
+            this.getSecIdZJH(entity);
             if (!StringUtil.equals(entity.getOperateType(), "save")) {
                 //产品化_所有投资指令预占需求_场内交易  add by zhangpei 20201128 start
                 doInsetOrUpdateForEtrPositionHoldMulti(entity);
@@ -350,7 +351,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
                 }
                 try {
                     entity.setPositionSeqno(null);
-                    this.getSecIdZJH(entity);
+
                     positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct);
                 } catch (PositionException e) {
                     Message message = PositionUtil.ajaxErrorReturn(e);

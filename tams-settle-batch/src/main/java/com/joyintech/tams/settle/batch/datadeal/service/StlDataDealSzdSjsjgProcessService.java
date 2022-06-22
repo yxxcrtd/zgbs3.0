@@ -582,6 +582,17 @@ public class StlDataDealSzdSjsjgProcessService {
             }else{
                 settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
             }
+            if(DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+                // 交易日期
+                settleTransData.setTradeDate(DateUtil.parseDate(szdSjsjg.getJgcjrq(), DateUtil.DEFAULT_OTHER_FORMAT));
+
+                if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), settleTransData.getSettleMode())){
+                    String calendarId = CacheUtil.getSysParam(StlDataDealProcessConstant.STL_DOWNDATA_DEAL_SZJYS_CALID);
+                    settleTransData.setSettleDate(stlDataDealProcessCommonService.getNextWorkDay(settleTransData.getTradeDate(), calendarId));
+                }else{
+                    settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgcjrq()));
+                }
+            }
         }
     }
 
