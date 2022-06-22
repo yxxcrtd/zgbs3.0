@@ -1573,6 +1573,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         FinProductIssue finProductIssue = finProductIssueMapper.selectByPrimaryKey(dto.getFinprodId());
         List<CheckMassgeInfo> checkMassgeInfos = new ArrayList<>();
         boolean flag = false;
+        if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), dto.getBiddingMethod())) {
+           return ajaxResult;
+        }
         if (StringUtil.equals("1", dto.getEditFeild())) {
             // 标的类金融产品发行信息.最高投标总量 IS NOT NULL AND 汇总投标券面总额（万元）*10000 + 系统中该资产的有效、流程中的汇总券面总额 > 标的类金融产品发行信息.最高投标总量
             BigDecimal totalBiddingNum = BigDecimal.ZERO;
@@ -2949,6 +2952,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         this.deleteWflDataByWorkflowId(entity.getWorkflowId());
         if (cfetsTrdBondFirstSub002Mapper.selectBidOrders(entity.getBidId()) == 0
                 && StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
+            List<CfetsTrdFirstBidFirmInvestTradeDto> tradeDtos = this.prepareBidEntity(entity, OperationType.REVOKE);
+            // 删除流程中数据
+            tradeDtos.forEach(this::deleteTradeData);
             // 老头寸处理
             this.dealOldPosition(entity, false, true);
         }

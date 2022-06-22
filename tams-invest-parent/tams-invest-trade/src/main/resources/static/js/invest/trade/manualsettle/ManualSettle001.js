@@ -44,7 +44,7 @@
             settleSeqNo = data.settleSeqNo;
             dataTableDetail.table == null ? dataTableDetail.load() : dataTableDetail.reload();
             // GNS-940:根据资产类型控制详情列展示 modify by fuyongsheng 20220223 start
-            if(data && data.finprodType2 && data.finprodType2 === 'F01'){
+            if(data && data.finprodType2 && (data.finprodType2 === 'F01'|| data.finprodType2 === 'F37')){
                 dataTableDetail.showColumns([{field:'settleNumStr',visible: true}]);
                 dataTableDetail.showColumns([{field:'settleAmt',visible: true}]);
                 dataTableDetail.showColumns([{field:'finprodMarketId',visible: true}]);

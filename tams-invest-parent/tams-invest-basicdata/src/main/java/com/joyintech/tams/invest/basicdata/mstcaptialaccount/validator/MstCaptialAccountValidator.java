@@ -162,6 +162,55 @@ public class MstCaptialAccountValidator implements BeanValidator{
                                 getMessage("MstCaptialAccount002.swiftCode"))));
                         }
                     }
+
+                    // add by etliu 20220622 start
+                    // 3.0.6场内 ZGCPCN-1622:资金账号修改关联柜台信息时报错
+                    if(StringUtil.isNotEmpty(dto.getIsCalint())) {
+                        if(StringUtil.equals(dto.getIsCalint(), DictCodeList.是否_是.getValue())){
+                            if(!StringUtil.isNotEmpty(dto.getEffectDate())) {
+                                //生效日不能为空
+                                errorList.add(new ValidMessage("effectDate", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.effectDate"))));
+                            }
+
+                            if(!StringUtil.isNotEmpty(dto.getBasis())) {
+                                //计息基础不能为空
+                                errorList.add(new ValidMessage("basis", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.basis"))));
+                            }
+
+                            if(StringUtil.isNotEmpty(dto.getRateType())) {
+                                if(StringUtil.equals(dto.getRateType(), DictCodeList.利率类型_固定利率.getValue())) {
+                                    //利率不能为空
+                                    if(!StringUtil.isNotEmpty(dto.getRate())) {
+                                        errorList.add(new ValidMessage("rate", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.rate"))));
+                                    }
+                                } else if(StringUtil.equals(dto.getRateType(), DictCodeList.利率类型_浮动利率.getValue())) {
+                                    //浮动利率不能为空
+                                    if(!StringUtil.isNotEmpty(dto.getIndexId())) {
+                                        errorList.add(new ValidMessage("indexId", getMessage("COMMON_E_0057",
+                                                getMessage("MstCaptialAccount002.currentRate"))));
+                                    }
+                                    //系数不能为空
+                                    if(!StringUtil.isNotEmpty(dto.getCoefficient())) {
+                                        errorList.add(new ValidMessage("coefficient", getMessage("COMMON_E_0057",
+                                                getMessage("MstCaptialAccount002.coefficient"))));
+                                    }
+                                    //利差不能为空
+                                    if(!StringUtil.isNotEmpty(dto.getSpreadRate())) {
+                                        errorList.add(new ValidMessage("spreadRate", getMessage("COMMON_E_0057",
+                                                getMessage("MstCaptialAccount002.spreadRate"))));
+                                    }
+                                }
+                            } else {
+                                errorList.add(new ValidMessage("rateType", getMessage("COMMON_E_0057",
+                                        getMessage("MstCaptialAccount002.rateType"))));
+                            }
+                        }
+
+                    } else {
+                        errorList.add(new ValidMessage("isCalint", getMessage("COMMON_E_0057",
+                                getMessage("MstCaptialAccount002.isCalint"))));
+                    }
+                    // add by etliu 20220622 end
                 }
                 
                if(StringUtil.isNotEmpty(dto.getAccountType())
