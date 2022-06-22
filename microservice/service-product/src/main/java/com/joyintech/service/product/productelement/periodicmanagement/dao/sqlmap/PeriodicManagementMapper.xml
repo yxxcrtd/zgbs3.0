@@ -3,7 +3,7 @@
 <mapper namespace="com.joyintech.service.product.productelement.periodicmanagement.dao.PeriodicManagementMapper">
 	<!-- 产品代码下拉框 -->
 	<select id="getFinprodIds" resultType="com.joyintech.framework.select.SelectOptionDto">
-		SELECT 
+		SELECT
 		FIN_PRODUCT.FINPROD_ID id,
 		FIN_PRODUCT.FINPROD_MARKET_ID||':'||FIN_PRODUCT.FINPROD_ABBR text,
 		<!-- 20-06-09 产品端二级法人改造 wangyang1 start -->
@@ -24,13 +24,13 @@
 		<!-- 修改bug BSTOZ-860 end wangcheng 20191025 -->
 		AND FIN_PRODUCT_ADD.DEAL_MODE = #{dealMode10}
 		<!-- 过滤周期子产品 -->
-		AND FIN_PRODUCT.P_FINPROD_ID IS NULL 
+		AND FIN_PRODUCT.P_FINPROD_ID IS NULL
 	</select>
-	
+
 	<sql id="validStatus02_sql">
 		<!-- /*高频开放 (无开放计划，天天开放)*/ -->
 		select t.* from(
-		select 
+		select
 			'待处理' validStatus,
 	       t.periodProdId,
 	       t.periodId,
@@ -52,7 +52,7 @@
            0 branch,
            t.effDate
 		from (
-		select 
+		select
 		  fp.finprod_id periodProdId,
 		  '' periodId,/*期次代码*/
 		  fpa.investment_cycle investCycle/*投资周期*/,
@@ -71,7 +71,7 @@
 		      when fbri.rate_type = #{calcType01}
 		        then to_char(fbri.rate * 100, 'fm9990.0099999')
 		          when fbri.rate_type = #{calcType02}
-		            then fbri.index_id ||'*'|| fbri.coefficient ||'+'||to_char(fbri.spread_rate*100,'fm9990.0099999')
+		            then ite.text ||'*'|| fbri.coefficient ||'+'||to_char(fbri.spread_rate*100,'fm9990.0099999')
 		              end as baseRule,
 		  fp.p_finprod_id,
 		  fp.mdate,
@@ -81,7 +81,7 @@
 		  on fp.finprod_id = fpa.finprod_id
 		<!-- 统一 权限过滤 add by wangcheng 20191107 start-->
 		inner join PTL_PORTFOLIO_AUTHORITY ppa
-		  on fpa.PORTFOLIO_ID = ppa.PORTFOLIO_ID and ppa.USER_ID = #{userId} 
+		  on fpa.PORTFOLIO_ID = ppa.PORTFOLIO_ID and ppa.USER_ID = #{userId}
 		<!-- 统一 权限过滤 add by wangcheng 20191107 end-->
 		left join fin_open_plan fop
 		  on fp.p_finprod_id = fop.finprod_id
@@ -89,7 +89,9 @@
 			on fbri.finprod_id = fp.finprod_id
 			AND fbri.base_rule_type = #{baseRuleType01}
 			AND fbri.branch = 0
-			left join info inf on inf.eff_date = fbri.eff_date
+		left join (SELECT ITEM_CODE id, ITEM_VALUE text FROM  SYS_DATADICT_LIST WHERE 	DICT_CODE = 'SECRATE_DATA' UNION ALL SELECT  INDEX_ID id, INDEX_NAME text FROM  MST_INDEX_INFO) ite
+		    on ite.id = fbri.index_id
+		left join info inf on inf.eff_date = fbri.eff_date
 			and inf.base_rule_id = fbri.base_rule_id,
 			(select to_date(#{platDate},'yyyy-MM-dd') + level -1 as dates from dual connect by to_date(#{platDate},'yyyy-MM-dd') + level -1 &lt;= to_date(#{platDate},'yyyy-MM-dd') + 7 ) days
 		where fpa.deal_mode = #{dealMode10}
@@ -109,7 +111,7 @@
                            and t1.vdate = t.dates)) t
 		<where>
 		<if test="finprodId != null and finprodId.size() > 0">
-			and t.finprodId  in 
+			and t.finprodId  in
 			<foreach collection="finprodId" item="item" open="(" close=")" separator=",">
 				#{item}
 			</foreach>
@@ -124,13 +126,13 @@
 		and t.endDate >= to_date(#{endDateBegin},'yyyy-MM-dd')
 		</if>
 		<if test="endDateEnd != null and endDateEnd != ''">
-		and t.endDate &lt;= to_date(#{endDateEnd},'yyyy-MM-dd') 
+		and t.endDate &lt;= to_date(#{endDateEnd},'yyyy-MM-dd')
 		</if>
 		</where>
 		<!-- /*非高频开放(有开放计划)*/ -->
 		union all
 		select
-			'待处理' validStatus, 
+			'待处理' validStatus,
 	       t.periodProdId,
 	       t.periodId,
 	       to_char(t.investCycle) investCycle,
@@ -172,7 +174,7 @@
 		      when fbri.rate_type = #{calcType01}
 		        then to_char(fbri.rate * 100, 'fm9990.0099999')
 		          when fbri.rate_type = #{calcType02}
-		            then fbri.index_id ||'*'|| fbri.coefficient ||'+'||to_char(fbri.spread_rate*100,'fm9990.0099999')
+		            then ite.text ||'*'|| fbri.coefficient ||'+'||to_char(fbri.spread_rate*100,'fm9990.0099999')
 		              end as baseRule,
 		  fp.p_finprod_id,
 		  fbri.EFF_DATE effDate
@@ -189,6 +191,8 @@
 		  	on fbri.finprod_id = fp.finprod_id
 		  	AND fbri.base_rule_type = #{baseRuleType01}
 		  	AND fbri.branch = 0
+		left join (SELECT ITEM_CODE id, ITEM_VALUE text FROM  SYS_DATADICT_LIST WHERE 	DICT_CODE = 'SECRATE_DATA' UNION ALL SELECT  INDEX_ID id, INDEX_NAME text FROM  MST_INDEX_INFO) ite
+		    on ite.id = fbri.index_id
 		left join info inf on inf.eff_date = fbri.eff_date
 			and inf.base_rule_id = fbri.base_rule_id
 		where fpa.deal_mode = #{dealMode10}
@@ -229,7 +233,7 @@
 			</if>
 		</where>
 	</sql>
-	
+
 	<sql id="validStatus01_sql">
 		<!-- /*查询有效sql*/ -->
 			select
@@ -254,7 +258,7 @@
        		   t.branch,
        		   t.effDate
 			from(
-			select 
+			select
 			'有效' validStatus,
 	    	fp.p_finprod_id periodProdId,
 			ftp.period_id periodId,
@@ -276,15 +280,18 @@
 			      when fbri.rate_type = #{calcType01}
 			        then to_char(fbri.rate * 100, 'fm9990.0099999')
 			          when fbri.rate_type = #{calcType02}
-			            then fbri.index_id ||'*'|| fbri.coefficient ||'+'||to_char(fbri.spread_rate*100,'fm9990.0099999')
+			            then ite.text ||'*'|| fbri.coefficient ||'+'||to_char(fbri.spread_rate*100,'fm9990.0099999')
 			              end as baseRule,
-			  fp.p_finprod_id,
-               ftp.branch,fbri.EFF_DATE effDate
+			fp.p_finprod_id,
+            ftp.branch,
+		    fbri.EFF_DATE effDate
 			from fin_trade_product ftp
 			left join fin_product fp
 			  on fp.finprod_id = ftp.finprod_id
 			left join fin_base_rule_info fbri
 			  on fbri.finprod_id = ftp.finprod_id and fbri.branch = ftp.branch
+		    left join (SELECT  ITEM_CODE id, ITEM_VALUE text FROM  SYS_DATADICT_LIST WHERE 	DICT_CODE = 'SECRATE_DATA' UNION ALL SELECT  INDEX_ID id, INDEX_NAME text FROM  MST_INDEX_INFO) ite
+		      on ite.id = fbri.index_id
 			left join fin_product_add fpa
               on fpa.finprod_id = fp.finprod_id
             <!-- 统一 权限过滤 add by wangcheng 20191107 start-->
@@ -322,7 +329,7 @@
 				</if>
 			</where>
 	</sql>
-	
+
 	<!-- 期次管理查询 -->
 	<select id="selectForPage" resultType="com.joyintech.service.product.productelement.periodicmanagement.dto.PeriodicManagement001Dto">
 			with info as (
@@ -351,9 +358,9 @@
 			</choose>
 		) order by PERIODPRODID , STARTDATE
 	</select>
-	
+
 	<select id="getInvestCycle" resultType="com.joyintech.framework.select.SelectOptionDto">
-		select 
+		select
 	    distinct
 	    fpa.investment_cycle id,
 	    fpa.investment_cycle text
@@ -366,9 +373,9 @@
 		and fp.p_finprod_id = #{finprodId}
 		</if>
 	</select>
-	
+
 	<select id="selectBaseInfoList" resultType="com.joyintech.service.product.productelement.periodicmanagement.dto.PeriodicManagementDto">
-		select 
+		select
 		fp.finprod_id finprodId,
 		fp.finprod_abbr finprodAbbr,
 		fpa.investment_cycle investCycle,
@@ -378,21 +385,21 @@
 		from fin_product fp
 		left join fin_product_add fpa
 		on fpa.finprod_id = fp.finprod_id
-		where 1=1 
+		where 1=1
 		<if test="periodId != null and periodId != '' and branch != null and branch != '' ">
 		   and fp.finprod_id IN (
 		      select FINPROD_ID from fin_trade_product
-		      where branch = #{branch}  
+		      where branch = #{branch}
 		        and PERIOD_ID = #{periodId}
 		   )
 		</if>
 		<if test="periodId == null or periodId == ''">
-		   and fp.p_finprod_id = #{finprodId}  
-		</if> 
+		   and fp.p_finprod_id = #{finprodId}
+		</if>
 	</select>
-	
+
 	<select id="selectPeriodProdId" resultType="com.joyintech.service.product.productelement.periodicmanagement.dto.PeriodicManagementDto">
-		select 
+		select
 		fp.finprod_id periodProdId,
 		fp.finprod_abbr finprodAbbr,
 		fpa.investment_cycle investCycle,
@@ -409,7 +416,7 @@
 	</select>
 	<!-- 查询业绩基准 -->
 	<select id="selectBenchMarkInfo" resultType="com.joyintech.service.product.productelement.periodicmanagement.dto.FinBaseRuleDto">
-		select 
+		select
 		fbri.rate_type rateType,
 		fbri.rate * 100 rate,
 		fbri.index_id indexId,
@@ -430,7 +437,7 @@
 		)
 		and fbri.base_rule_type = #{baseRuleType}
 	</select>
-	
+
 	<!-- 查询浮动管理费信息 -->
 	<select id="selectFloatFeeInfo" resultType="com.joyintech.service.product.productelement.periodicmanagement.dto.FinProductFloatFeeDto">
 		select
@@ -451,7 +458,7 @@
 			fci.pay_tday_rule payTdayRule,
 			fci.pay_cycle payCycle,
 			fci.cash_id periodCashId,
-			fci.remark 
+			fci.remark
 			from
 			(select
 			fci.cash_id,
@@ -474,9 +481,9 @@
 			where fci.cash_id = ffcr.cash_id
 			and fci.cash_id = fccr.cash_id
 			and fci.fee_id = mf.fee_id
-			and fci.finprod_id = fp.finprod_id	
+			and fci.finprod_id = fp.finprod_id
 	</select>
-	
+
 	<select id="selectFloatFeeList" resultType="com.joyintech.tams.common.base.entity.FinFloatCalcRuleDetail">
 		select
 		fin_float_calc_rule_detail.LEV lev,
@@ -509,9 +516,9 @@
 		</choose>
 		and fin_cash_info.finprod_type = #{type01}
 	</select>
-	
+
 	<select id="selectCashPayRule" resultType="com.joyintech.tams.common.base.entity.FinCashPayRule">
-		select 
+		select
 	    fcpr.cash_id cashId,
 	    fcpr.eff_date effDate,
 	    fcpr.pay_cycle_val payCycleVal,
@@ -532,13 +539,13 @@
 	    from fin_cash_pay_rule fcpr
 	    where fcpr.cash_id = #{periodCashId}
 	    and fcpr.eff_date = (
-	    select max(eff_date) from fin_cash_pay_rule 
+	    select max(eff_date) from fin_cash_pay_rule
 	    where eff_date &lt;= to_date(#{platDate},'yyyy-MM-dd')
 	    )
 	</select>
-	
+
 	<select id="selectCashCalcRule" resultType="com.joyintech.tams.common.base.entity.FinCashCalcRule">
-		select 
+		select
 	    fcpr.cash_id cashId,
 	    fcpr.eff_date effDate,
 	    fcpr.calc_type calcType,
@@ -555,13 +562,13 @@
 	    from fin_cash_calc_rule fcpr
 	    where fcpr.cash_id = #{periodCashId}
 	    and fcpr.eff_date = (
-	    select max(eff_date) from fin_cash_calc_rule 
+	    select max(eff_date) from fin_cash_calc_rule
 	    where eff_date &lt;= to_date(#{platDate},'yyyy-MM-dd')
     )
 	</select>
-	
+
 	<select id="selectFinFloatCalcRule" resultType="com.joyintech.tams.common.base.entity.FinFloatCalcRule">
-		select 
+		select
 	    fcpr.cash_id cashId,
 	    fcpr.eff_date effDate,
 	    fcpr.base_rule baseRule,
@@ -574,58 +581,58 @@
 	    from fin_float_calc_rule fcpr
 	    where fcpr.cash_id = #{periodCashId}
 	    and fcpr.eff_date = (
-	    select max(eff_date) from fin_float_calc_rule 
+	    select max(eff_date) from fin_float_calc_rule
 	    where eff_date &lt;= to_date(#{platDate},'yyyy-MM-dd')
 	    )
 	</select>
-	
+
 	<select id="selectFinCashInfo" resultType="com.joyintech.tams.common.base.entity.FinCashInfo">
-		select fci.cash_id cashId 
+		select fci.cash_id cashId
 			from fin_cash_info fci
 			where fci.cash_type_1 = #{cashType1}
 			and fci.cash_type_2 = #{cashType2}
 			and fci.Branch = #{branch}
-			and fci.finprod_id = #{periodProdId} 
+			and fci.finprod_id = #{periodProdId}
 	</select>
-	
+
 	<delete id="deleteFinBaseRuleInfo" parameterType="java.util.Map">
-		delete from fin_base_rule_info 
-		where FINPROD_ID = #{periodProdId,jdbcType=VARCHAR} 
+		delete from fin_base_rule_info
+		where FINPROD_ID = #{periodProdId,jdbcType=VARCHAR}
 		  and BRANCH = #{branch}
 		  and BASE_RULE_TYPE = #{baseRuleType,jdbcType=VARCHAR}
 	</delete>
-	
+
 	<delete id="deleteFinCashPayRule" parameterType="java.lang.String">
 		delete from fin_cash_pay_rule where cash_Id = #{cashId,jdbcType=VARCHAR}
 	</delete>
-	
+
 	<delete id="deleteFinCashCalcRule" parameterType="java.lang.String">
 		delete from fin_cash_calc_rule where cash_Id = #{cashId,jdbcType=VARCHAR}
 	</delete>
-	
+
 	<delete id="deleteFloatCashCalcRule" parameterType="java.lang.String">
 		delete from fin_float_calc_rule where cash_Id = #{cashId,jdbcType=VARCHAR}
 	</delete>
-	
+
 	<delete id="deleteFloatCashCalcRuleDetail" parameterType="java.lang.String">
 		delete from fin_float_calc_rule_detail where cash_Id = #{cashId,jdbcType=VARCHAR}
 	</delete>
-	
+
 	<delete id="deleteFinCashInfo" parameterType="java.lang.String">
 		delete from fin_cash_info where cash_Id = #{cashId,jdbcType=VARCHAR}
 	</delete>
-	
+
 	<select id="selectIsExistTrade" resultType="int">
 		select count(0) from TRD_PRODUCT_DEAL t where t.finprod_id = #{periodProdId} and t.branch = #{branch}
 		AND t.TRADE_STATUS = '01' AND (t.IS_CANCEL='N' or t.IS_CANCEL IS NULL)
 	</select>
-	
+
 	<select id="checkPeriodId" resultType="int">
 		select count(0) from fin_trade_product t where t.period_id = #{periodId}
 	</select>
-	
+
 	<select id="queryFinBaseRuleInfo" resultType="com.joyintech.tams.common.base.entity.FinBaseRuleInfo">
-		select 
+		select
 		a.eff_date effDate,
 		a.rate_type rateType,
 		a.rate *100 rate,
@@ -633,41 +640,41 @@
 		a.index_source indexSource,
 		a.coefficient,
 		a.spread_rate *100 spreadRate,
-		a.reset_type resetType, 
+		a.reset_type resetType,
 		a.publish_type publishType,
 		a.rate_limit *100 rateLimit,
-		a.rate_lower *100 rateLower 
-		from fin_base_rule_info a 
+		a.rate_lower *100 rateLower
+		from fin_base_rule_info a
 		left join fin_trade_product ftp
 		 on a.finprod_id = ftp.FINPROD_ID
-		 AND ftp.branch = #{branch}  
+		 AND ftp.branch = #{branch}
 		where a.branch = #{branch}
-		and a.base_rule_type = #{BASE_RULE_TYPE} 
+		and a.base_rule_type = #{BASE_RULE_TYPE}
 		and a.EFF_DATE = to_date(#{effDate}, 'yyyy-MM-dd')
 		<if test="periodId != null and periodId != ''">
-		   and ftp.period_id = #{periodId} 
+		   and ftp.period_id = #{periodId}
 		</if>
 		<if test="periodId == null or periodId == ''">
-		   and a.finprod_id = #{periodProdId}  
+		   and a.finprod_id = #{periodProdId}
 		</if>
 	</select>
-	
-	
+
+
 	<select id="getProdIdByPeriodId" resultType="String">
 		select  ftp.FINPROD_ID
-	      from fin_trade_product ftp 
-		where ftp.branch = #{branch} 
+	      from fin_trade_product ftp
+		where ftp.branch = #{branch}
 		<if test="periodId != null and periodId != ''">
-		   and ftp.period_id = #{periodId} 
-		</if> 
+		   and ftp.period_id = #{periodId}
+		</if>
 	</select>
-	
+
 	<select id = "getTrdProductDealByPeriodId" resultType="int">
-		SELECT				
+		SELECT
     		count(1)
 		FROM
 		    TRD_PRODUCT_DEAL
-		INNER JOIN    
+		INNER JOIN
 		    FIN_TRADE_PRODUCT
 		 ON TRD_PRODUCT_DEAL.FINPROD_ID = FIN_TRADE_PRODUCT.FINPROD_ID
 		 AND TRD_PRODUCT_DEAL.BRANCH = FIN_TRADE_PRODUCT.BRANCH
