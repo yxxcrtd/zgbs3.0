@@ -1330,7 +1330,8 @@ public class TrdCommonBaseService extends BaseService {
             portfolioDto.setOrderId(infContractDetailfile.getOrderId());
             if(DictCodeListExt3.目标类型_数量.getValue().equals(portfolioDetail.getTargetType())){
                 // 指令券面总额
-                if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())) {
+                if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
+                    || DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(etrEntrust.getFinprodType2())) {
                     portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), new BigDecimal(100)));
                 } else {
                     portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum()));

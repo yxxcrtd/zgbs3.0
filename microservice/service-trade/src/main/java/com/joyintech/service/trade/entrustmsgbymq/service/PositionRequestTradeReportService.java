@@ -625,7 +625,6 @@ public class PositionRequestTradeReportService {
         //组合数据集
         List<Map<String, Object>> ptlList = new ArrayList<>(4);
         //组合附属数据集（交付物债券）
-        List<Map<String, Object>> ptlRoList = new ArrayList<>(4);
         for (PortfolioCalculateDto dto : list) {
             Map<String, Object> plt = new HashMap<>(8);
             plt.put("portfolioId", dto.getPortfolioId());
@@ -638,18 +637,8 @@ public class PositionRequestTradeReportService {
             plt.put("secAmount", dto.getSecAmount());
             plt.put("cashAmount", dto.getCashAmount());
             ptlList.add(plt);
-            //组合附属数据
-//            Map<String, Object> ptlRo = new HashMap<>();
-//            ptlRo.put("portfolioId", dto.getPortfolioId());
-//            ptlRo.put("finprodId", entity.getFinprodId());
-//            ptlRo.put("tradeId", entity.getTradeId());
-//            ptlRo.put("secAcctId", dto.getSecAcctId());
-//            ptlRo.put("secAmount", dto.getSecAmount());
-//            ptlRoList.add(ptlRo);
-
         }
         resultMap.put("ptlList", ptlList);
-//        resultMap.put("ptlRoList", ptlRoList);
     }
 
     /**

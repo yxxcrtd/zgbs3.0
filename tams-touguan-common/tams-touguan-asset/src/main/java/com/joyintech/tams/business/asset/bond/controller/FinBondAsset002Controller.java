@@ -279,7 +279,7 @@ public class FinBondAsset002Controller extends BaseController{
                 return new Message<AjaxResult>().success().setData(ajax);
             }
         }
-        if (StringUtil.equals(dto.getOperateStatus(), "NEW")) {
+        if (StringUtil.equals(dto.getOperateStatus(), "NEW") && StringUtil.isBlank(dto.getWorkflowId())) {
             WflValidInputParameter parameter = new WflValidInputParameter();
             parameter.setPageId("FinBondAsset002");
             parameter.setBusinessDataPk1(dto.getFinprodMarketId() + dto.getTradeMarketId());

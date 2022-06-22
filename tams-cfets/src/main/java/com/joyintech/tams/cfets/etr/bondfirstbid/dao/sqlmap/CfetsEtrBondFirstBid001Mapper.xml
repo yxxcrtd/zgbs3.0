@@ -8,6 +8,7 @@
             select
                 aaa.effectiveStatusName,
                 aaa.entrustStatus,
+                aaa.busiTypePosition,
                 aaa.execFinishAmt,
                 aaa.execRemainderAmt,
                 aaa.execProcess,
@@ -120,6 +121,7 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
+            eea.BUSI_TYPE_POSITION busiTypePosition,
             trunc(nvl(efs.ENT_FINISH_AMT, 0)/10000, 2)               execFinishAmt,
             trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0))/10000,2) execRemainderAmt,
             trunc(nvl(efs.ENT_FINISH_AMT, 0) /
@@ -167,7 +169,7 @@
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-                    fpi.PAY_EDATE
+                    nvl(fpi.PAY_EDATE, fpi.PAY_DATE)
                 ELSE fpi.PAY_DATE
                 END AS payEdate,
             T2.PORTFOLIO_ID portfolioId,
@@ -182,7 +184,7 @@
             ee.REMARK remark,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
+            nvl(TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd'))
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
             TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
@@ -193,6 +195,7 @@
             end as issueDateStr
 
         FROM ETR_ENTRUST ee
+        LEFT JOIN ETR_ENTRUST_ADD eea ON ee.ENTRUST_ID = eea.ENTRUST_ID
         LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
         from ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1   ) det2 ON det2.ENTRUST_ID  = ee.ENTRUST_ID
         INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON det2.PORTFOLIO_ID = PPA.PORTFOLIO_ID
@@ -298,6 +301,7 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
+            eea.BUSI_TYPE_POSITION busiTypePosition,
             trunc(nvl(efs.ENT_FINISH_AMT, 0)/10000, 2)               execFinishAmt,
             trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0))/10000,2) execRemainderAmt,
             trunc(nvl(efs.ENT_FINISH_AMT, 0) /
@@ -341,7 +345,7 @@
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-                    fpi.PAY_EDATE
+                    nvl(fpi.PAY_EDATE, fpi.PAY_DATE)
                 ELSE fpi.PAY_DATE
                 END AS payEdate,
             T2.PORTFOLIO_ID portfolioId,
@@ -356,7 +360,7 @@
             ee.REMARK remark,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
+            nvl(TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd'))
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
             TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
@@ -367,6 +371,7 @@
             end as issueDateStr
 
         FROM WFL_ETR_ENTRUST ee
+        LEFT JOIN WFL_ETR_ENTRUST_ADD eea ON ee.ENTRUST_ID = eea.ENTRUST_ID
         LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
         from WFL_ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1   ) det2 ON det2.ENTRUST_ID  = ee.ENTRUST_ID
         INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON det2.PORTFOLIO_ID = PPA.PORTFOLIO_ID

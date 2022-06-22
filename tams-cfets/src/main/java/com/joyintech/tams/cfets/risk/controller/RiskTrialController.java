@@ -47,7 +47,7 @@ public class RiskTrialController {
                 m.setData(result);
                 return new Message<AjaxResult>().success().setData(m);
             }
-            RiskCommonOutputDto outputDto = paramSerivce.buildParamThenRisk(param, 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), pageId);
+            RiskCommonOutputDto outputDto = paramSerivce.buildParamThenRisk(param, 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), pageId,null);
             CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
             result.setRiskMathFlag("02");
             AjaxResult m = new AjaxResult();

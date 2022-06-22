@@ -17,6 +17,7 @@ import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoinfo003Service;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInsertDto;
+import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
 import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
@@ -210,7 +211,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             }
             return map;
         }*/
-        if (obj instanceof CfetsBondDealRegisterQuoteDto || StringUtil.equals(pageId, "IbuQuoteBond004")) {
+        if (obj instanceof CfetsBondDealRegisterQuoteDto || obj instanceof CfetsBondDealQuoteCommonDto  || StringUtil.equals(pageId, "IbuQuoteBond004")) {
             CfetsBondDealRegisterQuoteDto dto = JsonUtils.json2Object(businessJson, CfetsBondDealRegisterQuoteDto.class);
             BaseMap map = BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.BOND001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_交易登记.getValue())
@@ -418,12 +419,33 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @param pageId
      * @return
      */
-    public RiskCommonOutputDto buildParamThenRisk(Object obj, String decisionAct, String flowStatus, String pageId) {
+    public RiskCommonOutputDto buildParamThenRisk(Object obj, String decisionAct, String flowStatus, String pageId,String eventType) {
         BaseMap map = generateBusinessDto(obj, decisionAct, flowStatus, true, pageId);
         RiskCommonInputDto inputDto = getRiskInputParam(map);
         if (inputDto == null) return new RiskCommonOutputDto();
+        inputDto.setEventType(eventType);
+        if(StringUtil.isEmpty(eventType)) {
+            setEventType(inputDto,pageId);
+        }
         return doRisk(inputDto);
     }
+
+    /**
+     * 根据pageId判定是交易还是指令
+     *
+     * @param pageId
+     * @return
+     */
+    private void setEventType(RiskCommonInputDto inputDto,String pageId) {
+        List<String> etrList = Lists.newArrayList("CfetsEtrIbBondinfo003","CfetsEtrIbRepoinfo003","CfetsEtrBondInfo","CfetsEtrBondFirstBid002");
+        if(etrList.contains(pageId)) {
+            inputDto.setEventType(NodeConfigConstant.ENTRUST);
+        }else {
+            inputDto.setEventType(NodeConfigConstant.TRADE);
+        }
+    }
+
+
 
     /**
      * 指标和授信占用
@@ -462,10 +484,10 @@ public class RiskInputParamSerivce extends RiskCommonService {
         Object data = param.get(NodeConfigConstant.DATA);
         RiskCommonInputDto inputDto = new RiskCommonInputDto();
         BeanUtil.copyPropertiesIgnoreNull(inputDto, dtl);
-        this.buildAuthorizeParam(inputDto, data, dtl);
+        this.buildAuthorizeParam(inputDto, data, dtl, isCheck);
         inputDto.setCreditInputList(this.buildCreditParam(data, dtl));
         inputDto.setRiskRdsDtoList(this.buildRiskRdsParam(data, dtl, isCheck));
-        inputDto.setRiskNameList(this.buildRiskNameParam(data, dtl));
+        inputDto.setRiskNameList(this.buildRiskNameParam(data, dtl,isCheck));
         logger.info("{}", JsonUtils.object2Json(inputDto));
         return inputDto;
     }
@@ -787,8 +809,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @param data
      * @return
      */
-    public List<RiskNameListDto> buildRiskNameParam(Object data, RiskNodeConfigDtl dtl) {
-        if (this.isControl(dtl.getNameListControl())) {
+    public List<RiskNameListDto> buildRiskNameParam(Object data, RiskNodeConfigDtl dtl,boolean isCheck) {
+        if (!isCheck) {
             return null;
         }
         RiskNameListDto listDto = new RiskNameListDto();
@@ -830,7 +852,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
         } else if (data instanceof CfetsRepoDealQuoteCommonDto) {
             // 银行间质押式回购-对话/请求登记、对话报价（上行）check
             CfetsRepoDealQuoteCommonDto businessDto = (CfetsRepoDealQuoteCommonDto) data;
-            listDto.setCounterId(businessDto.getCounterId());
+            listDto.setCounterId(businessDto.getCounterPartyId());
             listDto.setInputValue1(DictCodeList.平安资产类型_质押式回购.getValue());
             listDto.setInputValue2(DictCodeList.回购类型_质押式回购.getValue());
             listDto.setInputValue3(businessDto.getPs());
@@ -879,8 +901,10 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @param dtl
      * @return
      */
-    public void buildAuthorizeParam(RiskCommonInputDto dto, Object data, RiskNodeConfigDtl dtl) {
-        if (this.isControl(dtl.getAuthorizeControl())) return;
+    public void buildAuthorizeParam(RiskCommonInputDto dto, Object data, RiskNodeConfigDtl dtl,boolean isCheck) {
+        if (!isCheck) {
+            return;
+        }
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
             // 一级投标确认
             riskInputBuildAuthorizeParamSerivce.buildCfetsTrdFirstBidFirmInfoParam(dto, data);
@@ -984,7 +1008,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @return
      */
     private boolean isControl(String control) {
-        return StringUtil.isEmpty(control) || StringUtil.equals(control, DictCodeListRsk.风险控制类别_不控.getValue());
+        //return StringUtil.isEmpty(control) || StringUtil.equals(control, DictCodeListRsk.风险控制类别_不控.getValue());
+        return false;
     }
 
     /**

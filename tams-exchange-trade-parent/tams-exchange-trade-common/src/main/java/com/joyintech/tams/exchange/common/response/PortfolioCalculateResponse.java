@@ -79,6 +79,9 @@ public class PortfolioCalculateResponse {
     @JsonProperty("instructionLeftNum")
     private Long instructionLeftNum;
 
+    /**
+     * 指令数量
+     */
     @JsonProperty("etrSecAmount")
     public BigDecimal etrSecAmount;
 

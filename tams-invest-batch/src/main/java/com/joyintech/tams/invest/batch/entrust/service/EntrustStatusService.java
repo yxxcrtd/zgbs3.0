@@ -108,7 +108,8 @@ public class EntrustStatusService {
                                     || (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
                                     || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                                     || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()))
-                                    || (StringUtil.equals(item.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())))
+                                    || (StringUtil.equals(item.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue()))
+                                    || (StringUtil.equals(item.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())))
                     .collect(Collectors.toList());
             //entrustStatusMapper.updateDistributeStatus(params);//add by yangwenjun 20201211 更新委托指令分发表中的接收状态
            // entrustStatusMapper.updateEntrustStatus(params);

@@ -219,6 +219,17 @@ public class CfetsEtribBondInfo003Dto extends EtrEntrust implements ProcessEntit
 
     private String systemAct;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型")
+    private String busiTypePosition;
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
     public String getBusinessId() {
         return businessId;
     }

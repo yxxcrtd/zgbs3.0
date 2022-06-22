@@ -301,14 +301,14 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             dto.setFinprodId(creditProtectionCertificate002Service.getFinprodId(dto));
         }
         //文件信息
-        if (StringUtil.isNotEmpty(dto.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(dto.getMstFileInputParameter().getFileList())
-                && StringUtil.isNotEmpty(dto.getFinprodId())) {
-            // 将附件和当前业务对象绑定（更新附件的业务代码）
-            fileAttachmentProcess.updateBussinessNo(
-                    dto.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
-                            Collectors.toList()),
-                    dto.getFinprodId());
-        }
+//        if (StringUtil.isNotEmpty(dto.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(dto.getMstFileInputParameter().getFileList())
+//                && StringUtil.isNotEmpty(dto.getFinprodId())) {
+//            // 将附件和当前业务对象绑定（更新附件的业务代码）
+//            fileAttachmentProcess.updateBussinessNo(
+//                    dto.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
+//                            Collectors.toList()),
+//                    dto.getFinprodId());
+//        }
         ProcessParameter<CreditProtectionCertificate002Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CreditProtectionCertificate002Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());

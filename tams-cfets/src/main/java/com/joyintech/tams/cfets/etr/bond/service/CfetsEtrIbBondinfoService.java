@@ -2348,17 +2348,22 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         List<CfetsEtrIbClosePosEtrRequest> etrList=new ArrayList<>();
         for(CfetsEtribBondInfo003Dto t: dtolist){
             CfetsEtrIbClosePosEtrRequest closeItem=new CfetsEtrIbClosePosEtrRequest();
-            String busiTypePosition=DictCodeListExt3.头寸业务类型_现券交易.getValue();
-            if (StringUtil.equals(assetType, DictCodeList.平安资产类型_质押式回购.getValue())) {
-                busiTypePosition = DictCodeListExt3.头寸业务类型_质押式回购首期.getValue();
-            } else if (StringUtil.equals(assetType, DictCodeList.平安资产类型_一级市场债.getValue())) {
-                busiTypePosition = DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
+            String busiTypePosition = DictCodeListExt3.头寸业务类型_现券交易.getValue();
+            if (StringUtil.isNotEmpty(t.getBusiTypePosition())) {
+                busiTypePosition = t.getBusiTypePosition();
             } else {
-                if (StringUtil.isNotEmpty(t.getPs())
-                        && StringUtil.equals(t.getPs(), BussinessDictCodeList.交易方向_行权回售.getValue())) {
-                    busiTypePosition = DictCodeListExt3.头寸业务类型_债券行权交易.getValue(); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易
+                if (StringUtil.equals(assetType, DictCodeList.平安资产类型_质押式回购.getValue())) {
+                    busiTypePosition = DictCodeListExt3.头寸业务类型_质押式回购首期.getValue();
+                } else if (StringUtil.equals(assetType, DictCodeList.平安资产类型_一级市场债.getValue())) {
+                    busiTypePosition = DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
+                } else {
+                    if (StringUtil.isNotEmpty(t.getPs())
+                            && StringUtil.equals(t.getPs(), BussinessDictCodeList.交易方向_行权回售.getValue())) {
+                        busiTypePosition = DictCodeListExt3.头寸业务类型_债券行权交易.getValue(); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易
+                    }
                 }
             }
+
             closeItem.setBusiType(busiTypePosition);
             closeItem.setPs(t.getPs());
             closeItem.setCloseId(t.getEntrustId());

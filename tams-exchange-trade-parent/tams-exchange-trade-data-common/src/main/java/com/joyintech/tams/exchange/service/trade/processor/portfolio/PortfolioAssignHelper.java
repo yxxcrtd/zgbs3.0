@@ -214,7 +214,9 @@ public class PortfolioAssignHelper {
             portfolioDetail.setBusiStatus(PortfolioDetailBusiStatusEnum.CONFIRM.getCode());
             portfolioDetail.setBusiType(busiType.getCode());
 
-            portfolioDetail.setEtrSecAmount(detail.getEntrustAmt());
+            //指令数量
+            portfolioDetail.setEtrSecAmount(detail.getEntrustNum());
+
             list.add(portfolioDetail);
             if (i == len - 1) {
                 portfolioDetail.setTargetNum(totalVolume);

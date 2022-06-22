@@ -34,7 +34,7 @@ public class LogAspect {
         logger.debug("className [{}] methodName [{}] return result [{}]",
                 joinPoint.getTarget().getClass().getName(),
                 joinPoint.getSignature().getName(),
-                cn.hutool.json.JSONUtil.toJsonStr(returnVal));
+                null);
     }
 
     private HttpServletRequest getRequest() {

@@ -1,6 +1,7 @@
 package com.joyintech.tams.cfets.risk.service;
 
 import com.joyintech.background.component.common.pack.common.util.JsonUtils;
+import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
@@ -128,12 +129,14 @@ public class RiskInputBuildAuthorizeParamSerivce extends RiskCommonService {
         dto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
         dto.setTradeMarket(infoDto.getTradeMarket());
         dto.setPs(DictCodeList.交易方向_买入.getValue());
-        FinProductTypeKey key = new FinProductTypeKey();
-        key.setFinprodId(infoDto.getFinprodId());
-        key.setBranch(0L);
-        FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
-        dto.setAssetSecType(finProductType.getType9());
-        dto.setFinprodId(infoDto.getFinprodId());
+        if(StringUtil.isNotEmpty(infoDto.getFinprodId())) {
+            FinProductTypeKey key = new FinProductTypeKey();
+            key.setFinprodId(infoDto.getFinprodId());
+            key.setBranch(0L);
+            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
+            dto.setAssetSecType(finProductType.getType9());
+            dto.setFinprodId(infoDto.getFinprodId());
+        }
     }
 
 }
