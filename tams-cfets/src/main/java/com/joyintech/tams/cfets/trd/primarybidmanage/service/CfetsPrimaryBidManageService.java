@@ -1840,7 +1840,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             List<String> finishEtrList = new ArrayList<>();
             // 判断委托代码的完成额度是否大于等于100
             for (BaseEtrFinishAmtDto etrFinishAmtDto : etrFinishAmtDtoList) {
-                if (etrFinishAmtDto.getSumFinishPercent().compareTo(BigDecimal.valueOf(100)) >= 1) {
+                if (etrFinishAmtDto.getSumFinishPercent().compareTo(BigDecimal.valueOf(100)) >= 0 ) {
                     // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“已完成”
                     etrInvestInfoServiceImpl.updateDelegateStatus(etrFinishAmtDto.getEntrustId(), DictCodeList.委托状态_已完成.getValue());
                     finishEtrList.add(etrFinishAmtDto.getEntrustId());
