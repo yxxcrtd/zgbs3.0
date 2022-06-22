@@ -2474,8 +2474,8 @@ public class StlDataDealSzdJsmxProcessService {
 		if(StringUtil.equals(szdJsmx.getYwlx(), StlDataDealProcessConstant.YWLX_352)){ // 债券兑付
 			FinProduct finProduct = settleCommonService.selectFinProduct(settleTransData.getFinprodId());
 			// 清算数据的交易日期 == 标的信息的到期日
-			String jyrq = StringUtil.isNotEmpty(szdJsmx.getJyrq()) ? szdJsmx.getJyrq() : szdJsmx.getQsrq();
-			if(DateUtil.parse(jyrq).equals(finProduct.getMdate())){
+			String jyrq = szdJsmx.getJsrq();
+			if(DateUtil.parse(jyrq).compareTo(finProduct.getMdate()) >= 0){
 				// 交易方向
 				settleTransData.setPs(DictCodeList.交易方向_到期.getValue());
 				// 业务场景细类
