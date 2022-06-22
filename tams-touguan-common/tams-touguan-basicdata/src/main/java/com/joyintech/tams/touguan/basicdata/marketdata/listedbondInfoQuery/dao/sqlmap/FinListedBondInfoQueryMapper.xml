@@ -314,6 +314,15 @@
                 AND SEC_INFO.BOND_ABBREVIATION = #{secName,jdbcType=VARCHAR}
             </if>
 
+            <choose>
+                <when test="additionalBatches != null">
+                    AND RELEASE_INFO.ADDITIONAL_BATCHES = #{additionalBatches,jdbcType=INTEGER}
+                </when>
+                <otherwise>
+                    AND RELEASE_INFO.ADDITIONAL_BATCHES is null
+                </otherwise>
+            </choose>
+
         </where>
     </select>
 

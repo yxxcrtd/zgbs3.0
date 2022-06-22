@@ -510,7 +510,13 @@ public class PositionInfoService {
         /*账户现金*/
         resp.add(BaseMap.newMap()
                 .put("field", "ZHXJ")
-                .put("name", "账户现金（元）")
+                .put("name", "托管户账户现金（元）")
+                .put("amount", "--")
+                .put("type", "xj"));
+
+        resp.add(BaseMap.newMap()
+                .put("field", "ZQHKQXJ")
+                .put("name", "券商户可取现金（元）")
                 .put("amount", "--")
                 .put("type", "xj"));
 
@@ -519,7 +525,7 @@ public class PositionInfoService {
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", "RRQMKDGHCC")
-                    .put("name", "融入券卖空待购回持仓（元）")
+                    .put("name", "卖空待回购持仓（元）")
                     .put("amount", "--")
                     .put("type", "cc"));
         }

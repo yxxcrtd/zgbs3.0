@@ -690,15 +690,10 @@ public class EtrExchangeTradeCpc001Controller extends BaseController {
                 if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
                     riskEtrExchangeTrade001DtoList=riskPreEtrExchangeTrade001DtoList;
                     String infCode = BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue();
-                    //风险用新的list
-
-                    // add by zhangrui1 start
                     AjaxResult ar = ExchangeEntrustRdsCommonAop.doListPreOccupy("EtrExchangeTradeMulti001", riskPreEtrExchangeTrade001DtoList,
                             infCode);
                     if (null != ar) {
-                        //return new Message<AjaxResult>().success().setData(ar);
                     }
-
                     ExchangeEntrustRdsCommonAop.riskListToChildren(dto.getRiskTrialRetDto(), riskEtrExchangeTrade001DtoList,
                             (etrExchangeTrade001Dto, list) -> etrExchangeTrade001Dto.setRiskTrialRetDto(list));
                 }

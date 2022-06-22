@@ -27,8 +27,9 @@ public class FinListedBondInfoQuery003Controller extends BaseController {
     @ResponseBody
     @PostMapping("/addCoupons")
     @ApiOperation(value = "加券按钮", notes = "加券按钮")
-    public Message<AjaxResult> addCoupons(@RequestParam("secId") String secId) {
-        AjaxResult ajaxResult = finListedBondInfoQuery001Service.addCoupons(secId);
+    public Message<AjaxResult> addCoupons(@RequestParam("secId") String secId,
+                                          @RequestParam(value = "additionalBatches", required = false) Integer additionalBatches) {
+        AjaxResult ajaxResult = finListedBondInfoQuery001Service.addCoupons(secId, additionalBatches);
         return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 

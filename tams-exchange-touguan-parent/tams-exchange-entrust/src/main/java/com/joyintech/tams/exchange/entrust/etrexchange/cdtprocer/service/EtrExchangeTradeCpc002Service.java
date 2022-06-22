@@ -252,16 +252,20 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                 EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() + r.getFinprodId());
                 if (dto != null) {
                     // 1.持仓成本（元）
-                    r.setPositionsAmt(dto.getBuyCostAmt());
+//                    r.setPositionsAmt(dto.getBuyCostAmt());
                     // 2.持仓成本单位价（元） 取单位成本
                     r.setPositionUnitCost(dto.getUnitCost());
                 }
+                //持仓成本
+                BigDecimal positionsAmt = ArithmeticUtil.multiply(r.getPositionUnitCost(),
+                        ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100")));
+                r.setPositionsAmt(positionsAmt);
                 // 最新净价*组合持仓.数量 - 持仓成本 as 浮动盈亏
                 BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(),
                         ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, r.getPositionsNum(), 2);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, r.getPositionsAmt(), 2);
                 //add wsz 20220620 修改持仓浮动盈亏百分比 start
                 r.setFloatingPL(ArithmeticUtil.multiply(floatPL,new BigDecimal(100)));
                 //add wsz 20220620 修改持仓浮动盈亏百分比 end

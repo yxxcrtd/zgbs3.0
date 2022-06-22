@@ -80,7 +80,6 @@ import org.springframework.validation.BindingResult;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -226,6 +225,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         //退回的移到备份表
         doInsertBackupQuery(entity);
         doInsertFlow(entity);
+        this.getSecIdZJH(entity);
         //插入和修改时，指令持仓流水 、现金流水处理,支持多组合
         doInsetOrUpdateForEtrPositionHoldMulti(entity);
         //增加调用头寸引擎代码start
@@ -250,7 +250,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
 //                }
 //            }
 //        }
-        this.getSecIdZJH(entity);
+
         if(!Objects.isNull(entity.getEntrustDate())){
             entity.setVdate(entity.getEntrustDate());
         }
@@ -306,6 +306,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             doDeleteFlow(entity.getWorkflowId());
             // 重新insert
             doInsertFlow(entity);
+            this.getSecIdZJH(entity);
             if (!StringUtil.equals(entity.getOperateType(), "save")) {
                 //产品化_所有投资指令预占需求_场内交易  add by zhangpei 20201128 start
                 doInsetOrUpdateForEtrPositionHoldMulti(entity);
@@ -350,7 +351,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
                 }
                 try {
                     entity.setPositionSeqno(null);
-                    this.getSecIdZJH(entity);
+
                     positionRequestService.sendEtrExchangeTradeSaveRequest(entity, decisionAct, systemAct);
                 } catch (PositionException e) {
                     Message message = PositionUtil.ajaxErrorReturn(e);
@@ -628,13 +629,32 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
      * @param dto
      */
     public void doInsetOrUpdateForEtrPositionHoldMulti(EtrCreditProtectionCertificateApplyRequest dto) {
-        if (StringUtil.equals(dto.getIsMulti(), DictCodeList.是否_是.getValue())) {
-            List<EtrCreditProtectionCertificateApplyRequest> EtrExchangeTrade001DtoList = new ArrayList<>();
+        Map<String,List<EtrExchangeTradePortfolioSecRepoRequest>> groupMap= dto.getPortfolioList().stream().collect(
+                Collectors.groupingBy(item->item.getAcctNo()));
+        if(groupMap.keySet().size() > 1 && dto.getPortfolioList().size()>1) {
             for (EtrExchangeTradePortfolioSecRepoRequest item : dto.getPortfolioList()) {
                 EtrCreditProtectionCertificateApplyRequest etrExchangeTrade001Dto = this.genEtrExchangeTradeSaveSecRepoRequest(dto, item);
                 doInsetOrUpdateForEtrPositionHold(etrExchangeTrade001Dto);
             }
         } else {
+            EtrExchangeTradePortfolioSecRepoRequest item=dto.getPortfolioList().get(0);
+            BigDecimal totalEntrustAmt = null;
+            if(dto.getPortfolioList().get(0).getEntrustAmt()!=null){
+                totalEntrustAmt = dto.getPortfolioList().stream().map(EtrExchangeTradePortfolioSecRepoRequest::getEntrustAmt).reduce(BigDecimal::add).get();
+            }
+            BigDecimal totalEntrustNum = dto.getPortfolioList().stream().map(EtrExchangeTradePortfolioSecRepoRequest::getEntrustNum).reduce(BigDecimal::add).get();
+            dto.setEntrustAmt(totalEntrustAmt);
+            dto.setEntrustNum(totalEntrustNum);
+            dto.setVdate(dto.getEntrustDate());
+            dto.setMdate(dto.getEntrustDate());
+            dto.setAcctNo(item.getAcctNo());
+            dto.setSecAcctId(item.getSecAcctId());
+            dto.setStockId(dto.getStockId());
+            dto.setInvManagerId(LoginUserUtil.getUserName());// 投资经理
+            dto.setCreateUser(LoginUserUtil.getUserName());// 用户名
+            dto.setCreateDept(LoginUserUtil.getDeptCode());// 用户部门
+            dto.setCreateTime(new Date());// 创建时间
+            dto.setPortfolioId(item.getPortfolioId()); //让指令分发能查出来
             doInsetOrUpdateForEtrPositionHold(dto);
         }
 
