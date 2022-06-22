@@ -1744,7 +1744,7 @@
 		</where>
 	</select>
 
-	<select id="selectBidOrderBidPrices" resultType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
+	<select id="selectBidEntrustIds" resultType="java.lang.String">
 		SELECT
 			bobp.ENTRUST_ID
 		FROM
@@ -1754,5 +1754,17 @@
 		WHERE
 			bobp.ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
 			AND bo.BID_MODLE = #{BID_MODLE_03}
+		UNION
+		SELECT
+			brd.ENTRUST_ID
+		FROM
+			BID_RESULT_DETAIL brd
+		LEFT JOIN
+			BID_RESULT_TOTAL brt ON brd.TOTAL_WIN_ID = brt.TOTAL_WIN_ID
+		INNER JOIN
+			BID_ORDER bo ON brt.BID_ID = bo.BID_ID
+		WHERE
+			brd.ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
+		  	AND bo.BID_MODLE = #{BID_MODLE_03}
 	</select>
 </mapper>
