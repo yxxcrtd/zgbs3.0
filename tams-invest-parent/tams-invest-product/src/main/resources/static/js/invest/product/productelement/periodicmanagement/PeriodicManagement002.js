@@ -383,6 +383,22 @@ $(function () {
     	}
     });
 
+	var bussBenchMarkInfoRateType= function(){
+		var rateType = $('#BussBenchMarkInfo_rateType').val();
+		if(rateType == '01'){
+			$('#BussBenchMarkInfo_indexId').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_coefficient').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_spreadRate').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_resetType').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_rate').trigger('change').prop('disabled', false);
+		}else{
+			$('#BussBenchMarkInfo_indexId').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_coefficient').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_spreadRate').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_resetType').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_rate').trigger('change').prop('disabled', true);
+		}
+	}
 
 
     var init = function(){
@@ -439,6 +455,9 @@ $(function () {
     	//修改bug 待处理数据确认时 期次代码、期次开始日、期次结束日、投资周期置灰不可修改 add by wangcheng 20191101 end
     	finprodIdChangrAction();
     	publishTypeChangeAction();
+		bussBenchMarkInfoRateType();
+		feeIdChangeAction();
+
     	var rateType = $('#BussFinProductFloatFee_rateType').val();
     	if(rateType == '01'){
     		$('#BussFinProductFloatFee_indexId').val('').trigger('change').prop('disabled', true);
