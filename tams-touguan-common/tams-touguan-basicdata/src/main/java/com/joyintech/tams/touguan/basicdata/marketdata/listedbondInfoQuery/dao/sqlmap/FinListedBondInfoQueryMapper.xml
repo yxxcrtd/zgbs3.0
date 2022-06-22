@@ -54,8 +54,14 @@
         nvl(to_char(RDI_RELEASE_INFO.MAX_PER_TENDER_AMT, 'fm99999999999990.00'), to_char(RELEASE_INFO.MAX_PER_TENDER_AMT, 'fm99999999999990.00')) as maxPerTenderAmt,
         RDI_RELEASE_INFO.REMARK as REMARK,
         PRODUCT.FINPROD_ID FINPRODID,
-        nvl(to_char(RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd'), to_char(RELEASE_INFO.BID_BEGIN_DATE,'yyyy-mm-dd') ||' - '|| to_char(RELEASE_INFO.BID_END_DATE,'yyyy-mm-dd'))
-        as additionalTenderDate,
+        CASE
+        WHEN
+        RELEASE_INFO.ISSUE_DATE IS NOT NULL THEN
+        to_char( RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd' )
+        WHEN RELEASE_INFO.BID_BEGIN_DATE IS NOT NULL
+        OR RELEASE_INFO.BID_END_DATE IS NOT NULL THEN
+        to_char( RELEASE_INFO.BID_BEGIN_DATE, 'yyyy-mm-dd' ) || ' - ' || to_char( RELEASE_INFO.BID_END_DATE, 'yyyy-mm-dd' ) ELSE to_char( RELEASE_INFO.ADDITIONAL_TENDER_BEGIN_DATE, 'yyyy-mm-dd' ) || ' - ' || to_char( RELEASE_INFO.ADDITIONAL_TENDER_END_DATE, 'yyyy-mm-dd' )
+        END additionalTenderDate,
 
         nvl(to_char(RDI_RELEASE_INFO.COUPON_RATE, 'fm99999999999990.0000'), to_char(RELEASE_INFO.COUPON_RATE, 'fm99999999999990.0000')) as couponRate
 

@@ -456,7 +456,7 @@
         var riskLists = entity_RiskTrialRetList || [];
         if (riskLists.length > 0) {
             $("#riskTrialSpan").html("&nbsp;&nbsp;" + riskLists[0].conclusion);
-            setRiskFlag(0);
+            setRiskFlag(1);
         }
     }
 
@@ -729,6 +729,10 @@
         }
         if(Number(tradeAmt) !== entrustNumAll) {
             Joyin.error("券面总额与组合分配处的券面总额不一致")
+            return false;
+        }
+        if(riskFlag === 1) {
+            Joyin.error("请先点击风险试算")
             return false;
         }
         var obj = getSubmitParam("submit");
