@@ -9,7 +9,7 @@
         (
             select portfolioId,portfolioName,secAcctId,secAcctName,finprodId,finprodMarketId,finprodAbbr, type9, type10, type11, type12, type8, type7, type6,
                    actualPositionAmount, tradePositionAmount, instructionsAmount, pledgeAmount, preReductionAmount,
-                   nvl(marketPrice,decode(type8,'F01',100,1))*actualPositionAmount marketValue
+                   nvl(marketPrice,decode(type8,'F01',100,'F37',100,1))*actualPositionAmount marketValue
             from
               (
 				select portfolioId,portfolioName,secAcctId,secAcctName,finprodId,finprodMarketId,finprodAbbr, type9, type10, type11, type12, type8, type7, type6,
