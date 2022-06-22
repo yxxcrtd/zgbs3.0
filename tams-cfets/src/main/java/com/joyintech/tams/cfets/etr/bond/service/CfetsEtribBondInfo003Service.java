@@ -365,8 +365,8 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
             if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
                 isSubmit = false;
             }
+            cfetsEtrIbBondinfoService.packageEquityForSubmit(entity);
             if ("submit".equals(entity.getOperateType()) && isSubmit) {
-                cfetsEtrIbBondinfoService.packageEquityForSubmit(entity);
                 List<CfetsEtribBondInfo003Dto> dataList = new ArrayList<>();
                 for (CfetsEtribBondInfo003Dto dto : entity.getEtrInvestBondInfoDtos()) {
                     if (StringUtil.isNotEmpty(dto.getPortfolioId()) && StringUtil.isNotEmpty(dto.getFinprodId())) {
@@ -1771,8 +1771,7 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
                 }
             }
             posport.setSecAmount(dto.getEntrustNum());
-            posport.setCashAmount(ArithmeticUtil.divide(ArithmeticUtil.multiply(dto.getUnitFprice(), dto.getEntrustNum()),
-                    new BigDecimal(100), 2));
+            posport.setCashAmount(dto.getUnitFpriceAmt());
             if(!StringUtil.isEmptyList(dto.getBussCombDistribtList())){
                 posport.setInvAim(dto.getBussCombDistribtList().get(0).getBusinessModel());
             }

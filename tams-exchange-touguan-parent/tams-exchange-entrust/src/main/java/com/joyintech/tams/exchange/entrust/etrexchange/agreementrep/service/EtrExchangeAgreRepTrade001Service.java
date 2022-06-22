@@ -739,7 +739,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             // 质押券代码
             agreRepHwayChgSecDto.setRepSecId(entity.getNewRepSecId());
             // 目标类型
-            agreRepOpenSecDto.setTargetType(DictCodeListExt3.目标类型_数量.getValue());
+            agreRepHwayChgSecDto.setTargetType(DictCodeListExt3.目标类型_数量.getValue());
             if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())) {
             	 //成交编号/初始交易编号
             	agreRepHwayChgSecDto.setTradeId(entity.getIntiTradeId());
@@ -827,7 +827,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             // 质押券代码
             agreRepHwayChgSecDto.setRepSecId(entity.getNewRepSecId());
             // 目标类型
-            agreRepOpenSecDto.setTargetType(DictCodeListExt3.目标类型_金额.getValue());
+            agreRepHwayChgSecDto.setTargetType(DictCodeListExt3.目标类型_金额.getValue());
             agreRepHwayChgSecDto.setTradeId(entity.getIntiTradeId());
 
             if(DictCodeList.回购拆借方向_正回购.getValue().equals(entity.getRepPs())){
@@ -1368,7 +1368,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             // 质押券代码
             agreRepHwayChgSecDto.setRepSecId(entity.getNewRepSecId());
             // 目标类型
-            agreRepOpenSecDto.setTargetType(DictCodeListExt3.目标类型_数量.getValue());
+            agreRepHwayChgSecDto.setTargetType(DictCodeListExt3.目标类型_数量.getValue());
 
             if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())) {
             	 //成交编号/初始交易编号

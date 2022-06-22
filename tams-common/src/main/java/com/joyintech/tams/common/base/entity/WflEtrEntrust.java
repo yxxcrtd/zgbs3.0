@@ -189,6 +189,11 @@ public class WflEtrEntrust extends WflEtrEntrustKey {
     private String businessModel;
 
     /**
+     * 结算金额
+     */
+    private BigDecimal unitFpriceAmt;
+
+    /**
      * 取得 组合代码
      * @return 组合代码
      */
@@ -741,5 +746,13 @@ public class WflEtrEntrust extends WflEtrEntrustKey {
 
     public void setBusinessModel(String businessModel) {
         this.businessModel = businessModel;
+    }
+
+    public BigDecimal getUnitFpriceAmt() {
+        return unitFpriceAmt;
+    }
+
+    public void setUnitFpriceAmt(BigDecimal unitFpriceAmt) {
+        this.unitFpriceAmt = unitFpriceAmt;
     }
 }

@@ -55,7 +55,7 @@
         CALENDAR_ID CALENDAR_ID, REMARK REMARK, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, 
         CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, CHL_ID CHL_ID, 
         SALE_CODE SALE_CODE, PRICE_MODEL PRICE_MODEL, ENTRUST_TYPE ENTRUST_TYPE, STOCK_ID STOCK_ID, 
-        ENTRUST_CLASS ENTRUST_CLASS, WORKFLOW_ID WORKFLOW_ID
+        ENTRUST_CLASS ENTRUST_CLASS, WORKFLOW_ID WORKFLOW_ID,UNIT_FPRICE_AMT
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -96,14 +96,14 @@
         ENTRUST_NUM, AVAILABLE_NUM, PRO_AVAILABLE_CASH, ACC_AVAILABLE_CASH, ENTRUST_STATUS, 
         PRICE, IS_ACCURATE, INV_MANAGER_ID, CALENDAR_ID, REMARK, CREATE_USER, CREATE_DEPT, 
         CREATE_TIME, UPDATE_USER, UPDATE_TIME, CHL_ID, SALE_CODE, PRICE_MODEL, ENTRUST_TYPE, 
-        STOCK_ID, ENTRUST_CLASS, WORKFLOW_ID)
+        STOCK_ID, ENTRUST_CLASS, WORKFLOW_ID,UNIT_FPRICE_AMT)
         select ENTRUST_ID, WORKFLOW_STATUS, PORTFOLIO_ID, FINPROD_ID, 
             FINPROD_TYPE2, TRADE_MARKET, TRADE_PLAT, TRADE_MARKET_MODE, PS, CCY, INV_AIM, COUNTER_ID, 
             IS_OUT_TRADE, COUNTER_TRADER, CONTACT_INFO, ENTRUST_DATE, VDATE, MDATE, ENTRUST_AMT, 
             ENTRUST_NUM, AVAILABLE_NUM, PRO_AVAILABLE_CASH, ACC_AVAILABLE_CASH, ENTRUST_STATUS, 
             PRICE, IS_ACCURATE, INV_MANAGER_ID, CALENDAR_ID, REMARK, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, CHL_ID, SALE_CODE, PRICE_MODEL, ENTRUST_TYPE, 
-            STOCK_ID, ENTRUST_CLASS, #{newWorkflowId,jdbcType=VARCHAR} WORKFLOW_ID
+            STOCK_ID, ENTRUST_CLASS, #{newWorkflowId,jdbcType=VARCHAR} WORKFLOW_ID,UNIT_FPRICE_AMT
              from WFL_ETR_ENTRUST
              where WORKFLOW_ID = #{oldWorkflowId,jdbcType=VARCHAR}
     </insert>
@@ -221,6 +221,9 @@
             <if test="entrustClass != null" >
                 ENTRUST_CLASS = #{entrustClass,jdbcType=VARCHAR},
             </if>
+            <if test="unitFpriceAmt != null" >
+                UNIT_FPRICE_AMT = #{unitFpriceAmt,jdbcType=DECIMAL},
+            </if>
         </set>
         where WORKFLOW_ID = #{workflowId, jdbcType=VARCHAR}
     </update>
@@ -264,6 +267,7 @@
         ENTRUST_TYPE = #{entrustType,jdbcType=VARCHAR},
         STOCK_ID = #{stockId,jdbcType=VARCHAR},
         ENTRUST_CLASS = #{entrustClass,jdbcType=VARCHAR},
+        UNIT_FPRICE_AMT = #{unitFpriceAmt,jdbcType=DECIMAL}
         where WORKFLOW_ID = #{workflowId, jdbcType=VARCHAR}
     </update>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.WflEtrEntrust" >
@@ -280,7 +284,7 @@
             CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
             UPDATE_TIME, CHL_ID, SALE_CODE, 
             PRICE_MODEL, ENTRUST_TYPE, STOCK_ID, 
-            ENTRUST_CLASS, WORKFLOW_ID)
+            ENTRUST_CLASS, WORKFLOW_ID,UNIT_FPRICE_AMT)
         values (#{entrustId,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, 
             #{finprodId,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR}, #{tradeMarket,jdbcType=VARCHAR}, 
             #{tradePlat,jdbcType=VARCHAR}, #{tradeMarketMode,jdbcType=VARCHAR}, #{ps,jdbcType=VARCHAR}, 
@@ -294,7 +298,7 @@
             #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
             #{updateTime,jdbcType=TIMESTAMP}, #{chlId,jdbcType=VARCHAR}, #{saleCode,jdbcType=VARCHAR}, 
             #{priceModel,jdbcType=VARCHAR}, #{entrustType,jdbcType=VARCHAR}, #{stockId,jdbcType=VARCHAR}, 
-            #{entrustClass,jdbcType=VARCHAR}, #{workflowId,jdbcType=VARCHAR})
+            #{entrustClass,jdbcType=VARCHAR}, #{workflowId,jdbcType=VARCHAR}, #{unitFpriceAmt,jdbcType=DECIMAL})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.WflEtrEntrust" >
         insert into WFL_ETR_ENTRUST
@@ -425,6 +429,9 @@
             <if test="businessModel != null" >
                 BUSINESS_MODEL,
             </if>
+            <if test="unitFpriceAmt != null" >
+                UNIT_FPRICE_AMT,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -553,6 +560,9 @@
             <if test="businessModel != null" >
                 #{businessModel,jdbcType=VARCHAR},
             </if>
+            <if test="unitFpriceAmt != null" >
+                #{unitFpriceAmt,jdbcType=DECIMAL},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.WflEtrEntrust" >
@@ -562,14 +572,14 @@
         ENTRUST_NUM, AVAILABLE_NUM, PRO_AVAILABLE_CASH, ACC_AVAILABLE_CASH, ENTRUST_STATUS, 
         PRICE, IS_ACCURATE, INV_MANAGER_ID, CALENDAR_ID, REMARK, CREATE_USER, CREATE_DEPT, 
         CREATE_TIME, UPDATE_USER, UPDATE_TIME, CHL_ID, SALE_CODE, PRICE_MODEL, ENTRUST_TYPE, 
-        STOCK_ID, ENTRUST_CLASS, WORKFLOW_ID)
+        STOCK_ID, ENTRUST_CLASS, WORKFLOW_ID,UNIT_FPRICE_AMT)
         select ENTRUST_ID, WORKFLOW_STATUS, PORTFOLIO_ID, FINPROD_ID, 
             FINPROD_TYPE2, TRADE_MARKET, TRADE_PLAT, TRADE_MARKET_MODE, PS, CCY, INV_AIM, COUNTER_ID, 
             IS_OUT_TRADE, COUNTER_TRADER, CONTACT_INFO, ENTRUST_DATE, VDATE, MDATE, ENTRUST_AMT, 
             ENTRUST_NUM, AVAILABLE_NUM, PRO_AVAILABLE_CASH, ACC_AVAILABLE_CASH, ENTRUST_STATUS, 
             PRICE, IS_ACCURATE, INV_MANAGER_ID, CALENDAR_ID, REMARK, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, CHL_ID, SALE_CODE, PRICE_MODEL, ENTRUST_TYPE, 
-            STOCK_ID, ENTRUST_CLASS, #{workflowId,jdbcType=VARCHAR} WORKFLOW_ID
+            STOCK_ID, ENTRUST_CLASS, #{workflowId,jdbcType=VARCHAR} WORKFLOW_ID,UNIT_FPRICE_AMT
              from WFL_ETR_ENTRUST
              where 1 = 1 and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR} and WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR}
     </insert>
@@ -684,6 +694,9 @@
             <if test="workflowId != null" >
                 WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR},
             </if>
+            <if test="unitFpriceAmt != null" >
+                UNIT_FPRICE_AMT = #{unitFpriceAmt,jdbcType=DECIMAL},
+            </if>
         </set>
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
           and WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR}
@@ -725,7 +738,8 @@
             ENTRUST_TYPE = #{entrustType,jdbcType=VARCHAR},
             STOCK_ID = #{stockId,jdbcType=VARCHAR},
             ENTRUST_CLASS = #{entrustClass,jdbcType=VARCHAR},
-            WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
+            WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR},
+            UNIT_FPRICE_AMT = #{unitFpriceAmt,jdbcType=DECIMAL}
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
           and WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR}
     </update>

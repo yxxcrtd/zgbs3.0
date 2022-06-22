@@ -1360,8 +1360,12 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 acctId = gen账号(etrEntrust.getTradeMarket(), etrEntrust.getChlId(), etrEntrust.getPortfolioId(), etrEntrust.getCcy(),
                     entrustCommonDto.getEtrEntrustAdd().getSecAcctId(),
                         entrustCommonDto.getEtrEntrust().getCounterId(), etrCashPositionFlowDto);
-                // 减少委托券面总额*委托全价/100
-                etrCashPositionFlowDto.setAmount(etrEntrust.getEntrustNum().negate().multiply(委托全价));
+                if(StringUtil.isNotEmpty(etrEntrust.getUnitFpriceAmt())){
+                    etrCashPositionFlowDto.setAmount(etrEntrust.getUnitFpriceAmt().negate());
+                }else{
+                    // 减少委托券面总额*委托全价/100
+                    etrCashPositionFlowDto.setAmount(etrEntrust.getEntrustNum().negate().multiply(委托全价));
+                }
                 etrCashPositionFlowDto.setAcctId(acctId);
                 etrCashPositionFlowDto.setOffsetId(entrustCommonDto.getEtrEntrust().getEntrustId());
                 etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
