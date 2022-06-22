@@ -152,7 +152,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
                 if (cfetsDto.getTotalBiddingNum().compareTo(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100))) < 1) {
                     CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
                     cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
-                    AjaxResult m = new AjaxResult("一级指令修改直接通过成功！");
+                    AjaxResult m = new AjaxResult("一级投标指令修改成功！");
                     return new Message<AjaxResult>().success().setData(m);
                 }
             }

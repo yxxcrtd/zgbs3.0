@@ -548,13 +548,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     } else {
                         dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                     }
-
-                    //投标日前下的指令，指令结束日为投标日;投标日后下的指令，指令结束日为指令日期
-                    if (DateUtil.compareDate(dto.getEntrustDate(), dto.getIssueDate()) >= 0) {
-                        dd.setMdate(dto.getIssueDate());
-                    } else {
-                        dd.setMdate(dto.getEntrustDate());
-                    }
+                    dd.setMdate(dto.getIssueDate());
 
                     etrInvestBondFirstBidList.add(dd);
                 }
@@ -1100,13 +1094,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     } else {
                         dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                     }
-
-                    //投标日前下的指令，指令结束日为投标日;投标日后下的指令，指令结束日为指令日期
-                    if (DateUtil.compareDate(dto.getEntrustDate(), dto.getIssueDate()) >= 0) {
-                        dd.setMdate(dto.getIssueDate());
-                    } else {
-                        dd.setMdate(dto.getEntrustDate());
-                    }
+                    dd.setMdate(dto.getIssueDate());
 
                     etrInvestBondFirstBidList.add(dd);
                 }
