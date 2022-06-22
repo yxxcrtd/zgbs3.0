@@ -390,10 +390,6 @@ public class TradeQueryBean implements Serializable {
     }
 
     public long getTradedVolume() {
-        if (BussTypeEnum.COUPON.codeEquals(busiTypeTg)
-                || BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.codeEquals(busiTypeTg)) {
-            return tradedVolume / 100;
-        }
         return tradedVolume;
     }
 
