@@ -403,8 +403,16 @@ public class CfetsEtrDispatcherService extends BaseService {
 
         //将交易员和投资经理转为真实姓名
         List<CfetsEtrDispatcherTradeListResponse> list2 = pageLimit.getRoot();
-        List<CfetsEtrDispatcherTradeListResponse> list = list2.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
-                new TreeSet<>(Comparator.comparing(CfetsEtrDispatcherTradeListResponse::getEntrustId))), ArrayList::new));
+        List<String> entrustIds = new ArrayList<>();
+        List<CfetsEtrDispatcherTradeListResponse> list = list2.stream().filter(
+                v -> {
+                    boolean flag = !entrustIds.contains(v.getEntrustId());
+                    if (flag) {
+                        entrustIds.add(v.getEntrustId());
+                    }
+                    return flag;
+                }
+        ).collect(Collectors.toList());
         pageLimit.setRoot(list);
         if (!list.isEmpty()) {
             for (CfetsEtrDispatcherTradeListResponse response : list) {
