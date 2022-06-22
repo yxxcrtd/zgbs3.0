@@ -1912,6 +1912,7 @@
         WHERE
         TMP.PORTFOLIO_ID =#{ portfolioId,jdbcType = VARCHAR }
         AND TMP.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
+         AND TMP.BUSINESS_MODEL  is not  null
     </select>
 
     <delete id="deleteRskIsupTrial">
