@@ -1140,7 +1140,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             index++;
             // 占比值 根据每条数据的“剩余指令额度/指令剩余额度汇总*基本信息中券面总额”计算
             BigDecimal proportion = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getAvaNum(), dto.getBidPriceTotal()), avaNumTotal, 2);
-            proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
+            proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.DOWN), minChangeUnit);
             // 记录剩余指令额度
             item.setAvaNumTemp(item.getAvaNum());
             // 最后一位时
@@ -1185,8 +1185,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 自动计算的计算结果需要为最小变动单位1000的整数倍，且每条数据的券面总额须小于等于剩余指令额度
         BigDecimal minChangeUnit = subMinChangeUnit;
         // 平均值计算
-        BigDecimal avg = ArithmeticUtil.divide(dto.getBidPriceTotal(), dto.getProductDtos().size(), 2);
-        avg = ArithmeticUtil.multiply(ArithmeticUtil.divide(avg, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
+        BigDecimal avg = ArithmeticUtil.divide(dto.getBidPriceTotal(), minChangeUnit, 0, RoundingMode.DOWN);
+        avg = ArithmeticUtil.multiply(ArithmeticUtil.divide(avg, BigDecimal.valueOf(dto.getProductDtos().size()), 0, RoundingMode.DOWN), minChangeUnit);
 //        // 剩余尾差
         BigDecimal tailDifference = dto.getBidPriceTotal();
         int index = 0;
@@ -1250,7 +1250,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             item.setAvaNumTemp(item.getEtrBidPriceTotal());
             // 占比值 根据每条数据的“指令投标券面总额/基本信息.指令投标券面总额*基本信息.汇总投标券面总额”计算
             BigDecimal proportion = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getEtrBidPriceTotal(), dto.getTotalBiddingNum()), dto.getEtrBidPriceTotal(), 2);
-            proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
+            proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.DOWN), minChangeUnit);
             // 最后一位时
             if (index == dto.getProductDtos().size()) {
                 if (BigDecimalUtil.ACompareToB(item.getEtrBidPriceTotal(), tailDifference, 6) >= 0
@@ -1498,8 +1498,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 缴款金额
         BigDecimal payableAmount = dto.getPayableAmount();
         List<CfetsTrdFirstBidFirmProductDto> productDtos = dto.getProductDtos();
+        productDtos.sort(Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getAvaNum).reversed());
         // 费用平均值
-        BigDecimal avg = ArithmeticUtil.divide(settFeeAmt, new BigDecimal(productDtos.size()), 2);
+        BigDecimal avg = ArithmeticUtil.divide(settFeeAmt, new BigDecimal(productDtos.size()), 2, RoundingMode.DOWN);
         // 交易金额剩余尾差
         BigDecimal tradeTailDifference = tradeAmt;
         // 应计利息总额剩余尾差
@@ -1551,7 +1552,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             feeTailDifference = ArithmeticUtil.subtract(feeTailDifference, item.getSettFeeAmt());
         }
         this.handleTailDifferenceOhter(productDtos, tradeTailDifference, intTailDifference, payTailDifference, feeTailDifference);
-        return productDtos;
+        dto.setProductDtos(productDtos);
+        return this.productDtosSort(dto);
     }
 
     /**
@@ -2427,6 +2429,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             stlPayOrders.setOrderStatus(DictCodeListExt1.交易状态_初始.getValue());
             stlPayOrders.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
             tradeDto.setStlPayOrders(stlPayOrders);
+            // 清算指令表（STL_ACT_ORDER）
+            StlActOrder stlActOrder = new StlActOrder();
+            stlActOrder.setActOrderId(stlPayOrders.getOrderId());
+//            stlActOrder.setBusiType();
+            stlActOrder.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
             // 数据库取值
             List<WflTrdProductDeal> wflDeals = cfetsTrdFirstBidFirm002Mapper.findWflDealByTotleTradeId(total.getTotleTradeId());
             List<TrdProductDeal> deals = new ArrayList<>();
