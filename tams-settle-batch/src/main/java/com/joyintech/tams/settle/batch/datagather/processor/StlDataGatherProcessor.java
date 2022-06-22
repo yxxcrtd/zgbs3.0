@@ -326,8 +326,8 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 Map<String, Object> map = new HashMap<>();
                 map.put("entrustId", etrEntrustDto.getEntrustId());
                 map.put("BID_MODLE_03", DictCodeListExt4.投标方式_分销买入.getValue());
-                List<BidOrderBidPrice> bidPrices = stlDataGatherMapper.selectBidOrderBidPrices(map);
-                if(CollectionUtils.isNotEmpty(bidPrices)){
+                List<String> bidEntrustIds = stlDataGatherMapper.selectBidEntrustIds(map);
+                if(CollectionUtils.isNotEmpty(bidEntrustIds)){
                     etrEntrustDtoFirstBondList.add(etrEntrustDto);
                 }
             }

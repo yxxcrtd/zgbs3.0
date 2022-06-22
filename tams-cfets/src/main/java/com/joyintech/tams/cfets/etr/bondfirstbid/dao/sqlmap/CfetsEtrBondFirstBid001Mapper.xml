@@ -169,7 +169,7 @@
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-                    fpi.PAY_EDATE
+                    nvl(fpi.PAY_EDATE, fpi.PAY_DATE)
                 ELSE fpi.PAY_DATE
                 END AS payEdate,
             T2.PORTFOLIO_ID portfolioId,
@@ -184,7 +184,7 @@
             ee.REMARK remark,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
+            nvl(TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd'))
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
             TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
@@ -345,7 +345,7 @@
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-                    fpi.PAY_EDATE
+                    nvl(fpi.PAY_EDATE, fpi.PAY_DATE)
                 ELSE fpi.PAY_DATE
                 END AS payEdate,
             T2.PORTFOLIO_ID portfolioId,
@@ -360,7 +360,7 @@
             ee.REMARK remark,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
+            nvl(TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd'))
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
             TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
