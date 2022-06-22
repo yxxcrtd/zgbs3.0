@@ -209,7 +209,7 @@
     </delete>
 	<!--查询产品对应最小跑批日期-->
 	<select id="selectImportValTableProdList" resultType="java.util.Map">
-		SELECT DISTINCT fp1.FINPROD_ID "finprodId",tt.VAL_DATE "valDate"
+		SELECT DISTINCT psv.PORTFOLIO_ID "finprodId",tt.VAL_DATE "valDate"
 		FROM PTL_SEC_VALUTION psv
 		LEFT JOIN FIN_PRODUCT fp
 		ON fp.FINPROD_ID = psv.FINPROD_ID

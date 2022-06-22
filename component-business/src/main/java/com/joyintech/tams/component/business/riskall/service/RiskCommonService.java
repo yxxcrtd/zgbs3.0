@@ -632,11 +632,11 @@ public class RiskCommonService {
                             riskNameListResult.setListDetailType("机构名单");
                             if (StringUtil.equals(item.getListType(), DictCodeListRsk.名单属性_黑名单.getValue())) {
                                 riskNameListResult.setErrorMsg("交易对手在黑名单内: "+riskNameListCommonDto.getCustomerName());
-                                riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_不通过.getCodeName());
-                                riskNameListResult.setListType(DictCodeListRsk.名单属性_黑名单.getCodeName());
+                                riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
+                                riskNameListResult.setListType(DictCodeListRsk.名单属性_黑名单.getValue());
                             }else {
-                                riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_通过.getCodeName());
-                                riskNameListResult.setListType(DictCodeListRsk.名单属性_白名单.getCodeName());
+                                riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
+                                riskNameListResult.setListType(DictCodeListRsk.名单属性_白名单.getValue());
                             }
                             resultList.add(riskNameListResult);
                         }

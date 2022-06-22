@@ -188,11 +188,6 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
             if (BussTypeEnum.STANDARD_COUPONS_IN_AND_OUT.codeEquals(entrustQueryBean.getBusiTypeTg())) {
                 entrustQueryBean.setEntrustPriceView(entrustQueryBean.getEntrustPrice().multiply(BigDecimal.valueOf(100)));
             }
-            if (BussTypeEnum.COUPON.codeEquals(entrustQueryBean.getBusiTypeTg())
-                    || BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.codeEquals(entrustQueryBean.getBusiTypeTg())) {
-                entrustQueryBean.setEntrustVolume(entrustQueryBean.getEntrustVolume() / 100);
-                entrustQueryBean.setTradedVolume(entrustQueryBean.getTradedVolume() / 100);
-            }
         });
         return new PageInfo<>(entrustQueryBeanList);
     }
