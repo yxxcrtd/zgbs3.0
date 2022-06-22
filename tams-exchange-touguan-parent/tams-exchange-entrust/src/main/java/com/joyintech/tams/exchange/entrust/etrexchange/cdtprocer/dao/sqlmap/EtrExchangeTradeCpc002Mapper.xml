@@ -413,7 +413,7 @@
         ELSE FP.FINPROD_MARKET_ID
         END             AS secId,
         FP.FINPROD_ABBR AS secName,
-        round(TEMP.AMOUNT/100,2)     AS positionsNum,
+        round(TEMP.AMOUNT,2)     AS positionsNum,
         invaim.INV_AIM as invAim,
         invaim.BUSINESS_MODEL as businessModel,
         invaim.TRADE_PLAT tradePlat,
@@ -421,7 +421,10 @@
         FP.TRADE_MARKET                           AS tradeMarket,
         c1.acctNo1                          AS acctNo,
         c1.acctName as dealCurAcctName,
-        FPT.TYPE_8 assetType
+        case FP.FINPROD_TYPE2 when 'F37' then  FPT.TYPE_8
+        else FPT.TYPE_10
+        end  assetType,
+        fpa.IS_NETPRICE
         FROM
         (
         SELECT
@@ -500,6 +503,7 @@
         FIN_PRODUCT FP
         ON
         TEMP.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
         LEFT JOIN
         PTL_PORTFOLIO PP
         ON
@@ -554,7 +558,7 @@
         on FP.FINPROD_ID = FPT.FINPROD_ID
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
-        AND FP.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F37})<!--  债券 -->
+        AND FP.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F37}, #{FINPROD_TYPE_TG_F01})<!--  债券 -->
         <!--AND FPT.type_6 != #{type6_B14}  非可转债 -->
         <if test="portfolioIdList != null and portfolioIdList.size()>0">
             <foreach collection="portfolioIdList" open="AND TEMP.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
