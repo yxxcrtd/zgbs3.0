@@ -304,7 +304,7 @@ public class CfetsTradeHandlerAop {
         Object[] args = joinPoint.getArgs();
         AjaxResult result = new AjaxResult();
         try {
-            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], decisionAct, flowStatus, null, NodeConfigConstant.TRADE);
+            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], decisionAct, flowStatus, pageId, NodeConfigConstant.TRADE);
             if (StringUtil.isNotEmpty(outputDto.getErrorMsg())) {
                 result.setErrorList(Lists.newArrayList(new ValidMessage(outputDto.getErrorMsg())));
                 ajaxResultMessage.setData(result);
