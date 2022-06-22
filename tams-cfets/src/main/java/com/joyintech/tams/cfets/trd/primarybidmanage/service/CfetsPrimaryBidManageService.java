@@ -691,6 +691,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setTradeDate(iplatformDate.getSysDate());
             trdProductDeal.setSettleDate(dto.getCreditorDebtDate());
             trdProductDeal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            trdProductDeal.setEntrustId(entrustId);
             BigDecimal cpriceAmt =null;
             BigDecimal winPrinamt =null;
             BigDecimal intAmt =null;
@@ -731,6 +732,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setCounterId(dto.getCounterId());
             trdProductDeal.setRemark(dto.getRemark());
             trdProductDeal.setInvAim(invAim);
+            trdProductDeal.setTrader(dto.getOuTraderId());
             trdProductDealList.add(trdProductDeal);
             //金融产品交易附属表
             TrdProductDealAdd  trdProductDealAdd = new TrdProductDealAdd();
