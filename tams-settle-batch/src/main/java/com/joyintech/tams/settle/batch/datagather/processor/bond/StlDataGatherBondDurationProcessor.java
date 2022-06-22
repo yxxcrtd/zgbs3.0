@@ -325,12 +325,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
         // 分支序号
         dealTotal.setBranch(0L);
         // 交易日
-        // dealTotal.setTradeDate(settleTransData.getTradeDate());
-        if(DictCodeList.交易方向_行权_赎回.getValue().equals(settleTransData.getPs())){
-            dealTotal.setTradeDate(settleTransData.getSettleDate());
-        }else{
-            dealTotal.setTradeDate(settleTransData.getMdate2());
-        }
+        dealTotal.setTradeDate(settleTransData.getTradeDate());
         // 起息日
         dealTotal.setVdate(settleTransData.getVdate());
         // 到期日
@@ -442,12 +437,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
         // 分支序号
         trdProductDeal.setBranch(0L);
         // 交易日
-        // trdProductDeal.setTradeDate(settleTransData.getTradeDate());
-        if(DictCodeList.交易方向_行权_赎回.getValue().equals(settleTransData.getPs())){
-            trdProductDeal.setTradeDate(settleTransData.getSettleDate());
-        }else{
-            trdProductDeal.setTradeDate(settleTransData.getMdate2());
-        }
+        trdProductDeal.setTradeDate(settleTransData.getTradeDate());
         // ZGZGST-4231:赋值起息日和到期日 fuyongsheng modify start
         // 起息日
         // trdProductDeal.setVdate(null);
