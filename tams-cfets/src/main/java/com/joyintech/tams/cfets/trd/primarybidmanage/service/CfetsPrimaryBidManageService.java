@@ -1014,9 +1014,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             String confirmOk = RequestUtil.getParam("confirmOk");
             try {
                 if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
-                    boolean isSubmit = false;
+                    boolean isSubmit = true;
                     SysWflBusinessList sysWflBusinessList = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
                     if (StringUtil.equals(sysWflBusinessList.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+                        isSubmit = false;
                         this.sendPositionMethod(entity, isSubmit, confirmOk);
                     } else {
                         this.sendPositionMethod(entity, isSubmit, confirmOk);

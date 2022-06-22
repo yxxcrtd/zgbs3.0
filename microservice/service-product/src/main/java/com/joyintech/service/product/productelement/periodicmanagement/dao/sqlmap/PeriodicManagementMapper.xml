@@ -682,4 +682,11 @@
 		AND TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND (TRD_PRODUCT_DEAL.IS_CANCEL='N' or
 		TRD_PRODUCT_DEAL.IS_CANCEL IS NULL)
 	</select>
+
+	<select id="checkPeriodTradeDate" resultType="int">
+		select count(0) from fin_trade_product t
+		where t.finprod_id = #{finprodId,jdbcType=VARCHAR}
+			and t.vdate = to_date(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+			and t.mdate = to_date(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	</select>
 </mapper>

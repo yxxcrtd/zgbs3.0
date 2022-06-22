@@ -194,4 +194,12 @@ public class PeriodicManagementController {
     public int getTrdProductDealByPeriodId(@RequestBody Map<String,Object> map){
         return periodicManagementService.getTrdProductDealByPeriodId(map);
     }
+
+	/**
+	 * 查询相同开始日和结束日是否存在
+	 */
+	@PostMapping("checkPeriodTradeDate")
+	public int checkPeriodTradeDate(@RequestBody Map<String, Object> param){
+		return periodicManagementService.checkPeriodTradeDate(param);
+	}
 }
