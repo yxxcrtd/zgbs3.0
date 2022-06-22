@@ -614,7 +614,7 @@ public class CommonBusinessService extends BaseService {
         }
 
         // modify by wj 20200620  五个特殊参数 修改 为特殊取值方法
-        String institutionCode = "";
+   /*     String institutionCode = "";
         if(MultilevelDataAuthorityUtil.isEnabled()){
             institutionCode =  MultilevelDataAuthorityUtil.getOrganizationCode(LoginUserUtil.getUserName());
         }
@@ -623,7 +623,7 @@ public class CommonBusinessService extends BaseService {
         if (paraAuthorizeLimit == null || BussinessConstant.AUTHORIZE_LIMIT.equals(paraAuthorizeLimit)
                 || DictCodeListExt1.是或否_否.getValue().equals(paraAuthorizeLimit)) {
             return false;
-        }
+        }*/
 
         // 根据资产类型取得授权类型
         FinProductTypeConfig finProductTypeConfig = getRskAuthorizeType(assetId, assetType);
@@ -714,7 +714,7 @@ public class CommonBusinessService extends BaseService {
         }
 
         // modify by wj 20200620 二级法人改造 五个特殊参数 修改 为特殊取值方法
-        String institutionCode = "";
+   /*     String institutionCode = "";
         if(MultilevelDataAuthorityUtil.isEnabled()){
             institutionCode =  MultilevelDataAuthorityUtil.getOrganizationCode(LoginUserUtil.getUserName());
         }
@@ -724,7 +724,7 @@ public class CommonBusinessService extends BaseService {
                 || DictCodeListExt1.是或否_否.getValue().equals(paraAuthorizeLimit)) {
             variables.put(BussinessConstant.是否需要上级审批, false);
             return variables;
-        }
+        }*/
 
         // 根据资产类型取得授权类型
         FinProductTypeConfig finProductTypeConfig = getRskAuthorizeType(assetId, assetType);
