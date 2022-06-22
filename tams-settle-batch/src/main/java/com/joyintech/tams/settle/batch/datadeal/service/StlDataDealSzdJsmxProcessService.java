@@ -478,6 +478,9 @@ public class StlDataDealSzdJsmxProcessService {
 				if(DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
 						|| DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
 						|| DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+					if(DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+						settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getQsrq()));
+					}
 					// 交割日期
 					if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), settleTransData.getSettleMode())){
 						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));
