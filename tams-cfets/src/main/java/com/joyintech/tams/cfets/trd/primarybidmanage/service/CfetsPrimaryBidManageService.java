@@ -397,20 +397,20 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                             trdProductDealRevoke.setTradeId(trdProductDeal.getTradeId());
                             trdProductDealRevoke.setIsCancel(DictCodeList.是否_是.getValue());
                             trdProductDealMapper.updateByPrimaryKeySelective(trdProductDealRevoke);
-
                             trdProductDeal.setpTradeId(trdProductDeal.getTradeId());
                             trdProductDeal.setTradeId(trdProductDeal.getTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                             trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
                             trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
                             trdProductDealMapper.insert(trdProductDeal);
-                            trdProductDeals.add(trdProductDeal);
                             /**交易附属表 **/
                             TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getTradeId());
                             if (trdProductDealAdd != null) {
+                                trdProductDeal.setEntrustId(trdProductDealAdd.getEntrustId());
                                 trdProductDealAdd.setTradeId(trdProductDealAdd.getTradeId()
                                         + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                                 trdProductDealAddMapper.insert(trdProductDealAdd);
                             }
+                            trdProductDeals.add(trdProductDeal);
                             // 组合交易表
                             List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDeal.getTradeId());
                             if (!ptlTradeList.isEmpty()) {
@@ -691,6 +691,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setTradeDate(iplatformDate.getSysDate());
             trdProductDeal.setSettleDate(dto.getCreditorDebtDate());
             trdProductDeal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            trdProductDeal.setEntrustId(entrustId);
             BigDecimal cpriceAmt =null;
             BigDecimal winPrinamt =null;
             BigDecimal intAmt =null;
@@ -731,6 +732,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setCounterId(dto.getCounterId());
             trdProductDeal.setRemark(dto.getRemark());
             trdProductDeal.setInvAim(invAim);
+            trdProductDeal.setTrader(dto.getOuTraderId());
             trdProductDealList.add(trdProductDeal);
             //金融产品交易附属表
             TrdProductDealAdd  trdProductDealAdd = new TrdProductDealAdd();
