@@ -13,7 +13,7 @@
             from
               (
 				select portfolioId,portfolioName,secAcctId,secAcctName,finprodId,finprodMarketId,finprodAbbr, type9, type10, type11, type12, type8, type7, type6,
-					case when type8 in ('F01','F04','F11') or (type8 = 'F02' and tradeMarket in ('03','04','09')) then marketPrice else 1 end as marketPrice,
+					case when type8 in ('F01','F04','F11','F37') or (type8 = 'F02' and tradeMarket in ('03','04','09')) then marketPrice else 1 end as marketPrice,
 					case when type8 in (#{finprodType2_F01},#{finprodType2_F10},#{finprodType2_F37}) then (PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06)*100 else (PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06) end as actualPositionAmount,
 					<!-- etliu modify 20210227 start -->
 					case when type8 in (#{finprodType2_F01},#{finprodType2_F10},#{finprodType2_F37}) then (PTL_FLOW_AMOUNT01-PTL_FLOW_AMOUNT10 + PTL_AMOUNT03 + PTL_AMOUNT05 - PTL_AMOUNT06 - PTL_AMOUNT04 + PTL_AMOUNT08 + andOneDataAmout)*100
@@ -248,6 +248,7 @@
 												WHEN fpt.TYPE_8 = 'F02' and fp.TRADE_MARKET in ('03','04') THEN mfmi.CLOSE_PRICE
 												WHEN fpt.TYPE_8 = 'F04' THEN frv.VALUATION
 												WHEN fpt.TYPE_8 = 'F11' THEN msp.CLOSE_PRICE
+												WHEN fpt.TYPE_8 = 'F37' THEN mcmi.MDPRICE
 											END AS marketPrice,
 											CASE
 												WHEN fpt.TYPE_8 = 'F01' THEN mbvi.VALUE_DATE
@@ -255,6 +256,7 @@
 												WHEN fpt.TYPE_8 = 'F02' and fp.TRADE_MARKET in ('03','04') THEN mfmi.VALUE_DATE
 												WHEN fpt.TYPE_8 = 'F04' THEN frv.VAL_DATE
 												WHEN fpt.TYPE_8 = 'F11' THEN msp.DEAL_DATE
+												WHEN fpt.TYPE_8 = 'F37' THEN to_date(mcmi.CDATE,'yyyy-MM-dd')
 											END AS valueDate
 										FROM
 										FIN_PRODUCT fp
@@ -267,6 +269,8 @@
 										ON mfmi.FUND_CODE = fp.FINPROD_MARKET_ID AND mfmi.VALUE_DATE &lt;= to_date(#{cdate},'yyyy-MM-dd')
 										LEFT JOIN MST_SHARE_PRICE msp
 										ON msp.SHARES_ID = fp.FINPROD_MARKET_ID AND msp.DEAL_DATE &lt;= to_date(#{cdate},'yyyy-MM-dd')
+										LEFT JOIN MST_CREDIT_MARKET_INFO mcmi
+										ON mcmi.SECID = fp.FINPROD_MARKET_ID AND mcmi.CDATE &lt;= #{cdate}
 									)gavInfo
 							) WHERE num = 1
 							<!-- ZGZGST-1408:市值要取最近的一次估值 fuyongsheng 20210828 edit end -->
