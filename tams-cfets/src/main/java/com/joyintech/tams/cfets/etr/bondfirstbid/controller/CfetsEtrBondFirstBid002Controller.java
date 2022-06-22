@@ -151,7 +151,10 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
                 //投标量没有改高，不走流程直接更新原指令信息
                 if (cfetsDto.getTotalBiddingNum().compareTo(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100))) < 1) {
                     CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
+                    allDto.setTotalEtrustId(cfetsDto.getEntrustId());
                     cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
+                    //发送头寸
+                    cfetsEtrBondFirstBid002Service.sendPositionMethod(allDto, Boolean.FALSE, "1");
                     AjaxResult m = new AjaxResult("一级投标指令修改成功！");
                     return new Message<AjaxResult>().success().setData(m);
                 }

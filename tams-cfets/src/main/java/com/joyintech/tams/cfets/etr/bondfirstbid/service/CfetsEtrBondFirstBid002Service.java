@@ -321,7 +321,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      * @param isSubmit
      * @param confirmOk
      */
-    private void sendPositionMethod(CfetsEtrBondFirstBid002Dto dto, boolean isSubmit, String confirmOk) {
+    public void sendPositionMethod(CfetsEtrBondFirstBid002Dto dto, boolean isSubmit, String confirmOk) {
         List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
         for (CfetsEtrBondFirstBid002Dto entity : dto.getEtrInvestBondFirstBidDtos()) {
             for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {
