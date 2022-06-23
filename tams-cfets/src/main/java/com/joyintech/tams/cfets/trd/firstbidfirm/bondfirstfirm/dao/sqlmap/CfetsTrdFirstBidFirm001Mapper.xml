@@ -46,7 +46,6 @@
             WHEN bobrt.BID_MODLE IS NULL THEN '01'
             WHEN bobrt.IS_WIN = 'N' THEN '03'
             WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
-            ELSE '05'
         END AS firstBidStatus,
         nvl(efs.ENT_FINISH_AMT, 0)               finishAmt,
         trunc(nvl(efs.ENT_FINISH_AMT, 0) /
@@ -390,7 +389,6 @@
                         WHEN bobrt.BID_MODLE IS NULL THEN '01'
                         WHEN bobrt.IS_WIN = 'N' THEN '03'
                         WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
-                        ELSE '05'
                         END AS firstBidStatus,
                         bo.BID_ID         AS bidId/*投标编号*/,
                         fp.FINPROD_ID  finprodId,
