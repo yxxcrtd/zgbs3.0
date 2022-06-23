@@ -4,6 +4,7 @@
      * 是否可编辑
      */
     var editFlag = true;
+    var riskFlag = 0;//风险试算标识，提交前需要点击风险试算
     var rskApproval;
 
     var el = function (ele) {
@@ -452,6 +453,10 @@
             Joyin.error("组合分配信息,请填写完整")
             return false;
         }
+        if(riskFlag === 0) {
+            Joyin.error("请先进行风险试算")
+            return false;
+        }
         var obj = getSubmitParam("submit");
         var errorMsg = "";
         var confirmMsg = "";
@@ -716,6 +721,7 @@
                 }else if(result.message){
                     Joyin.error(result.message);
                 }
+                riskFlag = 1;
             }
         });
     });

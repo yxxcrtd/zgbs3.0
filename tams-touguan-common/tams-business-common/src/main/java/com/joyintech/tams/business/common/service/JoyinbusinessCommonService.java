@@ -125,6 +125,10 @@ public class JoyinbusinessCommonService extends BaseService {
             //需要查询债券资产、回购期限、项目类资产、公募基金、计划类净值型、计划类利率型、计划类货币型、存款
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdForAll(param));
         }
+        // 查询债券信息含接口表数据
+        if(StringUtil.isNotEmpty(dto.getDealType()) && StringUtil.equals(dto.getDealType(), "02")){
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdAndInterfData(param));
+        }
         if (StringUtil.isNotEmpty(dto.getPs()) && (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue())
                 || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_赎回.getValue()))) {
             param.put("ps", dto.getPs());

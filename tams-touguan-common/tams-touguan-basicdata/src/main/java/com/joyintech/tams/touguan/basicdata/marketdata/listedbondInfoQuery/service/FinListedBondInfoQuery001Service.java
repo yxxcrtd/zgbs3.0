@@ -24,7 +24,6 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
-import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -45,10 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 待上市债券市场信息查询服务类
@@ -67,8 +63,6 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     private BaseGetBusinessId bussGetBussinessIdService;
     @Resource
     private CommonAutoCouponService commonAutoCouponService;
-    @Resource
-    private CommonBusinessService commonBusinessService;
     @Resource
     private FinListedBondInfoQueryMapper finListedBondInfoQueryMapper;
     @Resource
@@ -178,7 +172,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         AjaxResult ajaxResult = new AjaxResult();
         logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]；additionalBatches: [{}]", secId, additionalBatches);
         List<ValidMessage> validMessages = new ArrayList<>();
-        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2AndBatch(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), additionalBatches);
         //该债券信息在系统中已存在，无法加券！
         if (finProduct != null) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
@@ -210,7 +204,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //公共加券操作
         commonAutoCouponService.autoBondCouponSave(interfPayhsrcsecinfoDto);
         //保存操作记录
-        this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
+        this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
         //发行人处理
         return ajaxResult;
     }
@@ -236,7 +230,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         List<MstCalendarInfo> mstCalendarInfoList = getMstCalendarInfo();
         //new标的类金融产品
         FinProduct finProduct = new FinProduct();
-        String finProdId = commonBusinessService.getFinProdId(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), StringUtil.EMPTY);
+        String finProdId = getFinprodId(secId);
         finProduct.setFinprodId(finProdId);
         finProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         finProduct.setFinprodAbbr(finListedBondInfoQuery001Dto.getBondAbbreviation());
@@ -410,7 +404,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @see
      * @since 1.0
      */
-    private String getIssuer(String issuerShort) {
+    public String getIssuer(String issuerShort) {
         String customerId = restTemplate.getForObject(ServiceApplication.BASICDATA_SERVICE_NAME
                 + "/MstCustomerNature/getIssuer?linkId1=" + issuerShort + "&type=" + "IS_ISSUER", String.class);
         if (StringUtil.isEmpty(customerId)) {
@@ -428,6 +422,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             /* 发行人加券后客户类型默认：市场机构 add by liuwei 20201118 end */
 
             mstCustomerInfoAdd.setCustomerId(customerId);
+            mstCustomerInfoAdd.setInsitituteCode(issuerShort);
             //客户信息表插入数据
             mstCustomerInfoMapper.insert(mstCustomerInfo);
             mstCustomerInfoAddMapper.insert(mstCustomerInfoAdd);
@@ -460,7 +455,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      */
     private void saveOperate(String tradeId, String remark, DictCodeListExt3 operType, String workFlowId) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        String finProdId = commonBusinessService.getFinProdId(tradeId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), StringUtil.EMPTY);
+        String finProdId = getFinprodId(tradeId);
         oprHisReq.setEntrustId(finProdId);
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
@@ -537,5 +532,18 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             }
         }
     }
+
+
+    /**
+     * 构造金融标的代码
+     *
+     * @param secId
+     * @return
+     */
+    public String getFinprodId(String secId) {
+        String[] arr = secId.split("\\.");
+        return String.format("%s_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0], DateUtil.format(new Date(), "yyyyMMddHHmmss"), arr[1]);
+    }
+
 
 }

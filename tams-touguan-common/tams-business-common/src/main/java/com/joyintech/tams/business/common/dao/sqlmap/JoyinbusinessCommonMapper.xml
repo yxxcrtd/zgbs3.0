@@ -82,6 +82,7 @@
             <result column="EXERCISE_DATE" property="exerciseDate" jdbcType="VARCHAR" />
             <result column="ACT_EXERCISE_DATE" property="actExerciseDate" jdbcType="VARCHAR" />
             <result column="is_Special" property="isSpecial" jdbcType="VARCHAR" />
+            <result column="is_interf" property="is_interf" jdbcType="VARCHAR" />
         </association>
     </resultMap>
     <select id="getfinprodIdForAdd" resultMap="finprodIdMap">
@@ -112,6 +113,47 @@
         LEFT JOIN MST_BOND_MARKET_INFO mbmi  ON T1.FINPROD_MARKET_ID  = mbmi.SEC_ID
             AND mbmi.VALUE_DATE = #{platDate,jdbcType=DATE}
         <include refid="getfinprodIdForAddWhere"></include>
+    </select>
+    <select id="getfinprodIdAndInterfData" resultMap="finprodIdMap">
+        SELECT
+            T1.FINPROD_MARKET_ID id,
+            T1.FINPROD_ABBR text,
+            T1.FINPROD_NAME,
+            T1.FINPROD_ID,
+            'N' is_interf
+        FROM
+        FIN_PRODUCT T1
+        LEFT JOIN FIN_PRODUCT_TYPE T2 ON T1.FINPROD_ID = T2.FINPROD_ID
+        left join FIN_PRODUCT_TYPE fpt on T1.FINPROD_ID = fpt.FINPROD_ID
+        left join FIN_PRODUCT_SPECIAL fps on fps.FINPROD_MARKET_ID = T1.FINPROD_MARKET_ID
+        LEFT JOIN MST_BOND_MARKET_INFO mbmi  ON T1.FINPROD_MARKET_ID  = mbmi.SEC_ID
+        AND mbmi.VALUE_DATE = #{platDate,jdbcType=DATE}
+        <include refid="getfinprodIdForAddWhere"></include>
+        union all
+        SELECT
+            ip.SECID id,
+            ip.SECNAME text,
+            ip.SECFULLNAME FINPROD_NAME,
+            ip.SECID FINPROD_ID,
+            'Y' is_interf
+        from INTERF_PAYHSRCSECINFO ip
+        WHERE not exists(select 1 from FIN_PRODUCT where FINPROD_MARKET_ID = ip.SECID)
+        AND ip.MARKET2 in ('01', '02')
+        <where>
+            ip.CCY = 'CNY'
+            AND ip.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+            AND ip.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+            AND ip.MARKET2 in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            <if test="initValue != null and !initValue.equals('')">
+                and ip.SECID = #{initValue}
+            </if>
+            <if test="search != null and !search.equals('')">
+                and (ip.SECID like concat('%',concat(#{search},'%'))
+                or ip.SECNAME like concat('%',concat(#{search},'%'))
+                or ip.SECFULLNAME like concat('%',concat(#{search},'%'))
+                )
+            </if>
+        </where>
     </select>
     <select id="getfinprodIdForNewBond" resultMap="finprodIdMap">
         SELECT

@@ -90,7 +90,8 @@ public class RiskCommonService {
         // 判断授信是否控制
         // 入参不为空、授信控制类别为软控、硬控
         if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT)) &&
-            !StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_不占.getValue()) && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())){
+            !StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
+                && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())){
             String occupyType = "";
             List<CreditLinesInputDto> list = new ArrayList<>();
             if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占.getValue())) {
@@ -224,6 +225,7 @@ public class RiskCommonService {
         RiskCommonOutputDto riskCommonOutputDto = new RiskCommonOutputDto();
         // 判断授信是否控制
         if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT))
+            && !StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
             && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())){
             List<CreditLinesInputDto> list = new ArrayList<>();
             if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占.getValue())) {
@@ -259,6 +261,7 @@ public class RiskCommonService {
         // 判断风险指标是否控制
         //风险试算开关是否打开
         if (StringUtil.equals(DictCodeListExt1.是或否_是.getValue(),CacheUtil.getSysParam("risk_math_switch"))
+            && !StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
             && !StringUtil.isEmptyList(riskCommonInputDto.getRiskRdsDtoList())){
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_预占释放再预占.getValue())) {
                 // 处理差分预占参数，接口支持程度待确认

@@ -176,8 +176,14 @@ public class CfetsTrdQueryService extends BaseService{
         pageParam.put("TRADE_PLACE_02",DictCodeListExt1.交易场所_商业银行柜台.getValue());
         pageParam.put("STATUS_VALID_01",DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_04",DictCodeListExt1.有效状态_流程中.getValue());
-        pageParam.put("BUSI_TYPE_POSITION_01","01");
-        pageParam.put("BUSI_TYPE_POSITION_34","34");
+        pageParam.put("BUSI_TYPE_POSITION_01",DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
+        pageParam.put("BUSI_TYPE_POSITION_34",DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
+        // 招标标的_利率
+        pageParam.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
+        // 招标标的_价格
+        pageParam.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_价格.getValue());
+        // 招标标的_利差
+        pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
 
         if (StringUtils.isNotEmpty(userId)) {
             //判断角色配置
@@ -1204,12 +1210,12 @@ public class CfetsTrdQueryService extends BaseService{
      */
     public Map<String, Object> selectManualSettleInfo(String pageCode, String dtCode, String spcdCode,CfetsTrdQueryTradeInfoListResponse settleDto) {
         Map<String, Object> resultData = new HashMap<>();
-        if(StringUtil.isBlank(spcdCode)){
+        if (StringUtil.isBlank(spcdCode)) {
             return resultData;
         }
         String userId = SecurityUtil.getLoginUser().getUserName();
-        if(DictCodeListExt4.投标方式_分销买入.getValue().equals(settleDto.getBidModle())) {
-             //基础信息
+        if (DictCodeListExt4.投标方式_分销买入.getValue().equals(settleDto.getBidModle())) {
+            //基础信息
             List<CfgReadonlyFormShow> baseForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "03W");
             //金额信息03W,M
             List<CfgReadonlyFormShow> amtForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "03W,M");
@@ -1231,7 +1237,7 @@ public class CfetsTrdQueryService extends BaseService{
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             //判断角色配置
             List<String> roleList = cfetsTrdQueryMapper.selectSysRoleById(userId);
-            if (roleList.contains(DictCodeList.角色岗位_领导.getValue()) || roleList.contains(DictCodeList.角色岗位_投资处长.getValue())|| roleList.contains(DictCodeList.角色岗位_交易处长.getValue())) {
+            if (roleList.contains(DictCodeList.角色岗位_领导.getValue()) || roleList.contains(DictCodeList.角色岗位_投资处长.getValue()) || roleList.contains(DictCodeList.角色岗位_交易处长.getValue())) {
                 //角色配置为领导、交易处长、投资处长可查看所有数据
             } else if (roleList.contains(DictCodeList.角色岗位_交易员.getValue())) {
                 //交易员
@@ -1257,7 +1263,7 @@ public class CfetsTrdQueryService extends BaseService{
             resultData.put("CfetsTrdQueryBidInfo_dataform", dataform);
             resultData.put("CfetsTrdQueryBidInfo_datatablep", portIntFenPeiInfoDtoList);
             return resultData;
-        } else if(DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())) {
+        } else if (DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())) {
             //基础信息
             List<CfgReadonlyFormShow> baseForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "01W");
             //金额信息05,M
@@ -1280,7 +1286,7 @@ public class CfetsTrdQueryService extends BaseService{
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             //判断角色配置
             List<String> roleList = cfetsTrdQueryMapper.selectSysRoleById(userId);
-            if (roleList.contains(DictCodeList.角色岗位_领导.getValue()) || roleList.contains(DictCodeList.角色岗位_投资处长.getValue())|| roleList.contains(DictCodeList.角色岗位_交易处长.getValue())) {
+            if (roleList.contains(DictCodeList.角色岗位_领导.getValue()) || roleList.contains(DictCodeList.角色岗位_投资处长.getValue()) || roleList.contains(DictCodeList.角色岗位_交易处长.getValue())) {
                 //角色配置为领导、交易处长、投资处长可查看所有数据
             } else if (roleList.contains(DictCodeList.角色岗位_交易员.getValue())) {
                 //交易员
@@ -1310,7 +1316,7 @@ public class CfetsTrdQueryService extends BaseService{
             resultData.put("CfetsTrdQueryBidInfo_datatablep", portIntFenPeiInfoDtoList);
             return resultData;
         } else if (DictCodeListExt3.头寸业务类型_债券一级申购.getValue().equals(settleDto.getTgBusiType())
-        && !StringUtil.isNotEmpty(settleDto.getBidModle())) {//一级申购
+                && !StringUtil.isNotEmpty(settleDto.getBidModle())) {//一级申购
             //基础信息
             List<CfgReadonlyFormShow> baseForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "34W");
             //备注05,O
@@ -1330,7 +1336,7 @@ public class CfetsTrdQueryService extends BaseService{
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             //判断角色配置
             List<String> roleList = cfetsTrdQueryMapper.selectSysRoleById(userId);
-            if (roleList.contains(DictCodeList.角色岗位_领导.getValue()) || roleList.contains(DictCodeList.角色岗位_投资处长.getValue())|| roleList.contains(DictCodeList.角色岗位_交易处长.getValue())) {
+            if (roleList.contains(DictCodeList.角色岗位_领导.getValue()) || roleList.contains(DictCodeList.角色岗位_投资处长.getValue()) || roleList.contains(DictCodeList.角色岗位_交易处长.getValue())) {
                 //角色配置为领导、交易处长、投资处长可查看所有数据
             } else if (roleList.contains(DictCodeList.角色岗位_交易员.getValue())) {
                 //交易员

@@ -461,8 +461,6 @@ public class CfetsEtrDispatcherService extends BaseService {
                     response.setDealProgress(ArithmeticUtil.divide(response.getFinishAmt(), response.getEntrustAmt(), 4).multiply(new BigDecimal("100")));
                     response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(ArithmeticUtil.subtract(response.getEntrustAmt(), response.getFinishAmt()), new BigDecimal("10000"), 4))));
                     response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("10000"), 4))));
-                    response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
-                    response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
                 } else if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
                     if (StringUtil.equals(response.getTargetType(), DictCodeListExt3.目标类型_数量.getValue())) {
                         DecimalFormat df = new DecimalFormat("0.##");
@@ -886,8 +884,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                 for (CfetsEtrDispatcherDealListInfoResponse response : list) {
                     if (StringUtil.isNotEmpty(response.getTradeId())) {
                         response.setBusiCode(response.getTradeId());
-                    }
-                    if (StringUtil.isNotEmpty(response.getBidId())) {
+                    } else if (StringUtil.isNotEmpty(response.getBidId())) {
                         response.setBusiCode(response.getBidId());
                     }
                     response.setTgBusiType(response.getBusiTypePosition());
@@ -1463,7 +1460,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                 EtrEntrust entrust = etrEntrustMapper.selectByPrimaryKey(entrustId);
                 if(Objects.nonNull(entrust)) {
                     if(((StringUtil.equals(entrust.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue()) || StringUtil.equals(entrust.getTradeMarket(),DictCodeListExt1.交易场所_商业银行柜台.getValue()))
-                        && (StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())|| StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购)
+                        && (StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())|| StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                             || StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())))
                         ) {
                         b = false;

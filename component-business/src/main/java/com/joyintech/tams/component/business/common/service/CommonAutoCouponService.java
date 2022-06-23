@@ -405,6 +405,7 @@ public class CommonAutoCouponService extends BaseService {
                 finProductAdd.setFinprodId(finprodId);
                 finProductAdd.setWindId(secid);
                 finProductAdd.setIsAutoUpdate(DictCodeList.是否_是.getValue());
+                finProductAdd.setIsAllowOverwrite(DictCodeList.是否_是.getValue());
                 if (DictCodeListExt3.交易场所_上海证券交易所.getValue().equals(interfPayhsrcsecinfo.getMarket())) {
                     finProductAdd.setIsNoGuard(DictCodeList.是否_是.getValue());
                 } else {
@@ -1462,6 +1463,7 @@ public class CommonAutoCouponService extends BaseService {
             /* 发行人加券后客户类型默认：市场机构 add by liuwei 20201118 end */
 
             mstCustomerInfoAdd.setCustomerId(customerId);
+            mstCustomerInfoAdd.setInsitituteCode(interfPayhsrcsecinfo.getIssuershort());
             //发行人所属行业一二级分类
 //            String industry = interfPayhsrcsecinfo.getIndustry();
 //            if (industry != null && industry.length() == 1) {

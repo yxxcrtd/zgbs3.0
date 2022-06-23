@@ -164,6 +164,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         FinProduct finProduct = new FinProduct();
         BeanUtil.copyPropertiesIgnoreNull(finProduct, dto);
         //add wsz ZGCPCN-1460 修改默认币种为 CNY（人名币） satrt
+        finProduct.setIssuer(dto.getIssuershort());
         finProduct.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         //add wsz ZGCPCN-1460 修改默认币种为 CNY（人名币） end
         finProductMapper.insert(finProduct);
@@ -174,6 +175,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         BigDecimal cash = StringUtil.isNotEmpty(dto.getNomCapi())? dto.getNomCapi().multiply(new BigDecimal(10000)):new BigDecimal(0.00);
         productAdd.setNomCapi(cash);
         productAdd.setBasis(dto.getBasis());
+        productAdd.setIsInformationCoverage(dto.getIsAllowOverwrite());
         finProductAddMapper.insert(productAdd);
         //3.保存融产品分类表
         FinProductType finProductType = new FinProductType();

@@ -46,7 +46,6 @@
             WHEN bobrt.BID_MODLE IS NULL THEN '01'
             WHEN bobrt.IS_WIN = 'N' THEN '03'
             WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
-            ELSE '05'
         END AS firstBidStatus,
         nvl(efs.ENT_FINISH_AMT, 0)               finishAmt,
         trunc(nvl(efs.ENT_FINISH_AMT, 0) /
@@ -390,7 +389,6 @@
                         WHEN bobrt.BID_MODLE IS NULL THEN '01'
                         WHEN bobrt.IS_WIN = 'N' THEN '03'
                         WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
-                        ELSE '05'
                         END AS firstBidStatus,
                         bo.BID_ID         AS bidId/*投标编号*/,
                         fp.FINPROD_ID  finprodId,
@@ -487,7 +485,7 @@
                     LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
                     LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
                     AND brt.FINPROD_ID = bo.FINPROD_ID
-                    WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
+                    WHERE bo.TRADE_STATUS = '01'
                     GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
                     ) bobrt ON 	bobrt.FINPROD_ID = fp.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
                 <where>

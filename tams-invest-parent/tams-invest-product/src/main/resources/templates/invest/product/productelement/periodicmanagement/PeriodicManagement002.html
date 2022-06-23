@@ -69,17 +69,18 @@ width: 33%!important;
 					<div class="layui-inline layui-col-md4">
 						<label class="layui-form-label form-lable">投资周期(天)</label>
 						<div class="layui-input-inline input-inline" id="investCycleSelect">
-							<select id="investCycle" name="investCycle" 
+							<select id="investCycle" name="investCycle"
 								class="layui-input form-input input-select"
 								data-th-placeholder="#{SysCommon.placeholder}"
 								formatoption=false parentIds="finprodId"
 								data-th-data-url="|@{/invest/product/productelement/periodicmanagement/PeriodicManagement002/getInvestCycle}|"
-								data-th-initValue='${entity?.investCycle}'>
+								data-th-initValue='${entity?.investCycle}' required>
 							</select>
 						</div>
 						<div class="layui-input-inline input-inline" id="investCycleInput">
 							<input type="text" id="investCycle2" name="investCycle2" class="layui-input form-input"
-								 th:value="${entity?.investCycle2}?:${entity?.investCycle}" />
+								   data-th-placeholder="#{SysCommon.placeholder}"
+								 th:value="${entity?.investCycle2}?:${entity?.investCycle}" required>
 						</div>
 					</div>
 					<div class="layui-inline layui-col-md4">

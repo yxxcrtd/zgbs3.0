@@ -322,6 +322,8 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
         paramMap.put("BID_MODLE_03", DictCodeListExt4.投标方式_分销买入.getValue());
         // 是否中标
         paramMap.put("IS_WIN_Y", DictCodeList.是否_是.getValue());
+        paramMap.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+        paramMap.put("IS_CANCEL_N", DictCodeList.是否_否.getValue());
         List<EtrEntrustDto> etrEntrustDtoFirstBondList = stlDataGatherMapper.selectFirstBondEtrEntrustData(paramMap);
         etrEntrustDtoList.addAll(etrEntrustDtoFirstBondList);
 
@@ -463,11 +465,20 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             BigDecimal entrustNumTotal = currEtrEntrustList.stream().map(EtrEntrustDto::getEntrustNum).reduce(BigDecimal.ZERO, BigDecimal::add);
             if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(entrustNumTotal)>=0){
                 exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
-            }else{
-                //委托金额汇总
-                BigDecimal entrustAmtTotal = currEtrEntrustList.stream().map(EtrEntrustDto::getEntrustAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-                if(null!=settleTransDataDto.getTradeAmt()&&settleTransDataDto.getTradeAmt().compareTo(entrustAmtTotal)>=0){
-                    exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
+            } else{
+                boolean flag = true;
+                for(EtrEntrustDto etrEntrust : currEtrEntrustList){
+                    if(etrEntrust.getEntrustAmt() == null){
+                        flag = false;
+                        break;
+                    }
+                }
+                if(flag){
+                    //委托金额汇总
+                    BigDecimal entrustAmtTotal = currEtrEntrustList.stream().map(EtrEntrustDto::getEntrustAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    if(null!=settleTransDataDto.getTradeAmt()&&settleTransDataDto.getTradeAmt().compareTo(entrustAmtTotal)>=0){
+                        exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
+                    }
                 }
             }
         }

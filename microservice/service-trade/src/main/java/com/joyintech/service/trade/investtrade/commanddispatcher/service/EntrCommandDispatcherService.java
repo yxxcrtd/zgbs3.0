@@ -1,5 +1,6 @@
 package com.joyintech.service.trade.investtrade.commanddispatcher.service;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map;
 
 import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EtrEntrustDetailDto;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +19,7 @@ import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommand
 import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePledgeDto;
 
 /**
- * 
+ *
  * 指令分发接口Service
  * 〈功能详细描述〉
  * @author tanxuan
@@ -27,13 +29,13 @@ import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePl
  */
 @Service
 public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatcherDto>{
-	
+
 	@Autowired
 	private EntrCommandDispatcherMapper entrTradeSysInterfMapper;
-	
+
 	/**
 	 * 指令分发 <功能详细描述>
-	 * 
+	 *
 	 * @param param
 	 * @return
 	 * @see
@@ -57,6 +59,24 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
 		dto.setEtr_entrust_list(selectList);
 		dto.setEtr_pledge_list(this.selectPledgeList(selectList));
 		dto.setEtr_entrust_detail_list(selectEtrDetailList(param));
+
+		// ZGCPCN-1650 add 20220623
+		for (EntrCommandDispatcherDto entrCommandDispatcherDto : dto.getEtr_entrust_list()) {
+			boolean flag = true;
+			for (EtrEntrustDetailDto entrustDetailDto : dto.getEtr_entrust_detail_list()) {
+				if (entrustDetailDto.getEntrustId().equals(entrCommandDispatcherDto.getEntrustId())) {
+					flag = false;
+					break;
+				}
+			}
+			if (flag) {
+				EtrEntrustDetailDto entrustDetailDtoCopy = new EtrEntrustDetailDto();
+				entrustDetailDtoCopy.setDisRate(BigDecimal.ONE);
+				BeanUtils.copyProperties(entrCommandDispatcherDto, entrustDetailDtoCopy);
+				dto.getEtr_entrust_detail_list().add(entrustDetailDtoCopy);
+			}
+		}
+
 		if (selectList != null && !selectList.isEmpty()) {
 			dto.setAMOUNT(selectList.size());
 			dto.setPageCount(1);
@@ -66,7 +86,7 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
 		}
 		return dto;
 	}
-	
+
 	/**
      * 指令接口查询
      * <功能详细描述>
@@ -78,7 +98,7 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
     public List<EntrCommandDispatcherDto> selectList(Map<String, Object> param){
     	return entrTradeSysInterfMapper.selectList(param);
     }
-    
+
     /**
      * 指令回购质押品查询
      * <功能详细描述>
@@ -88,8 +108,8 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
      * @since 1.0
      */
     public List<EntrTradePledgeDto> selectPledgeList(List<EntrCommandDispatcherDto> list){
-    	List<EntrTradePledgeDto> pledgelist = new ArrayList<EntrTradePledgeDto>(); 
-    	
+    	List<EntrTradePledgeDto> pledgelist = new ArrayList<EntrTradePledgeDto>();
+
     	if(list != null && !list.isEmpty()) {
 	    	for(EntrCommandDispatcherDto dto : list) {
 	    		if("F02".equals(dto.getFinprodType2()) || "F03".equals(dto.getFinprodType2()) ) {

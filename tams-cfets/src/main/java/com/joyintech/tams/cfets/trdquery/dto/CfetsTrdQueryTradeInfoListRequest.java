@@ -88,6 +88,9 @@ public class CfetsTrdQueryTradeInfoListRequest {
     @ApiModelProperty(name="bidId",value="投标编号",example="字符串1")
     private String bidId;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型",example="字符串1")
+    private String busiTypePosition;
+
     public String getEffectiveStatus() {
         return effectiveStatus;
     }
@@ -246,5 +249,13 @@ public class CfetsTrdQueryTradeInfoListRequest {
 
     public void setBidId(String bidId) {
         this.bidId = bidId;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 }

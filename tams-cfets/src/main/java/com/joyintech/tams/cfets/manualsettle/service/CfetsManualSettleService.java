@@ -28,6 +28,7 @@ import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoAutoRKService;
 import com.joyintech.tams.cfets.trdquery.dao.CfetsTrdQueryMapper;
 import com.joyintech.tams.cfets.trdquery.dto.CfetsPledgeInfoResponse;
 import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdBondInvestTradeDto;
+import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdRepoTrade002Dto;
 import com.joyintech.tams.cfets.trdquery.service.CfetsTrdBondInvestTrade002Service;
 import com.joyintech.tams.cfets.trdquery.service.CfetsTrdFirstBondInvestTrade002Service;
@@ -1069,7 +1070,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         revokeEntity.setTgBusiType(entity.getTgBusiType());
                         cfetsTrdBondInvestTrade002Service.doCompleteRevoke(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId));
                     } else if (StringUtil.equals(entity.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())) {
-                        CfetsTrdBondInvestTradeDto revokeEntity = this.getTrdBondInvestTradeDto(entity.getTradeId());
+                        CfetsTrdFirstBondInvestTradeDto revokeEntity = cfetsTrdFirstBondInvestTrade002Service.getTrdFirstBondInvestTradeDto(entity.getTradeId());
                         revokeEntity.setTgBusiType(entity.getTgBusiType());
                         cfetsTrdFirstBondInvestTrade002Service.doCompleteBidRevoke(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId));
                     }else {
