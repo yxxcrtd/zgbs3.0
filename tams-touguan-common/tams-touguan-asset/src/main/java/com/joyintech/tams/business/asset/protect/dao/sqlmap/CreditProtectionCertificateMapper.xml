@@ -48,7 +48,7 @@
             fp.ISSUE_PRICE issuePrice,						<!-- 创设价格（元）-->
             fpa.SETTLE_METHOD settleMethod,			<!-- 结算方式		-->
             sdl2.item_value settleMethodStr,
-            fpa.IS_INFORMATION_COVERAGE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
+            fpa.IS_ALLOW_OVERWRITE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
             sdl1.item_value isOrNoStr,
             fp.REMARK,
             fpa.BASIS ratebasic
@@ -58,7 +58,7 @@
             LEFT JOIN FIN_CASH_INFO fci ON fci.FINPROD_ID = fp.FINPROD_ID
             LEFT JOIN MST_CUSTOMER_INFO ci1 ON fp.ISSUER = ci1.CUSTOMER_ID
             LEFT JOIN MST_CUSTOMER_INFO ci2 ON fpa.REF_ENTITY = ci2.CUSTOMER_ID
-            LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='YES_OR_NO' and sdl1.item_code = fpa.IS_INFORMATION_COVERAGE
+            LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='YES_OR_NO' and sdl1.item_code = fpa.IS_ALLOW_OVERWRITE
             LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='SETTLE_METHOD' and sdl2.item_code = fpa.SETTLE_METHOD
             LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='TRADE_PLACE' and sdl3.item_code = fp.TRADE_MARKET
             LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='PROTECT_OBJECT' and sdl4.item_code = fpa.PROTECT_OBJECT
@@ -144,7 +144,7 @@
         fp.ISSUE_PRICE issuePrice,						<!-- 创设价格（元）-->
         fpa.SETTLE_METHOD settleMethod,			<!-- 结算方式		-->
         sdl2.item_value settleMethodStr,
-        fpa.IS_INFORMATION_COVERAGE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
+        fpa.IS_ALLOW_OVERWRITE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
         sdl1.item_value isOrNoStr,
         fp.REMARK,
         fpa.basis                       <!-- 计费年度天数	-->
@@ -154,7 +154,7 @@
         LEFT JOIN FIN_CASH_INFO fci ON fci.FINPROD_ID = fp.FINPROD_ID
         LEFT JOIN MST_CUSTOMER_INFO ci1 ON fp.ISSUER = ci1.CUSTOMER_ID
         LEFT JOIN MST_CUSTOMER_INFO ci2 ON fpa.REF_ENTITY = ci2.CUSTOMER_ID
-        LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='YES_OR_NO' and sdl1.item_code = fpa.IS_INFORMATION_COVERAGE
+        LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='YES_OR_NO' and sdl1.item_code = fpa.IS_ALLOW_OVERWRITE
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='SETTLE_METHOD' and sdl2.item_code = fpa.SETTLE_METHOD
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='TRADE_PLACE' and sdl3.item_code = fp.TRADE_MARKET
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='PROTECT_OBJECT' and sdl4.item_code = fpa.PROTECT_OBJECT

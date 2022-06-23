@@ -71,6 +71,7 @@ public class RiskTrialController {
             } else {//没有试算结果时默认也给通过，针对没有配置指标试算的场景
                 result.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
                 result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
+                m.setData(result);
                 return new Message<AjaxResult>().success().setData(m);
             }
         } catch (Exception e) {

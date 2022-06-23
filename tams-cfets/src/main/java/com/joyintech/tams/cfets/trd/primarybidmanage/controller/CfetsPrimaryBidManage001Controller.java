@@ -351,7 +351,8 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                         break;
                     }
                     BidResultTotal bidResultTotal = bidResultTotalMapper.selectByPrimaryKey(request.getTotalWinId());
-                    if (DateUtil.compareDate(iPlatformDate.getSysDate(),bidResultTotal.getWinDate()) != 0) {
+                    if (StringUtil.equals(request.getIsWin(),DictCodeList.是否_是.getValue()) &&
+                            DateUtil.compareDate(iPlatformDate.getSysDate(),bidResultTotal.getWinDate()) != 0) {
                         errorList.add(new ValidMessage("投标方式为自主投标的已中标有效数据，仅支持当日撤销"));
                         break;
                     }
