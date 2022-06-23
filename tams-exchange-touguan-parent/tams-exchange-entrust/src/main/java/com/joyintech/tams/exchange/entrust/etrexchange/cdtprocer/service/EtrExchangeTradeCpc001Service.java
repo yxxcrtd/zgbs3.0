@@ -61,6 +61,7 @@ import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
+import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinPirceDto;
@@ -294,6 +295,12 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             positionRequestService.sendDelete(entity);
         }
         //增加调用头寸引擎代码end
+    }
+
+    @Override
+    public void doBack(EtrCreditProtectionCertificateApplyRequest entity) {
+        doDeleteFlow(entity.getWorkflowId());
+        AllTradeCommonUtil.deletePosition(null, entity.getEntrustId());
     }
 
     @Override

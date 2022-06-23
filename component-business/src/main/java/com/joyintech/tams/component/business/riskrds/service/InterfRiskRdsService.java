@@ -2513,6 +2513,10 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             }
 
             infRiskRdsDto.setCalendarCode((String) CommonUtil.findValue(dataMap, "calendarId"));
+            if (StringUtil.isEmpty(infRiskRdsDto.getCalendarCode())
+                && StringUtil.equals(infRiskRdsDto.getTradePlace(),DictCodeListExt1.交易场所_银行间.getValue())){
+                infRiskRdsDto.setCalendarCode("03");
+            }
             if (StringUtil.isNotEmpty(finDto.getMdate())) {
                 infRiskRdsDto.setRepoTerm(BigDecimal.valueOf(DateUtil.getBetweenDayNumber(finDto.getTradeDate(), finDto.getMdate())));
             }
@@ -2572,7 +2576,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         if (StringUtil.equals(DictCodeListExt2.平安资产类型_一级市场债.getValue(), v.getAssetType())) {
             if (CommonUtil.isType(v.getEventStatus(), DictCodeListExt4.共通业务类型_中标结果维护自主投标) ||
                     CommonUtil.isType(v.getEventStatus(), DictCodeListExt4.共通业务类型_中标结果维护代投代缴)) {
-                infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "totalBiddingNum", BigDecimal.ZERO));//汇总券面总额
+                infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "actWinPrinamt", BigDecimal.ZERO));//汇总券面总额
                 infRiskRdsDto.setTradeNum(
                         ArithmeticUtil.divide(infRiskRdsDto.getAmount(), new BigDecimal(100), 4));
                 // add by zhangrui1 汇总确认 end

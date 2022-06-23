@@ -609,11 +609,14 @@ public class CommonManagement extends BaseService {
         return new Message(map);
     }
 
+    /**
+     * 对手方交易商、交易主体、交易员 不需要根据本方标识做筛选
+     */
     public List<TradeInfoProResponse> getCounterDealerTraderInfo(TradeInfoProRequest dto) {
         dto.setIsOur(null);
         List<TradeInfoProResponse> list = getDealerTraderInfo(dto);
-
-        return list.stream().filter(o -> StringUtil.isEmpty(o.getIsOur()) || StringUtil.equals(o.getIsOur(), "N")).collect(Collectors.toList());
+        return list;
+//        return list.stream().filter(o -> StringUtil.isEmpty(o.getIsOur()) || StringUtil.equals(o.getIsOur(), "N")).collect(Collectors.toList());
     }
 
     public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {

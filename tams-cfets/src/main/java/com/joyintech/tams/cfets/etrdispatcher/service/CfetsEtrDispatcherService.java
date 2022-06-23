@@ -461,8 +461,6 @@ public class CfetsEtrDispatcherService extends BaseService {
                     response.setDealProgress(ArithmeticUtil.divide(response.getFinishAmt(), response.getEntrustAmt(), 4).multiply(new BigDecimal("100")));
                     response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(ArithmeticUtil.subtract(response.getEntrustAmt(), response.getFinishAmt()), new BigDecimal("10000"), 4))));
                     response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("10000"), 4))));
-                    response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
-                    response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
                 } else if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
                     if (StringUtil.equals(response.getTargetType(), DictCodeListExt3.目标类型_数量.getValue())) {
                         DecimalFormat df = new DecimalFormat("0.##");

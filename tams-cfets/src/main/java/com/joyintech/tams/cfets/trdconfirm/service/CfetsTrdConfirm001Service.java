@@ -72,7 +72,6 @@ import com.joyintech.tams.invest.common.trade.service.PreTrdCommonBaseService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.interf.service.InterfComponentService;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
-import com.joyintech.tams.invest.trade.trdrepotrade.dto.TrdRepoTrade002Dto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -849,7 +848,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
         if (!StringUtil.isEmptyList(finishEtrList)) {
             for (String item : finishEtrList) {
                 closeDelegatePositionMethod(item, entity.getPs(), "bid");
-
             }
         }
         if (StringUtil.equals(genType, DictCodeListExt1.生成方式_画面录入.getValue())) {
@@ -2099,11 +2097,11 @@ public class CfetsTrdConfirm001Service extends BaseService {
      * 处理一级申购老头寸
      *
      * @param entity
-     * @param isOverFlow 是否流程生效
+     * @param isRevoke 是否撤销
      * @author jiangpeng
      * @date 2022/5/26 17:22
      */
-    public void dealOldBidPosition(CfetsTrdFirstBondInvestTradeDto entity, boolean isOverFlow) {
+    public void dealOldBidPosition(CfetsTrdFirstBondInvestTradeDto entity, boolean isRevoke) {
         if (StringUtil.equals(DictCodeList.是否_否.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             return;
         }
@@ -2121,10 +2119,10 @@ public class CfetsTrdConfirm001Service extends BaseService {
         for (TrdProductDeal deal : entity.getTrdProductDeals()) {
             AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
             FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
-            if(isOverFlow) {
-                finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
-            }else{
+            if (!isRevoke) {
                 finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+            } else {
+                finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
             }
             finProductTradeDto.setAssetType2("ISSUE_CLASS_01");
             finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());

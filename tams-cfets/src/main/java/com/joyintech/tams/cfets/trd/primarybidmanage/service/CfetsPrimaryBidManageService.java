@@ -369,8 +369,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
             bidResultTotalMapper.updateByPrimaryKeySelective(bidResultTotal);
             cfetsPrimaryBidManageMapper.updateBidOrder(entity.getBidId());
-            BaseBidManageBaseInfoDto baseInfoDto = new BaseBidManageBaseInfoDto();
-            if (StringUtil.equals(entity.getIsWin(), DictCodeList.是否_是.getValue())) {
+            BaseBidManageBaseInfoDto  baseInfoDto = new BaseBidManageBaseInfoDto();
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                 List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
                 List<TrdProductDeal> trdProductDeals = new ArrayList<>();
                 for (TrdFinProductDealTotal trdFinProductDealTotal : trdFinProductDealTotalList) {
@@ -389,7 +389,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
                     }
                     // 根据汇总交易编号查询金融产品交易
-                    List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
                     if (!trdProductDealList.isEmpty()) {
                         for (TrdProductDeal trdProductDeal : trdProductDealList) {
                             /**金融产品交易表**/
@@ -403,7 +403,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                             trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
                             trdProductDealMapper.insert(trdProductDeal);
                             /**交易附属表 **/
-                            TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getTradeId());
+                            TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDealRevoke.getTradeId());
                             if (trdProductDealAdd != null) {
                                 trdProductDeal.setEntrustId(trdProductDealAdd.getEntrustId());
                                 trdProductDealAdd.setTradeId(trdProductDealAdd.getTradeId()
@@ -412,7 +412,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                             }
                             trdProductDeals.add(trdProductDeal);
                             // 组合交易表
-                            List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDeal.getTradeId());
+                            List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDealRevoke.getTradeId());
                             if (!ptlTradeList.isEmpty()) {
                                 for (PtlTrade ptlTrade : ptlTradeList) {
                                     ptlTrade.setBusiNo(ptlTrade.getBusiNo() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
@@ -427,7 +427,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
                     }
                     // 划款指令表
-                    List<StlOrders> stlPayOrdersList = cfetsPrimaryBidManageMapper.queryStlPayOrdersByTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    List<StlOrders> stlPayOrdersList = cfetsPrimaryBidManageMapper.queryStlPayOrdersByTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
                     if (!stlPayOrdersList.isEmpty()) {
                         for (StlOrders stlOrders : stlPayOrdersList) {
                             stlOrders.setOrderId(stlOrders.getOrderId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
@@ -448,16 +448,16 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 // 老头寸处理
                 this.dealOldPosition(entity, true);
             }
-            updateCfetsOprHis(entity.getTotalWinId(), action);
+            updateCfetsOprHis(entity.getTotalWinId(),action);
         } else {
             action = OperationType.NEW.name();
-            if (StringUtil.equals(entity.getIsWin(), DictCodeList.是否_是.getValue())) {
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                 entity = cncapBaseBidManageBaseInfoDto(entity);
                 doCompleteInsert(entity);
-            } else {
+            }else{
                 unBidSave(entity);
             }
-            updateCfetsOprHis(entity.getTotalWinId(), action);
+            updateCfetsOprHis(entity.getTotalWinId(),action);
         }
         baseTradeCommExecute(entity, type);
     }
@@ -944,7 +944,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
      * @param entity   页面元素
-     * @param isRevokeOrBack 交易流程状态 参数字典 TRADE_FLOW_STATUS
+     * @param flowType 交易流程状态 参数字典 TRADE_FLOW_STATUS
      * @author jiangpeng
      * @date 2022/4/28 10:37
      */
@@ -1026,14 +1026,26 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             } catch (PositionException e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
-                String code = (String) bm.get("code");
-                String messageStr = JsonUtils.json2Object((String) bm.get("message").toString(), String.class);
-                if (StringUtil.isEmpty(confirmOk)
-                        && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
-                    WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
-                }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
-                    WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
+                String messageStr = null;
+                if (StringUtil.isNotEmpty(bm)) {
+                    String code = (String) bm.get("code");
+                    messageStr = JsonUtils.json2Object((String) bm.get("message").toString(), String.class);
+                    if (StringUtil.isEmpty(confirmOk)
+                            && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
+                    }
+                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK,code)) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
+                    }
+                }else{
+                    messageStr = JsonUtils.json2Object(message.getMessage(), String.class);
+                    if (StringUtil.isEmpty(confirmOk)
+                            && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, message.getCode())) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
+                    }
+                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, message.getCode())) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
+                    }
                 }
                 throw new PositionException(messageStr);
             }

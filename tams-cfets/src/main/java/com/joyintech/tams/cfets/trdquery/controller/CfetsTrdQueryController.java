@@ -20,6 +20,7 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.cfets.trdquery.dto.*;
 import com.joyintech.tams.cfets.trdquery.service.CfetsTrdBondInvestTrade002Service;
 import com.joyintech.tams.cfets.trdquery.service.CfetsTrdFirstBondInvestTrade002Service;
@@ -419,6 +420,7 @@ public class CfetsTrdQueryController extends BaseController {
                     && StringUtil.equals(item.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
                 String totleTradeId = item.getTotleTradeId();
                 CfetsTrdFirstBondInvestTradeDto inputDto = cfetsTrdFirstBondInvestTrade002Service.getTrdFirstBondInvestTradeDto(totleTradeId);
+                inputDto.setWorkflowParameter(item.getWorkflowParameter());
                 inputDto.setOperateType(item.getOperateType());
                 inputDto.setRevokeReason(input.getRevokeReason());
                 inputDto.setTotleTradeId(totleTradeId + "R");
