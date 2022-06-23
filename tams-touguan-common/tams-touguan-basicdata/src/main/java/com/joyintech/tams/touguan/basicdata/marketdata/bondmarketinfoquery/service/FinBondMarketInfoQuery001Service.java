@@ -16,7 +16,11 @@ import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.dao.MstCustomerInfoAddMapper;
+import com.joyintech.tams.common.base.dao.MstCustomerInfoMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.MstCustomerInfo;
+import com.joyintech.tams.common.base.entity.MstCustomerInfoAddWithBLOBs;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -36,6 +40,7 @@ import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.servi
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +73,11 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     private IPlatformDate iPlatformDate;
     @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
+    @Autowired
+    private MstCustomerInfoMapper mstCustomerInfoMapper;
+
+    @Autowired
+    private MstCustomerInfoAddMapper mstCustomerInfoAddMapper;
 
     /**
      * 债券市场信息分页查询
@@ -187,7 +197,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             ajaxResult.setMessageType(MessageType.错误消息);
         } else {
             //操作记录
-            this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
+            this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
         }
         return ajaxResult;
     }
@@ -214,6 +224,30 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         //校验必填项
         addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
         return validMessages;
+    }
+
+    /**
+     * 发行人处理
+     *
+     * @param issuer
+     */
+    private void handleIssuer(String issuer) {
+        MstCustomerInfo mstCustomerInfo = mstCustomerInfoMapper.selectByPrimaryKey(issuer);
+        if (StringUtil.isNotEmpty(mstCustomerInfo)) {
+            mstCustomerInfo.setIsIssuer(DictCodeList.是否_是.getValue());
+            mstCustomerInfoMapper.updateByPrimaryKey(mstCustomerInfo);
+        } else {
+            mstCustomerInfo = new MstCustomerInfo();
+            mstCustomerInfo.setCustomerId(issuer);
+            mstCustomerInfo.setCustomerAbbr(issuer);
+            mstCustomerInfo.setCustomerName(issuer);
+            mstCustomerInfo.setCustomerType(DictCodeList.客户类型_法人.getValue());
+            mstCustomerInfo.setIsIssuer(DictCodeList.是否_是.getValue());
+            mstCustomerInfoMapper.insertSelective(mstCustomerInfo);
+            MstCustomerInfoAddWithBLOBs mstCustomerInfoAdd = new MstCustomerInfoAddWithBLOBs();
+            mstCustomerInfoAdd.setCustomerId(issuer);
+            mstCustomerInfoAddMapper.insertSelective(mstCustomerInfoAdd);
+        }
     }
 
 
