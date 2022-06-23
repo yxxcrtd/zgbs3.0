@@ -62,10 +62,14 @@ public class CfetsCommonOprHisHandlerAop {
     protected void doDispatcherDealPoint() {
     }
 
+    @Pointcut("execution(* com.joyintech.tams.cfets..*.*.revoke(..))")
+    protected void revoke() {
+    }
+
     /**
      * 提交及更新时更新细操作履历表
      */
-    @AfterReturning("insertPoint() || updatePoint()||doDispatcherDealPoint()")
+    @AfterReturning("insertPoint() || updatePoint()||doDispatcherDealPoint()||revoke()")
     public void updateCfetsOprHis(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         OperationType operationType = OperationType.NEW;
