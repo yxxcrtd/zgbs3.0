@@ -157,6 +157,16 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
             CfetsPrimaryBidManageSaveRequest response = new CfetsPrimaryBidManageSaveRequest();
             if (StringUtil.isNotEmpty(workflowId)) {
                 response = cfetsPrimaryBidManageService.getBussinessEntityByWorkflowId(workflowId);
+                if (StringUtil.equals(request.getIsWin(),DictCodeList.是否_否.getValue())){
+                    response.setPayDate(null);
+                    response.setCirculationCode(null);
+                    response.setListingDate(null);
+                    response.setWinPrinamt(null);response.setRemark("未中标");
+                    response.getAllocationDetails().forEach(item->{
+                        item.setBidType(null);
+                        item.setIntAmt(null);
+                    });
+                }
             }else if (StringUtil.isNotEmpty(request.getTotalWinId())){
                 response = cfetsPrimaryBidManageService.selectBasicInfo(request);
             }
