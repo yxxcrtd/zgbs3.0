@@ -1440,7 +1440,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     /** add by yanya on 20210309 新增数据字典：行权回售申请交易处理 end**/
 
     // add by etliu 2021-04-20 权益类资产功能合并 start
-    金融产品类型_投管用_权益类资产(DictCode.金融产品类型_投管用,"F37","权益类资产"),
+    金融产品类型_投管用_权益类资产(DictCode.金融产品类型_投管用,"F37_FQ","权益类资产_废弃"),
     平安资产类型_权益类资产(DictCode.平安资产类型,"F19","权益类资产"),
     共通业务类型_权益类资产信息(DictCode.共通业务类型,"FINASSET21","权益类资产信息"),
     共通业务类型_权益类资产委托(DictCode.共通业务类型,"ETR41","权益类资产指令"),
