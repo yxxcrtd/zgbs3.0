@@ -181,12 +181,13 @@ public class StlDataDealSzdSjsmxProcessService {
             }
             // 全价总额
             settleTransData.setFpriceAmt(abs(szdSjsmx.getMxqsbj()));
-            if ("B14".equals(getFinProductTypeType6(settleTransData))) {
+            if ("B14".equals(stlDataDealProcessCommonService.getFinProductTypeType6(settleTransData))) {
                 settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdSjsmx.getMxjyfs()));
             }
             // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
-            stlDownDataDealService.calc(settleTransData);
-
+            if(BussinessDictCodeList.金融产品类型_投管用_债券.getValue().equals(settleTransData.getFinprodType2())){
+                stlDownDataDealService.calc(settleTransData);
+            }
             return true;
         }));
     }
@@ -840,19 +841,4 @@ public class StlDataDealSzdSjsmxProcessService {
         return stlDataDealProcessCommonService.getNextWorkDay(parseDate, calendarId);
     }
 
-    /**
-     * 根据金融产品代码查询FIN_PRODUCT_TYPE.TYPE_6 -- 投管一级类型
-     */
-    private String getFinProductTypeType6(SettleTransData settleTransData) {
-        FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
-        finProductTypeKey.setBranch(0L);
-        finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
-        FinProductType finProductType = new FinProductType();
-        try {
-            finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
-        } catch (Exception e) {
-            logger.error("根据金融产品代码查询投管一级类型出错信息：" + e);
-        }
-        return finProductType.getType6();
-    }
 }

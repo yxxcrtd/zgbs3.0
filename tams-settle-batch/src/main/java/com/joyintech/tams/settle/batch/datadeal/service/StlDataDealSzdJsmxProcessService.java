@@ -276,7 +276,7 @@ public class StlDataDealSzdJsmxProcessService {
 					szdJsmx.setCjbh(szdJsmx.getJsbh());
 				}
 				// 交易平台
-				String finProductTypeType6 = getFinProductTypeType6(settleTransData);
+				String finProductTypeType6 = stlDataDealProcessCommonService.getFinProductTypeType6(settleTransData);
 				settleTransData.setTradePlat(null);
 				if ("B14".equals(finProductTypeType6)) {
 					settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
@@ -2423,7 +2423,7 @@ public class StlDataDealSzdJsmxProcessService {
 		// 交易币种
 		settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
 		// 交易平台
-		String finProductTypeType6 = getFinProductTypeType6(settleTransData);
+		String finProductTypeType6 = stlDataDealProcessCommonService.getFinProductTypeType6(settleTransData);
 		settleTransData.setTradePlat(null);
 		if ("B14".equals(finProductTypeType6)) {
 			settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
@@ -2622,21 +2622,6 @@ public class StlDataDealSzdJsmxProcessService {
 		settleTransTgMapping.setTradeId(settleTransData.getTradeId());
 		stlDownDataDealWriteBaseDto.setSettleTransTgMapping(settleTransTgMapping);
 		return stlDownDataDealWriteBaseDto;
-	}
-
-	/**
-	 * 根据金融产品代码查询FIN_PRODUCT_TYPE.TYPE_6 -- 投管一级类型
-	 */
-	private String getFinProductTypeType6(SettleTransData settleTransData) {
-		FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
-		finProductTypeKey.setBranch(0L);
-		finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
-
-		FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
-		if (null == finProductType) {
-			return "";
-		}
-		return finProductType.getType6();
 	}
 
 	/**
