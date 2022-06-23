@@ -1808,6 +1808,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             return null;
         }
         List<String> entrustIdList = new ArrayList<>();
+        if (!StringUtil.isNotEmpty(dto.getBaseBidManageBaseInfoDto())){
+            return null;
+        }
         for (TrdProductDeal trdProductDeal : dto.getBaseBidManageBaseInfoDto().getTrdProductDealList()) {
             if (StringUtil.isEmpty(trdProductDeal.getEntrustId())) {
                 continue;
