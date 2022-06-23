@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
 @PageId("etrCreditProtectionCertificate")
 @RequestMapping("/etrexchange/cpc/etrCreditProtectionCertificate")
 @Api(tags = "场内交易-信用保护凭证指令—下单审批接口")
-public class EtrExchangeTradeCpc001Controller extends BaseController {
+public class EtrCreditProtectionCertificateController extends BaseController {
 
     /**
      * 日志
