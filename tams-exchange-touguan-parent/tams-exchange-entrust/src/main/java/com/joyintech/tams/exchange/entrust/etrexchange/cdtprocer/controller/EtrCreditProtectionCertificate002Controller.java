@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 @PageId("etrCreditProtectionCertificate002")
 @RequestMapping("/etrexchange/cpc/etrCreditProtectionCertificate002")
 @Api(tags = "场内交易-信用保护凭证指令—下单审批接口")
-public class EtrExchangeTradeCpc002Controller extends BaseController {
+public class EtrCreditProtectionCertificate002Controller extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(EtrExchangeTradeSecRepo002Controller.class);
     /**
