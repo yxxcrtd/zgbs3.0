@@ -136,7 +136,7 @@ public class StlDownDataDealWriter extends BaseWriter<NeedToWriteEntity> {
 			SettleTransData settleTransData = dataDealWriteBaseDto.getSettleTransData();
 			// ZGCPCN-1441: 修改可转债和一级投标债成交明细赋值 modify by fuyongsheng 20220616 start
 			if(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue().equals(settleTransData.getFinprodType2())){
-				String finProdMarketId = settleTransData.getFinprodId().substring(3);
+				String finProdMarketId = settleTransData.getFinprodId().substring(4);
 				List<FinProduct> finProducts = stlDownDataDealMapper.getFinproduct(finProdMarketId, settleTransData.getFinprodType2());
 				// 实例：FinprodId = F32_2121211_20220618142523.IB
 				// 取时间戳最新的那条
