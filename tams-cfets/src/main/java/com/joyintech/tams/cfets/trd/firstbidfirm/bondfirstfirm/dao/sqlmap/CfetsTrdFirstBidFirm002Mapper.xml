@@ -233,7 +233,6 @@
                             WHEN bobrt.BID_MODLE IS NULL THEN '01'
                             WHEN bobrt.IS_WIN = 'N' THEN '03'
                             WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
-                            ELSE '05'
                             END AS        firstBidStatus,
                         CASE
                             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')

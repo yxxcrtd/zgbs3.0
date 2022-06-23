@@ -21,7 +21,9 @@ public interface FinProductMapper {
 
     FinProduct selectByFinprodMarketId(String finprodMarketId);
 
-    FinProduct selectByFinprodMarketIdAndType2(@Param("finprodMarketId") String finprodMarketId,@Param("finprodType2") String finprodType2);
+    FinProduct selectByFinprodMarketIdAndType2(@Param("finprodMarketId") String finprodMarketId, @Param("finprodType2") String finprodType2);
+
+    FinProduct selectByFinprodMarketIdAndType2AndBatch(@Param("finprodMarketId") String finprodMarketId, @Param("finprodType2") String finprodType2, @Param("additionalBatches") Integer additionalBatches);
 
     int updateByPrimaryKeySelective(FinProduct record);
 

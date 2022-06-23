@@ -3310,7 +3310,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 addDimension = ArithmeticUtil.divide(tailDifference, new BigDecimal(size), 2, RoundingMode.HALF_UP);
                 addDimension = ArithmeticUtil.multiply(ArithmeticUtil.divide(addDimension, minChangeUnit, 0, RoundingMode.DOWN), minChangeUnit);
             }
-            if (flag && set.size() != 1) {
+            if ((flag && set.size() != 1) || BigDecimalUtil.isZero(addDimension)) {
                 addDimension = minChangeUnit;
             }
             for (CfetsTrdFirstBidFirmProductDto item : productDtos) {
