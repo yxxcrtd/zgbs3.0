@@ -886,8 +886,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                 for (CfetsEtrDispatcherDealListInfoResponse response : list) {
                     if (StringUtil.isNotEmpty(response.getTradeId())) {
                         response.setBusiCode(response.getTradeId());
-                    }
-                    if (StringUtil.isNotEmpty(response.getBidId())) {
+                    } else if (StringUtil.isNotEmpty(response.getBidId())) {
                         response.setBusiCode(response.getBidId());
                     }
                     response.setTgBusiType(response.getBusiTypePosition());
