@@ -4682,6 +4682,40 @@
             and TPD.TRADE_ID=#{busiCode}
         </if>
     </select>
+    <select id="findRepoPortIntFenPeiInfoList2"
+            resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
+        SELECT
+        TPDA.Entrust_Id entrustId,
+        TPDA.PORTFOLIO_ID portfolioId,
+        pp.PORTFOLIO_NAME portfolioName,
+        TPD.TRADE_AMT tradeAmt,
+        ttft.fee_amt jyFeeAmt,
+        ttft1.fee_amt jsFeeAmt,
+        ftp.m_int_amt as mintAmt,
+        ftp.m_trade_amt as fpriceAmt,
+        pledges.disFaceValue as disFaceValue,
+        EE.PRICE_MODEL as priceModel,
+        ftp.int_rate*100 as tradeYield
+        FROM TRD_PRODUCT_TEMP_DEAL TPD
+        INNER JOIN TRD_PRODUCT_TEMP_DEAL_ADD TPDA on TPD.TRADE_ID = TPDA.TRADE_ID
+        <if test="userName != null and userName != ''">
+            inner JOIN PTL_PORTFOLIO_AUTHORITY PPA
+            ON TPDA.portfolio_id = PPA.PORTFOLIO_ID
+            AND PPA.USER_ID = #{userName}
+        </if>
+        LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
+        LEFT JOIN TRD_TRADE_FEE_DETAIL ttft ON tpd.trade_id = ttft.trade_id AND ttft.fee_type =#{feeType06}
+        LEFT JOIN TRD_TRADE_FEE_DETAIL ttft1 ON tpd.trade_id = ttft1.trade_id AND ttft1.fee_type =#{feeType08}
+        LEFT JOIN ETR_ENTRUST ee ON TPDA.Entrust_Id = ee.entrust_id
+        left join fin_trade_product ftp on ftp.finprod_id=TPD.TRADE_ID
+        left join (select pledge.finprod_id,sum(pledge.pledge_number*100) as disFaceValue
+        from FIN_DEAL_PLEDGE pledge group by pledge.finprod_id)pledges
+        on ftp.finprod_id=pledges.finprod_id
+        where TPD.TOTLE_TRADE_ID = #{totleTradeId} and  TPD.Trade_Status='01'
+        <if test="busiCode != null and busiCode != ''">
+            and TPD.TRADE_ID=#{busiCode}
+        </if>
+    </select>
     <select id="findRepoPledgeInfoList"
             resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsPledgeInfoResponse">
         select rp.pledge_finprod_id as finprodId,
