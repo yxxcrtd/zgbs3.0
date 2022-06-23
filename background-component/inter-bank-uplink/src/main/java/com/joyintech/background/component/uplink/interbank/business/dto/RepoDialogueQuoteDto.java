@@ -14,7 +14,7 @@ import com.joyintech.background.component.common.pack.common.util.BeanUtil;
 import com.joyintech.background.component.uplink.interbank.database.entity.IbuQuoteCrepHis;
 import com.joyintech.background.component.uplink.interbank.database.entity.IbuQuoteCrepPledgeHis;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 

@@ -40,7 +40,7 @@ import com.joyintech.workflow.engine.service.WorkflowMethodInterceptor;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.task.Task;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.slf4j.Logger;

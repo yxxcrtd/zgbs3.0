@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.h2.util.New;
+//import org.h2.util.New;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -23,7 +23,7 @@ import com.joyintech.tams.common.base.entity.SettleBatchPara;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.basicdata.dataclear.dto.SettleBatchResultDto;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

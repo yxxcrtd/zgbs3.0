@@ -2,7 +2,7 @@ package com.joyintech.tams.business.common.util;
 
 import com.joyintech.framework.validation.ValidMessage;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;

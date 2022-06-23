@@ -32,7 +32,7 @@ import com.joyintech.tams.valuation.common.interf.val.dao.BokTradeBuildMapper;
 import com.joyintech.tams.valuation.common.interf.val.dao.BorrowBaseInfoInitMapper;
 import com.joyintech.tams.valuation.common.interf.val.dto.ProdInfoDto;
 import com.joyintech.tams.valuation.common.interf.val.service.ValSysParaService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

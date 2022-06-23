@@ -22,7 +22,7 @@ import com.joyintech.tams.valuation.batch.batchunistart.dao.BatchUnistartMapper;
 import com.joyintech.tams.valuation.batch.batchunistart.entity.BatchUnistartDto;
 import com.joyintech.tams.valuation.batch.batchunistart.entity.BatchUnistartGrpconfig;
 import com.joyintech.tams.valuation.batch.batchunistart.service.BatchUnistartCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;

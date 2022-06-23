@@ -30,7 +30,7 @@ import com.joyintech.tams.common.base.entity.WflEtrEntrustAddKey;
 import com.joyintech.tams.common.base.entity.WflEtrEntrustKey;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;

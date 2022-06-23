@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.joyintech</groupId>
 		<artifactId>tams-parent</artifactId>
-		<version>0.0.5.alibaba</version>
+		<version>0.0.5.268</version>
 	</parent>
 	<artifactId>tams-touguan</artifactId>
 	<version>0.1.9</version>
@@ -221,7 +221,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+		<!-- 此处由于 DMSG_DC需要强制使用commons-httpclient -->
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>tams-touguan</finalName>

@@ -21,7 +21,7 @@ import com.joyintech.tams.invest.batch.overduesecpositionforward.dto.OverdueSecP
 import com.joyintech.tams.invest.batch.overduesecpositionforward.dto.SecManageAcctInfoDto;
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

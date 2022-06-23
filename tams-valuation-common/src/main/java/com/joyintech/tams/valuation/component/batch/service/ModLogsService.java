@@ -6,7 +6,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.ModBatchLogsMapper;
 import com.joyintech.tams.common.base.entity.ModBatchLogs;
 import com.joyintech.tams.constant.ModelDictCodeList;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;

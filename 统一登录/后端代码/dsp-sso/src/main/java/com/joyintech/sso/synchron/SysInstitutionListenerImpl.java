@@ -6,7 +6,7 @@ import com.joyintech.sso.config.pojo.SsoPlatform;
 import com.joyintech.sso.config.service.SsoPlatformService;
 import com.joyintech.system.institution.SysInstitutionListener;
 import com.joyintech.system.institution.dto.SysInstitutionDto;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

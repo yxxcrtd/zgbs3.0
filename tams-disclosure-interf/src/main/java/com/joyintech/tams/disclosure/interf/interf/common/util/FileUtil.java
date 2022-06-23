@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 
 import com.joyintech.framework.file.SafelyFile;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.zip.ZipFile;

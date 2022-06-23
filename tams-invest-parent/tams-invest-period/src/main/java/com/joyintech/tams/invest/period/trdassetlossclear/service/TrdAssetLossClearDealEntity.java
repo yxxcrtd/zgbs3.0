@@ -42,7 +42,7 @@ import com.joyintech.tams.invest.period.common.service.PeriodCommonService;
 import com.joyintech.tams.invest.period.trdassetlossclear.dto.TrdAssetLossClear001Dto;
 import com.joyintech.tams.invest.period.trdplannetduration.dto.TrdPlanNetDuration001Dto;
 import com.joyintech.workflow.engine.constant.OperationType;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

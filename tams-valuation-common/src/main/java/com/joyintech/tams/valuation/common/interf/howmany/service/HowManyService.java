@@ -15,7 +15,7 @@ import com.joyintech.tams.valuation.common.interf.howmany.dto.TrdProductDealDto;
 import com.joyintech.tams.valuation.common.service.BookAccountCommonService;
 import com.joyintech.tams.valuation.common.service.DataTransplantCommonService;
 import com.joyintech.tams.valuation.common.utils.DBUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

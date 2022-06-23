@@ -8,7 +8,7 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

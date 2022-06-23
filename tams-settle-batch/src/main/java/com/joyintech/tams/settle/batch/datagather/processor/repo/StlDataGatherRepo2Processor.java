@@ -10,7 +10,7 @@ import com.joyintech.tams.settle.batch.datagather.dto.FinTradeProductDto;
 import com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto;
 import com.joyintech.tams.settle.batch.datagather.dto.TotalTrdProductDealDto;
 import com.joyintech.tams.settle.batch.datagather.dto.TrdProductDealDto;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 

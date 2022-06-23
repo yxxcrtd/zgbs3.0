@@ -22,7 +22,7 @@ import com.joyintech.tams.model.valuation.batch.cashflowdiscount.dao.CashFlowDis
 import com.joyintech.tams.model.valuation.batch.cashflowdiscount.dto.CashFlowDiscountResult;
 import com.joyintech.tams.model.valuation.batch.cashflowdiscount.dto.ModCurveResultDetail;
 import com.joyintech.tams.valuation.common.utils.DataHandleUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;

@@ -33,6 +33,10 @@ mybatis:
 spring:
   application:
     name: tams-server
+
+  main:
+    allow-bean-definition-overriding: true #此处bean可以覆盖
+    allow-circular-references: true #此处设置可以循环依赖
     
   profiles:
     include:

@@ -24,7 +24,7 @@ import com.joyintech.tams.valuation.accounadjustmanage.assistaccout.service.ValA
 import com.joyintech.tams.valuation.accounadjustmanage.subjectset.dto.ValBokSubjectDto;
 import com.joyintech.tams.valuation.accounadjustmanage.subjectset.service.ValSubjectSet001Service;
 import com.joyintech.tams.valuation.common.constants.SubjectConfigCode;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;

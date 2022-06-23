@@ -1,46 +1,1 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorator="~{layout/default}">
-<head>
-<title>jixu日调整</title>
-</head>
-<body>
-    <div layout:fragment="content">
-        <form class="layui-form joyin-form-wrap" style="padding:10px 0;" method="post" th:action="@{/invest/risk/stresstestmanage/jixudate/JixuDate001/update}">
-            <div class="layui-form-item">
-                <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4" style="height:1px;">
-                </div>
-                <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4">
-                    <!-- <label class="layui-form-label form-lable" data-th-text="#{JixuDate001.oldDate}">当前日期</label> -->                    <label class="layui-form-label form-lable" >当前日期</label>
-                    <div class="layui-input-inline input-inline">
-                        <input type="text" data-th-value="${jixuDate}" disabled
-                        	class="layui-input form-input input-dateSelect"
-                        	placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}">
-                    </div>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4" style="height:1px;">
-                </div>
-                <div class="layui-inline layui-col-md4 layui-col-xs6 layui-col-sm4 layui-col-lg4">
-                    <!-- <label class="layui-form-label form-lable" data-th-text="#{JixuDate001.newDate}">新日期</label> -->                    <label class="layui-form-label form-lable">新日期</label>
-                    <div class="layui-input-inline input-inline">
-                        <input type="text" name="newDate" required
-                        	class="layui-input form-input input-dateSelect"
-                        	placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}">
-                    </div>
-                </div>
-            </div>
-	        <div class="layui-col-md11 layui-col-xs11 layui-col-sm11 layui-col-lg11" style="margin:50px;">
-	        	<div class="text-center">
-		            <button id="JixuDate001_btn_save" type="submit" class="layui-btn layui-btn-sm btn-save" data-th-text="#{SysCommon.save}">保存</button>
-		        </div>
-	        </div>
-        </form>
-    </div>
-    <div layout:fragment="script">
-    </div>
-</body>
-
-</html>
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"    layout:decorate="~{layout/default}"><head><title>jixu日调整</title></head><body>    <div layout:fragment="content">        <form class="layui-form joyin-form-wrap" style="padding:10px 0;" method="post" th:action="@{/invest/risk/stresstestmanage/jixudate/JixuDate001/update}">            <div class="layui-form-item">                <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4" style="height:1px;">                </div>                <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4">                    <!-- <label class="layui-form-label form-lable" data-th-text="#{JixuDate001.oldDate}">当前日期</label> -->                    <label class="layui-form-label form-lable" >当前日期</label>                    <div class="layui-input-inline input-inline">                        <input type="text" data-th-value="${jixuDate}" disabled                        	class="layui-input form-input input-dateSelect"                        	placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}">                    </div>                </div>            </div>            <div class="layui-form-item">                <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4" style="height:1px;">                </div>                <div class="layui-inline layui-col-md4 layui-col-xs6 layui-col-sm4 layui-col-lg4">                    <!-- <label class="layui-form-label form-lable" data-th-text="#{JixuDate001.newDate}">新日期</label> -->                    <label class="layui-form-label form-lable">新日期</label>                    <div class="layui-input-inline input-inline">                        <input type="text" name="newDate" required                        	class="layui-input form-input input-dateSelect"                        	placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}">                    </div>                </div>            </div>	        <div class="layui-col-md11 layui-col-xs11 layui-col-sm11 layui-col-lg11" style="margin:50px;">	        	<div class="text-center">		            <button id="JixuDate001_btn_save" type="submit" class="layui-btn layui-btn-sm btn-save" data-th-text="#{SysCommon.save}">保存</button>		        </div>	        </div>        </form>    </div>    <div layout:fragment="script">    </div></body></html>

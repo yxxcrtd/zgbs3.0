@@ -37,7 +37,7 @@ import com.joyintech.tams.report.interf.common.service.InterfService;
 import com.joyintech.tams.report.interf.common.util.CnBondUtil;
 import com.joyintech.tams.report.interf.common.util.FileUtil;
 import com.joyintech.tams.systemtools.constant.DataIndexSequenceType;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

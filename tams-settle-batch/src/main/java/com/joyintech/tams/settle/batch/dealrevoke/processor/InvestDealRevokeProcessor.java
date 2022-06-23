@@ -9,7 +9,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.settle.batch.dealrevoke.dto.DealRevokeParamDto;
 import com.joyintech.tams.settle.batch.dealrevoke.service.BaseRevokeService;
 import com.joyintech.tams.settle.batch.dealrevoke.service.InvestDealRevokeService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

@@ -10,7 +10,7 @@ import com.joyintech.tams.valuation.common.batch.finproduct.entity.ValExecFeeDif
 import com.joyintech.tams.valuation.common.batch.tradecommon.dao.ValTradeCommonMapper;
 import com.joyintech.tams.valuation.common.batch.tradecommon.dto.ValExecApplyInfoDto;
 import com.joyintech.tams.valuation.common.batch.tradecommon.dto.ValTrdProductDealInfoDto;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

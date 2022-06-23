@@ -23,7 +23,7 @@ import com.joyintech.service.valuation.accounadjustmanage.subjectset.dto.ValBokS
 import com.joyintech.service.valuation.accounadjustmanage.subjectset.dto.ValSubjectHandDto;
 import com.joyintech.tams.common.base.dao.BokSubjectMapper;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.jasypt.commons.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

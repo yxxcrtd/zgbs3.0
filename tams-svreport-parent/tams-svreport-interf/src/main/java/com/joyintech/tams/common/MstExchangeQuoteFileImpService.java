@@ -6,7 +6,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.report.framework.thread.JoyinThreadPoolExecutor;
 import com.joyintech.tams.svreport.interf.chb.mstexchangequote.service.SvrMstExchangeQuoteFileImpService;
 import com.joyintech.tams.svreport.interf.dis.mstexchangequote.service.DisRepMstExchangeQuoteService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

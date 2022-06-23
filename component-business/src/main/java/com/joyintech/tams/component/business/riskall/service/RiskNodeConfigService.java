@@ -6,7 +6,7 @@ import com.joyintech.tams.common.base.dao.RiskNodeConfigMapper;
 import com.joyintech.tams.common.base.entity.RiskNodeConfig;
 import com.joyintech.tams.common.base.entity.RiskNodeConfigDtl;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 

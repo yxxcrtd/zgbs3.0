@@ -418,7 +418,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             params.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
             params.put("refList", StringUtil.splitToList(null, entity.getRefSec()));
             List<String> refList = creditProtectionCertificateMapper.getRefList(params);
-            entity.setRefSecLists(refList.stream().collect(Collectors.joining(",")));
+            entity.setRefSecList(refList.stream().collect(Collectors.joining(",")));
         }
         return entity;
     }
@@ -545,7 +545,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());
                 if(StringUtil.isNotEmpty(creditProtectionCertificateMapper.selectFinprodId(param))) {
-                    validList.add(new ValidMessage("资产代码不能重复！"));
+                    validList.add(new ValidMessage("资产代码已存在"));
                 }
                 String finprodId = getFinprodId(dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
