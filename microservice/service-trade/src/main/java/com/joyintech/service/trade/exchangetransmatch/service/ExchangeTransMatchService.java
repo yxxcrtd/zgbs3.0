@@ -115,6 +115,7 @@ public class ExchangeTransMatchService extends BaseService {
         map.put("BID_MODLE_03", DictCodeListExt4.投标方式_分销买入.getValue());
         // 是否中标
         map.put("IS_WIN_Y", DictCodeList.是否_是.getValue());
+        map.put("IS_CANCEL_N", DictCodeList.是否_否.getValue());
         // GNS-956:特殊场景不加日期条件查询指令 modify by fuyongsheng 20220224 start
         String ps = String.valueOf(map.get("ps"));
         String finprodType = String.valueOf(map.get("finprodType1"));
