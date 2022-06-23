@@ -10,22 +10,20 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
-import com.joyintech.tams.common.base.dao.MstCustomerInfoAddMapper;
-import com.joyintech.tams.common.base.dao.MstCustomerInfoMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.MstCustomerInfo;
-import com.joyintech.tams.common.base.entity.MstCustomerInfoAddWithBLOBs;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
@@ -40,7 +38,6 @@ import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.servi
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,11 +70,6 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     private IPlatformDate iPlatformDate;
     @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
-    @Autowired
-    private MstCustomerInfoMapper mstCustomerInfoMapper;
-
-    @Autowired
-    private MstCustomerInfoAddMapper mstCustomerInfoAddMapper;
 
     /**
      * 债券市场信息分页查询
@@ -174,6 +166,8 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         }
         //校验必填项
         addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
+        //发行人处理
+        handleIssuer(validMessages, interfPayhsrcsecinfoDto.getIssuershort());
         if (CollectionUtils.isNotEmpty(validMessages)) {
             ajaxResult.setErrorList(validMessages);
             ajaxResult.setMessageType(MessageType.警告消息);
@@ -229,25 +223,22 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     /**
      * 发行人处理
      *
+     * @param validMessages
      * @param issuer
      */
-    private void handleIssuer(String issuer) {
-        MstCustomerInfo mstCustomerInfo = mstCustomerInfoMapper.selectByPrimaryKey(issuer);
-        if (StringUtil.isNotEmpty(mstCustomerInfo)) {
-            mstCustomerInfo.setIsIssuer(DictCodeList.是否_是.getValue());
-            mstCustomerInfoMapper.updateByPrimaryKey(mstCustomerInfo);
-        } else {
-            mstCustomerInfo = new MstCustomerInfo();
-            mstCustomerInfo.setCustomerId(issuer);
-            mstCustomerInfo.setCustomerAbbr(issuer);
-            mstCustomerInfo.setCustomerName(issuer);
-            mstCustomerInfo.setCustomerType(DictCodeList.客户类型_法人.getValue());
-            mstCustomerInfo.setIsIssuer(DictCodeList.是否_是.getValue());
-            mstCustomerInfoMapper.insertSelective(mstCustomerInfo);
-            MstCustomerInfoAddWithBLOBs mstCustomerInfoAdd = new MstCustomerInfoAddWithBLOBs();
-            mstCustomerInfoAdd.setCustomerId(issuer);
-            mstCustomerInfoAddMapper.insertSelective(mstCustomerInfoAdd);
+    private void handleIssuer(List<ValidMessage> validMessages, String issuer) {
+        logger.info("handleIssuer >> 发行人处理参数：{}", issuer);
+        Map<String, Object> result = restTemplate.getForObject(
+                ServiceApplication.PINGAN_SERVICE_NAME + "/invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/autoAddInstitutions?insitituteCode=" + issuer,
+                Map.class);
+        logger.info("handleIssuer >> 发行人处理结果：{}", JsonUtils.object2Json(result));
+        if (Objects.nonNull(result)) {
+            int errorCode = (int) result.get("errorCode");
+            if (errorCode == 0) {
+                validMessages.add(new ValidMessage("发行人匹配失败，请手动处理"));
+            }
         }
+
     }
 
 
