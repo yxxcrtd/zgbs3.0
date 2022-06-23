@@ -465,11 +465,20 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             BigDecimal entrustNumTotal = currEtrEntrustList.stream().map(EtrEntrustDto::getEntrustNum).reduce(BigDecimal.ZERO, BigDecimal::add);
             if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(entrustNumTotal)>=0){
                 exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
-            }else{
-                //委托金额汇总
-                BigDecimal entrustAmtTotal = currEtrEntrustList.stream().map(EtrEntrustDto::getEntrustAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-                if(null!=settleTransDataDto.getTradeAmt()&&settleTransDataDto.getTradeAmt().compareTo(entrustAmtTotal)>=0){
-                    exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
+            } else{
+                boolean flag = true;
+                for(EtrEntrustDto etrEntrust : currEtrEntrustList){
+                    if(etrEntrust.getEntrustAmt() == null){
+                        flag = false;
+                        break;
+                    }
+                }
+                if(flag){
+                    //委托金额汇总
+                    BigDecimal entrustAmtTotal = currEtrEntrustList.stream().map(EtrEntrustDto::getEntrustAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    if(null!=settleTransDataDto.getTradeAmt()&&settleTransDataDto.getTradeAmt().compareTo(entrustAmtTotal)>=0){
+                        exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
+                    }
                 }
             }
         }
