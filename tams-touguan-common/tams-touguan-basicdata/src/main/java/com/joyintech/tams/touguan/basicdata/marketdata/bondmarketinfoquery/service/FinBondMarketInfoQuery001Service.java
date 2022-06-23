@@ -13,6 +13,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
@@ -93,6 +94,15 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             }
             request.setSecTypes(secTypes);
             request.setSecType2s(secType2s);
+        }
+
+        if (Objects.nonNull(request.getPageMode())) {
+            PageMode pageMode = request.getPageMode();
+            String sort = pageMode.getSort();
+            if (StringUtil.isNotBlank(sort) && sort.contains("Str")) {
+                pageMode.setSort(sort.replaceAll("Str", ""));
+                request.setPageMode(pageMode);
+            }
         }
         List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
         return new Page<>(PageInfo.of(bondMarketInfoQuery004Dtos));
