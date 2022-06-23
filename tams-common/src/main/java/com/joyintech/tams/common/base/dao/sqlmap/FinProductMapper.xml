@@ -114,7 +114,7 @@
                 AND b.ADD_BATCH = #{additionalBatches,jdbcType=INTEGER}
             </when>
             <otherwise>
-                AND b.ADD_BATCH is null
+                AND (b.ADD_BATCH IS NULL OR b.ADD_BATCH = 0)
             </otherwise>
         </choose>
     </select>
