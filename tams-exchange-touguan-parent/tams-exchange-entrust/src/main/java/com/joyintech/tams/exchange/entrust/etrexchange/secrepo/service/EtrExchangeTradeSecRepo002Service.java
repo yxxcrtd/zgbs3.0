@@ -150,6 +150,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         //可用数量
                         PositionCashSecDto secDto = new PositionCashSecDto();
                         BeanUtil.copyPropertiesIgnoreNull(secDto, entity);
+                        secDto.setTradePlat(DictCodeList.交易平台_新债平台.getValue());
                         BigDecimal sellNum = etrTradeCommonervice.selectAvailableNum(secDto);
                         entity.setSellNum(ArithmeticUtil.divide(sellNum,new BigDecimal("100"),2));
                         //过滤掉实际持仓和可用持仓都等于0
