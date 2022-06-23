@@ -4479,9 +4479,9 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 return m;
             }
             if(inputDto.getTradeDate().compareTo(iPlatformDate.getSysDate())!=0){
-                AjaxResult m = new AjaxResult();
-                m.setErrorList(Arrays.asList(new ValidMessage("只可在交易生效日进行撤销操作")));
-                return m;
+//                AjaxResult m = new AjaxResult();
+//                m.setErrorList(Arrays.asList(new ValidMessage("只可在交易生效日进行撤销操作")));
+//                return m;
             }
             if(StringUtil.equals(inputDto.getPs(),DictCodeList.交易方向_卖出.getValue())
                     || StringUtil.equals(inputDto.getPs(),DictCodeList.交易方向_行权_回售.getValue())

@@ -6,8 +6,10 @@ package com.joyintech.tams.cfets.trdquery.dao;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond;
 import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.cfets.trdquery.dto.*;
 import com.joyintech.tams.common.base.entity.RegFinProductDealTotal;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -174,6 +176,12 @@ public interface CfetsTrdQueryMapper {
      */
     RegFinProductDealTotal selectRegTotalInfoById(String bizCode);
     /**
+     * 根据主键查询一级申购登记信息
+     * @param bizCode
+     * @return
+     */
+    RegFinProductDealTotal selectBidOrderById(String bizCode);
+    /**
      * 根据主键更新登记数据
      * @param pageParam
      * @return
@@ -304,4 +312,6 @@ public interface CfetsTrdQueryMapper {
 
     List<BidPortIntFenPeiInfoDto> findYjsgFenPeiInfoList(Map<String, Object> pageParam);
 
+
+    List<TrdProductDeal> selectTrdProductDealsByTotleTradeId(@Param("totleTradeId") String totleTradeId);
 }
