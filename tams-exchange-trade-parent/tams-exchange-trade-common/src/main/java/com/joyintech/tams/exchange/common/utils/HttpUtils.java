@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.netflix.appinfo.InstanceInfo;
-import com.netflix.discovery.shared.Application;
+//import com.netflix.appinfo.InstanceInfo;
+//import com.netflix.discovery.shared.Application;
 import com.thoughtworks.xstream.XStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,18 +83,18 @@ public class HttpUtils {
         return result;
     }
 
-    public static Map<String, String> getEurekaApplications(String url) throws Exception {
-        String xml = doRequest(url, "GET", null);
-
-        XStream xstream = new XStream();
-        xstream.processAnnotations(Application.class);
-        xstream.aliasField("app", InstanceInfo.class, "appName");
-        xstream.omitField(InstanceInfo.class, "dataCenterInfo");
-        xstream.omitField(InstanceInfo.class, "metadata");
-        Application application = (Application) xstream.fromXML(xml);
-        if (Objects.isNull(application)) return null;
-        return application.getInstances().stream().collect(Collectors.toMap(InstanceInfo::getInstanceId, InstanceInfo::getInstanceId));
-    }
+//    public static Map<String, String> getEurekaApplications(String url) throws Exception {
+//        String xml = doRequest(url, "GET", null);
+//
+//        XStream xstream = new XStream();
+//        xstream.processAnnotations(Application.class);
+//        xstream.aliasField("app", InstanceInfo.class, "appName");
+//        xstream.omitField(InstanceInfo.class, "dataCenterInfo");
+//        xstream.omitField(InstanceInfo.class, "metadata");
+//        Application application = (Application) xstream.fromXML(xml);
+//        if (Objects.isNull(application)) return null;
+//        return application.getInstances().stream().collect(Collectors.toMap(InstanceInfo::getInstanceId, InstanceInfo::getInstanceId));
+//    }
 
     public static ResultBean getResultBeanByDoRequest(String url, String method, Object content) {
         try {

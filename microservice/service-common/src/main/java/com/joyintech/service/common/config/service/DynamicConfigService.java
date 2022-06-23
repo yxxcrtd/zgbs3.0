@@ -7,7 +7,9 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.common.config.dao.DynamicConfigMapper;
-import groovy.json.StringEscapeUtils;
+
+import org.apache.commons.lang.StringEscapeUtils;
+//import groovy.json.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +70,7 @@ public class DynamicConfigService extends BaseService {
                     }else {
                         m.put("checked", jsonStr);
                     }
+//                    return StringEscapeUtils.unescapeJavaScript(JsonUtils.object2Json(m));
                     return StringEscapeUtils.unescapeJavaScript(JsonUtils.object2Json(m));
                 }
             }else { // 数据库不存在，则返回模板表数据

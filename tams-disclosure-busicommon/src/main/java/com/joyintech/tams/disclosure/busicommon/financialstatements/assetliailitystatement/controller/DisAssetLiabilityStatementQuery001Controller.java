@@ -221,7 +221,7 @@ public class DisAssetLiabilityStatementQuery001Controller extends BaseController
     		dtoList = service.findAssetsStatementAll(dto);
     	}
 
-        if(CollectionUtils.isNotEmpty(dtoList)) {
+        if(null!=dtoList) {
             dtoList.add(new DisAssetLiabilityStatementQuery001Dto());
             dtoList.add(new DisAssetLiabilityStatementQuery001Dto());
             dtoList.add(new DisAssetLiabilityStatementQuery001Dto());
@@ -265,7 +265,7 @@ public class DisAssetLiabilityStatementQuery001Controller extends BaseController
     		dto.setAccountList(valAssetBook001Service.getBooksetId2(super.getRequest().getParameter("param")));
     		dtoList = service.findLiabilityInterestStatementAll(dto);
     	}
-    	if(CollectionUtils.isNotEmpty(dtoList)) {
+    	if(null!=dtoList) {
             dtoList.addAll(DisAssetLiabilityStatementUtil.getLiabilityInterestListSum(dtoList));
         }
     	

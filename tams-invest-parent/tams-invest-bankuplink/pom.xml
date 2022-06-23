@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>com.joyintech</groupId>
 			<artifactId>framework-rabbitmq</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5.alibaba</version>
 		</dependency>
 	</dependencies>
 	<properties>

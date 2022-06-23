@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>joyintech-workflow</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.5.alibaba</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

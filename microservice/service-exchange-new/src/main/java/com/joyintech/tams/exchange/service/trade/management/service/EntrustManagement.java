@@ -73,11 +73,6 @@ public class EntrustManagement extends BaseService {
     private TrdExchangeWorkflowService trdExchangeWorkflowService;
     @Autowired
     private CommonManagement commonManagement;
-    /**
-     * 是否单体服务
-     */
-    @Value("${application.micorservice.contextPath.single:false}")
-    private boolean isSingle;
 
     @Autowired(required = false)
     @Qualifier("simpleRestTemplate")

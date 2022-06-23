@@ -13,13 +13,14 @@ import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import com.joyintech.framework.exception.BusinessException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Element;
 
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.valuation.interf.valuation.send.xmlCommon.model.Body;
@@ -36,7 +37,8 @@ import com.joyintech.tams.valuation.interf.valuation.send.xmlCommon.model.Transa
 @Scope("prototype")
 public class XmlUtil{
 
-	private Logger log = Logger.getLogger(getClass());
+//	private Logger log = Logger.getLogger(getClass());
+	private static Logger log = LoggerFactory.getLogger(XmlUtil.class);
 
 	private final String TEMPLATE_PATH = "templates/";
 

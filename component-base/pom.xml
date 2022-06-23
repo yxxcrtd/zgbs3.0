@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>com.joyintech</groupId>
 		<artifactId>tams-parent</artifactId>
-		<version>0.0.4</version>
+		<version>0.0.5.alibaba</version>
 	</parent>
 	<properties>
 		<java.version>1.8</java.version>

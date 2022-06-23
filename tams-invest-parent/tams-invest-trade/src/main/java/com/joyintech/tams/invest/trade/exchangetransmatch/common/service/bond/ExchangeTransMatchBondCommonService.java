@@ -54,13 +54,13 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
     @Autowired
     private TrdCommonBaseService trdCommonBaseService;
 
-    @Value("${application.micorservice.contextPath.commonService:http://commonService}")
+    @Value("${application.micorservice.contextpath.commonService:http://commonService}")
     private String commonServiceName;
 
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
     /**
      * 交易信息实体

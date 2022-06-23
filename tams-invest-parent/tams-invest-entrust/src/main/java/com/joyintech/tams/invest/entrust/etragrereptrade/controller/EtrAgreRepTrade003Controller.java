@@ -10,39 +10,10 @@
  
 package com.joyintech.tams.invest.entrust.etragrereptrade.controller;
 
-import com.joyintech.framework.ajax.AjaxResult;
-import com.joyintech.framework.annotation.PageId;
-import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.util.*;
-import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.common.base.entity.EtrDistribute;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
-import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
-/*import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;*/
-import com.joyintech.tams.invest.common.position.dto.PostionParameter;
-import com.joyintech.tams.invest.common.position.service.CommonPositionService;
-import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
-//import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
-import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
-import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
-import com.joyintech.tams.invest.entrust.etragrereptrade.dto.EtrAgreRepTrade003Dto;
-import com.joyintech.tams.invest.entrust.etragrereptrade.dto.EtrAgreRepTradeDto;
-import com.joyintech.tams.invest.entrust.etragrereptrade.service.EtrAgreRepTrade001Service;
-import com.joyintech.tams.invest.entrust.etragrereptrade.service.EtrAgreRepTrade003Service;
-import com.joyintech.tams.invest.entrust.etrconbond.dto.EtrConBondDto;
-import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.EtrExchangeTrade001Dto;
-import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.EtrExchangeTrade003Dto;
-import com.joyintech.tams.invest.entrust.etrexchangetrade.service.EtrExchangeTrade001Service;
-import com.joyintech.workflow.engine.dto.ProcessParameter;
-import com.joyintech.workflow.engine.dto.WorkFlowParameter;
-import com.netflix.discovery.converters.Auto;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,13 +25,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.annotation.PageId;
+import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.RequestUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.common.base.entity.EtrDistribute;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
+import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
+//import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
+import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
+import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
+import com.joyintech.tams.invest.entrust.etragrereptrade.dto.EtrAgreRepTrade003Dto;
+import com.joyintech.tams.invest.entrust.etragrereptrade.dto.EtrAgreRepTradeDto;
+import com.joyintech.tams.invest.entrust.etragrereptrade.service.EtrAgreRepTrade001Service;
+import com.joyintech.tams.invest.entrust.etragrereptrade.service.EtrAgreRepTrade003Service;
+import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.EtrExchangeTrade003Dto;
+import com.joyintech.tams.invest.entrust.etrexchangetrade.service.EtrExchangeTrade001Service;
 
 /**
  * 交易所指令交易（债券股票回购基金场内指令交易）

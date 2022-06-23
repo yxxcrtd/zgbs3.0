@@ -40,7 +40,7 @@ public class SettleCommonService {
 	/**
 	 * 是否单体服务
 	 */
-	@Value("${application.micorservice.contextPath.single:false}")
+	@Value("${application.micorservice.contextpath.single:false}")
 	private boolean isSingle;
 
 	@Autowired(required = false)
@@ -53,7 +53,7 @@ public class SettleCommonService {
     @Autowired
     private SettleCommonMapper settleCommonMapper;
 
-    @Value("${application.micorservice.contextPath.commonService:http://commonService}")
+    @Value("${application.micorservice.contextpath.commonService:http://commonService}")
 	private String commonServiceName;
 
 	@Autowired(required = false)

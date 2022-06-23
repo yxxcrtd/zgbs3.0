@@ -79,11 +79,6 @@ public class PortfolioManager extends BaseService {
      * 非交易业务
      */
     private static final String NO_TRADE_BUSINESS_ETR = "noTradeBusinessEtr";
-    /**
-     * 是否单体服务
-     */
-    @Value("${application.micorservice.contextPath.single:false}")
-    private boolean isSingle;
 
     @Autowired
     private EtrTradeCommonervice etrTradeCommonervice;
@@ -96,7 +91,12 @@ public class PortfolioManager extends BaseService {
     @Autowired
     private PortfolioAssignHelper portfolioAssignHelper;
 
-
+    /**
+     * 是否单体服务
+     */
+    @Value("${application.micorservice.contextpath.single:false}")
+    private boolean isSingle;
+    
     /**
      * 组合计算
      */

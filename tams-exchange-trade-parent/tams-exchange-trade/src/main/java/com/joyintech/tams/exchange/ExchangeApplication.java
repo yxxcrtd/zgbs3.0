@@ -1,16 +1,15 @@
 package com.joyintech.tams.exchange;
 
-import com.joyintech.framework.JoyinApplication;
-import com.joyintech.framework.config.WebApplication;
 import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+import com.joyintech.framework.JoyinApplication;
+import com.joyintech.framework.config.WebApplication;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
-@EnableEurekaClient
+//@EnableEurekaClient
+@EnableDiscoveryClient(autoRegister = true)
 public class ExchangeApplication extends WebApplication {
     public static void main(String[] args) {
         JoyinApplication.run(ExchangeApplication.class, args);

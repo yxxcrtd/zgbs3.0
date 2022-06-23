@@ -1,49 +1,54 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.joyintech</groupId>
-        <artifactId>tams-exchange-trade-parent</artifactId>
-        <version>3.0.0</version>
-    </parent>
-    <artifactId>tams-exchange-trade-common</artifactId>
-    <packaging>jar</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.joyintech</groupId>
+		<artifactId>tams-exchange-trade-parent</artifactId>
+		<version>3.0.0</version>
+	</parent>
+	<artifactId>tams-exchange-trade-common</artifactId>
+	<packaging>jar</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.joyintech</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>3.3.7</version>
-        </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.joyintech</groupId>
+			<artifactId>disruptor</artifactId>
+			<version>3.3.7</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>3.5.0</version>
-        </dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.5.0</version>
+		</dependency>
 
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>5.8.0.M2</version>
-        </dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-all</artifactId>
+			<version>5.8.0.M2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.joyintech</groupId>
-            <artifactId>framework-redis</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>com.joyintech</groupId>
+			<artifactId>framework-redis</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>com.github.oshi</groupId>
-            <artifactId>oshi-core</artifactId>
-            <version>5.2.5</version>
-        </dependency>
-        <dependency>
+		<dependency>
+			<groupId>com.github.oshi</groupId>
+			<artifactId>oshi-core</artifactId>
+			<version>5.2.5</version>
+		</dependency>
+		<dependency>
 			<groupId>com.joyintech</groupId>
 			<artifactId>tams-business-common</artifactId>
 			<version>3.0.4</version>
@@ -54,8 +59,8 @@
 			<artifactId>tams-invest-common</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-        
-        <dependency>
+
+		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
 			<version>2.5.0</version>
@@ -70,6 +75,6 @@
 			<artifactId>swagger-annotations</artifactId>
 			<version>1.5.9</version>
 		</dependency>
-    </dependencies>
+	</dependencies>
 
 </project>

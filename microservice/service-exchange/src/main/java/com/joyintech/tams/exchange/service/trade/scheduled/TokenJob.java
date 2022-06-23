@@ -60,9 +60,6 @@ public class TokenJob {
     @Value("${server.context-path:/tams}")
     private String prefixYiTiHua;
 
-    @Value("${application.micorservice.contextPath.single:false}")
-    private boolean isSingle;
-
     @Autowired
     private ServiceApplication.ContextPathConfiguration config;
 
