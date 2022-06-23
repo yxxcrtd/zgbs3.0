@@ -332,7 +332,7 @@
             FP.TRADE_MARKET         tradeMarket,
             BRT.COUNTER_ID          counterId,
             MCP.COUNTER_NAME        counterName,
-            BRT.REMARK              remark
+            hisInfo.remark          remark
         FROM BID_ORDER BO
         INNER JOIN BID_RESULT_TOTAL BRT ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
@@ -356,6 +356,8 @@
         from BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+        ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="userId != null and userId != ''">
             AND BO.OUR_TRADER = #{userId}
@@ -474,7 +476,7 @@
         FP.TRADE_MARKET         tradeMarket,
         BRT.COUNTER_ID          counterId,
         MCP.COUNTER_NAME        counterName,
-        BRT.REMARK              remark
+        hisInfo.remark          remark
         FROM BID_ORDER BO
         INNER JOIN (SELECT * FROM (SELECT BRT.*
         ,ROW_NUMBER() OVER(PARTITION BY BRT.BID_ID ORDER BY BRT.WIN_DATE DESC) RANK
@@ -502,6 +504,8 @@
         from WFL_BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+               ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="userId != null and userId != ''">
             AND BO.OUR_TRADER = #{userId}
@@ -658,7 +662,7 @@
             FP.TRADE_MARKET         tradeMarket,
             BRT.COUNTER_ID          counterId,
             MCP.COUNTER_NAME        counterName,
-            BRT.REMARK              remark
+            hisInfo.REMARK          remark
         FROM BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
@@ -681,6 +685,8 @@
         from BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+        ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="bidId != null and bidId != ''">
             AND BO.BID_ID = #{bidId}
@@ -720,9 +726,9 @@
             decode(BRT.IS_WIN,'Y', BRT.WIN_DATE)           winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
-            BO.COUNTER_ID          counterId,
+            BO.COUNTER_ID           counterId,
             MCP.COUNTER_NAME        counterName,
-            BRT.REMARK              remark
+            hisInfo.REMARK          remark
         FROM WFL_BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
@@ -745,6 +751,8 @@
         from WFL_BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+        ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="bidId != null and bidId != ''">
            AND BO.BID_ID = #{bidId}
