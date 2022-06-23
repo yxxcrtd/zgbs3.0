@@ -5159,21 +5159,25 @@
                 FP.CCY  ccy,
                 FPI.TENDER_SDATE bidDateStart,
                 FPI.TENDER_EDATE bidDateEnd,
-                FPI.PAY_EDATE payEdate,
-                FPI.PAY_DATE payDate,
+                nvl(FPI.PAY_EDATE, FPI.PAY_DATE) payEdate,
                 FPI.ASSIGN_REGDATE assignRegdate,
-                BO.ONMARKET_DATE onmarketDate,
+                nvl(BO.ONMARKET_DATE, FPA.LISTING_DATE) onmarketDate,
                 BO.BID_MODLE  bidModle,
-                BO.PAY_TYPE payType,
+                nvl(BO.PAY_TYPE, brt.PAY_DATE) payType,
                 BRBP.ENTRUST_NUM/100  bidPrinAmt,
                 BRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
                 BRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
-                BO.WIN_PRICE  winPrice,
+                case
+                    WHEN fpi.TENDER_TARGET = '01' AND nvl(BO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(BO.WIN_PRICE, brt.WIN_PRICE)*100, 'FM9999999999999990.9990') || '%'
+                    WHEN fpi.TENDER_TARGET = '02' AND nvl(BO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(BO.WIN_PRICE, brt.WIN_PRICE), 'FM9999999999999990.9990') || '元'
+                    WHEN fpi.TENDER_TARGET = '03' AND nvl(BO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(BO.WIN_PRICE, brt.WIN_PRICE) * 10000, 'FM9999999999999990.90') || 'BP'
+                    end              winPrice/*中标标位*/,
                 BO.UNIT_CPRICE unitCprice,
                 BO.UNIT_INT unitInt,
-                BO.SETT_FEE_AMT settleFeeAmt,
+                nvl(BO.SETT_FEE_AMT, BRT.SETT_FEE_AMT) settleFeeAmt,
                 BO.REMARK remark
             FROM BID_ORDER BO
+            LEFT JOIN BID_RESULT_TOTAL brt ON brt.BID_ID  = bo.BID_ID
             LEFT JOIN (SELECT BRBP.BID_ID,SUM(EE.ENTRUST_NUM) ENTRUST_NUM,SUM(BRBP.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT
                 FROM BID_ORDER_BID_PRICE BRBP
                 LEFT JOIN ETR_ENTRUST EE
@@ -5182,6 +5186,7 @@
             ) BRBP ON BRBP.BID_ID = BO.BID_ID
             LEFT JOIN FIN_PRODUCT FP
             ON FP.FINPROD_ID = BO.FINPROD_ID
+            LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_ISSUE FPI
             ON FPI.FINPROD_ID = FP.FINPROD_ID
             LEFT JOIN MST_COUNTER_PARTY MCCI
@@ -5203,21 +5208,25 @@
                 FP.CCY  ccy,
                 FPI.TENDER_SDATE bidDateStart,
                 FPI.TENDER_EDATE bidDateEnd,
-                FPI.PAY_EDATE payEdate,
-                FPI.PAY_DATE payDate,
+                nvl(FPI.PAY_EDATE, FPI.PAY_DATE) payEdate,
                 FPI.ASSIGN_REGDATE assignRegdate,
-                WBO.ONMARKET_DATE onmarketDate,
+                nvl(WBO.ONMARKET_DATE, FPA.LISTING_DATE) onmarketDate,
                 WBO.BID_MODLE  bidModle,
-                WBO.PAY_TYPE payType,
+                nvl(WBO.PAY_TYPE, brt.PAY_DATE) payType,
                 WBRBP.ENTRUST_NUM/100  bidPrinAmt,
                 WBRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
                 WBRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
-                WBO.WIN_PRICE  winPrice,
+                case
+                    WHEN fpi.TENDER_TARGET = '01' AND nvl(WBO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(WBO.WIN_PRICE, brt.WIN_PRICE)*100, 'FM9999999999999990.9990') || '%'
+                    WHEN fpi.TENDER_TARGET = '02' AND nvl(WBO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(WBO.WIN_PRICE, brt.WIN_PRICE), 'FM9999999999999990.9990') || '元'
+                    WHEN fpi.TENDER_TARGET = '03' AND nvl(WBO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(WBO.WIN_PRICE, brt.WIN_PRICE) * 10000, 'FM9999999999999990.90') || 'BP'
+                    end              winPrice/*中标标位*/,
                 WBO.UNIT_CPRICE unitCprice,
                 WBO.UNIT_INT unitInt,
-                WBO.SETT_FEE_AMT settleFeeAmt,
+                nvl(WBO.SETT_FEE_AMT, BRT.SETT_FEE_AMT) settleFeeAmt,
                 WBO.REMARK remark
             FROM WFL_BID_ORDER WBO
+            LEFT JOIN WFL_BID_RESULT_TOTAL brt ON brt.BID_ID  = WBO.BID_ID
             LEFT JOIN (SELECT WBRBP.BID_ID,SUM(EE.ENTRUST_NUM) ENTRUST_NUM,SUM(WBRBP.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT
                         FROM WFL_BID_ORDER_BID_PRICE WBRBP
                         LEFT JOIN ETR_ENTRUST EE
@@ -5226,6 +5235,7 @@
             ) WBRBP ON WBRBP.BID_ID = WBO.BID_ID
             LEFT JOIN FIN_PRODUCT FP
             ON FP.FINPROD_ID = WBO.FINPROD_ID
+            LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_ISSUE FPI
             ON FPI.FINPROD_ID = FP.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_TYPE FPT
@@ -5245,19 +5255,21 @@
                 BRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
                 BRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
                 nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(BRBP.THE_WIN_PRIN_AMT,0) avaNum,
-                BRBP.SETT_FEE_AMT settleFeeAmt,
-                BRBP.TRADE_AMT  tradeAmt,
-                BRBP.INT_AMT intAmt,
-                BRBP.PAYABLE_AMOUNT payAmt,
+                nvl(brd.SETT_FEE_AMT, BRBP.SETT_FEE_AMT) settleFeeAmt,
+                nvl(brd.ACT_WIN_PRINAMT, BRBP.TRADE_AMT)tradeAmt,
+                nvl(brd.INT_AMT , BRBP.INT_AMT) intAmt,
+                nvl(brd.PAY_AMT, BRBP.PAYABLE_AMOUNT) payAmt,
                 decode(FPI.TENDER_TARGET,'01',to_char(BRBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BRBP.BID_PRICE*10000,'fm999999990.90')||'BP') bidPrice,
                 BRBP.INV_AIM invAim,
                 BRBP.SEC_ACCT_ID secManageAcctId,
                 STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
                 SU.REAL_NAME invManagerId,
                 BO.BID_MODLE  bidModle
-            FROM BID_ORDER_BID_PRICE BRBP
-            LEFT JOIN BID_ORDER BO
+            FROM BID_ORDER BO
+            LEFT JOIN BID_ORDER_BID_PRICE BRBP
                    ON BRBP.BID_ID = BO.BID_ID
+            LEFT JOIN BID_RESULT_TOTAL brt ON brt.BID_ID = bo.BID_ID
+            LEFT JOIN BID_RESULT_DETAIL brd ON brd.TOTAL_WIN_ID  = brt.TOTAL_WIN_ID
             LEFT JOIN FIN_PRODUCT_ISSUE FPI
                    ON FPI.FINPROD_ID = BO.FINPROD_ID
             LEFT JOIN ETR_ENTRUST EE
@@ -5283,19 +5295,21 @@
                 WBRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
                 WBRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
                 nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(WBRBP.THE_WIN_PRIN_AMT,0) avaNum,
-                WBRBP.SETT_FEE_AMT settleFeeAmt,
-                WBRBP.TRADE_AMT  tradeAmt,
-                WBRBP.INT_AMT intAmt,
-                WBRBP.PAYABLE_AMOUNT payAmt,
+                nvl(brd.SETT_FEE_AMT, WBRBP.SETT_FEE_AMT) settleFeeAmt,
+                nvl(brd.ACT_WIN_PRINAMT, WBRBP.TRADE_AMT)tradeAmt,
+                nvl(brd.INT_AMT , WBRBP.INT_AMT) intAmt,
+                nvl(brd.PAY_AMT, WBRBP.PAYABLE_AMOUNT) payAmt,
                 decode(FPI.TENDER_TARGET,'01',to_char(WBRBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(WBRBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(WBRBP.BID_PRICE*10000,'fm999999990.90')||'BP') bidPrice,
                 WBRBP.INV_AIM invAim,
                 WBRBP.SEC_ACCT_ID secManageAcctId,
                 STLINFO.SEC_ACCT_NAME secManageAcctIdStr,
                 SU.REAL_NAME invManagerId,
                 WBO.BID_MODLE  bidModle
-         FROM WFL_BID_ORDER_BID_PRICE WBRBP
-         LEFT JOIN WFL_BID_ORDER WBO
+         FROM WFL_BID_ORDER WBO
+         LEFT JOIN WFL_BID_ORDER_BID_PRICE WBRBP
                    ON WBRBP.BID_ID = WBO.BID_ID
+         LEFT JOIN WFL_BID_RESULT_TOTAL brt ON brt.BID_ID = WBO.BID_ID
+         LEFT JOIN WFL_BID_RESULT_DETAIL brd ON brd.TOTAL_WIN_ID  = brt.TOTAL_WIN_ID
          LEFT JOIN FIN_PRODUCT_ISSUE FPI
                    ON FPI.FINPROD_ID = WBO.FINPROD_ID
          LEFT JOIN ETR_ENTRUST EE
