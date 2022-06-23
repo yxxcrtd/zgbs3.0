@@ -389,7 +389,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
                     }
                     // 根据汇总交易编号查询金融产品交易
-                    List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
                     if (!trdProductDealList.isEmpty()) {
                         for (TrdProductDeal trdProductDeal : trdProductDealList) {
                             /**金融产品交易表**/
@@ -403,7 +403,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                             trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
                             trdProductDealMapper.insert(trdProductDeal);
                             /**交易附属表 **/
-                            TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getTradeId());
+                            TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDealRevoke.getTradeId());
                             if (trdProductDealAdd != null) {
                                 trdProductDeal.setEntrustId(trdProductDealAdd.getEntrustId());
                                 trdProductDealAdd.setTradeId(trdProductDealAdd.getTradeId()
@@ -412,7 +412,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                             }
                             trdProductDeals.add(trdProductDeal);
                             // 组合交易表
-                            List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDeal.getTradeId());
+                            List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDealRevoke.getTradeId());
                             if (!ptlTradeList.isEmpty()) {
                                 for (PtlTrade ptlTrade : ptlTradeList) {
                                     ptlTrade.setBusiNo(ptlTrade.getBusiNo() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
@@ -427,7 +427,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
                     }
                     // 划款指令表
-                    List<StlOrders> stlPayOrdersList = cfetsPrimaryBidManageMapper.queryStlPayOrdersByTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    List<StlOrders> stlPayOrdersList = cfetsPrimaryBidManageMapper.queryStlPayOrdersByTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
                     if (!stlPayOrdersList.isEmpty()) {
                         for (StlOrders stlOrders : stlPayOrdersList) {
                             stlOrders.setOrderId(stlOrders.getOrderId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
