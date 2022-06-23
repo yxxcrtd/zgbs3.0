@@ -876,11 +876,11 @@
         <if test="acctTradeMarket != null and acctTradeMarket != ''">
             and a.trade_market = #{acctTradeMarket}
         </if>
-        and a.finprod_type2 in (#{FINPROD_TYPE_TG_F37})<!--  不查找债券 -->
+        and a.finprod_type2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})<!--  不查找债券 -->
         and r.type_6 != #{type6_B14}
         ) t
         <where>
-            t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37})   <!--#{FINPROD_TYPE2}-->
+            t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})   <!--#{FINPROD_TYPE2}-->
             <if test="acctTradeMarket != null and acctTradeMarket != ''">
                 and t.TRADE_MARKET = #{acctTradeMarket}
             </if>
