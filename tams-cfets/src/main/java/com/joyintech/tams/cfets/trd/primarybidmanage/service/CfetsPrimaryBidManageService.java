@@ -427,9 +427,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
                     }
                     // 划款指令表
-                    List<StlOrders> stlPayOrdersList = cfetsPrimaryBidManageMapper.queryStlPayOrdersByTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
-                    if (!stlPayOrdersList.isEmpty()) {
-                        for (StlOrders stlOrders : stlPayOrdersList) {
+                    List<StlOrders> stlOrdersList = cfetsPrimaryBidManageMapper.queryStlOrdersByTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
+                    if (!stlOrdersList.isEmpty()) {
+                        for (StlOrders stlOrders : stlOrdersList) {
                             stlOrders.setOrderId(stlOrders.getOrderId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                             stlOrders.setpOrderId(stlOrders.getOrderId());
                             stlOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
