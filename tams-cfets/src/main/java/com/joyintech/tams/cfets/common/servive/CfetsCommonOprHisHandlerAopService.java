@@ -107,22 +107,43 @@ public class CfetsCommonOprHisHandlerAopService extends BaseService {
             // 中标结果维护
             else if (object instanceof CfetsPrimaryBidManageSaveRequest) {
                 CfetsPrimaryBidManageSaveRequest entity = (CfetsPrimaryBidManageSaveRequest) object;
-                trdId = entity.getTotalWinId();
-                busiDes = entity.getRemark();
-                workflowId = entity.getWorkflowId();
-                if (operationType.equals(OperationType.NEW)) {
-                    type = DictCodeListExt3.操作类型_新建.getValue();
-                } else if (operationType.equals(OperationType.REVOKE)) {
-                    type = DictCodeListExt3.操作类型_撤回.getValue();
-                } else if (operationType.equals(OperationType.MODIFY)) {
-                    type = DictCodeListExt3.操作类型_修改.getValue();
+                if (CollectionUtils.isNotEmpty(entity.getSelectedItem())){
+                   for (CfetsPrimaryBidManageSaveRequest saveRequest:entity.getSelectedItem()){
+                       trdId = saveRequest.getTotalWinId();
+                       busiDes = entity.getRemark();
+                       workflowId = saveRequest.getWorkflowId();
+                       if (operationType.equals(OperationType.NEW)) {
+                           type = DictCodeListExt3.操作类型_新建.getValue();
+                       } else if (operationType.equals(OperationType.REVOKE)) {
+                           type = DictCodeListExt3.操作类型_撤回.getValue();
+                       } else if (operationType.equals(OperationType.MODIFY)) {
+                           type = DictCodeListExt3.操作类型_修改.getValue();
+                       }
+                       CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+                       oprHisReq.setEntrustId(trdId);
+                       oprHisReq.setBusiDes(busiDes);
+                       oprHisReq.setOperType(type);
+                       oprHisReq.setWorkflowId(workflowId);
+                       cfetsOprHisInfoRequests.add(oprHisReq);
+                   }
+                }else {
+                    trdId = entity.getTotalWinId();
+                    busiDes = entity.getRemark();
+                    workflowId = entity.getWorkflowId();
+                    if (operationType.equals(OperationType.NEW)) {
+                        type = DictCodeListExt3.操作类型_新建.getValue();
+                    } else if (operationType.equals(OperationType.REVOKE)) {
+                        type = DictCodeListExt3.操作类型_撤回.getValue();
+                    } else if (operationType.equals(OperationType.MODIFY)) {
+                        type = DictCodeListExt3.操作类型_修改.getValue();
+                    }
+                    CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+                    oprHisReq.setEntrustId(trdId);
+                    oprHisReq.setBusiDes(busiDes);
+                    oprHisReq.setOperType(type);
+                    oprHisReq.setWorkflowId(workflowId);
+                    cfetsOprHisInfoRequests.add(oprHisReq);
                 }
-                CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-                oprHisReq.setEntrustId(trdId);
-                oprHisReq.setBusiDes(busiDes);
-                oprHisReq.setOperType(type);
-                oprHisReq.setWorkflowId(workflowId);
-                cfetsOprHisInfoRequests.add(oprHisReq);
             }
             // 赎回登记
             else if (object instanceof CfetsTrdRedeemDealRegisterQuoteDto) {

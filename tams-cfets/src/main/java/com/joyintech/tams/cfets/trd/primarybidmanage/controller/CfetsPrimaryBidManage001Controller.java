@@ -436,6 +436,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             request.setBidId(dto.getBidId());
             dto = cfetsPrimaryBidManageService.getBidManageCfmInsert(request);
             dto.setIsWin(DictCodeList.是否_否.getValue());
+            dto.setRemark("未中标");
             dto.setTotalWinId(IDGenerator.generate());
             ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
             WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
