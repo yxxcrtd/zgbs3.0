@@ -632,7 +632,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     public List<ValidMessage> modifyAndDeleteCheck(FinTenderBondAsset001Dto dto) {
         List<ValidMessage> validList = new ArrayList<>();
         String operateType = dto.getOperateType();
-        if (isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset002", "FinTenderBondAsset003")) {
+        if (isInProcess(dto.getFinprodId(), "FinTenderBondAsset002", "FinTenderBondAsset003")) {
             validList.add(new ValidMessage("存在流程中的数据"));
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {

@@ -202,6 +202,9 @@ public class CfetsTrdBidInfoResponse {
     @ApiModelProperty(name="payableAmount",value="应缴款金额")
     private BigDecimal payableAmount;
 
+    @ApiModelProperty(name="payAmt",value="应缴款金额")
+    private BigDecimal payAmt;
+
     @ApiModelProperty(name="totalWinPrinAmt",value="汇总投标券面总额")
     private BigDecimal totalWinPrinAmt;
 
@@ -683,5 +686,13 @@ public class CfetsTrdBidInfoResponse {
 
     public void setOuPartyIdStr(String ouPartyIdStr) {
         this.ouPartyIdStr = ouPartyIdStr;
+    }
+
+    public BigDecimal getPayAmt() {
+        return payAmt;
+    }
+
+    public void setPayAmt(BigDecimal payAmt) {
+        this.payAmt = payAmt;
     }
 }

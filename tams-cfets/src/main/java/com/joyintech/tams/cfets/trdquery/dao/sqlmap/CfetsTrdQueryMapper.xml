@@ -2464,26 +2464,30 @@
             </foreach>
         </if>
         union all
-        SELECT TMI.MATCH_STATUS	matchStatus,
+        SELECT distinct case
+                when tmi.match_status is null or tmi.match_status != '01' then '01'
+                when tmi.match_status = '01' and
+                (tmi.trd_conf_status is null or tmi.trd_conf_status = '0') then '02'
+                when tmi.trd_conf_status = '1' then '03' end                       as matchStatus,
                ICB.TRD_ID execid,
                'BOND1'  businesstype,
-      		   ICB.INSTRUMENT_ID  finprodId,
-               FP.FINPROD_MARKET_ID  finprodMarketId,
+      		   FP.FINPROD_ID  finprodId,
+               ICB.INSTRUMENT_ID||'.IB'  finprodMarketId,
                ICB.INSTRUMENT_SHORT_NAME finprodAbbr,
                 #{PS_T01} 	ps,
                 null		AS	settleSpeed,
                 ''		  AS	secManageAcctId,
                 '' as secManageAcctIdStr,
                ICB.SUBSCRIPTION_AMOUNT*10000	 faceValue,
-       CASE WHEN FPI.TENDER_TARGET=#{TENDER_TARGET_02} THEN ICB.ISSUE_PRICE
-            WHEN FPI.TENDER_TARGET=#{TENDER_TARGET_01} THEN ICB.COUPON_RATE
-            WHEN FPI.TENDER_TARGET=#{TENDER_TARGET_03} THEN ICB.SPREAD END
+       CASE when ICB.ISSUE_PRICE is not null then ICB.ISSUE_PRICE
+            when ICB.COUPON_RATE is not null then ICB.ISSUE_PRICE
+            when ICB.SPREAD is not null then ICB.ISSUE_PRICE   END
         AS	tradeYield,
         null	termDays,
         ICB.ACTUAL_FEE 	AS	tradeAmt,
         ''	 quoteid,
-        ICB.FULL_CHINESE_NAME_OF_SUBSCRIBE traderid,
-        ICB.SUBMIT_USER AS	traderidStr,
+        ICB.SUBMIT_USER traderid,
+        ICB.FULL_CHINESE_NAME_OF_SUBSCRIBE AS	traderidStr,
         ''	trader,
         '' counterId,
         '' counterIdStr,
@@ -2501,7 +2505,7 @@
         ON		FPT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN TRDQUTO_MATCH_INFO TMI
         ON		TMI.CSTP_TRADE_ID = ICB.TRD_ID
-        WHERE  FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+        <where>
         <if test="sysDate != null and !sysDate.equals('')">
             AND to_date(to_char(to_date(ICB.SUBSCRIPTION_TIME,'yyyy-MM-dd HH24:mi:ss'),'yyyy-MM-dd'),'yyyy-MM-dd') = #{sysDate,jdbcType=DATE}
         </if>
@@ -2553,6 +2557,10 @@
                 #{item}
             </foreach>
         </if>
+        <if test="isNull!=null and isNull!=''">
+            OR TMI.MATCH_STATUS IS NULL
+        </if>
+        </where>
         ) aaa
         left join SYS_DATADICT_LIST sdlMatch on aaa.matchStatus=sdlMatch.ITEM_CODE and sdlMatch.DICT_CODE='CSTP_MATCH_STATUS'
         left join SYS_DATADICT_LIST sdl on aaa.businesstype=sdl.ITEM_CODE and sdl.DICT_CODE='CSTP_BUSINESS_TYPE'
@@ -2560,7 +2568,12 @@
         left join SYS_DATADICT_LIST dictsp on aaa.settleSpeed=dictsp.ITEM_CODE and dictsp.DICT_CODE='ACCOUNT_SPEED'
         left join SYS_DATADICT_LIST dictct on aaa.clearType=dictct.ITEM_CODE and dictct.DICT_CODE='CLEAR_TYPE'
         <!-- 关键字模糊查询 -->
-        <include refid="vagueQueryCstpWhere"></include>
+        <where>
+            <include refid="vagueQueryCstpWhere"></include>
+            <if test="busiTypePosition!=null and busiTypePosition != ''">
+                and aaa.tgBusiType = #{busiTypePosition}
+            </if>
+        </where>
 
         order by aaa.businesstype, aaa.matchStatus,aaa.ps DESC)
         <!--前端传入排序字段-->
@@ -2570,7 +2583,6 @@
     </select>
     <sql id="vagueQueryCstpWhere">
         <if test="search != null and search != '' and search !='有效' ">
-            <where>
                 ((
                 sdlMatch.ITEM_VALUE || '|' ||aaa.execid || '|' || sdl.ITEM_VALUE || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr
                 || '|' || dictps.ITEM_VALUE || '|' || dictsp.ITEM_VALUE
@@ -2587,7 +2599,6 @@
                 or replace(aaa.tradeDate,'-','/')||''=#{search}
                 or replace(aaa.tradeDate,'-','/')||''=#{year}||'/'||#{search}
                 )
-            </where>
         </if>
     </sql>
     <select id="selectCstpBondFormDataByKey" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdQueryCstpInfoListResponse">
@@ -2695,9 +2706,9 @@
         SELECT
             to_char(to_date(ICB.SUBSCRIPTION_TIME,'yyyy-MM-dd HH24:mi:ss'),'yyyy-MM-dd') tradeDate,
             '' execid,
-			ICB.INSTRUMENT_ID     finprodId,
+			ICB.INSTRUMENT_ID||'.IB'   finprodId,
 			ICB.INSTRUMENT_SHORT_NAME  finprodAbbr,
-			FPT.TYPE_9    businesstype,
+			FPT.TYPE_11    businesstype,
 			ICB.ISSUE_PRICE issuePrice,
 			ICB.SPREAD  spread,
 			ICB.COUPON_RATE  couponRate,
@@ -3939,7 +3950,12 @@
         left join SYS_DATADICT_LIST sdlcs on sdlcs.DICT_CODE='SETTLE_STATUS' and aaa.cleanStatus=sdlcs.ITEM_CODE
         left join SYS_DATADICT_LIST sdlss on sdlss.DICT_CODE='DELIVERY_STATUS' and aaa.settleStatus=sdlss.ITEM_CODE
         <!-- 关键字模糊查询 -->
+        <where>
         <include refid="vagueQueryTradeDetailWhere"></include>
+            <if test="busiTypePosition!=null and busiTypePosition != ''">
+                and aaa.tgBusiType = #{busiTypePosition}
+            </if>
+        </where>
         order by aaa.confirmTradeDate,aaa.effectiveStatus,aaa.finprodType2,aaa.tgBusiType,aaa.ps)
         <!--前端传入排序字段-->
         <if test="sort != null and sort != '' and direction != null and direction != ''">
@@ -3948,7 +3964,6 @@
     </select>
     <sql id="vagueQueryTradeDetailWhere">
         <if test="search != null and search != '' and search !='有效' ">
-            <where>
                 ((
                 sdles.ITEM_VALUE || '|' ||sdlcs.ITEM_VALUE || '|' || sdlss.ITEM_VALUE
                 || '|' ||aaa.totleTradeId || '|' ||aaa.busiCode  || '|' ||aaa.entrustId
@@ -3972,7 +3987,6 @@
                 or replace(aaa.settleDate,'-','/')||''=#{search}
                 or replace(aaa.settleDate,'-','/')||''=#{year}||'/'||#{search}
                 )
-            </where>
         </if>
     </sql>
     <select id="findManualSettleInfoOther"
@@ -4682,6 +4696,40 @@
             and TPD.TRADE_ID=#{busiCode}
         </if>
     </select>
+    <select id="findRepoPortIntFenPeiInfoList2"
+            resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
+        SELECT
+        TPDA.Entrust_Id entrustId,
+        TPDA.PORTFOLIO_ID portfolioId,
+        pp.PORTFOLIO_NAME portfolioName,
+        TPD.TRADE_AMT tradeAmt,
+        ttft.fee_amt jyFeeAmt,
+        ttft1.fee_amt jsFeeAmt,
+        ftp.m_int_amt as mintAmt,
+        ftp.m_trade_amt as fpriceAmt,
+        pledges.disFaceValue as disFaceValue,
+        EE.PRICE_MODEL as priceModel,
+        ftp.int_rate*100 as tradeYield
+        FROM TRD_PRODUCT_TEMP_DEAL TPD
+        INNER JOIN TRD_PRODUCT_TEMP_DEAL_ADD TPDA on TPD.TRADE_ID = TPDA.TRADE_ID
+        <if test="userName != null and userName != ''">
+            inner JOIN PTL_PORTFOLIO_AUTHORITY PPA
+            ON TPDA.portfolio_id = PPA.PORTFOLIO_ID
+            AND PPA.USER_ID = #{userName}
+        </if>
+        LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
+        LEFT JOIN TRD_TRADE_FEE_DETAIL ttft ON tpd.trade_id = ttft.trade_id AND ttft.fee_type =#{feeType06}
+        LEFT JOIN TRD_TRADE_FEE_DETAIL ttft1 ON tpd.trade_id = ttft1.trade_id AND ttft1.fee_type =#{feeType08}
+        LEFT JOIN ETR_ENTRUST ee ON TPDA.Entrust_Id = ee.entrust_id
+        left join fin_trade_product ftp on ftp.finprod_id=TPD.TRADE_ID
+        left join (select pledge.finprod_id,sum(pledge.pledge_number*100) as disFaceValue
+        from FIN_DEAL_PLEDGE pledge group by pledge.finprod_id)pledges
+        on ftp.finprod_id=pledges.finprod_id
+        where TPD.TOTLE_TRADE_ID = #{totleTradeId} and  TPD.Trade_Status='01'
+        <if test="busiCode != null and busiCode != ''">
+            and TPD.TRADE_ID=#{busiCode}
+        </if>
+    </select>
     <select id="findRepoPledgeInfoList"
             resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsPledgeInfoResponse">
         select rp.pledge_finprod_id as finprodId,
@@ -4841,7 +4889,7 @@
 				TFPDT.CPRICE_AMT cpriceAmt,
 				TFPDT.INT_AMT intAmt,
 				TFPDT.TRADE_AMT tradeAmt,
-                BO.PAYABLE_AMOUNT payableAmount
+                BO.PAYABLE_AMOUNT payAmt
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
         LEFT JOIN FIN_PRODUCT FP
         ON		FP.FINPROD_ID = TFPDT.FINPROD_ID
@@ -5094,7 +5142,7 @@
             fpi.ISSUE_PRICE  issuePrice,
             fpi.REFER_YIELD  rate,
             T1.SHARE_AMT*100  subAmt,
-            T1.TRADE_AMT tradeAmt,
+            T1.TRADE_AMT payAmt,
             T1.FEE_AMT settleFeeAmt,
             T1.REMARK remark,
             bo.BID_MODLE BidModle

@@ -707,6 +707,10 @@ public class CfetsTrdQueryService extends BaseService{
         if(StringUtil.isNotEmpty(matchStatus)){
             pageParam.put("matchStatusList", StringUtil.splitToList(GlobalConstant.COMMA,matchStatus));
         }
+        // 查询匹配状态为空
+        if(matchStatus.contains("01")){
+            pageParam.put("isNull","Y");
+        }
         String finprodId = (String)pageParam.get("finprodId");
         if(StringUtil.isNotEmpty(finprodId)){
             pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA,finprodId));
@@ -892,16 +896,16 @@ public class CfetsTrdQueryService extends BaseService{
         //基本信息
         spcdCode = spcdCodeTemp+",BB";
         List<CfgReadonlyFormShow> infoFormb = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode,dtCode,spcdCode);
-        //发行信息
+        //申购信息
         spcdCode = spcdCodeTemp+",BS";
         List<CfgReadonlyFormShow> infoForms = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode,dtCode,spcdCode);
         //发行信息
         spcdCode = spcdCodeTemp+",BF";
         List<CfgReadonlyFormShow> infoFormf = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode,dtCode,spcdCode);
 
-        resultData.put(dtCode+"_formb",infoFormb);
-        resultData.put(dtCode+"_forms",infoForms);
-        resultData.put(dtCode+"_formf",infoFormf);
+        resultData.put(dtCode+"_formbb",infoFormb);
+        resultData.put(dtCode+"_formbs",infoForms);
+        resultData.put(dtCode+"_formbf",infoFormf);
 
         Map<String, Object> pageParam = new HashMap<>();
         if (StringUtil.isNotEmpty(dto.getQuoteId())) {
@@ -925,8 +929,8 @@ public class CfetsTrdQueryService extends BaseService{
             //投资经理
             pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
         }
-        CfetsTrdQueryCstpInfoListResponse dataform = null;
-        if (StringUtil.isNotEmpty(dto.getQuoteId())) {
+        CfetsTrdQueryCstpBidInfoListResponse dataform = null;
+        if (StringUtil.isNotEmpty(dto.getQuoteId())||StringUtil.isNotEmpty(dto.getExecid())) {
             dataform = cfetsTrdQueryMapper.selectCstpBidFormDataByKey(pageParam);
         }
         //表格质押券data

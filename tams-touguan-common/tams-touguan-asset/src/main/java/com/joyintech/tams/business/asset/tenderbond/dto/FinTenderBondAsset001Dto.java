@@ -622,7 +622,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getDebRate() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.评级结果, this.subRate);
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.评级结果, this.debRate);
     }
 
     public void setDebRate(String debRate) {
@@ -630,7 +630,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getSubRateOrg() {
-        return subRateOrg;
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.评级机构, this.subRateOrg);
     }
 
     public void setSubRateOrg(String subRateOrg) {
