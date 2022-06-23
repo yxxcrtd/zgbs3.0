@@ -39,14 +39,6 @@ public class RiskTrialController {
     @PostMapping("/doRiskcal/{pageId}")
     public Message<AjaxResult> doRiskcal(@RequestBody Map<String, Object> param, @PathVariable("pageId") String pageId) {
         try {
-            if (StringUtil.equals("CfetsEtrBondFirstBid002", pageId)) {
-                AjaxResult m = new AjaxResult();
-                CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
-                result.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
-                result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
-                m.setData(result);
-                return new Message<AjaxResult>().success().setData(m);
-            }
             RiskCommonOutputDto outputDto = paramSerivce.buildParamThenRisk(param, 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), pageId,null);
             CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
             result.setRiskMathFlag("02");
@@ -71,6 +63,7 @@ public class RiskTrialController {
             } else {//没有试算结果时默认也给通过，针对没有配置指标试算的场景
                 result.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
                 result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
+                m.setData(result);
                 return new Message<AjaxResult>().success().setData(m);
             }
         } catch (Exception e) {
