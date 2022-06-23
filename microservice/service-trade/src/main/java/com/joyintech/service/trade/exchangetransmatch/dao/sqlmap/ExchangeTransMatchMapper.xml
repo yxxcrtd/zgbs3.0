@@ -320,14 +320,8 @@
             D1.TARGET_TYPE targetType,
             A1.UPDATE_TIME updateTime,
             #{TRADE_TYPE_02} tradeType,
-            CASE
-                WHEN A1.ENTRUST_CLASS = #{ENTRUST_CLASS_02} THEN det.PORTFOLIO_ID
-                ELSE A1.PORTFOLIO_ID
-            END portfolioId,
-            CASE
-                WHEN A1.ENTRUST_CLASS = #{ENTRUST_CLASS_02} THEN det.PORTFOLIO_NAME
-                ELSE B1.PORTFOLIO_NAME
-            END portfolioName,
+            det.PORTFOLIO_ID,
+            det.PORTFOLIO_NAME,
             #{SEC_TYPE_01} secType,
             A1.FINPROD_ID,
             A1.FINPROD_TYPE2,
