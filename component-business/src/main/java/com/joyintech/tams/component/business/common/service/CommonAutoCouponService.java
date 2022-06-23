@@ -405,6 +405,7 @@ public class CommonAutoCouponService extends BaseService {
                 finProductAdd.setFinprodId(finprodId);
                 finProductAdd.setWindId(secid);
                 finProductAdd.setIsAutoUpdate(DictCodeList.是否_是.getValue());
+                finProductAdd.setIsAllowOverwrite(DictCodeList.是否_是.getValue());
                 if (DictCodeListExt3.交易场所_上海证券交易所.getValue().equals(interfPayhsrcsecinfo.getMarket())) {
                     finProductAdd.setIsNoGuard(DictCodeList.是否_是.getValue());
                 } else {
