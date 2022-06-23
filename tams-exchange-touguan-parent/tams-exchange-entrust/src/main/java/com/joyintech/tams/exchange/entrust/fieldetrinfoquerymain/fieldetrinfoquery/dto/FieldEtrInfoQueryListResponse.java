@@ -128,6 +128,16 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     private String isWin;
 
 
+    private String outputValue;
+
+    public String getOutputValue() {
+        return outputValue;
+    }
+
+    public void setOutputValue(String outputValue) {
+        this.outputValue = outputValue;
+    }
+
     /**
      * 获取 otherEntrustStatus
      * @return otherEntrustStatus.

@@ -37,11 +37,14 @@
         END AS otherPs,
         ETR_ENTRUST_ADD.BUSI_PS busiPs,
         ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        CASE WHEN ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34') THEN TO_CHAR(ETR_ENTRUST.ENTRUST_NUM*100)
+        btm.OUTPUT_VALUE_1 outputValue,
+        CASE WHEN ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34')
+        THEN
+        ETR_ENTRUST.ENTRUST_NUM*100
         ELSE decode(
             btm.OUTPUT_VALUE_1,
             'EX004',
-            '',
+            0,
             decode(
             ETR_ENTRUST_ADD.ASSET_TYPE,
             'F01',
@@ -360,12 +363,15 @@
         END AS otherPs,
         WFL_ETR_ENTRUST_ADD.BUSI_PS busiPs,
         WFL_ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        CASE WHEN WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34') THEN TO_CHAR(WFL_ETR_ENTRUST.ENTRUST_NUM*100)
+        WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION outputValue,
+        CASE WHEN WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34')
+        THEN
+        WFL_ETR_ENTRUST.ENTRUST_NUM*100
         ELSE
             decode(
             WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
             'EX004',
-            '',
+            0,
             decode(
             WFL_ETR_ENTRUST_ADD.ASSET_TYPE,
             'F01',
