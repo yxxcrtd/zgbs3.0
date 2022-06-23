@@ -66,11 +66,13 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                     }
                 });
                 if ((finProductIssue.getMinTamt() != null) && (dto.getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0
-                        || dto.getAllocationDetails().get(0).getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0)) {
+                        || (StringUtil.isNotEmpty(dto.getAllocationDetails().get(0).getWinPrice())
+                        && dto.getAllocationDetails().get(0).getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0))) {
                     checkFlag = true;
                 }
                 if ((finProductIssue.getMaxTamt() != null) &&(dto.getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0
-                        || dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0)) {
+                        || (StringUtil.isNotEmpty(dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinPrice())
+                        && dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0))) {
                     checkFlag = true;
                 }
                 if ((finProductIssue.getTenderUnit() != null) &&(dto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0)) {
