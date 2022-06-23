@@ -1385,7 +1385,7 @@
         bo.BID_MODLE AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE AS payType/*缴款方式*/,
         BRT.WIN_TYPE AS winType/*中标方式*/,
-        decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT) AS winPrinamt/*中标券面总额(万元)*/,
+        BRT.WIN_PRINAMT AS winPrinamt/*中标券面总额(万元)*/,
         CASE
         WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100,
         'FM9999999999999990.9990') || '%'
@@ -1395,10 +1395,10 @@
         'FM9999999999999990.90') || 'BP'
         END winPrice /*中标标位*/,
         BRT.SETT_FEE_AMT settFeeAmt/*结算服务费*/,
-        decode(BO.IS_WIN, 'Y', BRT.PAY_DATE) payDate/*缴款日*/,
-        decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE) assignRegdate/*债权债务登记日*/,
-        decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE) listingDate/*上市日*/,
-        decode(BO.IS_WIN, 'Y', BRT.WIN_DATE) AS bidConfirmDate/*中标日期*/,
+        BRT.PAY_DATE payDate/*缴款日*/,
+        BRT.CREDITOR_DEBT_DATE assignRegdate/*债权债务登记日*/,
+        FPA.LISTING_DATE listingDate/*上市日*/,
+        BRT.WIN_DATE AS bidConfirmDate/*中标日期*/,
         to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') tradeDate,
         BRT.COUNTER_ID counterId,
         mcp.counter_name counterName,
@@ -1480,7 +1480,7 @@
         bo.BID_MODLE AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE AS payType/*缴款方式*/,
         BRT.WIN_TYPE AS winType/*中标方式*/,
-        decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT) AS winPrinamt/*中标券面总额(万元)*/,
+        BRT.WIN_PRINAMT AS winPrinamt/*中标券面总额(万元)*/,
         CASE
         WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100,
         'FM9999999999999990.9990') || '%'
@@ -1490,10 +1490,10 @@
         'FM9999999999999990.90') || 'BP'
         END winPrice /*中标标位*/,
         BRT.SETT_FEE_AMT settFeeAmt/*结算服务费*/,
-        decode(BO.IS_WIN, 'Y', BRT.PAY_DATE) payDate/*缴款日*/,
-        decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE) assignRegdate/*债权债务登记日*/,
-        decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE) listingDate/*上市日*/,
-        decode(BO.IS_WIN, 'Y', BRT.WIN_DATE) AS bidConfirmDate/*中标日期*/,
+        BRT.PAY_DATE payDate/*缴款日*/,
+        BRT.CREDITOR_DEBT_DATE assignRegdate/*债权债务登记日*/,
+        FPA.LISTING_DATE listingDate/*上市日*/,
+        BRT.WIN_DATE AS bidConfirmDate/*中标日期*/,
         to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') tradeDate,
         BRT.COUNTER_ID counterId,
         mcp.counter_name counterName,
@@ -1585,7 +1585,7 @@
             bo.PAY_TYPE       AS payType/*缴款方式*/,
             BRT.WIN_TYPE       AS winType/*中标方式*/,
             bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额(万元)*/,
-            decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT)   AS winPrinamt/*中标券面总额(万元)*/,
+            BRT.WIN_PRINAMT   AS winPrinamt/*中标券面总额(万元)*/,
             CASE
                 WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
                 WHEN fpi.TENDER_TARGET = '02' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE, 'FM9999999999999990.9990') || '元'
@@ -1594,10 +1594,10 @@
             bo.UNIT_CPRICE       price/*净价*/,
             BRD.PAY_AMT    payableAmount/*缴款金额*/,
             BRT.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
-            decode(BO.IS_WIN, 'Y', BRT.PAY_DATE)          payDate/*缴款日*/,
-            decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE)    assignRegdate/*债权债务登记日*/,
-            decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE)     listingDate/*上市日*/,
-            decode(BO.IS_WIN, 'Y', BRT.WIN_DATE)       AS bidConfirmDate/*中标日期*/,
+            BRT.PAY_DATE          payDate/*缴款日*/,
+            BRT.CREDITOR_DEBT_DATE    assignRegdate/*债权债务登记日*/,
+            FPA.LISTING_DATE     listingDate/*上市日*/,
+            BRT.WIN_DATE       AS bidConfirmDate/*中标日期*/,
             bo.BID_ID            bidId/*投标编号*/,
             to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
             tpd.counter_id counterId,
@@ -1609,7 +1609,6 @@
             LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPD.TRADE_ID = TPDA.TRADE_ID
             LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON tpd.TOTLE_TRADE_ID=tfpdt.TOTLE_TRADE_ID
             LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = TFPDT.B_TRADE_ID
-            AND BRT.STATUS ='01'
             LEFT JOIN BID_RESULT_DETAIL BRD ON	BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
             AND	BRD.ENTRUST_ID = TPDA.ENTRUST_ID
             AND	BRD.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
@@ -1706,7 +1705,7 @@
             bo.PAY_TYPE       AS payType/*缴款方式*/,
             brt.WIN_TYPE       AS winType/*中标方式*/,
             bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额(万元)*/,
-            decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT)   AS winPrinamt/*中标券面总额(万元)*/,
+            BRT.WIN_PRINAMT   AS winPrinamt/*中标券面总额(万元)*/,
             CASE
                 WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
                 WHEN fpi.TENDER_TARGET = '02' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE, 'FM9999999999999990.9990') || '元'
@@ -1715,10 +1714,10 @@
             bo.UNIT_CPRICE       price/*净价*/,
             BRD.PAY_AMT    payableAmount/*缴款金额*/,
             BRT.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
-            decode(BO.IS_WIN, 'Y', BRT.PAY_DATE)          payDate/*缴款日*/,
-            decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE)    assignRegdate/*债权债务登记日*/,
-            decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE)     listingDate/*上市日*/,
-            decode(BO.IS_WIN, 'Y', BRT.WIN_DATE)       AS bidConfirmDate/*中标日期*/,
+            BRT.PAY_DATE          payDate/*缴款日*/,
+            BRT.CREDITOR_DEBT_DATE    assignRegdate/*债权债务登记日*/,
+            FPA.LISTING_DATE     listingDate/*上市日*/,
+            BRT.WIN_DATE      AS bidConfirmDate/*中标日期*/,
             bo.BID_ID            bidId/*投标编号*/,
             to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
             tpd.counter_id counterId,
@@ -1730,7 +1729,6 @@
             LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD TPDA ON TPD.TRADE_ID = TPDA.TRADE_ID
             LEFT JOIN WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON tpd.TOTLE_TRADE_ID=tfpdt.TOTLE_TRADE_ID
             LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = TFPDT.B_TRADE_ID
-            AND BRT.STATUS ='01'
             LEFT JOIN BID_RESULT_DETAIL BRD ON	BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
             AND	BRD.ENTRUST_ID = TPDA.ENTRUST_ID
             AND	BRD.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
