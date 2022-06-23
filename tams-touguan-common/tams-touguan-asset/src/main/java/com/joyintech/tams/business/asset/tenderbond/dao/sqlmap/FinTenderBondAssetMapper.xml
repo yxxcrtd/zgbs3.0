@@ -76,7 +76,7 @@
             ZT.RATING as subRate,
             MCI.CUSTOMER_NAME as subRateOrg,
             ZX.RATING as debRate,
-            MCIT.CUSTOMER_NAME as debRateOrg,
+            ZX.GRADE_ORG_ID as debRateOrg,
             PRODUCT.REMARK as remark,
             PRODUCT.FINPROD_ID as finprodId,
             PRODUCT.CIRCULATION_CODE as circulationCode,
@@ -96,8 +96,8 @@
             FROM MST_BOND_CREDIT_RATING BRATING
             WHERE BRATING.O_TYPE = '01' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
             ) WHERE RANK=1
-        ) ZT on PRODUCT.FINPROD_MARKET_ID = ZT.ASSET_CODE
-        LEFT JOIN MST_CUSTOMER_INFO MCI ON MCI.CUSTOMER_ID=ZT.GRADE_ORG_ID
+        ) ZT on PRODUCT.ISSUER = ZT.ASSET_CODE
+        LEFT JOIN MST_CUSTOMER_INFO MCI ON MCI.CUSTOMER_ID=ZT.ASSET_CODE
         LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
             SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
             ,BRATING.GRADE_RESULT DESC ) RANK ,BRATING.O_CODE AS ASSET_CODE ,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
@@ -105,7 +105,6 @@
             WHERE BRATING.O_TYPE = '02' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
             ) WHERE RANK=1
         ) ZX ON PRODUCT.FINPROD_MARKET_ID = ZX.ASSET_CODE
-        LEFT JOIN MST_CUSTOMER_INFO MCIT ON MCIT.CUSTOMER_ID=ZX.GRADE_ORG_ID
         LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDL on ISSUE.INT_RATE_ID = SDL.ITEM_CODE
         <where> PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
               AND PRODUCT.TRADE_MARKET in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上海和甚至交易所-->
@@ -121,8 +120,8 @@
             <if test="issuer !=null and issuer !=''">
                 AND PRODUCT.ISSUER=#{issuer,jdbcType=VARCHAR}
             </if>
-            <if test="issueType !=null and issueType !=''">
-                AND PRODUCT.ISSUE_TYPE=#{issueType,jdbcType=VARCHAR}
+            <if test="raiseType !=null and raiseType !=''">
+                AND PRODUCT.ISSUE_TYPE=#{raiseType,jdbcType=VARCHAR}
             </if>
             <if test="issueClass !=null and issueClass !=''">
                 AND ISSUE.ISSUE_CLASS=#{issueClass,jdbcType=VARCHAR}
@@ -198,7 +197,7 @@
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'ISSUE_STAGE') E1 ON t.issueStage=E1.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'TRADE_PLACE') E2 ON t.tradeMarket=E2.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'REGIST_ORG') E3 ON t.registOrg=E3.ITEM_CODE
-        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'RAISE_TYPE') E4 ON t.issueType=E4.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'RAISE_TYPE_BOND') E4 ON t.issueType=E4.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'ISSUE_CLASS') E5 ON t.issueClass=E5.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'TENDER_TYPE') E6 ON t.tenderType=E6.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'TENDER_TARGET') E7 ON t.tenderTarget=E7.ITEM_CODE
@@ -210,6 +209,10 @@
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'CUSTOM_ASSET_TYPE_TWO') E13 ON t.type9=E13.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'CUSTOM_ASSET_TYPE_THREE') E14 ON t.type10=E14.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'CUSTOM_ASSET_TYPE_FOUR') E15 ON t.type11=E15.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'FREQUENCY_UNIT') E16 ON t.payCycle=E16.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'GRADE_PARTY') E17 ON t.debRateOrg=E17.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'MAIN_GRADE_RESULT') E18 ON t.subRate=E18.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'MAIN_GRADE_RESULT') E19 ON t.debRate=E19.ITEM_CODE
         <where>
             <if test="appearMarketId !=null and appearMarketId !=''">
                 AND t.appearMarketId=#{appearMarketId,jdbcType=VARCHAR}
@@ -241,11 +244,16 @@
                     E11.ITEM_VALUE like '%' || #{search} || '%' OR
                     E12.ITEM_VALUE like '%' || #{search} || '%' OR
                     E13.ITEM_VALUE like '%' || #{search} || '%' OR
-                    E4.ITEM_VALUE like '%' || #{search} || '%' OR
-                    E5.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E14.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E15.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E16.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E17.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E18.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E19.ITEM_VALUE like '%' || #{search} || '%' OR
                     t.finprodMarketId like '%' || #{search} || '%' OR
                     t.finprodAbbr like '%' || #{search} || '%' OR
                     t.issuer like '%' || #{search} || '%' OR
+                    t.issuerName like '%' || #{search} || '%' OR
                     t.appearMarketId like '%' || #{search} || '%' OR
                     t.crossMarket like '%' || #{search} || '%' OR
                     t.crossMarketCode like '%' || #{search} || '%' OR
