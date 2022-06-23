@@ -64,7 +64,7 @@ public class StlDataDealProcessCommonService {
 	/**
 	 * 是否单体服务
 	 */
-	@Value("${application.micorservice.contextPath.single:false}")
+	@Value("${application.micorservice.contextpath.single:false}")
 	private boolean isSingle;
 
 	// 无需计算佣金场景

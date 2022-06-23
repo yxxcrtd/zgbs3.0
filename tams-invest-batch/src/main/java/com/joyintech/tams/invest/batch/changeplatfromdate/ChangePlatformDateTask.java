@@ -62,7 +62,7 @@ public class ChangePlatformDateTask extends BatchBaseService {
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
     /**
