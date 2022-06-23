@@ -1026,14 +1026,26 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             } catch (PositionException e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
-                String code = (String) bm.get("code");
-                String messageStr = JsonUtils.json2Object((String) bm.get("message").toString(), String.class);
-                if (StringUtil.isEmpty(confirmOk)
-                        && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
-                    WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
-                }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
-                    WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
+                String messageStr = null;
+                if (StringUtil.isNotEmpty(bm)) {
+                    String code = (String) bm.get("code");
+                    messageStr = JsonUtils.json2Object((String) bm.get("message").toString(), String.class);
+                    if (StringUtil.isEmpty(confirmOk)
+                            && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
+                    }
+                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK,code)) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
+                    }
+                }else{
+                    messageStr = JsonUtils.json2Object(message.getMessage(), String.class);
+                    if (StringUtil.isEmpty(confirmOk)
+                            && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, message.getCode())) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
+                    }
+                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, message.getCode())) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
+                    }
                 }
                 throw new PositionException(messageStr);
             }
