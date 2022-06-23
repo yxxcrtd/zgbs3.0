@@ -74,6 +74,7 @@ public class ExchangeTransMatchValidator implements BeanValidator {
             )
                     || com.joyintech.framework.util.StringUtil.equals(DictCodeListExt3.交易方向_配债.getValue(), ps)
                     || com.joyintech.framework.util.StringUtil.equals(DictCodeListExt2.交易方向_配股.getValue(), ps)
+                    || com.joyintech.framework.util.StringUtil.equals(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), dealDto.getFinprodType2())
             ){
                 if(!StringUtil.equals(dealDto.getSecAcctId(),entrustDto.getSecAcctId())
                         || !StringUtil.equals(dealDto.getAcctNo(),entrustDto.getAcctNo())

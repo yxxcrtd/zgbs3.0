@@ -160,6 +160,13 @@ public interface CfetsTrdQueryMapper {
      * @return
      */
     CfetsTrdBondInvestTradeDto getTrdBondInvestTradeDto(Map<String, Object> params);
+
+    /**
+     * 查询债券交易基本信息
+     * @param params
+     * @return
+     */
+    CfetsTrdFirstBondInvestTradeDto getTrdFirstBondInvestTradeDto(Map<String, Object> params);
     /**
      * 根据主键查询登记信息
      * @param pageParam

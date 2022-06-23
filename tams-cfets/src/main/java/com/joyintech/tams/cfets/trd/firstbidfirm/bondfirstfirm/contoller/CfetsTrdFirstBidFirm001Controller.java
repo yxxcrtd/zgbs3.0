@@ -93,10 +93,10 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         // 招标标的_利率
         initPageParams.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
-        // 招标标的_利差
-        initPageParams.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_利差.getValue());
         // 招标标的_价格
-        initPageParams.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_价格.getValue());
+        initPageParams.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_价格.getValue());
+        // 招标标的_利差
+        initPageParams.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
         // 缴款方式
         initPageParams.put("PAY_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.缴款方式, null));
         initPageParams.put("PAY_TYPE_01", BussinessDictCodeList.缴款方式_一级分销.getValue());
