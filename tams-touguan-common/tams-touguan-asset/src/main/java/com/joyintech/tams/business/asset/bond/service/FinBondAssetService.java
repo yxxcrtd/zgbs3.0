@@ -82,6 +82,9 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.*;
 
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.现金流类型_中间还本;
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.现金流类型_到期还本;
+
 /**
  * 债券标的信息新建
  *
@@ -328,6 +331,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //现金流计划表（FIN_CASH_PLAN）
             List<FinCashPlan> finCashPlanList = dto.getFinCashPlanList();
             for(FinCashPlan finCashPlan: finCashPlanList) {
+                if(!StringUtil.equals(finCashPlan.getCashType(),现金流类型_到期还本.getValue()) && !StringUtil.equals(finCashPlan.getCashType(),现金流类型_中间还本.getValue())) {
+                    finCashPlan.setCashAmt(finCashPlan.getIntAmt());
+                }
                 finCashPlanMapper.insertSelective(finCashPlan);
             }
             //行权计划表（FIN_EXERCISE_PLAN）
@@ -392,6 +398,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finBondAssetMapper.deleteFinCashPlan(entity.getFinprodId());
             List<FinCashPlan> finCashPlanList = dto.getFinCashPlanList();
             for(FinCashPlan finCashPlan: finCashPlanList) {
+                if(!StringUtil.equals(finCashPlan.getCashType(),现金流类型_到期还本.getValue()) && !StringUtil.equals(finCashPlan.getCashType(),现金流类型_中间还本.getValue())) {
+                    finCashPlan.setCashAmt(finCashPlan.getIntAmt());
+                }
                 finCashPlanMapper.insertSelective(finCashPlan);
             }
             //行权计划表（FIN_EXERCISE_PLAN）
@@ -1019,7 +1028,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 //付息
                 List<BondFinCashPlanDto> payInvestDtos = new ArrayList<>();
                 for (FinCashPlan finCashPlan : finCashPlanList) {
-                    if (BussinessDictCodeList.现金流类型_中间还本.getValue().equals(finCashPlan.getCashType())
+                    if (现金流类型_中间还本.getValue().equals(finCashPlan.getCashType())
                             || BussinessDictCodeList.现金流类型_到期还本.getValue().equals(finCashPlan.getCashType())){
                         FinCashPlanDto finCashPlanDto = new FinCashPlanDto();
                         BeanUtil.copyPropertiesIgnoreNull(finCashPlanDto,finCashPlan);

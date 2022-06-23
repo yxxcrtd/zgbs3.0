@@ -22,9 +22,18 @@ public class CfetsManualSettleInsertDto {
 
     //原交易编号
     private String tradeId;
+    private String totleTradeId;
 
 
-    public TrdBankManualSettleInfo getTrdBankManualSettleInfo() {
+    public String getTotleTradeId() {
+		return totleTradeId;
+	}
+
+	public void setTotleTradeId(String totleTradeId) {
+		this.totleTradeId = totleTradeId;
+	}
+
+	public TrdBankManualSettleInfo getTrdBankManualSettleInfo() {
         return trdBankManualSettleInfo;
     }
 

@@ -200,11 +200,12 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             return ajaxResult;
         }
         //接口数据转换
-        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto);
+        String finProdId = getFinprodId(secId);
+        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto, finProdId);
         //公共加券操作
         commonAutoCouponService.autoBondCouponSave(interfPayhsrcsecinfoDto);
         //保存操作记录
-        this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
+        this.saveOperate(finProdId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
         //发行人处理
         return ajaxResult;
     }
@@ -215,7 +216,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @param finListedBondInfoQuery001Dto
      * @return
      */
-    private InterfPayhsrcsecinfoDto convertInterfPayhsrcsecinfoDto(FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto) {
+    private InterfPayhsrcsecinfoDto convertInterfPayhsrcsecinfoDto(FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto, String finProdId) {
         InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = new InterfPayhsrcsecinfoDto();
         String secId = finListedBondInfoQuery001Dto.getSecId();
         //金融产品信息List
@@ -230,7 +231,6 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         List<MstCalendarInfo> mstCalendarInfoList = getMstCalendarInfo();
         //new标的类金融产品
         FinProduct finProduct = new FinProduct();
-        String finProdId = getFinprodId(secId);
         finProduct.setFinprodId(finProdId);
         finProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         finProduct.setFinprodAbbr(finListedBondInfoQuery001Dto.getBondAbbreviation());
@@ -455,8 +455,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      */
     private void saveOperate(String tradeId, String remark, DictCodeListExt3 operType, String workFlowId) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        String finProdId = getFinprodId(tradeId);
-        oprHisReq.setEntrustId(finProdId);
+        oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
         oprHisReq.setWorkflowId(workFlowId);

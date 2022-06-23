@@ -675,6 +675,9 @@ public class TradeQueryBean implements Serializable {
     @ApiModelProperty(name = "counterName", value = "交易对手名称", example = "A1")
     private String counterName;
 
+    @ApiModelProperty(name = "counterName", value = "交易对手资金账户", example = "A1")
+    private String propAcctNo;
+
     @ApiModelProperty(name = "tradeMarket", value = "交易场所")
     private String tradeMarket;
 
@@ -837,6 +840,14 @@ public class TradeQueryBean implements Serializable {
 
     public void setCounterName(String counterName) {
         this.counterName = counterName;
+    }
+
+    public String getPropAcctNo() {
+        return propAcctNo;
+    }
+
+    public void setPropAcctNo(String propAcctNo) {
+        this.propAcctNo = propAcctNo;
     }
 
     public String getTradeMarket() {

@@ -2513,6 +2513,10 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             }
 
             infRiskRdsDto.setCalendarCode((String) CommonUtil.findValue(dataMap, "calendarId"));
+            if (StringUtil.isEmpty(infRiskRdsDto.getCalendarCode())
+                && StringUtil.equals(infRiskRdsDto.getTradePlace(),DictCodeListExt1.交易场所_银行间.getValue())){
+                infRiskRdsDto.setCalendarCode("03");
+            }
             if (StringUtil.isNotEmpty(finDto.getMdate())) {
                 infRiskRdsDto.setRepoTerm(BigDecimal.valueOf(DateUtil.getBetweenDayNumber(finDto.getTradeDate(), finDto.getMdate())));
             }

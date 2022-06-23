@@ -526,10 +526,7 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
      }
 
      public Date getIssueDate() {
-         if (StringUtil.equals(this.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())){
-             return issueDate;
-         }
-         return null;
+         return issueDate;
      }
 
      public void setIssueDate(Date issueDate) {

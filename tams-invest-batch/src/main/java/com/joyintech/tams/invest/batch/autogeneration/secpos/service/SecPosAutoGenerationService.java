@@ -10,18 +10,6 @@
 
 package com.joyintech.tams.invest.batch.autogeneration.secpos.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -38,6 +26,12 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.batch.autogeneration.secpos.dao.SecPosAutoGenerationMapper;
 import com.joyintech.tams.invest.batch.autogeneration.secpos.dto.AssetTargetDbDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 组合持仓自动生成批处理Service
@@ -61,10 +55,11 @@ public class SecPosAutoGenerationService {
 
     @Autowired
     private CommonProductRatingService commonProductRatingService;
+
     /**
      * 组合持仓自动生成
      *
-     * @param batchDate 执行日
+     * @param batchDate     执行日
      * @param productIdList
      * @see
      * @since 1.0
@@ -76,8 +71,7 @@ public class SecPosAutoGenerationService {
         paramMap.put("batchDate", batchDate);
         if (productIdList.size() < 1000) {
             paramMap.put("productIdList", productIdList);
-        }
-        else {
+        } else {
             paramMap.put("productIdList", null);
         }
         secPosAutoGenerationMapper.deleteTodaySecPosData(paramMap);
@@ -98,7 +92,7 @@ public class SecPosAutoGenerationService {
         secPosAutoGenerationMapper.insertTodaySecPosDetailData(paramMap);
         //add for 华兴 by liupengfei E
 
-		secPosAutoGenerationMapper.deleteTodayStaSecPosData(paramMap);
+        secPosAutoGenerationMapper.deleteTodayStaSecPosData(paramMap);
 
         secPosAutoGenerationMapper.insertTodayStaSecPosData(paramMap);
     }
@@ -107,7 +101,7 @@ public class SecPosAutoGenerationService {
     /**
      * 组合持仓分析报表自动生成
      *
-     * @param batchDate 执行日
+     * @param batchDate     执行日
      * @param productIdList
      * @see
      * @since 1.0
@@ -120,14 +114,13 @@ public class SecPosAutoGenerationService {
         paramMap.put("batchDate", batchDate);
         if (productIdList.size() < 1000) {
             paramMap.put("productIdList", productIdList);
-        }
-        else {
+        } else {
             paramMap.put("productIdList", null);
         }
         paramMap.put("lastDate", DateUtil.addDay(batchDate, -1));
 
         //查询产品风险等级评定排序sql片段
-        Map<String,Object> sqlSortMap = new HashMap<String,Object>();
+        Map<String, Object> sqlSortMap = new HashMap<String, Object>();
         sqlSortMap.put("oType", "98");
         String sqlSortString = commonProductRatingService.getProductRatingOrderSql(sqlSortMap);
         paramMap.put("sqlSortString", sqlSortString);
@@ -162,41 +155,41 @@ public class SecPosAutoGenerationService {
         List<AssetTargetDbDto> secPosDataList = secPosAutoGenerationMapper.getSecPosData(paramMap);
         List<AssetTargetDbDto> underlyingAssetsData = secPosAutoGenerationMapper.getUnderlyingAssetsData(paramMap);
         //不穿透的资产总规模
-        BigDecimal noPassBshareScale = BigDecimal.ZERO;
+        BigDecimal noPassBshareScale;
         //穿透的资产总规模
         BigDecimal isPassBshareScale = BigDecimal.ZERO;
         //底层的资产总规模
         BigDecimal underlyingBshareScale = BigDecimal.ZERO;
         //底层资产汇总List
-        List<AssetTargetDbDto> underlyingAssetsSumList = new ArrayList<AssetTargetDbDto>();
+        List<AssetTargetDbDto> underlyingAssetsSumList = new ArrayList<>();
 
-        if(!StringUtil.isEmptyList(secPosDataList) &&secPosDataList.size()>0) {
-            Map<String,Object> noPassBshareScaleMap = new HashMap<String, Object>();
-            Map<String,Object> isPassBshareScaleMap = new HashMap<String, Object>();
+        if (!StringUtil.isEmptyList(secPosDataList) && secPosDataList.size() > 0) {
+            Map<String, Object> noPassBshareScaleMap = new HashMap<>();
+            Map<String, Object> isPassBshareScaleMap = new HashMap<>();
 
             //先按组合ID汇总资产规模
-            for(AssetTargetDbDto dto:secPosDataList) {
-                if(StringUtil.isNotEmpty(dto.getRiskAssetType2())) {
-                    if(StringUtil.equals(dto.getIsPerne(), DictCodeListExt3.穿透维度_不穿透.getValue())) {
-                        noPassBshareScale = (BigDecimal)noPassBshareScaleMap.get(dto.getPortfolioId());
-                        noPassBshareScale = ArithmeticUtil.doAdd(noPassBshareScale,dto.getBshareScale());
+            for (AssetTargetDbDto dto : secPosDataList) {
+                if (StringUtil.isNotEmpty(dto.getRiskAssetType2())) {
+                    if (StringUtil.equals(dto.getIsPerne(), DictCodeListExt3.穿透维度_不穿透.getValue())) {
+                        noPassBshareScale = (BigDecimal) noPassBshareScaleMap.get(dto.getPortfolioId());
+                        noPassBshareScale = ArithmeticUtil.doAdd(noPassBshareScale, dto.getBshareScale());
 
                         noPassBshareScaleMap.put(dto.getPortfolioId(), noPassBshareScale);
                     } else if (StringUtil.equals(dto.getIsPerne(), DictCodeListExt3.穿透维度_穿透.getValue()))
-                        isPassBshareScale = (BigDecimal)isPassBshareScaleMap.get(dto.getPortfolioId());
-                        isPassBshareScale = ArithmeticUtil.doAdd(isPassBshareScale,dto.getBshareScale());
+                        isPassBshareScale = (BigDecimal) isPassBshareScaleMap.get(dto.getPortfolioId());
+                    isPassBshareScale = ArithmeticUtil.doAdd(isPassBshareScale, dto.getBshareScale());
 
-                        isPassBshareScaleMap.put(dto.getPortfolioId(), isPassBshareScale);
-                    }
+                    isPassBshareScaleMap.put(dto.getPortfolioId(), isPassBshareScale);
                 }
+            }
 
-            if(!StringUtil.isEmptyList(underlyingAssetsData) &&underlyingAssetsData.size()>0) {
+            if (!StringUtil.isEmptyList(underlyingAssetsData) && underlyingAssetsData.size() > 0) {
                 //按组合ID汇总资产总规模
-                Map<String,Object> underlyingBshareScaleMap = new HashMap<String, Object>();
-                for(AssetTargetDbDto dto:underlyingAssetsData) {
-                    AssetTargetDbDto underlyingBshareScaleSumDto = (AssetTargetDbDto)underlyingBshareScaleMap.get(dto.getPortfolioId());
-                    if(underlyingBshareScaleSumDto != null) {
-                        underlyingBshareScaleSumDto.setBshareScale(ArithmeticUtil.doAdd(underlyingBshareScaleSumDto.getBshareScale(),dto.getBshareScale()));
+                Map<String, Object> underlyingBshareScaleMap = new HashMap<>();
+                for (AssetTargetDbDto dto : underlyingAssetsData) {
+                    AssetTargetDbDto underlyingBshareScaleSumDto = (AssetTargetDbDto) underlyingBshareScaleMap.get(dto.getPortfolioId());
+                    if (underlyingBshareScaleSumDto != null) {
+                        underlyingBshareScaleSumDto.setBshareScale(ArithmeticUtil.doAdd(underlyingBshareScaleSumDto.getBshareScale(), dto.getBshareScale()));
                     } else {
                         underlyingBshareScaleSumDto = new AssetTargetDbDto();
                         underlyingBshareScaleSumDto.setPortfolioId(dto.getPortfolioId());
@@ -204,35 +197,35 @@ public class SecPosAutoGenerationService {
                         underlyingBshareScaleMap.put(dto.getPortfolioId(), underlyingBshareScaleSumDto);
                     }
 
-                    underlyingBshareScale = ArithmeticUtil.doAdd(underlyingBshareScale,dto.getBshareScale());
+                    underlyingBshareScale = ArithmeticUtil.doAdd(underlyingBshareScale, dto.getBshareScale());
                 }
 
                 //再次循环计算出集中度和风险评定等级
-                for(AssetTargetDbDto dto:underlyingAssetsData) {
-                    AssetTargetDbDto underlyingBshareScaleSumDto = (AssetTargetDbDto)underlyingBshareScaleMap.get(dto.getPortfolioId());
-                    if(underlyingBshareScaleSumDto != null) {
+                for (AssetTargetDbDto dto : underlyingAssetsData) {
+                    AssetTargetDbDto underlyingBshareScaleSumDto = (AssetTargetDbDto) underlyingBshareScaleMap.get(dto.getPortfolioId());
+                    if (underlyingBshareScaleSumDto != null) {
                         BigDecimal crn = ArithmeticUtil.divide(dto.getBshareScale(), underlyingBshareScaleSumDto.getBshareScale(), 2);
                         dto.setCrn(crn);
                         String assetRiskType = this.getDtoAssetRiskType(dto);
                         dto.setAssetRiskType(assetRiskType);
 
-                        BigDecimal assetRiskTypevalue = ArithmeticUtil.doAdd(StringUtil.isNotEmpty(underlyingBshareScaleSumDto.getAssetRiskType())?
-                            new BigDecimal(underlyingBshareScaleSumDto.getAssetRiskType()): BigDecimal.ZERO,
-                            ArithmeticUtil.multiply(crn,StringUtil.isNotEmpty(assetRiskType)?new BigDecimal(assetRiskType): BigDecimal.ZERO));
+                        BigDecimal assetRiskTypevalue = ArithmeticUtil.doAdd(StringUtil.isNotEmpty(underlyingBshareScaleSumDto.getAssetRiskType()) ?
+                                        new BigDecimal(underlyingBshareScaleSumDto.getAssetRiskType()) : BigDecimal.ZERO,
+                                ArithmeticUtil.multiply(crn, StringUtil.isNotEmpty(assetRiskType) ? new BigDecimal(assetRiskType) : BigDecimal.ZERO));
                         underlyingBshareScaleSumDto.setAssetRiskType(assetRiskTypevalue.toString());
                     }
                     //如果不是债券，rate(票面利率%)和BShareFaceValue(持仓券面总额)设置成空
-                    if(!StringUtil.equals(dto.getPinanAssetType(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
+                    if (!StringUtil.equals(dto.getPinanAssetType(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                         dto.setRate(null);
                         dto.setBshareFaceValue(null);
                     }
                     assetTargetDbMapper.insert(dto);
                 }
 
-                for(String key:underlyingBshareScaleMap.keySet()) {
-                    AssetTargetDbDto underlyingBshareScaleSumDto = (AssetTargetDbDto)underlyingBshareScaleMap.get(key);
+                for (String key : underlyingBshareScaleMap.keySet()) {
+                    AssetTargetDbDto underlyingBshareScaleSumDto = (AssetTargetDbDto) underlyingBshareScaleMap.get(key);
                     String assetRiskType = underlyingBshareScaleSumDto.getAssetRiskType();
-                    if(StringUtil.isNotEmpty(assetRiskType)) {
+                    if (StringUtil.isNotEmpty(assetRiskType)) {
                         underlyingBshareScaleSumDto.setAssetRiskType(this.IRConvert(new BigDecimal(assetRiskType)));
                     }
                     underlyingBshareScaleSumDto.setCrn(ArithmeticUtil.divide(underlyingBshareScaleSumDto.getBshareScale(), underlyingBshareScale, 2));
@@ -241,9 +234,9 @@ public class SecPosAutoGenerationService {
 
             }
 
-            for(AssetTargetDbDto item:secPosDataList) {
+            for (AssetTargetDbDto item : secPosDataList) {
                 //剩余期限计算
-                if(item.getMdate()!=null){
+                if (item.getMdate() != null) {
                     item.setLastPeriod(calculationSurplusDays(item.getFinprodId(), DateUtil.format(item.getVdate()), DateUtil.format(item.getMdate()), DateUtil.format(batchDate), item.getBranch()));
                 }
                 //获取剩余期限、成本收益率、含权信息、下一行权日、剩余行权期限信息、债券评级
@@ -290,9 +283,9 @@ public class SecPosAutoGenerationService {
                     //成本收益率计算
                     item.setCostRate(calculationCostRate(item.getFinprodId(), DateUtil.format(batchDate), item.getPortfolioId(), item.getIsPerne()));
 
-                    if (StringUtil.equals(item.getIsRight(),DictCodeList.是否_是.getValue())) {
-                        List<FinExercisePlan> finExercisePlanList =new ArrayList<FinExercisePlan>();
-                        if(item.getExDate() !=null && item.getExDate() !=""){
+                    if (StringUtil.equals(item.getIsRight(), DictCodeList.是否_是.getValue())) {
+                        List<FinExercisePlan> finExercisePlanList = new ArrayList<FinExercisePlan>();
+                        if (item.getExDate() != null && item.getExDate() != "") {
                             finExercisePlanList = calculationSurplusExercise(item.getFinprodId(), DateUtil.format(batchDate), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), "", item.getExDate());
                         }
                         if (finExercisePlanList != null && !StringUtil.isEmptyList(finExercisePlanList) && finExercisePlanList.size() > 0) {
@@ -334,14 +327,14 @@ public class SecPosAutoGenerationService {
 
                 }
 
-              //计算集中度
-                if(StringUtil.isNotEmpty(item.getRiskAssetType2())) {
+                //计算集中度
+                if (StringUtil.isNotEmpty(item.getRiskAssetType2())) {
                     BigDecimal crn = BigDecimal.ZERO;
-                    if(StringUtil.equals(item.getIsPerne(), DictCodeListExt3.穿透维度_不穿透.getValue())) {
-                        noPassBshareScale = (BigDecimal)noPassBshareScaleMap.get(item.getPortfolioId());
+                    if (StringUtil.equals(item.getIsPerne(), DictCodeListExt3.穿透维度_不穿透.getValue())) {
+                        noPassBshareScale = (BigDecimal) noPassBshareScaleMap.get(item.getPortfolioId());
                         crn = ArithmeticUtil.divide(item.getBshareScale(), noPassBshareScale, 2);
                     } else {
-                        isPassBshareScale = (BigDecimal)isPassBshareScaleMap.get(item.getPortfolioId());
+                        isPassBshareScale = (BigDecimal) isPassBshareScaleMap.get(item.getPortfolioId());
                         crn = ArithmeticUtil.divide(item.getBshareScale(), isPassBshareScale, 2);
                     }
 
@@ -351,24 +344,23 @@ public class SecPosAutoGenerationService {
                     item.setAssetRiskType(getDtoAssetRiskType(item));
                 }
 
-                for(AssetTargetDbDto underlyingAssetsSumDto : underlyingAssetsSumList) {
-                    if(StringUtil.equals(item.getPortfolioId(), underlyingAssetsSumDto.getPortfolioId())
-                        && StringUtil.equals(item.getIsPerne(), DictCodeListExt3.穿透维度_不穿透.getValue())) {
+                for (AssetTargetDbDto underlyingAssetsSumDto : underlyingAssetsSumList) {
+                    if (StringUtil.equals(item.getPortfolioId(), underlyingAssetsSumDto.getPortfolioId())
+                            && StringUtil.equals(item.getIsPerne(), DictCodeListExt3.穿透维度_不穿透.getValue())) {
                         item.setAssetRiskType(underlyingAssetsSumDto.getAssetRiskType());
                     }
                 }
                 //如果不是债券，rate(票面利率%)和BShareFaceValue(持仓券面总额)设置成空
-                if(!StringUtil.equals(item.getPinanAssetType(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
+                if (!StringUtil.equals(item.getPinanAssetType(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                     item.setRate(null);
                     item.setBshareFaceValue(null);
                 }
-                if(StringUtil.equals(item.getPinanAssetType(),DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+                if (StringUtil.equals(item.getPinanAssetType(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())) {
                     item.setPrin(item.getPosAmount());
                 }
-                try{
+                try {
                     assetTargetDbMapper.insert(item);
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -379,47 +371,43 @@ public class SecPosAutoGenerationService {
 
     /**
      * 成本收益率计算
-     *资产代码，查询日期
+     * 资产代码，查询日期
+     *
      * @param
      * @return
      */
 
-    public BigDecimal calculationCostRate(String finprodId, String searchDate, String portfolioId, String pass)
-    {
+    public BigDecimal calculationCostRate(String finprodId, String searchDate, String portfolioId, String pass) {
         BigDecimal yesterDayPosAmount = new BigDecimal(0); //昨日持仓数量
         BigDecimal yesterDaycostRate = new BigDecimal(0); //昨日综合成本收益率
-        Map<String, Object> map=new HashMap<>();
-        map.put("finprodId",finprodId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("finprodId", finprodId);
         map.put("date", searchDate);
-        map.put("pass",pass);
+        map.put("pass", pass);
         //根据资产代码查询相关所有的交易信息
 
         List<TrdProductDeal> tradeList = secPosAutoGenerationMapper.getTradeListByFinprodId(map);
 
         // 根据资产代码查询昨日指标信息的持仓数量和综合成本收益率
-        map.put("date", DateUtil.format(DateUtil.addDay(DateUtil.parse(searchDate),-1)));//查询日-1
+        map.put("date", DateUtil.format(DateUtil.addDay(DateUtil.parse(searchDate), -1)));//查询日-1
         AssetTargetDb yesterdayTarget = secPosAutoGenerationMapper.getYesterdayTarget(map);
 
-        if(yesterdayTarget!=null )
-        {
-            yesterDayPosAmount=yesterdayTarget.getPosAmount()==null?new BigDecimal(0):yesterdayTarget.getPosAmount();
-            yesterDaycostRate=yesterdayTarget.getCostRate()==null?new BigDecimal(0):yesterdayTarget.getCostRate();
+        if (yesterdayTarget != null) {
+            yesterDayPosAmount = yesterdayTarget.getPosAmount() == null ? new BigDecimal(0) : yesterdayTarget.getPosAmount();
+            yesterDaycostRate = yesterdayTarget.getCostRate() == null ? new BigDecimal(0) : yesterdayTarget.getCostRate();
         }
-        if(!StringUtil.isEmptyList(tradeList))
-        {
-            for (TrdProductDeal trdProductDeal : tradeList)
-            {
-                if(trdProductDeal.getPs().equals(DictCodeList.交易方向_买入.getValue()))
-                {
+        if (!StringUtil.isEmptyList(tradeList)) {
+            for (TrdProductDeal trdProductDeal : tradeList) {
+                if (trdProductDeal.getPs().equals(DictCodeList.交易方向_买入.getValue())) {
 
-                    if(yesterDayPosAmount.add(trdProductDeal.getShareAmt()==null?new BigDecimal(0):trdProductDeal.getShareAmt()).compareTo(new BigDecimal(0))!=0) {
-                        yesterDaycostRate = (yesterDayPosAmount.multiply(yesterDaycostRate).add(trdProductDeal.getShareAmt() == null ? new BigDecimal(0) : trdProductDeal.getShareAmt().multiply(trdProductDeal.getYield() == null ? new BigDecimal(0) : trdProductDeal.getYield()))).divide(yesterDayPosAmount.add(trdProductDeal.getShareAmt()== null ? new BigDecimal(0) : trdProductDeal.getShareAmt()),6,BigDecimal.ROUND_HALF_UP);
+                    if (yesterDayPosAmount.add(trdProductDeal.getShareAmt() == null ? new BigDecimal(0) : trdProductDeal.getShareAmt()).compareTo(new BigDecimal(0)) != 0) {
+                        yesterDaycostRate = (yesterDayPosAmount.multiply(yesterDaycostRate).add(trdProductDeal.getShareAmt() == null ? new BigDecimal(0) : trdProductDeal.getShareAmt().multiply(trdProductDeal.getYield() == null ? new BigDecimal(0) : trdProductDeal.getYield()))).divide(yesterDayPosAmount.add(trdProductDeal.getShareAmt() == null ? new BigDecimal(0) : trdProductDeal.getShareAmt()), 6, BigDecimal.ROUND_HALF_UP);
                     }
-                    yesterDayPosAmount=yesterDayPosAmount.add(trdProductDeal.getShareAmt()==null?new BigDecimal(0):trdProductDeal.getShareAmt());
+                    yesterDayPosAmount = yesterDayPosAmount.add(trdProductDeal.getShareAmt() == null ? new BigDecimal(0) : trdProductDeal.getShareAmt());
 
                 }
 
-                if(trdProductDeal.getPs().equals(DictCodeList.交易方向_卖出.getValue())) {
+                if (trdProductDeal.getPs().equals(DictCodeList.交易方向_卖出.getValue())) {
 
                     yesterDayPosAmount = yesterDayPosAmount.subtract(trdProductDeal.getTradeAmt() == null ? new BigDecimal(0) : trdProductDeal.getTradeAmt());
                 }
@@ -428,50 +416,43 @@ public class SecPosAutoGenerationService {
         }
 //        return yesterDaycostRate.multiply(new BigDecimal(100)).setScale(4,BigDecimal.ROUND_HALF_UP);
         //update by lwj 组合持仓分析报表自动生成批处理跑批报值大于为此列指定的允许精度错误  start 20200331
-        return yesterDaycostRate.setScale(6,BigDecimal.ROUND_HALF_UP);
+        return yesterDaycostRate.setScale(6, BigDecimal.ROUND_HALF_UP);
         //update by lwj 组合持仓分析报表自动生成批处理跑批报值大于为此列指定的允许精度错误  end 20200331
     }
+
     /**
      * 剩余期限计算
-     *  资产代码、起息日、查询日期、分支序号
+     * 资产代码、起息日、查询日期、分支序号
+     *
      * @param
      * @return
      */
-    public  BigDecimal calculationSurplusDays(String finprodId,String vdate,String mdate,String searchDate, Long branch)
-    {
-        BigDecimal surplusDays=new BigDecimal(0);// 剩余期限
+    public BigDecimal calculationSurplusDays(String finprodId, String vdate, String mdate, String searchDate, Long branch) {
+        BigDecimal surplusDays = new BigDecimal(0);// 剩余期限
         //根据资产代码、起息日、分支序号 查询对应的计息基础
-        Map<String, Object> map=new HashMap<>();
-        map.put("finprodId",finprodId);
-        map.put("effDate",vdate);
-        map.put("branch",branch);
+        Map<String, Object> map = new HashMap<>();
+        map.put("finprodId", finprodId);
+        map.put("effDate", vdate);
+        map.put("branch", branch);
         map.put("CASH_TYPE_2_C02", DictCodeListExt1.现金流二级类型_利息.getValue());
         FinCashCalcRule finCashCaluRule = secPosAutoGenerationMapper.getBasisByFinprodId
                 (map);
-        if(finCashCaluRule!=null )
-        {
-            if(finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_365.getValue()) ||finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_365F.getValue()))
-            {
+        if (finCashCaluRule != null) {
+            if (finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_365.getValue()) || finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_365F.getValue())) {
                 //变量.剩余期限 = round（（参数.到期日 - 参数.查询日）/365，2）
-                surplusDays= new BigDecimal(getDay(DateUtil.parse(searchDate),DateUtil.parse(mdate))).divide(new BigDecimal(365),2, BigDecimal.ROUND_HALF_UP);
-            }
-            else if(finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_360.getValue()) ||finCashCaluRule.getBasis().equals(DictCodeList.计息基础_30_360.getValue()))
-            {
+                surplusDays = new BigDecimal(getDay(DateUtil.parse(searchDate), DateUtil.parse(mdate))).divide(new BigDecimal(365), 2, BigDecimal.ROUND_HALF_UP);
+            } else if (finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_360.getValue()) || finCashCaluRule.getBasis().equals(DictCodeList.计息基础_30_360.getValue())) {
                 //变量.剩余期限 = round（（参数.到期日 - 参数.查询日）/360，2）
-                surplusDays= new BigDecimal(getDay(DateUtil.parse(searchDate),DateUtil.parse(mdate))).divide(new BigDecimal(360),2, BigDecimal.ROUND_HALF_UP);
-            }
-            else   if(finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_A_平均分配.getValue()) ||finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_A_按实际天数分配.getValue()) ||finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_A.getValue()))
-            {
+                surplusDays = new BigDecimal(getDay(DateUtil.parse(searchDate), DateUtil.parse(mdate))).divide(new BigDecimal(360), 2, BigDecimal.ROUND_HALF_UP);
+            } else if (finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_A_平均分配.getValue()) || finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_A_按实际天数分配.getValue()) || finCashCaluRule.getBasis().equals(DictCodeList.计息基础_A_A.getValue())) {
                 //if 参数.到期日.年份 = 参数.查询日.年份  变量.剩余期限 = round（（参数.到期日 - 参数.查询日）/（参数.查询日的年的12月31-参数.查询日的年的1月1+1），2）
 
-                if(DateUtil.getYear(mdate)==DateUtil.getYear(searchDate)) {
+                if (DateUtil.getYear(mdate) == DateUtil.getYear(searchDate)) {
 
                     surplusDays = new BigDecimal(getDay(DateUtil.parse(searchDate), DateUtil.parse(mdate))).divide(new BigDecimal(DateUtil.getDayOfYear(searchDate)), 2, BigDecimal.ROUND_HALF_UP);
                 }
-            }
-            else
-            {
-                if(DateUtil.getYear(mdate)==DateUtil.getYear(searchDate)) {
+            } else {
+                if (DateUtil.getYear(mdate) == DateUtil.getYear(searchDate)) {
 
                     surplusDays = new BigDecimal(getDay(DateUtil.parse(searchDate), DateUtil.parse(mdate))).divide(new BigDecimal(DateUtil.getDayOfYear(searchDate)), 2, BigDecimal.ROUND_HALF_UP);
                 }
@@ -482,46 +463,38 @@ public class SecPosAutoGenerationService {
 
     /**
      * 剩余行权期限计算
-     *  资产代码、起息日\下一行权日期、查询日期\分支序号
+     * 资产代码、起息日\下一行权日期、查询日期\分支序号
+     *
      * @param
      * @return
      */
-    public  BigDecimal calculationExPeriodDays(String finprodId,String date,String searchDate, Long branch,String lastExPeriodDate)
-    {
-        BigDecimal surplusDays=new BigDecimal(0);// 剩余行权期限
+    public BigDecimal calculationExPeriodDays(String finprodId, String date, String searchDate, Long branch, String lastExPeriodDate) {
+        BigDecimal surplusDays = new BigDecimal(0);// 剩余行权期限
         //根据资产代码、起息日、分支序号 查询对应的计息基础
-        Map<String, Object> map=new HashMap<>();
-        map.put("finprodId",finprodId);
-        map.put("effDate",date);
-        map.put("branch",branch);
+        Map<String, Object> map = new HashMap<>();
+        map.put("finprodId", finprodId);
+        map.put("effDate", date);
+        map.put("branch", branch);
         map.put("CASH_TYPE_2_C02", DictCodeListExt1.现金流二级类型_利息.getValue());
         FinCashCalcRule finCashCalcRule = secPosAutoGenerationMapper.getBasisByFinprodId(
                 map);
-        if(finCashCalcRule!=null )
-        {
+        if (finCashCalcRule != null) {
 
-            if(finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_365.getValue()) ||finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_365F.getValue()))
-            {
+            if (finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_365.getValue()) || finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_365F.getValue())) {
                 //变量.剩余行权期限 = round（（参数.下一行权日期 - 参数.查询日）/365，2）
-                surplusDays= new BigDecimal(getDay(DateUtil.parse(searchDate),DateUtil.parse(lastExPeriodDate))).divide(new BigDecimal(365),2, BigDecimal.ROUND_HALF_UP);
-            }
-            else if(finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_360.getValue()) ||finCashCalcRule.getBasis().equals(DictCodeList.计息基础_30_360.getValue()))
-            {
+                surplusDays = new BigDecimal(getDay(DateUtil.parse(searchDate), DateUtil.parse(lastExPeriodDate))).divide(new BigDecimal(365), 2, BigDecimal.ROUND_HALF_UP);
+            } else if (finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_360.getValue()) || finCashCalcRule.getBasis().equals(DictCodeList.计息基础_30_360.getValue())) {
                 //变量.剩余行权期限 = round（（参数.下一行权日期 - 参数.查询日）/360，2）
-                surplusDays= new BigDecimal(getDay(DateUtil.parse(searchDate),DateUtil.parse(lastExPeriodDate))).divide(new BigDecimal(360),2, BigDecimal.ROUND_HALF_UP);
-            }
-            else   if(finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_A_平均分配.getValue()) ||finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_A_按实际天数分配.getValue()) ||finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_A.getValue()))
-            {
+                surplusDays = new BigDecimal(getDay(DateUtil.parse(searchDate), DateUtil.parse(lastExPeriodDate))).divide(new BigDecimal(360), 2, BigDecimal.ROUND_HALF_UP);
+            } else if (finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_A_平均分配.getValue()) || finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_A_按实际天数分配.getValue()) || finCashCalcRule.getBasis().equals(DictCodeList.计息基础_A_A.getValue())) {
                 //if 参数.到期日.年份 = 参数.查询日.年份  变量.剩余期限 = round（（参数.到期日 - 参数.查询日）/（参数.查询日的年的12月31-参数.查询日的年的1月1+1），2）
 
-                if(DateUtil.getYear(lastExPeriodDate)==DateUtil.getYear(searchDate)) {
+                if (DateUtil.getYear(lastExPeriodDate) == DateUtil.getYear(searchDate)) {
 
                     surplusDays = new BigDecimal(getDay(DateUtil.parse(searchDate), DateUtil.parse(lastExPeriodDate))).divide(new BigDecimal(DateUtil.getDayOfYear(searchDate)), 2, BigDecimal.ROUND_HALF_UP);
                 }
-            }
-            else
-            {
-                if(DateUtil.getYear(lastExPeriodDate)==DateUtil.getYear(searchDate)) {
+            } else {
+                if (DateUtil.getYear(lastExPeriodDate) == DateUtil.getYear(searchDate)) {
 
                     surplusDays = new BigDecimal(getDay(DateUtil.parse(searchDate), DateUtil.parse(lastExPeriodDate))).divide(new BigDecimal(DateUtil.getDayOfYear(searchDate)), 2, BigDecimal.ROUND_HALF_UP);
                 }
@@ -529,14 +502,15 @@ public class SecPosAutoGenerationService {
         }
         return surplusDays;
     }
+
     /**
      * 下一行权日查询
-     *资产代码、查询日、金融产品类型、行权方式\含权摊销日
+     * 资产代码、查询日、金融产品类型、行权方式\含权摊销日
+     *
      * @param
      * @return
      */
-    public   List<FinExercisePlan>  calculationSurplusExercise(String finprodId, String seachDate, String finprodType, String execMode, String exDate)
-    {
+    public List<FinExercisePlan> calculationSurplusExercise(String finprodId, String seachDate, String finprodType, String execMode, String exDate) {
         // Sonar Fix modify by huwei 220609   Introduce a new variable
         /*String nextExDate="";//下一行权日
         if(StringUtil.equals(exDate,DictCodeList.含权债摊销日_最近赎回行权日.getValue()))
@@ -547,24 +521,24 @@ public class SecPosAutoGenerationService {
         {
             execMode=DictCodeList.行权方式_回售.getValue();
         }*/
-        Map<String, Object> map=new HashMap<>();
-        map.put("finprodId",finprodId);
-        map.put("exerciseDate",seachDate);
-        map.put("finprodtype",finprodType);
-        List<FinExercisePlan> finExercisePlanList = secPosAutoGenerationMapper.getExerciseDate( map);
+        Map<String, Object> map = new HashMap<>();
+        map.put("finprodId", finprodId);
+        map.put("exerciseDate", seachDate);
+        map.put("finprodtype", finprodType);
+        List<FinExercisePlan> finExercisePlanList = secPosAutoGenerationMapper.getExerciseDate(map);
         return finExercisePlanList;
 
     }
+
     //获取俩个时间相差的天数
-    public  long getDay( Date date1,Date date2)
-    {
+    public long getDay(Date date1, Date date2) {
         // 获取相差的天数
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date1);
         long timeInMillis1 = calendar.getTimeInMillis();
         calendar.setTime(date2);
         long timeInMillis2 = calendar.getTimeInMillis();
-        long betweenDays =  (timeInMillis2 - timeInMillis1) / (1000L*3600L*24L);
+        long betweenDays = (timeInMillis2 - timeInMillis1) / (1000L * 3600L * 24L);
         return betweenDays;
 
     }
@@ -572,60 +546,60 @@ public class SecPosAutoGenerationService {
 
     /**
      * 根据资产代码、评级类型（主体、债项）获取对应的评级信息
+     *
      * @return
      * @throws Exception
      * @see
      * @since 1.0
      */
-    public List<CommonProductRatingDto> getRatingResult(String finprodId,String gradeType)
-    {
+    public List<CommonProductRatingDto> getRatingResult(String finprodId, String gradeType) {
         Map<String, Object> mapRating = new HashMap<>();
         // 查询外部主体评级相关信息
         mapRating.put("finprodId", finprodId);
         mapRating.put("gradeType", gradeType);
         List<CommonProductRatingDto> ratingResultList = secPosAutoGenerationMapper.getBestProductRating(mapRating);
-        return  ratingResultList;
+        return ratingResultList;
     }
 
     private String getDtoAssetRiskType(AssetTargetDbDto dto) {
         String assetRiskType = "";
-        if(StringUtil.isNotEmpty(dto.getGradeResult())) {
+        if (StringUtil.isNotEmpty(dto.getGradeResult())) {
             BigDecimal gradeResult = new BigDecimal(dto.getGradeResult());
             //判断是否含权 or 金融机构次级债券 ，如果是，将之前算出的评级结果等级升一个等级
-             if(StringUtil.equals(dto.getIsRight(),DictCodeList.是否_是.getValue())
-                 || StringUtil.equals(dto.getCustomAssetTypeFour(),DictCodeListExt3.行内资产四级分类_金融机构次级债.getValue())
-                 ) {
+            if (StringUtil.equals(dto.getIsRight(), DictCodeList.是否_是.getValue())
+                    || StringUtil.equals(dto.getCustomAssetTypeFour(), DictCodeListExt3.行内资产四级分类_金融机构次级债.getValue())
+            ) {
 
-                 if(!StringUtil.equals(dto.getGradeResult(),"01")) {
-                     gradeResult = ArithmeticUtil.subtract(gradeResult, BigDecimal.ONE);
-                 }
+                if (!StringUtil.equals(dto.getGradeResult(), "01")) {
+                    gradeResult = ArithmeticUtil.subtract(gradeResult, BigDecimal.ONE);
+                }
 
-             }
-             //根据资产风险等级映射表传入风险等级资产一、二级分类、集中度、评级类型、融资人性质/资产类型、评级结果 查询资产等级 ※如果没找到资产等级降一级继续匹配，当都匹配不了则为空
-             Map<String,Object> paramsMap = new HashMap<String, Object>();
-             paramsMap.put("gradeResult", gradeResult);
-             paramsMap.put("riskAssetType1", StringUtil.isNotEmpty(dto.getRiskAssetType1())?dto.getRiskAssetType1():"");
-             paramsMap.put("riskAssetType2", StringUtil.isNotEmpty(dto.getRiskAssetType2())?dto.getRiskAssetType2():"");
-             paramsMap.put("gradeType", StringUtil.isNotEmpty(dto.getGradeType())?dto.getGradeType():"");
-             paramsMap.put("inOrOut", StringUtil.isNotEmpty(dto.getInOrOut())?dto.getInOrOut():"");
-             paramsMap.put("crn", StringUtil.isNotEmpty(dto.getCrn())?dto.getCrn():BigDecimal.ZERO);
-             paramsMap.put("natureOrg", StringUtil.isNotEmpty(dto.getNatureOrg())?dto.getNatureOrg():"");
+            }
+            //根据资产风险等级映射表传入风险等级资产一、二级分类、集中度、评级类型、融资人性质/资产类型、评级结果 查询资产等级 ※如果没找到资产等级降一级继续匹配，当都匹配不了则为空
+            Map<String, Object> paramsMap = new HashMap<String, Object>();
+            paramsMap.put("gradeResult", gradeResult);
+            paramsMap.put("riskAssetType1", StringUtil.isNotEmpty(dto.getRiskAssetType1()) ? dto.getRiskAssetType1() : "");
+            paramsMap.put("riskAssetType2", StringUtil.isNotEmpty(dto.getRiskAssetType2()) ? dto.getRiskAssetType2() : "");
+            paramsMap.put("gradeType", StringUtil.isNotEmpty(dto.getGradeType()) ? dto.getGradeType() : "");
+            paramsMap.put("inOrOut", StringUtil.isNotEmpty(dto.getInOrOut()) ? dto.getInOrOut() : "");
+            paramsMap.put("crn", StringUtil.isNotEmpty(dto.getCrn()) ? dto.getCrn() : BigDecimal.ZERO);
+            paramsMap.put("natureOrg", StringUtil.isNotEmpty(dto.getNatureOrg()) ? dto.getNatureOrg() : "");
 
             List<String> assetRiskTypeList = new ArrayList<>();
-            if(!StringUtil.isEmpty(dto.getRiskAssetType1())){
+            if (!StringUtil.isEmpty(dto.getRiskAssetType1())) {
                 assetRiskTypeList = secPosAutoGenerationMapper.getAssetRiskTypeList(paramsMap);
             }
-             if(!StringUtil.isEmptyList(assetRiskTypeList)) {
-                 assetRiskType = assetRiskTypeList.get(0);
-             }
+            if (!StringUtil.isEmptyList(assetRiskTypeList)) {
+                assetRiskType = assetRiskTypeList.get(0);
+            }
 
-             if((StringUtil.equals(dto.getCustomAssetTypeFive(),DictCodeListExt3.行内资产五级分类_上市银行优先股.getValue())
-                 || StringUtil.equals(dto.getIsSus(),DictCodeList.是否_是.getValue()))
-                 && StringUtil.isNotEmpty(assetRiskType)) {
-                 if(!StringUtil.equals(dto.getGradeResult(),"01")) {
-                 }
+            if ((StringUtil.equals(dto.getCustomAssetTypeFive(), DictCodeListExt3.行内资产五级分类_上市银行优先股.getValue())
+                    || StringUtil.equals(dto.getIsSus(), DictCodeList.是否_是.getValue()))
+                    && StringUtil.isNotEmpty(assetRiskType)) {
+                if (!StringUtil.equals(dto.getGradeResult(), "01")) {
+                }
 
-             }
+            }
         }
 
 
@@ -638,23 +612,19 @@ public class SecPosAutoGenerationService {
     private String IRConvert(BigDecimal IR) {
         String newIR = "0";
 
-        if(BigDecimal.ZERO.compareTo(IR)<=0
-            && BigDecimal.valueOf(1.25).compareTo(IR)>=0) {
+        if (BigDecimal.ZERO.compareTo(IR) <= 0
+                && BigDecimal.valueOf(1.25).compareTo(IR) >= 0) {
             newIR = "01";
-        }
-        else if (BigDecimal.valueOf(1.25).compareTo(IR)<0
-            && BigDecimal.valueOf(2.25).compareTo(IR)>=0) {
+        } else if (BigDecimal.valueOf(1.25).compareTo(IR) < 0
+                && BigDecimal.valueOf(2.25).compareTo(IR) >= 0) {
             newIR = "02";
-        }
-        else if (BigDecimal.valueOf(2.25).compareTo(IR)<0
-            && BigDecimal.valueOf(3.25).compareTo(IR)>=0) {
+        } else if (BigDecimal.valueOf(2.25).compareTo(IR) < 0
+                && BigDecimal.valueOf(3.25).compareTo(IR) >= 0) {
             newIR = "03";
-        }
-        else if (BigDecimal.valueOf(3.25).compareTo(IR)<0
-            && BigDecimal.valueOf(4.25).compareTo(IR)>=0) {
+        } else if (BigDecimal.valueOf(3.25).compareTo(IR) < 0
+                && BigDecimal.valueOf(4.25).compareTo(IR) >= 0) {
             newIR = "04";
-        }
-        else if (BigDecimal.valueOf(4.25).compareTo(IR)<0) {
+        } else if (BigDecimal.valueOf(4.25).compareTo(IR) < 0) {
             newIR = "05";
         }
         return newIR;

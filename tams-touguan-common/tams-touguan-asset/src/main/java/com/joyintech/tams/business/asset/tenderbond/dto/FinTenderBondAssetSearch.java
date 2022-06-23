@@ -114,6 +114,9 @@ public class FinTenderBondAssetSearch {
     @ApiModelProperty(name="platformDate",value="平台日",example="12")
     private String platformDate;
 
+    @ApiModelProperty(name="raiseType",value="募集方式")
+    private String raiseType;
+
     private List<String> type9List;
     private List<String> type10List;
     private List<String> type11List;
@@ -389,5 +392,13 @@ public class FinTenderBondAssetSearch {
 
     public void setType11List(List<String> type11List) {
         this.type11List = type11List;
+    }
+
+    public String getRaiseType() {
+        return raiseType;
+    }
+
+    public void setRaiseType(String raiseType) {
+        this.raiseType = raiseType;
     }
 }

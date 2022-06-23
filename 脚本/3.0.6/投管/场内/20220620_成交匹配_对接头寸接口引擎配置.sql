@@ -83,7 +83,7 @@ values ('TRANS_MATCH', 'F37', 'T04', '19', 'TRD', 'com.joyintech.tams.invest.tra
 
 
 /*债券存续期接口*/
-DELETE FROM INTERF_POSITION_CONFIG WHERE TRADE_PLAT = 'TRANS_MATCH' AND INTERF_TYPE IN ('Bond002', 'Bond003') AND FINPROD_TYPE IN ('F01', 'F01-B14') AND PS IN ('T39', 'T22', 'T23', 'T41', 'T05') AND ENTITY = 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto';
+DELETE FROM INTERF_POSITION_CONFIG WHERE TRADE_PLAT = 'TRANS_MATCH' AND INTERF_TYPE IN ('Bond002', 'Bond003') AND FINPROD_TYPE IN ('F01', 'F01-B14') AND PS IN ('T39', 'T22', 'T23', 'T41', 'T05', 'T08') AND ENTITY = 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto';
 
 INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE) 
 VALUES ('TRANS_MATCH', 'F01', 'T39', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'Bond002', 'system', null, sysdate, 'system', sysdate, '债券存续期接口-非可转债-成交匹配-行权赎回', 'Y');
@@ -105,6 +105,9 @@ INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSI
 VALUES ('TRANS_MATCH', 'F01-B14', 'T41', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'Bond003', 'system', null, sysdate, 'system', sysdate, '债券存续期接口-可转债-成交匹配-上市流通', 'Y');
 INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE) 
 VALUES ('TRANS_MATCH', 'F01-B14', 'T05', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'Bond003', 'system', null, sysdate, 'system', sysdate, '债券存续期接口-可转债-成交匹配-申购确认', 'Y');
+insert into INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE)
+values ('TRANS_MATCH', 'F01', 'T08', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'Bond002', 'system', null, sysdate, 'system', sysdate, '债券存续期接口-到期', 'Y');
+
 
 /*回购存续期接口*/
 DELETE FROM INTERF_POSITION_CONFIG WHERE TRADE_PLAT = 'TRANS_MATCH' AND INTERF_TYPE IN ('REPO002', 'REPO003') AND FINPROD_TYPE IN ('F02-H01', 'F03-H01') AND PS IN ('T22', 'T23') AND ENTITY = 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto';
@@ -151,3 +154,5 @@ VALUES ('TRANS_MATCH', 'F10', 'T41', '19', 'TRD', 'com.joyintech.tams.invest.com
 DELETE FROM INTERF_POSITION_CONFIG WHERE TRADE_PLAT = 'TRANS_MATCH' AND INTERF_TYPE = 'Bond002' AND FINPROD_TYPE = 'F32' AND PS IN ('T01') AND ENTITY = 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto';
 insert into INTERF_POSITION_CONFIG(TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE)
 values('TRANS_MATCH', 'F32', 'T01', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'Bond002', 'system', null, sysdate, 'system', sysdate, '债券一级投标-成交匹配-买入','Y');
+
+

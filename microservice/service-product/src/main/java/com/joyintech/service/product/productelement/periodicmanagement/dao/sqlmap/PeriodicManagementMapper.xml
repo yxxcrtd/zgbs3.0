@@ -392,8 +392,8 @@
 		      where branch = #{branch} and PERIOD_ID = #{periodId}
 		   )
 		</if>
-		<if test="finprodId != null and finprodId != ''">
-		   and fp.finprod_id = #{finprodId}
+		<if test="periodId == null or periodId == ''">
+			and fp.p_finprod_id = #{finprodId}
 		</if>
 	</select>
 
