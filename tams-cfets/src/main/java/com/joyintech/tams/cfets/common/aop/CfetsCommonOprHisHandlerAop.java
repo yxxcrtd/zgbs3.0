@@ -69,7 +69,7 @@ public class CfetsCommonOprHisHandlerAop {
     /**
      * 提交及更新时更新细操作履历表
      */
-    @AfterReturning("insertPoint() || updatePoint()||doDispatcherDealPoint()||revoke()")
+    @AfterReturning("insertPoint() || updatePoint()||doDispatcherDealPoint()")
     public void updateCfetsOprHis(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         OperationType operationType = OperationType.NEW;
