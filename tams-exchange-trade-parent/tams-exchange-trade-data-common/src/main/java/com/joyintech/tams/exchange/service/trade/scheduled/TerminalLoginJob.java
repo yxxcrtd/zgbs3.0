@@ -12,7 +12,7 @@ import com.joyintech.tams.exchange.datacommon.db.service.TerminalMappingService;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

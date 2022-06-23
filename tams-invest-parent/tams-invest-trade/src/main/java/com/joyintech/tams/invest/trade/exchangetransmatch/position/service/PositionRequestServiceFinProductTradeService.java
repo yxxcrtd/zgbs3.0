@@ -27,7 +27,7 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTra
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.bean.PositionRequestBaseBean;
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.bean.TrdMoreConvrateDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.constant.PositionConstant;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

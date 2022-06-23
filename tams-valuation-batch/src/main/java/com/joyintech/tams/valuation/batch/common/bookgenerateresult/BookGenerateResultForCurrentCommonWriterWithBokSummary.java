@@ -19,7 +19,7 @@ import com.joyintech.tams.valuation.common.batch.bookcommon.dao.BokAssetMarketIn
 import com.joyintech.tams.valuation.common.batch.bookcommon.dao.BokBatchMarketwarningInfoWriterMapper;
 import com.joyintech.tams.valuation.common.batch.losscommon.service.LossCommonService;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

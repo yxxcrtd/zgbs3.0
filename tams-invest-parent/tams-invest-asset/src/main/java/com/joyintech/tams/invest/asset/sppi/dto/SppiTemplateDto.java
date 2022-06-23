@@ -20,7 +20,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.asset.sppi.valid.SppiTestValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;

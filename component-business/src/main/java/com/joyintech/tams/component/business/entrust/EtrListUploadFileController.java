@@ -4,7 +4,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

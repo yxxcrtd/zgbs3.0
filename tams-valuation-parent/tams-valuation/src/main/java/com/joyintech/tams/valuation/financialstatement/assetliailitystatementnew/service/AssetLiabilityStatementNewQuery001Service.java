@@ -28,7 +28,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.valuation.accounadjustmanage.assetbook.service.ValAssetBook001Service;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

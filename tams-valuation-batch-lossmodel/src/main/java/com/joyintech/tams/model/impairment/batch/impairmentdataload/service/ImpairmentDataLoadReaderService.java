@@ -17,7 +17,7 @@ import com.joyintech.tams.valuation.component.common.constant.ValComponentConsta
 import com.joyintech.tams.valuation.model.common.rateconfig.service.RateConfigCommonService;
 import com.joyintech.tams.valuation.model.common.rateinfo.dto.ViewRatingInfoDto;
 import com.joyintech.tams.valuation.model.common.rateinfo.service.RateInfoCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

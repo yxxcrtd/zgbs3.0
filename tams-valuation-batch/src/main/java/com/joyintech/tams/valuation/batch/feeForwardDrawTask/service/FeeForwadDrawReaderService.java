@@ -15,7 +15,7 @@ import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawB
 import com.joyintech.tams.valuation.batch.feeForwardDrawTask.dao.FeeForwadDrawMapper;
 import com.joyintech.tams.valuation.batch.feeForwardDrawTask.dto.FeeForwadDrawConfigDto;
 import com.joyintech.tams.valuation.batch.feeForwardDrawTask.dto.FeeForwadDrawReaderResult;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;

@@ -12,7 +12,7 @@ import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoResponse;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

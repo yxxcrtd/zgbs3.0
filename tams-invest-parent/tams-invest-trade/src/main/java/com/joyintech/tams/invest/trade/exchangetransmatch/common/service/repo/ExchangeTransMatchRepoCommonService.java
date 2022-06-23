@@ -33,7 +33,7 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTra
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.CommonTrdTempDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -16,7 +16,7 @@ import com.joyintech.tams.settle.batch.datagather.processor.StlDataGatherProcess
 import com.joyintech.tams.settle.batch.datagather.service.StlDataGatherService;
 import com.joyintech.tams.settle.common.service.SettleCommonService;
 import com.joyintech.tams.settle.common.util.DateUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

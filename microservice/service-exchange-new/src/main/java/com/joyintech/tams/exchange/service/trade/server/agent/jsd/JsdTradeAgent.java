@@ -57,7 +57,7 @@ import com.joyintech.tams.exchange.service.trade.server.agent.jsd.resp.header.Re
 import com.joyintech.tams.exchange.service.trade.server.agent.jsd.resp.header.RespIntegratedEntrustHeader;
 import com.joyintech.tams.exchange.service.trade.server.agent.jsd.resp.header.RespQryEnableHeader;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

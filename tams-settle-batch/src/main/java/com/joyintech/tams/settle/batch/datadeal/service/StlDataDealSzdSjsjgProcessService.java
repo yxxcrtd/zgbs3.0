@@ -23,7 +23,7 @@ import com.joyintech.tams.settle.batch.datadeal.function.PersonalityFunction;
 import com.joyintech.tams.settle.common.dto.FundInfoDto;
 import com.joyintech.tams.settle.common.dto.StlDownDataDealAccountInfoDto;
 import com.joyintech.tams.settle.common.service.SettleCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;

@@ -22,7 +22,7 @@ import com.joyintech.framework.sso.SSOPermissionsAuthorizationFilter;
 import com.joyintech.framework.util.StringUtil;
 import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.subject.Pac4jSubjectFactory;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AbstractAuthenticator;

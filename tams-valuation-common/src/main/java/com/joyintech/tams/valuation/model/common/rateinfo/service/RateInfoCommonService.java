@@ -12,7 +12,7 @@ import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.dto.modelDto.ModAssetInfoDto;
 import com.joyintech.tams.valuation.model.common.rateinfo.dao.RateInfoCommonMapper;
 import com.joyintech.tams.valuation.model.common.rateinfo.dto.ViewRatingInfoDto;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

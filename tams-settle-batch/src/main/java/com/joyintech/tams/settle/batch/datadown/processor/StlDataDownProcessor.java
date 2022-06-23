@@ -12,7 +12,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.settle.batch.datadown.dto.DataToWriteEntity;
 import com.joyintech.tams.settle.batch.datadown.dto.DbfDataRow;
 import com.joyintech.tams.settle.batch.datadown.dto.StepContext;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

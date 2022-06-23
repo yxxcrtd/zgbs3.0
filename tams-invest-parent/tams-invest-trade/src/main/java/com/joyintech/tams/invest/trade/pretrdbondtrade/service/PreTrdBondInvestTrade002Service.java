@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.component.business.common.service.BussCommonMapperDelegateService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

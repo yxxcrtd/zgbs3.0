@@ -34,7 +34,7 @@ import com.joyintech.tams.valuation.financialstatement.assetliailitystatementnew
 import com.joyintech.tams.valuation.financialstatement.assetliailitystatementnew.dto.AssetLiabilityStatementNewQuery001Dto;
 import com.joyintech.tams.valuation.financialstatement.assetliailitystatementnew.dto.AssetLiabilityStatementNewQuery001SearchDto;
 import com.joyintech.tams.valuation.financialstatement.assetliailitystatementnew.service.AssetLiabilityStatementNewQuery001Service;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

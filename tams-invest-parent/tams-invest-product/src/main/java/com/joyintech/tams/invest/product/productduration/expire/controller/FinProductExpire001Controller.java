@@ -18,7 +18,7 @@ import javax.validation.Valid;
 
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

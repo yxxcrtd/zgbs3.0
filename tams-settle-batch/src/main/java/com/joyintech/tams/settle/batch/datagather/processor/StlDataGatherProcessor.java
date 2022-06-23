@@ -16,7 +16,7 @@ import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonD
 import com.joyintech.tams.settle.batch.datagather.dao.StlDataGatherMapper;
 import com.joyintech.tams.settle.batch.datagather.dto.*;
 import com.joyintech.tams.settle.batch.datagather.service.StlDataGatherService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

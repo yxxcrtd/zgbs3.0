@@ -13,7 +13,7 @@ package com.joyintech.tams.valuation.batch.vatdraw.dto;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.tams.common.base.entity.TaxBokBalance;
 import com.joyintech.tams.constant.DictCodeList;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;

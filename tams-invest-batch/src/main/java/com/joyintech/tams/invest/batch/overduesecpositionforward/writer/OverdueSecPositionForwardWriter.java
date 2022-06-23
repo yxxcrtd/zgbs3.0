@@ -4,7 +4,7 @@ import com.joyintech.batch.batchbase.baseclass.BaseWriter;
 import com.joyintech.tams.common.base.dao.PtlRecePositionFlowMapper;
 import com.joyintech.tams.invest.batch.overduesecpositionforward.dto.OverdueSecPositionForwardResultDto;
 import com.joyintech.tams.invest.batch.overduesecpositionforward.service.OverdueSecPositionForwardService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

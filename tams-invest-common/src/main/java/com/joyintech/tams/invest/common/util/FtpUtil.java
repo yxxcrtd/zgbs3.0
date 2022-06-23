@@ -1,7 +1,7 @@
 package com.joyintech.tams.invest.common.util;
 
 import com.joyintech.framework.util.DateUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;

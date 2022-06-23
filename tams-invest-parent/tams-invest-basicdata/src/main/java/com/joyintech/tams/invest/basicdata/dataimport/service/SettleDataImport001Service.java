@@ -27,7 +27,7 @@ import com.joyintech.tams.common.base.entity.SettleTransPara;
 import com.joyintech.tams.invest.basicdata.dataimport.dto.SettleTransResultDto;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tools.util.FileUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
