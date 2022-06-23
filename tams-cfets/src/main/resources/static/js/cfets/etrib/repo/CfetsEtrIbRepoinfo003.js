@@ -612,7 +612,7 @@
             return false;
         }
         if(confirmMsg && confirmMsg.length > 0) {
-            rskApproval = result.data.data;
+            //rskApproval = result.data.data;
             return Joyin.confirm(confirmMsg, function (){
                 saveOrSubmit('submit');
             });
