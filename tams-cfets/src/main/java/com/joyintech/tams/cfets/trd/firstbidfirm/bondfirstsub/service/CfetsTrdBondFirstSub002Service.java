@@ -54,6 +54,7 @@ import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCash
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -937,7 +938,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         List<CfetsTrdBondFirstSubProductDto> productDtos = new ArrayList<>();
         for (BidOrderBidPrice item : list) {
             CfetsTrdBondFirstSubProductDto productDto = new CfetsTrdBondFirstSubProductDto();
-            BeanUtil.copyPropertiesIgnoreNull(item, productDto);
+            BeanUtil.copyPropertiesIgnoreNull(productDto, item);
             productDtos.add(productDto);
         }
         entity.setProductDtos(productDtos);
@@ -945,7 +946,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     }
 
     /**
-     * 撤销，共外部调用
+     * 一级申购撤销，共外部调用
      *
      * @param bidId              投标编号
      * @param remark             备注
@@ -957,6 +958,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     public void dorevoke(String bidId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
         CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(bidId);
         entity.setBidId(bidId);
+        entity.setRemark(remark);
         this.insertData(entity, OperationType.REVOKE);
         try {
             if (isNeedDealPosition) {
@@ -966,13 +968,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                         DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
             }
             // 老头寸处理
-            this.dealOldPosition(entity, true);
+//            this.dealOldPosition(entity, true);
             //处理指令执行进度
             this.insertEtrFinishStatus(entity, OperationType.REVOKE);
-        } catch (PositionException e) {
-            e.printStackTrace();
-            Message message = PositionUtil.ajaxErrorReturn(e);
-            throw new BusinessException("MSG:" + message.getMessage());
+        } catch (Exception e) {
+            throw new WorkFlowException(e);
         }
     }
 
