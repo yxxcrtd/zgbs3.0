@@ -166,8 +166,6 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         }
         //校验必填项
         addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
-        //发行人处理
-        handleIssuer(validMessages, interfPayhsrcsecinfoDto.getIssuershort());
         if (CollectionUtils.isNotEmpty(validMessages)) {
             ajaxResult.setErrorList(validMessages);
             ajaxResult.setMessageType(MessageType.警告消息);
@@ -226,7 +224,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      * @param validMessages
      * @param issuer
      */
-    private void handleIssuer(List<ValidMessage> validMessages, String issuer) {
+    public void handleIssuer(List<ValidMessage> validMessages, String issuer) {
         logger.info("handleIssuer >> 发行人处理参数：{}", issuer);
         Map<String, Object> result = restTemplate.getForObject(
                 ServiceApplication.PINGAN_SERVICE_NAME + "/invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/autoAddInstitutions?insitituteCode=" + issuer,
