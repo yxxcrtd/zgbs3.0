@@ -430,7 +430,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     List<StlOrders> stlOrdersList = cfetsPrimaryBidManageMapper.queryStlOrdersByTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
                     if (!stlOrdersList.isEmpty()) {
                         for (StlOrders stlOrders : stlOrdersList) {
-                            stlOrders.setOrderId(stlOrders.getOrderId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                            stlOrders.setOrderId(stlOrders.getOrderId().substring(0,30) + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                             stlOrders.setpOrderId(stlOrders.getOrderId());
                             stlOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                             stlOrders.setOrderStatus(DictCodeListExt1.指令状态_撤销.getValue());
