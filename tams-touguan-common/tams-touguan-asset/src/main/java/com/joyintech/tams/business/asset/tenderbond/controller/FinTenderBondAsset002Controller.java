@@ -153,10 +153,6 @@ public class FinTenderBondAsset002Controller extends BaseController {
     public Message<AjaxResult> save(@RequestBody FinTenderBondAsset002Dto dto) {
         ProcessParameter<FinTenderBondAsset002Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<FinTenderBondAsset002Dto> params = new WorkFlowParameter<>();
-        params.setPageId(this.getPageId());
-        params.setElementId(dto.getElementId());
-        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodId);
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
             processParameter.setOperationType(OperationType.NEW);
             dto.setFinprodId(finTenderBoundAssetService.getFinprodId(dto));
@@ -165,6 +161,10 @@ public class FinTenderBondAsset002Controller extends BaseController {
         } else {
             processParameter.setOperationType(OperationType.DELETE);
         }
+        params.setPageId(this.getPageId());
+        params.setElementId(dto.getElementId());
+        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodId);
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         processParameter.setWorkFlowParameter(params);
         try {
             finTenderBoundAssetService.start(processParameter, dto);
