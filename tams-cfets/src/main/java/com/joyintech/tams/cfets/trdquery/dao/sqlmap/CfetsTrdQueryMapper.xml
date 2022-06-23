@@ -4142,7 +4142,7 @@
             <result column="COUNTER_CONTACT"    property="contactInfo"   jdbcType="VARCHAR" />
         </association>
     </resultMap>
-    <resultMap id="trdFirstBondInvestTradeFullResultMap" type="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdFirstBondInvestTradeDto"
+    <resultMap id="trdFirstBondInvestTradeFullResultMap" type="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto"
                extends="com.joyintech.tams.common.base.dao.TrdProductDealMapper.BaseResultMap">
         <result column="fee_amt"    property="channelFee"   jdbcType="DECIMAL"/>
         <result column="ENTRUST_ID"         property="entrustId"        jdbcType="VARCHAR" />
@@ -4347,6 +4347,14 @@
         inner join trdquto_match_info match
         on reg.totle_trade_id=match.pre_trade_id
         where  match.trd_id = #{bizCode}
+    </select>
+
+    <select id="selectBidOrderById"  resultType="com.joyintech.tams.common.base.entity.RegFinProductDealTotal">
+        select bo.BID_ID    totleTradeId,
+               bo.remark as remark
+        from BID_ORDER bo
+         inner join trdquto_match_info tmi on tmi.PRE_TRADE_ID = bo.BID_ID
+        where  tmi.trd_id = #{bizCode}
     </select>
     <update id="updateRegTotalByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.RegFinProductDealTotal" >
         update reg_fin_product_deal_total
@@ -5413,6 +5421,94 @@
          left join ETR_ENTRUST_DETAIL eed on wbrbp.ENTRUST_ID = eed.ENTRUST_ID and wbrbp.PORTFOLIO_ID = eed.PORTFOLIO_ID
          left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
         where wbo.BID_ID = #{bidId}
+    </select>
+
+    <select id="selectTrdProductDealsByTotleTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+        select tpd.TRADE_ID,
+               tpd.BUSI_TYPE,
+               tpd.FINPROD_ID,
+               tpd.FINPROD_TYPE,
+               tpd.FINPROD_TYPE2,
+               tpd.BRANCH,
+               tpd.TRADE_DATE,
+               tpd.VDATE,
+               tpd.MDATE,
+               tpd.SETTLE_DATE,
+               tpd.SETTLE_SPEED,
+               tpd.CCY,
+               tpd.CPRICE_DATE,
+               tpd.UNIT_CPRICE,
+               tpd.UNIT_INT,
+               tpd.UNIT_FPRICE,
+               tpd.PAR_VALUE,
+               tpd.CPRICE_AMT,
+               tpd.SHARE_AMT,
+               tpd.PRIN_AMT,
+               tpd.INT_AMT,
+               tpd.FPRICE_AMT,
+               tpd.FEE_AMT_PAY,
+               tpd.TRADE_AMT,
+               tpd.FEE_AMT_UNPAY,
+               tpd.FEE_AMT,
+               tpd.PS,
+               tpd.YIELD,
+               tpd.EXER_YIELD,
+               tpd.INV_AIM,
+               tpd.TRADE_STATUS,
+               tpd.IS_CANCEL,
+               tpd.P_TRADE_ID,
+               tpd.IS_CLEAN,
+               tpd.TOTLE_TRADE_ID,
+               tpd.R_TRADE_ID,
+               tpd.B_TRADE_ID,
+               tpd.CHL_ID,
+               tpd.COUNTER_ID,
+               tpd.IS_OUT_TRADE,
+               tpd.TRADE_MARKET,
+               tpd.TRADE_PLAT,
+               tpd.TRADE_MARKET_MODE,
+               tpd.TRADER,
+               tpd.COUNTER_TRADER,
+               tpd.COUNTER_CONTACT,
+               tpd.SEC_MANAGE_ACCT_ID,
+               tpd.F_TRADE_ID,
+               tpd.CASH_ID,
+               tpd.REGIST_ORG,
+               tpd.REMARK,
+               tpd.CANCEL_REMARK,
+               tpd.CREATE_USER,
+               tpd.CREATE_DEPT,
+               tpd.CREATE_TIME,
+               tpd.UPDATE_USER,
+               tpd.UPDATE_TIME,
+               tpd.DELIVERY_TYPE,
+               tpd.PAY_DATE,
+               tpd.SALE_CODE,
+               tpd.ACCR_NUM,
+               tpd.TG_BUSI_TYPE,
+               tpd.PS_PAYMENT,
+               tpd.SPLIT_TRADE_ID,
+               tpd.IS_SWAP_TRANSACTION,
+               tpd.SEAT_ID,
+               tpd.SETTLEMEN_TYPE,
+               tpd.HK_MARKET,
+               tpd.BUY_SETTLE_RATE,
+               tpd.SELL_SETTLE_RATE,
+               tpd.DEAL_AMT,
+               tpd.COMMISSION,
+               tpd.STAMPDUTY,
+               tpd.TRANSACTION_LEVY,
+               tpd.TRANSACTION_FEE,
+               tpd.TRANSACTION_SYSTEM_FEE,
+               tpd.SHARE_PAYMENT_FEE,
+               tpd.YESTERDAY_POSITION,
+               tpd.BUSINESS_MODEL,
+               tpd.CANCEL_DATE,
+               tpda.PORTFOLIO_ID portfolioId,
+               tpda.ENTRUST_ID entrustId
+        from TRD_PRODUCT_DEAL tpd
+                 left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
+        where tpd.TOTLE_TRADE_ID = #{totleTradeId}
     </select>
 </mapper>
 
