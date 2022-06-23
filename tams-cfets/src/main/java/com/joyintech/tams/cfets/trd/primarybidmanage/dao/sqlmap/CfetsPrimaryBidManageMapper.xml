@@ -357,6 +357,9 @@
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
+        <if test="userId != null and userId != ''">
+            AND BO.OUR_TRADER = #{userId}
+        </if>
          <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND FP.FINPROD_MARKET_ID IN
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -500,6 +503,9 @@
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
+        <if test="userId != null and userId != ''">
+            AND BO.OUR_TRADER = #{userId}
+        </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND FP.FINPROD_MARKET_ID IN
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
