@@ -291,6 +291,8 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
 
     @Autowired
     private CfetsQuotedCommonService cfetsQuotedCommonService;
+    @Autowired(required = false)
+    private FinProductAddMapper finProductAddMapper;
 
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
@@ -335,6 +337,10 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
         // 处理老头寸
         this.dealOldBidPosition(entity, true);
+
+        FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(entity.getFinprodId());
+        finProductAdd.setIssueStatus(null);
+        finProductAddMapper.updateByPrimaryKey(finProductAdd);
         //发送头寸
         String ps = DictCodeList.交易方向_买入.getValue();
         String busiType = DictCodeListExt3.头寸业务类型_债券一级申购.getValue();

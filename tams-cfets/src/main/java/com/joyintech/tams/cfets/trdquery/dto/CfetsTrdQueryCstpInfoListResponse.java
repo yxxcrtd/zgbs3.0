@@ -262,11 +262,10 @@ public class CfetsTrdQueryCstpInfoListResponse {
     }
 
     public String getMatchStatusStr() {
-        String matchStatusStr =SysDataUtil.getNameFromDataDict(DictCode.CSTP匹配状态, getMatchStatus());
-        if(StringUtil.equals("BOND1",getBusinesstype())){
-            matchStatusStr = SysDataUtil.getNameFromDataDict(DictCode.匹配状态, getMatchStatus());
+        if (StringUtil.isEmpty(getMatchStatus())) {
+            return StringUtil.EMPTY;
         }
-        return matchStatusStr;
+        return SysDataUtil.getNameFromDataDict(DictCode.CSTP匹配状态, getMatchStatus());
     }
 
     public void setMatchStatusStr(String matchStatusStr) {

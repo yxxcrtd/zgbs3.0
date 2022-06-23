@@ -301,7 +301,7 @@ public interface CfetsTrdQueryMapper {
 
     List<BidPortIntFenPeiInfoDto> findYjsgPortIntFenPeiInfoList(Map<String, Object> pageParam);
 
-    CfetsTrdQueryCstpInfoListResponse selectCstpBidFormDataByKey(Map<String, Object> pageParam);
+    CfetsTrdQueryCstpBidInfoListResponse selectCstpBidFormDataByKey(Map<String, Object> pageParam);
 
 
     CfetsTrdBidInfoResponse findYjtbBidTradeDetailInfo(Map<String, Object> pageParam);

@@ -263,7 +263,7 @@ public class CfetsTrdQueryController extends BaseController {
         try {
             Map<String,Object> resultData = new HashMap<>();
             if (StringUtil.equals(dto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
-                resultData = cfetsTrdQueryService.findBidCstpInfo(pageCode,dtCode,spcdCode,dto);
+                resultData = cfetsTrdQueryService.findBidCstpInfo(pageCode,dtCode,dto.getTgBusiType(),dto);
             }else{
                 resultData = cfetsTrdQueryService.findCstpInfo(pageCode,dtCode,spcdCode,dto);
             }
