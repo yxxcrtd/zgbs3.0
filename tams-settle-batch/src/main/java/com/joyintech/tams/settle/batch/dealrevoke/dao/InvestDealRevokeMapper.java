@@ -227,4 +227,11 @@ public interface InvestDealRevokeMapper {
     //删除交收结果表（交收成功的交易对应的交收结果删除）
     void deleteManualSetDetailBySettleId(@Param("settleIds") List<String> manualSettleIdTgMs);
     void deleteManualSettleInfoBySettleId(@Param("settleIds") List<String> manualSettleIdTgMs);
+
+    /**
+     * 中标结果维护中的自主投标的一级分销
+     * @param param
+     * @return
+     */
+    List<TrdProductDeal> getFirstBondNeedRevokeTrdProductDeals(Map<String, Object> param);
 }

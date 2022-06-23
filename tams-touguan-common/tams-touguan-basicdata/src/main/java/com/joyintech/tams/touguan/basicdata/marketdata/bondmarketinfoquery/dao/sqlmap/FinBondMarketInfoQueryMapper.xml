@@ -5,6 +5,7 @@
     <select id="queryForPage"
             resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto"
             parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest">
+select  * from (
         SELECT
         PAYHSRCSECINFO.SECID,
         PAYHSRCSECINFO.SECNAME,
@@ -262,11 +263,20 @@
                 )
             </if>
         </where>
-        ORDER BY
-        PAYHSRCSECINFO.SECTYPE,
-        PAYHSRCSECINFO.SECTYPE2,
-        PAYHSRCSECINFO.VDATE,
-        PAYHSRCSECINFO.SECID
+        )
+
+        <choose>
+            <when test="pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+                order by ${pageMode.sort}  ${pageMode.direction}
+            </when>
+            <otherwise>
+                ORDER BY
+                SECTYPE,
+                SECTYPE2,
+                VDATE,
+                SECID
+            </otherwise>
+        </choose>
     </select>
 
     <select id="queryForAddCoupons"

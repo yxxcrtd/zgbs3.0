@@ -106,6 +106,14 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
             for (String entrustId: entrustIdListMap.keySet()){
 //                BigDecimal sumActWinPrinamt = entrustIdListMap.get(entrustId).stream().map(item -> item.getTheWinPrinamt()).reduce(BigDecimal.ZERO, BigDecimal::add);
                 for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()){
+                    if(!StringUtil.isNotEmpty(detailDto.getActWinPrinamt())){
+                        resultList.add(new ValidMessage(getMessage("分配明细中中标券面总额不可为空！")));
+                        break;
+                    }
+                    if(!StringUtil.isNotEmpty(detailDto.getTotalBidPrinamt())){
+                        resultList.add(new ValidMessage(getMessage("分配明细中汇总投标券面总额不可为空！")));
+                        break;
+                    }
                     if (detailDto.getActWinPrinamt().compareTo(detailDto.getTotalBidPrinamt())>0){
                         resultList.add(new ValidMessage(getMessage("中标券面总额不能大于汇总投标券面总额！")));
                         break;

@@ -465,19 +465,24 @@ public class StlDataDealProcessCommonService {
 				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_经手费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setJsfAmt(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_过户费.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_过户费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setGhfAmt(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_证管费.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_证管费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setZgfAmt(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_交易手续费.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_交易手续费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setSxfAmt(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_结算费.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_结算费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setSettleFee(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_印花税.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_印花税.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setStampFee(null);
 				}
 			}
