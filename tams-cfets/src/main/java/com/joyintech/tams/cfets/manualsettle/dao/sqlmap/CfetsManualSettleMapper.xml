@@ -1740,6 +1740,62 @@
          LEFT JOIN ibu_quote_crep ic ON ic.quote_id = nvl(T7.PRE_TRADE_ID,T1.B_TRADE_ID)
         WHERE T1.TOTLE_TRADE_ID = #{totleTradeId} and T1.TRADE_STATUS = #{TRADE_STATUS01}
     </select>
+    
+    <select id="findManualSettleInfoRepo2" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdSettleInfoResponse">
+        SELECT
+            distinct
+            T1.PS ps,
+            TO_CHAR(T1.TRADE_DATE,'yyyy-MM-dd') tradeDate,
+            DECODE(T1.SETTLE_SPEED,0,'01',1,'02','2','03') settleSpeed,
+            TO_CHAR(T1.SETTLE_DATE,'yyyy-MM-dd') settleDate,
+            nvl(T8.ccy,ic.ccy) as secCcy,
+            nvl(T8.sett_ccy,ic.sett_ccy) settCcy,
+            T1.REMARK remark,
+            T1.SHARE_AMT/100 faceValue,
+            nvl(T4.M_INT_AMT,ic.M_INT_AMT) intAmt,
+            ttft.fee_amt trdFeeAmt,
+            ttft1.fee_amt settleFeeAmt,
+            nvl(T8.Trade_Amt,ic.M_TRADE_AMT) tradeAmt,
+            T1.TRADE_MARKET tradeMarket,
+            T1.TRADE_MARKET_MODE tradeMarketMode,
+            T1.TRADE_PLAT tradePlat,
+            T7.EXE_ID tradeId,
+            NVL(T9.PARTY_ABBR,T5.OU_PARTY_ID) traderidStr ,
+            NVL(T10.REAL_NAME,T1.TRADER) trader,
+            NVL(T11.COUNTER_NAME,T1.COUNTER_ID) counterIdStr,
+            NVL(T12.TRADER_NAME,T1.COUNTER_TRADER) counterTrader,
+            T1.Delivery_Type deliveryType,
+            nvl(T8.clear_type,ic.SETT_TYPE) clearType,
+            nvl(T8.REPO_TYPE,'1') as repoType,
+            nvl(T8.REPO_TERM,T4.TERM) as repoTerm,
+            T1.RATE * 100 as tradeYield,
+            nvl(T8.DIS_FACE_VALUE,ic.SHARE_CT_AMT) as disFaceValue,
+            nvl(T4.BASIS,ic.BASIS) as basis,
+            nvl(T8.act_repo_term,ic.ACT_DAYS) as actRepoTerm,
+            nvl(T8.TERM_TYPE,ic.TERM_TYPE) as termType,
+            TO_CHAR(nvl(T8.M_SETTLE_DATE,ic.M_SETTLE_DATE),'yyyy-MM-dd') as msettleDate,
+            TO_CHAR(nvl(T8.V_SETTLE_DATE,ic.V_SETTLE_DATE),'yyyy-MM-dd') as vsettleDate,
+            nvl(T8.M_DELIVERY_TYPE,ic.M_DELIVERY_TYPE) as mdeliveryType,
+            nvl(T8.DELIVERY_TYPE,ic.M_DELIVERY_TYPE) as deliveryType,
+            nvl(T8.dip_type,ic.DIP_TYPE) as distriType,
+            nvl(T8.M_TRADE_AMT,ic.M_TRADE_AMT) as mtradeAmt
+        FROM TRD_PRODUCT_TEMP_DEAL_TOTAL T1
+         LEFT JOIN PA_TRD_PROD_TEMP_DEAL_TOTAL T3 ON T1.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID
+         left join (select sum(nvl(p.m_int_amt,0)) as m_int_amt, max(p.BASIS) as BASIS,max(p.TERM) as TERM,TOTLE_TRADE_ID from TRD_PRODUCT_DEAL d
+         inner join FIN_TRADE_PRODUCT p on d.FINPROD_ID=p.FINPROD_ID  group by d.TOTLE_TRADE_ID ) t4 on t1.TOTLE_TRADE_ID=t4.TOTLE_TRADE_ID
+         LEFT JOIN TRD_TRADE_FEE_TOTAL ttft ON T1.totle_trade_id = ttft.totle_trade_id AND ttft.fee_type =#{feeType06}
+         LEFT JOIN TRD_TRADE_FEE_TOTAL ttft1 ON T1.totle_trade_id = ttft1.totle_trade_id AND ttft1.fee_type = #{feeType08}
+         LEFT JOIN TRD_DEAL_TOTAL_ADD T5 ON T1.TOTLE_TRADE_ID = T5.TOTLE_TRADE_ID
+         LEFT JOIN TRDQUTO_MATCH_INFO T7 ON T7.Trd_Id = T1.TOTLE_TRADE_ID
+         LEFT JOIN REG_FIN_PRODUCT_DEAL_TOTAL T8 ON T8.TOTLE_TRADE_ID = nvl(T7.PRE_TRADE_ID,T1.B_TRADE_ID)
+         LEFT JOIN MST_CFETS_CUSTOMER_INFO T9 ON T9.PARTY_ID = T5.OU_PARTY_ID
+         LEFT JOIN SYS_USER T10 ON T10.USER_NAME = T1.TRADER
+         LEFT JOIN MST_COUNTER_PARTY T11 ON T11.COUNTER_ID = T1.COUNTER_ID
+         LEFT JOIN MST_CFETS_CUSTOMER_TRADER T12 ON T12.trader_id = T1.COUNTER_TRADER
+         LEFT JOIN IBU_QUOTE_BOND ib ON ib.quote_id = nvl(T7.PRE_TRADE_ID,T1.B_TRADE_ID)
+         LEFT JOIN ibu_quote_crep ic ON ic.quote_id = nvl(T7.PRE_TRADE_ID,T1.B_TRADE_ID)
+        WHERE T1.TOTLE_TRADE_ID = #{totleTradeId} and T1.TRADE_STATUS = #{TRADE_STATUS01}
+    </select>
 
     <!-- 根据用户名得到真实姓名 -->
     <select id="getRealNameByUserName" resultType="com.joyintech.tams.common.base.entity.User">

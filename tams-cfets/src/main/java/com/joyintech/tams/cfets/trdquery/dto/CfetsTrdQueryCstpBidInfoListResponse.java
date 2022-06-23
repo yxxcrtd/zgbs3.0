@@ -111,7 +111,7 @@ public class CfetsTrdQueryCstpBidInfoListResponse {
     }
 
     public String getBusinesstypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, getBusinesstype());
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, getBusinesstype());
     }
 
     public void setBusinesstypeStr(String businesstypeStr) {

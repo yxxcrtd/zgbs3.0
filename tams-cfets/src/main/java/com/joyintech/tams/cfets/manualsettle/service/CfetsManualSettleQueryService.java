@@ -528,9 +528,15 @@ public class CfetsManualSettleQueryService extends BaseService{
         pageParam.put("CASH_TYPE_2_C02", DictCodeListExt1.现金流二级类型_利息.getValue());
         //表单data
         CfetsTrdSettleInfoResponse dataform = cfetsManualSettleMapper.findManualSettleInfoRepo(pageParam);
+        if(dataform==null) {
+        	dataform = cfetsManualSettleMapper.findManualSettleInfoRepo2(pageParam);
+        }
         //表格组合分配data
         pageParam.put("totleTradeId", settleDto.getTradeId());
         List<PortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsTrdQueryMapper.findRepoPortIntFenPeiInfoList(pageParam);
+        if(CollectionUtils.isEmpty(portIntFenPeiInfoDtoList)) { 
+        	portIntFenPeiInfoDtoList = cfetsTrdQueryMapper.findRepoPortIntFenPeiInfoList2(pageParam);
+        }
 
         //表格质押券data
         pageParam.put("TRADEPLACE01", DictCodeListExt1.交易场所_银行间.getValue());

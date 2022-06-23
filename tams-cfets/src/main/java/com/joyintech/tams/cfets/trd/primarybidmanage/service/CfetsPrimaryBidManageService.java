@@ -1038,12 +1038,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
                     }
                 }else{
-                    messageStr = JsonUtils.json2Object(message.getMessage(), String.class);
+                    messageStr = message.getMessage();
                     if (StringUtil.isEmpty(confirmOk)
                             && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, message.getCode())) {
                         WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
-                    }
-                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, message.getCode())) {
+                    }else {
                         WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
                     }
                 }

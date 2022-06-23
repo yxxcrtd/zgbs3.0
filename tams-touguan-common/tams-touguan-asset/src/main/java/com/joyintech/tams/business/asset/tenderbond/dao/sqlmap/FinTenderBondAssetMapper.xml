@@ -74,7 +74,7 @@
             round(ISSUE.MIN_PER_TAMT/100000000,2) as minPerTamt,
             round(ISSUE.MAX_PER_UTAMT/100000000,2) as maxPerUtamt,
             ZT.RATING as subRate,
-            MCI.CUSTOMER_NAME as subRateOrg,
+            ZT.GRADE_ORG_ID as subRateOrg,
             ZX.RATING as debRate,
             ZX.GRADE_ORG_ID as debRateOrg,
             PRODUCT.REMARK as remark,
@@ -97,7 +97,6 @@
             WHERE BRATING.O_TYPE = '01' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
             ) WHERE RANK=1
         ) ZT on PRODUCT.ISSUER = ZT.ASSET_CODE
-        LEFT JOIN MST_CUSTOMER_INFO MCI ON MCI.CUSTOMER_ID=ZT.ASSET_CODE
         LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
             SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
             ,BRATING.GRADE_RESULT DESC ) RANK ,BRATING.O_CODE AS ASSET_CODE ,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
@@ -211,6 +210,7 @@
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'CUSTOM_ASSET_TYPE_FOUR') E15 ON t.type11=E15.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'FREQUENCY_UNIT') E16 ON t.payCycle=E16.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'GRADE_PARTY') E17 ON t.debRateOrg=E17.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'GRADE_PARTY') E20 ON t.subRateOrg=E20.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'MAIN_GRADE_RESULT') E18 ON t.subRate=E18.ITEM_CODE
         LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'MAIN_GRADE_RESULT') E19 ON t.debRate=E19.ITEM_CODE
         <where>
@@ -249,6 +249,7 @@
                     E16.ITEM_VALUE like '%' || #{search} || '%' OR
                     E17.ITEM_VALUE like '%' || #{search} || '%' OR
                     E18.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E19.ITEM_VALUE like '%' || #{search} || '%' OR
                     E19.ITEM_VALUE like '%' || #{search} || '%' OR
                     t.finprodMarketId like '%' || #{search} || '%' OR
                     t.finprodAbbr like '%' || #{search} || '%' OR
@@ -687,8 +688,9 @@
     </select>
 
     <select id="selectTotleTradeId" resultType="java.lang.String">
-        select T.TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL T
-        where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR} and T.IS_CANCEL='N' and rownum=1
+        select * from (
+            select T.TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL T
+        where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR} and T.IS_CANCEL='N' order by T.CREATE_TIME desc) where rownum=1
     </select>
 
     <select id="getWindType" resultType="com.joyintech.tams.common.base.entity.FinProductTypeConfig">
