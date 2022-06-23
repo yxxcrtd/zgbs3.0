@@ -437,7 +437,8 @@
                     BID_ORDER bo ON bobp.BID_ID = bo.BID_ID
                 WHERE
                     bobp.ENTRUST_ID = A1.ENTRUST_ID
-                    AND bobp.IS_WIN = #{IS_WIN_Y}
+                    AND bobp.TRADE_STATUS = #{TRADE_STATUS_01}
+                    AND bobp.IS_CANCEL = #{IS_CANCEL_N}
                     AND bo.BID_MODLE = #{BID_MODLE_03}
                 UNION
                 SELECT
@@ -450,6 +451,7 @@
                     BID_ORDER bo ON brt.BID_ID = bo.BID_ID
                 WHERE
                     brd.ENTRUST_ID = A1.ENTRUST_ID
+                    AND brt.STATUS = #{TRADE_STATUS_01}
                     AND brt.IS_WIN = #{IS_WIN_Y}
                     AND bo.BID_MODLE = #{BID_MODLE_03}
             )

@@ -322,6 +322,8 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
         paramMap.put("BID_MODLE_03", DictCodeListExt4.投标方式_分销买入.getValue());
         // 是否中标
         paramMap.put("IS_WIN_Y", DictCodeList.是否_是.getValue());
+        paramMap.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+        paramMap.put("IS_CANCEL_N", DictCodeList.是否_否.getValue());
         List<EtrEntrustDto> etrEntrustDtoFirstBondList = stlDataGatherMapper.selectFirstBondEtrEntrustData(paramMap);
         etrEntrustDtoList.addAll(etrEntrustDtoFirstBondList);
 
