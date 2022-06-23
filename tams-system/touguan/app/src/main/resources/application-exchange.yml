@@ -4,7 +4,7 @@ MarketInfoInterf:
   cmdsUrl: http://10.1.20.135:8099  #外汇交易中心
 
 #监听市场行情最新净价
-cmdsWebSocketUrl: ws://192.168.90.244:18888/dsp/cmds
+cmdsWebSocketUrl: ws://192.168.90.208:38888/dsp/cmds
 #监听债券行情键值
 bondWebSocketKey: Subscriber
 
@@ -55,7 +55,7 @@ trade:
 quote:
   flag: false #是否使用接口平台行情，true 是，false 否
   ws:
-    host: ws://192.168.90.208:16667/dsp
+    host: ws://192.168.90.208:16668/dsp
     url: /exchange
   http:
     host: http://192.168.90.208:1668/dsp

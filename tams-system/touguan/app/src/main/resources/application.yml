@@ -41,7 +41,7 @@ spring:
     - rabbitmq     #RabbitMQ
     - microservice #微服务
     - exchange     #场内、银行间
-    - postion      #头寸  
+    - position      #头寸  
   cloud:    nacos:      discovery:        enabled: false
           
   ## 附件上传 ##    
