@@ -348,7 +348,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //计划发行量
         finProductIssue.setPlanIssueAmt(Objects.nonNull(finListedBondInfoQuery001Dto.getIssueSize()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssueSize()).multiply(new BigDecimal(100000000)) : null);
         finProductIssue.setIssueStyle(finListedBondInfoQuery001Dto.getReleaseType());
-        finProductIssue.setAddBatch(0L);
+        finProductIssue.setAddBatch(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalBatches()) ? finListedBondInfoQuery001Dto.getAdditionalBatches().longValue() : 0L);
         finProductIssue.setIssuePrice(Objects.nonNull(finListedBondInfoQuery001Dto.getIssuePx()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()) : null);
         finProductIssue.setReferYield(Objects.nonNull(finListedBondInfoQuery001Dto.getCouponRate()) ? new BigDecimal(finListedBondInfoQuery001Dto.getCouponRate()).divide(new BigDecimal(100)) : null);
         finProductIssue.setRateGrade(finListedBondInfoQuery001Dto.getDecimalPlaces());

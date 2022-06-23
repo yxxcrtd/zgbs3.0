@@ -1997,7 +1997,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
             infContractDetailfile.setSettleDay(null);
         }
         //ZGCPCN-1416
-        dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
+//        dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
 
         dto.setFpriceAmt(dto.getTradeAmt());
 

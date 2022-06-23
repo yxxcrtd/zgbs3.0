@@ -320,7 +320,6 @@ $(function () {
     	}
     }
 
-
     $('#startDate').on('change', function () {
     	//期限开始日
     	var srartDate = $('#startDate').val();
@@ -383,6 +382,22 @@ $(function () {
     	}
     });
 
+	var bussBenchMarkInfoRateType= function(){
+		var rateType = $('#BussBenchMarkInfo_rateType').val();
+		if(rateType == '01'){
+			$('#BussBenchMarkInfo_indexId').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_coefficient').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_spreadRate').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_resetType').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_rate').trigger('change').prop('disabled', false);
+		}else{
+			$('#BussBenchMarkInfo_indexId').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_coefficient').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_spreadRate').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_resetType').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_rate').trigger('change').prop('disabled', true);
+		}
+	}
 
 
     var init = function(){
@@ -406,6 +421,7 @@ $(function () {
     		//修改bug【强化测试】期次管理修改期次画面，期次开始日字段应置灰不可修改，目前未置灰。 add by wangcheng 20191030
     		$('#startDate').trigger('change').prop('disabled', true);
     		$('#periodId').trigger('change').prop('disabled', true);
+			$('#finprodId').trigger('change').prop('disabled', true);
     	}
     	//修改bug 待处理数据确认时 期次代码、期次开始日、期次结束日、投资周期置灰不可修改 add by wangcheng 20191101 start
     	if($('#operateType').val() == 'confrim'  || $('#operateType').val() == 'new'){
@@ -439,6 +455,9 @@ $(function () {
     	//修改bug 待处理数据确认时 期次代码、期次开始日、期次结束日、投资周期置灰不可修改 add by wangcheng 20191101 end
     	finprodIdChangrAction();
     	publishTypeChangeAction();
+		bussBenchMarkInfoRateType();
+		feeIdChangeAction();
+
     	var rateType = $('#BussFinProductFloatFee_rateType').val();
     	if(rateType == '01'){
     		$('#BussFinProductFloatFee_indexId').val('').trigger('change').prop('disabled', true);
@@ -483,20 +502,46 @@ $(function () {
         });
     });
 
+	var clearPublishTypeChange = function() {
+		var publishType = $('#BussBenchMarkInfo_publishType').val();
+		//是否区间披露为 是
+		if(publishType == '01'){
+			//利率类型、利率、浮动利率、系数、利差、业绩基准重置规则不可见
+			$('#BussBenchMarkInfo_rateType').val('').trigger('change');
+			$('#BussBenchMarkInfo_rate').val('').trigger('change');
+			$('#BussBenchMarkInfo_indexId').val('').trigger('change');
+			$('#BussBenchMarkInfo_coefficient').val('').trigger('change');
+			$('#BussBenchMarkInfo_spreadRate').val('').trigger('change');
+			$('#BussBenchMarkInfo_resetType').val('').trigger('change');
+		}else{
+			$('#BussBenchMarkInfo_rateLower').val('').trigger('change');
+			$('#BussBenchMarkInfo_rateLimit').val('').trigger('change');
+		}
+	}
+
+	var getSaveObject = function() {
+		var object = $.serializeToObject('#PeriodicManagement002_Form');
+
+		object.operateType = "new";
+		object.pageModel = pageModel;
+		object.periodProdId =$('#periodProdId').val();
+		if (object.periodProdId == null || object.periodProdId == "") {
+			object.periodProdId =$('#periodProdId2').val();
+		}
+		var finFloatCalcRuleDetailList = table.getAllRows();
+		object.finFloatCalcRuleDetailList = finFloatCalcRuleDetailList;
+		return object;
+	}
 
     function saveOrSubmit(operateType) {
-    	var object = $.serializeToObject('#PeriodicManagement002_Form');
-    	object.operateType = "new";
-        object.pageModel = pageModel;
-        object.periodProdId =$('#periodProdId').val();
-        if (object.periodProdId == null || object.periodProdId == "") {
-        	object.periodProdId =$('#periodProdId2').val();
-		}
-        var finFloatCalcRuleDetailList = table.getAllRows();
-        object.finFloatCalcRuleDetailList = finFloatCalcRuleDetailList;
+    	var object = getSaveObject();
+
     	Joyin.ajaxJson(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/check', object, function(result){
     		Joyin.confirm(result.data, function() {
-            	if(operateType== 'save') {
+				clearPublishTypeChange();
+				object = getSaveObject();
+
+				if(operateType== 'save') {
                     WorkFlow.doSaveList(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/save', object, "PeriodicManagement002_btn_save");
                 }else {
                     WorkFlow.doSubmitList(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/save', object, "PeriodicManagement002_btn_submit");

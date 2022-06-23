@@ -369,8 +369,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
             bidResultTotalMapper.updateByPrimaryKeySelective(bidResultTotal);
             cfetsPrimaryBidManageMapper.updateBidOrder(entity.getBidId());
-            BaseBidManageBaseInfoDto  baseInfoDto = new BaseBidManageBaseInfoDto();
-            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+            BaseBidManageBaseInfoDto baseInfoDto = new BaseBidManageBaseInfoDto();
+            if (StringUtil.equals(entity.getIsWin(), DictCodeList.是否_是.getValue())) {
                 List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
                 List<TrdProductDeal> trdProductDeals = new ArrayList<>();
                 for (TrdFinProductDealTotal trdFinProductDealTotal : trdFinProductDealTotalList) {
@@ -397,20 +397,20 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                             trdProductDealRevoke.setTradeId(trdProductDeal.getTradeId());
                             trdProductDealRevoke.setIsCancel(DictCodeList.是否_是.getValue());
                             trdProductDealMapper.updateByPrimaryKeySelective(trdProductDealRevoke);
-
                             trdProductDeal.setpTradeId(trdProductDeal.getTradeId());
                             trdProductDeal.setTradeId(trdProductDeal.getTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                             trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
                             trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
                             trdProductDealMapper.insert(trdProductDeal);
-                            trdProductDeals.add(trdProductDeal);
                             /**交易附属表 **/
                             TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getTradeId());
                             if (trdProductDealAdd != null) {
+                                trdProductDeal.setEntrustId(trdProductDealAdd.getEntrustId());
                                 trdProductDealAdd.setTradeId(trdProductDealAdd.getTradeId()
                                         + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                                 trdProductDealAddMapper.insert(trdProductDealAdd);
                             }
+                            trdProductDeals.add(trdProductDeal);
                             // 组合交易表
                             List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDeal.getTradeId());
                             if (!ptlTradeList.isEmpty()) {
@@ -448,16 +448,16 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 // 老头寸处理
                 this.dealOldPosition(entity, true);
             }
-            updateCfetsOprHis(entity.getTotalWinId(),action);
+            updateCfetsOprHis(entity.getTotalWinId(), action);
         } else {
             action = OperationType.NEW.name();
-            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+            if (StringUtil.equals(entity.getIsWin(), DictCodeList.是否_是.getValue())) {
                 entity = cncapBaseBidManageBaseInfoDto(entity);
                 doCompleteInsert(entity);
-            }else{
+            } else {
                 unBidSave(entity);
             }
-            updateCfetsOprHis(entity.getTotalWinId(),action);
+            updateCfetsOprHis(entity.getTotalWinId(), action);
         }
         baseTradeCommExecute(entity, type);
     }
@@ -691,6 +691,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setTradeDate(iplatformDate.getSysDate());
             trdProductDeal.setSettleDate(dto.getCreditorDebtDate());
             trdProductDeal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            trdProductDeal.setEntrustId(entrustId);
             BigDecimal cpriceAmt =null;
             BigDecimal winPrinamt =null;
             BigDecimal intAmt =null;
@@ -731,6 +732,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setCounterId(dto.getCounterId());
             trdProductDeal.setRemark(dto.getRemark());
             trdProductDeal.setInvAim(invAim);
+            trdProductDeal.setTrader(dto.getOuTraderId());
             trdProductDealList.add(trdProductDeal);
             //金融产品交易附属表
             TrdProductDealAdd  trdProductDealAdd = new TrdProductDealAdd();
@@ -942,7 +944,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
      * @param entity   页面元素
-     * @param flowType 交易流程状态 参数字典 TRADE_FLOW_STATUS
+     * @param isRevokeOrBack 交易流程状态 参数字典 TRADE_FLOW_STATUS
      * @author jiangpeng
      * @date 2022/4/28 10:37
      */
@@ -1012,9 +1014,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             String confirmOk = RequestUtil.getParam("confirmOk");
             try {
                 if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
-                    boolean isSubmit = false;
+                    boolean isSubmit = true;
                     SysWflBusinessList sysWflBusinessList = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
                     if (StringUtil.equals(sysWflBusinessList.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+                        isSubmit = false;
                         this.sendPositionMethod(entity, isSubmit, confirmOk);
                     } else {
                         this.sendPositionMethod(entity, isSubmit, confirmOk);
@@ -1805,6 +1808,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             return null;
         }
         List<String> entrustIdList = new ArrayList<>();
+        if (dto.getBaseBidManageBaseInfoDto() == null
+                || dto.getBaseBidManageBaseInfoDto().getTrdProductDealList() == null) {
+            return null;
+        }
         for (TrdProductDeal trdProductDeal : dto.getBaseBidManageBaseInfoDto().getTrdProductDealList()) {
             if (StringUtil.isEmpty(trdProductDeal.getEntrustId())) {
                 continue;
@@ -1837,7 +1844,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             List<String> finishEtrList = new ArrayList<>();
             // 判断委托代码的完成额度是否大于等于100
             for (BaseEtrFinishAmtDto etrFinishAmtDto : etrFinishAmtDtoList) {
-                if (etrFinishAmtDto.getSumFinishPercent().compareTo(BigDecimal.valueOf(100)) >= 1) {
+                if (etrFinishAmtDto.getSumFinishPercent().compareTo(BigDecimal.valueOf(100)) >= 0 ) {
                     // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“已完成”
                     etrInvestInfoServiceImpl.updateDelegateStatus(etrFinishAmtDto.getEntrustId(), DictCodeList.委托状态_已完成.getValue());
                     finishEtrList.add(etrFinishAmtDto.getEntrustId());

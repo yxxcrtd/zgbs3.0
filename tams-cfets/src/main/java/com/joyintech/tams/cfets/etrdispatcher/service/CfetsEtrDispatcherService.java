@@ -403,8 +403,16 @@ public class CfetsEtrDispatcherService extends BaseService {
 
         //将交易员和投资经理转为真实姓名
         List<CfetsEtrDispatcherTradeListResponse> list2 = pageLimit.getRoot();
-        List<CfetsEtrDispatcherTradeListResponse> list = list2.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
-                new TreeSet<>(Comparator.comparing(CfetsEtrDispatcherTradeListResponse::getEntrustId))), ArrayList::new));
+        List<String> entrustIds = new ArrayList<>();
+        List<CfetsEtrDispatcherTradeListResponse> list = list2.stream().filter(
+                v -> {
+                    boolean flag = !entrustIds.contains(v.getEntrustId());
+                    if (flag) {
+                        entrustIds.add(v.getEntrustId());
+                    }
+                    return flag;
+                }
+        ).collect(Collectors.toList());
         pageLimit.setRoot(list);
         if (!list.isEmpty()) {
             for (CfetsEtrDispatcherTradeListResponse response : list) {
@@ -1968,9 +1976,8 @@ public class CfetsEtrDispatcherService extends BaseService {
         dto.setIntType(finProductInfo.getIntType());
         dto.setIssueClass(finProductInfo.getIssueClass());
         dto.setCcy(finProductInfo.getCcy());
+        dto.setTenderTarget(finProductInfo.getTenderTarget());
         if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
-            dto.setIssueDate(finProductInfo.getIssueDate());
-            dto.setPayDate(finProductInfo.getPayDate());
             dto.setIssuePrice(new BigDecimal(finProductInfo.getIssuePrice()));
             if (StringUtil.isNotEmpty(dto.getCouponSpecies()) && StringUtil.isNotEmpty(dto.getIntType())) {
                 if (StringUtil.equals(DictCodeList.息票品种_利随本清.getValue(),dto.getCouponSpecies()) ||
@@ -1981,17 +1988,9 @@ public class CfetsEtrDispatcherService extends BaseService {
                     dto.setReferYield(etrInfoDto.getBidPriceStr());
                 }
             }
-
-            dto.setTenderTarget(finProductInfo.getTenderTarget());
             dto.setTenderSdate(finProductInfo.getTenderSdate());
             dto.setTenderEdate(finProductInfo.getTenderEdate());
 
-        }else {
-            dto.setTenderTarget(finProductInfo.getTenderTarget());
-            dto.setTenderSdate(finProductInfo.getTenderSdate());
-            dto.setTenderEdate(finProductInfo.getTenderEdate());
-            dto.setIssueDate(finProductInfo.getIssueDate());
-            dto.setPayEdate(finProductInfo.getPayEdate());
         }
 
         //查询指令明细信息
@@ -2052,7 +2051,11 @@ public class CfetsEtrDispatcherService extends BaseService {
                     dto.setTenderSdate(finProductInfo.getTenderSdate());
                     dto.setTenderEdate(finProductInfo.getTenderEdate());
                 }
-                dto.setPayEdate(finProductInfo.getPayEdate());
+                if (finProductInfo.getPayEdate() != null) {
+                    dto.setPayEdate(finProductInfo.getPayEdate());
+                }else {
+                    dto.setPayEdate(finProductInfo.getPayDate());
+                }
 
                 //查询指令标位信息
                 List<EtrEntrustBidPrice> bidPrices = cfetsEtrBondFirstBid001Mapper.selectBidPriceById(entrustId);

@@ -428,6 +428,31 @@
             <if test="secAccount!=null and secAccount!='' ">
                 AND det.SEC_ACCT_ID = #{secAccount}
             </if>
+            AND EXISTS (
+                SELECT
+                    bobp.ENTRUST_ID
+                FROM
+                    BID_ORDER_BID_PRICE bobp
+                LEFT JOIN
+                    BID_ORDER bo ON bobp.BID_ID = bo.BID_ID
+                WHERE
+                    bobp.ENTRUST_ID = A1.ENTRUST_ID
+                    AND bobp.IS_WIN = #{IS_WIN_Y}
+                    AND bo.BID_MODLE = #{BID_MODLE_03}
+                UNION
+                SELECT
+                    brd.ENTRUST_ID
+                FROM
+                    BID_RESULT_DETAIL brd
+                LEFT JOIN
+                    BID_RESULT_TOTAL brt ON brd.TOTAL_WIN_ID = brt.TOTAL_WIN_ID
+                INNER JOIN
+                    BID_ORDER bo ON brt.BID_ID = bo.BID_ID
+                WHERE
+                    brd.ENTRUST_ID = A1.ENTRUST_ID
+                    AND brt.IS_WIN = #{IS_WIN_Y}
+                    AND bo.BID_MODLE = #{BID_MODLE_03}
+            )
     </select>
 
     <select id="getFinprodId" resultType="com.joyintech.framework.select.SelectOptionDto">

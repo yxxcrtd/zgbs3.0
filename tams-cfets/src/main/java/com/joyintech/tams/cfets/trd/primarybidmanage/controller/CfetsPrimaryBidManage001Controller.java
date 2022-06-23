@@ -292,6 +292,12 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
         public Message<AjaxResult> unWinCheck(@RequestBody CfetsPrimaryBidManageSaveRequest dto, BindingResult result) {
             AjaxResult res= new AjaxResult();
             List<ValidMessage> errorList = new ArrayList<>();
+            if (CollectionUtils.isEmpty(dto.getAllocationDetails())){
+                CfetsPrimaryBidManageCfmRequest request = new CfetsPrimaryBidManageCfmRequest();
+                BeanUtil.copyPropertiesIgnoreNull(request,dto);
+                CfetsPrimaryBidManageSaveRequest saveRequest = cfetsPrimaryBidManageService.getBidManageCfmInsert(request);
+                dto.setAllocationDetails(saveRequest.getAllocationDetails());
+            }
             if(StringUtil.isNotEmpty(dto.getBidId())) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("CfetsPrimaryBidManage002");
@@ -322,16 +328,19 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
         @ApiOperation(value = "中标撤销的check", notes = "中标撤销的check")
         @ResponseBody
         @PostMapping("check")
-        public Message<AjaxResult> check(@RequestBody CfetsPrimaryBidManageSaveRequest dto, BindingResult result) {
+        public Message<AjaxResult> revokeCheck(@RequestBody CfetsPrimaryBidManageSaveRequest dto, BindingResult result) {
             AjaxResult res= new AjaxResult();
             List<ValidMessage> errorList = new ArrayList<>();
-            dto.setOperateType("revoke");
 //            List<ValidMessage> valid = cfetsPrimaryBidManageValidatorService.valid(dto);
 //            errorList.addAll(valid);
             if(CollectionUtils.isNotEmpty(dto.getSelectedItem())) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("CfetsPrimaryBidManage002");
                 for (CfetsPrimaryBidManageSaveRequest request:dto.getSelectedItem()) {
+                    if (CollectionUtils.isEmpty(dto.getAllocationDetails())){
+                        CfetsPrimaryBidManageSaveRequest saveRequest = cfetsPrimaryBidManageService.selectBasicInfo(request);
+                        request.setAllocationDetails(saveRequest.getAllocationDetails());
+                    }
                     parameter.setBusinessDataPk1(request.getBidId());
                     if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
                         errorList.add(new ValidMessage("存在流程中数据，不可撤销，请重新选择"));

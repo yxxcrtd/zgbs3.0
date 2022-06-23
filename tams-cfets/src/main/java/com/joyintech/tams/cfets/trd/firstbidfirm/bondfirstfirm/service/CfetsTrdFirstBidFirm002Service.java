@@ -1012,7 +1012,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 //THEN 参照原债券二级交易画面，到期收益率反算净价的算法，计算净价
                 if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())) {
                     // 招标标的=利率时，将中标标位作为到期收益率计算；
-                    calRequest.setMatureYield(dto.getWinPrice());
+                    calRequest.setMatureYield(ArithmeticUtil.divide(dto.getWinPrice(), BigDecimal.valueOf(100), 6));
                 } else {
                     //招标标的=利差时，取现金流利率信息表.基准编号当天的利率（结合现金流利率信息表.基准利率精度）*现金流利率信息表.系数+投标标位（作为利差）作为到期收益率计算。
                     Map<String, Object> pageParam = new HashMap<>();
@@ -1140,7 +1140,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             index++;
             // 占比值 根据每条数据的“剩余指令额度/指令剩余额度汇总*基本信息中券面总额”计算
             BigDecimal proportion = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getAvaNum(), dto.getBidPriceTotal()), avaNumTotal, 2);
-            proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
+            proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.DOWN), minChangeUnit);
             // 记录剩余指令额度
             item.setAvaNumTemp(item.getAvaNum());
             // 最后一位时
@@ -1185,8 +1185,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 自动计算的计算结果需要为最小变动单位1000的整数倍，且每条数据的券面总额须小于等于剩余指令额度
         BigDecimal minChangeUnit = subMinChangeUnit;
         // 平均值计算
-        BigDecimal avg = ArithmeticUtil.divide(dto.getBidPriceTotal(), dto.getProductDtos().size(), 2);
-        avg = ArithmeticUtil.multiply(ArithmeticUtil.divide(avg, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
+        BigDecimal avg = ArithmeticUtil.divide(dto.getBidPriceTotal(), minChangeUnit, 0, RoundingMode.DOWN);
+        avg = ArithmeticUtil.multiply(ArithmeticUtil.divide(avg, BigDecimal.valueOf(dto.getProductDtos().size()), 0, RoundingMode.DOWN), minChangeUnit);
 //        // 剩余尾差
         BigDecimal tailDifference = dto.getBidPriceTotal();
         int index = 0;
@@ -1250,7 +1250,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             item.setAvaNumTemp(item.getEtrBidPriceTotal());
             // 占比值 根据每条数据的“指令投标券面总额/基本信息.指令投标券面总额*基本信息.汇总投标券面总额”计算
             BigDecimal proportion = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getEtrBidPriceTotal(), dto.getTotalBiddingNum()), dto.getEtrBidPriceTotal(), 2);
-            proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
+            proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.DOWN), minChangeUnit);
             // 最后一位时
             if (index == dto.getProductDtos().size()) {
                 if (BigDecimalUtil.ACompareToB(item.getEtrBidPriceTotal(), tailDifference, 6) >= 0
@@ -1498,8 +1498,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 缴款金额
         BigDecimal payableAmount = dto.getPayableAmount();
         List<CfetsTrdFirstBidFirmProductDto> productDtos = dto.getProductDtos();
+        productDtos.sort(Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getAvaNum).reversed());
         // 费用平均值
-        BigDecimal avg = ArithmeticUtil.divide(settFeeAmt, new BigDecimal(productDtos.size()), 2);
+        BigDecimal avg = ArithmeticUtil.divide(settFeeAmt, new BigDecimal(productDtos.size()), 2, RoundingMode.DOWN);
         // 交易金额剩余尾差
         BigDecimal tradeTailDifference = tradeAmt;
         // 应计利息总额剩余尾差
@@ -1551,7 +1552,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             feeTailDifference = ArithmeticUtil.subtract(feeTailDifference, item.getSettFeeAmt());
         }
         this.handleTailDifferenceOhter(productDtos, tradeTailDifference, intTailDifference, payTailDifference, feeTailDifference);
-        return productDtos;
+        dto.setProductDtos(productDtos);
+        return this.productDtosSort(dto);
     }
 
     /**
@@ -1571,6 +1573,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         FinProductIssue finProductIssue = finProductIssueMapper.selectByPrimaryKey(dto.getFinprodId());
         List<CheckMassgeInfo> checkMassgeInfos = new ArrayList<>();
         boolean flag = false;
+        if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), dto.getBiddingMethod())) {
+           return ajaxResult;
+        }
         if (StringUtil.equals("1", dto.getEditFeild())) {
             // 标的类金融产品发行信息.最高投标总量 IS NOT NULL AND 汇总投标券面总额（万元）*10000 + 系统中该资产的有效、流程中的汇总券面总额 > 标的类金融产品发行信息.最高投标总量
             BigDecimal totalBiddingNum = BigDecimal.ZERO;
@@ -2427,6 +2432,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             stlPayOrders.setOrderStatus(DictCodeListExt1.交易状态_初始.getValue());
             stlPayOrders.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
             tradeDto.setStlPayOrders(stlPayOrders);
+            // 清算指令表（STL_ACT_ORDER）
+            StlActOrder stlActOrder = new StlActOrder();
+            stlActOrder.setActOrderId(stlPayOrders.getOrderId());
+//            stlActOrder.setBusiType();
+            stlActOrder.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
             // 数据库取值
             List<WflTrdProductDeal> wflDeals = cfetsTrdFirstBidFirm002Mapper.findWflDealByTotleTradeId(total.getTotleTradeId());
             List<TrdProductDeal> deals = new ArrayList<>();
@@ -2942,6 +2952,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         this.deleteWflDataByWorkflowId(entity.getWorkflowId());
         if (cfetsTrdBondFirstSub002Mapper.selectBidOrders(entity.getBidId()) == 0
                 && StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
+            List<CfetsTrdFirstBidFirmInvestTradeDto> tradeDtos = this.prepareBidEntity(entity, OperationType.REVOKE);
+            // 删除流程中数据
+            tradeDtos.forEach(this::deleteTradeData);
             // 老头寸处理
             this.dealOldPosition(entity, false, true);
         }
@@ -3288,12 +3301,17 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         Set<String> set = new HashSet<>();
         //递增维度
         BigDecimal addDimension = minChangeUnit;
+        // 标记是否存在递增维度大于剩余指令额度
+        boolean flag = false;
         // 降序
         productDtos.sort(Comparator.comparing(CfetsTrdFirstBidFirmProductDto::getAvaNum).reversed());
         while (tailDifference.compareTo(BigDecimal.ZERO) > 0 && size > 0) {
-            if (tailDifference.compareTo(minChangeUnit) > 0) {
+            if (tailDifference.compareTo(minChangeUnit) > 0 && !(flag && set.size() != 1)) {
                 addDimension = ArithmeticUtil.divide(tailDifference, new BigDecimal(size), 2, RoundingMode.HALF_UP);
                 addDimension = ArithmeticUtil.multiply(ArithmeticUtil.divide(addDimension, minChangeUnit, 0, RoundingMode.DOWN), minChangeUnit);
+            }
+            if (flag && set.size() != 1) {
+                addDimension = minChangeUnit;
             }
             for (CfetsTrdFirstBidFirmProductDto item : productDtos) {
                 // 分配值
@@ -3309,8 +3327,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     }
                     continue;
                 }
+                if (BigDecimalUtil.ACompareToB(addDimension, item.getAvaNumTemp(), 2) > 0) {
+                    flag = true;
+                }
                 // 处理尾差值的不同
-                if (BigDecimalUtil.ACompareToB(addDimension, minChangeUnit, 2) > 0) {
+                if (!flag) {
                     assign = addDimension;
                 } else if (BigDecimalUtil.ACompareToB(item.getAvaNumTemp(), minChangeUnit, 4) >= 0
                         && BigDecimalUtil.ACompareToB(tailDifference, minChangeUnit, 4) >= 0) {

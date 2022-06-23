@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.h2.util.New;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -444,5 +445,20 @@ public class PeriodicManagement002Service extends CommonExportService<PeriodicMa
 				ServiceApplication.PRODUCT_SERVICE_NAME + "/PeriodicManagement/queryFinBaseRuleInfo", param,
 				FinBaseRuleInfo.class);
 	}
-	
+
+
+	public boolean checkPeriodTradeDate(PeriodicManagement001Dto dto) {
+		boolean flag = false;
+		Map<String, Object> params = Maps.newHashMap();
+		params.put("finprodId", dto.getPeriodProdId());
+		params.put("startDate", DateUtil.format(dto.getStartDate(), "yyyy-MM-dd"));
+		params.put("endDate", DateUtil.format(dto.getEndDate(), "yyyy-MM-dd"));
+		Integer num = restTemplate.postForObject(
+				ServiceApplication.PRODUCT_SERVICE_NAME + "/PeriodicManagement/checkPeriodTradeDate", params,
+				Integer.class);
+		if (num > 0) {
+			flag = true;
+		}
+		return flag;
+	}
 }

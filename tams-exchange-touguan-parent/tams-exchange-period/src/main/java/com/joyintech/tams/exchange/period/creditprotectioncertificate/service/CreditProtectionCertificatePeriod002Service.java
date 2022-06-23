@@ -494,11 +494,11 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             trdProductDeal2.setUnitInt(BigDecimal.ZERO);
             trdProductDeal2.setUnitFprice(trdProductDeal2.getUnitCprice());
 
-            trdProductDeal2.setCpriceAmt(billingDetail.getDeliveryAmount());
+            trdProductDeal2.setCpriceAmt(billingDetail.getDeliverBondAmount());
 
-            trdProductDeal2.setFpriceAmt(billingDetail.getDeliveryAmount());
+            trdProductDeal2.setFpriceAmt(billingDetail.getDeliverBondAmount());
 
-            trdProductDeal2.setShareAmt(billingDetail.getRepNomCapi());
+            trdProductDeal2.setShareAmt(billingDetail.getDeliverBondAmount());
 
             trdProductDeal2.setTradeAmt(billingDetail.getDeliveryAmount());
 

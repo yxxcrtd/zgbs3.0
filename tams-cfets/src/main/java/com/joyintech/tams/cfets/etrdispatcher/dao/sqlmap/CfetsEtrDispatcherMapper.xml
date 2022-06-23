@@ -215,6 +215,7 @@
             END
         )
         END AS transRemainderAmt,
+        ETR_ENTRUST_ADD.TRANSMIT_TIME sortTime,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi') transmitTimeSer,
         ETR_ENTRUST_ADD.CALCULATE_FIELD,
@@ -476,12 +477,15 @@
             </if>
         </where>
         <!-- 关键字模糊查询 -->
-        <include refid="vagueQueryWhere"></include>
-        order by t.entrustStatusOrder,t.transmitTime,t.finprodType2,t.finprodMarketId,t.ps)
-        <!--前端传入排序字段-->
-        <if test="sort != null and sort != '' and direction != null and direction != ''">
-            order by ${sort} ${direction}
-        </if>
+        <include refid="vagueQueryWhere"/>
+        <choose>
+            <when test="sort != null and sort != '' and direction != null and direction != ''">
+                order by t.${sort} ${direction})
+            </when>
+            <otherwise>
+                order by t.entrustStatusOrder,t.sortTime DESC,t.finprodType2,t.finprodMarketId,t.ps)
+            </otherwise>
+        </choose>
     </select>
 
     <sql id="vagueQueryWhere">
@@ -1173,13 +1177,13 @@
         ON		FP.FINPROD_ID = TFPDT.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI
         ON		FPI.FINPROD_ID = FP.FINPROD_ID
-        LEFT JOIN BID_ORDER BO
+        LEFT JOIN WFL_BID_ORDER BO
         ON		BO.TRADE_STATUS = '01'
         AND		BO.BID_ID = TFPDT.P_TOTLE_TRADE_ID
         AND		BO.BID_MODLE = '03'
         LEFT JOIN ( select  TPD.TOTLE_TRADE_ID, SUM(EEBP.BID_PRIN_AMT)  BID_PRIN_AMT
-        from TRD_PRODUCT_DEAL TPD
-        LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
+        from WFL_TRD_PRODUCT_DEAL TPD
+        LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD TPDA
         ON TPD.TRADE_ID = TPDA.TRADE_ID
         LEFT JOIN ETR_ENTRUST EE
         ON EE.ENTRUST_ID = TPDA.ENTRUST_ID
@@ -1199,8 +1203,8 @@
         then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.BID_ID
-        from BID_ORDER_BID_PRICE t0
-        LEFT JOIN BID_ORDER t1 on t1.BID_ID = t0.BID_ID
+        from WFL_BID_ORDER_BID_PRICE t0
+        LEFT JOIN WFL_BID_ORDER t1 on t1.BID_ID = t0.BID_ID
         LEFT JOIN FIN_PRODUCT t2
         ON t2.FINPROD_ID = t1.FINPROD_ID
         LEFT JOIN
@@ -2926,8 +2930,8 @@
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
-			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
-			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败'
 			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
                WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
              END                                                   DELIVERY_RESULT,
@@ -2965,8 +2969,8 @@
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
-			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
-			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败'
 			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
                WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
 			 END                                                   DELIVERY_RESULT,

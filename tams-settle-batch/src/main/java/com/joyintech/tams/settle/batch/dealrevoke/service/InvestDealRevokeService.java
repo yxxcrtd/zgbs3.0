@@ -512,6 +512,42 @@ public class InvestDealRevokeService {
             PositionHttpRequest.batchRevoke(stasecBatchRevoke);
             // ZGTFCP-1621:冲销成交回报的质押券出入库流水 add by fuyongsheng 20220322 end
         }
+
+        // 撤销中标结果维护中的自主投标的一级分销头寸 add by fuyongsheng 20220622 start
+        param.put("TG_BUSI_TYPE_151", DictCodeListExt4.平安业务类型_中标结果维护.getValue());
+        param.put("FIN_PRODUCT_TYPE2_F32", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        param.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+        param.put("IS_CANCEL_N", DictCodeList.是否_否.getValue());
+        param.put("PS_T01", DictCodeList.交易方向_买入.getValue());
+        param.put("IS_WIN_Y", DictCodeList.是否_是.getValue());
+        param.put("BID_MODLE_03", DictCodeListExt4.投标方式_分销买入.getValue());
+        List<TrdProductDeal> firstBondTrdProductDeals = investDealRevokeMapper.getFirstBondNeedRevokeTrdProductDeals(param);
+        if(!CollectionUtils.isEmpty(firstBondTrdProductDeals)){
+            // 交易编号去重
+            List<TrdProductDeal> distinctFirstBondDeals = firstBondTrdProductDeals
+                    .stream()
+                    .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                            () -> new TreeSet<>(Comparator.comparing(TrdProductDeal::getTradeId))), ArrayList::new));
+            Map<String, Object> firstBondBatchRevoke = new HashMap<>();
+            List<Map<String, Object>> firstBondDataList = new ArrayList<>();
+            for(TrdProductDeal deal : distinctFirstBondDeals){
+                // 日间成交撤销数据
+                Map<String, Object> data = new HashMap<>();
+                data.put("busiType", DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
+                data.put("ps", deal.getPs());
+                data.put("closeId", deal.getTradeId());
+                data.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
+                data.put("busiAct", DictCodeListExt3.业务动作_成交匹配.getValue());
+                firstBondDataList.add(data);
+            }
+            firstBondBatchRevoke.put("data", firstBondDataList);
+            firstBondBatchRevoke.put("userId", LoginUserUtil.getUserName());
+            firstBondBatchRevoke.put("totalTradeId",IDGenerator.generate());
+            firstBondBatchRevoke.put("modelType",DictCodeListExt1.子系统代码_交易.getValue());
+            logger.debug("【批量撤销中标结果维护中的自主投标一级分销数据】batchRevoke:{}", JSON.toJSONString(firstBondBatchRevoke));
+            PositionHttpRequest.batchRevoke(firstBondBatchRevoke);
+        }
+        // 撤销中标结果维护中的自主投标的一级分销头寸 add by fuyongsheng 20220622 end
     }
 
     public void updateEtrStatusByTrdId(List<String> tradeIdList, List<String> totalTradeIdList) {

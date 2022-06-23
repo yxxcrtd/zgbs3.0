@@ -317,21 +317,12 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
 
         List<EtrEntrustDto> etrEntrustDtoList = stlDataGatherMapper.selectSpecialEtrEntrustData(paramMap);
 
-        List<EtrEntrustDto> etrEntrustDtoFirstBondList = new ArrayList<>();
         paramMap.put("finprodTypeList", Collections.singletonList(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()));
         paramMap.put("psList", Collections.singletonList(DictCodeList.交易方向_买入.getValue()));
-        List<EtrEntrustDto> etrEntrustDtoList1 = stlDataGatherMapper.selectFirstBondEtrEntrustData(paramMap);
-        if(CollectionUtils.isNotEmpty(etrEntrustDtoList1)){
-            for(EtrEntrustDto etrEntrustDto : etrEntrustDtoList1){
-                Map<String, Object> map = new HashMap<>();
-                map.put("entrustId", etrEntrustDto.getEntrustId());
-                map.put("BID_MODLE_03", DictCodeListExt4.投标方式_分销买入.getValue());
-                List<BidOrderBidPrice> bidPrices = stlDataGatherMapper.selectBidOrderBidPrices(map);
-                if(CollectionUtils.isNotEmpty(bidPrices)){
-                    etrEntrustDtoFirstBondList.add(etrEntrustDto);
-                }
-            }
-        }
+        paramMap.put("BID_MODLE_03", DictCodeListExt4.投标方式_分销买入.getValue());
+        // 是否中标
+        paramMap.put("IS_WIN_Y", DictCodeList.是否_是.getValue());
+        List<EtrEntrustDto> etrEntrustDtoFirstBondList = stlDataGatherMapper.selectFirstBondEtrEntrustData(paramMap);
         etrEntrustDtoList.addAll(etrEntrustDtoFirstBondList);
 
         if (StringUtil.isEmptyList(etrEntrustDtoList)) {
