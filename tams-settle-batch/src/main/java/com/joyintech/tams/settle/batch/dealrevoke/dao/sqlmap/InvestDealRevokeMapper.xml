@@ -1101,4 +1101,27 @@ FROM TRD_PRODUCT_DEAL A
             </otherwise>
         </choose>
     </delete>
+
+    <select id="getFirstBondNeedRevokeTrdProductDeals" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+        SELECT
+            trd.TRADE_ID,
+            trd.PS
+        FROM
+            TRD_PRODUCT_DEAL trd
+        LEFT JOIN
+            TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON trd.TOTLE_TRADE_ID = tfpdt.TOTLE_TRADE_ID
+        LEFT JOIN
+            BID_RESULT_TOTAL brt ON tfpdt.B_TRADE_ID = brt.TOTAL_WIN_ID
+        INNER JOIN
+            BID_ORDER bo ON brt.BID_ID = bo.BID_ID
+        WHERE
+            trd.FINPROD_TYPE2 = #{FIN_PRODUCT_TYPE2_F32}
+            AND trd.TG_BUSI_TYPE = #{TG_BUSI_TYPE_151}
+            AND trd.TRADE_MARKET IN (#{TRADE_MARKET_03}, #{TRADE_MARKET_04})
+            AND trd.TRADE_STATUS = #{TRADE_STATUS_01}
+            AND trd.IS_CANCEL = #{IS_CANCEL_N}
+            AND trd.TRADE_DATE = #{dealDate,jdbcType=DATE}
+            AND brt.IS_WIN = #{IS_WIN_Y}
+            AND bo.BID_MODLE = #{BID_MODLE_03}
+    </select>
 </mapper>

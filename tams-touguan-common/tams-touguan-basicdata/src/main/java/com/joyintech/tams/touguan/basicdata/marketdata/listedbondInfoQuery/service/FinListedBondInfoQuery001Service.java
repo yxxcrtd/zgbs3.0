@@ -45,10 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 待上市债券市场信息查询服务类
@@ -178,7 +175,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         AjaxResult ajaxResult = new AjaxResult();
         logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]；additionalBatches: [{}]", secId, additionalBatches);
         List<ValidMessage> validMessages = new ArrayList<>();
-        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2AndBatch(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), additionalBatches);
         //该债券信息在系统中已存在，无法加券！
         if (finProduct != null) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
@@ -236,7 +233,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         List<MstCalendarInfo> mstCalendarInfoList = getMstCalendarInfo();
         //new标的类金融产品
         FinProduct finProduct = new FinProduct();
-        String finProdId = commonBusinessService.getFinProdId(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), StringUtil.EMPTY);
+        String finProdId = getFinprodId(secId);
         finProduct.setFinprodId(finProdId);
         finProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         finProduct.setFinprodAbbr(finListedBondInfoQuery001Dto.getBondAbbreviation());
@@ -460,7 +457,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      */
     private void saveOperate(String tradeId, String remark, DictCodeListExt3 operType, String workFlowId) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        String finProdId = commonBusinessService.getFinProdId(tradeId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), StringUtil.EMPTY);
+        String finProdId = getFinprodId(tradeId);
         oprHisReq.setEntrustId(finProdId);
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
@@ -537,5 +534,18 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             }
         }
     }
+
+
+    /**
+     * 构造金融标的代码
+     *
+     * @param secId
+     * @return
+     */
+    public String getFinprodId(String secId) {
+        String[] arr = secId.split("\\.");
+        return String.format("%s_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0], DateUtil.format(new Date(), "yyyyMMddHHmmss"), arr[1]);
+    }
+
 
 }

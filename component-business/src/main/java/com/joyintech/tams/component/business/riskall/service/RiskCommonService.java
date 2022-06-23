@@ -521,7 +521,6 @@ public class RiskCommonService {
      * @return
      */
     private List<RiskNameListResult> riskNameListValid(List<RiskNameListDto> riskNameListDtoList,boolean isCheckAsset,boolean isCheckOrg){
-
         List<RiskNamListCommonDto> dtoList = new ArrayList<RiskNamListCommonDto>();
         List<RiskNameListResult> resultList = new ArrayList<>();
         for(RiskNameListDto riskNameList : riskNameListDtoList){
@@ -545,17 +544,9 @@ public class RiskCommonService {
                 if (item == null || StringUtil.isEmpty(item.getListId())){
                     continue;
                 }
-                // 名单控制类别为资产名单时，过滤掉机构名单(名单主体明细类型 不是资产)，不校验
-                if (isCheckAsset && !StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_资产.getValue())){
-                    continue;
-                }
-                // 名单控制类别为机构名单时，过滤掉资产名单(名单主体明细类型是资产)，不校验
-                if (isCheckOrg && StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_资产.getValue())){
-                    continue;
-                }
                 // 名单主体明细类型为资产、资产代码为空时
                 if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_资产.getValue())
-                    && StringUtil.isNotEmpty(item.getFinprodId())){
+                    && StringUtil.isNotEmpty(item.getFinprodId()) && isCheckAsset){
                     Map<String, Object> nameListMap = new HashMap<>();
                     nameListMap.put("listId", item.getListId());
                     nameListMap.put("finprodId", item.getFinprodId());
@@ -579,55 +570,56 @@ public class RiskCommonService {
                         resultList.add(riskNameListResult);
                     }
                     continue;
-                }
-                Map<String, Object> nameListMap = new HashMap<>();
-                nameListMap.put("listId", item.getListId());
-                String customerId = "";
-                if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_发行人.getValue())){
-                    customerId = item.getIssuer();
-                }
-                if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_管理人.getValue())){
-                    customerId = item.getManager();
-                }
-                if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_融资人.getValue())){
-                    customerId = item.getFinancier();
-                }
-                if (StringUtil.isNotEmpty(customerId)){
-                    RiskNamListCommonDto riskNameListCommonDto = riskNamListCommonMapper.selectCustomerInfo(customerId);
-                    if (isCustomerMatch(riskNameListCommonDto, nameListMap)) {
-                        RiskNameListResult riskNameListResult = new RiskNameListResult();
-                        riskNameListResult.setListName(item.getListName());
-                        riskNameListResult.setName(item.getFinprodAbbr());
-                        riskNameListResult.setListDetailType("机构名单");
-                        if (StringUtil.equals(item.getListType(), DictCodeListRsk.名单属性_黑名单.getValue())) {
-                            riskNameListResult.setErrorMsg("机构在黑名单内: "+riskNameListCommonDto.getCustomerName());
-                            riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
-                            riskNameListResult.setListType(DictCodeListRsk.名单属性_黑名单.getValue());
-                        }else {
-                            riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
-                            riskNameListResult.setListType(DictCodeListRsk.名单属性_白名单.getValue());
-                        }
-                        resultList.add(riskNameListResult);
+                }else if(isCheckOrg) {
+                    Map<String, Object> nameListMap = new HashMap<>();
+                    nameListMap.put("listId", item.getListId());
+                    String customerId = "";
+                    if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_发行人.getValue())) {
+                        customerId = item.getIssuer();
                     }
-                    continue;
-                }
-                if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt3.名单主体明细类型_交易对手.getValue())) {
-                    if (param.containsKey("counterId") && StringUtil.isNotEmpty(param.get("counterId"))) {
-                        RiskNamListCommonDto riskNameListCommonDto = riskNamListCommonMapper.selectCustomerInfo2(param.get("counterId").toString(), DictCodeListExt1.交易对手类型_市场机构.getValue());
+                    if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_管理人.getValue())) {
+                        customerId = item.getManager();
+                    }
+                    if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_融资人.getValue())) {
+                        customerId = item.getFinancier();
+                    }
+                    if (StringUtil.isNotEmpty(customerId)) {
+                        RiskNamListCommonDto riskNameListCommonDto = riskNamListCommonMapper.selectCustomerInfo(customerId);
                         if (isCustomerMatch(riskNameListCommonDto, nameListMap)) {
                             RiskNameListResult riskNameListResult = new RiskNameListResult();
                             riskNameListResult.setListName(item.getListName());
                             riskNameListResult.setName(item.getFinprodAbbr());
                             riskNameListResult.setListDetailType("机构名单");
                             if (StringUtil.equals(item.getListType(), DictCodeListRsk.名单属性_黑名单.getValue())) {
-                                riskNameListResult.setErrorMsg("交易对手在黑名单内: "+riskNameListCommonDto.getCustomerName());
+                                riskNameListResult.setErrorMsg("机构在黑名单内: " + riskNameListCommonDto.getCustomerName());
                                 riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
                                 riskNameListResult.setListType(DictCodeListRsk.名单属性_黑名单.getValue());
-                            }else {
+                            } else {
                                 riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
                                 riskNameListResult.setListType(DictCodeListRsk.名单属性_白名单.getValue());
                             }
                             resultList.add(riskNameListResult);
+                        }
+                        continue;
+                    }
+                    if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt3.名单主体明细类型_交易对手.getValue())) {
+                        if (param.containsKey("counterId") && StringUtil.isNotEmpty(param.get("counterId"))) {
+                            RiskNamListCommonDto riskNameListCommonDto = riskNamListCommonMapper.selectCustomerInfo2(param.get("counterId").toString(), DictCodeListExt1.交易对手类型_市场机构.getValue());
+                            if (isCustomerMatch(riskNameListCommonDto, nameListMap)) {
+                                RiskNameListResult riskNameListResult = new RiskNameListResult();
+                                riskNameListResult.setListName(item.getListName());
+                                riskNameListResult.setName(item.getFinprodAbbr());
+                                riskNameListResult.setListDetailType("机构名单");
+                                if (StringUtil.equals(item.getListType(), DictCodeListRsk.名单属性_黑名单.getValue())) {
+                                    riskNameListResult.setErrorMsg("交易对手在黑名单内: " + riskNameListCommonDto.getCustomerName());
+                                    riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
+                                    riskNameListResult.setListType(DictCodeListRsk.名单属性_黑名单.getValue());
+                                } else {
+                                    riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
+                                    riskNameListResult.setListType(DictCodeListRsk.名单属性_白名单.getValue());
+                                }
+                                resultList.add(riskNameListResult);
+                            }
                         }
                     }
                 }

@@ -1,0 +1,1 @@
+update SYS_PAGE set PAGE_URL = '/home.html#/approve/winmaintain' where SYS_PAGE.PAGE_ID = 'CfetsPrimaryBidManage002';
