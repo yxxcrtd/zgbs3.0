@@ -228,8 +228,12 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END
                 AS	faceValue,
-            CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BRBP.BID_PRICE
-            WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD*100,4),'FM99999990.0000')||'%' END AS tradeYield,
+            decode(BO.BID_MODLE,null,
+                    TO_CHAR(ROUND(FPI.REFER_YIELD*100,4),'FM99999990.0000')||'%',
+                    decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},BRBP.BID_PRICE||' %',
+                                            #{TENDER_TARGET_02},BRBP.BID_PRICE||' 元',
+                                            #{TENDER_TARGET_03},BRBP.BID_PRICE||' BP',BRBP.BID_PRICE))
+            AS tradeYield,
             null									AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.PAYABLE_AMOUNT END AS	tradeAmt,
@@ -259,13 +263,17 @@
                                   wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
                                   wm_concat(BRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                                   wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                                  wm_concat(TO_CHAR(ROUND(BRBP.BID_PRICE*100,4),'FM9999990.0000')||'%') BID_PRICE
+                                  wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(BRBP.BID_PRICE*100,4),'FM999999990.9990')
+                                                                    ,#{TENDER_TARGET_02},TO_CHAR(ROUND(BRBP.BID_PRICE,4),'FM999999990.9990')
+                                                                    ,#{TENDER_TARGET_03},TO_CHAR(ROUND(BRBP.BID_PRICE*10000,4),'FM999999990.90'))) BID_PRICE
                    FROM BID_ORDER_BID_PRICE BRBP
                    LEFT JOIN PTL_PORTFOLIO PP
                           ON PP.PORTFOLIO_ID = BRBP.PORTFOLIO_ID
                    LEFT JOIN ETR_ENTRUST_DETAIL EED
                           ON PP.PORTFOLIO_ID = EED.PORTFOLIO_ID
                          AND BRBP.ENTRUST_ID = EED.ENTRUST_ID
+                   left join ETR_ENTRUST ee on ee.ENTRUST_ID = eed.ENTRUST_ID
+                   left join FIN_PRODUCT_ISSUE fpi on ee.FINPROD_ID = fpi.FINPROD_ID
                    LEFT JOIN STL_SEC_ACCT_INFO STLINFO
                           ON BRBP.SEC_ACCT_ID=STLINFO.SEC_ACCT_ID
                    LEFT JOIN STL_SEC_ACCT_INFO STLINFO1
@@ -383,8 +391,12 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN WBO.WIN_PRIN_AMT/10000
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN WBO.SUBSCRIPTION_AMOUNT/10000
                 END AS	faceValue,
-                CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN WBRBP.BID_PRICE
-                WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN TO_CHAR(ROUND(FPI.REFER_YIELD*100,4),'FM990.0000')||'%' END AS	tradeYield,
+            decode(WBO.BID_MODLE,null,
+                    TO_CHAR(ROUND(FPI.REFER_YIELD*100,4),'FM99999990.9990')||'%',
+                    decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},WBRBP.BID_PRICE||' %',
+                                            #{TENDER_TARGET_02},WBRBP.BID_PRICE||' 元',
+                                            #{TENDER_TARGET_03},WBRBP.BID_PRICE||' BP',WBRBP.BID_PRICE))
+            AS tradeYield,
             null	AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN WBO.PAYABLE_AMOUNT END  AS	tradeAmt,
@@ -409,7 +421,9 @@
                     wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
                     wm_concat(WBRBP.PORTFOLIO_ID) PORTFOLIO_ID,
                     wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                    wm_concat(TO_CHAR(ROUND(WBRBP.BID_PRICE*100,4),'FM990.0000')||'%') BID_PRICE
+                    wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(WBRBP.BID_PRICE*100,4),'FM999999990.9990')
+                            ,#{TENDER_TARGET_02},TO_CHAR(ROUND(WBRBP.BID_PRICE,4),'FM999999990.9990')
+                            ,#{TENDER_TARGET_03},TO_CHAR(ROUND(WBRBP.BID_PRICE*10000,4),'FM999999990.90'))) BID_PRICE
                 FROM WFL_BID_ORDER_BID_PRICE WBRBP
                 LEFT JOIN PTL_PORTFOLIO PP
                 ON PP.PORTFOLIO_ID = WBRBP.PORTFOLIO_ID
@@ -418,6 +432,8 @@
                 LEFT JOIN ETR_ENTRUST_DETAIL EED
                        ON PP.PORTFOLIO_ID = EED.PORTFOLIO_ID
                       AND WBRBP.ENTRUST_ID = EED.ENTRUST_ID
+                left join ETR_ENTRUST ee on ee.ENTRUST_ID = eed.ENTRUST_ID
+                left join FIN_PRODUCT_ISSUE fpi on ee.FINPROD_ID = fpi.FINPROD_ID
                 LEFT JOIN STL_SEC_ACCT_INFO STLINFO1
                        ON EED.SEC_ACCT_ID=STLINFO1.SEC_ACCT_ID
                 where 1=1
@@ -3283,7 +3299,12 @@
         left join SYS_DATADICT_LIST sdlcs on sdlcs.DICT_CODE='SETTLE_STATUS' and aaa.cleanStatus=sdlcs.ITEM_CODE
         left join SYS_DATADICT_LIST sdlss on sdlss.DICT_CODE='DELIVERY_STATUS' and aaa.settleStatus=sdlss.ITEM_CODE
         <!-- 关键字模糊查询 -->
-        <include refid="vagueQueryTradeWhere"></include>
+        <where>
+            <include refid="vagueQueryTradeWhere"></include>
+            <if test="busiTypePosition!=null and busiTypePosition != ''">
+                and aaa.tgBusiType = #{busiTypePosition}
+            </if>
+        </where>
         order by aaa.confirmTradeDate,aaa.effectiveStatus,aaa.finprodType2,aaa.tgBusiType,aaa.ps)
         <!--前端传入排序字段-->
         <if test="sort != null and sort != '' and direction != null and direction != ''">
@@ -3293,7 +3314,6 @@
 
     <sql id="vagueQueryTradeWhere">
         <if test="search != null and search != '' and search !='有效' ">
-            <where>
                 ((
                 sdles.ITEM_VALUE || '|' ||sdlcs.ITEM_VALUE || '|' || sdlss.ITEM_VALUE
                 || '|' ||aaa.totleTradeId || '|' || aaa.finprodType2Str
@@ -3315,7 +3335,6 @@
                 or replace(aaa.settleDate,'-','/')||''=#{search}
                 or replace(aaa.settleDate,'-','/')||''=#{year}||'/'||#{search}
                 )
-            </where>
         </if>
     </sql>
     <select id="queryAllTradeDetailInfoList"
@@ -4123,6 +4142,61 @@
             <result column="COUNTER_CONTACT"    property="contactInfo"   jdbcType="VARCHAR" />
         </association>
     </resultMap>
+    <resultMap id="trdFirstBondInvestTradeFullResultMap" type="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdFirstBondInvestTradeDto"
+               extends="com.joyintech.tams.common.base.dao.TrdProductDealMapper.BaseResultMap">
+        <result column="fee_amt"    property="channelFee"   jdbcType="DECIMAL"/>
+        <result column="ENTRUST_ID"         property="entrustId"        jdbcType="VARCHAR" />
+        <result column="PORTFOLIO_ID"       property="portfolioId"      jdbcType="VARCHAR" />
+        <result column="integrateTradeAmt"       property="integrateTradeAmt"      jdbcType="DECIMAL" />
+        <result column="ownTradeAmt"       property="ownTradeAmt"      jdbcType="DECIMAL" />
+        <result column="integrateCpriceAmt"       property="integrateCpriceAmt"      jdbcType="DECIMAL" />
+        <result column="integrateIntAmt"       property="integrateIntAmt"      jdbcType="DECIMAL" />
+        <result column="ownIntAmt"       property="ownIntAmt"      jdbcType="DECIMAL" />
+        <result column="integrateFpriceAmt"       property="integrateFpriceAmt"      jdbcType="DECIMAL" />
+        <result column="ownFpriceAmt"       property="ownFpriceAmt"      jdbcType="DECIMAL" />
+        <result column="PORTFOLIO_NAME"     property="portfolioName"    jdbcType="VARCHAR" />
+        <result column="FINPROD_ID"         property="finprodId"        jdbcType="VARCHAR" />
+        <result column="FINPROD_NAME"       property="finprodName"      jdbcType="VARCHAR" />
+        <result column="CALENDAR_ID"       property="calendarId"      jdbcType="VARCHAR" />
+        <result column="WORKFLOW_ID"       property="workflowId"       jdbcType="VARCHAR" />
+        <result column="WORKFLOW_STATUS"       property="workflowStatus"       jdbcType="VARCHAR" />
+        <!-- 推荐方 新增 zhuyongkang 20191023 start -->
+        <result column="ASSET_RECOMMAND_ORG"       property="assetRecommandOrg"       jdbcType="VARCHAR" />
+        <!-- 推荐方 新增 zhuyongkang 20191023 start -->
+        <result column="REFUND_RATE"       property="refundRate"      jdbcType="DECIMAL" />
+        <result column="REFUND_AMOUNT"       property="refundAmount"      jdbcType="DECIMAL" />
+        <result column="businessModel"       property="businessModel"      jdbcType="VARCHAR" />
+
+        <result column="UNIT_CPRICE"       property="unitCprice"      jdbcType="DECIMAL" />
+        <result column="YIELD"       property="yield"      jdbcType="DECIMAL" />
+        <result column="EXER_YIELD"       property="exerYield"      jdbcType="DECIMAL" />
+        <result column="REMARK"       property="remark"      jdbcType="VARCHAR" />
+        <result column="UNIT_INT"       property="unitInt"      jdbcType="DECIMAL" />
+        <result column="UNIT_FPRICE"       property="unitFprice"      jdbcType="DECIMAL" />
+        <result column="CPRICE_AMT"       property="cpriceAmt"      jdbcType="DECIMAL" />
+        <result column="INT_AMT"       property="intAmt"      jdbcType="DECIMAL" />
+        <result column="FPRICE_AMT"       property="fpriceAmt"      jdbcType="DECIMAL" />
+        <result column="ouPartyId"       property="ouPartyId"      jdbcType="VARCHAR" />
+        <result column="ouTraderId"       property="ouPartyId"      jdbcType="VARCHAR" />
+        <result column="execid"       property="execid"      jdbcType="VARCHAR" />
+        <result column="finprodMarketId"       property="finprodMarketId"      jdbcType="VARCHAR" />
+        <result column="settleSpeedStr"       property="settleSpeedStr"      jdbcType="VARCHAR" />
+        <result column="deliveryType"       property="deliveryType"      jdbcType="VARCHAR" />
+        <result column="qty"       property="qty"      jdbcType="DECIMAL" />
+        <result column="procedureAmt"       property="procedureAmt"      jdbcType="DECIMAL" />
+        <result column="settleServiceAmt"       property="settleServiceAmt"      jdbcType="DECIMAL" />
+        <result column="clearType"       property="clearType"      jdbcType="VARCHAR" />
+        <result column="ouPartyIdStr"       property="ouPartyIdStr"      jdbcType="VARCHAR" />
+        <result column="ouTraderIdStr"       property="ouTraderIdStr"      jdbcType="VARCHAR" />
+        <result column="counterIdStr"       property="counterIdStr"      jdbcType="VARCHAR" />
+        <result column="counterTraderStr"       property="counterTraderStr"      jdbcType="VARCHAR" />
+        <association property="trdInvestPersonInfo" javaType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdInvestPersonInfoDto">
+            <result column="TRADER"             property="trader"           jdbcType="VARCHAR" />
+            <result column="COUNTER_ID"         property="counterId"        jdbcType="VARCHAR" />
+            <result column="COUNTER_TRADER"     property="counterTrader"    jdbcType="VARCHAR" />
+            <result column="COUNTER_CONTACT"    property="contactInfo"   jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
 
     <select id="getTrdBondInvestTradeDto" resultMap="trdBondInvestTradeFullResultMap">
         SELECT DISTINCT
@@ -4187,6 +4261,83 @@
         left join MST_CFETS_CUSTOMER_TRADER t4 on t4.TRADER_ID=tpd.COUNTER_TRADER
         WHERE tpd.TOTLE_TRADE_ID = #{tradeId}
     </select>
+
+    <select id="getTrdFirstBondInvestTradeDto" resultMap="trdFirstBondInvestTradeFullResultMap">
+        SELECT  DISTINCT tpd.TOTLE_TRADE_ID
+               ,tpd.FINPROD_TYPE2
+               ,tpda.ENTRUST_ID
+               ,PP.PORTFOLIO_ID
+               ,tpd.SETTLE_SPEED
+               ,tpd.TRADE_DATE
+               ,tpd.SETTLE_DATE
+               ,tpd.PS
+               ,tpd.FINPROD_ID
+               ,fp.finprod_abbr FINPROD_NAME
+               ,fp.CALENDAR_ID
+               ,tpd.TRADE_MARKET
+               ,tpd.TRADE_PLAT
+               ,tpd.TRADE_MARKET_MODE
+               ,nvl(tpd.INV_AIM,trd_product_deal.INV_AIM) INV_AIM
+               ,tpd.F_TRADE_ID
+               ,tpd.SEC_MANAGE_ACCT_ID
+               ,nvl(tpd.CCY,trd_product_deal.CCY) CCY
+               ,tpd.SHARE_AMT * 100                                 AS TRADE_AMT
+               ,tpda.LENDIN_SHARE_AMT * 100 integrateTradeAmt
+               ,nvl(tpda.OUR_SHARE_AMT,tpd.SHARE_AMT) * 100 ownTradeAmt
+               ,tpd.UNIT_CPRICE
+               ,tpd.UNIT_INT
+               ,tpd.UNIT_FPRICE
+               ,tpd.CPRICE_AMT
+               ,tpda.LENDIN_CPRICE_AMT integrateCpriceAmt
+               ,nvl(tpda.OUR_CPRICE_AMT,tpd.CPRICE_AMT) ownCpriceAmt
+               ,tpd.INT_AMT
+               ,tpda.LENDIN_FPRICE_AMT2 integrateIntAmt
+               ,nvl(tpda.OUR_FPRICE_AMT2,tpd.INT_AMT) ownIntAmt
+               ,tpd.FPRICE_AMT
+               ,tpda.LENDIN_FPRICE_AMT integrateFpriceAmt
+               ,nvl(tpda.OUR_FPRICE_AMT,tpd.FPRICE_AMT) ownFpriceAmt
+               ,tpd.YIELD
+               ,tpd.EXER_YIELD
+               ,tpd.REMARK
+               ,tpd.TRADER
+               ,tpd.COUNTER_ID
+               ,tpd.COUNTER_TRADER
+               ,tpd.COUNTER_CONTACT
+               ,tpd.CHL_ID
+               ,tpd.FEE_AMT
+               ,tpda.ASSET_RECOMMAND_ORG
+               ,tpd.PRIN_AMT
+               ,ptpd.REFUND_RATE*100                                AS REFUND_RATE
+               ,ptpd.REFUND_AMOUNT                                  AS REFUND_AMOUNT
+               ,TRD_PRODUCT_DEAL.BUSINESS_MODEL                     AS businessModel
+               ,tpda.ou_party_id                                    AS ouPartyId
+               ,tpd.TRADER                                          AS ouTraderId
+               ,match.exe_id                                        AS execid
+               ,fp.Finprod_Market_Id                                AS finprodMarketId
+               ,decode(tpd.settle_speed,'0','01','1','02','2','03') AS settleSpeedStr
+               ,tpd.delivery_type                                   AS deliveryType
+               ,tpd.SHARE_AMT/100                                   AS qty
+               ,ttft.fee_amt                                        AS settleServiceAmt
+               ,tpd.clear_type                                      AS clearType
+               ,nvl(t2.PARTY_ABBR,tpda.ou_party_id)                 AS ouPartyIdStr
+               ,nvl(t3.real_name,tpd.TRADER)                        AS ouTraderIdStr
+               ,nvl(t1.counter_name,tpd.COUNTER_ID)                 AS counterIdStr
+               ,nvl(t4.TRADER_NAME,tpd.COUNTER_TRADER)              AS counterTraderStr
+        FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd
+        LEFT JOIN TRD_DEAL_TOTAL_ADD tpda ON tpda.TOTLE_TRADE_ID = tpd.TOTLE_TRADE_ID
+        LEFT JOIN PA_TRD_FIN_PRODUCT_DEAL_TOTAL ptpd ON ptpd.TOTLE_TRADE_ID = tpd.TOTLE_TRADE_ID
+        LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = tpd.FINPROD_ID
+        LEFT JOIN PTL_PORTFOLIO PP ON tpd.PORTFOLIO_ID = PP.PORTFOLIO_ID
+        LEFT JOIN trd_product_deal ON TRD_PRODUCT_DEAL.TOTLE_TRADE_ID = tpd.TOTLE_TRADE_ID
+        LEFT JOIN trdquto_match_info match ON tpd.TOTLE_TRADE_ID = match.trd_id
+        LEFT JOIN TRD_TRADE_FEE_TOTAL ttft ON tpd.TOTLE_TRADE_ID = ttft.TOTLE_TRADE_ID AND ttft.fee_type = #{B08}
+        LEFT JOIN MST_COUNTER_PARTY t1 ON t1.counter_id = tpd.COUNTER_ID
+        LEFT JOIN MST_CFETS_CUSTOMER_INFO t2 ON t2.PARTY_ID = tpda.ou_party_id
+        LEFT JOIN sys_user t3 ON t3.user_name = tpd.TRADER
+        LEFT JOIN MST_CFETS_CUSTOMER_TRADER t4 ON t4.TRADER_ID = tpd.COUNTER_TRADER
+        WHERE tpd.TOTLE_TRADE_ID = #{tradeId}
+    </select>
+
     <select id="selectRegTotalInfoById"  resultType="com.joyintech.tams.common.base.entity.RegFinProductDealTotal">
         select
         reg.totle_trade_id  as totleTradeId,
@@ -4681,7 +4832,8 @@
 				TFPDT.UNIT_FPRICE unitFprice,
 				TFPDT.CPRICE_AMT cpriceAmt,
 				TFPDT.INT_AMT intAmt,
-				TFPDT.TRADE_AMT tradeAmt
+				TFPDT.TRADE_AMT tradeAmt,
+                BO.PAYABLE_AMOUNT payableAmount
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
         LEFT JOIN FIN_PRODUCT FP
         ON		FP.FINPROD_ID = TFPDT.FINPROD_ID

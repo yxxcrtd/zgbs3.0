@@ -39,15 +39,13 @@ import com.joyintech.system.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
-import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmMatchDto;
 import com.joyintech.tams.cfets.trdquery.dao.CfetsTrdQueryMapper;
-import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdBondInvestTradeDto;
+import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdInvestPersonInfoDto;
 import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdQueryTradeInfoListResponse;
-import com.joyintech.tams.cfets.trdquery.dto.CfetsTrdRepoTrade002Dto;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
@@ -138,7 +136,7 @@ import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcServic
  * @since 1.0
  */
 @Service
-public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrdBondInvestTradeDto> implements BaseProcessService<CfetsTrdBondInvestTradeDto> {
+public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrdFirstBondInvestTradeDto> implements BaseProcessService<CfetsTrdFirstBondInvestTradeDto> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
@@ -382,7 +380,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    public void prepareEntity(CfetsTrdBondInvestTradeDto dto) {
+    public void prepareEntity(CfetsTrdFirstBondInvestTradeDto dto) {
         setDealData(dto);
 
         // 汇总扩展表
@@ -543,7 +541,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         // 金融产品交易扩展Entity 构造结束----------------------------------------------------------
     }
 
-    public void setDealData(CfetsTrdBondInvestTradeDto dto) {
+    public void setDealData(CfetsTrdFirstBondInvestTradeDto dto) {
         // 券面总额
         dto.setTotalFaceValue(dto.getTradeAmt());
         // add by jiangpeng on 20210622 自动加券的债券id没有"F01_"的前缀 TISHKBS-2200
@@ -622,7 +620,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      *
      * @param dto
      */
-    public void setDealDataForValid(CfetsTrdBondInvestTradeDto dto) {
+    public void setDealDataForValid(CfetsTrdFirstBondInvestTradeDto dto) {
         BigDecimal tradeAmt = dto.getTradeAmt();
         setDealData(dto);
         dto.setTradeAmt(tradeAmt);
@@ -661,7 +659,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         return result;
     }
 
-    private TrdDealTotalAdd 生成汇总附属表(CfetsTrdBondInvestTradeDto dto) {
+    private TrdDealTotalAdd 生成汇总附属表(CfetsTrdFirstBondInvestTradeDto dto) {
         TrdDealTotalAdd trdDealTotalAdd = new TrdDealTotalAdd();
         trdDealTotalAdd.setTotleTradeId(dto.getTotleTradeId());
         trdDealTotalAdd.setOurShareAmt(ArithmeticUtil.divide(dto.getOwnTradeAmt(), 100, 4));
@@ -703,20 +701,20 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         return result;
     }
 
-    private PaTrdFinProductDealTotal 生成汇总扩展表(CfetsTrdBondInvestTradeDto dto) {
+    private PaTrdFinProductDealTotal 生成汇总扩展表(CfetsTrdFirstBondInvestTradeDto dto) {
         PaTrdFinProductDealTotal productDealTotal = new PaTrdFinProductDealTotal();
         productDealTotal.setTotleTradeId(dto.getTotleTradeId());
         productDealTotal.setPaBussType(getPaBussType(dto.getPs()));
         return productDealTotal;
     }
 
-    private boolean checkIfNeed融入券(CfetsTrdBondInvestTradeDto dto) {
+    private boolean checkIfNeed融入券(CfetsTrdFirstBondInvestTradeDto dto) {
         return (DictCodeList.交易方向_买入.getValue().equals(dto.getPs()) || DictCodeList.交易方向_卖出.getValue().equals(dto.getPs()))
                 && dto.getIntegrateTradeAmt() != null && dto.getIntegrateTradeAmt().compareTo(BigDecimal.ZERO) > 0
                 && StringUtil.equals("01", CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED"));
     }
 
-    private void 生成交易扩展表(CfetsTrdBondInvestTradeDto dto, CfetsTrdInvestPersonInfoDto personInfo, String 交易编号,
+    private void 生成交易扩展表(CfetsTrdFirstBondInvestTradeDto dto, CfetsTrdInvestPersonInfoDto personInfo, String 交易编号,
                          List<PaTrdProductDeal> paTrdProductDeals) {
         PaTrdProductDeal paTrdProductDeal = new PaTrdProductDeal();
         paTrdProductDeal.setTradeId(交易编号); // 交易编号
@@ -743,7 +741,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         return null;
     }
 
-    private void 生成组合交易(CfetsTrdBondInvestTradeDto dto, String 交易编号, List<PtlTrade> ptlTrades) {
+    private void 生成组合交易(CfetsTrdFirstBondInvestTradeDto dto, String 交易编号, List<PtlTrade> ptlTrades) {
         PtlTrade ptlTrade = new PtlTrade();
         ptlTrade.setPortfolioId(dto.getPortfolioId()); // 组合代码
         ptlTrade.setBusiNo(交易编号); // 业务编号
@@ -771,7 +769,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    private void handleBussFlowData(CfetsTrdBondInvestTradeDto entity) {
+    private void handleBussFlowData(CfetsTrdFirstBondInvestTradeDto entity) {
         // 多组合交易时对附件进行处理
         //setDzhUploadFileList(entity);
 
@@ -894,7 +892,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         }
     }
 
-    public void setEntity(List<CfetsTrdBondInvestTradeDto> entitys) {
+    public void setEntity(List<CfetsTrdFirstBondInvestTradeDto> entitys) {
         entitys.forEach(entity -> {
             entity.setActPortfolioId(entity.getPortfolioId());
             entity.setPortfolioId(AllTradeCommonUtil.exchangePortfolio(entity.getPortfolioId()));
@@ -911,7 +909,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     @DataSource(DataSourceType.OTHER)
     @DTXTransaction
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
-    public void setDzhUploadFileList(CfetsTrdBondInvestTradeDto entity) {
+    public void setDzhUploadFileList(CfetsTrdFirstBondInvestTradeDto entity) {
         if (CollectionUtils.isNotEmpty(entity.getUploadFileList())) {
             for (UploadFile file : entity.getUploadFileList()) {
                 SysUploadFileInfo sysUploadFileInfo = sysUploadFileInfoMapper.selectByPrimaryKey(file.getFileNo());
@@ -931,7 +929,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     }
 
     /*
-     * private void setChannelFee(CfetsTrdBondInvestTradeDto entity) {
+     * private void setChannelFee(CfetsTrdFirstBondInvestTradeDto entity) {
      *
      * if (DictCodeList.交易方向_买入.getValue().equals(entity.getPs())) { entity.setTradeAmt(ArithmeticUtil.doAdd(entity.getTradeAmt(),
      * entity.getChannelFee())); } else { entity.setTradeAmt(ArithmeticUtil.subtract(entity.getTradeAmt(), entity.getChannelFee())); }
@@ -963,7 +961,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    private void dealInfoCbReportLogic_7_3(CfetsTrdBondInvestTradeDto dto) {
+    private void dealInfoCbReportLogic_7_3(CfetsTrdFirstBondInvestTradeDto dto) {
         // 7.7写入交易信息进交易报送信息表，为中债报送用
         // 1)查询产品登记编码
         String prodRegistCode = restTemplate.postForObject(
@@ -1027,7 +1025,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    private void assetDebtCbReportLogic_7_4(CfetsTrdBondInvestTradeDto dto) {
+    private void assetDebtCbReportLogic_7_4(CfetsTrdFirstBondInvestTradeDto dto) {
         // 利用金融产品代码作为条件把资产负债报送信息表中的报送状态更改为是
         restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/common/trdcommonbase/updateRepAssetDebt",
                 dto.getFinprodId(), Boolean.class);
@@ -1040,7 +1038,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    private void doRevokeInsert(CfetsTrdBondInvestTradeDto entity) {
+    private void doRevokeInsert(CfetsTrdFirstBondInvestTradeDto entity) {
         Map<String, Object> params = new HashMap<>();
         if (entity.getTotleTradeId().lastIndexOf('R') == entity.getTotleTradeId().length() - 1) {
             entity.setTotleTradeId(entity.getTotleTradeId().substring(0, entity.getTotleTradeId().length() - 1));
@@ -1063,17 +1061,14 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    public void doCompleteBidRevoke(CfetsTrdBondInvestTradeDto entity, String settleRemark, Boolean isNeedDealPosition) {
+    public void doCompleteBidRevoke(CfetsTrdFirstBondInvestTradeDto entity, String settleRemark, Boolean isNeedDealPosition) {
         // 调用基础组合.【金融产品交易组件.查询金融产品交易信息】获取原交易信息
         if (entity.getTotleTradeId().lastIndexOf('R') == entity.getTotleTradeId().length() - 1) {
             entity.setTotleTradeId(entity.getTotleTradeId().substring(0, entity.getTotleTradeId().length() - 1));
         }
-
         List<String> totleIdList1 = Arrays.asList(entity.getTotleTradeId());
         List<String> totleIdList = new ArrayList(totleIdList1);
-
         List<BaseTradeProductDealDto> baseTradeProductDealDtos = baseTradeProductDealService.selectTotalDeal(totleIdList);
-
         FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
         for (BaseTradeProductDealDto baseTradeProductDealDto : baseTradeProductDealDtos) {
             TrdProductDeal trdProductDeal = baseTradeProductDealDto.getTrdProductDeal();
@@ -1087,7 +1082,6 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             finProductTradeDto.setTotalFaceValue(entity.getTotalFaceValue());// 劵面总额
             finProductTradeDto.setNeedSum(true);
 
-
             // 委托代码不为空设置委托编号
             if (StringUtil.isNotEmpty(entity.getEntrustId())) {
                 baseTradeProductDealDto.setEntrustId(entity.getEntrustId());
@@ -1095,12 +1089,6 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
 
             finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
             baseTradeProductDealDto.setActPortfolioId(entity.getActPortfolioId());
-
-            trdProductDeal.setCreateUser(finProductTradeDto.getCreateUser());
-            trdProductDeal.setCreateTime(finProductTradeDto.getCreateTime());
-            trdProductDeal.setCreateDept(finProductTradeDto.getCreateDept());
-            trdProductDeal.setUpdateTime(finProductTradeDto.getUpdateTime());
-            trdProductDeal.setUpdateUser(finProductTradeDto.getUpdateUser());
 
             //          一级投标信息不为空
             if (StringUtil.isNotEmpty(entity.getBondFirstSign())) {
@@ -1127,9 +1115,6 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
 //            investInterfCommService.doInvestInterf(investInterfCommDto);
             // 调用投管接口 add by renping 20190205 end
             trdProductDeal.setTradeId(tradeId);
-
-            //删除授信占用
-//            riskCreditListCommonValidatorService.deleteCredit(cetradeid);
 
             //插入头寸
             if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
@@ -1206,7 +1191,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @param isdeleteflag    是否是作废删除
      * @return
      */
-    private void isNeedOccupy(CfetsTrdBondInvestTradeDto entity, boolean isNotBottomflag, boolean isSave, Boolean isdeleteflag) {
+    private void isNeedOccupy(CfetsTrdFirstBondInvestTradeDto entity, boolean isNotBottomflag, boolean isSave, Boolean isdeleteflag) {
         // 所有交易生效后调用的共通方法(入账信息) 撤销后释放占用的授信额度 Add 20190828 by xkni
         AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
         inputDto.setProdid(entity.getPortfolioId());
@@ -1246,7 +1231,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     }
 
     @Override
-    public void doInsert(CfetsTrdBondInvestTradeDto entity, OperationType operationType) {
+    public void doInsert(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType) {
         if (StringUtil.isNotEmpty(entity.getBondFirstSign()) && !OperationType.REVOKE.equals(operationType)) {
             Map<String, Object> map1 = new HashMap<>();
             map1.put("tradeId", entity.getTotleTradeId());
@@ -1273,22 +1258,22 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * {@inheritDoc}
      */
     @Override
-    public void doUpdate(CfetsTrdBondInvestTradeDto entity) {
+    public void doUpdate(CfetsTrdFirstBondInvestTradeDto entity) {
         if (!StringUtil.equals("revoke", entity.getOperateType()) && !StringUtil.equals("delete", entity.getOperateType())) {
             // 先删除流程中数据
             this.deleteBussFlowData(entity.getWorkflowId());
             //流程中修改保存不会进入controller的save方法，会导致丢失数据
             if (StringUtil.isEmpty(entity.getTotleTradeId())) {
                 try {
-                    List<CfetsTrdBondInvestTradeDto> dtoList = getDtoList(entity);
+                    List<CfetsTrdFirstBondInvestTradeDto> dtoList = getDtoList(entity);
                     setEntity(dtoList);
                     if (dtoList.size() > 0) {
                         BeanUtil.copyPropertiesIgnoreNull(entity, dtoList.remove(0));
                     }
                     //存在多条，需要新建工作流
                     if (dtoList.size() > 0) {
-                        ProcessParameter<CfetsTrdBondInvestTradeDto> processParameter = new ProcessParameter<>();
-                        WorkFlowParameter<CfetsTrdBondInvestTradeDto> workFlowParameter = new WorkFlowParameter<>();
+                        ProcessParameter<CfetsTrdFirstBondInvestTradeDto> processParameter = new ProcessParameter<>();
+                        WorkFlowParameter<CfetsTrdFirstBondInvestTradeDto> workFlowParameter = new WorkFlowParameter<>();
                         processParameter.setWorkFlowParameter(workFlowParameter);
                         processParameter.setPageId("TrdBondInvestTrade002");
                         if (StringUtil.equals(entity.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_NEW)) {
@@ -1305,7 +1290,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
                                 getMessage("TrdBondInvestTrade002.tradeId") + GlobalConstant.COLON + dto.getTotleTradeId(),
                                 getMessage("TrdBondInvestTrade002.finprodName") + GlobalConstant.COLON + dto.getFinprodName(),
                                 getMessage("TrdBondInvestTrade002.tradeDate") + GlobalConstant.COLON + DateUtil.format(dto.getTradeDate())));
-                        this.start(processParameter, dtoList.toArray(new CfetsTrdBondInvestTradeDto[]{}));
+                        this.start(processParameter, dtoList.toArray(new CfetsTrdFirstBondInvestTradeDto[]{}));
                     }
 
                 } catch (Exception e) {
@@ -1324,7 +1309,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             entity.setPortfolioId(entity.getActPortfolioId());
             ProcessMark newEntity;
             try {
-                newEntity = WorkFlowUtil.getBusinessObjectFromRequest(CfetsTrdBondInvestTradeDto.class, true);
+                newEntity = WorkFlowUtil.getBusinessObjectFromRequest(CfetsTrdFirstBondInvestTradeDto.class, true);
                 // 工作流ID
                 newEntity.setWorkflowId(entity.getWorkflowId());
                 newEntity.setStatus(entity.getStatus());
@@ -1338,13 +1323,13 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         }
     }
 
-    public List<CfetsTrdBondInvestTradeDto> getDtoList(CfetsTrdBondInvestTradeDto dto) throws InvocationTargetException, IllegalAccessException {
-        List<CfetsTrdBondInvestTradeDto> dtoList = new ArrayList<>();
+    public List<CfetsTrdFirstBondInvestTradeDto> getDtoList(CfetsTrdFirstBondInvestTradeDto dto) throws InvocationTargetException, IllegalAccessException {
+        List<CfetsTrdFirstBondInvestTradeDto> dtoList = new ArrayList<>();
         List<BussTrdTransfenpeiDto> fenpeiList = dto.getBussTrdTransfenpeiDto();
         List<BussTrdTransferOrderDto> orderList = dto.getBussTrdTransferOrder();
         for (BussTrdTransferOrderDto bussTrdTransferOrder : orderList) {
 
-            CfetsTrdBondInvestTradeDto tempDto = new CfetsTrdBondInvestTradeDto();
+            CfetsTrdFirstBondInvestTradeDto tempDto = new CfetsTrdFirstBondInvestTradeDto();
             BeanUtil.copyProperties(tempDto, dto);
             List<BussTrdTransferOrderDto> tmpOrderList = new ArrayList<BussTrdTransferOrderDto>();
             if (fenpeiList != null && fenpeiList.size() > 0) {
@@ -1392,8 +1377,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      */
     @Override
     public void doDelete(String workflowId) {
-        CfetsTrdBondInvestTradeDto entity = this.getBussinessEntityByWorkflowId(
-                workflowId);
+        CfetsTrdFirstBondInvestTradeDto entity = this.getBussinessEntityByWorkflowId(workflowId);
         if (StringUtil.isNotEmpty(entity.getBondFirstSign()) && !"revoke".equals(entity.getOperateType())) {
             Map<String, Object> map1 = new HashMap<>();
             map1.put("tradeId", null);
@@ -1439,52 +1423,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         }
     }
 
-    @Override
-    public void doComplete(CfetsTrdBondInvestTradeDto entity, OperationType operationType) {
-        String tradeId = entity.getTotleTradeId();
-        //买入含权债时，自动创建交易对手 add by wangwei5 2020-03-23 Start
-        if (operationType.equals(OperationType.NEW)) {
-            //含权债标记
-            String str = entity.getFinprodId();
-            if (!StringUtil.equals(str.substring(0, 3), "F01")) {
-                entity.setFinprodId("F01_" + str);
-            }
-            DebtBaseInfo debtbaseinfo = trdFinProductDealTotalMapper.selectIsRight(entity.getFinprodId());
-            if (StringUtil.isNotEmpty(debtbaseinfo.getIsRight()) && StringUtil.isNotEmpty(entity.getPs())) {
-                if ("Y".equals(debtbaseinfo.getIsRight()) && "T01".equals(entity.getPs())) {
-                    BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
-                    bussinessCodeParameter.setCommonBusinessType(DictCodeList.共通业务类型_交易对手管理);
-                    debtbaseinfo.setCounterId(baseGetBusinessId.buildBussinessCode(bussinessCodeParameter));
-                    debtbaseinfo.setCreateUser(LoginUserUtil.getUserName());
-                    debtbaseinfo.setCreateDept(LoginUserUtil.getDeptCode());
-                    debtbaseinfo.setUpdateUser(LoginUserUtil.getUserName());
-                    //判断交易对手表中是否存在
-                    int flag = trdFinProductDealTotalMapper.selectCounterName(debtbaseinfo.getCounterName());
-                    if (flag == 0) {
-                        trdFinProductDealTotalMapper.insertDebtBaseInfo(debtbaseinfo);
-                    }
-                }
-            }
-        }
-        //买入含权债时，自动创建交易对手 add by wangwei5 2020-03-23 end
-        if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
-
-        }
-        // 撤销
-        else {
-            this.doCompleteBidRevoke(entity, "", true);
-
-            //补充  如果是撤销将交易ID赋值为null
-            Map<String, Object> map = new HashMap<>();
-            map.put("totleTradeId", entity.getTotleTradeId());
-            map.put("entrustId", entity.getEntrustId());
-            restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME + "/Etrbondbiddingresult/deleteTradeId", map,
-                    Integer.class);
-        }
-
-    }
-
-    private List<TrdTradeFeeTotal> getTrdTradeFeeDetails(CfetsTrdBondInvestTradeDto entity) {
+    private List<TrdTradeFeeTotal> getTrdTradeFeeDetails(CfetsTrdFirstBondInvestTradeDto entity) {
         List<TrdTradeFeeTotal> ttfdList = new ArrayList<>();
 
         //构筑结算费经手费保存到数据库的实体
@@ -1555,6 +1494,17 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             // add by wangpeng 费用设置 20180818 end
         }
         return ttfdList;
+    }
+
+    @Override
+    public void doComplete(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType) {
+        String tradeId = entity.getTotleTradeId();
+        if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
+            this.doCompleteBidRevoke(entity, "", true);
+        }
+        if(StringUtil.isNotEmpty(operationType)){
+            throw new RuntimeException("jp");
+        }
     }
 
     /**
@@ -1758,7 +1708,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    public AjaxResult calculateData(CfetsTrdBondInvestTradeDto inputDto) {
+    public AjaxResult calculateData(CfetsTrdFirstBondInvestTradeDto inputDto) {
         AjaxResult ajaxResult = new AjaxResult();
 
         // 校验输入参数
@@ -1783,7 +1733,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    private List<ValidMessage> validCalcAmt(CfetsTrdBondInvestTradeDto dto) {
+    private List<ValidMessage> validCalcAmt(CfetsTrdFirstBondInvestTradeDto dto) {
         List<ValidMessage> validMessageList = new ArrayList<ValidMessage>();
         // 1.交割日
         if (dto.getSettleDate() == null) {
@@ -2018,12 +1968,12 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    public CfetsTrdBondInvestTradeDto getTrdBondInvestTradeDto(String tradeId) {
+    public CfetsTrdFirstBondInvestTradeDto getTrdFirstBondInvestTradeDto(String tradeId) {
         Map<String, Object> params = new HashMap<>();
         params.put("tradeId", tradeId);
-        params.put("B09", DictCodeListExt1.一次性费用类型_通道费.getValue());
+        params.put("B08", DictCodeListExt1.一次性费用类型_结算手续费.getValue());
         params.put("Y", DictCodeList.是否_是.getValue());
-        CfetsTrdBondInvestTradeDto resultDto = cfetsTrdQueryMapper.getTrdBondInvestTradeDto(params);
+        CfetsTrdFirstBondInvestTradeDto resultDto = cfetsTrdQueryMapper.getTrdFirstBondInvestTradeDto(params);
         if (resultDto != null) {
             //待办事项中显示组合分配
             Map<String, Object> pageParam = new HashMap<>();
@@ -2033,25 +1983,6 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             List<PortIntFenPeiInfoDto> fenPeiList = cfetsTrdQueryMapper.findPortIntFenPeiInfoList(pageParam);
             resultDto.setCfetsBussCombDistribtList(fenPeiList);
 
-          /*  if (resultDto.getSettleSpeed() != null) {
-                resultDto.setSettleSpeedStr(String.valueOf(resultDto.getSettleSpeed()));
-            }
-            else if(resultDto.getSettleSpeed() == 1L){
-                resultDto.setSettleSpeedStr("1");
-            }else if(resultDto.getSettleSpeed() == 2L){
-                resultDto.setSettleSpeedStr("2");
-            }else{
-                resultDto.setSettleSpeedStr(resultDto.getSettleSpeed().toString());
-            }*/
-           /* if(StringUtil.isNotEmpty(resultDto.getSettleSpeed())) {
-                if (resultDto.getSettleSpeed() == 0L) {
-                    resultDto.setSettleSpeedStr("01");
-                } else if (resultDto.getSettleSpeed() == 1L) {
-                    resultDto.setSettleSpeedStr("02");
-                } else if (resultDto.getSettleSpeed() == 2L) {
-                    resultDto.setSettleSpeedStr("03");
-                }
-            }*/
             // 到期收益率
             if (resultDto.getYield() != null) {
                 resultDto.setYield(ArithmeticUtil.multiply(resultDto.getYield(), BigDecimal.valueOf(100)));
@@ -2089,7 +2020,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    private void getUnitIntFromValution(CfetsTrdBondInvestTradeDto dto) {
+    private void getUnitIntFromValution(CfetsTrdFirstBondInvestTradeDto dto) {
         // 应计利息根据后台估值核算中前一个自然日的数据计算，等于后台的应计利息总额/后台的债券持仓总数量，如取不到估值核算中前一个自然日的数据，计算方式见算法文档；
         // 画面.应计利息=PTL_SEC_VALUTION.TDY_INTINCEXP/PTL_SEC_VALUTION.SHARE_AMT （PTL_SEC_VALUTION.日期 = 画面.交割日-1 ，取不到，取最大日期对应数据）
         Map<String, Object> paraMapForIntAmt = new HashMap<String, Object>();
@@ -2112,7 +2043,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    public void calcAmt(CfetsTrdBondInvestTradeDto dto) {
+    public void calcAmt(CfetsTrdFirstBondInvestTradeDto dto) {
         // 先计算融入券
         if (dto.getIntegrateTradeAmt() != null && dto.getIntegrateTradeAmt().compareTo(BigDecimal.ZERO) > 0) {
             dto.setPrinAmt(dto.getIntegrateTradeAmt());
@@ -2126,7 +2057,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         calc(dto, false);
     }
 
-    private void calc(CfetsTrdBondInvestTradeDto dto, boolean 计算融入券) {
+    private void calc(CfetsTrdFirstBondInvestTradeDto dto, boolean 计算融入券) {
         if (DateUtil.compareDate(dto.getSettleDate(), dto.getVdate()) < 0) {
             dto.setSettleDate(dto.getVdate());
         }
@@ -2688,7 +2619,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    public AjaxResult checkConfirmInfo(CfetsTrdBondInvestTradeDto inputDto, BindingResult result) {
+    public AjaxResult checkConfirmInfo(CfetsTrdFirstBondInvestTradeDto inputDto, BindingResult result) {
         if (result != null && result.hasErrors()) {
             return null;
         }
@@ -2732,7 +2663,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
                 for (BussTrdTransferOrderDto bussTrdTransferOrder : inputDto.getBussTrdTransferOrder()) {
                     if (CollectionUtils.isNotEmpty(inputDto.getBussTrdTransfenpeiDto())) {
                         for (int i = 0; i < inputDto.getBussTrdTransfenpeiDto().size(); i++) {
-                            CfetsTrdBondInvestTradeDto tempDto = new CfetsTrdBondInvestTradeDto();
+                            CfetsTrdFirstBondInvestTradeDto tempDto = new CfetsTrdFirstBondInvestTradeDto();
                             if (StringUtil.equals(inputDto.getBussTrdTransfenpeiDto().get(i).getPortfolioId(),
                                     bussTrdTransferOrder.getPortfolioId())) {
                                 tempDto.setPortfolioId(bussTrdTransferOrder.getPortfolioId());
@@ -2761,7 +2692,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
                 for (BussTrdTransferOrderDto bussTrdTransferOrder : inputDto.getBussTrdTransferOrder()) {
                     if (CollectionUtils.isNotEmpty(inputDto.getBussTrdTransfenpeiDto())) {
                         for (int i = 0; i < inputDto.getBussTrdTransfenpeiDto().size(); i++) {
-                            CfetsTrdBondInvestTradeDto tempDto = new CfetsTrdBondInvestTradeDto();
+                            CfetsTrdFirstBondInvestTradeDto tempDto = new CfetsTrdFirstBondInvestTradeDto();
                             if (StringUtil.equals(inputDto.getBussTrdTransfenpeiDto().get(i).getPortfolioId(),
                                     bussTrdTransferOrder.getPortfolioId())) {
                                 tempDto.setPortfolioId(bussTrdTransferOrder.getPortfolioId());
@@ -2792,7 +2723,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
                 for (BussTrdTransferOrderDto bussTrdTransferOrder : inputDto.getBussTrdTransferOrder()) {
                     if (CollectionUtils.isNotEmpty(inputDto.getBussTrdTransfenpeiDto())) {
                         for (int i = 0; i < inputDto.getBussTrdTransfenpeiDto().size(); i++) {
-                            CfetsTrdBondInvestTradeDto tempDto = new CfetsTrdBondInvestTradeDto();
+                            CfetsTrdFirstBondInvestTradeDto tempDto = new CfetsTrdFirstBondInvestTradeDto();
                             if (StringUtil.equals(inputDto.getBussTrdTransfenpeiDto().get(i).getPortfolioId(),
                                     bussTrdTransferOrder.getPortfolioId())) {
                                 tempDto.setPortfolioId(bussTrdTransferOrder.getPortfolioId());
@@ -2837,7 +2768,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         return null;
     }
 
-    private String getPortfolioCanUserMoney(CfetsTrdBondInvestTradeDto inputDto, String confirmMsg, String changeLineMark) {
+    private String getPortfolioCanUserMoney(CfetsTrdFirstBondInvestTradeDto inputDto, String confirmMsg, String changeLineMark) {
         if (inputDto.getBussTrdAvailableCashQueryavalibleCash() != null && StringUtil.isNotEmpty(inputDto.getTradeAmtAndFee())) {
             if (inputDto.getTradeAmtAndFee().compareTo(inputDto.getBussTrdAvailableCashQueryavalibleCash()) > 0) {
                 PtlPortfolio ptlPortfolio = ptlPortfolioMapper.selectByPrimaryKey(inputDto.getPortfolioId());
@@ -2853,7 +2784,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         return confirmMsg;
     }
 
-    private String getYcxhk(CfetsTrdBondInvestTradeDto inputDto, String confirmMsg, String changeLineMark) {
+    private String getYcxhk(CfetsTrdFirstBondInvestTradeDto inputDto, String confirmMsg, String changeLineMark) {
         // 调用基础组件.【组合可用现金和实际现金查询更新组件.查询现金余额(可用)】
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("portfolioId", inputDto.getPortfolioId());
@@ -2874,7 +2805,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         return confirmMsg;
     }
 
-    private String checkTradeMarket(CfetsTrdBondInvestTradeDto inputDto, String confirmMsg, String changeLineMark,
+    private String checkTradeMarket(CfetsTrdFirstBondInvestTradeDto inputDto, String confirmMsg, String changeLineMark,
                                     BussTrdTransferOrderDto bussTrdTransferOrder) {
         // 交易方向为买入时校验交易所证券账户（券商存管账户）余额是否足够，如不足，提醒进行银证转账
         if (StringUtil.equals(DictCodeList.交易方向_买入.getValue(), inputDto.getPs())
@@ -2925,7 +2856,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId)
             throws WorkFlowException {
         Map<String, Object> variables = new HashMap<>();
-        CfetsTrdBondInvestTradeDto dto = this.getBussinessEntity(entity);
+        CfetsTrdFirstBondInvestTradeDto dto = this.getBussinessEntity(entity);
         CommonBusinessService commonBusinessService = SpringContextUtil.getBean(CommonBusinessService.class);
         if (taskId != null) {
             try {
@@ -2954,6 +2885,11 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         // return null;
     }
 
+    @Override
+    public BaseProcessService<CfetsTrdFirstBondInvestTradeDto> getMyBusinessService() {
+        return null;
+    }
+
     /**
      * 发送Murex接口处理
      *
@@ -2962,7 +2898,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    private void sendMurex(CfetsTrdBondInvestTradeDto entity, boolean revokeFlag) {
+    private void sendMurex(CfetsTrdFirstBondInvestTradeDto entity, boolean revokeFlag) {
         if (StringUtil.isNotEmpty(entity.getPortfolioId())) {
             PaPtlPortfolio paPtlPortfolio = paPtlPortfolioMapper.selectByPrimaryKey(entity.getPortfolioId());
             if (paPtlPortfolio != null) {
@@ -3132,7 +3068,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    public void calcFeeAmt(CfetsTrdBondInvestTradeDto dto) {
+    public void calcFeeAmt(CfetsTrdFirstBondInvestTradeDto dto) {
         // --------add by 裴家俊 2019/03/28 费用查询----start---
         try {
             dto.setPrinAmt(dto.getTradeAmt());
@@ -3187,7 +3123,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @since 1.0
      */
     @Override
-    public void doBack(CfetsTrdBondInvestTradeDto entity) {
+    public void doBack(CfetsTrdFirstBondInvestTradeDto entity) {
         // 对Cstp交易处理
         uodateCstpMessage(entity.getWorkflowId());
         // 根据交易编号，删除可用，质押，融入，融出，在途FLOW持仓
@@ -3210,7 +3146,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     }
 
     @Override
-    public void doRevoke(CfetsTrdBondInvestTradeDto entity) {
+    public void doRevoke(CfetsTrdFirstBondInvestTradeDto entity) {
         // 对Cstp交易处理
         uodateCstpMessage(entity.getWorkflowId());
         // 根据交易编号，删除可用，质押，融入，融出，在途FLOW持仓
@@ -3251,7 +3187,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    public AjaxResult calculateFeeData(CfetsTrdBondInvestTradeDto inputDto) {
+    public AjaxResult calculateFeeData(CfetsTrdFirstBondInvestTradeDto inputDto) {
         AjaxResult ajaxResult = new AjaxResult();
 
         // 计算逻辑
@@ -3318,12 +3254,12 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     /**
      * 查询交易页面债券的市值净价和摊销净价（吉林银行产品化需求）
      *
-     * @param dto CfetsTrdBondInvestTradeDto
+     * @param dto CfetsTrdFirstBondInvestTradeDto
      * @return
      * @see
      * @since 1.0 malinlin 2019.12.2
      */
-    public SecCpriceInfoDto getCprice(CfetsTrdBondInvestTradeDto dto) {
+    public SecCpriceInfoDto getCprice(CfetsTrdFirstBondInvestTradeDto dto) {
         Map<String, Object> map = new HashMap<>();
         map.put("finprodId", dto.getFinprodId());
         // 查询债券基本信息
@@ -3388,7 +3324,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
                 String.class);
     }
 
-    private void setWorkflowId(CfetsTrdBondInvestTradeDto entity) {
+    private void setWorkflowId(CfetsTrdFirstBondInvestTradeDto entity) {
         if (entity.getPaTrdFinProductDealTotal() != null) {
             entity.getPaTrdFinProductDealTotal().setWorkflowId(entity.getWorkflowId());
         }
@@ -3455,7 +3391,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     /* add by msk 新增查询通道划款交易 TISHKBS-1038  20201111 end */
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    public void fastSave(CfetsTrdBondInvestTradeDto dto) {
+    public void fastSave(CfetsTrdFirstBondInvestTradeDto dto) {
         //****
         prepareEntity(dto);
         dto.setActPortfolioId(dto.getPortfolioId());
@@ -3510,9 +3446,9 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @author zhangnian
      * @date 2021/1/21 0021
      */
-    public Map<String, Object> secAutoTrade(CfetsTrdBondInvestTradeDto entity) {
+    public Map<String, Object> secAutoTrade(CfetsTrdFirstBondInvestTradeDto entity) {
         Map<String, Object> resultMap = makeBondTradeDto(entity);
-        List<CfetsTrdBondInvestTradeDto> trdBondInvestTrades = (List<CfetsTrdBondInvestTradeDto>) resultMap.get("trdBondInvestTrades");
+        List<CfetsTrdFirstBondInvestTradeDto> trdBondInvestTrades = (List<CfetsTrdFirstBondInvestTradeDto>) resultMap.get("trdBondInvestTrades");
         if (!StringUtil.isEmptyList(trdBondInvestTrades)) {
             trdBondInvestTrades.stream().forEach(item -> {
                 dealAutoTradeFeeDetial(item);
@@ -3526,14 +3462,14 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     /**
      * 功能描述 : 银行间下行组装交易实体类
      *
-     * @param * @param CfetsTrdBondInvestTradeDto
+     * @param * @param CfetsTrdFirstBondInvestTradeDto
      * @return void
      * @author zhangnian
      * @date 2021/1/21 0021
      */
-    public Map<String, Object> makeBondTradeDto(CfetsTrdBondInvestTradeDto entity) {
+    public Map<String, Object> makeBondTradeDto(CfetsTrdFirstBondInvestTradeDto entity) {
         Map<String, Object> resultMap = new HashMap<>();
-        List<CfetsTrdBondInvestTradeDto> trdBondInvestTrades = new ArrayList<>();
+        List<CfetsTrdFirstBondInvestTradeDto> trdBondInvestTrades = new ArrayList<>();
         // 通过成交单编号查询数据,为生成交易数据做准备
         InterfTradSecdealDto bondCstpInfo = new InterfTradSecdealDto();
         BeanUtil.copyPropertiesIgnoreNull(bondCstpInfo, entity.getInterfTradSecdeal());
@@ -3582,10 +3518,10 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
 
         //构造交易实体
         ptlAllocationDtos.stream().forEach(item -> {
-            CfetsTrdBondInvestTradeDto CfetsTrdBondInvestTradeDto = new CfetsTrdBondInvestTradeDto();
-            BeanUtil.copyPropertiesIgnoreNull(CfetsTrdBondInvestTradeDto, entity);
-            CfetsTrdBondInvestTradeDto.setPortfolioId(item.getPortfolioId());
-            CfetsTrdBondInvestTradeDto.setEntrustId(item.getEntrustId());
+            CfetsTrdFirstBondInvestTradeDto CfetsTrdFirstBondInvestTradeDto = new CfetsTrdFirstBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(CfetsTrdFirstBondInvestTradeDto, entity);
+            CfetsTrdFirstBondInvestTradeDto.setPortfolioId(item.getPortfolioId());
+            CfetsTrdFirstBondInvestTradeDto.setEntrustId(item.getEntrustId());
             //全价总额
             BigDecimal fpriceAmt2 = item.getFpriceAmt();
             //券面总额
@@ -3596,74 +3532,74 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             BigDecimal intAmt = ArithmeticUtil.subtract(fpriceAmt2, cpriceAmt);
             // 交易编号
             BussinessCodeParameter codeParameter = new BussinessCodeParameter();
-            if (StringUtil.equals(BussinessDictCodeList.交易方向_买入.getValue(), CfetsTrdBondInvestTradeDto.getPs())) {
+            if (StringUtil.equals(BussinessDictCodeList.交易方向_买入.getValue(), CfetsTrdFirstBondInvestTradeDto.getPs())) {
                 codeParameter.setCommonBusinessType(BussinessDictCodeList.共同业务类型_债券买入);
             } else {
                 codeParameter.setCommonBusinessType(BussinessDictCodeList.共同业务类型_债券卖出);
             }
-            CfetsTrdBondInvestTradeDto.setTotleTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
-            CfetsTrdBondInvestTradeDto.setfTradeId(bondCstpInfo.getFedealno());
-            CfetsTrdBondInvestTradeDto.setAutoTradeFlag(true);
+            CfetsTrdFirstBondInvestTradeDto.setTotleTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
+            CfetsTrdFirstBondInvestTradeDto.setfTradeId(bondCstpInfo.getFedealno());
+            CfetsTrdFirstBondInvestTradeDto.setAutoTradeFlag(true);
             // 金融产品类型（投管分类）
-            CfetsTrdBondInvestTradeDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
             // 金融产品类型（估值核算）
-            CfetsTrdBondInvestTradeDto.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
             // 交易日期
-            CfetsTrdBondInvestTradeDto.setTradeDate(bondCstpInfo.getDealdate());
+            CfetsTrdFirstBondInvestTradeDto.setTradeDate(bondCstpInfo.getDealdate());
             // 交割日期
-            CfetsTrdBondInvestTradeDto.setSettleDate(bondCstpInfo.getSettdate());
+            CfetsTrdFirstBondInvestTradeDto.setSettleDate(bondCstpInfo.getSettdate());
             // 证券托管户
-            CfetsTrdBondInvestTradeDto.setSecManageAcctId(bondCstpInfo.getOurdepositaccountnumber());
+            CfetsTrdFirstBondInvestTradeDto.setSecManageAcctId(bondCstpInfo.getOurdepositaccountnumber());
             // 交易场所
-            CfetsTrdBondInvestTradeDto.setTradeMarket(BussinessDictCodeList.交易场所_银行间.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setTradeMarket(BussinessDictCodeList.交易场所_银行间.getValue());
             // 交易市场
-            CfetsTrdBondInvestTradeDto.setTradeMarketMode(BussinessDictCodeList.交易市场_二级市场.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setTradeMarketMode(BussinessDictCodeList.交易市场_二级市场.getValue());
             // 交易平台
-            CfetsTrdBondInvestTradeDto.setTradePlat(DictCodeList.交易平台_外汇交易中心.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setTradePlat(DictCodeList.交易平台_外汇交易中心.getValue());
             // 投资目的
             Map<String, Object> map = new HashMap<>();
-            map.put("portfolioId", CfetsTrdBondInvestTradeDto.getPortfolioId());
-            CfetsTrdBondInvestTradeDto.setInvAim(getInvAim(map));
+            map.put("portfolioId", CfetsTrdFirstBondInvestTradeDto.getPortfolioId());
+            CfetsTrdFirstBondInvestTradeDto.setInvAim(getInvAim(map));
             // 币种
-            CfetsTrdBondInvestTradeDto.setCcy(BussinessDictCodeList.币种_人民币.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setCcy(BussinessDictCodeList.币种_人民币.getValue());
             // 交易日历
-            CfetsTrdBondInvestTradeDto.setCalendarId("03");
+            CfetsTrdFirstBondInvestTradeDto.setCalendarId("03");
             // 债券一级分类
-            FinProductType finProductType = queryFinProductTypeByFinProdId(CfetsTrdBondInvestTradeDto.getFinprodId());
+            FinProductType finProductType = queryFinProductTypeByFinProdId(CfetsTrdFirstBondInvestTradeDto.getFinprodId());
             if (finProductType != null) {
-                CfetsTrdBondInvestTradeDto.setWindtypeone(finProductType.getType4());
+                CfetsTrdFirstBondInvestTradeDto.setWindtypeone(finProductType.getType4());
             }
             // 清算速度
             if (DateUtil.isSameDate(bondCstpInfo.getDealdate(), bondCstpInfo.getSettdate())) {
-                CfetsTrdBondInvestTradeDto.setSettleSpeedStr(BussinessDictCodeList.清算速度_T加0.getValue());
+                CfetsTrdFirstBondInvestTradeDto.setSettleSpeedStr(BussinessDictCodeList.清算速度_T加0.getValue());
             } else {
-                CfetsTrdBondInvestTradeDto.setSettleSpeedStr(BussinessDictCodeList.清算速度_T加1.getValue());
+                CfetsTrdFirstBondInvestTradeDto.setSettleSpeedStr(BussinessDictCodeList.清算速度_T加1.getValue());
             }
 
             // =====================金额信息=====================
             // 券面总额、净价、应计利息、全价、净价总额、应计利息总额、全价总额
             // 交易金额
-            CfetsTrdBondInvestTradeDto.setTradeAmt(prinamt2);
-            CfetsTrdBondInvestTradeDto.setTotalFaceValue(prinamt2);
+            CfetsTrdFirstBondInvestTradeDto.setTradeAmt(prinamt2);
+            CfetsTrdFirstBondInvestTradeDto.setTotalFaceValue(prinamt2);
             // 交易金额(原交易金额被券面总额所用)
-            CfetsTrdBondInvestTradeDto.setTradeRepAmt(fpriceAmt2);
-            CfetsTrdBondInvestTradeDto.setTradeAmtAndFee(fpriceAmt2);
+            CfetsTrdFirstBondInvestTradeDto.setTradeRepAmt(fpriceAmt2);
+            CfetsTrdFirstBondInvestTradeDto.setTradeAmtAndFee(fpriceAmt2);
             // 净价 price8
-            CfetsTrdBondInvestTradeDto.setUnitCprice(bondCstpInfo.getPrice8());
+            CfetsTrdFirstBondInvestTradeDto.setUnitCprice(bondCstpInfo.getPrice8());
             // 设置费用费用信息
-           /* CfetsTrdBondInvestTradeDto.setCalculateField("unitCprice");
-            calcAmt(CfetsTrdBondInvestTradeDto);*/
-            CfetsTrdBondInvestTradeDto.setTradeFeeList(item.getTradeFeeList());
+           /* CfetsTrdFirstBondInvestTradeDto.setCalculateField("unitCprice");
+            calcAmt(CfetsTrdFirstBondInvestTradeDto);*/
+            CfetsTrdFirstBondInvestTradeDto.setTradeFeeList(item.getTradeFeeList());
             // 全价
-            CfetsTrdBondInvestTradeDto.setUnitFprice(bondCstpInfo.getDirtyprice());
+            CfetsTrdFirstBondInvestTradeDto.setUnitFprice(bondCstpInfo.getDirtyprice());
             // 全价总额
-            CfetsTrdBondInvestTradeDto.setFpriceAmt(fpriceAmt2);
+            CfetsTrdFirstBondInvestTradeDto.setFpriceAmt(fpriceAmt2);
             // 净价总额 = 净价 * 券面总额 / 100
-            CfetsTrdBondInvestTradeDto.setCpriceAmt(cpriceAmt);
+            CfetsTrdFirstBondInvestTradeDto.setCpriceAmt(cpriceAmt);
             // 应计利息总额
-            CfetsTrdBondInvestTradeDto.setIntAmt(ArithmeticUtil.subtract(fpriceAmt2, cpriceAmt));
+            CfetsTrdFirstBondInvestTradeDto.setIntAmt(ArithmeticUtil.subtract(fpriceAmt2, cpriceAmt));
             // 单位应计利息
-            CfetsTrdBondInvestTradeDto.setUnitInt(bondCstpInfo.getAccruedinterestamt());
+            CfetsTrdFirstBondInvestTradeDto.setUnitInt(bondCstpInfo.getAccruedinterestamt());
             // =====================金额信息=====================
 
             // =====================人员信息=====================
@@ -3671,17 +3607,17 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             // 本方交易员
             //trdInvestPersonInfo.setTrader(
             //       StringUtil.isNotEmpty(bondCstpInfo.getTrad()) ? bondCstpInfo.getTrad() : LoginUserUtil.getUserName());
-            trdInvestPersonInfo.setTrader(CfetsTrdBondInvestTradeDto.getTrader());
+            trdInvestPersonInfo.setTrader(CfetsTrdFirstBondInvestTradeDto.getTrader());
             // 交易对手
             //trdInvestPersonInfo.setCounterId(bondCstpInfo.getCno());
-            trdInvestPersonInfo.setCounterId(CfetsTrdBondInvestTradeDto.getCounterId());
+            trdInvestPersonInfo.setCounterId(CfetsTrdFirstBondInvestTradeDto.getCounterId());
             trdInvestPersonInfo.setIsOutTrade(BussinessDictCodeList.是否_是.getValue());
             // 对手方交易员
-            trdInvestPersonInfo.setCounterTrader(CfetsTrdBondInvestTradeDto.getCounterTrader());
+            trdInvestPersonInfo.setCounterTrader(CfetsTrdFirstBondInvestTradeDto.getCounterTrader());
             //trdInvestPersonInfo.setCounterTrader(bondCstpInfo.getClienttrader());
             // 联系方式
             trdInvestPersonInfo.setContactInfo(bondCstpInfo.getCountertelephone());
-            CfetsTrdBondInvestTradeDto.setTrdInvestPersonInfo(trdInvestPersonInfo);
+            CfetsTrdFirstBondInvestTradeDto.setTrdInvestPersonInfo(trdInvestPersonInfo);
 
             // =====================人员信息=====================
 
@@ -3690,92 +3626,92 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             BussSettleOrderParameterDto bussSettleOrderParameterDto = new BussSettleOrderParameterDto();
             bussSettleOrderParameterDto.setIsTotalTrade(BussinessDictCodeList.是否_否.getValue());
             bussSettleOrderParameterDto.setBankLendingType(null);
-            bussSettleOrderParameterDto.setPortfolioId(CfetsTrdBondInvestTradeDto.getPortfolioId());
+            bussSettleOrderParameterDto.setPortfolioId(CfetsTrdFirstBondInvestTradeDto.getPortfolioId());
             TrdProductDeal deal = new TrdProductDeal();
             deal.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
-            deal.setSettleDate(CfetsTrdBondInvestTradeDto.getSettleDate());
-            deal.setTradeDate(CfetsTrdBondInvestTradeDto.getTradeDate());
-            deal.setPs(CfetsTrdBondInvestTradeDto.getPs());
-            deal.setCcy(CfetsTrdBondInvestTradeDto.getCcy());
+            deal.setSettleDate(CfetsTrdFirstBondInvestTradeDto.getSettleDate());
+            deal.setTradeDate(CfetsTrdFirstBondInvestTradeDto.getTradeDate());
+            deal.setPs(CfetsTrdFirstBondInvestTradeDto.getPs());
+            deal.setCcy(CfetsTrdFirstBondInvestTradeDto.getCcy());
             deal.setTradeAmt(fpriceAmt2);
-            deal.setCounterId(CfetsTrdBondInvestTradeDto.getCounterId());
-            deal.setTradeMarket(CfetsTrdBondInvestTradeDto.getTradeMarket());
-            deal.setTradePlat(CfetsTrdBondInvestTradeDto.getTradePlat());
-            deal.setSecManageAcctId(CfetsTrdBondInvestTradeDto.getSecManageAcctId());
-            deal.setTradeMarketMode(CfetsTrdBondInvestTradeDto.getTradeMarketMode());
+            deal.setCounterId(CfetsTrdFirstBondInvestTradeDto.getCounterId());
+            deal.setTradeMarket(CfetsTrdFirstBondInvestTradeDto.getTradeMarket());
+            deal.setTradePlat(CfetsTrdFirstBondInvestTradeDto.getTradePlat());
+            deal.setSecManageAcctId(CfetsTrdFirstBondInvestTradeDto.getSecManageAcctId());
+            deal.setTradeMarketMode(CfetsTrdFirstBondInvestTradeDto.getTradeMarketMode());
             bussSettleOrderParameterDto.setDeal(deal);
             BussTrdTransferOrderDto bussTrdTransferOrderDto = bussTrdTransferOrderService.generateOrder(bussSettleOrderParameterDto);
             bussTrdTransferOrderDto.setPayAcctNoList(null);
             bussTrdTransferOrderDto.setRecAcctNoList(null);
             bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
-            if (StringUtil.equals(BussinessDictCodeList.账户来源_自营.getValue(), CfetsTrdBondInvestTradeDto.getSecAcctSource())
-                    && StringUtil.equals(CfetsTrdBondInvestTradeDto.getPs(), BussinessDictCodeList.交易方向_买入.getValue())) {
+            if (StringUtil.equals(BussinessDictCodeList.账户来源_自营.getValue(), CfetsTrdFirstBondInvestTradeDto.getSecAcctSource())
+                    && StringUtil.equals(CfetsTrdFirstBondInvestTradeDto.getPs(), BussinessDictCodeList.交易方向_买入.getValue())) {
                 bussTrdTransferOrderDto.setIsNeedSend(BussinessDictCodeList.是否_否.getValue());
             }
             bussTrdTransferOrder.add(bussTrdTransferOrderDto);
-            CfetsTrdBondInvestTradeDto.setBussTrdTransferOrder(bussTrdTransferOrderService.save(bussTrdTransferOrder));
+            CfetsTrdFirstBondInvestTradeDto.setBussTrdTransferOrder(bussTrdTransferOrderService.save(bussTrdTransferOrder));
             // =====================划款指令信息=====================
 
             // 金融产品交易Entity 构造开始----------------------------------------------------------
             // 分支序号
-            CfetsTrdBondInvestTradeDto.setBranch(Long.parseLong(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE)));
+            CfetsTrdFirstBondInvestTradeDto.setBranch(Long.parseLong(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE)));
             // 单位面值
-            CfetsTrdBondInvestTradeDto.setParValue(getUnitPrice(CfetsTrdBondInvestTradeDto.getFinprodId(), CfetsTrdBondInvestTradeDto.getSettleDate()));
+            CfetsTrdFirstBondInvestTradeDto.setParValue(getUnitPrice(CfetsTrdFirstBondInvestTradeDto.getFinprodId(), CfetsTrdFirstBondInvestTradeDto.getSettleDate()));
             // 交易本金 = 画面.净价总额
-            CfetsTrdBondInvestTradeDto.setPrinAmt(CfetsTrdBondInvestTradeDto.getCpriceAmt());
+            CfetsTrdFirstBondInvestTradeDto.setPrinAmt(CfetsTrdFirstBondInvestTradeDto.getCpriceAmt());
             // 交易份额 = 画面.券面总额/100
-            CfetsTrdBondInvestTradeDto.setShareAmt(ArithmeticUtil.divide(prinamt2, new BigDecimal(100), 4, RoundingMode.HALF_UP));
+            CfetsTrdFirstBondInvestTradeDto.setShareAmt(ArithmeticUtil.divide(prinamt2, new BigDecimal(100), 4, RoundingMode.HALF_UP));
             //下行接口自动生成交易明细   到期收益率和行权收益率  由接口带出
             // 到期收益率 = 画面.到期收益率/100
             if (null != bondCstpInfo.getYield8()) {
-                CfetsTrdBondInvestTradeDto.setYield(ArithmeticUtil.multiply(bondCstpInfo.getYield8(), new BigDecimal(100)));
+                CfetsTrdFirstBondInvestTradeDto.setYield(ArithmeticUtil.multiply(bondCstpInfo.getYield8(), new BigDecimal(100)));
             }
             // 行权收益率 = 画面.行权收益率/100
             if (null != bondCstpInfo.getStrikeyield()) {
-                CfetsTrdBondInvestTradeDto.setExerYield(ArithmeticUtil.multiply(bondCstpInfo.getStrikeyield(), new BigDecimal(100)));
+                CfetsTrdFirstBondInvestTradeDto.setExerYield(ArithmeticUtil.multiply(bondCstpInfo.getStrikeyield(), new BigDecimal(100)));
             }
             // 是否结清 = 数据字典缓存.是否.是
-            CfetsTrdBondInvestTradeDto.setIsClean(BussinessDictCodeList.是否_是.getValue());
-            CfetsTrdBondInvestTradeDto.setIsCancel(BussinessDictCodeList.是否_否.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setIsClean(BussinessDictCodeList.是否_是.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setIsCancel(BussinessDictCodeList.是否_否.getValue());
             if (trdInvestPersonInfo != null) {
                 // 本方交易员
-                //CfetsTrdBondInvestTradeDto.setTrader(trdInvestPersonInfo.getTrader());
+                //CfetsTrdFirstBondInvestTradeDto.setTrader(trdInvestPersonInfo.getTrader());
                 // 交易对手
-                //CfetsTrdBondInvestTradeDto.setCounterId(trdInvestPersonInfo.getCounterId());
+                //CfetsTrdFirstBondInvestTradeDto.setCounterId(trdInvestPersonInfo.getCounterId());
                 // 是否外部交易
-                CfetsTrdBondInvestTradeDto.setIsOutTrade(trdInvestPersonInfo.getIsOutTrade());
+                CfetsTrdFirstBondInvestTradeDto.setIsOutTrade(trdInvestPersonInfo.getIsOutTrade());
                 // 对手方交易员
-                //CfetsTrdBondInvestTradeDto.setCounterTrader(trdInvestPersonInfo.getCounterTrader());
+                //CfetsTrdFirstBondInvestTradeDto.setCounterTrader(trdInvestPersonInfo.getCounterTrader());
                 // 联系方式
-                CfetsTrdBondInvestTradeDto.setCounterContact(trdInvestPersonInfo.getContactInfo());
+                CfetsTrdFirstBondInvestTradeDto.setCounterContact(trdInvestPersonInfo.getContactInfo());
             }
 
             // 清算速度
-            CfetsTrdBondInvestTradeDto.setSettleSpeed(1L);
-            if (StringUtil.equals(BussinessDictCodeList.清算速度_T加0.getValue(), CfetsTrdBondInvestTradeDto.getSettleSpeedStr())) {
-                CfetsTrdBondInvestTradeDto.setSettleSpeed(0L);
+            CfetsTrdFirstBondInvestTradeDto.setSettleSpeed(1L);
+            if (StringUtil.equals(BussinessDictCodeList.清算速度_T加0.getValue(), CfetsTrdFirstBondInvestTradeDto.getSettleSpeedStr())) {
+                CfetsTrdFirstBondInvestTradeDto.setSettleSpeed(0L);
             }
             //成交明细接口处理交易明细  默认本方券
-            CfetsTrdBondInvestTradeDto.setOwnTradeAmt(prinamt2);
-            CfetsTrdBondInvestTradeDto.setOwnFpriceAmt(fpriceAmt2);
-            CfetsTrdBondInvestTradeDto.setOwnIntAmt(intAmt);
+            CfetsTrdFirstBondInvestTradeDto.setOwnTradeAmt(prinamt2);
+            CfetsTrdFirstBondInvestTradeDto.setOwnFpriceAmt(fpriceAmt2);
+            CfetsTrdFirstBondInvestTradeDto.setOwnIntAmt(intAmt);
             // 交易对手
-            //CfetsTrdBondInvestTradeDto.setCounterId(bondCstpInfo.getCno());
+            //CfetsTrdFirstBondInvestTradeDto.setCounterId(bondCstpInfo.getCno());
             //清算方式
-            CfetsTrdBondInvestTradeDto.setClearType(bondCstpInfo.getClearingmethod());
+            CfetsTrdFirstBondInvestTradeDto.setClearType(bondCstpInfo.getClearingmethod());
             //结算方式
-            CfetsTrdBondInvestTradeDto.setDeliveryType(bondCstpInfo.getDeliverytype());
-            CfetsTrdBondInvestTradeDto.setTradeStatus(BussinessDictCodeList.交易状态_初始.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setDeliveryType(bondCstpInfo.getDeliverytype());
+            CfetsTrdFirstBondInvestTradeDto.setTradeStatus(BussinessDictCodeList.交易状态_初始.getValue());
             // =========================流程信息=========================
             // 画面模式
-            CfetsTrdBondInvestTradeDto.setPageModel("0");
+            CfetsTrdFirstBondInvestTradeDto.setPageModel("0");
             // 操作类型
-            CfetsTrdBondInvestTradeDto.setOperateType("submit");
+            CfetsTrdFirstBondInvestTradeDto.setOperateType("submit");
             // 是否来自代办
-            CfetsTrdBondInvestTradeDto.setTodoListFlag("false");
+            CfetsTrdFirstBondInvestTradeDto.setTodoListFlag("false");
             // 导入标识 为后面doComplete处理交易相关表判断
-            CfetsTrdBondInvestTradeDto.setImportFlag(false);
-            trdBondInvestTrades.add(CfetsTrdBondInvestTradeDto);
+            CfetsTrdFirstBondInvestTradeDto.setImportFlag(false);
+            trdBondInvestTrades.add(CfetsTrdFirstBondInvestTradeDto);
         });
         resultMap.put("ptlAllocationDtos", ptlAllocationDtos);
         resultMap.put("trdBondInvestTrades", trdBondInvestTrades);
@@ -3785,57 +3721,57 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     /**
      * 功能描述: 给对应页面的佣金，结算费，手续费成员变量字段设置值
      *
-     * @param * @param CfetsTrdBondInvestTradeDto
+     * @param * @param CfetsTrdFirstBondInvestTradeDto
      * @return void
      * @author zhangnian
      * @date 2021/1/21 0021
      */
-    public void dealAutoTradeFeeDetial(CfetsTrdBondInvestTradeDto CfetsTrdBondInvestTradeDto) {
-        if (!StringUtil.isEmptyList(CfetsTrdBondInvestTradeDto.getTradeFeeList())) {
-            for (TrdTradeFeeDetail tradeFeeDto : CfetsTrdBondInvestTradeDto.getTradeFeeList()) {
+    public void dealAutoTradeFeeDetial(CfetsTrdFirstBondInvestTradeDto CfetsTrdFirstBondInvestTradeDto) {
+        if (!StringUtil.isEmptyList(CfetsTrdFirstBondInvestTradeDto.getTradeFeeList())) {
+            for (TrdTradeFeeDetail tradeFeeDto : CfetsTrdFirstBondInvestTradeDto.getTradeFeeList()) {
                 if (!StringUtil.isNotEmpty(tradeFeeDto.getIsPayWithTrade())) tradeFeeDto.setIsPayWithTrade("N");
                 //给对应页面的佣金，结算费，手续费成员变量字段设置值
                 if (StringUtil.equals(tradeFeeDto.getFeeType(), BussinessDictCodeList.费用类型_佣金.getValue()) && tradeFeeDto.getFeeAmt() != null) {
-                    CfetsTrdBondInvestTradeDto.setCommissionAmt(CfetsTrdBondInvestTradeDto.getFeeAmt());
-                    if ((StringUtil.equals(CfetsTrdBondInvestTradeDto.getTradeMarket(), BussinessDictCodeList.交易场所_上海证券交易所.getValue()) ||
-                            StringUtil.equals(CfetsTrdBondInvestTradeDto.getTradeMarket(), BussinessDictCodeList.交易场所_深圳证券交易所.getValue())) &&
-                            StringUtil.equals(CfetsTrdBondInvestTradeDto.getTradeMarketMode(), BussinessDictCodeList.交易市场_一级市场.getValue())) {
-                        CfetsTrdBondInvestTradeDto.setCommissionAmt(BigDecimal.ZERO);
+                    CfetsTrdFirstBondInvestTradeDto.setCommissionAmt(CfetsTrdFirstBondInvestTradeDto.getFeeAmt());
+                    if ((StringUtil.equals(CfetsTrdFirstBondInvestTradeDto.getTradeMarket(), BussinessDictCodeList.交易场所_上海证券交易所.getValue()) ||
+                            StringUtil.equals(CfetsTrdFirstBondInvestTradeDto.getTradeMarket(), BussinessDictCodeList.交易场所_深圳证券交易所.getValue())) &&
+                            StringUtil.equals(CfetsTrdFirstBondInvestTradeDto.getTradeMarketMode(), BussinessDictCodeList.交易市场_一级市场.getValue())) {
+                        CfetsTrdFirstBondInvestTradeDto.setCommissionAmt(BigDecimal.ZERO);
                     }
-                    if (StringUtil.equals(CfetsTrdBondInvestTradeDto.getPs(), BussinessDictCodeList.交易方向_买入.getValue())) {
-                        CfetsTrdBondInvestTradeDto.setTradeRepAmt(CfetsTrdBondInvestTradeDto.getTradeRepAmt().add(CfetsTrdBondInvestTradeDto.getCommissionAmt()));
-                    } else if (StringUtil.equals(CfetsTrdBondInvestTradeDto.getPs(), BussinessDictCodeList.交易方向_卖出.getValue())) {
-                        CfetsTrdBondInvestTradeDto.setTradeRepAmt(CfetsTrdBondInvestTradeDto.getTradeRepAmt().subtract(CfetsTrdBondInvestTradeDto.getCommissionAmt()));
+                    if (StringUtil.equals(CfetsTrdFirstBondInvestTradeDto.getPs(), BussinessDictCodeList.交易方向_买入.getValue())) {
+                        CfetsTrdFirstBondInvestTradeDto.setTradeRepAmt(CfetsTrdFirstBondInvestTradeDto.getTradeRepAmt().add(CfetsTrdFirstBondInvestTradeDto.getCommissionAmt()));
+                    } else if (StringUtil.equals(CfetsTrdFirstBondInvestTradeDto.getPs(), BussinessDictCodeList.交易方向_卖出.getValue())) {
+                        CfetsTrdFirstBondInvestTradeDto.setTradeRepAmt(CfetsTrdFirstBondInvestTradeDto.getTradeRepAmt().subtract(CfetsTrdFirstBondInvestTradeDto.getCommissionAmt()));
                     }
 
                 }
                 if (StringUtil.equals(tradeFeeDto.getFeeType(), BussinessDictCodeList.费用类型_交易手续费.getValue()) && tradeFeeDto.getFeeAmt() != null) {
-                    CfetsTrdBondInvestTradeDto.setProcedureAmt(tradeFeeDto.getFeeAmt());
-                    CfetsTrdBondInvestTradeDto.setProcedureAmtRate(tradeFeeDto.getFeeRate());
+                    CfetsTrdFirstBondInvestTradeDto.setProcedureAmt(tradeFeeDto.getFeeAmt());
+                    CfetsTrdFirstBondInvestTradeDto.setProcedureAmtRate(tradeFeeDto.getFeeRate());
                 }
                 if (StringUtil.equals(tradeFeeDto.getFeeType(), BussinessDictCodeList.费用类型_结算手续费.getValue()) && tradeFeeDto.getFeeAmt() != null) {
-//                    CfetsTrdBondInvestTradeDto.setSettleAmt(tradeFeeDto.getFeeAmt());
-                    CfetsTrdBondInvestTradeDto.setSettleServiceAmt(tradeFeeDto.getFeeAmt());
+//                    CfetsTrdFirstBondInvestTradeDto.setSettleAmt(tradeFeeDto.getFeeAmt());
+                    CfetsTrdFirstBondInvestTradeDto.setSettleServiceAmt(tradeFeeDto.getFeeAmt());
                 }
             }
         }
         //将甲类户和对应的交易手续费、结算费、佣金设置为0。银行间一级市场的交易手续费、结算费设置为0
-        /*if(StringUtil.isNotEmpty(CfetsTrdBondInvestTradeDto.getSecManageAcctId())){
-            if(bizCommonController.isJiaLeiHu(CfetsTrdBondInvestTradeDto.getSecManageAcctId())){
-                CfetsTrdBondInvestTradeDto.setCommissionAmt(BigDecimal.ZERO);
-                CfetsTrdBondInvestTradeDto.setProcedureAmt(BigDecimal.ZERO);
-                CfetsTrdBondInvestTradeDto.setSettleAmt(BigDecimal.ZERO);
+        /*if(StringUtil.isNotEmpty(CfetsTrdFirstBondInvestTradeDto.getSecManageAcctId())){
+            if(bizCommonController.isJiaLeiHu(CfetsTrdFirstBondInvestTradeDto.getSecManageAcctId())){
+                CfetsTrdFirstBondInvestTradeDto.setCommissionAmt(BigDecimal.ZERO);
+                CfetsTrdFirstBondInvestTradeDto.setProcedureAmt(BigDecimal.ZERO);
+                CfetsTrdFirstBondInvestTradeDto.setSettleAmt(BigDecimal.ZERO);
             }else{
-                if(StringUtil.isNotEmpty(CfetsTrdBondInvestTradeDto.getTradeMarket())&&StringUtil.isNotEmpty(CfetsTrdBondInvestTradeDto.getTradeMarketMode())
-                        &&bizCommonController.isYhjAndOneTradeMarket(CfetsTrdBondInvestTradeDto.getTradeMarketMode(), CfetsTrdBondInvestTradeDto.getTradeMarket())){
-                    CfetsTrdBondInvestTradeDto.setProcedureAmt(BigDecimal.ZERO);
-                    CfetsTrdBondInvestTradeDto.setSettleAmt(BigDecimal.ZERO);
+                if(StringUtil.isNotEmpty(CfetsTrdFirstBondInvestTradeDto.getTradeMarket())&&StringUtil.isNotEmpty(CfetsTrdFirstBondInvestTradeDto.getTradeMarketMode())
+                        &&bizCommonController.isYhjAndOneTradeMarket(CfetsTrdFirstBondInvestTradeDto.getTradeMarketMode(), CfetsTrdFirstBondInvestTradeDto.getTradeMarket())){
+                    CfetsTrdFirstBondInvestTradeDto.setProcedureAmt(BigDecimal.ZERO);
+                    CfetsTrdFirstBondInvestTradeDto.setSettleAmt(BigDecimal.ZERO);
                 }
             }
         }*/
     }
 
-    public void prepareEntityInterf(CfetsTrdBondInvestTradeDto dto) {
+    public void prepareEntityInterf(CfetsTrdFirstBondInvestTradeDto dto) {
         setDealData(dto);
 
         // 汇总扩展表
@@ -4006,12 +3942,12 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     /**
      * 功能描述 : 成交明细自动生成交易数据
      *
-     * @param * @param CfetsTrdBondInvestTradeDto
+     * @param * @param CfetsTrdFirstBondInvestTradeDto
      * @return void
      * @author zhangnian
      * @date 2021/1/18 0018
      */
-    public void saveAutoTrade(CfetsTrdBondInvestTradeDto entity) {
+    public void saveAutoTrade(CfetsTrdFirstBondInvestTradeDto entity) {
         {
             entity.setActPortfolioId(entity.getPortfolioId());
             entity.setPortfolioId(AllTradeCommonUtil.exchangePortfolio(entity.getPortfolioId()));
@@ -4150,61 +4086,61 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         }
     }
 
-    public List<TrdTradeFeeDetail> calFeeDetail(CfetsTrdBondInvestTradeDto entity) {
-        CfetsTrdBondInvestTradeDto CfetsTrdBondInvestTradeDto = new CfetsTrdBondInvestTradeDto();
+    public List<TrdTradeFeeDetail> calFeeDetail(CfetsTrdFirstBondInvestTradeDto entity) {
+        CfetsTrdFirstBondInvestTradeDto CfetsTrdFirstBondInvestTradeDto = new CfetsTrdFirstBondInvestTradeDto();
         InterfTradSecdealDto bondCstpInfo = new InterfTradSecdealDto();
         BeanUtil.copyPropertiesIgnoreNull(bondCstpInfo, entity.getInterfTradSecdeal());
         //全价总额
         BigDecimal fpriceAmt = bondCstpInfo.getSettamt();
         //券面总额
         BigDecimal prinamt = bondCstpInfo.getPrinamt();
-        BeanUtil.copyPropertiesIgnoreNull(CfetsTrdBondInvestTradeDto, entity);
+        BeanUtil.copyPropertiesIgnoreNull(CfetsTrdFirstBondInvestTradeDto, entity);
         // 金融产品类型（投管分类）
-        CfetsTrdBondInvestTradeDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
+        CfetsTrdFirstBondInvestTradeDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
         // 金融产品类型（估值核算）
-        CfetsTrdBondInvestTradeDto.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
+        CfetsTrdFirstBondInvestTradeDto.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
         // 交易日期
-        CfetsTrdBondInvestTradeDto.setTradeDate(bondCstpInfo.getDealdate());
+        CfetsTrdFirstBondInvestTradeDto.setTradeDate(bondCstpInfo.getDealdate());
         // 交割日期
-        CfetsTrdBondInvestTradeDto.setSettleDate(bondCstpInfo.getSettdate());
+        CfetsTrdFirstBondInvestTradeDto.setSettleDate(bondCstpInfo.getSettdate());
         // 证券托管户
-        CfetsTrdBondInvestTradeDto.setSecManageAcctId(bondCstpInfo.getOurdepositaccountnumber());
+        CfetsTrdFirstBondInvestTradeDto.setSecManageAcctId(bondCstpInfo.getOurdepositaccountnumber());
         // 交易场所
-        CfetsTrdBondInvestTradeDto.setTradeMarket(BussinessDictCodeList.交易场所_银行间.getValue());
+        CfetsTrdFirstBondInvestTradeDto.setTradeMarket(BussinessDictCodeList.交易场所_银行间.getValue());
         // 交易市场
-        CfetsTrdBondInvestTradeDto.setTradeMarketMode(BussinessDictCodeList.交易市场_二级市场.getValue());
+        CfetsTrdFirstBondInvestTradeDto.setTradeMarketMode(BussinessDictCodeList.交易市场_二级市场.getValue());
         // 交易平台
-        CfetsTrdBondInvestTradeDto.setTradePlat(DictCodeList.交易平台_外汇交易中心.getValue());
+        CfetsTrdFirstBondInvestTradeDto.setTradePlat(DictCodeList.交易平台_外汇交易中心.getValue());
         // 币种
-        CfetsTrdBondInvestTradeDto.setCcy(BussinessDictCodeList.币种_人民币.getValue());
+        CfetsTrdFirstBondInvestTradeDto.setCcy(BussinessDictCodeList.币种_人民币.getValue());
         // 交易日历
-        CfetsTrdBondInvestTradeDto.setCalendarId("03");
+        CfetsTrdFirstBondInvestTradeDto.setCalendarId("03");
         // 债券一级分类
-        FinProductType finProductType = queryFinProductTypeByFinProdId(CfetsTrdBondInvestTradeDto.getFinprodId());
+        FinProductType finProductType = queryFinProductTypeByFinProdId(CfetsTrdFirstBondInvestTradeDto.getFinprodId());
         if (finProductType != null) {
-            CfetsTrdBondInvestTradeDto.setWindtypeone(finProductType.getType4());
+            CfetsTrdFirstBondInvestTradeDto.setWindtypeone(finProductType.getType4());
         }
         // 清算速度
         if (DateUtil.isSameDate(bondCstpInfo.getDealdate(), bondCstpInfo.getSettdate())) {
-            CfetsTrdBondInvestTradeDto.setSettleSpeedStr(BussinessDictCodeList.清算速度_T加0.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setSettleSpeedStr(BussinessDictCodeList.清算速度_T加0.getValue());
         } else {
-            CfetsTrdBondInvestTradeDto.setSettleSpeedStr(BussinessDictCodeList.清算速度_T加1.getValue());
+            CfetsTrdFirstBondInvestTradeDto.setSettleSpeedStr(BussinessDictCodeList.清算速度_T加1.getValue());
         }
 
         // =====================金额信息=====================
         // 券面总额、净价、应计利息、全价、净价总额、应计利息总额、全价总额
         // 交易金额
-        CfetsTrdBondInvestTradeDto.setTradeAmt(prinamt);
-        CfetsTrdBondInvestTradeDto.setTotalFaceValue(prinamt);
+        CfetsTrdFirstBondInvestTradeDto.setTradeAmt(prinamt);
+        CfetsTrdFirstBondInvestTradeDto.setTotalFaceValue(prinamt);
         // 交易金额(原交易金额被券面总额所用)
-        CfetsTrdBondInvestTradeDto.setTradeRepAmt(fpriceAmt);
-        CfetsTrdBondInvestTradeDto.setTradeAmtAndFee(fpriceAmt);
+        CfetsTrdFirstBondInvestTradeDto.setTradeRepAmt(fpriceAmt);
+        CfetsTrdFirstBondInvestTradeDto.setTradeAmtAndFee(fpriceAmt);
         // 净价 price8
-        CfetsTrdBondInvestTradeDto.setUnitCprice(bondCstpInfo.getPrice8());
+        CfetsTrdFirstBondInvestTradeDto.setUnitCprice(bondCstpInfo.getPrice8());
         // 设置费用费用信息
-        CfetsTrdBondInvestTradeDto.setCalculateField("unitCprice");
-        calcAmt(CfetsTrdBondInvestTradeDto);
-        return CfetsTrdBondInvestTradeDto.getTradeFeeList();
+        CfetsTrdFirstBondInvestTradeDto.setCalculateField("unitCprice");
+        calcAmt(CfetsTrdFirstBondInvestTradeDto);
+        return CfetsTrdFirstBondInvestTradeDto.getTradeFeeList();
     }
 
     /**
@@ -4411,18 +4347,12 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
                     return m;
                 }
             }
-            CfetsTrdBondInvestTradeDto dto = this.getTrdBondInvestTradeDto(inputDto.getTotleTradeId() + "R");
+            CfetsTrdFirstBondInvestTradeDto dto = this.getTrdFirstBondInvestTradeDto(inputDto.getTotleTradeId() + "R");
             if (StringUtil.isNotEmpty(dto)) {
                 AjaxResult m = new AjaxResult();
                 m.setErrorList(Arrays.asList(new ValidMessage("已撤销的交易不允许撤销")));
                 return m;
             }
-//            CfetsTrdRepoTrade002Dto dtoRepo = cfetsTrdRepoTrade002Service.getTrdRepoInvestTradeDto(inputDto.getTotleTradeId() + "R");
-//            if (StringUtil.isNotEmpty(dtoRepo)) {
-//                AjaxResult m = new AjaxResult();
-//                m.setErrorList(Arrays.asList(new ValidMessage("已撤销的交易不允许撤销")));
-//                return m;
-//            }
             Map<String, Object> pageParam = new HashMap<>();
             pageParam.put("totleTradeId", inputDto.getTotleTradeId());
             List<String> entrusIds = cfetsTrdQueryMapper.findEtrEntrustIsForcedFinish(pageParam);
@@ -4441,7 +4371,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @param input
      * @return
      */
-    public AjaxResult checkModifyExecId(CfetsTrdBondInvestTradeDto input) {
+    public AjaxResult checkModifyExecId(CfetsTrdFirstBondInvestTradeDto input) {
         if (StringUtil.isNotEmpty(input.getExecid())) {
             //判断该成交编号，是否已经被匹配
             Map<String, Object> param = new HashMap<String, Object>();
@@ -4462,7 +4392,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @param input
      * @return
      */
-    public AjaxResult modifyExecIdMethod(CfetsTrdBondInvestTradeDto input) {
+    public AjaxResult modifyExecIdMethod(CfetsTrdFirstBondInvestTradeDto input) {
         CfetsTrdConfirmMatchDto dto = new CfetsTrdConfirmMatchDto();
         dto.setPreTradeId(input.getPreTradeId());
         dto.setExeId(input.getExecid());

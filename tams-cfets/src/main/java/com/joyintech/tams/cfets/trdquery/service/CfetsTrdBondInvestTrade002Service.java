@@ -4462,6 +4462,14 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             }else if(StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
                     || StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())){
                 parameter.setPageId("CfetsTrdRepoTrade002");
+            } else if (StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())
+                    && StringUtil.equals(inputDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+                parameter.setPageId("CfetsTrdFirstBondInvestTrade002");
+            }
+            if(StringUtil.equals(inputDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())){
+                AjaxResult m = new AjaxResult();
+                m.setErrorList(Arrays.asList(new ValidMessage("一级投标成交数据不允许撤销,请撤销中标结果维护/分销买入数据")));
+                return m;
             }
             parameter.setBusinessDataPk1(inputDto.getTotleTradeId() + "R");
             //parameter.setBusinessDataPk2("F01");
