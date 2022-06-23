@@ -1460,7 +1460,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                 EtrEntrust entrust = etrEntrustMapper.selectByPrimaryKey(entrustId);
                 if(Objects.nonNull(entrust)) {
                     if(((StringUtil.equals(entrust.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue()) || StringUtil.equals(entrust.getTradeMarket(),DictCodeListExt1.交易场所_商业银行柜台.getValue()))
-                        && (StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())|| StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购)
+                        && (StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())|| StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                             || StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())))
                         ) {
                         b = false;

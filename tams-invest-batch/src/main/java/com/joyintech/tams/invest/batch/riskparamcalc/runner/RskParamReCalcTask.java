@@ -134,12 +134,11 @@ public class RskParamReCalcTask extends BatchBaseService {
         step1Reader.setParams(params);
         step1Processor.setParams(params);
         step1Writer.setParams(params);
-        step2Reader.setParams(params);
-        step2Processor.setParams(params);
-        step2Writer.setParams(params);
+//        step2Reader.setParams(params);
+//        step2Processor.setParams(params);
+//        step2Writer.setParams(params);
         return batchBuilder.init(this)
             .batch("step1", (BaseReader)step1Reader, (BaseProcessor)step1Processor, step1Writer)
-            .batch("step2",step2Reader,step2Processor,step2Writer)
             .builder(this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId())
             .run();
     }

@@ -24,7 +24,6 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
-import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -64,8 +63,6 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     private BaseGetBusinessId bussGetBussinessIdService;
     @Resource
     private CommonAutoCouponService commonAutoCouponService;
-    @Resource
-    private CommonBusinessService commonBusinessService;
     @Resource
     private FinListedBondInfoQueryMapper finListedBondInfoQueryMapper;
     @Resource
@@ -207,7 +204,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //公共加券操作
         commonAutoCouponService.autoBondCouponSave(interfPayhsrcsecinfoDto);
         //保存操作记录
-        this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
+        this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
         //发行人处理
         return ajaxResult;
     }
@@ -407,7 +404,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @see
      * @since 1.0
      */
-    private String getIssuer(String issuerShort) {
+    public String getIssuer(String issuerShort) {
         String customerId = restTemplate.getForObject(ServiceApplication.BASICDATA_SERVICE_NAME
                 + "/MstCustomerNature/getIssuer?linkId1=" + issuerShort + "&type=" + "IS_ISSUER", String.class);
         if (StringUtil.isEmpty(customerId)) {
@@ -425,6 +422,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             /* 发行人加券后客户类型默认：市场机构 add by liuwei 20201118 end */
 
             mstCustomerInfoAdd.setCustomerId(customerId);
+            mstCustomerInfoAdd.setInsitituteCode(issuerShort);
             //客户信息表插入数据
             mstCustomerInfoMapper.insert(mstCustomerInfo);
             mstCustomerInfoAddMapper.insert(mstCustomerInfoAdd);

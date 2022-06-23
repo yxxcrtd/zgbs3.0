@@ -389,12 +389,11 @@
 		<if test="periodId != null and periodId != '' and branch != null and branch != '' ">
 		   and fp.finprod_id IN (
 		      select FINPROD_ID from fin_trade_product
-		      where branch = #{branch}
-		        and PERIOD_ID = #{periodId}
+		      where branch = #{branch} and PERIOD_ID = #{periodId}
 		   )
 		</if>
-		<if test="periodId == null or periodId == ''">
-		   and fp.p_finprod_id = #{finprodId}
+		<if test="finprodId != null and finprodId != ''">
+		   and fp.finprod_id = #{finprodId}
 		</if>
 	</select>
 

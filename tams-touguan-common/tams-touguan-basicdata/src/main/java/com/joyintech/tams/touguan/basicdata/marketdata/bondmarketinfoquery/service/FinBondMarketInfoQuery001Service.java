@@ -10,6 +10,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
@@ -22,6 +23,7 @@ import com.joyintech.tams.component.business.common.service.CommonAutoCouponServ
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
@@ -187,7 +189,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             ajaxResult.setMessageType(MessageType.错误消息);
         } else {
             //操作记录
-            this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
+            this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
         }
         return ajaxResult;
     }
@@ -214,6 +216,27 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         //校验必填项
         addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
         return validMessages;
+    }
+
+    /**
+     * 发行人处理
+     *
+     * @param validMessages
+     * @param issuer
+     */
+    public void handleIssuer(List<ValidMessage> validMessages, String issuer) {
+        logger.info("handleIssuer >> 发行人处理参数：{}", issuer);
+        Map<String, Object> result = restTemplate.getForObject(
+                ServiceApplication.PINGAN_SERVICE_NAME + "/invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/autoAddInstitutions?insitituteCode=" + issuer,
+                Map.class);
+        logger.info("handleIssuer >> 发行人处理结果：{}", JsonUtils.object2Json(result));
+        if (Objects.nonNull(result)) {
+            int errorCode = (int) result.get("errorCode");
+            if (errorCode == 0) {
+                validMessages.add(new ValidMessage("发行人匹配失败，请手动处理"));
+            }
+        }
+
     }
 
 

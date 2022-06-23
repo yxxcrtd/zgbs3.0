@@ -589,7 +589,7 @@
             <foreach item="item" index="index" collection="finprodMarketIds" open="(" separator="," close=")">
                 #{item, jdbcType=VARCHAR}
             </foreach> ) OR -->
-        (FP.FINPROD_ID in
+        (FP.FINPROD_MARKET_ID in
            <foreach item="item" index="index" collection="finprodMarketIds" open="(" separator="," close=")">
                #{item, jdbcType=VARCHAR}
             </foreach>)

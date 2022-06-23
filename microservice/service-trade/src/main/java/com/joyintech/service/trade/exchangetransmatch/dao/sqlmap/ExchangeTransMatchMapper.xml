@@ -379,7 +379,7 @@
                 SEC_ACCT_ID
         ) S ON S.ENTRUNST_TRADE_ID = A1.ENTRUST_ID AND S.SEC_ACCT_ID = det.SEC_ACCT_ID
         LEFT JOIN
-            STL_SEC_ACCT_INFO E1 ON E1.SEC_ACCT_ID = D1.SEC_ACCT_ID
+            STL_SEC_ACCT_INFO E1 ON E1.SEC_ACCT_ID = det.SEC_ACCT_ID
         LEFT JOIN
             STL_CAPACCT_INFO F1 ON F1.ACCT_NO = E1.TRD_ACCT_ID
         WHERE
@@ -437,7 +437,8 @@
                     BID_ORDER bo ON bobp.BID_ID = bo.BID_ID
                 WHERE
                     bobp.ENTRUST_ID = A1.ENTRUST_ID
-                    AND bobp.IS_WIN = #{IS_WIN_Y}
+                    AND bobp.TRADE_STATUS = #{TRADE_STATUS_01}
+                    AND bobp.IS_CANCEL = #{IS_CANCEL_N}
                     AND bo.BID_MODLE = #{BID_MODLE_03}
                 UNION
                 SELECT
@@ -450,6 +451,7 @@
                     BID_ORDER bo ON brt.BID_ID = bo.BID_ID
                 WHERE
                     brd.ENTRUST_ID = A1.ENTRUST_ID
+                    AND brt.STATUS = #{TRADE_STATUS_01}
                     AND brt.IS_WIN = #{IS_WIN_Y}
                     AND bo.BID_MODLE = #{BID_MODLE_03}
             )
