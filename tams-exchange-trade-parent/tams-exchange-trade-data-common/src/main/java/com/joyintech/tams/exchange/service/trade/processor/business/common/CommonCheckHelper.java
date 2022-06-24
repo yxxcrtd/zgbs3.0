@@ -25,7 +25,7 @@ import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
-import com.joyintech.tams.exchange.service.trade.processor.InvestInterfaceHelper;
+import com.joyintech.tams.exchange.service.trade.processor.invest.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
