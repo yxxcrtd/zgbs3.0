@@ -193,7 +193,6 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     股票交易发行方式_红利补税(DictCode.股票交易发行方式,"04","未上市-新股"),
     股票交易发行方式零碎股转现金(DictCode.股票交易发行方式,"05","已上市"),
     /** add by zhangzewei on 20220428：股票相关变更 end **/
-    ;
     共同业务类型_一级投标确认_申购_登记(DictCode.共通业务类型, "TRD95", "一级投标确认-申购-登记"),
             ;
     /**
