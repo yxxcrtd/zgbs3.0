@@ -779,6 +779,8 @@ public class CfetsTrdQueryService extends BaseService{
                 //投资经理
                 pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
             }
+            pageParam.put("BUSI_TYPE_POSITION_02", DictCodeListExt3.头寸业务类型_现券交易.getValue());
+            pageParam.put("BUSI_TYPE_POSITION_05", DictCodeListExt3.头寸业务类型_质押式回购首期.getValue());
             pageParam.put("BUSI_TYPE_POSITION_34", DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
             pageParam.put("PS_T01", DictCodeList.交易方向_买入.getValue());
             pageParam.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
@@ -909,9 +911,9 @@ public class CfetsTrdQueryService extends BaseService{
         spcdCode = spcdCodeTemp+",BF";
         List<CfgReadonlyFormShow> infoFormf = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode,dtCode,spcdCode);
 
-        resultData.put(dtCode+"_formbb",infoFormb);
+        resultData.put(dtCode+"_formb",infoFormb);
         resultData.put(dtCode+"_formbs",infoForms);
-        resultData.put(dtCode+"_formbf",infoFormf);
+        resultData.put(dtCode+"_formfx",infoFormf);
 
         Map<String, Object> pageParam = new HashMap<>();
         if (StringUtil.isNotEmpty(dto.getQuoteId())) {
