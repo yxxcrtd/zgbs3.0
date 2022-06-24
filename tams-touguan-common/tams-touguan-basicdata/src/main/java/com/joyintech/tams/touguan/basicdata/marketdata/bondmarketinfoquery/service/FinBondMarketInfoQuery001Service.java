@@ -105,6 +105,10 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
                 pageMode.setSort(sort.replaceAll("Str", ""));
                 request.setPageMode(pageMode);
             }
+            if (StringUtil.isNotBlank(sort) && sort.equals("conceptTypeStr")) {
+                pageMode.setSort("CITYINVESTSECWIND");
+                request.setPageMode(pageMode);
+            }
         }
         List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
         return new Page<>(PageInfo.of(bondMarketInfoQuery004Dtos));
