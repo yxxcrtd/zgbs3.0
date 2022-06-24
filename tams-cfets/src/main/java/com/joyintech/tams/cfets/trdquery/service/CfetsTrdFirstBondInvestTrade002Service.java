@@ -57,7 +57,6 @@ import com.joyintech.tams.invest.interf.service.InterfComponentService;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
-import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -412,12 +411,8 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
 
     @Override
     public void doComplete(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType) {
-        try {
-            if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
-                this.doCompleteBidRevoke(entity, "", true);
-            }
-        }catch (Exception e){
-            throw new WorkFlowException(e);
+        if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
+            this.doCompleteBidRevoke(entity, "", true);
         }
     }
 
