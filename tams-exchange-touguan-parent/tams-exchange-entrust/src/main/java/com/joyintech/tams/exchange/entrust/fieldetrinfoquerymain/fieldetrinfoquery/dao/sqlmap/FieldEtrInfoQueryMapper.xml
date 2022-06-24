@@ -999,6 +999,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="VARCHAR"/>
         <result column="FULL_PRICE" property="fullPrice" jdbcType="NUMERIC"/>
         <result column="PORTFOLIO_NAME" property="portfolioName" jdbcType="NUMERIC"/>
+        <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="NUMERIC"/>
         <result column="SEC_ACCT_ID" property="secAcctId" jdbcType="VARCHAR"/>
         <result column="TRADE_PLAT" property="tradePlat" jdbcType="VARCHAR"/>
         <result column="FINPROD_TYPE2" property="finprodType2" jdbcType="VARCHAR"/>
@@ -1058,7 +1059,10 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         order by t.TRADING_DAY desc,t.TRADE_TIME desc
     </select>-->
     <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
-	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, <!--PP.PORTFOLIO_NAME,--> SCI.ACCT_NAME  ACCOUNT_NAME
+	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, <!--PP.PORTFOLIO_NAME,-->
+      nvl(detail.PORTFOLIO_ID,'') PORTFOLIO_ID,
+      nvl(detail.PORTFOLIO_NAME,'') PORTFOLIO_NAME,
+      nvl(detail.ACCT_NAME, sci.ACCT_NAME) ACCOUNT_NAME
 	  FROM (
 	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
 			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
@@ -1178,6 +1182,23 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         ) A
 	  LEFT JOIN STL_CAPACCT_INFO SCI ON A.ACCT_ACCOUNT = SCI.ACCT_NO
 	  LEFT JOIN ETR_ENTRUST EE ON A.INSTRUCTION_ID = EE.ENTRUST_ID
+        LEFT JOIN (
+        SELECT
+        EED.ENTRUST_ID,
+        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+        wm_concat (sci.ACCT_NO) AS ACCT_NO,
+        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+        FROM ETR_ENTRUST_DETAIL EED
+        left join
+        (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
+        FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON
+        sci.ACCT_NO = ssai.TRD_ACCT_ID
+        GROUP BY EED.ENTRUST_ID ) detail ON A.INSTRUCTION_ID = detail.ENTRUST_ID
         <!-- LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
         LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID -->
       WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
