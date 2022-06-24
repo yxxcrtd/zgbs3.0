@@ -17,7 +17,8 @@ import com.joyintech.tams.invest.basicdata.mstcalendartype.dto.MstCalendarType00
 import com.joyintech.tams.invest.basicdata.mstcalendartype.service.MstCalendarType001Service;
 import com.joyintech.tams.invest.basicdata.mstcaptialaccount.dto.MstCaptialAccountDto;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.h2.util.StringUtils;
+//import org.h2.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -40,6 +40,7 @@ import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class CommonCheckHelper {
@@ -65,12 +66,12 @@ public class CommonCheckHelper {
     @Autowired
     private BondHelper bondHelper;
 
-    private static final ThreadLocal<SimpleDateFormat> INSTRUCTION_DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("yyyyMMdd");
-        }
-    };
+//    private static final ThreadLocal<SimpleDateFormat> INSTRUCTION_DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+//        @Override
+//        protected SimpleDateFormat initialValue() {
+//            return new SimpleDateFormat("yyyyMMdd");
+//        }
+//    };
 
     @Autowired
     private TradeTimeService tradeTimeService;
