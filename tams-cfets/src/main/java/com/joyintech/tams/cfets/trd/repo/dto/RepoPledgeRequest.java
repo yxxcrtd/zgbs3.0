@@ -34,6 +34,15 @@ public class RepoPledgeRequest {
     @ApiModelProperty(required = false, name = "finprodTypeList", value = "债券类型List", example = "['003']")
     private List<String> finprodTypeList;
 
+    @ApiModelProperty(required = false, name = "finprodType2List", value = "债券二级分类List", example = "['02']")
+    private List<String> finprodType2List;
+
+    @ApiModelProperty(required = false, name = "finprodType3List", value = "债券三级分类List", example = "['11']")
+    private List<String> finprodType3List;
+
+    @ApiModelProperty(required = false, name = "finprodType4List", value = "债券四级分类List", example = "['155']")
+    private List<String> finprodType4List;
+
     @ApiModelProperty(required = false, name = "repRegistOrgList", value = "登记托管机构代码List", example = "['01']")
     private List<String> repRegistOrgList;
 
@@ -129,6 +138,30 @@ public class RepoPledgeRequest {
 
     public void setPageMode(PageMode pageMode) {
         this.pageMode = pageMode;
+    }
+
+    public List<String> getFinprodType2List() {
+        return finprodType2List;
+    }
+
+    public void setFinprodType2List(List<String> finprodType2List) {
+        this.finprodType2List = finprodType2List;
+    }
+
+    public List<String> getFinprodType3List() {
+        return finprodType3List;
+    }
+
+    public void setFinprodType3List(List<String> finprodType3List) {
+        this.finprodType3List = finprodType3List;
+    }
+
+    public List<String> getFinprodType4List() {
+        return finprodType4List;
+    }
+
+    public void setFinprodType4List(List<String> finprodType4List) {
+        this.finprodType4List = finprodType4List;
     }
 }
 

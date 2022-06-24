@@ -87,6 +87,9 @@ public class RepoEntrustPledgeDto {
     @ApiModelProperty(name = "convertAmt", value = "汇总质押券折算总额", example = "200000")
     private BigDecimal convertAmt;
 
+    @ApiModelProperty(required = false, name = "isInterf", value = "是否接口数据", example = "N 否，Y 是")
+    private String isInterf;
+
     public String getBondCode() {
         return bondCode;
     }
@@ -281,5 +284,13 @@ public class RepoEntrustPledgeDto {
 
     public void setPeriodStr(String periodStr) {
         this.periodStr = periodStr;
+    }
+
+    public String getIsInterf() {
+        return isInterf;
+    }
+
+    public void setIsInterf(String isInterf) {
+        this.isInterf = isInterf;
     }
 }

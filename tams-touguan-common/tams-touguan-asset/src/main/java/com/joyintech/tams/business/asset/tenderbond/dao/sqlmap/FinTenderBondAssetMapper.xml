@@ -345,7 +345,19 @@
         FROM INTERF_WIND_UNRELEASE_SEC_INFO sec
         LEFT JOIN INTERF_WIND_RELEASE_INFO ri ON sec.SEC_ID = ri.SEC_ID
         LEFT JOIN (select (SECURITY_ID||'.IB') as SEC_ID,t.* from INTERF_RDI_RELEASE_INFO t where t.SECURITY_TYPE in ('同业存单','公司短期融资券'))  pri ON pri.SEC_ID = ri.SEC_ID
-        where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04}) AND ROWNUM=1
+        where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+        <choose>
+            <when test="additionalBatches != null and additionalBatches != '' and additionalBatches != '-1'">
+                AND ri.ADDITIONAL_BATCHES = #{additionalBatches}
+            </when>
+            <when test="additionalBatches == '-1'">
+
+            </when>
+            <otherwise>
+                AND ri.ADDITIONAL_BATCHES is null
+            </otherwise>
+        </choose>
+          AND ROWNUM = 1
     </select>
 
     <select id="getCount" resultType="java.lang.Integer">

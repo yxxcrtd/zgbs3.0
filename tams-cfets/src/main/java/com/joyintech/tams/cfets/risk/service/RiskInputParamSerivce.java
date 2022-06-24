@@ -813,6 +813,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (!isCheck) {
             return null;
         }
+        if(this.isControl(dtl.getNameListControl())) {
+            return null;
+        }
         RiskNameListDto listDto = new RiskNameListDto();
         if (data instanceof CfetsTrdFirstBidFirmInfoDto) {
             // 一级投标确认
@@ -1008,8 +1011,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
      * @return
      */
     private boolean isControl(String control) {
-        //return StringUtil.isEmpty(control) || StringUtil.equals(control, DictCodeListRsk.风险控制类别_不控.getValue());
-        return false;
+        return StringUtil.isEmpty(control) || StringUtil.equals(control, DictCodeListRsk.风险控制类别_不控.getValue());
+        //return false;
     }
 
     /**
