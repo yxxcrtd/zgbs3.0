@@ -2083,6 +2083,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             wflBidOrder.setWinPrinAmt(entity.getTotalBiddingNum());
             // 分配方式 = 画面.调整策略
             wflBidOrder.setDipType(entity.getAdjustStrategy());
+            // 撤销备注
+            if(StringUtil.isNotEmpty(entity.getRevokeReason())){
+                wflBidOrder.setRemark(StringUtil.join(wflBidOrder.getRemark(), entity.getRevokeReason()));
+            }
             for (CfetsTrdFirstBidFirmProductDto item : entity.getProductDtos()) {
                 WflBidOrderBidPrice wflBidOrderBidPrice = new WflBidOrderBidPrice();
                 // 投标编号

@@ -155,6 +155,9 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "remark", value = "备注", example = "XXX")
     private String remark;
 
+    @ApiModelProperty(name = "revokeReason", value = "撤销备注", example = "XXX")
+    private String revokeReason;
+
     @ApiModelProperty(name = "adjustStrategy", value = "调整策略", example = "XXX")
     private String adjustStrategy;
 
@@ -582,6 +585,14 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getRevokeReason() {
+        return revokeReason;
+    }
+
+    public void setRevokeReason(String revokeReason) {
+        this.revokeReason = revokeReason;
     }
 
     public String getAdjustStrategy() {
