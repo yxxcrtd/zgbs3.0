@@ -11,9 +11,9 @@
 package com.joyintech.tams.cfets.trdquery.dto;
 
 
-import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -111,7 +111,7 @@ public class CfetsTrdQueryCstpBidInfoListResponse {
     }
 
     public String getBusinesstypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, getBusinesstype());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.CSTP资产类型, getBusinesstype());
     }
 
     public void setBusinesstypeStr(String businesstypeStr) {
@@ -191,7 +191,7 @@ public class CfetsTrdQueryCstpBidInfoListResponse {
     }
 
     public String getCouponRateTypeStr() {
-        return couponRateTypeStr;
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.CSTP息票类型,  this.getCouponRateType());
     }
 
     public void setCouponRateTypeStr(String couponRateTypeStr) {
@@ -207,7 +207,7 @@ public class CfetsTrdQueryCstpBidInfoListResponse {
     }
 
     public String getCcyStr() {
-        return ccyStr;
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.币种,  this.getCcy());
     }
 
     public void setCcyStr(String ccyStr) {
@@ -271,6 +271,9 @@ public class CfetsTrdQueryCstpBidInfoListResponse {
     }
 
     public String getIssueClass() {
+        if("6".equals(issueClass)){
+            return "报价发行";
+        }
         return issueClass;
     }
 
@@ -287,7 +290,10 @@ public class CfetsTrdQueryCstpBidInfoListResponse {
     }
 
     public String getInstrumentStatus() {
-        return instrumentStatus;
+        if("1".equals(instrumentStatus)){
+            return "发行成功";
+        }
+        return "发行失败";
     }
 
     public void setInstrumentStatus(String instrumentStatus) {

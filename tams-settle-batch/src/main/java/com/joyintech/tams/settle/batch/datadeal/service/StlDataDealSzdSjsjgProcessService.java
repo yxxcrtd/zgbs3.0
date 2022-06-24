@@ -1134,7 +1134,11 @@ public class StlDataDealSzdSjsjgProcessService {
                     if(!bondAssetList.contains(finprodId) && !sharesAssetList.contains(shareFinprodId)) {
                         continue;
                     }
-                }else{
+                }
+                // 一级投标业务不做资产校验
+                else if(StringUtil.equals(StlDataDealProcessConstant.SJSMX_YWLB_JY02, szdSjsjg.getJgywlb())){
+                }
+                else{
                     if(!bondAssetList.contains(finprodId)) {
                         continue;
                     }
