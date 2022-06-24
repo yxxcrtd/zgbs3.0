@@ -146,6 +146,9 @@ public class CfetsTrdConfirmExecBondInfoResponse {
     @ApiModelProperty(name="totleTradeId",value="登记编号/报价内部编号",example="1")
     private String totleTradeId;
 
+    @ApiModelProperty(name="finprodType2",value="资产类型CODE",example="A1")
+    private String finprodType2;
+
     public String getBusiCode() {
         return busiCode;
     }
@@ -450,5 +453,13 @@ public class CfetsTrdConfirmExecBondInfoResponse {
 
     public void setTotleTradeId(String totleTradeId) {
         this.totleTradeId = totleTradeId;
+    }
+
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
     }
 }

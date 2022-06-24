@@ -1113,8 +1113,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             bidOrder.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
             bidOrder.setIsCancel(DictCodeList.是否_否.getValue());
             bidOrder.setpBidId(entity.getBidId());
-            if (StringUtil.isNotEmpty(entity.getRemark())) {
-                bidOrder.setRemark(entity.getRemark());
+            // 撤销备注
+            if(StringUtil.isNotEmpty(entity.getRevokeReason())){
+                bidOrder.setRemark(StringUtil.join(bidOrder.getRemark(), entity.getRevokeReason()));
             }
         } else {
             // 投标日期=交易日
