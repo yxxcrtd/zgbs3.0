@@ -120,7 +120,8 @@
         f.FINPROD_ABBR finprodAbbr,
         m.VALUE_SOURCE valueSource,
         sdl1.item_value valueSourceStr,
-        m.CDATE cdate,
+<!--         m.CDATE cdate, ,-->
+        to_char(m.CDATE,'yyyy-mm-dd') cdate,
         m.MDPRICE mdprice,
         m.MCPRICE mcprice,
         m.MINT mint,
@@ -152,10 +153,13 @@
                 AND m.VALUE_SOURCE = #{valueSource}
             </if>
             <if test="cdateStart != null and cdateStart != ''">
-                <![CDATA[AND  m.cdate >= #{cdateStart,jdbcType=VARCHAR} ]]>
+                <!--[CDATA[AND  m.cdate >= #{cdateStart,jdbcType=VARCHAR} ]]-->
+                and m.cdate &gt; to_date(#{cdateStart}, 'yyyy-MM-dd')
             </if>
             <if test="cdateEnd != null and cdateEnd != ''">
-                <![CDATA[AND  m.cdate <= #{cdateEnd,jdbcType=VARCHAR}]]>
+                <!--[CDATA[AND  m.cdate <= #{cdateEnd,jdbcType=VARCHAR}]]-->
+                and m.cdate &lt; to_date(#{cdateEnd}, 'yyyy-MM-dd')
+
             </if>
         </where>
         ) T

@@ -1,12 +1,7 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
@@ -21,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import com.joyintech.framework.base.BaseService;
@@ -366,16 +362,19 @@ public class ExchangeTransMatchCommonService extends BaseService {
         }
         if(!StringUtil.isEmptyList(commonEntrustDtoList)) {
             String matchStatus = DictCodeListExt3.下行交易匹配状态_未匹配.getValue();
-
+            // ZGCPCN-1694:方法内部对list进行clear操作,须通过返回list对象进行实现 modify by fuyongsheng 20220624 start
+            Pair<String, List<ExchangeTransMatchCommonEntrustDto>> pair;
             if((StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                     || StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()))
                 && StringUtil.equals(dto.getSettleTransDataTotalAdd().getRepoType(),DictCodeList.回购类型_质押式协议回购.getValue())){
-                matchStatus = this.calcAgreRepShareAndAmount(dto,commonEntrustDtoList,matchStatus);
+                 pair = this.calcAgreRepShareAndAmount(dto,commonEntrustDtoList,matchStatus);
             }
             else {
-                matchStatus = this.calcShareAndAmount(dto,commonEntrustDtoList,matchStatus);
+                 pair = this.calcShareAndAmount(dto,commonEntrustDtoList,matchStatus);
             }
-
+            // ZGCPCN-1694:方法内部对list进行clear操作,须通过返回list对象进行实现 modify by fuyongsheng 20220624 end
+            matchStatus = pair.getFirst();
+            commonEntrustDtoList = pair.getSecond();
             // 处理多组合系列户指令的组合分配
             this.handleMultiPortfolioAllocation(dto, commonEntrustDtoList);
 
@@ -1543,7 +1542,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
      * @param commonEntrustDtoList
      * @param matchStatus
      */
-    private String calcShareAndAmount(ExchangeTransMatchCommonDto dto,List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList,String matchStatus){
+    private Pair<String, List<ExchangeTransMatchCommonEntrustDto>> calcShareAndAmount(ExchangeTransMatchCommonDto dto,List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList,String matchStatus){
         //只有一条匹配指令时
         if(dto.getEntrustIdList().size() == 1) {
             ExchangeTransMatchCommonEntrustDto commonEntrustDto = commonEntrustDtoList.get(0);
@@ -1853,7 +1852,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     }
                 }
 
-                commonEntrustDtoList.clear();
+                commonEntrustDtoList = new ArrayList<>();
                 commonEntrustDtoList.addAll(commonEntrustDtoListTmp);
                 if(dto.getRemainNum().compareTo(totalFinishMarchQty) >0 || dto.getRemainAmount().compareTo(totalFinishMarchAmt) >0){
                     matchStatus = DictCodeListExt3.下行交易匹配状态_部分匹配.getValue();
@@ -1863,7 +1862,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             }
         }
 
-        return matchStatus;
+        return Pair.of(matchStatus, commonEntrustDtoList);
     }
 
     /**
@@ -1872,7 +1871,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
      * @param commonEntrustDtoList
      * @param matchStatus
      */
-    private String calcAgreRepShareAndAmount(ExchangeTransMatchCommonDto dto,List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList,String matchStatus){
+    private Pair<String, List<ExchangeTransMatchCommonEntrustDto>> calcAgreRepShareAndAmount(ExchangeTransMatchCommonDto dto, List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList, String matchStatus){
 
         //只有一条匹配指令时
         if(dto.getEntrustIdList().size() == 1) {
@@ -2030,13 +2029,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     }
                 }
 
-                commonEntrustDtoList.clear();
+                commonEntrustDtoList = new ArrayList<>();
                 commonEntrustDtoList.addAll(commonEntrustDtoListTmp);
                 matchStatus = DictCodeListExt3.下行交易匹配状态_部分匹配.getValue();
             }
         }
 
-        return matchStatus;
+        return Pair.of(matchStatus, commonEntrustDtoList);
     }
 
     /**
