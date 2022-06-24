@@ -382,6 +382,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             if (br.hasErrors()) {
                 return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
             }
+            dto.setRemark("中标结果撤销原因："+dto.getRemark());
             List<CfetsPrimaryBidManageSaveRequest> selectedItem = new ArrayList<>();
             for (CfetsPrimaryBidManageSaveRequest requestDto: dto.getSelectedItem()) {
                 CfetsPrimaryBidManageSaveRequest saveRequest = cfetsPrimaryBidManageService.selectBasicInfo(requestDto);
