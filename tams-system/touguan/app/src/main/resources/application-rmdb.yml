@@ -1,7 +1,7 @@
 ############################资管框架自定义的配置############################ 
 tx-lcn:
   client:
-    managerAddress: 192.168.70.246:8070
+    managerAddress: 192.168.60.185:8070
   springcloud:
     loadbalance:
       enabled: true
@@ -67,7 +67,8 @@ base:
     filterSlf4jEnabled: true
     filterSlf4jStatementExecutableSqlLogEnable: true
 
-chbsend:  datasource:
+chbsend:
+  datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
