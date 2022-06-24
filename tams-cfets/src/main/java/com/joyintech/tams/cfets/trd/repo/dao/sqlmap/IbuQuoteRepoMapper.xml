@@ -1035,7 +1035,8 @@
                mdate,
                firstNetPrice,
                repRegistOrg,
-               pledgeRatio
+               pledgeRatio,
+               isInterf
         FROM (
             SELECT
                 fp.FINPROD_MARKET_ID bondCode,
@@ -1049,6 +1050,7 @@
                     when mbvi.NETPRICE is null then round(nvl(PA.prinAmt,100)/100,4)*100
                     else round(mbvi.NETPRICE/nvl(PA.prinAmt,100),4)*100
                 end as pledgeRatio /*折算比例*/
+            ,'N' isInterf
             FROM FIN_PRODUCT fp
            INNER JOIN  FIN_PRODUCT_TYPE FPT
                ON  FPT.FINPROD_ID = fp.FINPROD_ID
@@ -1093,16 +1095,22 @@
                         #{item}
                     </foreach>
                 </if>
-                <if test="finprodTypeList != null and finprodTypeList.size() > 0">
-                    AND FPT.TYPE_11 in
-                    <foreach  collection="finprodTypeList" item="finprodType" open="(" close=")" separator=",">
+                <if test="finprodType2List != null and finprodType2List.size() > 0">
+                    AND FPT.TYPE_9 in
+                    <foreach  collection="finprodType2List" item="finprodType" open="(" close=")" separator=",">
                         #{finprodType}
                     </foreach>
                 </if>
-                <if test="nofinprodIdList != null and nofinprodIdList.size() > 0">
-                    AND fp.FINPROD_ID not in
-                    <foreach  collection="nofinprodIdList" item="item" open="(" close=")" separator=",">
-                        #{item}
+                <if test="finprodType3List != null and finprodType3List.size() > 0">
+                    AND FPT.TYPE_10 in
+                    <foreach  collection="finprodType3List" item="finprodType" open="(" close=")" separator=",">
+                        #{finprodType}
+                    </foreach>
+                </if>
+                <if test="finprodType4List != null and finprodType4List.size() > 0">
+                    AND FPT.TYPE_11 in
+                    <foreach  collection="finprodType4List" item="finprodType" open="(" close=")" separator=",">
+                        #{finprodType}
                     </foreach>
                 </if>
                 <if test="nofinprodIdList != null and nofinprodIdList.size() > 0">
@@ -1125,8 +1133,12 @@
                 ip.mdate,
                 null        firstNetPrice,
                 ip.INSTITUTION repRegistOrg,
-                100         pledgeRatio
-            from INTERF_PAYHSRCSECINFO ip
+                100         pledgeRatio,
+                'Y' isInterf
+            from INTERF_PAYHSRCSECINFO  ip
+            INNER JOIN FIN_PRODUCT_TYPE_CONFIG fptc
+            on fptc.CONFIG_TYPE = 'WINDTWO_TG_TYPE' and ip.SECTYPE = fptc.OUTPUT_VALUE_1
+            AND (nvl(ip.SECTYPE2,'null') = 'null' or ip.SECTYPE2 = fptc.OUTPUT_VALUE_2)
             <where>
                 not exists(select 1 from FIN_PRODUCT where FINPROD_MARKET_ID = ip.SECID)
                 AND ip.MARKET2 in ('01','02')/*银行间 商业银行柜台*/
@@ -1136,13 +1148,22 @@
                         #{item}
                     </foreach>
                 </if>
-                <if test="finprodTypeList != null and finprodTypeList.size() > 0">
-                    1 = 2
+                <if test="finprodType2List != null and finprodType2List.size() > 0">
+                    AND fptc.INPUT_VALUE_2 in
+                    <foreach  collection="finprodType2List" item="finprodType" open="(" close=")" separator=",">
+                        #{finprodType}
+                    </foreach>
                 </if>
-                <if test="nofinprodIdList != null and nofinprodIdList.size() > 0">
-                    AND ip.SECID not in
-                    <foreach  collection="nofinprodIdList" item="item" open="(" close=")" separator=",">
-                        #{item}
+                <if test="finprodType3List != null and finprodType3List.size() > 0">
+                    AND fptc.INPUT_VALUE_3 in
+                    <foreach  collection="finprodType3List" item="finprodType" open="(" close=")" separator=",">
+                        #{finprodType}
+                    </foreach>
+                </if>
+                <if test="finprodType4List != null and finprodType4List.size() > 0">
+                    AND fptc.INPUT_VALUE_4 in
+                    <foreach  collection="finprodType4List" item="finprodType" open="(" close=")" separator=",">
+                        #{finprodType}
                     </foreach>
                 </if>
                 <if test="nofinprodIdList != null and nofinprodIdList.size() > 0">
