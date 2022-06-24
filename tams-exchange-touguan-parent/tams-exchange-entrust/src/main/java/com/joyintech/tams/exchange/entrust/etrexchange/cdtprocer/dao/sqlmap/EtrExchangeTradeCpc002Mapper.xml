@@ -608,7 +608,8 @@
         FROM
             MST_CREDIT_MARKET_INFO
         WHERE
-            SECID=#{secid,jdbcType=VARCHAR} and CDATE &lt;= #{nowDate,jdbcType=VARCHAR}
+            SECID=#{secid,jdbcType=VARCHAR}
+            and m.cdate &lt; to_date(#{nowDate}, 'yyyy-MM-dd')
     </select>
 
     <!-- 当日交易数据查询 -->
