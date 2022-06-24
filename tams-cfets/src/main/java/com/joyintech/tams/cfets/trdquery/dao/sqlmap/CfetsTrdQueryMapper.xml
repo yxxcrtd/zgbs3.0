@@ -5406,7 +5406,7 @@
                 case
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
                         then nvl(fpi.REFER_YIELD,0)*100 end rateYleid,
-                bo.SUBSCRIPTION_AMOUNT subAmt,
+                bo.SUBSCRIPTION_AMOUNT/10000 subAmt,
                 bo.PAYABLE_AMOUNT  payableAmount,
                 bo.SETT_FEE_AMT  settleFeeAmt,
                 bo.remark  remark
