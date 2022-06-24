@@ -13,11 +13,14 @@ package com.joyintech.tams.invest.basicdata.mstcalendartype.dto;
 import java.util.Date;
 import java.util.List;
 
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.tams.common.base.entity.MstTradeCalendar;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.validation.annotation.Length;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.invest.basicdata.mstcalendartype.validator.MstCalendarTypeValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -31,6 +34,8 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
  * @since 1.0
  */
 @PageId("MstCalendarType002")
+@ValidLogic(targetClass = MstCalendarTypeValidator.class, groups = {ValidateGroupEdit.class,
+        ValidateGroupDelete.class})
 public class MstCalendarType001Dto extends MstTradeCalendar implements ProcessEntity{
     /**
      * serialVersionUID

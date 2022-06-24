@@ -117,6 +117,9 @@ public enum ErrorCode implements IEnum<Integer> {
     PROP_INVESTOR_NOT_EMPTY(1028, "对手方交易主体ID或名称不能为空"),
     CONTRACT_ID_NOT_EMPTY(1029, "协商成交约定号不能为空"),
 
+    CANCEL_ENTRUST_BUSI_ERROR(1021, "该类业务不可撤单"),
+
+
     /**
      * 2001 —— 3000终端错误号
      */

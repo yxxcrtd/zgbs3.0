@@ -2,7 +2,7 @@
 <Workbook filePath="ComYieldCurveInfo001.xlsx" name="收益率曲线">
 	<Worksheet javaBean="com.joyintech.tams.common.basicdata.marketdata.yieldcurveinfo.dto.ComYieldCurveInfoDto">
 		<Row>
-			<Cell order="1" name="曲线日期">curveDateFormatStr</Cell><!-- 曲线日期 -->
+			<Cell order="1" name="曲线日期">curveDateStr</Cell><!-- 曲线日期 -->
 			<Cell order="2" name="曲线代码">curveCode</Cell><!-- 曲线代码 -->
 			<Cell order="3" name="曲线名称">curveName</Cell><!-- 曲线名称 -->
 			<Cell order="4" name="关键年限点">keyPoint</Cell><!-- 关键年限点 -->

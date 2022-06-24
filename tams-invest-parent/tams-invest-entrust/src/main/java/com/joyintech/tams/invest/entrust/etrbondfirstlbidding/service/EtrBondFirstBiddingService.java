@@ -127,6 +127,7 @@ public class EtrBondFirstBiddingService extends CommonExportService<EtrBondFirst
      */
     public Page<SelectOptionDto> getentrustIdAdd(Map<String, Object> param) {
         param.put("userId", SecurityUtil.getLoginUser().getUserName());
+        param.put("userIsNoOrOn", "no");
         return restTemplate.postForPage(ServiceApplication.ENTRUST_SERVICE_NAME
                         + "/EtrBondFirstLBidding/getentrustIdAdd"
                 , param,

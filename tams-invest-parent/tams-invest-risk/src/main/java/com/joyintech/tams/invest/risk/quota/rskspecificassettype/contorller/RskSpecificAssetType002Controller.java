@@ -101,7 +101,7 @@ public class RskSpecificAssetType002Controller extends BaseController {
             return new AjaxResult(br);
         }
         if (StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_NEW)) {
-            dto.setSpecificId(rskSpecificAssetTypeService.getUUid());
+            dto.setSpecificId(dto.getFinprodId());
         }
         WorkFlowParameter<RskSpecificAssetTypeDto> params = new WorkFlowParameter<RskSpecificAssetTypeDto>();
         params.setPageId(this.getPageId());

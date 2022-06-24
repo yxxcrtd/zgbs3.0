@@ -56,6 +56,7 @@ public class CeAssetGroupValidator implements BeanValidator{
         			&& StringUtil.isNotEmpty(dto.getCustomerName())) {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("customerName", dto.getCustomerName());
+                map.put("vdate",dto.getVdateStr());
         		List<CreditAssetpool> listpool = ceAssetGroup002Service.querycreditAssetpool(map);
         		if (listpool != null && listpool.size() > 0) {
         			resultList.add(new ValidMessage("customerName",this.getMessage("RSK_W_0077")));
@@ -67,6 +68,7 @@ public class CeAssetGroupValidator implements BeanValidator{
                 }
                 param.setBusinessDataPk3(dto.getCustomerName());
                 param.setPageId("CeAssetGroup002");
+                param.setBusinessDataPk4(dto.getVdateStr());
                 if(null != mstWorkflowCommonService && 
                     mstWorkflowCommonService.isInWflProcess(param)){
                     resultList.add(new ValidMessage("customerName",this.getMessage("RSK_W_0077")));

@@ -1,8 +1,10 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -72,7 +74,8 @@ import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetT
 @Service
 public class TradeHelper {
     private static final Logger logger = LoggerFactory.getLogger(TradeHelper.class);
-
+    @Autowired
+    FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private TradeAgentManager tradeAgentManager;
     @Autowired
@@ -85,8 +88,6 @@ public class TradeHelper {
     private IntegratedEntrustService integratedEntrustService;
     @Autowired
     private InstrumentService instrumentService;
-    @Autowired
-    FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private InvestmentManagement investmentManagement;
     @Autowired

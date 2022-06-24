@@ -73,6 +73,9 @@
             , {field: 'tradeId', width:180, sortField:'tradeId', title: 'TrdRepoTrade001.colModel.tradeId'}
             , {field: 'entrustId', width:200, sortField:'entrustId', title: 'TrdRepoTrade001.colModel.entrustId'}
             //,{field:'fTradeId',sortField:'fTradeId', width:180, title: 'TrdBondInvestTrade002.fTradeId'}
+            // TISHKS-674:CLONE - 【交易管理】【场内交易】【场内质押式回购交易】系统中缺少成交编号字段，导出表格中多了合作资产字段 modify by huwei 2022/5/7 start
+            , {field:'fTradeId',sortField:'fTradeId', width:180, title: '成交编号', visible:pageId == 'TrdRepoTradeEx001'}
+            // TISHKS-674:CLONE - 【交易管理】【场内交易】【场内质押式回购交易】系统中缺少成交编号字段，导出表格中多了合作资产字段 modify by huwei 2022/5/7 end
             , {
                 field: 'portfolioId', width:180, sortField:'portfolioId', title: 'TrdRepoTrade001.colModel.portfolioId',
                 render: function (data, type, row, meta) {
@@ -89,7 +92,6 @@
             , {field: 'tradeDate', width:120, sortField:'tradeDate', title: 'TrdRepoTrade001.colModel.tradeDate', type: 'date'}
             , {field: 'prinAmt', width:120, sortField:'prinAmt', title: 'TrdRepoTrade001.colModel.prinAmt', type: 'money'}
             , {field: 'ccyText', width:180, sortField:'ccy', title: 'TrdRepoTrade001.colModel.ccy'}
-            , {field:'fTradeId',sortField:'fTradeId', width:180, title: '银行间成交编号', visible:pageId != 'TrdRepoTradeEx001'}
             , {field: 'remark', width:120, sortable:false, title: 'TrdRepoTrade001.colModel.remark'}
             , {field: 'ps', visible: false}
             , {field: 'repoType', visible: false}
