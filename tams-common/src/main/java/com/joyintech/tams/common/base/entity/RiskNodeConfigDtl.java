@@ -131,7 +131,7 @@ public class RiskNodeConfigDtl {
      * @return INDICATOR_CONTROL 指标控制：00：不控 01：软控 02：硬控
      */
     public String getIndicatorControl() {
-        if(StringUtil.equals(this.nameListControl, DictCodeListRsk.风险控制类别_不控.getValue())) {
+        if(StringUtil.equals(this.indicatorControl, DictCodeListRsk.风险控制类别_不控.getValue())) {
             return DictCodeListRsk.风险控制类别_不控.getValue();
         }
         return CacheUtil.getSysParam("IS_RISKMATH_SOFTCONTROL");
@@ -198,7 +198,7 @@ public class RiskNodeConfigDtl {
      * @return CREDIT_CONTROL 授信控制：00：不控 01：软控 02：硬控
      */
     public String getCreditControl() {
-        if(StringUtil.equals(this.nameListControl, DictCodeListRsk.风险控制类别_不控.getValue())) {
+        if(StringUtil.equals(this.creditControl, DictCodeListRsk.风险控制类别_不控.getValue())) {
             return DictCodeListRsk.风险控制类别_不控.getValue();
         }
         return Boolean.parseBoolean(CacheUtil.getSysParam("IS_CREDIT_SOFTCONTROL")) ? DictCodeListRsk.风险控制类别_软控.getValue() : DictCodeListRsk.风险控制类别_硬控.getValue();

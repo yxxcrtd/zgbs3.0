@@ -79,6 +79,9 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "remark", value = "备注", example = "XXX")
     private String remark;
 
+    @ApiModelProperty(name = "revokeReason", value = "撤销备注", example = "XXX")
+    private String revokeReason;
+
     @ApiModelProperty(name = "tradeDate", value = "申购日期")
     private Date tradeDate;
 
@@ -259,6 +262,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public String getRemark() {
         return remark;
+    }
+
+    public String getRevokeReason() {
+        return revokeReason;
+    }
+
+    public void setRevokeReason(String revokeReason) {
+        this.revokeReason = revokeReason;
     }
 
     public void setRemark(String remark) {

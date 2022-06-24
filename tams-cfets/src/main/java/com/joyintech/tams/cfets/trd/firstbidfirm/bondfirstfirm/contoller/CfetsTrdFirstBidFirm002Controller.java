@@ -114,6 +114,9 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         if (StringUtil.isNotEmpty(workflowId)) {
             CfetsTrdFirstBidFirmInfoDto entity = cfetsTrdFirstBidFirm002Service.getBussinessEntityByWorkflowId(workflowId);
 //            test(entity);
+            if(StringUtil.isNotEmpty(entity.getRevokeReason())){
+                entity.setRemark(StringUtil.join(entity.getRemark(), entity.getRevokeReason()));
+            }
             initPageParams.put(GlobalConstant.WORKFLOW_ID, workflowId);
             initPageParams.put(GlobalConstant.ENTITY, entity);
         }
@@ -470,7 +473,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
             ProcessMark processMark = cfetsRepoQuotedPrice004Service.getBusinessInfoByPageIdAndPk(wflValidInputParameter);
             CfetsTrdFirstBidFirmInfoDto dto = cfetsTrdFirstBidFirm002Service.getBussinessEntity(processMark);
             dto.setBidId(detail.getBidId());
-            dto.setRemark(StringUtil.join("投标确认撤销原因：", requst.getRemark()));
+            dto.setRevokeReason(StringUtil.join("投标确认撤销原因：", requst.getRemark()));
             dto.setOperateType("revoke");
             biddingMethod = dto.getBiddingMethod();
             dtos.add(dto);
