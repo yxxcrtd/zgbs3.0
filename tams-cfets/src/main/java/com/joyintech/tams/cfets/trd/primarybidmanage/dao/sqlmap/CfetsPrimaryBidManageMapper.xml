@@ -356,7 +356,7 @@
         from BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
-        LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+        LEFT JOIN ( <include refid="selectHisBidInfo" />) hisInfo
         ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="userId != null and userId != ''">
@@ -504,7 +504,7 @@
         from WFL_BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
-        LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+        LEFT JOIN ( <include refid="selectHisBidInfo" />) hisInfo
                ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="userId != null and userId != ''">
@@ -685,7 +685,7 @@
         from BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
-        LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+        LEFT JOIN ( <include refid="selectHisBidInfo" />) hisInfo
         ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="bidId != null and bidId != ''">
@@ -751,7 +751,7 @@
         from WFL_BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
-        LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+        LEFT JOIN ( <include refid="selectHisBidInfo" />) hisInfo
         ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="bidId != null and bidId != ''">
@@ -933,7 +933,16 @@
         WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
     </select>
 
-
+    <sql id="selectHisBidInfo" >
+        select his.ENTRUST_ID,
+               listagg(decode(his.OPER_TYPE,'03', '中标结果撤销原因：'||his.BUSI_DES , his.BUSI_DES))
+                   within group (order by his.OPER_TIME desc) AS remark
+        from ETR_ENTRUST_OPER_HIS his
+            left join SYS_DATADICT_LIST sdl on sdl.ITEM_CODE = his.OPER_TYPE and sdl.DICT_CODE = 'OPR_TYPE'
+            left join SYS_USER su on su.USER_NAME = his.USER_ID
+        where his.BUSI_DES is not null
+        group by his.ENTRUST_ID
+    </sql>
 
     <select id="getBusinessData" parameterType="com.joyintech.tams.component.business.core.dto.WflValidInputParameter" resultType="java.lang.String">
         select pm.STATUS status
