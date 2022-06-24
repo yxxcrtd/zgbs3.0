@@ -211,6 +211,7 @@
             left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
             left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+            left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = fp.FINPROD_ID
             LEFT JOIN SYS_DATADICT_LIST SDL on fpi.INT_RATE_ID = SDL.ITEM_CODE and DICT_CODE='SECRATE_DATA'
             left join (select INT_RATE_ID,row_number() over(partition by INT_RATE_ID order by INT_RATE_ID,EFF_DATE desc) as rn
             from MST_INT_RATE_INFO
@@ -243,6 +244,9 @@
             AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where bo.BID_ID=match.pre_trade_id)
             <if test="userId != null and userId != ''">
                 and bo.OUR_TRADER = #{userId}
+            </if>
+            <if test="userId != null and userId != ''">
+                and fpa.ISSUE_STATUS != #{ISSUE_STATUS_01}
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND bo.finprod_id in
