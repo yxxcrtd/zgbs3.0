@@ -28,7 +28,7 @@ import com.joyintech.tams.valuation.common.constants.DataIndexSequenceType;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.utils.DBUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

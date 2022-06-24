@@ -272,6 +272,16 @@ public class EtrCreditProtectionCertificateResponse {
     @ApiModelProperty(name="priceType",value="价格模式")
     private String priceType;
 
+    private String remark;
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public String getPriceType() {
         return priceType;
     }

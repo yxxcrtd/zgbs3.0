@@ -48,13 +48,6 @@ public class InvestRiskManagement extends BaseService {
     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-    /**
-     * 是否单体服务
-     */
-    @Value("${application.micorservice.contextPath.single:false}")
-    private boolean isSingle;
-
-
     public RiskOccupyBean riskCheck(Collection<EntrustInterface> entrusts) {
         return riskCheck(entrusts, null);
     }

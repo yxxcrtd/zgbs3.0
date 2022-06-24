@@ -72,6 +72,11 @@ public class RiskCommonInputDto extends RiskNodeConfigDtl {
      */
     private String finprodId;
 
+    /**
+     * 事件类型： 事件类型_投资委托(0)，事件类型_投资交易(1)
+     */
+    private String eventType;
+
 
     public List<InterfRiskRdsDto> getRiskRdsDtoList() {
         return riskRdsDtoList;
@@ -151,5 +156,13 @@ public class RiskCommonInputDto extends RiskNodeConfigDtl {
 
     public void setFinprodId(String finprodId) {
         this.finprodId = finprodId;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 }

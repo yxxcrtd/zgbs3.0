@@ -12,7 +12,7 @@ package com.joyintech.service.valuation.datatransplant.dto;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.github.pagehelper.util.StringUtil;
 import com.joyintech.framework.base.intf.DataDictItem;

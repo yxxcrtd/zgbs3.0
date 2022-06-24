@@ -309,7 +309,7 @@ public class StlDataDealSzdJsmxProcessService {
 						// 业务场景明细分类
 						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_分销_结果.getValue());
 						// 金融产品代码
-						settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()+szdJsmx.getZqdm1()+".SH");
+						settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm1()+".SH");
 						// 金融产品类型(估值核算)
 						settleTransData.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
 						// 金融产品类型(投管分类)
@@ -478,6 +478,9 @@ public class StlDataDealSzdJsmxProcessService {
 				if(DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
 						|| DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
 						|| DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+					if(DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+						settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getQsrq()));
+					}
 					// 交割日期
 					if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), settleTransData.getSettleMode())){
 						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));
@@ -523,7 +526,7 @@ public class StlDataDealSzdJsmxProcessService {
 			settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_分销_结果.getValue());
 		}
 		// 金融产品代码
-		settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()+szdJsmx.getZqdm1()+".SH");
+		settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm1()+".SH");
 		// 金融产品类型(估值核算)
 		settleTransData.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
 		// 金融产品类型(投管分类)
@@ -2052,7 +2055,7 @@ public class StlDataDealSzdJsmxProcessService {
 				}
 
 				// 交易份额
-				settleTransData.setShareAmt(new BigDecimal(szdJsmx.getCjsl()).abs().divide(new BigDecimal(100)));
+				settleTransData.setShareAmt(new BigDecimal(szdJsmx.getSl()).abs());
 				// 全价总额
 				settleTransData.setFpriceAmt(new BigDecimal(szdJsmx.getQsje()).abs());
 
@@ -2082,7 +2085,7 @@ public class StlDataDealSzdJsmxProcessService {
 				// 交易平台
 				settleTransData.setTradePlat(null);
 				//普通二级市场交易业务
-				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02)){
+				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03)){
 					// 交易方向
 					if(StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())){
 						settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
@@ -2409,8 +2412,11 @@ public class StlDataDealSzdJsmxProcessService {
 		//		BussinessDictCodeListRds.操作符_加.getValue(), BussinessDictCodeListRds.特征值偏移单位_自然日.getValue())));
 		// settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getJyrq()));
 		// modify by fuyongsheng 20211218 交易日期取清算日期 start
-		settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getQsrq()));
+		// settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getQsrq()));
 		// modify by fuyongsheng 20211218 交易日期取清算日期 end
+		// ZGCPCN-1601:交易日期取交收日期 modify by fuyongsheng 20220622 start
+		settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getJsrq()));
+		// ZGCPCN-1601:交易日期取交收日期 modify by fuyongsheng 20220622 end
 		// modify by fuyongsheng 20211217 交易日期无需+1自然日 end
 		// 交割日期
 		settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));
@@ -2468,8 +2474,8 @@ public class StlDataDealSzdJsmxProcessService {
 		if(StringUtil.equals(szdJsmx.getYwlx(), StlDataDealProcessConstant.YWLX_352)){ // 债券兑付
 			FinProduct finProduct = settleCommonService.selectFinProduct(settleTransData.getFinprodId());
 			// 清算数据的交易日期 == 标的信息的到期日
-			String jyrq = StringUtil.isNotEmpty(szdJsmx.getJyrq()) ? szdJsmx.getJyrq() : szdJsmx.getQsrq();
-			if(DateUtil.parse(jyrq).equals(finProduct.getMdate())){
+			String jyrq = szdJsmx.getJsrq();
+			if(DateUtil.parse(jyrq).compareTo(finProduct.getMdate()) >= 0){
 				// 交易方向
 				settleTransData.setPs(DictCodeList.交易方向_到期.getValue());
 				// 业务场景细类
@@ -2520,6 +2526,13 @@ public class StlDataDealSzdJsmxProcessService {
 //				settleTransData.setFpriceAmt(BigDecimal.valueOf(Math.abs(new BigDecimal(szdJsmx.getQsje()).doubleValue())));
 				settleTransData.setFpriceAmt(new BigDecimal(szdJsmx.getQsje()).abs());
 				// modify by etliu 20211225 end
+				settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getQsrq()));
+				// 交割日期
+				if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), settleTransData.getSettleMode())){
+					settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));
+				}else{
+					settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getQsrq()));
+				}
 			}
 		}else if(StringUtil.equals(szdJsmx.getYwlx(), StlDataDealProcessConstant.YWLX_353)){ // 债券兑息
 			// 清算数据价格2不为空且不等于0

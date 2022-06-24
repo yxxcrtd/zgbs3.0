@@ -1,30 +1,16 @@
 package com.joyintech.tams;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.DateSerializer;
-import com.joyintech.background.component.common.pack.common.json.CustomDateDeserialize;
-import com.joyintech.framework.JoyinApplication;
-import com.joyintech.framework.config.WebApplication;
-import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.json.StringDeserializer;
-import com.joyintech.tams.common.ErrorPageFilter;
 import org.activiti.spring.boot.SecurityAutoConfiguration;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import com.joyintech.framework.JoyinApplication;
+import com.joyintech.framework.config.WebApplication;
+import com.joyintech.tams.common.ErrorPageFilter;
 
 /**
  * @author 王波
@@ -32,6 +18,8 @@ import java.util.TimeZone;
  * @see 1
  * @since 1.0
  */
+//@MapperScan(value = "com.joyintech.**.dao", annotationClass = Repository.class)
+@ComponentScan(basePackages = "com.joyintech")
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class })
 public class TamsApplication extends WebApplication {
 

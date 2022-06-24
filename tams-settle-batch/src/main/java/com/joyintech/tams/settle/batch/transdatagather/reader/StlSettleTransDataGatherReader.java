@@ -7,10 +7,7 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.SettleTransData;
-import com.joyintech.tams.common.base.entity.SettleTransDataTotal;
-import com.joyintech.tams.common.base.entity.SettleTransDataTotalAdd;
-import com.joyintech.tams.common.base.entity.SettleTransDataTotalPledge;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDataDealProcessCommonService;
@@ -18,7 +15,7 @@ import com.joyintech.tams.settle.batch.transdatagather.dto.StlSettleTransDataGat
 import com.joyintech.tams.settle.batch.transdatagather.dto.StlSettleTransDataGatherParamDto;
 import com.joyintech.tams.settle.batch.transdatagather.service.StlSettleTransDataGatherService;
 import com.joyintech.tams.settle.common.service.SettleCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -301,6 +298,14 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         dealTotal.setUnitCprice(unitCprice);
                         dealTotal.setUnitFprice(unitCprice);
                     }
+                    else if(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(settleTransDataDto.getFinprodType2())){
+                        dealTotal.setUnitCprice(list.get(0).getUnitCprice());
+                    }
+                    // ZGCPCN-1606:一级投标债价格使用unitCprice modify by fuyongsheng 20220622 start
+                    else if(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(settleTransDataDto.getFinprodType2())){
+                        dealTotal.setUnitCprice(settleTransDataDto.getUnitCprice());
+                    }
+                    // ZGCPCN-1606:一级投标债价格使用unitCprice modify by fuyongsheng 20220622 end
                     //单位面值  空
                     // 交易份额
                     dealTotal.setShareAmt(totalShareAmt);

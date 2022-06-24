@@ -16,7 +16,7 @@ import java.util.List;
 
 import com.joyintech.tams.common.base.dao.ModEclResultMapper;
 import com.joyintech.tams.common.base.entity.*;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

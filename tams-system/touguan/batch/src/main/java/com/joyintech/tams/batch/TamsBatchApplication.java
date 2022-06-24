@@ -6,6 +6,7 @@ import com.joyintech.framework.config.WebApplication;
 import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Import;
  * @author 王波
  *
  */
+@ComponentScan(basePackages = "com.joyintech")
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class })
 @Import({ BatchConfiguration.class })
 public class TamsBatchApplication  extends WebApplication {

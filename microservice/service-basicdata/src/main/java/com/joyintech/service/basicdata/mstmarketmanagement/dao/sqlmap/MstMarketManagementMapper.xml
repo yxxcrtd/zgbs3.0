@@ -181,8 +181,8 @@
 						a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{initValue,jdbcType=VARCHAR}, '%'))
 						)
 					</if>
-					AND (i.IS_TRUSTER = 'Y' OR i.IS_FINANCIER = 'Y' OR i.IS_ASSTE_MANAGER = 'Y' OR i.IS_GUARANTEE = 'Y'
-					OR i.IS_PLEDGOR = 'Y' OR i.IS_DEPOSIT_BANK = 'Y')
+					AND (i.IS_ISSUER = 'Y' OR i.IS_TRUSTER = 'Y' OR i.IS_FINANCIER = 'Y' OR i.IS_ASSTE_MANAGER = 'Y' OR i.IS_GUARANTEE = 'Y'
+					OR i.IS_PLEDGOR = 'Y' OR i.IS_DEPOSIT_BANK = 'Y' OR i.IS_ORIGINAL_OWNER = 'Y')
 				</where>
 			</when>
 			<otherwise>

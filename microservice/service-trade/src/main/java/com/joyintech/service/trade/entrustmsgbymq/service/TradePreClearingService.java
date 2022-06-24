@@ -111,11 +111,20 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
     @Autowired
     private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
 
+    @Autowired
+    private PaTrdFinProductDealTotalMapper paTrdFinProductDealTotalMapper;
+
     /**
      * 临时划款指令表
      */
     @Autowired
     private StlPayTempOrdersMapper stlPayTempOrdersMapper;
+
+    /**
+     * 划款指令表
+     */
+    @Autowired
+    private StlPayOrdersMapper stlPayOrdersMapper;
 
     /**
      * 交易类金融产品表
@@ -223,16 +232,16 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         logger.info("【成交数据预清算开始】tradePreClearing entrustId: {}, seqno: {}", infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
         List<TrdTempDto> trdTempDtoList = new ArrayList<>();
         // 判断是否是多组合系列户指令
-        if(tradePreCommonService.isMultiPortFolioEntrust(infContractDetailfile.getEntrustId())){
+        if (tradePreCommonService.isMultiPortFolioEntrust(infContractDetailfile.getEntrustId())) {
             String totalTradeId = null;
             List<InfContractPortfolioDetail> details = trdCommonBaseService.getInfContractPortfolioDetails(infContractDetailfile.getSeqno());
-            if(!CollectionUtils.isEmpty(details)){
+            if (!CollectionUtils.isEmpty(details)) {
                 // modify by etliu 20220601 start
                 // 3.0.6场内 ZGCPCN-1085: 【手工交收管理】多组合场内现券下单成交回报后，手工交收管理查询展示的数据重复了
                 int dataIndex = 0;
                 // modify by etliu 20220601 end
 
-                for(InfContractPortfolioDetail detail : details){
+                for (InfContractPortfolioDetail detail : details) {
                     TrdTempDto trdTempDto = new TrdTempDto();
                     trdTempDto.setTotleTradeId(totalTradeId);
                     // ZGCPCN-635 modify by huwei
@@ -277,9 +286,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
     // modify by etliu 20220601 start
     // 3.0.6场内 ZGCPCN-1085: 【手工交收管理】多组合场内现券下单成交回报后，手工交收管理查询展示的数据重复了
 //    private void handleTradeInfo(TrdTempDto trdTempDto,InfContractDetailfile infContractDetailfile) throws Exception{
-    private void handleTradeInfo(TrdTempDto trdTempDto,InfContractDetailfile infContractDetailfile, int dataIndex) throws Exception{
+    private void handleTradeInfo(TrdTempDto trdTempDto, InfContractDetailfile infContractDetailfile, int dataIndex) throws Exception {
         // modify by etliu 20220601 end
-        if(DictCodeListExt3.交易方向_质押券入库.getValue().equals(infContractDetailfile.getPs())
+        if (DictCodeListExt3.交易方向_质押券入库.getValue().equals(infContractDetailfile.getPs())
                 || DictCodeListExt3.交易方向_质押券出库.getValue().equals(infContractDetailfile.getPs())) {
             //标准券入出库成交数据接入：
             logger.info("【成交数据预清算-标准券入出库开始】tradePreClearing entrustId: {}, seqno: {}",
@@ -379,13 +388,13 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
                     // 3.0.6场内 ZGCPCN-1085: 【手工交收管理】多组合场内现券下单成交回报后，手工交收管理查询展示的数据重复了
                     if (dataIndex == 0) {
                         // 手工交收判断 add by yufei 20201022 start
-                        if(StringUtil.isNotEmpty(infContractDetailfile.getSettleDay())
-                                && StringUtil.isNotEmpty(infContractDetailfile.getBusiType())){
+                        if (StringUtil.isNotEmpty(infContractDetailfile.getSettleDay())
+                                && StringUtil.isNotEmpty(infContractDetailfile.getBusiType())) {
                             logger.info("【成交数据预清算手工交收处理-开始】tradePreClearing entrustId: {}, seqno: {}",
                                     infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
 
                             trdTempDto.setIsManualSettle("Y");
-                            this.saveSettleInfo(infContractDetailfile,trdTempDto);
+                            this.saveSettleInfo(infContractDetailfile, trdTempDto);
 
                             logger.info("【成交数据预清算手工交收处理-结束】tradePreClearing entrustId: {}, seqno: {}",
                                     infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
@@ -842,6 +851,27 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
             BeanUtil.copyPropertiesIgnoreNull(stlPayTempOrders,
                     trdTempDto.getBussTrdTransferOrder().get(0));
             stlPayTempOrdersMapper.insertSelective(stlPayTempOrders);
+            if (DictCodeList.交易方向_申购.getValue().equals(infContractDetailfile.getPs())
+                    && Objects.nonNull(trdTempDto.getFinProductType())
+                    && DictCodeListExt2.平安资产类型_信用保护凭证.getValue().equals(trdTempDto.getFinProductType().getType8())) {
+                StlPayOrders stlPayOrders = new StlPayOrders();
+                BeanUtil.copyPropertiesIgnoreNull(stlPayOrders, stlPayTempOrders);
+                stlPayOrdersMapper.insertSelective(stlPayOrders);
+
+                // 写入金融产品临时汇总交易表
+                TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
+                BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdTempDto.getTrdProductTempDeal());
+                // ZGCPCN-652: busiType不能为null   2022/5/20 start
+                if (StringUtil.isEmpty(trdFinProductDealTotal.getBusiType())) {
+                    trdFinProductDealTotal.setBusiType("busiType");
+                }
+                trdFinProductDealTotal.setTotleTradeId(trdTempDto.getTradeId());
+                // ZGCPCN-652: busiType不能为null   2022/5/20 end
+                InfContractDetailfile infContractDetailfileTemp = infContractDetailfileMapper.selectByPrimaryKey(infContractDetailfile.getSeqno());
+                trdFinProductDealTotal.setShareAmt(infContractDetailfileTemp.getShareAmt());
+                trdFinProductDealTotal.setTradeAmt(infContractDetailfileTemp.getTradeAmt());
+                trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
+            }
         }
         // 质押式回购
         if ((DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(trdTempDto.getFinprodType2())
@@ -886,11 +916,12 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
     /**
      * 信用保护凭证清算数据
      * 金融产品交易汇总Entitiy，金融产品交易汇总附属表Entity，金融产品交易Entitiy，
-     *    金融产品交易附属表Entity，划款指令表Entity，交易费用明细表Entity，组合交易Entity保存到数据库中。
+     * 金融产品交易附属表Entity，划款指令表Entity，交易费用明细表Entity，组合交易Entity保存到数据库中。
+     *
      * @param trdTempDto
      * @param infContractDetailfile
      */
-    private void tradePreClearCredit(TrdTempDto trdTempDto, InfContractDetailfile infContractDetailfile){
+    private void tradePreClearCredit(TrdTempDto trdTempDto, InfContractDetailfile infContractDetailfile) {
 
     }
 
@@ -1965,6 +1996,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         } else if (DictCodeList.交易方向_申购.getValue().equals(infContractDetailfile.getPs())) {
             infContractDetailfile.setSettleDay(null);
         }
+        //ZGCPCN-1416
+//        dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
 
         dto.setFpriceAmt(dto.getTradeAmt());
 
@@ -1978,7 +2011,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         dto.setWithLockPeriod(DictCodeListExt2.是否有锁定期_否.getValue());
         // 交易编号
         BussinessCodeParameter param = new BussinessCodeParameter();
-        param.setCommonBusinessExtType(DictCodeListExt2.fromDictCodeList(DictCodeListExt2.共通业务类型_股票投资交易));
+        param.setCommonBusinessExtType(DictCodeListExt2.fromDictCodeList(DictCodeListExt2.共通业务类型_信用保护凭证交易));
         dto.setTradeId(autoPeriodCommonService.buildBussinessCode(param));
 
         // 多组合系列户指令须登录临时交易汇总表
@@ -2059,6 +2092,26 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();
         bussTrdTransferOrder.add(bussTrdTransferOrderDto);
         dto.setBussTrdTransferOrder(bussTrdTransferOrder);
+
+        FinProductType finProductType = new FinProductType();
+        // 金融产品代码 = 交易类金融产品.金融产品代码
+        finProductType.setFinprodId(dto.getFinprodId());
+        // 分支序号
+        finProductType.setBranch(0L);
+        // 分类7
+        finProductType.setType7(infContractDetailfile.getPs());
+        // 分类8
+        finProductType.setType8(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+        dto.setFinProductType(finProductType);
+
+        //金融产品临时交易表
+//        trdProductTempDealMapper.insertSelective(trdProductTempDeal);
+//        //金融产品临时交易附属表
+//        trdProductTempDealAddMapper.insertSelective(trdProductTempDealAdd);
+//        // 写入临时划款指令表
+//        StlPayTempOrders stlPayTempOrders = new StlPayTempOrders();
+//        BeanUtil.copyPropertiesIgnoreNull(stlPayTempOrders, bussTrdTransferOrderDto);
+//        stlPayTempOrdersMapper.insertSelective(stlPayTempOrders);
     }
 
     /**

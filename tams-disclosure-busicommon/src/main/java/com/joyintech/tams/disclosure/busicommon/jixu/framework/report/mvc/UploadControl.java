@@ -5,12 +5,13 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+//import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.joyintech.tams.disclosure.busicommon.jixu.framework.report.ReportManager;
 import com.joyintech.tams.disclosure.busicommon.jixu.framework.report.pojo.ReportInfo;
 import com.joyintech.tams.disclosure.busicommon.jixu.framework.report.repository.ReportRepository;
@@ -48,7 +49,8 @@ public class UploadControl {
 		//ReportManager rm = new ReportManager(null);
 		ReportInfo r1 = reportManager.getReportByURI("CLGG");
 		
-		BasicDataSource dataSource = new BasicDataSource();
+//		BasicDataSource dataSource = new BasicDataSource();
+		DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName("com.ibm.db2.jcc.DB2Driver");
         dataSource.setUrl("jdbc:db2://192.168.70.62:50000/tamsdb:currentSchema=REVEAL_MAST_TEST;");
         dataSource.setUsername("tamsinst");
@@ -69,7 +71,7 @@ public class UploadControl {
 		//ReportManager rm = new ReportManager(null);
 		ReportInfo r1 = reportManager.getReportByURI("CLGG");
 		
-		BasicDataSource dataSource = new BasicDataSource();
+		DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName("com.ibm.db2.jcc.DB2Driver");
         dataSource.setUrl("jdbc:db2://192.168.70.62:50000/tamsdb:currentSchema=REVEAL_MAST_TEST;");
         dataSource.setUsername("tamsinst");

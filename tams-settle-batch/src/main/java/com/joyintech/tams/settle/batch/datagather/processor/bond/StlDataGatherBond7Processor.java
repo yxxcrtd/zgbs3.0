@@ -10,7 +10,7 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.position.dao.CommonPtlPositionMapper;
 import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

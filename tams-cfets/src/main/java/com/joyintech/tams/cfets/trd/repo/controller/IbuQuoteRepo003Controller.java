@@ -29,7 +29,7 @@ import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,6 +137,7 @@ public class IbuQuoteRepo003Controller extends BaseController {
     public Message<AjaxResult> check(@RequestBody CfetsRepoDealQuoteCommonDto cfetsRepoDealQuoteCommonDto) {
         try {
             //check必填项
+            cfetsRepoDealQuoteCommonDto.setPageId("CfetsQuoteRepo003");
             AjaxResult ajaxResult = cfetsRepoDealQuotedPrice002Service.checkSave(cfetsRepoDealQuoteCommonDto);
             return new Message<AjaxResult>().success().setData(ajaxResult);
         } catch (Exception e) {

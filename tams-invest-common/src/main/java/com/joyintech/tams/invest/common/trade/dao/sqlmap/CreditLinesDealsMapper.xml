@@ -1044,4 +1044,36 @@
 		WHERE
 			A.FINPROD_ID = #{finprodId}
 	</select>
+	<select id="selectBidOrderByFinprodIds" parameterType="java.util.Map" resultMap="com.joyintech.tams.common.base.dao.BidOrderMapper.BaseResultMap">
+		select
+		<include refid="com.joyintech.tams.common.base.dao.BidOrderMapper.Base_Column_List" />
+		from BID_ORDER
+		where
+			<if test="finprodIds!=null and finprodIds.size()>0">
+				<foreach collection="finprodIds" item="item" open=" FINPROD_ID in (" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			 and IS_CANCEL = #{isCancel,jdbcType=VARCHAR} and TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectBidOrderBidPriceByFinprodIds" parameterType="java.util.Map" resultMap="com.joyintech.tams.common.base.dao.BidOrderBidPriceMapper.BaseResultMap">
+		select
+			BID_ID, ENTRUST_ID, BID_PRICE, PORTFOLIO_ID, IS_WIN, WIN_PRICE, WIN_CPRICE, THE_WIN_PRIN_AMT,
+			WIN_PRIN_AMT, TRADE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,
+			IS_FROZEN_POSITION, SUBSCRIPTION_AMOUNT, PAYABLE_AMOUNT, SETT_FEE_AMT, P_BID_ID,
+			IS_CANCEL, TRADE_STATUS,INV_AIM ,SEC_ACCT_ID ,ACCT_NO,TRADE_AMT,INT_AMT
+		from BID_ORDER_BID_PRICE
+		where BID_ID in (
+						select
+							BID_ID
+						from BID_ORDER
+						where
+							<if test="finprodIds!=null and finprodIds.size()>0">
+								<foreach collection="finprodIds" item="item" open=" BID_ID in (" close=")" separator=",">
+									#{item}
+								</foreach>
+							</if>
+						and IS_CANCEL = #{isCancel,jdbcType=VARCHAR} and TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR})
+	</select>
 </mapper>

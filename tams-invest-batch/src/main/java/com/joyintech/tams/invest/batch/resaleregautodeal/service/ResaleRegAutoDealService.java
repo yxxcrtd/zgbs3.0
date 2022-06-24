@@ -8,7 +8,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.batch.resaleregautodeal.dao.ResaleRegAutoDealMapper;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +29,7 @@ public class ResaleRegAutoDealService {
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
     @Autowired(required = false)
@@ -39,7 +39,7 @@ public class ResaleRegAutoDealService {
     @Qualifier("simpleRestTemplate")
     protected JoyinRestTemplate simpleRestTemplate;
 
-    @Value("${application.micorservice.contextPath.tamsServer:http://tams-server}")
+    @Value("${application.micorservice.contextpath.tamsServer:http://tams-server}")
     private String tamsSerever;
 
     @Autowired

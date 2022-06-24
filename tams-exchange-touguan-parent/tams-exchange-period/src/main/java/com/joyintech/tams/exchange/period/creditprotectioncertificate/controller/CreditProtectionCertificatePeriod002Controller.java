@@ -16,6 +16,7 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -122,12 +123,19 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             }
             //保护凭证的名义本金数量超过组合下可用数量
             //债券交付数量不超过组合下的债券可用数量
-            boolean isError = StringUtil.equals(CacheUtil.getSysParam("AMOUNT_CONTROL_STL"), "01");
+            boolean softControl = StringUtil.equals(CacheUtil.getSysParam("AMOUNT_CONTROL_STL"), "Y");
             List<BillingDetailsDto> billingDetails = dto.getBillingDetails();
             StringBuilder confirmMessage = new StringBuilder();
             String newSecPositionSwitch = CacheUtil.getSysParam("NEW_SEC_POSITION_SWITCH");
             Date platformDate = DateUtil.platDateFromCache();
             for (BillingDetailsDto billingDetail : billingDetails) {
+                if (billingDetail.getRepNomCapi().compareTo(BigDecimal.ZERO) <= 0) {
+                    ValidMessage validMessage = new ValidMessage();
+                    validMessage.setField("repNomCapi");
+                    validMessage.setMessage("名义本金需大于零");
+                    validMessages.add(validMessage);
+                    break;
+                }
                 BigDecimal amount;
                 if (DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
                     amount = creditProtectionCertificatePeriodMapper.getAmountByPortfolioIdOld(dto.getFinprodMarketId(), billingDetail.getPortfolioId(), platformDate);
@@ -135,7 +143,7 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
                     amount = creditProtectionCertificatePeriodMapper.getAmountByPortfolioId(dto.getFinprodMarketId(), billingDetail.getPortfolioId(), platformDate);
                 }
                 if (billingDetail.getRepNomCapi().compareTo(amount) > 0) {
-                    if (isError) {
+                    if (!softControl) {
                         ValidMessage validMessage = new ValidMessage();
                         validMessage.setField("repNomCapi");
                         validMessage.setMessage("保护凭证的名义本金数量不可超过组合下可用数量");
@@ -145,7 +153,7 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
                     }
                 }
                 if (billingDetail.getDeliverBondAmount() != null && billingDetail.getDeliveryAmount().compareTo(amount) > 0) {
-                    if (isError) {
+                    if (!softControl) {
                         ValidMessage validMessage = new ValidMessage();
                         validMessage.setField("deliverBondAmount");
                         validMessage.setMessage("债券交付数量不超过该组合下的债券可用数量");
@@ -201,7 +209,7 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
         } catch (PositionException e1) {
             logger.error("头寸处理异常", e1);
-            return new Message<AjaxResult>().fail().setData(new AjaxResult(e1.getMessage(), MessageType.错误消息));
+            return PositionUtil.ajaxErrorReturn(e1);
         } catch (Exception e) {
             logger.error("保存失败", e);
             return new Message<AjaxResult>().fail().setData(new AjaxResult("保存失败", MessageType.错误消息));

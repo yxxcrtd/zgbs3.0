@@ -407,7 +407,8 @@
 	    select assetHold1.finprodMarketId,assetHold1.finprodAbbr,null portFolioName,sum(assetHold1.marketValue) as marketValue,
 		       sum(assetHold1.dscCostAmt) as dscCostAmt,sum(assetHold1.shareAmt) as shareAmt,
         round(sum(nvl(assetHold1.marketValue,0))/sum(assetHold1.tdyAssetValue)*100,2) as marketValueRatio,null portfolioId,'02' as hasChildren
-		       ,'root' parentInfo,assetHold1.finprodMarketId childInfo, null belongInstitutionCodeNew
+		       ,'root' parentInfo,assetHold1.finprodMarketId childInfo, null belongInstitutionCodeNew,
+        assetHold1.ptlIssueType
 		from (
 		SELECT
 		assetHold.*,
@@ -422,12 +423,13 @@
 			</foreach>
 		</if>
 		) assetHold1
-		group by assetHold1.finprodMarketId,assetHold1.finprodAbbr
+		group by assetHold1.finprodMarketId,assetHold1.finprodAbbr,assetHold1.ptlIssueType
 	    union all
 	    select null finprodMarketId,null finprodAbbr,assetHold1.portFolioName,assetHold1.marketValue,assetHold1.dscCostAmt,assetHold1.shareAmt,
 		assetHold1.marketValueRatio,assetHold1.portfolioId,'01' as hasChildren
 		       ,assetHold1.finprodMarketId parentInfo,assetHold1.portFolioName childInfo,
-		assetHold1.belongInstitutionCode belongInstitutionCodeNew
+		assetHold1.belongInstitutionCode belongInstitutionCodeNew,
+        assetHold1.ptlIssueType
 		from (
 		SELECT
 		assetHold.*,

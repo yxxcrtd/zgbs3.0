@@ -32,7 +32,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.service.InvDataCheckService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -182,14 +182,14 @@ public class FinBondAssetValidatorService implements BeanValidator{
             	if ( dto.getFinExercisePlanList() == null
             			|| dto.getFinExercisePlanList().size() == 0) {
             		resultList.add(new ValidMessage(getMessage("含权债的行权计划不能为空!")));
-            	}else{
+            	}/*else{
             	    for(BondFinExercisePlanDto finExercisePlan : dto.getFinExercisePlanList()){
                         if (finExercisePlan.getExercisePrice() == null) {
                             resultList.add(new ValidMessage(getMessage("行权计划中的行权价（净价）不能为空!")));
                             break;
                         }
                     }
-                }
+                }*/
             }
             if(dto.getTradeMarket ().equals ("03") || dto.getTradeMarket ().equals ("04")){
 //                if(dto.getIsNetprice () == null || dto.getIsNetprice () == ""){

@@ -27,7 +27,7 @@ import com.joyintech.tams.valuation.valapi.dto.BokTradeBuild001Dto;
 import com.joyintech.tams.valuation.valapi.dto.BokTradeBuildPtl001Dto;
 import com.joyintech.tams.valuation.valapi.dto.DurationTrade001Dto;
 import com.joyintech.tams.valuation.valapi.dto.ProdAcctInit001Dto;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

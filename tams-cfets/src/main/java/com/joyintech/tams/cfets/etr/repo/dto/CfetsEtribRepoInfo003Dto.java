@@ -197,6 +197,8 @@ public class CfetsEtribRepoInfo003Dto extends EtrEntrust implements ProcessEntit
      */
     private String systemAct;
 
+    private String rskApproval;
+
     /**
      * 质押券折算总额(元)
      */
@@ -521,4 +523,11 @@ public class CfetsEtribRepoInfo003Dto extends EtrEntrust implements ProcessEntit
         this.totalAmount = totalAmount;
     }
 
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
+    }
 }

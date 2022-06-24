@@ -10,11 +10,12 @@
 
 package com.joyintech.tams.disclosure.interf.framework.util;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+//import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.joyintech.framework.util.StringUtil;
 
 /**
@@ -30,10 +31,11 @@ public final class DataSourceUtil {
     /**
      *
      */
-    private static BasicDataSource dataSource;
+//    private static BasicDataSource dataSource;
+	private static DruidDataSource dataSource;
 
     @Autowired(required=true)
-    public void setDataSource(@Qualifier("masterDataSource") BasicDataSource dataSource) {
+    public void setDataSource(@Qualifier("masterDataSource") DruidDataSource dataSource) {
         DataSourceUtil.dataSource = dataSource;
     }
 

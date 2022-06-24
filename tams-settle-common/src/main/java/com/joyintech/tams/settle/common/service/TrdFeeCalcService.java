@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.joyintech.tams.constant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +34,6 @@ import com.joyintech.tams.common.base.entity.FinProductType;
 import com.joyintech.tams.common.base.entity.FinProductTypeKey;
 import com.joyintech.tams.common.base.entity.TrdFeeConfig;
 import com.joyintech.tams.common.base.entity.TrdFeeConfigDetail;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.settle.common.dao.TrdFeeCalcMapper;
 import com.joyintech.tams.settle.common.dto.CalcParamDto;
 import com.joyintech.tams.settle.common.dto.CommisionDetail;
@@ -275,6 +272,11 @@ public class TrdFeeCalcService {
     	if (StringUtil.equals(DictCodeListExt1.证券品种_股票.getValue(), tradeType)) {
     		tradeType = DictCodeListExt2.平安资产类型_股票.getValue();
     	}
+		// ZGCPCN-1541:费用计算增加信用保护凭证 modify by fuyongsheng 20220620 start
+		if (StringUtil.equals(DictCodeListStl.证券品种_信用保护凭证.getValue(), tradeType)) {
+			tradeType = DictCodeListExt2.平安资产类型_信用保护凭证.getValue();
+		}
+		// ZGCPCN-1541:费用计算增加信用保护凭证 modify by fuyongsheng 20220620 end
 
     	// 方案查询
 		PlanSearchInfo localPlanSearchInfo = new PlanSearchInfo();
@@ -481,6 +483,12 @@ public class TrdFeeCalcService {
 			localPlanSearchInfo.setAssetClassify1(DictCodeListExt2.平安资产类型_股票.getValue());
 			localPlanSearchInfo.setAssetClassify2(DictCodeListExt2.平安资产类型_股票.getValue());
 		}
+		// ZGCPCN-1541:费用计算增加信用保护凭证 modify by fuyongsheng 20220620 start
+		else if (StringUtil.equals(tradeType, DictCodeListExt2.平安资产类型_信用保护凭证.getValue())){
+			localPlanSearchInfo.setAssetClassify1(DictCodeListExt2.平安资产类型_信用保护凭证.getValue());
+			localPlanSearchInfo.setAssetClassify2(DictCodeListExt2.平安资产类型_信用保护凭证.getValue());
+		}
+		// ZGCPCN-1541:费用计算增加信用保护凭证 modify by fuyongsheng 20220620 end
 		// add by etliu 20220126 end
 
         // 查询费用方案

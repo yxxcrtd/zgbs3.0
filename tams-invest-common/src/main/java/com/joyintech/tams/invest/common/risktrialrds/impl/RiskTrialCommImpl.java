@@ -21,7 +21,7 @@ import com.joyintech.tams.invest.common.risktrialrds.service.RiskTrialCommCallab
 import com.joyintech.tams.invest.common.risktrialrds.service.SupervisionCalcSvc;
 import com.joyintech.tams.invest.common.risktrialrds.util.Const;
 import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -13,7 +13,7 @@ import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.SppiTest;
 import com.joyintech.tams.common.base.entity.SppiTestQa;
 import com.joyintech.tams.constant.DictCode;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;

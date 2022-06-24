@@ -1,9 +1,9 @@
 package com.joyintech.tams.business.asset.protect.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.SecurityUtil;
@@ -11,6 +11,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjRequest;
+import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate002Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate004Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
@@ -21,13 +22,14 @@ import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -138,6 +141,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
                 //流程代办checkImportData
                 entity = creditProtectionCertificate002Service.getBussinessEntityByWorkflowId(workflowId);
             }
+            entity = creditProtectionCertificate002Service.getProcessEntity(entity);
             return new Message<CreditProtectionCertificate002Dto>().success().setData(entity);
         } catch(Exception e){
             e.printStackTrace();
@@ -211,14 +215,14 @@ public class CreditProtectionCertificate002Controller extends BaseController {
      * @see
      * @since 1.0
      */
-    @ApiOperation(value="该资产是否有交易数据check", notes = "该资产是否有交易数据check")
+    @ApiOperation(value="该资产是否有成交数据check", notes = "该资产是否有成交数据check")
     @ResponseBody
     @PostMapping("/isTransInAssetCheck")
     public Message<Boolean> isTransInAssetCheck(@RequestBody FinAssetRateAdjRequest request) {
-        if(commonBusinessService.isTransInAsset(request.getFinprodId())!=0){
-            return Message.success("该资产是否有交易数据check",true);
+        if(creditProtectionCertificate002Service.checkAssertOnDealed(request.getFinprodId())!=0){
+            return Message.success("该资产是否有成交数据check",true);
         }
-        return  Message.success("该资产是否有交易数据check",false);
+        return  Message.success("该资产是否有成交数据check",false);
     }
 
     /**
@@ -229,7 +233,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
      */
     @ApiOperation(value = "附件上传", notes = "附件上传")
     @ResponseBody
-    @PostMapping(value = "/UploadFile")
+    @PostMapping(value = "/uploadFile")
     public Message<SysUploadFileInfo> UploadFile(MultipartFile file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
@@ -252,7 +256,7 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     @ApiOperation(value = "附件删除", notes = "附件删除")
     @ResponseBody
     @PostMapping(value = "/deleteFile")
-    public Message<AjaxResult> UploadFile(SysUploadFileInfo file) {
+    public Message<AjaxResult> deleteFile(SysUploadFileInfo file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
                 AjaxResult ajaxResult = creditProtectionCertificate002Service.delFileInfo(file);
@@ -265,31 +269,46 @@ public class CreditProtectionCertificate002Controller extends BaseController {
         return null;
     }
 
+    @ApiOperation(value = "保存check", notes = "保存check")
+    @PostMapping("/saveCheck")
+    @ResponseBody
+    public Message<AjaxResult> saveCheck(@RequestBody FinBondAssetSaveRequest dto, BindingResult result) {
+        AjaxResult ajax = new AjaxResult();
+        List<ValidMessage> validList = new ArrayList<>();
+        String finProdId = commonBusinessService.getFinProdId(dto.getFinprodMarketId() + dto.getTradeMarketId(), DictCodeListExt1.金融产品类型_信用保护凭证.getValue(), null);
+        if (creditProtectionCertificate002Service.selectCountByfinprodId(finProdId) > 0) {
+            validList.add(new ValidMessage("",
+                    getMessage("资产代码不能重复!")));
+            ajax.setErrorList(validList);
+            ajax.setMessageType(MessageType.错误消息);
+            return new Message<AjaxResult>().success().setData(ajax);
+        }
+        return new Message<AjaxResult>().success().setData(commonCheck(result, dto.getOperateType()));
+    }
 
     @ResponseBody
     @PostMapping("/save")
     @ApiOperation(value = "新建/修改", notes = "新建/修改")
     public Message<AjaxResult> save(@RequestBody CreditProtectionCertificate002Dto dto, BindingResult br) {
-//        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
-//        creditProtectionCertificate002Service.insert(dto);
-//        return new Message<AjaxResult>().success().setData(new AjaxResult("成功"));
         if (br.hasErrors()) {
             return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
         //生成金融产品代码
-        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
+        if(!dto.getFinprodMarketId().contains(".")){
+            dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
+        }
         if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
             dto.setFinprodId(creditProtectionCertificate002Service.getFinprodId(dto));
         }
         //文件信息
-        if (CollectionUtils.isNotEmpty(dto.getFileArray())
-                && StringUtil.isNotEmpty(dto.getFinprodId())) {
-            // 将附件和当前业务对象绑定（更新附件的业务代码）
-            fileAttachmentProcess.updateBussinessNo(
-                    dto.getFileArray().stream().map(UploadFile::getFileNo).collect(
-                            Collectors.toList()),
-                    dto.getFinprodId());
-        }
+//        if (StringUtil.isNotEmpty(dto.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(dto.getMstFileInputParameter().getFileList())
+//                && StringUtil.isNotEmpty(dto.getFinprodId())) {
+//            // 将附件和当前业务对象绑定（更新附件的业务代码）
+//            fileAttachmentProcess.updateBussinessNo(
+//                    dto.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
+//                            Collectors.toList()),
+//                    dto.getFinprodId());
+//        }
         ProcessParameter<CreditProtectionCertificate002Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CreditProtectionCertificate002Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
@@ -331,14 +350,16 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             CreditProtectionCertificate002Dto request = creditProtectionCertificate002Service.getById(saveRequest.getFinprodMarketId());
             request.setOperateType(OperationType.DELETE.name());
             selectedItem.add(request);
+//            creditProtectionCertificate002Service.delete(request);
         }
+//        return new Message<AjaxResult>().success().setData(new AjaxResult("删除成功"));
         cpc004Dto.setOperateType(OperationType.DELETE.name());
         cpc004Dto.setSelectedItem(selectedItem);
         cpc004Dto.setRemark(cpc004Dto.getRemark());
         params.setPageId(this.getPageId());
         params.setElementId(cpc004Dto.getElementId());
         params.setBusinessCode(CreditProtectionCertificate002Dto::getFinprodMarketId);
-        params.setBusinessType(DictCodeList.共通业务类型_基金类资产信息.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证标的.getValue());
 
         // 设置流程业务说明, entity即传入的dto
         params.setComment(entity1 -> {
@@ -357,6 +378,31 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             return new Message<AjaxResult>().fail().setData(new AjaxResult("流程发起失败"));
         }
 
+    }
+
+    /**
+     * 附件下载
+     * @param seqNo  入参
+     * @return 处理结果
+     * @throws IOException 异常信息
+     */
+    @ApiOperation(value = "附件下载", notes = "附件下载")
+    @ResponseBody
+    @PostMapping( "/downloadFile/{seqNo}")
+    public void downloadFile(@PathVariable("seqNo") String seqNo, HttpServletResponse request) {
+        try {
+            logger.info("文件下载开始");
+            seqNo = seqNo.replaceAll("\"","");
+            if (StringUtil.isNotEmpty(seqNo)) {
+                creditProtectionCertificate002Service.downloadFileInfo(seqNo,request);
+                return;
+            }
+            logger.info("文件下载结束");
+        }catch (Exception e){
+            logger.error("文件下载异常", e);
+            return;
+        }
+        return;
     }
 
 }

@@ -32,7 +32,7 @@ import com.joyintech.tams.common.svreport.datacheck.beforeinsert.dto.ChbCheckTab
 import com.joyintech.tams.common.svreport.datacheck.beforeinsert.service.CommonCodeCheckBatchService;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.report.interf.common.constant.DateUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;

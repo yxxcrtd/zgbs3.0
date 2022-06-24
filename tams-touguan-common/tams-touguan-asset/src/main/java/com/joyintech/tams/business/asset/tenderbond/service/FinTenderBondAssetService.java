@@ -26,7 +26,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,11 +73,11 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     @Override
     public void doInsert(FinTenderBondAsset002Dto dto, OperationType type) {
         if (OperationType.DELETE == type) {
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_删除,dto.getWorkflowId());
+            this.saveOperate(dto.getFinprodId(), dto.getRemark(), DictCodeListExt3.操作类型_删除,dto.getWorkflowId());
         } else if (OperationType.NEW == type) {
-            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_新建,dto.getWorkflowId());
+            this.saveOperate(dto.getFinprodId(), "", DictCodeListExt3.操作类型_新建,dto.getWorkflowId());
         } else if (OperationType.MODIFY == type) {
-            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_修改,dto.getWorkflowId());
+            this.saveOperate(dto.getFinprodId(), "", DictCodeListExt3.操作类型_修改,dto.getWorkflowId());
         }
     }
 
@@ -252,10 +252,26 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             dto.setProductAddDto(addDto);
         }
         //dto.setCapiIncomeFeature(DictCodeList.是否_否.getValue());
-        if(list.size() > 1 ) {
-            param.put("flag","Y");
+        Integer qty = finTenderBondAssetMapper.getCount(dto.getFinprodMarketId());
+        if(Objects.nonNull(qty) && qty >1) {
+            param.put("flag", "Y");
         }
         dto.setIssueDto(finTenderBondAssetMapper.getProductIssueFromInterface(param));
+        if(Objects.nonNull(dto.getIssueDto())) {
+            String issueMethod = dto.getIssueDto().getIssueClass();
+            if(StringUtil.isNotEmpty(issueMethod)) {
+                issueMethod = issueMethod.trim();
+            }
+            if ("0".equals(issueMethod)) {
+                dto.getIssueDto().setTenderType(DictCodeListExt4.招标方式_单一价格招标.getValue());
+                dto.getIssueDto().setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+            }else if("5".equals(issueMethod)){
+                dto.getIssueDto().setTenderType(DictCodeListExt4.招标方式_数量招标.getValue());
+                dto.getIssueDto().setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+            }else if("6".equals(issueMethod)){
+                dto.getIssueDto().setIssueClass(DictCodeListExt4.新债_发行方式_报价发行.getValue());
+            }
+        }
         return dto;
     }
 
@@ -284,7 +300,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         //金融产品类型_资产代码_增发批次_交易场所进行拼接
         dto.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         dto.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
-        dto.setFinprodId(getFinprodId(dto));
+        //dto.setFinprodId(getFinprodId(dto));
         FinProduct finProduct = new FinProduct();
         BeanUtil.copyPropertiesIgnoreNull(finProduct, dto);
         finProductMapper.insert(finProduct);
@@ -319,6 +335,8 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         if(Objects.nonNull(resultType)) {
             finProductType.setType6(resultType.getOutputValue1());
             finProductType.setType7(resultType.getOutputValue2());
+            finProductType.setType4(resultType.getOutputValue1());
+            finProductType.setType5(resultType.getOutputValue2());
         }
         finProductTypeMapper.insert(finProductType);
     }
@@ -529,11 +547,24 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
 
     public List<ValidMessage> validFinprodMarketId(FinTenderBondAsset002Dto dto) {
         List<ValidMessage> validList = new ArrayList<>();
-        Map<String, String> param = new HashMap<>();
-        param.put("finprodMarketId", dto.getFinprodMarketId());
-        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
-        if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
-            validList.add(new ValidMessage("资产代码已存在"));
+        if(Objects.nonNull(dto.getIssueDto()) && StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) && (StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())
+                || StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))
+                && StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发.getValue())) {
+            Map<String, Object> param = new HashMap<>();
+            param.put("finprodMarketId", dto.getFinprodMarketId());
+            param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            param.put("issueStyle", dto.getIssueDto().getIssueStyle());
+            param.put("addBatch", dto.getIssueDto().getAddBatch());
+            if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectExistFinprodId(param))) {
+                validList.add(new ValidMessage("资产代码已存在"));
+            }
+        }else if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+            Map<String, String> param = new HashMap<>();
+            param.put("finprodMarketId", dto.getFinprodMarketId());
+            param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
+                validList.add(new ValidMessage("资产代码已存在"));
+            }
         }
         return validList;
     }
@@ -561,17 +592,23 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && !dto.getFinprodMarketId().matches("^[A-Za-z0-9]+.[A-Za-z0-9]+$")) {
                 validList.add(new ValidMessage("资产代码只能由数字和字母组成"));
             }
-            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+            if(Objects.nonNull(dto.getIssueDto()) && StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) && (StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())
+                    || StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))
+                    && StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发.getValue())) {
+                Map<String, Object> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+                param.put("issueStyle", dto.getIssueDto().getIssueStyle());
+                param.put("addBatch", dto.getIssueDto().getAddBatch());
+                if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectExistFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
+            }else if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());
                 param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
                 if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
                     validList.add(new ValidMessage("资产代码已存在"));
-                }
-                String finprodId = getFinprodId(dto);
-                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
-                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
-                    validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
                 }
             }
         }
@@ -623,14 +660,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      */
     public String getFinprodId(FinTenderBondAsset002Dto dto) {
         String[] arr = dto.getFinprodMarketId().split("\\.");
-       if(StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
-           return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0],
-                   dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getIssueDto().getIssueDate(), "yyyyMMdd"), arr[1]);
-       }else {
-           Date date = dto.getIssueDto().getIssueDate() == null ? dto.getIssueDto().getTenderEdate() : dto.getIssueDto().getIssueDate();
-           return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0],
-                   dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(date, "yyyyMMdd"), arr[1]);
-       }
+        return String.format("%s_%s_%s.%s",DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0],DateUtil.format(new Date(), "yyyyMMddHHmmss"), arr[1]);
     }
 
 

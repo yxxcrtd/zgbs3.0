@@ -129,6 +129,12 @@ public abstract class OccupyReleasService<V> extends EventBaseService<V> {
             }
             // 计算参数值、预占/实占额度
             calcParamVal(paraValMap, mapData, items, details, preOcpParam2);
+            // 有编号相同的占用的情况下进行试算，要在释放的基础上进行试算，并且不能写入Redis,所以释放结果存到线程变量
+            if (StringUtil.equals(mapData.get("writeRedis"),BussinessDictCodeListRds.是否_否.getValue())){
+                String ocpCode = (String) request.getBody().get("eventId");
+                setServiceInfo(ocpCode,paraValMap);
+                return ocpRelParam;
+            }
             // 更新参数值信息
             paramValSrv.setParamVal(paraValMap);
             // 实占撤销的场合，直接删除实占信息

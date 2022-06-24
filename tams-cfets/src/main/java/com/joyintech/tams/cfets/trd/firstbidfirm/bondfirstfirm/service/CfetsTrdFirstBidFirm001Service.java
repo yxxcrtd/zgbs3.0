@@ -14,7 +14,7 @@ import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.EtrEntrustOperHisDto;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.CfgDataTableService;
@@ -52,7 +52,7 @@ import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,7 +185,18 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         if (CollectionUtils.isEmpty(requestList)) {
             return ajaxResult;
         }
+
+        List<ValidMessage> errorMessageList = new ArrayList<>();
         List<String> errorList = new ArrayList<String>();
+        for (CfetsTrdBondFirstBidFirmEtrRequest request:requestList) {
+            errorMessageList.addAll(etrInvesInfo.checkDelegateOperation(request.getEntrustId(), DictCodeListExt1.委托操作类型_接收.getValue(), null, DictCodeListExt1.委托关闭方式_人工.getValue()));
+        }
+        //错误时，返回错误信息
+        if (CollectionUtils.isNotEmpty(errorMessageList) && errorMessageList.size() > 0) {
+            ajaxResult.setErrorList(errorMessageList);
+            return ajaxResult;
+        }
+        //数据是否是已接收
         List<String> entrustIdListAll = new ArrayList<>();
         Map<String, String> finprodAbbrMap = requestList.stream().collect(Collectors.toMap(CfetsTrdBondFirstBidFirmEtrRequest::getFinprodId,CfetsTrdBondFirstBidFirmEtrRequest::getFinprodAbbr,(v1, v2) ->v2));
         Map<String,List<CfetsTrdBondFirstBidFirmEtrRequest>> finprodIdMap = requestList.stream().collect(Collectors.groupingBy(o -> o.getFinprodId()));
@@ -194,7 +205,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             //查询
             Map<String, Object> param = new HashMap<>();
             this.setParam(param);
-            param.put("finprodId",entry.getKey());
+            param.put("finprodIds", Arrays.asList(entry.getKey()));
             //筛选出未接收的指令
             List<String> entrustIdListNew = cfetsTrdFirstBidFirm001Mapper.listEntrust(param).stream()
                     .filter(item ->DictCodeList.委托状态_待接收.getValue().equals(item.getEntrustStatus())).map(CfetsTrdFirstBidFirmEntrustDto::getEntrustId).collect(Collectors.toList());
@@ -229,25 +240,12 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         param.put("trader", LoginUserUtil.getUserName());
         List<EtrDistribute> list = cfetsTrdBondFirstSub001Service.getDistributeTrader(param);
         logger.debug("接收指令,入参:" + JsonUtils.object2Json(param));
-        List<String> traderList = new ArrayList<>();
         for (EtrDistribute etrDis : list) {
-            errorList.addAll(etrInvesInfo.checkDelegateOperation(etrDis.getEntrustId(), DictCodeListExt1.委托操作类型_接收.getValue(), traderList, DictCodeListExt1.委托关闭方式_人工.getValue()));
-            etrDis.setUpdateUser(etrDis.getTrader());
+           etrDis.setUpdateUser(etrDis.getTrader());
         }
-        //错误时，返回错误信息
-        if (CollectionUtils.isNotEmpty(errorList) && errorList.size() > 0) {
-            return errorList;
-        }
+
         // 接受委托
         etrInvesInfo.receptionDelegate(list);
-        List<String> entrustIds = StringUtil.splitToList(",", (String) param.get("entrustIds"));
-        for (String entrustId : entrustIds) {
-            //更新操作记录日志
-            CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-            oprHisReq.setEntrustId(entrustId);
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
-            joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-        }
         return errorList;
     }
 
@@ -259,36 +257,10 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      */
     public String giveUpEntrust(String entrustId) {
         String massege = "";
-        if (StringUtil.isEmpty(entrustId)) {
-            massege = "请选择指令！";
-        }
-        // 1.查询指令信息
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entrustId);
-        if (etrEntrust == null) {
-            massege = "未查询到指令信息！";
-        }
-
         Map<String, Object> params = new HashMap<>();
         params.put("entrustId", entrustId);
         setParam(params);
-        // 2.查询指令状态及执行进度
-        List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtoList = cfetsTrdFirstBidFirm001Mapper.listEntrust(params);
-        logger.debug("查询指令状态及执行进度,结果:" + JsonUtils.object2Json(cfetsTrdFirstBidFirmEntrustDtoList));
-        // 已接收且执行进度<100%的指令可以选择【放弃】接收
-        if (CollectionUtils.isNotEmpty(cfetsTrdFirstBidFirmEntrustDtoList)) {
-            for (CfetsTrdFirstBidFirmEntrustDto item : cfetsTrdFirstBidFirmEntrustDtoList) {
-                if (!StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())
-                        && BigDecimalUtil.ACompareToB(item.getTransactioncom(), new BigDecimal(100), 2) >= 0) {
-                    return "已接收且执行进度<100%的指令,才能执行放弃操作！";
-                }
-            }
-        }
-        //是否存在流程中或者有效且数据状态不为 已撤回 已终止
-        int i = cfetsTrdFirstBidFirm001Mapper.checkDataStatus(params);
-        if (i > 0) {
-            return "存在流程中的一级投标确认，不可放弃！";
-        }
-        //2.查询指令分发的临时表数据  插入  指令分发表，并将状态改为  待接收。
+        //.查询指令分发的临时表数据  插入  指令分发表，并将状态改为  待接收。
         List<EtrDistributeInterfTmp> distmpList = cfetsIbuQuoteBondEtrMapper.listEtrDistributeInterfTmp(params);
         if (!StringUtil.isEmptyList(distmpList)) {
             boolean status = etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_待接收.getValue());
@@ -319,6 +291,48 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         if (CollectionUtils.isEmpty(requestList)) {
             return ajaxResult;
         }
+        List<ValidMessage> errorMessageList = new ArrayList<>();
+        for (CfetsTrdBondFirstBidFirmEtrRequest request : requestList) {
+            if (StringUtil.isEmpty(request.getEntrustId())) {
+                errorMessageList.add(new ValidMessage("请选择指令！"));
+                ajaxResult.setErrorList(errorMessageList);
+                return ajaxResult;
+            }
+            // 1.查询指令信息
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(request.getEntrustId());
+            if (etrEntrust == null) {
+                errorMessageList.add(new ValidMessage("未查询到指令信息！"));
+                ajaxResult.setErrorList(errorMessageList);
+                return ajaxResult;
+            }
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("entrustId", request.getEntrustId());
+            setParam(params);
+            // 2.查询指令状态及执行进度
+            List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtoList = cfetsTrdFirstBidFirm001Mapper.listEntrust(params);
+            logger.debug("查询指令状态及执行进度,结果:" + JsonUtils.object2Json(cfetsTrdFirstBidFirmEntrustDtoList));
+            // 已接收且执行进度<100%的指令可以选择【放弃】接收
+            if (CollectionUtils.isNotEmpty(cfetsTrdFirstBidFirmEntrustDtoList)) {
+                for (CfetsTrdFirstBidFirmEntrustDto item : cfetsTrdFirstBidFirmEntrustDtoList) {
+                    if (!StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())
+                            && BigDecimalUtil.ACompareToB(item.getTransactioncom(), new BigDecimal(100), 2) >= 0) {
+                        errorMessageList.add(new ValidMessage("已接收且执行进度<100%的指令,才能执行放弃操作！"));
+                        ajaxResult.setErrorList(errorMessageList);
+                        return ajaxResult;
+                    }
+                }
+            }
+            //是否存在流程中或者有效且数据状态不为 已撤回 已终止
+            int i = cfetsTrdFirstBidFirm001Mapper.checkDataStatus(params);
+            if (i > 0) {
+                errorMessageList.add(new ValidMessage("存在流程中的一级投标确认，不可放弃！"));
+                ajaxResult.setErrorList(errorMessageList);
+                return ajaxResult;
+            }
+        }
+
+
         List<String> errorList = new ArrayList<String>();
         List<String> entrustIdListAll = new ArrayList<>();
         Map<String, String> finprodAbbrMap = requestList.stream().collect(Collectors.toMap(CfetsTrdBondFirstBidFirmEtrRequest::getFinprodId,CfetsTrdBondFirstBidFirmEtrRequest::getFinprodAbbr,(v1, v2) ->v2));
@@ -329,7 +343,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             //查询
             Map<String, Object> param = new HashMap<>();
             this.setParam(param);
-            param.put("finprodId", entry.getKey());
+            param.put("finprodIds", Arrays.asList(entry.getKey()));
             //筛选出未接收的指令
             List<String> entrustIdListNew = cfetsTrdFirstBidFirm001Mapper.listEntrust(param).stream()
                     .filter(item -> DictCodeList.委托状态_已接收.getValue().equals(item.getEntrustStatus()) && DictCodeList.一级投标中标状态_待投标.getValue().equals(item.getFirstBidStatus()))
@@ -342,10 +356,44 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             }
 
         }
+        //过滤掉流程中的数据
+        //过滤已接收且执行进度>0%的数据
+        List<String> entrustIdAll = new ArrayList<>();
+        for (String entrustId : entrustIdListAll) {
+            Boolean addFlag = Boolean.TRUE;
+            Map<String, Object> params = new HashMap<>();
+            params.put("entrustId", entrustId);
+            setParam(params);
+            // 查询指令状态及执行进度
+            List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtoList = cfetsTrdFirstBidFirm001Mapper.listEntrust(params);
+            // 已接收且执行进度<100%的指令可以选择【放弃】接收
+            if (CollectionUtils.isNotEmpty(cfetsTrdFirstBidFirmEntrustDtoList)) {
+                for (CfetsTrdFirstBidFirmEntrustDto item : cfetsTrdFirstBidFirmEntrustDtoList) {
+                    if (!StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())
+                            && BigDecimalUtil.ACompareToB(item.getTransactioncom(), new BigDecimal(100), 2) >= 0) {
+                        addFlag = Boolean.FALSE;
+                    }
+                }
+            }
+            //是否存在流程中或者有效且数据状态不为 已撤回 已终止
+            int i = cfetsTrdFirstBidFirm001Mapper.checkDataStatus(params);
+            if (i > 0) {
+                addFlag = Boolean.FALSE;
+
+            }
+            if (addFlag) {
+                entrustIdAll.add(entrustId);
+            }else {
+                CfetsTrdFirstBidFirmEntrustDto cfetsDto = new CfetsTrdFirstBidFirmEntrustDto();
+                cfetsDto.setEntrustId(entrustId);
+                this.undoSumSave(cfetsDto, this.SUM_FLAG_01, null);
+            }
+
+        }
         if (CollectionUtils.isNotEmpty(errorList)) {
             Map<String, Object> map = new HashMap<>();
             map.put("massege", errorList);
-            map.put("ids", entrustIdListAll);
+            map.put("ids", entrustIdAll);
             ajaxResult.setData(map);
             ajaxResult.setMessageType(MessageType.确认消息);
         }
@@ -417,7 +465,14 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     public Page<CfetsTrdFirstBidFirmEntrustDto> pageEntrust(CfetsTrdBondFirstBidFirmEntrustRequest dto) {
         Map<String, Object> param = BeanUtil.object2Map(dto);
         this.setParam(param);
-        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.listEntrust(param));
+        Page<CfetsTrdFirstBidFirmEntrustDto> page
+                = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.listEntrust(param));
+        page.getRoot().forEach(item -> {
+                    List<EtrEntrustOperHisDto> list = joyinbusinessCommonService.selectCfetsOprHisByEntrustId(item.getEntrustId());
+                    item.setRemarks(list);
+                }
+        );
+        return page;
     }
 
     /**
@@ -429,7 +484,12 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     public List<CfetsTrdFirstBidFirmEntrustDto> listEntrust(CfetsTrdBondFirstBidFirmEntrustRequest dto) {
         Map<String, Object> param = BeanUtil.object2Map(dto);
         this.setParam(param);
-        return cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
+        List<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
+        list.forEach(item -> {
+            List<EtrEntrustOperHisDto> list1 = joyinbusinessCommonService.selectCfetsOprHisByEntrustId(item.getEntrustId());
+            item.setRemarks(list1);
+        });
+        return list;
     }
 
     /**
@@ -835,8 +895,8 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
                 bidFirmSum.setFinishDealAmt(sumFinishDealAmt);
                 bidFirmSum.setAvaNum(sumAvaNum);
                 bidFirmSum.setAvaDealAmt(sumAvaDealAmt);
-                bidFirmSum.setTransactioncom(ArithmeticUtil.divide(sumFinishAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
-                bidFirmSum.setTradeFinishPercent(ArithmeticUtil.divide(sumFinishDealAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
+                bidFirmSum.setTransactioncom(ArithmeticUtil.divide(sumFinishAmt, sumEntrustNum, 4).multiply(new BigDecimal("100")));
+                bidFirmSum.setTradeFinishPercent(ArithmeticUtil.divide(sumFinishDealAmt, sumEntrustNum, 4).multiply(new BigDecimal("100")));
                 bidFirmSum.setFinprodId(bidFirmDetail.get(0).getFinprodId());
                 bidFirmSum.setFinprodMarketId(bidFirmDetail.get(0).getFinprodMarketId());
                 bidFirmSum.setFinprodAbbr(bidFirmDetail.get(0).getFinprodAbbr());
@@ -1062,7 +1122,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         //拖出：取消汇总
         if (CollectionUtils.isNotEmpty(outList)) {
             CfetsTrdFirstBidFirmEntrustDto cfetsDto = outList.get(0);
-            undoSumSave(cfetsDto, this.SUM_FLAG_01);
+            undoSumSave(cfetsDto, this.SUM_FLAG_01, null);
         }
 
         if (CollectionUtils.isNotEmpty(inList)) {
@@ -1070,10 +1130,10 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             //汇总数据维度（新债标的OR投标日OR指令状态）
             Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMap = inList.stream()
                     .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getEntrustStatus()));
-//            if (!counterIsNullMap.isEmpty() && counterIsNullMap.size() > 1) {
-//                errorList.add(new ValidMessage("所选指令不满足汇总条件：【新债标的OR投标日OR交易对手OR指令状态】不同"));
-//                return errorList;
-//            }
+            if (!counterIsNullMap.isEmpty() && counterIsNullMap.size() > 1) {
+                errorList.add(new ValidMessage("所选指令不满足汇总条件：【新债标的OR投标日OR交易对手OR指令状态】不同"));
+                return errorList;
+            }
 
             List<CfetsTrdFirstBidFirmEntrustDto> counterIdList = inList.stream().filter(x -> StringUtil.isNotEmpty(x.getCounterId()))
                     .collect(Collectors.toList());
@@ -1086,36 +1146,23 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
             //拖入：没有交易对手方 删除汇总关系 （指令信息自动汇总）
             if (CollectionUtils.isEmpty(counterIdList)) {
                 if (CollectionUtils.isNotEmpty(counterIdIsNullList)) {
-                    String loginUserId = LoginUserUtil.getUserName();
+                    String uuid = IDGenerator.generate();
                     for (CfetsTrdFirstBidFirmEntrustDto dto : counterIdIsNullList) {
-                        undoSumSave(dto, this.SUM_FLAG_02);
+                        undoSumSave(dto, this.SUM_FLAG_02, uuid);
                     }
                 }
             }
 
             if (CollectionUtils.isNotEmpty(counterIdList)) {
-                String loginUserId = LoginUserUtil.getUserName();
                 String uuid = IDGenerator.generate();
                 if (CollectionUtils.isNotEmpty(counterIdList)) {
-                    for (CfetsTrdFirstBidFirmEntrustDto dto :counterIdList) {
-                        cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(dto.getEntrustId(), loginUserId);
-                        TotalEtrEntrustRel totalEtrEntrustRel = new TotalEtrEntrustRel();
-                        totalEtrEntrustRel.setTotleId(uuid);
-                        totalEtrEntrustRel.setEntrustId(dto.getEntrustId());
-                        totalEtrEntrustRel.setSumFlag(this.SUM_FLAG_02);
-                        totalEtrEntrustRel.setTrader(loginUserId);
-                        totalEtrEntrustRelMapper.insertSelective(totalEtrEntrustRel);
+                    for (CfetsTrdFirstBidFirmEntrustDto dto : counterIdList) {
+                        undoSumSave(dto, this.SUM_FLAG_02, uuid);
                     }
                 }
                 if (CollectionUtils.isNotEmpty(counterIdIsNullList)) {
-                    for (CfetsTrdFirstBidFirmEntrustDto dto :counterIdIsNullList) {
-                        cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(dto.getEntrustId(), loginUserId);
-                        TotalEtrEntrustRel totalEtrEntrustRel = new TotalEtrEntrustRel();
-                        totalEtrEntrustRel.setTotleId(uuid);
-                        totalEtrEntrustRel.setEntrustId(dto.getEntrustId());
-                        totalEtrEntrustRel.setSumFlag(this.SUM_FLAG_02);
-                        totalEtrEntrustRel.setTrader(loginUserId);
-                        totalEtrEntrustRelMapper.insertSelective(totalEtrEntrustRel);
+                    for (CfetsTrdFirstBidFirmEntrustDto dto : counterIdIsNullList) {
+                        undoSumSave(dto, this.SUM_FLAG_02, uuid);
                     }
                 }
 
@@ -1131,14 +1178,13 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      * @param cfetsDto
      * @return
      */
-    public int undoSumSave(CfetsTrdFirstBidFirmEntrustDto cfetsDto, String sumFlag) {
+    public int undoSumSave(CfetsTrdFirstBidFirmEntrustDto cfetsDto, String sumFlag ,String uuid) {
         TotalEtrEntrustRel totalEtrEntrustRel = new TotalEtrEntrustRel();
-        String uuid = IDGenerator.generate();
-        totalEtrEntrustRel.setTotleId(uuid);
+        String totleId = StringUtil.isNotEmpty(uuid) ? uuid : IDGenerator.generate();
+        totalEtrEntrustRel.setTotleId(totleId);
         totalEtrEntrustRel.setEntrustId(cfetsDto.getEntrustId());
         totalEtrEntrustRel.setSumFlag(sumFlag);
         String loginUserId = LoginUserUtil.getUserName();
-        // param.put("loginUserId", loginUserId);
         totalEtrEntrustRel.setTrader(loginUserId);
         if (StringUtil.isEmpty(sumFlag)) {
             return cfetsTrdFirstBidFirm001Mapper.deleteEtrEntrustRel(cfetsDto.getEntrustId(), loginUserId);

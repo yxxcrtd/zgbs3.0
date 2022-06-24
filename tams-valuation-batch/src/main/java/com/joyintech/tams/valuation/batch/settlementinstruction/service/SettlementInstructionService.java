@@ -22,7 +22,7 @@ import java.util.Set;
 
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.valuation.batch.vatdraw.service.VatDrawCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

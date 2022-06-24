@@ -7,6 +7,7 @@ import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.validator.CreditProtectionCertificatePeriodSaveDtoValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -17,7 +18,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-@PageId("CreditProtectionCertificate002")
+@PageId("CreditProtectionCertificatePeriod002")
 @ValidLogic(targetClass = CreditProtectionCertificatePeriodSaveDtoValidator.class , groups = {ValidateGroupEdit.class})
 @ApiModel(value="信用凭证保护存续期",description="信用凭证保护存续期")
 public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity implements ProcessEntity {
@@ -70,6 +71,12 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
     private String finprodMarketId;
 
     /**
+     * 资产代码
+     */
+    @ApiModelProperty(name = "finprodId",value = "资产代码2")
+    private String finprodId;
+
+    /**
      * 资产名称
      */
     @NotEmpty(fieldName = "资产名称", groups = {ValidateGroupEdit.class})
@@ -101,6 +108,12 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
      */
     @ApiModelProperty(name = "refEntity",value = "参考实体")
     private String refEntity;
+
+    /**
+     * 参考实体
+     */
+    @ApiModelProperty(name = "refEntityStr",value = "参考实体")
+    private String refEntityStr;
 
     /**
      * 信用事件
@@ -446,6 +459,22 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
 
     public void setDeliverBondAmount(BigDecimal deliverBondAmount) {
         this.deliverBondAmount = deliverBondAmount;
+    }
+
+    public String getRefEntityStr() {
+        return refEntityStr;
+    }
+
+    public void setRefEntityStr(String refEntityStr) {
+        this.refEntityStr = refEntityStr;
+    }
+
+    public String getFinprodId() {
+        return DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue() + "_" + this.finprodMarketId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }
 

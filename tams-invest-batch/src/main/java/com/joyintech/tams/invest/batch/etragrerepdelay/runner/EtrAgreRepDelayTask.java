@@ -19,7 +19,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.invest.batch.common.util.BatchConstant;
 import com.joyintech.tams.invest.batch.etragrerepdelay.service.EtrAgreRepDelayService;
 import com.joyintech.tams.invest.common.risktrialrds.util.Const;
-import com.netflix.discovery.converters.Auto;
+//import com.netflix.discovery.converters.Auto;
 
 /**
  * 协议回购到期指令延期

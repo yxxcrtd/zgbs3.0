@@ -22,7 +22,7 @@ import javax.validation.Valid;
 
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -221,7 +221,7 @@ public class DisAssetLiabilityStatementQuery001Controller extends BaseController
     		dtoList = service.findAssetsStatementAll(dto);
     	}
 
-        if(CollectionUtils.isNotEmpty(dtoList)) {
+        if(null!=dtoList) {
             dtoList.add(new DisAssetLiabilityStatementQuery001Dto());
             dtoList.add(new DisAssetLiabilityStatementQuery001Dto());
             dtoList.add(new DisAssetLiabilityStatementQuery001Dto());
@@ -265,7 +265,7 @@ public class DisAssetLiabilityStatementQuery001Controller extends BaseController
     		dto.setAccountList(valAssetBook001Service.getBooksetId2(super.getRequest().getParameter("param")));
     		dtoList = service.findLiabilityInterestStatementAll(dto);
     	}
-    	if(CollectionUtils.isNotEmpty(dtoList)) {
+    	if(null!=dtoList) {
             dtoList.addAll(DisAssetLiabilityStatementUtil.getLiabilityInterestListSum(dtoList));
         }
     	

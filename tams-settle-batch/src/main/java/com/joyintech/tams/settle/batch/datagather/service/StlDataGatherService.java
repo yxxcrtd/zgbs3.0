@@ -20,7 +20,7 @@ import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonD
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonParamDto;
 import com.joyintech.tams.settle.batch.datagather.dto.*;
 import com.joyintech.tams.systemtools.util.CommonUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class StlDataGatherService {
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
     @Autowired(required = false)
@@ -65,7 +65,7 @@ public class StlDataGatherService {
     @Qualifier("simpleRestTemplate")
     protected JoyinRestTemplate simpleRestTemplate;
 
-    @Value("${application.micorservice.contextPath.tamsServer:http://tams-server}")
+    @Value("${application.micorservice.contextpath.tamsServer:http://tams-server}")
     private String tamsSerever;
 
     @Autowired
@@ -1080,9 +1080,11 @@ public class StlDataGatherService {
         paramDto.setParamDataList(dtoList);
         paramDto.setNeedUpdateStatusEntrustIdList(needUpdateStatusEntrustIdList);
         logger.debug("调用成交匹配:" + JsonUtils.object2Json(paramDto));
-        if (CollectionUtils.isEmpty(dtoList)) {
-            return;
-        }
+        // ZGCPCN-1583:dtoList为空时需要更新指令状态,不能return modify by fuyongsheng 20220621 start
+//        if (CollectionUtils.isEmpty(dtoList)) {
+//            return;
+//        }
+        // ZGCPCN-1583:dtoList为空时需要更新指令状态,不能return modify by fuyongsheng 20220621 end
         // 调用债券交易计算逻辑
         if (isSingle) {
             simpleRestTemplate.postForObject(tamsSerever + "/invest/trade/exchangetransmatch/ExchangeTransMatchCommon/transactionMacthBatch", paramDto, Map.class);

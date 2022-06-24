@@ -154,7 +154,7 @@
         end) as issuerMsg, <!--发行主体-->
 
         (case
-        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' then
+        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37' then
         mcia.IS_PRIVATE
         when fp.finprod_type2 = 'F18' then
         mcia1.IS_PRIVATE
@@ -164,7 +164,7 @@
         end) as IS_PRIVATE,<!--是否国企-->
 
         (case
-        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' then
+        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37' then
         mcia.IS_LISTED_COMPANY
         when fp.finprod_type2 = 'F18' then
         mcia1.IS_LISTED_COMPANY
@@ -174,7 +174,7 @@
         end) as IS_LISTED_COMPANY, <!--是否上市公司-->
 
         (case
-        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' then
+        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37' then
         mcia.PARTY_TYPE2
         when fp.finprod_type2 = 'F18' then
         mcia1.PARTY_TYPE2
@@ -184,7 +184,7 @@
         end) as COMPANY_NATURE, <!--企业性质-->
 
         (case
-        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' then
+        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37' then
         mcia.INDUSTRY
         when fp.finprod_type2 = 'F18' then
         mcia1.INDUSTRY
@@ -194,7 +194,7 @@
         end) as INDUSTRY, <!--所属行业-->
 
         (case
-        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' then
+        when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37' then
         mcia.INDUSTRY2
         when fp.finprod_type2 = 'F18' then
         mcia1.INDUSTRY2
@@ -906,8 +906,9 @@
 		                                then fp.financier
 		                           when fp.finprod_type2 = 'F06' or fp.finprod_type2 = 'F17' 
 		                                then fp.manager
+                                             else fp.issuer
 		                                  end) as issuerMsg, <!--发行主体-->
-		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' 
+		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37'
 		                                then mcia.IS_PRIVATE
 		                           when fp.finprod_type2 = 'F18' 
 		                                then mcia1.IS_PRIVATE
@@ -915,7 +916,7 @@
 		                                then mcia2.IS_PRIVATE
 		                                end) as IS_PRIVATE,<!--是否国企-->
 		
-		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' 
+		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37'
 		                                then mcia.IS_LISTED_COMPANY
 		                           when fp.finprod_type2 = 'F18' 
 		                                then mcia1.IS_LISTED_COMPANY
@@ -923,14 +924,14 @@
 		                                then mcia2.IS_LISTED_COMPANY
 		                                end) as IS_LISTED_COMPANY, <!--是否上市公司-->
 		
-		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' 
+		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37'
 		                                then mcia.PARTY_TYPE2
 		                           when fp.finprod_type2 = 'F18' 
 		                                then mcia1.PARTY_TYPE2
 		                           when fp.finprod_type2 = 'F06' or fp.finprod_type2 = 'F07' or fp.finprod_type2 = 'F17' 
 		                                then mcia2.PARTY_TYPE2
 		                                end) as COMPANY_NATURE, <!--企业性质-->
-		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' 
+		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37'
 		                                then mcia.INDUSTRY
 		                           when fp.finprod_type2 = 'F18' 
 		                                then mcia1.INDUSTRY
@@ -938,7 +939,7 @@
 		                                then mcia2.INDUSTRY
 		                                end) as INDUSTRY, <!--所属行业-->
 		
-		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' 
+		                     (case when fp.finprod_type2 = 'F01' or fp.finprod_type2 = 'F10' or fp.finprod_type2 = 'F37'
 		                                then mcia.INDUSTRY2
 		                           when fp.finprod_type2 = 'F18' 
 		                                then mcia1.INDUSTRY2

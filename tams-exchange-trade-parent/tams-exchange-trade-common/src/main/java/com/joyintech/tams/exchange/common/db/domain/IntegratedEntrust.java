@@ -1190,15 +1190,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     }
 
     public String getCounterId() {
-        if(StringUtil.isNotEmpty(counterId)){
-            return counterId;
-        }
-        if (StringUtil.isNotEmpty(extend2) && extend2.contains("counterId")) {
-            Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
-            return (String)map.get("counterId");
-        }
-
-        return "";
+        return counterId;
     }
 
     public void setCounterId(String counterId) {

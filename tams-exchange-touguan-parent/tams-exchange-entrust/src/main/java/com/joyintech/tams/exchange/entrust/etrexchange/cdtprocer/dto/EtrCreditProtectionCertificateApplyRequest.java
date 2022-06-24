@@ -147,6 +147,18 @@ public class EtrCreditProtectionCertificateApplyRequest extends EtrEntrust imple
 
     private String confirmOk;
 
+    private String remark;
+
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    @Override
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public String getConfirmOk() {
         return confirmOk;
     }

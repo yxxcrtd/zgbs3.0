@@ -19,10 +19,19 @@ import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto
 import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.invest.batch.valbatchimport.common.service.CommonAutoCouponService;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
+import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
+import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter;
+import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
+import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,10 +77,23 @@ public class FinTenderBondAssetBatchService {
     @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
+    @Resource
+    private BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
+
+    @Resource
+    private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
+
+
+    @Autowired(required = false)
+    private EtrCommonCashPositionDealService etrCommonCashPositionDealService;
+
+    @Autowired(required = false)
+    private EtrCommonCashPositionMapper etrCommonCashPositionMapper;
+
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
     @Autowired(required = false)
@@ -81,7 +103,7 @@ public class FinTenderBondAssetBatchService {
     @Qualifier("simpleRestTemplate")
     protected JoyinRestTemplate simpleRestTemplate;
 
-    @Value("${application.micorservice.contextPath.tamsServer:http://tams-server}")
+    @Value("${application.micorservice.contextpath.tamsServer:http://tams-server}")
     private String tamsSerever;
 
     /**
@@ -254,6 +276,53 @@ public class FinTenderBondAssetBatchService {
         this.sendPosition(dto, plateDate, seqList);
     }
 
+    /**
+     * 处理旧头寸
+     *
+     * @param dto
+     */
+    private void insertOldPostion(FinTenderBondAssetBatchDto dto,String finproductId) {
+        if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+            //1.查出新债的流水
+            List<PtlSecPositionFlow> flowList = baseAssetCashPositionCommMapper.selectByFinproductId(dto.getFinprodId());
+            if (com.joyintech.framework.util.StringUtil.isNotEmpty(finproductId)) {
+                if (CollectionUtils.isNotEmpty(flowList)) {
+                    //2.冲正新债的流水
+                    for (PtlSecPositionFlow flow : flowList) {
+                        PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
+                        BeanUtil.copyPropertiesIgnoreNull(flowDto, flow);
+                        flowDto.setAmount(flow.getAmount().negate());
+                        basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
+                        //3.重新插入二级债的流水
+                        PtlSecPositionFlowDto twoDto = new PtlSecPositionFlowDto();
+                        BeanUtil.copyPropertiesIgnoreNull(twoDto, flow);
+                        twoDto.setFinprodId(finproductId);
+                        basePtlSecPositionInfoService.inertSecPositionFlow(twoDto);
+                    }
+                }
+           /*     //4.处理指令流水
+                List<EtrSecPositionFlowDto> etrFlowList = etrCommonCashPositionMapper.selectAllPositionByFinprodId(dto.getFinprodId());
+                if (CollectionUtils.isNotEmpty(etrFlowList)) {
+                    List<EtrSecPositionFlowDto> list = new ArrayList<>();
+                    for (EtrSecPositionFlowDto flowDto : list) {
+                        EtrSecPositionFlowDto dto1 = new EtrSecPositionFlowDto();
+                        BeanUtil.copyPropertiesIgnoreNull(dto1, flowDto);
+                        dto1.setAmount(dto1.getAmount().negate());
+                        list.add(dto1);
+                        flowDto.setFinprodId(finproductId);
+                    }
+                    //先生成一笔一级反向流水
+                    EtrPositionHoldDto holdDto = new EtrPositionHoldDto();
+                    holdDto.setPtlSecPositionFlows(list);
+                    etrCommonCashPositionDealService.持久化流水Dto(holdDto);
+                    //重新插入二级
+                    EtrPositionHoldDto holdDto1 = new EtrPositionHoldDto();
+                    holdDto1.setPtlSecPositionFlows(etrFlowList);
+                    etrCommonCashPositionDealService.持久化流水Dto(holdDto1);
+                }*/
+            }
+        }
+    }
 
     private void sendPosition(FinTenderBondAssetBatchDto dto, Date plateDate, List<Long> seqList) {
         long seqNo = (long) Arrays.deepHashCode(new Object[]{dto.getTotleTradeId(), DictCodeListExt1.子系统代码_交易.getValue(), new Date().getTime(), Thread.currentThread().getId()});
@@ -287,6 +356,8 @@ public class FinTenderBondAssetBatchService {
         }
         seqList.add(seqNo);
         PositionHttpRequest.send(param);
+        //处理旧头寸
+        this.insertOldPostion(dto,finproductId);
     }
 
 

@@ -7,10 +7,9 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.tams.invest.batch.cfetsentrust.dao;
 
-import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.invest.batch.cfetsentrust.dto.CfetsEntrustClosePosEtrReqDto;
 import org.springframework.stereotype.Repository;
 
@@ -20,9 +19,10 @@ import java.util.Map;
 /**
  * 更新关闭委托状态
  * 〈功能详细描述〉
+ *
  * @author zhangnian
  * @version 1.0 2019年2月15日
- * @see EntrustStatusMapper
+ * @see CfetsEntrustStatusMapper
  * @since 1.0
  */
 @Repository
@@ -36,5 +36,5 @@ public interface CfetsEntrustStatusMapper {
 
     void updateDistributeStatus(Map<String, String> sysDate);
 
-    void updateBusModel(Map<String,Object> param);
+    void updateBusModel(Map<String, Object> param);
 }

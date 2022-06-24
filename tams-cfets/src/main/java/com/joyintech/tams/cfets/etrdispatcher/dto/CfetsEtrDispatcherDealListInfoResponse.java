@@ -40,6 +40,9 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     @ApiModelProperty(name = "secAcctId", value = "证券账户code", example = "XXX证券账户")
     private String secAcctId;
 
+    @ApiModelProperty(name = "busiTypePosition", value = "业务类型", example = "A1")
+    private String busiTypePosition;
+
     @ApiModelProperty(name = "secAcctIdStr", value = "证券账户", example = "XXX证券账户")
     private String secAcctIdStr;
 
@@ -1385,6 +1388,15 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称")
     private String finprodAbbr;
 
+    @ApiModelProperty(name = "busiCode", value = "业务编号,调用交易查询用", example = "A1")
+    private String busiCode;
+
+    @ApiModelProperty(name="tgBusiType",value="业务类型,调用交易查询用",example="A1")
+    private String tgBusiType;
+
+    @ApiModelProperty(name="bidModle",value="投标方式,调用交易查询用")
+    private String bidModle;
+
     public String getFirstBidStatus() {
         return firstBidStatus;
     }
@@ -1656,7 +1668,7 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     }
 
     public String getWinTypeStr() {
-        return winTypeStr;
+        return SysDataUtil.getNameFromDataDict(DictCode.中标方式, this.getWinType());
     }
 
     public void setWinTypeStr(String winTypeStr) {
@@ -1811,5 +1823,39 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
 
     public void setDeliverySchedule(String deliverySchedule) {
         this.deliverySchedule = deliverySchedule;
+    }
+
+    @Override
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    @Override
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
+    public String getBusiCode() {
+        return busiCode;
+    }
+
+    public void setBusiCode(String busiCode) {
+        this.busiCode = busiCode;
+    }
+
+    public String getTgBusiType() {
+        return tgBusiType;
+    }
+
+    public void setTgBusiType(String tgBusiType) {
+        this.tgBusiType = tgBusiType;
+    }
+
+    public String getBidModle() {
+        return bidModle;
+    }
+
+    public void setBidModle(String bidModle) {
+        this.bidModle = bidModle;
     }
 }

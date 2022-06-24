@@ -620,7 +620,7 @@ public class FinBondAssetResponse {
     }
 
     public String getIssueTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.getIssueType());
+        return SysDataUtil.getNameFromDataDict(DictCode.债券类资产募集方式, this.getIssueType());
     }
 
     public void setIssueTypeStr(String issueTypeStr) {

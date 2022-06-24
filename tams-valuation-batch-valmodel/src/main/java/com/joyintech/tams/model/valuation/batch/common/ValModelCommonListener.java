@@ -9,7 +9,7 @@ import com.joyintech.tams.valuation.common.batch.batchTasks.CommonErrorParams;
 import com.joyintech.tams.valuation.component.batch.service.ModLogsService;
 import com.joyintech.tams.valuation.component.batch.service.ModParamsService;
 import com.joyintech.tams.valuation.component.common.constant.ValComponentConstant;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;

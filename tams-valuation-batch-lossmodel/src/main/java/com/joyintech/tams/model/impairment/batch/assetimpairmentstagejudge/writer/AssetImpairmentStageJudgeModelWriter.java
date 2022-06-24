@@ -7,7 +7,7 @@ import com.joyintech.tams.model.impairment.batch.assetimpairmentstagejudge.dto.A
 import com.joyintech.tams.model.impairment.batch.common.utils.DataHandleUtil;
 import com.joyintech.tams.valuation.common.batch.losscommon.dao.LossCommonMapper;
 import com.joyintech.tams.common.base.entity.ModEclResultProcess;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;

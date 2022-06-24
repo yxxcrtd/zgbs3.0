@@ -23,7 +23,7 @@ import com.joyintech.component.svrreport.chb.contant.DictCodeList;
 import com.joyintech.component.svrreport.chb.dto.*;
 import com.joyintech.component.svrreport.chb.util.ChbXmlUtil;
 import com.joyintech.component.svrreport.chb.util.InterfLogUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

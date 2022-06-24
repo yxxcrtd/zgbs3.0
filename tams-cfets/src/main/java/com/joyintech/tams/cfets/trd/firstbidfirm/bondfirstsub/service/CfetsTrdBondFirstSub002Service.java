@@ -54,9 +54,10 @@ import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCash
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -281,6 +282,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         // 3.计算 【应缴款金额】=发行价格*认购量*10000/100 【结算服务费】，根据银行间债券交易费用规则计算
         this.calAmtAndFee(cfetsTrdBondFirstSubInfoDto);
         cfetsTrdBondFirstSubInfoDto.getProductDtos().sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum).reversed());
+        cfetsTrdBondFirstSubInfoDto.setTradeDate(iPlatformDate.getSysDate());
         logger.debug("初始化申购页面,结果:" + JsonUtils.object2Json(cfetsTrdBondFirstSubInfoDto));
         return cfetsTrdBondFirstSubInfoDto;
     }
@@ -936,7 +938,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         List<CfetsTrdBondFirstSubProductDto> productDtos = new ArrayList<>();
         for (BidOrderBidPrice item : list) {
             CfetsTrdBondFirstSubProductDto productDto = new CfetsTrdBondFirstSubProductDto();
-            BeanUtil.copyPropertiesIgnoreNull(item, productDto);
+            BeanUtil.copyPropertiesIgnoreNull(productDto, item);
             productDtos.add(productDto);
         }
         entity.setProductDtos(productDtos);
@@ -944,18 +946,19 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     }
 
     /**
-     * 撤销，共外部调用
+     * 一级申购撤销，共外部调用
      *
-     * @param totleTradeId
-     * @param remark
-     * @param isNeedDealPosition
-     * @param tgBusiType
+     * @param bidId              投标编号
+     * @param remark             备注
+     * @param isNeedDealPosition 是否需要撤销持仓
+     * @param tgBusiType         业务类型
      * @author jiangpeng
      * @date 2022/5/12 14:53
      */
-    public void dorevoke(String totleTradeId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
-        CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(totleTradeId);
-        entity.setBidId(totleTradeId);
+    public void dorevoke(String bidId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
+        CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(bidId);
+        entity.setBidId(bidId);
+        entity.setRemark(remark);
         this.insertData(entity, OperationType.REVOKE);
         try {
             if (isNeedDealPosition) {
@@ -965,13 +968,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                         DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
             }
             // 老头寸处理
-            this.dealOldPosition(entity, true);
+//            this.dealOldPosition(entity, true);
             //处理指令执行进度
             this.insertEtrFinishStatus(entity, OperationType.REVOKE);
-        } catch (PositionException e) {
-            e.printStackTrace();
-            Message message = PositionUtil.ajaxErrorReturn(e);
-            throw new BusinessException("MSG:" + message.getMessage());
+        } catch (Exception e) {
+            throw new WorkFlowException(e);
         }
     }
 
@@ -1030,19 +1031,19 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                         new ValidMessage("所选对象存在流程中的数据!"));
             }
             if (joyinbusinessCommonService.countMatchInfo(item.getBidId(), DictCodeList.确认状态_未确认.getValue()) > 0
-                    && (StringUtil.equals(DictCodeList.是否_否.getValue(), requst.getIsSure()) || StringUtil.isEmpty(requst.getIsSure()))) {
+                    && !StringUtil.equals(DictCodeList.是否_是.getValue(), requst.getIsSure()) ) {
                 //如勾选数据已生成匹配待确认的记录
-                msg += item.getBidId() + "存在已匹配待确认记录，是否确认撤销?/n";
+                msg += item.getBidId() + "存在已匹配待确认记录，是否确认撤销?";
             }
             //如勾选数据发行状态不为空不可撤销
             if (StringUtil.isNotEmpty(item.getIssueStatus())) {
                 errorList.add(new ValidMessage(item.getBidId() + "发行状态不为空不可撤销"));
             }
         }
-        if (StringUtil.isNotEmpty(errorList)) {
+        if (CollectionUtils.isNotEmpty(errorList)) {
             ajaxResult.setErrorList(errorList);
             ajaxResult.setMessageType(MessageType.错误消息);
-        } else {
+        } else if (StringUtil.isNotEmpty(msg)) {
             ajaxResult.setMessage(msg, MessageType.确认消息);
         }
         return ajaxResult;
@@ -1662,6 +1663,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     trdProductDeal.setPrinAmt(deal.getSubscriptionAmount());
                     trdProductDeal.setTradeDate(entity.getTradeDate());
                     trdProductDeal.setSettleDate(entity.getTradeDate());
+                    trdProductDeal.setTradeMarket(BussinessDictCodeList.交易场所_银行间.getValue());
                     trdProductDeal.setSecManageAcctId(deal.getSecManageAcctId());
                     baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
                     TrdProductDealAdd add = new TrdProductDealAdd();

@@ -111,6 +111,9 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     头寸批处理类型_头寸日终批处理(DictCode.头寸批处理类型,"05","头寸日终批处理"),
     头寸批处理类型_同步数据(DictCode.头寸批处理类型,"06","同步数据批处理"),
     头寸批处理类型_标准券自动生成(DictCode.头寸批处理类型,"07","标准券自动生成"),
+
+    批处理类型_日初刷新内存数据(DictCode.头寸批处理类型,"08","日初刷新内存数据"),
+
     投标方式_自主投标(DictCode.投标方式,"01","自主投标"),
     投标方式_代投代缴(DictCode.投标方式,"02","代投代缴"),
     投标方式_分销买入(DictCode.投标方式,"03","分销买入"),
@@ -191,6 +194,8 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     股票交易发行方式零碎股转现金(DictCode.股票交易发行方式,"05","已上市"),
     /** add by zhangzewei on 20220428：股票相关变更 end **/
     ;
+    共同业务类型_一级投标确认_申购_登记(DictCode.共通业务类型, "TRD95", "一级投标确认-申购-登记"),
+            ;
     /**
      * 对应于数据字典code
      */

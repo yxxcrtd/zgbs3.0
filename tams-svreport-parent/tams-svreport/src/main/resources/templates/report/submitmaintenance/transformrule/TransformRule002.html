@@ -2,10 +2,10 @@
 <html
   xmlns:th="http://www.thymeleaf.org"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorator="~{layout/default}">
+  layout:decorate="~{layout/default}">
   <head>
     <meta charset="gb18030" />
-    <title data-th-text="#{SvrTransformRule002}">å˜å½¢è½¬æ¢è§„åˆ™æ–°å»º</title>
+    <title data-th-text="#{SvrTransformRule002}">±äÐÎ×ª»»¹æÔòÐÂ½¨</title>
     <link
       rel="stylesheet"
       type="text/css"
@@ -16,7 +16,7 @@
       <form class="layui-form joyin-form-wrap" id="submitForm">
         <div class="layui-form-item">
           <div class="layui-inline layui-col-md6">
-            <label class="layui-form-label form-lable">ç±»åž‹</label>
+            <label class="layui-form-label form-lable">ÀàÐÍ</label>
             <div class="layui-input-inline input-inline">
               <input
               	required
@@ -32,9 +32,9 @@
               />
             </div>
           </div>
-          <!--Î¿nkeyup="value=this.value.replace(/[^\u4e00-\u9ff5]/g,'')" -->
+          <!--¦Ïnkeyup="value=this.value.replace(/[^\u4e00-\u9ff5]/g,'')" -->
           <div  class="layui-inline layui-col-md6">
-            <label class="layui-form-label form-lable">åŽŸå§‹å€¼</label>
+            <label class="layui-form-label form-lable">Ô­Ê¼Öµ</label>
             <div class="layui-input-inline input-inline">
               <input
                 required
@@ -43,7 +43,7 @@
                 id="orgField"
                 name="orgField"
                 class="layui-input form-input"
-                placeholder="è¯·è¾“å…¥å†…å®¹"
+                placeholder="ÇëÊäÈëÄÚÈÝ"
                 data-th-placeholder="#{SysCommon.placeholder}"
                 data-th-value="${entity?.orgField}"
               />
@@ -52,7 +52,7 @@
         </div>
         <div class="layui-form-item">
           <div class="layui-inline layui-col-md6">
-            <label class="layui-form-label form-lable">æ‹¼éŸ³</label>
+            <label class="layui-form-label form-lable">Æ´Òô</label>
             <div class="layui-input-inline input-inline">
               <input
               	required
@@ -61,14 +61,14 @@
                 id="pinyin"
                 name="pinyin"
                 class="layui-input form-input"
-                placeholder="è¯·è¾“å…¥å†…å®¹"
+                placeholder="ÇëÊäÈëÄÚÈÝ"
                 data-th-placeholder="#{SysCommon.placeholder}"
                 data-th-value="${entity?.pinyin}"
               />
             </div>
           </div>
           <div class="layui-inline layui-col-md6">
-            <label class="layui-form-label form-lable">unicodeç </label>
+            <label class="layui-form-label form-lable">unicodeÂë</label>
             <div class="layui-input-inline input-inline">
               <input
               	required
@@ -78,14 +78,14 @@
                 name="fieldUnicode"
                 class="layui-input form-input"
                 data-th-value="${entity?.fieldUnicode}"
-                placeholder="è‡ªåŠ¨ç”Ÿæˆ"
+                placeholder="×Ô¶¯Éú³É"
               />
             </div>
           </div>
         </div>
         <div class="layui-form-item">
           <div class="layui-inline layui-col-md6">
-            <label class="layui-form-label form-lable">è½¬åŒ–åŽå€¼</label>
+            <label class="layui-form-label form-lable">×ª»¯ºóÖµ</label>
             <div class="layui-input-inline input-inline">
               <input
                 type="text"
@@ -95,19 +95,19 @@
                 disabled="disabled"
                 data-th-value="${entity?.targetField}"
                 required
-                placeholder="è‡ªåŠ¨ç”Ÿæˆ"
+                placeholder="×Ô¶¯Éú³É"
               />
             </div>
           </div>
           <div class="layui-inline layui-col-md6">
-            <label class="layui-form-label form-lable">å¤‡æ³¨</label>
+            <label class="layui-form-label form-lable">±¸×¢</label>
             <div class="layui-input-inline input-inline">
               <input
                 type="text"
                 id="remark"
                 name="remark"
                 class="layui-input form-input"
-                placeholder="è¯·è¾“å…¥å†…å®¹"
+                placeholder="ÇëÊäÈëÄÚÈÝ"
                 data-th-placeholder="#{SysCommon.placeholder}"
                 data-th-value="${entity?.remark}"
               />
@@ -120,13 +120,13 @@
               id="TransformRule002_btn_save"
               class="layui-btn layui-btn-sm btn-save"
               data-th-text="#{SysCommon.submit}"
-              >æäº¤</a
+              >Ìá½»</a
             >
             <a
               id="TransformRule002_btn_cancel"
               class="layui-btn layui-btn-sm btn-cancel"
               data-th-text="#{SysCommon.cancel}"
-              >å–æ¶ˆ</a
+              >È¡Ïû</a
             >
           </div>
         </div>

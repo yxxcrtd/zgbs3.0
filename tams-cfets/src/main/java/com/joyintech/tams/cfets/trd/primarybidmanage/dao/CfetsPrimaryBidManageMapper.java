@@ -85,4 +85,6 @@ public interface CfetsPrimaryBidManageMapper {
 	 * @return
 	 */
 	String selectSecAcctSource(Map<String, Object> param);
+
+	int updateBidOrder(@Param("bidId") String bidId);
 }

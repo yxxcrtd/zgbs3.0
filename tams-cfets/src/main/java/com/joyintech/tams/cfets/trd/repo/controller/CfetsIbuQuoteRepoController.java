@@ -30,7 +30,7 @@ import com.joyintech.tams.systemtools.dao.TamsBaseMapper;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

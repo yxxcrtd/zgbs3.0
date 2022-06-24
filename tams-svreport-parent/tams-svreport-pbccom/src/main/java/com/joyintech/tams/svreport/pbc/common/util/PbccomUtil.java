@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Properties;
-import org.apache.log4j.Logger;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 
@@ -20,7 +22,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class PbccomUtil {
 	/* log4j */
-	private static Logger log = Logger.getLogger(PbccomUtil.class);
+//	private static Logger log = Logger.getLogger(PbccomUtil.class);
+	private static final Log log = LogFactory.getLog(PbccomUtil.class);
 
 	private static String file_name = "/pbccomConfig.properties";
 

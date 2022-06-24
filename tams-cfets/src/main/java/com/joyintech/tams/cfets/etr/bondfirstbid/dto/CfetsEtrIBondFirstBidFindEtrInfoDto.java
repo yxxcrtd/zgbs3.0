@@ -146,6 +146,17 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     @ApiModelProperty(name="ps",value="交易方向Code",example="T01")
     private String ps;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型")
+    private String busiTypePosition;
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
     public String getEffectiveStatus() {
         return effectiveStatus;
     }

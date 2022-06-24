@@ -7,11 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.h2.util.New;
+import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.framework.constant.DictCodeList;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -40,12 +39,11 @@ import com.joyintech.tams.component.business.prod.dto.BussBenchMarkInfoDto;
 import com.joyintech.tams.component.business.prod.dto.BussFinProductFloatFeeDto;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.CommonUtil;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.product.productelement.periodicmanagement.dto.PeriodicManagement001Dto;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 
@@ -444,5 +442,20 @@ public class PeriodicManagement002Service extends CommonExportService<PeriodicMa
 				ServiceApplication.PRODUCT_SERVICE_NAME + "/PeriodicManagement/queryFinBaseRuleInfo", param,
 				FinBaseRuleInfo.class);
 	}
-	
+
+
+	public boolean checkPeriodTradeDate(PeriodicManagement001Dto dto) {
+		boolean flag = false;
+		Map<String, Object> params = Maps.newHashMap();
+		params.put("finprodId", dto.getPeriodProdId());
+		params.put("startDate", DateUtil.format(dto.getStartDate(), "yyyy-MM-dd"));
+		params.put("endDate", DateUtil.format(dto.getEndDate(), "yyyy-MM-dd"));
+		Integer num = restTemplate.postForObject(
+				ServiceApplication.PRODUCT_SERVICE_NAME + "/PeriodicManagement/checkPeriodTradeDate", params,
+				Integer.class);
+		if (num > 0) {
+			flag = true;
+		}
+		return flag;
+	}
 }

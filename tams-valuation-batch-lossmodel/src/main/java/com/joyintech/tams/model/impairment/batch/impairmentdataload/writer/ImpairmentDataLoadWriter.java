@@ -11,7 +11,7 @@ import com.joyintech.tams.model.impairment.batch.impairmentdataload.dto.Impairme
 import com.joyintech.tams.valuation.common.batch.losscommon.dao.LossCommonMapper;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.common.base.entity.ModEclResultProcess;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

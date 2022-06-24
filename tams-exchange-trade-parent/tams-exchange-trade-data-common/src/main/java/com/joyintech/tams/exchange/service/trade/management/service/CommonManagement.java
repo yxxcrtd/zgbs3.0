@@ -53,7 +53,7 @@ import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositi
 import com.joyintech.tams.exchange.service.trade.processor.check.CommonCheckKit;
 import com.joyintech.tams.exchange.service.trade.scheduled.TokenJob;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeOtherCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,7 +101,7 @@ public class CommonManagement extends BaseService {
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
     private String fairCode = ExchangeConstant.TRUE_IN_PARA;
 
@@ -609,11 +609,14 @@ public class CommonManagement extends BaseService {
         return new Message(map);
     }
 
+    /**
+     * 对手方交易商、交易主体、交易员 不需要根据本方标识做筛选
+     */
     public List<TradeInfoProResponse> getCounterDealerTraderInfo(TradeInfoProRequest dto) {
         dto.setIsOur(null);
         List<TradeInfoProResponse> list = getDealerTraderInfo(dto);
-
-        return list.stream().filter(o -> StringUtil.isEmpty(o.getIsOur()) || StringUtil.equals(o.getIsOur(), "N")).collect(Collectors.toList());
+        return list;
+//        return list.stream().filter(o -> StringUtil.isEmpty(o.getIsOur()) || StringUtil.equals(o.getIsOur(), "N")).collect(Collectors.toList());
     }
 
     public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {

@@ -69,6 +69,9 @@ public class PortfolioDetail implements Serializable, KeyMethodInterface<String>
     @ApiModelProperty(value = "目标类型：01 数量；02 金额")
     private String targetType;
 
+    /**
+     * 指令数量
+     */
     public BigDecimal etrSecAmount;
 
     public String getId() {

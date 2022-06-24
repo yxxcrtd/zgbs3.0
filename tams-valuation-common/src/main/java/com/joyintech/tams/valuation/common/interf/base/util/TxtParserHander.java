@@ -9,22 +9,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
-import org.xml.sax.helpers.DefaultHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.ValInterflog;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateColMatchDTO;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderDTO;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderResult;
 
 public class TxtParserHander {
 
-    Logger logger = Logger.getLogger(DefaultHandler.class);
+//    Logger logger = Logger.getLogger(DefaultHandler.class);
+	private static Logger logger = LoggerFactory.getLogger(TxtParserHander.class);
 
     private Class<?> T;
 

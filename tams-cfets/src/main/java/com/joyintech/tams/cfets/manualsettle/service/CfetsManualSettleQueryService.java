@@ -19,7 +19,7 @@ import com.joyintech.tams.common.base.entity.User;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,6 +163,8 @@ public class CfetsManualSettleQueryService extends BaseService{
         pageParam.put("PS_T03", DictCodeList.交易方向_行权_回售.getValue());
         pageParam.put("PS_T01", DictCodeList.交易方向_买入.getValue());
         pageParam.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
+        pageParam.put("tradePlat_01", BussinessDictCodeList.交易场所_银行间.getValue());
+        pageParam.put("tradePlat_02", BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
 
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
@@ -297,6 +299,14 @@ public class CfetsManualSettleQueryService extends BaseService{
         if (StringUtil.equals(respond.getBusiType(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue())) {
             // 基本信息
             List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "FXB");
+            if(!StringUtil.isNotEmpty(respond.getBidDateEnd())){
+                infoForm.forEach(form->{
+                    if(StringUtil.equals("投标日",form.getColname())){
+                        form.setColcode("bidDateStart");
+                        form.setExtendcfg("{\"colAlign\": \"left\",\"dataType\":\"date\"}");
+                    }
+                });
+            }
             resultData.put("infoForm", infoForm);
             // 金额信息
             List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "FXA");
@@ -308,10 +318,13 @@ public class CfetsManualSettleQueryService extends BaseService{
             List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCodeTemp + "FXP", EFFERANGE_NO, USER_ID);
             List<PortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsManualSettleMapper.findBidFirmPortIntFenPeiInfoList(pageParam);
             BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
+            BigDecimal qty = BigDecimal.ZERO;
             for (PortIntFenPeiInfoDto item : portIntFenPeiInfoDtoList) {
                 etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, item.getUnFinshAmt());
+                qty = ArithmeticUtil.doAdd(qty, item.getQtyd());
             }
             respond.setEtrBidPriceTotal(etrBidPriceTotal);
+            respond.setQty(qty);
             resultData.put("talbeForm", infoForm4);
             resultData.put("infoData", respond);
             resultData.put("infoData1", respond);
@@ -324,6 +337,14 @@ public class CfetsManualSettleQueryService extends BaseService{
         } else {
             // 基本信息
             List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "ZBB");
+            if(!StringUtil.isNotEmpty(respond.getBidDateEnd())){
+                infoForm.forEach(form->{
+                    if(StringUtil.equals("投标日",form.getColname())){
+                        form.setColcode("bidDateStart");
+                        form.setExtendcfg("{\"colAlign\": \"left\",\"dataType\":\"date\"}");
+                    }
+                });
+            }
             resultData.put("infoForm", infoForm);
             // 金额信息
             List<CfgReadonlyFormShow> infoForm1 = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCodeTemp + "ZBA");

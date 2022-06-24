@@ -14,7 +14,7 @@ import com.joyintech.tams.invest.batch.stockonlinevoting.dto.*;
 import com.joyintech.tams.invest.common.util.FtpUtil;
 import com.joyintech.tams.invest.common.util.SftpUtil;
 import com.joyintech.tams.invest.common.util.XmlParseUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;

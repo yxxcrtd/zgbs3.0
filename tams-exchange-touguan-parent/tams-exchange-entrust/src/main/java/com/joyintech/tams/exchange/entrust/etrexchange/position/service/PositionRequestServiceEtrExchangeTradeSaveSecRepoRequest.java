@@ -18,7 +18,7 @@ import com.joyintech.tams.exchange.entrust.etrexchange.position.bean.PositionReq
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeOtherCommonService;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.TrdMoreConvrateDto;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

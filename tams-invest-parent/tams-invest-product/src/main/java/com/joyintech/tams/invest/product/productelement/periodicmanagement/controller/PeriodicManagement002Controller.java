@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.invest.product.productelement.periodicmanagement.service.PeriodicManagement001Service;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,6 +192,11 @@ public class PeriodicManagement002Controller extends BaseController {
     				&&dateCalService.isDealCalendarHoliday(dto.getEndDate(), "01")){
     			str = "期次开始日/期次结束日为节假日，是否继续";
     		}
+
+			if(periodicManagement002Service.checkPeriodTradeDate(dto)){
+				str = "该产品该期次开始日结束日区间已存在，是否继续?";
+			}
+
     		if(StringUtil.isNotBlank(str)){
     			AjaxResult wr = new AjaxResult();
     			wr.setData(str);

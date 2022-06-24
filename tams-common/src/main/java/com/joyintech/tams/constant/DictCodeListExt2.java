@@ -1675,6 +1675,8 @@ public enum DictCodeListExt2 implements BaseDictCodeList {
     平安业务类型_现金分红(DictCode.平安业务类型,"113","现金分红"),
     平安业务类型_送转(DictCode.平安业务类型,"114","送转"),
     平安业务类型_分红送转(DictCode.平安业务类型,"115","分红送转"),
+
+    共通业务类型_信用保护凭证交易(DictCode.共通业务类型, "TRD801", "信用保护凭证交易"),
     /**
      * add by zhangnian  2019/07/24
      */

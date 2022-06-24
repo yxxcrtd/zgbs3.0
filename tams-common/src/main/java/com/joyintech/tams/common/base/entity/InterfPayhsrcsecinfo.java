@@ -189,6 +189,17 @@ public class InterfPayhsrcsecinfo extends InterfPayhsrcsecinfoKey {
     private String issecbond;
 
     /**
+     * 是否含权债
+     */
+    private String isRight;
+
+    /**
+     * 原始权益人
+     */
+    private String originalOwner;
+
+
+    /**
      * 是否永续债,Y是N否
      */
     private String issus;
@@ -1620,5 +1631,21 @@ public class InterfPayhsrcsecinfo extends InterfPayhsrcsecinfoKey {
 
     public void setFirstRateDeterminationDate(Date firstRateDeterminationDate) {
         this.firstRateDeterminationDate = firstRateDeterminationDate;
+    }
+
+    public String getIsRight() {
+        return isRight;
+    }
+
+    public void setIsRight(String isRight) {
+        this.isRight = isRight;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
     }
 }

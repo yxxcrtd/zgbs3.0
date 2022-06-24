@@ -65,11 +65,6 @@ public class CommonManagement extends BaseService {
     private FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private AccountPositionHelper accountPositionHelper;
-    /**
-     * 是否单体服务
-     */
-    @Value("${application.micorservice.contextPath.single:false}")
-    private boolean isSingle;
 
     @Autowired(required = false)
     @Qualifier("simpleRestTemplate")

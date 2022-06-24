@@ -7,7 +7,7 @@ import com.joyintech.tams.business.common.service.CfgDataTableService;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrFinProductInfoMapper;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrFinProductInfoResponse;
 import com.joyintech.tams.constant.DictCodeListExt4;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

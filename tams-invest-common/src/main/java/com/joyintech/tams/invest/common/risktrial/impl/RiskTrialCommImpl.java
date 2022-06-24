@@ -207,7 +207,7 @@ public class RiskTrialCommImpl extends BaseService implements RiskTrialComm {
 		while(task != null) {
 			// 构造
 			SystemParam sysParam = new SystemParam();
-			sysParam.setValDate(Const.DateFmt.format(task.getDate()));
+			sysParam.setValDate(Const.DATE_FORMAT.format(task.getDate()));
 			//---------add by jjpei 20190829----TOUGUAN784,容错-------
 			sysParam.setTrdProductDeal(new TrdProductDeal());
 			//---------add by jjpei 20190829----TOUGUAN784,容错-------

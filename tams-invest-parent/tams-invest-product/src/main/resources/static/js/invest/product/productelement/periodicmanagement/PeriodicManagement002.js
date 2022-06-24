@@ -1,4 +1,4 @@
-$(function () { 
+$(function () {
     /**
      * 定义数据表格
      */
@@ -10,7 +10,7 @@ $(function () {
                 return {periodProdId : $('#periodProdId').val(),workflowId : workflowId,periodId : $('#periodId').val()};
             }
         },
-        
+
         addclick : function(rowData) {
         	rowData.lev = table.getAllRows().length;
         	rowData.baseRate = JoyinUtil.getLabel("BussBenchMarkInfo");
@@ -31,7 +31,7 @@ $(function () {
               ,{field:'chargeRatio', width:200, title: 'BussFinProductFloatFee.table.chargeRatio', sortable: false,edit:true, type: 'number',fixType:"2",pattern:"2", digit:4}
               ,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['delt']}
           ]*/
-        
+
         cols:[
               {field:'lev', width:200, title: 'BussFinProductFloatFee.table.floatBaseLevel', sortable: false}
               ,{field:'baseRuleId', visible : false}
@@ -80,7 +80,7 @@ $(function () {
        }
 
     }
-    
+
     /**
      * 投资周期文本框change事件
      */
@@ -95,15 +95,15 @@ $(function () {
     		if($('#operateType').val() != 'look' && $('#operateType').val() != 'edit'){
     			$("#endDate").val(endDate).trigger('change');
     		}
-    	} 
+    	}
     	commonChangeAction();
     });
-    
+
     /**
      * 投资周期下拉框change事件
      */
     $('#investCycle').on('change', function () {
-    	
+
     	//产品代码
     	var finprodId = $('#finprodId').val();
     	//期限开始日
@@ -114,10 +114,10 @@ $(function () {
     		//期限结束日 = 期限开始日 + 投资周期
     		var endDate= DateUtil.parse(srartDate).DateAdd('d', investCycle).Format('yyyy-MM-dd');
     		$("#endDate").val(endDate).trigger('change');
-    	} 
+    	}
     	commonChangeAction();
     });
-    
+
     var finprodIdChangrAction = function(){
     	if(fromToDoList){
     		return;
@@ -145,7 +145,7 @@ $(function () {
     			$("#termType").val(result.termType).trigger('change');
     			$("#termType").val(result.termType);
     			$("#profitType").val(result.profitType).trigger('change');
-    			$("#periodProdId").val(result.finprodId).trigger('change');  
+    			$("#periodProdId").val(result.finprodId).trigger('change');
     			if(result.termType == '01'){
     				//当期限品种为单一固定期限
     				$('#investCycleSelect').hide();
@@ -169,7 +169,7 @@ $(function () {
                     if(result.investCycle!=null){
     				$('#investCycle2').val(result.investCycle).prop('disabled', false).trigger('change');
     				}
-    			} 
+    			}
     			// $('#investCycle2').val(result.investCycle).prop('disabled', true).trigger('change');
     			if(pageModel==PAGE_MODEL_REFERENCE){
     				commonChangeAction();
@@ -177,7 +177,7 @@ $(function () {
     		});
     	}
     }
-    
+
     var commonChangeAction = function(){
 
     	if(fromToDoList){
@@ -199,7 +199,7 @@ $(function () {
     		//根据产品代码 、投资周期查询 查询 期限产品代码
     		Joyin.ajax(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/selectPeriodProdId', {finprodId : finprodId, investCycle : investCycle}, function (result) {
     			if(result){
-    				$('#periodProdId').val(result.periodProdId).trigger('change'); 
+    				$('#periodProdId').val(result.periodProdId).trigger('change');
     			}
     			if(result.periodProdId){
     				//根据期限产品代码 查询 业绩基准信息、 浮动管理费信息 、分层列表
@@ -219,8 +219,10 @@ $(function () {
     							$("#BussBenchMarkInfo_rateLower").val(result2.bussBenchMarkInfoDto.rateLower).trigger('change');
     							$("#BussBenchMarkInfo_rateLimit").val(result2.bussBenchMarkInfoDto.rateLimit).trigger('change');
     							//修改 bug 新建画面，选择产品的投资周期对应的业绩基准为区间披露，带不出利率区间 add by wangcheng 20191119 end
-    						}
-    						
+    						} else {
+								clearbussBenchMarkInfo();
+                            }
+
     						//3.浮动管理费信息
     						if(result2.bussFinProductFloatFeeDto){
     							$("#BussFinProductFloatFee_DIV").show();
@@ -253,20 +255,54 @@ $(function () {
     							if(result2.bussFinProductFloatFeeDto.remark){
     								$("#BussFinProductFloatFee_remark").val(result2.bussFinProductFloatFeeDto.remark).trigger('change');
     							}
-    						}else{
+    						} else {
+								clearbussFinProductFloatFee();
     							$("#BussFinProductFloatFee_DIV").hide();
     						}
     					}
     				});
     				//4.业绩分层列表
 					table.reload();
-    			}
+    			} else {
+					clearbussBenchMarkInfo();
+					clearbussFinProductFloatFee();
+					$("#BussFinProductFloatFee_DIV").show();
+					table.reload();
+				}
     		});
     	}
     }
-    
+
+	//清除业绩基准信息
+	var clearbussBenchMarkInfo =  function(){
+		$("#BussBenchMarkInfo_publishType").val('').trigger('change');
+		$("#BussBenchMarkInfo_rateType").val('').trigger('change');
+		$("#BussBenchMarkInfo_rate").val('').trigger('change');
+		$("#BussBenchMarkInfo_indexId").val('').trigger('change');
+		$("#BussBenchMarkInfo_coefficient").val('').trigger('change');
+		$("#BussBenchMarkInfo_spreadRate").val('').trigger('change');
+		$("#BussBenchMarkInfo_resetType").val('').trigger('change');
+		$("#BussBenchMarkInfo_rateLower").val('').trigger('change');
+		$("#BussBenchMarkInfo_rateLimit").val('').trigger('change');
+	}
+
+	//清除浮动管理费信息
+	var clearbussFinProductFloatFee =  function(){
+		$("#periodCashId").val('').trigger('change');
+		$("#BussFinProductFloatFee_feeId").val('').trigger("change");
+		$("#BussFinProductFloatFee_basicBill").val('').trigger('change');
+		$("#BussFinProductFloatFee_basis").val('').trigger('change');
+		$("#BussFinProductFloatFee_rateType").val('').trigger('change');
+		$("#BussFinProductFloatFee_rate").val('').trigger('change');
+		$("#BussFinProductFloatFee_indexId").val('').trigger('change');
+		$("#BussFinProductFloatFee_coefficient").val('').trigger('change');
+		$("#BussFinProductFloatFee_spreadRate").val('').trigger('change');
+		$("#BussFinProductFloatFee_resetType").val('').trigger('change');
+		$("#BussFinProductFloatFee_remark").val('').trigger('change');
+	}
+
     var publishTypeChangeAction = function(){
-    	var publishType = $('#BussBenchMarkInfo_publishType').val(); 
+    	var publishType = $('#BussBenchMarkInfo_publishType').val();
     	//是否区间披露为 是
     	if(publishType == '01'){
     		//利率类型、利率、浮动利率、系数、利差、业绩基准重置规则不可见
@@ -283,8 +319,7 @@ $(function () {
     		$('#BussBenchMarkInfo_div2').hide();
     	}
     }
-    
-    
+
     $('#startDate').on('change', function () {
     	//期限开始日
     	var srartDate = $('#startDate').val();
@@ -303,12 +338,12 @@ $(function () {
     		$("#endDate").val(endDate).trigger('change');
     	}
     });
-    
+
     //业绩基准 是否区间披露
     $('#BussBenchMarkInfo_publishType').on('change', function () {
     	publishTypeChangeAction();
     });
-    
+
     //业绩基准利率类型
     $('#BussBenchMarkInfo_rateType').on('change', function () {
 
@@ -327,7 +362,7 @@ $(function () {
     		$('#BussBenchMarkInfo_rate').val('').trigger('change').prop('disabled', true);
     	}
     });
-    
+
     //
     $('#BussFinProductFloatFee_rateType').on('change', function () {
 
@@ -346,11 +381,27 @@ $(function () {
     		$('#BussFinProductFloatFee_rate').val('').trigger('change').prop('disabled', true);
     	}
     });
-    
-    
-    
+
+	var bussBenchMarkInfoRateType= function(){
+		var rateType = $('#BussBenchMarkInfo_rateType').val();
+		if(rateType == '01'){
+			$('#BussBenchMarkInfo_indexId').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_coefficient').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_spreadRate').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_resetType').trigger('change').prop('disabled', true);
+			$('#BussBenchMarkInfo_rate').trigger('change').prop('disabled', false);
+		}else{
+			$('#BussBenchMarkInfo_indexId').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_coefficient').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_spreadRate').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_resetType').trigger('change').prop('disabled', false);
+			$('#BussBenchMarkInfo_rate').trigger('change').prop('disabled', true);
+		}
+	}
+
+
     var init = function(){
-    	//update by hechuan 2019-10-17 start  
+    	//update by hechuan 2019-10-17 start
     	var termType = $('#termType').val();
     	if(termType == '01'){
 			//当期限品种为单一固定期限
@@ -364,13 +415,14 @@ $(function () {
 			//当期限品种为无固定期限
 			$('#investCycleSelect').hide();
 			$('#investCycleInput').show();
-		}  
+		}
     	//update by hechuan 2019-10-17 end
     	if(pageModel == PAGE_MODEL_EDIT){
     		//修改bug【强化测试】期次管理修改期次画面，期次开始日字段应置灰不可修改，目前未置灰。 add by wangcheng 20191030
     		$('#startDate').trigger('change').prop('disabled', true);
     		$('#periodId').trigger('change').prop('disabled', true);
-    	} 
+			$('#finprodId').trigger('change').prop('disabled', true);
+    	}
     	//修改bug 待处理数据确认时 期次代码、期次开始日、期次结束日、投资周期置灰不可修改 add by wangcheng 20191101 start
     	if($('#operateType').val() == 'confrim'  || $('#operateType').val() == 'new'){
     		$('#periodId').trigger('change').prop('disabled', true);
@@ -399,10 +451,13 @@ $(function () {
     		$("#endDate").val(endDate).trigger('change');
     	}
 
-    	} 
+    	}
     	//修改bug 待处理数据确认时 期次代码、期次开始日、期次结束日、投资周期置灰不可修改 add by wangcheng 20191101 end
     	finprodIdChangrAction();
     	publishTypeChangeAction();
+		bussBenchMarkInfoRateType();
+		feeIdChangeAction();
+
     	var rateType = $('#BussFinProductFloatFee_rateType').val();
     	if(rateType == '01'){
     		$('#BussFinProductFloatFee_indexId').val('').trigger('change').prop('disabled', true);
@@ -424,19 +479,19 @@ $(function () {
      * 绑定按钮事件
      */
     $(function() {
-    	init(); 
+    	init();
     	if($('#BussBenchMarkInfo_rateType').val() == '01'){
     		$('#BussBenchMarkInfo_indexId').val('').trigger('change').prop('disabled', true);
     		$('#BussBenchMarkInfo_coefficient').val('').trigger('change').prop('disabled', true);
     		$('#BussBenchMarkInfo_spreadRate').val('').trigger('change').prop('disabled', true);
-    		$('#BussBenchMarkInfo_resetType').val('').trigger('change').prop('disabled', true); 
+    		$('#BussBenchMarkInfo_resetType').val('').trigger('change').prop('disabled', true);
     	}else{
 //    		$('#BussBenchMarkInfo_indexId').val('').trigger('change').prop('disabled', false);
 //    		$('#BussBenchMarkInfo_coefficient').val('1.00').trigger('change').prop('disabled', false);
 //    		$('#BussBenchMarkInfo_spreadRate').val('').trigger('change').prop('disabled', false);
 //    		$('#BussBenchMarkInfo_resetType').val('').trigger('change').prop('disabled', false); 
     	}
-    	
+
         // 绑定按钮事件
         $('#PeriodicManagement002_btn_submit').click(function() {
         	saveOrSubmit("submit");
@@ -446,28 +501,54 @@ $(function () {
         	saveOrSubmit("save");
         });
     });
-    
-    
-    function saveOrSubmit(operateType) {
-    	var object = $.serializeToObject('#PeriodicManagement002_Form');
-    	object.operateType = "new";
-        object.pageModel = pageModel;
-        object.periodProdId =$('#periodProdId').val();
-        if (object.periodProdId == null || object.periodProdId == "") {
-        	object.periodProdId =$('#periodProdId2').val();
+
+	var clearPublishTypeChange = function() {
+		var publishType = $('#BussBenchMarkInfo_publishType').val();
+		//是否区间披露为 是
+		if(publishType == '01'){
+			//利率类型、利率、浮动利率、系数、利差、业绩基准重置规则不可见
+			$('#BussBenchMarkInfo_rateType').val('').trigger('change');
+			$('#BussBenchMarkInfo_rate').val('').trigger('change');
+			$('#BussBenchMarkInfo_indexId').val('').trigger('change');
+			$('#BussBenchMarkInfo_coefficient').val('').trigger('change');
+			$('#BussBenchMarkInfo_spreadRate').val('').trigger('change');
+			$('#BussBenchMarkInfo_resetType').val('').trigger('change');
+		}else{
+			$('#BussBenchMarkInfo_rateLower').val('').trigger('change');
+			$('#BussBenchMarkInfo_rateLimit').val('').trigger('change');
 		}
-        var finFloatCalcRuleDetailList = table.getAllRows();
-        object.finFloatCalcRuleDetailList = finFloatCalcRuleDetailList; 
+	}
+
+	var getSaveObject = function() {
+		var object = $.serializeToObject('#PeriodicManagement002_Form');
+
+		object.operateType = "new";
+		object.pageModel = pageModel;
+		object.periodProdId =$('#periodProdId').val();
+		if (object.periodProdId == null || object.periodProdId == "") {
+			object.periodProdId =$('#periodProdId2').val();
+		}
+		var finFloatCalcRuleDetailList = table.getAllRows();
+		object.finFloatCalcRuleDetailList = finFloatCalcRuleDetailList;
+		return object;
+	}
+
+    function saveOrSubmit(operateType) {
+    	var object = getSaveObject();
+
     	Joyin.ajaxJson(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/check', object, function(result){
     		Joyin.confirm(result.data, function() {
-            	if(operateType== 'save') {
+				clearPublishTypeChange();
+				object = getSaveObject();
+
+				if(operateType== 'save') {
                     WorkFlow.doSaveList(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/save', object, "PeriodicManagement002_btn_save");
                 }else {
                     WorkFlow.doSubmitList(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/save', object, "PeriodicManagement002_btn_submit");
                 }
             })
     	})
-    	
+
     }
 });
 

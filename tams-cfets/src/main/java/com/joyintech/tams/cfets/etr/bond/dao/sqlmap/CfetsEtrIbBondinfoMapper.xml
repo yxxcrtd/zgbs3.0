@@ -481,13 +481,18 @@ from
                     SELECT FINPROD_ID, PORTFOLIO_ID, INV_AIM
                     FROM (
                         select
-                        a.BUSINESS_MODEL as INV_AIM , a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
+                        a.INV_AIM , a.TRADE_DATE ,nvl(T1.FINPROD_ID, a.FINPROD_ID) FINPROD_ID,b.PORTFOLIO_ID,
                         ROW_NUMBER () over(
                         PARTITION BY a.TRADE_ID
                         ORDER BY a.TRADE_DATE DESC
                         ) rn
                         from TRD_PRODUCT_DEAL a
                         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+                         left join (select fp.FINPROD_ID, fp1.FINPROD_ID CIRCULATION_CODE
+                                    from FIN_PRODUCT fp
+                                             left join FIN_PRODUCT fp1 on fp.FINPROD_MARKET_ID = fp1.CIRCULATION_CODE
+                                    where fp1.CIRCULATION_CODE is not null) T1
+                                   on a.FINPROD_ID = T1.FINPROD_ID or a.FINPROD_ID = T1.CIRCULATION_CODE
                         WHERE 1=1
                         <if test="finprodId != null and finprodId != ''">
                             AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
@@ -501,9 +506,14 @@ from
                         AND a.TRADE_DATE &lt;= to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') - 1
                     ) WHERE rn = 1
                     UNION
-                    SELECT a.FINPROD_ID, b.PORTFOLIO_ID, a.BUSINESS_MODEL as INV_AIM
+                    SELECT nvl(T1.FINPROD_ID, a.FINPROD_ID) FINPROD_ID, b.PORTFOLIO_ID, a.INV_AIM
                     from TRD_PRODUCT_DEAL a
                     LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
+                     left join (select fp.FINPROD_ID, fp1.FINPROD_ID CIRCULATION_CODE
+                                from FIN_PRODUCT fp
+                                         left join FIN_PRODUCT fp1 on fp.FINPROD_MARKET_ID = fp1.CIRCULATION_CODE
+                                where fp1.CIRCULATION_CODE is not null) T1
+                               on a.FINPROD_ID = T1.FINPROD_ID or a.FINPROD_ID = T1.CIRCULATION_CODE
                     WHERE 1=1
                     <if test="finprodId != null and finprodId != ''">
                         AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
@@ -598,9 +608,26 @@ from
         a.FINPROD_ID ,
         a.INV_AIM ,
         a.PS ,
-        a.UNIT_CPRICE AS PRICE,
-        a.SHARE_AMT AS AMT
-        from TRD_PRODUCT_DEAL a
+        nvl(a.UNIT_CPRICE,0) AS PRICE,
+        nvl(a.SHARE_AMT,0) AS AMT
+        from (
+        SELECT nvl(T1.FINPROD_ID, T.FINPROD_ID) FINPROD_ID,
+               T.PS,
+               T.INV_AIM,
+               T.UNIT_CPRICE,
+               T.SHARE_AMT,
+               T.TRADE_ID,
+               T.TRADE_DATE,
+               T.CREATE_TIME,
+               T.IS_CANCEL,
+               T.TRADE_STATUS
+        from TRD_PRODUCT_DEAL T
+                 left join (select fp.FINPROD_ID, fp1.FINPROD_ID CIRCULATION_CODE
+                            from FIN_PRODUCT fp
+                                     left join FIN_PRODUCT fp1 on fp.FINPROD_MARKET_ID = fp1.CIRCULATION_CODE
+                            where fp1.CIRCULATION_CODE is not null) T1
+                           on T.FINPROD_ID = T1.FINPROD_ID or T.FINPROD_ID = T1.CIRCULATION_CODE
+        ) a
         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID AND c.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F01}
         LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID
@@ -723,28 +750,32 @@ from
         MCI.CUSTOMER_NAME issuer,
         TO_CHAR(t1.VDATE,'yyyy-MM-dd') vdate,
         TO_CHAR(t1.MDATE,'yyyy-MM-dd') mdate,
-        TO_CHAR(MBVI.LAST_PERIOD,'fm99990.00') ||'年' lastqx,
+        CASE WHEN MBVI.LAST_PERIOD IS NOT NULL THEN TO_CHAR(MBVI.LAST_PERIOD,'fm99990.00') ||'年' END  lastqx,
         MBVI.VALUE_SOURCE valueSource,
         TO_CHAR(MBVI.VALUE_DATE,'yyyy-MM-dd') valueDate,
         TO_CHAR(t4.PAY_DATE,'yyyy-MM-dd') lastPaydate,
         sd.ITEM_VALUE rateType,
-        TO_CHAR(ROUND(fccc.YIELD*100,4),'fm990.0000') ||'%' rate,
+        CASE
+            WHEN fccc.YIELD IS NOT NULL THEN TO_CHAR(ROUND(fccc.YIELD*100,4),'fm990.0000') ||'%'
+            END rate,
         MBCR.O_TYPE otype,
         sd1.ITEM_VALUE zxGrade,
         sd2.ITEM_VALUE ztGrade,
         t1.IS_RIGHT xqFlg,
         TO_CHAR(B.EXERCISE_DATE,'yyyy-MM-dd') xqdate,
-        TO_CHAR(MBVI.NETVALUATION_EXERCISE,'fm99990.0000') ||'元' priceXq,
-        TO_CHAR(MBVI.NETPRICE,'fm99990.0000') ||'元' priceTj,
+        CASE WHEN MBVI.NETVALUATION_EXERCISE IS NOT NULL THEN TO_CHAR(MBVI.NETVALUATION_EXERCISE,'fm99990.0000') ||'元' END priceXq,
+        CASE WHEN MBVI.NETPRICE IS NOT NULL THEN TO_CHAR(MBVI.NETPRICE,'fm99990.0000') ||'元' END priceTj,
         PJ.INNEROUTER inOrOut,
-        TO_CHAR(ROUND(MBVI.BPYIELD*100,4),'fm99990.0000') ||'%' gzRate,
+        CASE WHEN MBVI.BPYIELD IS NOT NULL THEN TO_CHAR(ROUND(MBVI.BPYIELD*100,4),'fm99990.0000') ||'%' END gzRate,
         sdltwo.ITEM_VALUE type2,
         sdlIssueType.ITEM_VALUE issueType,
         MCI2.CUSTOMER_NAME sponsorName,
         sdlCouponSpecies.ITEM_VALUE couponSpecies,
         sdlPayCycle.ITEM_VALUE payCycle,
         FCCR.BASIS basis,
-        TO_CHAR(ROUND(t1.ISSUE_AMT/10000,2),'fm999999999999999999999990.00') || '万元' issueAmt,
+        CASE
+            WHEN t1.ISSUE_AMT IS NOT NULL THEN TO_CHAR(ROUND(t1.ISSUE_AMT/10000,2),'fm999,999,999,999,999,999,999,990.00') || '万元'
+            END issueAmt,
         TO_CHAR(ROUND(MBVI.M_DURATION,2),'fm9999999999999990.00') mDuration,
         TO_CHAR(ROUND(MBVI.INTEREST_DURATION,2),'fm9999999999999990.00') interestDuration,
         TO_CHAR(ROUND(MBVI.SDURATION,2),'fm9999999999999990.00') sDuration,
@@ -752,7 +783,9 @@ from
         TO_CHAR(ROUND(MBVI.BPVALUE,4),'fm9999999999999990.0000') bpvalue,
         CASE WHEN T2.TYPE_6 = 'B13' THEN TO_CHAR(ROUND(TO_NUMBER(t1.MDATE-t1.VDATE),2),'FM99990.00')||'天'
             else TO_CHAR(months_between(t1.MDATE,t1.VDATE)/12,'FM99990.00')||'年' end as deadline,
-        TO_CHAR(ROUND(MBMI.MARKET_AMT/10000,2),'fm999999999999999999999990.00') || '万元' as secMarketAmt
+        CASE
+            WHEN MBMI.MARKET_AMT IS NOT NULL THEN TO_CHAR(ROUND(MBMI.MARKET_AMT/10000,2),'fm999,999,999,999,999,999,999,990.00') || '万元'
+            END as secMarketAmt
         FROM FIN_PRODUCT t1
         LEFT JOIN FIN_PRODUCT_TYPE t2 ON t1.FINPROD_ID = t2.FINPROD_ID
         LEFT JOIN MST_BOND_MARKET_INFO MBMI on t1.FINPROD_MARKET_ID=MBMI.SEC_ID
@@ -803,7 +836,7 @@ from
         left join
         fin_cash_info t5 on t5.FINPROD_ID = t1.FINPROD_ID AND t5.CASH_TYPE_2 = 'C02' and t5.FINPROD_TYPE = '01'
         LEFT JOIN
-        FIN_RATE_INFO t6 ON t6.CASH_ID = t5.CASH_ID AND to_char(#{sysDate},'yyyy-MM-dd') >= to_char(t6.EFF_DATE,'yyyy-MM-dd')
+        FIN_CASH_CALC_RULE t6 ON t6.CASH_ID = t5.CASH_ID AND to_char(#{sysDate},'yyyy-MM-dd') >= to_char(t6.EFF_DATE,'yyyy-MM-dd')
         LEFT JOIN (
         SELECT
         fcc.YIELD as YIELD,
@@ -858,7 +891,7 @@ from
         LEFT JOIN
         SYS_DATADICT_LIST sdlPayCycle ON sdlPayCycle.DICT_CODE = 'FREQUENCY_UNIT' AND sdlPayCycle.ITEM_CODE = FCPR.PAY_CYCLE
         LEFT JOIN
-        SYS_DATADICT_LIST sd ON sd.DICT_CODE = 'INT_TYPE' AND sd.ITEM_CODE = t6.INT_TYPE
+        SYS_DATADICT_LIST sd ON sd.DICT_CODE = 'INT_TYPE' AND sd.ITEM_CODE = t6.CALC_TYPE
         LEFT JOIN MST_CUSTOMER_INFO MCI ON t1.ISSUER = MCI.CUSTOMER_ID
         LEFT JOIN MST_CUSTOMER_INFO MCI2 ON t1.SPONSOR = MCI2.CUSTOMER_ID
         LEFT JOIN

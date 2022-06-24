@@ -20,7 +20,7 @@ import com.joyintech.tams.invest.trade.investtrade.commandreceive.dto.TrdCommand
 import com.joyintech.tams.invest.trade.investtrade.commandreceive.service.TrdCommandReceive001Service;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

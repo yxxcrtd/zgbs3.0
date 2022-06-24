@@ -229,4 +229,11 @@
         WHERE
             TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectByFinproductId" resultMap="com.joyintech.tams.common.base.dao.PtlSecPositionFlowMapper.BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.PtlSecPositionFlowMapper.Base_Column_List" />
+        from PTL_SEC_POSITION_FLOW
+        where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} AND HODING_TYPE IN ('01', '02','03', '04', '05', '06', '09','10','12')
+    </select>
 </mapper>

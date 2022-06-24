@@ -47,7 +47,7 @@ import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.PtlAllocationDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -381,7 +381,7 @@ public class IbuComponentReceiveService extends BaseService{
             }
             updateBondDialoguePositionRule(quoteResultDto);
             // 成交后风险处理
-            ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
+            //ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
         }
 
         return quoteResultDto;
@@ -582,7 +582,7 @@ public class IbuComponentReceiveService extends BaseService{
             }
             updateBondRequestPositionRule(quoteResultDto);
             // 成交后风险处理
-            ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
+            //ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
         }
 
         return quoteResultDto;
@@ -738,7 +738,7 @@ public class IbuComponentReceiveService extends BaseService{
                 this.updateRepoDialoguePosition(quoteResultDto);
             }
             // 成交后风险处理
-            ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
+           // ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
         }
         
         return quoteResultDto;

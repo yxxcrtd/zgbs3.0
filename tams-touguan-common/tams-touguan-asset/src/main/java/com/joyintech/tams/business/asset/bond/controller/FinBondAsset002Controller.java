@@ -4,40 +4,30 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.file.SafelyFile;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.asset.bond.service.FinBondAsset001Service;
-import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
+import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
+import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ValidUtils;
-import com.joyintech.tams.common.base.entity.FinCashPlan;
-import com.joyintech.tams.common.base.entity.MstBondCreditRating;
 import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.component.business.asset.BussFinRepaymentService;
 import com.joyintech.tams.component.business.asset.FinPayInterestStdInfoService;
 import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
 import com.joyintech.tams.component.business.asset.dto.FinInterestFactorDto;
 import com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto;
-import com.joyintech.tams.component.business.bond.BusiFinBondRatingInfoService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.*;
-import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
-import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
-import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDetailDto;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -45,8 +35,7 @@ import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
-import org.aspectj.util.FileUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +44,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -114,7 +103,7 @@ public class FinBondAsset002Controller extends BaseController{
        initPageParams.put("TYPE_11", this.getSelectDataFromDataDic(DictCode.行内资产四级分类 , null));
        initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
        initPageParams.put("REGIST_ORG", this.getSelectDataFromDataDic(DictCode.登记托管机构, null));
-       initPageParams.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.募集方式, null));
+       initPageParams.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.债券类资产募集方式, null));
        initPageParams.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
        initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种, null));
        initPageParams.put("AMT_INCOME_TYPE", this.getSelectDataFromDataDic(DictCode.本金收益特征, null));
@@ -204,6 +193,10 @@ public class FinBondAsset002Controller extends BaseController{
                 CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE)==null? 
                         DictCodeListExt1.是或否_是.getValue(): CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE));
         //add by lizhi 是否显示中债信息开关 2020年2月28日  end
+
+        // 加券按钮
+        initPageParams.put("IS_ADDBOND_SHOW_CFETSETRREPO", CacheUtil.getSysParam("IS_ADDBOND_SHOW_CFETSETRREPO"));
+
         return new Message<Map<String, Object>>(initPageParams).success();
     }
 
@@ -224,9 +217,9 @@ public class FinBondAsset002Controller extends BaseController{
                 //流程代办checkImportData
                 entity = finBondAssetService.getBussinessEntityByWorkflowId(workflowId);
                 if (StringUtil.isNotEmpty(entity)){
-                    entity.setType9(entity.getTypeTwo());
-                    entity.setType10(entity.getTypeThree());
-                    entity.setType11(entity.getTypeFour());
+                    if(StringUtil.isEmpty(entity.getType9())) entity.setType9(entity.getTypeTwo());
+                    if(StringUtil.isEmpty(entity.getType10())) entity.setType10(entity.getTypeThree());
+                    if(StringUtil.isEmpty(entity.getType11())) entity.setType11(entity.getTypeFour());
                     finBondAssetService.getIssues(entity);
                 }
 
@@ -281,6 +274,17 @@ public class FinBondAsset002Controller extends BaseController{
             if (finBondAssetService.selectCountByfinprodId(finProdId) > 0) {
                 validList.add(new ValidMessage("",
                         getMessage("资产代码不能重复!")));
+                ajax.setErrorList(validList);
+                ajax.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().success().setData(ajax);
+            }
+        }
+        if (StringUtil.equals(dto.getOperateStatus(), "NEW") && StringUtil.isBlank(dto.getWorkflowId())) {
+            WflValidInputParameter parameter = new WflValidInputParameter();
+            parameter.setPageId("FinBondAsset002");
+            parameter.setBusinessDataPk1(dto.getFinprodMarketId() + dto.getTradeMarketId());
+            if (finBondAssetService.isInWflProcess(parameter)) {
+                validList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！不可提交!")));
                 ajax.setErrorList(validList);
                 ajax.setMessageType(MessageType.错误消息);
                 return new Message<AjaxResult>().success().setData(ajax);
@@ -701,20 +705,21 @@ public class FinBondAsset002Controller extends BaseController{
      */
     @ApiOperation(value = "附件下载", notes = "附件下载")
     @ResponseBody
-    @PostMapping( "/downloadFile")
-    public Message<MultipartFile> downloadFile(String seqNo) {
+    @PostMapping( "/downloadFile/{seqNo}")
+    public void downloadFile(@PathVariable("seqNo") String seqNo, HttpServletResponse request) {
         try {
             logger.info("文件下载开始");
+            seqNo = seqNo.replaceAll("\"","");
             if (StringUtil.isNotEmpty(seqNo)) {
-                MultipartFile fileInfo = finBondAssetService.downloadFileInfo(seqNo);
-                return new Message<MultipartFile>().success().setData(fileInfo);
+                finBondAssetService.downloadFileInfo(seqNo,request);
+                return ;
             }
             logger.info("文件下载结束");
         }catch (Exception e){
             logger.error("文件下载异常", e);
-            return new Message<MultipartFile>().fail().setMessage("文件下载异常");
+            return ;
         }
-        return null;
+        return ;
     }
 
     /**

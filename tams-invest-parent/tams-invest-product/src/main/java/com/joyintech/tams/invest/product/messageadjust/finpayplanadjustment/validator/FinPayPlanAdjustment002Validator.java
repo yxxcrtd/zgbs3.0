@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,13 +27,11 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
-import com.joyintech.tams.component.business.prod.dto.BussFinProductFeeInfoDto;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.product.messageadjust.finpayplanadjustment.dto.FinPayPlanAdjustment002Dto;
 import com.joyintech.tams.invest.product.messageadjust.finpayplanadjustment.service.FinPayPlanAdjustment002Service;
-
-import groovy.xml.Entity;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 
 /**
  * 〈一句话功能简述〉 〈功能详细描述〉

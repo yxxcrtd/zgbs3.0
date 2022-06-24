@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient;
+//import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +47,7 @@ public class ExchangeSettleTask extends BatchBaseService {
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
     @Autowired
@@ -88,9 +88,12 @@ public class ExchangeSettleTask extends BatchBaseService {
         final String serviceNameFinal = serverName;
         if (appList != null) {
             appList.forEach(serviceInstance -> {
-                EurekaDiscoveryClient.EurekaServiceInstance client = (EurekaDiscoveryClient.EurekaServiceInstance) serviceInstance;
+//                EurekaDiscoveryClient.EurekaServiceInstance client = (EurekaDiscoveryClient.EurekaServiceInstance) serviceInstance;
+//                String apiUrl = StringUtil.replaceOnce(serviceApplicationName, serviceNameFinal,
+//                        serviceInstance.getInstanceInfo().getIPAddr() + ":" + serviceInstance.getInstanceInfo().getPort());
+                //nacos处理
                 String apiUrl = StringUtil.replaceOnce(serviceApplicationName, serviceNameFinal,
-                        client.getInstanceInfo().getIPAddr() + ":" + client.getInstanceInfo().getPort());
+                        serviceInstance.getHost()+":"+serviceInstance.getPort());
                 logger.debug("场内交易清算任务接口：{}", apiUrl);
                 HttpClient.getString(apiUrl + "/joyin/settle", null, null);
             });

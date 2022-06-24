@@ -14,13 +14,12 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.common.base.entity.ValInterflog;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderDTO;
 
 /**
@@ -32,7 +31,9 @@ import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoRead
  * @since 1.0
  */
 public class SetPropAndCheckUtil {
-    private static Logger logger = Logger.getLogger(SetPropAndCheckUtil.class);
+//    private static Logger logger = Logger.getLogger(SetPropAndCheckUtil.class);
+	
+	private static Logger logger = LoggerFactory.getLogger(SetPropAndCheckUtil.class);
 
     /**
      * 

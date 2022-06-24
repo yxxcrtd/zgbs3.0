@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -34,7 +36,10 @@ public class CreditProtectionCertificatePeriod001Service extends CommonExportSer
         paramsMap.put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         paramsMap.put("YES_OR_NO_N", DictCodeList.是否_否.getValue());
 
-        paramsMap.put("finprodIdList", StringUtil.splitToList( ",",params.getFinprodId()));
+        List<String> finprodIds = StringUtil.splitToList(",", params.getFinprodId());
+        List<String> finprodIds2 = new ArrayList();
+        finprodIds.forEach(finprodId -> finprodIds2.add(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue() + "_" + finprodId));
+        paramsMap.put("finprodIdList", finprodIds2);
         paramsMap.put("busiCodeList", StringUtil.splitToList(",",params.getBusinessCode()));
         paramsMap.put("busiTypeList", params.getBusinessTypeList());
         paramsMap.put("validStatusList", StringUtil.splitToList( ",",params.getValidStatus()));

@@ -20,18 +20,21 @@ import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.position.PositionQueryDto;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -149,10 +152,12 @@ public class PositionInfoService {
         // 从原投管系统取
 
         if (CollectionUtils.isNotEmpty(ptlList)) {
-            for (PositionCashRequestDetailDto list : ptlList){
+            List<String> portfolioIdList = ptlList.stream().map(PositionCashRequestDetailDto::getPortfolioId)
+                    .distinct().collect(Collectors.toList());
+            for (String portfolioId : portfolioIdList){
                 BaseMap paramMap = BaseMap.newMap()
                         .put("finprodId", finprodId)
-                        .put("portfolioId", list.getPortfolioId())
+                        .put("portfolioId", portfolioId)
                         .put("ccy", ccy)
                         .put("vdate", cdate)
                         .put("calId", calId) // 银行间
@@ -163,7 +168,7 @@ public class PositionInfoService {
                     cashT1 = ArithmeticUtil.doAdd(cashT1, BaseMap.newMap(mapRst).getBigDecimal("cashT1"));
                 }
                 PtlCashPositionFlowDto positionQueryDto = new PtlCashPositionFlowDto();
-                positionQueryDto.setPortfolioId(list.getPortfolioId());
+                positionQueryDto.setPortfolioId(portfolioId);
                 positionQueryDto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 positionQueryDto.setCdate(iPlatformDate.getSysDate());
                 // 实际现金（账户现金）
@@ -185,6 +190,22 @@ public class PositionInfoService {
             String flowType = "01";// 01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
             //筛选出有资金账户的组合
             List<PositionCashSecDto> sumAcctNoList = new ArrayList<>();
+            ptlList= ptlList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(
+                    () -> new TreeSet<>(Comparator.comparing(o -> o.getPortfolioId() + "#" + o.getAcctNo()))),
+                    ArrayList::new));
+            //组合列表中组合一样（选择资金账号，未选择资金账号），去掉选择资金账号的组合数据
+            List<String> portfolioIds =  ptlList.stream().filter(item -> StringUtil.isEmpty(item.getAcctNo()))
+                    .map(PositionCashRequestDetailDto::getPortfolioId).collect(Collectors.toList());
+            Iterator<PositionCashRequestDetailDto> iterator = ptlList.iterator();
+            while (iterator.hasNext()) {
+                PositionCashRequestDetailDto positionDto = iterator.next();
+                if (StringUtil.isNotEmpty(positionDto.getPortfolioId()) && StringUtil.isNotEmpty(positionDto.getAcctNo())) {
+                    if (portfolioIds.contains(positionDto.getPortfolioId())) {
+                        iterator.remove();
+                    }
+                }
+
+            }
             for (PositionCashRequestDetailDto list : ptlList) {
                 Map<String, String> secIdMap = new HashMap<String, String>();
                 List<String> secAcctIds = new ArrayList<>();
@@ -489,7 +510,13 @@ public class PositionInfoService {
         /*账户现金*/
         resp.add(BaseMap.newMap()
                 .put("field", "ZHXJ")
-                .put("name", "账户现金（元）")
+                .put("name", "托管户账户现金（元）")
+                .put("amount", "--")
+                .put("type", "xj"));
+
+        resp.add(BaseMap.newMap()
+                .put("field", "ZQHKQXJ")
+                .put("name", "券商户可取现金（元）")
                 .put("amount", "--")
                 .put("type", "xj"));
 
@@ -498,7 +525,7 @@ public class PositionInfoService {
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", "RRQMKDGHCC")
-                    .put("name", "融入券卖空待购回持仓（元）")
+                    .put("name", "卖空待回购持仓（元）")
                     .put("amount", "--")
                     .put("type", "cc"));
         }

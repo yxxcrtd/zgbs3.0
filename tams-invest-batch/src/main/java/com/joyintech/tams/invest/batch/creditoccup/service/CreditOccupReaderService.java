@@ -11,7 +11,7 @@ import com.joyintech.tams.invest.batch.creditoccup.dao.CreditOccupMapper;
 import com.joyintech.tams.invest.batch.creditoccup.dto.CreditOccupReaderResult;
 import com.joyintech.tams.invest.batch.creditoccup.dto.CreditUsingDto;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;

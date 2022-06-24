@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.joyintech.tams.constant.DictCodeList;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.ValFinProductDealBatchMapper;
 import com.joyintech.tams.valuation.common.interf.base.dto.ProductDealDto;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;

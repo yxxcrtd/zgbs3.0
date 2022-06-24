@@ -41,7 +41,7 @@ import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -845,6 +845,9 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
                         && DateUtil.compareTo(finProduct.getDelistingDate(), SettlementEndDate) <= 0) {
                     result.setMessage("回购期限不可大于【质押券" + response.getFinprodAbbr() + "(" + response.getFinprodMarketId()
                             + ")】】摘牌日", MessageType.错误消息);
+                    return result;
+                }
+                if (StringUtil.isEmptyList(finExercisePlans)){
                     return result;
                 }
                 FinExercisePlan finExercisePlan = finExercisePlans.get(0);

@@ -10,7 +10,7 @@ import com.joyintech.tams.common.base.entity.SettleTransDataTotalStatus;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.settle.batch.transdatagather.dto.StlSettleTransDataGatherParamDto;
 import com.joyintech.tams.settle.batch.transdatagather.service.StlSettleTransDataGatherService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

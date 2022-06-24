@@ -21,7 +21,7 @@ import com.joyintech.tams.valuation.batch.subjectbalanceagaincollect.dto.BokBala
 import com.joyintech.tams.valuation.batch.subjectbalanceagaincollect.dto.BooksetTodoDto;
 import com.joyintech.tams.valuation.batch.subjectbalanceagaincollect.dto.SubjectBalanceBatch;
 import com.joyintech.tams.valuation.batch.subjectbalanceagaincollect.dto.SubjectBalanceGenerateResult;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

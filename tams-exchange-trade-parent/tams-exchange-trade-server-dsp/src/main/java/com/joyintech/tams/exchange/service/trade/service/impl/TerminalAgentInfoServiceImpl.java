@@ -5,7 +5,7 @@ import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
 import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfoExample;
 import com.joyintech.tams.exchange.service.trade.dao.mapper.TerminalAgentInfoMapper;
 import com.joyintech.tams.exchange.service.trade.service.TerminalAgentInfoService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

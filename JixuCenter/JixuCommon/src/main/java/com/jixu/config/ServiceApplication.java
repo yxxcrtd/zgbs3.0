@@ -39,7 +39,7 @@ public class ServiceApplication {
     public static String ASSET_SERVICE_NAME = "http://assetService";
     
     @Configuration
-    @ConditionalOnProperty(prefix = "application.micorservice.contextPath", name = "customerInterfService")
+    @ConditionalOnProperty(prefix = "application.micorservice.contextpath", name = "customerInterfService")
     @EnableConfigurationProperties(AutoConfig.ContextPathConfiguration.class)
     class AutoConfig {
 
@@ -60,7 +60,7 @@ public class ServiceApplication {
             }
         }
         
-        @ConfigurationProperties(prefix = "application.micorservice.contextPath")
+        @ConfigurationProperties(prefix = "application.micorservice.contextpath")
         class ContextPathConfiguration {
 
             private boolean single;

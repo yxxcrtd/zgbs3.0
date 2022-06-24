@@ -75,6 +75,8 @@ public class CfetsTrdBondFirstSubProductDto {
      */
     private String partyId;
 
+    private String finprodId;
+
     public String getIndex() {
         return index;
     }
@@ -220,5 +222,13 @@ public class CfetsTrdBondFirstSubProductDto {
 
     public void setSecDesirableCash(BigDecimal secDesirableCash) {
         this.secDesirableCash = secDesirableCash;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }

@@ -16,7 +16,7 @@ import com.joyintech.tams.invest.period.trdsecoverdueduration.validator.TrdSecOv
 import com.joyintech.tams.invest.period.trdsecoverdueduration.validator.TrdSecOverdueDuration002DtoValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;

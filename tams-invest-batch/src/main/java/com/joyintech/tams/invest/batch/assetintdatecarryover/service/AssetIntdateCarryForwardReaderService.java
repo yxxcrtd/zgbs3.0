@@ -6,7 +6,7 @@ import com.joyintech.tams.invest.batch.assetintdatecarryover.dto.AssetIntdateCar
 import com.joyintech.tams.invest.batch.assetintdatecarryover.dao.AssetIntdateCarryForwardMapper;
 import com.joyintech.tams.invest.batch.assetintdatecarryover.dto.AssetIntdateCarryForwardDto;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
