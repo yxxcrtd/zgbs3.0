@@ -1525,7 +1525,7 @@ public class StlDataDealSzdSjsjgProcessService {
         // 交收方式
         settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsjg.getJgjsfs()));
         // 交收结果
-        settleTransData.setDeliveryResult(setDeliveryResult(szdSjsjg));
+        settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_正常交收.getValue());
         // 执行日期
         settleTransData.setDealDate(stlDownDataDealOperatorDto.getDealDate());
         // 证券品种
