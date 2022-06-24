@@ -235,6 +235,18 @@ $(function () {
         } else if (termType == '01') {
             investCycle = $('#investCycle2').val();
         }
+
+        var bussFinProductFloatFeeRateType = $("#BussFinProductFloatFee_rateType").val()
+        console.log("-----bussFinProductFloatFeeRateType-----");
+        console.log(bussFinProductFloatFeeRateType);
+        var bussFinProductFloatFeeRate = $("#BussFinProductFloatFee_rate").val();
+        console.log(bussFinProductFloatFeeRate);
+        var bussFinProductFloatFeeIndexId = $("#BussFinProductFloatFee_indexId").val();
+        var bussFinProductFloatFeeCoefficient = $("#BussFinProductFloatFee_coefficient").val();
+        var bussFinProductFloatFeeSpreadRate = $("#BussFinProductFloatFee_spreadRate").val();
+        var bussFinProductFloatFeeResetType = $("#BussFinProductFloatFee_resetType").val();
+        var bussFinProductFloatFeeRemark = $("#BussFinProductFloatFee_remark").val();
+
         if (finprodId && termType) {
             //当产品为多固定期限时 return false
             if (termType != '03' && !investCycle) {
@@ -285,25 +297,44 @@ $(function () {
                                 }
                                 $("#BussFinProductFloatFee_basicBill").val(result2.bussFinProductFloatFeeDto.basicBill).trigger('change');
                                 $("#BussFinProductFloatFee_basis").val(result2.bussFinProductFloatFeeDto.basis).trigger('change');
-                                if (result2.bussFinProductFloatFeeDto.rateType) {
+
+                                if (bussFinProductFloatFeeRateType) {
+                                    $("#BussFinProductFloatFee_rateType").val(bussFinProductFloatFeeRateType).trigger('change');
+                                } else if (result2.bussFinProductFloatFeeDto.rateType) {
                                     $("#BussFinProductFloatFee_rateType").val(result2.bussFinProductFloatFeeDto.rateType).trigger('change');
                                 }
-                                if (result2.bussFinProductFloatFeeDto.rate) {
+
+                                if (bussFinProductFloatFeeRateType == '02') {
+                                    $("#BussFinProductFloatFee_rate").val('').trigger('change');
+                                } else if (bussFinProductFloatFeeRate) {
+                                    $("#BussFinProductFloatFee_rate").val(bussFinProductFloatFeeRate).trigger('change');
+                                } else if (result2.bussFinProductFloatFeeDto.rate) {
                                     $("#BussFinProductFloatFee_rate").val(result2.bussFinProductFloatFeeDto.rate).trigger('change');
                                 }
-                                if (result2.bussFinProductFloatFeeDto.indexId) {
+
+                                if (bussFinProductFloatFeeIndexId) {
+                                    $("#BussFinProductFloatFee_indexId").val(bussFinProductFloatFeeIndexId).trigger('change');
+                                } else if (result2.bussFinProductFloatFeeDto.indexId) {
                                     $("#BussFinProductFloatFee_indexId").val(result2.bussFinProductFloatFeeDto.indexId).trigger('change');
                                 }
-                                if (result2.bussFinProductFloatFeeDto.coefficient) {
+                                if (bussFinProductFloatFeeCoefficient) {
+                                    $("#BussFinProductFloatFee_coefficient").val(bussFinProductFloatFeeCoefficient).trigger('change');
+                                } else if (result2.bussFinProductFloatFeeDto.coefficient) {
                                     $("#BussFinProductFloatFee_coefficient").val(result2.bussFinProductFloatFeeDto.coefficient).trigger('change');
                                 }
-                                if (result2.bussFinProductFloatFeeDto.spreadRate) {
+                                if (bussFinProductFloatFeeSpreadRate) {
+                                    $("#BussFinProductFloatFee_spreadRate").val(bussFinProductFloatFeeSpreadRate).trigger('change');
+                                } else if (result2.bussFinProductFloatFeeDto.spreadRate) {
                                     $("#BussFinProductFloatFee_spreadRate").val(result2.bussFinProductFloatFeeDto.spreadRate).trigger('change');
                                 }
-                                if (result2.bussFinProductFloatFeeDto.resetType) {
+                                if (bussFinProductFloatFeeResetType) {
+                                    $("#BussFinProductFloatFee_resetType").val(bussFinProductFloatFeeResetType).trigger('change');
+                                } else if (result2.bussFinProductFloatFeeDto.resetType) {
                                     $("#BussFinProductFloatFee_resetType").val(result2.bussFinProductFloatFeeDto.resetType).trigger('change');
                                 }
-                                if (result2.bussFinProductFloatFeeDto.remark) {
+                                if (bussFinProductFloatFeeRemark) {
+                                    $("#BussFinProductFloatFee_remark").val(bussFinProductFloatFeeRemark).trigger('change');
+                                } else if (result2.bussFinProductFloatFeeDto.remark) {
                                     $("#BussFinProductFloatFee_remark").val(result2.bussFinProductFloatFeeDto.remark).trigger('change');
                                 }
                             } else {
