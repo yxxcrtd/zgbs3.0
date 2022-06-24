@@ -78,7 +78,7 @@ VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'counterId', '交�
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3, SPCDCODE_DESC)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01,R', 'remark', '备注', NULL, 10, '{"colAlign": "left"}', 1, 0, NULL, NULL, '999999');
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3, SPCDCODE_DESC)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01,A', 'entrustNum', '汇总投标券面总额', NULL, 11, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 1, 0, NULL, NULL, '999999');
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01,A', 'entrustNum', '汇总投标券面总额', NULL, 11, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000","unit":"wanYuan"}', 1, 0, NULL, NULL, '999999');
 -- 指令详情 一级投标 投标产品列表
 DELETE FROM cfg_datatable_show WHERE PAGECODE='FieldEtrDispatcher' AND DTCODE='FieldEtrDispatcherInfo'  AND SPCDCODE  = '01';
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
@@ -86,11 +86,11 @@ VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'portfolioName', '�
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'acctNo', '资金账户', NULL, 2, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'bidPrice', '投标标位', NULL, 3, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'bidPriceStr', '投标标位', NULL, 3, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'bidPrinAmt', '投标券面总额(万元)', NULL, 4, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'bidPrinAmt', '投标券面总额(万元)', NULL, 4, 1, 0, 0, 150, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'portfolioTotalBidPrinAmt', '组合汇总投标券面总额(万元)', NULL, 5, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'portfolioTotalBidPrinAmt', '组合汇总投标券面总额(万元)', NULL, 5, 1, 0, 0, 150, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', '01', 'businessModelStr', '业务模式', NULL, 6, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 
@@ -111,9 +111,9 @@ VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', '0101', 'tenderTargetS
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', '0101', 'issueDateStr', '投标日', NULL, 7, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', '0101', 'etrBidPriceTotal', '指令投标券面总额(万元)', NULL, 8, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', '0101', 'etrBidPriceTotal', '指令投标券面总额(万元)', NULL, 8, 1, 0, 0, 150, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', '0101', 'totalBiddingNum', '汇总投标券面总额(万元)', NULL, 9, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', '0101', 'totalBiddingNum', '汇总投标券面总额(万元)', NULL, 9, 1, 0, 0, 150, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherExeInfo', '0101', 'bidPrice', '投标标位', NULL, 10, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
@@ -150,7 +150,7 @@ insert into cfg_datatable_show (PAGECODE, DTCODE,SPCDCODE, COLCODE, COLNAME, DIC
 -- 指令成交 一级投标
 DELETE FROM cfg_datatable_show WHERE PAGECODE='FieldEtrDispatcher' AND DTCODE='FieldEtrDispatcherDealInfo'  AND SPCDCODE  = '0101';
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'brokerTradeId', '交易编号', NULL, 1, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'tradeId', '交易编号', NULL, 1, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'portfolioId', '组合代码', NULL, 2, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
@@ -158,19 +158,19 @@ VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'portfolioNam
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'accountName', '资金账户', NULL, 4, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'stockCode', '资产代码', NULL, 5, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'finprodMarketId', '资产代码', NULL, 5, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'stockName', '资产名称', NULL, 6, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'finprodAbbr', '资产名称', NULL, 6, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'marketStr', '交易场所', NULL, 7, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'tradeMarketStr', '交易场所', NULL, 7, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'entrustBsStr', '交易方向', NULL, 8, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'otherPs', '交易方向', NULL, 8, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'tradedVolume', '券面总额(万元)', NULL, 9, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'shareNum', '券面总额(万元)', NULL, 9, 1, 0, 0, 120, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"1"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'tradedPrice', '成交价格', NULL, 10, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"4","divisor":"1"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'winPrice', '成交价格', NULL, 10, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'tradedBalance', '成交金额（元）', NULL, 11, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"4","divisor":"1"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'tradeAmt', '成交金额（元）', NULL, 11, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"1"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'tradingDay', '成交日期', NULL, 12, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
@@ -178,25 +178,25 @@ VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0101', 'tradeTime', 
 -- 指令成交 分销买入
 DELETE FROM cfg_datatable_show WHERE PAGECODE='FieldEtrDispatcher' AND DTCODE='FieldEtrDispatcherDealInfo'  AND SPCDCODE  = '0103';
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'effectiveStatusName', '有效状态', NULL, 1, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'otherEffectFlag', '有效状态', NULL, 1, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'brokerTradeId', '交易编号', NULL, 2, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'tradeId', '交易编号', NULL, 2, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'portfolioId', '组合代码', NULL, 3, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'portfolioName', '组合名称', NULL, 4, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'stockCode', '资产代码', NULL, 5, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'finprodMarketId', '资产代码', NULL, 5, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'stockName', '资产简称', NULL, 6, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'finprodAbbr', '资产简称', NULL, 6, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'etrBidPriceTotal', '指令汇总券面总额(万元)', NULL, 7, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'etrBidPriceTotal', '指令汇总券面总额(万元)', NULL, 7, 1, 0, 0, 150, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'shareNum', '券面总额(万元)', NULL, 8, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"10000"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'shareNum', '券面总额(万元)', NULL, 8, 1, 0, 0, 120, '{"colAlign": "right","dataType":"amount","precision":"2","divisor":"1"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'price', '净价（元）', NULL, 9, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"4","divisor":"1"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
-VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'tradeAmt', '交易金额（元）', NULL, 10, 1, 0, 0, 100, '{"colAlign": "right","dataType":"amount","precision":"4","divisor":"1"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
+VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'tradeAmt', '交易金额（元）', NULL, 10, 1, 0, 0, 120, '{"colAlign": "right","dataType":"amount","precision":"4","divisor":"1"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)
 VALUES('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', '0103', 'biddingMethodStr', '投标方式', NULL, 11, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, NULL, NULL, 0, '999999', NULL);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC, IS_HIDE)

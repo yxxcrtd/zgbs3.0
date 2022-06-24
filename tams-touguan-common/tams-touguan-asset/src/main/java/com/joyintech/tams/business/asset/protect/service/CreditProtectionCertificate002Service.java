@@ -424,7 +424,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     }
 
     public CreditProtectionCertificate002Dto getProcessEntity(CreditProtectionCertificate002Dto entity){
-//        //add wsz 修改现实问题 ZGCPCN-1356 start
+        //add wsz 修改现实问题 ZGCPCN-1356 start
 //        CreditProtectionCertificate002Dto entity2 = null;
 //        if(StringUtil.isNotEmpty(entity.getFinprodId())) {
 //            entity2 = this.getById(entity.getFinprodId());
@@ -442,16 +442,19 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
 ////            entity.setMstFileInputParameter(mstFileInputParameter);
 //            entity.setMstFileInputParameter(joyinbusinessCommonService.selectFileInfoByBusId(entity.getFinprodId()));
 //        }
-//        if(StringUtils.isNotEmpty(entity.getFinprodMarketId())&&!entity.getFinprodMarketId().contains(".")){
-//            String markId = "";
-//            if(StringUtils.isEmpty(entity.getTradeMarketId())){
-//                markId = ".";
-//            } else {
-//                markId = entity.getTradeMarketId();
-//            }
-//            entity.setFinprodMarketId(entity.getFinprodMarketId()+markId);
-//        }
-//        //add wsz 修改现实问题 ZGCPCN-1356 end
+        //add wsz 20220624 解决代办多次保存时代码为空 start
+        //3.0.6场内 ZGCPCN-1678 【信用保护凭证标的】-保存-待办事项-在待办事项中多次保存，资产代码为空了；
+        if(StringUtils.isNotEmpty(entity.getFinprodMarketId())&&!entity.getFinprodMarketId().contains(".")){
+            String markId = "";
+            if(StringUtils.isEmpty(entity.getTradeMarketId())){
+                markId = ".";
+            } else {
+                markId = entity.getTradeMarketId();
+            }
+            entity.setFinprodMarketId(entity.getFinprodMarketId()+markId);
+        }
+        //add wsz 20220624 解决代办多次保存时代码为空 end
+        //add wsz 修改现实问题 ZGCPCN-1356 end
         entity.setRefSecLists(this.getRefList(entity));
         entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
         entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
