@@ -67,7 +67,8 @@ public class FinTenderBondAsset002Controller extends BaseController {
                     entity.getProductAddDto().setAppearMarketId(entity.getCirculationCode());
                     entity.getProductAddDto().setListingDate(entity.getCirculationDate());
                 } else if (Objects.isNull(entity)) {
-                    entity = finTenderBoundAssetService.addCoupons(finprodId);
+                    String additionalBatches = getParam("additionalBatches");
+                    entity = finTenderBoundAssetService.addCoupons(finprodId, additionalBatches);
                 }
                 if (Objects.nonNull(entity)) {
                     params.put("businessId", entity.getFinprodMarketId());
