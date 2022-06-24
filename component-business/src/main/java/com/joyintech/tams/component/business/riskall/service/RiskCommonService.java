@@ -226,7 +226,8 @@ public class RiskCommonService {
         // 判断授信是否控制
         if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT))
             && !StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
-            && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())){
+            && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())
+            && !StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险控制类别_不控.getValue())){
             List<CreditLinesInputDto> list = new ArrayList<>();
             if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占.getValue())) {
                 list.addAll(riskCommonInputDto.getCreditInputList());
@@ -262,7 +263,8 @@ public class RiskCommonService {
         //风险试算开关是否打开
         if (StringUtil.equals(DictCodeListExt1.是或否_是.getValue(),CacheUtil.getSysParam("risk_math_switch"))
             && !StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
-            && !StringUtil.isEmptyList(riskCommonInputDto.getRiskRdsDtoList())){
+            && !StringUtil.isEmptyList(riskCommonInputDto.getRiskRdsDtoList())
+            && !StringUtil.equals(riskCommonInputDto.getIndicatorControl(), DictCodeListRsk.风险控制类别_不控.getValue())) {
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_预占释放再预占.getValue())) {
                 // 处理差分预占参数，接口支持程度待确认
 //                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
@@ -307,10 +309,12 @@ public class RiskCommonService {
         //是否验证机构
         boolean isCheckOrg = Boolean.parseBoolean(CacheUtil.getSysParam("IS_CHECK_ORG"));
         if (isCheckAsset || isCheckOrg){
-            if(!StringUtil.isEmptyList(riskCommonInputDto.getRiskNameList())) {
-                List<RiskNameListDto> riskNameListDtoList = riskCommonInputDto.getRiskNameList();
-                List<RiskNameListResult> resultList = riskNameListValid(riskNameListDtoList,isCheckAsset,isCheckOrg);
-                riskCommonOutputDto.setRiskNameListResultList(resultList);
+            if(!StringUtil.equals(riskCommonInputDto.getNameListControl(),DictCodeListRsk.风险控制类别_不控.getValue())) {
+                if (!StringUtil.isEmptyList(riskCommonInputDto.getRiskNameList())) {
+                    List<RiskNameListDto> riskNameListDtoList = riskCommonInputDto.getRiskNameList();
+                    List<RiskNameListResult> resultList = riskNameListValid(riskNameListDtoList, isCheckAsset, isCheckOrg);
+                    riskCommonOutputDto.setRiskNameListResultList(resultList);
+                }
             }
         }
         // 根据软硬控参数处理风险试算结果
