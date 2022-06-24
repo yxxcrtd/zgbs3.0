@@ -31,6 +31,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.SelectOptionCommonRequest;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dao.FinListedBondInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
@@ -63,6 +64,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     private BaseGetBusinessId bussGetBussinessIdService;
     @Resource
     private CommonAutoCouponService commonAutoCouponService;
+    @Resource
+    private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
     @Resource
     private FinListedBondInfoQueryMapper finListedBondInfoQueryMapper;
     @Resource
@@ -194,6 +197,10 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finListedBondInfoQuery001Dto.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         //非空校验
         emptyCheck(finListedBondInfoQuery001Dto, validMessages);
+        //发行处理
+        if(StringUtil.isNotBlank(finListedBondInfoQuery001Dto.getIssuerCode())){
+            finBondMarketInfoQuery001Service.handleIssuer(validMessages, finListedBondInfoQuery001Dto.getIssuerCode());
+        }
         if (CollectionUtils.isNotEmpty(validMessages)) {
             ajaxResult.setErrorList(validMessages);
             ajaxResult.setMessageType(MessageType.警告消息);
@@ -247,7 +254,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProduct.setBlnArea(finListedBondInfoQuery001Dto.getDomesticAndForeign());
         finProduct.setTradeMarket(finListedBondInfoQuery001Dto.getTradingPlaces());
         /**--交易场所modify 2019-04-15 end--**/
-        finProduct.setIssuer(getIssuer(finListedBondInfoQuery001Dto.getIssuer()));
+        finProduct.setIssuer(finListedBondInfoQuery001Dto.getIssuer());
         //2019年5月27日  交易日历
         if (StringUtil.equals(DictCodeListExt1.交易场所_银行间.getValue(), finListedBondInfoQuery001Dto.getTradingPlaces())) {
             finProduct.setCalendarId("03");
