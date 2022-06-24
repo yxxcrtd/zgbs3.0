@@ -407,7 +407,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getBidModleStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, getTenderTarget());
+        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, getBidModle());
     }
 
     public void setBidModleStr(String bidModleStr) {

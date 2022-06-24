@@ -384,10 +384,7 @@ public class CfetsTrdQueryService extends BaseService{
                 infoTableH = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCodeTabTemp, EFFERANGE_IS, userId);
             }
 
-            resultData.put(dtCode + "_formb", infoFormb);
-            resultData.put(dtCode + "_formo", infoFormo);
-            resultData.put(dtCode + "_tablep", infoTableP);
-            resultData.put(dtCode + "_tableh", infoTableH);
+
             Map<String, Object> pageParam = new HashMap<>();
             pageParam.put("bidId", dto.getBusiCode());
             //判断角色配置
@@ -425,6 +422,15 @@ public class CfetsTrdQueryService extends BaseService{
                 bidPortIntFenPeiInfoDto.setBidPrinAmt(bidPrinAmt);
                 datahlist.add(bidPortIntFenPeiInfoDto);
             }
+
+            //表头
+            resultData.put(dtCode + "_formb", infoFormb);
+            resultData.put(dtCode + "_formo", infoFormo);
+            resultData.put(dtCode + "_tablep", infoTableP);
+            if (dataform != null && !StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), dataform.getBidModle())) {
+                resultData.put(dtCode + "_tableh", infoTableH);
+            }
+            //数据
             resultData.put(dtCode + "_dataform", dataform);
             resultData.put(dtCode + "_datalist", datalist);
             resultData.put(dtCode + "_datahlist", datahlist);
