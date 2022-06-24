@@ -7,7 +7,7 @@
     SELECT * FROM (SELECT T.* FROM(
     SELECT
     #{effectFlag} effectFlag,
-    bobrt.BID_MODLE bidModle,
+    bobrt1.BID_MODLE bidModle,
     bobrt.IS_WIN isWin,
     ETR_ENTRUST.ENTRUST_STATUS entrustStatus,
     decode(ETR_ENTRUST.ENTRUST_STATUS,'09',1,'02',2,'03',3,'04',4,'06',5,'05',6,'07',7) entrustStatusOrder,
@@ -251,13 +251,30 @@
             AND ((ETR_ENTRUST.FINPROD_TYPE2 = 'F32' and btm.issueClass = FIN_PRODUCT_ISSUE.ISSUE_CLASS) or
             ETR_ENTRUST.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
         LEFT JOIN (
-        SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
-        LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
-        LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
-        AND brt.FINPROD_ID = bo.FINPROD_ID
-        WHERE bo.TRADE_STATUS = '01'
-        GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
+            SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
+            LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+            LEFT JOIN (
+            SELECT brt1.BID_ID , brt1.STATUS , brt1.FINPROD_ID, brt1.IS_WIN FROM BID_RESULT_TOTAL brt1
+            UNION ALL
+            SELECT brt2.BID_ID , brt2.STATUS , brt2.FINPROD_ID, brt2.IS_WIN FROM WFL_BID_RESULT_TOTAL brt2
+            ) brt  ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+            AND brt.FINPROD_ID = bo.FINPROD_ID
+            WHERE bo.TRADE_STATUS = '01'
+            GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
         ) bobrt ON 	bobrt.FINPROD_ID = FIN_PRODUCT.FINPROD_ID AND bobrt.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
+        LEFT JOIN (
+            SELECT * FROM (
+            SELECT bo.BID_MODLE, bo.FINPROD_ID, bobp.ENTRUST_ID
+            FROM BID_ORDER bo
+            LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+            WHERE bo.TRADE_STATUS = '01'
+            UNION ALL
+            SELECT bo.BID_MODLE, bo.FINPROD_ID, bobp.ENTRUST_ID
+            FROM WFL_BID_ORDER bo
+            LEFT JOIN WFL_BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+            WHERE bo.TRADE_STATUS = '01') T
+        GROUP BY T.BID_MODLE, T.FINPROD_ID,T.ENTRUST_ID ) bobrt1 ON
+        bobrt1.FINPROD_ID = FIN_PRODUCT.FINPROD_ID AND bobrt1.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
     <where>
         AND ETR_ENTRUST.ENTRUST_STATUS IN(#{entrustAwait},#{entrustDistribute},#{entrustReceive},#{entrustUntread},#{entrustClose},#{entrustReturn},#{entrustRecall},#{entrustInwfl})
         <if test="entrustStatusList != null and entrustStatusList.size() > 0">

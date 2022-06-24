@@ -1019,7 +1019,38 @@
     </select>
 
     <select id="getEtrFxmrBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
-        SELECT T.* FROM
+        SELECT
+                T.effectFlag,
+                T.busiTypePosition,
+                T.firstBidStatus,
+                T.bidId,
+                T.finprodId,
+                T.finprodMarketId,
+                T.finprodAbbr,
+                T.tradeMarket,
+                T.tenderTarget,
+                T.issueDateStart,
+                T.issueDateEnd,
+                T.etrBidPriceTotal,
+                T.totalBiddingNum,
+                T.biddingMethod,
+                T.payType,
+                T.bidprice,
+                T.winPrice,
+                T.price,
+                T.payableAmount,
+                T.settFeeAmt,
+                T.payDate,
+                T.assignRegdate,
+                T.listingDate,
+                T.bidConfirmDate,
+                T.tradeDate,
+                T.counterId,
+                T.counterName,
+                T.remark,
+                T.updateTime
+
+        FROM
         (SELECT
         decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
         #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
@@ -1028,6 +1059,7 @@
         FP.FINPROD_ID finprodId,
         FP.FINPROD_MARKET_ID finprodMarketId,
         FP.FINPROD_ABBR finprodAbbr,
+        FP.TRADE_MARKET tradeMarket,
         FPI.TENDER_TARGET tenderTarget,
         CASE
         WHEN fpi.ISSUE_CLASS = '01' THEN fpi.ISSUE_DATE
@@ -1133,6 +1165,7 @@
         FP.FINPROD_ID finprodId,
         FP.FINPROD_MARKET_ID finprodMarketId,
         FP.FINPROD_ABBR finprodAbbr,
+        FP.TRADE_MARKET tradeMarket,
         FPI.TENDER_TARGET tenderTarget,
         CASE
         WHEN fpi.ISSUE_CLASS = '01' THEN fpi.ISSUE_DATE
@@ -1229,6 +1262,36 @@
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>) T
+        GROUP BY
+        T.effectFlag,
+        T.busiTypePosition,
+        T.firstBidStatus,
+        T.bidId,
+        T.finprodId,
+        T.finprodMarketId,
+        T.finprodAbbr,
+        T.tradeMarket,
+        T.tenderTarget,
+        T.issueDateStart,
+        T.issueDateEnd,
+        T.etrBidPriceTotal,
+        T.totalBiddingNum,
+        T.biddingMethod,
+        T.payType,
+        T.bidprice,
+        T.winPrice,
+        T.price,
+        T.payableAmount,
+        T.settFeeAmt,
+        T.payDate,
+        T.assignRegdate,
+        T.listingDate,
+        T.bidConfirmDate,
+        T.tradeDate,
+        T.counterId,
+        T.counterName,
+        T.remark,
+        T.updateTime
         ORDER BY T.updateTime DESC
     </select>
     <select id="getEtrSubBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">

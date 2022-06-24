@@ -468,6 +468,8 @@
            }
             if(result.data && result.data.message && result.data.messageType === 'confirm') {
                 confirmMsg = result.data.message;
+                rskApproval = result.data.data;
+
             }
         },false)
         if(errorMsg && errorMsg.length > 0) {
@@ -476,7 +478,6 @@
         }
 
         if(confirmMsg && confirmMsg.length > 0) {
-            rskApproval = result.data.data;
             return Joyin.confirm(confirmMsg, function (){
                 saveOrSubmitAction('submit');
             });

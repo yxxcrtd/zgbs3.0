@@ -170,6 +170,10 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         }
         //校验必填项
         addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
+        //发行人处理
+        if (StringUtil.isNotBlank(interfPayhsrcsecinfoDto.getIssuershort())) {
+            handleIssuer(validMessages, interfPayhsrcsecinfoDto.getIssuershort());
+        }
         if (CollectionUtils.isNotEmpty(validMessages)) {
             ajaxResult.setErrorList(validMessages);
             ajaxResult.setMessageType(MessageType.警告消息);
@@ -240,7 +244,6 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
                 validMessages.add(new ValidMessage("发行人匹配失败，请手动处理"));
             }
         }
-
     }
 
 

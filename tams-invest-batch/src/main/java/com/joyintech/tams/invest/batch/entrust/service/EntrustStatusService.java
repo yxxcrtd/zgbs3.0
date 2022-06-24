@@ -191,7 +191,7 @@ public class EntrustStatusService {
         req.setUserId("SYSTEM");
         req.setTotalTradeId(IDGenerator.generate());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        PositionHttpRequest.batchClose(req);
+        //PositionHttpRequest.batchClose(req);
     }
 
     private void closeDelegatOprHisMethod(List<EntrustClosePosEtrReqDto> entrustIdList) {
@@ -261,7 +261,7 @@ public class EntrustStatusService {
                     pageId = "CfetsTrdFirstBidFirm001";
                 }
             } else {
-                pageId = "CfetsEtrIbBondinfo003";
+                pageId = "CfetsEtrIbRepoinfo003";
             }
             url = tamsSerever + String.format("/riskTrial/doOccupy/%s/%s/%s", pageId, 系统动作_关闭.getValue(), 流程节点_流程提交.getValue());
             Map<String,Object> param = new HashMap<>();
