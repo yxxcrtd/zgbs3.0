@@ -15,6 +15,7 @@ import com.joyintech.tams.business.common.dao.CfgDataTableMapper;
 import com.joyintech.tams.business.common.dao.CfgReadonlyFormShowMapper;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgDataTableShowFlag;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
@@ -50,11 +51,8 @@ import com.joyintech.tams.invest.common.component.business.basicdata.BaseTradeFe
 import com.joyintech.tams.invest.common.component.business.basicdata.dto.BasicTradeFeeInputDto;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
-import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
-import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.tams.invest.entrust.etrinvestbondinfo.dto.EtrInvestBondInfoDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
@@ -63,7 +61,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -317,6 +314,24 @@ public class IbuQuoteRepoService extends BaseService {
                 if (!StringUtil.isEmptyList(entrustDtos)) {
                     ajaxResult = preconditionJudgment(entrustDtos, cfetsRepoDealQuoteRequest.getQuoteType());
                 }
+
+                setParam(param, 2);
+                // 质押券信息查询
+                List<RepoEntrustPledgeDto> repoEntrustPledgeDtos = cfetsIbuQuoteRepoMapper.selectRepoEntrustPledgesInit(param);
+                List<String> finProdIds = new ArrayList<>();
+                repoEntrustPledgeDtos.forEach(item -> {
+                    finProdIds.add(item.getFinprodId());
+                });
+                if (CollectionUtils.isNotEmpty(finProdIds)) {
+                    List<FinProductSpecialDto> finProductSpecialDtos = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(finProdIds);
+                    for (FinProductSpecialDto finProductSpecialDto : finProductSpecialDtos) {
+                        if (StringUtil.equals(finProductSpecialDto.getIsDefaultBondIndicator(), DictCodeList.是否_是.getValue())) {
+                            ajaxResult.setMessage("债券" + finProductSpecialDto.getFinprodAbbr()
+                                    + "(" + finProductSpecialDto.getFinprodMarketId() + ")为到期违约债,不可质押!");
+                            return ajaxResult;
+                        }
+                    }
+                }
             } catch (Exception e) {
                 ajaxResult.setMessage("交易执行检查异常!");
                 return ajaxResult;
@@ -435,7 +450,7 @@ public class IbuQuoteRepoService extends BaseService {
         logger.debug("添加指令联动添加质押券,入参:" + JsonUtils.object2Json(request));
         List<RepoEntrustPledgeDto> resultList = new ArrayList<>();
         Map<String, Object> param = new HashMap<>();
-        if(CollectionUtils.isEmpty(request.getEntrustIdList())){
+        if (CollectionUtils.isEmpty(request.getEntrustIdList())) {
             logger.debug("添加指令联动添加质押券,指令代码为空,未添加指令,不做处理");
             return request.getRepoEntrustPledgeDtos();
         }
@@ -1391,6 +1406,14 @@ public class IbuQuoteRepoService extends BaseService {
         if (!StringUtil.equals(request.getPs(), DictCodeListExt3.交易方向_正回购.getValue())) {
             return result;
         }
+        List<FinProductSpecialDto> finProductSpecialDtos = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(finProdIds);
+        for (FinProductSpecialDto finProductSpecialDto : finProductSpecialDtos) {
+            if (StringUtil.equals(finProductSpecialDto.getIsDefaultBondIndicator(), DictCodeList.是否_是.getValue())) {
+                result.setMessage("债券" + finProductSpecialDto.getFinprodAbbr()
+                        + "(" + finProductSpecialDto.getFinprodMarketId() + ")为到期违约债,不可质押!", MessageType.错误消息);
+                return result;
+            }
+        }
         Map<String, Object> param = new HashMap<>();
         param.put("finProdIds", finProdIds);
         param.put("platDate", iPlatformDate.getSysDateStr());
@@ -1404,7 +1427,7 @@ public class IbuQuoteRepoService extends BaseService {
                 return result;
             }
             // Sonar Fix modify by huwei 220608
-            if (StringUtil.isNotEmpty(finExercisePlans)) {
+            if (CollectionUtils.isNotEmpty(finExercisePlans)) {
                 FinExercisePlan finExercisePlan = finExercisePlans.get(0);
                 if (DateUtil.compareTo(finExercisePlan.getExerciseDate(), request.getSettlementEndDate()) < 0) {
                     result.setMessage("债券" + repoEntrustPledgeDto.getBondCode() +

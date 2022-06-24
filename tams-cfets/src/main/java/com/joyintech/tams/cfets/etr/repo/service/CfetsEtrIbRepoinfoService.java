@@ -24,6 +24,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.business.common.dto.SecManageAcctIdRequestDto;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepoMapper;
@@ -806,6 +807,14 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
         List<String> finProdIds = new ArrayList<>();
         for (CfetsEtrRepoZLCXPositionResponse response : request.getCfetsEtrRepoZLCXPositionResponses()) {
             finProdIds.add(response.getFinprodId());
+        }
+        List<FinProductSpecialDto> finProductSpecialDtos = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(finProdIds);
+        for (FinProductSpecialDto finProductSpecialDto : finProductSpecialDtos) {
+            if (StringUtil.equals(finProductSpecialDto.getIsDefaultBondIndicator(), DictCodeList.是否_是.getValue())) {
+                result.setMessage("债券" + finProductSpecialDto.getFinprodAbbr()
+                        + "(" + finProductSpecialDto.getFinprodMarketId() + ")为到期违约债,不可质押!", MessageType.错误消息);
+                return result;
+            }
         }
         param.put("finProdIds", finProdIds);
         param.put("platDate", iPlatformDate.getSysDateStr());
