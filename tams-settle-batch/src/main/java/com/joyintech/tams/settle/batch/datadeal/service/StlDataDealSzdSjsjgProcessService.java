@@ -1134,7 +1134,11 @@ public class StlDataDealSzdSjsjgProcessService {
                     if(!bondAssetList.contains(finprodId) && !sharesAssetList.contains(shareFinprodId)) {
                         continue;
                     }
-                }else{
+                }
+                // 一级投标业务不做资产校验
+                else if(StringUtil.equals(StlDataDealProcessConstant.SJSMX_YWLB_JY02, szdSjsjg.getJgywlb())){
+                }
+                else{
                     if(!bondAssetList.contains(finprodId)) {
                         continue;
                     }
@@ -1525,7 +1529,7 @@ public class StlDataDealSzdSjsjgProcessService {
         // 交收方式
         settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsjg.getJgjsfs()));
         // 交收结果
-        settleTransData.setDeliveryResult(setDeliveryResult(szdSjsjg));
+        settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_正常交收.getValue());
         // 执行日期
         settleTransData.setDealDate(stlDownDataDealOperatorDto.getDealDate());
         // 证券品种

@@ -2348,6 +2348,7 @@
         stlinfo.sec_acct_name as secManageAcctIdStr,
         ts.prinamt/10000 as faceValue,
         decode(I.BUSINESSTYPE, 'BOND', I.yield2*100, 'REPO', I.PRICE*100) tradeYield,
+        decode(I.BUSINESSTYPE, 'BOND', to_char(I.yield2*100,'FM999999990.9990'), 'REPO', to_char(I.PRICE*100,'FM999999990.9990')) tradeYieldStr,
         I.TRADELIMITDAYS as termDays,
         decode(I.BUSINESSTYPE, 'BOND', I.SETTLCURRAMT, 'REPO', DECODE(I.MARKETINDICATOR, 9, I.TRADECASHAMT, 10, I.SETTLCURRAMT)) as tradeAmt,
         I.QUOTEID as quoteid,
@@ -2365,7 +2366,7 @@
         to_char(total.trade_date,'yyyy-MM-dd') as tradeDate,
         nvl(ts.dealtext,tr.dealtext) as remark,
         '' tenderTarget,
-        '' tgBusiType
+        decode(I.BUSINESSTYPE, 'BOND', #{BUSI_TYPE_POSITION_02}, 'REPO', #{BUSI_TYPE_POSITION_05}) tgBusiType
         from INTERF_CSTP_TRADE I
         INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
         left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
@@ -2479,32 +2480,32 @@
                 ''		  AS	secManageAcctId,
                 '' as secManageAcctIdStr,
                ICB.SUBSCRIPTION_AMOUNT*10000	 faceValue,
-       CASE when ICB.ISSUE_PRICE is not null then ICB.ISSUE_PRICE
-            when ICB.COUPON_RATE is not null then ICB.ISSUE_PRICE
-            when ICB.SPREAD is not null then ICB.ISSUE_PRICE   END
-        AS	tradeYield,
-        null	termDays,
-        ICB.ACTUAL_FEE 	AS	tradeAmt,
-        ''	 quoteid,
-        ICB.SUBMIT_USER traderid,
-        ICB.FULL_CHINESE_NAME_OF_SUBSCRIBE AS	traderidStr,
-        ''	trader,
-        '' counterId,
-        '' counterIdStr,
-        ''	clearType,
-        to_char(to_date(ICB.SUBSCRIPTION_TIME,'yyyy-MM-dd HH24:mi:ss'),'yyyy-MM-dd') tradeDate,
-        ''  remark,
-        FPI.TENDER_TARGET tenderTarget,
-        #{BUSI_TYPE_POSITION_34} tgBusiType
+                CASE when ICB.ISSUE_PRICE is not null then ICB.ISSUE_PRICE
+                    when ICB.COUPON_RATE is not null then ICB.COUPON_RATE
+                    when ICB.SPREAD is not null then ICB.SPREAD   END
+                AS	tradeYield,
+                CASE when ICB.ISSUE_PRICE is not null then to_char(ICB.ISSUE_PRICE,'FM99999990.9990')||'元'
+                when ICB.COUPON_RATE is not null then to_char(ICB.COUPON_RATE,'FM99999990.9990')||'%'
+                when ICB.SPREAD is not null then to_char(ICB.SPREAD,'FM99999990.90')||'BP'   END
+                AS	tradeYieldStr,
+                null	termDays,
+                ICB.ACTUAL_FEE 	AS	tradeAmt,
+                null	 quoteid,
+                ICB.FULL_CHINESE_NAME_OF_SUBSCRIBE traderid,
+                ICB.FULL_CHINESE_NAME_OF_SUBSCRIBE AS	traderidStr,
+                ICB.SUBMIT_USER 	trader,
+                null counterId,
+                null counterIdStr,
+                null	clearType,
+                to_char(to_date(ICB.SUBSCRIPTION_TIME,'yyyy-MM-dd HH24:mi:ss'),'yyyy-MM-dd') tradeDate,
+                null  remark,
+                FPI.TENDER_TARGET tenderTarget,
+                #{BUSI_TYPE_POSITION_34} tgBusiType
         FROM INTERF_CSTP_BJFXJG ICB
-        LEFT JOIN  FIN_PRODUCT FP
-               ON FP.FINPROD_MARKET_ID = ICB.INSTRUMENT_ID
-        LEFT JOIN FIN_PRODUCT_ISSUE FPI
-        ON		FPI.FINPROD_ID = FP.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT_TYPE FPT
-        ON		FPT.FINPROD_ID = FP.FINPROD_ID
-        LEFT JOIN TRDQUTO_MATCH_INFO TMI
-        ON		TMI.CSTP_TRADE_ID = ICB.TRD_ID
+        LEFT JOIN  FIN_PRODUCT FP ON FP.FINPROD_MARKET_ID = ICB.INSTRUMENT_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE FPT ON FPT.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN TRDQUTO_MATCH_INFO TMI ON TMI.CSTP_TRADE_ID = ICB.TRD_ID
         <where>
         <if test="sysDate != null and !sysDate.equals('')">
             AND to_date(to_char(to_date(ICB.SUBSCRIPTION_TIME,'yyyy-MM-dd HH24:mi:ss'),'yyyy-MM-dd'),'yyyy-MM-dd') = #{sysDate,jdbcType=DATE}
@@ -2552,13 +2553,14 @@
             AND 1 != 1
         </if>
         <if test="matchStatusList != null and matchStatusList.size() > 0">
-            AND TMI.MATCH_STATUS in
+            AND ( TMI.MATCH_STATUS in
             <foreach collection="matchStatusList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
-        </if>
-        <if test="isNull!=null and isNull!=''">
-            OR TMI.MATCH_STATUS IS NULL
+            <if test="isNull!=null and isNull!=''">
+                OR TMI.MATCH_STATUS IS NULL
+            </if>
+            )
         </if>
         </where>
         ) aaa
@@ -2706,9 +2708,9 @@
         SELECT
             to_char(to_date(ICB.SUBSCRIPTION_TIME,'yyyy-MM-dd HH24:mi:ss'),'yyyy-MM-dd') tradeDate,
             '' execid,
-			ICB.INSTRUMENT_ID||'.IB'   finprodId,
+			ICB.INSTRUMENT_ID   finprodMarketId,
 			ICB.INSTRUMENT_SHORT_NAME  finprodAbbr,
-			FPT.TYPE_11    businesstype,
+			ICB.INSTRUMENT_TYPE    businesstype,
 			ICB.ISSUE_PRICE issuePrice,
 			ICB.SPREAD  spread,
 			ICB.COUPON_RATE  couponRate,
@@ -2717,12 +2719,12 @@
 			ICB.FULL_CHINESE_NAME_OF_SUBSCRIBE subscribeOrgan,
 			ICB.SUBSCRIBE_INSTITUTION_ID subscribe21Organ,
 			ICB.SUBMIT_USER  submitUser,
-			ICB.SUBSCRIPTION_AMOUNT*100000000  subAmt,
+			ICB.SUBSCRIPTION_AMOUNT  subAmt,
 			ICB.ACTUAL_FEE   payAmt,
             FP.ISSUER   issuer,
 			ICB.ISSUER_21_FIRM_ID  issuer21FirmId,
             FPI.ISSUE_CLASS   issueClass,
-			ICB.REAL_ISSUESIZE*100000000  issueAmt,
+			ICB.REAL_ISSUESIZE  issueAmt,
 			ICB.INSTRUMENT_STATUS   instrumentStatus
         FROM  INTERF_CSTP_BJFXJG ICB
         LEFT JOIN FIN_PRODUCT FP
@@ -3798,7 +3800,7 @@
         TPD.TOTLE_TRADE_ID totleTradeId,
         TPD.TRADE_ID     busiCode,
         TPDA.ENTRUST_ID  entrustId,
-        FPT.TYPE_8     finprodType2,
+        TPD.FINPROD_TYPE2     finprodType2,
         sdl1.item_value finprodType2Str,
         CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN '01'
         WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN '34' END tgBusiType,
@@ -5215,8 +5217,8 @@
                 FP.CCY  ccy,
                 FPI.TENDER_SDATE bidDateStart,
                 FPI.TENDER_EDATE bidDateEnd,
-                nvl(FPI.PAY_EDATE, FPI.PAY_DATE) payEdate,
-                FPI.ASSIGN_REGDATE assignRegdate,
+                COALESCE (BO.PAY_DATE, FPI.PAY_EDATE, FPI.PAY_DATE) payEdate,
+                nvl(BO.ASSIGN_REGDATE, FPI.ASSIGN_REGDATE) assignRegdate,
                 nvl(BO.ONMARKET_DATE, FPA.LISTING_DATE) onmarketDate,
                 BO.BID_MODLE  bidModle,
                 BO.PAY_TYPE payType,
@@ -5234,12 +5236,15 @@
                 BO.REMARK remark
             FROM BID_ORDER BO
             LEFT JOIN BID_RESULT_TOTAL brt ON brt.BID_ID  = bo.BID_ID
-            LEFT JOIN (SELECT BRBP.BID_ID,SUM(EE.ENTRUST_NUM) ENTRUST_NUM,SUM(BRBP.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT
-                FROM BID_ORDER_BID_PRICE BRBP
-                LEFT JOIN ETR_ENTRUST EE
-                ON EE.ENTRUST_ID = BRBP.ENTRUST_ID
-                GROUP BY BRBP.BID_ID
-            ) BRBP ON BRBP.BID_ID = BO.BID_ID
+            LEFT JOIN (
+                select sum(eebp.BID_PRIN_AMT)     ENTRUST_NUM,
+                       SUM(bobp.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT,
+                       bobp.BID_ID
+                from ETR_ENTRUST_BID_PRICE eebp
+                         left join BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
+                    and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                group by bobp.BID_ID
+            ) BRBP ON BRBP.BID_ID = bo.BID_ID
             LEFT JOIN FIN_PRODUCT FP
             ON FP.FINPROD_ID = BO.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
@@ -5264,8 +5269,8 @@
                 FP.CCY  ccy,
                 FPI.TENDER_SDATE bidDateStart,
                 FPI.TENDER_EDATE bidDateEnd,
-                nvl(FPI.PAY_EDATE, FPI.PAY_DATE) payEdate,
-                FPI.ASSIGN_REGDATE assignRegdate,
+                COALESCE (WBO.PAY_DATE, FPI.PAY_EDATE, FPI.PAY_DATE) payEdate,
+                nvl(WBO.ASSIGN_REGDATE, FPI.ASSIGN_REGDATE) assignRegdate,
                 nvl(WBO.ONMARKET_DATE, FPA.LISTING_DATE) onmarketDate,
                 WBO.BID_MODLE  bidModle,
                 WBO.PAY_TYPE payType,
@@ -5283,11 +5288,13 @@
                 WBO.REMARK remark
             FROM WFL_BID_ORDER WBO
             LEFT JOIN WFL_BID_RESULT_TOTAL brt ON brt.BID_ID  = WBO.BID_ID
-            LEFT JOIN (SELECT WBRBP.BID_ID,SUM(EE.ENTRUST_NUM) ENTRUST_NUM,SUM(WBRBP.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT
-                        FROM WFL_BID_ORDER_BID_PRICE WBRBP
-                        LEFT JOIN ETR_ENTRUST EE
-                        ON EE.ENTRUST_ID = WBRBP.ENTRUST_ID
-                        GROUP BY WBRBP.BID_ID
+            LEFT JOIN (select sum(eebp.BID_PRIN_AMT) ENTRUST_NUM,
+                              SUM(bobp.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT,
+                              bobp.BID_ID
+                       from ETR_ENTRUST_BID_PRICE eebp
+                                left join WFL_BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
+                           and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                       group by bobp.BID_ID
             ) WBRBP ON WBRBP.BID_ID = WBO.BID_ID
             LEFT JOIN FIN_PRODUCT FP
             ON FP.FINPROD_ID = WBO.FINPROD_ID

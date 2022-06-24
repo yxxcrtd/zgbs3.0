@@ -5427,6 +5427,18 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         etrExchangeTrade001Dto.setEntrustDate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
         etrExchangeTrade001Dto.setOptType(dto.getOptType());
 
+        //风险试算 ZGCPCN-1582 保留单组合信息
+        if (dto.getPortfolioList().size() > 1 && !CollectionUtils.isEmpty(dto.getRiskTrialRetDto())) {
+            List<RiskTrialRetDto> riskTrialRetDtos1 = new ArrayList<>();
+            dto.getRiskTrialRetDto().forEach(riskTrialRetDto -> {
+                if (StringUtil.equals(riskTrialRetDto.getPortfolioCode(), etrExchangeTrade001Dto.getPortfolioId())
+                        || StringUtil.equals(riskTrialRetDto.getPortfolioId(), etrExchangeTrade001Dto.getPortfolioId())) {
+                    riskTrialRetDtos1.add(riskTrialRetDto);
+                }
+            });
+            etrExchangeTrade001Dto.setRiskTrialRetDto(riskTrialRetDtos1);
+        }
+
         return etrExchangeTrade001Dto;
     }
 

@@ -872,15 +872,29 @@
         on b.FINPROD_ID = a.FINPROD_ID
         left join fin_product_type r
         on a.FINPROD_ID = r.FINPROD_ID
-        where a.trade_market in (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})<!-- 上海证券交易所、深圳证券交易所 -->
+        <where>
+        a.trade_market in (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})<!-- 上海证券交易所、深圳证券交易所 -->
         <if test="acctTradeMarket != null and acctTradeMarket != ''">
             and a.trade_market = #{acctTradeMarket}
         </if>
-        and a.finprod_type2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})<!--  不查找债券 -->
+            <if test="searchPageType != null and searchPageType != ''">
+                and a.finprod_type2 in (#{FINPROD_TYPE_TG_F37})
+            </if>
+            <if test="searchPageType == null or searchPageType == ''">
+                and a.finprod_type2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})
+            </if>
+       <!--  不查找债券 -->
         and r.type_6 != #{type6_B14}
+        </where>
         ) t
         <where>
-            t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})   <!--#{FINPROD_TYPE2}-->
+            <if test="searchPageType != null and searchPageType != ''">
+                and t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37})
+            </if>
+            <if test="searchPageType == null or searchPageType == ''">
+                and t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})
+            </if>
+            <!--t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})-->
             <if test="acctTradeMarket != null and acctTradeMarket != ''">
                 and t.TRADE_MARKET = #{acctTradeMarket}
             </if>

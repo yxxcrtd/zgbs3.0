@@ -604,7 +604,7 @@ $(function () {
     var getSaveObject = function () {
         var object = $.serializeToObject('#PeriodicManagement002_Form');
 
-        if (object.operateType == null || object.operateType == "" || object.operateType == undefined) {
+        if ("edit" != object.operateType) {
             object.operateType = "new";
         }
 
