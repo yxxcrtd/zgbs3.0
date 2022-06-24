@@ -272,7 +272,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
         // 银行间质押式回购-指令
         if (obj instanceof CfetsEtribRepoInfo003Dto || obj instanceof CfetsEtrRepoSaveRequest || StringUtil.equals(pageId, "CfetsEtrIbRepoinfo003")) {
             CfetsEtribRepoInfo003Dto dto = JsonUtils.json2Object(businessJson, CfetsEtribRepoInfo003Dto.class);
-            cfetsEtrIbRepoinfo003Service.packageEquity(dto,new ArrayList<>());
+            if(CollectionUtils.isNotEmpty(dto.getEtrInvestRepoInfoDtos())) {
+                cfetsEtrIbRepoinfo003Service.packageEquity(dto, new ArrayList<>());
+            }
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, NodeConfigConstant.REPO001)
                     .put(NodeConfigConstant.BUSI_ACT, 业务动作_投资指令.getValue())
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
@@ -602,7 +604,12 @@ public class RiskInputParamSerivce extends RiskCommonService {
             CfetsEtribRepoInfo003Dto businessDto = (CfetsEtribRepoInfo003Dto) data;
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
-            list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, businessDto.getEtrInvestRepoInfoDtos(), null);
+            if(CollectionUtils.isNotEmpty(businessDto.getEtrInvestRepoInfoDtos())) {
+                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, businessDto.getEtrInvestRepoInfoDtos(), null);
+            }
+            if(CollectionUtils.isEmpty(businessDto.getEtrInvestRepoInfoDtos()) && CollectionUtils.isNotEmpty(businessDto.getSelectedItem())) {
+                list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, businessDto.getSelectedItem(), null);
+            }
         }
         // 银行间质押式回购登记
         if (data instanceof CfetsRepoDealRegisterQuoteDto) {

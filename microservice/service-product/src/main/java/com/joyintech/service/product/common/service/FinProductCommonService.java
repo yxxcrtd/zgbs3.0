@@ -1,74 +1,39 @@
 package com.joyintech.service.product.common.service;
 
-import java.lang.reflect.InvocationTargetException;
-//import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
-import com.joyintech.tams.common.base.dao.*;
-import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.invest.common.component.base.core.impl.dao.BaseGetBussinessIdMapper;
-import com.joyintech.tams.systemtools.constant.DataIndexSequenceType;
-import com.joyintech.workflow.engine.constant.OperationType;
-import org.apache.commons.codec.binary.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.service.product.common.dao.BenchMarketInfoMapper;
-import com.joyintech.service.product.common.dao.FinProductFloatFeeMapper;
-import com.joyintech.service.product.common.dao.FinProductGoalInfoMapper;
-import com.joyintech.service.product.common.dao.FinProductRevalDocumentMapper;
-import com.joyintech.service.product.common.dao.PrdInvestParamMapper;
-import com.joyintech.service.product.common.dao.PrdPtlManagementInfo001Mapper;
-import com.joyintech.service.product.common.dao.ProductCommonMapper;
-import com.joyintech.service.product.common.dto.BussBenchMarkInfoDto;
-import com.joyintech.service.product.common.dto.BussBenchMarkLayeredInfoDto;
-import com.joyintech.service.product.common.dto.BussFinProductBonusPlanDto;
-import com.joyintech.service.product.common.dto.BussFinProductFeeInfoDto;
-import com.joyintech.service.product.common.dto.BussFinProductInvestInfoDto;
-import com.joyintech.service.product.common.dto.BussFinProductInvestPeriodDto;
-import com.joyintech.service.product.common.dto.BussFinProductOpenPlanDto;
-import com.joyintech.service.product.common.dto.BussFinProductPayPlanDto;
-import com.joyintech.service.product.common.dto.BussFinProductRevalDocumentDto;
-import com.joyintech.service.product.common.dto.FinProductAnapleroticInfoDto;
-import com.joyintech.service.product.common.dto.FinProductAnapleroticPlanDto;
-import com.joyintech.service.product.common.dto.FinProductCommonInfoDto;
-import com.joyintech.service.product.common.dto.FinProductFloatFeeDto;
-import com.joyintech.service.product.common.dto.FundAccountInfoDto;
-import com.joyintech.service.product.common.dto.MstTradeOpponentDto;
-import com.joyintech.service.product.common.dto.PtlManagementInfoDto;
-import com.joyintech.service.product.common.dto.SecuritiesAccountInfoDto;
-import com.joyintech.service.product.common.dto.StlCapacctDto;
+import com.joyintech.framework.util.*;
+import com.joyintech.service.product.common.dao.*;
+import com.joyintech.service.product.common.dto.*;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.BaseFinProductBaseInfoService;
 import com.joyintech.tams.component.base.core.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.CommonUtil;
-//import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.invest.common.component.base.core.impl.dao.BaseGetBussinessIdMapper;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.valuationinterf.ValuationInterfService;
 import com.joyintech.tams.invest.common.valuationinterf.dto.BussFinProductFundAccountInfoDto;
-import com.joyintech.tams.invest.common.valuationinterf.dto.ProdOtherInfoInitInputDto;
+import com.joyintech.tams.systemtools.constant.DataIndexSequenceType;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.codec.binary.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 /**
  * @author : 强成西
@@ -1191,6 +1156,13 @@ public class FinProductCommonService extends BaseService {
         // 浮动管理费
         if (finProductCommonInfoDto.getBussFinProductFloatFeeDto() != null) {
             FinProductFloatFeeDto finProductFloatFeeDto = finProductCommonInfoDto.getBussFinProductFloatFeeDto();
+
+            List<FinFloatCalcRuleDetail> finFloatCalcRuleDetailDtoList = finProductFloatFeeDto.getFinFloatCalcRuleDetailDtoList();
+            for (FinFloatCalcRuleDetail finFloatCalcRuleDetail : finFloatCalcRuleDetailDtoList) {
+                finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide(finFloatCalcRuleDetail.getSpreadRate(), 100, 8));
+                finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(finFloatCalcRuleDetail.getChargeRatio(), 100, 8));
+            }
+
             //如果净值型产品分档 就不存母产品浮动管理费，因为净值型产品分档浮动管理费对应到分层子产品-- 净值型周期型产品浮动管理费对应期限层
             if (!(StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), finProductCommonInfoDto.getProfitType())
                     && (StringUtil.equals(DictCodeList.处理模式_分档.getValue(), finProductCommonInfoDto.getDealMode())
@@ -2934,12 +2906,12 @@ public class FinProductCommonService extends BaseService {
                     finFloatCalcRuleDetail.setCashId(finCashInfo.getCashId());
                     finFloatCalcRuleDetail.setEffDate(effDate);
                     finFloatCalcRuleDetail.setLev(finFloatCalcRuleDetail.getLev());
-                    finFloatCalcRuleDetail.setBaseRuleId(
-                            baseRuleId);// 业绩基准代码
-                    finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide(
-                            finFloatCalcRuleDetail.getSpreadRate(), 100, 14));
-                    finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(
-                            finFloatCalcRuleDetail.getChargeRatio(), 100, 14));
+                    finFloatCalcRuleDetail.setBaseRuleId(baseRuleId);// 业绩基准代码
+//                    finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide( finFloatCalcRuleDetail.getSpreadRate(), 100, 14));
+//                    finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(finFloatCalcRuleDetail.getChargeRatio(), 100, 14));
+
+                    finFloatCalcRuleDetail.setSpreadRate(finFloatCalcRuleDetail.getSpreadRate());
+                    finFloatCalcRuleDetail.setChargeRatio(finFloatCalcRuleDetail.getChargeRatio());
                     finFloatCalcRuleDetailMapper.insert(finFloatCalcRuleDetail);
                 }
             }
@@ -4050,12 +4022,11 @@ public class FinProductCommonService extends BaseService {
                     finFloatCalcRuleDetail.setCashId(cashId_floatFee);
                     finFloatCalcRuleDetail.setEffDate(effDate);
                     finFloatCalcRuleDetail.setLev(finFloatCalcRuleDetail.getLev());
-                    finFloatCalcRuleDetail.setBaseRuleId(
-                            baseRuleId);// 业绩基准代码
-                    finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide(
-                            finFloatCalcRuleDetail.getSpreadRate(), 100, 14));
-                    finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(
-                            finFloatCalcRuleDetail.getChargeRatio(), 100, 14));
+                    finFloatCalcRuleDetail.setBaseRuleId(baseRuleId);// 业绩基准代码
+//                    finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide( finFloatCalcRuleDetail.getSpreadRate(), 100, 14));
+//                    finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide( finFloatCalcRuleDetail.getChargeRatio(), 100, 14));
+                    finFloatCalcRuleDetail.setSpreadRate(finFloatCalcRuleDetail.getSpreadRate());
+                    finFloatCalcRuleDetail.setChargeRatio(finFloatCalcRuleDetail.getChargeRatio());
                     finFloatCalcRuleDetailMapper.insert(finFloatCalcRuleDetail);
                 }
             }

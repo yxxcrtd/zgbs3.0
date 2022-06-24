@@ -209,9 +209,12 @@ $(function () {
                     $('#investCycleInput').show();
                     //修改bug【期次管理】有效状态的数据，双击查看，投资周期（天）字段值丢失。 add by wangcheng 20191030
 //    				$('#investCycle2').val('').prop('disabled', false).trigger('change');
-
+                    console.log("-----investCycle-------")
+                    console.log(result.investCycle)
                     if (result.investCycle != null) {
                         $('#investCycle2').val(result.investCycle).prop('disabled', false).trigger('change');
+                    } else {
+                        $('#investCycle2').val('').prop('disabled', false).trigger('change');
                     }
                 }
                 // $('#investCycle2').val(result.investCycle).prop('disabled', true).trigger('change');

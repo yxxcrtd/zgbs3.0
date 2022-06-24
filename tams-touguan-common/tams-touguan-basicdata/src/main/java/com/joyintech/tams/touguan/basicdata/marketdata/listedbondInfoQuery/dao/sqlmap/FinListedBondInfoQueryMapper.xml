@@ -218,6 +218,7 @@
         SEC_INFO.TRADING_PLACES tradingPlaces,
         SEC_INFO.REGISTERED_CUSTODIAN registeredCustodian,
         CUSTOMER_INFO.CUSTOMER_NAME issuer,
+        SEC_INFO.CUSTOMER_NAME issuerCode,
         SEC_INFO.RAISE_MODE raiseMode,
         SEC_INFO.DOMESTIC_AND_FOREIGN domesticAndForeign,
         SEC_INFO.IS_BONDS_WITH_RIGHTS isBondsWithRights,

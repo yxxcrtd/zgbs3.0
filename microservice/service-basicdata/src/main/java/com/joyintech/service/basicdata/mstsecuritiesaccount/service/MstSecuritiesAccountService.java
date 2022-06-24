@@ -13,6 +13,7 @@ package com.joyintech.service.basicdata.mstsecuritiesaccount.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -433,7 +434,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
         map.put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         map.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         map.put("type6_B14",DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
-        if(StringUtils.equals(map.get("searchPageType").toString(), "add")){
+        if(!Objects.isNull(map.get("searchPageType")) && StringUtils.equals(map.get("searchPageType").toString(), "add")){
             map.put("searchPageType", "add");
         } else {
             map.put("searchPageType", "");
