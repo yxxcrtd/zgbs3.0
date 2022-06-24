@@ -960,20 +960,16 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         entity.setBidId(bidId);
         entity.setRemark(remark);
         this.insertData(entity, OperationType.REVOKE);
-        try {
-            if (isNeedDealPosition) {
-                // 匹配取消
-                cfetsTrdBondFirstSub002Mapper.deleteByPreTradeId(entity.getBidId());
-                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
-                        DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
-            }
-            // 老头寸处理
-//            this.dealOldPosition(entity, true);
-            //处理指令执行进度
-            this.insertEtrFinishStatus(entity, OperationType.REVOKE);
-        } catch (Exception e) {
-            throw new WorkFlowException(e);
+        if (isNeedDealPosition) {
+            // 匹配取消
+            cfetsTrdBondFirstSub002Mapper.deleteByPreTradeId(entity.getBidId());
+            PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                    DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
         }
+        // 老头寸处理
+//            this.dealOldPosition(entity, true);
+        //处理指令执行进度
+        this.insertEtrFinishStatus(entity, OperationType.REVOKE);
     }
 
     /**

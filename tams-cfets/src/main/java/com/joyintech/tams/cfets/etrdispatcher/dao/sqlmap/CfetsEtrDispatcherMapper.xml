@@ -502,11 +502,6 @@
     <sql id="vagueQueryWhere">
         <if test="search != null and search != '' and search !='有效' ">
             <where>
-            <choose>
-                <when test="search.length() > 10">
-                    t.entrustId like '%' || #{search} || '%'
-                </when>
-                <otherwise>
                     (sdl.ITEM_VALUE like '%' || #{search} || '%'
                     OR sdl1.ITEM_VALUE like '%' || #{search} || '%'
                     OR sdl2.ITEM_VALUE like '%' || #{search} || '%'
@@ -541,8 +536,6 @@
                     OR t.transmitTime = #{search}
                     OR t.transmitTimeSer = #{search}
                     )
-                </otherwise>
-            </choose>
             </where>
         </if>
     </sql>
