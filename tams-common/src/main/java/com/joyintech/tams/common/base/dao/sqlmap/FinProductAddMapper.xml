@@ -191,7 +191,7 @@
                                      LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER,
                                      IS_EFF_PLEDGE, IS_ISSUE_ASSET, APPEAR_MARKET_ID,
                                      WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE, IS_NO_GUARD ,
-                                     CONCEPT_TYPE , IS_ALLOW_OVERWRITE ,IS_INFORMATION_COVERAGE ,OLD_DELISTING_DATE,
+                                     CONCEPT_TYPE , IS_ALLOW_OVERWRITE ,OLD_DELISTING_DATE,
                                      LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,
                                      IS_SEVEN_DAY_CASHABLE,OPEN_TYPE,PROTECT_OBJECT,REF_ENTITY,
                                      REF_SEC,REF_SEC_FEATURES,GRACE_PERIOD,BOOK_BUILDING_DATE,PAY_DATE,
@@ -228,7 +228,7 @@
                 #{isEffPledge,jdbcType=VARCHAR}, #{isIssueAsset,jdbcType=VARCHAR}, #{appearMarketId,jdbcType=VARCHAR},
                 #{windCode,jdbcType=VARCHAR},#{crossMarket,jdbcType=VARCHAR},#{crossMarketCode,jdbcType=VARCHAR},
                 #{isNoGuard,jdbcType=VARCHAR},#{conceptType,jdbcType=VARCHAR}
-                ,#{isAllowOverwrite,jdbcType=VARCHAR},#{isInformationCoverage,jdbcType=VARCHAR},#{oldDelistingDate,jdbcType=DATE},
+                ,#{isAllowOverwrite,jdbcType=VARCHAR},#{oldDelistingDate,jdbcType=DATE},
                 #{listingDateFromTrade,jdbcType=VARCHAR},#{directDisclosureRiskFlag,jdbcType=VARCHAR},
                 #{isOpenEveryDay,jdbcType=VARCHAR},#{isSevenDayCashable,jdbcType=VARCHAR},#{openType,jdbcType=VARCHAR},
                 #{protectObject,jdbcType=VARCHAR},#{refEntity,jdbcType=VARCHAR},#{refSec,jdbcType=VARCHAR},#{refSecFeatures,jdbcType=VARCHAR},
