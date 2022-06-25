@@ -16,4 +16,6 @@ public interface WebSocketMapper {
     void insertFlows(Map<String, Object> map);
 
     void deleteFlows(Map<String, Object> map);
+
+    String selectSysParaByCode(Map<String, Object> map);
 }

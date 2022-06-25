@@ -3,7 +3,6 @@ package com.joyintech.tams.cfets.trd.primarybidmanage.controller;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -14,12 +13,14 @@ import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService;
-import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageValidatorService;
 import com.joyintech.tams.common.base.dao.BidResultTotalMapper;
 import com.joyintech.tams.common.base.entity.BidOrder;
 import com.joyintech.tams.common.base.entity.BidResultTotal;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
-import com.joyintech.tams.constant.*;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -63,16 +65,13 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
     /**
      * 日志
      */
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private CfetsPrimaryBidManageService cfetsPrimaryBidManageService;
 
     @Autowired
     private CfetsPrimaryBidManage001Service cfetsPrimaryBidManage001Service;
-
-    @Autowired
-    private CfetsPrimaryBidManageValidatorService cfetsPrimaryBidManageValidatorService;
 
     @Autowired
     private IPlatformDate iPlatformDate;
@@ -83,7 +82,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
     @ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/init")
     @ResponseBody
-    public Message<Map<String,Object>> init(){
+    public Message init(){
         Map<String, Object> model = new HashMap<>();
         model.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         model.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));

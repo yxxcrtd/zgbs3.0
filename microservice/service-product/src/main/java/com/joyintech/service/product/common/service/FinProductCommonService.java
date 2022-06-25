@@ -1158,10 +1158,15 @@ public class FinProductCommonService extends BaseService {
             FinProductFloatFeeDto finProductFloatFeeDto = finProductCommonInfoDto.getBussFinProductFloatFeeDto();
 
             List<FinFloatCalcRuleDetail> finFloatCalcRuleDetailDtoList = finProductFloatFeeDto.getFinFloatCalcRuleDetailDtoList();
-            for (FinFloatCalcRuleDetail finFloatCalcRuleDetail : finFloatCalcRuleDetailDtoList) {
-                finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide(finFloatCalcRuleDetail.getSpreadRate(), 100, 8));
-                finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(finFloatCalcRuleDetail.getChargeRatio(), 100, 8));
+            // modify by etliu 20220625 start
+            // 3.0.6场内 ZGCPCN-1704:【集成环境-待办事项】产品新建后提交，在待办事项中审批报错
+            if (!StringUtil.isEmptyList(finFloatCalcRuleDetailDtoList)) {
+                for (FinFloatCalcRuleDetail finFloatCalcRuleDetail : finFloatCalcRuleDetailDtoList) {
+                    finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide(finFloatCalcRuleDetail.getSpreadRate(), 100, 8));
+                    finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(finFloatCalcRuleDetail.getChargeRatio(), 100, 8));
+                }
             }
+            // modify by etliu 20220625 end
 
             //如果净值型产品分档 就不存母产品浮动管理费，因为净值型产品分档浮动管理费对应到分层子产品-- 净值型周期型产品浮动管理费对应期限层
             if (!(StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), finProductCommonInfoDto.getProfitType())

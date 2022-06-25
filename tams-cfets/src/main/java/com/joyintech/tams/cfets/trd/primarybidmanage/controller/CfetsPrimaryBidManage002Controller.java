@@ -13,6 +13,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.cfets.risk.aop.CfetsTradeHandlerAop;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService;
@@ -178,21 +179,85 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
     }
 
     /**
-     * 查询投标确认信息
-     * @return
-     * @throws Exception
-     * @see
-     * @since 1.0
+     * 分配明细联动处理
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
      */
-    @ApiOperation(value="分配明细联动处理",notes = "分配明细联动处理")
+    @ApiOperation(value = "分配明细联动处理", notes = "分配明细联动处理")
     @ResponseBody
-    @PostMapping("autoAllocation")
+    @PostMapping("/autoAllocation")
     public Message<CfetsPrimaryBidManageSaveRequest> autoAllocation(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
         try {
-            CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageService.autoAllocation(request);
-            return new Message<CfetsPrimaryBidManageSaveRequest>().success().setData(response);
-        }catch (Exception e) {
-            logger.error("查询投标确认信息数据异常",e);
+            CfetsPrimaryBidManageSaveRequest result = cfetsPrimaryBidManageService.autoAllocation(request);
+            return new Message<CfetsPrimaryBidManageSaveRequest>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("查询投标确认信息数据异常", e);
+            return new Message<CfetsPrimaryBidManageSaveRequest>().fail().setMessage("查询投标确认信息异常");
+        }
+    }
+
+    /**
+     * 分配费用
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
+     */
+    @ApiOperation(value = "分配费用", notes = "分配费用处理")
+    @ResponseBody
+    @PostMapping("/feeAllocation")
+    public Message<List<CfetsPrimaryBidManageSaveDetailDto>> feeAllocation(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
+        try {
+            List<CfetsPrimaryBidManageSaveDetailDto> result = cfetsPrimaryBidManageService.otherDistribution(request);
+            return new Message<List<CfetsPrimaryBidManageSaveDetailDto>>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("查询投标确认信息数据异常", e);
+            return new Message<List<CfetsPrimaryBidManageSaveDetailDto>>().fail().setMessage("查询投标确认信息异常");
+        }
+    }
+
+    /**
+     * 编辑明细中缴款金额
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
+     */
+    @ApiOperation(value = "编辑明细中缴款金额", notes = "编辑明细中缴款金额")
+    @ResponseBody
+    @PostMapping("/editPayAmt")
+    public Message<CfetsPrimaryBidManageSaveRequest> editPayAmt(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
+        try {
+            CfetsPrimaryBidManageSaveRequest result = cfetsPrimaryBidManageService.editList(request,"1");
+            return new Message<CfetsPrimaryBidManageSaveRequest>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("查询投标确认信息数据异常", e);
+            return new Message<CfetsPrimaryBidManageSaveRequest>().fail().setMessage("查询投标确认信息异常");
+        }
+    }
+
+    /**
+     * 编辑明细中缴款金额
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
+     */
+    @ApiOperation(value = "编辑明细中中标净价", notes = "编辑明细中中标净价")
+    @ResponseBody
+    @PostMapping("/editWinCprice")
+    public Message<CfetsPrimaryBidManageSaveRequest> editWinCprice(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
+        try {
+            CfetsPrimaryBidManageSaveRequest result = cfetsPrimaryBidManageService.editList(request,"2");
+            return new Message<CfetsPrimaryBidManageSaveRequest>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("查询投标确认信息数据异常", e);
             return new Message<CfetsPrimaryBidManageSaveRequest>().fail().setMessage("查询投标确认信息异常");
         }
     }
@@ -277,7 +342,6 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
 
     /**
      * 净价、行权收益率、到期收益率
-     * <功能详细描述>
      *
      * @param dto
      * @return
