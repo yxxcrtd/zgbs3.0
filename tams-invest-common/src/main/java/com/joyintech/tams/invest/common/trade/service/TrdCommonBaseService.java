@@ -1478,6 +1478,19 @@ public class TrdCommonBaseService extends BaseService {
     }
 
     /**
+     * 获取当日对账数据不一致和待处理数量
+     * @return
+     */
+    public Integer getCheckDisaccordCountDataNum(Date executeDate){
+        Map<String, Object> param = new HashMap<>();
+        param.put("CHECK_RESULT_0", DictCodeListExt3.对账状态结果_不一致.getValue());
+        param.put("CHECK_RESULT_2", DictCodeListExt3.对账状态结果_待处理.getValue());
+        param.put("execDate", executeDate);
+        // 查询对账结果不一致和待处理的数量
+        return trdCommonBaseMapper.getCheckDisaccordCountDataNum(param);
+    }
+
+    /**
      * 查询首期清算数据
      * @param sqcjbh 首期成交编号
      * @param seatNumber 席位号 注:seatNumber和secAcctId至少传一个

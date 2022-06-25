@@ -18,6 +18,7 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.InterfFloatcouprate;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -197,7 +198,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             ajaxResult.setMessageType(MessageType.错误消息);
         } else {
             //操作记录
-            this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
+            this.saveOperate(secId, null, DictCodeListExt3.操作类型_自动加券, null);
         }
         return ajaxResult;
     }
@@ -449,6 +450,12 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
                 }
                 if (StringUtil.isBlank(interfPayhsrcsecinfoDto.getObservebefunit())) {
                     getValidMessages("延后时间单位", validMessages);
+                }
+            }
+            if (StringUtil.isNotBlank(interfPayhsrcsecinfoDto.getCouponspecies()) && DictCodeList.息票品种_附息.getValue().equals(interfPayhsrcsecinfoDto.getCouponspecies())) {
+                List<InterfFloatcouprate> interfFloatcouprates = commonAutoCouponService.selectInterfFloatingcouponsrate(interfPayhsrcsecinfoDto.getSecid());
+                if(CollectionUtils.isEmpty(interfFloatcouprates)){
+                    getValidMessages("附息计划", validMessages);
                 }
             }
         }

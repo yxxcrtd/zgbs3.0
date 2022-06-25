@@ -251,7 +251,7 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
                 BeanUtil.copyPropertiesIgnoreNull(bondDto, bidOrderBidPrice);
                 bondDto.setShareAmt(ArithmeticUtil.divide(bidOrderBidPrice.getSubscriptionAmount(), BigDecimal.valueOf(100), 6));
                 bondDto.setFpriceAmt(bidOrderBidPrice.getPayableAmount());
-                bondDto.setTradeId(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId());
+                bondDto.setEntrustId(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId());
                 BidOrder bidOrder = bidOrderMapper.selectByPrimaryKey(bidOrderBidPrice.getBidId());
                 bondDto.setFinprodId(bidOrder.getFinprodId());
             } else {
@@ -261,8 +261,7 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
                         ArithmeticUtil.divide(bidOrderBidPrice.getSubscriptionAmount(), BigDecimal.valueOf(100), 6)));
                 // 应缴款金额
                 bondDto.setTradeAmt(ArithmeticUtil.doAdd(bondDto.getTradeAmt(), bidOrderBidPrice.getPayableAmount()));
-//                bondDto.setEntrustId(entity.getRegIbuId() + item.getPortfolioId());
-                bondDto.setTradeId(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId());
+                bondDto.setEntrustId(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId());
             }
             map.put(bidOrderBidPrice.getBidId() + bidOrderBidPrice.getPortfolioId(), bondDto);
         }

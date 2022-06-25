@@ -1070,7 +1070,7 @@
 						from BID_ORDER
 						where
 							<if test="finprodIds!=null and finprodIds.size()>0">
-								<foreach collection="finprodIds" item="item" open=" BID_ID in (" close=")" separator=",">
+								<foreach collection="finprodIds" item="item" open=" FINPROD_ID in (" close=")" separator=",">
 									#{item}
 								</foreach>
 							</if>
