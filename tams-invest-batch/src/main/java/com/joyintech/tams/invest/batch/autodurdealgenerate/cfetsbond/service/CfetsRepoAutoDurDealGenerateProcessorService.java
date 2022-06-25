@@ -135,7 +135,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
         trdFinProductDealTotal.setFinprodType2(entity.getFinprodType2());
         trdFinProductDealTotal.setPortfolioId(entity.getPortfolioId());
         trdFinProductDealTotal.setCcy(entity.getCcy());
-        trdFinProductDealTotal.setPs(entity.getPs()==null ? DictCodeList.交易方向_到期.getValue() : entity.getPs());
+        trdFinProductDealTotal.setPs(DictCodeList.交易方向_到期.getValue());
         trdFinProductDealTotal.setSecManageAcctId(entity.getSecManageAcctId());
         trdFinProductDealTotal.setBranch(AutoPeriodCommonService.changePsToBranch(entity.getmDate(), DictCodeList.交易方向_到期.getValue()));
         trdFinProductDealTotal.setTradeDate(DateTime.parse(entity.getSettleDate()).toDate());
@@ -202,11 +202,11 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
         paTrdFinProductDealTotal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
         if (DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(entity.getFinprodType2())) {
             trdFinProductDealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_正回购到期.getValue());
-            trdFinProductDealTotal.setPs(DictCodeListExt3.交易方向_正回购.getValue());
+            //trdFinProductDealTotal.setPs(DictCodeListExt3.交易方向_正回购.getValue());
             paTrdFinProductDealTotal.setPaBussType(DictCodeListExt1.平安业务类型_正回购到期.getValue());
         } else if (DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(entity.getFinprodType2())) {
             trdFinProductDealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_逆回购到期.getValue());
-            trdFinProductDealTotal.setPs(DictCodeListExt3.交易方向_逆回购.getValue());
+            //trdFinProductDealTotal.setPs(DictCodeListExt3.交易方向_逆回购.getValue());
             paTrdFinProductDealTotal.setPaBussType(DictCodeListExt1.平安业务类型_逆回购到期.getValue());
         }
         paTrdFinProductDealTotal.setRate(ArithmeticUtil.divide(entity.getIntRate(), 100, 5));
