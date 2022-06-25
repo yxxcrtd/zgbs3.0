@@ -214,7 +214,11 @@ public class StlDataDealSzdJsmxProcessService {
 //				settleTransData.setFpriceAmt(new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getQsje()).doubleValue())));
 				settleTransData.setFpriceAmt(new BigDecimal(szdJsmx.getQsje()).abs());
 				// modify by etliu 20211225 end
-
+				// 清算速度
+				settleTransData.setSettleSpeed(0L);
+				if (!StringUtil.equals(szdJsmx.getQsrq(), szdJsmx.getJsrq())){
+					settleTransData.setSettleSpeed(1L);
+				}
 				// 单位净价
 				if (StringUtil.isNotEmpty(szdJsmx.getJg2())) {
 					settleTransData.setUnitCprice(new BigDecimal(szdJsmx.getJg2()));// 配债此字段未空，需要判断
@@ -381,11 +385,6 @@ public class StlDataDealSzdJsmxProcessService {
 				}*/
 
 				// modify by etliu 20211225 start
-				// 清算速度
-				settleTransData.setSettleSpeed(0L);
-				if (DateUtil.compareDate(settleTransData.getTradeDate(), settleTransData.getSettleDate()) != 0){
-					settleTransData.setSettleSpeed(1L);
-				}
 				// 光大反馈问题修复：产品的这种写法统一改下吧，精度缺失，会导致我们对不上资金余额；
 				// 印花税
 				if (StringUtil.isNotEmpty(szdJsmx.getYhs())){
@@ -1744,7 +1743,11 @@ public class StlDataDealSzdJsmxProcessService {
 			settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getJyrq()));
 			// 交割日期
 			settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getQsrq()));
-			
+			// 清算速度
+			settleTransData.setSettleSpeed(0L);
+			if (!StringUtil.equals(szdJsmx.getQsrq(), szdJsmx.getJsrq())){
+				settleTransData.setSettleSpeed(1L);
+			}
 			// 新股中签
 			if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03) &&
 					StringUtil.equals(StlDataDealProcessConstant.JLLX_002, szdJsmx.getJllx()) && StringUtil.equals(StlDataDealProcessConstant.JYFS_001, szdJsmx.getJyfs()) &&
@@ -1920,11 +1923,6 @@ public class StlDataDealSzdJsmxProcessService {
 			settleTransData.setBranch(0L);
 			// 业务类型
 			settleTransData.setBusiType(DictCodeList.业务类型_股票交易.getValue());
-			// 清算速度
-			settleTransData.setSettleSpeed(0L);
-			if (DateUtil.compareDate(settleTransData.getTradeDate(), settleTransData.getSettleDate()) != 0){
-				settleTransData.setSettleSpeed(1L);
-			}
 			// modify by etliu 20211225 start
 			// 光大反馈问题修复：产品的这种写法统一改下吧，精度缺失，会导致我们对不上资金余额；
 			// 印花税
@@ -2080,7 +2078,7 @@ public class StlDataDealSzdJsmxProcessService {
 				settleTransData.setTradePlat(null);
 				// 清算速度
 				settleTransData.setSettleSpeed(0L);
-				if (DateUtil.compareDate(settleTransData.getTradeDate(), settleTransData.getSettleDate()) != 0){
+				if (!StringUtil.equals(szdJsmx.getQsrq(), szdJsmx.getJsrq())){
 					settleTransData.setSettleSpeed(1L);
 				}
 				//普通二级市场交易业务
@@ -2437,7 +2435,7 @@ public class StlDataDealSzdJsmxProcessService {
 		settleTransData.setSecType(stlDownDataDealOperatorDto.getFinprodType());
 		// 清算速度
 		settleTransData.setSettleSpeed(0L);
-		if (DateUtil.compareDate(settleTransData.getTradeDate(), settleTransData.getSettleDate()) != 0){
+		if (!StringUtil.equals(szdJsmx.getQsrq(), szdJsmx.getJsrq())){
 			settleTransData.setSettleSpeed(1L);
 		}
 		// 交易场所
