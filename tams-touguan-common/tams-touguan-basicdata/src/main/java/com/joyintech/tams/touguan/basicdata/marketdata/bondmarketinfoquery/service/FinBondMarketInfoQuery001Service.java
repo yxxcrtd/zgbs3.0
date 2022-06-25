@@ -198,7 +198,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             ajaxResult.setMessageType(MessageType.错误消息);
         } else {
             //操作记录
-            this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
+            this.saveOperate(secId, null, DictCodeListExt3.操作类型_自动加券, null);
         }
         return ajaxResult;
     }
