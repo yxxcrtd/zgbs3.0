@@ -87,7 +87,14 @@
           $(counterId).attr('disabled',true);
           $(counterTrader).attr('disabled',true);
           $(contactInfo).attr('disabled',true);
-        }else if(pageId =='TrdStock002'){
+        }
+        // TISHKS-727:场内公募基金交易新建页面交易对手必填 modify by fuyongsheng 20220507 start
+        else if(pageId == 'TrdFundInvestTrade002'){
+            getElementById('counterId').attr("required", true);
+            star();
+        }
+        // TISHKS-727:场内公募基金交易新建页面交易对手必填 modify by fuyongsheng 20220507 end
+        else if(pageId =='TrdStock002'){
             //交易对手必填 modified by lishuping 20191029 start
         	//getElementById('counterId').removeAttr("required");
             //交易对手必填 modified by lishuping 20191029 end

@@ -2107,7 +2107,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         if (baseEtrCashPositionCommService != null && (DictCodeList.委托状态_待接收.getValue().equals(entity.getEntrustStatus())
                 || DictCodeListExt3.委托状态_待分发.getValue().equals(entity.getEntrustStatus()))) {
             baseEtrCashPositionCommService.entrustCloseExecute(entity.getEntrustId(), DictCodeList.是否_是.getValue());
-//			positionRequestService.sendRevoke(entity);
+			//positionRequestService.sendRevoke(entity);
         }
         //处理履历
         updateCfetsOprHis(entity.getEntrustId(), "revoke",null,null);
@@ -2524,6 +2524,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             } else {
                 entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
             }
+//            }
             if (StringUtils.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), ps) ||
                     StringUtils.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), ps)) {
                 if (null != entrustNum) {//entrustAmt 代表标准券数量

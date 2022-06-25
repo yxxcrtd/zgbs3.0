@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Strings;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -20,10 +21,12 @@ import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.EntrustService;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
-import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
+
+import com.joyintech.tams.exchange.service.trade.processor.InvestInterfaceHelper;import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
 import org.slf4j.Logger;
@@ -37,12 +40,16 @@ import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component
 public class CommonCheckHelper {
     private static final Logger logger = LoggerFactory.getLogger(CommonCheckHelper.class);
-
+    private static final ThreadLocal<SimpleDateFormat> INSTRUCTION_DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyyMMdd");
+        }
+    };
     @Autowired
     private EntrustService entrustService;
     @Autowired
@@ -71,6 +78,10 @@ public class CommonCheckHelper {
     private PriceHelper priceHelper;
     @Autowired
     private CommonManagement commonManagement;
+    @Autowired
+    private InvestInterfaceHelper investInterfaceHelper;
+    @Autowired
+    private InstructionService instructionService;
 
     // modify by swwan TISHKS-263 闭市校验无效 20211216 start
 
@@ -191,8 +202,17 @@ public class CommonCheckHelper {
                 return entrustOptional.get().getId();
             }
         }
-        return null;
+        return StrUtil.EMPTY;
     }
+
+    private boolean filterUniqueEntrustByEntrustStatusAndStockCodeAndEntrustProp(String entrustProp, String stockCode, Entrust entrust) {
+        return entrust.getEntrustProp().equals(entrustProp)
+                && entrust.getStockCode().equals(stockCode)
+                && (entrust.getEntrustStatus() == EntrustStatus.REPORTED.value
+                || entrust.getEntrustStatus() == EntrustStatus.PENDING_APPROVAL.value
+                || entrust.getEntrustStatus() == EntrustStatus.PENDING_REVIEW.value);
+    }
+
 
     public boolean checkCommonParam(BigDecimal entrustPrice, long entrustVolume, OrderInterface orderInterface, Instrument instrument, String tradePlat, String instructionPs, BigDecimal entrustBalance, String entrustBussType, String priceMode) {
         if (EntrustBs.BUY.value.equals(orderInterface.getEntrustBs()) && instrument.getBuyUnit() > 0 && entrustVolume % instrument.getBuyUnit() != 0) {

@@ -217,7 +217,12 @@ public class ComCoinFundQuotationInfo001Service extends CommonExportService<ComC
      * @return
      */
     public AjaxResult checkImportData(String fileName) {
-        Pattern pattern = Pattern.compile("[0-9]*");
+        //Pattern pattern = Pattern.compile("[0-9]*");
+        // 正则校验由整数改为 浮点数校验 区分保留位数  likaitao 2022/5/9 start
+        Pattern patternDecimal14 = Pattern.compile("([1-9]\\d*\\.?\\d{1,14})|(0\\.\\d*[0-9]{1,14}|[0-9]\\d*)");
+        Pattern patternDecimal4 = Pattern.compile("([1-9]\\d*\\.?\\d{1,4})|(0\\.\\d*[0-9]{1,4}|[0-9]\\d*)");
+        Pattern patternDecimal2 = Pattern.compile("([1-9]\\d*\\.?\\d{1,2})|(0\\.\\d*[0-9]{1,2}|[0-9]\\d*)");
+        // 正则校验由整数改为 浮点数校验 区分保留位数  likaitao 2022/5/9 end
         List<String> findList =  this.queryFinprod(Maps.newHashMap()).stream().map(item->item.getId()).collect(Collectors.toList());
         List<List<String>> objects = ExcelUtil.getTempList(fileName);
         if (objects.size() - 1 > 1000) {
@@ -266,31 +271,31 @@ public class ComCoinFundQuotationInfo001Service extends CommonExportService<ComC
                     //万份收益/净值 必填
                     if (!StringUtil.isNotEmpty(rowData.get(3))){
                         errorMsg.append("万份收益/净值 必填！");
-                    }else if (!pattern.matcher(rowData.get(3)).matches()){
+                    }else if (!patternDecimal14.matcher(rowData.get(3)).matches()){
                         errorMsg.append("万份收益/净值 格式不正确！");
                     }
 
                     //累计净值	复权单位净值	七日年化收益率	基金总份额
                     if (StringUtil.isNotEmpty(rowData.get(5))){
-                        if (!pattern.matcher(rowData.get(5)).matches()){
+                        if (!patternDecimal4.matcher(rowData.get(5)).matches()){
                             errorMsg.append("累计净值 格式不正确！");
                         }
                     }
 
                     if (StringUtil.isNotEmpty(rowData.get(6))){
-                        if (!pattern.matcher(rowData.get(6)).matches()){
+                        if (!patternDecimal4.matcher(rowData.get(6)).matches()){
                             errorMsg.append("复权单位净值 格式不正确！");
                         }
                     }
 
                     if (StringUtil.isNotEmpty(rowData.get(7))){
-                        if (!pattern.matcher(rowData.get(7)).matches()){
+                        if (!patternDecimal4.matcher(rowData.get(7)).matches()){
                             errorMsg.append("七日年化收益率 格式不正确！");
                         }
                     }
 
                     if (StringUtil.isNotEmpty(rowData.get(8))){
-                        if (!pattern.matcher(rowData.get(8)).matches()){
+                        if (!patternDecimal2.matcher(rowData.get(8)).matches()){
                             errorMsg.append("基金总份额 格式不正确！");
                         }
                     }

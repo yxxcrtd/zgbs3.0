@@ -207,4 +207,10 @@ public class MstCalendarTypeService extends BaseService<MstCalendarType001Dto>{
     public List<SuggestDto> getTradeCalendarName(Map<String, Object> map) {
         return mstCalendarType001mapper.getTradeCalendarName(map);
     }
+
+    // TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 start
+    public Integer hasCalendarName(String calendarName){
+        return mstCalendarType001mapper.hasCalendarName(calendarName);
+    }
+    // TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 end
 }

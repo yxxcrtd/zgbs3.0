@@ -195,4 +195,15 @@ public class MstCalendarTypeController {
     public List<SuggestDto> getTradeCalendarName(@RequestBody Map<String, Object> map) {
         return mstCalendarTypeService.getTradeCalendarName(map);
     }
+
+    // TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 start
+    /**
+     * 查询日历名称
+     * @param calendarName 日历名称
+     */
+    @GetMapping("/hasCalendarName")
+    public Integer hasCalendarName(String calendarName){
+        return mstCalendarTypeService.hasCalendarName(calendarName);
+    }
+    // TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 end
 }

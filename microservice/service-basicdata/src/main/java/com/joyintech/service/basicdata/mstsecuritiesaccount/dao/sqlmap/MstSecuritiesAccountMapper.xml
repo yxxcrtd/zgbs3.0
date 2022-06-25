@@ -561,6 +561,11 @@
             on va.finprod_id = v.finprod_id
             left join fin_product_type r
             on v.FINPROD_ID = r.FINPROD_ID
+            and ((
+            <if test="tradePlat != null and tradePlat != ''">
+                va.TRADE_PLAT like concat('%',concat(#{tradePlat},'%')) and
+            </if>
+            v.finprod_type2 = 'F01' ) or v.finprod_type2 != 'F01')
             where t.branch = 0
             <if test="tradePlat == null or tradePlat == '' ">
                 and  v.finprod_type2='F01'  and t.oth_type=#{FINPROD_OTH_CODE_TYPE_05}

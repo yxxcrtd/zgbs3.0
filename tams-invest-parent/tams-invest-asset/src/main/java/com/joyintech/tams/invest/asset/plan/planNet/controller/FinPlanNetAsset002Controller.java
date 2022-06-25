@@ -106,7 +106,8 @@ public class FinPlanNetAsset002Controller extends BaseController{
         model.addAttribute("PROFIT_TYPE_02", DictCodeList.收益类型_收益型.getValue());
         model.addAttribute("YES", DictCodeList.是否_是.getValue());
         String finprodId = getParam("finprodId");
-        // 增加快捷录入功能 by 赵东东 2019.10.12 start 
+        // 增加快捷录入功能 by 赵东东 2019.10.12 start
+        boolean isQuickInput = Boolean.parseBoolean(getParam("isQuickInput"));
         String finprodMarketId = getParam("finprodMarketId");
         if(StringUtil.isNotEmpty(finprodMarketId)&&StringUtil.isEmpty(finprodId)) {
         	finprodId = finPlanNetAssetService.getFinprodId(finprodMarketId);
@@ -130,7 +131,10 @@ public class FinPlanNetAsset002Controller extends BaseController{
             FinPlanNetAssetDto finPlanAssetNInfo = finPlanNetAssetService.getBasicInfoByFinprodId(finprodId);
             if(null!=finPlanAssetNInfo){
                 finPlanAssetNInfo.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
-                finPlanAssetNInfo.setFjId(finPlanAssetNInfo.getFinprodId());
+                // 快录时，不默认带出附件信息
+                if (!isQuickInput){
+                    finPlanAssetNInfo.setFjId(finPlanAssetNInfo.getFinprodId());
+                }
             }
             if (StringUtil.isNotEmpty(getParam("pageModel"))){
                 finPlanAssetNInfo.setPageModel(getParam("pageModel"));     
