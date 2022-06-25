@@ -107,30 +107,38 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
             Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> entrustIdListMap = dto.getAllocationDetails().stream().collect(JoyinCollectors.groupingBy(CfetsPrimaryBidManageSaveDetailDto::getEntrustId));
             for (String entrustId: entrustIdListMap.keySet()){
 //                BigDecimal sumActWinPrinamt = entrustIdListMap.get(entrustId).stream().map(item -> item.getTheWinPrinamt()).reduce(BigDecimal.ZERO, BigDecimal::add);
-                for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()){
-                    if(!StringUtil.isNotEmpty(detailDto.getActWinPrinamt())){
-                        resultList.add(new ValidMessage(getMessage("分配明细中中标券面总额不可为空！")));
-                        break;
-                    }
-                    if(!StringUtil.isNotEmpty(detailDto.getTotalBidPrinamt())){
-                        resultList.add(new ValidMessage(getMessage("分配明细中汇总投标券面总额不可为空！")));
-                        break;
-                    }
-                    if (detailDto.getActWinPrinamt().compareTo(detailDto.getTotalBidPrinamt())>0){
+                for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()) {
+                    if (!StringUtil.isNotEmpty(detailDto.getActWinPrinamt())
+                            && !StringUtil.isNotEmpty(detailDto.getTotalBidPrinamt())
+                            && detailDto.getActWinPrinamt().compareTo(detailDto.getTotalBidPrinamt()) > 0) {
                         resultList.add(new ValidMessage(getMessage("中标券面总额不能大于汇总投标券面总额！")));
                         break;
                     }
                 }
             }
  //            分配明细中缴款金额 汇总金额<>基本信息中的缴款金额
-            BigDecimal sumPatAmt = dto.getAllocationDetails().stream().filter(item->StringUtil.isNotEmpty(item.getPayAmt())).map(item -> item.getPayAmt()).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal sumPatAmt = dto.getAllocationDetails().stream().filter(
+                    item->StringUtil.isNotEmpty(item.getPayAmt())).map(CfetsPrimaryBidManageSaveDetailDto::getPayAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+
             if (StringUtil.isNotEmpty(dto.getPayAmt()) && sumPatAmt.compareTo(dto.getPayAmt())!=0){
                 resultList.add(new ValidMessage(getMessage("明细汇总缴款金额不等于基本信息中的缴款金额！")));
             }
 //            分配明细中结算服务费 汇总金额<>基本信息中的结算服务费
-            BigDecimal sumSettFeeAmt = dto.getAllocationDetails().stream().filter(item->StringUtil.isNotEmpty(item.getSettFeeAmt())).map(item -> item.getSettFeeAmt()).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal sumSettFeeAmt = dto.getAllocationDetails().stream().filter(
+                    item->StringUtil.isNotEmpty(item.getSettFeeAmt())).map(CfetsPrimaryBidManageSaveDetailDto::getSettFeeAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
             if (StringUtil.isNotEmpty(dto.getSettFeeAmt()) && sumSettFeeAmt.compareTo(dto.getSettFeeAmt())!=0){
                 resultList.add(new ValidMessage(getMessage("明细汇总结算服务费不等于基本信息中的结算服务费！")));
+            }
+            //提交时校验分配明细列表中【理论中标券面总额】、【实际中标券面总额】汇总等于基本信息中【中标券面总额】；
+            BigDecimal theWinPrinamt = dto.getAllocationDetails().stream().filter(
+                    item -> StringUtil.isNotEmpty(item.getTheWinPrinamt())).map(CfetsPrimaryBidManageSaveDetailDto::getTheWinPrinamt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (StringUtil.isNotEmpty(dto.getWinPrinamt()) && dto.getWinPrinamt().compareTo(theWinPrinamt) != 0) {
+                resultList.add(new ValidMessage(getMessage("明细汇总理论中标券面总额不等于基本信息中的中标券面总额！")));
+            }
+            BigDecimal actWinPrinamt = dto.getAllocationDetails().stream().filter(
+                    item -> StringUtil.isNotEmpty(item.getActWinPrinamt())).map(CfetsPrimaryBidManageSaveDetailDto::getActWinPrinamt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (StringUtil.isNotEmpty(dto.getWinPrinamt()) && dto.getWinPrinamt().compareTo(actWinPrinamt) != 0) {
+                resultList.add(new ValidMessage(getMessage("明细汇总实际中标券面总额不等于基本信息中的中标券面总额！")));
             }
 //            分配明细中【中标标位】是否存在连续投标标位，即标位1和标位2之间仅差1个投标步长
             String bidMinUnit = CacheUtil.getSysParam("BID_MIN_UNIT");
