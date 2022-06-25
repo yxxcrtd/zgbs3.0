@@ -175,7 +175,6 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         BigDecimal cash = StringUtil.isNotEmpty(dto.getNomCapi())? dto.getNomCapi().multiply(new BigDecimal(10000)):new BigDecimal(0.00);
         productAdd.setNomCapi(cash);
         productAdd.setBasis(dto.getBasis());
-        productAdd.setIsInformationCoverage(dto.getIsAllowOverwrite());
         finProductAddMapper.insert(productAdd);
         //3.保存融产品分类表
         FinProductType finProductType = new FinProductType();

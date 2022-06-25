@@ -18,7 +18,7 @@
           from (select *
                   from fin_product f
                   inner join MST_CUSTOMER_INFO_ADD m
-                  on ((f.ISSUER = m.Customer_Id and f.finprod_type in ('F01','F17')) OR (f.FINANCIER = m.Customer_Id and f.finprod_type in ('F06')))
+                  on ((f.ISSUER = m.Customer_Id and f.finprod_type in ('F01','F32')) OR (f.FINANCIER = m.Customer_Id and f.finprod_type in ('F06')))
                  inner join sys_institution i
                     on m.insititute_code = i.insititute_code
                    and i.institution_type = '01'

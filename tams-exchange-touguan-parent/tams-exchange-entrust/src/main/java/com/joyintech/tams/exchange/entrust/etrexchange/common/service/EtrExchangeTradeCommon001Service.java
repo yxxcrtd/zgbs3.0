@@ -2478,7 +2478,6 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             }else {
                 entrustNum = ArithmeticUtil.divide(entrustAmt, entrustPrice, 0, RoundingMode.DOWN);
             }
-//            }
         }
 
         if (null != param.get("minTrdUnitLimitDto")) {

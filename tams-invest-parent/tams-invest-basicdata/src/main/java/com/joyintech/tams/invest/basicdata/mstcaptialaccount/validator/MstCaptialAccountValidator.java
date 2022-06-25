@@ -118,7 +118,10 @@ public class MstCaptialAccountValidator implements BeanValidator{
                                 getMessage("MstCaptialAccount002.swiftCode"))));
                         }
                     }
-
+                    // TISHKS-1189:增加利息校验 modify by fuyongsheng 20220507 start
+                    // 校验利息
+                    this.checkIsCalint(dto, errorList);
+                    // TISHKS-1189:增加利息校验 modify by fuyongsheng 20220507 end
                     // add by etliu 20220622 start
                     // 3.0.6场内 ZGCPCN-1622:资金账号修改关联柜台信息时报错
                     if(StringUtil.isNotEmpty(dto.getIsCalint())) {

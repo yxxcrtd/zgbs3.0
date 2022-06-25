@@ -8,8 +8,10 @@ import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedToWriteEntity;
 import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.web.PlatformDate;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.settle.batch.datagather.dto.InvestTradeWriteDto;
 import com.joyintech.tams.settle.batch.datagather.listener.StlDataGatherJobListener;
@@ -32,6 +34,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 存续期交易生成批处理任务
@@ -105,6 +109,17 @@ public class StlDownDurationDataGatherTask extends BatchBaseService {
         if(null == batchExecuteInfo.getExecuteDate()){
             date = platformDateService.getSysDate();
         }
+        // ZGCPCN-1706:增加当日对账是否完成条件 modify by fuyongsheng 20220625 start
+        // 当日未对账完成数据
+        Integer unFinishReconNum = trdCommonBaseService.getCheckDisaccordCountDataNum(date);
+        if(unFinishReconNum >0){
+            logger.debug("当日未对账完成数量大于0,批处理退出。");
+            JobExecution result = new JobExecution(1l);
+            result.setStatus(BatchStatus.STOPPED);
+            return result;
+        }
+        // ZGCPCN-1706:增加当日对账是否完成条件 modify by fuyongsheng 20220625 end
+        // 当日未完全成交匹配数据
         Integer unFinishMatchNum = trdCommonBaseService.getUnFinishMatchSettleTransDataNum(date);
         if(unFinishMatchNum > 0){
             logger.debug("当日未完全成交匹配数量大于0,批处理退出。");

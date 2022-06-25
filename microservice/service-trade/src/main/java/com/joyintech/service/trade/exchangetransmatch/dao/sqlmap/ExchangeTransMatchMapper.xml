@@ -79,8 +79,9 @@
                 E1.FINPROD_ID  rFinprodId,
                 A.F_CJBH fCjbh,
                 <!--GNS-878:增加busitype,手动成交匹配需要 modify by fuyongsheng 20220217 start-->
-                A.BUSI_TYPE
+                A.BUSI_TYPE,
                 <!--GNS-878:增加busitype,手动成交匹配需要 modify by fuyongsheng 20220217 end-->
+                A.IS_PAY_WITH_TRADE
         from SETTLE_TRANS_DATA_TOTAL A
         LEFT JOIN SETTLE_TRANS_DATA_TOTAL_STATUS B
             ON A.SEQ_ID = B.SEQ_NO
