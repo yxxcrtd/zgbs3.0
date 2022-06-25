@@ -978,9 +978,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         req.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
         req.setWorkFlowId(entity.getWorkflowId());
         String balanceCheck = DictCodeList.是否_是.getValue();
-        if ((StringUtil.isNotEmpty(entity.getSoftSkipMode())
-                && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))
-                || StringUtil.isNotEmpty(confirmOk)) {
+        if (isSubmit&&(StringUtil.isNotEmpty(entity.getSoftSkipMode())
+                && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))) {
+            balanceCheck = DictCodeList.是否_否.getValue();
+        }else if ( StringUtil.isNotEmpty(confirmOk)) {
             balanceCheck = DictCodeList.是否_否.getValue();
         }
         req.setBalanceCheck(balanceCheck);
