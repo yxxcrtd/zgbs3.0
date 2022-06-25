@@ -466,7 +466,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
             ProcessMark processMark = cfetsRepoQuotedPrice004Service.getBusinessInfoByPageIdAndPk(wflValidInputParameter);
             CfetsTrdBondFirstSubInfoDto dto = cfetsTrdBondFirstSub002Service.getBussinessEntity(processMark);
             dto.setBidId(cfetsBondFirstSubCheckDetaileRequst.getBidId());
-            dto.setRemark(StringUtil.join("申购撤销原因：", requst.getRemark()));
+            dto.setRevokeReason(StringUtil.join("申购撤销原因：", requst.getRemark()));
             dto.setOperateType("revoke");
             cfetsTrdBondFirstSubInfoDtos.add(dto);
         }

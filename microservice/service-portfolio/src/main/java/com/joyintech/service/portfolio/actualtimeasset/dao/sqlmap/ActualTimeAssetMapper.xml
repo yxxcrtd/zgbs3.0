@@ -270,7 +270,7 @@
 										LEFT JOIN MST_SHARE_PRICE msp
 										ON msp.SHARES_ID = fp.FINPROD_MARKET_ID AND msp.DEAL_DATE &lt;= to_date(#{cdate},'yyyy-MM-dd')
 										LEFT JOIN MST_CREDIT_MARKET_INFO mcmi
-										ON mcmi.SECID = fp.FINPROD_MARKET_ID AND mcmi.CDATE &lt;= #{cdate}
+										ON mcmi.SECID = fp.FINPROD_MARKET_ID AND mcmi.CDATE &lt;= to_date(#{cdate},'yyyy-MM-dd')
 									)gavInfo
 							) WHERE num = 1
 							<!-- ZGZGST-1408:市值要取最近的一次估值 fuyongsheng 20210828 edit end -->

@@ -35,6 +35,8 @@ public class FinprodMarketInfoRequest {
     @ApiModelProperty(name="initValue",value="市场代码id",example="A1")
     private String initValue;
 
+    private String searchPageType;
+
     @ApiModelProperty(name="pageMode",value="分页对象")
     private PageMode pageMode;
 
@@ -68,6 +70,14 @@ public class FinprodMarketInfoRequest {
 
     public void setInitValue(String initValue) {
         this.initValue = initValue;
+    }
+
+    public String getSearchPageType() {
+        return searchPageType;
+    }
+
+    public void setSearchPageType(String searchPageType) {
+        this.searchPageType = searchPageType;
     }
 
     public String getTradeMarket() {

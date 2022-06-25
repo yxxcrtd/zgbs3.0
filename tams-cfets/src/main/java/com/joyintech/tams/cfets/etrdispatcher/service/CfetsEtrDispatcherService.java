@@ -874,7 +874,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                 page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrPrimaryBidDealListInfo(pageParam));
             }else if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_分销买入.getValue())) {
                 page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrFxmrBidDealListInfo(pageParam));
-            }else {
+            }else if (StringUtil.equals(dto.getBidModle(), DictCodeListExt4.投标方式_自主投标.getValue()) && StringUtil.equals(dto.getIsWin(), DictCodeList.是否_是.getValue())){
                 page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrDispatcherFirstBidDealListInfo(pageParam));
             }
 

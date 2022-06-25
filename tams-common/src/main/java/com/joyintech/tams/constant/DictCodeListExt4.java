@@ -147,7 +147,7 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     头寸申购方式_代投代缴(DictCode.头寸申购方式,"06","代投代缴"),
     共通业务类型_中标结果维护自主投标(DictCode.共通业务类型,"TRD102","共通业务类型_中标结果维护-自主投标"),
     共通业务类型_中标结果维护代投代缴(DictCode.共通业务类型,"TRD103","共通业务类型_中标结果维护-代投代缴"),
-
+    共同业务类型_一级投标确认_申购_登记(DictCode.共通业务类型, "TRD95", "一级投标确认-申购-登记"),
     /** add by weipeng on 20220410：现金管理类产品改造升级 start **/
     利息收入备抵科目_利息收入备抵(DictCode.增值税缴纳利息收入备抵科目,"01","利息收入增值税备抵"),
     利息收入备抵科目_投资收益_利息收入备抵(DictCode.增值税缴纳利息收入备抵科目,"02","投资收益_利息收入_增值税备抵"),
@@ -193,8 +193,7 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     股票交易发行方式_红利补税(DictCode.股票交易发行方式,"04","未上市-新股"),
     股票交易发行方式零碎股转现金(DictCode.股票交易发行方式,"05","已上市"),
     /** add by zhangzewei on 20220428：股票相关变更 end **/
-    共同业务类型_一级投标确认_申购_登记(DictCode.共通业务类型, "TRD95", "一级投标确认-申购-登记"),
-            ;
+    ;
     /**
      * 对应于数据字典code
      */

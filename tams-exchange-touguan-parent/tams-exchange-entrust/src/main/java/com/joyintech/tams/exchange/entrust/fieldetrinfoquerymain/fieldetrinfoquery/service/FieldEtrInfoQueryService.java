@@ -210,6 +210,15 @@ public class FieldEtrInfoQueryService extends BaseService {
                         response.setDealProgress(dto2.getDealProgress());
                     }
                 }
+                //add wsz 3.0.6场内 ZGCPCN-1659 20220623 start
+                //【场内指令查询-信用保护凭证】指令金额排序有误将sql中的转化为字符串逻辑放在此处处理，解决金额排序问题
+                if(!StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())&&
+                  !StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())
+                        &&StringUtils.equals(response.getOutputValue(), DictCodeListExt3.投管业务类型_债转股.getValue())
+                ){
+                    response.setEntrustAmt(null);
+                }
+                //add wsz 3.0.6场内 ZGCPCN-1659 20220623 end
             }
 
         }

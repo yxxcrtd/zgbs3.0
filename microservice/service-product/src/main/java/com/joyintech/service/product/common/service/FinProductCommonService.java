@@ -1,74 +1,39 @@
 package com.joyintech.service.product.common.service;
 
-import java.lang.reflect.InvocationTargetException;
-//import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
-import com.joyintech.tams.common.base.dao.*;
-import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.invest.common.component.base.core.impl.dao.BaseGetBussinessIdMapper;
-import com.joyintech.tams.systemtools.constant.DataIndexSequenceType;
-import com.joyintech.workflow.engine.constant.OperationType;
-import org.apache.commons.codec.binary.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.service.product.common.dao.BenchMarketInfoMapper;
-import com.joyintech.service.product.common.dao.FinProductFloatFeeMapper;
-import com.joyintech.service.product.common.dao.FinProductGoalInfoMapper;
-import com.joyintech.service.product.common.dao.FinProductRevalDocumentMapper;
-import com.joyintech.service.product.common.dao.PrdInvestParamMapper;
-import com.joyintech.service.product.common.dao.PrdPtlManagementInfo001Mapper;
-import com.joyintech.service.product.common.dao.ProductCommonMapper;
-import com.joyintech.service.product.common.dto.BussBenchMarkInfoDto;
-import com.joyintech.service.product.common.dto.BussBenchMarkLayeredInfoDto;
-import com.joyintech.service.product.common.dto.BussFinProductBonusPlanDto;
-import com.joyintech.service.product.common.dto.BussFinProductFeeInfoDto;
-import com.joyintech.service.product.common.dto.BussFinProductInvestInfoDto;
-import com.joyintech.service.product.common.dto.BussFinProductInvestPeriodDto;
-import com.joyintech.service.product.common.dto.BussFinProductOpenPlanDto;
-import com.joyintech.service.product.common.dto.BussFinProductPayPlanDto;
-import com.joyintech.service.product.common.dto.BussFinProductRevalDocumentDto;
-import com.joyintech.service.product.common.dto.FinProductAnapleroticInfoDto;
-import com.joyintech.service.product.common.dto.FinProductAnapleroticPlanDto;
-import com.joyintech.service.product.common.dto.FinProductCommonInfoDto;
-import com.joyintech.service.product.common.dto.FinProductFloatFeeDto;
-import com.joyintech.service.product.common.dto.FundAccountInfoDto;
-import com.joyintech.service.product.common.dto.MstTradeOpponentDto;
-import com.joyintech.service.product.common.dto.PtlManagementInfoDto;
-import com.joyintech.service.product.common.dto.SecuritiesAccountInfoDto;
-import com.joyintech.service.product.common.dto.StlCapacctDto;
+import com.joyintech.framework.util.*;
+import com.joyintech.service.product.common.dao.*;
+import com.joyintech.service.product.common.dto.*;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.BaseFinProductBaseInfoService;
 import com.joyintech.tams.component.base.core.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.CommonUtil;
-//import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.invest.common.component.base.core.impl.dao.BaseGetBussinessIdMapper;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.valuationinterf.ValuationInterfService;
 import com.joyintech.tams.invest.common.valuationinterf.dto.BussFinProductFundAccountInfoDto;
-import com.joyintech.tams.invest.common.valuationinterf.dto.ProdOtherInfoInitInputDto;
+import com.joyintech.tams.systemtools.constant.DataIndexSequenceType;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.codec.binary.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 /**
  * @author : 强成西
@@ -1191,6 +1156,13 @@ public class FinProductCommonService extends BaseService {
         // 浮动管理费
         if (finProductCommonInfoDto.getBussFinProductFloatFeeDto() != null) {
             FinProductFloatFeeDto finProductFloatFeeDto = finProductCommonInfoDto.getBussFinProductFloatFeeDto();
+
+            List<FinFloatCalcRuleDetail> finFloatCalcRuleDetailDtoList = finProductFloatFeeDto.getFinFloatCalcRuleDetailDtoList();
+            for (FinFloatCalcRuleDetail finFloatCalcRuleDetail : finFloatCalcRuleDetailDtoList) {
+                finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide(finFloatCalcRuleDetail.getSpreadRate(), 100, 8));
+                finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(finFloatCalcRuleDetail.getChargeRatio(), 100, 8));
+            }
+
             //如果净值型产品分档 就不存母产品浮动管理费，因为净值型产品分档浮动管理费对应到分层子产品-- 净值型周期型产品浮动管理费对应期限层
             if (!(StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), finProductCommonInfoDto.getProfitType())
                     && (StringUtil.equals(DictCodeList.处理模式_分档.getValue(), finProductCommonInfoDto.getDealMode())
@@ -1861,13 +1833,16 @@ public class FinProductCommonService extends BaseService {
         FinProduct parentFinProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
         // 查询现金流信息
 //		        FinCashInfo parentFinCashInfo =pCahsInfo;
-        if (!StringUtil.equals(entity.getTermType(), DictCodeListExt2.期限类型_多固定期限.getValue())) {
-            //无固定期限的周期型产品不需要自动生成期次数据 modify by lifangpeng 2022-06-21 start
-            if (StringUtil.equals(entity.getTermType(), DictCodeListExt2.期限类型_无固定期限.getValue())) {
-                return;
-            }
-            //无固定期限的周期型产品不需要自动生成期次数据 modify by lifangpeng 2022-06-21 end
 
+        //无固定期限的周期型产品不需要自动生成期次数据 modify by lifangpeng 2022-06-23 start
+        if (StringUtil.equals(entity.getTermType(), DictCodeListExt2.期限类型_无固定期限.getValue())) {
+            cycleProdInfo(parentFinProduct, entity, cashMap);
+            return;
+        }
+        //无固定期限的周期型产品不需要自动生成期次数据 modify by lifangpeng 2022-06-23 end
+
+
+        if (!StringUtil.equals(entity.getTermType(), DictCodeListExt2.期限类型_多固定期限.getValue())) {
             PrdLayerParam prdLayerParam = new PrdLayerParam();
             // 生成金融产品代码
             //周期型期限产品后缀
@@ -2623,6 +2598,212 @@ public class FinProductCommonService extends BaseService {
         }
     }
 
+    private void cycleProdInfo(FinProduct parentFinProduct, FinProductCommonInfoDto entity, HashMap<String, String> cashMap) throws InvocationTargetException, IllegalAccessException {
+        PrdLayerParam prdLayerParam = new PrdLayerParam();
+        // 生成金融产品代码
+        //周期型期限产品后缀
+        String endFinprodId = "";
+        if (StringUtil.equals(entity.getTermType(), DictCodeListExt2.期限类型_单一固定期限.getValue())) {
+            endFinprodId = entity.getTermType() + "_" + entity.getInvestmentCycle();
+            prdLayerParam.setTermMax(Long.parseLong(entity.getInvestmentCycle()));
+        } else {
+            endFinprodId = entity.getTermType();
+        }
+        prdLayerParam.setFinprodId(entity.getFinprodId() + "_" + endFinprodId);
+        // 理财产品分层参数表
+        prdLayerParam.setpFinprodId(entity.getFinprodId());
+        prdLayerParam.setVdate(entity.getVdate());
+        prdLayerParam.setIsSale(entity.getConsignmentFlag());
+        prdLayerParam.setRemark(entity.getRemark());
+        prdLayerParamMapper.insert(prdLayerParam);
+
+        List<BaseFinProductBaseInfoDto> baseInfoDtoList = new ArrayList<BaseFinProductBaseInfoDto>();
+        // 标的类金融产品基本信息基础组件
+        BaseFinProductBaseInfoDto baseFinProductBaseInfoDto = new BaseFinProductBaseInfoDto();
+        // 现金流信息dtolist
+        baseFinProductBaseInfoDto.setFinCashInfoList(new ArrayList<FinCashInfo>());
+        // 现金流计算规则dtolist
+        baseFinProductBaseInfoDto.setFinCashCalcRuleList(new ArrayList<FinCashCalcRule>());
+        // 现金流支付规则dtolist
+        baseFinProductBaseInfoDto.setFinCashPayRuleList(new ArrayList<FinCashPayRule>());
+        // 现金流利率信息表dtolist
+        baseFinProductBaseInfoDto.setFinRateInfoList(new ArrayList<FinRateInfo>());
+        // 现金流计划表dtolist
+        baseFinProductBaseInfoDto.setFinCashPlanList(new ArrayList<FinCashPlan>());
+        //
+        baseFinProductBaseInfoDto.setFinCashCountingRuleList(new ArrayList<FinFloatCountingRule>());
+        // 标的类金融产品基本信息
+        FinProduct finProduct = new FinProduct();
+        BeanUtil.copyProperties(finProduct, parentFinProduct);
+        finProduct.setFinprodId(prdLayerParam.getFinprodId());
+        finProduct.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_理财产品分层.getValue());
+        // 画面.产品简称
+        finProduct.setFinprodAbbr(parentFinProduct.getFinprodAbbr() + "_" + endFinprodId);
+        // 画面.产品名称
+        finProduct.setFinprodName(parentFinProduct.getFinprodName() + "_" + endFinprodId);
+        finProduct.setVdate(entity.getVdate());
+        finProduct.setTermDays(entity.getTermDays());
+        finProduct.setpFinprodId(entity.getFinprodId());
+        finProduct.setRemark(entity.getRemark());
+        //增加是否轧差清算 yzg 20191107 start
+//			                finProduct.setLiquidationYesno(entity.getLiquidationYesno());
+        //增加是否轧差清算 yzg 20191107 end
+        baseFinProductBaseInfoDto.setFinProduct(finProduct);
+        // 一体化对应etliu start
+
+
+        // 二级法人权限处理
+//        if (MultilevelDataAuthorityUtil.isEnabled()) {
+//            //创建机构代码
+//            String createInst = MultilevelDataAuthorityUtil.getService().queryOrganizationCode(LoginUserUtil.getUserName());
+//            entity.setCreateInst(createInst);
+//            // 有查询权限的机构代码
+//            List<String> searchOrgCodeList = null;
+//            // 有编辑权限的机构代码
+//            List<String> editOrgCodeList = null;
+//
+//            //获取所有父级机构。  拥有查看权限
+//            searchOrgCodeList = com.joyintech.tams.systemtools.util.CommonUtil.getParentInstitution(createInst);
+//            // 仅资产的创建机构（当前登录用户所在机构）有编辑权限
+//            editOrgCodeList = Arrays.asList(entity.getCreateInst());
+//
+//            // 记录二级法人权限
+//            insertDataAuthTypeInst(finTradeProduct.getFinprodId(), searchOrgCodeList, editOrgCodeList, DictCodeList.共通业务类型_期次管理.getValue());
+//        }
+
+        //3.FinBaseRuleInfo  通过业绩基准和 浮动管理费 生成的 下面都生成的branch为0 和期次要求的不为0 不符 重新生成
+
+        // 一体化对应etliu start
+        // 金融产品附属表entity
+        FinProductAdd finProductAdd = new FinProductAdd();
+        BeanUtil.copyProperties(finProductAdd, entity);
+        finProductAdd.setPortfolioId(entity.getPtlId());
+        finProductAdd.setFinprodId(finProduct.getFinprodId());
+        // 一体化对应etliu end
+
+        finProductAdd.setRedSpeed(finProductAdd.getPurSpeed());
+        //add by zhangweiqi 净值化产品状态修改
+        if (StringUtil.equals(entity.getPageId(), "FinProductBuild002") ||
+                StringUtil.equals(entity.getPageId(), "FinNetValueProductBuild002")) {
+            finProductAdd.setIssueStatus(DictCodeListExt1.发行状态_确认发行.getValue());
+        } else {
+            finProductAdd.setTmplId(entity.getFinprodId());
+        }
+        if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode())) {
+            finProductAdd.setIsCycle(DictCodeList.是否_是.getValue());
+            finProductAdd.setIsLay(DictCodeList.是否_是.getValue());
+        }
+        finProductAdd.setTermType(entity.getTermType());
+        finProductAdd.setLayType(DictCodeList.分层类型_期限分层.getValue());
+        finProductAdd.setInvestmentCycle(entity.getInvestmentCycle());
+
+        baseFinProductBaseInfoDto.setFinProductAdd(finProductAdd);
+        // 一体化对应etliu end
+
+        if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()) && StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())) {
+            // 开放规则dtolist
+            baseFinProductBaseInfoDto.setFinOpenRuleList(new ArrayList<>());
+            // 开放计划dtolist
+            baseFinProductBaseInfoDto.setFinOpenPlanList(new ArrayList<>());
+            //开放计划生成（需要在浮动管理费前生成）
+            this.procFinProductOpenPlan(entity, baseFinProductBaseInfoDto);
+        }
+        String resetType = null;
+        // 业绩基准 本身只有净值型产品界面存在 目前只支持净值型分档产品
+        if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()) &&
+                StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())) {
+            BussBenchMarkInfoDto bussBenchMarkInfoDto = entity.getBussBenchMarkInfoDto();
+            if (bussBenchMarkInfoDto != null &&
+                    (DictCodeListExt1.披露类型_区间披露.getValue().equals(bussBenchMarkInfoDto.getPublishType())
+                            || StringUtil.isNotEmpty(bussBenchMarkInfoDto.getRateType()))) {
+                String baseRuleId = CommonUtil.generateCashFlowCode(finProduct.getFinprodId(), null, entity.getBranch(), DictCodeListExt1.业绩基准类型_产品披露.getValue());
+                bussBenchMarkInfoDto.setBaseRuleId(baseRuleId);
+                bussBenchMarkInfoDto.setBaseRuleType(DictCodeListExt1.业绩基准类型_产品披露.getValue());
+                bussBenchMarkInfoDto.setBranch(entity.getBranch());
+                bussBenchMarkInfoDto.setRateLower(ArithmeticUtil.divide(bussBenchMarkInfoDto.getRateLower(), 100, 14));
+                bussBenchMarkInfoDto.setRateLimit(ArithmeticUtil.divide(bussBenchMarkInfoDto.getRateLimit(), 100, 14));
+                bussBenchMarkInfoDto.setRate(ArithmeticUtil.divide(bussBenchMarkInfoDto.getRate(), 100, 14));
+                if (StringUtil.isNotEmpty(finProduct.getVdate())) {
+                    bussBenchMarkInfoDto.setEffDate(finProduct.getVdate());
+                } else {
+                    bussBenchMarkInfoDto.setEffDate(DateUtil.platDateFromCache());
+                }
+                if (StringUtil.equals(bussBenchMarkInfoDto.getRateType(),
+                        DictCodeList.利率类型_浮动利率.getValue())) {
+                    MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(
+                            bussBenchMarkInfoDto.getIndexId());
+                    if (mstIndexInfo != null) {
+                        bussBenchMarkInfoDto.setIndexSource(mstIndexInfo.getIndexType());
+                    } else {
+                        bussBenchMarkInfoDto.setIndexSource(DictCodeListExt1.基准类型_2_利率.getValue());
+                    }
+                }
+                bussBenchMarkInfoDto.setFinprodId(finProduct.getFinprodId());
+                bussBenchMarkInfoDto.setSpreadRate(
+                        ArithmeticUtil.divide(bussBenchMarkInfoDto.getSpreadRate(), 100, 14));
+
+                // 一体化对应etliu start
+                resetType = bussBenchMarkInfoDto.getResetType(); // 业绩基准重置规则
+                // 一体化对应etliu end
+
+                finBaseRuleInfoMapper.insert(bussBenchMarkInfoDto);
+            }
+        }
+
+        // 浮动管理费
+        FinProductFloatFeeDto finProductFloatFeeDto = entity.getBussFinProductFloatFeeDto();
+        if (finProductFloatFeeDto != null && (StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())
+                && StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()))) {
+            //浮动管理费用处理
+            this.procFinProductFloatFeeInfoData(entity, baseFinProductBaseInfoDto, finProductFloatFeeDto, resetType, cashMap);
+
+            BussBenchMarkInfoDto bussBenchMarkInfoDtoTmp = entity.getBussBenchMarkFloatInfoDto();
+            FinBaseRuleInfo finBaseRuleInfo = new FinBaseRuleInfo();
+            //当净值行产品，并且浮动管理费的业绩基准不为空，并且浮动管理费finProductFloatFeeDto无业绩基准信息时，执行以下操作
+            if (bussBenchMarkInfoDtoTmp != null && StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())
+                    && StringUtil.isNotEmpty(bussBenchMarkInfoDtoTmp.getRateType()) && StringUtil.isEmpty(finProductFloatFeeDto.getRateType())) {
+                String baseRuleId = CommonUtil.generateCashFlowCode(finProduct.getFinprodId(), null, entity.getBranch(), DictCodeListExt1.业绩基准类型_浮动管理费.getValue());
+                finBaseRuleInfo.setBaseRuleId(baseRuleId);
+                finBaseRuleInfo.setBaseRuleType(DictCodeListExt1.披露类型_单值披露.getValue());
+                finBaseRuleInfo.setBranch(entity.getBranch());
+                finBaseRuleInfo.setRateType(bussBenchMarkInfoDtoTmp.getRateType());
+                finBaseRuleInfo.setRate(ArithmeticUtil.divide(bussBenchMarkInfoDtoTmp.getRate(), 100, 14));
+                finBaseRuleInfo.setCoefficient(bussBenchMarkInfoDtoTmp.getCoefficient());
+                finBaseRuleInfo.setResetType(bussBenchMarkInfoDtoTmp.getResetType());
+                if (StringUtil.isNotEmpty(finProduct.getVdate())) {
+                    finBaseRuleInfo.setEffDate(finProduct.getVdate());
+                } else {
+                    finBaseRuleInfo.setEffDate(DateUtil.platDateFromCache());
+                }
+                if (StringUtil.equals(finProductFloatFeeDto.getRateType(),
+                        DictCodeList.利率类型_浮动利率.getValue())) {
+                    MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(
+                            bussBenchMarkInfoDtoTmp.getIndexId());
+                    if (mstIndexInfo != null) {
+                        finBaseRuleInfo.setIndexSource(mstIndexInfo.getIndexType());
+                    } else {
+                        finBaseRuleInfo.setIndexSource(DictCodeListExt1.基准类型_2_利率.getValue());
+                    }
+                }
+                finBaseRuleInfo.setFinprodId(finProduct.getFinprodId());
+                finBaseRuleInfo.setSpreadRate(
+                        ArithmeticUtil.divide(bussBenchMarkInfoDtoTmp.getSpreadRate(), 100, 14));
+
+                // 一体化对应etliu start
+                resetType = finProductFloatFeeDto.getResetType(); // 业绩基准重置规则
+                // 一体化对应etliu end
+
+                finBaseRuleInfoMapper.insert(finBaseRuleInfo);
+
+                // 重新生成 第一个期次的数据 branch 为 fintradeProduct的branch
+                // 生成并直接入表 fincashinfo fin_cash_pay_rule fin_cash_calc_rule fin_float_calc_rule fin_float_calc_rule_detail finBaseRuleInfo
+//                execFirstPeriodProductData(entity, finTradeProduct, resetType, entity.getTermType(), finProductFloatFeeDto);
+            }
+        }
+        baseInfoDtoList.add(baseFinProductBaseInfoDto);
+        baseFinProductBaseInfoService.insert(baseInfoDtoList);
+    }
+
     private void execFirstPeriodProductData(FinProductCommonInfoDto finProductCommonInfoDto, FinTradeProduct finTradeProduct, String resetType, String termType, FinProductFloatFeeDto finProductFloatFeeDto) throws InvocationTargetException, IllegalAccessException {
         //
 
@@ -2725,12 +2906,12 @@ public class FinProductCommonService extends BaseService {
                     finFloatCalcRuleDetail.setCashId(finCashInfo.getCashId());
                     finFloatCalcRuleDetail.setEffDate(effDate);
                     finFloatCalcRuleDetail.setLev(finFloatCalcRuleDetail.getLev());
-                    finFloatCalcRuleDetail.setBaseRuleId(
-                            baseRuleId);// 业绩基准代码
-                    finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide(
-                            finFloatCalcRuleDetail.getSpreadRate(), 100, 14));
-                    finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(
-                            finFloatCalcRuleDetail.getChargeRatio(), 100, 14));
+                    finFloatCalcRuleDetail.setBaseRuleId(baseRuleId);// 业绩基准代码
+//                    finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide( finFloatCalcRuleDetail.getSpreadRate(), 100, 14));
+//                    finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(finFloatCalcRuleDetail.getChargeRatio(), 100, 14));
+
+                    finFloatCalcRuleDetail.setSpreadRate(finFloatCalcRuleDetail.getSpreadRate());
+                    finFloatCalcRuleDetail.setChargeRatio(finFloatCalcRuleDetail.getChargeRatio());
                     finFloatCalcRuleDetailMapper.insert(finFloatCalcRuleDetail);
                 }
             }
@@ -3841,12 +4022,11 @@ public class FinProductCommonService extends BaseService {
                     finFloatCalcRuleDetail.setCashId(cashId_floatFee);
                     finFloatCalcRuleDetail.setEffDate(effDate);
                     finFloatCalcRuleDetail.setLev(finFloatCalcRuleDetail.getLev());
-                    finFloatCalcRuleDetail.setBaseRuleId(
-                            baseRuleId);// 业绩基准代码
-                    finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide(
-                            finFloatCalcRuleDetail.getSpreadRate(), 100, 14));
-                    finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide(
-                            finFloatCalcRuleDetail.getChargeRatio(), 100, 14));
+                    finFloatCalcRuleDetail.setBaseRuleId(baseRuleId);// 业绩基准代码
+//                    finFloatCalcRuleDetail.setSpreadRate(ArithmeticUtil.divide( finFloatCalcRuleDetail.getSpreadRate(), 100, 14));
+//                    finFloatCalcRuleDetail.setChargeRatio(ArithmeticUtil.divide( finFloatCalcRuleDetail.getChargeRatio(), 100, 14));
+                    finFloatCalcRuleDetail.setSpreadRate(finFloatCalcRuleDetail.getSpreadRate());
+                    finFloatCalcRuleDetail.setChargeRatio(finFloatCalcRuleDetail.getChargeRatio());
                     finFloatCalcRuleDetailMapper.insert(finFloatCalcRuleDetail);
                 }
             }

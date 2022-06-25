@@ -2513,6 +2513,10 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             }
 
             infRiskRdsDto.setCalendarCode((String) CommonUtil.findValue(dataMap, "calendarId"));
+            if (StringUtil.isEmpty(infRiskRdsDto.getCalendarCode())
+                && StringUtil.equals(infRiskRdsDto.getTradePlace(),DictCodeListExt1.交易场所_银行间.getValue())){
+                infRiskRdsDto.setCalendarCode("03");
+            }
             if (StringUtil.isNotEmpty(finDto.getMdate())) {
                 infRiskRdsDto.setRepoTerm(BigDecimal.valueOf(DateUtil.getBetweenDayNumber(finDto.getTradeDate(), finDto.getMdate())));
             }
@@ -2626,6 +2630,10 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 //设置是否是股东发行
                 infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
             }
+            // 债券可用面值 * 交易数量
+            infRiskRdsDto.setTotalFaceAmt(
+                    ArithmeticUtil.multiply(null == finDto.getParValue() ? new BigDecimal(100) : finDto.getParValue(), infRiskRdsDto.getTradeNum()));
+            // add by zhangrui1 增加券面总额（元） end
         }
         if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_利率互换.getValue(), v.getFinType()) ||
                 StringUtil.equals(DictCodeListExt2.平安资产类型_利率互换.getValue(), v.getAssetType())) {

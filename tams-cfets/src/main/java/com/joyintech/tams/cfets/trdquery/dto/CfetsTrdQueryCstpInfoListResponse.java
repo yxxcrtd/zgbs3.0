@@ -80,6 +80,9 @@ public class CfetsTrdQueryCstpInfoListResponse {
     @ApiModelProperty(name="tradeYield",value="成交价/回购利率",example="1")
     private BigDecimal tradeYield;
 
+    @ApiModelProperty(name="tradeYieldStr",value="成交价/回购利率",example="1")
+    private String tradeYieldStr;
+
     @ApiModelProperty(name="tenderTarget",value="招标标的",example="1")
     private String tenderTarget;
 
@@ -262,11 +265,10 @@ public class CfetsTrdQueryCstpInfoListResponse {
     }
 
     public String getMatchStatusStr() {
-        String matchStatusStr =SysDataUtil.getNameFromDataDict(DictCode.CSTP匹配状态, getMatchStatus());
-        if(StringUtil.equals("BOND1",getBusinesstype())){
-            matchStatusStr = SysDataUtil.getNameFromDataDict(DictCode.匹配状态, getMatchStatus());
+        if (StringUtil.isEmpty(getMatchStatus())) {
+            return StringUtil.EMPTY;
         }
-        return matchStatusStr;
+        return SysDataUtil.getNameFromDataDict(DictCode.CSTP匹配状态, getMatchStatus());
     }
 
     public void setMatchStatusStr(String matchStatusStr) {
@@ -390,6 +392,14 @@ public class CfetsTrdQueryCstpInfoListResponse {
 
     public void setTradeYield(BigDecimal tradeYield) {
         this.tradeYield = tradeYield;
+    }
+
+    public String getTradeYieldStr() {
+        return tradeYieldStr;
+    }
+
+    public void setTradeYieldStr(String tradeYieldStr) {
+        this.tradeYieldStr = tradeYieldStr;
     }
 
     public BigDecimal getTermDays() {

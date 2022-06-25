@@ -348,6 +348,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 trdBankManualSetDetail.setSettleStatus(DictCodeListExt3.交收状态_未交收.getValue());
             }
             listTrdBnakSetDetails.add(trdBankManualSetDetail);
+            cfetsManualSettleInsertDto.setTotleTradeId(cfetsManualSettleDealInfo.getTradeId());
         }
 
         cfetsManualSettleInsertDto.setTrdBankManualSettleInfo(trdBankManualSettleInfo);
@@ -1042,7 +1043,11 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         this.insertOldBidPosition(cfetsManualSettleInsertDto, entity.getButtonType(), entity.getSettleAmt(),
                                 entity.getFinprodType2(), false, entity.getTgBusiType(), false);
                     }else {
-                        sendRepoPositionMethod(cfetsManualSettleInsertDto,entity.getButtonType());
+                    	//与头寸沟通，头寸引擎没有配置逆回购，不需要调用头寸引擎，如果后期需要调用再放开 yflv-2022-06-23-start
+                    	if (!StringUtil.equals(entity.getPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
+                    		sendRepoPositionMethod(cfetsManualSettleInsertDto,entity.getButtonType());
+                    	}
+                    	//与头寸沟通，头寸引擎没有配置逆回购，不需要调用头寸引擎，如果后期需要调用再放开 yflv-2022-06-23-end
                        //对回购数据进行处理
                         if ((StringUtil.equals(entity.getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue())
                                 || StringUtil.equals(entity.getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) ) {
@@ -1710,6 +1715,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         }
         StlPayOrdersDto stlPayOrdersDto = new StlPayOrdersDto();
         List<StlPayOrdersDto> list = cfetsManualSettleMapper.getStlPayOrdersByTradeId(cfetsManualSettleRequest.getTradeId());
+        if (CollectionUtils.isEmpty(list)) {
+        	list = cfetsManualSettleMapper.getStlPayOrdersByTradeId(cfetsManualSettleRequest.getTotleTradeId());
+        }
         // 首期只会按汇总编号生成一条汇总的划款指令
         if (CollectionUtils.isNotEmpty(list)) {
             stlPayOrdersDto = list.get(0);

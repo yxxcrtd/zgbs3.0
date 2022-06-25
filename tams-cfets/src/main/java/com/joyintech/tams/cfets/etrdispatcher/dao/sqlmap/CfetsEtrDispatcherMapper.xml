@@ -502,11 +502,6 @@
     <sql id="vagueQueryWhere">
         <if test="search != null and search != '' and search !='有效' ">
             <where>
-            <choose>
-                <when test="search.length() > 10">
-                    t.entrustId like '%' || #{search} || '%'
-                </when>
-                <otherwise>
                     (sdl.ITEM_VALUE like '%' || #{search} || '%'
                     OR sdl1.ITEM_VALUE like '%' || #{search} || '%'
                     OR sdl2.ITEM_VALUE like '%' || #{search} || '%'
@@ -541,8 +536,6 @@
                     OR t.transmitTime = #{search}
                     OR t.transmitTimeSer = #{search}
                     )
-                </otherwise>
-            </choose>
             </where>
         </if>
     </sql>
@@ -1026,7 +1019,38 @@
     </select>
 
     <select id="getEtrFxmrBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
-        SELECT T.* FROM
+        SELECT
+                T.effectFlag,
+                T.busiTypePosition,
+                T.firstBidStatus,
+                T.bidId,
+                T.finprodId,
+                T.finprodMarketId,
+                T.finprodAbbr,
+                T.tradeMarket,
+                T.tenderTarget,
+                T.issueDateStart,
+                T.issueDateEnd,
+                T.etrBidPriceTotal,
+                T.totalBiddingNum,
+                T.biddingMethod,
+                T.payType,
+                T.bidprice,
+                T.winPrice,
+                T.price,
+                T.payableAmount,
+                T.settFeeAmt,
+                T.payDate,
+                T.assignRegdate,
+                T.listingDate,
+                T.bidConfirmDate,
+                T.tradeDate,
+                T.counterId,
+                T.counterName,
+                T.remark,
+                T.updateTime
+
+        FROM
         (SELECT
         decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
         #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
@@ -1035,6 +1059,7 @@
         FP.FINPROD_ID finprodId,
         FP.FINPROD_MARKET_ID finprodMarketId,
         FP.FINPROD_ABBR finprodAbbr,
+        FP.TRADE_MARKET tradeMarket,
         FPI.TENDER_TARGET tenderTarget,
         CASE
         WHEN fpi.ISSUE_CLASS = '01' THEN fpi.ISSUE_DATE
@@ -1140,6 +1165,7 @@
         FP.FINPROD_ID finprodId,
         FP.FINPROD_MARKET_ID finprodMarketId,
         FP.FINPROD_ABBR finprodAbbr,
+        FP.TRADE_MARKET tradeMarket,
         FPI.TENDER_TARGET tenderTarget,
         CASE
         WHEN fpi.ISSUE_CLASS = '01' THEN fpi.ISSUE_DATE
@@ -1236,6 +1262,36 @@
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>) T
+        GROUP BY
+        T.effectFlag,
+        T.busiTypePosition,
+        T.firstBidStatus,
+        T.bidId,
+        T.finprodId,
+        T.finprodMarketId,
+        T.finprodAbbr,
+        T.tradeMarket,
+        T.tenderTarget,
+        T.issueDateStart,
+        T.issueDateEnd,
+        T.etrBidPriceTotal,
+        T.totalBiddingNum,
+        T.biddingMethod,
+        T.payType,
+        T.bidprice,
+        T.winPrice,
+        T.price,
+        T.payableAmount,
+        T.settFeeAmt,
+        T.payDate,
+        T.assignRegdate,
+        T.listingDate,
+        T.bidConfirmDate,
+        T.tradeDate,
+        T.counterId,
+        T.counterName,
+        T.remark,
+        T.updateTime
         ORDER BY T.updateTime DESC
     </select>
     <select id="getEtrSubBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
@@ -1385,7 +1441,7 @@
         bo.BID_MODLE AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE AS payType/*缴款方式*/,
         BRT.WIN_TYPE AS winType/*中标方式*/,
-        decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT) AS winPrinamt/*中标券面总额(万元)*/,
+        BRT.WIN_PRINAMT AS winPrinamt/*中标券面总额(万元)*/,
         CASE
         WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100,
         'FM9999999999999990.9990') || '%'
@@ -1395,10 +1451,10 @@
         'FM9999999999999990.90') || 'BP'
         END winPrice /*中标标位*/,
         BRT.SETT_FEE_AMT settFeeAmt/*结算服务费*/,
-        decode(BO.IS_WIN, 'Y', BRT.PAY_DATE) payDate/*缴款日*/,
-        decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE) assignRegdate/*债权债务登记日*/,
-        decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE) listingDate/*上市日*/,
-        decode(BO.IS_WIN, 'Y', BRT.WIN_DATE) AS bidConfirmDate/*中标日期*/,
+        BRT.PAY_DATE payDate/*缴款日*/,
+        BRT.CREDITOR_DEBT_DATE assignRegdate/*债权债务登记日*/,
+        FPA.LISTING_DATE listingDate/*上市日*/,
+        BRT.WIN_DATE AS bidConfirmDate/*中标日期*/,
         to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') tradeDate,
         BRT.COUNTER_ID counterId,
         mcp.counter_name counterName,
@@ -1480,7 +1536,7 @@
         bo.BID_MODLE AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE AS payType/*缴款方式*/,
         BRT.WIN_TYPE AS winType/*中标方式*/,
-        decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT) AS winPrinamt/*中标券面总额(万元)*/,
+        BRT.WIN_PRINAMT AS winPrinamt/*中标券面总额(万元)*/,
         CASE
         WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100,
         'FM9999999999999990.9990') || '%'
@@ -1490,10 +1546,10 @@
         'FM9999999999999990.90') || 'BP'
         END winPrice /*中标标位*/,
         BRT.SETT_FEE_AMT settFeeAmt/*结算服务费*/,
-        decode(BO.IS_WIN, 'Y', BRT.PAY_DATE) payDate/*缴款日*/,
-        decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE) assignRegdate/*债权债务登记日*/,
-        decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE) listingDate/*上市日*/,
-        decode(BO.IS_WIN, 'Y', BRT.WIN_DATE) AS bidConfirmDate/*中标日期*/,
+        BRT.PAY_DATE payDate/*缴款日*/,
+        BRT.CREDITOR_DEBT_DATE assignRegdate/*债权债务登记日*/,
+        FPA.LISTING_DATE listingDate/*上市日*/,
+        BRT.WIN_DATE AS bidConfirmDate/*中标日期*/,
         to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') tradeDate,
         BRT.COUNTER_ID counterId,
         mcp.counter_name counterName,
@@ -1585,7 +1641,7 @@
             bo.PAY_TYPE       AS payType/*缴款方式*/,
             BRT.WIN_TYPE       AS winType/*中标方式*/,
             bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额(万元)*/,
-            decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT)   AS winPrinamt/*中标券面总额(万元)*/,
+            BRT.WIN_PRINAMT   AS winPrinamt/*中标券面总额(万元)*/,
             CASE
                 WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
                 WHEN fpi.TENDER_TARGET = '02' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE, 'FM9999999999999990.9990') || '元'
@@ -1594,10 +1650,10 @@
             bo.UNIT_CPRICE       price/*净价*/,
             BRD.PAY_AMT    payableAmount/*缴款金额*/,
             BRT.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
-            decode(BO.IS_WIN, 'Y', BRT.PAY_DATE)          payDate/*缴款日*/,
-            decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE)    assignRegdate/*债权债务登记日*/,
-            decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE)     listingDate/*上市日*/,
-            decode(BO.IS_WIN, 'Y', BRT.WIN_DATE)       AS bidConfirmDate/*中标日期*/,
+            BRT.PAY_DATE          payDate/*缴款日*/,
+            BRT.CREDITOR_DEBT_DATE    assignRegdate/*债权债务登记日*/,
+            FPA.LISTING_DATE     listingDate/*上市日*/,
+            BRT.WIN_DATE       AS bidConfirmDate/*中标日期*/,
             bo.BID_ID            bidId/*投标编号*/,
             to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
             tpd.counter_id counterId,
@@ -1609,7 +1665,6 @@
             LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPD.TRADE_ID = TPDA.TRADE_ID
             LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON tpd.TOTLE_TRADE_ID=tfpdt.TOTLE_TRADE_ID
             LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = TFPDT.B_TRADE_ID
-            AND BRT.STATUS ='01'
             LEFT JOIN BID_RESULT_DETAIL BRD ON	BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
             AND	BRD.ENTRUST_ID = TPDA.ENTRUST_ID
             AND	BRD.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
@@ -1706,7 +1761,7 @@
             bo.PAY_TYPE       AS payType/*缴款方式*/,
             brt.WIN_TYPE       AS winType/*中标方式*/,
             bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额(万元)*/,
-            decode(BO.IS_WIN, 'Y', BRT.WIN_PRINAMT)   AS winPrinamt/*中标券面总额(万元)*/,
+            BRT.WIN_PRINAMT   AS winPrinamt/*中标券面总额(万元)*/,
             CASE
                 WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
                 WHEN fpi.TENDER_TARGET = '02' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE, 'FM9999999999999990.9990') || '元'
@@ -1715,10 +1770,10 @@
             bo.UNIT_CPRICE       price/*净价*/,
             BRD.PAY_AMT    payableAmount/*缴款金额*/,
             BRT.SETT_FEE_AMT      settFeeAmt/*结算服务费*/,
-            decode(BO.IS_WIN, 'Y', BRT.PAY_DATE)          payDate/*缴款日*/,
-            decode(BO.IS_WIN, 'Y', BRT.CREDITOR_DEBT_DATE)    assignRegdate/*债权债务登记日*/,
-            decode(BO.IS_WIN, 'Y', FPA.LISTING_DATE)     listingDate/*上市日*/,
-            decode(BO.IS_WIN, 'Y', BRT.WIN_DATE)       AS bidConfirmDate/*中标日期*/,
+            BRT.PAY_DATE          payDate/*缴款日*/,
+            BRT.CREDITOR_DEBT_DATE    assignRegdate/*债权债务登记日*/,
+            FPA.LISTING_DATE     listingDate/*上市日*/,
+            BRT.WIN_DATE      AS bidConfirmDate/*中标日期*/,
             bo.BID_ID            bidId/*投标编号*/,
             to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
             tpd.counter_id counterId,
@@ -1730,7 +1785,6 @@
             LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD TPDA ON TPD.TRADE_ID = TPDA.TRADE_ID
             LEFT JOIN WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON tpd.TOTLE_TRADE_ID=tfpdt.TOTLE_TRADE_ID
             LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = TFPDT.B_TRADE_ID
-            AND BRT.STATUS ='01'
             LEFT JOIN BID_RESULT_DETAIL BRD ON	BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
             AND	BRD.ENTRUST_ID = TPDA.ENTRUST_ID
             AND	BRD.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
@@ -3138,14 +3192,16 @@
         <result column="REPORT_NO" property="reportNo" jdbcType="VARCHAR"/>
         <result column="OPERATE_USER" property="operateUser" jdbcType="VARCHAR"/>
         <result column="PORTFOLIO_NAME" property="portfolioName" jdbcType="NUMERIC"/>
+        <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="NUMERIC"/>
         <result column="SEC_ACCT_ID" property="secAcctId" jdbcType="VARCHAR"/>
         <result column="TRADE_PLAT" property="tradePlat" jdbcType="VARCHAR"/>
         <result column="FINPROD_TYPE2" property="finprodType2" jdbcType="VARCHAR"/>
         <result column="INV_MANAGER_ID" property="invManagerId" jdbcType="VARCHAR"/>
+        <result column="propAcctNo" property="propAcctNo" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="query_integrated_entrust">
-        a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
+        a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID,  a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
         a.FINANCE_ACCOUNT, a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET, a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,
         a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, decode(a.IS_FULL_PRICE,'Y',a.FULL_PRICE,a.ENTRUST_PRICE) ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
         a.DISCOUNT, a.TRANS_CODE, a.EXPIRE_YEAR_RATE, a.PRETERM_YEAR_RATE, a.LIAISON_NAME, a.LIAISON_TEL,
@@ -3154,12 +3210,13 @@
         a.TRADED_BALANCE, a.TRADED_VOLUME, a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,  TO_CHAR(a.CREATE_TIME,'HH24:Mi:ss') AS TRADE_TIME,
         a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG, a.TRADING_DAY, a.LOCAL_ENTRUST_ID, a.BROKER_ENTRUST_ID,
         a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
-        b.PORTFOLIO_NAME,b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,b.PS as ENTRUST_BS,
-        CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS
+        b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,b.PS as ENTRUST_BS,
+        CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS,
+        PROP_ACCT_NO propAcctNo
     </sql>
 
     <sql id="query_entrust">
-        a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
+        a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID,  a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
         a.FINANCE_ACCOUNT, a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET, a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,
         a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, decode(a.IS_FULL_PRICE,'Y',a.FULL_PRICE,a.ENTRUST_PRICE) ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
         NULL AS DISCOUNT, NULL AS TRANS_CODE, NULL AS EXPIRE_YEAR_RATE, NULL AS PRETERM_YEAR_RATE, NULL AS LIAISON_NAME,
@@ -3169,12 +3226,13 @@
         a.FROZEN_VOLUME, a.TRADED_BALANCE, a.TRADED_VOLUME, a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
          TO_CHAR(a.CREATE_TIME,'HH24:Mi:ss') AS TRADE_TIME, a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG, a.TRADING_DAY, a.LOCAL_ENTRUST_ID, a.BROKER_ENTRUST_ID,
         a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
-        b.PORTFOLIO_NAME,b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,b.PS as ENTRUST_BS,
-        CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS
+        b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,b.PS as ENTRUST_BS,
+        CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS,
+        null propAcctNo
     </sql>
 
     <sql id="query_entrust_history">
-        a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,a.FINANCE_ACCOUNT,
+        a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID,  a.USER_ID, a.USERNAME, a.ACCOUNT_ID,a.FINANCE_ACCOUNT,
         a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET,a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,a.ENTRUST_PROP,
         a.BS_FLAG, a.ENTRUST_VOLUME, decode(a.IS_FULL_PRICE,'Y',a.FULL_PRICE,a.ENTRUST_PRICE) ENTRUST_PRICE, a.FULL_PRICE,a. ENTRUST_BALANCE, NULL AS DISCOUNT, NULL AS TRANS_CODE,
         NULL AS EXPIRE_YEAR_RATE, NULL AS PRETERM_YEAR_RATE, NULL AS LIAISON_NAME, NULL AS LIAISON_TEL,
@@ -3184,12 +3242,13 @@
         a.TRADED_VOLUME, a.TRADED_PRICE, a.CANCEL_VOLUME,a. REPORT_TIME, TO_CHAR(a.CREATE_TIME,'HH24:Mi:ss') AS TRADE_TIME, a.CANCEL_TIME, a.ERROR_CODE,
         a.ERROR_MSG, a.TRADING_DAY, a.LOCAL_ENTRUST_ID, a.BROKER_ENTRUST_ID,a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME,
         a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
-        b.PORTFOLIO_NAME,b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,b.PS as ENTRUST_BS,
-        CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS
+        b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,b.PS as ENTRUST_BS,
+        CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS,
+        null propAcctNo
     </sql>
 
     <sql id="query_integrated_entrust_history">
-        a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID,a.USER_ID, a.USERNAME,a.ACCOUNT_ID,
+        a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.USER_ID, a.USERNAME,a.ACCOUNT_ID,
         a.FINANCE_ACCOUNT, a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET, a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,
         a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, decode(a.IS_FULL_PRICE,'Y',a.FULL_PRICE,a.ENTRUST_PRICE) ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
         a.DISCOUNT, a.TRANS_CODE, a.EXPIRE_YEAR_RATE, a.PRETERM_YEAR_RATE, a.LIAISON_NAME, a.LIAISON_TEL,
@@ -3198,13 +3257,17 @@
         a.TRADED_BALANCE, a.TRADED_VOLUME, a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,  TO_CHAR(a.CREATE_TIME,'HH24:Mi:ss') AS TRADE_TIME,
         a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG, a.TRADING_DAY, a.LOCAL_ENTRUST_ID, a.BROKER_ENTRUST_ID,
         a.IP_MAC, a.REMARK, a.CREATE_TIME,a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID,
-        a.REPORT_NO, a.OPERATE_USER,b.PORTFOLIO_NAME,b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,
+        a.REPORT_NO, a.OPERATE_USER,b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,
         b.PS as ENTRUST_BS,
-        CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS
+        CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS,
+        PROP_ACCT_NO propAcctNo
     </sql>
 
     <select id="queryEntrust2Touguan" resultMap="QueryResultMap" parameterType="java.lang.String">
-        select * from (
+        select T.*,
+        nvl(detail.PORTFOLIO_ID,'') PORTFOLIO_ID,
+        nvl(detail.PORTFOLIO_NAME,'') PORTFOLIO_NAME
+         from (
         SELECT
         <include refid="query_entrust"/>
         FROM T_ENTRUST a left join T_INSTRUCTION b on a.INSTRUCTION_ID =b.ENTRUST_ID
@@ -3225,6 +3288,24 @@
         FROM T_INTEGRATED_ENTRUSTHISTORY a left join T_INSTRUCTION b on a.INSTRUCTION_ID =b.ENTRUST_ID
         where a.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
         ) T
+        LEFT JOIN STL_CAPACCT_INFO SCI ON T.ACCOUNT_ID = SCI.ACCT_NO
+        LEFT JOIN (
+        SELECT
+        EED.ENTRUST_ID,
+        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+        wm_concat (sci.ACCT_NO) AS ACCT_NO,
+        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+        FROM ETR_ENTRUST_DETAIL EED
+        left join
+        (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
+        FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON
+        sci.ACCT_NO = ssai.TRD_ACCT_ID
+        GROUP BY EED.ENTRUST_ID ) detail ON T.INSTRUCTION_ID = detail.ENTRUST_ID
         order by T.CREATE_TIME desc
     </select>
 </mapper>

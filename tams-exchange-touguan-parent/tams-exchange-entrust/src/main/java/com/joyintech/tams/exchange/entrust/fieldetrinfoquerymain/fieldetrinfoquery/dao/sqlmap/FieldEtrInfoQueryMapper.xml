@@ -37,11 +37,14 @@
         END AS otherPs,
         ETR_ENTRUST_ADD.BUSI_PS busiPs,
         ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        CASE WHEN ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34') THEN TO_CHAR(ETR_ENTRUST.ENTRUST_NUM*100)
+        btm.OUTPUT_VALUE_1 outputValue,
+        CASE WHEN ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34')
+        THEN
+        ETR_ENTRUST.ENTRUST_NUM*100
         ELSE decode(
             btm.OUTPUT_VALUE_1,
             'EX004',
-            '',
+            0,
             decode(
             ETR_ENTRUST_ADD.ASSET_TYPE,
             'F01',
@@ -360,12 +363,15 @@
         END AS otherPs,
         WFL_ETR_ENTRUST_ADD.BUSI_PS busiPs,
         WFL_ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        CASE WHEN WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34') THEN TO_CHAR(WFL_ETR_ENTRUST.ENTRUST_NUM*100)
+        WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION outputValue,
+        CASE WHEN WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34')
+        THEN
+        WFL_ETR_ENTRUST.ENTRUST_NUM*100
         ELSE
             decode(
             WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
             'EX004',
-            '',
+            0,
             decode(
             WFL_ETR_ENTRUST_ADD.ASSET_TYPE,
             'F01',
@@ -993,11 +999,14 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="VARCHAR"/>
         <result column="FULL_PRICE" property="fullPrice" jdbcType="NUMERIC"/>
         <result column="PORTFOLIO_NAME" property="portfolioName" jdbcType="NUMERIC"/>
+        <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="NUMERIC"/>
         <result column="SEC_ACCT_ID" property="secAcctId" jdbcType="VARCHAR"/>
         <result column="TRADE_PLAT" property="tradePlat" jdbcType="VARCHAR"/>
         <result column="FINPROD_TYPE2" property="finprodType2" jdbcType="VARCHAR"/>
         <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
         <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
+
     </resultMap>
 
     <sql id="Query_Column_List">
@@ -1050,7 +1059,10 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         order by t.TRADING_DAY desc,t.TRADE_TIME desc
     </select>-->
     <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
-	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, <!--PP.PORTFOLIO_NAME,--> SCI.ACCT_NAME  ACCOUNT_NAME
+	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, <!--PP.PORTFOLIO_NAME,-->
+      nvl(detail.PORTFOLIO_ID,'') PORTFOLIO_ID,
+      nvl(detail.PORTFOLIO_NAME,'') PORTFOLIO_NAME,
+      nvl(detail.ACCT_NAME, sci.ACCT_NAME) ACCOUNT_NAME
 	  FROM (
 	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
 			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
@@ -1078,7 +1090,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
 			 END                                                   DELIVERY_SCHEDULE,
-			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT
+			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT,
+			 TT.PROP_ACCT_NO                                        PROP_ACCT_NO
 		FROM SETTLE_TRANS_DATA STD
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') AND TT.TRADE_TYPE = '0')
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
@@ -1117,7 +1130,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			   WHEN STD.DELIVERY_RESULT = '04' THEN '0'
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
 			 END                                                   DELIVERY_SCHEDULE,
-			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT
+			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT,
+            TT.PROP_ACCT_NO                                        PROP_ACCT_NO
 		FROM T_TRADE TT
 		LEFT JOIN SETTLE_TRANS_DATA STD
 		  ON TT.BROKER_TRADE_ID = STD.CJBH
@@ -1152,7 +1166,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
             tpd.CREATE_TIME CREATE_TIME,
             '正常交收' DELIVERY_RESULT,
             '100' DELIVERY_SCHEDULE,
-            ssai.SEC_ACCT_ID ACCT_ACCOUNT
+            ssai.SEC_ACCT_ID ACCT_ACCOUNT,
+            null PROP_ACCT_NO
         FROM
             TRD_FIN_PRODUCT_DEAL_TOTAL tpd
             LEFT JOIN TRD_DEAL_TOTAL_ADD tpda ON tpd.TOTLE_TRADE_ID = tpda.TOTLE_TRADE_ID
@@ -1167,6 +1182,23 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         ) A
 	  LEFT JOIN STL_CAPACCT_INFO SCI ON A.ACCT_ACCOUNT = SCI.ACCT_NO
 	  LEFT JOIN ETR_ENTRUST EE ON A.INSTRUCTION_ID = EE.ENTRUST_ID
+        LEFT JOIN (
+        SELECT
+        EED.ENTRUST_ID,
+        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+        wm_concat (sci.ACCT_NO) AS ACCT_NO,
+        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+        FROM ETR_ENTRUST_DETAIL EED
+        left join
+        (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
+        FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON
+        sci.ACCT_NO = ssai.TRD_ACCT_ID
+        GROUP BY EED.ENTRUST_ID ) detail ON A.INSTRUCTION_ID = detail.ENTRUST_ID
         <!-- LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
         LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID -->
       WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}

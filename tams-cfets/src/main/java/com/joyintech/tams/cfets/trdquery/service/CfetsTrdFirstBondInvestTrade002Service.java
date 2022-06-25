@@ -57,7 +57,6 @@ import com.joyintech.tams.invest.interf.service.InterfComponentService;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
-import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -294,6 +293,8 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
 
     @Autowired
     private CfetsQuotedCommonService cfetsQuotedCommonService;
+    @Autowired(required = false)
+    private FinProductAddMapper finProductAddMapper;
 
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
@@ -338,6 +339,10 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
         // 处理老头寸
         this.dealOldBidPosition(entity, true);
+
+        FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(entity.getFinprodId());
+        finProductAdd.setIssueStatus(null);
+        finProductAddMapper.updateByPrimaryKey(finProductAdd);
         //发送头寸
         String ps = DictCodeList.交易方向_买入.getValue();
         String busiType = DictCodeListExt3.头寸业务类型_债券一级申购.getValue();
@@ -409,12 +414,8 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
 
     @Override
     public void doComplete(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType) {
-        try {
-            if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
-                this.doCompleteBidRevoke(entity, "", true);
-            }
-        }catch (Exception e){
-            throw new WorkFlowException(e);
+        if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
+            this.doCompleteBidRevoke(entity, "", true);
         }
     }
 

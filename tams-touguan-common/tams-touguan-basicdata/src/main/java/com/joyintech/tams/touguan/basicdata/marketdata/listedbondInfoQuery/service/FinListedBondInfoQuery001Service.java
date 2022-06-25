@@ -31,6 +31,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.SelectOptionCommonRequest;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dao.FinListedBondInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
@@ -63,6 +64,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     private BaseGetBusinessId bussGetBussinessIdService;
     @Resource
     private CommonAutoCouponService commonAutoCouponService;
+    @Resource
+    private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
     @Resource
     private FinListedBondInfoQueryMapper finListedBondInfoQueryMapper;
     @Resource
@@ -194,17 +197,22 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finListedBondInfoQuery001Dto.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         //非空校验
         emptyCheck(finListedBondInfoQuery001Dto, validMessages);
+        //发行处理
+        if(StringUtil.isNotBlank(finListedBondInfoQuery001Dto.getIssuerCode())){
+            finBondMarketInfoQuery001Service.handleIssuer(validMessages, finListedBondInfoQuery001Dto.getIssuerCode());
+        }
         if (CollectionUtils.isNotEmpty(validMessages)) {
             ajaxResult.setErrorList(validMessages);
             ajaxResult.setMessageType(MessageType.警告消息);
             return ajaxResult;
         }
         //接口数据转换
-        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto);
+        String finProdId = getFinprodId(secId);
+        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto, finProdId);
         //公共加券操作
         commonAutoCouponService.autoBondCouponSave(interfPayhsrcsecinfoDto);
         //保存操作记录
-        this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
+        this.saveOperate(finProdId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
         //发行人处理
         return ajaxResult;
     }
@@ -215,7 +223,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @param finListedBondInfoQuery001Dto
      * @return
      */
-    private InterfPayhsrcsecinfoDto convertInterfPayhsrcsecinfoDto(FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto) {
+    private InterfPayhsrcsecinfoDto convertInterfPayhsrcsecinfoDto(FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto, String finProdId) {
         InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = new InterfPayhsrcsecinfoDto();
         String secId = finListedBondInfoQuery001Dto.getSecId();
         //金融产品信息List
@@ -230,7 +238,6 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         List<MstCalendarInfo> mstCalendarInfoList = getMstCalendarInfo();
         //new标的类金融产品
         FinProduct finProduct = new FinProduct();
-        String finProdId = getFinprodId(secId);
         finProduct.setFinprodId(finProdId);
         finProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         finProduct.setFinprodAbbr(finListedBondInfoQuery001Dto.getBondAbbreviation());
@@ -247,7 +254,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProduct.setBlnArea(finListedBondInfoQuery001Dto.getDomesticAndForeign());
         finProduct.setTradeMarket(finListedBondInfoQuery001Dto.getTradingPlaces());
         /**--交易场所modify 2019-04-15 end--**/
-        finProduct.setIssuer(getIssuer(finListedBondInfoQuery001Dto.getIssuer()));
+        finProduct.setIssuer(finListedBondInfoQuery001Dto.getIssuer());
         //2019年5月27日  交易日历
         if (StringUtil.equals(DictCodeListExt1.交易场所_银行间.getValue(), finListedBondInfoQuery001Dto.getTradingPlaces())) {
             finProduct.setCalendarId("03");
@@ -455,8 +462,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      */
     private void saveOperate(String tradeId, String remark, DictCodeListExt3 operType, String workFlowId) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        String finProdId = getFinprodId(tradeId);
-        oprHisReq.setEntrustId(finProdId);
+        oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(remark);
         oprHisReq.setWorkflowId(workFlowId);

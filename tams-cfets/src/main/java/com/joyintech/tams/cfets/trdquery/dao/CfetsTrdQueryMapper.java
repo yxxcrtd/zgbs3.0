@@ -271,6 +271,7 @@ public interface CfetsTrdQueryMapper {
      * @return List<PortIntFenPeiInfoDto>
      */
     List<PortIntFenPeiInfoDto> findRepoPortIntFenPeiInfoList(Map<String, Object> pageParam);
+    List<PortIntFenPeiInfoDto> findRepoPortIntFenPeiInfoList2(Map<String, Object> pageParam);
     /**
      * 查询交易质押券,针对交易明细回购
      *
@@ -301,7 +302,7 @@ public interface CfetsTrdQueryMapper {
 
     List<BidPortIntFenPeiInfoDto> findYjsgPortIntFenPeiInfoList(Map<String, Object> pageParam);
 
-    CfetsTrdQueryCstpInfoListResponse selectCstpBidFormDataByKey(Map<String, Object> pageParam);
+    CfetsTrdQueryCstpBidInfoListResponse selectCstpBidFormDataByKey(Map<String, Object> pageParam);
 
 
     CfetsTrdBidInfoResponse findYjtbBidTradeDetailInfo(Map<String, Object> pageParam);

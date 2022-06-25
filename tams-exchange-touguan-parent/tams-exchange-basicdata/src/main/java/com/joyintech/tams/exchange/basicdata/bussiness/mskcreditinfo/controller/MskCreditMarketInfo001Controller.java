@@ -98,7 +98,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
             return new Message<Page<MskCreditInfoProSaveRequest>>().success().setData(page);
         }catch (Exception e) {
             logger.error("查询信用保护凭证行情信息分页数据异常",e);
-            return new Message<Page<MskCreditInfoProSaveRequest>>().fail().setMessage("信用保护凭证行情信息");
+            return new Message<Page<MskCreditInfoProSaveRequest>>().fail().setMessage("查询信用保护凭证行情信息分页数据异常");
         }
     }
 

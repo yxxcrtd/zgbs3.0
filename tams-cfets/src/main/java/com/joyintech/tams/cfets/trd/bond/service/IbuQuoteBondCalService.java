@@ -112,7 +112,7 @@ public class IbuQuoteBondCalService extends BaseService {
         // 特殊债券信息查询
         List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(calRequest.getFinprodId()));
         if (CollectionUtils.isNotEmpty(list)) {
-            if (StringUtil.equals(list.get(0).getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
+            if (!StringUtil.equals(list.get(0).getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
                 calRequest.setUnitInt(null);
             }
         }

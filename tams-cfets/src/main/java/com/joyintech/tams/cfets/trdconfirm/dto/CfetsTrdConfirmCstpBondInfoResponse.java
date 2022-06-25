@@ -129,6 +129,9 @@ public class CfetsTrdConfirmCstpBondInfoResponse {
     @ApiModelProperty(name="remark",value="备注",example="字符串1")
     private String remark;
 
+    @ApiModelProperty(name="finprodType2",value="资产类型CODE",example="A1")
+    private String finprodType2;
+
     public String getExecid() {
         return execid;
     }
@@ -408,5 +411,13 @@ public class CfetsTrdConfirmCstpBondInfoResponse {
 
     public void setCounterIdName(String counterIdName) {
         this.counterIdName = counterIdName;
+    }
+
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
     }
 }

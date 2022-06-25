@@ -209,11 +209,11 @@ public class CfetsPrimaryBidManageCfmResponse {
     }
 
     public String getBidDate() {
-        if (StringUtil.equals(this.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())){
-            return DateUtil.format(this.getIssueDate(),DateUtil.DEFAULT_DATE_FORMAT_EN);
+        if (StringUtil.isNotEmpty(this.getBidDateStart())){
+            return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) +"~"+DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN) ;
         }
-        return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) +"~"+DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN) ;
-    }
+        return DateUtil.format(this.getIssueDate(),DateUtil.DEFAULT_DATE_FORMAT_EN);
+     }
 
     public String getIssueClass() {
         return issueClass;

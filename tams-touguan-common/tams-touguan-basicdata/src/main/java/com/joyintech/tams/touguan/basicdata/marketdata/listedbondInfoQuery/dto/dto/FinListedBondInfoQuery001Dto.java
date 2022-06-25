@@ -57,8 +57,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "additionalBatches", value = "增发批次")
     private Integer additionalBatches;
 
-    @ApiModelProperty(name = "issuer", value = "发行人", required = true)
+    @ApiModelProperty(name = "issuer", value = "发行人")
     private String issuer;
+
+    @ApiModelProperty(name = "issuerCode", value = "发行人", required = true)
+    private String issuerCode;
 
     @ApiModelProperty(name = "issuerName", value = "发行人")
     private String issuerName;
@@ -963,5 +966,13 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public void setGuartype(String guartype) {
         this.guartype = guartype;
+    }
+
+    public String getIssuerCode() {
+        return issuerCode;
+    }
+
+    public void setIssuerCode(String issuerCode) {
+        this.issuerCode = issuerCode;
     }
 }

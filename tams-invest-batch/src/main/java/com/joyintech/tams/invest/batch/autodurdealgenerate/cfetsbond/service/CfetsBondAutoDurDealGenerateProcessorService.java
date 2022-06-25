@@ -221,7 +221,7 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
                     positionRulePtlData.setSecAcctId(secAcctId); // 证券账户
                 }
             }
-            positionRulePtlData.setSecAmount(dto.getShareAmt());
+            positionRulePtlData.setSecAmount(dto.getShareAmt() == null? BigDecimal.ZERO : ArithmeticUtil.multiply(dto.getShareAmt(),new BigDecimal(100)));
             positionRulePtlData.setCashAmount(dto.getTradeAmt());
             positionRulePtlData.setInvAim(dto.getInvAim());
             positionRulePtlData.setOwnSecAmount(dto.getOurShareAmt() == null? BigDecimal.ZERO : ArithmeticUtil.multiply(dto.getOurShareAmt(),new BigDecimal(100)));

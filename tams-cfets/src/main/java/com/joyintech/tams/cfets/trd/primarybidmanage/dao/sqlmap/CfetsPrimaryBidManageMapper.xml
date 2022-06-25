@@ -317,22 +317,22 @@
             BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
-            decode(BO.IS_WIN,'Y',BRT.WIN_PRINAMT/10000)   winPrinamt,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_PRINAMT/10000)   winPrinamt,
             BRT.WIN_PRICE           winPrice,
             CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
                  decode(FPI.TENDER_TARGET,'01', to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
                  ELSE '' END winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
-            decode(BO.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
-            decode(BO.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
-            decode(BO.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
-            decode(BO.IS_WIN,'Y', BRT.WIN_DATE )           winDate,
+            decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
+            decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
+            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+            decode(BRT.IS_WIN,'Y', BRT.WIN_DATE )           winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
             BRT.COUNTER_ID          counterId,
             MCP.COUNTER_NAME        counterName,
-            BRT.REMARK              remark
+            BRT.remark          remark
         FROM BID_ORDER BO
         INNER JOIN BID_RESULT_TOTAL BRT ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
@@ -356,6 +356,8 @@
         from BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ( <include refid="selectHisBidInfo" />) hisInfo
+        ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="userId != null and userId != ''">
             AND BO.OUR_TRADER = #{userId}
@@ -474,7 +476,7 @@
         FP.TRADE_MARKET         tradeMarket,
         BRT.COUNTER_ID          counterId,
         MCP.COUNTER_NAME        counterName,
-        BRT.REMARK              remark
+        BRT.remark          remark
         FROM BID_ORDER BO
         INNER JOIN (SELECT * FROM (SELECT BRT.*
         ,ROW_NUMBER() OVER(PARTITION BY BRT.BID_ID ORDER BY BRT.WIN_DATE DESC) RANK
@@ -502,6 +504,8 @@
         from WFL_BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ( <include refid="selectHisBidInfo" />) hisInfo
+               ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="userId != null and userId != ''">
             AND BO.OUR_TRADER = #{userId}
@@ -643,22 +647,22 @@
             BO.BID_MODLE            bidModle,
             BO.PAY_TYPE             payType,
             BRT.WIN_TYPE            bidType,
-            decode(BO.IS_WIN,'Y',BRT.WIN_PRINAMT/10000)   winPrinamt,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_PRINAMT/10000)   winPrinamt,
             BRT.WIN_PRICE           winPrice,
             CASE WHEN BRT.WIN_PRICE IS NOT NULL THEN
               decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP')
             ELSE '' END             winPriceStr,
             BRD.PAY_AMT             payAmt,
             BRT.SETT_FEE_AMT        settFeeAmt,
-            decode(BO.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
-            decode(BO.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
-            decode(BO.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
-            decode(BO.IS_WIN,'Y',BRT.WIN_DATE )           winDate,
+            decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
+            decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
+            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_DATE )           winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
             BRT.COUNTER_ID          counterId,
             MCP.COUNTER_NAME        counterName,
-            BRT.REMARK              remark
+            BRT.REMARK          remark
         FROM BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
@@ -681,6 +685,8 @@
         from BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ( <include refid="selectHisBidInfo" />) hisInfo
+        ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="bidId != null and bidId != ''">
             AND BO.BID_ID = #{bidId}
@@ -720,9 +726,9 @@
             decode(BRT.IS_WIN,'Y', BRT.WIN_DATE)           winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
-            BO.COUNTER_ID          counterId,
+            BO.COUNTER_ID           counterId,
             MCP.COUNTER_NAME        counterName,
-            BRT.REMARK              remark
+            BRT.REMARK          remark
         FROM WFL_BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
@@ -745,6 +751,8 @@
         from WFL_BID_RESULT_DETAIL BRD
         group by TOTAL_WIN_ID
         ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ( <include refid="selectHisBidInfo" />) hisInfo
+        ON hisInfo.ENTRUST_ID = BRT.TOTAL_WIN_ID
         WHERE 1=1
         <if test="bidId != null and bidId != ''">
            AND BO.BID_ID = #{bidId}
@@ -815,18 +823,18 @@
             FPI.TENDER_EDATE   bidDateEnd,
             FPI.ISSUE_DATE   issueDate,
             FPI.ISSUE_CLASS  issueClass,
-            decode(BO.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
-            decode(BO.IS_WIN,'Y',FPA.LISTING_DATE)  listingDate,
-            decode(BO.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
+            decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE)  creditorDebtDate,
+            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)  listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
             BO.BID_MODLE     bidModle,
             BO.WIN_PRIN_AMT totalBiddingNum,
-            decode(BO.IS_WIN,'Y',BRT.WIN_PRINAMT)  winPrinAmt,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_PRINAMT)  winPrinAmt,
             BRT.WIN_PRICE       winPrice,
             BRT.SETT_FEE_AMT     settFeeAmt,
-            decode(BO.IS_WIN,'Y',BRT.REMARK,'未中标')  remark,
+            decode(BRT.IS_WIN,'Y',BRT.REMARK,'未中标')  remark,
             FP.TRADE_MARKET  tradeMarket,
             BO.BID_ID  bidId,
-            decode(BO.IS_WIN,'Y',BRT.PAY_DATE)   payDate,
+            decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)   payDate,
             BO.PAY_TYPE  payType
         FROM BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
@@ -907,7 +915,7 @@
             BRD.BID_PRICE   bidPrice,
             BRD.WIN_PRICE   winPrice,
             BRD.WIN_CPRICE   winCprice,
-            decode(BO.IS_WIN,'Y',BRD.INT_AMT)   intAmt,
+            decode(BRT.IS_WIN,'Y',BRD.INT_AMT)   intAmt,
             BRD.PAY_AMT   payAmt,
             BRD.SETT_FEE_AMT     settFeeAmt,
             BRD.INV_AIM   invAim,
@@ -925,7 +933,16 @@
         WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
     </select>
 
-
+    <sql id="selectHisBidInfo" >
+        select his.ENTRUST_ID,
+               listagg(decode(his.OPER_TYPE,'03', '中标结果撤销原因：'||his.BUSI_DES , his.BUSI_DES))
+                   within group (order by his.OPER_TIME desc) AS remark
+        from ETR_ENTRUST_OPER_HIS his
+            left join SYS_DATADICT_LIST sdl on sdl.ITEM_CODE = his.OPER_TYPE and sdl.DICT_CODE = 'OPR_TYPE'
+            left join SYS_USER su on su.USER_NAME = his.USER_ID
+        where his.BUSI_DES is not null
+        group by his.ENTRUST_ID
+    </sql>
 
     <select id="getBusinessData" parameterType="com.joyintech.tams.component.business.core.dto.WflValidInputParameter" resultType="java.lang.String">
         select pm.STATUS status
@@ -1088,14 +1105,14 @@
     </select>
 
     <!-- 根据划款指令信息 -->
-    <select id="queryStlOrdersByTradeId" resultMap="com.joyintech.tams.common.base.dao.StlOrdersMapper.BaseResultMap">
-        select <include refid="com.joyintech.tams.common.base.dao.StlOrdersMapper.Base_Column_List" />
-        from STL_RDERS where TRADE_ID = #{tradeId}
-    </select>
-
     <select id="queryStlPayOrdersByTradeId" resultMap="com.joyintech.tams.common.base.dao.StlPayOrdersMapper.BaseResultMap">
         select <include refid="com.joyintech.tams.common.base.dao.StlPayOrdersMapper.Base_Column_List" />
-        from STL_PAY_ORDERS where TRADE_ID = #{tradeId}
+        from STL_PAY_RDERS where TRADE_ID = #{tradeId}
+    </select>
+
+    <select id="queryStlOrdersByTradeId" resultMap="com.joyintech.tams.common.base.dao.StlOrdersMapper.BaseResultMap">
+        select <include refid="com.joyintech.tams.common.base.dao.StlOrdersMapper.Base_Column_List" />
+        from STL_ORDERS where TRADE_ID = #{tradeId}
     </select>
 
     <select id="queryPtlTradeByTradeId" resultMap="com.joyintech.tams.common.base.dao.PtlTradeMapper.BaseResultMap">

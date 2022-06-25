@@ -96,12 +96,6 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     @Resource
     private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
 
-    @Autowired(required = false)
-    private EtrCommonCashPositionDealService etrCommonCashPositionDealService;
-
-    @Autowired(required = false)
-    private EtrCommonCashPositionMapper etrCommonCashPositionMapper;
-
     @Resource
     private IPlatformDate iPlatformDate;
 
@@ -165,7 +159,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 finProductAddMapper.updateForTenderBound(productAdd);
                 if (dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日期和平台日相等的时候才会发撤销头寸
                     //处理旧头寸
-                    this.revokeOldPostion(dto);
+                    this.revokeOldPostion(dto,totleTradeId);
                     try {
                         PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_上市流通.getValue(), DictCodeList.交易方向_上市流通.getValue());
                     } catch (PositionException e) {
@@ -213,7 +207,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             finProductAddMapper.updateForTenderBound(productAdd);
             if (dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日和平台日相等时才发头寸
                 //处理旧头寸
-                this.insertOldPostion(dto);
+                this.insertOldPostion(dto,trdFinProductDealTotal.getTotleTradeId());
                 Map<String, String> params = new HashMap();
                 params.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
                 params.put("finprodMarketId", dto.getAppearMarketId());
@@ -257,7 +251,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      *
      * @param dto
      */
-    private void insertOldPostion(FinTenderBondAsset003Dto dto) {
+    private void insertOldPostion(FinTenderBondAsset003Dto dto,String totleTradeId) {
         if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             //1.查出二级债对应的金融产品代码
             Map<String, String> params = new HashMap();
@@ -265,19 +259,21 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             params.put("finprodMarketId", dto.getAppearMarketId());
             String finproductId = finTenderBoundAssetMapper.selectFinprodId(params);
             //2.查出新债的流水
-            List<PtlSecPositionFlow> flowList = baseAssetCashPositionCommMapper.selectByFinproductId(dto.getFinprodId());
+            List<PtlSecPosition> flowList = baseAssetCashPositionCommMapper.selectPositionByFinproductId(dto.getFinprodId(),iPlatformDate.getSysDateStr());
             if (StringUtil.isNotEmpty(finproductId)) {
                 if (CollectionUtils.isNotEmpty(flowList)) {
                     //3.冲正新债的流水
-                    for (PtlSecPositionFlow flow : flowList) {
+                    for (PtlSecPosition flow : flowList) {
                         PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(flowDto, flow);
                         flowDto.setAmount(flow.getAmount().negate());
+                        flowDto.setTradeId(totleTradeId);
                         basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
                         //4.重新插入二级债的流水
                         PtlSecPositionFlowDto twoDto = new PtlSecPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(twoDto, flow);
                         twoDto.setFinprodId(finproductId);
+                        twoDto.setTradeId(totleTradeId);
                         basePtlSecPositionInfoService.inertSecPositionFlow(twoDto);
                     }
                 }
@@ -310,7 +306,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      *
      * @param dto
      */
-    private void revokeOldPostion(FinTenderBondAsset003Dto dto) {
+    private void revokeOldPostion(FinTenderBondAsset003Dto dto,String totleTradeId) {
         if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             //1.查出二级债的流水
             Map<String, String> params = new HashMap();
@@ -318,18 +314,20 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             params.put("finprodMarketId", dto.getAppearMarketId());
             String finproductId = finTenderBoundAssetMapper.selectFinprodId(params);
             if (StringUtil.isNotEmpty(finproductId)) {
-                List<PtlSecPositionFlow> flowList = baseAssetCashPositionCommMapper.selectByFinproductId(finproductId);
+                List<PtlSecPosition> flowList = baseAssetCashPositionCommMapper.selectPositionByFinproductId(finproductId,iPlatformDate.getSysDateStr());
                 if (CollectionUtils.isNotEmpty(flowList)) {
-                    for (PtlSecPositionFlow flow : flowList) {
+                    for (PtlSecPosition flow : flowList) {
                         //2.生成一笔反向的冲掉二级债的
                         PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(flowDto, flow);
                         flowDto.setAmount(flow.getAmount().negate());
+                        flowDto.setTradeId(totleTradeId);
                         basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
                         //3.重新插入一级债的流水
                         PtlSecPositionFlowDto twoDto = new PtlSecPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(twoDto, flow);
                         twoDto.setFinprodId(dto.getFinprodId());
+                        twoDto.setTradeId(totleTradeId);
                         basePtlSecPositionInfoService.inertSecPositionFlow(twoDto);
                     }
                 }

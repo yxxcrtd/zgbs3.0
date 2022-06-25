@@ -105,6 +105,10 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
                 pageMode.setSort(sort.replaceAll("Str", ""));
                 request.setPageMode(pageMode);
             }
+            if (StringUtil.isNotBlank(sort) && sort.equals("conceptTypeStr")) {
+                pageMode.setSort("CITYINVESTSECWIND");
+                request.setPageMode(pageMode);
+            }
         }
         List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
         return new Page<>(PageInfo.of(bondMarketInfoQuery004Dtos));
@@ -166,6 +170,10 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         }
         //校验必填项
         addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
+        //发行人处理
+        if (StringUtil.isNotBlank(interfPayhsrcsecinfoDto.getIssuershort())) {
+            handleIssuer(validMessages, interfPayhsrcsecinfoDto.getIssuershort());
+        }
         if (CollectionUtils.isNotEmpty(validMessages)) {
             ajaxResult.setErrorList(validMessages);
             ajaxResult.setMessageType(MessageType.警告消息);
@@ -236,7 +244,6 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
                 validMessages.add(new ValidMessage("发行人匹配失败，请手动处理"));
             }
         }
-
     }
 
 

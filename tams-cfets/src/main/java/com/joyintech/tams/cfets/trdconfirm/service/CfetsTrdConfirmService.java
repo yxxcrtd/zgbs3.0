@@ -205,6 +205,7 @@ public class CfetsTrdConfirmService extends BaseService{
         if(StringUtil.isNotEmpty(counterId)){
             pageParam.put("counterIdList", StringUtil.splitToList(GlobalConstant.COMMA,counterId));
         }
+        pageParam.put("ISSUE_STATUS_01", DictCodeListExt1.发行状态_发行失败.getValue());
       /*  if (StringUtil.equals(dto.getSettleSpeed(),
                 DictCodeList.清算速度_T_0.getValue())) {
             pageParam.put("settleSpeed","0");

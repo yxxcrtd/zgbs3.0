@@ -367,6 +367,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BidResultTotal bidResultTotal = new BidResultTotal();
             bidResultTotal.setTotalWinId(entity.getTotalWinId());
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
+            bidResultTotal.setRemark(entity.getRemark());
             bidResultTotalMapper.updateByPrimaryKeySelective(bidResultTotal);
             cfetsPrimaryBidManageMapper.updateBidOrder(entity.getBidId());
             BaseBidManageBaseInfoDto  baseInfoDto = new BaseBidManageBaseInfoDto();
@@ -427,10 +428,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
                     }
                     // 划款指令表
-                    List<StlOrders> stlPayOrdersList = cfetsPrimaryBidManageMapper.queryStlPayOrdersByTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
-                    if (!stlPayOrdersList.isEmpty()) {
-                        for (StlOrders stlOrders : stlPayOrdersList) {
-                            stlOrders.setOrderId(stlOrders.getOrderId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                    List<StlOrders> stlOrdersList = cfetsPrimaryBidManageMapper.queryStlOrdersByTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
+                    if (!stlOrdersList.isEmpty()) {
+                        for (StlOrders stlOrders : stlOrdersList) {
+                            stlOrders.setOrderId(stlOrders.getOrderId().substring(0,30) + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                             stlOrders.setpOrderId(stlOrders.getOrderId());
                             stlOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                             stlOrders.setOrderStatus(DictCodeListExt1.指令状态_撤销.getValue());
@@ -1038,12 +1039,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
                     }
                 }else{
-                    messageStr = JsonUtils.json2Object(message.getMessage(), String.class);
+                    messageStr = message.getMessage();
                     if (StringUtil.isEmpty(confirmOk)
                             && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, message.getCode())) {
                         WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
-                    }
-                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, message.getCode())) {
+                    }else {
                         WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
                     }
                 }

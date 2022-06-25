@@ -1181,7 +1181,7 @@
 		and (tdeal.ps in ('T65', 'T66') or tdeal.ps = ipd.ps or ((tdeal.finprod_type2 = 'F02' OR tdeal.finprod_type2 = 'F03') AND tdeal.ps in ('T56', 'T93', 'T94', 'T07', 'T54')))
 	</if>
 	<if test="needPsCondition != null and needPsCondition == 'need2'">
-		and (ipd.ps in ('T22', 'T23', 'T24')
+		and (ipd.ps in ('T23', 'T24')
 		<!--GNS-877:股票的现金分红和送转特殊,交易汇总表和交易表登录的交易方向字典不同 modify by fuyongsheng 20220227 start-->
 		or ((tdeal.finprod_type2 = 'F10') AND tdeal.ps in ('01', '02'))
 		<!--GNS-877:股票的现金分红和送转特殊,交易汇总表和交易表登录的交易方向字典不同 modify by fuyongsheng 20220227 end-->

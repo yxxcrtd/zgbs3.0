@@ -284,7 +284,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                 //数量转化为张
                 BigDecimal num = r.getPositionsNum();
                 if(StringUtils.equals(r.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
-                    num = ArithmeticUtil.divide(r.getPositionsNum(), new BigDecimal(100),0);
+                    num = ArithmeticUtil.divide(r.getPositionsNum(), new BigDecimal(10000),0);
                 }
                 BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(),ArithmeticUtil.multiply(num,new BigDecimal("100")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());

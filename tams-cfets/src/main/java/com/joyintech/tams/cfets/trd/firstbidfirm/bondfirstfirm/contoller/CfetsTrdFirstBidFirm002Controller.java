@@ -64,7 +64,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(CfetsTrdBondFirstSub002Controller.class);
 
     @Autowired
-    CfetsTrdFirstBidFirm002Service cfetsTrdFirstBidFirm002Service;
+    private CfetsTrdFirstBidFirm002Service cfetsTrdFirstBidFirm002Service;
 
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
@@ -114,6 +114,9 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         if (StringUtil.isNotEmpty(workflowId)) {
             CfetsTrdFirstBidFirmInfoDto entity = cfetsTrdFirstBidFirm002Service.getBussinessEntityByWorkflowId(workflowId);
 //            test(entity);
+            if(StringUtil.isNotEmpty(entity.getRevokeReason())){
+                entity.setRemark(StringUtil.join(entity.getRemark(), entity.getRevokeReason()));
+            }
             initPageParams.put(GlobalConstant.WORKFLOW_ID, workflowId);
             initPageParams.put(GlobalConstant.ENTITY, entity);
         }
@@ -334,20 +337,6 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
-//    @ResponseBody
-//    @ApiOperation(value = "风险试算", notes = "风险试算")
-//    @PostMapping("doRiskcal")
-//    public Message<AjaxResult> doRiskcal(@RequestBody RiskCalRequest riskCalRequest) {
-//        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
-//        try {
-//            AjaxResult m = new AjaxResult();
-//            m.setData(result);
-//            return new Message<AjaxResult>().success().setData(m);
-//        } catch (Exception e) {
-//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-//        }
-//    }
-
     /**
      * 投标确认提交检查
      *
@@ -470,7 +459,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
             ProcessMark processMark = cfetsRepoQuotedPrice004Service.getBusinessInfoByPageIdAndPk(wflValidInputParameter);
             CfetsTrdFirstBidFirmInfoDto dto = cfetsTrdFirstBidFirm002Service.getBussinessEntity(processMark);
             dto.setBidId(detail.getBidId());
-            dto.setRemark(StringUtil.join("投标确认撤销原因：", requst.getRemark()));
+            dto.setRevokeReason(StringUtil.join("投标确认撤销原因：", requst.getRemark()));
             dto.setOperateType("revoke");
             biddingMethod = dto.getBiddingMethod();
             dtos.add(dto);
@@ -504,25 +493,4 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         }
     }
 
-//    @ResponseBody
-//    @ApiOperation(value = "风险试算", notes = "风险试算")
-//    @PostMapping("doRiskcal")
-//    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
-//        try {
-//            String message = cfetsTrdFirstBidFirm002Service.doRiskcalCheckMethod(dto);
-//            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
-//                AjaxResult ar = new AjaxResult();
-//                List<ValidMessage> warnList = new ArrayList<>();
-//                warnList.add(new ValidMessage(message));
-//                ar.setErrorList(warnList);
-//                ar.setMessageType(MessageType.错误消息);
-//                return new Message<AjaxResult>().setData(ar);
-//            }
-//            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,this.getPageId());
-//            return new Message<AjaxResult>().setData(ajaxResult);
-//        } catch (Exception e) {
-//            logger.error("风险试算", e);
-//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-//        }
-//    }
 }

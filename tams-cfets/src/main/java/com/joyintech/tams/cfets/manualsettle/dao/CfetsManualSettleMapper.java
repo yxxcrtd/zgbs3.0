@@ -307,6 +307,7 @@ public interface CfetsManualSettleMapper {
      * @return void
      */
     CfetsTrdSettleInfoResponse findManualSettleInfoRepo(Map<String,Object> params);
+    CfetsTrdSettleInfoResponse findManualSettleInfoRepo2(Map<String,Object> params);
 
     List<PortIntFenPeiInfoDto> findManualSettleFenPei(Map<String,Object> params);
 
