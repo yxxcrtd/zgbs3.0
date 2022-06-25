@@ -141,7 +141,7 @@
             #{createTime,jdbcType=TIMESTAMP}, 
             #{updateUser,jdbcType=VARCHAR}, 
             #{updateTime,jdbcType=TIMESTAMP},
-            #{firstConfirmDate,jdbcType=DATE}
+            #{firstConfirmDate,jdbcType=DATE},
             #{benchmarkIdAccuracy,jdbcType=DECIMAL})
     </insert>
 
