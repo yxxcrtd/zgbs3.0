@@ -104,6 +104,21 @@
         where FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR} and FINPROD_TYPE2 =  #{finprodType2,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectByFinprodMarketIdAndType2AndBatch" resultMap="BaseResultMap"  parameterType="java.lang.String" >
+        select
+        a.*
+        from FIN_PRODUCT a left join FIN_PRODUCT_ISSUE b on a.FINPROD_ID = b.FINPROD_ID
+        where a.FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR} and a.FINPROD_TYPE2 =  #{finprodType2,jdbcType=VARCHAR}
+        <choose>
+            <when test="additionalBatches != null">
+                AND b.ADD_BATCH = #{additionalBatches,jdbcType=INTEGER}
+            </when>
+            <otherwise>
+                AND (b.ADD_BATCH IS NULL OR b.ADD_BATCH = 0)
+            </otherwise>
+        </choose>
+    </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
         delete from FIN_PRODUCT
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}

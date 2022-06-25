@@ -12,10 +12,8 @@ package com.joyintech.tams.cfets.trdquery.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -112,7 +110,7 @@ public class CfetsTrdBidInfoResponse {
     private BigDecimal prinAmt;
 
     @ApiModelProperty(name="winPrice",value="中标标位")
-    private BigDecimal winPrice;
+    private String winPrice;
 
     @ApiModelProperty(name="unitCprice",value="中标净价")
     private BigDecimal unitCprice;
@@ -204,6 +202,9 @@ public class CfetsTrdBidInfoResponse {
     @ApiModelProperty(name="payableAmount",value="应缴款金额")
     private BigDecimal payableAmount;
 
+    @ApiModelProperty(name="payAmt",value="应缴款金额")
+    private BigDecimal payAmt;
+
     @ApiModelProperty(name="totalWinPrinAmt",value="汇总投标券面总额")
     private BigDecimal totalWinPrinAmt;
 
@@ -211,7 +212,7 @@ public class CfetsTrdBidInfoResponse {
     private BigDecimal subAmt;
 
     public String getTradeMarketModeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.交易市场, getTenderTarget());
+        return SysDataUtil.getNameFromDataDict(DictCode.交易市场, getTradeMarketMode());
     }
 
     public void setTradeMarketModeStr(String tradeMarketModeStr) {
@@ -259,7 +260,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getBidDate() {
-        return DateUtil.format(this.getBidDateStart(),"YYYY-MM-DD")+"-"+DateUtil.format(this.getBidDateEnd(),"YYYY-MM-DD");
+        return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN)+"~"+DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN);
     }
 
     public void setBidDate(String bidDate) {
@@ -338,7 +339,7 @@ public class CfetsTrdBidInfoResponse {
     public void setCcy(String ccy) {
         this.ccy = ccy;
     }
-
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getBidDateStart() {
         return bidDateStart;
     }
@@ -346,7 +347,7 @@ public class CfetsTrdBidInfoResponse {
     public void setBidDateStart(Date bidDateStart) {
         this.bidDateStart = bidDateStart;
     }
-
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getBidDateEnd() {
         return bidDateEnd;
     }
@@ -370,7 +371,7 @@ public class CfetsTrdBidInfoResponse {
     public void setTradeMarketMode(String tradeMarketMode) {
         this.tradeMarketMode = tradeMarketMode;
     }
-
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getPayDate() {
         return payDate;
     }
@@ -379,6 +380,7 @@ public class CfetsTrdBidInfoResponse {
         this.payDate = payDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getAssignRegdate() {
         return assignRegdate;
     }
@@ -387,6 +389,7 @@ public class CfetsTrdBidInfoResponse {
         this.assignRegdate = assignRegdate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getOnmarketDate() {
         return onmarketDate;
     }
@@ -404,7 +407,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getBidModleStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, getTenderTarget());
+        return SysDataUtil.getNameFromDataDict(DictCode.投标方式, getBidModle());
     }
 
     public void setBidModleStr(String bidModleStr) {
@@ -443,11 +446,11 @@ public class CfetsTrdBidInfoResponse {
         this.prinAmt = prinAmt;
     }
 
-    public BigDecimal getWinPrice() {
+    public String getWinPrice() {
         return winPrice;
     }
 
-    public void setWinPrice(BigDecimal winPrice) {
+    public void setWinPrice(String winPrice) {
         this.winPrice = winPrice;
     }
 
@@ -507,6 +510,7 @@ public class CfetsTrdBidInfoResponse {
         this.exeId = exeId;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getTradeDate() {
         return tradeDate;
     }
@@ -570,7 +574,7 @@ public class CfetsTrdBidInfoResponse {
     public void setTradePlaStr(String tradePlaStr) {
         this.tradePlaStr = tradePlaStr;
     }
-
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getIssueDate() {
         return issueDate;
     }
@@ -620,7 +624,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getCouponSpeciesStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, getTenderTarget());
+        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, getCouponSpecies());
     }
 
     public void setCouponSpeciesStr(String couponSpeciesStr) {
@@ -682,5 +686,13 @@ public class CfetsTrdBidInfoResponse {
 
     public void setOuPartyIdStr(String ouPartyIdStr) {
         this.ouPartyIdStr = ouPartyIdStr;
+    }
+
+    public BigDecimal getPayAmt() {
+        return payAmt;
+    }
+
+    public void setPayAmt(BigDecimal payAmt) {
+        this.payAmt = payAmt;
     }
 }

@@ -557,7 +557,7 @@ public class CfetsTrdFirstBidFirmDistributionInfoDto extends BaseEntity implemen
 
     public String getBidDateStr() {
         if(!StringUtil.isNotEmpty(this.getBidDateEndStr())){
-            this.getBidDateStartStr();
+            return this.getBidDateStartStr();
         }
         return this.getBidDateStartStr() + "~" + this.getBidDateEndStr();
     }

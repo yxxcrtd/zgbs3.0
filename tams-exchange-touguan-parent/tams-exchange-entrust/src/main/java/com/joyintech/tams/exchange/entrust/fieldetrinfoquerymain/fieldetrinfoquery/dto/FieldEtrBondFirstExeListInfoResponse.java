@@ -140,6 +140,17 @@ public class FieldEtrBondFirstExeListInfoResponse {
     @ApiModelProperty(required = false, name = "remark", value = "备注")
     private String remark;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型")
+    private String busiTypePosition;
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
     public String getEffectiveStatus() {
         return effectiveStatus;
     }

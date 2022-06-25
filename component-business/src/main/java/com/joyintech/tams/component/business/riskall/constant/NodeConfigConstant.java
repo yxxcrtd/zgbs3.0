@@ -2,7 +2,6 @@ package com.joyintech.tams.component.business.riskall.constant;
 
 
 /**
- *
  * 风控节点配置报文字段
  *
  * @author gwl
@@ -34,6 +33,30 @@ public class NodeConfigConstant {
      */
     public static final String FLOW_STATUS = "flowStatus";
     /**
+     * 申购方式 数据字典 DictCode.头寸申购方式
+     */
+    public static final String PURCH_MODLE = "purchModle";
+    /**
+     * 交易场所 数据字典 DictCode.交易场所
+     */
+    public static final String TRADE_PLACE = "tradePlace";
+    /**
+     * 投标结果 数据字典 DictCode.是否
+     */
+    public static final String BID_RESULT = "bidResult";
+    /**
+     * 交易方向 数据字典 DictCode.交易方向
+     */
+    public static final String PS = "ps";
+    /**
+     * 是否校验 布尔类型
+     */
+    public static final String IS_CHECK = "isCheck";
+    /**
+     * 数据
+     */
+    public static final String DATA = "data";
+    /**
      * 场外现券
      */
     public static final String BOND001 = "Bond001";
@@ -41,15 +64,25 @@ public class NodeConfigConstant {
      * 场内现券
      */
     public static final String BOND002 = "Bond002";
+
+    /**
+     * 质押式双边回购
+     */
+    public static final String REPO001 = "REPO001";
     /**
      * 质押式回购
      */
     public static final String REPO003 = "REPO003";
 
     /**
-     * 数据
+     * 指令
      */
-    public static final String DATA = "data";
+    public static final String ENTRUST = "0";
+
+    /**
+     * 交易
+     */
+    public static final String TRADE = "1";
 
 
 }

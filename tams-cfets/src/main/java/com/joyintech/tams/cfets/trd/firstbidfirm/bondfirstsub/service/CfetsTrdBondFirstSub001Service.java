@@ -3,12 +3,16 @@ package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
-import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.EtrEntrustOperHisDto;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
@@ -16,14 +20,16 @@ import com.joyintech.tams.business.common.service.CfgDataTableService;
 import com.joyintech.tams.business.common.service.CfgReadonlyFormService;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsBussCombDistribtBaseDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalRequest;
 import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondRegCheckRequst;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub001Mapper;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstDaySubDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstDaySubRequest;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubDealDetailDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDetailDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustProductDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustRequest;
 import com.joyintech.tams.common.base.dao.EtrDistributeMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.WflEtrEntrustMapper;
@@ -36,7 +42,6 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -47,7 +52,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 一级申购SERVICE
@@ -181,7 +190,14 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         this.setParam(pageParam);
         PageMode pageMode = this.setPageMode(dto.getPageMode());
         logger.debug("查询指令,入参:" + JsonUtils.object2Json(pageParam));
-        return super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listEntrust(pageParam));
+        Page<CfetsTrdBondFirstSubEntrustDto> page =
+                super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listEntrust(pageParam));
+        page.getRoot().forEach(item -> {
+                    List<EtrEntrustOperHisDto> list = joyinbusinessCommonService.selectCfetsOprHisByEntrustId(item.getEntrustId());
+                    item.setRemarks(list);
+                }
+        );
+        return page;
     }
 
     /**
@@ -225,14 +241,6 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         }
         // 接受委托
         etrInvesInfo.receptionDelegate(list);
-        List<String> entrustIds = StringUtil.splitToList(",", (String) param.get("entrustIds"));
-        for (String entrustId : entrustIds) {
-            //更新操作记录日志
-            CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-            oprHisReq.setEntrustId(entrustId);
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
-            joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-        }
         return errorList;
     }
 

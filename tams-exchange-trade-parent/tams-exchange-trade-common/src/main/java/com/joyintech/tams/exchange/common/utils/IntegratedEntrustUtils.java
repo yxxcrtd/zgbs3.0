@@ -419,4 +419,25 @@ public class IntegratedEntrustUtils {
         }
         return false;
     }
+	
+	 /***
+     * @Description: 332742   上海-固收债券回售申报
+     * @Param: [entrustProp, entrustBs, market]
+     * @return: boolean
+     * @Author: xiazelei
+     * @Date: 2022/5/25 14:55
+     */
+    public static boolean isBindSellBackSH(String entrustProp, String entrustBs, String market) {
+        //上交所
+        if (Market.SHSE.value.equals(market)) {
+            // 卖出
+            if (EntrustBs.SELL.value.equals(entrustBs)) {
+                // 上海-固收债券回售申报
+                if (EntrustProp.HS.value.equals(entrustProp)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

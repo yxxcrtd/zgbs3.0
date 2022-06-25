@@ -5,6 +5,7 @@ import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.SettleBatchPara;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
 import com.joyintech.tams.settle.batch.datadeal.dto.step2.StepContext;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDownDataDealReaderService;
@@ -69,11 +70,14 @@ public class StlDownDataDealReader extends BaseReader<StlDownDataDealOperatorDto
 	        result = stlDownDataDealService.generatorStlDownDataDealOperatorDto(execInfo.getExecuteDate(), portfolioIdList, secTypeList);
         }*/
 
-		secTypeList = Arrays.asList(DictCodeListExt1.证券品种_债券.getValue(),DictCodeListExt1.证券品种_基金.getValue(),DictCodeListExt1.证券品种_股票.getValue(),DictCodeListExt1.证券品种_回购.getValue());
+		secTypeList = Arrays.asList(DictCodeListExt1.证券品种_债券.getValue(),DictCodeListExt1.证券品种_基金.getValue(),
+				DictCodeListExt1.证券品种_股票.getValue(),DictCodeListExt1.证券品种_回购.getValue(),
+				DictCodeListStl.证券品种_信用保护凭证.getValue());
 		StepContext.start(DictCodeListExt1.证券品种_债券.getValue());
 		StepContext.start(DictCodeListExt1.证券品种_基金.getValue());
 		StepContext.start(DictCodeListExt1.证券品种_股票.getValue());
 		StepContext.start(DictCodeListExt1.证券品种_回购.getValue());
+		StepContext.start(DictCodeListStl.证券品种_信用保护凭证.getValue());
 		result = stlDownDataDealService.generatorStlDownDataDealOperatorDto(execInfo.getExecuteDate(), portfolioIdList, secTypeList);
         if(CollectionUtils.isNotEmpty(result)) {
         	// 根据证券品种初始化

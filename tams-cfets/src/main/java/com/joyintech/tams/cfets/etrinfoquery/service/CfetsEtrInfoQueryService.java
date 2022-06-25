@@ -14,6 +14,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.cfets.etrdispatcher.dao.CfetsEtrDispatcherMapper;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -189,11 +191,11 @@ public class CfetsEtrInfoQueryService extends BaseService{
                         StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
                     CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
                     if (dto2 != null) {
-                        response.setExecFinishAmt(dto2.getExecFinishAmt());
-                        response.setExecRemainderAmt(dto2.getExecRemainderAmt());
+                        response.setExecFinishAmt(ArithmeticUtil.divide(dto2.getExecFinishAmt(), BigDecimal.valueOf(10000),2));
+                        response.setExecRemainderAmt(ArithmeticUtil.divide(dto2.getExecRemainderAmt(), BigDecimal.valueOf(10000),2));
                         response.setExeProgress(dto2.getExeProgress());
-                        response.setTransFinishAmt(dto2.getTransFinishAmt());
-                        response.setTransRemainderAmt(dto2.getTransRemainderAmt());
+                        response.setTransFinishAmt(ArithmeticUtil.divide(dto2.getTransFinishAmt(), BigDecimal.valueOf(10000),2));
+                        response.setTransRemainderAmt(ArithmeticUtil.divide(dto2.getTransRemainderAmt(), BigDecimal.valueOf(10000),2));
                         response.setDealProgress(dto2.getDealProgress());
                     }
                 }

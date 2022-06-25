@@ -77,11 +77,11 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
             Map<String,Object> param = new HashMap<>();
             // ZGZGST-4216: 查询持仓时日期使用付息截止日前一日 fuyongsheng 20211214 modify start
             // param.put("dealDate",executeDate);
-            Date mdate2 = settleTransDataDtos.get(0).getMdate2();
+            // Date mdate2 = settleTransDataDtos.get(0).getMdate2();
             List<PtlSecPosition> ptlSecPositions = Lists.newArrayList();
-            if(null != mdate2){
-                param.put("dealDate", DateUtil.parse(DateUtil.getYesterDayDate(mdate2)));
-                // ZGZGST-4216: 查询持仓时日期使用付息截止日前一日 fuyongsheng 20211214 modify end
+            // if(null != mdate2){
+                param.put("dealDate", executeDate);
+                // ZGZGST-4216: 查询持仓时日期使用当日持仓 fuyongsheng 20211214 modify end
                 param.put("hodingType",DictCodeList.持仓类型_实际.getValue());
                 // ZGTFCP-1363:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220321 start
                 // 新老头寸开关(Y:新头寸,N:老头寸)
@@ -93,9 +93,16 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                     param.put("hodingType", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                     param.put("dateType", StlDataGatherConstant.DATE_TYPE_T_0);
                     ptlSecPositions = stlDataGatherMapper.listPtlSecPositionRule(param);
+                    // ZGCPCN-1599:查询新头寸需要除以100 modify by fuyongsheng 20220622 start
+                    if(CollectionUtils.isNotEmpty(ptlSecPositions)){
+                        for(PtlSecPosition ptlSecPosition : ptlSecPositions){
+                            ptlSecPosition.setAmount(ArithmeticUtil.divide(ptlSecPosition.getAmount(), new BigDecimal(100), 4));
+                        }
+                    }
+                    // ZGCPCN-1599:查询新头寸需要除以100 modify by fuyongsheng 20220622 end
                 }
                 // ZGTFCP-1363:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220321 end
-            }
+            // }
             //按金融产品代码分组
             Map<String,List<PtlSecPosition> > finprodIdMap = new HashMap<>();
             if(CollectionUtils.isNotEmpty(ptlSecPositions)) {
@@ -108,7 +115,12 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                        + i.getPs()+","+i.getSecAcctId()+","+i.getSeatNumber())).forEach(SettleTransDataMap::put);
             }
             for (SettleTransDataDto settleTransData : settleTransDataDtos) {
-               // GNS-860:还原债券存续期 modify by fuyongsheng 20220214 start
+                // ZGCPCN-1527:必须当日有持仓才会生成交易相关数据 modify by fuyongsheng 20220620 start
+                if(!finprodIdMap.containsKey(settleTransData.getFinprodId())){
+                    continue;
+                }
+                // ZGCPCN-1527:必须当日有持仓才会生成交易相关数据 modify by fuyongsheng 20220620 end
+                // GNS-860:还原债券存续期 modify by fuyongsheng 20220214 start
                handTrdProductDeal(Arrays.asList(settleTransData));
                // GNS-860:还原债券存续期 modify by fuyongsheng 20220214 end
                 //汇总交(资产维度)

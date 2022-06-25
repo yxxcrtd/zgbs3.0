@@ -5,6 +5,7 @@ import com.joyintech.calculation.shell.PriceByYieldCalculator;
 import com.joyintech.calculation.shell.YieldByPriceCalculator;
 import com.joyintech.calculation.shell.param.*;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.file.SafelyFile;
@@ -18,7 +19,10 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
@@ -53,8 +57,10 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,15 +68,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.util.*;
+
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.现金流类型_中间还本;
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.现金流类型_到期还本;
 
 /**
  * 债券标的信息新建
@@ -318,6 +331,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //现金流计划表（FIN_CASH_PLAN）
             List<FinCashPlan> finCashPlanList = dto.getFinCashPlanList();
             for(FinCashPlan finCashPlan: finCashPlanList) {
+                if(!StringUtil.equals(finCashPlan.getCashType(),现金流类型_到期还本.getValue()) && !StringUtil.equals(finCashPlan.getCashType(),现金流类型_中间还本.getValue())) {
+                    finCashPlan.setCashAmt(finCashPlan.getIntAmt());
+                }
                 finCashPlanMapper.insertSelective(finCashPlan);
             }
             //行权计划表（FIN_EXERCISE_PLAN）
@@ -382,6 +398,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finBondAssetMapper.deleteFinCashPlan(entity.getFinprodId());
             List<FinCashPlan> finCashPlanList = dto.getFinCashPlanList();
             for(FinCashPlan finCashPlan: finCashPlanList) {
+                if(!StringUtil.equals(finCashPlan.getCashType(),现金流类型_到期还本.getValue()) && !StringUtil.equals(finCashPlan.getCashType(),现金流类型_中间还本.getValue())) {
+                    finCashPlan.setCashAmt(finCashPlan.getIntAmt());
+                }
                 finCashPlanMapper.insertSelective(finCashPlan);
             }
             //行权计划表（FIN_EXERCISE_PLAN）
@@ -645,6 +664,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finProductAdd.setIsPpb(DictCodeList.是否_否.getValue());
         }
         finProductAdd.setFaceValue(BigDecimal.valueOf(100));
+        finProductAdd.setInvestNature(DictCodeList.投资性质_固定收益类.getValue());
         //----add by jjpei 20190727 添加投资性质----start----
 //        if(StringUtil.isNotBlank(dto.getType4())&&DictCodeList.WIND一级分类_含债券一级分类等_优先股.getValue().equals(dto.getType4())){
 //            finProductAdd.setInvestNature(DictCodeList.投资性质_权益类.getValue());
@@ -1008,7 +1028,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 //付息
                 List<BondFinCashPlanDto> payInvestDtos = new ArrayList<>();
                 for (FinCashPlan finCashPlan : finCashPlanList) {
-                    if (BussinessDictCodeList.现金流类型_中间还本.getValue().equals(finCashPlan.getCashType())
+                    if (现金流类型_中间还本.getValue().equals(finCashPlan.getCashType())
                             || BussinessDictCodeList.现金流类型_到期还本.getValue().equals(finCashPlan.getCashType())){
                         FinCashPlanDto finCashPlanDto = new FinCashPlanDto();
                         BeanUtil.copyPropertiesIgnoreNull(finCashPlanDto,finCashPlan);
@@ -1691,34 +1711,98 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         return finBondAssetMapper.isTransInAssetTwo(finprodId);
     }
 
-    public MultipartFile downloadFileInfo(String seqNo) {
-        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
-        File pathFile = new SafelyFile(file.getPath());
-        FileItem fileItem = createFileItem(pathFile, pathFile.getName());
-        MultipartFile multipartFile = null;
-        //  生成文件夹
-        if (pathFile.exists()){
-            multipartFile = new CommonsMultipartFile(fileItem);
+//    public MultipartFile downloadFileInfo(String seqNo) throws FileNotFoundException {
+//        ServletOutputStream out = null;
+//        FileInputStream ips = null;
+//        try{
+//            SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
+//            File pathFile = new SafelyFile(file.getPath());
+//            if(!pathFile.exists()) {
+//                return null;
+//            }
+//            ips = new FileInputStream(pathFile);
+//            List<Map<String, Object>> list = null; //此处为业务需要
+//            int len = 0;
+//            byte[] buffer = new byte[1024 * 10];
+//            while ((len = ips.read(buffer)) != -1){
+//                out.write(buffer,0,len);
+//            }
+//            out.flush();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }finally {
+//            try {
+//                out.close();
+//                ips.close();
+//            } catch (IOException e) {
+//                System.out.println("关闭流出现异常");
+//                e.printStackTrace();
+//            }
+//        }
+////        MultipartFile multipartFile = createMultipartFile(pathFile);
+////        return multipartFile;
+//    }
+
+
+    public void  downloadFileInfo(String seqNo, HttpServletResponse response) throws IOException {
+        ServletOutputStream out = null;
+        FileInputStream ips = null;
+        try {
+             //获取文件存放的路径
+            SysUploadFileInfo fileInfo = joyinFSMapper.selectByPrimaryKey(seqNo);
+            File file = new SafelyFile(fileInfo.getPath());
+            String fileName=file.getName();
+             //获取到文字 数据库里对应的附件名字加上老的文件名字：filename 截取到后面的文件类型 例：txt 组成一个新的文件名字：newFileName
+             if(!file.exists()) {
+                //如果文件不存在就跳出
+                return;
+            }
+            ips = new FileInputStream(file);
+            response.reset();
+//            response.setContentType("multipart/form-data");
+            response.setContentType("application/octet-stream");
+            //为文件重新设置名字，采用数据库内存储的文件名称
+//            response.addHeader("Content-Disposition", "attachment; fileName=\"" + new String(fileName.getBytes("UTF-8"),"ISO8859-1") + "\"");
+            response.addHeader("Content-Disposition",
+                    "attachment;filename=" + new String(fileName.getBytes()));
+            response.addHeader("Content-Length", "" + file.length());
+            out = response.getOutputStream();
+            //读取文件流
+            int len = 0;
+            byte[] buffer = new byte[1024 * 10];
+            while ((len = ips.read(buffer)) != -1){
+                out.write(buffer,0,len);
+            }
+            out.flush();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            try {
+                out.close();
+                ips.close();
+            } catch (IOException e) {
+                System.out.println("关闭流出现异常");
+                e.printStackTrace();
+            }
         }
-        return multipartFile;
     }
 
-    private FileItem createFileItem(File file, String fieldName) {
-        FileItemFactory factory = new DiskFileItemFactory(16, null);
-        FileItem item = factory.createItem(fieldName, "text/plain", true, file.getName());
-        int bytesRead = 0;
-        byte[] buffer = new byte[8192];
+    private MultipartFile createMultipartFile(File file) {
         try {
-            FileInputStream fis = new FileInputStream(file);
-            OutputStream os = item.getOutputStream();
-            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
+            FileItem fileItem = null;
+            MultipartFile multipartFile = null;
+            fileItem = new DiskFileItem(file.getName(), Files.probeContentType(file.toPath()),
+                    false, file.getName(), (int) file.length(), file.getParentFile());
+            InputStream input = new FileInputStream(file);
+            OutputStream os = fileItem.getOutputStream();
+            IOUtils.copy(input, os);
+            multipartFile = new CommonsMultipartFile(fileItem);
             os.close();
-            fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            input.close();
+            return multipartFile;
+        } catch (Exception e) {
+            e.getStackTrace();
+            throw new RuntimeException("File转MultipartFile失败");
         }
-        return item;
     }
 }

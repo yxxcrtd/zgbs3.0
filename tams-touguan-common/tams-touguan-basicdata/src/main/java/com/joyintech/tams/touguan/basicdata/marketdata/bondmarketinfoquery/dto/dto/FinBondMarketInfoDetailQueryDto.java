@@ -188,6 +188,8 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "observeBefDay", value = "延后时间单位")
     private String observeBefUnit;
 
+    private String basis;
+
     @ApiModelProperty(name = "ratebasic", value = "计息基础")
     private String ratebasic;
 
@@ -297,6 +299,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "yield", value = "初始利率")
     private BigDecimal yield;
 
+    @ApiModelProperty(name = "originalOwner", value = "原始权益人")
+    private String originalOwner;
+
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
@@ -305,6 +310,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     @ApiModelProperty(name = "bondMarketInvRepayDtos", value = "还本计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos;
+
+    @ApiModelProperty(name = "allBondMarketPlanDtos", value = "计划信息")
+    private List<FinBondMarketCashPlanDto> allBondMarketPlanDtos;
 
     public String getSecId() {
         return secId;
@@ -942,6 +950,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
         if (CollectionUtils.isEmpty(conceptTypes)) {
             return null;
         }
+        if (conceptTypes.size() == 1) {
+            return SysDataUtil.getNameFromDataDict(DictCode.概念标识, conceptTypes.get(0));
+        }
         StringBuilder builder = new StringBuilder();
         conceptTypes.stream().forEach(conceptType -> builder.append(SysDataUtil.getNameFromDataDict(DictCode.概念标识, conceptType)).append(","));
         return builder.toString();
@@ -1045,5 +1056,29 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setIsWind(String isWind) {
         this.isWind = isWind;
+    }
+
+    public String getBasis() {
+        return basis;
+    }
+
+    public void setBasis(String basis) {
+        this.basis = basis;
+    }
+
+    public List<FinBondMarketCashPlanDto> getAllBondMarketPlanDtos() {
+        return allBondMarketPlanDtos;
+    }
+
+    public void setAllBondMarketPlanDtos(List<FinBondMarketCashPlanDto> allBondMarketPlanDtos) {
+        this.allBondMarketPlanDtos = allBondMarketPlanDtos;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
     }
 }

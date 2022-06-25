@@ -1968,8 +1968,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                         CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴) ||
                         CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标)) {
                         if (CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入)) {
-                            infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "entrustNum", BigDecimal.ZERO));//券面总额
-                            infRiskRdsDto.setTradeNum(CommonUtil.getBigDecimal(dataMap, "entrustNum", BigDecimal.ZERO));
+                            infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "bidPriceTotal", BigDecimal.ZERO));//券面总额
+                            infRiskRdsDto.setTradeNum(CommonUtil.getBigDecimal(dataMap, "bidPriceTotal", BigDecimal.ZERO));
                         }
                         if (CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴)
                           || CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标)) {
@@ -2513,6 +2513,10 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             }
 
             infRiskRdsDto.setCalendarCode((String) CommonUtil.findValue(dataMap, "calendarId"));
+            if (StringUtil.isEmpty(infRiskRdsDto.getCalendarCode())
+                && StringUtil.equals(infRiskRdsDto.getTradePlace(),DictCodeListExt1.交易场所_银行间.getValue())){
+                infRiskRdsDto.setCalendarCode("03");
+            }
             if (StringUtil.isNotEmpty(finDto.getMdate())) {
                 infRiskRdsDto.setRepoTerm(BigDecimal.valueOf(DateUtil.getBetweenDayNumber(finDto.getTradeDate(), finDto.getMdate())));
             }
@@ -2572,7 +2576,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         if (StringUtil.equals(DictCodeListExt2.平安资产类型_一级市场债.getValue(), v.getAssetType())) {
             if (CommonUtil.isType(v.getEventStatus(), DictCodeListExt4.共通业务类型_中标结果维护自主投标) ||
                     CommonUtil.isType(v.getEventStatus(), DictCodeListExt4.共通业务类型_中标结果维护代投代缴)) {
-                infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "totalBiddingNum", BigDecimal.ZERO));//汇总券面总额
+                infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "actWinPrinamt", BigDecimal.ZERO));//汇总券面总额
                 infRiskRdsDto.setTradeNum(
                         ArithmeticUtil.divide(infRiskRdsDto.getAmount(), new BigDecimal(100), 4));
                 // add by zhangrui1 汇总确认 end
@@ -2585,6 +2589,19 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("payDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
                 }
                 infRiskRdsDto.setEventId(StringUtil.isNotEmpty(dataMap.get("bidId")) ? dataMap.get("bidId").toString() : StringUtil.EMPTY);
+                //设置是否是股东发行
+                infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
+            }else if (CommonUtil.isType(v.getEventStatus(), DictCodeListExt4.共同业务类型_一级投标确认_申购_登记)) {
+                infRiskRdsDto.setAmount(finDto.getFpriceAmt());
+                infRiskRdsDto.setTradeNum(finDto.getShareAmt());
+                infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
+//                if (StringUtil.isNotEmpty(dataMap.get("tradeDate"))) {
+                infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("tradeDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+//                } else if (StringUtil.isNotEmpty(dataMap.get("settleDate"))) {
+//                    infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("settleDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
+//                }
+                infRiskRdsDto.setEventId(StringUtil.isNotEmpty(dataMap.get("tradeId")) ? dataMap.get("tradeId").toString() : StringUtil.EMPTY);
                 //设置是否是股东发行
                 infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
             }else{
@@ -2613,6 +2630,10 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 //设置是否是股东发行
                 infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
             }
+            // 债券可用面值 * 交易数量
+            infRiskRdsDto.setTotalFaceAmt(
+                    ArithmeticUtil.multiply(null == finDto.getParValue() ? new BigDecimal(100) : finDto.getParValue(), infRiskRdsDto.getTradeNum()));
+            // add by zhangrui1 增加券面总额（元） end
         }
         if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_利率互换.getValue(), v.getFinType()) ||
                 StringUtil.equals(DictCodeListExt2.平安资产类型_利率互换.getValue(), v.getAssetType())) {

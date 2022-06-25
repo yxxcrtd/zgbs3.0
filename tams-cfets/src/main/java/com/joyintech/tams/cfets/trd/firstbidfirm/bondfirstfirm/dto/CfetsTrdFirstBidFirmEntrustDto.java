@@ -5,6 +5,7 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.business.common.dto.EtrEntrustOperHisDto;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
@@ -161,6 +162,9 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     @ApiModelProperty(name = "totleId", value = "汇总代码：汇总指令关系表，用于指令汇总", example = "true/fasle")
     private String totleId;
+
+    @ApiModelProperty(name = "remarks", value = "备注列表 ")
+    private List<EtrEntrustOperHisDto> remarks;
 
     public String getEntrustStatus() {
         return entrustStatus;
@@ -320,7 +324,7 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     }
 
     public String getIssueDateStr() {
-        if (null == this.getIssueDateEnd() && null != this.getIssueDateEnd()) {
+        if (null == this.getIssueDateEnd() && null != this.getIssueDateStart()) {
             return DateUtil.format(this.getIssueDateStart());
         }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {
@@ -561,5 +565,13 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     public void setTotleId(String totleId) {
         this.totleId = totleId;
+    }
+
+    public List<EtrEntrustOperHisDto> getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(List<EtrEntrustOperHisDto> remarks) {
+        this.remarks = remarks;
     }
 }

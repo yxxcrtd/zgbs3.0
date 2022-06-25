@@ -1,0 +1,1 @@
+UPDATE CFG_READONLY_FORM_SHOW SET EXTENDCFG = '{"colAlign": "left","dataType":"amount","precision":"4","unit":"%","divisor":"0.01"}' WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '06' AND COLCODE = 'matureYield';

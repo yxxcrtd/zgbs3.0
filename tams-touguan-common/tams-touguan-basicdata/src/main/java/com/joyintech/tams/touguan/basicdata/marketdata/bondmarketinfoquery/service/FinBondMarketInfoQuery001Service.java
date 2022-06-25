@@ -10,9 +10,11 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
@@ -21,6 +23,7 @@ import com.joyintech.tams.component.business.common.service.CommonAutoCouponServ
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
@@ -94,6 +97,19 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             request.setSecTypes(secTypes);
             request.setSecType2s(secType2s);
         }
+
+        if (Objects.nonNull(request.getPageMode())) {
+            PageMode pageMode = request.getPageMode();
+            String sort = pageMode.getSort();
+            if (StringUtil.isNotBlank(sort) && sort.contains("Str")) {
+                pageMode.setSort(sort.replaceAll("Str", ""));
+                request.setPageMode(pageMode);
+            }
+            if (StringUtil.isNotBlank(sort) && sort.equals("conceptTypeStr")) {
+                pageMode.setSort("CITYINVESTSECWIND");
+                request.setPageMode(pageMode);
+            }
+        }
         List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
         return new Page<>(PageInfo.of(bondMarketInfoQuery004Dtos));
     }
@@ -154,6 +170,10 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         }
         //校验必填项
         addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
+        //发行人处理
+        if (StringUtil.isNotBlank(interfPayhsrcsecinfoDto.getIssuershort())) {
+            handleIssuer(validMessages, interfPayhsrcsecinfoDto.getIssuershort());
+        }
         if (CollectionUtils.isNotEmpty(validMessages)) {
             ajaxResult.setErrorList(validMessages);
             ajaxResult.setMessageType(MessageType.警告消息);
@@ -177,10 +197,55 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             ajaxResult.setMessageType(MessageType.错误消息);
         } else {
             //操作记录
-            this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
+            this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
         }
         return ajaxResult;
     }
+
+    /**
+     * 加券前的校验
+     *
+     * @param secId
+     * @return
+     */
+    public List<ValidMessage> addCouponsValid(String secId) {
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2(secId, DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        List<ValidMessage> validMessages = new ArrayList<>();
+        if (Objects.nonNull(finProduct)) {
+            validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
+            return validMessages;
+        }
+        //校验
+        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.selectWindBondAssetBySecId(secId);
+        if (Objects.isNull(interfPayhsrcsecinfoDto)) {
+            validMessages.add(new ValidMessage("未查询到该待上市债券信息，无法加券，请手工维护"));
+            return validMessages;
+        }
+        //校验必填项
+        addCouponsCheck(validMessages, interfPayhsrcsecinfoDto);
+        return validMessages;
+    }
+
+    /**
+     * 发行人处理
+     *
+     * @param validMessages
+     * @param issuer
+     */
+    public void handleIssuer(List<ValidMessage> validMessages, String issuer) {
+        logger.info("handleIssuer >> 发行人处理参数：{}", issuer);
+        Map<String, Object> result = restTemplate.getForObject(
+                ServiceApplication.PINGAN_SERVICE_NAME + "/invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/autoAddInstitutions?insitituteCode=" + issuer,
+                Map.class);
+        logger.info("handleIssuer >> 发行人处理结果：{}", JsonUtils.object2Json(result));
+        if (Objects.nonNull(result)) {
+            int errorCode = (int) result.get("errorCode");
+            if (errorCode == 0) {
+                validMessages.add(new ValidMessage("发行人匹配失败，请手动处理"));
+            }
+        }
+    }
+
 
     /**
      * 加券市场信息查询
@@ -195,6 +260,11 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         param.put("platformDate", iPlatformDate.getSysDateStr());
         FinBondMarketInfoDetailQueryDto detailQueryDto = finBondMarketInfoQueryMapper.queryFinBondMarketForCoupons(param);
         if (Objects.nonNull(detailQueryDto)) {
+            if (DictCodeListExt3.交易场所_上海证券交易所.getValue().equals(detailQueryDto.getMarket())) {
+                detailQueryDto.setIsNoGuard(DictCodeList.是否_是.getValue());
+            } else {
+                detailQueryDto.setIsNoGuard(DictCodeList.是否_否.getValue());
+            }
             detailQueryDto.setMarketBasis(detailQueryDto.getRatebasic());
             //行权计划信息
             List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(secId);
@@ -213,6 +283,11 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             param.put("scheduTypeList", scheduTypeList);
             List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(param);
             detailQueryDto.setBondMarketInvRepayDtos(bondMarketInvRepayDtos);
+            //还本付息计划信息
+            List<FinBondMarketCashPlanDto> allBondMarketPlanDtos = new ArrayList<>();
+            allBondMarketPlanDtos.addAll(detailQueryDto.getBondMarketCashPlanDtos());
+            allBondMarketPlanDtos.addAll(detailQueryDto.getBondMarketInvRepayDtos());
+            detailQueryDto.setAllBondMarketPlanDtos(allBondMarketPlanDtos);
         } else {
             param.put("FINPROD_TYPE2_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
             param.put("FIN_CASH_BUSINESS_TYPE_01", DictCodeListExt1.现金流业务类型_金融产品.getValue());
@@ -228,6 +303,12 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             param.put("finprodType", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             detailQueryDto = finBondMarketInfoQueryMapper.queryFinProductForCoupons(param);
             if (Objects.nonNull(detailQueryDto)) {
+                if (StringUtil.equals(detailQueryDto.getBasis(), DictCodeList.计息基础_A_A_平均分配.getValue())) {
+                    detailQueryDto.setBasisStyle(DictCodeListExt1.利息分配方式_平均分配.getValue());
+                }
+                if (StringUtil.equals(detailQueryDto.getBasis(), DictCodeList.计息基础_A_A_按实际天数分配.getValue())) {
+                    detailQueryDto.setBasisStyle(DictCodeListExt1.利息分配方式_按照实际天数分配.getValue());
+                }
                 Map<String, Object> map = new HashMap<>();
                 //付息计划
                 map.put("cashId", detailQueryDto.getBasisStyle());
@@ -284,6 +365,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(operType.getValue());
+        oprHisReq.setBusiType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         oprHisReq.setBusiDes(remark);
         oprHisReq.setWorkflowId(workFlowId);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);

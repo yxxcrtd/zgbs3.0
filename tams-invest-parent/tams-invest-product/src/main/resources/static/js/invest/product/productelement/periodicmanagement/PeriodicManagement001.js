@@ -60,7 +60,8 @@ $(function () {
 		   {field:'periodProdId',visible : false },
 		   {field:'branch',visible : false },
 		   // 2019-11-18 yangxiaofeng BSTOZ-1273
-		   {field:'finprodId', title: '产品代码', sort:true ,sortField:'finprodId',width:150},
+		   {field:'finprodId', visible : false},
+		   {field:'finprodMarketId', title: '产品代码', sort:true ,sortField:'finprodMarketId',width:150},
 		   // 2019-11-18 yangxiaofeng BSTOZ-1273
 		   {field:'investCycle',visible : false },
 		   {field:'publishType',visible : false },

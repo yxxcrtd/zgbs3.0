@@ -74,4 +74,10 @@ public interface PeriodicManagementMapper {
      * @since 1.0
      */
     int getTrdProductDealByPeriodId(Map<String, Object> map);
+
+
+	/**
+	 * 查询相同开始日和结束日是否存在
+	 */
+    int checkPeriodTradeDate(Map<String, Object> param);
 }

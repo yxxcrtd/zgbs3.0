@@ -234,6 +234,14 @@ public class FinBondAsset001Controller extends BaseController{
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
+                parameter.setPageId("FinBondAsset003");
+                parameter.setBusinessDataPk1(entity.getFinprodMarketId());
+                if (finBondAssetService.isInWflProcess(parameter)) {
+                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！不可删除!")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
             }
 
         }
@@ -353,6 +361,7 @@ public class FinBondAsset001Controller extends BaseController{
         for (FinBondAssetSaveRequest saveRequest:dto.getSelectedItem()){
             String finProdId = commonBusinessService.getFinProdId(saveRequest.getFinprodMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
             FinBondAssetSaveRequest request = finBondAssetService.getBasicInfos(finProdId, null);
+            request.setOperateStatus(dto.getOperateStatus());
             selectedItem.add(request);
         }
         entity.setOperateType(OperationType.DELETE.name());

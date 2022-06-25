@@ -84,6 +84,11 @@ public class CfetsEtribSaveRequest extends EtrEntrust implements ProcessEntity {
      */
     private String assetType11;
 
+    /**
+     * 是否审批
+     */
+    private String rskApproval;
+
     public String getOperateType() {
         return operateType;
     }
@@ -263,5 +268,13 @@ public class CfetsEtribSaveRequest extends EtrEntrust implements ProcessEntity {
 
     public void setAssetType11(String assetType11) {
         this.assetType11 = assetType11;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
     }
 }

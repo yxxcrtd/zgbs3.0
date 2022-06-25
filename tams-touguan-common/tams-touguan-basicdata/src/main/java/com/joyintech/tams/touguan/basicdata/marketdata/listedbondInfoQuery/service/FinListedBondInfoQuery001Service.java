@@ -24,7 +24,6 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
-import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -32,6 +31,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.SelectOptionCommonRequest;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dao.FinListedBondInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
@@ -45,10 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 待上市债券市场信息查询服务类
@@ -68,7 +65,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     @Resource
     private CommonAutoCouponService commonAutoCouponService;
     @Resource
-    private CommonBusinessService commonBusinessService;
+    private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
     @Resource
     private FinListedBondInfoQueryMapper finListedBondInfoQueryMapper;
     @Resource
@@ -170,14 +167,15 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * 加券
      *
      * @param secId
+     * @param additionalBatches
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public AjaxResult addCoupons(String secId) {
+    public AjaxResult addCoupons(String secId, Integer additionalBatches) {
         AjaxResult ajaxResult = new AjaxResult();
-        logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]", secId);
+        logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]；additionalBatches: [{}]", secId, additionalBatches);
         List<ValidMessage> validMessages = new ArrayList<>();
-        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketIdAndType2AndBatch(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), additionalBatches);
         //该债券信息在系统中已存在，无法加券！
         if (finProduct != null) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
@@ -188,6 +186,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //债券信息查询
         FinListedBondInfoQueryRequest request = new FinListedBondInfoQueryRequest();
         request.setSecId(secId);
+        request.setAdditionalBatches(additionalBatches);
         FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = queryFinWindMarketForCoupons(request);
         if (Objects.isNull(finListedBondInfoQuery001Dto)) {
             validMessages.add(new ValidMessage("未查询到该待上市债券信息，无法加券，请手工维护"));
@@ -198,17 +197,22 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finListedBondInfoQuery001Dto.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         //非空校验
         emptyCheck(finListedBondInfoQuery001Dto, validMessages);
+        //发行处理
+        if(StringUtil.isNotBlank(finListedBondInfoQuery001Dto.getIssuerCode())){
+            finBondMarketInfoQuery001Service.handleIssuer(validMessages, finListedBondInfoQuery001Dto.getIssuerCode());
+        }
         if (CollectionUtils.isNotEmpty(validMessages)) {
             ajaxResult.setErrorList(validMessages);
             ajaxResult.setMessageType(MessageType.警告消息);
             return ajaxResult;
         }
         //接口数据转换
-        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto);
+        String finProdId = getFinprodId(secId);
+        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto, finProdId);
         //公共加券操作
         commonAutoCouponService.autoBondCouponSave(interfPayhsrcsecinfoDto);
         //保存操作记录
-        this.saveOperate(secId, "自动加券", DictCodeListExt3.操作类型_新建, null);
+        this.saveOperate(finProdId, "自动加券", DictCodeListExt3.操作类型_自动加券, null);
         //发行人处理
         return ajaxResult;
     }
@@ -219,7 +223,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @param finListedBondInfoQuery001Dto
      * @return
      */
-    private InterfPayhsrcsecinfoDto convertInterfPayhsrcsecinfoDto(FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto) {
+    private InterfPayhsrcsecinfoDto convertInterfPayhsrcsecinfoDto(FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto, String finProdId) {
         InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = new InterfPayhsrcsecinfoDto();
         String secId = finListedBondInfoQuery001Dto.getSecId();
         //金融产品信息List
@@ -234,7 +238,6 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         List<MstCalendarInfo> mstCalendarInfoList = getMstCalendarInfo();
         //new标的类金融产品
         FinProduct finProduct = new FinProduct();
-        String finProdId = commonBusinessService.getFinProdId(secId, BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue(), StringUtil.EMPTY);
         finProduct.setFinprodId(finProdId);
         finProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         finProduct.setFinprodAbbr(finListedBondInfoQuery001Dto.getBondAbbreviation());
@@ -251,7 +254,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProduct.setBlnArea(finListedBondInfoQuery001Dto.getDomesticAndForeign());
         finProduct.setTradeMarket(finListedBondInfoQuery001Dto.getTradingPlaces());
         /**--交易场所modify 2019-04-15 end--**/
-        finProduct.setIssuer(getIssuer(finListedBondInfoQuery001Dto.getIssuer()));
+        finProduct.setIssuer(finListedBondInfoQuery001Dto.getIssuer());
         //2019年5月27日  交易日历
         if (StringUtil.equals(DictCodeListExt1.交易场所_银行间.getValue(), finListedBondInfoQuery001Dto.getTradingPlaces())) {
             finProduct.setCalendarId("03");
@@ -284,6 +287,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProduct.setIsChl(DictCodeList.是否_否.getValue());
         finProduct.setIsRight(finListedBondInfoQuery001Dto.getIsBondsWithRights());
         finProduct.setRegistOrg(finListedBondInfoQuery001Dto.getRegisteredCustodian());
+        finProduct.setIsSus(finListedBondInfoQuery001Dto.getIssus());
         baseFinProductBaseInfoDto.setFinProduct(finProduct);
         //new标的类金融产品附属
         FinProductAdd finProductAdd = new FinProductAdd();
@@ -291,6 +295,10 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductAdd.setWindId(secId);
         finProductAdd.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         finProductAdd.setCrossMarket(DictCodeList.是否_否.getValue());
+        finProductAdd.setIsSecBond(finListedBondInfoQuery001Dto.getIssecbond());
+        finProductAdd.setListingDate(finListedBondInfoQuery001Dto.getListingDate());
+        finProductAdd.setOriginalOwner(finListedBondInfoQuery001Dto.getOriginalOwner());
+        finProductAdd.setGuaType(finListedBondInfoQuery001Dto.getGuartype());
         //面值
         finProductAdd.setFaceValue(finListedBondInfoQuery001Dto.getFaceValue());
         // 20200819 债券自动加券优化-判断城投债级别 wangwei end
@@ -302,7 +310,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //金融产品分类
         FinProductType finProductType = new FinProductType();
         finProductType.setFinprodId(finProdId);
-        finProductType.setBranch(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalBatches()) ? finListedBondInfoQuery001Dto.getAdditionalBatches().longValue() : 0L);
+        finProductType.setBranch(0L);
         //取债券资料表系统债券类型
         finProductType.setType4(finListedBondInfoQuery001Dto.getPrimaryClassification());
         //取债券资料表系统债券类型2
@@ -327,13 +335,23 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setFinprodId(finProdId);
         finProductIssue.setIssueClass(finListedBondInfoQuery001Dto.getIssueMethod());
         finProductIssue.setTenderType(finListedBondInfoQuery001Dto.getBiddingMethod());
+        String issueMethod = finListedBondInfoQuery001Dto.getIssueMethod();
+        if ("0".equals(issueMethod)) {
+            finProductIssue.setTenderType(DictCodeListExt4.招标方式_单一价格招标.getValue());
+            finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        } else if ("5".equals(issueMethod)) {
+            finProductIssue.setTenderType(DictCodeListExt4.招标方式_数量招标.getValue());
+            finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        } else if ("6".equals(issueMethod)) {
+            finProductIssue.setIssueClass(DictCodeListExt4.新债_发行方式_报价发行.getValue());
+        }
         finProductIssue.setTenderTarget(finListedBondInfoQuery001Dto.getTenderTarget());
         //计划发行量
-        finProductIssue.setPlanIssueAmt(Objects.nonNull(finListedBondInfoQuery001Dto.getIssueSize()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssueSize()) : null);
+        finProductIssue.setPlanIssueAmt(Objects.nonNull(finListedBondInfoQuery001Dto.getIssueSize()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssueSize()).multiply(new BigDecimal(100000000)) : null);
         finProductIssue.setIssueStyle(finListedBondInfoQuery001Dto.getReleaseType());
-        finProductIssue.setAddBatch(0L);
+        finProductIssue.setAddBatch(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalBatches()) ? finListedBondInfoQuery001Dto.getAdditionalBatches().longValue() : 0L);
         finProductIssue.setIssuePrice(Objects.nonNull(finListedBondInfoQuery001Dto.getIssuePx()) ? new BigDecimal(finListedBondInfoQuery001Dto.getIssuePx()) : null);
-        finProductIssue.setReferYield(Objects.nonNull(finListedBondInfoQuery001Dto.getCouponRate()) ? new BigDecimal(finListedBondInfoQuery001Dto.getCouponRate()) : null);
+        finProductIssue.setReferYield(Objects.nonNull(finListedBondInfoQuery001Dto.getCouponRate()) ? new BigDecimal(finListedBondInfoQuery001Dto.getCouponRate()).divide(new BigDecimal(100)) : null);
         finProductIssue.setRateGrade(finListedBondInfoQuery001Dto.getDecimalPlaces());
         finProductIssue.setBp(Objects.nonNull(finListedBondInfoQuery001Dto.getSpread()) ? new BigDecimal(finListedBondInfoQuery001Dto.getSpread()) : null);
         finProductIssue.setIssueDate(finListedBondInfoQuery001Dto.getIssueDate());
@@ -349,18 +367,18 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         }
         finProductIssue.setPayEdate(finListedBondInfoQuery001Dto.getEventDate());
         finProductIssue.setAssignRegdate(finListedBondInfoQuery001Dto.getDebtRegistrationDate());
-        finProductIssue.setMinPamt(finListedBondInfoQuery001Dto.getSingleMinSubAmt());
-        finProductIssue.setMaxPamt(finListedBondInfoQuery001Dto.getSingleMaxSubAmt());
-        finProductIssue.setMaxTotalamt(finListedBondInfoQuery001Dto.getMaxSubAmt());
-        finProductIssue.setMinPerTamt(finListedBondInfoQuery001Dto.getMinPerTenderAmt());
-        finProductIssue.setMaxPerUtamt(finListedBondInfoQuery001Dto.getMaxPerTenderAmt());
+        finProductIssue.setMinPamt(Objects.nonNull(finListedBondInfoQuery001Dto.getSingleMinSubAmt()) ? finListedBondInfoQuery001Dto.getSingleMinSubAmt().multiply(new BigDecimal(100000000)) : null);
+        finProductIssue.setMaxPamt(Objects.nonNull(finListedBondInfoQuery001Dto.getSingleMaxSubAmt()) ? finListedBondInfoQuery001Dto.getSingleMaxSubAmt().multiply(new BigDecimal(100000000)) : null);
+        finProductIssue.setMaxTotalamt(Objects.nonNull(finListedBondInfoQuery001Dto.getMaxSubAmt()) ? finListedBondInfoQuery001Dto.getMaxSubAmt().multiply(new BigDecimal(100000000)) : null);
+        finProductIssue.setMinPerTamt(Objects.nonNull(finListedBondInfoQuery001Dto.getMinPerTenderAmt()) ? finListedBondInfoQuery001Dto.getMinPerTenderAmt().multiply(new BigDecimal(100000000)) : null);
+        finProductIssue.setMaxPerUtamt(Objects.nonNull(finListedBondInfoQuery001Dto.getMaxPerTenderAmt()) ? finListedBondInfoQuery001Dto.getMaxPerTenderAmt().multiply(new BigDecimal(100000000)) : null);
         finProductIssue.setMinTamt(finListedBondInfoQuery001Dto.getMinTenderPxForPlan());
         finProductIssue.setMaxTamt(finListedBondInfoQuery001Dto.getMaxTenderPxForPlan());
         finProductIssue.setTenderUnit(finListedBondInfoQuery001Dto.getTenderStep());
         finProductIssue.setMaxTenderUnit(Objects.nonNull(finListedBondInfoQuery001Dto.getMedianMaxBidMarked()) ? new BigDecimal(finListedBondInfoQuery001Dto.getMedianMaxBidMarked()) : null);
         finProductIssue.setMaxTenderPlus(Objects.nonNull(finListedBondInfoQuery001Dto.getMaxTenderPxDiffer()) ? new BigDecimal(finListedBondInfoQuery001Dto.getMaxTenderPxDiffer()) : null);
         finProductIssue.setSeriYN(finListedBondInfoQuery001Dto.getContinuousTenderLimit());
-        finProductIssue.setMaxTotalTender(finListedBondInfoQuery001Dto.getMaxTotalTenderAmt());
+        finProductIssue.setMaxTotalTender(Objects.nonNull(finListedBondInfoQuery001Dto.getMaxTotalTenderAmt()) ? finListedBondInfoQuery001Dto.getMaxTotalTenderAmt().multiply(new BigDecimal(100000000)) : null);
         finProductIssue.setPayCycle(finListedBondInfoQuery001Dto.getInterestPaymentFrequency());
         finProductIssue.setIntType(finListedBondInfoQuery001Dto.getRateType());
         baseFinProductBaseInfoDto.setFinProductIssue(finProductIssue);
@@ -393,7 +411,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @see
      * @since 1.0
      */
-    private String getIssuer(String issuerShort) {
+    public String getIssuer(String issuerShort) {
         String customerId = restTemplate.getForObject(ServiceApplication.BASICDATA_SERVICE_NAME
                 + "/MstCustomerNature/getIssuer?linkId1=" + issuerShort + "&type=" + "IS_ISSUER", String.class);
         if (StringUtil.isEmpty(customerId)) {
@@ -411,6 +429,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             /* 发行人加券后客户类型默认：市场机构 add by liuwei 20201118 end */
 
             mstCustomerInfoAdd.setCustomerId(customerId);
+            mstCustomerInfoAdd.setInsitituteCode(issuerShort);
             //客户信息表插入数据
             mstCustomerInfoMapper.insert(mstCustomerInfo);
             mstCustomerInfoAddMapper.insert(mstCustomerInfoAdd);
@@ -519,5 +538,18 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             }
         }
     }
+
+
+    /**
+     * 构造金融标的代码
+     *
+     * @param secId
+     * @return
+     */
+    public String getFinprodId(String secId) {
+        String[] arr = secId.split("\\.");
+        return String.format("%s_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0], DateUtil.format(new Date(), "yyyyMMddHHmmss"), arr[1]);
+    }
+
 
 }

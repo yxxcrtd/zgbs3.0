@@ -353,7 +353,7 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     }
 
     public String getIssueTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.getIssueType());
+        return SysDataUtil.getNameFromDataDict(DictCode.债券类资产募集方式, this.getIssueType());
     }
 
 
@@ -434,6 +434,10 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public String getGuarType() {
         return guarType;
+    }
+
+    public String getGuarTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_担保方式, this.getGuarType());
     }
 
     public void setGuarType(String guarType) {

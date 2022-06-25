@@ -66,14 +66,16 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     /**
      * 产品起息日
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "vDateWhole",value = "产品起息日")
-    private String vDateWhole;
+    private Date vDateWhole;
 
     /**
      * 产品到期日
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty(name = "mDateWhole",value = "产品到期日")
-    private String mDateWhole;
+    private Date mDateWhole;
 
     /**
      * 名义本金
@@ -86,6 +88,12 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
      */
     @ApiModelProperty(name = "refEntity",value = "参考实体")
     private String refEntity;
+
+    /**
+     * 参考实体
+     */
+    @ApiModelProperty(name = "refEntityStr",value = "参考实体")
+    private String refEntityStr;
 
     /**
      * 信用事件
@@ -189,19 +197,19 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
         this.finprodMarketName = finprodMarketName;
     }
 
-    public String getvDateWhole() {
+    public Date getvDateWhole() {
         return vDateWhole;
     }
 
-    public void setvDateWhole(String vDateWhole) {
+    public void setvDateWhole(Date vDateWhole) {
         this.vDateWhole = vDateWhole;
     }
 
-    public String getmDateWhole() {
+    public Date getmDateWhole() {
         return mDateWhole;
     }
 
-    public void setmDateWhole(String mDateWhole) {
+    public void setmDateWhole(Date mDateWhole) {
         this.mDateWhole = mDateWhole;
     }
 
@@ -323,5 +331,13 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
 
     public void setSettleMethodStr(String settleMethodStr) {
         this.settleMethodStr = settleMethodStr;
+    }
+
+    public String getRefEntityStr() {
+        return refEntityStr;
+    }
+
+    public void setRefEntityStr(String refEntityStr) {
+        this.refEntityStr = refEntityStr;
     }
 }

@@ -79,6 +79,9 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "remark", value = "备注", example = "XXX")
     private String remark;
 
+    @ApiModelProperty(name = "revokeReason", value = "撤销备注", example = "XXX")
+    private String revokeReason;
+
     @ApiModelProperty(name = "tradeDate", value = "申购日期")
     private Date tradeDate;
 
@@ -115,6 +118,8 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     @ApiModelProperty(name = "riskcalResponse", value = "风险实体类")
     private CfetsEtribdoRiskcalResponse riskcalResponse;
+
+    private String rskApproval;
 
     public String getValidStatus() {
         return validStatus;
@@ -259,6 +264,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
         return remark;
     }
 
+    public String getRevokeReason() {
+        return revokeReason;
+    }
+
+    public void setRevokeReason(String revokeReason) {
+        this.revokeReason = revokeReason;
+    }
+
     public void setRemark(String remark) {
         this.remark = remark;
     }
@@ -360,6 +373,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setConfirmOk(String confirmOk) {
         this.confirmOk = confirmOk;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
     }
 }
 

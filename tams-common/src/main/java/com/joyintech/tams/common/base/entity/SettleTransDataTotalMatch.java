@@ -134,4 +134,17 @@ public class SettleTransDataTotalMatch extends SettleTransDataTotalMatchKey {
     public void setCcy(String ccy) {
         this.ccy = ccy == null ? null : ccy.trim();
     }
+
+    /**
+     * 证券账户
+     */
+    private String secAcctId;
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
+    }
 }

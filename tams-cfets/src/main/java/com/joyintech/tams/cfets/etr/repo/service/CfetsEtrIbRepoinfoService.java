@@ -24,6 +24,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.business.common.dto.SecManageAcctIdRequestDto;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepoMapper;
@@ -807,6 +808,14 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
         for (CfetsEtrRepoZLCXPositionResponse response : request.getCfetsEtrRepoZLCXPositionResponses()) {
             finProdIds.add(response.getFinprodId());
         }
+        List<FinProductSpecialDto> finProductSpecialDtos = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(finProdIds);
+        for (FinProductSpecialDto finProductSpecialDto : finProductSpecialDtos) {
+            if (StringUtil.equals(finProductSpecialDto.getIsDefaultBondIndicator(), DictCodeList.是否_是.getValue())) {
+                result.setMessage("债券" + finProductSpecialDto.getFinprodAbbr()
+                        + "(" + finProductSpecialDto.getFinprodMarketId() + ")为到期违约债,不可质押!", MessageType.错误消息);
+                return result;
+            }
+        }
         param.put("finProdIds", finProdIds);
         param.put("platDate", iPlatformDate.getSysDateStr());
         if (StringUtil.equals(request.getPs(), DictCodeListExt3.交易方向_正回购.getValue())) {
@@ -845,6 +854,9 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
                         && DateUtil.compareTo(finProduct.getDelistingDate(), SettlementEndDate) <= 0) {
                     result.setMessage("回购期限不可大于【质押券" + response.getFinprodAbbr() + "(" + response.getFinprodMarketId()
                             + ")】】摘牌日", MessageType.错误消息);
+                    return result;
+                }
+                if (StringUtil.isEmptyList(finExercisePlans)){
                     return result;
                 }
                 FinExercisePlan finExercisePlan = finExercisePlans.get(0);

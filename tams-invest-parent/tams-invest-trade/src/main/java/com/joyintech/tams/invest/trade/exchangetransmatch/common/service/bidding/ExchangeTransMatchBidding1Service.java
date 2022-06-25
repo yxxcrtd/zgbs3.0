@@ -65,7 +65,9 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         //生成金融产品汇总交易信息
         TrdFinProductDealTotal trdFinProductDealTotal = this.genTrdFinProductDealTotal(transDto,entrustDto);
 
-        if (DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(entrustDto.getEntrustClass())) {
+        if (DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(entrustDto.getEntrustClass())
+                && CollectionUtils.isNotEmpty(entrustDto.getEntrustDetailDtoList())
+                && entrustDto.getEntrustDetailDtoList().size()>1) {
             for (ExchangeTransMatchCommonEntrustDetailDto detailDto : entrustDto.getEntrustDetailDtoList()) {
                 if(detailDto.getMarchQty() == null || detailDto.getMarchQty().compareTo(BigDecimal.ZERO) <= 0){
                     continue;
@@ -85,6 +87,8 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
                 baseTradeProductDealDto.setTrdDealTotalAdd(this.generateDealTotalAdd(entrustDtoTmp,baseTradeProductDealDto.getTrdFinProductDealTotal()));
                 //生成金融产品交易信息
                 baseTradeProductDealDto.setTrdProductDeal(this.genTrdProductDeal(transDto,entrustDtoTmp,baseTradeProductDealDto.getTrdFinProductDealTotal()));
+                //生成金融产品交易附属表信息
+                baseTradeProductDealDto.setTrdProductDealAdd(this.genTrdProductDealAdd(transDto,entrustDtoTmp,baseTradeProductDealDto.getTrdProductDeal()));
                 //生成组合交易表数据
                 baseTradeProductDealDto.setPtlTrade(this.generatePtlTrade(entrustDtoTmp,baseTradeProductDealDto.getTrdProductDeal()));
                 //生成费用信息list
@@ -98,7 +102,12 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
             }
         }
 
-        if (DictCodeListExt3.投资指令类型_单组合单资产指令.getValue().equals(entrustDto.getEntrustClass())) {
+        // ZGCPCN-1551:modify by fuyongsheng 20220620 start
+        if (DictCodeListExt3.投资指令类型_单组合单资产指令.getValue().equals(entrustDto.getEntrustClass()) ||
+                (DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(entrustDto.getEntrustClass())
+                        && CollectionUtils.isNotEmpty(entrustDto.getEntrustDetailDtoList())
+                        && entrustDto.getEntrustDetailDtoList().size() == 1)) {
+            // ZGCPCN-1551:modify by fuyongsheng 20220620 end
             ExchangeTransMatchBaseTradeDto baseTradeProductDealDto = new ExchangeTransMatchBaseTradeDto();
             // TODO 金融产品汇总交易信息
             baseTradeProductDealDto.setTrdFinProductDealTotal(trdFinProductDealTotal);
@@ -106,6 +115,8 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
             baseTradeProductDealDto.setTrdDealTotalAdd(this.generateDealTotalAdd(entrustDto,baseTradeProductDealDto.getTrdFinProductDealTotal()));
             // TODO 生成金融产品交易信息
             baseTradeProductDealDto.setTrdProductDeal(this.genTrdProductDeal(transDto,entrustDto,baseTradeProductDealDto.getTrdFinProductDealTotal()));
+            //生成金融产品交易附属表信息
+            baseTradeProductDealDto.setTrdProductDealAdd(this.genTrdProductDealAdd(transDto,entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
             // TODO 生成组合交易表数据
             baseTradeProductDealDto.setPtlTrade(this.generatePtlTrade(entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
             // TODO 生成费用信息list
@@ -322,8 +333,7 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         calcFeeAmtPay(transDto, entrustDto,trdProductDeal);
         // 交易方向
         trdProductDeal.setPs(entrustDto.getPs());
-        // 到期收益率和行权收益率
-        this.calc(trdProductDeal);
+
         trdProductDeal.setTgBusiType(getTgBusiType(transDto.getDeliveryResult()));
 
         // 到期收益率
@@ -344,6 +354,9 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
     public TrdProductDeal createProductDeal(ExchangeTransMatchCommonDto transDto, ExchangeTransMatchCommonEntrustDto entrustDto,TrdFinProductDealTotal trdFinProductDealTotal) {
         TrdProductDeal trdProductDeal = new TrdProductDeal();
         BussinessCodeParameter codeParameter = new BussinessCodeParameter();
+        if (StringUtil.equals(DictCodeList.交易方向_买入.getValue(), entrustDto.getPs())) {
+            codeParameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
+        }
         // 交易编号
         trdProductDeal.setTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
         // 业务类型
@@ -358,6 +371,8 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         trdProductDeal.setBranch(0L);
         // 交易日
         trdProductDeal.setTradeDate(transDto.getTradeDate());
+        // 业务模式
+        trdProductDeal.setBusinessModel(entrustDto.getBusinessModel());
         // 起息日
         trdProductDeal.setVdate(null);
         // 到期日
@@ -471,59 +486,6 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         // 总交易费用
         trdProductDeal.setFeeAmt(ArithmeticUtil.doAdd(entrustDto.getMarchFeeAmtPay(), entrustDto.getMarchFeeAmtUnPay()));
     }
-    /**
-     * 计算债券到期收益率和行权收益率
-     * @param productDeal
-     */
-    public void calc(TrdProductDeal productDeal) {
-        // 设置计算参数
-        TrdBondInvestTradeDto dealParam = new TrdBondInvestTradeDto();
-        dealParam.setFinprodId(productDeal.getFinprodId());
-        dealParam.setTradeAmt(productDeal.getShareAmt().multiply(BigDecimal.valueOf(100)));
-        dealParam.setSettleDate(productDeal.getSettleDate());
-        dealParam.setVdate(productDeal.getVdate());
-        dealParam.setTradeMarket(productDeal.getTradeMarket());
-        dealParam.setTradeMarketMode(productDeal.getTradeMarketMode());
-        dealParam.setPs(productDeal.getPs());
-        dealParam.setUnitInt(productDeal.getUnitInt());
-        dealParam.setUnitFprice(productDeal.getUnitFprice());
-
-        // 设置计算类型为全价总额（根据全价总额计算到期收益率和行权收益率）
-        dealParam.setCalculateField("fpriceAmt");
-        dealParam.setFpriceAmt(productDeal.getFpriceAmt());
-        dealParam.setIntAmt(productDeal.getIntAmt());
-        dealParam.setInvAim(productDeal.getInvAim());
-
-        // 调用债券交易计算逻辑
-        AjaxResult ajaxResult = trdBondInvestTrade002Service.calculateData(dealParam);
-
-        if (ajaxResult != null && StringUtil.isNotEmpty(ajaxResult.getData())) {
-            Object result = ajaxResult.getData();
-            if(result instanceof Map) {
-                Map<String, Object> calcResult = (Map)result;
-                Object yield = calcResult.get("yield");
-                Object exerYield = calcResult.get("exerYield");
-                if(yield instanceof BigDecimal) {
-                    productDeal.setYield((BigDecimal)yield);
-                }
-                else if (yield != null) {
-                    productDeal.setYield(new BigDecimal(yield.toString()));
-                }
-                if(exerYield instanceof BigDecimal) {
-                    productDeal.setExerYield((BigDecimal)exerYield);
-                }
-                else if (exerYield != null) {
-                    productDeal.setExerYield(new BigDecimal(exerYield.toString()));
-                }
-                if (productDeal.getYield() != null){
-                    productDeal.setYield(productDeal.getYield().divide(BigDecimal.valueOf(100)));
-                }
-                if (productDeal.getExerYield() != null){
-                    productDeal.setExerYield(productDeal.getExerYield().divide(BigDecimal.valueOf(100)));
-                }
-            }
-        }
-    }
 
     private TrdDealTotalAdd generateDealTotalAdd(ExchangeTransMatchCommonEntrustDto entrustDto, TrdFinProductDealTotal trdFinProductDealTotal) {
         TrdDealTotalAdd trdDealTotalAdd =  new TrdDealTotalAdd();
@@ -539,6 +501,9 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
 
         BussinessCodeParameter codeParameter = new BussinessCodeParameter();
+        if (StringUtil.equals(DictCodeList.交易方向_买入.getValue(), entrustDto.getPs())) {
+            codeParameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
+        }
         // 汇总交易编号
         trdFinProductDealTotal.setTotleTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
         // 业务类型
@@ -630,5 +595,16 @@ public class ExchangeTransMatchBidding1Service extends BaseService {
         trdFinProductDealTotal.setDeliveryType("券款兑付");
         // TODO 交收方式  席位号  委托代码
         return trdFinProductDealTotal;
+    }
+
+    /**
+     * 金融产品交易附属表
+     */
+    public TrdProductDealAdd genTrdProductDealAdd(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto,TrdProductDeal trdProductDeal) {
+        TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
+        BeanUtil.copyPropertiesIgnoreNull(trdProductDealAdd, trdProductDeal);
+        trdProductDealAdd.setEntrustId(entrustDto.getEntrustId());
+        trdProductDealAdd.setPortfolioId(entrustDto.getPortfolioId());
+        return trdProductDealAdd;
     }
 }

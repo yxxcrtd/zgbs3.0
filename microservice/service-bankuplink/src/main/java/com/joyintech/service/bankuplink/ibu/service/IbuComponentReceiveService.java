@@ -381,7 +381,7 @@ public class IbuComponentReceiveService extends BaseService{
             }
             updateBondDialoguePositionRule(quoteResultDto);
             // 成交后风险处理
-            ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
+            //ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
         }
 
         return quoteResultDto;
@@ -582,7 +582,7 @@ public class IbuComponentReceiveService extends BaseService{
             }
             updateBondRequestPositionRule(quoteResultDto);
             // 成交后风险处理
-            ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
+            //ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
         }
 
         return quoteResultDto;
@@ -738,7 +738,7 @@ public class IbuComponentReceiveService extends BaseService{
                 this.updateRepoDialoguePosition(quoteResultDto);
             }
             // 成交后风险处理
-            ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
+           // ibuComponentRiskService.excuteRiskHandle(quoteResultDto);
         }
         
         return quoteResultDto;

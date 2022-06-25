@@ -967,7 +967,13 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         /*账户现金*/
         resp.add(BaseMap.newMap()
                 .put("field", "ZHXJ")
-                .put("name", "账户现金（元）")
+                .put("name", "托管户账户现金（元）")
+                .put("amount", "--")
+                .put("type", "xj"));
+        /*券商户可取现金*/
+        resp.add(BaseMap.newMap()
+                .put("field", "ZQHKQXJ")
+                .put("name", "券商户可取现金（元）")
                 .put("amount", "--")
                 .put("type", "xj"));
 
@@ -976,7 +982,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", "RRQMKDGHCC")
-                    .put("name", "融入券卖空待购回持仓（元）")
+                    .put("name", "卖空待回购持仓（元）")
                     .put("amount", "--")
                     .put("type", "cc"));
         }
@@ -1287,15 +1293,15 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             }
 
             //付息频率
-            if (dto.getPayCycle().equals("月")||dto.getPayCycle().equals("季")||dto.getPayCycle().equals("年")||dto.getPayCycle().equals("半年")) {
-                dto.setPayCycle(dto.getPayCycle()+"付");
+            if ("月".equals(dto.getPayCycle())||"季".equals(dto.getPayCycle())||"年".equals(dto.getPayCycle())||"半年".equals(dto.getPayCycle())) {
+                dto.setPayCycle(dto.getPayCycle() + "付");
             }
 
             //如果估价净价（行权）、估价净价（推荐）为空，显示为--
-            if (dto.getPriceXq().equals("元")) {
+            if ("元".equals(dto.getPriceXq())) {
                 dto.setPriceXq("--");
             }
-            if (dto.getPriceTj().equals("元")) {
+            if ("元".equals(dto.getPriceTj())) {
                 dto.setPriceTj("--");
             }
             //下一行权日若无，则显示为“—”  计划行权日>交易日取最小
@@ -1316,7 +1322,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 dto.setXqdate("--");
             }
 //            如果估值收益率没有数据，则显示为空
-            if (dto.getGzRate().equals("%")) {
+            if ("%".equals(dto.getGzRate())) {
                 dto.setGzRate(" ");
             }
 //            若为含权债，显示为含权债的行权方式；若有多个行权方式，用分号“;”隔开    非含权债，显示为“无”
@@ -2342,17 +2348,22 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         List<CfetsEtrIbClosePosEtrRequest> etrList=new ArrayList<>();
         for(CfetsEtribBondInfo003Dto t: dtolist){
             CfetsEtrIbClosePosEtrRequest closeItem=new CfetsEtrIbClosePosEtrRequest();
-            String busiTypePosition=DictCodeListExt3.头寸业务类型_现券交易.getValue();
-            if (StringUtil.equals(assetType, DictCodeList.平安资产类型_质押式回购.getValue())) {
-                busiTypePosition = DictCodeListExt3.头寸业务类型_质押式回购首期.getValue();
-            } else if (StringUtil.equals(assetType, DictCodeList.平安资产类型_一级市场债.getValue())) {
-                busiTypePosition = DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
+            String busiTypePosition = DictCodeListExt3.头寸业务类型_现券交易.getValue();
+            if (StringUtil.isNotEmpty(t.getBusiTypePosition())) {
+                busiTypePosition = t.getBusiTypePosition();
             } else {
-                if (StringUtil.isNotEmpty(t.getPs())
-                        && StringUtil.equals(t.getPs(), BussinessDictCodeList.交易方向_行权回售.getValue())) {
-                    busiTypePosition = DictCodeListExt3.头寸业务类型_债券行权交易.getValue(); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易
+                if (StringUtil.equals(assetType, DictCodeList.平安资产类型_质押式回购.getValue())) {
+                    busiTypePosition = DictCodeListExt3.头寸业务类型_质押式回购首期.getValue();
+                } else if (StringUtil.equals(assetType, DictCodeList.平安资产类型_一级市场债.getValue())) {
+                    busiTypePosition = DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
+                } else {
+                    if (StringUtil.isNotEmpty(t.getPs())
+                            && StringUtil.equals(t.getPs(), BussinessDictCodeList.交易方向_行权回售.getValue())) {
+                        busiTypePosition = DictCodeListExt3.头寸业务类型_债券行权交易.getValue(); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易
+                    }
                 }
             }
+
             closeItem.setBusiType(busiTypePosition);
             closeItem.setPs(t.getPs());
             closeItem.setCloseId(t.getEntrustId());

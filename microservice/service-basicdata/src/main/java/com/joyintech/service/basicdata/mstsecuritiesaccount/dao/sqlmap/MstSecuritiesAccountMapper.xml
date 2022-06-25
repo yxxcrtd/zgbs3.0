@@ -162,6 +162,7 @@
         <result column="parentId" property="parentId" jdbcType="VARCHAR"/>
         <association property="object" javaType="java.util.Map">
             <result column="text" property="finprodName" jdbcType="VARCHAR" />
+            <result column="finprod_name2" property="finprodName2" jdbcType="VARCHAR" />
             <result column="OTH_CODE_TYPE" property="othCodeType" jdbcType="VARCHAR" />
             <result column="FINPROD_TYPE2" property="finprodType2" jdbcType="VARCHAR" />
             <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
@@ -598,10 +599,10 @@
         </if>
         <choose>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '04'.toString()">
-                and (a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 债券 、股票 、基金 -->
+                and ((a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '02'.toString()">
-                and (a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 债券 、股票 、基金 -->
+                and ((a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '03'.toString()">
                 and a.finprod_type2='F01' and r.type_6='B14'
@@ -824,12 +825,13 @@
         ) aaa order by aaa.TRADE_MARKET,aaa.termDays asc
     </select>
 
-    <!-- 证券代码 -->
+    <!-- 信用保护凭证标的 -->
     <select id="getFinprodMarketInfoCds" resultMap="secAcctInfo">
-        <!-- 质押式回购代码与期限品种映射关系 -->
+        <!-- edit wsz 20220622 修改查找表格 修改返回值 start-->
         select * from(
         select distinct t.finprod_market_id as id,
         t.finprod_name as text,
+        t.finprod_name2 as finprod_name2,
         '${acctTradeMarket}' as parentId,
         t.oth_code_type,
         t.finprod_type2,
@@ -848,6 +850,7 @@
         from (
         select a.finprod_market_id,
         a.finprod_market_id || '|' || a.finprod_abbr as finprod_name,
+        a.finprod_abbr as finprod_name2,
         a.FINPROD_NAME name,
         null as oth_code_type,
         a.finprod_type2,
@@ -869,35 +872,29 @@
         on b.FINPROD_ID = a.FINPROD_ID
         left join fin_product_type r
         on a.FINPROD_ID = r.FINPROD_ID
-        where a.trade_market in (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})<!-- 上海证券交易所、深圳证券交易所 -->
+        <where>
+        a.trade_market in (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})<!-- 上海证券交易所、深圳证券交易所 -->
         <if test="acctTradeMarket != null and acctTradeMarket != ''">
             and a.trade_market = #{acctTradeMarket}
         </if>
-        and a.finprod_type2 in (#{FINPROD_TYPE_TG_F37})<!--  不查找债券 -->
+            <if test="searchPageType != null and searchPageType != ''">
+                and a.finprod_type2 in (#{FINPROD_TYPE_TG_F37})
+            </if>
+            <if test="searchPageType == null or searchPageType == ''">
+                and a.finprod_type2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})
+            </if>
+       <!--  不查找债券 -->
         and r.type_6 != #{type6_B14}
-        union
-        select distinct a.MARKET_ID as finprod_market_id,
-        concat(concat(a.MARKET_ID,'|'),a.TERM_TYPE) as finprod_name,
-        null as name,
-        null as oth_code_type,
-        null as finprod_type2,
-        a.TERM_TYPE as finprod_id,
-        a.TRADE_MARKET as trade_market,
-        a.MARKET_ID AS MARKET_ID,
-        null AS BOARD,
-        null AS TYPE_6,
-        null AS TYPE_7,
-        null AS IS_NET_SETT,
-        null AS mdate,
-        null AS FACE_VALUE,
-        null AS IS_NETPRICE,
-        null AS IS_NO_GUARD,
-        null AS termDays,
-        a.TERM_TYPE         AS  termType
-        from MST_REPO_PRODUCT a
+        </where>
         ) t
         <where>
-            t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37})   <!--#{FINPROD_TYPE2}-->
+            <if test="searchPageType != null and searchPageType != ''">
+                and t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37})
+            </if>
+            <if test="searchPageType == null or searchPageType == ''">
+                and t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})
+            </if>
+            <!--t.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F37},#{FINPROD_TYPE_TG_F01})-->
             <if test="acctTradeMarket != null and acctTradeMarket != ''">
                 and t.TRADE_MARKET = #{acctTradeMarket}
             </if>
@@ -913,8 +910,7 @@
             <if test="search != null and !search.equals('')">
                 AND (
                     t.finprod_market_id like concat('%',concat(#{search},'%'))
-                OR t.finprod_name like concat('%',concat(#{search},'%'))
-                or t.name like concat('%',concat(#{search},'%'))
+                    OR t.finprod_name like concat('%',concat(#{search},'%'))
                 )
             </if>
         </where>

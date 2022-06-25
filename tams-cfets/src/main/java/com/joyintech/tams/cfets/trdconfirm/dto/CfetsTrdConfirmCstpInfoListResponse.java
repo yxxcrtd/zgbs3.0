@@ -147,6 +147,10 @@ public class CfetsTrdConfirmCstpInfoListResponse {
     private BigDecimal   pledgeRatio;
     @ApiModelProperty(name="pledgeFaceValue",value="质押券面值",example="字符串1")
     private BigDecimal   pledgeFaceValue;
+
+    @ApiModelProperty(name="finprodType2",value="资产类型CODE",example="A1")
+    private String finprodType2;
+
     public String getExecid() {
         return execid;
     }
@@ -479,5 +483,13 @@ public class CfetsTrdConfirmCstpInfoListResponse {
 
     public void setPledgeFaceValues(String pledgeFaceValues) {
         this.pledgeFaceValues = pledgeFaceValues;
+    }
+
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
     }
 }

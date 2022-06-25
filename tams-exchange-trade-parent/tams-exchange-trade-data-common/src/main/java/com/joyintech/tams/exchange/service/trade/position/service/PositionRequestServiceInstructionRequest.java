@@ -8,6 +8,7 @@ import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -73,9 +74,7 @@ public class PositionRequestServiceInstructionRequest {
         //设置公共字段，个性化的需要在具体接口中覆盖
         this.setCommonField(entity, resultMap);
         String finprodType = entity.getFinprodType2();
-        if (DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(finprodType)
-                && !交易方向_质押券入库.getValue().equals(entity.getPs())
-                && !交易方向_质押券出库.getValue().equals(entity.getPs())) {
+        if (DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(finprodType) && !交易方向_质押券入库.getValue().equals(entity.getPs()) && !交易方向_质押券出库.getValue().equals(entity.getPs())) {
             String type6 = commonPositionEngineService.getType6(entity.getFinprodId());
             if (DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue().equals(type6)) {
                 finprodType += "-" + type6;
@@ -331,9 +330,8 @@ public class PositionRequestServiceInstructionRequest {
                 // 标准券代码
                 map.put(STANDARD_SEC_ID, STANDAR_SEC_ID);
                 //指令券面总额
-                map.put(ETR_SEC_AMOUNT, item.getEtrSecAmount());
-                if (交易方向_质押券入库.getValue().equals(entity.getPs())
-                        || 交易方向_质押券出库.getValue().equals(entity.getPs())) {
+                map.put(ETR_SEC_AMOUNT, commonPositionEngineService.multiplyWithOneHundred(item.getEtrSecAmount()));
+                if (交易方向_质押券入库.getValue().equals(entity.getPs()) || 交易方向_质押券出库.getValue().equals(entity.getPs())) {
                     //出入库时，可以为空
                     map.put("cashAmount", null);
                     Map<String, Object> params = new HashMap<>();
@@ -401,11 +399,7 @@ public class PositionRequestServiceInstructionRequest {
         String firstRepoPs = entity.getFirstRepoPs();
         resultMap.put(PS, firstRepoPs);
         // 首期组合现金数据集，IF 交易方向 = 正回购、逆回购、提前购回、到期购回、解除质押 传值 否则为空
-        if (交易方向_正回购.getValue().equals(ps)
-                || 交易方向_逆回购.getValue().equals(ps)
-                || 交易方向_提前购回.getValue().equals(ps)
-                || 交易方向_到期购回.getValue().equals(ps)
-                || 交易方向_解除质押.getValue().equals(ps)) {
+        if (交易方向_正回购.getValue().equals(ps) || 交易方向_逆回购.getValue().equals(ps) || 交易方向_提前购回.getValue().equals(ps) || 交易方向_到期购回.getValue().equals(ps) || 交易方向_解除质押.getValue().equals(ps)) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             bean = new PositionRequestBaseBean(entity);
 //            bean.setCashAmount(NumberUtil.sub(entity.getmTradeAmt(), entity.getmIntAmt()));
@@ -421,9 +415,7 @@ public class PositionRequestServiceInstructionRequest {
 
             // 交易金额
             // 交易方向= 首期 取回购金额，其他取到期结算金额
-            if (交易方向_提前购回.getValue().equals(ps)
-                    || 交易方向_到期购回.getValue().equals(ps)
-                    || 交易方向_解除质押.getValue().equals(ps)) {
+            if (交易方向_提前购回.getValue().equals(ps) || 交易方向_到期购回.getValue().equals(ps) || 交易方向_解除质押.getValue().equals(ps)) {
                 bean.setCashAmount(entity.getmTradeAmt());
             } else {
                 bean.setCashAmount(entity.getEntrustAmt());
@@ -456,8 +448,7 @@ public class PositionRequestServiceInstructionRequest {
 
         // 质押券数据集	ptlSecList
         // IF 交易方向 = 首期、中途换券换入and 回购类型 = 正回购 THEN 传值 ELSE 空
-        if (交易方向_正回购.getValue().equals(firstRepoPs) ||
-                (交易方向_中途换券.getValue().equals(ps) && 交易方向_正回购.getValue().equals(ps))) {
+        if (交易方向_正回购.getValue().equals(firstRepoPs) || (交易方向_中途换券.getValue().equals(ps) && 交易方向_正回购.getValue().equals(ps))) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             // 查询质押券集合
             InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
@@ -485,11 +476,7 @@ public class PositionRequestServiceInstructionRequest {
 
         // 解除质押券数据集	ptlRelieveSecList
         // IF 交易方向 = 交易方向 = 解除质押、到期购回、提前购回、中途换券换出、到期续作 and 回购类型 = 正回购  THEN 传值 ELSE 空 END IF
-        if ((交易方向_解除质押.getValue().equals(ps)
-                || 交易方向_到期购回.getValue().equals(ps)
-                || 交易方向_提前购回.getValue().equals(ps)
-                || 交易方向_到期续做.getValue().equals(ps)
-                || 交易方向_中途换券.getValue().equals(ps))
+        if ((交易方向_解除质押.getValue().equals(ps) || 交易方向_到期购回.getValue().equals(ps) || 交易方向_提前购回.getValue().equals(ps) || 交易方向_到期续做.getValue().equals(ps) || 交易方向_中途换券.getValue().equals(ps))
             /*&& 交易方向_正回购.getValue().equals(firstRepoPs)*/) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             // 查询质押券集合
@@ -607,12 +594,19 @@ public class PositionRequestServiceInstructionRequest {
             List<Map<String, Object>> ptlList = new ArrayList<>(calculateSize);
             for (PortfolioCalculateResponse item : calculates) {
                 bean = new PositionRequestBaseBean(entity);
-                bean.setPortfolioId(item.getPortfolioId());
+                String portfolioId = item.getPortfolioId();
+                bean.setPortfolioId(portfolioId);
+                if (InstructionPs.APPLY.codeEquals(entity.getPs())) {
+                    String capacctNo = tamsBusinessCommonService.selectProdTghCapacctNo(portfolioId);
+                    log.info("信用保护凭证-申购-托管账户：portfolioId={}，capacctNo={}", portfolioId, capacctNo);
+                    bean.setCashAcctId(capacctNo);
+                }
                 bean.setCashAmount(item.getEntrustAmt());
-                bean.setSecAmount(BigDecimal.valueOf(item.getEntrustNum()));
+                BigDecimal entrustNum = commonPositionEngineService.multiplyWithOneHundred(item.getEntrustNum());
+                bean.setSecAmount(entrustNum);
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
-                map.put("etrSecAmount", item.getInstructionTotalAmt());
+                map.put(ETR_SEC_AMOUNT, commonPositionEngineService.multiplyWithOneHundred(item.getEtrSecAmount()));
                 ptlList.add(map);
             }
             resultMap.put(PTL_LIST, ptlList);

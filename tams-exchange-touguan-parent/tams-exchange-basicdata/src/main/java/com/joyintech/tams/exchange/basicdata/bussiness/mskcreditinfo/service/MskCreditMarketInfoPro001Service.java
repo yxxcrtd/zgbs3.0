@@ -2,12 +2,15 @@ package com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.system.user.dto.SysUserDto;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -20,6 +23,7 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,14 +55,17 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
             if (StringUtil.isNotEmpty(cdateStart)){
                 pageParam.put("cdateStart",cdateStart);
             }
-            String cdateEnd = request.getDate().get(1);
-            if (StringUtil.isNotEmpty(cdateEnd)){
-                pageParam.put("cdateEnd",cdateEnd);
+            if (request.getDate().size() > 1) {
+                String cdateEnd = request.getDate().get(1);
+                if (StringUtil.isNotEmpty(cdateEnd)){
+                    pageParam.put("cdateEnd",cdateEnd);
+                }
             }
-        }else{
-            pageParam.put("cdateEnd",DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN));
-            pageParam.put("cdateStart",DateUtil.addDay(DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN), -1));
         }
+//        else{
+//            pageParam.put("cdateEnd",DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN));
+//            pageParam.put("cdateStart",DateUtil.addDay(DateUtil.format(sysDate, DateUtil.DEFAULT_DATE_FORMAT_EN), -1));
+//        }
         Page<MskCreditInfoProSaveRequest> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> mskCreditInfoProMapper.queryForPage(pageParam));
@@ -78,15 +85,34 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
         map.put("secId", secId);
         map.put("valueDate", valueDate);
         map.put("valueSource", valueSource);
-        return mskCreditInfoProMapper.selectByKey(map);
+        List<MskCreditInfoProSaveRequest> list =  mskCreditInfoProMapper.selectByKey(map);
+        if(list.isEmpty() || list.size()<=0){
+            return null;
+        }  else {
+            return list.get(0);
+        }
+    }
+
+    public boolean selectByKeys(String mdprice, String secId, String valueDate, String valueSource) {
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("mdprice",mdprice);
+        map.put("secId", secId);
+        map.put("valueDate", valueDate);
+        map.put("valueSource", valueSource);
+        List<MskCreditInfoProSaveRequest> list =  mskCreditInfoProMapper.selectByKey(map);
+        if(!list.isEmpty() && list.size()==1){
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
     @Override
     public void doInsert(MskCreditInfoProSaveRequest entity, OperationType type) {
-        if(OperationType.NEW == type){
-            this.insert(entity);
-        }
+//        if(OperationType.NEW == type){
+//            this.insert(entity);
+//        }
     }
 
     @Override
@@ -101,11 +127,23 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
 
     @Override
     public void doComplete(MskCreditInfoProSaveRequest mskCreditInfoProSaveRequest, OperationType operationType) {
+        // modify by etliu 20220617 start
+        // 3.0.6场内 ZGCPCN-1448: 2、估价收益率显示错误（例如新建时填的是4，新建成功后，列表展示为400）；
+        if (mskCreditInfoProSaveRequest.getMyield() != null) {
+            mskCreditInfoProSaveRequest.setMyield(ArithmeticUtil.divide(mskCreditInfoProSaveRequest.getMyield(), BigDecimal.valueOf(100), 6));
+        }
+        // modify by etliu 20220617 end
+
         if (OperationType.DELETE == operationType) {
             this.delete(mskCreditInfoProSaveRequest);
-        }else if(OperationType.MODIFY == operationType){
+        } else if (OperationType.MODIFY == operationType) {
             this.update(mskCreditInfoProSaveRequest);
         }
+        // modify by yangxunpeng ZGCPCN-1355 start
+        else if (OperationType.NEW == operationType) {
+            this.insert(mskCreditInfoProSaveRequest);
+        }
+        // modify by yangxunpeng ZGCPCN-1355 end
     }
 
     private void update(MskCreditInfoProSaveRequest mskCreditInfoProSaveRequest) {
@@ -134,16 +172,31 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
         return Boolean.FALSE;
     }
 
-    public MskCreditInfoProSaveRequest getBasicInfos(String secid, Object o) {
+    public MskCreditInfoProSaveRequest getBasicInfos(MskCreditInfoProSaveRequest request) {
         MskCreditInfoProSaveRequest dto = new MskCreditInfoProSaveRequest();
         Map<String,Object> map= new HashMap<>();
-        map.put("secid",secid);
+        map.put("secid",request.getSecid());
+        map.put("cdate",request.getCdate());
         return mskCreditInfoProMapper.getBasicInfo(map);
+    }
+    public MskCreditInfoProSaveRequest getPrice(MskCreditInfoProSaveRequest request) {
+        Map<String,Object> map= new HashMap<>();
+        map.put("secid",request.getSecid());
+        Date platDate = DateUtil.platDateFromCache();
+        map.put("nowDate",DateUtil.format(platDate));
+        return mskCreditInfoProMapper.getPrice(map);
     }
 
     public Page<SelectOptionDto> getFinprodMarketInfo(MskCreditInfoProSaveRequest request) {
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
         pageParam.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         return this.queryForPageForSelectReturn(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),() -> mskCreditInfoProMapper.getFinprodMarketInfo(pageParam));
+    }
+
+    @Override
+    public String generateTitle(MskCreditInfoProSaveRequest entity, OperationType type) {
+        return WorkFlowUtil.concatComment("资产代码" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity.getSecid(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                , "估值日期" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity.getCdate(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                , "估值来源" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity.getValueSourceStr(), "") + GlobalConstant.CLOSE_PARENTHESIS);
     }
 }

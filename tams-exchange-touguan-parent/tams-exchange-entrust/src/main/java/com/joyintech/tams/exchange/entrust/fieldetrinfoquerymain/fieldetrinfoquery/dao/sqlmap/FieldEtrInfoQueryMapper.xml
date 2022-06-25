@@ -37,19 +37,24 @@
         END AS otherPs,
         ETR_ENTRUST_ADD.BUSI_PS busiPs,
         ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        decode(
-        btm.OUTPUT_VALUE_1,
-        'EX004',
-        '',
-        decode(
-        ETR_ENTRUST_ADD.ASSET_TYPE,
-        'F01',
-        NVL(ETR_ENTRUST.ENTRUST_AMT, ETR_ENTRUST.ENTRUST_NUM),
-        'F10',
-        NVL( ETR_ENTRUST.ENTRUST_NUM * 100, 0 ),
-        NVL( ETR_ENTRUST.ENTRUST_AMT, ETR_ENTRUST.ENTRUST_NUM )
-        )
-        )entrustAmt,
+        btm.OUTPUT_VALUE_1 outputValue,
+        CASE WHEN ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34')
+        THEN
+        ETR_ENTRUST.ENTRUST_NUM*100
+        ELSE decode(
+            btm.OUTPUT_VALUE_1,
+            'EX004',
+            0,
+            decode(
+            ETR_ENTRUST_ADD.ASSET_TYPE,
+            'F01',
+            NVL(ETR_ENTRUST.ENTRUST_AMT, ETR_ENTRUST.ENTRUST_NUM),
+            'F10',
+            NVL( ETR_ENTRUST.ENTRUST_NUM * 100, 0 ),
+            NVL( ETR_ENTRUST.ENTRUST_AMT, ETR_ENTRUST.ENTRUST_NUM )
+            )
+            )
+        END AS entrustAmt,
         decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),'F10',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),NVL(ETR_FINISH_STATUSA.FINISH_AMT,0)) finishAmt,
@@ -99,29 +104,49 @@
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( nvl( T5.ORDER_FINISH_AMT/100, 0 ), 4 ),'EX018', ROUND( nvl( T5.ORDER_FINISH_AMT/100, 0 ), 4 ),ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
+        'EX017',ROUND( nvl( T5.ORDER_FINISH_AMT/100, 0 ), 4 ),
+        'EX018', ROUND( nvl( T5.ORDER_FINISH_AMT/100, 0 ), 4 ),
+        'EX019', ROUND( nvl( T5.ORDER_FINISH_AMT/100, 0 ), 4 ),
+        ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 ))
+        ELSE ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
         END AS execFinishAmt,
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),'EX018',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
+        'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),
+        'EX018',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),
+        'EX019',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),
+        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
         END AS execRemainderAmt,
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),'EX018',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
+        'EX017',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),
+        'EX018',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),
+        'EX019',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),
+        ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 ))
+        ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
         END AS transFinishAmt,
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),'EX018',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
+        'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),
+        'EX018',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),
+        'EX019',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),
+        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 ))
+        ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
         END AS transRemainderAmt,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi') transmitTimeSer,
         ETR_ENTRUST.PRICE_MODEL priceModel,
-        sci.ACCT_NAME trdAcctId,
+        nvl(detail.ACCT_NAME, sci.ACCT_NAME) trdAcctId,
         case when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017'  then ROUND(ETR_ENTRUST.ENTRUST_NUM/100,2)
         when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018'  then 0
+        when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX019'  then ROUND(ETR_ENTRUST.ENTRUST_NUM/100,2)
         when  ETR_ENTRUST_ADD.BUSI_TYPE_POSITION in ('01', '34') then null
         else ETR_ENTRUST.ENTRUST_NUM end as entrustNum,
         ETR_ENTRUST_ADD.CALCULATE_FIELD calculateField,
@@ -141,11 +166,18 @@
             SELECT
                 EED.ENTRUST_ID,
                 wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
+                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+                wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+                wm_concat (sci.ACCT_NO) AS ACCT_NO,
+                wm_concat (sci.ACCT_NAME) AS ACCT_NAME
             FROM ETR_ENTRUST_DETAIL EED
             left join
             (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
         FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON
+        sci.ACCT_NO = ssai.TRD_ACCT_ID
         GROUP BY EED.ENTRUST_ID ) detail ON ETR_ENTRUST.ENTRUST_ID = detail.ENTRUST_ID
 
         /* LEFT JOIN
@@ -169,8 +201,15 @@
         ETR_ENTRUST.ENTRUST_ID = ETR_ENTRUST_ADD.ENTRUST_ID
         LEFT JOIN OPT_TARGET_INFO ON ETR_ENTRUST_ADD.ASSET_TYPE_10 = OPT_TARGET_INFO.TARGET_ID
         <if test="userId != null and userId!='' ">
+            LEFT JOIN (
+            select ENTRUST_ID ,PORTFOLIO_ID
+            from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY
+            ol.ENTRUST_ID) ds
+            from ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1 ) det2 ON det2.ENTRUST_ID =
+            ETR_ENTRUST.ENTRUST_ID
             INNER JOIN PTL_PORTFOLIO_AUTHORITY
-            ON PTL_PORTFOLIO.PORTFOLIO_ID = PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID
+            ON (PTL_PORTFOLIO.PORTFOLIO_ID = PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID OR
+            PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID = det2.PORTFOLIO_ID)
         </if>
         /*LEFT JOIN (SELECT listagg(BID_PRICE, ',') within group (order by BID_PRICE) BID_PRICE,
         ENTRUST_ID as ENTRUST_ID FROM ETR_ENTRUST_BID_PRICE GROUP BY ENTRUST_ID) EEBP
@@ -283,11 +322,10 @@
                 AND PTL_PORTFOLIO_AUTHORITY.USER_ID = #{userId}
             </if>
             <if test="trdAcctId != null and trdAcctId!='' ">
-                AND sci.ACCT_NO = #{trdAcctId}
+                AND (sci.ACCT_NO = #{trdAcctId} OR detail.ACCT_NO  LIKE concat(concat('%',#{trdAcctId,jdbcType=VARCHAR}),'%') )
             </if>
             <if test="trdAcctName != null and trdAcctName!='' ">
                 AND ssai.SEC_ACCT_NAME = #{trdAcctName}
-                LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
             </if>
         </where>
         union all
@@ -325,19 +363,25 @@
         END AS otherPs,
         WFL_ETR_ENTRUST_ADD.BUSI_PS busiPs,
         WFL_ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        decode(
-        ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
-        'EX004',
-        '',
-        decode(
-        WFL_ETR_ENTRUST_ADD.ASSET_TYPE,
-        'F01',
-        NVL(WFL_ETR_ENTRUST.ENTRUST_AMT, WFL_ETR_ENTRUST.ENTRUST_NUM),
-        'F10',
-        NVL( WFL_ETR_ENTRUST.ENTRUST_NUM * 100, 0 ),
-        NVL( WFL_ETR_ENTRUST.ENTRUST_AMT, WFL_ETR_ENTRUST.ENTRUST_NUM )
-        )
-        )entrustAmt,
+        WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION outputValue,
+        CASE WHEN WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION IN ('01', '34')
+        THEN
+        WFL_ETR_ENTRUST.ENTRUST_NUM*100
+        ELSE
+            decode(
+            WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
+            'EX004',
+            0,
+            decode(
+            WFL_ETR_ENTRUST_ADD.ASSET_TYPE,
+            'F01',
+            NVL(WFL_ETR_ENTRUST.ENTRUST_AMT, WFL_ETR_ENTRUST.ENTRUST_NUM),
+            'F10',
+            NVL( WFL_ETR_ENTRUST.ENTRUST_NUM * 100, 0 ),
+            NVL( WFL_ETR_ENTRUST.ENTRUST_AMT, WFL_ETR_ENTRUST.ENTRUST_NUM )
+            )
+            )
+        END AS entrustAmt,
         /*decode(WFL_ETR_ENTRUST_ADD.ASSET_TYPE,'F01',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),'F10',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),NVL(ETR_FINISH_STATUSA.FINISH_AMT,0)) */
@@ -414,9 +458,10 @@
         NULL transmitTime,
         NULL transmitTimeSer,
         WFL_ETR_ENTRUST.PRICE_MODEL priceModel,
-        sci.ACCT_NAME trdAcctId,
+        nvl(detail.ACCT_NAME, sci.ACCT_NAME) trdAcctId,
         case when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then ROUND(WFL_ETR_ENTRUST.ENTRUST_NUM/100,2)
         when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then 0
+        when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX019'  then ROUND(WFL_ETR_ENTRUST.ENTRUST_NUM/100,2)
         when  WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION in ('01', '34') then null
         else WFL_ETR_ENTRUST.ENTRUST_NUM end entrustNum,
         WFL_ETR_ENTRUST_ADD.CALCULATE_FIELD calculateField,
@@ -436,11 +481,18 @@
             SELECT
                 EED.ENTRUST_ID,
                 wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
-            FROM ETR_ENTRUST_DETAIL EED
+                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+                wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+                wm_concat (sci.ACCT_NO) AS ACCT_NO,
+                wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+            FROM WFL_ETR_ENTRUST_DETAIL EED
             left join
             (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
             FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+            LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+            EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+            LEFT JOIN STL_CAPACCT_INFO sci ON
+            sci.ACCT_NO = ssai.TRD_ACCT_ID
             GROUP BY EED.ENTRUST_ID ) detail ON WFL_ETR_ENTRUST.ENTRUST_ID = detail.ENTRUST_ID
         /*LEFT JOIN
         (SELECT
@@ -467,8 +519,14 @@
         AND (WFL_ETR_ENTRUST.Ps = btm.INPUT_VALUE_3 OR btm.INPUT_VALUE_3 is null)
         AND (WFL_ETR_ENTRUST.TRADE_PLAT = btm.INPUT_VALUE_1 OR btm.INPUT_VALUE_1 IS NULL)
         <if test="userId != null and userId!='' ">
+            LEFT JOIN (select ENTRUST_ID ,PORTFOLIO_ID
+            from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY
+            ol.ENTRUST_ID) ds
+            from WFL_ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1 ) det2 ON det2.ENTRUST_ID =
+            WFL_ETR_ENTRUST.ENTRUST_ID
             INNER JOIN PTL_PORTFOLIO_AUTHORITY
-            ON PTL_PORTFOLIO.PORTFOLIO_ID = PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID
+            ON (PTL_PORTFOLIO.PORTFOLIO_ID = PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID OR
+            PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID = det2.PORTFOLIO_ID)
         </if>
        /* LEFT JOIN (SELECT listagg(BID_PRICE, ',') within group (order by BID_PRICE) BID_PRICE,
         ENTRUST_ID as ENTRUST_ID FROM ETR_ENTRUST_BID_PRICE GROUP BY ENTRUST_ID) EEBP
@@ -566,7 +624,7 @@
                 AND PTL_PORTFOLIO_AUTHORITY.USER_ID = #{userId}
             </if>
             <if test="trdAcctId != null and trdAcctId!='' ">
-                AND sci.ACCT_NO = #{trdAcctId}
+                AND (sci.ACCT_NO = #{trdAcctId} OR detail.ACCT_NO  LIKE concat(concat('%',#{trdAcctId,jdbcType=VARCHAR}),'%') )
             </if>
         </where>
         ) t
@@ -941,11 +999,14 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="VARCHAR"/>
         <result column="FULL_PRICE" property="fullPrice" jdbcType="NUMERIC"/>
         <result column="PORTFOLIO_NAME" property="portfolioName" jdbcType="NUMERIC"/>
+        <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="NUMERIC"/>
         <result column="SEC_ACCT_ID" property="secAcctId" jdbcType="VARCHAR"/>
         <result column="TRADE_PLAT" property="tradePlat" jdbcType="VARCHAR"/>
         <result column="FINPROD_TYPE2" property="finprodType2" jdbcType="VARCHAR"/>
         <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
         <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
+
     </resultMap>
 
     <sql id="Query_Column_List">
@@ -998,7 +1059,10 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         order by t.TRADING_DAY desc,t.TRADE_TIME desc
     </select>-->
     <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
-	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, <!--PP.PORTFOLIO_NAME,--> SCI.ACCT_NAME  ACCOUNT_NAME
+	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, <!--PP.PORTFOLIO_NAME,-->
+      nvl(detail.PORTFOLIO_ID,'') PORTFOLIO_ID,
+      nvl(detail.PORTFOLIO_NAME,'') PORTFOLIO_NAME,
+      nvl(detail.ACCT_NAME, sci.ACCT_NAME) ACCOUNT_NAME
 	  FROM (
 	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
 			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
@@ -1026,7 +1090,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
 			 END                                                   DELIVERY_SCHEDULE,
-			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT
+			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT,
+			 TT.PROP_ACCT_NO                                        PROP_ACCT_NO
 		FROM SETTLE_TRANS_DATA STD
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') AND TT.TRADE_TYPE = '0')
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
@@ -1065,7 +1130,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			   WHEN STD.DELIVERY_RESULT = '04' THEN '0'
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
 			 END                                                   DELIVERY_SCHEDULE,
-			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT
+			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT,
+            TT.PROP_ACCT_NO                                        PROP_ACCT_NO
 		FROM T_TRADE TT
 		LEFT JOIN SETTLE_TRANS_DATA STD
 		  ON TT.BROKER_TRADE_ID = STD.CJBH
@@ -1100,7 +1166,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
             tpd.CREATE_TIME CREATE_TIME,
             '正常交收' DELIVERY_RESULT,
             '100' DELIVERY_SCHEDULE,
-            ssai.SEC_ACCT_ID ACCT_ACCOUNT
+            ssai.SEC_ACCT_ID ACCT_ACCOUNT,
+            null PROP_ACCT_NO
         FROM
             TRD_FIN_PRODUCT_DEAL_TOTAL tpd
             LEFT JOIN TRD_DEAL_TOTAL_ADD tpda ON tpd.TOTLE_TRADE_ID = tpda.TOTLE_TRADE_ID
@@ -1115,6 +1182,23 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         ) A
 	  LEFT JOIN STL_CAPACCT_INFO SCI ON A.ACCT_ACCOUNT = SCI.ACCT_NO
 	  LEFT JOIN ETR_ENTRUST EE ON A.INSTRUCTION_ID = EE.ENTRUST_ID
+        LEFT JOIN (
+        SELECT
+        EED.ENTRUST_ID,
+        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+        wm_concat (sci.ACCT_NO) AS ACCT_NO,
+        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+        FROM ETR_ENTRUST_DETAIL EED
+        left join
+        (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
+        FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON
+        sci.ACCT_NO = ssai.TRD_ACCT_ID
+        GROUP BY EED.ENTRUST_ID ) detail ON A.INSTRUCTION_ID = detail.ENTRUST_ID
         <!-- LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
         LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID -->
       WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
@@ -1310,6 +1394,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         T.effectiveStatus,
         T.firstBidStatus,
         T.bidId,
+        T.busiTypePosition,
         T.finprodId,
         T.finprodMarketId,
         T.finprodAbbr,
@@ -1345,6 +1430,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
         END           AS firstBidStatus/*中标状态*/,
         bo.BID_ID         AS bidId/*投标编号*/,
+        #{busiTypePosition} busiTypePosition,
         fp.FINPROD_ID  finprodId,
         fp.FINPROD_MARKET_ID finprodMarketId,
         fp.FINPROD_ABBR finprodAbbr,
@@ -1368,13 +1454,17 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         ee.ENTRUST_NUM *100   AS etrBidPriceTotal/*指令投标券面总额*/,
         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
         bo.WIN_PRIN_AMT   AS totalBiddingNum/*券面总额*/,
-        bobp.BID_PRICE    AS bidprice/*投标标位, 多个逗号分隔展示*/,
+        CASE
+        WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+        WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+        WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+        END bidprice /*投标标位, 多个逗号分隔展示*/,
         bo.BID_MODLE      AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE       AS payType/*缴款方式*/,
         case
-        when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-        when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-        when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        when fpi.TENDER_TARGET = '01' AND bo.WIN_PRICE IS NOT NULL then to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        when fpi.TENDER_TARGET = '02' AND bo.WIN_PRICE IS NOT NULL then to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+        when fpi.TENDER_TARGET = '03' AND bo.WIN_PRICE IS NOT NULL then to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
         end              winPrice/*中标标位*/,
         bo.UNIT_CPRICE       price/*净价*/,
         bo.TRADE_AMT         tradeAmt/*交易金额*/,
@@ -1392,11 +1482,11 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '02'
-        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.BID_ID
         from BID_ORDER_BID_PRICE t0
@@ -1440,6 +1530,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
         END         AS firstBidStatus/*中标状态*/,
         bo.BID_ID       AS bidId/*投标编号*/,
+        #{busiTypePosition} busiTypePosition,
         fp.FINPROD_ID  finprodId,
         fp.FINPROD_MARKET_ID finprodMarketId,
         fp.FINPROD_ABBR finprodAbbr,
@@ -1463,13 +1554,17 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         ee.ENTRUST_NUM*100  AS etrBidPriceTotal/*指令投标券面总额*/,
         ee.TRADE_MARKET  AS tradeMarket/*交易市场*/,
         bo.WIN_PRIN_AMT AS totalBiddingNum/*券面总额*/,
-        bobp.BID_PRICE  AS bidprice/*投标标位, 多个逗号分隔展示*/,
+        CASE
+        WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
+        WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
+        WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
+        END bidprice /*投标标位, 多个逗号分隔展示*/,
         bo.BID_MODLE    AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE     AS payType/*缴款方式*/,
         case
-        when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-        when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-        when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        when fpi.TENDER_TARGET = '01' AND bo.WIN_PRICE IS NOT NULL then to_char(bo.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        when fpi.TENDER_TARGET = '02' AND bo.WIN_PRICE IS NOT NULL then to_char(bo.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+        when fpi.TENDER_TARGET = '03' AND bo.WIN_PRICE IS NOT NULL then to_char(bo.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
         end            winPrice/*中标标位*/,
         bo.UNIT_CPRICE     price/*净价*/,
         bo.TRADE_AMT       tradeAmt/*交易金额*/,
@@ -1487,11 +1582,11 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '02'
-        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990') || '元'
+        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.BID_ID
         from WFL_BID_ORDER_BID_PRICE t0
@@ -1532,6 +1627,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         T.effectiveStatus,
         T.firstBidStatus,
         T.bidId,
+        T.busiTypePosition,
         T.finprodId,
         T.finprodMarketId,
         T.finprodAbbr,
@@ -1642,8 +1738,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         WHERE iqer.entrust_id = #{entrustId}
     </select>
 
-    <select id="getEtrDispatcherDealListInfo"
-            resultMap="TradeResultMap">
+    <select id="getEtrDispatcherDealListInfo"  resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.TradeQueryBean">
         SELECT distinct
         decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
         <include refid="etrDispatcherDealListInfo"/>
@@ -1653,19 +1748,46 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         left join TRD_FIN_PRODUCT_DEAL_TOTAL tpdt on tpd.TOTLE_TRADE_ID=tpdt.TOTLE_TRADE_ID
         LEFT JOIN PTL_PORTFOLIO pp ON tpda.portfolio_id = pp.portfolio_id
         LEFT JOIN FIN_PRODUCT fp ON tpd.finprod_id = fp.finprod_id
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
         left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
         LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
-        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID  = fpt.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on tpd.FINPROD_ID = FTP.FINPROD_ID
         left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
+        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
-        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND	BO.BID_ID = BRT.BID_ID
-        LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID = #{entrustId}
-        WHERE tpd.TRADE_ID  = (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
-        OR tpd.B_TRADE_ID = (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
+        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
+        LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID  = ee.ENTRUST_ID
+        LEFT JOIN (
+        SELECT
+            brd.ENTRUST_ID,
+            wm_concat ( brd.WIN_PRICE ) AS WIN_PRICE
+            FROM BID_RESULT_DETAIL brd
+            GROUP BY brd.ENTRUST_ID
+        ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN (
+        SELECT
+            EED.ENTRUST_ID,
+            wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+            wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+            wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+            wm_concat (sci.ACCT_NO) AS ACCT_NO,
+            wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+            FROM ETR_ENTRUST_DETAIL EED
+            left join
+            (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
+            FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+            LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+            EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+            LEFT JOIN STL_CAPACCT_INFO sci ON
+            sci.ACCT_NO = ssai.TRD_ACCT_ID
+            GROUP BY EED.ENTRUST_ID ) detail ON ee.ENTRUST_ID = detail.ENTRUST_ID
+        WHERE
+        ee.ENTRUST_ID = #{entrustId}
+        AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
+        OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId}))
         union all
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
@@ -1676,19 +1798,46 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         left join WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpdt on tpd.TOTLE_TRADE_ID=tpdt.TOTLE_TRADE_ID
         LEFT JOIN PTL_PORTFOLIO pp ON tpda.portfolio_id = pp.portfolio_id
         LEFT JOIN FIN_PRODUCT fp ON tpd.finprod_id = fp.finprod_id
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
         left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
         LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
-        LEFT JOIN FIN_PRODUCT_TYPE fpt  ON tpd.FINPROD_ID = fpt.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on tpd.FINPROD_ID = FTP.FINPROD_ID
         left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
+        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
-        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND	BO.BID_ID = BRT.BID_ID
-        LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID = #{entrustId}
-        WHERE tpd.TRADE_ID  = (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
-        OR tpd.B_TRADE_ID = (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
+        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
+        LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID  = ee.ENTRUST_ID
+        LEFT JOIN (
+            SELECT
+            brd.ENTRUST_ID,
+            wm_concat ( brd.WIN_PRICE ) AS WIN_PRICE
+            FROM BID_RESULT_DETAIL brd
+            GROUP BY brd.ENTRUST_ID
+        ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN (
+            SELECT
+            EED.ENTRUST_ID,
+            wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+            wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+            wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+            wm_concat (sci.ACCT_NO) AS ACCT_NO,
+            wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+            FROM ETR_ENTRUST_DETAIL EED
+            left join
+            (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
+            FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+            LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+            EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+            LEFT JOIN STL_CAPACCT_INFO sci ON
+            sci.ACCT_NO = ssai.TRD_ACCT_ID
+            GROUP BY EED.ENTRUST_ID ) detail ON ee.ENTRUST_ID = detail.ENTRUST_ID
+        WHERE
+        ee.ENTRUST_ID = #{entrustId}
+        AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
+        OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID = #{entrustId}))
     </select>
 
     <sql id="etrDispatcherDealListInfo">
@@ -1711,6 +1860,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         tpd.trade_id tradeId,
         tpda.portfolio_id portfolioId,
         pp.portfolio_name portfolioName,
+        case when tpd.FINPROD_TYPE2 in ('F04','F05') then fp3.FINPROD_ID else fp.FINPROD_ID end finprodId,
         case when tpd.FINPROD_TYPE2 in ('F04','F05') then fp3.finprod_market_id else fp.finprod_market_id end finprodMarketId,
         case when tpd.FINPROD_TYPE2 in ('F04','F05') then fp3.finprod_abbr else fp.finprod_abbr  end finprodAbbr,
         nvl(tpd.PS, tpdt.ps) ps,
@@ -1751,8 +1901,14 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         ee.ENTRUST_NUM *100   AS etrBidPriceTotal/*指令投标券面总额*/,
         bo.UNIT_CPRICE    AS   price/*净价*/,
         bo.PAY_TYPE       AS   payType/*缴款方式*/,
-        bo.WIN_TYPE       AS   winType/*中标方式*/,
-        bo.PAY_DATE       AS   payDate/*缴款日*/
+        bo.BID_MODLE       AS   biddingMethod/*投标方式*/,
+        bo.PAY_DATE       AS   payDate/*缴款日*/,
+	    detail.ACCT_NAME  AS   accountName,
+        case
+           when fpi.TENDER_TARGET = '01' AND brd.WIN_PRICE IS NOT NULL then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+           when fpi.TENDER_TARGET = '02' AND brd.WIN_PRICE IS NOT NULL then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+           when fpi.TENDER_TARGET = '03' AND brd.WIN_PRICE IS NOT NULL then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+           end          AS    winPrice/*中标标位(成交价格)*/
 
     </sql>
 
@@ -1933,7 +2089,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
                             from TRD_PRODUCT_DEAL t1
                                      left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
                             where t1.IS_CANCEL = 'N'
-                              and t1.TRADE_STATUS != '03'
+                              and t1.TRADE_STATUS = '01'
                             group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         where ee.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
     </select>

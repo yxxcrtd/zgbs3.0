@@ -219,4 +219,12 @@ public class PeriodicManagementService extends BaseService<PeriodicManagement001
 	   public int getTrdProductDealByPeriodId(Map<String, Object> map) {
 	      return periodicManagementMapper.getTrdProductDealByPeriodId(map); 
 	   }
+
+
+	/**
+	 * 查询相同开始日和结束日是否存在
+	 */
+	public int checkPeriodTradeDate(Map<String, Object> param) {
+		return periodicManagementMapper.checkPeriodTradeDate(param);
+	}
 }

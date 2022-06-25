@@ -784,26 +784,45 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
         this.softSkipMode = softSkipMode;
     }
 
+    /**
+     * 债券是否特殊债
+     */
     public String getIsSpecialDebt() {
         return isSpecialDebt;
     }
 
+    /**
+     * 债券是否特殊债
+     */
     public void setIsSpecialDebt(String isSpecialDebt) {
         this.isSpecialDebt = isSpecialDebt;
     }
 
+
+    /**
+     * 债券是否到期违约债
+     */
     public String getIsDefaultBondIndicator() {
         return isDefaultBondIndicator;
     }
 
+    /**
+     * 债券是否到期违约债
+     */
     public void setIsDefaultBondIndicator(String isDefaultBondIndicator) {
         this.isDefaultBondIndicator = isDefaultBondIndicator;
     }
 
+    /**
+     * 是否资产支持证券
+     */
     public String getIsAbs() {
         return isAbs;
     }
 
+    /**
+     * 是否资产支持证券
+     */
     public void setIsAbs(String isAbs) {
         this.isAbs = isAbs;
     }
@@ -812,6 +831,9 @@ public class CfetsBondDealQuoteCommonDto extends BaseEntity implements ProcessEn
         return isSpecial;
     }
 
+    /**
+     * 是否锚定净价
+     */
     public void setIsSpecial(String isSpecial) {
         this.isSpecial = isSpecial;
     }

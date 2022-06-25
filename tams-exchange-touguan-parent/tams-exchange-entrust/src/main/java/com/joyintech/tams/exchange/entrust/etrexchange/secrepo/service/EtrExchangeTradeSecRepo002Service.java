@@ -150,6 +150,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         //可用数量
                         PositionCashSecDto secDto = new PositionCashSecDto();
                         BeanUtil.copyPropertiesIgnoreNull(secDto, entity);
+                        secDto.setTradePlat(DictCodeList.交易平台_新债平台.getValue());
                         BigDecimal sellNum = etrTradeCommonervice.selectAvailableNum(secDto);
                         entity.setSellNum(ArithmeticUtil.divide(sellNum,new BigDecimal("100"),2));
                         //过滤掉实际持仓和可用持仓都等于0
@@ -189,7 +190,11 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         map.put("prinAmt", new BigDecimal(100));
                         map.put("fprice", v.getPrice());
                         map.put("tradeMarket", v.getTradeMarket());
-                        Map<String, BigDecimal> returnMap = etrExchangeTradeSecRepo001Service.calcPriceAndYield(map);
+                        Map<String, BigDecimal> returnMap=null;
+                        try{
+                            returnMap = etrExchangeTradeSecRepo001Service.calcPriceAndYield(map);
+                        }catch (Exception e){
+                        }
                         if(!Objects.isNull(returnMap) && !Objects.isNull(returnMap.get("cprice"))){
                             BigDecimal cPrice = v.getPrice();
                             v.setPrice(returnMap.get("cprice"));

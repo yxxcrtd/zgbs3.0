@@ -145,7 +145,7 @@ public class EntrustBankCommonService extends BaseService<ITableRow> {
 		if (StringUtil.equals(DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), busiTypePosition)) {
 			//中标状态
 			EtrBondFirstBidInfoDto bidInfoDto = entrustBankCommonMapper.selectBidInfo(param);
-			if (!StringUtil.equals(bidInfoDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标)) {
+			if (!StringUtil.equals(bidInfoDto.getFirstBidStatus(), DictCodeList.一级投标中标状态_待投标.getValue())) {
 				return "4";
 			}
 			int i = entrustBankCommonMapper.checkFirstBidDataStatus(param);

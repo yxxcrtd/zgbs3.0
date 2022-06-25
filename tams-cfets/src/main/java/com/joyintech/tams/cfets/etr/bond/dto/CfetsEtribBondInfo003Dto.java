@@ -176,6 +176,8 @@ public class CfetsEtribBondInfo003Dto extends EtrEntrust implements ProcessEntit
      */
     private String remark;
 
+    private String rskApproval;
+
     /**
      * 组合分配
      */
@@ -216,6 +218,17 @@ public class CfetsEtribBondInfo003Dto extends EtrEntrust implements ProcessEntit
   //  private Boolean submitFlag;
 
     private String systemAct;
+
+    @ApiModelProperty(name="busiTypePosition",value="业务类型")
+    private String busiTypePosition;
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
 
     public String getBusinessId() {
         return businessId;
@@ -725,5 +738,13 @@ public class CfetsEtribBondInfo003Dto extends EtrEntrust implements ProcessEntit
 
     public void setForcedFinishAmt(BigDecimal forcedFinishAmt) {
         this.forcedFinishAmt = forcedFinishAmt;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
     }
 }

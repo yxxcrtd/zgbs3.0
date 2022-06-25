@@ -296,9 +296,13 @@
         where tpd.TRADE_MARKET in (#{TRADE_PLACE_03},#{TRADE_PLACE_04})
         and  tpd.TRADE_DATE = to_date(#{executeDate},'yyyy-MM-dd')
         and  tpd.TRADE_STATUS = #{status} and tpd.IS_CANCEL = #{YES_OR_NO_N}
-        and (tpd.PS not in ('T11','T12','T13','T09','T08','T07','T39') and tpd.FINPROD_TYPE2 not in ('F10','F01','F02','F03')
-            or tpd.FINPROD_TYPE2 in ('F10','F01') and tpd.PS not in ('T05','T11','T12','T13','T39','T22')
-            or tpd.FINPROD_TYPE2 in ('F02','F03') and tpd.PS = 'T01' and fpt.type_7 = 'H01')
+        and (
+            (tpd.PS not in ('T11','T12','T13','T09','T08','T07','T39') and tpd.FINPROD_TYPE2 not in ('F10','F01','F02','F03'))
+            or
+            (tpd.FINPROD_TYPE2 in ('F10','F01') and tpd.PS not in ('T05','T11','T12','T13','T39','T22'))
+            or
+            (tpd.FINPROD_TYPE2 in ('F02','F03') and tpd.PS = 'T01' and fpt.type_7 = 'H01')
+        )
     </select>
 
 

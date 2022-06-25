@@ -15,6 +15,7 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.service.entrust.common.service.WFlowCommonService;
@@ -41,6 +42,7 @@ import com.joyintech.tams.common.base.entity.EtrPledge;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.trade.BussRepoSecService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -61,6 +63,7 @@ import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommSer
 import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -157,8 +160,51 @@ public class CfetsEtrIbRepoinfo003Service extends CommonExportService<CfetsEtrib
                 "(回购期限" + ":" + (entity.getRepoTerm() == null? "" : entity.getRepoTerm()) + "天)-"+
                 "指令金额"+ ":" + df4.format(entity.getEntrustAmt()) + "元";
     }
-
-
+    private Map<String, Object> getEtrLimitSwitch(String workflowId, CfetsEtribRepoInfo003Dto dto,
+                                                  CommonBusinessService commonBusinessService) throws WorkFlowException {
+        BigDecimal amount = dto.getEntrustNum();
+        if (amount == null) {
+            amount = dto.getEntrustAmt();
+        }
+        Map<String, Object> params = CommonBusinessService.setParams(dto.getCounterId(), amount, LoginUserUtil.getUserName(),
+                BussinessDictCodeList.平安资产类型_回购.getValue(), dto.getAssetType1(), dto.getTradeMarket(), dto.getPs()
+                , dto.getFinprodId(), workflowId
+        );
+        // add by zhangrui1 风险审批修改 start
+        params.put("riskTrialRetDto", dto.getRiskTrialRetDto());
+        // add by zhangrui1 风险审批修改 end
+        return commonBusinessService.是否需要上级审批_委托用(params);
+    }
+    @Override
+    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
+        CfetsEtribRepoInfo003Dto dto = this.getBussinessEntity(entity);
+        CommonBusinessService commonBusinessService = SpringContextUtil.getBean(CommonBusinessService.class);
+        if (taskId != null) {
+            try {
+                if(StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH_IS_TOTAL), "Y")){
+                    return getEtrLimitSwitch(entity.getWorkflowId(), dto, commonBusinessService);
+                }else{
+//           		BussinessConstant.是否需要上级审批
+                    List<CfetsEtribRepoInfo003Dto> etribRepoInfo003DtoList =dto.getEtrInvestRepoInfoDtos();
+                    Map<String, Object> result = new HashMap<>();
+                    for(CfetsEtribRepoInfo003Dto cfetsEtribRepoInfo003Dto:etribRepoInfo003DtoList){
+                        result=getEtrLimitSwitch(entity.getWorkflowId(), cfetsEtribRepoInfo003Dto, commonBusinessService);
+                        if((boolean)result.get(BussinessConstant.是否需要上级审批)==true){
+                            return result;
+                        }
+                    }
+                    return result;
+                }
+            }
+            catch (WorkFlowException e) {
+                // 未设置授权或设置成不授权时，抛出异常，当前用户只能退回
+                throw new WorkFlowException(e);
+            }
+        }
+        else {
+            return null;
+        }
+    }
     /**
      * 流程结束后操作
      *

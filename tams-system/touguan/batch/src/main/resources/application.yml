@@ -125,7 +125,7 @@ batch:
     maxJobPoolSize: 5 #job线程池
     maxExeUser: 2 #最大并发用户数
     maxThreadPerUser: 5 #任务并发数
-    sleeptime: 1000 #轮询时间
+    sleeptime: 10 #轮询时间
     maxSqlNum: 50 #批量提交数
     needProcessLog: false #process是否记录正常日志
     enableServerDoubleAlive: false #是否启用双活
@@ -224,7 +224,7 @@ tx-lcn:
   client:
     managerAddress: 192.168.90.47:8070
 #头寸引擎地址
-positionUrl: http://192.168.90.244:2667/dsp
+positionUrl: http://192.168.70.146:2667/dsp
 ---
 spring:
   profiles: test
@@ -242,15 +242,15 @@ spring:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS30INIT_TEST
-    password: BS30INIT_TEST
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
 #应用配置
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS30INIT_TEST
-  sqldirpassword: BS30INIT_TEST
+  sqldiruserName: BS303INIT_TEST1008_03
+  sqldirpassword: BS303INIT_TEST1008_03
   #以下根据实际ip和端口进行修改
   micorservice:
     contextPath:
@@ -284,15 +284,15 @@ base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS30INIT_TEST
-    password: BS30INIT_TEST
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
 #interf数据源配置
 interf:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS30INIT_TEST
-    password: BS30INIT_TEST
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
 #日志路径配置
 log:
   path: /home/tams/logs/touguan/batch
@@ -323,15 +323,15 @@ spring:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS30INIT_TEST
-    password: BS30INIT_TEST
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
 #应用配置
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS30INIT_TEST
-  sqldirpassword: BS30INIT_TEST
+  sqldiruserName: BS303INIT_TEST1008_03
+  sqldirpassword: BS303INIT_TEST1008_03
   #以下根据实际ip和端口进行修改
   micorservice:
     contextPath:
@@ -365,15 +365,15 @@ base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS30INIT_TEST
-    password: BS30INIT_TEST
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
 #interf数据源配置
 interf:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS30INIT_TEST
-    password: BS30INIT_TEST
+    username: BS303INIT_TEST1008_03
+    password: BS303INIT_TEST1008_03
 #日志路径配置
 log:
   path: /home/tams/logs/touguan/batch

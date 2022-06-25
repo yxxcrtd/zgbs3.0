@@ -1418,7 +1418,8 @@ public enum BussinessDictCode implements com.joyintech.framework.base.BaseDictCo
     组合估值方法("PTL_VALUATION_METHOD"),
     报价方式_登记("QUOTE_STYLE"),
     分配方式("DISTRIBUTION"),
-
+    CSTP息票类型("CSTP_COUPON_RATE_TYPE"),
+    CSTP资产类型("CSTP_SEC_TYPE"),
     ;
     /**
      * 对应于数据字典code

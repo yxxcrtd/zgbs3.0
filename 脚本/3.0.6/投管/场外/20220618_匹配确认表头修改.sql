@@ -1,0 +1,1 @@
+UPDATE CFG_DATATABLE_SHOW SET COLCODE = 'tradeYieldStr' WHERE PAGECODE = 'CfetsTrdConfirm' AND DTCODE = 'CfetsTrdConfirmCstpTrdMatchInfo' AND SPCDCODE = '999999' AND COLCODE = 'tradeYield';

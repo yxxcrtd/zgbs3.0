@@ -395,7 +395,9 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setPriceMode(instruction.getPriceMode());
             calculateResponse.setAcctNo(instruction.getAcctName());
 
-            calculateResponse.setEtrSecAmount(detail.getEntrustAmt());
+            //指令数量
+            calculateResponse.setEtrSecAmount(detail.getEntrustNum());
+
             calculateResponse.setInstructionLeftNum(isVolume ? instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue() : 0L);
 
             PortfolioDetail portfolioDetail = portfolioDetailMap.get(portfolioId);
@@ -429,9 +431,15 @@ public class PortfolioManager extends BaseService {
         // 处理指令剩余数量、指令剩余金额
         BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
         long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
+        boolean isFirstOrder = leftNum == instruction.getEntrustNum();
         for (PortfolioCalculateResponse item : list) {
-            item.setInstructionLeftAmt(BigDecimal.ZERO.compareTo(orderAmt) == 0 ? NumberUtil.mul(leftAmt, item.getDisRate()) : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
-            item.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+            if (isFirstOrder) {
+                item.setInstructionLeftAmt(item.getInstructionTotalAmt());
+                item.setInstructionLeftNum(item.getInstructionTotalNum());
+            } else {
+                item.setInstructionLeftAmt(BigDecimal.ZERO.compareTo(orderAmt) == 0 ? NumberUtil.mul(leftAmt, item.getDisRate()) : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
+                item.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+            }
 
             // 处理分配比例
             item.setDisRate(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? BigDecimal.ZERO : NumberUtil.mul(NumberUtil.div(item.getEntrustNum(), orderVolume), 100));
@@ -801,18 +809,18 @@ public class PortfolioManager extends BaseService {
             Long realVolume = 0L;
             if (bean.getEntrustVolume() != 0L) {
                 if (EntrustUtils.isBond(ins)) {
-                    realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 1);
+                    realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 0);
                 } else if (EntrustUtils.isPledgeRepurchase(ins)) {
                     //通用质押式回购最小交易单元：深交所-1，上交所-10
                     if (Market.SZSE.investValue.equals(ins.getTradeMarket())) {
                         realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 0);
                     } else {
-                        realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 1);
+                        realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 0);
                     }
                 } else if (EntrustUtils.isFutures(ins)) {
                     realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 0);
                 } else {
-                    realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 2);
+                    realVolume = getEntrustVolume(totalLeftVolume, bean.getEntrustVolume(), context.getLeftVolume(), 0);
                 }
             }
 

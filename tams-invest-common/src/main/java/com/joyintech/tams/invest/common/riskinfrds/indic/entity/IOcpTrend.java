@@ -52,7 +52,8 @@ public interface IOcpTrend extends Serializable {
      */
     boolean isTrendBad();
 
-    default boolean equals(IOcpTrend other) {
+    // Sonar Either override Object.equals(Object), or rename the method to prevent any confusion.
+    default boolean equalsW(IOcpTrend other) {
         return other != null && StringUtil.equals(other.getOcpCode(), getOcpCode());
     }
 }

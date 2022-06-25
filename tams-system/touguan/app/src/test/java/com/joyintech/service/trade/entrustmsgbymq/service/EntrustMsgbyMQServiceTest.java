@@ -51,4 +51,16 @@ public class EntrustMsgbyMQServiceTest extends BaseTest {
         TradeMessage tradeMessage = JSON.parseObject(tradeMessageStr, TradeMessage.class);
         entrustMsgbyMQService.insertEntrustMsg(tradeMessage);
     }
+
+    /**
+     * 【信用保护凭证】MQ接收 成交回报报文
+     */
+    @Test
+    public void insertF37EntrustMsg() throws Exception {
+        String tradeMessageStr = "{\"acctNo\":\"12345:ZJH61301\",\"ccy\":\"CNY\",\"counterId\":\"JYDS000000001546\",\"dealBalance\":990000.00,\"dealNo\":\"1144365\",\"dealPrice\":110,\"dealVolume\":9000.0,\"entrustId\":\"WTCDS202112227839\",\"entrustNo\":\"2061411443500006\",\"entrustVolume\":9000.0,\"finprodId\":\"F37_0613001.SH\",\"finprodMarketId\":\"0613001.SH\",\"fullPrice\":110.0,\"id\":\"22061411443600005\",\"orderId\":\"i22061411443500006\",\"pS\":\"T04\",\"portfolioId\":\"P61301\",\"portfolioTradeMessages\":[{\"busiId\":\"22061411443600005\",\"entrustAmt\":990000,\"entrustNum\":9000,\"portfolioId\":\"P61301\",\"portfolioName\":\"信用凭证组合\",\"targetType\":\"01\",\"tradeAmt\":990000.00,\"tradeNum\":9000}],\"propAcctNo\":\":80000010101\",\"secAcctId\":\"ZQZ61301\",\"tradeMarket\":\"03\",\"tradePlat\":\"99\",\"tradingDay\":\"20211221\"}";
+        Mockito.doReturn("我是模拟的返回值").when(BaseGetBusinessIdImpl).buildBussinessCode(any());
+        Mockito.doReturn("我是模拟的返回值").when(autoPeriodCommonService).buildBussinessCode(any());
+        TradeMessage tradeMessage = JSON.parseObject(tradeMessageStr, TradeMessage.class);
+        entrustMsgbyMQService.insertEntrustMsg(tradeMessage);
+    }
 }

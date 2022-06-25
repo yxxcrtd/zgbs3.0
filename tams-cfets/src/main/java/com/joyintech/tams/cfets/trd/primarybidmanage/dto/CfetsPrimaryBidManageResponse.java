@@ -2,8 +2,10 @@ package com.joyintech.tams.cfets.trd.primarybidmanage.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -139,6 +141,10 @@ public class CfetsPrimaryBidManageResponse {
     @ApiModelProperty(name="bidModleStr",value="投标方式Str")
     private String bidModleStr;
 
+    private Date issueDate;
+
+    private String issueClass;
+
     public String getIsWin() {
         return isWin;
     }
@@ -188,8 +194,26 @@ public class CfetsPrimaryBidManageResponse {
     }
 
     public String getBidDate() {
-        return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) + "~"
-              +DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN);
+        if (StringUtil.isNotEmpty(this.getBidDateStart())){
+            return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) +"~"+DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN) ;
+        }
+        return DateUtil.format(this.getIssueDate(),DateUtil.DEFAULT_DATE_FORMAT_EN);
+    }
+
+    public Date getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public String getIssueClass() {
+        return issueClass;
+    }
+
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
     }
 
     public void setBidDate(String bidDate) {

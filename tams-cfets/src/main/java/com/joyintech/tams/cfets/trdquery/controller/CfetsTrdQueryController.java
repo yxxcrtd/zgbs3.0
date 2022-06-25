@@ -16,29 +16,22 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
-import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListRequest;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.cfets.trdquery.dto.*;
 import com.joyintech.tams.cfets.trdquery.service.CfetsTrdBondInvestTrade002Service;
+import com.joyintech.tams.cfets.trdquery.service.CfetsTrdFirstBondInvestTrade002Service;
 import com.joyintech.tams.cfets.trdquery.service.CfetsTrdQueryService;
 import com.joyintech.tams.cfets.trdquery.service.CfetsTrdRepoTrade002Service;
-import com.joyintech.tams.cfets.trdredeem.dto.CfetsTrdRedeemDealRegisterQuoteDto;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
-import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.component.business.settle.BussSettleOrderCommService;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.BussTrdTransferOrderBase;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
-import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
-import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
-import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeRevokeDto;
-import com.joyintech.tams.invest.trade.trdrepotrade.dto.TrdRepoTrade002Dto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -50,11 +43,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,11 +61,6 @@ public class CfetsTrdQueryController extends BaseController {
 
     @Autowired
     private CfetsTrdQueryService cfetsTrdQueryService;
-    /**
-     * 流程组件
-     */
-    @Autowired
-    private MstWorkflowCommonService mstWorkflowCommonService;
     @Autowired
     private CfetsTrdBondInvestTrade002Service cfetsTrdBondInvestTrade002Service;
     @Autowired
@@ -85,11 +71,10 @@ public class CfetsTrdQueryController extends BaseController {
      */
     @Autowired
     private BussSettleOrderCommService bussSettleOrderCommService;
-    /**
-     * 交易基础组件调用Service
-     */
+
     @Autowired
-    private TrdCommonBaseService trdCommonBaseService;
+    private CfetsTrdFirstBondInvestTrade002Service cfetsTrdFirstBondInvestTrade002Service;
+
 
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
@@ -136,27 +121,28 @@ public class CfetsTrdQueryController extends BaseController {
         //pageId
         initPageParams.put("bondPageId", "CfetsTrdBondInvestTrade002");
         initPageParams.put("repoPageId", "CfetsTrdRepoTrade002");
+        initPageParams.put("bidPageId", "CfetsTrdFirstBondInvestTrade002");
 
 
         //当前平台日
         initPageParams.put("platDate",DateUtil.platDateFromCache());
         //当前用户
         initPageParams.put("userId", SecurityUtil.getLoginUser().getUserName());
-        return new Message<Map<String, Object>>(initPageParams).success();
+        return new Message<>(initPageParams).success();
     }
+
+
     /**
      * 交易登记列表分页查询
      *
      * @param dto
      * @return Page<CfetsTrdConfirmRegInfoListResponse>
-     * @throws Exception Exception
      * @since 1.0
      */
     @ApiOperation(value = "交易登记列表分页查询", notes = "交易登记列表分页查询")
     @PostMapping("/queryAllRegInfoList")
     @ResponseBody
-    public Message<Page<CfetsTrdQueryRegInfoListResponse>> queryAllRegInfoList(@RequestBody CfetsTrdQueryRegInfoListRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdQueryRegInfoListResponse>> queryAllRegInfoList(@RequestBody CfetsTrdQueryRegInfoListRequest dto) {
         try {
             Page<CfetsTrdQueryRegInfoListResponse> page =cfetsTrdQueryService.queryAllRegInfoList(dto);
             return new Message<Page<CfetsTrdQueryRegInfoListResponse>>().success().setData(page);
@@ -165,19 +151,22 @@ public class CfetsTrdQueryController extends BaseController {
             return new Message<Page<CfetsTrdQueryRegInfoListResponse>>().fail().setMessage("查询交易登记列表分页数据异常");
         }
     }
+
+
+
     @ApiOperation(value = "只读表单设置及数据查询_登记信息查询", notes = "只读表单设置及数据查询_登记信息查询")
     @PostMapping("/findRegInfo/{pageCode}/{dtCode}/{spcdCode}")
     @ResponseBody
     public Message<Map<String,Object>> findRegInfo(@PathVariable("pageCode") String pageCode,
                                                             @PathVariable("dtCode") String dtCode,
                                                             @PathVariable("spcdCode") String spcdCode,
-                                                            @RequestBody CfetsTrdQueryRegInfoListResponse dto) throws Exception {
+                                                            @RequestBody CfetsTrdQueryRegInfoListResponse dto) {
         try {
             Map<String,Object> resultData = null;
             if (StringUtil.equals(dto.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())
-            || StringUtil.equals(dto.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())){
-                resultData = cfetsTrdQueryService.findRegBidInfo(pageCode,dtCode,dto.getBusiTypePosition(),dto);
-            }else {
+                    || StringUtil.equals(dto.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
+                resultData = cfetsTrdQueryService.findRegBidInfo(pageCode, dtCode, dto.getBusiTypePosition(), dto);
+            } else {
                 resultData = cfetsTrdQueryService.findRegInfo(pageCode, dtCode, spcdCode, dto);
             }
             return new Message<Map<String,Object>>().success().setData(resultData);
@@ -270,11 +259,11 @@ public class CfetsTrdQueryController extends BaseController {
     public Message<Map<String,Object>> findCstpInfo(@PathVariable("pageCode") String pageCode,
                                                    @PathVariable("dtCode") String dtCode,
                                                    @PathVariable("spcdCode") String spcdCode,
-                                                   @RequestBody CfetsTrdQueryCstpInfoListResponse dto) throws Exception {
+                                                   @RequestBody CfetsTrdQueryCstpInfoListResponse dto) {
         try {
             Map<String,Object> resultData = new HashMap<>();
-            if (StringUtil.equals(spcdCode, DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
-                resultData = cfetsTrdQueryService.findBidCstpInfo(pageCode,dtCode,spcdCode,dto);
+            if (StringUtil.equals(dto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())){
+                resultData = cfetsTrdQueryService.findBidCstpInfo(pageCode,dtCode,dto.getTgBusiType(),dto);
             }else{
                 resultData = cfetsTrdQueryService.findCstpInfo(pageCode,dtCode,spcdCode,dto);
             }
@@ -331,15 +320,13 @@ public class CfetsTrdQueryController extends BaseController {
      *
      * @param dto
      * @return Page<CfetsManualSettleTradeListRespond>
-     * @throws Exception Exception
      * @seeTrade
      * @since 1.0
      */
     @ApiOperation(value = "银行间交易明细分页查询", notes = "银行间交易明细分页查询")
     @PostMapping("/queryAllTradeDetailInfoList")
     @ResponseBody
-    public Message<Page<CfetsTrdQueryTradeInfoListResponse>> queryAllTradeDetailInfoList(@RequestBody CfetsTrdQueryTradeInfoListRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdQueryTradeInfoListResponse>> queryAllTradeDetailInfoList(@RequestBody CfetsTrdQueryTradeInfoListRequest dto) {
         try {
             Page<CfetsTrdQueryTradeInfoListResponse> page = cfetsTrdQueryService.queryAllTradeDetailInfoList(dto);
             return new Message<Page<CfetsTrdQueryTradeInfoListResponse>>().success().setData(page);
@@ -380,7 +367,7 @@ public class CfetsTrdQueryController extends BaseController {
     public Message<Map<String,Object>> findTradeDetailInfo(@PathVariable("pageCode") String pageCode,
                                                      @PathVariable("dtCode") String dtCode,
                                                      @PathVariable("spcdCode") String spcdCode,
-                                                     @RequestBody CfetsTrdQueryTradeInfoListResponse dto) throws Exception {
+                                                     @RequestBody CfetsTrdQueryTradeInfoListResponse dto) {
         try {
             Map<String, Object> resultData = new HashMap<>();
             if (DictCodeListExt4.投标方式_分销买入.getValue().equals(dto.getBidModle())
@@ -400,8 +387,7 @@ public class CfetsTrdQueryController extends BaseController {
     @ApiOperation(value = "交易撤销前check", notes = "交易撤销前check")
     @PostMapping("checkRevoke")
     @ResponseBody
-    public  Message<AjaxResult> checkRevoke(@RequestBody CfetsTrdQueryTradeInfoListResponse inputDto)
-          throws Exception {
+    public  Message<AjaxResult> checkRevoke(@RequestBody CfetsTrdQueryTradeInfoListResponse inputDto) {
             try {
                 AjaxResult ajax= cfetsTrdBondInvestTrade002Service.checkRevoke(inputDto);
                 if(null!=ajax){
@@ -417,7 +403,7 @@ public class CfetsTrdQueryController extends BaseController {
 
     /**
      * 撤销
-     * @param inputDto 画面输入参数dto
+     * @param input 画面输入参数dto
      * @return 撤销结果
      * @throws Exception
      * @see
@@ -428,9 +414,34 @@ public class CfetsTrdQueryController extends BaseController {
     @ResponseBody
     public Message<AjaxResult> doRevoke(@RequestBody CfetsTrdQueryTradeInfoListResponse input) throws WorkFlowException {
         List<CfetsTrdQueryTradeInfoListResponse> list=input.getSelectedItem();
-        String msg="";
-        for(CfetsTrdQueryTradeInfoListResponse item:list){
-            if(StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_债券.getValue())){
+        StringBuilder msg = new StringBuilder();
+        for (CfetsTrdQueryTradeInfoListResponse item : list) {
+            if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())
+                    && StringUtil.equals(item.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+                String totleTradeId = item.getTotleTradeId();
+                CfetsTrdFirstBondInvestTradeDto inputDto = cfetsTrdFirstBondInvestTrade002Service.getTrdFirstBondInvestTradeDto(totleTradeId);
+                inputDto.setWorkflowParameter(item.getWorkflowParameter());
+                inputDto.setOperateType(item.getOperateType());
+                inputDto.setRevokeReason(input.getRevokeReason());
+                inputDto.setTotleTradeId(totleTradeId + "R");
+
+                ProcessParameter<CfetsTrdFirstBondInvestTradeDto> processParameter = new ProcessParameter<>();
+                WorkFlowParameter<CfetsTrdFirstBondInvestTradeDto> workFlowParameter = new WorkFlowParameter<>();
+                processParameter.setWorkFlowParameter(workFlowParameter);
+                processParameter.setPageId("CfetsTrdFirstBondInvestTrade002");
+                processParameter.setOperationType(OperationType.REVOKE);
+
+                workFlowParameter.setPageId("CfetsTrdFirstBondInvestTrade002");
+                workFlowParameter.setElementId(this.getParam("elementId"));
+                workFlowParameter.setBusinessCode(CfetsTrdFirstBondInvestTradeDto::getTotleTradeId);
+                workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
+                workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
+                        "交易编号" + GlobalConstant.COLON + entity.getTotleTradeId(),
+                        "资产简称" + GlobalConstant.COLON + entity.getFinprodName(),
+                        "交易日期" + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
+
+                msg.append(cfetsTrdFirstBondInvestTrade002Service.start(processParameter, inputDto));
+            } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())) {
                 //债券
                 String operateType = item.getOperateType();
                 String totleTradeId = item.getTotleTradeId();
@@ -440,13 +451,13 @@ public class CfetsTrdQueryController extends BaseController {
                 inputDto.setTradeId(totleTradeId);
                 //add by  meifaxin 后面审批用到 end
                 String turnInvAim = cfetsTrdBondInvestTrade002Service.getReverseTradeDtoInvAim(inputDto.getTotleTradeId());
-                if(StringUtil.isNotEmpty(turnInvAim)) {
+                if (StringUtil.isNotEmpty(turnInvAim)) {
                     inputDto.setTurnInvAim(turnInvAim);
                 }
                 //划款指令
-                if (inputDto != null && StringUtil.isEmptyList(inputDto.getBussTrdTransferOrder())){
-                    List<BussTrdTransferOrderBase> orderDtolist = bussSettleOrderCommService.selectOrdersByBizCode(inputDto.getTotleTradeId()) ;
-                    if (!com.joyintech.framework.util.StringUtil.isEmptyList(orderDtolist)){
+                if (inputDto != null && StringUtil.isEmptyList(inputDto.getBussTrdTransferOrder())) {
+                    List<BussTrdTransferOrderBase> orderDtolist = bussSettleOrderCommService.selectOrdersByBizCode(inputDto.getTotleTradeId());
+                    if (!com.joyintech.framework.util.StringUtil.isEmptyList(orderDtolist)) {
                         List<BussTrdTransferOrderDto> bussTrdTransferOrderDtoList = new ArrayList<BussTrdTransferOrderDto>();
                         BussTrdTransferOrderDto bussTrdTransferOrderDto = new BussTrdTransferOrderDto();
                         BeanUtil.copyPropertiesIgnoreNull(bussTrdTransferOrderDto, orderDtolist.get(0));
@@ -454,7 +465,7 @@ public class CfetsTrdQueryController extends BaseController {
                         inputDto.setBussTrdTransferOrder(bussTrdTransferOrderDtoList);
                     }
                 }
-                if(StringUtil.equals(inputDto.getTradeMarketMode(), DictCodeListExt1.交易市场_一级市场.getValue())){
+                if (StringUtil.equals(inputDto.getTradeMarketMode(), DictCodeListExt1.交易市场_一级市场.getValue())) {
                     inputDto.setBondFirstSign("01");
                 }
                 inputDto.setRevokeReason(input.getRevokeReason());
@@ -470,20 +481,20 @@ public class CfetsTrdQueryController extends BaseController {
 
                 workFlowParameter.setPageId("CfetsTrdBondInvestTrade002");
                 workFlowParameter.setElementId(this.getParam("elementId"));
-                workFlowParameter.setBusinessCode((entity) -> entity.getTotleTradeId());
+                workFlowParameter.setBusinessCode(CfetsTrdBondInvestTradeDto::getTotleTradeId);
                 workFlowParameter.setBusinessType(DictCodeList.共通业务类型_债券类资产交易.getValue());
                 workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
                         getMessage("TrdBondInvestTrade002.tradeId") + GlobalConstant.COLON + entity.getTotleTradeId(),
                         getMessage("TrdBondInvestTrade002.finprodName") + GlobalConstant.COLON + entity.getFinprodName(),
                         getMessage("TrdBondInvestTrade002.tradeDate") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
 
-                msg += cfetsTrdBondInvestTrade002Service.start(processParameter, inputDto);
+                msg.append(cfetsTrdBondInvestTrade002Service.start(processParameter, inputDto));
 
-            }else if(StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
-                    || StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())){
+            } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
+                    || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())) {
                 //质押式回购
                 String totleTradeId = item.getTotleTradeId();
-                CfetsTrdRepoTrade002Dto inputDto =cfetsTrdRepoTrade002Service.getTrdRepoInvestTradeDto(item.getTotleTradeId());
+                CfetsTrdRepoTrade002Dto inputDto = cfetsTrdRepoTrade002Service.getTrdRepoInvestTradeDto(item.getTotleTradeId());
                 inputDto.setRevokeReason(input.getRevokeReason());
                 inputDto.setWorkflowParameter(item.getWorkflowParameter());
                 inputDto.setTotleTradeId(totleTradeId + "R");
@@ -495,18 +506,18 @@ public class CfetsTrdQueryController extends BaseController {
 
                 workFlowParameter.setPageId("CfetsTrdRepoTrade002");
                 workFlowParameter.setElementId(this.getParam("elementId"));
-                workFlowParameter.setBusinessCode((entity) -> entity.getTotleTradeId());
+                workFlowParameter.setBusinessCode(CfetsTrdRepoTrade002Dto::getTotleTradeId);
                 workFlowParameter.setBusinessType(DictCodeList.共通业务类型_质押式回购交易.getValue());
                 workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
                         getMessage("TrdRepoTrade002.tradeId") + GlobalConstant.OPEN_PARENTHESIS + entity.getTradeId() + GlobalConstant.CLOSE_PARENTHESIS,
-                        DictCodeListExt1.交易场所_银行间.getValue().equals(entity.getTradeMarket())?"":getMessage("TrdRepoTrade002.repoType") + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.回购类型, entity.getRepoType()) + GlobalConstant.CLOSE_PARENTHESIS,
+                        DictCodeListExt1.交易场所_银行间.getValue().equals(entity.getTradeMarket()) ? "" : getMessage("TrdRepoTrade002.repoType") + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.回购类型, entity.getRepoType()) + GlobalConstant.CLOSE_PARENTHESIS,
                         getMessage("TrdRepoTrade002.tradeDate") + GlobalConstant.OPEN_PARENTHESIS + DateUtil.format(entity.getTradeDate()) + GlobalConstant.CLOSE_PARENTHESIS));
 
-                msg += cfetsTrdRepoTrade002Service.start(processParameter, inputDto);
+                msg.append(cfetsTrdRepoTrade002Service.start(processParameter, inputDto));
             }
         }
         try {
-            AjaxResult m =new AjaxResult(msg);
+            AjaxResult m =new AjaxResult(msg.toString());
             return new Message<AjaxResult>().success().setData(m);
         }catch (Exception e) {
             logger.error("撤销交易失败",e);

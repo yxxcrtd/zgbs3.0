@@ -62,6 +62,10 @@ public class CfetsCommonOprHisHandlerAop {
     protected void doDispatcherDealPoint() {
     }
 
+    @Pointcut("execution(* com.joyintech.tams.cfets..*.*.revoke(..))")
+    protected void revoke() {
+    }
+
     /**
      * 提交及更新时更新细操作履历表
      */

@@ -13,9 +13,11 @@ import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,31 +55,49 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
      * @since 1.0
      */
     public void pushCommandMsg(Map<String, Object> param)  {
-        	EtrCommandDispatcherTotalDto dto = new EtrCommandDispatcherTotalDto();
-        	List<EtrCommandDispatcherDto> selectList = this.selectList(param);
-        	if(selectList != null && selectList.size() == 1){
-        		for(EtrCommandDispatcherDto etrCommandDispatcherDto : selectList){
-        			etrCommandDispatcherDto.setIsAutoReceive(DictCodeListExt1.是否_是.getValue());
-        		}
-        	}
-	    	if(selectList != null && selectList.size() > 0) {
-				for (EtrCommandDispatcherDto etrCommandDispatcherDto : selectList) {
-					if (!StringUtil.isNotEmpty(etrCommandDispatcherDto.getBusiTypeTg())
-							&& StringUtil.equals(etrCommandDispatcherDto.getPS(), DictCodeListExt3.交易方向_债转股.getValue())) {
-						etrCommandDispatcherDto.setBusiTypeTg(DictCodeListExt3.投管业务类型_债转股.getValue());
-					}
+		EtrCommandDispatcherTotalDto dto = new EtrCommandDispatcherTotalDto();
+		List<EtrCommandDispatcherDto> selectList = this.selectList(param);
+		if (selectList != null && selectList.size() == 1) {
+			for (EtrCommandDispatcherDto etrCommandDispatcherDto : selectList) {
+				etrCommandDispatcherDto.setIsAutoReceive(DictCodeListExt1.是否_是.getValue());
+			}
+		}
+		if (selectList != null && selectList.size() > 0) {
+			for (EtrCommandDispatcherDto etrCommandDispatcherDto : selectList) {
+				if (!StringUtil.isNotEmpty(etrCommandDispatcherDto.getBusiTypeTg())
+						&& StringUtil.equals(etrCommandDispatcherDto.getPS(), DictCodeListExt3.交易方向_债转股.getValue())) {
+					etrCommandDispatcherDto.setBusiTypeTg(DictCodeListExt3.投管业务类型_债转股.getValue());
 				}
 			}
-    		dto.setEtr_entrust_list(selectList);
-    		dto.setEtr_pledge_list(this.selectPledgeList(selectList));
-		    dto.setEtr_entrust_detail_list(selectEtrDetailList(param));
-    		if(selectList!=null && !selectList.isEmpty()) {
-    			dto.setAMOUNT(selectList.size());
-        		dto.setPageCount(1);
-        		//放弃使用mq推送消息,采用接口调用
-        		//messageSenderService.pushCommandMsgToMQ(dto);
-        		sendMessageByInf(dto);
-    		}
+		}
+		dto.setEtr_entrust_list(selectList);
+		dto.setEtr_pledge_list(this.selectPledgeList(selectList));
+		dto.setEtr_entrust_detail_list(selectEtrDetailList(param));
+
+		// ZGCPCN-1650 add 20220623
+		for (EtrCommandDispatcherDto entrCommandDispatcherDto : dto.getEtr_entrust_list()) {
+			boolean flag = true;
+			for (EtrEntrustDetailDto entrustDetailDto : dto.getEtr_entrust_detail_list()) {
+				if (entrustDetailDto.getEntrustId().equals(entrCommandDispatcherDto.getEntrustId())) {
+					flag = false;
+					break;
+				}
+			}
+			if (flag) {
+				EtrEntrustDetailDto entrustDetailDtoCopy = new EtrEntrustDetailDto();
+				entrustDetailDtoCopy.setDisRate(BigDecimal.ONE);
+				BeanUtils.copyProperties(entrCommandDispatcherDto, entrustDetailDtoCopy);
+				dto.getEtr_entrust_detail_list().add(entrustDetailDtoCopy);
+			}
+		}
+
+		if (selectList != null && !selectList.isEmpty()) {
+			dto.setAMOUNT(selectList.size());
+			dto.setPageCount(1);
+			//放弃使用mq推送消息,采用接口调用
+			//messageSenderService.pushCommandMsgToMQ(dto);
+			sendMessageByInf(dto);
+		}
      }
 
 	/**

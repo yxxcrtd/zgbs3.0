@@ -26,6 +26,7 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
     /**
      * 金融产品代码
      */
+    @PrimaryKey(PrimaryKey.Field.PK_1)
     @ApiModelProperty(name="finprodId",value="金融产品代码")
     private String finprodId;
 
@@ -234,7 +235,6 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
      */
     @ApiModelProperty(name="isRight",value="是否含权")
     private String isRight;
-
     /**
      * 本金收益特征
      */
@@ -1148,7 +1148,6 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
      * 市场代码
      * {@inheritDoc}
      */
-    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getFinprodMarketId(){
         return this.finprodMarketId;
     }
@@ -1264,4 +1263,5 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
     public void setCirculationDate(Date circulationDate) {
         this.circulationDate = circulationDate;
     }
+
 }

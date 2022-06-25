@@ -44,6 +44,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.现金流类型_中间还本;
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.现金流类型_到期还本;
+
 /**
  * 利率调整 〈功能详细描述〉
  *
@@ -343,6 +346,9 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
                 finCashPlanMapper.deleteByPrimaryKey(key);
             });
             dto.getFinCashPlanList().forEach(entity->{
+                if(!StringUtil.equals(entity.getCashType(),现金流类型_到期还本.getValue()) && !StringUtil.equals(entity.getCashType(),现金流类型_中间还本.getValue())) {
+                    entity.setCashAmt(entity.getIntAmt());
+                }
                 finCashPlanMapper.insert(entity);
             });
         }

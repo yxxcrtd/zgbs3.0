@@ -280,6 +280,7 @@ public class ExchangeTransMatch001Service extends CommonExportService<ExchangeTr
         if(unFinishMatchNum == 0){
             Map<String, Object> param = new HashMap<>();
             param.put("beanNames", Collections.singletonList("stlDownDurationDataGatherTask"));
+            param.put("execDate", DateUtil.format(exchangeTransMatchCommonDto.getTradeDate(), "yyyy-MM-dd"));
             logger.debug("当日无未完全成交匹配数据,启动存续期交易生成批处理任务,日期:" + DateUtil.format(exchangeTransMatchCommonDto.getTradeDate()));
             batchManualExcuteService.execute(param);
         }

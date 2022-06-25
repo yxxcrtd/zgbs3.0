@@ -4,6 +4,7 @@
      * 是否可编辑
      */
     var editFlag = true;
+    var riskFlag = 0;//风险试算标识，提交前需要点击风险试算
     var rskApproval;
 
     var el = function (ele) {
@@ -373,6 +374,7 @@
         }
         object.workflowId = workflowId;
         object.rskApproval = rskApproval;
+        object.riskTrialRetDto = entity_RiskTrialRetList;
         return object;
     }
 
@@ -451,26 +453,10 @@
             Joyin.error("组合分配信息,请填写完整")
             return false;
         }
-        var obj = getSubmitParam("submit");
-        //风险校验
-        var riskFlag = false;
-        $.ajax({
-            type: "POST",
-            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond',
-            dataType: "json",
-            contentType: "application/json",
-            async: false,
-            data: JSON.stringify(obj),
-            success: function (result) {
-                console.log(result);//只记录不影响提交
-                if(result.code === '200') {
-                    riskFlag = true;
-                }
-            }
-        });
-      /*  if(!riskFlag) {
+        if(riskFlag === 0) {
+            Joyin.error("请先进行风险试算")
             return false;
-        }*/
+        }
         var obj = getSubmitParam("submit");
         var errorMsg = "";
         var confirmMsg = "";
@@ -482,6 +468,8 @@
            }
             if(result.data && result.data.message && result.data.messageType === 'confirm') {
                 confirmMsg = result.data.message;
+                rskApproval = result.data.data;
+
             }
         },false)
         if(errorMsg && errorMsg.length > 0) {
@@ -490,7 +478,6 @@
         }
 
         if(confirmMsg && confirmMsg.length > 0) {
-            rskApproval = result.data.data;
             return Joyin.confirm(confirmMsg, function (){
                 saveOrSubmitAction('submit');
             });
@@ -700,10 +687,19 @@
     $('#IbuQuoteBond004_btn_riskcal').click(function () {
         var object = $.serializeToObject('#submitForm');
         var param = JSON.parse(JSON.stringify(object));
-        param.ptlAllocations = param.cfetsBondDealDialogueQuoteDtoList;
+        param.ptlAllocatios = param.cfetsBondDealDialogueQuoteDtoList;
+        if ( param.ptlAllocatios) {
+            $.each(param.ptlAllocatios, function (index, obj) {
+                obj.shareAmt = JoyinMath.doMul(obj.shareAmt, 10000);
+                obj.avaNum = JoyinMath.doMul(obj.avaNum, 10000);
+                obj.avaNumOld = JoyinMath.doMul(obj.avaNumOld, 10000);
+                obj.ourEntNum = JoyinMath.doMul(obj.ourEntNum, 10000);
+                obj.lendinEntNum = JoyinMath.doMul(obj.lendinEntNum, 10000);
+            });
+        }
         $.ajax({
             type: "POST",
-            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond',
+            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond004',
             dataType: "json",
             contentType: "application/json",
             async: false,
@@ -726,6 +722,7 @@
                 }else if(result.message){
                     Joyin.error(result.message);
                 }
+                riskFlag = 1;
             }
         });
     });

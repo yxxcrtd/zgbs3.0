@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.framework.JoyinRestTemplate;
+import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
+import com.joyintech.tams.common.base.entity.FinProductType;
+import com.joyintech.tams.common.base.entity.FinProductTypeKey;
+import com.joyintech.tams.common.base.entity.SettleTransData;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +57,9 @@ public class StlDataDealProcessCommonService {
 	
 	@Autowired
     protected TrdFeeCalcService trdFeeCalcService;
+
+	@Autowired(required = false)
+	private FinProductTypeMapper finProductTypeMapper;
 
 	@Autowired(required = false)
 	private JoyinRestTemplate restTemplate;
@@ -465,19 +472,24 @@ public class StlDataDealProcessCommonService {
 				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_经手费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setJsfAmt(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_过户费.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_过户费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setGhfAmt(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_证管费.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_证管费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setZgfAmt(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_交易手续费.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_交易手续费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setSxfAmt(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_结算费.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_结算费.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setSettleFee(null);
 				}
-				else if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_印花税.getValue())){
+				// else
+				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_印花税.getValue())){
 					stlDownDataDealWriteBaseDto.getSettleTransData().setStampFee(null);
 				}
 			}
@@ -548,5 +560,20 @@ public class StlDataDealProcessCommonService {
 		else {
 			return restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME  + "/TrdBondInvestTrade/getUnitPrice", parameters, BigDecimal.class);
 		}
+	}
+
+	/**
+	 * 根据金融产品代码查询FIN_PRODUCT_TYPE.TYPE_6 -- 投管一级类型
+	 */
+	public String getFinProductTypeType6(SettleTransData settleTransData) {
+		FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
+		finProductTypeKey.setBranch(0L);
+		finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
+
+		FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+		if (null == finProductType) {
+			return "";
+		}
+		return finProductType.getType6();
 	}
 }

@@ -205,6 +205,7 @@ public class CfetsTrdConfirmService extends BaseService{
         if(StringUtil.isNotEmpty(counterId)){
             pageParam.put("counterIdList", StringUtil.splitToList(GlobalConstant.COMMA,counterId));
         }
+        pageParam.put("ISSUE_STATUS_01", DictCodeListExt1.发行状态_发行失败.getValue());
       /*  if (StringUtil.equals(dto.getSettleSpeed(),
                 DictCodeList.清算速度_T_0.getValue())) {
             pageParam.put("settleSpeed","0");
@@ -673,6 +674,7 @@ public class CfetsTrdConfirmService extends BaseService{
         //根据汇总交易编号查询登记数据
         CfetsTrdConfirmRegInfoListResponse dtoReg=cfetsTrdConfirmMapper.selectRegInfoByKey(totleTradeId);
         CfetsTrdBondInvestTradeDto entity=new CfetsTrdBondInvestTradeDto();
+        entity.setTradeDate(iPlatformDate.getSysDate());
         entity.setRegIbuId(totleTradeId);
         BeanUtil.copyPropertiesIgnoreNull(entity,dtoReg);
         if (baseGetBusinessId != null) {
@@ -807,6 +809,7 @@ public class CfetsTrdConfirmService extends BaseService{
         for(CfetsRegFinProductDealDto regDeal:regDealList){
             TrdProductDeal deal = new TrdProductDeal();
             BeanUtil.copyPropertiesIgnoreNull(deal, regDeal);
+            deal.setTradeDate(iPlatformDate.getSysDate());
             deal.setTradeId(baseGetBusinessId.buildBussinessCode(getBussinessCodeParameter(deal.getPs())));
             // 交易本金 = 画面.净价总额
             deal.setPrinAmt(regDeal.getCpriceAmt());
@@ -847,17 +850,15 @@ public class CfetsTrdConfirmService extends BaseService{
             trdTradeFeeDetails.addAll(生成交易费用明细数据(regDeal.getTradeId(),deal.getTradeId()));
 
             //风险数据
-            if(StringUtil.equals(genType,DictCodeListExt1.生成方式_画面录入.getValue())){
-                CfetsTrdBondInvestTradeDto dto=new CfetsTrdBondInvestTradeDto();
-                BeanUtil.copyPropertiesIgnoreNull(dto,entity);
-                dto.setPortfolioId(regDeal.getPortfolioId());
-                dto.setTradeAmt(regDeal.getTradeAmt());
-                dto.setCpriceAmt(regDeal.getCpriceAmt());
-                dto.setFpriceAmt(regDeal.getFpriceAmt());
-                dto.setEntrustId(regDeal.getEntrustId());
-                dto.setTotleTradeId(deal.getTradeId());
-                dtoList.add(dto);
-            }
+            CfetsTrdBondInvestTradeDto dto=new CfetsTrdBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(dto,entity);
+            dto.setPortfolioId(regDeal.getPortfolioId());
+            dto.setTradeAmt(regDeal.getTradeAmt());
+            dto.setCpriceAmt(regDeal.getCpriceAmt());
+            dto.setFpriceAmt(regDeal.getFpriceAmt());
+            dto.setEntrustId(regDeal.getEntrustId());
+            dto.setTotleTradeId(deal.getTradeId());
+            dtoList.add(dto);
         }
 
         entity.setPtlTrade(ptlTrades);
@@ -1103,6 +1104,7 @@ public class CfetsTrdConfirmService extends BaseService{
         List<TrdProductDeal> deals = new ArrayList<>();
         entity.setTrdProductDeals(deals);
 
+        List<CfetsTrdBondInvestTradeDto> dtoList = new ArrayList<>();
         //根据报价编号查询所有报价记明细
         List<CfetsRegFinProductDealDto>  regDealList=cfetsTrdConfirmMapper.findAllIbuDealList(dtoReg.getTotleTradeId());
         for(CfetsRegFinProductDealDto regDeal:regDealList){
@@ -1163,12 +1165,22 @@ public class CfetsTrdConfirmService extends BaseService{
             生成交易扩展表(regDeal, deal.getTradeId(), paTrdProductDeals);
 
             trdTradeFeeDetails.addAll(生成交易Ibu费用明细数据(regDeal,deal.getTradeId()));
+            //风险数据
+            CfetsTrdBondInvestTradeDto dto=new CfetsTrdBondInvestTradeDto();
+            BeanUtil.copyPropertiesIgnoreNull(dto,entity);
+            dto.setPortfolioId(regDeal.getPortfolioId());
+            dto.setTradeAmt(regDeal.getTradeAmt());
+            dto.setCpriceAmt(regDeal.getCpriceAmt());
+            dto.setFpriceAmt(regDeal.getFpriceAmt());
+            dto.setEntrustId(regDeal.getEntrustId());
+            dto.setTotleTradeId(deal.getTradeId());
+            dtoList.add(dto);
 
         }
 
         entity.setPtlTrade(ptlTrades);
         // 组合交易表Entity 构造结束----------------------------------------------------------
-
+        entity.setDtoList(dtoList);
 
         // =====================划款指令信息=====================
         List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();
@@ -3292,12 +3304,12 @@ public class CfetsTrdConfirmService extends BaseService{
     }
 
     /**
-     * 一级申购自动匹配
-     * 匹配要素：
-     * 一级申购
-     * 基础要素：成交日期、资产代码、交易场所、本方、认购量、成交价
-     * 可选要素：本方交易员、应缴款金额
-     * 当存在多条可匹配数据时，按时间优先的方案匹配
+     * <p>一级申购自动匹配
+     * <p>匹配要素：
+     * <p>一级申购
+     * <p>基础要素：成交日期、资产代码、交易场所、本方、认购量、成交价
+     * <p>可选要素：本方交易员、应缴款金额
+     * <p>当存在多条可匹配数据时，按时间优先的方案匹配
      *
      * @param interfTradSecdeal
      * @param iCstpTrade

@@ -138,6 +138,9 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
     @ApiModelProperty(name="counterName",value="交易对手名称",example="A1")
     private String counterName;
 
+
+    private String rskApproval;
+
     public String getElementId() {
         return elementId;
     }
@@ -296,5 +299,13 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
 
     public void setIsModify(String isModify) {
         this.isModify = isModify;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
     }
 }

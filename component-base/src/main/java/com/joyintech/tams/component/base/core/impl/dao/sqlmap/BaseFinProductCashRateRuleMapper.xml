@@ -104,7 +104,7 @@
             BENCHMARK_TYPE, FINPROD_ID, BRANCH, 
             FINPROD_TYPE, FINPROD_TYPE2, REMARK, 
             CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-            UPDATE_USER, UPDATE_TIME,FIRST_CONFIRM_DATE)
+            UPDATE_USER, UPDATE_TIME,FIRST_CONFIRM_DATE,BENCHMARK_ID_ACCURACY)
         values (#{cashId,jdbcType=VARCHAR}, 
 	        #{effDate,jdbcType=DATE}, 
 	        <!-- 一体化对应etliu start -->
@@ -141,7 +141,8 @@
             #{createTime,jdbcType=TIMESTAMP}, 
             #{updateUser,jdbcType=VARCHAR}, 
             #{updateTime,jdbcType=TIMESTAMP},
-            #{firstConfirmDate,jdbcType=DATE})
+            #{firstConfirmDate,jdbcType=DATE}
+            #{benchmarkIdAccuracy,jdbcType=DECIMAL})
     </insert>
 
 </mapper>

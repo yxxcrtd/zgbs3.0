@@ -105,40 +105,40 @@
         </trim>
     </insert>
     <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
-
-     delete from MST_CREDIT_MARKET_INFO
+        delete
+        from MST_CREDIT_MARKET_INFO
         where SECID = #{secid,jdbcType=VARCHAR}
           and CDATE = #{cdate,jdbcType=VARCHAR}
-          and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
-
     </delete>
 
 
     <select id="queryForPage"
             resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" parameterType="Map">
-         SELECT
-            m.SECID secid,
-            f.FINPROD_ABBR finprodAbbr,
-            m.VALUE_SOURCE,
-            sdl1.item_value valueSourceStr,
-            m.CDATE cdate,
-            m.MDPRICE mdprice,
-            m.MCPRICE mcprice,
-            m.MINT mint,
-            m.MYIELD*100 myield,
-            m.M_MDURATION mMduration,
-            m.M_CNVXTY mCnvxty,
-            m.ISSUE_MARKET_NUM issueMarketNum,
-            m.CREDIT_TYPE creditType,
-            sdl2.item_value creditTypeStr
-         FROM
-             MST_CREDIT_MARKET_INFO		m
-         LEFT JOIN
-             FIN_PRODUCT		f
-         ON	 f.FINPROD_MARKET_ID=m.SECID
-         LEFT JOIN
-             INTERF_CREDITINFO	i
-         ON	 i.SECID = m.SECID
+        select * from (
+        SELECT
+        m.SECID secid,
+        f.FINPROD_ABBR finprodAbbr,
+        m.VALUE_SOURCE valueSource,
+        sdl1.item_value valueSourceStr,
+<!--         m.CDATE cdate, ,-->
+        to_char(m.CDATE,'yyyy-mm-dd') cdate,
+        m.MDPRICE mdprice,
+        m.MCPRICE mcprice,
+        m.MINT mint,
+        m.MYIELD*100 myield,
+        m.M_MDURATION mMduration,
+        m.M_CNVXTY mCnvxty,
+        m.ISSUE_MARKET_NUM issueMarketNum,
+        m.CREDIT_TYPE creditType,
+        sdl2.item_value creditTypeStr
+        FROM
+        MST_CREDIT_MARKET_INFO m
+        LEFT JOIN
+        FIN_PRODUCT f
+        ON f.FINPROD_MARKET_ID=m.SECID
+        LEFT JOIN
+        INTERF_CREDITINFO i
+        ON i.SECID = m.SECID
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='VALUATION_SOURCE' and sdl1.item_code = m.VALUE_SOURCE
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='PROTECTION_CREDIT_TYPE' and sdl2.item_code = m.CREDIT_TYPE
         <where>
@@ -153,15 +153,24 @@
                 AND m.VALUE_SOURCE = #{valueSource}
             </if>
             <if test="cdateStart != null and cdateStart != ''">
-                <![CDATA[AND  m.cdate >= #{cdateStart,jdbcType=VARCHAR} ]]>
+                <!--[CDATA[AND  m.cdate >= #{cdateStart,jdbcType=VARCHAR} ]]-->
+                and m.cdate &gt; to_date(#{cdateStart}, 'yyyy-MM-dd')
             </if>
             <if test="cdateEnd != null and cdateEnd != ''">
-                <![CDATA[AND  m.cdate <= #{cdateEnd,jdbcType=VARCHAR}]]>
+                <!--[CDATA[AND  m.cdate <= #{cdateEnd,jdbcType=VARCHAR}]]-->
+                and m.cdate &lt; to_date(#{cdateEnd}, 'yyyy-MM-dd')
+
             </if>
-            <include refid="vagueQueryWhere"></include>
         </where>
-        ORDER BY
-          m.SECID
+        ) T
+        <include refid="vagueQueryWhere"></include>
+        <!--前端传入排序字段-->
+        <if test="pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+            order by T.${pageMode.sort} ${pageMode.direction}
+        </if>
+        <if test="pageMode.sort == null or pageMode.sort == '' or pageMode.direction == null or pageMode.direction == ''">
+            order by T.secid
+        </if>
     </select>
     <select id="select"
             resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" parameterType="Map">
@@ -214,17 +223,22 @@
 
     <sql id="vagueQueryWhere">
         <if test="search != null and search != '' ">
-            AND  (
-            sdl1.ITEM_VALUE like '%' || #{search} || '%'
-            or sdl2.ITEM_VALUE like '%' || #{search} || '%'
-            OR m.SECID like '%' || #{search} || '%'
-            OR m.CREDIT_TYPE like '%' || #{search} || '%'
+            WHERE  (
+            T.secid like '%' || #{search} || '%'
+            or T.finprodAbbr like '%' || #{search} || '%'
+            OR T.valueSource like '%' || #{search} || '%'
+            OR T.valueSourceStr like '%' || #{search} || '%'
+            OR T.creditType like '%' || #{search} || '%'
+            OR T.creditTypeStr like '%' || #{search} || '%'
+            OR T.cdate ||''= #{search}
             <if test="search_isNumberFlag != null and search_isNumberFlag == true">
-            or (m.MYIELD*100 = #{search})
-            or (m.MCPRICE = #{search})
-            or (m.MINT = #{search})
-            or (m.M_MDURATION = #{search})
-            or (m.M_CNVXTY = #{search})
+                or (round(T.mdprice) = ROUND(#{search}))
+                or (round(T.mcprice) = ROUND(#{search}))
+                or (round(T.mint) = ROUND(#{search}))
+                or (round(T.myield*100) = ROUND(#{search}))
+                or (round(T.mMduration) = ROUND(#{search}))
+                or (round(T.mCnvxty) = ROUND(#{search}))
+                or (round(T.mCnvxty) = ROUND(#{search}))
             </if>
             )
         </if>
@@ -257,8 +271,9 @@
         m.SECID=#{secId,jdbcType=VARCHAR}
         AND
         m.CDATE=#{valueDate,jdbcType=VARCHAR}
-        AND
-        m.VALUE_SOURCE=#{valueSource,jdbcType=VARCHAR}
+        <if test="valueSource != null and valueSource !=''">
+            and m.VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
+        </if>
         <if test="mdprice != null and mdprice !=''">
             and m.MDPRICE = #{mdprice,jdbcType=VARCHAR}
         </if>
@@ -300,6 +315,14 @@
         order by pm.create_time desc
     </select>
 
+    <select id="getPrice" parameterType="Map" resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+        SELECT
+            max( MDPRICE ) MDPRICE
+        FROM
+            MST_CREDIT_MARKET_INFO
+        WHERE
+            SECID=#{secid,jdbcType=VARCHAR} and CDATE &lt;= #{nowDate,jdbcType=VARCHAR}
+    </select>
 
     <select id="getBasicInfo" parameterType="Map" resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
              SELECT
@@ -324,7 +347,7 @@
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
         WHERE
-        m.SECID=#{secid,jdbcType=VARCHAR}
+        m.SECID=#{secid,jdbcType=VARCHAR} and m.CDATE = #{cdate,jdbcType=VARCHAR}
     </select>
 
     <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
@@ -391,10 +414,12 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="valueSource != null">
+                VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR},
+            </if>
         </set>
         where SECID = #{secid,jdbcType=VARCHAR}
         and CDATE = #{cdate,jdbcType=VARCHAR}
-        and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
     </update>
 
 </mapper>

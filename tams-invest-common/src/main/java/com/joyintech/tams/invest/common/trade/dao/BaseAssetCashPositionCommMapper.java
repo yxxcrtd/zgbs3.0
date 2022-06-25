@@ -5,16 +5,15 @@
 
 package com.joyintech.tams.invest.common.trade.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import com.joyintech.tams.common.base.entity.PtlCashPositionFlow;
-import com.joyintech.tams.common.base.entity.PtlSecPositionFlow;
-import com.joyintech.tams.common.base.entity.WflTrdProductDealAdd;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
@@ -123,4 +122,21 @@ public interface BaseAssetCashPositionCommMapper {
      * @return
      */
     List<TrdProductDeal> selectTrdProductDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+
+
+    /**
+     * 根据金融产品代码查询流水
+     *
+     * @param finprodId
+     * @return
+     */
+    List<PtlSecPositionFlow> selectByFinproductId(@Param("finprodId") String finprodId);
+
+
+    /**
+     * 查询持仓余额
+     * @param finprodId
+     * @return
+     */
+    List<PtlSecPosition> selectPositionByFinproductId(@Param("finprodId") String finprodId, @Param("cdate") String cdate);
 }

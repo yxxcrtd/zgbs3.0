@@ -22,6 +22,7 @@ import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.common.vo.EntrustVo;
 import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
@@ -268,6 +269,14 @@ public class EntrustManagement extends BaseService {
                 entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setFrozenVolumeView(BigDecimal.valueOf(entrust.getFrozenVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setCancelVolumeView(BigDecimal.valueOf(entrust.getCancelVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+            } else if (投管业务类型_信用保护凭证.getValue().equals(entrust.getBusiTypeTg())) {
+                entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                //成交编号 借用reportNo字段
+                String extend2 = entrust.getExtend2();
+                if (StringUtil.isNotEmpty(extend2) && extend2.contains("brokerTradeId")) {
+                    Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
+                    entrust.setReportNo((String)map.get("brokerTradeId"));
+                }
             }
 
             entrusts.add(entrust);

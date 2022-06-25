@@ -16,7 +16,8 @@
         PORTFOLIO_NAME prodName
         from PTL_PORTFOLIO
         where
-        1 = 1
+        /**不是委外组合**/
+        PORTFOLIO_TYPE != '02'
         <if test="prodGroupSeqNos != null">
             AND PORTFOLIO_ID IN
             <foreach collection="prodGroupSeqNos" item="item" open="( " close=" )" separator=",">

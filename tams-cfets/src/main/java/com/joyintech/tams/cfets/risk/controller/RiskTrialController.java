@@ -39,7 +39,7 @@ public class RiskTrialController {
     @PostMapping("/doRiskcal/{pageId}")
     public Message<AjaxResult> doRiskcal(@RequestBody Map<String, Object> param, @PathVariable("pageId") String pageId) {
         try {
-            RiskCommonOutputDto outputDto = paramSerivce.buildParamThenRisk(param, 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), pageId);
+            RiskCommonOutputDto outputDto = paramSerivce.buildParamThenRisk(param, 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), pageId,null);
             CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
             result.setRiskMathFlag("02");
             AjaxResult m = new AjaxResult();
@@ -63,12 +63,27 @@ public class RiskTrialController {
             } else {//没有试算结果时默认也给通过，针对没有配置指标试算的场景
                 result.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
                 result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
+                m.setData(result);
                 return new Message<AjaxResult>().success().setData(m);
             }
         } catch (Exception e) {
             logger.error("风险试算异常", e);
             return new Message<AjaxResult>().fail().setMessage("风险试算异常");
         }
+    }
 
+    @ApiOperation(value = "风险占用", notes = "风险占用")
+    @PostMapping("/doOccupy/{pageId}/{decisionAct}/{flowStatus}")
+    public Message<AjaxResult> doOccupy(@RequestBody Map<String, Object> param,
+                                        @PathVariable("pageId") String pageId,
+                                        @PathVariable("decisionAct") String decisionAct,
+                                        @PathVariable("flowStatus") String flowStatus) {
+        try {
+            paramSerivce.buildParamThenOccupy(param, decisionAct, flowStatus, pageId);
+            return new Message<AjaxResult>().success();
+        } catch (Exception e) {
+            logger.error("风险占用更新异常", e);
+            return new Message<AjaxResult>().fail().setMessage("风险占用更新异常");
+        }
     }
 }

@@ -72,7 +72,9 @@ public interface CfetsPrimaryBidManageMapper {
 
 	List<TrdProductDeal> queryTrdProductDealByTotleTradeId(@Param("tradeId") String tradeId);
 
-	List<StlOrders> queryStlPayOrdersByTradeId(@Param("tradeId") String tradeId);
+	List<StlPayOrders> queryStlPayOrdersByTradeId(@Param("tradeId") String tradeId);
+
+	List<StlOrders> queryStlOrdersByTradeId(@Param("tradeId") String tradeId);
 
 	List<PtlTrade> queryPtlTradeByTradeId(@Param("tradeId") String tradeId);
 
@@ -85,4 +87,6 @@ public interface CfetsPrimaryBidManageMapper {
 	 * @return
 	 */
 	String selectSecAcctSource(Map<String, Object> param);
+
+	int updateBidOrder(@Param("bidId") String bidId);
 }

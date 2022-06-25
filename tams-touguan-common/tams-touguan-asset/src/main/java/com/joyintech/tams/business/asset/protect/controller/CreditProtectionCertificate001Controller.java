@@ -7,18 +7,21 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateInsertRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateRequest;
 import com.joyintech.tams.business.asset.protect.service.CreditProtectionCertificate001Service;
+import com.joyintech.tams.business.asset.protect.service.CreditProtectionCertificate002Service;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -32,10 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 信用保护凭证标的
@@ -58,6 +58,9 @@ public class CreditProtectionCertificate001Controller extends BaseController {
 
     @Autowired
     private CreditProtectionCertificate001Service creditProtectionCertificate001Service;
+
+    @Autowired
+    private CreditProtectionCertificate002Service creditProtectionCertificate002Service;
 
     @ResponseBody
     @PostMapping("/getPageParams")
@@ -88,6 +91,8 @@ public class CreditProtectionCertificate001Controller extends BaseController {
         initPageParams.put("PAY_TYPE", this.getSelectDataFromDataDic(DictCode.支付方式, null));
         initPageParams.put("MARKET_INSTI_TYPE_SCA", this.getSelectDataFromDataDic(DictCode.市场机构机构类型, null));
         initPageParams.put("BASIS", this.getSelectDataFromDataDic(DictCode.计息基础, null));
+        //刷新时间
+        initPageParams.put("CreditProtectionCertificate001_list_refresh_period", CacheUtil.getSysParam("CreditProtectionCertificate001_list_refresh_period"));
         //交易日历
 
         //pageId
@@ -169,11 +174,27 @@ public class CreditProtectionCertificate001Controller extends BaseController {
                 parameter.setPageId("CreditProtectionCertificate002");
                 parameter.setBusinessDataPk1(entity.getFinprodMarketId());
                 if (creditProtectionCertificate001Service.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可删除!")));
+                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
+                Integer count = creditProtectionCertificate002Service.checkAssertOnDealed(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue() + "_"+ entity.getFinprodMarketId());
+                if (Objects.nonNull(count) && count > 0) {
+                    errorList.add(new ValidMessage("", getMessage("仅支持对无交易记录的信用保护凭证标的进行删除")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
+                //复原流程中得数据 判定 - add wsz 20220620
+                Integer counts = creditProtectionCertificate001Service.countFinprodIdUse(entity.getFinprodMarketId());
+                if (Objects.nonNull(counts) && counts > 0) {
+                    errorList.add(new ValidMessage("", getMessage("所选对象存在流程中的数据！")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
+
             }
         }
         AjaxResult ajaxResult = commonCheck(result, "revoke");

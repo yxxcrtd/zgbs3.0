@@ -122,9 +122,6 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
-            <if test="isExistNew != null" >
-                is_Exist_New,
-            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="portfolioId != null" >
@@ -174,9 +171,6 @@
             </if>
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="isExistNew != null" >
-                #{isExistNew,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

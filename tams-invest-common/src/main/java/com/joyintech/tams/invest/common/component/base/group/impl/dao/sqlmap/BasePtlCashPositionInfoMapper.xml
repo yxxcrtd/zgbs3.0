@@ -230,9 +230,6 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="isExistNew != null" >
-                is_Exist_New = #{isExistNew,jdbcType=VARCHAR},
-            </if>
         </set>
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
         and ACCT_ID = #{acctId,jdbcType=VARCHAR}

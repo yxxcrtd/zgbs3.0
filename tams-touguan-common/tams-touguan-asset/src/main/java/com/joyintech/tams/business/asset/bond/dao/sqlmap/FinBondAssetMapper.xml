@@ -312,8 +312,8 @@
             T5.REDEEM_PRICE REDEEM_PRICE,
             T5.CON_VDATE CON_VDATE,
             T1.COUPON_SPECIES COUPON_SPECIES,
-            T12.CALC_TYPE CALC_TYPE,
-            T12.YIELD YIELD,
+            T16.INT_TYPE CALC_TYPE,
+            T16.RATE YIELD,
             T16.BENCHMARK_ID_ACCURACY BENCHMARK_ID_ACCURACY,
             T16.BENCHMARK_ID basicRate,
             T16.COEFFICIENT coefficient,
@@ -324,8 +324,8 @@
             T16.OBSERVE_BEF_DAY observeBefDay,
             T16.OBSERVE_BEF_UNIT observeBefUnit,
             T16.FIRST_CONFIRM_DATE firstConfirmDate,
-            T12.BASIS BASIS,
-            T12.MARKET_BASIS MARKET_BASIS,
+            T16.BASIS BASIS,
+            T16.BASIS MARKET_BASIS,
             T1.REMARK REMARK,
             NVL(T4.CIRCULATION_DATE,T7.LISTING_DATE)  listingDate,
             T10.CASH_ID interestCashId,
@@ -1094,7 +1094,7 @@
     </select>
 
     <select id="getSearchTabInfoQueryOperate" resultType="com.joyintech.tams.business.asset.bond.dto.SearchInfoOperateListResponse">
-        SELECT distinct row_number() over( order by ORDER_TIME) SEQ_NO,t.* from (select
+        SELECT distinct row_number() over( order by ORDER_TIME desc) SEQ_NO,t.* from (select
                his.ENTRUST_ID,
                FP.FINPROD_ABBR,
                his.OPER_TYPE,
@@ -1240,26 +1240,31 @@
 
     <select id="getCustomer" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT
-        CUSTOMER_ID id,
-        CUSTOMER_NAME text
-        FROM MST_CUSTOMER_INFO
+        i.CUSTOMER_ID id,
+        i.CUSTOMER_NAME text
+        FROM MST_CUSTOMER_INFO i
+        LEFT JOIN MST_CUSTOMER_INFO_ADD a on i.CUSTOMER_ID=a.CUSTOMER_ID
         <where>
             <if test="search != null and search != ''">
                 (
-                CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 OR
-                CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 OR
-                CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                OR
+                a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 )
             </if>
             <if test="initValue != null and initValue != ''">
                 (
-                CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                 OR
-                CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                 OR
-                CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                OR
+                a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{initValue,jdbcType=VARCHAR}, '%'))
                 )
             </if>
             <if test="IS_ISSUER != null and IS_ISSUER != ''">
