@@ -467,8 +467,6 @@ public class FinProductAdd extends BaseEntity {
      */
     private String isAllowOverwrite;
 
-    private String isInformationCoverage;
-
     /**
      * 原摘牌日
      */
@@ -2019,14 +2017,6 @@ public class FinProductAdd extends BaseEntity {
      */
     public void setIsAllowOverwrite(String isAllowOverwrite) {
         this.isAllowOverwrite = isAllowOverwrite;
-    }
-
-    public String getIsInformationCoverage() {
-        return isInformationCoverage;
-    }
-
-    public void setIsInformationCoverage(String isInformationCoverage) {
-        this.isInformationCoverage = isInformationCoverage;
     }
 
     /**
