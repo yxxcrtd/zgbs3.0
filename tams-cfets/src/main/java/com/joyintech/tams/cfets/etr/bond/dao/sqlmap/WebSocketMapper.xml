@@ -135,5 +135,10 @@
             </otherwise>
         </choose>
     </update>
+
+    <select id="selectSysParaByCode" parameterType="java.util.Map"
+            resultType="java.lang.String">
+        SELECT PARAM_VALUE FROM SYS_PARA WHERE PARA_CODE = #{paraCode}
+    </select>
     
 </mapper>
