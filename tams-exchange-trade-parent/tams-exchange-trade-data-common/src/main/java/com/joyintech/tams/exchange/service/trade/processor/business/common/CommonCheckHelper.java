@@ -53,7 +53,6 @@ import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
-import com.joyintech.tams.exchange.service.trade.processor.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
 
@@ -89,8 +88,6 @@ public class CommonCheckHelper {
     private PriceHelper priceHelper;
     @Autowired
     private CommonManagement commonManagement;
-    @Autowired
-    private InvestInterfaceHelper investInterfaceHelper;
     @Autowired
     private InstructionService instructionService;
 
