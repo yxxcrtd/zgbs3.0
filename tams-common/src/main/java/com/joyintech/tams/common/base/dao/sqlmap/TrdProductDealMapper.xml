@@ -998,7 +998,7 @@
             TRANSACTION_SYSTEM_FEE = #{transactionSystemFee,jdbcType=DECIMAL},
             SHARE_PAYMENT_FEE = #{sharePaymentFee,jdbcType=DECIMAL},
             YESTERDAY_POSITION = #{yesterdayPosition,jdbcType=DECIMAL},
-            CANCEL_DATE = #{cancelDate,jdbcType=DATE}
+            CANCEL_DATE = #{cancelDate,jdbcType=DATE},
             ISSUE_TYPE = #{issueType,jdbcType=DATE}
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>

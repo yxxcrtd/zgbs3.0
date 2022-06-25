@@ -321,6 +321,8 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         // nothing to do just for aspect
         if (!StringUtil.equals("revoke", entity.getOperateType()) && !StringUtil.equals("delete", entity.getOperateType())) {
             //退回的移到备份表
+            //根据投资目的与业务模式的对应关系入库时赋值
+            entity.setInvAim("FVTPL");
             doInsertBackupQuery(entity);
             // 先删除流程中数据
             doDeleteFlow(entity.getWorkflowId());
@@ -842,9 +844,9 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
     public void updateCfetsOprHis(String entrustId, String optType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
-        /*if (ENTRUST_RECORD_NEW.equals(optType)) {
+        if (ENTRUST_RECORD_NEW.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-        } else*/ if (ENTRUST_RECORD_NEW.equals(optType)) {
+        } else if (ENTRUST_RECORD_MODIFY.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
         } else if ("close".equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_关闭.getValue());

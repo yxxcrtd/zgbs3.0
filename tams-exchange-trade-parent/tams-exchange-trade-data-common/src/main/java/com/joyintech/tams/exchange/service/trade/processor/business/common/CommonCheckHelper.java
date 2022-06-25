@@ -1,6 +1,18 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
-import cn.hutool.core.util.StrUtil;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Strings;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -10,11 +22,26 @@ import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.investment.TradeTimeBean;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
-import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.constant.DerivativeBsDir;
+import com.joyintech.tams.exchange.common.constant.DerivativeOcFlag;
+import com.joyintech.tams.exchange.common.constant.EntrustBs;
+import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.constant.EntrustStatus;
+import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.ExchangeConstant;
+import com.joyintech.tams.exchange.common.constant.FullPriceConst;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
+import com.joyintech.tams.exchange.common.constant.InstructionStatus;
+import com.joyintech.tams.exchange.common.constant.OffsetFlag;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.Switches;
-import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.db.domain.Entrust;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.db.domain.Order;
+import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
@@ -29,17 +56,8 @@ import com.joyintech.tams.exchange.service.trade.processor.invest.InvestInterfac
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.util.Objects;
+import cn.hutool.core.util.StrUtil;
 import java.util.Optional;
 
 @Component
@@ -79,8 +97,6 @@ public class CommonCheckHelper {
     private PriceHelper priceHelper;
     @Autowired
     private CommonManagement commonManagement;
-    @Autowired
-    private InvestInterfaceHelper investInterfaceHelper;
     @Autowired
     private InstructionService instructionService;
 

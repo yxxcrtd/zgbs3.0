@@ -62,6 +62,7 @@ import java.math.RoundingMode;
 import java.util.*;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_到期;
 import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_行权回售;
 
 /**
@@ -574,6 +575,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
                 bondDto.setShareAmt(item.getSettleNum());
                 bondDto.setFpriceAmt(item.getSettleAmt());
                 bondDto.setPs(dto.getPs());
+                bondDto.setMdate(item.getSettleDate());
+                bondDto.setTradeDate(item.getSettleDate());
+                bondDto.setPrinAmt(item.getSettleAmt());
                 list1.add(bondDto);
             }
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, list1, null);
@@ -1133,9 +1137,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
             creditLinesInputDto.setTradeId(inputDto.getTradeId());
             creditLinesInputDto.setTradeAmt(inputDto.getSettleAmt());
             creditLinesInputDto.setTradeDate(inputDto.getSettleDate());
-            if (inputDto.getBusiType().equals(头寸业务类型_质押式回购到期.getValue()) && insertDto.getPs().equals(交易方向_正回购.getValue())) {
+            if (inputDto.getBusiType().equals(头寸业务类型_质押式回购到期.getValue()) && insertDto.getPs().equals(交易方向_到期.getValue())) {
                 creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
-            } else if (inputDto.getBusiType().equals(头寸业务类型_质押式回购到期.getValue()) && insertDto.getPs().equals(交易方向_逆回购.getValue())) {
+            } else if (inputDto.getBusiType().equals(头寸业务类型_质押式回购到期.getValue()) && insertDto.getPs().equals(交易方向_到期.getValue())) {
                 creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
             } else {
                 creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());

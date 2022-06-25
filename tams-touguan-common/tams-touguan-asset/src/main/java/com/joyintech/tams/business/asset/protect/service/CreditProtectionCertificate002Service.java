@@ -107,7 +107,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     public void saveOperate(CreditProtectionCertificate002Dto dto, DictCodeListExt3 operType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         //add wsz 修改 ZGCPCN-1333 start
-        oprHisReq.setEntrustId(dto.getFinprodMarketId());
+        oprHisReq.setEntrustId(getFinprodId(dto.getFinprodMarketId()));
         //add wsz 修改 ZGCPCN-1333 end
         oprHisReq.setOperType(operType.getValue());
         oprHisReq.setBusiDes(dto.getRemark());
