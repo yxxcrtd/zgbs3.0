@@ -529,7 +529,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             if (StringUtil.isEmpty(dto.getListingCode())) {
                 validList.add(new ValidMessage("上市代码不能为空"));
             }
-            if (StringUtil.isNotEmpty(dto.getAdditionalTenderBeginDate()) && DateUtil.compareDate(DateUtil.parse(dto.getAdditionalTenderBeginDate()), iPlatformDate.getSysDate()) < 0) {
+            if (StringUtil.isNotEmpty(dto.getAdditionalTenderEndDate()) && DateUtil.compareDate(DateUtil.parse(dto.getAdditionalTenderEndDate()), iPlatformDate.getSysDate()) < 0) {
                 validList.add(new ValidMessage("增发投标日截止日需大于等于平台日"));
             }
         } else {
