@@ -85,6 +85,7 @@ public class CfetsTrdQueryController extends BaseController {
        // initPageParams.put("IS_SUPPORT_CSTP_FLAG", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG"));
         initPageParams.put("IS_SUPPORT_CSTP_FLAG_BOND", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BOND"));
         initPageParams.put("IS_SUPPORT_CSTP_FLAG_REPO", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO"));
+        initPageParams.put("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
 
 
         //自动刷新时间
