@@ -64,7 +64,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(CfetsTrdBondFirstSub002Controller.class);
 
     @Autowired
-    CfetsTrdFirstBidFirm002Service cfetsTrdFirstBidFirm002Service;
+    private CfetsTrdFirstBidFirm002Service cfetsTrdFirstBidFirm002Service;
 
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
@@ -337,20 +337,6 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
-//    @ResponseBody
-//    @ApiOperation(value = "风险试算", notes = "风险试算")
-//    @PostMapping("doRiskcal")
-//    public Message<AjaxResult> doRiskcal(@RequestBody RiskCalRequest riskCalRequest) {
-//        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
-//        try {
-//            AjaxResult m = new AjaxResult();
-//            m.setData(result);
-//            return new Message<AjaxResult>().success().setData(m);
-//        } catch (Exception e) {
-//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-//        }
-//    }
-
     /**
      * 投标确认提交检查
      *
@@ -507,25 +493,4 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         }
     }
 
-//    @ResponseBody
-//    @ApiOperation(value = "风险试算", notes = "风险试算")
-//    @PostMapping("doRiskcal")
-//    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
-//        try {
-//            String message = cfetsTrdFirstBidFirm002Service.doRiskcalCheckMethod(dto);
-//            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
-//                AjaxResult ar = new AjaxResult();
-//                List<ValidMessage> warnList = new ArrayList<>();
-//                warnList.add(new ValidMessage(message));
-//                ar.setErrorList(warnList);
-//                ar.setMessageType(MessageType.错误消息);
-//                return new Message<AjaxResult>().setData(ar);
-//            }
-//            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,this.getPageId());
-//            return new Message<AjaxResult>().setData(ajaxResult);
-//        } catch (Exception e) {
-//            logger.error("风险试算", e);
-//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-//        }
-//    }
 }

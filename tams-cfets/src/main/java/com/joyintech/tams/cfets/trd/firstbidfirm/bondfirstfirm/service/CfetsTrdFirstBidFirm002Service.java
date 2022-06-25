@@ -31,6 +31,7 @@ import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePositionRequest;
 import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRespone;
+import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm002Mapper;
@@ -39,6 +40,7 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFi
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
+import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
@@ -57,6 +59,7 @@ import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
+import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
@@ -243,6 +246,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
 
     @Autowired
     private TrdTempDealTotalAddMapper trdTempDealTotalAddMapper;
+
+    @Autowired(required = false)
+    private BasRiskMathCommService basRiskMathCommService;
 
     /**
      * <投标确认>界面初始化检查
@@ -2038,6 +2044,18 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             } else {
                 this.sendPositionMethodOther(entity, true, null);
                 // 自主投标不处理老头寸 在中标结果维护时处理
+            }
+            //保存风险数据
+            if (StringUtil.isNotEmpty(entity.getRiskcalResponse())
+                    && CollectionUtils.isNotEmpty(entity.getRiskcalResponse().getRiskcalReturnList())) {
+                List<RiskTrialRetDto> param = new ArrayList<>();
+                entity.getRiskcalResponse().getRiskcalReturnList().forEach(item-> {
+                            RiskTrialRetDto risk = new RiskTrialRetDto();
+                            BeanUtil.copyPropertiesIgnoreNull(risk,item);
+                            param.add(risk);
+                        }
+                );
+                basRiskMathCommService.insert(param, entity.getBidId());
             }
         }
         // AOP中处理操作履历
