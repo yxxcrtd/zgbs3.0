@@ -1462,6 +1462,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 //【汇总投标券面总额】由各指令自动带入，默认为各指令的指令投标券面总额，可修改，修改后不得高于各指令的指令投标券面总额
                 productDto.setTotalBiddingNum(productDto.getEtrBidPriceTotal());
             }
+            if(BigDecimalUtil.isZero(productDto.getTotalBiddingNum())){
+                continue;
+            }
             CfetsTrdFirstBidFirmTotalDto totalDto = totalDtoMap.get(productDto.getBidPrice());
             if (!StringUtil.isNotEmpty(totalDto)) {
                 totalDto = new CfetsTrdFirstBidFirmTotalDto();
