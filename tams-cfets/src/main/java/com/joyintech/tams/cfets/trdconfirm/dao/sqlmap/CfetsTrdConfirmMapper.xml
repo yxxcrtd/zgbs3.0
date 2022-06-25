@@ -246,7 +246,7 @@
                 and bo.OUR_TRADER = #{userId}
             </if>
             <if test="userId != null and userId != ''">
-                and fpa.ISSUE_STATUS != #{ISSUE_STATUS_01}
+                and ( fpa.ISSUE_STATUS != #{ISSUE_STATUS_01} or fpa.ISSUE_STATUS is null )
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND bo.finprod_id in
