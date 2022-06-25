@@ -106,7 +106,7 @@
 			</exclusions>
 		</dependency>
 
-		<!-- 接口画面端 
+		<!-- 接口画面端 -->
 		<dependency>
 			<groupId>com.joyintech</groupId>
 			<artifactId>tams-customer-interf</artifactId>
@@ -118,7 +118,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
--->
+
 <!--        &lt;!&ndash; 移动APP &ndash;&gt;-->
 <!--		<dependency>-->
 <!--			<groupId>com.itextpdf</groupId>-->
