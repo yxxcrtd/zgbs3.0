@@ -425,6 +425,12 @@ public interface TrdCommonBaseMapper {
     Integer getUnFinishMatchSettleTransDataNum(Map<String, Object> map);
 
     /**
+     * 获取当日对账数据不一致和待处理数量
+     * @return
+     */
+    Integer getCheckDisaccordCountDataNum(Map<String, Object> map);
+
+    /**
      * 查询首期清算数据
      * @param sqcjbh 首期成交编号
      * @param seatNumber 席位号
