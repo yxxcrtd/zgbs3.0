@@ -84,6 +84,12 @@
 			<groupId>com.joyintech</groupId>
 			<artifactId>framework-core</artifactId>
 			<version>${framework.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>lettuce-core</artifactId>
+					<groupId>io.lettuce</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.joyintech</groupId>
