@@ -825,7 +825,8 @@
                                eted.FIRST_UNIT_CPRICE || ' - ' || eted.FIRST_UNIT_CPRICE2 firstprice,
                                pss.pledge_stock_name pledgeStockName,
                                fp.Is_Right isRight,
-                               ete.PRICE * 100 rate
+                               ete.PRICE * 100 rate,
+                               eted.CALCULATE_FIELD calculateField
                            FROM ETR_ENTRUST ete
                                     INNER JOIN ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
                                     LEFT JOIN PTL_PORTFOLIO pp ON ete.portfolio_id = pp.portfolio_id
@@ -909,7 +910,8 @@
                                eted.FIRST_UNIT_CPRICE || ' - ' || eted.FIRST_UNIT_CPRICE2 firstprice,
                                pss.pledge_stock_name pledgeStockName,
                                fp.Is_Right isRight,
-                               ete.PRICE * 100 rate
+                               ete.PRICE * 100 rate,
+                               eted.CALCULATE_FIELD calculateField
                            FROM WFL_ETR_ENTRUST ete
                                     INNER JOIN WFL_ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
                                     LEFT JOIN PTL_PORTFOLIO pp ON ete.portfolio_id = pp.portfolio_id
