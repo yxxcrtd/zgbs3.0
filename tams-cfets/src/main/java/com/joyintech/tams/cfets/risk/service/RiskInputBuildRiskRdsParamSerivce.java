@@ -180,6 +180,7 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
         InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
         CfetsTrdFirstBondInvestTradeDto entity = (CfetsTrdFirstBondInvestTradeDto) data;
         riskRdsDto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
+        riskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资交易.getValue());
         riskRdsDto.setEventStatus(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
         Map<String, TrdBondInvestTradeDto> map = new HashMap<>();
         entity.getTrdProductDeals().forEach(item -> {
@@ -188,7 +189,7 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
                 BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
                 bondDto.setFpriceAmt(item.getTradeAmt());
                 bondDto.setEntrustId(entity.getRegIbuId() + item.getPortfolioId());
-                bondDto.setTradeId(entity.getTotleTradeId() + item.getPortfolioId());
+                bondDto.setTradeId(item.getTotleTradeId() + item.getPortfolioId());
                 bondDto.setFinprodId(entity.getFinprodId());
             } else {
                 bondDto = map.get(entity.getRegIbuId() + item.getPortfolioId());
@@ -205,7 +206,7 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
                 // 全价总额
                 bondDto.setFpriceAmt(ArithmeticUtil.doAdd(bondDto.getFpriceAmt(), item.getFpriceAmt()));
                 bondDto.setEntrustId(entity.getRegIbuId() + item.getPortfolioId());
-                bondDto.setTradeId(entity.getTotleTradeId() + item.getPortfolioId());
+                bondDto.setTradeId(item.getTotleTradeId() + item.getPortfolioId());
                 bondDto.setFinprodId(entity.getFinprodId());
             }
             map.put(entity.getTotleTradeId() + item.getPortfolioId(), bondDto);
