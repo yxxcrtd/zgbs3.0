@@ -915,6 +915,14 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
     }
 
+    @Override
+    public void doBack(CfetsPrimaryBidManageSaveRequest request){
+        BidResultTotal bidResultTotal = new BidResultTotal();
+        BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,request);
+        wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
+        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
+    }
+
     /**
      * 头寸处理
      *

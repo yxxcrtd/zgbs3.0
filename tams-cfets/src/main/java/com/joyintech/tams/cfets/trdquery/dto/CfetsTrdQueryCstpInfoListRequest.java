@@ -24,6 +24,9 @@ public class CfetsTrdQueryCstpInfoListRequest {
     @ApiModelProperty(name="regAssetType",value="资产类型",example="01")
     private String regAssetType;
 
+    @ApiModelProperty(name="busiTypePosition",value="业务类型",example="01")
+    private String busiTypePosition;
+
     @ApiModelProperty(name="finprodId",value="资产代码",example="字符串1,字符串2,...")
     private String finprodId;
 
@@ -69,6 +72,14 @@ public class CfetsTrdQueryCstpInfoListRequest {
 
     public void setRegAssetType(String regAssetType) {
         this.regAssetType = regAssetType;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 
     public String getFinprodId() {

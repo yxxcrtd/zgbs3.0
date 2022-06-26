@@ -435,6 +435,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             CfetsPrimaryBidManageCfmRequest request = new CfetsPrimaryBidManageCfmRequest();
             request.setBidId(dto.getBidId());
             dto = cfetsPrimaryBidManageService.getBidManageCfmInsert(request);
+            dto.setSettFeeAmt(null);
             dto.setIsWin(DictCodeList.是否_否.getValue());
             dto.setRemark("未中标");
             dto.setTotalWinId(IDGenerator.generate());
