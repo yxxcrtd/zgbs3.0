@@ -75,7 +75,7 @@ public class CfetsEtribdoRiskcalResponse {
 	@ApiModelProperty(name="kriName",value="指标名称",example="3")
 	private String kriName;
 
-	private String groupId;
+	private int groupId;
 
 	@ApiModelProperty(name="kriType",value="指标类型Code",example="3")
 	private String kriType;
@@ -258,11 +258,12 @@ public class CfetsEtribdoRiskcalResponse {
 		this.kriName = kriName;
 	}
 
-	public String getGroupId() {
+
+	public int getGroupId() {
 		return groupId;
 	}
 
-	public void setGroupId(String groupId) {
+	public void setGroupId(int groupId) {
 		this.groupId = groupId;
 	}
 
