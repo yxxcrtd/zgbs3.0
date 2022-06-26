@@ -968,7 +968,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @author jiangpeng
      * @date 2022/5/12 14:53
      */
-    public void dorevoke(String bidId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
+    public CfetsTrdBondFirstSubInfoDto dorevoke(String bidId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
         CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(bidId);
         entity.setBidId(bidId);
         entity.setRemark(remark);
@@ -983,6 +983,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
 //            this.dealOldPosition(entity, true);
         //处理指令执行进度
         this.insertEtrFinishStatus(entity, OperationType.REVOKE);
+
+        return entity;
     }
 
     /**

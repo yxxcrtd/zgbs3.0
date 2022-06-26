@@ -58,6 +58,8 @@ public interface CfetsPrimaryBidManageMapper {
 
 	List<String> getBusinessData(WflValidInputParameter parameter);
 
+	List<String> getWflData(WflValidInputParameter parameter);
+
 	List<StlCapacctInfo> selectCounterCapacctInfoList(@Param("counterId") String counterId, @Param("acctType") String acctType, @Param("ccy") String ccy);
 
     SecInfoModelDto getSecInfoModel(Map<String, Object> tempParamMap);

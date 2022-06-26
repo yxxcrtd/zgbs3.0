@@ -133,6 +133,9 @@ public class RiskCommonService {
                     list.add(item);
                 });
             }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占预占释放.getValue())) {
+                occupyType = DictCodeListRsk.授信占用类别_实占.getValue();
+                list.addAll(riskCommonInputDto.getCreditInputList());
+                list.forEach(item -> item.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue()));
                 // 接口调用方式待梳理
             }
 
@@ -191,6 +194,9 @@ public class RiskCommonService {
                 });*/
             }
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占预占释放.getValue())) {
+                interfRiskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资交易.getValue());
+                interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_实占释放批量接口.getValue());
+                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> item.setRevokeFlg(DictCodeList.是否_是.getValue()));
                 // 接口调用方式待梳理
             }
             // 处理软硬控参数

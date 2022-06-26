@@ -978,6 +978,14 @@
         </where>
         order by pm.create_time desc
     </select>
+    <select id="getWflData" parameterType="com.joyintech.tams.component.business.core.dto.WflValidInputParameter" resultType="java.lang.String">
+        select BID_ID from WFL_BID_RESULT_TOTAL
+        <where>
+            <if test="businessDataPk1 != null and businessDataPk1 !=''">
+                and BID_ID = #{businessDataPk1}
+            </if>
+        </where>
+    </select>
     <select id="selectCounterCapacctInfoList" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
         SELECT
         DISTINCT

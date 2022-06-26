@@ -10,11 +10,13 @@ import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
@@ -306,7 +308,8 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * @see
      * @since 1.0
      */
-    public void doCompleteBidRevoke(CfetsTrdFirstBondInvestTradeDto entity, String settleRemark, Boolean isNeedDealPosition) {
+    public CfetsTrdBondFirstSubInfoDto doCompleteBidRevoke(CfetsTrdFirstBondInvestTradeDto entity, String settleRemark, Boolean isNeedDealPosition) {
+        CfetsTrdBondFirstSubInfoDto tradeDto = null;
         Map<String, Object> params = new HashMap<>();
         params.put("workflowId", entity.getWorkflowId());
         String bizCode = entity.getTotleTradeId();
@@ -333,7 +336,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
                 remark = (settleRemark == null ? "" : settleRemark) + "交易撤销：" + entity.getRevokeReason();
             }
             regTotal.setRemark(remark);
-            cfetsTrdBondFirstSub002Service.dorevoke(regTotal.getTotleTradeId(), remark, isNeedDealPosition, entity.getTgBusiType());
+            tradeDto = cfetsTrdBondFirstSub002Service.dorevoke(regTotal.getTotleTradeId(), remark, isNeedDealPosition, entity.getTgBusiType());
         }
         // 删除匹配关系表
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
@@ -347,6 +350,8 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         String ps = DictCodeList.交易方向_买入.getValue();
         String busiType = DictCodeListExt3.头寸业务类型_债券一级申购.getValue();
         PositionHttpRequest.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), busiType, ps);
+
+        return tradeDto;
     }
 
     /**
@@ -415,7 +420,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     @Override
     public void doComplete(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType) {
         if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
-            this.doCompleteBidRevoke(entity, "", true);
+            SpringContextUtil.getApplicationContext().getBean(CfetsTrdFirstBondInvestTrade002Service.class).doCompleteBidRevoke(entity,"",true);
         }
     }
 

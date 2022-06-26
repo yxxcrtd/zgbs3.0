@@ -1141,9 +1141,13 @@ public class RiskInputParamSerivce extends RiskCommonService {
             if(StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
                 creditLinesInputDto.setFinprodId(null);
                 creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
+                creditLinesInputDto.setPsPayment(DictCodeList.回购类型_质押式回购.getValue());
+                creditLinesInputDto.setSaleCode(交易方向_逆回购.getValue());
             }else if(StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
                 creditLinesInputDto.setFinprodId(null);
                 creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
+                creditLinesInputDto.setPsPayment(DictCodeList.回购类型_质押式回购.getValue());
+                creditLinesInputDto.setSaleCode(交易方向_正回购.getValue());
             } else {
                 creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                 creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_债券.getValue());

@@ -23,7 +23,7 @@ public class RiskUtil {
             DictCodeListRsk.风险占用类型_预占释放再预占.getValue());
     //实占类型
     public static List<String> list = Lists.newArrayList(DictCodeListRsk.风险占用类型_实占.getValue(), DictCodeListRsk.风险占用类型_实占释放.getValue(),
-            DictCodeListRsk.风险占用类型_实占释放再实占.getValue());
+            DictCodeListRsk.风险占用类型_实占释放再实占.getValue(),DictCodeListRsk.风险占用类型_实占预占释放.getValue());
 
     /**
      * 根据配置组装返回的指标入参对象

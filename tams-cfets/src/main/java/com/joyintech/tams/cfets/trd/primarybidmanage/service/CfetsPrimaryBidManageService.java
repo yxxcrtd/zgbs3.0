@@ -1718,6 +1718,15 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         return Boolean.FALSE;
     }
 
+    public boolean isInWflData(WflValidInputParameter parameter) {
+        parameter.setSeachMode("01");
+        List<String> result = cfetsPrimaryBidManageMapper.getWflData(parameter);
+        if (CollectionUtils.isNotEmpty(result)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
     public BidResultTotal getBidResultTotal(String totalWinId) {
         return bidResultTotalMapper.selectByPrimaryKey(totalWinId);
     }
