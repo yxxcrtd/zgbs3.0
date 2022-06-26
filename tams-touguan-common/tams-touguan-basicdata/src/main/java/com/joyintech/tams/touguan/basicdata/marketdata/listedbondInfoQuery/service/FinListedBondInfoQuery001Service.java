@@ -254,7 +254,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProduct.setBlnArea(finListedBondInfoQuery001Dto.getDomesticAndForeign());
         finProduct.setTradeMarket(finListedBondInfoQuery001Dto.getTradingPlaces());
         /**--交易场所modify 2019-04-15 end--**/
-        finProduct.setIssuer(finListedBondInfoQuery001Dto.getIssuer());
+        finProduct.setIssuer(finListedBondInfoQuery001Dto.getIssuerCode());
         //2019年5月27日  交易日历
         if (StringUtil.equals(DictCodeListExt1.交易场所_银行间.getValue(), finListedBondInfoQuery001Dto.getTradingPlaces())) {
             finProduct.setCalendarId("03");
