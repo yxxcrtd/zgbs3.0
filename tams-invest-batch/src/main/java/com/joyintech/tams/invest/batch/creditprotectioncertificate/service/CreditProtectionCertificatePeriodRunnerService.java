@@ -282,8 +282,8 @@ public class CreditProtectionCertificatePeriodRunnerService {
             etrSecPositionFlow.setSecAcctId(expireData.getSecAcctId());
             etrSecPositionFlow.setFinprodId(expireData.getFinprodId());
             etrSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
-            etrSecPositionFlow.setInvAim(null);
-            etrSecPositionFlow.setHodingType(DictCodeList.持仓类型_实际.getValue());
+            etrSecPositionFlow.setInvAim("999999");
+            etrSecPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
             etrSecPositionFlow.setCdate(iPlatformDate.getSysDate());
             etrSecPositionFlow.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
             etrSecPositionFlow.setAmount(ArithmeticUtil.divide(etrSecPositionFlow.getAmount(), 100, 4));
@@ -306,7 +306,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow.setSecAcctId(expireData.getSecAcctId());
             ptlSecPositionFlow.setFinprodId(expireData.getFinprodId());
             ptlSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
-            ptlSecPositionFlow.setInvAim(null);
+            ptlSecPositionFlow.setInvAim("999999");
             ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
             ptlSecPositionFlow.setCdate(iPlatformDate.getSysDate());
             ptlSecPositionFlow.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
