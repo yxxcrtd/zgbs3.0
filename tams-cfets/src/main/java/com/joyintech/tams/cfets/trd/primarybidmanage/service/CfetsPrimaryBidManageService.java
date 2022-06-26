@@ -1363,7 +1363,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         calRequest.setCalculateField("02");
         if (StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利差.getValue())
                 || StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利率.getValue())) {
-            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+            FinProduct finProduct = finProductMapper.selectByFinprodMarketId(finprodId);//前台传值为市场代码
             //CASE WHEN （标的类金融产品发行信息.招标标的 IN（利率，利差） AND 标的类金融产品.上市流通日期 IS NOT NULL）
             // 通过上市流通代码查找二级债 避免出现二级债未录入系统的问题
             FinProduct finProduct2 = cfetsTrdFirstBidFirm002Mapper.selectByFinprodMarketId(finProduct.getFinprodMarketId());
