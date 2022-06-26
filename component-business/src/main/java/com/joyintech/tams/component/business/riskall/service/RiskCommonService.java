@@ -133,6 +133,9 @@ public class RiskCommonService {
                     list.add(item);
                 });
             }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占预占释放.getValue())) {
+                occupyType = DictCodeListRsk.授信占用类别_实占.getValue();
+                list.addAll(riskCommonInputDto.getCreditInputList());
+                list.forEach(item -> item.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue()));
                 // 接口调用方式待梳理
             }
 
