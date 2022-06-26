@@ -131,7 +131,7 @@ public class FinTenderBondAsset001Controller extends BaseController {
     @PostMapping("/addCoupons")
     @ApiOperation(value = "加券按钮", notes = "加券按钮")
     public Message<FinTenderBondAsset002Dto> addCoupons(@RequestParam("finprodMarketId") String finprodMarketId) {
-        return Message.success("success", finTenderBondAssetService.addCoupons(finprodMarketId, "-1"));
+        return Message.success("success", finTenderBondAssetService.addCoupons(finprodMarketId, null, "0"));
     }
 
     @ResponseBody

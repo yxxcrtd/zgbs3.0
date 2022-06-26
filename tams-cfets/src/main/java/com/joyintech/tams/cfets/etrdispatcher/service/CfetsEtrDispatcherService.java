@@ -879,7 +879,7 @@ public class CfetsEtrDispatcherService extends BaseService {
             }
 
             //处理调用交易查询字段
-            if (CollectionUtils.isNotEmpty(page.getRoot())) {
+            if (page != null && CollectionUtils.isNotEmpty(page.getRoot())) {
                 List<CfetsEtrDispatcherDealListInfoResponse> list = page.getRoot();
                 if (CollectionUtils.isNotEmpty(list)) {
                     for (CfetsEtrDispatcherDealListInfoResponse response : list) {
@@ -900,7 +900,7 @@ public class CfetsEtrDispatcherService extends BaseService {
         }else if (StringUtil.equals(dto.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
             page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrDispatcherMapper.getEtrSubBidDealListInfo(pageParam));
             //处理调用交易查询字段
-            if (CollectionUtils.isNotEmpty(page.getRoot())) {
+            if (page != null && CollectionUtils.isNotEmpty(page.getRoot())) {
                 List<CfetsEtrDispatcherDealListInfoResponse> list = page.getRoot();
                 if (CollectionUtils.isNotEmpty(list)) {
                     for (CfetsEtrDispatcherDealListInfoResponse response : list) {
