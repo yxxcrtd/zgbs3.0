@@ -346,17 +346,16 @@
         LEFT JOIN INTERF_WIND_RELEASE_INFO ri ON sec.SEC_ID = ri.SEC_ID
         LEFT JOIN (select (SECURITY_ID||'.IB') as SEC_ID,t.* from INTERF_RDI_RELEASE_INFO t where t.SECURITY_TYPE in ('同业存单','公司短期融资券'))  pri ON pri.SEC_ID = ri.SEC_ID
         where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
-        <choose>
-            <when test="additionalBatches != null and additionalBatches != '' and additionalBatches != '-1'">
-                AND ri.ADDITIONAL_BATCHES = #{additionalBatches}
-            </when>
-            <when test="additionalBatches == '-1'">
-
-            </when>
-            <otherwise>
-                AND ri.ADDITIONAL_BATCHES is null
-            </otherwise>
-        </choose>
+        <if test="isFromInterF != null and isFromInterF == '1'">
+            <choose>
+                <when test="additionalBatches != null and additionalBatches != ''">
+                    AND ri.ADDITIONAL_BATCHES = #{additionalBatches}
+                </when>
+                <otherwise>
+                    AND ri.ADDITIONAL_BATCHES is null
+                </otherwise>
+            </choose>
+        </if>
           AND ROWNUM = 1
     </select>
 
@@ -430,7 +429,8 @@
 
     <select id="selectFinprodId" resultType="java.lang.String">
         select t.* from (
-            select T1.FINPROD_ID from FIN_PRODUCT T1
+            select T1.FINPROD_ID from FIN_PRODUCT T1 left join
+        FIN_PRODUCT_ISSUE T2 on T1.FINPROD_ID = T2.FINPROD_ID
             where  1=1
                 <if test="finprodType2 !=null and finprodType2 !=''">
                     AND T1.FINPROD_TYPE2 = #{finprodType2}
@@ -438,8 +438,19 @@
                 <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
                     AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
                 </if>
+                <if test="isFromInterF != null and isFromInterF == '1'">
+                    <choose>
+                        <when test="additionalBatches != null and additionalBatches != ''">
+                            AND T2.ADD_BATCH = #{additionalBatches}
+                        </when>
+                        <otherwise>
+                            AND T2.ADD_BATCH is null
+                        </otherwise>
+                    </choose>
+                </if>
                 AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR} order by T1.CREATE_TIME desc
-        ) t where ROWNUM=1
+
+        ) t where ROWNUM = 1
     </select>
 
     <select id="selectExistFinprodId" resultType="java.lang.String">
