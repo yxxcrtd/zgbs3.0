@@ -12,8 +12,10 @@ package com.joyintech.tams.cfets.trdquery.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -211,6 +213,9 @@ public class CfetsTrdBidInfoResponse {
     @ApiModelProperty(name="subAmt",value="认购量")
     private BigDecimal subAmt;
 
+    @ApiModelProperty(name="dipType",value="分配方式")
+    private String dipType;
+
     public String getTradeMarketModeStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.交易市场, getTradeMarketMode());
     }
@@ -260,7 +265,10 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getBidDate() {
-        return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN)+"~"+DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN);
+        if (StringUtil.isNotEmpty(this.getBidDateEnd())) {
+            return DateUtil.format(this.getBidDateStart(), DateUtil.DEFAULT_DATE_FORMAT_EN) + "~" + DateUtil.format(this.getBidDateEnd(), DateUtil.DEFAULT_DATE_FORMAT_EN);
+        }
+        return DateUtil.format(this.getBidDateStart(), DateUtil.DEFAULT_DATE_FORMAT_EN);
     }
 
     public void setBidDate(String bidDate) {
@@ -423,7 +431,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getPayTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.缴款方式, getTenderTarget());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.缴款方式, getTenderTarget());
     }
 
     public void setPayTypeStr(String payTypeStr) {
@@ -694,5 +702,13 @@ public class CfetsTrdBidInfoResponse {
 
     public void setPayAmt(BigDecimal payAmt) {
         this.payAmt = payAmt;
+    }
+
+    public String getDipType() {
+        return dipType;
+    }
+
+    public void setDipType(String dipType) {
+        this.dipType = dipType;
     }
 }
