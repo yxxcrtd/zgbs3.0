@@ -6,6 +6,8 @@ import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
+import com.joyintech.system.base.dao.SysWflBusinessListMapper;
+import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -130,6 +132,9 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     @Autowired
     private BasePtlCashPositionInfoServiceImpl basePtlCashPositionInfoServiceImpl;
 
+    @Autowired
+    private SysWflBusinessListMapper sysWflBusinessListMapper;
+
     @Override
     public void doComplete(CreditProtectionCertificatePeriodSaveDto entity, OperationType operationType) {
         BaseBussinessDto baseBussinessDto = genBaseBussinessDto(entity);
@@ -154,12 +159,17 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             deleteFlow(entity.getWorkflowId());
             insertFlow(baseBussinessDto, entity);
             doOldPositionSubmit(entity, false);
-            String decisionAct = 系统动作_修改.getValue();
-            String systemAct = 系统动作_修改.getValue();
-            if ("new".equalsIgnoreCase(entity.getOptType())) {
-                systemAct = 系统动作_新建.getValue();
-                decisionAct = 系统动作_新建.getValue();
+            String decisionAct = 系统动作_新建.getValue();
+            String systemAct = 系统动作_新建.getValue();
+            SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
+            if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+                systemAct = 系统动作_修改.getValue();
+                decisionAct = 系统动作_修改.getValue();
             }
+//            if ("new".equalsIgnoreCase(entity.getOptType())) {
+//                systemAct = 系统动作_新建.getValue();
+//                decisionAct = 系统动作_新建.getValue();
+//            }
             positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
@@ -180,11 +190,12 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             deleteFlow(entity.getWorkflowId());
             insertFlow(baseBussinessDto, entity);
             doOldPositionSubmit(entity, false);
-            String decisionAct = 系统动作_修改.getValue();
-            String systemAct = 系统动作_修改.getValue();
-            if ("new".equalsIgnoreCase(entity.getOptType())) {
-                systemAct = 系统动作_新建.getValue();
-                decisionAct = 系统动作_新建.getValue();
+            String decisionAct = 系统动作_新建.getValue();
+            String systemAct = 系统动作_新建.getValue();
+            SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
+            if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+                systemAct = 系统动作_修改.getValue();
+                decisionAct = 系统动作_修改.getValue();
             }
             try {
                 positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
