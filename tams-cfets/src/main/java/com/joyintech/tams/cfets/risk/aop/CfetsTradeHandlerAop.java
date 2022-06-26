@@ -14,6 +14,8 @@ import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.constant.DictCodeList;
@@ -418,10 +420,13 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning("doCompleteBidRevoke()")
-    public void revokeBidComplete(JoinPoint joinPoint) throws BusinessException {
+    @AfterReturning(pointcut = "doCompleteBidRevoke() ",returning = "tradeDto")
+    public void revokeBidComplete(JoinPoint joinPoint, CfetsTrdBondFirstSubInfoDto tradeDto) throws BusinessException {
         Object[] args = joinPoint.getArgs();
+        // 释放实占
         inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), "doCompleteBidRevoke");
+        // 释放预占
+        inputParamSerivce.buildParamThenOccupy(tradeDto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), "");
     }
 
     /**
