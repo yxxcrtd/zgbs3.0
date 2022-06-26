@@ -485,7 +485,7 @@
                     LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
                     LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
                     AND brt.FINPROD_ID = bo.FINPROD_ID
-                    WHERE bo.TRADE_STATUS = '01'
+                    WHERE bo.TRADE_STATUS = '01' AND bo.IS_CANCEL != 'Y'
                     GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
                     ) bobrt ON 	bobrt.FINPROD_ID = fp.FINPROD_ID AND bobrt.ENTRUST_ID = ee.ENTRUST_ID
                 <where>
@@ -628,6 +628,7 @@
                      WHEN bo.IS_CANCEL = 'Y' THEN '03'
                      ELSE '02' END AS validStatus/*有效状态*/,
                  CASE
+                     WHEN bo.IS_CANCEL = 'Y' THEN '01'
                      WHEN brt.IS_WIN = 'Y' THEN '04'
                      WHEN brt.IS_WIN = 'N' THEN '03'
                      WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
@@ -748,11 +749,7 @@
             </if>
           union all
           SELECT '01' AS validStatus/*有效状态*/,
-                 CASE
-                     WHEN brt.IS_WIN = 'Y' THEN '04'
-                     WHEN brt.IS_WIN = 'N' THEN '03'
-                     WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
-                     END           AS firstBidStatus/*中标状态*/,
+                 '01' AS firstBidStatus /*中标状态*/,
                  bo.BID_ID         AS bidId/*投标编号*/,
                  fp.FINPROD_ID finprodId,
                  fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
@@ -965,7 +962,9 @@
              SELECT CASE
                         WHEN bo.IS_CANCEL = 'Y' THEN '03'
                         ELSE '02' END AS validStatus/*有效状态*/,
-                    '04'              AS firstBidStatus/*中标状态*/,
+                        CASE
+                        WHEN bo.IS_CANCEL = 'Y' THEN '01'
+                        ELSE '04' END AS firstBidStatus/*中标状态*/,
                     bo.BID_ID         AS bidId/*投标编号*/,
                      fp.FINPROD_ID finprodId,
                      fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
