@@ -523,7 +523,8 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         param.put("year", DateUtil.getYear(iPlatformDate.getSysDateStr()));
         if (!StringUtil.isNotEmpty(param.get("firstBidStatus"))) {
             param.put("firstBidStatus", Arrays.asList(DictCodeList.一级投标中标状态_已投标.getValue(),
-                    DictCodeList.一级投标中标状态_未中标.getValue(), DictCodeList.一级投标中标状态_已中标.getValue()));
+                    DictCodeList.一级投标中标状态_未中标.getValue(), DictCodeList.一级投标中标状态_已中标.getValue(),
+                    DictCodeList.一级投标中标状态_待投标.getValue()));
         }
     }
 

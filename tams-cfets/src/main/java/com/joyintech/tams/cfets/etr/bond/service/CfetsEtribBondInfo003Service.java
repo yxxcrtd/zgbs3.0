@@ -1770,9 +1770,10 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
         req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
         String balanceCheck="Y";
-        if ((StringUtil.isNotEmpty(entity.getSoftSkipMode())
-                && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))
-                || StringUtil.isNotEmpty(confirmOk)) {
+        if (isSubmit&&(StringUtil.isNotEmpty(entity.getSoftSkipMode())
+                && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))) {
+            balanceCheck = DictCodeList.是否_否.getValue();
+        }else if ( StringUtil.isNotEmpty(confirmOk)) {
             balanceCheck = DictCodeList.是否_否.getValue();
         }
         req.setBalanceCheck(balanceCheck);

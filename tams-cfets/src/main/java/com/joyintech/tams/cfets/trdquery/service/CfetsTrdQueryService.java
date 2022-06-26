@@ -1293,6 +1293,9 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("spcdCode", spcdCode);
             pageParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
             pageParam.put("WIN_TYPE_03", DictCodeListExt4.投标方式_分销买入.getValue());
+            pageParam.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
+            pageParam.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_价格.getValue());
+            pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findFxmrManualSettleInfo(pageParam);
             //表格组合分配data
@@ -1345,6 +1348,9 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("WIN_TYPE_01", DictCodeListExt4.投标方式_自主投标.getValue());
             pageParam.put("WIN_TYPE_02", DictCodeListExt4.投标方式_代投代缴.getValue());
             pageParam.put("WIN_TYPE_03", DictCodeListExt4.投标方式_分销买入.getValue());
+            pageParam.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
+            pageParam.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_价格.getValue());
+            pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findZztbManualSettleInfo(pageParam);
             //表格组合分配data
@@ -1392,6 +1398,9 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("spcdCode", spcdCode);
             pageParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
             pageParam.put("WIN_TYPE_03", DictCodeListExt4.投标方式_分销买入.getValue());
+            pageParam.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
+            pageParam.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_价格.getValue());
+            pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findYjsgManualSettleInfo(pageParam);
             //表格组合分配data
@@ -1612,8 +1621,12 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("spcdCode", spcdCode);
             pageParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
             pageParam.put("WIN_TYPE_03", DictCodeListExt4.投标方式_分销买入.getValue());
+            pageParam.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
+            pageParam.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_价格.getValue());
+            pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findFxmrManualSettleInfo(pageParam);
+            dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.分配方式, dataform.getDipType()));
             //表格组合分配data
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             List<BidPortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsTrdQueryMapper.findFxmrPortIntFenPeiInfoList(pageParam);
@@ -1664,8 +1677,12 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("WIN_TYPE_01", DictCodeListExt4.投标方式_自主投标.getValue());
             pageParam.put("WIN_TYPE_02", DictCodeListExt4.投标方式_代投代缴.getValue());
             pageParam.put("WIN_TYPE_03", DictCodeListExt4.投标方式_分销买入.getValue());
+            pageParam.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
+            pageParam.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_价格.getValue());
+            pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findZztbManualSettleInfo(pageParam);
+            dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.调整策略, dataform.getDipType()));
             //表格组合分配data
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             List<BidPortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsTrdQueryMapper.findZztbPortIntFenPeiInfoList(pageParam);
@@ -1711,6 +1728,9 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("spcdCode", spcdCode);
             pageParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
             pageParam.put("WIN_TYPE_03", DictCodeListExt4.投标方式_分销买入.getValue());
+            pageParam.put("TENDER_TARGET_01", DictCodeListExt4.招标标的_利率.getValue());
+            pageParam.put("TENDER_TARGET_02", DictCodeListExt4.招标标的_价格.getValue());
+            pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findYjsgManualSettleInfo(pageParam);
             //表格组合分配data

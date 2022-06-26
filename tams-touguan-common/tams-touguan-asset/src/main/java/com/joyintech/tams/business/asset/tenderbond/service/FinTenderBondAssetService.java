@@ -27,6 +27,8 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +47,8 @@ import java.util.*;
  */
 @Service
 public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002Dto> implements BaseProcessService<FinTenderBondAsset002Dto> {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
     private FinTenderBondAssetMapper finTenderBondAssetMapper;
@@ -203,6 +207,8 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @return
      */
     public FinTenderBondAsset002Dto addCoupons(String finprodMarketId, String additionalBatches, String isFromInterF) {
+        logger.info("addCoupons >> 加券查询参数：finprodMarketId:{}, additionalBatches:{}, isFromInterF:{}",
+                finprodMarketId, additionalBatches, isFromInterF);
         Map<String, String> param = new HashMap<>();
         param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());

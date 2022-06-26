@@ -2822,16 +2822,18 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 删除流程中数据
             this.deleteTradeData(entity);
 
-            trdFinProductDealTotalMapper.insertSelective(entity.getTrdFinProductDealTotal());
             if (isYJFS) {
                 trdProductTempDealTotalMapper.insert(entity.getTrdFinProductDealTotal());
+            } else {
+                trdFinProductDealTotalMapper.insertSelective(entity.getTrdFinProductDealTotal());
             }
 
-            trdDealTotalAddMapper.insertSelective(entity.getTrdDealTotalAdd());
             if (isYJFS) {
                 TrdTempDealTotalAdd trdTempDealTotalAdd = new TrdTempDealTotalAdd();
                 BeanUtil.copyPropertiesIgnoreNull(trdTempDealTotalAdd, entity.getTrdDealTotalAdd());
                 trdTempDealTotalAddMapper.insertSelective(trdTempDealTotalAdd);
+            } else {
+                trdDealTotalAddMapper.insertSelective(entity.getTrdDealTotalAdd());
             }
 
             //改造保存结算费经手费
@@ -2849,13 +2851,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             });
 
             for (TrdProductDeal trdProductDeal : entity.getTrdProductDeals()) {
-                trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
-                trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
-                trdProductDealMapper.insertSelective(trdProductDeal);
                 if (isYJFS) {
                     TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
                     BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, trdProductDeal);
                     trdProductTempDealMapper.insertSelective(trdProductTempDeal);
+                } else {
+                    trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
+                    trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
+                    trdProductDealMapper.insertSelective(trdProductDeal);
                 }
             }
             if (!isJys) {
