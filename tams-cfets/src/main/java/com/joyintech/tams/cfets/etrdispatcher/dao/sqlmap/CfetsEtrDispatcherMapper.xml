@@ -1094,7 +1094,7 @@
         OR fpi.ISSUE_CLASS = '03'
         THEN fpi.TENDER_EDATE
         END AS issueDateEnd/*投标日 结束*/,
-        EEBP.BID_PRIN_AMT etrBidPriceTotal,
+        EEBP.BID_PRIN_AMT*100 etrBidPriceTotal,
         TFPDT.PRIN_AMT totalBiddingNum,
         BO.BID_MODLE biddingMethod,
         BO.PAY_TYPE payType,
@@ -1200,7 +1200,7 @@
         OR fpi.ISSUE_CLASS = '03'
         THEN fpi.TENDER_EDATE
         END AS issueDateEnd/*投标日 结束*/,
-        EEBP.BID_PRIN_AMT etrBidPriceTotal,
+        EEBP.BID_PRIN_AMT*100 etrBidPriceTotal,
         TFPDT.PRIN_AMT totalBiddingNum,
         BO.BID_MODLE biddingMethod,
         BO.PAY_TYPE payType,
