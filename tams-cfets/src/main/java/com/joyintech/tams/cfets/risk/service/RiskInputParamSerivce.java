@@ -464,7 +464,11 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (inputDto == null) {
             return;
         }
-        doOccupy(inputDto);
+        try {
+            doOccupy(inputDto);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -561,7 +565,8 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     || StringUtil.equals(dto.getTrdBankManualSettleInfo().getBusiType(), 头寸业务类型_债券一级申购.getValue()))) {
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
             } else if (StringUtil.isNotEmpty(dto.getTrdBankManualSettleInfo())
-                    && (StringUtil.equals(dto.getTrdBankManualSettleInfo().getBusiType(), 头寸业务类型_质押式回购到期.getValue()))) {
+                    && (StringUtil.equals(dto.getTrdBankManualSettleInfo().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
+                    || StringUtil.equals(dto.getTrdBankManualSettleInfo().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()))) {
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
             } else {
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());

@@ -20,6 +20,7 @@
 		<result column="tgBusiType" property="tgBusiType" jdbcType="VARCHAR" />
 		<result column="ccy" property="ccy" jdbcType="VARCHAR" />
 		<result column="busiType" property="busiType" jdbcType="VARCHAR" />
+		<result column="counterId" property="counterId" jdbcType="VARCHAR" />
 		<collection property="cfetsSettleDetailInfoDtoList" ofType="com.joyintech.tams.invest.batch.cfetssettle.dto.CfetsSettleDetailInfoDto">
 			<id column="tradeId" property="tradeId" jdbcType="VARCHAR" />
 			<result column="shareAmt" property="shareAmt" jdbcType="DECIMAL" />
@@ -53,6 +54,7 @@
 			T3.TRADE_AMT settleAmt,
 			T4.PORTFOLIO_ID portfolioId,
 			T1.CCY ccy,
+		    T1.COUNTER_ID counterId,
 			btm.busi_type busiType
 		FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
 		LEFT JOIN FIN_PRODUCT T2 ON T1.FINPROD_ID = T2.FINPROD_ID
@@ -125,6 +127,7 @@
 			T3.TRADE_AMT settleAmt,
 			T4.PORTFOLIO_ID portfolioId,
 			T1.CCY ccy,
+		    T1.COUNTER_ID counterId,
 			btm.busi_type busiType
 		FROM TRD_PRODUCT_TEMP_DEAL_TOTAL T1
 		LEFT JOIN FIN_PRODUCT T2 ON T1.FINPROD_ID = T2.FINPROD_ID
