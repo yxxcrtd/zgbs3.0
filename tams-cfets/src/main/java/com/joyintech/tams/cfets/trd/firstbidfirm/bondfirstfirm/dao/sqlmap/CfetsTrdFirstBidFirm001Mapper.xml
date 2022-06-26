@@ -710,6 +710,9 @@
                              ON mcp.COUNTER_ID = bo.COUNTER_ID
           WHERE bo.BID_MODLE IN ('01', '02')
             AND bo.TRADE_STATUS = '01'
+            <if test="loginUserId != null and loginUserId!='' ">
+                AND bo.CREATE_USER = #{loginUserId}
+            </if>
             <if test="tradeMarkets != null and tradeMarkets.size()>0">
                 AND
                 <foreach collection="tradeMarkets" open=" fp.TRADE_MARKET in(" close=")" separator="," item="item">
@@ -827,6 +830,9 @@
                    LEFT JOIN MST_COUNTER_PARTY mcp
                              ON mcp.COUNTER_ID = bo.COUNTER_ID
           WHERE bo.BID_MODLE IN ('01', '02')
+            <if test="loginUserId != null and loginUserId!='' ">
+                AND bo.CREATE_USER = #{loginUserId}
+            </if>
             <if test="tradeMarkets != null and tradeMarkets.size()>0">
                 AND
                 <foreach collection="tradeMarkets" open=" fp.TRADE_MARKET in(" close=")" separator="," item="item">
@@ -1053,6 +1059,9 @@
                              ON mcp.COUNTER_ID = bo.COUNTER_ID
              WHERE bo.BID_MODLE IN ('03')
                AND bo.TRADE_STATUS = '01'
+                <if test="loginUserId != null and loginUserId!='' ">
+                    AND bo.CREATE_USER = #{loginUserId}
+                </if>
                 <if test="tradeMarkets != null and tradeMarkets.size()>0">
                     AND
                     <foreach collection="tradeMarkets" open=" fp.TRADE_MARKET in(" close=")" separator="," item="item">
@@ -1180,6 +1189,9 @@
                    LEFT JOIN MST_COUNTER_PARTY mcp
                              ON mcp.COUNTER_ID = bo.COUNTER_ID
              WHERE bo.BID_MODLE IN ('03')
+                <if test="loginUserId != null and loginUserId!='' ">
+                    AND bo.CREATE_USER = #{loginUserId}
+                </if>
                 <if test="tradeMarkets != null and tradeMarkets.size()>0">
                     AND
                     <foreach collection="tradeMarkets" open=" fp.TRADE_MARKET in(" close=")" separator="," item="item">
