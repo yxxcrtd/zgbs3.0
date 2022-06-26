@@ -160,7 +160,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 systemAct = 系统动作_新建.getValue();
                 decisionAct = 系统动作_新建.getValue();
             }
-            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
+//            positionRequestService.sendCreditProtectionCertificatePeriod(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
         }
     }
 
@@ -746,7 +746,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
                 etrSecPositionFlow.setFinprodId(entity.getFinprodId());
                 etrSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
-                etrSecPositionFlow.setInvAim(null);
+                etrSecPositionFlow.setInvAim("999999");
                 etrSecPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
                 etrSecPositionFlow.setCdate(entity.getTradeDate());
                 etrSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi() : billingDetail.getRepNomCapi().negate());
@@ -772,7 +772,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
                 ptlSecPositionFlow.setFinprodId(entity.getFinprodId());
                 ptlSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
-                ptlSecPositionFlow.setInvAim(null);
+                ptlSecPositionFlow.setInvAim("999999");
                 ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 ptlSecPositionFlow.setCdate(entity.getTradeDate());
                 ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi() : billingDetail.getRepNomCapi().negate());
@@ -800,6 +800,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().negate() : billingDetail.getDeliveryAmount());
                 etrCashPositionFlow.setOrderId(entity.getBusiCode());
                 etrCashPositionFlow.setOffsetId(entity.getBusiCode());
+                etrCashPositionFlow.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());
                 etrCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
                 etrCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());
                 etrCashPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
@@ -817,7 +818,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
                 etrSecPositionFlow.setFinprodId(entity.getFinprodId());
                 etrSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
-                etrSecPositionFlow.setInvAim(null);
+                etrSecPositionFlow.setInvAim("999999");
                 etrSecPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
                 etrSecPositionFlow.setCdate(entity.getTradeDate());
                 etrSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi() : billingDetail.getRepNomCapi().negate());
@@ -850,7 +851,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
                 ptlSecPositionFlow.setFinprodId(entity.getFinprodId());
                 ptlSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
-                ptlSecPositionFlow.setInvAim(null);
+                ptlSecPositionFlow.setInvAim("999999");
                 ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 ptlSecPositionFlow.setCdate(entity.getTradeDate());
                 ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi() : billingDetail.getRepNomCapi().negate());
@@ -954,7 +955,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             ptlSecPositionFlow.setSecAcctId(billingDetail.getSecAcctId());
             ptlSecPositionFlow.setFinprodId(entity.getFinprodId());
             ptlSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
-            ptlSecPositionFlow.setInvAim(null);
+            ptlSecPositionFlow.setInvAim("999999");
             ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
             ptlSecPositionFlow.setCdate(nextWorkDate);
             ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().negate() : billingDetail.getRepNomCapi());
