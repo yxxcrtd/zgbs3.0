@@ -30,7 +30,7 @@ public interface EtrExchangeTradeCpc002Mapper {
      */
     EtrDistribute getDistributeByEntrustId(Map<String, Object> map);
 
-    EtrCreditProtectionCertificateHoldResponse getPrice(Map<String, Object> map);
+//    EtrCreditProtectionCertificateHoldResponse getPrice(Map<String, Object> map);
 
     /**
      * 根据委托id查询委托

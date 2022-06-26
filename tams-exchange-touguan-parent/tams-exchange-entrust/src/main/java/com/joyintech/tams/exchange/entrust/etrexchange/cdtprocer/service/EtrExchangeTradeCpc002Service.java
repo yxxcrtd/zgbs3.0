@@ -200,10 +200,8 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                         //最新价从行情取
                         //add wsz 获取 最新估价 作为最新价 start
                         if(StringUtils.equals(entity.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
-                            EtrCreditProtectionCertificateHoldResponse priceEntity = this.getPrice(entity);
-                            if(!Objects.isNull(priceEntity)){
-                                entity.setPrice(priceEntity.getPrice());
-                            } else {
+//                            EtrCreditProtectionCertificateHoldResponse priceEntity = this.getPrice(entity);
+                            if(entity.getPrice() == null) {
                                 entity.setPrice(new BigDecimal(0.00));
                             }
                         } else if (StringUtils.equals(entity.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
@@ -260,13 +258,13 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
         return null;
     }
 
-    public EtrCreditProtectionCertificateHoldResponse getPrice(EtrCreditProtectionCertificateHoldResponse request) {
-        Map<String,Object> map= new HashMap<>();
-        map.put("secid",request.getFinprodMarketId());
-        Date platDate = DateUtil.platDateFromCache();
-        map.put("nowDate",DateUtil.format(platDate));
-        return etrExchangeTradeCpc002Mapper.getPrice(map);
-    }
+//    public EtrCreditProtectionCertificateHoldResponse getPrice(EtrCreditProtectionCertificateHoldResponse request) {
+//        Map<String,Object> map= new HashMap<>();
+//        map.put("secid",request.getFinprodMarketId());
+//        Date platDate = DateUtil.platDateFromCache();
+//        map.put("nowDate",DateUtil.format(platDate));
+//        return etrExchangeTradeCpc002Mapper.getPrice(map);
+//    }
 
     private Page<EtrCreditProtectionCertificateHoldResponse> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap,
                                                                                Page<EtrCreditProtectionCertificateHoldResponse> pages,
