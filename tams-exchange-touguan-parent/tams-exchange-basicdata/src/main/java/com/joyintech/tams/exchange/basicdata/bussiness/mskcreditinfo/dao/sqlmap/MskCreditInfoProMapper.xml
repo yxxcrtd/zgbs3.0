@@ -58,7 +58,7 @@
                 #{secid,jdbcType=VARCHAR},
             </if>
             <if test="cdate != null" >
-                #{cdate,jdbcType=VARCHAR},
+                to_date(#{cdate,jdbcType=VARCHAR}, 'yyyy-MM-dd'),
             </if>
             <if test="mdprice != null" >
                 #{mdprice,jdbcType=DECIMAL},
@@ -108,7 +108,7 @@
         delete
         from MST_CREDIT_MARKET_INFO
         where SECID = #{secid,jdbcType=VARCHAR}
-          and CDATE = #{cdate,jdbcType=VARCHAR}
+          and CDATE = to_date(#{cdate,jdbcType=VARCHAR}, 'yyyy-MM-dd')
     </delete>
 
 
@@ -154,11 +154,11 @@
             </if>
             <if test="cdateStart != null and cdateStart != ''">
                 <!--[CDATA[AND  m.cdate >= #{cdateStart,jdbcType=VARCHAR} ]]-->
-                and m.cdate &gt; to_date(#{cdateStart}, 'yyyy-MM-dd')
+                and m.cdate &gt;= to_date(#{cdateStart}, 'yyyy-MM-dd')
             </if>
             <if test="cdateEnd != null and cdateEnd != ''">
                 <!--[CDATA[AND  m.cdate <= #{cdateEnd,jdbcType=VARCHAR}]]-->
-                and m.cdate &lt; to_date(#{cdateEnd}, 'yyyy-MM-dd')
+                and m.cdate &lt;= to_date(#{cdateEnd}, 'yyyy-MM-dd')
 
             </if>
         </where>
@@ -270,7 +270,7 @@
         where
         m.SECID=#{secId,jdbcType=VARCHAR}
         AND
-        m.CDATE=#{valueDate,jdbcType=VARCHAR}
+        m.CDATE = to_date(#{valueDate,jdbcType=VARCHAR}, 'yyyy-MM-dd')
         <if test="valueSource != null and valueSource !=''">
             and m.VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
         </if>
@@ -321,7 +321,7 @@
         FROM
             MST_CREDIT_MARKET_INFO
         WHERE
-            SECID=#{secid,jdbcType=VARCHAR} and CDATE &lt;= #{nowDate,jdbcType=VARCHAR}
+            SECID=#{secid,jdbcType=VARCHAR} and CDATE &lt;= to_date(#{nowDate,jdbcType=VARCHAR}, 'yyyy-MM-dd')
     </select>
 
     <select id="getBasicInfo" parameterType="Map" resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
@@ -347,7 +347,7 @@
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
         WHERE
-        m.SECID=#{secid,jdbcType=VARCHAR} and m.CDATE = #{cdate,jdbcType=VARCHAR}
+        m.SECID=#{secid,jdbcType=VARCHAR} and m.CDATE = to_date(#{cdate,jdbcType=VARCHAR}, 'yyyy-MM-dd')
     </select>
 
     <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
@@ -419,7 +419,7 @@
             </if>
         </set>
         where SECID = #{secid,jdbcType=VARCHAR}
-        and CDATE = #{cdate,jdbcType=VARCHAR}
+        and CDATE = to_date(#{cdate,jdbcType=VARCHAR}, 'yyyy-MM-dd')
     </update>
 
 </mapper>
