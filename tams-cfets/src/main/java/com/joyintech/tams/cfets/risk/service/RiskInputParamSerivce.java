@@ -1137,12 +1137,17 @@ public class RiskInputParamSerivce extends RiskCommonService {
             creditLinesInputDto.setTradeId(inputDto.getTradeId());
             creditLinesInputDto.setTradeAmt(inputDto.getSettleAmt());
             creditLinesInputDto.setTradeDate(inputDto.getSettleDate());
-            if (inputDto.getBusiType().equals(头寸业务类型_质押式回购到期.getValue()) && insertDto.getPs().equals(交易方向_到期.getValue())) {
-                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
-            } else if (inputDto.getBusiType().equals(头寸业务类型_质押式回购到期.getValue()) && insertDto.getPs().equals(交易方向_到期.getValue())) {
-                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+            creditLinesInputDto.setCounterId(inputDto.getCounterId());
+            if(StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
+                creditLinesInputDto.setFinprodId(null);
+                creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
+            }else if(StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
+                creditLinesInputDto.setFinprodId(null);
+                creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
             } else {
                 creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_债券.getValue());
+
             }
         }
         // 银行间回购指令

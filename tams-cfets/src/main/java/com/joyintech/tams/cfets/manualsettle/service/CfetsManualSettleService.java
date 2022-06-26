@@ -198,6 +198,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                    && ((StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_买入.getValue()) && StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue()) && StringUtil.equals(cfetsDto.getCleanStatus(), DictCodeListExt3.清算状态_清算成功.getValue()))
                    || ((StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_到期.getValue()) || StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_提前终止.getValue()) || StringUtil.equals(cfetsDto.getPs(), DictCodeListExt3.交易方向_投资端_逾期返售.getValue()))
                       && StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue()) && StringUtil.equals(cfetsDto.getCleanStatus(), DictCodeListExt3.清算状态_清算成功.getValue()))
+                   || ((StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_到期.getValue()) || StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_提前终止.getValue()) || StringUtil.equals(cfetsDto.getPs(), DictCodeListExt3.交易方向_投资端_逾期返售.getValue()))
+                        && StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue()) && StringUtil.equals(cfetsDto.getCleanStatus(), DictCodeListExt3.清算状态_清算成功.getValue()))
                    || (StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_到期.getValue()) && (StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券买断式正回购.getValue())
                        || StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券借贷融入.getValue())) && StringUtil.equals(cfetsDto.getCleanStatus(), DictCodeListExt3.清算状态_清算成功.getValue()))
                    || (StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_买入.getValue()) && (StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券买断式逆回购.getValue())
@@ -386,6 +388,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             //交收数量
             trdBankManualSettleInfo.setSettleNum(cfetsManualSettleDto.getSettleNum());
 
+            trdBankManualSettleInfo.setCounterId(cfetsManualSettleDto.getCounterId());
             //交收金额
             if(StringUtil.equals(cfetsManualSettleDto.getTgBusiType(),DictCodeListExt3.头寸业务类型_现券交易.getValue())
                     && StringUtil.equals(cfetsManualSettleDto.getPs(),DictCodeList.交易方向_买入.getValue())){
@@ -407,9 +410,11 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             trdBankManualSettleInfo.setFinprodId(cfetsManualSettleDto.getFinprodId());
             trdBankManualSettleInfo.setSettleAmt(cfetsManualSettleDto.getSettleAmt());
             trdBankManualSettleInfo.setTradeId(cfetsManualSettleDto.getTradeId());
+
             //业务类别
             trdBankManualSettleInfo.setBusiType(cfetsManualSettleDto.getTgBusiType());
             trdBankManualSettleInfo.setSettleDate(platformDateImpl.getSysDate());
+            trdBankManualSettleInfo.setCounterId(cfetsManualSettleDto.getCounterId());
             //交收状态
             trdBankManualSettleInfo.setSettleStatus(DictCodeListExt3.交收状态_未交收.getValue());
             if(StringUtil.equals(buttonType,DictCodeListExt3.交收操作类型_交收.getValue())  ||StringUtil.equals(buttonType,DictCodeListExt3.交收操作类型_交收修改.getValue())){
@@ -419,6 +424,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 trdBankManualSettleInfo.setRemark(cfetsManualSettleDto.getRemark());
             }
         }
+        trdBankManualSettleInfo.setFinprodType2(cfetsManualSettleDto.getFinprodType2());
         return trdBankManualSettleInfo;
     }
 
