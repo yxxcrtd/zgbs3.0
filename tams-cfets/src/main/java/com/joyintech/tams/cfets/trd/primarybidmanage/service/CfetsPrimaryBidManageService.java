@@ -376,6 +376,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
             bidResultDetailMapper.insertSelective(bidResultDetail);
         }
+        Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> allocationListTwoMap = request.getAllocationDetails().stream()
+                .collect(JoyinCollectors.groupingBy(item ->  item.getEntrustId() ));
+        for (String entrustId:allocationListTwoMap.keySet()) {
+            // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“委托状态_已完成”
+            etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_已完成.getValue());
+        }
     }
 
     public AjaxResult unBidSave(CfetsPrimaryBidManageCfmRequest request) {
@@ -507,6 +513,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     }
                     baseInfoDto.setTrdProductDealList(trdProductDeals);
                     entity.setBaseBidManageBaseInfoDto(baseInfoDto);
+                }
+            }else{
+                List<String> entrustIdList =cfetsPrimaryBidManageMapper.selectEntrustIdByBidId(entity.getBidId());
+                for (String entrustId : entrustIdList) {
+                    // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“已接收”
+                    etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_已接收.getValue());
                 }
             }
             if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {

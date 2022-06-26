@@ -89,4 +89,7 @@ public interface CfetsPrimaryBidManageMapper {
 	String selectSecAcctSource(Map<String, Object> param);
 
 	int updateBidOrder(@Param("bidId") String bidId);
+
+
+	List<String> selectEntrustIdByBidId(@Param("bidId") String bidId);
 }
