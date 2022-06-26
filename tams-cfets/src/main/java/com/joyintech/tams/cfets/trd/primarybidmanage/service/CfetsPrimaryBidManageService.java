@@ -1422,7 +1422,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     public List<CfetsPrimaryBidManageSaveDetailDto> otherDistribution(CfetsPrimaryBidManageSaveRequest dto) {
         // 根据投标产品列表中指令条数平均分配结算服务费
         BigDecimal settFeeAmt = StringUtil.isNotEmpty(dto.getSettFeeAmt()) ? dto.getSettFeeAmt() : BigDecimal.ZERO;
-        List<CfetsPrimaryBidManageSaveDetailDto> productDtos = dto.getAllocationDetails();
+        List<CfetsPrimaryBidManageSaveDetailDto> productDtos = dto.getAllocationDetails().stream().filter(item -> StringUtil.isNotEmpty(item.getPayAmt())).collect(Collectors.toList());
+        List<CfetsPrimaryBidManageSaveDetailDto> productNullDtos = dto.getAllocationDetails().stream().filter(item -> !StringUtil.isNotEmpty(item.getPayAmt())).collect(Collectors.toList());
         productDtos.sort(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getPayAmt));
         // 费用平均值
         BigDecimal avg = ArithmeticUtil.divide(settFeeAmt, new BigDecimal(productDtos.size()), 2, RoundingMode.DOWN);
@@ -1447,6 +1448,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             feeTailDifference = ArithmeticUtil.subtract(feeTailDifference, item.getSettFeeAmt());
         }
         this.handleTailDifferenceOhter(productDtos, feeTailDifference);
+        productDtos.addAll(productNullDtos);
         dto.setAllocationDetails(productDtos);
         return this.productDtoSort(dto);
     }

@@ -196,6 +196,9 @@ public class CfetsEtrDispatcherInfoResponse extends CfetsEtrDispatcherBaseInfo{
     @ApiModelProperty(name="isRight",value="是否含权",example="A1")
     private String isRight;
 
+    @ApiModelProperty(name="calculateField",value="计算方式",example="计算方式供前台判断使用")
+    private String calculateField;
+
 
     public String getBusiPs() {
         return busiPs;
@@ -626,5 +629,13 @@ public class CfetsEtrDispatcherInfoResponse extends CfetsEtrDispatcherBaseInfo{
 
     public void setTermDays(String termDays) {
         this.termDays = termDays;
+    }
+
+    public String getCalculateField() {
+        return calculateField;
+    }
+
+    public void setCalculateField(String calculateField) {
+        this.calculateField = calculateField;
     }
 }
