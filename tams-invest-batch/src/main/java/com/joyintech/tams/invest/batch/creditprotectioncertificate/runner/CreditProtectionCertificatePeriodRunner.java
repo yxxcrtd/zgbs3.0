@@ -64,27 +64,27 @@ public class CreditProtectionCertificatePeriodRunner extends BatchBaseService {
 
     @Override
     public JobExecution execute() throws BatchException {
-        logger.info("信用保护凭证自动生成..........");
-        SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
-        if (batchExecuteInfo == null) {
-            logger.info("无启动参数，批处理退出。");
-            return null;
-        }
-        // 设置此task的序列任务公用的params参数
-        Map<String, Object> params = new HashMap<>();
-
-        params.put(BatchConstant.BATCH_INFO, batchExecuteInfo);
-        params.put(BatchConstant.PLATE_DATE, platformDateService.getSysDate(batchExecuteInfo.getCreateUser()));
-
-        // 各步骤设置参数
-        reader1.setParams(params);
-        process1.setParams(params);
-        writer1.setParams(params);
-        reader2.setParams(params);
-        process2.setParams(params);
-        writer2.setParams(params);
-
         try {
+            logger.info("信用保护凭证自动生成..........");
+            SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
+            if (batchExecuteInfo == null) {
+                logger.info("无启动参数，批处理退出。");
+                return null;
+            }
+            // 设置此task的序列任务公用的params参数
+            Map<String, Object> params = new HashMap<>();
+
+            params.put(BatchConstant.BATCH_INFO, batchExecuteInfo);
+            params.put(BatchConstant.PLATE_DATE, platformDateService.getSysDate(batchExecuteInfo.getCreateUser()));
+
+            // 各步骤设置参数
+            reader1.setParams(params);
+            process1.setParams(params);
+            writer1.setParams(params);
+            reader2.setParams(params);
+            process2.setParams(params);
+            writer2.setParams(params);
+
             return batchBuilder.init(this)
                     .batch("step1", (BaseReader) reader1, (BaseProcessor) process1, (BaseWriter) writer1)
                     .batch("step2", (BaseReader) reader2, (BaseProcessor) process2, (BaseWriter) writer2)
