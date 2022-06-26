@@ -64,7 +64,7 @@ public class CreditProtectionCertificatePeriodRunner extends BatchBaseService {
 
     @Override
     public JobExecution execute() throws BatchException {
-        logger.error("信用保护凭证自动生成..........");
+        logger.info("信用保护凭证自动生成..........");
         SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
         if (batchExecuteInfo == null) {
             logger.info("无启动参数，批处理退出。");
