@@ -15,9 +15,11 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
 import com.joyintech.tams.common.base.entity.FinProductIssue;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,10 +158,26 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                     }
                 }
                 for (int i = 0; i < dto.getAllocationDetails().size(); i++) {
-                    if (StringUtil.isNotEmpty(dto.getAllocationDetails().get(0).getActWinPrinamt())) {
-                        BigDecimal[] remainder = dto.getAllocationDetails().get(0).getActWinPrinamt().divideAndRemainder(new BigDecimal(bidMinUnit));
+                    if (StringUtil.isNotEmpty(dto.getAllocationDetails().get(i).getActWinPrinamt())) {
+                        BigDecimal[] remainder = dto.getAllocationDetails().get(i).getActWinPrinamt().divideAndRemainder(new BigDecimal(bidMinUnit));
                         if (remainder[1].compareTo(BigDecimal.ZERO) != 0) {
                             resultList.add(new ValidMessage(getMessage("中标券面总额不满足该资产发行要求，请确认")));
+                        }
+                        if (StringUtil.equals(DictCodeListExt4.中标方式_单标位中标.getValue(), dto.getWinType())
+                                && BigDecimalUtil.ACompareToB(dto.getWinPrice(), dto.getAllocationDetails().get(i).getWinPrice(), 4) != 0) {
+                            resultList.add(new ValidMessage(getMessage("单标位中标的分配明细中中标标位必须等于基本信息中中标标位")));
+                            break;
+                        } else if (StringUtil.equals(DictCodeListExt4.中标方式_多标位中标.getValue(), dto.getWinType())) {
+                            if ((StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
+                                    StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue()))
+                                    && BigDecimalUtil.ACompareToB(dto.getWinPrice(), dto.getAllocationDetails().get(i).getWinPrice(), 4) > 0) {
+                                resultList.add(new ValidMessage(getMessage("单标位中标的分配明细中中标标位必须小于等于基本信息中中标标位")));
+                                break;
+                            } else if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())
+                                    && BigDecimalUtil.ACompareToB(dto.getWinPrice(), dto.getAllocationDetails().get(i).getWinPrice(), 4) < 0) {
+                                resultList.add(new ValidMessage(getMessage("单标位中标的分配明细中中标标位必须大于等于基本信息中中标标位")));
+                                break;
+                            }
                         }
                     }
                 }

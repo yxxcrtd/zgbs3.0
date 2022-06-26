@@ -96,6 +96,9 @@ public class CfetsManualSettleDto extends BaseEntity implements ProcessEntity {
     @ApiModelProperty(name="counterName",value="交易对手",example="admin")
     private String counterName;
 
+    @ApiModelProperty(name="counterName",value="交易对手",example="admin")
+    private String counterId;
+
     @ApiModelProperty(name="cleanStlStatus",value="结算指令状态CODE",example="A1")
     private String cleanStlStatus;
 
@@ -481,5 +484,14 @@ public class CfetsManualSettleDto extends BaseEntity implements ProcessEntity {
 
     public void setBusiTypePosition(String busiTypePosition) {
         this.busiTypePosition = busiTypePosition;
+    }
+
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
     }
 }
