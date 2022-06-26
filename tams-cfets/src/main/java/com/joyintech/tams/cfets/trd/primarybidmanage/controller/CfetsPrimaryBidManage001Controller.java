@@ -301,7 +301,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("CfetsPrimaryBidManage002");
                 parameter.setBusinessDataPk1(dto.getBidId());
-                if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
+                if (cfetsPrimaryBidManageService.isInWflData(parameter)) {
                     errorList.add(new ValidMessage("存在流程中数据，不可进行中标结果维护！"));
                 }
                 parameter.setPageId("CfetsTrdFirstBidFirm002");
