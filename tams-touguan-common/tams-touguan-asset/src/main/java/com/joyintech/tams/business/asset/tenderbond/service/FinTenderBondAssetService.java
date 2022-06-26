@@ -202,7 +202,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @param additionalBatches 批次
      * @return
      */
-    public FinTenderBondAsset002Dto addCoupons(String finprodMarketId, String additionalBatches) {
+    public FinTenderBondAsset002Dto addCoupons(String finprodMarketId, String additionalBatches, String isFromInterF) {
         Map<String, String> param = new HashMap<>();
         param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
@@ -212,6 +212,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         param.put("platformDate", iPlatformDate.getSysDateStr());
         param.put("finprodMarketId", finprodMarketId);
         param.put("additionalBatches", additionalBatches);
+        param.put("isFromInterF", isFromInterF);
         String finprodId = finTenderBondAssetMapper.selectFinprodId(param);
         if (StringUtil.isNotEmpty(finprodId)) {
             return getById(finprodId);
