@@ -2820,6 +2820,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         infRiskRdsDto.setTradePlace(finDto.getTradeMarket());
         infRiskRdsDto.setIsWarnNeedConfirm(DictCodeList.是否_否.getValue());
         infRiskRdsDto.setIsApprNeedConfirm(DictCodeList.是否_否.getValue());
+        infRiskRdsDto.setAssetType2(((InterfRiskRdsDto)v).getAssetType2());
         //add by quzhi 存续期交易增加到期日 begin
         infRiskRdsDto.setMdate(StringUtil.isNotEmpty(finDto.getmDate()) ? DateUtil.parse(finDto.getmDate()) : finDto.getMdate());
         //add by quzhi 存续期交易增加到期日 end

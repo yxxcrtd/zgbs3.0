@@ -1728,6 +1728,7 @@
             on bo.BID_ID = bobp2.BID_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         WHERE tpda.entrust_id = #{entrustId}
+          AND tfpdt.TRADE_STATUS = '01'
         union all
         SELECT
             #{TRADE_FLOW_STATUS01} effectFlag,
@@ -1847,7 +1848,8 @@
             group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
             on bo.BID_ID = bobp2.BID_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
-        WHERE tpda.entrust_id = #{entrustId}) T
+        WHERE tpda.entrust_id = #{entrustId}
+          AND tfpdt.TRADE_STATUS = '01') T
         ORDER BY T.updateTime DESC
 
     </select>

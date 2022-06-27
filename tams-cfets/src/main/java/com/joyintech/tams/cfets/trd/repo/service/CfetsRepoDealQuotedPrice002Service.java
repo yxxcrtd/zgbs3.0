@@ -43,6 +43,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo003Mapper;
@@ -2264,7 +2265,8 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlCashList(ptlCashList);
         req.setPtlSecList(ptlSecList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     /**
