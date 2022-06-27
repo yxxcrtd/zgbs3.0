@@ -135,6 +135,11 @@ public class ImplAsset extends FinProduct implements IAssetInfo {
      */
     private String isExistRecAst;
 
+    /**
+     * 原始权益人
+     */
+    private String originalOwner;
+
     @Override
     public String getAssetType() {
         return this.type6;
@@ -665,5 +670,13 @@ public class ImplAsset extends FinProduct implements IAssetInfo {
 
     public void setIsExistRecAst(String isExistRecAst) {
         this.isExistRecAst = isExistRecAst;
+    }
+
+    public String getOriginalOwner() {
+        return originalOwner;
+    }
+
+    public void setOriginalOwner(String originalOwner) {
+        this.originalOwner = originalOwner;
     }
 }

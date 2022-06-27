@@ -36,6 +36,7 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRespone;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
@@ -213,6 +214,18 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
     @Autowired(required = false)
     private BaseTradeFeeCommService baseTradeFeeCommService;
+
+    @Autowired
+    private TrdProductTempDealTotalMapper trdProductTempDealTotalMapper;
+
+    @Autowired
+    private TrdProductTempDealMapper trdProductTempDealMapper;
+
+    @Autowired
+    private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
+
+    @Autowired
+    private TrdTempDealTotalAddMapper trdTempDealTotalAddMapper;
 
     /**
      * 默认设置
@@ -436,6 +449,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     public void doComplete(CfetsPrimaryBidManageSaveRequest entity, OperationType type) {
         String action = StringUtil.EMPTY;
         if (OperationType.REVOKE.equals(type)) {
+            // 是否交易所
+            boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                    && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+            // 是否交易所一级分销
+            boolean isYJFS = isJys && StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue());
             action = OperationType.REVOKE.name();
             BidResultTotal bidResultTotal = new BidResultTotal();
             bidResultTotal.setTotalWinId(entity.getTotalWinId());
@@ -546,6 +564,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
     private void doCompleteInsert(CfetsPrimaryBidManageSaveRequest entity) {
         BaseBidManageBaseInfoDto dto = entity.getBaseBidManageBaseInfoDto();
+        // 是否交易所
+        boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+        // 是否交易所一级分销
+        boolean isYJFS = isJys && StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue());
         //中标结果汇总表
         BidResultTotal bidResultTotal = dto.getBidResultTotal();
         wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
@@ -563,15 +586,33 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
         //金融产品交易汇总表
         for(TrdFinProductDealTotal trdFinProductDealTotal: dto.getTrdFinProductDealTotalList()) {
-            trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
+            if (isYJFS) {
+                trdProductTempDealTotalMapper.insert(trdFinProductDealTotal);
+            } else {
+                trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
+            }
         }
         //金融产品交易表
         for(TrdProductDeal trdProductDeal: dto.getTrdProductDealList()) {
-            trdProductDealMapper.insertSelective(trdProductDeal);
+            if (isYJFS) {
+                TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, trdProductDeal);
+                trdProductTempDealMapper.insertSelective(trdProductTempDeal);
+            } else {
+                trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
+                trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
+                trdProductDealMapper.insertSelective(trdProductDeal);
+            }
         }
         //金融产品交易附属表
         for(TrdProductDealAdd trdProductDealAdd: dto.getTrdProductDealAddList()) {
-            trdProductDealAddMapper.insertSelective(trdProductDealAdd);
+            if (isYJFS) {
+                TrdProductTempDealAdd trdTempDealTotalAdd = new TrdProductTempDealAdd();
+                BeanUtil.copyPropertiesIgnoreNull(trdTempDealTotalAdd, trdProductDealAdd);
+                trdProductTempDealAddMapper.insertSelective(trdTempDealTotalAdd);
+            }else {
+                trdProductDealAddMapper.insertSelective(trdProductDealAdd);
+            }
         }
         //汇总交易费用表
         for(TrdTradeFeeTotal trdTradeFeeTotal: dto.getTrdTradeFeeTotalList()) {
@@ -1030,7 +1071,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         req.setCdate(iplatformDate.getSysDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     /**
