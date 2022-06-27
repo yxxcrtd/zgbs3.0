@@ -394,8 +394,6 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         dto.setFinprodMarketId(finProductInfo.getFinprodMarketId());
         dto.setFinprodAbbr(finProductInfo.getFinprodAbbr());
         if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
-            dto.setIssueDate(finProductInfo.getIssueDate());
-            dto.setPayDate(finProductInfo.getPayDate());
             dto.setIssuePrice(new BigDecimal(finProductInfo.getIssuePrice()));
             dto.setReferYield(finProductInfo.getReferYield());
             dto.setTenderTarget(finProductInfo.getTenderTarget());
@@ -411,8 +409,6 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
             dto.setTenderTarget(finProductInfo.getTenderTarget());
             dto.setTenderSdate(finProductInfo.getTenderSdate());
             dto.setTenderEdate(finProductInfo.getTenderEdate());
-            dto.setIssueDate(finProductInfo.getIssueDate());
-            dto.setPayEdate(finProductInfo.getPayEdate());
             dto.setCounterId(etrEntrust.getCounterId());
             dto.setCounterName(counterMap.get(etrEntrust.getCounterId()));
             dto.setTenderTarget(finProductInfo.getTenderTarget());
@@ -434,7 +430,11 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
                     dto.setTenderSdate(finProductInfo.getTenderSdate());
                     dto.setTenderEdate(finProductInfo.getTenderEdate());
                 }
-                dto.setPayEdate(finProductInfo.getPayEdate());
+                if (finProductInfo.getPayEdate() != null) {
+                    dto.setPayEdate(finProductInfo.getPayEdate());
+                }else {
+                    dto.setPayEdate(finProductInfo.getPayDate());
+                }
 
                 //查询指令标位信息
                 List<EtrEntrustBidPrice> bidPrices = cfetsEtrBondFirstBid001Mapper.selectBidPriceById(entrustId);
@@ -481,7 +481,11 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
                     dto.setTenderSdate(finProductInfo.getTenderSdate());
                     dto.setTenderEdate(finProductInfo.getTenderEdate());
                 }
-                dto.setPayEdate(finProductInfo.getPayEdate());
+                if (finProductInfo.getPayEdate() != null) {
+                    dto.setPayEdate(finProductInfo.getPayEdate());
+                }else {
+                    dto.setPayEdate(finProductInfo.getPayDate());
+                }
 
                 //查询指令标位信息
                 List<EtrEntrustBidPrice> bidPrices = cfetsEtrBondFirstBid001Mapper.selectBidPriceById(entrustId);

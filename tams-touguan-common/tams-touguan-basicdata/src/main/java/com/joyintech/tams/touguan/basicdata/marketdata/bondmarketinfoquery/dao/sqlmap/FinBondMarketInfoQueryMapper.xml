@@ -655,6 +655,23 @@ select  * from (
                RANGE_YIELD  couponrate,
                INT_AMT      accrueintamt,
                BASIS        basis,
+               INT_PRIN_AMT     prinAmt,
+               CASH_AMT     cashAmt
+        from FIN_CASH_PLAN fcp
+        WHERE fcp.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+          AND fcp.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+          AND fcp.BRANCH = 0
+          AND fcp.CASH_ID = #{cashId}
+    </select>
+
+    <select id="selectInvRepayList"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto">
+        SELECT VDATE        intereststartday,
+               MDATE        interestendday,
+               PAY_DATE     interestpayday,
+               RANGE_YIELD  couponrate,
+               INT_AMT      accrueintamt,
+               BASIS        basis,
                PRIN_AMT     prinAmt,
                CASH_AMT     cashAmt
         from FIN_CASH_PLAN fcp

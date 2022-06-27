@@ -201,7 +201,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         if (StringUtil.isNotBlank(finListedBondInfoQuery001Dto.getIssuerCode())) {
             String customerId = finBondMarketInfoQuery001Service.handleIssuer(validMessages, finListedBondInfoQuery001Dto.getIssuerCode());
             if(StringUtil.isNotBlank(customerId)){
-                finListedBondInfoQuery001Dto.setIssuer(customerId);
+                finListedBondInfoQuery001Dto.setIssuerCode(customerId);
             }
         }
         if (CollectionUtils.isNotEmpty(validMessages)) {

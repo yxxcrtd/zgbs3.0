@@ -288,8 +288,8 @@ public class CreditProtectionCertificatePeriodRunnerService {
             etrSecPositionFlow.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
             etrSecPositionFlow.setAmount(ArithmeticUtil.divide(etrSecPositionFlow.getAmount(), 100, 4));
             etrSecPositionFlow.setpFinprodId(null);
-            etrSecPositionFlow.setTradeId(expireData.getTradeId());
-            etrSecPositionFlow.setOffsetId(expireData.getTradeId());
+            etrSecPositionFlow.setTradeId(writerDto.getBussinessCode());
+            etrSecPositionFlow.setOffsetId(writerDto.getBussinessCode());
             etrSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
             etrSecPositionFlow.setCreateUser("SYSTEM");
             etrSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
@@ -312,8 +312,8 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
             ptlSecPositionFlow.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow.getAmount(), 100, 4));
             ptlSecPositionFlow.setpFinprodId(null);
-            ptlSecPositionFlow.setTradeId(expireData.getTradeId());
-            ptlSecPositionFlow.setOffsetId(expireData.getTradeId());
+            ptlSecPositionFlow.setTradeId(writerDto.getBussinessCode());
+            ptlSecPositionFlow.setOffsetId(writerDto.getBussinessCode());
             ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
             ptlSecPositionFlow.setCreateUser("SYSTEM");
             ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());

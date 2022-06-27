@@ -296,8 +296,15 @@ public class FieldEtrInfoQueryService extends BaseService {
         if (StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1) {
             return new Page<TradeQueryBean>();
         }
-        Page<TradeQueryBean>
-                page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> fieldEtrInfoQueryMapper.getEtrDispatcherDealListInfo(pageParam));
+        Page<TradeQueryBean> page = null;
+        //一级投标
+        if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
+            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
+                    () -> fieldEtrInfoQueryMapper.getEtrDispatcherBidDealListInfo(pageParam));
+        } else {
+            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
+                    () -> fieldEtrInfoQueryMapper.getEtrDispatcherDealListInfo(pageParam));
+        }
         return page;
     }
 
