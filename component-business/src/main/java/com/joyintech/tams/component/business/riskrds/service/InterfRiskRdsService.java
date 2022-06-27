@@ -2605,7 +2605,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 //设置是否是股东发行
                 infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
             }else{
-                infRiskRdsDto.setAmount(finDto.getFpriceAmt());//债券为全价总额存款
+                //infRiskRdsDto.setAmount(finDto.getFpriceAmt());//债券为全价总额存款
                 // add by zhangrui1 汇总确认 start
                 String winPrinAmtKey = "bidPrinAmt";
                 Object winPrinAmt = dataMap.get(winPrinAmtKey);
@@ -2626,7 +2626,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 } else if (StringUtil.isNotEmpty(dataMap.get("payDate"))) {
                     infRiskRdsDto.setEventDate(DateUtil.format(new Date(Long.parseLong(dataMap.get("payDate").toString())), DateUtil.DEFAULT_DATE_FORMAT_EN));
                 }
-                infRiskRdsDto.setEventId(StringUtil.isNotEmpty(dataMap.get("bidId")) ? dataMap.get("bidId").toString() : StringUtil.EMPTY);
+                infRiskRdsDto.setEventId(StringUtil.isNotEmpty(dataMap.get("bidId")) ? dataMap.get("bidId").toString() : dataMap.get("entrustId").toString());
                 //设置是否是股东发行
                 infRiskRdsDto.setIsShareHolder(riskRdsTrialCommonMapper.getIsShareholderIssue(dataMap));
             }
@@ -2680,8 +2680,10 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
 
         // 预占功能 add by zhangrui1 start
         // 设置委托编号
-        infRiskRdsDto.setEntrustCode(finDto.getEntrustId());
-        infRiskRdsDto.setPreOccupyCode(finDto.getEntrustId());
+       if(!CommonUtil.isType(v.getEventStatus(), BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入)) {
+           infRiskRdsDto.setEntrustCode(finDto.getEntrustId());
+           infRiskRdsDto.setPreOccupyCode(finDto.getEntrustId());
+       }
         // 预占功能 add by zhangrui1 end
         if (CommonUtil.isType(v.getAssetType(), DictCodeList.平安资产类型_买断式回购)
                 || CommonUtil.isType(v.getAssetType(), DictCodeList.平安资产类型_质押式回购)) {
