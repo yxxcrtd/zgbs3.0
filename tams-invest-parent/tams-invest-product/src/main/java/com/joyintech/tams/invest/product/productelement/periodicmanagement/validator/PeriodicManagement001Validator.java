@@ -112,10 +112,10 @@ public class PeriodicManagement001Validator implements BeanValidator {
                 if (periodicManagement001Service.checkPeriodId(dto.getPeriodId())) {
                     errorList.add(new ValidMessage(getMessage("期次代码已存在")));
                 }
-//                if (dto.getEndDate() != null &&
-//                        dto.getStartDate().compareTo(DateUtil.platDateFromCache()) < 0) {
-//                    errorList.add(new ValidMessage(getMessage("期次开始日应大于等于平台日期")));
-//                }
+                if (dto.getEndDate() != null &&
+                        dto.getStartDate().compareTo(DateUtil.platDateFromCache()) < 0) {
+                    errorList.add(new ValidMessage(getMessage("期次开始日应大于等于平台日期")));
+                }
             }
             if (!StringUtil.isNotEmpty(dto.getStartDate())) {
                 errorList.add(new ValidMessage(getMessage("请输入期次开始日")));
