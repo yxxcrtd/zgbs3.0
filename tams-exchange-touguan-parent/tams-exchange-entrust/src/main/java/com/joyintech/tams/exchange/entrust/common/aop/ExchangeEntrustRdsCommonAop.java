@@ -344,6 +344,9 @@ public class ExchangeEntrustRdsCommonAop {
         if(StringUtil.equals("F36", mapTrd.get("finprodType2"))) {
         	return;
         }
+        if(StringUtil.equals("F37", mapTrd.get("finprodType2"))) {
+            return;
+        }
         // add by yzg 期货暂时不用风险 20201211 end
         if (StringUtil.equals(getOperateType(mapTrd), BussinessConstant.SUBMIT)) {
             //如果是撤销的退回再提交直接退去，不需要调实占

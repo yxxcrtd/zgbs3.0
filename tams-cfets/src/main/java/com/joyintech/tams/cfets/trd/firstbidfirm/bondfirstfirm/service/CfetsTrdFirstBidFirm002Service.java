@@ -2783,6 +2783,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             //处理指令完成进度
             finishEtrList.forEach(this::closeDelegatePositionMethod);
         } catch (Exception e) {
+            logger.error("处理异常",e);
             throw new BusinessException("MSG:" + e.getMessage());
         }
     }
@@ -3546,10 +3547,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 汇总投标券面总额
             if (!StringUtil.isNotEmpty(item.getTotalBiddingNum())) {
                 errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额不可为空!"));
-            } else if (BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), BigDecimal.ZERO, 4) <= 0
+            } else if (BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), BigDecimal.ZERO, 4) < 0
                     || BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), item.getEtrBidPriceTotal(), 4) > 0) {
                 // 投标产品列表中汇总投标券面总额要小于等于指令投标券面总额
-                errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额必须大于0，小于等于指令投标券面总额!"));
+                errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额必须大于等于0，小于等于指令投标券面总额!"));
             }
             // 指令投标券面总额
             if (!StringUtil.isNotEmpty(item.getEtrBidPriceTotal())) {

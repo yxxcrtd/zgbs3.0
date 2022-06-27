@@ -1105,6 +1105,7 @@
                his.BUSI_DES, his.OPER_TIME ORDER_TIME,
                CASE WHEN his.OPER_TYPE = '01' THEN
                         nvl(SU2.real_name,nvl(SUR.REAL_NAME,SUB.REAL_NAME))
+                    WHEN his.OPER_TYPE = '20' THEN his.user_id
                     ELSE SU.real_name
                    END AS userId
            from ETR_ENTRUST_OPER_HIS his
