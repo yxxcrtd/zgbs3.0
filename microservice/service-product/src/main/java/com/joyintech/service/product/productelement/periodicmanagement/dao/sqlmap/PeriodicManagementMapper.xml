@@ -514,6 +514,7 @@
 			</otherwise>
 		</choose>
 		and fin_cash_info.finprod_type = #{type01}
+		order by lev
 	</select>
 
 	<select id="selectCashPayRule" resultType="com.joyintech.tams.common.base.entity.FinCashPayRule">
