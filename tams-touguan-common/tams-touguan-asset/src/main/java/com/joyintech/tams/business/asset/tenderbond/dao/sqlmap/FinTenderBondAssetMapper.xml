@@ -438,7 +438,7 @@
                 <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
                     AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
                 </if>
-                <if test="isFromInterF != null and isFromInterF == '1'">
+                <if test="isFromInterF != null and isFromInterF == 1">
                     <choose>
                         <when test="additionalBatches != null and additionalBatches != ''">
                             AND T2.ADD_BATCH = #{additionalBatches}
