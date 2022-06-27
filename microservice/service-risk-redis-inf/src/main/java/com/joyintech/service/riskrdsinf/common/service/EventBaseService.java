@@ -11,17 +11,8 @@
 package com.joyintech.service.riskrdsinf.common.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -2011,7 +2002,7 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
             // 实占金额大于预占金额时，刷新预占金额
             BigDecimal ocpVal = item.getOccupyVal();
             if (relVal != null && ocpVal != null && relVal.compareTo(ocpVal) > 0) {
-                item.setOffsetVal(relVal.subtract(ocpVal).add(item.getOffsetVal()));
+                item.setOffsetVal(relVal.subtract(ocpVal).add(Objects.isNull(item.getOffsetVal())?BigDecimal.ZERO:item.getOffsetVal()));
             }
         });
     }
