@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.joyintech.tams.invest.product.productelement.periodicmanagement.service.PeriodicManagement002Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,9 @@ public class PeriodicManagement001Validator implements BeanValidator {
 
     @Autowired
     private FinProductMapper finProductMapper;
+
+    @Autowired
+    private PeriodicManagement002Service periodicManagement002Service;
 
     @Override
     public List<ValidMessage> valid(Object value) {
@@ -77,6 +81,10 @@ public class PeriodicManagement001Validator implements BeanValidator {
             }
         }
         if (StringUtil.equals(dto.getOperateType(), "new")) {
+            if (periodicManagement002Service.checkPeriodTradeDate(dto)) {
+                errorList.add(new ValidMessage( getMessage("该产品该期次开始日结束日区间已存在")));
+            }
+
             //投资周期必填校验 yzg 20191122 start
             if (StringUtil.isNotEmpty(dto.getTermType())) {
                 if (StringUtil.equals(dto.getTermType(), DictCodeListExt2.期限类型_多固定期限.getValue())) {

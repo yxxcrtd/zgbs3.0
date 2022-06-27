@@ -192,10 +192,6 @@ public class PeriodicManagement002Controller extends BaseController {
                 str = "期次开始日/期次结束日为节假日，是否继续";
             }
 
-            if (StringUtil.equals(dto.getOperateType(), "new") && periodicManagement002Service.checkPeriodTradeDate(dto)) {
-                str = "该产品该期次开始日结束日区间已存在，是否继续?";
-            }
-
             if (StringUtil.isNotBlank(str)) {
                 AjaxResult wr = new AjaxResult();
                 wr.setData(str);
