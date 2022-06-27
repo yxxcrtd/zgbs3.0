@@ -10,12 +10,13 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
-import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.constant.DictCodeList;
@@ -31,9 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sun.rmi.transport.ObjectTable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
@@ -399,7 +402,21 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("completePoint() || completeRepoPoint()")
     public void occupyOnComplete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+        try {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if(CollectionUtils.isEmpty(mapList)){
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**

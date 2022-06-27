@@ -347,15 +347,6 @@ public class FinBondAsset002Controller extends BaseController {
         if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
             dto = finBondAssetService.getFinprodId(dto);
         }
-        //文件信息
-        if (StringUtil.isNotEmpty(dto.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(dto.getMstFileInputParameter().getFileList())
-                && StringUtil.isNotEmpty(dto.getFinprodId())) {
-            // 将附件和当前业务对象绑定（更新附件的业务代码）
-            fileAttachmentProcess.updateBussinessNo(
-                    dto.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
-                            Collectors.toList()),
-                    dto.getFinprodId());
-        }
         dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         WorkFlowParameter<FinBondAssetSaveRequest> params = new WorkFlowParameter<FinBondAssetSaveRequest>();
         params.setPageId(this.getPageId());
