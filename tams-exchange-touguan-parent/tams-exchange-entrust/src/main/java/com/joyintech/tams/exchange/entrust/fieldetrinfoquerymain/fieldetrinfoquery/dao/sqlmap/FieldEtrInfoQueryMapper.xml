@@ -1840,6 +1840,55 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         ee.ENTRUST_ID = #{entrustId}
         AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
         OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID = #{entrustId}))
+        union all
+        SELECT distinct
+        decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
+        <include refid="etrDispatcherBidDealListInfo"/>
+        FROM TRD_PRODUCT_DEAL tpd
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON tpd.trade_id = tpda.trade_id
+        left join TRD_FIN_PRODUCT_DEAL_TOTAL tpdt on tpd.TOTLE_TRADE_ID=tpdt.TOTLE_TRADE_ID
+        LEFT JOIN PTL_PORTFOLIO pp ON tpda.portfolio_id = pp.portfolio_id
+        LEFT JOIN FIN_PRODUCT fp ON tpd.finprod_id = fp.finprod_id
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
+        left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
+        LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
+        LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
+        left join FIN_TRADE_PRODUCT FTP on tpd.FINPROD_ID = FTP.FINPROD_ID
+        left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
+        LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
+        LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
+        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
+        LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID  = ee.ENTRUST_ID
+        LEFT JOIN (
+        SELECT
+        brd.ENTRUST_ID,
+        wm_concat ( brd.WIN_PRICE ) AS WIN_PRICE
+        FROM BID_RESULT_DETAIL brd
+        GROUP BY brd.ENTRUST_ID
+        ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN (
+        SELECT
+        EED.ENTRUST_ID,
+        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+        wm_concat (sci.ACCT_NO) AS ACCT_NO,
+        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+        FROM ETR_ENTRUST_DETAIL EED
+        left join
+        (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
+        FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
+        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON
+        sci.ACCT_NO = ssai.TRD_ACCT_ID
+        GROUP BY EED.ENTRUST_ID ) detail ON ee.ENTRUST_ID = detail.ENTRUST_ID
+        WHERE
+        ee.ENTRUST_ID = #{entrustId}
+        AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
+        OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId}))
     </select>
 
     <sql id="etrDispatcherBidDealListInfo">
@@ -2184,12 +2233,18 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
                  left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
                             from ETR_FINISH_STATUS
                             group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
-                 left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
-                            from TRD_PRODUCT_TEMP_DEAL t1
-                                     left join TRD_PRODUCT_TEMP_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
-                            where t1.IS_CANCEL = 'N'
-                              and t1.TRADE_STATUS = '01'
-                            group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
+                 left join (
+                     select sum(T.SHARE_AMT) SHARE_AMT, T.ENTRUST_ID from (
+                         select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+                            from TRD_PRODUCT_DEAL t1
+                                     left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+                            where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS = '01'
+                         union all
+                         select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+                         from TRD_PRODUCT_TEMP_DEAL t1
+                                  left join TRD_PRODUCT_TEMP_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+                         where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS = '01') T
+                            group by T.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         where ee.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
     </select>
 
