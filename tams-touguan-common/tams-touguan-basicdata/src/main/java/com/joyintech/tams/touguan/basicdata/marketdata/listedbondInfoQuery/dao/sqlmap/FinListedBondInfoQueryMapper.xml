@@ -373,6 +373,8 @@
         ISSUE.PAY_EDATE eventDate,
         ISSUE.ASSIGN_REGDATE debtRegistrationDate,
         PRODUCT_ADD.LISTING_DATE listingDate,
+        PRODUCT_ADD.CROSS_MARKET_CODE crossMarketCode,
+        PRODUCT_ADD.CROSS_MARKET crossMarket,
         PRODUCT.FINPROD_MARKET_ID listingCode,
         ISSUE.MIN_PAMT singleMinSubAmt,
         ISSUE.MAX_PAMT singleMaxSubAmt,

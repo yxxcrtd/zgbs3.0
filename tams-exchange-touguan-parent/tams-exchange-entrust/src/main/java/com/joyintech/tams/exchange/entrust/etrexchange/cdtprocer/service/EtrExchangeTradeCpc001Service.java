@@ -215,7 +215,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         etrExchangeTrade001Dto.setStockId(dto.getStockId());
         etrExchangeTrade001Dto.setEntrustDate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
         etrExchangeTrade001Dto.setOptType(dto.getOptType());
-
+        etrExchangeTrade001Dto.setIsMulti(DictCodeList.是否_是.getValue());
         //风险试算 ZGCPCN-1582 保留单组合信息
         if (dto.getPortfolioList().size() > 1 && !CollectionUtils.isEmpty(dto.getRiskTrialRetDto())) {
             List<RiskTrialRetDto> riskTrialRetDtos1 = new ArrayList<>();
@@ -681,6 +681,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             dto.setCreateDept(LoginUserUtil.getDeptCode());// 用户部门
             dto.setCreateTime(new Date());// 创建时间
             dto.setPortfolioId(item.getPortfolioId()); //让指令分发能查出来
+            dto.setIsMulti(DictCodeList.是否_否.getValue());
             doInsetOrUpdateForEtrPositionHold(dto);
         }
 
@@ -936,7 +937,18 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
                 EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).entrustCheck(etrSecRepoBondDto, result);
             }
+
             AjaxResult ajax = new AjaxResult(result);
+            List<ValidMessage> errorList = new ArrayList<>();
+            if(Objects.equals(entity.getPs(), DictCodeList.交易方向_申购.getValue())){
+                for (EtrExchangeTradePortfolioSecRepoRequest item : entity.getPortfolioList()) {
+                    String acctNo = tamsBusinessCommonService.selectProdTghCapacctNo(item.getPortfolioId());
+                    if(StringUtils.isEmpty(acctNo)){
+                        errorList.add(new ValidMessage("组合["+item.getPortfolioId()+"]未关联托管户"));
+                        ajax.setErrorList(errorList);
+                    }
+                }
+            }
             Field[] fields = ReflectUtil.getDeclaredFields(ajax);
             for (Field field : fields) {
                 if (StringUtil.equals(field.getName(), "messageType")) {

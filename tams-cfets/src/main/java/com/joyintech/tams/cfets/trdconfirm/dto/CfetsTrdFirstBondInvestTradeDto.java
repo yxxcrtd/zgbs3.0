@@ -49,9 +49,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
     @ApiModelProperty(name = "validStatus", value = "有效状态, pageDaySubDetail 接口", example = "01")
     private String validStatus;
 
-    @ApiModelProperty(name = "finprodId", value = "资产代码", example = "F01_001.IB")
-    private String finprodId;
-
     @ApiModelProperty(name = "finprodMarketId", value = "市场代码", example = "001.IB")
     private String finprodMarketId;
 
@@ -79,9 +76,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
     @ApiModelProperty(name = "referenceRateStr", value = "参考收益率,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率，文本，形式为：基准利率+利差BP", example = "个人活期+1")
     private String referenceRateStr;
 
-    @ApiModelProperty(name = "rate", value = "票面利率", example = "99.0000")
-    private BigDecimal rate;
-
     @ApiModelProperty(name = "rateStr", value = "票面利率", example = "99.0000")
     private String rateStr;
 
@@ -94,14 +88,8 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
     @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
     private BigDecimal settFeeAmt;
 
-    @ApiModelProperty(name = "remark", value = "备注", example = "XXX")
-    private String remark;
-
     @ApiModelProperty(name = "revokeReason", value = "撤销备注", example = "XXX")
     private String revokeReason;
-
-    @ApiModelProperty(name = "tradeDate", value = "申购日期")
-    private Date tradeDate;
 
     @ApiModelProperty(name = "tradeDateStr", value = "申购日期格式化")
     private String tradeDateStr;
@@ -158,10 +146,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
     private boolean autoTradeFlag;
 
     /**
-     * 交易金额(原交易金额被券面总额所用)
-     */
-    private BigDecimal tradeAmt;
-    /**
      * 导入标识
      */
     private boolean importFlag;
@@ -182,16 +166,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
 
     public void setParentPageId(String parentPageId) {
         this.parentPageId = parentPageId;
-    }
-
-    /**
-     * 取得 金融产品类型（投管分类），债券、理财产品、基金、理财产品模板、理财产品分层
-     *
-     * @return 金融产品类型（投管分类），债券、理财产品、基金、理财产品模板、理财产品分层
-     */
-    @Override
-    public String getFinprodType2() {
-        return super.getFinprodType2();
     }
 
     /**
@@ -907,140 +881,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
     }
 
     /**
-     * 取得 交易日期
-     *
-     * @return 交易日期
-     */
-    @NotEmpty(fieldName = "TrdBondInvestTrade002.tradeDate")
-    @Override
-    public Date getTradeDate() {
-        return super.getTradeDate();
-    }
-
-    /**
-     * 取得 交割日期
-     *
-     * @return 交割日期
-     */
-    @NotEmpty(fieldName = "TrdBondInvestTrade002.settleDate")
-    @Override
-    public Date getSettleDate() {
-        return super.getSettleDate();
-    }
-
-    /**
-     * 取得 交易方向，买入、卖出、收息、还本、申购、赎回等
-     *
-     * @return 交易方向，买入、卖出、收息、还本、申购、赎回等
-     */
-    @NotEmpty(fieldName = "TrdBondInvestTrade002.ps")
-    @Override
-    public String getPs() {
-        return super.getPs();
-    }
-
-    /**
-     * 取得 金融产品代码
-     *
-     * @return 金融产品代码
-     */
-    @NotEmpty(fieldName = "TrdBondInvestTrade002.finprodId")
-    @Override
-    public String getFinprodId() {
-        return super.getFinprodId();
-    }
-
-    /**
-     * 取得 交易场所，银行间、上交所、深交所、柜面等
-     *
-     * @return 交易场所，银行间、上交所、深交所、柜面等
-     */
-    @NotEmpty(fieldName = "TrdBondInvestTrade002.tradeMarket")
-    @Override
-    public String getTradeMarket() {
-        return super.getTradeMarket();
-    }
-
-    /**
-     * 取得 交易市场，一级市场、二级市场
-     *
-     * @return 交易市场，一级市场、二级市场
-     */
-    @NotEmpty(fieldName = "TrdBondInvestTrade002.tradeMarketMode", groups = ValidateGroupEdit.class)
-    @Override
-    public String getTradeMarketMode() {
-        return super.getTradeMarketMode();
-    }
-
-    /**
-     * 取得 交易平台，银行间、上交所固定收益平台、上交所大宗交易平台、深交所大宗平台、深交所综合协议交易平台、其他等
-     *
-     * @return 交易平台，银行间、上交所固定收益平台、上交所大宗交易平台、深交所大宗平台、深交所综合协议交易平台、其他等
-     */
-    // 交易所债一级市场时，交易平台非必填 delete by renping 20191105 start
-    // @NotEmpty(fieldName = "TrdBondInvestTrade002.tradePlat", groups = ValidateGroupEdit.class )
-    // 交易所债一级市场时，交易平台非必填 add by renping 20191105 end
-    @Override
-    public String getTradePlat() {
-        return super.getTradePlat();
-    }
-
-    // /**
-    // * 取得 投资目的
-    // *
-    // * @return 投资目的
-    // */
-    // @NotEmpty(fieldName = "TrdBondInvestTrade002.invAim")
-    // @Override
-    // public String getInvAim() {
-    // return super.getInvAim();
-    // }
-
-    /**
-     * 取得 证券管理户代码
-     *
-     * @return 证券管理户代码
-     */
-//    @NotEmpty(fieldName = "TrdBondInvestTrade002.secManageAcctId")
-    @Override
-    public String getSecManageAcctId() {
-        return super.getSecManageAcctId();
-    }
-
-//    /**
-//     * 取得 交易金额
-//     *
-//     * @return 交易金额
-//     */
-//    @NotEmpty(fieldName = "TrdBondInvestTrade002.tradeAmt")
-//    @Override
-//    public BigDecimal getTradeAmt() {
-//        return super.getTradeAmt();
-//    }
-
-    /**
-     * 取得 单位净价
-     *
-     * @return 单位净价
-     */
-    @NotEmpty(fieldName = "TrdBondInvestTrade002.unitCprice")
-    @Override
-    public BigDecimal getUnitCprice() {
-        return super.getUnitCprice();
-    }
-
-    /**
-     * 取得 到期收益率
-     *
-     * @return 到期收益率
-     */
-//    @NotEmpty(fieldName = "TrdBondInvestTrade002.yield")
-    @Override
-    public BigDecimal getYield() {
-        return super.getYield();
-    }
-
-    /**
      * 获取 bussTrdTransferOrder
      *
      * @return bussTrdTransferOrder
@@ -1137,16 +977,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
         this.entrustId = entrustId;
     }
 
-    /**
-     * 获取 portfolioId
-     *
-     * @return portfolioId
-     */
-    @Override
-    @NotEmpty(fieldName = "TrdBondInvestTrade002.portfolioId")
-    public String getPortfolioId() {
-        return super.getPortfolioId();
-    }
 
 
     /**
@@ -2483,11 +2313,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
         this.oprType = oprType;
     }
 
-    @Override
-    public void setFinprodId(String finprodId) {
-        this.finprodId = finprodId;
-    }
-
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -2552,15 +2377,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
         this.referenceRateStr = referenceRateStr;
     }
 
-    @Override
-    public BigDecimal getRate() {
-        return rate;
-    }
-
-    @Override
-    public void setRate(BigDecimal rate) {
-        this.rate = rate;
-    }
 
     public String getRateStr() {
         return rateStr;
@@ -2592,21 +2408,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
 
     public void setSettFeeAmt(BigDecimal settFeeAmt) {
         this.settFeeAmt = settFeeAmt;
-    }
-
-    @Override
-    public String getRemark() {
-        return remark;
-    }
-
-    @Override
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    @Override
-    public void setTradeDate(Date tradeDate) {
-        this.tradeDate = tradeDate;
     }
 
     public String getTradeDateStr() {
@@ -2679,16 +2480,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
 
     public void setRskApproval(String rskApproval) {
         this.rskApproval = rskApproval;
-    }
-
-    @Override
-    public BigDecimal getTradeAmt() {
-        return tradeAmt;
-    }
-
-    @Override
-    public void setTradeAmt(BigDecimal tradeAmt) {
-        this.tradeAmt = tradeAmt;
     }
 
     public String getIssuer() {
