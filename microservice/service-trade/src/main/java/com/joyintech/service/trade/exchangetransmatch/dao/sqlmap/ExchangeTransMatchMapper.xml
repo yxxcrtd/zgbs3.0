@@ -681,12 +681,12 @@
             E.FINPROD_ID
         END finprodId,
         C.PS ps,
-        A.MARCH_AMT_EN tradeAmt,
+        A.MARCH_AMT tradeAmt,
         <!--GNS-892:回购需特殊处理 modify by fuyongsheng 20220227 start-->
         <!--A.MARCH_QTY_EN tradeNum,-->
         CASE
-        WHEN C.SEC_TYPE = #{SEC_TYPE_09} THEN A.MARCH_AMT_EN
-        ELSE A.MARCH_QTY_EN
+        WHEN C.SEC_TYPE = #{SEC_TYPE_09} THEN A.MARCH_AMT
+        ELSE A.MARCH_QTY
         END tradeNum,
         <!--GNS-892:回购需特殊处理 modify by fuyongsheng 20220227 end-->
         CASE
