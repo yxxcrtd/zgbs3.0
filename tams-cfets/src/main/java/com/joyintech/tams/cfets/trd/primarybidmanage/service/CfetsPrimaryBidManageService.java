@@ -1544,7 +1544,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         // 中标净价
         amountResponse.setWinCprice(cprice);
         // 全价 = 中标净价 + 应计利息
-        amountResponse.setWinCprice(request.getAllocationDetails().get(0).getIntAmt());
+        amountResponse.setUnitFprice(ArithmeticUtil.doAdd(cprice,intAmt));
         // 应计利息=分配明细中的应计利息
         amountResponse.setIntAmt(intAmt);
         // 交易金额=基本信息中中标券面总额*中标净价/100
