@@ -949,7 +949,7 @@
         pp.portfolio_name portfolioName,
         case when tpd.FINPROD_TYPE2 in ('F04','F05') then fp3.finprod_market_id else fp.finprod_market_id end finprodMarketId,
         case when tpd.FINPROD_TYPE2 in ('F04','F05') then fp3.finprod_abbr else fp.finprod_abbr  end finprodAbbr,
-        nvl(tpd.PS, tpdt.ps) ps,
+        nvl(tpdt.ps, tpd.PS) ps,
         ssai.sec_acct_name secAcctId,
         to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
         DECODE(tpd.settle_speed,0,'01',1,'02','2','03') settleSpeed,
@@ -3213,7 +3213,6 @@
         <result column="FINPROD_TYPE2" property="finprodType2" jdbcType="VARCHAR"/>
         <result column="INV_MANAGER_ID" property="invManagerId" jdbcType="VARCHAR"/>
         <result column="propAcctNo" property="propAcctNo" jdbcType="VARCHAR"/>
-        <result column="COUNTER_NAME" property="counterName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="query_integrated_entrust">
@@ -3228,8 +3227,7 @@
         a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
         b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,b.PS as ENTRUST_BS,
         CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS,
-        a.PROP_ACCT_NAME propAcctNo,
-        a.COUNTER_NAME COUNTER_NAME
+        PROP_ACCT_NO propAcctNo
     </sql>
 
     <sql id="query_entrust">
@@ -3245,8 +3243,7 @@
         a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
         b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,b.PS as ENTRUST_BS,
         CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS,
-        null propAcctNo,
-        null COUNTER_NAME
+        null propAcctNo
     </sql>
 
     <sql id="query_entrust_history">
@@ -3262,8 +3259,7 @@
         a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
         b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,b.PS as ENTRUST_BS,
         CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS,
-        null propAcctNo,
-        null COUNTER_NAME
+        null propAcctNo
     </sql>
 
     <sql id="query_integrated_entrust_history">
@@ -3279,8 +3275,7 @@
         a.REPORT_NO, a.OPERATE_USER,b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.INV_MANAGER_ID,
         b.PS as ENTRUST_BS,
         CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS,
-        a.PROP_ACCT_NAME propAcctNo,
-        a.COUNTER_NAME COUNTER_NAME
+        PROP_ACCT_NO propAcctNo
     </sql>
 
     <select id="queryEntrust2Touguan" resultMap="QueryResultMap" parameterType="java.lang.String">
