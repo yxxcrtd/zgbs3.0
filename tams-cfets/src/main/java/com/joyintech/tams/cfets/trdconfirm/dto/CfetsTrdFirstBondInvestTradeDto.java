@@ -17,6 +17,9 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.trade.dto.BussTrdAvailableCashQuery;
 import com.joyintech.tams.component.business.trade.dto.BussTrdTransfenpeiDto;
@@ -28,6 +31,7 @@ import com.joyintech.tams.invest.common.risk.dto.RiskCreditListCommonDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -41,6 +45,100 @@ import java.util.List;
  * @date 2022/5/6 14:47
  */
 public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal implements ProcessEntity {
+
+    @ApiModelProperty(name = "validStatus", value = "有效状态, pageDaySubDetail 接口", example = "01")
+    private String validStatus;
+
+    @ApiModelProperty(name = "finprodId", value = "资产代码", example = "F01_001.IB")
+    private String finprodId;
+
+    @ApiModelProperty(name = "finprodMarketId", value = "市场代码", example = "001.IB")
+    private String finprodMarketId;
+
+    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "001债券")
+    private String finprodAbbr;
+
+    @ApiModelProperty(name = "ouPartyId", value = "本方id", example = "114912384")
+    private String ouPartyId;
+
+    @ApiModelProperty(name = "ouPartyIdAbbr", value = "本方简称", example = "广发银行")
+    private String ouPartyIdAbbr;
+
+    @ApiModelProperty(name = "ourTrader", value = "本方交易员id(申购人)", example = "001")
+    private String ourTrader;
+
+    @ApiModelProperty(name = "ourTraderName", value = "本方交易员名称", example = "交易员1")
+    private String ourTraderName;
+
+    @ApiModelProperty(name = "issuePrice", value = "发行价格", example = "99.0000")
+    private BigDecimal issuePrice;
+
+    @ApiModelProperty(name = "referenceRate", value = "参考收益率", example = "99.0000")
+    private BigDecimal referenceRate;
+
+    @ApiModelProperty(name = "referenceRateStr", value = "参考收益率,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率，文本，形式为：基准利率+利差BP", example = "个人活期+1")
+    private String referenceRateStr;
+
+    @ApiModelProperty(name = "rate", value = "票面利率", example = "99.0000")
+    private BigDecimal rate;
+
+    @ApiModelProperty(name = "rateStr", value = "票面利率", example = "99.0000")
+    private String rateStr;
+
+    @ApiModelProperty(name = "subscriptionAmount", value = "认购量", example = "1000.00")
+    private BigDecimal subscriptionAmount;
+
+    @ApiModelProperty(name = "payableAmount", value = "应缴款金额", example = "1000.00")
+    private BigDecimal payableAmount;
+
+    @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
+    private BigDecimal settFeeAmt;
+
+    @ApiModelProperty(name = "remark", value = "备注", example = "XXX")
+    private String remark;
+
+    @ApiModelProperty(name = "revokeReason", value = "撤销备注", example = "XXX")
+    private String revokeReason;
+
+    @ApiModelProperty(name = "tradeDate", value = "申购日期")
+    private Date tradeDate;
+
+    @ApiModelProperty(name = "tradeDateStr", value = "申购日期格式化")
+    private String tradeDateStr;
+
+    @ApiModelProperty(name = "dipType", value = "分配方式", example = "139")
+    private String dipType;
+
+    @ApiModelProperty(name = "productDtos", value = "申购产品列表")
+    private List<CfetsTrdBondFirstSubProductDto> productDtos;
+
+    @ApiModelProperty(name = "entrustDtos", value = "指令列表 addOrDelList接口新增指令时必传")
+    private List<CfetsTrdBondFirstSubEntrustDto> entrustDtos;
+
+    @ApiModelProperty(name = "bidId", value = "投标编号,编辑页面/提交用", example = "111")
+    private String bidId;
+
+    @ApiModelProperty(name = "operateType", value = "操作类型,编辑页面/提交用", example = "NEW")
+    private String operateType;
+
+    @ApiModelProperty(name = "elementId", value = "提交要素,编辑页面/提交用", example = "TenderBondSub002_btn_save")
+    private String elementId;
+
+    @ApiModelProperty(name = "softSkipMode", value = "是否忽略头寸软控,编辑页面/提交用", example = "Y")
+    private String softSkipMode;
+
+    @ApiModelProperty(name = "systemAct", value = "头寸_系统动作,编辑页面/提交用", example = "Y")
+    private String systemAct;
+
+    @ApiModelProperty(name = "confirmOk", value = "是否忽略头寸软控", example = "Y")
+    private String confirmOk;
+
+    @ApiModelProperty(name = "riskcalResponse", value = "风险实体类")
+    private CfetsEtribdoRiskcalResponse riskcalResponse;
+
+    private String rskApproval;
+
+    private String issuer;
 
     /**
      * 交易编号
@@ -92,7 +190,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
      * @return 金融产品类型（投管分类），债券、理财产品、基金、理财产品模板、理财产品分层
      */
     @Override
-    @PrimaryKey(PrimaryKey.Field.PK_2)
     public String getFinprodType2() {
         return super.getFinprodType2();
     }
@@ -107,11 +204,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
     public String getTotleTradeId() {
         return super.getTotleTradeId();
     }
-
-    /**
-     * 有效状态
-     */
-    private String validStatus;
 
     /**
      * 委托代码
@@ -162,11 +254,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
      * 债券一级分类
      */
     private String windtypeone;
-
-    /**
-     * 操作类型
-     */
-    private String operateType;
 
     /**
      * 画面模式
@@ -293,11 +380,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
      * 委托时的行权收益率
      */
     private BigDecimal entrustExerYield;
-
-    /**
-     * 撤销说明
-     */
-    private String revokeReason;
 
     /**
      * 金融产品代码（系统自动生成）
@@ -646,21 +728,9 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
     private String oFinprodId;
 
     /**
-     * 投标编号
-     */
-    private String bidId;
-
-    /**
      * 投标标位
      */
     private BigDecimal bidPrice;
-
-    /**
-     * 本方
-     *
-     * @return
-     */
-    private String ouPartyId;
 
     /**
      * 本方交易员
@@ -2255,11 +2325,6 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
     }
     // 合并 by 华兴 end
 
-    /**
-     * 按钮Id
-     */
-    private String elementId;
-
     public String getElementId() {
         return elementId;
     }
@@ -2416,5 +2481,221 @@ public class CfetsTrdFirstBondInvestTradeDto extends TrdFinProductDealTotal impl
 
     public void setOprType(String oprType) {
         this.oprType = oprType;
+    }
+
+    @Override
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
+    }
+
+    public String getFinprodAbbr() {
+        return finprodAbbr;
+    }
+
+    public void setFinprodAbbr(String finprodAbbr) {
+        this.finprodAbbr = finprodAbbr;
+    }
+
+    public String getOuPartyIdAbbr() {
+        return ouPartyIdAbbr;
+    }
+
+    public void setOuPartyIdAbbr(String ouPartyIdAbbr) {
+        this.ouPartyIdAbbr = ouPartyIdAbbr;
+    }
+
+    public String getOurTrader() {
+        return ourTrader;
+    }
+
+    public void setOurTrader(String ourTrader) {
+        this.ourTrader = ourTrader;
+    }
+
+    public String getOurTraderName() {
+        return ourTraderName;
+    }
+
+    public void setOurTraderName(String ourTraderName) {
+        this.ourTraderName = ourTraderName;
+    }
+
+    public BigDecimal getIssuePrice() {
+        return issuePrice;
+    }
+
+    public void setIssuePrice(BigDecimal issuePrice) {
+        this.issuePrice = issuePrice;
+    }
+
+    public BigDecimal getReferenceRate() {
+        return referenceRate;
+    }
+
+    public void setReferenceRate(BigDecimal referenceRate) {
+        this.referenceRate = referenceRate;
+    }
+
+    public String getReferenceRateStr() {
+        return referenceRateStr;
+    }
+
+    public void setReferenceRateStr(String referenceRateStr) {
+        this.referenceRateStr = referenceRateStr;
+    }
+
+    @Override
+    public BigDecimal getRate() {
+        return rate;
+    }
+
+    @Override
+    public void setRate(BigDecimal rate) {
+        this.rate = rate;
+    }
+
+    public String getRateStr() {
+        return rateStr;
+    }
+
+    public void setRateStr(String rateStr) {
+        this.rateStr = rateStr;
+    }
+
+    public BigDecimal getSubscriptionAmount() {
+        return subscriptionAmount;
+    }
+
+    public void setSubscriptionAmount(BigDecimal subscriptionAmount) {
+        this.subscriptionAmount = subscriptionAmount;
+    }
+
+    public BigDecimal getPayableAmount() {
+        return payableAmount;
+    }
+
+    public void setPayableAmount(BigDecimal payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    public BigDecimal getSettFeeAmt() {
+        return settFeeAmt;
+    }
+
+    public void setSettFeeAmt(BigDecimal settFeeAmt) {
+        this.settFeeAmt = settFeeAmt;
+    }
+
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    @Override
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    @Override
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
+    }
+
+    public String getTradeDateStr() {
+        return tradeDateStr;
+    }
+
+    public void setTradeDateStr(String tradeDateStr) {
+        this.tradeDateStr = tradeDateStr;
+    }
+
+    public String getDipType() {
+        return dipType;
+    }
+
+    public void setDipType(String dipType) {
+        this.dipType = dipType;
+    }
+
+    public List<CfetsTrdBondFirstSubProductDto> getProductDtos() {
+        return productDtos;
+    }
+
+    public void setProductDtos(List<CfetsTrdBondFirstSubProductDto> productDtos) {
+        this.productDtos = productDtos;
+    }
+
+    public List<CfetsTrdBondFirstSubEntrustDto> getEntrustDtos() {
+        return entrustDtos;
+    }
+
+    public void setEntrustDtos(List<CfetsTrdBondFirstSubEntrustDto> entrustDtos) {
+        this.entrustDtos = entrustDtos;
+    }
+
+    public String getSoftSkipMode() {
+        return softSkipMode;
+    }
+
+    public void setSoftSkipMode(String softSkipMode) {
+        this.softSkipMode = softSkipMode;
+    }
+
+    public String getSystemAct() {
+        return systemAct;
+    }
+
+    public void setSystemAct(String systemAct) {
+        this.systemAct = systemAct;
+    }
+
+    public String getConfirmOk() {
+        return confirmOk;
+    }
+
+    public void setConfirmOk(String confirmOk) {
+        this.confirmOk = confirmOk;
+    }
+
+    public CfetsEtribdoRiskcalResponse getRiskcalResponse() {
+        return riskcalResponse;
+    }
+
+    public void setRiskcalResponse(CfetsEtribdoRiskcalResponse riskcalResponse) {
+        this.riskcalResponse = riskcalResponse;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
+    }
+
+    @Override
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    @Override
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 }

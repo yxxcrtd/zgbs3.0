@@ -391,10 +391,6 @@ public class ExchangeTransMatchCommonService extends BaseService {
     private void handleMultiPortfolioAllocation(ExchangeTransMatchCommonDto matchDto, List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList){
         //系列户指令处理组合分配
         commonEntrustDtoList.stream().filter(item->StringUtil.equals(item.getEntrustClass(),DictCodeListExt3.投资指令类型_多组合单资产指令.getValue())).forEach(item->{
-            // 债转股暂时不支持多组合系列户拆分逻辑
-            if(DictCodeListExt3.交易方向_债转股.getValue().equals(item.getPs())){
-                return;
-            }
             List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList = exchangeTransMatchCommonMapper.getEntrustDetailList(item.getEntrustId());
             if(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(item.getFinprodType2())){
                 entrustDetailDtoList = entrustDetailDtoList.stream()
@@ -517,6 +513,14 @@ public class ExchangeTransMatchCommonService extends BaseService {
         });
     }
 
+    /**
+     * 计算组合分配的金额和交易支付费用
+     * @param matchDto
+     * @param item
+     * @param portfolioMatchQtyMap
+     * @param portfolioRemainQtyList
+     * @param entrustDetailDtoList
+     */
     private void calculatePortFolioMatchAmt(ExchangeTransMatchCommonDto matchDto, ExchangeTransMatchCommonEntrustDto item,
                     Map<String, BigDecimal> portfolioMatchQtyMap, List<Map.Entry<String, BigDecimal>> portfolioRemainQtyList,
                                             List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList){

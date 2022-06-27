@@ -11,6 +11,9 @@
         CASE WHEN BO.IS_WIN = 'Y' THEN '04'
         WHEN BO.IS_WIN = 'N' THEN '03'
         ELSE '02' END isWin,
+        CASE WHEN BO.IS_WIN = 'Y' THEN '02'
+        WHEN BO.IS_WIN = 'N' THEN '03'
+        ELSE '01' END isWinOrder,
         BO.BID_ID bidId,
         BO.FINPROD_ID finprodId,
         FP.FINPROD_MARKET_ID finprodMarketId,
@@ -119,6 +122,7 @@
                     #{item}
                 </foreach>
             </if>
+            ORDER BY isWinOrder ,finprodId,bidDateEnd,bidCfmDate
         ) ss
         left join SYS_DATADICT_LIST sdl_isWin on ss.isWin=sdl_isWin.ITEM_CODE and sdl_isWin.DICT_CODE='FIRST_BID_STATUS'
         left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
