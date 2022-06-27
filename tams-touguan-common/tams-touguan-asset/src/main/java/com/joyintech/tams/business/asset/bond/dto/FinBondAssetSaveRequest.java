@@ -152,6 +152,9 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     @ApiModelProperty(name="crossMarketCode",value="跨市场代码")
     private String crossMarketCode;
 
+    @ApiModelProperty(name="crossMarket",value="跨市场发行")
+    private String crossMarket;
+
     @ApiModelProperty(name="sustainableRemark",value="特殊条款(条件必填)")
     private String sustainableRemark;
 
@@ -2131,5 +2134,13 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setIsAgainCalInt(String isAgainCalInt) {
         this.isAgainCalInt = isAgainCalInt;
+    }
+
+    public String getCrossMarket() {
+        return crossMarket;
+    }
+
+    public void setCrossMarket(String crossMarket) {
+        this.crossMarket = crossMarket;
     }
 }
