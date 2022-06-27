@@ -48,27 +48,24 @@
         object.pageId = "CfetsQuoteRepo003";
         object.ptlAllocationList = table.getAllRows();//组合分配列表
         object.pledgeBondList = pledgeTable.getAllRows();//质押券信息
-        Joyin.confirm("是否确认提交?",
-            function () {
-                //保存 走流程
-                if (operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'cfets/bankuplink/repo/IbuQuoteRepo003/save', object, "CfetsQuoteRepo003_btn_save", null,
-                        function () {
-                            var index = window.parent.layer.getFrameIndex(window.name);
-                            window.parent.layer.close(index);
-                        })
-                }
-                //提交 走流程
-                else if (operateType === 'submit') {
-                    Joyin.ajaxJson(basePath + 'cfets/bankuplink/repo/IbuQuoteRepo003/checkByHome', object, function(result) {
-                        WorkFlow.doSubmitList(basePath + 'cfets/bankuplink/repo/IbuQuoteRepo003/save', object, "CfetsQuoteRepo003_btn_submit", null,
-                            function () {
-                                var index = window.parent.layer.getFrameIndex(window.name);
-                                window.parent.layer.close(index);
-                            })
-                    });
-                }
+        //保存 走流程
+        if (operateType === 'save') {
+            WorkFlow.doSaveList(basePath + 'cfets/bankuplink/repo/IbuQuoteRepo003/save', object, "CfetsQuoteRepo003_btn_save", null,
+                function () {
+                    var index = window.parent.layer.getFrameIndex(window.name);
+                    window.parent.layer.close(index);
+                })
+        }
+        //提交 走流程
+        else if (operateType === 'submit') {
+            Joyin.ajaxJson(basePath + 'cfets/bankuplink/repo/IbuQuoteRepo003/checkByHome', object, function(result) {
+                WorkFlow.doSubmitList(basePath + 'cfets/bankuplink/repo/IbuQuoteRepo003/save', object, "CfetsQuoteRepo003_btn_submit", null,
+                    function () {
+                        var index = window.parent.layer.getFrameIndex(window.name);
+                        window.parent.layer.close(index);
+                    })
             });
+        }
     };
     /**
      * 组合分配
