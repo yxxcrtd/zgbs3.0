@@ -3073,7 +3073,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         if (CommonUtil.isType(v.getAssetType(), DictCodeList.平安资产类型_买断式回购)
                 || CommonUtil.isType(v.getAssetType(), DictCodeList.平安资产类型_质押式回购)) {
             long oneDay = DateUtil.getBetweenDayNumber(DateUtil.platDateFromCache(),
-                    DateUtil.parse(finDto.getmDate()));
+                    new Date((Long)dataMap.get("mdate")));
             infRiskRdsDto.setOneDay(oneDay);
             //wangyang1 add by 增加期限金额 2021年9月10日 start
             if (StringUtil.isNotEmpty(infRiskRdsDto.getAmount()) && StringUtil.isNotEmpty(oneDay)) {
