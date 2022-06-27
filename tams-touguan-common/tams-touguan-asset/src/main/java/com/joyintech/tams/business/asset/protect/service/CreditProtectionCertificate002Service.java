@@ -402,45 +402,14 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         }
         BigDecimal cash = StringUtil.isNotEmpty(entity.getNomCapi())? entity.getNomCapi().divide(new BigDecimal(10000)):new BigDecimal(0.00);
         entity.setNomCapi(cash);
-//        List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
-//        MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
-//        mstFileInputParameter.setFileList(uploadInfo);
-//        mstFileInputParameter.setBussinessId(entity.getFinprodId());
         entity.setMstFileInputParameter(joyinbusinessCommonService.selectFileInfoByBusId(entity.getFinprodId()));
         entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
         entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
-        //查询参考债券
-        if(StringUtils.isNotEmpty(entity.getRefSec())){
-            Map<String,Object> params = new HashMap<>();
-            params.put("finprodType2", DictCodeListExt1.金融产品类型_债券.getValue());
-            params.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
-            params.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
-            params.put("refList", StringUtil.splitToList(null, entity.getRefSec()));
-            List<String> refList = creditProtectionCertificateMapper.getRefList(params);
-            entity.setRefSecLists(refList.stream().collect(Collectors.joining(",")));
-        }
+        entity.setRefSecLists(this.getRefList(entity));
         return entity;
     }
 
     public CreditProtectionCertificate002Dto getProcessEntity(CreditProtectionCertificate002Dto entity){
-        //add wsz 修改现实问题 ZGCPCN-1356 start
-//        CreditProtectionCertificate002Dto entity2 = null;
-//        if(StringUtil.isNotEmpty(entity.getFinprodId())) {
-//            entity2 = this.getById(entity.getFinprodId());
-//        }
-//        if(!Objects.isNull(entity2)){
-//            BeanUtil.copyPropertiesIgnoreNull(entity, entity2);
-//        } else {
-//            entity.setRefSecLists(this.getRefList(entity));
-//            entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
-//            entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
-////            List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
-////            MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
-////            mstFileInputParameter.setFileList(uploadInfo);
-////            mstFileInputParameter.setBussinessId(entity.getFinprodId());
-////            entity.setMstFileInputParameter(mstFileInputParameter);
-//            entity.setMstFileInputParameter(joyinbusinessCommonService.selectFileInfoByBusId(entity.getFinprodId()));
-//        }
         //add wsz 20220624 解决代办多次保存时代码为空 start
         //3.0.6场内 ZGCPCN-1678 【信用保护凭证标的】-保存-待办事项-在待办事项中多次保存，资产代码为空了；
         if(StringUtils.isNotEmpty(entity.getFinprodMarketId())&&!entity.getFinprodMarketId().contains(".")){
@@ -453,7 +422,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
             entity.setFinprodMarketId(entity.getFinprodMarketId()+markId);
         }
         //add wsz 20220624 解决代办多次保存时代码为空 end
-        //add wsz 修改现实问题 ZGCPCN-1356 end
+        //add wsz 修改显示问题 ZGCPCN-1356 end
         entity.setRefSecLists(this.getRefList(entity));
         entity.setRefEntityStr(this.getMstCustomerInfo(entity.getRefEntity()));
         entity.setIssuershortStr(this.getMstCustomerInfo(entity.getIssuershort()));
