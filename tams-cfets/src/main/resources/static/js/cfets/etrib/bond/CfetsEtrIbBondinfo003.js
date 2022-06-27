@@ -368,6 +368,20 @@
             sortable: false
         }
         , {
+            /*资产名称*/
+            field: 'assetName',
+            width: 150,
+            title: 'BaseRiskMathComm.assetName',
+            sortable: false
+        }
+        , {
+            /*违规阈值*/
+            field: 'forbiddenLn',
+            width: 150,
+            title: 'BaseRiskMathComm.forbiddenLn',
+            sortable: false
+        }
+        , {
             /*审批线*/
             field: 'approveLine',
             width: 150,
