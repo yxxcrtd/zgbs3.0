@@ -308,7 +308,7 @@
     </select>
 
     <update id="updateBidOrder">
-        UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark} WHERE BID_ID = #{bidId}
+        UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark,jdbcType=VARCHAR} WHERE BID_ID = #{bidId}
     </update>
 
     <update id="updateBidOrderBidPrice">

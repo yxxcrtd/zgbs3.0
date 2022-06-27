@@ -2783,6 +2783,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             //处理指令完成进度
             finishEtrList.forEach(this::closeDelegatePositionMethod);
         } catch (Exception e) {
+            logger.error("处理异常",e);
             throw new BusinessException("MSG:" + e.getMessage());
         }
     }
