@@ -77,6 +77,19 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
     private String secAcctId;
 
     /**
+     * 转股数量
+     */
+    private BigDecimal conAmt;
+
+    public BigDecimal getConAmt() {
+        return conAmt;
+    }
+
+    public void setConAmt(BigDecimal conAmt) {
+        this.conAmt = conAmt;
+    }
+
+    /**
      * 指令多组合明细list
      */
     private List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList;
