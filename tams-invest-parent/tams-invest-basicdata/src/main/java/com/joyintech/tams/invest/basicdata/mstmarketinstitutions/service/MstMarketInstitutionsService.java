@@ -183,7 +183,7 @@ public class MstMarketInstitutionsService extends CommonExportService<MstMarketI
     @Override
     protected void buildExportParam(ExportParam exportParam) {
         exportParam.config(
-                "/com/joyintech/tams/invest/basicdata/mstmarketinstitutions/conf/export_conf.xml")
+                        "/com/joyintech/tams/invest/basicdata/mstmarketinstitutions/conf/export_conf.xml")
                 .dataSource(DataSourceType.MASERT);
     }
 
@@ -356,7 +356,7 @@ public class MstMarketInstitutionsService extends CommonExportService<MstMarketI
      */
     public Map<String, Object> autoAddInstitutions(String insitituteCode) {
         Map<String, Object> result = new HashMap<>();
-        if(StringUtil.isEmpty(insitituteCode)) {
+        if (StringUtil.isEmpty(insitituteCode)) {
             result.put("errorCode", 0);
             result.put("message", "匹配失败");
             return result;
@@ -384,6 +384,9 @@ public class MstMarketInstitutionsService extends CommonExportService<MstMarketI
         } else {
             result.put("errorCode", 0);
             result.put("message", "匹配失败");
+        }
+        if (Objects.nonNull(mstDto)) {
+            result.put("customerId", mstDto.getCustomerId());
         }
         result.put("data", mstDto);
         return result;
