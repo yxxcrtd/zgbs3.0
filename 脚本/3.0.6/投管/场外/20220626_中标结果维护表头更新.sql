@@ -1,0 +1,2 @@
+UPDATE CFG_DATATABLE_SHOW SET SORT = 0 where PAGECODE ='CfetsPrimaryBidManage001' and DTCODE = 'BidProductInfo';
+UPDATE CFG_DATATABLE_SHOW SET SORT = 0 where PAGECODE ='CfetsPrimaryBidManage001' and DTCODE = 'SummaryBidInfo';
