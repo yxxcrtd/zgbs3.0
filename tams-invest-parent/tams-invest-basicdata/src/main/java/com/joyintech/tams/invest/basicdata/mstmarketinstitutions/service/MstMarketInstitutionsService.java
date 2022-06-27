@@ -12,7 +12,6 @@ package com.joyintech.tams.invest.basicdata.mstmarketinstitutions.service;
 
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
