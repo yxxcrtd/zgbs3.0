@@ -2980,7 +2980,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         this.deleteWflDataByWorkflowId(entity.getWorkflowId());
         if (cfetsTrdBondFirstSub002Mapper.selectBidOrders(entity.getBidId()) == 0
                 && StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
-            List<CfetsTrdFirstBidFirmInvestTradeDto> tradeDtos = this.prepareBidEntity(entity, OperationType.REVOKE);
+            List<CfetsTrdFirstBidFirmInvestTradeDto> tradeDtos = this.prepareBidEntity(entity, null);
             // 删除流程中数据
             tradeDtos.forEach(this::deleteTradeData);
             // 老头寸处理

@@ -510,7 +510,11 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             etrCommandDispatcherService.pushCommandMsg(param);
         }
         //处理履历
-        updateCfetsOprHis(dto.getEntrustId(), dto.getOptType());
+        if (OperationType.MODIFY.equals(arg1)) {
+            updateCfetsOprHis(dto.getEntrustId(), ENTRUST_RECORD_MODIFY);
+        } else {
+            updateCfetsOprHis(dto.getEntrustId(), dto.getOptType());
+        }
 
         basRiskMathCommService.insert(dto.getRiskTrialRetDto(), dto.getEntrustId());
 

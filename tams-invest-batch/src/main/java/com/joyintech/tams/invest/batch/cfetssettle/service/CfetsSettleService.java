@@ -173,6 +173,10 @@ public class CfetsSettleService extends BaseService {
         trdBankManualSettleInfo.setBusiType(cfetsSettleAllInfoDto.getTgBusiType());
         //交收状态
         trdBankManualSettleInfo.setSettleStatus(DictCodeListExt3.交收状态_已交收.getValue());
+
+        trdBankManualSettleInfo.setFinprodType2(cfetsSettleAllInfoDto.getFinprodType2());
+        trdBankManualSettleInfo.setCounterId(cfetsSettleAllInfoDto.getCounterId());
+
         trdBankManualSettleInfo.setCreateUser("SYSTEM");
         trdBankManualSettleInfo.setUpdateUser("SYSTEM");
         return trdBankManualSettleInfo;
@@ -580,7 +584,7 @@ public class CfetsSettleService extends BaseService {
             cfetsManualSettleInsertDto.setButtonType(交收操作类型_交收.getValue());
             cfetsManualSettleInsertDto.setTradeId(cfetsManualSettleInsertDto.getTotalTradeId());
             Message<AjaxResult> message;
-            String url = String.format("/riskTrial/doOccupy/%s/%s/%s", "CfetsManualSettle", 系统动作_关闭.getValue(), 流程节点_审批生效.getValue());
+            String url = String.format("/riskTrial/doOccupy/%s/%s/%s", "CfetsManualSettle", 系统动作_新建.getValue(), 流程节点_审批生效.getValue());
             if (isSingle) {
                 message = simpleRestTemplate.postForObject(tamsSerever + url, cfetsManualSettleInsertDto, Message.class);
             } else {
