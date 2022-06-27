@@ -584,7 +584,7 @@ public class CfetsTradeHandlerAop {
         } catch (BusinessException e) {
             List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
             if (CollectionUtils.isEmpty(mapList)) {
-                throw new BusinessException(e);
+                throw e;
             }
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
