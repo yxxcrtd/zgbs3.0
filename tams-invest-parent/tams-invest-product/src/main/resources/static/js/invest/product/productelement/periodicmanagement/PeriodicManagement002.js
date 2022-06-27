@@ -607,6 +607,9 @@ $(function () {
     var getSaveObject = function () {
         var object = $.serializeToObject('#PeriodicManagement002_Form');
 
+        console.log("-----------operateType-------------");
+        console.log(object.operateType);
+
         if ("edit" != object.operateType) {
             object.operateType = "new";
         }
@@ -623,13 +626,16 @@ $(function () {
 
     function saveOrSubmit(operateType) {
         var object = getSaveObject();
-        console.log("-----------object-------------");
-        console.log(object);
+        object.saveOrSubmit = operateType;
+        console.log("-----------object.saveOrSubmit-------------");
+        console.log(object.saveOrSubmit);
 
         Joyin.ajaxJson(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/check', object, function (result) {
             Joyin.confirm(result.data, function () {
                 clearPublishTypeChange();
                 object = getSaveObject();
+                console.log("-----------object-------------");
+                console.log(object);
 
                 if (operateType == 'save') {
                     WorkFlow.doSaveList(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/save', object, "PeriodicManagement002_btn_save");
