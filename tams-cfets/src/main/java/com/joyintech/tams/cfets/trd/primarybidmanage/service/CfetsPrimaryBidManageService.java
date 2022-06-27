@@ -1302,8 +1302,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 lastWinPrinamt = ArithmeticUtil.subtract(lastWinPrinamt, detailDto.getActWinPrinamt());
             } else if (BigDecimalUtil.ACompareToB(detailDto.getTotalBidPrinamt(), bidMinUnit, 2) >= 0) {
                 // 剩余中标券面总额 取余 参数.中标最小单位
-                BigDecimal[] results = detailDto.getTotalBidPrinamt().divideAndRemainder(bidMinUnit);
-                detailDto.setTheWinPrinamt(results[0]);
+                BigDecimal[] results = lastWinPrinamt.divideAndRemainder(bidMinUnit);
+                detailDto.setTheWinPrinamt(ArithmeticUtil.multiply(results[0], bidMinUnit));
                 tailDifference = results[1];
                 detailDto.setActWinPrinamt(detailDto.getTheWinPrinamt());
                 lastWinPrinamt = ArithmeticUtil.subtract(lastWinPrinamt, detailDto.getActWinPrinamt());
@@ -1323,7 +1323,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             detailDto.setWinCprice(this.calPrice(detailDto, request.getTenderTarget(), request.getFinprodMarketId(), request.getPayDate()));
         }
         saveDetailDto.setActWinPrinamt(ArithmeticUtil.doAdd(saveDetailDto.getActWinPrinamt(), tailDifference));
-        saveDetailDto.setActWinPrinamt(saveDetailDto.getTheWinPrinamt());
         // 计算分配明细中缴款金额
         this.calPayAmt(list);
         request.setAllocationDetails(list);
