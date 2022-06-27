@@ -191,7 +191,8 @@ public class EntrustStatusService {
         req.setUserId("SYSTEM");
         req.setTotalTradeId(IDGenerator.generate());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        //PositionHttpRequest.batchClose(req);
+        logger.info("[关闭委托状态更新]批处理发送头寸开始");
+        PositionHttpRequest.batchClose(req);
     }
 
     private void closeDelegatOprHisMethod(List<EntrustClosePosEtrReqDto> entrustIdList) {
