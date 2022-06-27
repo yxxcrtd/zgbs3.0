@@ -233,7 +233,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      * @param validMessages
      * @param issuer
      */
-    public void handleIssuer(List<ValidMessage> validMessages, String issuer) {
+    public String handleIssuer(List<ValidMessage> validMessages, String issuer) {
         logger.info("handleIssuer >> 发行人处理参数：{}", issuer);
         Map<String, Object> result = restTemplate.getForObject(
                 ServiceApplication.PINGAN_SERVICE_NAME + "/invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/autoAddInstitutions?insitituteCode=" + issuer,
@@ -244,7 +244,9 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             if (errorCode == 0) {
                 validMessages.add(new ValidMessage("发行人匹配失败，请手动处理"));
             }
+            return (String) result.get("customerId");
         }
+        return null;
     }
 
 
