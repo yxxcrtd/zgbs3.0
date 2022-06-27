@@ -46,6 +46,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.invest.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.risk.dto.RiskNameListDto;
 import com.joyintech.tams.invest.common.trade.dao.CreditLinesDealsMapper;
@@ -568,6 +569,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     && (StringUtil.equals(dto.getTrdBankManualSettleInfo().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
                     || StringUtil.equals(dto.getTrdBankManualSettleInfo().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()))) {
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+                riskRdsDto.setEventStatus(BussinessDictCodeListRds.事件类型_投资交易_存续期.getValue());
             } else {
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             }
