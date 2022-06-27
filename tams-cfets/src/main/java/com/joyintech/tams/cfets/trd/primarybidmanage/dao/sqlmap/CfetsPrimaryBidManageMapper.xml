@@ -801,15 +801,21 @@
         SELECT
             BOBP.ENTRUST_ID  entrustId,
             BOBP.PORTFOLIO_ID portfolioId,
+            PP.PORTFOLIO_NAME portfolioName,
             BOBP.THE_WIN_PRIN_AMT totalBidPrinamt,
             BOBP.BID_PRICE   bidPrice,
             BOBP.INV_AIM   invAim,
             BOBP.SEC_ACCT_ID secAcctId,
+            stlinfo.sec_acct_name secManageAcctIdName,
             BOBP.ACCT_NO  acctNo,
-            EE.INV_MANAGER_ID invManagerId
+            EE.INV_MANAGER_ID invManagerId,
+            SU.REAL_NAME invManagerName
         FROM BID_ORDER_BID_PRICE BOBP
         LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
         LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BOBP.ENTRUST_ID
+        LEFT JOIN PTL_PORTFOLIO PP ON BOBP.PORTFOLIO_ID = PP.PORTFOLIO_ID
+        left join stl_sec_acct_info stlinfo on BOBP.SEC_ACCT_ID = stlinfo.sec_acct_id
+        LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
         WHERE BO.BID_ID = #{bidId}
     </select>
 
@@ -886,6 +892,7 @@
             BRD.TOTAL_WIN_ID totalWinId,
             BRD.ENTRUST_ID  entrustId,
             BRD.PORTFOLIO_ID portfolioId,
+            PP.PORTFOLIO_NAME portfolioName,
             BRD.TOTAL_BID_PRINAMT totalBidPrinamt,
             BRD.THE_WIN_PRINAMT theWinPrinAmt,
             BRD.ACT_WIN_PRINAMT actWinPrinamt,
@@ -897,7 +904,9 @@
             BRD.SETT_FEE_AMT     settFeeAmt,
             BRD.INV_AIM   invAim,
             BRD.SEC_ACCT_ID secAcctId,
+            stlinfo.sec_acct_name secManageAcctIdName,
             EE.INV_MANAGER_ID invManagerId,
+            SU.REAL_NAME invManagerName,
             BOBR.ACCT_NO   acctNo
         FROM BID_RESULT_DETAIL BRD
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
@@ -907,12 +916,16 @@
                                           AND BOBR.PORTFOLIO_ID = BRD.PORTFOLIO_ID
                                           AND BOBR.BID_PRICE = BRD.BID_PRICE
         LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRD.ENTRUST_ID
+        LEFT JOIN PTL_PORTFOLIO PP ON BRD.PORTFOLIO_ID = PP.PORTFOLIO_ID
+        left join stl_sec_acct_info stlinfo on BRD.SEC_ACCT_ID = stlinfo.sec_acct_id
+        LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
         WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
         UNION ALL
         SELECT
             BRD.TOTAL_WIN_ID totalWinId,
             BRD.ENTRUST_ID  entrustId,
             BRD.PORTFOLIO_ID portfolioId,
+            PP.PORTFOLIO_NAME portfolioName,
             BRD.TOTAL_BID_PRINAMT totalBidPrinamt,
             BRD.THE_WIN_PRINAMT theWinPrinAmt,
             BRD.ACT_WIN_PRINAMT actWinPrinamt,
@@ -924,7 +937,9 @@
             BRD.SETT_FEE_AMT     settFeeAmt,
             BRD.INV_AIM   invAim,
             BRD.SEC_ACCT_ID secAcctId,
+            stlinfo.sec_acct_name secManageAcctIdName,
             EE.INV_MANAGER_ID invManagerId,
+            SU.REAL_NAME invManagerName,
             BOBR.ACCT_NO   acctNo
         FROM WFL_BID_RESULT_DETAIL BRD
         LEFT JOIN WFL_BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
@@ -934,6 +949,9 @@
                                           AND BOBR.ENTRUST_ID = BRD.ENTRUST_ID
                                           AND BOBR.PORTFOLIO_ID = BRD.PORTFOLIO_ID
                                           AND BOBR.BID_PRICE = BRD.BID_PRICE
+        LEFT JOIN PTL_PORTFOLIO PP ON BRD.PORTFOLIO_ID = PP.PORTFOLIO_ID
+        left join stl_sec_acct_info stlinfo on BRD.SEC_ACCT_ID = stlinfo.sec_acct_id
+        LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
         WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
     </select>
 

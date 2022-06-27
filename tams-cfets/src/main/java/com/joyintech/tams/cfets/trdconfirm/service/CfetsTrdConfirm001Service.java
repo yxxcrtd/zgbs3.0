@@ -266,6 +266,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
             trdFinProductDealTotal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
             trdFinProductDealTotal.setIsCancel(DictCodeList.是否_否.getValue());
             //     trdFinProductDealTotal.setPortfolioId(entity.getActPortfolioId());
+            trdFinProductDealTotal.setTradeDate(iPlatformDate.getSysDate());
             trdFinProductDealTotal.setSettleSpeed(entity.getSettleSpeed());
             trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
 
