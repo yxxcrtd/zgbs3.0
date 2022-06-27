@@ -16,6 +16,8 @@ import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.workflow.engine.constant.OperationType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -43,6 +45,7 @@ import java.util.Map;
 @RequestMapping("/cfets/etrib/cfetsEtrIbRepoRk")
 @Api(tags = "银行间回购质押券库")
 public class CfetsEtrIbRepoRkController extends BaseController {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
     private CfetsEtrIbRepoRKService cfetsEtrIbRepoRKService;
@@ -90,6 +93,7 @@ public class CfetsEtrIbRepoRkController extends BaseController {
             List<SelectOptionDto> page = cfetsEtrIbRepoinfoService.getPledgeStockId(params);
             return new Message<List<SelectOptionDto>>().success().setData(page);
         } catch (Exception e) {
+            logger.error("查询异常",e);
             return new Message<List<SelectOptionDto>>().fail().setMessage("查询异常");
         }
 

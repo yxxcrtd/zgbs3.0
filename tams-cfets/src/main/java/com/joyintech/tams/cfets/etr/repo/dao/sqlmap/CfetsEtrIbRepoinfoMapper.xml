@@ -842,7 +842,8 @@
     <select id="getPledgeStockId" resultType="com.joyintech.framework.select.SelectOptionDto">
         select distinct
         t.pledge_stock_id id,
-        t.pledge_stock_name text
+        t.pledge_stock_name text,
+        t.CREATE_TIME
         from ETR_SEC_STOCK t
         <where>
             <if test="userId != null and userId != ''">

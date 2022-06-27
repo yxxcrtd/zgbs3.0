@@ -414,7 +414,7 @@ public class CfetsTrdQueryController extends BaseController {
     @PostMapping("/doRevoke")
     @ResponseBody
     public Message<AjaxResult> doRevoke(@RequestBody CfetsTrdQueryTradeInfoListResponse input) throws WorkFlowException {
-        List<CfetsTrdQueryTradeInfoListResponse> list=input.getSelectedItem();
+        List<CfetsTrdQueryTradeInfoListResponse> list = input.getSelectedItem();
         StringBuilder msg = new StringBuilder();
         for (CfetsTrdQueryTradeInfoListResponse item : list) {
             if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())
@@ -424,7 +424,7 @@ public class CfetsTrdQueryController extends BaseController {
                 inputDto.setWorkflowParameter(item.getWorkflowParameter());
                 inputDto.setOperateType(item.getOperateType());
                 inputDto.setRevokeReason(input.getRevokeReason());
-                inputDto.setTotleTradeId(totleTradeId + "R");
+                inputDto.setTotleTradeId(totleTradeId);
 
                 ProcessParameter<CfetsTrdFirstBondInvestTradeDto> processParameter = new ProcessParameter<>();
                 WorkFlowParameter<CfetsTrdFirstBondInvestTradeDto> workFlowParameter = new WorkFlowParameter<>();
@@ -434,12 +434,15 @@ public class CfetsTrdQueryController extends BaseController {
 
                 workFlowParameter.setPageId("CfetsTrdFirstBondInvestTrade002");
                 workFlowParameter.setElementId(this.getParam("elementId"));
-                workFlowParameter.setBusinessCode(CfetsTrdFirstBondInvestTradeDto::getTotleTradeId);
-                workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
+                workFlowParameter.setBusinessCode(totleTradeId);
+                workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_成交确认撤销.getValue());
+                logger.debug("撤销数据{}",JsonUtils.object2Json(inputDto));
+                // 成交日期+资产简称+发行人+认购量
                 workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
-                        "交易编号" + GlobalConstant.COLON + entity.getTotleTradeId(),
-                        "资产简称" + GlobalConstant.COLON + entity.getFinprodName(),
-                        "交易日期" + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
+                        "成交日期" + GlobalConstant.COLON + DateUtil.format(entity.getSettleDate()),
+                        "资产简称" + GlobalConstant.COLON + entity.getFinprodAbbr(),
+                        "发行人" + GlobalConstant.COLON + entity.getIssuer(),
+                        "认购量" + GlobalConstant.COLON + entity.getShareAmt()));
 
                 msg.append(cfetsTrdFirstBondInvestTrade002Service.start(processParameter, inputDto));
             } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())) {
