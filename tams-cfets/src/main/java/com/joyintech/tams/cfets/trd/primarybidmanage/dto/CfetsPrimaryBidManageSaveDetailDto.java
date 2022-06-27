@@ -1,5 +1,6 @@
 package com.joyintech.tams.cfets.trd.primarybidmanage.dto;
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModel;
@@ -32,9 +33,13 @@ public class CfetsPrimaryBidManageSaveDetailDto {
     @ApiModelProperty(name="entrustId",value="指令代码")
     private String entrustId;
 
-    /**组合名称*/
-    @ApiModelProperty(name="portfolioId",value="组合名称")
+    /**组合代码*/
+    @ApiModelProperty(name="portfolioId",value="组合代码")
     private String portfolioId;
+
+
+    @ApiModelProperty(name = "portfolioName", value = "组合名称", example = "组合A")
+    private String portfolioName;
 
     /**汇总投标券面总额（万元）*/
     @ApiModelProperty(name="totalBidPrinamt",value="汇总投标券面总额（万元）")
@@ -76,13 +81,22 @@ public class CfetsPrimaryBidManageSaveDetailDto {
     @ApiModelProperty(name="invAim",value="业务模式")
     private String invAim;
 
+    @ApiModelProperty(name = "invAimStr", value = "业务模式名称,展示用")
+    private String invAimStr;
+
     /**证券账户*/
     @ApiModelProperty(name="secAcctId",value="证券账户")
     private String secAcctId;
 
+    @ApiModelProperty(name = "secManageAcctIdName", value = "证券账户", example = "银行间证券账户")
+    private String secManageAcctIdName;
+
     /**投资经理*/
     @ApiModelProperty(name="invManagerId",value="投资经理")
     private String invManagerId;
+
+    @ApiModelProperty(name = "invManagerName", value = "投资经理名称", example = "A1")
+    private String invManagerName;
 
     /**资金账户*/
     @ApiModelProperty(name="acctNo",value="资金账户")
@@ -295,5 +309,40 @@ public class CfetsPrimaryBidManageSaveDetailDto {
 
     public void setFinprodId(String finprodId) {
         this.finprodId = finprodId;
+    }
+
+    public String getPortfolioName() {
+        return portfolioName;
+    }
+
+    public void setPortfolioName(String portfolioName) {
+        this.portfolioName = portfolioName;
+    }
+
+    public String getInvAimStr() {
+        if (StringUtil.isEmpty(getInvAim())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, getInvAim());
+    }
+
+    public void setInvAimStr(String invAimStr) {
+        this.invAimStr = invAimStr;
+    }
+
+    public String getSecManageAcctIdName() {
+        return secManageAcctIdName;
+    }
+
+    public void setSecManageAcctIdName(String secManageAcctIdName) {
+        this.secManageAcctIdName = secManageAcctIdName;
+    }
+
+    public String getInvManagerName() {
+        return invManagerName;
+    }
+
+    public void setInvManagerName(String invManagerName) {
+        this.invManagerName = invManagerName;
     }
 }

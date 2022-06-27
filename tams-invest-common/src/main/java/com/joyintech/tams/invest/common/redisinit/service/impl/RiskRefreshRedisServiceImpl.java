@@ -171,7 +171,7 @@ public class RiskRefreshRedisServiceImpl extends BaseService implements RiskRefr
                 Date sysDate = platformDate.getSysDate();
                 iCond.setPlateDate(StringUtil.isNotEmpty(sysDate) ? sysDate : new Date());
             }
-            iCond.setLoadOffset(true);
+            iCond.setLoadOffset(false);
             iCond.setIsUpdParVal(true);
             iCond.setDel(false);
             Map<String, Object> mapPass = new HashMap<>();

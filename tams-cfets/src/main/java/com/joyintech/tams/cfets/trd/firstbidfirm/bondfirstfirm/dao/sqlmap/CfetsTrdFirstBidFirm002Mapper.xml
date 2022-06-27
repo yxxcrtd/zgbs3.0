@@ -308,7 +308,7 @@
     </select>
 
     <update id="updateBidOrder">
-        UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark} WHERE BID_ID = #{bidId}
+        UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark,jdbcType=VARCHAR} WHERE BID_ID = #{bidId}
     </update>
 
     <update id="updateBidOrderBidPrice">
@@ -338,6 +338,7 @@
                        THEN fpi.TENDER_EDATE
                    END           AS bidDateEnd/*投标日 结束*/,
                bo.PAY_DATE payDate/*缴款日*/,
+               bo.PAY_DATE payEdate/*缴款日*/,
                bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,
@@ -426,6 +427,7 @@
                        THEN fpi.TENDER_EDATE
                    END           AS bidDateEnd/*投标日 结束*/,
                bo.PAY_DATE          payDate/*缴款日*/,
+               bo.PAY_DATE payEdate/*缴款日*/,
                bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,

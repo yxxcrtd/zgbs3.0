@@ -69,6 +69,8 @@ import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,6 +87,11 @@ import java.util.stream.Collectors;
  */
 @Service
 public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtrBondFirstBid002Dto> implements BaseProcessService<CfetsEtrBondFirstBid002Dto> {
+    /**
+     * 日志
+     */
+    private static Logger logger = LoggerFactory.getLogger(CfetsEtrBondFirstBid002Service.class);
+
 
     @Autowired
     private CfetsEtrIbBondinfoMapper cfetsetrIbBondinfoMapper;
@@ -373,6 +380,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         req.setFinprodId(dto.getFinprodId());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
+        logger.info("一级投标指令发送头寸开始");
         PositionHttpRequest.send(req);
 
     }
