@@ -324,7 +324,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
                 map.put("cashId", detailQueryDto.getPrincipalCashId());
                 map.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                 if (StringUtil.isNotEmpty(detailQueryDto.getPrincipalCashId())) {
-                    List<FinBondMarketCashPlanDto> invRepayList = finBondMarketInfoQueryMapper.selectInvScheduleList(map);
+                    List<FinBondMarketCashPlanDto> invRepayList = finBondMarketInfoQueryMapper.selectInvRepayList(map);
                     detailQueryDto.setBondMarketInvRepayDtos(invRepayList);
                 }
 

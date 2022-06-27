@@ -53,6 +53,9 @@ public class RskParamCalcWriter extends BaseWriter<NeedToWriteEntity> {
                 return;
             }
             RskParamReCalcWriterDto dto = (RskParamReCalcWriterDto)entity;
+            if(StringUtil.isEmptyList(dto.getParaCalList())){
+                return;
+            }
             details.addAll(dto.getParaCalList());
         });
         // 参数计算流水

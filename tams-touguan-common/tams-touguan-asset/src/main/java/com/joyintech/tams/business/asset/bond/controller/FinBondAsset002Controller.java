@@ -64,16 +64,16 @@ import java.util.stream.Collectors;
 @PageId("FinBondAsset002")
 @RequestMapping("/business/asset/bond/FinBondAsset002")
 @Api(tags = "债券标的信息新建")
-public class FinBondAsset002Controller extends BaseController{
+public class FinBondAsset002Controller extends BaseController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private FinBondAssetService finBondAssetService;
 
-    @Autowired 
+    @Autowired
     private FileAttachmentProcess fileAttachmentProcess;
-    
+
     @Autowired
     private CommonBusinessService commonBusinessService;
 
@@ -89,109 +89,109 @@ public class FinBondAsset002Controller extends BaseController{
     @Autowired
     private FinBondAsset001Service finBondAsset001Service;
 
-    @ApiOperation(value="新建页面初始化参数", notes = "新建页面初始化参数")
+    @ApiOperation(value = "新建页面初始化参数", notes = "新建页面初始化参数")
     @PostMapping("/getInitPageParams")
     @ResponseBody
-    public Message<Map<String,Object>> getInitPageParams(){
+    public Message<Map<String, Object>> getInitPageParams() {
         //初始化基本信息画面数据字典
-       Map<String,Object> initPageParams = new HashMap<>();
-       initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
-       initPageParams.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.募集方式, null));
-       initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种 , null));
-       initPageParams.put("TYPE_9", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
-       initPageParams.put("TYPE_10", this.getSelectDataFromDataDic(DictCode.行内资产三级分类, null));
-       initPageParams.put("TYPE_11", this.getSelectDataFromDataDic(DictCode.行内资产四级分类 , null));
-       initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
-       initPageParams.put("REGIST_ORG", this.getSelectDataFromDataDic(DictCode.登记托管机构, null));
-       initPageParams.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.债券类资产募集方式, null));
-       initPageParams.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
-       initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种, null));
-       initPageParams.put("AMT_INCOME_TYPE", this.getSelectDataFromDataDic(DictCode.本金收益特征, null));
-       initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
-       initPageParams.put("COUPON_SPECIES", this.getSelectDataFromDataDic(DictCode.息票品种, null));
-       initPageParams.put("INT_TYPE", this.getSelectDataFromDataDic(DictCode.利率类型, null));
-       initPageParams.put("BASE_RATE_ACCURACY", this.getSelectDataFromDataDic(DictCode.基准利率精度, null));
-       initPageParams.put("RESET_TYPE", this.getSelectDataFromDataDic(DictCode.重置类型_基准利率调整规则, null));
-       initPageParams.put("ADVANCE_OBSERV_UNIT", this.getSelectDataFromDataDic(DictCode.提前观察单位_延后时间单位, null));
-       initPageParams.put("INTPAY_RULE", this.getSelectDataFromDataDic(DictCode.利息分配方式, null));
-       initPageParams.put("TDAY_RULE", this.getSelectDataFromDataDic(DictCode.营业日准则, null));
-       initPageParams.put("FREQUENCY_UNIT", this.getSelectDataFromDataDic(DictCode.频率, null));
-       initPageParams.put("CALC_RULE", this.getSelectDataFromDataDic(DictCode.推算方式, null));
-       initPageParams.put("BASIS", this.getSelectDataFromDataDic(DictCode.计息基础, null));
-       initPageParams.put("EXEC_TYPE", this.getSelectDataFromDataDic(DictCode.行权状态, null));
-       initPageParams.put("EXEC_MODE", this.getSelectDataFromDataDic(DictCode.行权方式, null));
-       initPageParams.put("ISSUE_CLASS", this.getSelectDataFromDataDic(DictCode.新债_发行方式, null));
-       initPageParams.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
-       initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
-       initPageParams.put("SECRATE_DATA", this.getSelectDataFromDataDic(DictCode.利率行情, null));
-       initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
-       initPageParams.put("GUARANTEE_MODE",this.getSelectDataFromDataDic(DictCode.新债_担保方式, null));
+        Map<String, Object> initPageParams = new HashMap<>();
+        initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
+        initPageParams.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.募集方式, null));
+        initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种, null));
+        initPageParams.put("TYPE_9", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
+        initPageParams.put("TYPE_10", this.getSelectDataFromDataDic(DictCode.行内资产三级分类, null));
+        initPageParams.put("TYPE_11", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
+        initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
+        initPageParams.put("REGIST_ORG", this.getSelectDataFromDataDic(DictCode.登记托管机构, null));
+        initPageParams.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.债券类资产募集方式, null));
+        initPageParams.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
+        initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种, null));
+        initPageParams.put("AMT_INCOME_TYPE", this.getSelectDataFromDataDic(DictCode.本金收益特征, null));
+        initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
+        initPageParams.put("COUPON_SPECIES", this.getSelectDataFromDataDic(DictCode.息票品种, null));
+        initPageParams.put("INT_TYPE", this.getSelectDataFromDataDic(DictCode.利率类型, null));
+        initPageParams.put("BASE_RATE_ACCURACY", this.getSelectDataFromDataDic(DictCode.基准利率精度, null));
+        initPageParams.put("RESET_TYPE", this.getSelectDataFromDataDic(DictCode.重置类型_基准利率调整规则, null));
+        initPageParams.put("ADVANCE_OBSERV_UNIT", this.getSelectDataFromDataDic(DictCode.提前观察单位_延后时间单位, null));
+        initPageParams.put("INTPAY_RULE", this.getSelectDataFromDataDic(DictCode.利息分配方式, null));
+        initPageParams.put("TDAY_RULE", this.getSelectDataFromDataDic(DictCode.营业日准则, null));
+        initPageParams.put("FREQUENCY_UNIT", this.getSelectDataFromDataDic(DictCode.频率, null));
+        initPageParams.put("CALC_RULE", this.getSelectDataFromDataDic(DictCode.推算方式, null));
+        initPageParams.put("BASIS", this.getSelectDataFromDataDic(DictCode.计息基础, null));
+        initPageParams.put("EXEC_TYPE", this.getSelectDataFromDataDic(DictCode.行权状态, null));
+        initPageParams.put("EXEC_MODE", this.getSelectDataFromDataDic(DictCode.行权方式, null));
+        initPageParams.put("ISSUE_CLASS", this.getSelectDataFromDataDic(DictCode.新债_发行方式, null));
+        initPageParams.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
+        initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
+        initPageParams.put("SECRATE_DATA", this.getSelectDataFromDataDic(DictCode.利率行情, null));
+        initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
+        initPageParams.put("GUARANTEE_MODE", this.getSelectDataFromDataDic(DictCode.新债_担保方式, null));
 
         String finprodId = getParam("finprodId");
-       String finprodType = getParam("finprodType");
-       String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
-       initPageParams.put("YES",DictCodeList.是否_是.getValue());
-       initPageParams.put("isTradeCalendar",DictCodeList.是否_是.getValue());
+        String finprodType = getParam("finprodType");
+        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        initPageParams.put("YES", DictCodeList.是否_是.getValue());
+        initPageParams.put("isTradeCalendar", DictCodeList.是否_是.getValue());
         /* add by zhangpuyu 2019/20/24 start */
-       initPageParams.put("counterType",DictCodeListExt1.交易对手类型_分行.getValue());
+        initPageParams.put("counterType", DictCodeListExt1.交易对手类型_分行.getValue());
         /* add by zhangpuyu 2019/20/24 end */
-       initPageParams.put("FINPROD_TYPE_TG_F01",DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-       initPageParams.put("FINPROD_TYPE_TG_F07", DictCodeListExt1.金融产品类型_投管用_存款.getValue());
-       initPageParams.put("FINPROD_TYPE_TG_F17",DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
-       initPageParams.put("FINPROD_TYPE_TG_F18",DictCodeListExt1.金融产品类型_投管用_项目类资产.getValue());
-       initPageParams.put("FINPROD_TYPE_TG_F10",DictCodeListExt1.金融产品类型_投管用_股票.getValue());
-       initPageParams.put("COUPON_SPECIES_02", DictCodeList.息票品种_贴现.getValue());
-       initPageParams.put("COUPON_SPECIES_03", DictCodeList.息票品种_零息.getValue());
-       initPageParams.put("CCY_INIT", DictCodeList.币种_人民币_CNY.getValue());
-       initPageParams.put("CUSTOM_ASSET_TYPE_FIVE_009", DictCodeListExt2.行内资产五级分类_金融机构次级债.getValue());//wangguiqi	2019/8/16
-       initPageParams.put("CUSTOM_ASSET_TYPE_FIVE_158", DictCodeListExt2.行内资产五级分类_政策性金融次级债.getValue());//wangguiqi	2019/8/16
+        initPageParams.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        initPageParams.put("FINPROD_TYPE_TG_F07", DictCodeListExt1.金融产品类型_投管用_存款.getValue());
+        initPageParams.put("FINPROD_TYPE_TG_F17", DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
+        initPageParams.put("FINPROD_TYPE_TG_F18", DictCodeListExt1.金融产品类型_投管用_项目类资产.getValue());
+        initPageParams.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+        initPageParams.put("COUPON_SPECIES_02", DictCodeList.息票品种_贴现.getValue());
+        initPageParams.put("COUPON_SPECIES_03", DictCodeList.息票品种_零息.getValue());
+        initPageParams.put("CCY_INIT", DictCodeList.币种_人民币_CNY.getValue());
+        initPageParams.put("CUSTOM_ASSET_TYPE_FIVE_009", DictCodeListExt2.行内资产五级分类_金融机构次级债.getValue());//wangguiqi	2019/8/16
+        initPageParams.put("CUSTOM_ASSET_TYPE_FIVE_158", DictCodeListExt2.行内资产五级分类_政策性金融次级债.getValue());//wangguiqi	2019/8/16
         //平台日
-       initPageParams.put("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
-       initPageParams.put("YES_OR_NO_Y", DictCodeList.是否_是.getValue());
-       initPageParams.put("isShowType", CacheUtil.getSysParam("IS_SHOW_TYPE")==null?"01":CacheUtil.getSysParam("IS_SHOW_TYPE"));
+        initPageParams.put("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
+        initPageParams.put("YES_OR_NO_Y", DictCodeList.是否_是.getValue());
+        initPageParams.put("isShowType", CacheUtil.getSysParam("IS_SHOW_TYPE") == null ? "01" : CacheUtil.getSysParam("IS_SHOW_TYPE"));
         //不来自于代办
-        if(WorkFlowUtil.isNotFromToDoList()&& StringUtil.isNotEmpty(finprodId)) {
-           initPageParams.put("isTransInAsset", commonBusinessService.isTransInAsset(finprodId)!=0?true:false);
-           initPageParams.put("isHqTrade", finBondAssetService.isHqTrade(finprodId)>0?true:false);
-          //根据主键获取业务实体--标的金融产品基本信息
+        if (WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(finprodId)) {
+            initPageParams.put("isTransInAsset", commonBusinessService.isTransInAsset(finprodId) != 0 ? true : false);
+            initPageParams.put("isHqTrade", finBondAssetService.isHqTrade(finprodId) > 0 ? true : false);
+            //根据主键获取业务实体--标的金融产品基本信息
             FinBondAssetSaveRequest finBondAssetDto = finBondAssetService.getBasicInfos(
-                finprodId, finprodType);
+                    finprodId, finprodType);
             //commonBusinessService.setTradeMarketId(finBondAssetDto,model);
             //点击修改保存提交会校验实际授信主体必填问题
             String a = CacheUtil.getSysParam(BussinessConstant.CEMODEL);
-            if(StringUtil.equals("01", a)){
+            if (StringUtil.equals("01", a)) {
                 finBondAssetDto.setCreditFlag("");
             }
-           initPageParams.put("entity", finBondAssetDto);
+            initPageParams.put("entity", finBondAssetDto);
         }//来自于代办
-        else if( StringUtil.isNotEmpty(workflowId)){
+        else if (StringUtil.isNotEmpty(workflowId)) {
             //根据工作流与留痕处理提供的共通方法获取业务实体
             FinBondAssetSaveRequest finBondAssetDto = finBondAssetService.getBussinessEntityByWorkflowId(workflowId);
             //commonBusinessService.setTradeMarketId(finBondAssetDto,model);
             //设置到model中
-           initPageParams.put("entity", finBondAssetDto);
-        }else{
+            initPageParams.put("entity", finBondAssetDto);
+        } else {
             FinBondAssetSaveRequest finBondAssetDto = new FinBondAssetSaveRequest();
             finBondAssetDto.setFinprodId(IDGenerator.generate());
             finBondAssetDto.setIsAutoUpdate(DictCodeList.是否_是.getValue());
 //            finBondAssetDto.setBlnArea(DictCodeList.境内外_境内.getValue());
             //commonBusinessService.setTradeMarketId(finBondAssetDto,model);
-           initPageParams.put("entity", finBondAssetDto);
+            initPageParams.put("entity", finBondAssetDto);
         }
         //资产类型
-       initPageParams.put("INT_ASSET_TYPE", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-       initPageParams.put("workflowId",workflowId);
-       initPageParams.put("pageModel",this.getPageModel());
-      //取系统参数
-       initPageParams.put("CE_MODEL", CacheUtil.getSysParam(BussinessConstant.CEMODEL));
-       initPageParams.put("WINDTYPEONE_B14",DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
-       initPageParams.put("WINDTYPEONE_B15",DictCodeList.WIND一级分类_含债券一级分类等_可交换债.getValue());
-       initPageParams.put("SVR_SHARES_TYPE_02",DictCodeListExt2.股票类型_优先股.getValue());
-       initPageParams.put("SVR_ASSET_TYPE_SECOND_LEVEL", createChbAssetType());
+        initPageParams.put("INT_ASSET_TYPE", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        initPageParams.put("workflowId", workflowId);
+        initPageParams.put("pageModel", this.getPageModel());
+        //取系统参数
+        initPageParams.put("CE_MODEL", CacheUtil.getSysParam(BussinessConstant.CEMODEL));
+        initPageParams.put("WINDTYPEONE_B14", DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
+        initPageParams.put("WINDTYPEONE_B15", DictCodeList.WIND一级分类_含债券一级分类等_可交换债.getValue());
+        initPageParams.put("SVR_SHARES_TYPE_02", DictCodeListExt2.股票类型_优先股.getValue());
+        initPageParams.put("SVR_ASSET_TYPE_SECOND_LEVEL", createChbAssetType());
         //add by lizhi 是否显示中债信息开关 2020年2月28日  start
-       initPageParams.put("ASSET_INFO_CHB_HIDE", 
-                CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE)==null? 
-                        DictCodeListExt1.是或否_是.getValue(): CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE));
+        initPageParams.put("ASSET_INFO_CHB_HIDE",
+                CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE) == null ?
+                        DictCodeListExt1.是或否_是.getValue() : CacheUtil.getSysParam(BussinessConstant.ASSET_INFO_CHB_HIDE));
         //add by lizhi 是否显示中债信息开关 2020年2月28日  end
 
         // 加券按钮
@@ -201,31 +201,31 @@ public class FinBondAsset002Controller extends BaseController{
     }
 
     /**
-     *  获取流程中信息
+     * 获取流程中信息
+     *
      * @param request
      * @return
      */
     @ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
     @ResponseBody
     @PostMapping("/getApproveEntity")
-    public Message<FinBondAssetSaveRequest> getApproveEntity(@RequestBody FinBondAssetInsertRequest request)
-    {
-        try{
+    public Message<FinBondAssetSaveRequest> getApproveEntity(@RequestBody FinBondAssetInsertRequest request) {
+        try {
             String workflowId = request.getWorkflowId();
             FinBondAssetSaveRequest entity = new FinBondAssetSaveRequest();
             if (StringUtil.isNotEmpty(workflowId)) {
                 //流程代办checkImportData
                 entity = finBondAssetService.getBussinessEntityByWorkflowId(workflowId);
-                if (StringUtil.isNotEmpty(entity)){
-                    if(StringUtil.isEmpty(entity.getType9())) entity.setType9(entity.getTypeTwo());
-                    if(StringUtil.isEmpty(entity.getType10())) entity.setType10(entity.getTypeThree());
-                    if(StringUtil.isEmpty(entity.getType11())) entity.setType11(entity.getTypeFour());
+                if (StringUtil.isNotEmpty(entity)) {
+                    if (StringUtil.isEmpty(entity.getType9())) entity.setType9(entity.getTypeTwo());
+                    if (StringUtil.isEmpty(entity.getType10())) entity.setType10(entity.getTypeThree());
+                    if (StringUtil.isEmpty(entity.getType11())) entity.setType11(entity.getTypeFour());
                     finBondAssetService.getIssues(entity);
                 }
 
             }
             return new Message<FinBondAssetSaveRequest>().success().setData(entity);
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return new Message<FinBondAssetSaveRequest>().fail().setMessage("查询异常");
         }
@@ -233,6 +233,7 @@ public class FinBondAsset002Controller extends BaseController{
 
     /**
      * 债券报送二级分类所有的资产负债类别不应该出现 1001:现金及活期存款，配置参数太多，通过代码控制
+     *
      * @return
      */
     private String createChbAssetType() {
@@ -252,6 +253,7 @@ public class FinBondAsset002Controller extends BaseController{
 
     /**
      * check--保存
+     *
      * @param dto
      * @param result
      * @return
@@ -264,9 +266,9 @@ public class FinBondAsset002Controller extends BaseController{
     public Message<AjaxResult> check(@RequestBody FinBondAssetSaveRequest dto, BindingResult result) {
         AjaxResult ajax = new AjaxResult();
         List<ValidMessage> validList = new ArrayList<>();
-        ValidUtils.valid(dto,validList);
-        ValidUtils.valid(dto.getFinProductConvertible(),validList);
-        ValidUtils.valid(dto.getFinInterestFactorDto(),validList);
+        ValidUtils.valid(dto, validList);
+        ValidUtils.valid(dto.getFinProductConvertible(), validList);
+        ValidUtils.valid(dto.getFinInterestFactorDto(), validList);
         List<ValidMessage> valids = finBondAssetValidatorService.valid(dto);
         validList.addAll(valids);
         if (!StringUtil.equals(dto.getOperateStatus(), "MODIFY")) {
@@ -290,7 +292,7 @@ public class FinBondAsset002Controller extends BaseController{
                 return new Message<AjaxResult>().success().setData(ajax);
             }
         }
-        if (CollectionUtils.isNotEmpty(validList)){
+        if (CollectionUtils.isNotEmpty(validList)) {
             ajax.setErrorList(validList);
             return new Message<AjaxResult>().success().setData(ajax);
         }
@@ -299,6 +301,7 @@ public class FinBondAsset002Controller extends BaseController{
 
     /**
      * check--保存
+     *
      * @param dto
      * @param result
      * @return
@@ -321,10 +324,10 @@ public class FinBondAsset002Controller extends BaseController{
         }
         return new Message<AjaxResult>().success().setData(commonCheck(result, dto.getOperateType()));
     }
-    
+
     /**
-     * 
      * 保存
+     *
      * @param dto
      * @param br
      * @return
@@ -340,18 +343,18 @@ public class FinBondAsset002Controller extends BaseController{
             return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
         //生成金融产品代码
-        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
+        dto.setFinprodMarketId(dto.getFinprodMarketId() + dto.getTradeMarketId());
         if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
             dto = finBondAssetService.getFinprodId(dto);
         }
         //文件信息
         if (StringUtil.isNotEmpty(dto.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(dto.getMstFileInputParameter().getFileList())
-            && StringUtil.isNotEmpty(dto.getFinprodId())) {
+                && StringUtil.isNotEmpty(dto.getFinprodId())) {
             // 将附件和当前业务对象绑定（更新附件的业务代码）
             fileAttachmentProcess.updateBussinessNo(
-                dto.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
-                    Collectors.toList()),
-                dto.getFinprodId());
+                    dto.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
+                            Collectors.toList()),
+                    dto.getFinprodId());
         }
         dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         WorkFlowParameter<FinBondAssetSaveRequest> params = new WorkFlowParameter<FinBondAssetSaveRequest>();
@@ -360,19 +363,17 @@ public class FinBondAsset002Controller extends BaseController{
         params.setBusinessCode(FinBondAssetSaveRequest::getFinprodMarketId);
         params.setBusinessType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         // 设置流程业务说明
-        params.setComment(entity -> {
-            return WorkFlowUtil.concatComment("债券代码"+
-                GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId(), GlobalConstant.CLOSE_PARENTHESIS+
-                "债券简称"+GlobalConstant.OPEN_PARENTHESIS+
-                entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
-        });
+        params.setComment(entity -> WorkFlowUtil.concatComment("债券代码" +
+                        GlobalConstant.OPEN_PARENTHESIS + entity.getFinprodMarketId() + GlobalConstant.CLOSE_PARENTHESIS,
+                "债券简称" + GlobalConstant.OPEN_PARENTHESIS +
+                        entity.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS));
         // 给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<FinBondAssetSaveRequest> parameter = new ProcessParameter<FinBondAssetSaveRequest>();
         if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
             parameter.setOperationType(OperationType.NEW);
         } else if (StringUtil.equals(dto.getOperateStatus(), OperationType.MODIFY.name())) {
             parameter.setOperationType(OperationType.MODIFY);
-        }else{
+        } else {
             parameter.setOperationType(OperationType.DELETE);
         }
         parameter.setWorkFlowParameter(params);
@@ -395,24 +396,24 @@ public class FinBondAsset002Controller extends BaseController{
     @ApiOperation(value = "获取债券基本信息", notes = "获取债券基本信息")
     @ResponseBody
     @PostMapping("/getBasicInfo")
-    public Message<FinBondAssetSaveRequest> getBasicInfo(@RequestBody FinBondAssetInsertRequest request){
+    public Message<FinBondAssetSaveRequest> getBasicInfo(@RequestBody FinBondAssetInsertRequest request) {
         String finprodId = null;
-        if (StringUtil.isNotEmpty(request.getFinprodId())){
+        if (StringUtil.isNotEmpty(request.getFinprodId())) {
             finprodId = request.getFinprodId();
-        }else{
+        } else {
             finprodId = request.getFinprodMarketId();
         }
         FinBondAssetSaveRequest resultDto = finBondAssetService.getBasicInfos(
-                finprodId,null);
+                finprodId, null);
         return new Message<FinBondAssetSaveRequest>().success().setData(resultDto);
     }
 
     /**
      * 获取新建界面的以及市场投标债券代码联想下拉框
-     * 
-     * @author wangguiqi
+     *
      * @param
      * @return
+     * @author wangguiqi
      * @see
      * @since 1.0
      */
@@ -432,51 +433,51 @@ public class FinBondAsset002Controller extends BaseController{
     @ResponseBody
     @PostMapping("/getIsNetSett")
     private Message<AjaxResult> getIsNetSett(@RequestBody FinBondAssetInsertRequest request) {
-        Map<String,String> map=new HashMap<String,String> ();
+        Map<String, String> map = new HashMap<String, String>();
         AjaxResult ar = new AjaxResult();
         String finprodMarketId = request.getFinprodMarketId();
         String tradeMarket = request.getTradeMarket();
         String type9 = request.getType10();
         String isPpb = request.getIsPpb();
-        String isNetSett=StringUtil.EMPTY;
-        String tradePlat=StringUtil.EMPTY;
-        if(StringUtil.equals(DictCodeListExt1.交易场所_上海证券交易所.getValue(), tradeMarket)){
+        String isNetSett = StringUtil.EMPTY;
+        String tradePlat = StringUtil.EMPTY;
+        if (StringUtil.equals(DictCodeListExt1.交易场所_上海证券交易所.getValue(), tradeMarket)) {
             // 全额结算 标识
             boolean settleFlag = false;
             // 判断债券代码 是否在 139000-139999代码段债券、123000-123499代码段债券 范围内
             String secid = finprodMarketId;
-            if(finprodMarketId.contains (".")){
-                secid=finprodMarketId.substring(0,finprodMarketId.indexOf("."));
+            if (finprodMarketId.contains(".")) {
+                secid = finprodMarketId.substring(0, finprodMarketId.indexOf("."));
             }
-            Pattern pattern=Pattern.compile("^-?\\d+(\\.\\d+)?$");
+            Pattern pattern = Pattern.compile("^-?\\d+(\\.\\d+)?$");
             //是否属于139000-139999代码段债券
-            if(pattern.matcher(secid).matches()) {
+            if (pattern.matcher(secid).matches()) {
                 Long l = Long.parseLong(secid);
                 if ((l >= 139000 && l <= 139999) || (l >= 123000 && l <= 123499)) {
                     settleFlag = true;
                 }
             }
             //全额结算 : 私募债 || 139000-139999代码段债券、123000-123499代码段债券 || 资产支持证券
-            if(StringUtil.equals(isPpb, "Y") || settleFlag || StringUtil.equals(DictCodeListExt3.行内资产三级分类_资产支持证券.getValue(), type9)){
-                isNetSett="Y";
+            if (StringUtil.equals(isPpb, "Y") || settleFlag || StringUtil.equals(DictCodeListExt3.行内资产三级分类_资产支持证券.getValue(), type9)) {
+                isNetSett = "Y";
 //                tradePlat=DictCodeList.交易平台_固定收益平台.getValue();
-            }else{
+            } else {
                 //以上情况都不符合则为纳入净额结算标准范围的债券
-                isNetSett="N";
+                isNetSett = "N";
 //                tradePlat=DictCodeList.交易平台_固定收益平台.getValue()+","+DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_大宗交易平台.getValue();
             }
-        }else if(StringUtil.equals(DictCodeListExt1.交易场所_深圳证券交易所.getValue(), tradeMarket)){
+        } else if (StringUtil.equals(DictCodeListExt1.交易场所_深圳证券交易所.getValue(), tradeMarket)) {
             //全额结算: 私募债 || 资产支持证券
-            if(StringUtil.equals(isPpb, "Y") || StringUtil.equals(DictCodeListExt3.行内资产三级分类_资产支持证券.getValue(), type9)){
-                isNetSett="Y";
+            if (StringUtil.equals(isPpb, "Y") || StringUtil.equals(DictCodeListExt3.行内资产三级分类_资产支持证券.getValue(), type9)) {
+                isNetSett = "Y";
 //                tradePlat=DictCodeList.交易平台_综合协议交易平台.getValue();
-            }else{
-                isNetSett="N";
+            } else {
+                isNetSett = "N";
 //                tradePlat=DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_综合协议交易平台.getValue();
             }
         }
         map.put("isNetSett", isNetSett);
-        ar.setData (map);
+        ar.setData(map);
         return new Message<AjaxResult>().success().setData(ar);
     }
 
@@ -487,7 +488,7 @@ public class FinBondAsset002Controller extends BaseController{
     @ApiOperation(value = "根据产品代码得到起息日和到期日", notes = "根据产品代码得到起息日和到期日")
     @ResponseBody
     @PostMapping("/isSameMdateAndVdate")
-    public Message<Boolean> isSameMdateAndVdate(@RequestBody FinBondAssetInsertRequest request){
+    public Message<Boolean> isSameMdateAndVdate(@RequestBody FinBondAssetInsertRequest request) {
         //债券标的   债券修改或新建，关联一级市场债券时，若关联的一级债券起息日、到期日与资产起息日、到期日不一致，需要进行提醒
         FinBondAssetSaveRequest dto = finBondAssetService.getMdateAndVdate(request.getoFinprodId());
         if (null != dto.getVdate() && null != dto.getMdate()) {
@@ -500,8 +501,8 @@ public class FinBondAsset002Controller extends BaseController{
     }
 
     /**
-     *
      * <功能详细描述>
+     *
      * @return
      * @see
      * @since 1.0
@@ -512,10 +513,10 @@ public class FinBondAsset002Controller extends BaseController{
     public Message<AssetCommonInfoRequest> getyieldByPriceCalculator(@RequestBody AssetCommonInfoRequest request) {
         AssetCommonInfoRequest response = new AssetCommonInfoRequest();
         request.setCalendarId(finBondAssetService.getCalendarId(request.getTradeMarket()));
-        if (StringUtil.isNotEmpty(request.getPriceFlag()) && StringUtil.equals(request.getPriceFlag(),DictCodeList.是否_是.getValue())) {
+        if (StringUtil.isNotEmpty(request.getPriceFlag()) && StringUtil.equals(request.getPriceFlag(), DictCodeList.是否_是.getValue())) {
             BigDecimal rate = finBondAssetService.getyieldByPriceCalculator(request);
             response.setRate(rate);
-        }else if (StringUtil.isNotEmpty(request.getRateFlag()) && StringUtil.equals(request.getRateFlag(),DictCodeList.是否_是.getValue())) {
+        } else if (StringUtil.isNotEmpty(request.getRateFlag()) && StringUtil.equals(request.getRateFlag(), DictCodeList.是否_是.getValue())) {
             BigDecimal issuePrice = finBondAssetService.getPriceByYieldCalculator(request);
             response.setIssuePrice(issuePrice);
         }
@@ -523,8 +524,8 @@ public class FinBondAsset002Controller extends BaseController{
     }
 
     /**
-     *
      * <功能详细描述>
+     *
      * @return
      * @see
      * @since 1.0
@@ -554,15 +555,15 @@ public class FinBondAsset002Controller extends BaseController{
     @ResponseBody
     @PostMapping("/checkGenerationPlan")
     public Message<AjaxResult> checkGenerationPlan(@RequestBody BondFinPayInterestStdInfoRequest previewParam,
-                            BindingResult result) {
+                                                   BindingResult result) {
         if (result != null && result.hasErrors()) {
-            return Message.success("生成付息计划check",new AjaxResult());
+            return Message.success("生成付息计划check", new AjaxResult());
         }
-        AjaxResult resultList=new AjaxResult(result);
+        AjaxResult resultList = new AjaxResult(result);
         List<ValidMessage> validMessages = finBondAssetService.checkGenerationPlan(previewParam);
         validMessages.addAll(finBondAssetService.valid(previewParam));
         resultList.setErrorList(validMessages);
-        return Message.success("生成付息计划check",resultList);
+        return Message.success("生成付息计划check", resultList);
     }
 
     /**
@@ -576,36 +577,36 @@ public class FinBondAsset002Controller extends BaseController{
     @ApiOperation(value = "生成付息计划", notes = "生成付息计划")
     @ResponseBody
     @PostMapping(value = "/generationPlan")
-    public Message<BondFinPayInterestStdInfoResponse> generationPlan(@RequestBody BondFinPayInterestStdInfoRequest dto){
+    public Message<BondFinPayInterestStdInfoResponse> generationPlan(@RequestBody BondFinPayInterestStdInfoRequest dto) {
         try {
             // 修改查看初始化
             String finprodId = dto.getFinprodId();
-            if(!StringUtil.isNotEmpty(finprodId) && StringUtil.isNotEmpty(dto.getFinprodMarketId())) {
-                finprodId = commonBusinessService.getFinProdId(dto.getFinprodMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
+            if (!StringUtil.isNotEmpty(finprodId) && StringUtil.isNotEmpty(dto.getFinprodMarketId())) {
+                finprodId = commonBusinessService.getFinProdId(dto.getFinprodMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
             }
             if (StringUtil.isNotEmpty(dto.getFinInterestFactorDto()) &&
-                    StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getYield()) ){
-                dto.getFinInterestFactorDto().setYield(ArithmeticUtil.multiply(dto.getFinInterestFactorDto().getYield(),BigDecimal.valueOf(100)));
+                    StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getYield())) {
+                dto.getFinInterestFactorDto().setYield(ArithmeticUtil.multiply(dto.getFinInterestFactorDto().getYield(), BigDecimal.valueOf(100)));
             }
             // 付息计划
             List<BondFinCashPlanDto> invList = new ArrayList<>();
             Date maxTradeDate = null;
-            if(StringUtil.isNotEmpty(finprodId)) {
+            if (StringUtil.isNotEmpty(finprodId)) {
                 maxTradeDate = finBondAssetService.getMaxTradeDate(finprodId);
                 // 生付息成计划
                 dto.setMaxTradeDate(maxTradeDate);
             }
             dto.setCalendarId(finBondAssetService.getCalendarId(dto.getTradeMarket()));
             dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-            if(StringUtil.equals(dto.getAdjPlanFlag(), DictCodeList.共通业务类型_付息计划调整.getValue())){
+            if (StringUtil.equals(dto.getAdjPlanFlag(), DictCodeList.共通业务类型_付息计划调整.getValue())) {
                 dto.setFinprodType2(dto.getAdjPlanFlag());
             }
-            FinPayInterestStdInfoDto finPayInterestStdInfoDto= new FinPayInterestStdInfoDto();
-            BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,dto);
+            FinPayInterestStdInfoDto finPayInterestStdInfoDto = new FinPayInterestStdInfoDto();
+            BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto, dto);
             BondFinInterestFactorDto bondFinInterestFactorDto = dto.getFinInterestFactorDto();
             FinInterestFactorDto finInterestFactorDto = new FinInterestFactorDto();
             finInterestFactorDto.setRate(bondFinInterestFactorDto.getYield());
-            BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto,bondFinInterestFactorDto);
+            BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto, bondFinInterestFactorDto);
             finPayInterestStdInfoDto.setFinInterestFactorDto(finInterestFactorDto);
             if (CollectionUtils.isNotEmpty(dto.getInvScheduleList())) {
                 List<FinCashPlanDto> invScheduleList = new ArrayList<>();
@@ -626,10 +627,10 @@ public class FinBondAsset002Controller extends BaseController{
                 finPayInterestStdInfoDto.setInvRepayList(invRepayList);
             }
             List<FinCashPlanDto> finCashPlanList = finPayInterestStdInfoService.createAssetPayInteresPlan(finPayInterestStdInfoDto);
-            for (FinCashPlanDto finCashPlan:finCashPlanList){
+            for (FinCashPlanDto finCashPlan : finCashPlanList) {
                 BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
-                BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto,finCashPlan);
-                bondFinCashPlanDto.setRangeYield(ArithmeticUtil.divide(bondFinCashPlanDto.getRangeYield(),BigDecimal.valueOf(100),4));
+                BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto, finCashPlan);
+                bondFinCashPlanDto.setRangeYield(ArithmeticUtil.divide(bondFinCashPlanDto.getRangeYield(), BigDecimal.valueOf(100), 4));
                 bondFinCashPlanDto.setLirs(null);
                 invList.add(bondFinCashPlanDto);
             }
@@ -662,12 +663,12 @@ public class FinBondAsset002Controller extends BaseController{
                     return o1.getVdate().compareTo(o2.getVdate());
                 }
             });
-            BondFinPayInterestStdInfoResponse  response = new BondFinPayInterestStdInfoResponse();
+            BondFinPayInterestStdInfoResponse response = new BondFinPayInterestStdInfoResponse();
             response.setInvScheduleList(invList);
             response.setInvRepayList(lirs);
             response.setMaxTradeDate(maxTradeDate);
             return new Message<BondFinPayInterestStdInfoResponse>().success().setData(response);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return new Message<BondFinPayInterestStdInfoResponse>().fail().setMessage("付息计划生成异常");
         }
@@ -675,13 +676,14 @@ public class FinBondAsset002Controller extends BaseController{
 
     /**
      * 附件上传
-     * @param file  入参
+     *
+     * @param file 入参
      * @return 处理结果
      * @throws IOException 异常信息
      */
     @ApiOperation(value = "附件上传", notes = "附件上传")
     @ResponseBody
-    @PostMapping( "/uploadFile")
+    @PostMapping("/uploadFile")
     public Message<SysUploadFileInfo> uploadFile(MultipartFile file) {
         try {
             logger.info("文件上传开始");
@@ -690,7 +692,7 @@ public class FinBondAsset002Controller extends BaseController{
                 return new Message<SysUploadFileInfo>().success().setData(fileInfo);
             }
             logger.info("文件上传结束");
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("文件上传异常", e);
             return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
         }
@@ -699,45 +701,47 @@ public class FinBondAsset002Controller extends BaseController{
 
     /**
      * 附件下载
-     * @param seqNo  入参
+     *
+     * @param seqNo 入参
      * @return 处理结果
      * @throws IOException 异常信息
      */
     @ApiOperation(value = "附件下载", notes = "附件下载")
     @ResponseBody
-    @PostMapping( "/downloadFile/{seqNo}")
+    @PostMapping("/downloadFile/{seqNo}")
     public void downloadFile(@PathVariable("seqNo") String seqNo, HttpServletResponse request) {
         try {
             logger.info("文件下载开始");
-            seqNo = seqNo.replaceAll("\"","");
+            seqNo = seqNo.replaceAll("\"", "");
             if (StringUtil.isNotEmpty(seqNo)) {
-                finBondAssetService.downloadFileInfo(seqNo,request);
-                return ;
+                finBondAssetService.downloadFileInfo(seqNo, request);
+                return;
             }
             logger.info("文件下载结束");
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("文件下载异常", e);
-            return ;
+            return;
         }
-        return ;
+        return;
     }
 
     /**
      * 附件删除
-     * @param file  入参
+     *
+     * @param file 入参
      * @return 处理结果
      * @throws IOException 异常信息
      */
     @ApiOperation(value = "附件删除", notes = "附件删除")
     @ResponseBody
-    @PostMapping( "/deleteFile")
+    @PostMapping("/deleteFile")
     public Message<AjaxResult> UploadFile(SysUploadFileInfo file) {
         try {
             if (StringUtil.isNotEmpty(file)) {
                 AjaxResult ajaxResult = finBondAssetService.delFileInfo(file);
                 return new Message<AjaxResult>().success().setData(ajaxResult);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return new Message<AjaxResult>().fail().setMessage("文件删除异常");
         }
@@ -745,26 +749,26 @@ public class FinBondAsset002Controller extends BaseController{
     }
 
 
-    @ApiOperation(value="正股代码的联想下拉框",notes = "正股代码的联想下拉框")
+    @ApiOperation(value = "正股代码的联想下拉框", notes = "正股代码的联想下拉框")
     @ResponseBody
     @PostMapping("getFinprodMarketIdList")
-    public Message<Page<SelectOptionDto>> getFinprodMarketIdList(@RequestBody SelectOptionCommonRequest request){
+    public Message<Page<SelectOptionDto>> getFinprodMarketIdList(@RequestBody SelectOptionCommonRequest request) {
         try {
             Page<SelectOptionDto> page = finBondAsset001Service.getFinprodMarketIdList(request);
             return new Message<Page<SelectOptionDto>>().success().setData(page);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return new Message<Page<SelectOptionDto>>().fail().setMessage("正股代码的联想下拉框异常");
         }
     }
 
-    @ApiOperation(value="节假日自动向后推算日期(参数：)",notes = "节假日自动向后推算日期")
+    @ApiOperation(value = "节假日自动向后推算日期(参数：)", notes = "节假日自动向后推算日期")
     @ResponseBody
     @PostMapping("getDealCalendarHoliday")
-    public Message<Date> getDealCalendarHoliday(@RequestBody SelectOptionCommonRequest request){
+    public Message<Date> getDealCalendarHoliday(@RequestBody SelectOptionCommonRequest request) {
         try {
             Date date = finBondAssetService.getDealCalendarHoliday(request);
             return new Message<Date>().success().setData(date);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return new Message<Date>().fail().setMessage("正股代码的联想下拉框异常");
         }
     }
@@ -772,44 +776,45 @@ public class FinBondAsset002Controller extends BaseController{
     /**
      * 查看区间付息计划
      * <功能详细描述>
+     *
      * @param dto
      * @return
      * @throws ParseException
      * @see
      * @since 1.0
      */
-    @ApiOperation(value="查看区间付息计划",notes = "查看区间付息计划")
+    @ApiOperation(value = "查看区间付息计划", notes = "查看区间付息计划")
     @ResponseBody
     @PostMapping("generationSubPlan")
     public Message<List<BondFinCashPlanDto>> generationSubPlan(@RequestBody BondFinPayInterestStdInfoRequest dto) {
         try {
             String finprodId = dto.getFinprodId();
-            if(!StringUtil.isNotEmpty(finprodId) && StringUtil.isNotEmpty(dto.getFinprodMarketId())) {
-                finprodId = commonBusinessService.getFinProdId(dto.getFinprodMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
+            if (!StringUtil.isNotEmpty(finprodId) && StringUtil.isNotEmpty(dto.getFinprodMarketId())) {
+                finprodId = commonBusinessService.getFinProdId(dto.getFinprodMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
             }
             if (StringUtil.isNotEmpty(dto.getFinInterestFactorDto()) &&
-                    StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getYield()) ){
-                dto.getFinInterestFactorDto().setYield(ArithmeticUtil.multiply(dto.getFinInterestFactorDto().getYield(),BigDecimal.valueOf(100)));
+                    StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getYield())) {
+                dto.getFinInterestFactorDto().setYield(ArithmeticUtil.multiply(dto.getFinInterestFactorDto().getYield(), BigDecimal.valueOf(100)));
             }
             // 付息计划
             List<BondFinCashPlanDto> invList = new ArrayList<>();
             Date maxTradeDate = null;
-            if(StringUtil.isNotEmpty(finprodId)) {
+            if (StringUtil.isNotEmpty(finprodId)) {
                 maxTradeDate = finBondAssetService.getMaxTradeDate(finprodId);
                 // 生付息成计划
                 dto.setMaxTradeDate(maxTradeDate);
             }
             dto.setCalendarId(finBondAssetService.getCalendarId(dto.getTradeMarket()));
             dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-            if(StringUtil.equals(dto.getAdjPlanFlag(), DictCodeList.共通业务类型_付息计划调整.getValue())){
+            if (StringUtil.equals(dto.getAdjPlanFlag(), DictCodeList.共通业务类型_付息计划调整.getValue())) {
                 dto.setFinprodType2(dto.getAdjPlanFlag());
             }
-            FinPayInterestStdInfoDto finPayInterestStdInfoDto= new FinPayInterestStdInfoDto();
-            BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,dto);
+            FinPayInterestStdInfoDto finPayInterestStdInfoDto = new FinPayInterestStdInfoDto();
+            BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto, dto);
             BondFinInterestFactorDto bondFinInterestFactorDto = dto.getFinInterestFactorDto();
             FinInterestFactorDto finInterestFactorDto = new FinInterestFactorDto();
             finInterestFactorDto.setRate(bondFinInterestFactorDto.getYield());
-            BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto,bondFinInterestFactorDto);
+            BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto, bondFinInterestFactorDto);
             finPayInterestStdInfoDto.setFinInterestFactorDto(finInterestFactorDto);
             if (CollectionUtils.isNotEmpty(dto.getInvScheduleList())) {
                 List<FinCashPlanDto> invScheduleList = new ArrayList<>();
@@ -830,15 +835,15 @@ public class FinBondAsset002Controller extends BaseController{
                 finPayInterestStdInfoDto.setInvRepayList(invRepayList);
             }
             List<FinCashPlanDto> finCashPlanList = finPayInterestStdInfoService.createAssetPayInteresPlan(finPayInterestStdInfoDto);
-            for (FinCashPlanDto finCashPlan:finCashPlanList){
+            for (FinCashPlanDto finCashPlan : finCashPlanList) {
                 BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
-                BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto,finCashPlan);
-                bondFinCashPlanDto.setRangeYield(ArithmeticUtil.divide(bondFinCashPlanDto.getRangeYield(),BigDecimal.valueOf(100),4));
+                BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto, finCashPlan);
+                bondFinCashPlanDto.setRangeYield(ArithmeticUtil.divide(bondFinCashPlanDto.getRangeYield(), BigDecimal.valueOf(100), 4));
                 bondFinCashPlanDto.setLirs(null);
                 invList.add(bondFinCashPlanDto);
             }
             return new Message<List<BondFinCashPlanDto>>().success().setData(invList);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return new Message<List<BondFinCashPlanDto>>().fail().setMessage("查看区间付息计划异常");
         }
 
