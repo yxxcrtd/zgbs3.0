@@ -342,10 +342,18 @@
              )
     </select>
     <select id="checkAssertOnDealed" resultType="java.lang.Integer">
-        select count(ENTRUST_ID) as num
-        from ETR_ENTRUST
-        where FINPROD_ID = #{finprodId}
-          and ENTRUST_STATUS in ('04', '06')
+        select sum(num)
+        from (
+                 select count(ENTRUST_ID) as num
+                 from ETR_ENTRUST
+                 where FINPROD_ID = #{finprodId}
+                   and ENTRUST_STATUS not in ('04', '06')
+                 union all
+                 select count(ENTRUST_ID) as num
+                 from WFL_ETR_ENTRUST
+                 where FINPROD_ID = #{finprodId}
+             )
+
     </select>
 
     <insert id="insertFileSelective" parameterType="com.joyintech.tams.common.base.entity.SysUploadFileInfo" >
