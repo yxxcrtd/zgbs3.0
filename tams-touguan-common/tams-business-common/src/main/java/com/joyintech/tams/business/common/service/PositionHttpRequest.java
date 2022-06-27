@@ -7,6 +7,7 @@ import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.util.HttpUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,7 @@ public class PositionHttpRequest {
      * @param req
      * @throws PositionException
      */
-    public static void send(Object req) throws PositionException {
+    public static Map<String, Object> send(Object req) throws PositionException {
         //
         //处理seqno
         Map<String, Object> params = JsonUtils.stringToMap(JsonUtils.object2Json(req));
@@ -86,6 +87,7 @@ public class PositionHttpRequest {
                 revokeCheck(msgMap, params);
             }
         }
+        return params;
     }
 
     /**

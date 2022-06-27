@@ -972,15 +972,27 @@
     </select>
     <select id="selectRegTablePledgeInfoList"
             resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsPledgeInfoResponse">
+        SELECT
+        T.finprodId,
+        T.finprodMarketId,
+        T.finprodAbbr,
+        T.portfolioId,
+        T.portfolioName,
+        SUM(pledgePrin) pledgePrin,
+        T.pledgeRate,
+        T.firstNetPrice,
+        T.repRegistOrg,
+        T.disFaceValue
+        FROM (
         select rp.pledge_finprod_id as finprodId,
-        fp.finprod_market_id as finprodMarketId,
-        fp.finprod_abbr as finprodAbbr,
+        nvl(fp.finprod_market_id, ipo.SECID) AS finprodMarketId,
+        nvl(fp.finprod_abbr, ipo.SECFULLNAME) AS finprodAbbr,
         rp.portfolio_id as portfolioId,
         pp.portfolio_name as portfolioName,
-        sum(rp.pledge_number)/100 as pledgePrin,
+        rp.pledge_number/100 as pledgePrin,
         rp.pledge_ratio*100 as pledgeRate,
         mbvi.NETPRICE as firstNetPrice,
-        fp.REGIST_ORG as repRegistOrg,
+        nvl(fp.REGIST_ORG, ipo.INSTITUTION) AS repRegistOrg,
         T8.DIS_FACE_VALUE as disFaceValue
         from REG_FIN_PLEDGE rp
         left join reg_fin_product_deal regdeal
@@ -995,6 +1007,7 @@
         </if>
         left join fin_product fp
         on fp.finprod_id=rp.pledge_finprod_id
+        LEFT JOIN INTERF_PAYHSRCSECINFO ipo ON ipo.SECID = rp.pledge_finprod_id
         LEFT JOIN (
         SELECT
         T2.SEC_ID,
@@ -1024,25 +1037,16 @@
         ON fp.FINPROD_MARKET_ID = mbvi.SEC_ID
         where regdeal.totle_trade_id=#{totleTradeId,jdbcType=VARCHAR}
         and decode(regdeal.is_cancel,'Y','03','N','01')= #{effectiveStatus,jdbcType=VARCHAR}
-        group by rp.pledge_finprod_id,
-        fp.finprod_market_id,
-        fp.finprod_abbr,
-        rp.portfolio_id,
-        pp.portfolio_name,
-        rp.pledge_ratio,
-        mbvi.NETPRICE,
-        fp.REGIST_ORG,
-        T8.DIS_FACE_VALUE
         union all
         select rp.pledge_finprod_id as finprodId,
-        fp.finprod_market_id as finprodMarketId,
-        fp.finprod_abbr as finprodAbbr,
+        nvl(fp.finprod_market_id, ipo.SECID) AS finprodMarketId,
+        nvl(fp.finprod_abbr, ipo.SECFULLNAME) AS finprodAbbr,
         rp.portfolio_id as portfolioId,
         pp.portfolio_name as portfolioName,
-        sum(rp.pledge_number)/100 as pledgePrin,
+        rp.pledge_number/100 as pledgePrin,
         rp.pledge_ratio*100 as pledgeRate,
         mbvi.NETPRICE as firstNetPrice,
-        fp.REGIST_ORG as repRegistOrg,
+        nvl(fp.REGIST_ORG, ipo.INSTITUTION) AS repRegistOrg,
         T8.DIS_FACE_VALUE as disFaceValue
         from wfl_REG_FIN_PLEDGE rp
         left join wfl_reg_fin_product_deal regdeal
@@ -1057,6 +1061,7 @@
         </if>
         left join fin_product fp
         on fp.finprod_id=rp.pledge_finprod_id
+        LEFT JOIN INTERF_PAYHSRCSECINFO ipo ON ipo.SECID = rp.pledge_finprod_id
         LEFT JOIN (
         SELECT
         T2.SEC_ID,
@@ -1086,15 +1091,17 @@
         ON fp.FINPROD_MARKET_ID = mbvi.SEC_ID
         where regdeal.totle_trade_id=#{totleTradeId,jdbcType=VARCHAR}
         and #{STATUS_VALID_04}= #{effectiveStatus,jdbcType=VARCHAR}
-        group by rp.pledge_finprod_id,
-        fp.finprod_market_id,
-        fp.finprod_abbr,
-        rp.portfolio_id,
-        pp.portfolio_name,
-        rp.pledge_ratio,
-        mbvi.NETPRICE,
-        fp.REGIST_ORG,
-        T8.DIS_FACE_VALUE
+        ) T
+        GROUP BY
+        T.finprodId,
+        T.finprodMarketId,
+        T.finprodAbbr,
+        T.portfolioId,
+        T.portfolioName,
+        T.pledgeRate,
+        T.firstNetPrice,
+        T.repRegistOrg,
+        T.disFaceValue
 
     </select>
     <!-- 报价管理查询 -->
@@ -5421,7 +5428,7 @@
                 case
                     when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                         then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
-                    when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD)
+                    when fpi.REFER_YIELD is not null  then  to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
                     end rateStr,
                 case
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
@@ -5452,7 +5459,7 @@
                 case
                     when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                         then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
-                    when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD)
+                    when fp.COUPON_SPECIES is not null then  to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
                     end rateStr,
                 case
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
