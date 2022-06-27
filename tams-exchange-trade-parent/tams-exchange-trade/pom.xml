@@ -60,7 +60,7 @@
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>framework-rabbitmq</artifactId>
-            <version>0.0.5.268</version>
+            <version>0.0.5.1</version>
         </dependency>
         <dependency>
             <groupId>com.joyintech</groupId>
