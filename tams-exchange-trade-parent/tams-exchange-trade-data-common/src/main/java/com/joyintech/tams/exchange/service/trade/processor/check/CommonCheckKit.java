@@ -23,6 +23,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
+import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
@@ -163,6 +164,10 @@ public class CommonCheckKit extends BaseCheckKit {
      * - 其他，返回false
      */
     public void checkTime(BaseOrderRequest order, Instruction instruction, Instrument instrument) throws BusinessResultException {
+        //判断是否需要检查交易时间段
+        if (!isCheckTime(instruction)) {
+            return;
+        }
 
         String trdTradeTimeSwitch = CacheUtil.getSysParam(TRD_TRADE_TIME_SWITCH);
         if (SwitcheEnum.OPEN.codeNotEquals(trdTradeTimeSwitch)) {
@@ -187,6 +192,15 @@ public class CommonCheckKit extends BaseCheckKit {
                     StrUtil.format("当前时间[{}]，不允许委托，允许委托时间段为：[{}]",
                             localTime, StrUtil.removeSuffix(builder.toString(), StrUtil.COMMA)));
         }
+    }
+
+    private boolean isCheckTime(Instruction instruction) {
+        //信用保护凭证不需要检查交易时间段
+        if (BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.codeEquals(instruction.getBusiTypeTg())) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -218,7 +232,7 @@ public class CommonCheckKit extends BaseCheckKit {
         if (StringUtil.equals(instruction.getBusiTypeTg(), STANDARD_COUPONS_IN_AND_OUT.getCode())) {
             return;
         }
-        if(Objects.nonNull(tickBean)){
+        if (Objects.nonNull(tickBean)) {
             checkLimitPrice(order, instruction, instrument, tickBean);
         }
     }
