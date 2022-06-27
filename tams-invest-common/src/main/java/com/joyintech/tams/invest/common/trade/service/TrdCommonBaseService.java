@@ -1485,7 +1485,7 @@ public class TrdCommonBaseService extends BaseService {
         Map<String, Object> param = new HashMap<>();
         param.put("CHECK_RESULT_0", DictCodeListExt3.对账状态结果_不一致.getValue());
         param.put("CHECK_RESULT_2", DictCodeListExt3.对账状态结果_待处理.getValue());
-        param.put("execDate", executeDate);
+        param.put("executeDate", executeDate);
         // 查询对账结果不一致和待处理的数量
         return trdCommonBaseMapper.getCheckDisaccordCountDataNum(param);
     }
