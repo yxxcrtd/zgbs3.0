@@ -435,7 +435,12 @@ public class CfetsSettleService extends BaseService {
         //业务动作BUSI_ACT 09:交收确认 10:交收失败
         req.setBusiAct(DictCodeListExt3.业务动作_交收确认.getValue());
         //交易方向
-        req.setPs(cfetsManualSettleInsertDto.getPs());
+        String finprodType2 = listTemp.get(0).getFinprodType2();
+        if(StringUtil.equals(finprodType2,DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())){
+            req.setPs(DictCodeList.回购拆借方向_正回购.getValue());
+        }else if(StringUtil.equals(finprodType2,DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())){
+            req.setPs(DictCodeList.回购拆借方向_逆回购.getValue());
+        }
         //新建 修改 关闭
         req.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
         //决策树
