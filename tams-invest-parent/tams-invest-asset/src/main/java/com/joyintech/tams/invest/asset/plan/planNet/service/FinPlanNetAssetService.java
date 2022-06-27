@@ -507,7 +507,16 @@ public class FinPlanNetAssetService extends CommonExportService<FinPlanNetAssetD
         ptlPortfolio.setMdate(finProduct.getMdate());
         ptlPortfolio.setProfitType(finProduct.getProfitType());
         dto.setPtlPortfolio(ptlPortfolio);
-        
+
+        //add by lpf 20220517 start 委外组合塞PA表用于组合关联指标 start
+        PaPtlPortfolio paPtlPortfolio = new PaPtlPortfolio();
+        paPtlPortfolio.setPortfolioId(ptlPortfolio.getPortfolioId());
+        paPtlPortfolio.setInvestNature(finProductAdd.getInvestNature());
+        paPtlPortfolio.setOpenType("02");
+        paPtlPortfolio.setRaiseType("2");
+        dto.setPaPtlPortfolio(paPtlPortfolio);
+        //add by lpf 20220517 start 委外组合塞PA表用于组合关联指标 end
+
         return dto;
     }
 

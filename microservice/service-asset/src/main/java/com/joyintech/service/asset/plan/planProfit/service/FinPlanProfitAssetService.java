@@ -93,6 +93,11 @@ public class FinPlanProfitAssetService extends BaseService<FinPlanProfitAssetDto
      */
     @Autowired
     private PtlPortfolioMapper ptlPortfolioMapper;
+    /**
+     * Pa组合表mapper
+     */
+    @Autowired
+    private PaPtlPortfolioMapper paPtlPortfolioMapper;
     
     /**
      * 查询是否自动创建组合AssetTypeConfigMapper
@@ -219,7 +224,9 @@ public class FinPlanProfitAssetService extends BaseService<FinPlanProfitAssetDto
         paFinProductBuyoutRateMapper.deleteByPrimaryKey(paFinProductBuyoutRateKey);
       //删除委外组合 add wangpeng 2019.07.23
         if(StringUtil.isNotEmpty(dto.getFinprodMarketId())){
-        	 ptlPortfolioMapper.deleteByPrimaryKey(dto.getFinprodMarketId());
+            ptlPortfolioMapper.deleteByPrimaryKey(dto.getFinprodMarketId());
+            paPtlPortfolioMapper.deleteByPrimaryKey(dto.getFinprodMarketId());
+
         }
       //删除授信关联
         CreditLines creditLines = new CreditLines();
@@ -334,6 +341,7 @@ public class FinPlanProfitAssetService extends BaseService<FinPlanProfitAssetDto
         	 //组合表插入
             ptlPortfolioMapper.deleteByPrimaryKey(dto.getPtlPortfolio().getPortfolioId());
             ptlPortfolioMapper.insert(dto.getPtlPortfolio());
+            paPtlPortfolioMapper.insert(dto.getPaPtlPortfolio());
         }
         //end
         //调用资产负债报送信息组件插入数据
