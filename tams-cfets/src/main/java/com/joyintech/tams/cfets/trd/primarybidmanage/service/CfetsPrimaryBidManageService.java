@@ -525,8 +525,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 // 匹配取消
                 PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
                         DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
-                // 老头寸处理
-                this.dealOldPosition(entity, true);
+                if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+                    // 老头寸处理
+                    this.dealOldPosition(entity, true);
+                }
             }
             updateCfetsOprHis(entity.getTotalWinId(),action);
         } else {
@@ -906,8 +908,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             // 发送头寸
             this.sendPositionMethod(entity, true, null);
-            // 老头寸处理
-            this.dealOldPosition(entity, false);
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+                // 老头寸处理
+                this.dealOldPosition(entity, false);
+            }
         }
         else if (type.toString().equals("REVOKE")) {
             entity.setOperateType("revoke");
@@ -1137,8 +1141,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 }
                 throw new PositionException(messageStr);
             }
-            // 老头寸处理
-            this.dealOldPosition(entity, false);
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+                // 老头寸处理
+                this.dealOldPosition(entity, false);
+            }
         }
     }
 
