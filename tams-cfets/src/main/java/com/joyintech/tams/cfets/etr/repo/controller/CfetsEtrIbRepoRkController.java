@@ -90,6 +90,7 @@ public class CfetsEtrIbRepoRkController extends BaseController {
             List<SelectOptionDto> page = cfetsEtrIbRepoinfoService.getPledgeStockId(params);
             return new Message<List<SelectOptionDto>>().success().setData(page);
         } catch (Exception e) {
+            logger.error("查询异常",e);
             return new Message<List<SelectOptionDto>>().fail().setMessage("查询异常");
         }
 
