@@ -2843,11 +2843,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             stlPayOrdersMapper.insertSelective(entity.getStlPayOrders());
 
             entity.getTrdProductDealAdds().forEach(trdProductDealAdd -> {
-                trdProductDealAddMapper.insertSelective(trdProductDealAdd);
                 if (isYJFS) {
                     TrdProductTempDealAdd trdTempDealTotalAdd = new TrdProductTempDealAdd();
                     BeanUtil.copyPropertiesIgnoreNull(trdTempDealTotalAdd, trdProductDealAdd);
                     trdProductTempDealAddMapper.insertSelective(trdTempDealTotalAdd);
+                }else {
+                    trdProductDealAddMapper.insertSelective(trdProductDealAdd);
                 }
             });
 
