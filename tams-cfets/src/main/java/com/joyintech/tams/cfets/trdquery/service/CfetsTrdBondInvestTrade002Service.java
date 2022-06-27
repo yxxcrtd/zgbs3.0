@@ -4464,6 +4464,11 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 parameter.setPageId("CfetsTrdRepoTrade002");
             } else if (StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())
                     && StringUtil.equals(inputDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+                if(!StringUtil.equals(inputDto.getSettleStatus(),DictCodeListExt3.交收状态_未交收.getValue())){
+                    AjaxResult m = new AjaxResult();
+                    m.setErrorList(Arrays.asList(new ValidMessage("已完成交收,不可撤销")));
+                    return m;
+                }
                 parameter.setPageId("CfetsTrdFirstBondInvestTrade002");
             }
             if(StringUtil.equals(inputDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())){
@@ -4479,9 +4484,9 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 return m;
             }
             if(inputDto.getTradeDate().compareTo(iPlatformDate.getSysDate())!=0){
-//                AjaxResult m = new AjaxResult();
-//                m.setErrorList(Arrays.asList(new ValidMessage("只可在交易生效日进行撤销操作")));
-//                return m;
+                AjaxResult m = new AjaxResult();
+                m.setErrorList(Arrays.asList(new ValidMessage("只可在交易生效日进行撤销操作")));
+                return m;
             }
             if(StringUtil.equals(inputDto.getPs(),DictCodeList.交易方向_卖出.getValue())
                     || StringUtil.equals(inputDto.getPs(),DictCodeList.交易方向_行权_回售.getValue())

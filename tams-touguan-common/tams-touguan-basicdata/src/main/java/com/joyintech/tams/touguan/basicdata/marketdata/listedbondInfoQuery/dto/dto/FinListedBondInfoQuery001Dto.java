@@ -72,6 +72,9 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
     private String crossMarketCode;
 
+    @ApiModelProperty(name = "crossMarket", value = "跨市场发行")
+    private String crossMarket;
+
     @ApiModelProperty(name = "raiseMode", value = "募集方式", required = true)
     private String raiseMode;
 

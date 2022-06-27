@@ -431,7 +431,7 @@ public class CfetsTrdBidInfoResponse {
     }
 
     public String getPayTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.缴款方式, getTenderTarget());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.缴款方式, getPayType());
     }
 
     public void setPayTypeStr(String payTypeStr) {

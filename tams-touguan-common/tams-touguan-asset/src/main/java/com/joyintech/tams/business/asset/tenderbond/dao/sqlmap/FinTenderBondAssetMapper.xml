@@ -346,7 +346,7 @@
         LEFT JOIN INTERF_WIND_RELEASE_INFO ri ON sec.SEC_ID = ri.SEC_ID
         LEFT JOIN (select (SECURITY_ID||'.IB') as SEC_ID,t.* from INTERF_RDI_RELEASE_INFO t where t.SECURITY_TYPE in ('同业存单','公司短期融资券'))  pri ON pri.SEC_ID = ri.SEC_ID
         where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
-        <if test="isFromInterF != null and isFromInterF == '1'">
+        <if test="isFromInterF != null and isFromInterF == 1">
             <choose>
                 <when test="additionalBatches != null and additionalBatches != ''">
                     AND ri.ADDITIONAL_BATCHES = #{additionalBatches}

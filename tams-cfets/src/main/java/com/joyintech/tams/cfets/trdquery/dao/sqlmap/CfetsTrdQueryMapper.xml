@@ -3873,7 +3873,7 @@
         ON		BO.TRADE_STATUS = #{TRADE_STATUS_01}
         AND		BO.IS_CANCEL = 'N'
         AND		(BO.BID_ID=TFPDT.B_TRADE_ID OR BO.BID_ID=BRT.BID_ID OR BO.BID_ID=TMI.PRE_TRADE_ID)
-        LEFT JOIN TRD_MANUAL_SETTLE_INFO TMSI
+        LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO TMSI
         ON		TMSI.TRADE_ID = TFPDT.TOTLE_TRADE_ID
         LEFT JOIN STL_ORDERS SO
         ON		SO.TRADE_ID = TFPDT.TOTLE_TRADE_ID
@@ -4887,8 +4887,8 @@
 				BO.BID_MODLE bidModle,
 				BO.PAY_TYPE payType,
                 BO.DIP_TYPE dipType,
-				EEBP.BID_PRIN_AMT bidPrinAmt,
-				TFPDT.PRIN_AMT/10000 prinAmt,
+				EEBP.BID_PRIN_AMT*100 bidPrinAmt,
+				TFPDT.PRIN_AMT prinAmt,
                 CASE WHEN BO.WIN_PRICE IS NOT NULL THEN
                 decode(FPI.TENDER_TARGET,#{TENDER_TARGET_01}, to_char(BO.WIN_PRICE*100,'fm999999990.9990')||'%',
                                         #{TENDER_TARGET_02},to_char(BO.WIN_PRICE,'fm999999990.9990')||'元',
@@ -4940,7 +4940,7 @@
             BO.DIP_TYPE   dipType,
             TPDA.ENTRUST_ID   entrustId,
             PP.PORTFOLIO_NAME  portfolioName,
-            TPD.PRIN_AMT/10000 prinAmt,
+            TPD.PRIN_AMT prinAmt,
             TPD.FEE_AMT     settleFeeAmt,
             TPD.TRADE_AMT   tradeAmt,
             TPD.INT_AMT    intAmt,

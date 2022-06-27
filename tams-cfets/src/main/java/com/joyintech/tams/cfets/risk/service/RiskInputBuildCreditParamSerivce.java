@@ -255,7 +255,7 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
         inputDto.setTradeDate(DateUtil.platDateFromCache());
         inputDto.setCounterId(dto.getCounterId());
         inputDto.setTradeId(dto.getTotalWinId());
-        inputDto.setTradeAmt(dto.getTotalBiddingNum());
+        inputDto.setTradeAmt(dto.getWinPrinamt());
 //        if(StringUtil.equals(DictCodeListExt1.交易状态_撤销.getValue(), inputDto.getTradeStatus())){
 //            inputDto.setEntrustId(dto.getTotalWinId());
 //            inputDto.setTradeId(dto.getTotalWinId()+"R");
