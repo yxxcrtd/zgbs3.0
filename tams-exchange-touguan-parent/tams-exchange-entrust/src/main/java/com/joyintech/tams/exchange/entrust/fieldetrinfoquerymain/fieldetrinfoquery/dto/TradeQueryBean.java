@@ -675,7 +675,7 @@ public class TradeQueryBean implements Serializable {
     @ApiModelProperty(name = "counterName", value = "交易对手名称", example = "A1")
     private String counterName;
 
-    @ApiModelProperty(name = "counterName", value = "交易对手资金账户", example = "A1")
+    @ApiModelProperty(name = "propAcctNo", value = "交易对手资金账户", example = "A1")
     private String propAcctNo;
 
     @ApiModelProperty(name = "tradeMarket", value = "交易场所")

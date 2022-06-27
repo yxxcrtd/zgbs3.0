@@ -94,7 +94,7 @@ public class CfetsEtrDispatcherExeListInfoResponse extends CfetsEtrDispatcherBas
     @ApiModelProperty(name="counterName",value="交易对手",example="A1")
     private String counterName;
 
-    @ApiModelProperty(name="counterName",value="交易对手",example="A1")
+    @ApiModelProperty(name="propAcctNo",value="交易对手",example="A1")
     private String propAcctNo;
 
     @ApiModelProperty(name="remark",value="备注",example="A1")

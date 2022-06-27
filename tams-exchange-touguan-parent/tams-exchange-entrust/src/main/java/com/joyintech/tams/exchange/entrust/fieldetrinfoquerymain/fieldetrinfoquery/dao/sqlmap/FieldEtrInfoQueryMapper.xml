@@ -1006,7 +1006,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
         <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
         <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
-
+        <result column="COUNTER_NAME" property="counterName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Query_Column_List">
@@ -1091,7 +1091,9 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
 			 END                                                   DELIVERY_SCHEDULE,
 			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT,
-			 TT.PROP_ACCT_NO                                        PROP_ACCT_NO
+			 TT.PROP_ACCT_NO                                        PROP_ACCT_NO,
+             TT.COUNTER_NAME COUNTER_NAME
+
 		FROM SETTLE_TRANS_DATA STD
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') AND TT.TRADE_TYPE = '0')
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
@@ -1131,7 +1133,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
 			 END                                                   DELIVERY_SCHEDULE,
 			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT,
-            TT.PROP_ACCT_NO                                        PROP_ACCT_NO
+            TT.PROP_ACCT_NO                                        PROP_ACCT_NO,
+        TT.COUNTER_NAME COUNTER_NAME
 		FROM T_TRADE TT
 		LEFT JOIN SETTLE_TRANS_DATA STD
 		  ON TT.BROKER_TRADE_ID = STD.CJBH
@@ -1167,7 +1170,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
             '正常交收' DELIVERY_RESULT,
             '100' DELIVERY_SCHEDULE,
             ssai.SEC_ACCT_ID ACCT_ACCOUNT,
-            null PROP_ACCT_NO
+            null PROP_ACCT_NO,
+            null COUNTER_NAME
         FROM
             TRD_FIN_PRODUCT_DEAL_TOTAL tpd
             LEFT JOIN TRD_DEAL_TOTAL_ADD tpda ON tpd.TOTLE_TRADE_ID = tpda.TOTLE_TRADE_ID
