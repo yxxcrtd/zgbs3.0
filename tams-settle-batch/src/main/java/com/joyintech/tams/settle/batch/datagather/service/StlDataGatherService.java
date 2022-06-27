@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -19,6 +20,8 @@ import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCash
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonParamDto;
 import com.joyintech.tams.settle.batch.datagather.dto.*;
+import com.joyintech.tams.settle.batch.dealrevoke.dao.InvestDealRevokeMapper;
+import com.joyintech.tams.settle.batch.dealrevoke.service.*;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -149,6 +152,24 @@ public class StlDataGatherService {
     @Autowired(required = false)
     private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
     // modify by etliu 20220220 start
+
+    @Autowired
+    private BondRevokeService bondRevokeService;
+
+    @Autowired
+    private FundRevokeService fundRevokeService;
+
+    @Autowired
+    private RepoRevokeService repoRevokeService;
+
+    @Autowired
+    private SharesRevokeService sharesRevokeService;
+
+    @Autowired
+    private InvestDealRevokeMapper investDealRevokeMapper;
+
+    @Autowired
+    private InvestDealRevokeService investDealRevokeService;
 
     /**
      * 获取除权交易明细
@@ -1130,5 +1151,149 @@ public class StlDataGatherService {
 
     public List<SettleTransDataDto> listBoundSharesMarketTradeData(Map<String, Object> paraMap) {
         return stlDataGatherMapper.listBoundSharesMarketTradeData(paraMap);
+    }
+
+    /**
+     * 撤销当日生成的存续期交易
+     * @param date
+     */
+    public void revokeCurrentDayDurationDeal(Date date) {
+        List<String> bondTotalTradeIds = this.getTotalTradeIdForBondDuration(date);
+        logger.debug("[撤销债券存续期交易,TotalTradeId:{}]", JSON.toJSONString(bondTotalTradeIds));
+        if(CollectionUtils.isNotEmpty(bondTotalTradeIds)){
+            Map<String,String> bondTotalTradeIdMap = investDealRevokeService.getTotalTradeIdPsMap(bondTotalTradeIds);
+            for (String totalTradeId: bondTotalTradeIds) {
+                if (!bondTotalTradeIdMap.containsKey(totalTradeId)) {
+                    bondTotalTradeIdMap.put(totalTradeId, totalTradeId);
+                }
+            }
+            Map<String, Object> bondParam = new HashMap<>();
+            bondParam.put("totalTradeIdList", new ArrayList<>(bondTotalTradeIdMap.keySet()));
+            bondParam.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
+            bondParam.put("busiType", DictCodeList.共通业务类型_债券类资产交易.getValue());
+            this.executeRevoke(bondParam);
+        }
+
+        List<String> repoTotalTradeIds = this.getTotalTradeIdForRepoDuration(date);
+        logger.debug("[撤销回购存续期交易,TotalTradeId:{}]", JSON.toJSONString(repoTotalTradeIds));
+        if(CollectionUtils.isNotEmpty(repoTotalTradeIds)){
+            Map<String,String> repoTotalTradeIdMap = investDealRevokeService.getTotalTradeIdPsMap(repoTotalTradeIds);
+            for (String totalTradeId: repoTotalTradeIds) {
+                if (!repoTotalTradeIdMap.containsKey(totalTradeId)) {
+                    repoTotalTradeIdMap.put(totalTradeId, totalTradeId);
+                }
+            }
+            Map<String, Object> repoParam = new HashMap<>();
+            repoParam.put("totalTradeIdList", new ArrayList<>(repoTotalTradeIdMap.keySet()));
+            repoParam.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
+            repoParam.put("busiType", DictCodeList.共通业务类型_质押式回购交易.getValue());
+            this.executeRevoke(repoParam);
+        }
+
+        List<String> fundTotalTradeIds = this.getTotalTradeIdForFundDuration(date);
+        logger.debug("[撤销基金存续期交易,TotalTradeId:{}]", JSON.toJSONString(fundTotalTradeIds));
+        if(CollectionUtils.isNotEmpty(fundTotalTradeIds)){
+            Map<String,String> fundTotalTradeIdMap = investDealRevokeService.getTotalTradeIdPsMap(fundTotalTradeIds);
+            for (String totalTradeId: fundTotalTradeIds) {
+                if (!fundTotalTradeIdMap.containsKey(totalTradeId)) {
+                    fundTotalTradeIdMap.put(totalTradeId, totalTradeId);
+                }
+            }
+            Map<String, Object> fundParam = new HashMap<>();
+            fundParam.put("totalTradeIdList", new ArrayList<>(fundTotalTradeIdMap.keySet()));
+            fundParam.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
+            fundParam.put("busiType", DictCodeList.共通业务类型_基金类资产交易.getValue());
+            this.executeRevoke(fundParam);
+        }
+
+        List<String> sharesTotalTradeIds = this.getTotalTradeIdForSharesDuration(date);
+        logger.debug("[撤销股票存续期交易,TotalTradeId:{}]", JSON.toJSONString(sharesTotalTradeIds));
+        if(CollectionUtils.isNotEmpty(sharesTotalTradeIds)){
+            Map<String,String> sharesTotalTradeIdMap = investDealRevokeService.getTotalTradeIdPsMap(sharesTotalTradeIds);
+            for (String totalTradeId: sharesTotalTradeIds) {
+                if (!sharesTotalTradeIdMap.containsKey(totalTradeId)) {
+                    sharesTotalTradeIdMap.put(totalTradeId, totalTradeId);
+                }
+            }
+            Map<String, Object> sharesParam = new HashMap<>();
+            sharesParam.put("totalTradeIdList", new ArrayList<>(sharesTotalTradeIdMap.keySet()));
+            sharesParam.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
+            sharesParam.put("busiType", DictCodeListExt2.共通业务类型_股票投资交易.getValue());
+            this.executeRevoke(sharesParam);
+        }
+    }
+
+    private List<String> getTotalTradeIdForBondDuration(Date date){
+        Map<String, Object> param = createCommonParam(date);
+        List<String> busiTypeList = new ArrayList<String>();
+        busiTypeList.add(DictCodeList.共通业务类型_债券类资产存续期.getValue());
+        param.put("busiTypeList", busiTypeList);
+        param.put("psList", Arrays.asList(DictCodeList.交易方向_收息到账.getValue(),DictCodeList.交易方向_还本到账.getValue(),
+                DictCodeList.交易方向_行权_赎回.getValue()
+        ));
+        return investDealRevokeMapper.selectTotalTradeIdTgM(param);
+    }
+
+    private List<String> getTotalTradeIdForRepoDuration(Date date){
+        Map<String, Object> param = createCommonParam(date);
+        param.put("psDurList", Arrays.asList(DictCodeList.交易方向_到期续做.getValue(), DictCodeList.交易方向_到期.getValue()
+                , DictCodeListExt3.交易方向_投资端_提前终止.getValue(),DictCodeListExt3.交易方向_中途换券.getValue(),DictCodeListExt3.交易方向_解除质押.getValue()
+                ,DictCodeList.交易方向_收息到账.getValue(),DictCodeList.交易方向_还本到账.getValue()));
+        param.put("tgBusiTypeList",Arrays.asList(DictCodeListExt3.平安业务类型_债券质押式逆回购.getValue(),DictCodeListExt3.平安业务类型_债券质押式正回购.getValue()
+                ,DictCodeListExt1.平安业务类型_正回购到期.getValue(),DictCodeListExt1.平安业务类型_逆回购到期.getValue()));
+        param.put("isRepoFund",DictCodeList.是否_是.getValue());
+        return investDealRevokeMapper.selectTotalTradeIdTgM(param);
+    }
+
+    private List<String> getTotalTradeIdForFundDuration(Date date){
+        Map<String, Object> param = createCommonParam(date);
+        param.put("busiType", DictCodeList.共通业务类型_基金类资产存续期.getValue());
+        param.put("psList", Arrays.asList(DictCodeList.交易方向_除权登记.getValue(),DictCodeList.交易方向_现金分红.getValue()
+                ,DictCodeList.交易方向_红利再投.getValue()));
+        return investDealRevokeMapper.selectTotalTradeIdTgM(param);
+    }
+
+    private List<String> getTotalTradeIdForSharesDuration(Date date){
+        Map<String, Object> param = createCommonParam(date);
+        param.put("busiType", DictCodeListExt2.共通业务类型_股票分红交易.getValue());
+        param.put("psList", Arrays.asList(DictCodeList.交易方向_现金分红.getValue(),DictCodeList.交易方向_红利再投.getValue()));
+        return investDealRevokeMapper.selectTotalTradeIdTgM(param);
+    }
+
+    private Map<String, Object> createCommonParam(Date date){
+        Map<String, Object> param = new HashMap<>();
+        param.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+        param.put("dealDate", date);
+        param.put("dealDateStr", DateUtil.format(date));
+        param.put("tradeMarketList",Arrays.asList(DictCodeListExt1.交易场所_上海证券交易所.getValue(),
+                DictCodeListExt1.交易场所_深圳证券交易所.getValue()));
+        return param;
+    }
+
+    /**
+     * 执行撤销逻辑
+     * @param param
+     */
+    private void executeRevoke(Map<String, Object> param){
+        List<String> totalTradeIdList = (List<String>)param.get("totalTradeIdList");
+        List<TrdFinProductDealTotal> trdFinProductDealTotalList = investDealRevokeMapper.selectSubTotalTradeData(param);
+        if (!StringUtil.isEmptyList(trdFinProductDealTotalList)) {
+            Map<String, List<TrdFinProductDealTotal>> tempTotalTradeIdMap = trdFinProductDealTotalList.stream().collect(Collectors.groupingBy(x -> x.getpTotleTradeId()));
+            List<String> tempTotalTradeIdList = new ArrayList<>();
+            for (String tempTotalTradeId: totalTradeIdList) {
+                if (tempTotalTradeIdMap.containsKey(tempTotalTradeId)) {
+                    for (TrdFinProductDealTotal trdFinProductDealTotal : tempTotalTradeIdMap.get(tempTotalTradeId)) {
+                        tempTotalTradeIdList.add(trdFinProductDealTotal.getTotleTradeId());
+                    }
+                }
+                else {
+                    tempTotalTradeIdList.add(tempTotalTradeId);
+                }
+            }
+            param.put("totalTradeIdList", tempTotalTradeIdList);
+        }
+        this.excutePosition(param);
+        investDealRevokeService.revokeDealTotal(totalTradeIdList);
+
     }
 }
