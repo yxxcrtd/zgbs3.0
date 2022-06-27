@@ -732,6 +732,18 @@ public class TradeQueryBean implements Serializable {
     @ApiModelProperty(name="busiTypePosition",value="业务类型")
     private String busiTypePosition;
 
+    @ApiModelProperty(name="tradeDate",value="交易日期")
+    private String tradeDate;
+
+
+    public String getTradeDate() {
+        return tradeDate;
+    }
+
+    public void setTradeDate(String tradeDate) {
+        this.tradeDate = tradeDate;
+    }
+
     public String getBusiTypePosition() {
         return busiTypePosition;
     }

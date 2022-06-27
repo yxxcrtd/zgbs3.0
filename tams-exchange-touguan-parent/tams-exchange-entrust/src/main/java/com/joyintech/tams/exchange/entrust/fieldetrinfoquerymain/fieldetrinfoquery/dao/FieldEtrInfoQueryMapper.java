@@ -50,6 +50,13 @@ public interface FieldEtrInfoQueryMapper {
 
     List<TradeQueryBean> getEtrDispatcherDealListInfo(Map<String, Object> pageParam);
 
+    /**
+     * 一级投标指令查询-指令成交
+     * @param pageParam
+     * @return
+     */
+    List<TradeQueryBean> getEtrDispatcherBidDealListInfo(Map<String, Object> pageParam);
+
     List<TradeQueryBean> queryTrade2Touguan(Map<String, Object> pageParam);
 
     /**
