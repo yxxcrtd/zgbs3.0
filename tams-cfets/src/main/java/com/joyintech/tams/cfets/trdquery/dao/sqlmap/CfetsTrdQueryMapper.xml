@@ -5013,7 +5013,7 @@
                      THEN FPI.TENDER_SDATE
                 END AS	bidDateStart,
             CASE WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_02} AND FPI.TENDER_TYPE IN(#{TENDER_TYPE_01},#{TENDER_TYPE_02})
-            THEN FPI.ISSUE_DATE
+            THEN null
             WHEN(FPI.ISSUE_CLASS = #{ISSUE_CLASS_02} AND(FPI.TENDER_TYPE IS NULL OR FPI.TENDER_TYPE IN(#{TENDER_TYPE_03},#{TENDER_TYPE_04})))
             OR FPI.ISSUE_CLASS = #{ISSUE_CLASS_03}
                 THEN FPI.TENDER_EDATE
@@ -5249,8 +5249,14 @@
                 MCCI.COUNTER_NAME AS counterIdStr,
                 FPI.TENDER_TARGET tenderTarget,
                 FP.CCY  ccy,
-                FPI.TENDER_SDATE bidDateStart,
-                FPI.TENDER_EDATE bidDateEnd,
+                CASE
+                    WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN nvl(fpi.ISSUE_DATE, fpi.TENDER_SDATE)
+                    ELSE fpi.ISSUE_DATE
+                    END AS bidDateStart,
+                CASE
+                    WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN fpi.TENDER_EDATE
+                    ELSE NULL
+                    END AS bidDateEnd,
                 COALESCE (BO.PAY_DATE, FPI.PAY_EDATE, FPI.PAY_DATE) payEdate,
                 nvl(BO.ASSIGN_REGDATE, FPI.ASSIGN_REGDATE) assignRegdate,
                 nvl(BO.ONMARKET_DATE, FPA.LISTING_DATE) onmarketDate,
@@ -5301,8 +5307,14 @@
                 MCCI.COUNTER_NAME AS counterIdStr,
                 FPI.TENDER_TARGET tenderTarget,
                 FP.CCY  ccy,
-                FPI.TENDER_SDATE bidDateStart,
-                FPI.TENDER_EDATE bidDateEnd,
+                CASE
+                    WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN nvl(fpi.ISSUE_DATE, fpi.TENDER_SDATE)
+                    ELSE fpi.ISSUE_DATE
+                    END AS bidDateStart,
+                CASE
+                    WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN fpi.TENDER_EDATE
+                    ELSE NULL
+                    END AS bidDateEnd,
                 COALESCE (WBO.PAY_DATE, FPI.PAY_EDATE, FPI.PAY_DATE) payEdate,
                 nvl(WBO.ASSIGN_REGDATE, FPI.ASSIGN_REGDATE) assignRegdate,
                 nvl(WBO.ONMARKET_DATE, FPA.LISTING_DATE) onmarketDate,
