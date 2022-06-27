@@ -350,7 +350,7 @@ public class StlDataDealSzdJsmxProcessService {
 					}
 					else {
 						// 金融产品代码
-						//将清算数据Entity.证券代码1作为转股代码去债券标的中取对应的股票代码，再取该股对应的金融产品代码
+						//将清算数据Entity.证券代码1作为债券代码去债券标的中取对应的股票代码，再取该股对应的金融产品代码
 						List<String> zzgFinprodIdList = stlDownDataDealMapper.getZzgFinprodId(szdJsmx.getZqdm1());
  						settleTransData.setFinprodId(CollectionUtils.isEmpty(zzgFinprodIdList)?null:zzgFinprodIdList.get(0));
 						// 金融产品类型(投管分类)
