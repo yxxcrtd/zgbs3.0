@@ -1,6 +1,7 @@
 package com.joyintech.tams.invest.basicdata.mstcommissionset.validator;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,6 +42,16 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
  */
 @Component
 public class MstCommissionSetValidator implements BeanValidator {
+    public static final String TRADE_TYPE = "tradeType";
+    public static final String FEE_TYPE = "feeType";
+    public static final String TRADE_MARKET = "tradeMarket";
+    public static final String ASSET_CLASSIFY_1 = "assetClassify1";
+    public static final String ASSET_CLASSIFY_2 = "assetClassify2";
+    public static final String TRADE_MARKET_MODE = "tradeMarketMode";
+    public static final String EFF_DATE = "effDate";
+    public static final String PS = "ps";
+    public static final String SEC_ACCT_ID = "secAcctId";
+    public static final String TERM_TYPE = "termType";
 
     /**
      * 共通Mapper的通用代理方案
@@ -81,12 +93,14 @@ public class MstCommissionSetValidator implements BeanValidator {
             if (StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_NEW)
                     || StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_EDIT)) {
                 //add by hudongyang 2020-08-04 start
-                if(StringUtil.isBlank(dto.getAssetClassify1())){
+                String assetClassify1 = dto.getAssetClassify1();
+                if(StringUtil.isBlank(assetClassify1)){
                     ValidMessage validMessage = new ValidMessage("assetClassify1",
                             getMessage("FW_E_0006", getMessage("MstCommissionSet002.assetClassify1")));
                     resultList.add(validMessage);
                 }
-                if(StringUtil.isBlank(dto.getAssetClassify2())){
+                String assetClassify2 = dto.getAssetClassify2();
+                if(StringUtil.isBlank(assetClassify2)){
                     ValidMessage validMessage = new ValidMessage("assetClassify2",
                             getMessage("FW_E_0006", getMessage("MstCommissionSet002.assetClassify2")));
                     resultList.add(validMessage);
@@ -126,9 +140,11 @@ public class MstCommissionSetValidator implements BeanValidator {
                 }
                 // add by wangguoxian 当费用类型选择为佣金时，是否随交易支付必填 20190717 end
                 // 交易品种选择质押式回购和买断式回购时，期限品种必填
+                String tradeType = dto.getTradeType();
+                String termType = dto.getTermType();
                 if (StringUtil.equals(BussinessDictCodeList.平安资产类型_回购.getValue(),
-                        dto.getTradeType())) {
-                    if (StringUtil.isBlank(dto.getTermType())) {
+                        tradeType)) {
+                    if (StringUtil.isBlank(termType)) {
                         ValidMessage validMessage = new ValidMessage("termType",
                                 getMessage("FW_E_0006", getMessage("MstCommissionSet002.termType")));
                         resultList.add(validMessage);
@@ -187,8 +203,12 @@ public class MstCommissionSetValidator implements BeanValidator {
                     }
                 }
 
+                // modify by swwan 2022-06-27 start TISHKS-1448
+                // 同一生效日、同一个费用类型、证券账户（佣金）、交易场所、交易市场、交易方向、期限品种（若有）、交易品种、资产分类（若有）的费用规则不能重复，
+                // 若存在，则不允许提交，并给出提示：
+                // “XX（交易场所）XX（证券账户）XX（交易市场）XX（交易品种）XX（资产分类，若有）XX（期限品种，若有）XX（交易方向）**(生效日)交易费用已设置，请重新选择！
                 //add by hudongyang 2020-08-05 start
-                Map<String,Object> map = new HashMap<>();
+                /*Map<String,Object> map = new HashMap<>();
                 map.put("batchSeq",StringUtil.equals(dto.getPageModel(),
                         GlobalConstant.DETAIL_PAGE_MODEL_NEW) ? StringUtil.EMPTY : dto.getBatchSeq());
                 map.put("tradeType",dto.getTradeType());//交易品种
@@ -215,8 +235,63 @@ public class MstCommissionSetValidator implements BeanValidator {
                             SysDataUtil.getNameFromDataDict(DictCode.授信资产三级分类,dto.getAssetClassify2()),//资产分类二
                             SysDataUtil.getNameFromDataDict(DictCode.交易平台,dto.getTradePlat()),//交易平台
                             effDateStr)));
+                }*/
+                HashMap<String, Object> map = Maps.newHashMap();
+                map.put("batchSeq",StringUtil.equals(dto.getPageModel(),
+                        GlobalConstant.DETAIL_PAGE_MODEL_NEW) ? StringUtil.EMPTY : dto.getBatchSeq());
+                // 交易品种
+                map.put(TRADE_TYPE, tradeType);
+                // 费用类型
+                String feeType = dto.getFeeType();
+                map.put(FEE_TYPE, feeType);
+                // 交易场所
+                String tradeMarket = dto.getTradeMarket();
+                map.put(TRADE_MARKET, tradeMarket);
+                // 资产分类
+                map.put(ASSET_CLASSIFY_1, assetClassify1);
+                map.put(ASSET_CLASSIFY_2, assetClassify2);
+                // 交易市场
+                String tradeMarketMode = dto.getTradeMarketMode();
+                map.put(TRADE_MARKET_MODE, tradeMarketMode);
+                // 生效日
+                String effDate = DateUtil.format(dto.getEffDate(), "yyyy-MM-dd HH:mm:ss");
+                map.put(EFF_DATE, effDate);
+                // 交易方向
+                String ps = dto.getPs();
+                map.put(PS, ps);
+                // 证券账户
+                String secAcctId = dto.getSecAcctId();
+                map.put(SEC_ACCT_ID, secAcctId);
+                // 期限品种
+                map.put(TERM_TYPE, termType);
+                int count = mstCommissionSetService.searchRepeatBySecPs(map);
+                if (count > 0) {
+                    StringBuffer sb = new StringBuffer();
+                    if (StringUtil.isNotEmpty(tradeMarket) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(BussinessDictCode.交易场所, tradeMarket))) {
+                        sb.append(SysDataUtil.getNameFromDataDict(BussinessDictCode.交易场所, tradeMarket)).append("(交易场所)");
+                    }
+                    if (StringUtil.isNotEmpty(secAcctId)) {
+                        sb.append(secAcctId).append("(证券账户)");
+                    }
+                    if (StringUtil.isNotEmpty(tradeMarketMode) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易市场, tradeMarketMode))) {
+                        sb.append(StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易市场, tradeMarketMode))).append("(交易市场)");
+                    }
+                    sb.append(SysDataUtil.getNameFromDataDict(DictCode.授信资产类型, tradeType)).append("(交易品种)");
+                    if (StringUtil.isNotEmpty(assetClassify1) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易所费用资产分类一, assetClassify1))) {
+                        sb.append(SysDataUtil.getNameFromDataDict(DictCode.交易所费用资产分类一, assetClassify1)).append("(资产分类一)");
+                    }
+                    if (StringUtil.isNotEmpty(assetClassify2) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易所费用资产分类二, assetClassify2))) {
+                        sb.append(SysDataUtil.getNameFromDataDict(DictCode.交易所费用资产分类二, assetClassify2)).append("(资产分类二)");
+                    }
+                    if (StringUtil.isNotEmpty(termType) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.回购期限品种, termType))) {
+                        sb.append(SysDataUtil.getNameFromDataDict(DictCode.回购期限品种, termType)).append("(期限品种)");
+                    }
+                    sb.append(getPsStr(ps)).append("(交易方向)");
+                    sb.append(DateUtil.format(dto.getEffDate())).append("(生效日)");
+                    resultList.add(new ValidMessage(getMessage("MST_INFO_E_0010", sb.toString())));
                 }
                 //add by hudongyang 2020-08-05 end
+                // modify by swwan 2022-06-27 end
                 
                 // 费用分档check
                 if(StringUtil.equals(BussinessDictCodeList.是否_是.getValue(),dto.getIsGrade())) {
@@ -343,7 +418,7 @@ public class MstCommissionSetValidator implements BeanValidator {
                 }
                 
                 // 交易品种为质押式回购时，佣金计算方式为按证券代码汇总的话，报错
-                if (StringUtil.equals(DictCodeList.平安资产类型_质押式回购.getValue(), dto.getTradeType()) &&
+                if (StringUtil.equals(DictCodeList.平安资产类型_质押式回购.getValue(), tradeType) &&
                 	StringUtil.equals(DictCodeListExt3.佣金计算方式_按证券代码汇总.getValue(), dto.getCommCalMethod())) {
                 	ValidMessage validMessage = new ValidMessage("commCalMethod",
                             getMessage("MST_COMMISSION_SET_E004"));
