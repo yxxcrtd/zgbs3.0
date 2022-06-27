@@ -18,6 +18,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,7 +123,7 @@ public class FinDepositTarget001Controller extends BaseController{
 
         if(StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_EDIT)
                 && StringUtil.isNotEmpty(DateUtil.platDateFromCache())){
-            if (DateUtil.compareDate(dto.getMdate(), DateUtil.platDateFromCache()) < 0){
+            if (Objects.nonNull(dto.getMdate()) && DateUtil.compareDate(dto.getMdate(), DateUtil.platDateFromCache()) < 0){
                 ArrayList<ValidMessage> errorList = new ArrayList<>();
                 errorList.add(new ValidMessage("不能修改已到期资产要素！"));
                 checkResult.setErrorList(errorList);
