@@ -14,6 +14,7 @@ import com.joyintech.tams.business.common.dto.PositionRulePtlData;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo004Mapper;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
@@ -574,7 +575,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             req.setCcy(cfetsManualSettleRequest.getCcy());
             req.setFinprodId(trdBankManualSettleInfo.getFinprodId());
             req.setPtlList(ptlList);
-            PositionHttpRequest.send(req);
+            Map<String, Object> param = PositionHttpRequest.send(req);
+            ThreadLocalUtil.setLocalCache(param);
         }
     }
     /**
@@ -664,7 +666,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             req.setCcy(cfetsManualSettleRequest.getCcy());
             req.setFinprodId(trdBankManualSettleInfo.getFinprodId());
             req.setPtlList(ptlList);
-            PositionHttpRequest.send(req);
+            Map<String, Object> param = PositionHttpRequest.send(req);
+            ThreadLocalUtil.setLocalCache(param);
         }
     }
     /**
@@ -760,7 +763,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             req.setCcy(cfetsManualSettleRequest.getCcy());
             req.setFinprodId(trdBankManualSettleInfo.getFinprodId());
             req.setPtlList(ptlList);
-            PositionHttpRequest.send(req);
+            Map<String, Object> param = PositionHttpRequest.send(req);
+            ThreadLocalUtil.setLocalCache(param);
         }
     }
     /**
@@ -871,7 +875,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             req.setCcy(cfetsManualSettleRequest.getCcy());
             req.setPtlCashList(ptlCashList);
             req.setPtlSecList(ptlSecList);
-            PositionHttpRequest.send(req);
+            Map<String, Object> param = PositionHttpRequest.send(req);
+            ThreadLocalUtil.setLocalCache(param);
         }
     }
 
