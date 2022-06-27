@@ -45,7 +45,7 @@ public abstract class BaseCheckKit {
     }
 
     public ResultBean check(BaseOrderRequest order) {
-        checkResult  = new BeanValidationResult(true);
+        checkResult = new BeanValidationResult(true);
         Instruction instruction = getInstruction(order);
         Instrument instrument = getInstrument(instruction);
         TickBean tickBean = getTickBean(instruction);
@@ -71,6 +71,10 @@ public abstract class BaseCheckKit {
     }
 
     protected TickBean getTickBean(Instruction instruction) {
+        //判断是否需要检查行情
+        if (!isCheckTick(instruction)) {
+            return null;
+        }
         ResultBean tick = quoteService.getTick(instruction.getFinprodMarketId());
         if (ErrorCode.isFail(tick.getErrorCode())) {
             throw new BusinessResultException(ErrorCode.QUOTE_NOT_EXIT);
@@ -86,5 +90,14 @@ public abstract class BaseCheckKit {
 
         checkResult.setSuccess(false);
         checkResult.addErrorMessage(errorMessage);
+    }
+
+    private boolean isCheckTick(Instruction instruction) {
+        //信用保护凭证不需要检查行情
+        if (BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.codeEquals(instruction.getBusiTypeTg())) {
+            return false;
+        }
+
+        return true;
     }
 }

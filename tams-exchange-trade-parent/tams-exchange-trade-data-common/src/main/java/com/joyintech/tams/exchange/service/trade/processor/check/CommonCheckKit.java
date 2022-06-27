@@ -218,7 +218,9 @@ public class CommonCheckKit extends BaseCheckKit {
         if (StringUtil.equals(instruction.getBusiTypeTg(), STANDARD_COUPONS_IN_AND_OUT.getCode())) {
             return;
         }
-        checkLimitPrice(order, instruction, instrument, tickBean);
+        if(Objects.nonNull(tickBean)){
+            checkLimitPrice(order, instruction, instrument, tickBean);
+        }
     }
 
     private void checkPriceWithPriceMode(BaseOrderRequest order, Instruction instruction) {
