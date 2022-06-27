@@ -24,7 +24,12 @@ import com.joyintech.tams.settle.batch.datagather.reader.StlDataGatherReader;
 import com.joyintech.tams.settle.batch.datagather.reader.StlDataGatherShares2Reader;
 import com.joyintech.tams.settle.batch.datagather.reader.bond.StlDataGatherBondDurationReader;
 import com.joyintech.tams.settle.batch.datagather.reader.repo.StlDataGatherRepoDurationReader;
+import com.joyintech.tams.settle.batch.datagather.service.StlDataGatherService;
 import com.joyintech.tams.settle.batch.datagather.writer.StlDataGatherWriter;
+import com.joyintech.tams.settle.batch.dealrevoke.service.BondRevokeService;
+import com.joyintech.tams.settle.batch.dealrevoke.service.FundRevokeService;
+import com.joyintech.tams.settle.batch.dealrevoke.service.RepoRevokeService;
+import com.joyintech.tams.settle.batch.dealrevoke.service.SharesRevokeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -92,6 +97,9 @@ public class StlDownDurationDataGatherTask extends BatchBaseService {
     @Autowired(required = false)
     private PlatformDate platformDateService;
 
+    @Autowired
+    private StlDataGatherService stlDataGatherService;
+
     /**
      * BatchBuilder
      */
@@ -127,6 +135,9 @@ public class StlDownDurationDataGatherTask extends BatchBaseService {
             result.setStatus(BatchStatus.STOPPED);
             return result;
         }
+        // 撤销当日生成的存续期交易
+        stlDataGatherService.revokeCurrentDayDurationDeal(date);
+
         JobExecution jobExecution = batchBuilder.init(this)
             .batch("fund2", stlDataGatherFund2Reader, stlDataGatherFund2Processor, stlDataGatherWriter)
             .batch("repo5", stlDataGatherRepoDurationReader, stlDataGatherRepoDurationProcessor, stlDataGatherWriter)

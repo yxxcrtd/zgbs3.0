@@ -1049,11 +1049,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         this.insertOldBidPosition(cfetsManualSettleInsertDto, entity.getButtonType(), entity.getSettleAmt(),
                                 entity.getFinprodType2(), false, entity.getTgBusiType(), false);
                     }else {
-                    	//与头寸沟通，头寸引擎没有配置逆回购，不需要调用头寸引擎，如果后期需要调用再放开 yflv-2022-06-23-start
-                    	if (!StringUtil.equals(entity.getPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
-                    		sendRepoPositionMethod(cfetsManualSettleInsertDto,entity.getButtonType());
-                    	}
-                    	//与头寸沟通，头寸引擎没有配置逆回购，不需要调用头寸引擎，如果后期需要调用再放开 yflv-2022-06-23-end
+                		sendRepoPositionMethod(cfetsManualSettleInsertDto,entity.getButtonType());
                        //对回购数据进行处理
                         if ((StringUtil.equals(entity.getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue())
                                 || StringUtil.equals(entity.getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) ) {

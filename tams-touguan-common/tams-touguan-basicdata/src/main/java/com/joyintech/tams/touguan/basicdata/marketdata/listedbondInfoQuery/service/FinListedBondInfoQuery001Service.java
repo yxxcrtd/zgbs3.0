@@ -199,7 +199,10 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         emptyCheck(finListedBondInfoQuery001Dto, validMessages);
         //发行处理
         if (StringUtil.isNotBlank(finListedBondInfoQuery001Dto.getIssuerCode())) {
-            finBondMarketInfoQuery001Service.handleIssuer(validMessages, finListedBondInfoQuery001Dto.getIssuerCode());
+            String customerId = finBondMarketInfoQuery001Service.handleIssuer(validMessages, finListedBondInfoQuery001Dto.getIssuerCode());
+            if(StringUtil.isNotBlank(customerId)){
+                finListedBondInfoQuery001Dto.setIssuer(customerId);
+            }
         }
         if (CollectionUtils.isNotEmpty(validMessages)) {
             ajaxResult.setErrorList(validMessages);
