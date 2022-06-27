@@ -2200,7 +2200,7 @@
             nvl(atd.custom_asset_type_four,RAI.ORG_ASSET_TYPE4)  AS customAssetTypeFour,
             nvl(atd.custom_asset_type_five,RAI.ORG_ASSET_TYPE5)  AS customAssetTypeFive,
             atd.faire_price as fairePrice,atd.pos_amount as posAmount,atd.prin,atd.pos_cost as posCost,atd.pos_value as posValue,atd.tdy_intincexp as tdyIntincexp,atd.issue_party as issueParty,atd.is_soe as isSoe,atd.is_listed_company as isListedCompany,atd.company_nature as companyNature,atd.industry ,atd.industry2 ,
-            atd.vdate ,atd.mdate,atd.term_days as termDays,atd.counter_id as counterId,atd.last_period as lastPeriod,atd.latest_deal_date as latestDealDate,atd.bshare_face_value as bshareFaceValue,atd.issue_face_value as issueFaceValue,atd.rate,atd.cost_rate as costRate,atd.bpyield ,atd.m_convexity mConvexity,atd.ex_info as exInfo,atd.ex_next_date as exNextDate,atd.last_ex_period as lastExPeriod,atd.m_grade_result mGradeResult,atd.m_grade_org mGradeOrg,atd.b_grade_result bGradeResult,atd.b_grade_org bGradeOrg,atd.m_grade_result_in mGradeResultIn,atd.b_grade_result_in bGradeResultIn,atd.is_city_bond isCityBond,atd.city_bond_lev cityBondLev,atd.c_shares cShares,atd.s_shares sShares,
+            atd.vdate ,atd.mdate,atd.prin,atd.term_days as termDays,atd.counter_id as counterId,atd.last_period as lastPeriod,atd.latest_deal_date as latestDealDate,atd.bshare_face_value as bshareFaceValue,atd.issue_face_value as issueFaceValue,atd.rate,atd.cost_rate as costRate,atd.bpyield ,atd.m_convexity mConvexity,atd.ex_info as exInfo,atd.ex_next_date as exNextDate,atd.last_ex_period as lastExPeriod,atd.m_grade_result mGradeResult,atd.m_grade_org mGradeOrg,atd.b_grade_result bGradeResult,atd.b_grade_org bGradeOrg,atd.m_grade_result_in mGradeResultIn,atd.b_grade_result_in bGradeResultIn,atd.is_city_bond isCityBond,atd.city_bond_lev cityBondLev,atd.c_shares cShares,atd.s_shares sShares,
             atd.trade_market tradeMarket,atd.is_sus isSus,atd.is_right isRight,atd.ex_date exDate,atd.m_grade_org_in mGradeOrgIn,atd.b_grade_org_in bGradeOrgIn,atd.bshare_scale bshareScale,atd.profit_type profitType,atd.DURATION mDuration,atd.MDURATION mdurationAmend
             , '02' hasChildren,
 
@@ -2396,7 +2396,7 @@
             THEN SUM(atd.tdy_intincexp)*-1
             ELSE SUM(atd.tdy_intincexp)
             END tdyIntincexp,atd.issue_party as issueParty,atd.is_soe as isSoe,atd.is_listed_company as isListedCompany,atd.company_nature as companyNature,atd.industry ,atd.industry2 ,
-            atd.vdate ,atd.mdate,atd.term_days as termDays,atd.counter_id as counterId,atd.last_period as lastPeriod,atd.latest_deal_date as latestDealDate,atd.bshare_face_value as bshareFaceValue,atd.issue_face_value as issueFaceValue,atd.rate,atd.cost_rate as costRate,atd.bpyield ,atd.m_convexity mConvexity,atd.ex_info as exInfo,atd.ex_next_date as exNextDate,atd.last_ex_period as lastExPeriod,atd.m_grade_result mGradeResult,atd.m_grade_org mGradeOrg,atd.b_grade_result bGradeResult,atd.b_grade_org bGradeOrg,atd.m_grade_result_in mGradeResultIn,atd.b_grade_result_in bGradeResultIn,atd.is_city_bond isCityBond,atd.city_bond_lev cityBondLev,atd.c_shares cShares,atd.s_shares sShares,
+            atd.vdate ,atd.mdate,atd.prin,atd.term_days as termDays,atd.counter_id as counterId,atd.last_period as lastPeriod,atd.latest_deal_date as latestDealDate,atd.bshare_face_value as bshareFaceValue,atd.issue_face_value as issueFaceValue,atd.rate,atd.cost_rate as costRate,atd.bpyield ,atd.m_convexity mConvexity,atd.ex_info as exInfo,atd.ex_next_date as exNextDate,atd.last_ex_period as lastExPeriod,atd.m_grade_result mGradeResult,atd.m_grade_org mGradeOrg,atd.b_grade_result bGradeResult,atd.b_grade_org bGradeOrg,atd.m_grade_result_in mGradeResultIn,atd.b_grade_result_in bGradeResultIn,atd.is_city_bond isCityBond,atd.city_bond_lev cityBondLev,atd.c_shares cShares,atd.s_shares sShares,
             atd.trade_market tradeMarket,atd.is_sus isSus,atd.is_right isRight,atd.ex_date exDate,atd.m_grade_org_in mGradeOrgIn,atd.b_grade_org_in bGradeOrgIn,atd.bshare_scale bshareScale,atd.profit_type profitType,atd.DURATION mDuration,atd.MDURATION mdurationAmend
             , '01' hasChildren,atd.dv01 dv01,atd.float_ingpl_add_price floatIngplAddPrice,atd.float_ingpl_add floatIngplAdd,
             <choose>
@@ -2549,6 +2549,7 @@
             atd.industry2,
             atd.vdate,
             atd.mdate,
+            atd.prin,
             atd.term_days,
             atd.counter_id ,
             atd.last_period ,
@@ -2586,7 +2587,7 @@
 
 
         <if test="parentId == null or parentId == '' or parentId=='root'.toString() and displayType=='02'">
-            select a.*,b.posCost as posCost,b.posValue as posValue,b.tdyIntincexp tdyIntincexp from (
+            select a.*,b.posCost as posCost,b.posValue as posValue,b.tdyIntincexp tdyIntincexp,b.prin from (
             <!--多级法人改造 add by jingqiongqiong 20200615-->
             select
             <if test="resourcesTreeInstCodeList != null and resourcesTreeInstCodeList.size() > 0">
@@ -2677,11 +2678,13 @@
             </if>
             ) t
             where t.row_number=1)a
-            left join ( select lx.pinanAssetType,sum(lx.posCost)as posCost,sum(lx.posValue) posValue,sum(lx.tdyIntincexp) tdyIntincexp
+            left join ( select lx.pinanAssetType,sum(lx.posCost)as posCost,sum(lx.posValue) posValue,sum(lx.tdyIntincexp) tdyIntincexp ,
+            sum( lx.PRIN) as PRIN
             from (select FTP.FINPROD_TYPE2,
             nvl(atd.pinan_asset_type,RAI.ORG_ASSET_TYPE1)as pinanAssetType,
             sum(atd.pos_amount) as posAmount,
             sum(atd.pos_cost) as posCost,
+            sum( atd.PRIN ) AS PRIN,
             CASE
             WHEN (FTP.FINPROD_TYPE2 = 'F02' OR
             FTP.FINPROD_TYPE2 = 'F25' OR
@@ -2803,6 +2806,7 @@
                     atd.industry2 ,
                     atd.vdate,
                     atd.mdate,
+                    atd.prin,
                     atd.term_days as termDays,
                     atd.counter_id as counterId,
                     atd.last_period as lastPeriod,
@@ -2996,6 +3000,7 @@
             atd.industry2,
             atd.vdate,
             atd.mdate,
+            atd.prin,
             atd.term_days,
             atd.counter_id ,
             atd.last_period ,

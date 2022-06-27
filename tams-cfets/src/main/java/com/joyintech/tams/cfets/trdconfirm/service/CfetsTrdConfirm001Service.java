@@ -20,6 +20,7 @@ import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bond.dto.*;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtribBondInfo003Service;
@@ -696,6 +697,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
             trdFinProductDealTotal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
             trdFinProductDealTotal.setIsCancel(DictCodeList.是否_否.getValue());
             trdFinProductDealTotal.setSettleSpeed(entity.getSettleSpeed());
+            trdFinProductDealTotal.setpTotleTradeId(entity.getRegIbuId());
             trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
 
             PaTrdFinProductDealTotal paTrdFinDealTotal = entity.getPaTrdFinProductDealTotal();
@@ -1909,7 +1911,8 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setFinprodId(entity.getFinprodId());
         req.setPtlList(ptlList);
         req.setbTotalTradeId(entity.getRegIbuId());
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
     private  void sendRepoPositionMethod(CfetsTrdRepoTrade003Dto entity){
         List<CfetsEtrIbRepoPosPortfolioCashRequest> ptlCashList = new ArrayList<>();
@@ -1989,7 +1992,8 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setbTotalTradeId(entity.getRegIbuId());
         req.setPtlCashList(ptlCashList);
         req.setPtlSecList(ptlSecList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -2090,7 +2094,8 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setFinprodId(entity.getFinprodId());
         req.setPtlList(ptlList);
         req.setbTotalTradeId(entity.getRegIbuId());
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     /**

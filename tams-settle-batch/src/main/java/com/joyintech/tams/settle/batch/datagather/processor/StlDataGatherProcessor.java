@@ -190,7 +190,14 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 if(DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataDto.getRepoType())){
                     // 处理协议回购数据
                     this.handleAgreRepData(etrEntrustDtos, settleTransDataDto, exchangeTransMatchCommonDto, needUpdateStatusEntrustIdList);
-                }else{
+                }
+                // ZGCPCN-1730:债转股匹配指令只能一对一匹配,并且份额小于等于指令份额 modify by fuyongsheng 20220627 start
+                else if(DictCodeListExt3.交易方向_债转股.getValue().equals(settleTransDataDto.getPs())){
+                    // 处理债转股数据
+                    this.handleBondToStockData(etrEntrustMap, settleTransDataDto, exchangeTransMatchCommonDto, needUpdateStatusEntrustIdList);
+                }
+                // ZGCPCN-1730:债转股匹配指令只能一对一匹配,并且份额小于等于指令份额 modify by fuyongsheng 20220627 end
+                else{
                     String busiKey = getSettleTransDataBusiKey(settleTransDataDto);
                     if(!etrEntrustMap.containsKey(busiKey)){
                         continue;
@@ -266,6 +273,31 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
         if(entrustIds.size() == 1){
             exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
             needUpdateStatusEntrustIdList.addAll(entrustIds);
+        }
+    }
+
+    /**
+     * 处理债转股数据
+     * @param etrEntrustMap
+     * @param settleTransDataDto
+     * @param exchangeTransMatchCommonDto
+     * @param needUpdateStatusEntrustIdList
+     */
+    private void handleBondToStockData(Map<String, List<EtrEntrustDto>> etrEntrustMap, SettleTransDataDto settleTransDataDto,
+                                       ExchangeTransMatchCommonDto exchangeTransMatchCommonDto,
+                                       List<String> needUpdateStatusEntrustIdList){
+        String busiKey = getSettleTransDataBusiKey(settleTransDataDto);
+        if(!etrEntrustMap.containsKey(busiKey)){
+            return;
+        }
+        List<EtrEntrustDto> currEtrEntrustList = etrEntrustMap.get(busiKey);
+        if(CollectionUtils.isEmpty(currEtrEntrustList)){
+            return;
+        }
+        // 因为债转股数据不支持拆分,所以匹配指令数量只能为1,并且清算数据份额小于等于指令份额
+        if(currEtrEntrustList.size()==1 && settleTransDataDto.getShareAmt().compareTo(currEtrEntrustList.get(0).getEntrustNum()) <= 0){
+            exchangeTransMatchCommonDto.setEntrustIdList(Collections.singletonList(currEtrEntrustList.get(0).getEntrustId()));
+            needUpdateStatusEntrustIdList.add(currEtrEntrustList.get(0).getEntrustId());
         }
     }
 
