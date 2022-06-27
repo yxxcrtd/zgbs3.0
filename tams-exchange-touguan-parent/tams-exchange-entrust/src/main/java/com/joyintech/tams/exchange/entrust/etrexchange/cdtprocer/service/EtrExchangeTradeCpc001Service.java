@@ -936,7 +936,18 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
                 EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).entrustCheck(etrSecRepoBondDto, result);
             }
+
             AjaxResult ajax = new AjaxResult(result);
+            List<ValidMessage> errorList = new ArrayList<>();
+            if(Objects.equals(entity.getPs(), DictCodeList.交易方向_申购.getValue())){
+                for (EtrExchangeTradePortfolioSecRepoRequest item : entity.getPortfolioList()) {
+                    String acctNo = tamsBusinessCommonService.selectProdTghCapacctNo(item.getPortfolioId());
+                    if(StringUtils.isEmpty(acctNo)){
+                        errorList.add(new ValidMessage("组合["+item.getPortfolioId()+"]未关联托管户"));
+                        ajax.setErrorList(errorList);
+                    }
+                }
+            }
             Field[] fields = ReflectUtil.getDeclaredFields(ajax);
             for (Field field : fields) {
                 if (StringUtil.equals(field.getName(), "messageType")) {

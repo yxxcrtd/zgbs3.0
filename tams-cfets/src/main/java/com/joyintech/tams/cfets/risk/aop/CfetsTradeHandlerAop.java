@@ -406,6 +406,9 @@ public class CfetsTradeHandlerAop {
             inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
         } catch (BusinessException e) {
             List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if(CollectionUtils.isEmpty(mapList)){
+                throw new BusinessException(e);
+            }
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
