@@ -17,6 +17,7 @@ import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInitRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
@@ -60,6 +61,7 @@ import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -339,10 +341,12 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
         // 处理老头寸
         this.dealOldBidPosition(entity, true);
-
-        FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(entity.getFinprodId());
-        finProductAdd.setIssueStatus(null);
-        finProductAddMapper.updateByPrimaryKey(finProductAdd);
+        if (CollectionUtils.isNotEmpty(entity.getTrdProductDeals())
+                && StringUtil.isNotEmpty(entity.getTrdProductDeals().get(0).getFinprodId())) {
+            FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(entity.getTrdProductDeals().get(0).getFinprodId());
+            finProductAdd.setIssueStatus(null);
+            finProductAddMapper.updateByPrimaryKey(finProductAdd);
+        }
         //发送头寸
         String ps = DictCodeList.交易方向_买入.getValue();
         String busiType = DictCodeListExt3.头寸业务类型_债券一级申购.getValue();
@@ -364,7 +368,6 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             return;
         }
         for (TrdProductDeal deal : entity.getTrdProductDeals()) {
-            AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
             FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
             if (!isRevoke) {
                 finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
@@ -378,7 +381,6 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             baseTradeProductDealDto.setStage("02");
             TrdProductDeal trdProductDeal = new TrdProductDeal();
             BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, deal);
-            trdProductDeal.setFinprodId(entity.getFinprodId());
             trdProductDeal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
             trdProductDeal.setSettleDate(entity.getTradeDate());
@@ -408,7 +410,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
 //            stlPayOrder.setpTradeId(entity.getTotleTradeId());
 //            stlPayOrders.add(stlPayOrder);
 //            baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
-            finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
+            finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
             baseTradeProductDealCommService.insertPosition(finProductTradeDto);
         }
     }
@@ -424,13 +426,18 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     /**
      * 根据汇总编号查询汇总表及交易详情表数据
      *
-     * @param totleTradeId 交易编号
-     * @return 债券投资交易信息
-     * @see
-     * @since 1.0
+     * @param totleTradeId
+     * @return com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto
+     * @author jiangpeng
+     * @date 2022/6/27 13:44
      */
     public CfetsTrdFirstBondInvestTradeDto getTrdFirstBondInvestTradeDto(String totleTradeId) {
         CfetsTrdFirstBondInvestTradeDto resultDto = new CfetsTrdFirstBondInvestTradeDto();
+        CfetsTrdBondFirstSubInitRequest request = new CfetsTrdBondFirstSubInitRequest();
+        request.setBidId(cfetsTrdQueryMapper.getTradeId(totleTradeId));
+        CfetsTrdBondFirstSubInfoDto result = cfetsTrdBondFirstSub002Service.viewPage(request);
+        resultDto.setIssuer(cfetsTrdBondFirstSub002Service.getIssuer(result.getFinprodId()));
+        BeanUtil.copyPropertiesIgnoreNull(resultDto, result);
         TrdFinProductDealTotal total = trdFinProductDealTotalMapper.selectByPrimaryKey(totleTradeId);
         BeanUtil.copyPropertiesIgnoreNull(resultDto, total);
         List<TrdProductDeal> list = cfetsTrdQueryMapper.selectTrdProductDealsByTotleTradeId(totleTradeId);

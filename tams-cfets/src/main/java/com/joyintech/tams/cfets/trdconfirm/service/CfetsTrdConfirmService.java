@@ -481,7 +481,7 @@ public class CfetsTrdConfirmService extends BaseService{
         //根据汇总交易编号查询费用信息
 
         TrdTradeFeeTotal ttfd = new TrdTradeFeeTotal();
-        ttfd.setTotleTradeId(totleTradeId);
+        ttfd.setTotleTradeId(entity.getTotleTradeId());
         ttfd.setFeeType(BussinessDictCodeList.费用类型_结算手续费.getValue());
         ttfd.setIsPayWithTrade(DictCodeList.是否_否.getValue());
         ttfd.setFeeAmt(dtoReg.getSettleFeeAmt());
