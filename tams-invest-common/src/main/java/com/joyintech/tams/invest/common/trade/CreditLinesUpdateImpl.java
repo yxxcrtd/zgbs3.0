@@ -196,11 +196,11 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
             return;
         }
         // 债券一级投标的汇总确认和中标结果维护需要更新指令的预占额度
-        if (StringUtil.equals(DictCodeListRsk.授信占用类别_实占.getValue(),inputDto.getCreditCallType())
-                && StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
-            updateCreditOccupy(inputDto,compareAmtOrg);
-            return;
-        }
+//        if (StringUtil.equals(DictCodeListRsk.授信占用类别_实占.getValue(),inputDto.getCreditCallType())
+//                && StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+//            updateCreditOccupy(inputDto,compareAmtOrg);
+//            return;
+//        }
         // 针对一级指令编辑特殊处理
         if (StringUtil.equals(DictCodeListRsk.授信占用类别_预占.getValue(),inputDto.getCreditCallType())
                 && StringUtil.equals(inputDto.getTradeStatus(), DictCodeListExt1.交易状态_初始.getValue())

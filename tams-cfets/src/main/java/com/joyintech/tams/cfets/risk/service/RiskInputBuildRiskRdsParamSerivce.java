@@ -74,7 +74,7 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
         logger.debug("构建指标计算参数-一级申购:" + JsonUtils.object2Json(data));
         InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
         riskRdsDto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
-        riskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());
+        //riskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());
         riskRdsDto.setEventStatus(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
         CfetsTrdBondFirstSubInfoDto dto = (CfetsTrdBondFirstSubInfoDto) data;
         Map<String, CfetsTrdBondFirstSubProductDto> map = new HashMap<>();
@@ -117,7 +117,7 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
         logger.debug("构建指标计算参数-一级投标确认:" + JsonUtils.object2Json(data));
         InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
         riskRdsDto.setAssetType(DictCodeList.平安资产类型_一级市场债.getValue());
-        riskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());
+        //riskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());
         CfetsTrdFirstBidFirmInfoDto dto = (CfetsTrdFirstBidFirmInfoDto) data;
         if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), dto.getBiddingMethod())) {
             //  自主投标
