@@ -873,7 +873,10 @@ public class RiskInputParamSerivce extends RiskCommonService {
         } else if (data instanceof CfetsRepoDealQuoteCommonDto) {
             // 银行间质押式回购-对话/请求登记、对话报价（上行）check
             CfetsRepoDealQuoteCommonDto businessDto = (CfetsRepoDealQuoteCommonDto) data;
-            listDto.setCounterId(businessDto.getCounterPartyId());
+            listDto.setCounterId(businessDto.getCounterId());
+            if(StringUtil.isEmpty(businessDto.getCounterId())){
+                listDto.setCounterId(businessDto.getCounterPartyId());
+            }
             listDto.setInputValue1(DictCodeList.平安资产类型_质押式回购.getValue());
             listDto.setInputValue2(DictCodeList.回购类型_质押式回购.getValue());
             listDto.setInputValue3(businessDto.getPs());
