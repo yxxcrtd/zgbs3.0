@@ -435,6 +435,7 @@ public class CommonAutoCouponService extends BaseService {
                 }
                 // 20200819 债券自动加券优化-判断城投债级别 wangwei end
                 finProductAdd.setIsNetprice(interfPayhsrcsecinfo.getIsNetprice());
+                finProductAdd.setCrossMarket(StringUtil.isNotBlank(interfPayhsrcsecinfo.getCrossMarketCode()) ? DictCodeList.是否_是.getValue() : DictCodeList.是否_否.getValue());
                 finProductAdd.setCrossMarketCode(interfPayhsrcsecinfo.getCrossMarketCode());
                 baseFinProductBaseInfoDto.setFinProductAdd(finProductAdd);
                 //new金融产品分类

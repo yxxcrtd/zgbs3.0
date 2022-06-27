@@ -165,6 +165,9 @@ public class FinBondAssetResponse {
     @ApiModelProperty(name="crossMarketCode",value="跨市场代码")
     private String crossMarketCode;
 
+    @ApiModelProperty(name="crossMarket",value="跨市场发行")
+    private String crossMarket;
+
     @ApiModelProperty(name="conceptType",value="概念标识Code")
     private String conceptType;
 
@@ -662,5 +665,18 @@ public class FinBondAssetResponse {
 
     public String getBasisRateStr() {
        return SysDataUtil.getNameFromDataDict(DictCode.利率行情, this.getBasisRate());
+    }
+
+
+    public String getCrossMarketStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getCrossMarket());
+    }
+
+    public String getCrossMarket() {
+        return crossMarket;
+    }
+
+    public void setCrossMarket(String crossMarket) {
+        this.crossMarket = crossMarket;
     }
 }
