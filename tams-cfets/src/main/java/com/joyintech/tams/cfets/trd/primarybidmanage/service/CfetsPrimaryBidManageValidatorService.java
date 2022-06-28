@@ -26,7 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 债券标的信息业务验证
@@ -37,61 +41,62 @@ import java.util.*;
  */
 
 @Service
-public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
+public class CfetsPrimaryBidManageValidatorService implements BeanValidator {
 
     @Autowired
     private CfetsPrimaryBidManageService cfetsPrimaryBidManageService;
 
     @Override
     public List<ValidMessage> valid(Object value) {
-        CfetsPrimaryBidManageSaveRequest dto = (CfetsPrimaryBidManageSaveRequest)value;
+        CfetsPrimaryBidManageSaveRequest dto = (CfetsPrimaryBidManageSaveRequest) value;
         List<ValidMessage> resultList = new ArrayList<ValidMessage>();
 
         if (StringUtil.equals(dto.getOperateType(), "submit")) {
- //       1、基本信息中【中标标位】、分配明细中最低【中标标位】大于等于标的资产的【最低标位】；
+            //       1、基本信息中【中标标位】、分配明细中最低【中标标位】大于等于标的资产的【最低标位】；
 //        2、基本信息中【中标标位】、分配明细中最高【中标标位】小于等于标的资产的【最高标位】；
 //        3、基本信息中【中标标位】、分配明细中【中标标位】取余标的资产的【投标步长】=0；
 //        4、分配明细中【中标标位】个数小于等于标的资产的【最大投标标位数】；
 //        5、分配明细中【中标标位】最高标位减去最低标位的差的绝对值小于等于标的资产的【最大投标标位差】；
 //        以上必须同时满足
-            if (!CollectionUtils.isNotEmpty(dto.getAllocationDetails())){
+            if (!CollectionUtils.isNotEmpty(dto.getAllocationDetails())) {
                 resultList.add(new ValidMessage(getMessage("中标结果明细为空")));
                 return resultList;
             }
             FinProductIssue finProductIssue = cfetsPrimaryBidManageService.getFinProductIssueDto(dto.getFinprodId());
             if (StringUtil.isNotEmpty(finProductIssue)) {
                 boolean checkFlag = false;
-                Collections.sort(dto.getAllocationDetails(), new Comparator<CfetsPrimaryBidManageSaveDetailDto>() {
-                    @Override
-                    public int compare(CfetsPrimaryBidManageSaveDetailDto o1, CfetsPrimaryBidManageSaveDetailDto o2) {
-                        return o1.getWinPrice().compareTo(o2.getWinPrice());
-                    }
-                });
+                List<CfetsPrimaryBidManageSaveDetailDto> list =
+                        dto.getAllocationDetails().stream().filter(
+                                item -> StringUtil.isNotEmpty(item.getPayAmt())).collect(Collectors.toList());
+                list.sort(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getWinPrice));
                 if ((finProductIssue.getMinTamt() != null) && (dto.getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0
-                        || (StringUtil.isNotEmpty(dto.getAllocationDetails().get(0).getWinPrice())
-                        && dto.getAllocationDetails().get(0).getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0))) {
+                        || (StringUtil.isNotEmpty(list.get(0).getWinPrice())
+                        && list.get(0).getWinPrice().compareTo(finProductIssue.getMinTamt()) < 0))) {
                     checkFlag = true;
                 }
-                if ((finProductIssue.getMaxTamt() != null) &&(dto.getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0
-                        || (StringUtil.isNotEmpty(dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinPrice())
-                        && dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0))) {
+                if ((finProductIssue.getMaxTamt() != null) && (dto.getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0
+                        || (StringUtil.isNotEmpty(list.get(list.size() - 1).getWinPrice())
+                        && list.get(list.size() - 1).getWinPrice().compareTo(finProductIssue.getMaxTamt()) > 0))) {
                     checkFlag = true;
                 }
-                if ((finProductIssue.getTenderUnit() != null) &&(dto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0)) {
+                if (StringUtil.isNotEmpty(finProductIssue.getTenderUnit())
+                        && (dto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0)) {
                     checkFlag = true;
                 }
-                if ((finProductIssue.getTenderUnit() != null)) {
-                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : dto.getAllocationDetails()) {
+                if (StringUtil.isNotEmpty(finProductIssue.getTenderUnit())) {
+                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : list) {
                         if (StringUtil.isNotEmpty(detailDto.getWinPrice()) && detailDto.getWinPrice().divideAndRemainder(finProductIssue.getTenderUnit())[1].compareTo(BigDecimal.ZERO) != 0) {
                             checkFlag = true;
                         }
                     }
                 }
-                if ((finProductIssue.getMaxTenderUnit() != null) && (BigDecimal.valueOf(dto.getAllocationDetails().size()).compareTo(finProductIssue.getMaxTenderUnit()) > 0)) {
+                if (StringUtil.isNotEmpty(finProductIssue.getMaxTenderUnit())
+                        && (BigDecimal.valueOf(list.size()).compareTo(finProductIssue.getMaxTenderUnit()) > 0)) {
                     checkFlag = true;
                 }
-                if (dto.getAllocationDetails().size() > 1) {
-                    BigDecimal subtract = ArithmeticUtil.subtract(dto.getAllocationDetails().get(0).getWinPrice(), dto.getAllocationDetails().get(dto.getAllocationDetails().size() - 1).getWinPrice());
+                if (StringUtil.isNotEmpty(finProductIssue.getMaxTenderPlus())
+                        && list.size() > 1) {
+                    BigDecimal subtract = ArithmeticUtil.subtract(list.get(0).getWinPrice(), list.get(list.size() - 1).getWinPrice());
                     if (subtract.compareTo(finProductIssue.getMaxTenderPlus()) > 0) {
                         checkFlag = true;
                     }
@@ -107,9 +112,9 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
             }
 //            分配明细中指令维度【实际中标券面总额】汇总>分配明细.【汇总投标券面总额】
             Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> entrustIdListMap = dto.getAllocationDetails().stream().collect(JoyinCollectors.groupingBy(CfetsPrimaryBidManageSaveDetailDto::getEntrustId));
-            for (String entrustId: entrustIdListMap.keySet()){
+            for (String entrustId : entrustIdListMap.keySet()) {
 //                BigDecimal sumActWinPrinamt = entrustIdListMap.get(entrustId).stream().map(item -> item.getTheWinPrinamt()).reduce(BigDecimal.ZERO, BigDecimal::add);
-                for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()) {
+                for (CfetsPrimaryBidManageSaveDetailDto detailDto : dto.getAllocationDetails()) {
                     if (!StringUtil.isNotEmpty(detailDto.getActWinPrinamt())
                             && !StringUtil.isNotEmpty(detailDto.getTotalBidPrinamt())
                             && detailDto.getActWinPrinamt().compareTo(detailDto.getTotalBidPrinamt()) > 0) {
@@ -118,17 +123,17 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
                     }
                 }
             }
- //            分配明细中缴款金额 汇总金额<>基本信息中的缴款金额
+            //            分配明细中缴款金额 汇总金额<>基本信息中的缴款金额
             BigDecimal sumPatAmt = dto.getAllocationDetails().stream().filter(
-                    item->StringUtil.isNotEmpty(item.getPayAmt())).map(CfetsPrimaryBidManageSaveDetailDto::getPayAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    item -> StringUtil.isNotEmpty(item.getPayAmt())).map(CfetsPrimaryBidManageSaveDetailDto::getPayAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            if (StringUtil.isNotEmpty(dto.getPayAmt()) && sumPatAmt.compareTo(dto.getPayAmt())!=0){
+            if (StringUtil.isNotEmpty(dto.getPayAmt()) && sumPatAmt.compareTo(dto.getPayAmt()) != 0) {
                 resultList.add(new ValidMessage(getMessage("明细汇总缴款金额不等于基本信息中的缴款金额！")));
             }
 //            分配明细中结算服务费 汇总金额<>基本信息中的结算服务费
             BigDecimal sumSettFeeAmt = dto.getAllocationDetails().stream().filter(
-                    item->StringUtil.isNotEmpty(item.getSettFeeAmt())).map(CfetsPrimaryBidManageSaveDetailDto::getSettFeeAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-            if (StringUtil.isNotEmpty(dto.getSettFeeAmt()) && sumSettFeeAmt.compareTo(dto.getSettFeeAmt())!=0){
+                    item -> StringUtil.isNotEmpty(item.getSettFeeAmt())).map(CfetsPrimaryBidManageSaveDetailDto::getSettFeeAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (StringUtil.isNotEmpty(dto.getSettFeeAmt()) && sumSettFeeAmt.compareTo(dto.getSettFeeAmt()) != 0) {
                 resultList.add(new ValidMessage(getMessage("明细汇总结算服务费不等于基本信息中的结算服务费！")));
             }
             //提交时校验分配明细列表中【理论中标券面总额】、【实际中标券面总额】汇总等于基本信息中【中标券面总额】；
@@ -144,37 +149,35 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator{
             }
 //            分配明细中【中标标位】是否存在连续投标标位，即标位1和标位2之间仅差1个投标步长
             String bidMinUnit = CacheUtil.getSysParam("BID_MIN_UNIT");
-            if (null!=bidMinUnit){
-                Collections.sort(dto.getAllocationDetails(), new Comparator<CfetsPrimaryBidManageSaveDetailDto>() {
-                    @Override
-                    public int compare(CfetsPrimaryBidManageSaveDetailDto o1, CfetsPrimaryBidManageSaveDetailDto o2) {
-                        return o1.getWinPrice().compareTo(o2.getWinPrice());
-                    }
-                });
-                for (int i = 0; i < dto.getAllocationDetails().size()-1; i++) {
-                    BigDecimal subtract = ArithmeticUtil.subtract(dto.getAllocationDetails().get(i+1).getWinPrice(), dto.getAllocationDetails().get(i).getWinPrice());
-                    if (subtract.compareTo(new BigDecimal(bidMinUnit))==0){
+            if (null != bidMinUnit) {
+                List<CfetsPrimaryBidManageSaveDetailDto> list =
+                        dto.getAllocationDetails().stream().filter(
+                                item -> StringUtil.isNotEmpty(item.getPayAmt())).collect(Collectors.toList());
+                list.sort(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getWinPrice));
+                for (int i = 0; i < list.size() - 1; i++) {
+                    BigDecimal subtract = ArithmeticUtil.subtract(list.get(i + 1).getWinPrice(), list.get(i).getWinPrice());
+                    if (subtract.compareTo(new BigDecimal(bidMinUnit)) == 0) {
                         resultList.add(new ValidMessage(getMessage("中标券面总额/中标标位不满足该资产发行要求！")));
                     }
                 }
-                for (int i = 0; i < dto.getAllocationDetails().size(); i++) {
-                    if (StringUtil.isNotEmpty(dto.getAllocationDetails().get(i).getActWinPrinamt())) {
-                        BigDecimal[] remainder = dto.getAllocationDetails().get(i).getActWinPrinamt().divideAndRemainder(new BigDecimal(bidMinUnit));
+                for (int i = 0; i < list.size(); i++) {
+                    if (StringUtil.isNotEmpty(list.get(i).getActWinPrinamt())) {
+                        BigDecimal[] remainder = list.get(i).getActWinPrinamt().divideAndRemainder(new BigDecimal(bidMinUnit));
                         if (remainder[1].compareTo(BigDecimal.ZERO) != 0) {
                             resultList.add(new ValidMessage(getMessage("中标券面总额不满足该资产发行要求，请确认")));
                         }
                         if (StringUtil.equals(DictCodeListExt4.中标方式_单标位中标.getValue(), dto.getWinType())
-                                && BigDecimalUtil.ACompareToB(dto.getWinPrice(), dto.getAllocationDetails().get(i).getWinPrice(), 4) != 0) {
+                                && BigDecimalUtil.ACompareToB(dto.getWinPrice(), list.get(i).getWinPrice(), 4) != 0) {
                             resultList.add(new ValidMessage(getMessage("单标位中标的分配明细中中标标位必须等于基本信息中中标标位")));
                             break;
                         } else if (StringUtil.equals(DictCodeListExt4.中标方式_多标位中标.getValue(), dto.getWinType())) {
                             if ((StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
                                     StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue()))
-                                    && BigDecimalUtil.ACompareToB(dto.getWinPrice(), dto.getAllocationDetails().get(i).getWinPrice(), 4) > 0) {
+                                    && BigDecimalUtil.ACompareToB(dto.getWinPrice(), list.get(i).getWinPrice(), 4) > 0) {
                                 resultList.add(new ValidMessage(getMessage("单标位中标的分配明细中中标标位必须小于等于基本信息中中标标位")));
                                 break;
                             } else if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())
-                                    && BigDecimalUtil.ACompareToB(dto.getWinPrice(), dto.getAllocationDetails().get(i).getWinPrice(), 4) < 0) {
+                                    && BigDecimalUtil.ACompareToB(dto.getWinPrice(), list.get(i).getWinPrice(), 4) < 0) {
                                 resultList.add(new ValidMessage(getMessage("单标位中标的分配明细中中标标位必须大于等于基本信息中中标标位")));
                                 break;
                             }

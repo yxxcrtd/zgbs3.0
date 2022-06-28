@@ -1270,8 +1270,10 @@ public class CfetsEtrDispatcherService extends BaseService {
     @Transactional(rollbackFor = Exception.class)
     public void doDispatcherDeal(Map<String, Object> pageParam) {
         // 删除原先分发过的所有交易员记录
-        List<String> entrustIds = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
-        List<String> tradersList = StringUtil.splitToList(",", (String) pageParam.get("traders"));
+        //add wsz 添加去重 修复主键冲突  20220628	ZGCPCN-1767	指令分发 【集成环境-指令分发】一个待分发指令无法同时分发给多个交易员
+        List<String> entrustIds = StringUtil.splitToList(",", (String) pageParam.get("entrustId")).stream().distinct().collect(Collectors.toList());;
+        List<String> tradersList = StringUtil.splitToList(",", (String) pageParam.get("traders")).stream().distinct().collect(Collectors.toList());
+        //add wsz 添加去重 修复主键冲突  20220628	ZGCPCN-1767	指令分发 【集成环境-指令分发】一个待分发指令无法同时分发给多个交易员
         EtrDistributeKey key = new EtrDistributeKey();
         EtrDistribute record = new EtrDistribute();
         for (int j = 0; j < entrustIds.size(); j++) {
