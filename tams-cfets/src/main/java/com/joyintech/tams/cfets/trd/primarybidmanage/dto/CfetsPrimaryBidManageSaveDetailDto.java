@@ -115,6 +115,18 @@ public class CfetsPrimaryBidManageSaveDetailDto {
 
     private String finprodId;
 
+    @ApiModelProperty(name = "cashT", value = "T+1日可用现金(元)")
+    private BigDecimal cashT;
+
+    @ApiModelProperty(name = "cashT1", value = "T日可用现金(元)")
+    private BigDecimal cashT1;
+
+    @ApiModelProperty(name = "realCash", value = "托管户账户现金(元)")
+    private BigDecimal realCash;
+
+    @ApiModelProperty(name = "secDesirableCash", value = "券商户可取现金(元)")
+    private BigDecimal secDesirableCash;
+
     public String getTotalWinId() {
         return totalWinId;
     }
@@ -344,5 +356,37 @@ public class CfetsPrimaryBidManageSaveDetailDto {
 
     public void setInvManagerName(String invManagerName) {
         this.invManagerName = invManagerName;
+    }
+
+    public BigDecimal getCashT() {
+        return cashT;
+    }
+
+    public void setCashT(BigDecimal cashT) {
+        this.cashT = cashT;
+    }
+
+    public BigDecimal getCashT1() {
+        return cashT1;
+    }
+
+    public void setCashT1(BigDecimal cashT1) {
+        this.cashT1 = cashT1;
+    }
+
+    public BigDecimal getRealCash() {
+        return realCash;
+    }
+
+    public void setRealCash(BigDecimal realCash) {
+        this.realCash = realCash;
+    }
+
+    public BigDecimal getSecDesirableCash() {
+        return secDesirableCash;
+    }
+
+    public void setSecDesirableCash(BigDecimal secDesirableCash) {
+        this.secDesirableCash = secDesirableCash;
     }
 }
