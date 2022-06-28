@@ -185,6 +185,7 @@ public class PtlFundAllocation001Service extends CommonExportService<PtlFundAllo
         ptlCashPositionFlow.setOrderId(entity.getOrderId());
         ptlCashPositionFlow.setCdate(entity.getSettleDate());
         ptlCashPositionFlow.setCcy(entity.getCcy());
+        ptlCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
         entity.setPtlCashPositionFlow(ptlCashPositionFlow);
 
 

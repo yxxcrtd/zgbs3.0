@@ -95,7 +95,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
 
     @Autowired(required = false)
     private FinProductAddMapper finProductAddMapper;
-    
+
     @Autowired
     private FinProductMapper finProductMapper;
     @Autowired
@@ -150,7 +150,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
      * @see
      * @since 1.0
      */
-    public Map<String, Object> getProAvailableCash(Map<String, Object> param) {        
+    public Map<String, Object> getProAvailableCash(Map<String, Object> param) {
         PtlCashPositionFlowDto dto = new PtlCashPositionFlowDto();
         Date sysdate = DateUtil.parse(DateUtil.getSysDate());
         if (StringUtil.isNotEmpty(param.get("acctId"))){
@@ -173,7 +173,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
                 param.put("sysDateT1",DateUtil.format(tradeDay));
             }
         }
-        
+
         dto.setCdate(sysdate);
         List<String> acctTypeList = new ArrayList<>();
         acctTypeList.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
@@ -195,9 +195,13 @@ public class EtrCommonService extends BaseService<ITableRow> {
                 result.put("cashT3", cashT3); // 托管户可用
                 cashT = ArithmeticUtil.doAdd(cashT, cashT3 == null ? BigDecimal.ZERO : cashT3);
 
-                acctTypeList.clear();
-                acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
-                BigDecimal cashT4 = baseEtrCashPositionCommService.qryCommandAvailableCash(dto);
+                BigDecimal cashT4 = BigDecimal.ZERO;
+                //ZGCPCN-1557
+                if(!param.containsKey("onlyA01")){
+                    acctTypeList.clear();
+                    acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+                    cashT4 = baseEtrCashPositionCommService.qryCommandAvailableCash(dto);
+                }
                 result.put("cashT4", cashT4);// 交易所资金账户可用
                 cashT = ArithmeticUtil.doAdd(cashT, cashT4 == null ? BigDecimal.ZERO : cashT4);
             }
@@ -222,7 +226,12 @@ public class EtrCommonService extends BaseService<ITableRow> {
                 Date sysdateT1 = DateUtil.parse((String)param.get("sysDateT1"));
                 dto2.setCdate(sysdateT1);
                 acctTypeList.clear();
-                acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+
+                //ZGCPCN-1557
+                if(!param.containsKey("onlyA01")) {
+                    acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+                }
+
                 acctTypeList.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
                 dto2.setAcctType(acctTypeList);
                 dto2.setPortfolioId((String)param.get("portfolioId"));
@@ -241,12 +250,12 @@ public class EtrCommonService extends BaseService<ITableRow> {
                     result.put("cashT21", cashT2 == null ? BigDecimal.ZERO : cashT2);// 通道T+1可用
                 }
                 result.put("cashT1", cashT1 == null ? result.get("cashT") : cashT1);// 组合T+1日可用
-                
+
                 acctTypeList.clear();
                 acctTypeList.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
                 BigDecimal cashTT1 = baseEtrCashPositionCommService.qryCommandAvailableCash(dto2);//组合托管户T+1可用
                 result.put("cashTT1", cashTT1 == null ? BigDecimal.ZERO : cashTT1);// 组合托管户T+1可用
-                
+
             }
         }
 
@@ -283,7 +292,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
 
     /**
      * check多对多指令字段用,空判断
-     * 
+     *
      * @param cellData cellData
      * @param labelName labelName
      * @param indexId indexId
@@ -331,7 +340,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
 
     /**
      * check多对多指令字段用,日期格式
-     * 
+     *
      * @param cellData cellData
      * @param labelName labelName
      * @param indexId indexId
@@ -357,7 +366,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
 
     /**
      * check多对多指令字段用,组合代码是否存在
-     * 
+     *
      * @param cellData cellData
      * @param labelName labelName
      * @param indexId indexId
@@ -384,10 +393,10 @@ public class EtrCommonService extends BaseService<ITableRow> {
         }
         return "";
     }
-    
+
     /**
      * check多对多指令字段用,交易日历是否存在
-     * 
+     *
      * @param cellData cellData
      * @param labelName labelName
      * @param indexId indexId
@@ -417,7 +426,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
 
     /**
      * check多对多指令字段用,正确的数值格式
-     * 
+     *
      * @param cellData cellData
      * @param labelName labelName
      * @param indexId indexId
@@ -439,7 +448,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
 
     /**
      * check多对多指令字段用,数值大于0
-     * 
+     *
      * @param cellData cellData
      * @param labelName labelName
      * @param indexId indexId
@@ -549,7 +558,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
 
     /**
      * check多对多指令字段用,错误消息拼接
-     * 
+     *
      * @param errorMessage 原错误信息
      * @param addMessage 新增错误信息
      * @return 错误信息
@@ -1574,7 +1583,7 @@ public class EtrCommonService extends BaseService<ITableRow> {
             return null;
         }
     }
-    
+
     /**
  	* 银行间指令 关闭check
  	* @param param
