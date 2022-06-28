@@ -30,12 +30,12 @@ import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
