@@ -67,7 +67,7 @@
                 ,{field:'listType', width:300 ,visible: false,sortField:'LIST_TYPE'}
                 ,{field:'listLevel', width:300 ,visible: false,sortField:'LIST_LEVEL'}
                 /*,{field:'listName', width:400 , title:'AssetNameManagement001.listName',sortField:'LIST_NAME'}*/
-                ,{field:'listName', title : 'AssetNameManagement001.listName', width:400,sortField:'LIST_NAME',
+                ,{field:'listName', title : 'AssetNameManagement001.listName', width:300,sortField:'LIST_NAME',
                     render: function (data, type, row, meta) {
                             var obj = {};
                             // modify by etliu 20211201 start
@@ -77,9 +77,9 @@
                             // modify by etliu 20211201 end
                     }
                 }
-                ,{field:'listTypeStr', width:300 ,title:'AssetNameManagement001.listType',sortField:'LIST_TYPE'}
-                ,{field:'listLevelStr', width:300 ,title:'AssetNameManagement001.listLevel',sortField:'LIST_LEVEL'}
-                ,{field:'effdate', width:400 ,title:'AssetNameManagement001.effdate',type:'date',sortField:'EFFDATE'}
+                ,{field:'listTypeStr', width:200 ,title:'AssetNameManagement001.listType',sortField:'LIST_TYPE'}
+                ,{field:'listLevelStr', width:200 ,title:'AssetNameManagement001.listLevel',sortField:'LIST_LEVEL'}
+                ,{field:'effdate', width:200 ,title:'AssetNameManagement001.effdate',type:'date',sortField:'EFFDATE'}
                 ,{field:'operation', width:400 , title: 'SysCommon.operation', sortable:false,
                             render:function (data, type, row, meta) {
                             return '<a class="btn layui-btn  manual" title="手工录入" style="color:white">手工录入</a><a class="btn layui-btn batch" title="批量录入" style="color:white">批量录入</a><a class="btn layui-btn del" title="删除" style="color:white">删除</a>';

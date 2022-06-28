@@ -564,7 +564,7 @@ public class RedisViewController extends RedisBaseController {
                 cond.setParamCodeArray(filed);
                 cond.setIsUpdParVal(StringUtil.equals(isUpParamVal,BussinessDictCodeListRds.是否_是.getValue())?true:false);
         	}
-            cond.setLoadOffset(true);
+            cond.setLoadOffset(false);
             redisWriter.dealRiskIndParam(cond);
             return;
         }
@@ -648,7 +648,7 @@ public class RedisViewController extends RedisBaseController {
         List<String> fList = new ArrayList<>();
         fList.add(filed);
         cond.setCondList(fList);
-        cond.setLoadOffset(true);
+        cond.setLoadOffset(false);
         redisWriter.dealRiskIndParam(cond);
     }
 

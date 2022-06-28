@@ -29,6 +29,7 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.NumericUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
@@ -381,7 +382,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
         logger.info("一级投标指令发送头寸开始");
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
 
     }
 

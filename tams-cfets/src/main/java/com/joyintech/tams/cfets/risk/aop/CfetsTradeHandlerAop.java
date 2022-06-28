@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.rmi.transport.ObjectTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,11 +52,10 @@ public class CfetsTradeHandlerAop {
     private RiskInputParamSerivce inputParamSerivce;
 
 
-
     /**
      * 风险试算
      *
-     * @param dto 委托指令内容
+     * @param dto    委托指令内容
      * @param pageId 接口代码
      * @return 执行结果
      * @throws Exception 异常
@@ -66,7 +64,7 @@ public class CfetsTradeHandlerAop {
         //风险试算check
         RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
         //风险试算组装dto
-        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), pageId,NodeConfigConstant.TRADE);
+        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), pageId, NodeConfigConstant.TRADE);
         CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
         result.setRiskMathFlag("02");
         if (riskCommonOutput != null && CollectionUtils.isNotEmpty(riskCommonOutput.getRiskTrialRetDto())) {
@@ -74,20 +72,20 @@ public class CfetsTradeHandlerAop {
             result.setRskStatus(riskCommonOutput.getRskTrialStatus());
             if (com.joyintech.background.component.common.pack.common.util.StringUtil.equals(riskCommonOutput.getRskTrialStatus(), "3")) {
                 result.setRiskTrialSpan(DictCodeListRsk.试算结果_不通过.getCodeName());
-            }else {
+            } else {
                 result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
             }
-            riskCommonOutput.getRiskTrialRetDto().forEach(e->{
+            riskCommonOutput.getRiskTrialRetDto().forEach(e -> {
                 CfetsEtribdoRiskcalResponse riskcalResponse = new CfetsEtribdoRiskcalResponse();
-                BeanUtil.copyPropertiesIgnoreNull(riskcalResponse,e);
+                BeanUtil.copyPropertiesIgnoreNull(riskcalResponse, e);
                 resultList.add(riskcalResponse);
             });
             result.setRiskcalReturnList(resultList);
-            return getAjaxResult(result,null,null);
+            return getAjaxResult(result, null, null);
         } else {
             result.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
             result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
-            return getAjaxResult(result,null,null);
+            return getAjaxResult(result, null, null);
         }
     }
 
@@ -225,7 +223,8 @@ public class CfetsTradeHandlerAop {
      * 交收失败，关闭指令
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService.closeDelegate(..))")
-    protected void closeDelegate(){}
+    protected void closeDelegate() {
+    }
 
 
     /**
@@ -236,7 +235,7 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning(pointcut = "doCheck()", returning = "ajaxResultMessage")
     public void doCheck(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
-        checkCommon(joinPoint,ajaxResultMessage,系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        checkCommon(joinPoint, ajaxResultMessage, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
@@ -247,7 +246,7 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning(pointcut = "checkByHome()", returning = "ajaxResult")
     public void checkByHome(JoinPoint joinPoint, AjaxResult ajaxResult) throws BusinessException {
-        if (ajaxResult == null){
+        if (ajaxResult == null) {
             return;
         }
         if (!StringUtil.isEmptyList(ajaxResult.getErrorList())) {
@@ -255,20 +254,18 @@ public class CfetsTradeHandlerAop {
         }
         Message<AjaxResult> ajaxResultMessage = new Message<AjaxResult>();
         ajaxResultMessage.setData(ajaxResult);
-        checkCommon(joinPoint,ajaxResultMessage,系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        checkCommon(joinPoint, ajaxResultMessage, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
         AjaxResult ar = ajaxResultMessage.getData();
-        if (ar != null && !StringUtil.isEmptyList(ar.getErrorList())){
+        if (ar != null && !StringUtil.isEmptyList(ar.getErrorList())) {
             ajaxResult.setErrorList(ar.getErrorList());
             return;
         }
         String message = ajaxResult.getMessage() == null ? "" : ajaxResult.getMessage();
-        if (ar != null && ar.getMessage() != null){
+        if (ar != null && ar.getMessage() != null) {
             message += ar.getMessage();
         }
-        ajaxResult.setMessage(message,MessageType.确认消息);
+        ajaxResult.setMessage(message, MessageType.确认消息);
     }
-
-
 
 
     /**
@@ -279,7 +276,7 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning(pointcut = "unWinCheck()", returning = "ajaxResultMessage")
     public void unWinCheck(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
-        checkCommon(joinPoint,ajaxResultMessage,系统动作_新建.getValue(), 流程节点_流程提交.getValue(), "CfetsPrimaryBidManage001");
+        checkCommon(joinPoint, ajaxResultMessage, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), "CfetsPrimaryBidManage001");
     }
 
     /**
@@ -290,18 +287,19 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning(pointcut = "checkRepoDeal()", returning = "ajaxResultMessage")
     public void checkRepoDeal(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
-        checkCommon(joinPoint,ajaxResultMessage,系统动作_成交.getValue(), 流程节点_流程提交.getValue(), null);
+        checkCommon(joinPoint, ajaxResultMessage, 系统动作_成交.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
      * check共通方法
+     *
      * @param joinPoint
      * @param ajaxResultMessage
      * @param decisionAct
      * @param flowStatus
      * @param pageId
      */
-    private void checkCommon(JoinPoint joinPoint,Message<AjaxResult> ajaxResultMessage,String decisionAct, String flowStatus, String pageId){
+    private void checkCommon(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage, String decisionAct, String flowStatus, String pageId) {
         AjaxResult ajaxResult = ajaxResultMessage.getData();
         if (ajaxResult != null && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
             return;
@@ -315,7 +313,7 @@ public class CfetsTradeHandlerAop {
                 ajaxResultMessage.setData(result);
             } else if (StringUtil.isNotEmpty(outputDto.getConfirmMsg())) {
                 result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
-                if(StringUtil.equals(outputDto.getRskStatus(),试算结果_风险审批.getValue())) {
+                if (StringUtil.equals(outputDto.getRskStatus(), 试算结果_风险审批.getValue())) {
                     result.setData(是否_是.getValue());
                 }
                 ajaxResultMessage.setData(result);
@@ -337,11 +335,25 @@ public class CfetsTradeHandlerAop {
     public void doCompleteSettle(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         CfetsManualSettleDto dto = (CfetsManualSettleDto) args[0];
-        if (StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue()) || StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
-            if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_赎回.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_还本.getValue())
-                    || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_收息.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())) {
-                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+        try {
+            if (StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue()) || StringUtil.equals(dto.getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
+                if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_赎回.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_还本.getValue())
+                        || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_收息.getValue()) || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                    inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+                }
             }
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
         }
     }
 
@@ -355,9 +367,23 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("insertPoint()")
     public void occupyOnInsert(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        OperationType op = (OperationType)args[1];
-        if(!StringUtil.equals(op.name(), OperationType.REVOKE.name())) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+        OperationType op = (OperationType) args[1];
+        try {
+            if (!StringUtil.equals(op.name(), OperationType.REVOKE.name())) {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+            }
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
         }
     }
 
@@ -371,7 +397,21 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("issuingFail()")
     public void occupyOnIssuingFail(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+        try {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**
@@ -382,8 +422,22 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning("updatePoint()")
     public void occupyOnUpdate(JoinPoint joinPoint) throws BusinessException {
-        Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
+        try {
+            Object[] args = joinPoint.getArgs();
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**
@@ -395,7 +449,21 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("deletePoint()")
     public void occupyOnDelete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
+        try {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
 
@@ -406,7 +474,7 @@ public class CfetsTradeHandlerAop {
             inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
         } catch (BusinessException e) {
             List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
-            if(CollectionUtils.isEmpty(mapList)){
+            if (CollectionUtils.isEmpty(mapList)) {
                 throw new BusinessException(e);
             }
             mapList.forEach(item -> {
@@ -428,7 +496,21 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("doRevokeComplete()")
     public void revokeComplete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+        try {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**
@@ -437,13 +519,27 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning(pointcut = "doCompleteBidRevoke() ",returning = "tradeDto")
+    @AfterReturning(pointcut = "doCompleteBidRevoke() ", returning = "tradeDto")
     public void revokeBidComplete(JoinPoint joinPoint, CfetsTrdBondFirstSubInfoDto tradeDto) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        // 释放实占
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), "doCompleteBidRevoke");
-        // 释放预占
-        inputParamSerivce.buildParamThenOccupy(tradeDto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), "");
+        try {
+            // 释放实占
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), "doCompleteBidRevoke");
+            // 释放预占
+            inputParamSerivce.buildParamThenOccupy(tradeDto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), "");
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**
@@ -452,9 +548,23 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning(pointcut = "doCompleteRevoke() ",returning = "tradeDto")
+    @AfterReturning(pointcut = "doCompleteRevoke() ", returning = "tradeDto")
     public void bondRevokeComplete(JoinPoint joinPoint, TrdBondInvestTradeDto tradeDto) throws BusinessException {
-        inputParamSerivce.buildParamThenOccupy(tradeDto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+        try {
+            inputParamSerivce.buildParamThenOccupy(tradeDto, 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**
@@ -466,9 +576,23 @@ public class CfetsTradeHandlerAop {
     @AfterReturning(pointcut = "doCompleteRegRevoke() ||subRevoke()||firmRevoke()||doCompletePrimaryRevoke()")
     public void bondRevokeRegComplete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        OperationType op = (OperationType)args[1];
-        if(StringUtil.equals(op.name(), OperationType.REVOKE.name())) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+        OperationType op = (OperationType) args[1];
+        try {
+            if (StringUtil.equals(op.name(), OperationType.REVOKE.name())) {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_撤销.getValue(), 流程节点_审批生效.getValue(), null);
+            }
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
         }
     }
 
@@ -481,7 +605,21 @@ public class CfetsTradeHandlerAop {
      */
     @AfterReturning(pointcut = "doForcedFinish()", returning = "bondInfo003Dto")
     public void doForcedFinish(JoinPoint joinPoint, CfetsEtribBondInfo003Dto bondInfo003Dto) throws BusinessException {
-        inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_关闭.getValue(), 流程节点_审批生效.getValue(), null);
+        try {
+            inputParamSerivce.buildParamThenOccupy(bondInfo003Dto, 系统动作_关闭.getValue(), 流程节点_审批生效.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**
@@ -490,9 +628,23 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning(pointcut = "closeDelegate()",returning = "tradeDto")
+    @AfterReturning(pointcut = "closeDelegate()", returning = "tradeDto")
     public void closeDelegate(JoinPoint joinPoint, CfetsEtribBondInfo003Dto tradeDto) throws BusinessException {
-        inputParamSerivce.buildParamThenOccupy(tradeDto, 系统动作_关闭.getValue(), 流程节点_审批生效.getValue(), null);
+        try {
+            inputParamSerivce.buildParamThenOccupy(tradeDto, 系统动作_关闭.getValue(), 流程节点_审批生效.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**
@@ -509,10 +661,11 @@ public class CfetsTradeHandlerAop {
 
     /**
      * 获取返回的信息
+     *
      * @param message
      * @return
      */
-    public static AjaxResult getAjaxResult(Object data,String message, MessageType messageType){
+    public static AjaxResult getAjaxResult(Object data, String message, MessageType messageType) {
         AjaxResult ar = new AjaxResult();
         ar.setData(data);
         List<ValidMessage> warnList = new ArrayList<>();
