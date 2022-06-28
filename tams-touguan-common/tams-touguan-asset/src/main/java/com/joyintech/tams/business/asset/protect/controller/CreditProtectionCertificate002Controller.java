@@ -377,32 +377,6 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             logger.error("流程发起失败", e);
             return new Message<AjaxResult>().fail().setData(new AjaxResult("流程发起失败"));
         }
-
-    }
-
-    /**
-     * 附件下载
-     * @param seqNo  入参
-     * @return 处理结果
-     * @throws IOException 异常信息
-     */
-    @ApiOperation(value = "附件下载", notes = "附件下载")
-    @ResponseBody
-    @PostMapping( "/downloadFile/{seqNo}")
-    public void downloadFile(@PathVariable("seqNo") String seqNo, HttpServletResponse request) {
-        try {
-            logger.info("文件下载开始");
-            seqNo = seqNo.replaceAll("\"","");
-            if (StringUtil.isNotEmpty(seqNo)) {
-                creditProtectionCertificate002Service.downloadFileInfo(seqNo,request);
-                return;
-            }
-            logger.info("文件下载结束");
-        }catch (Exception e){
-            logger.error("文件下载异常", e);
-            return;
-        }
-        return;
     }
 
 }
