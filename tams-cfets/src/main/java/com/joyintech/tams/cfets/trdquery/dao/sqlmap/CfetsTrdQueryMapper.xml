@@ -998,7 +998,7 @@
         FROM (
         select rp.pledge_finprod_id as finprodId,
         nvl(fp.finprod_market_id, ipo.SECID) AS finprodMarketId,
-        nvl(fp.finprod_abbr, ipo.SECFULLNAME) AS finprodAbbr,
+        nvl(fp.finprod_abbr, ipo.SECNAME) AS finprodAbbr,
         rp.portfolio_id as portfolioId,
         pp.portfolio_name as portfolioName,
         rp.pledge_number/100 as pledgePrin,
@@ -1052,7 +1052,7 @@
         union all
         select rp.pledge_finprod_id as finprodId,
         nvl(fp.finprod_market_id, ipo.SECID) AS finprodMarketId,
-        nvl(fp.finprod_abbr, ipo.SECFULLNAME) AS finprodAbbr,
+        nvl(fp.finprod_abbr, ipo.SECNAME) AS finprodAbbr,
         rp.portfolio_id as portfolioId,
         pp.portfolio_name as portfolioName,
         rp.pledge_number/100 as pledgePrin,
@@ -4765,7 +4765,7 @@
         FROM (
                  select rp.pledge_finprod_id                          as finprodId,
                         nvl(fp.finprod_market_id, ipo.SECID)          AS finprodMarketId,
-                        nvl(fp.finprod_abbr, ipo.SECFULLNAME)         AS finprodAbbr,
+                        nvl(fp.finprod_abbr, ipo.SECNAME)         AS finprodAbbr,
                         tpda.portfolio_id                             as portfolioId,
                         pp.portfolio_name                             as portfolioName,
                         (rp.pledge_number * rp.pledge_ratio) / 100 as pledgePrin,
@@ -4820,19 +4820,30 @@
 
     <select id="findRepoPledgeInfo"
             resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsPledgeInfoResponse">
+        SELECT T.finprodId,
+               T.finprodMarketId,
+               T.finprodAbbr,
+               T.portfolioId,
+               T.portfolioName,
+               SUM(pledgePrin) pledgePrin,
+               T.pledgeRate,
+               T.firstNetPrice,
+               T.repRegistOrg
+        FROM (
         select rp.pledge_finprod_id as finprodId,
-               fp.finprod_market_id as finprodMarketId,
-               fp.finprod_abbr as finprodAbbr,
+               nvl(fp.finprod_market_id, ipo.SECID)          AS finprodMarketId,
+               nvl(fp.finprod_abbr, ipo.SECNAME)         AS finprodAbbr,
                tpda.portfolio_id as portfolioId,
                pp.portfolio_name as portfolioName,
-               sum(rp.pledge_number*rp.pledge_ratio)/100 as pledgePrin,
+               (rp.pledge_number*rp.pledge_ratio)/100 as pledgePrin,
                rp.pledge_ratio*100 as pledgeRate,
                mbvi.NETPRICE as firstNetPrice,
-               fp.REGIST_ORG as repRegistOrg
+               nvl(fp.REGIST_ORG, ipo.INSTITUTION)           AS repRegistOrg
         from FIN_DEAL_PLEDGE rp
                  left join trd_product_deal deal
                            on rp.finprod_id=deal.trade_id
                  left join fin_product fp on fp.finprod_id=rp.pledge_finprod_id
+                 LEFT JOIN INTERF_PAYHSRCSECINFO ipo ON ipo.SECID = rp.pledge_finprod_id
                  left join trd_product_deal_add tpda on tpda.trade_id=rp.finprod_id
                  LEFT JOIN PTL_PORTFOLIO PP ON tpda.PORTFOLIO_ID = PP.PORTFOLIO_ID
                  LEFT JOIN (
@@ -4863,14 +4874,16 @@
         ) mbvi/*以上获取债券小于等于平台日的最新估值行情*/
                            ON fp.FINPROD_MARKET_ID = mbvi.SEC_ID
         where deal.TOTLE_TRADE_ID=#{totleTradeId,jdbcType=VARCHAR}
-        group by rp.pledge_finprod_id,
-                 fp.finprod_market_id,
-                 fp.finprod_abbr,
-                 tpda.portfolio_id,
-                 pp.portfolio_name,
-                 rp.pledge_ratio,
-                 mbvi.NETPRICE,
-                 fp.REGIST_ORG
+             ) T
+        GROUP BY
+            T.finprodId,
+            T.finprodMarketId,
+            T.finprodAbbr,
+            T.portfolioId,
+            T.portfolioName,
+            T.pledgeRate,
+            T.firstNetPrice,
+            T.repRegistOrg
     </select>
 
     <select id="findEtrEntrustIsForcedFinish" resultType="java.lang.String">
