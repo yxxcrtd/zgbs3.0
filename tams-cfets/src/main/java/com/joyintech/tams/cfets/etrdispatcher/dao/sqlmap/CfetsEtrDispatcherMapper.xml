@@ -366,7 +366,7 @@
         LEFT JOIN (
         SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
         LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
-        LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+        LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID
         AND brt.FINPROD_ID = bo.FINPROD_ID
         WHERE  bo.TRADE_STATUS = '01'
         GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID

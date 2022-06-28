@@ -73,8 +73,8 @@ public class PtlFundAllocation002Service extends CommonExportService<PtlFundAllo
      */
     @Autowired
     private InterfComponentService interfComponentService;
-    
-   
+
+
 
 
     /**
@@ -225,6 +225,7 @@ public class PtlFundAllocation002Service extends CommonExportService<PtlFundAllo
         else{
             ptlCashPositionFlow.setSeqno(seqno);
         }
+        ptlCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
         dto.setPtlCashPositionFlow(ptlCashPositionFlow);
 
         /**

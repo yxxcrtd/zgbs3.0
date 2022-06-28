@@ -114,16 +114,28 @@ public class EtrTradeCommonervice extends BaseService {
                     }
                 }
             }
-            //组合资金可用 1、老资金相关表
-            BigDecimal oldPortfolioAmount=BigDecimal.ZERO;
+            //组合资金可用 1、老资金相关表 ZGCPCN-1557
+            BigDecimal oldPortfolioAmount = BigDecimal.ZERO;
+            for (PositionCashSecDto dto : list) {
+                if (StringUtil.isEmpty(dto.getCdate())) {
+                    dto.setCdate(iPlatformDate.getSysDateStr());
+                }
+                if (StringUtil.isEmpty(dto.getPortfolioId())) {
+                    continue;
+                }
+                oldPortfolioAmount = oldPortfolioAmount.add(getPortfolioAvailableCashForChangnei(dto.getPortfolioId()));
+            }
             if (!CollectionUtils.isEmpty(sumPortfolioAcctNoList)) {
 
+                // ZGCPCN-1557
+                /**
                 for (PositionCashSecDto dto : sumPortfolioAcctNoList) {
                     PositionCashSecData data = querySingleCash(dto);
                     if (data != null && data.getCashT() != null) {
                         oldPortfolioAmount = oldPortfolioAmount.add(data.getCashT());
                     }
-                }
+                }**/
+
                 //组合资金可用 2、新头寸引擎
                 BigDecimal newPortfolioAmount = queryPosition(sumPortfolioAcctNoList, flowType, DictCodeListExt3.资产类型_托管户可用资金.getValue());
                 if (newPortfolioAmount != null) {
@@ -190,6 +202,27 @@ public class EtrTradeCommonervice extends BaseService {
 
         }
         return assemble(portfolioCash, canCash, realCash, canSec, realSec, requestDto);
+    }
+
+    /**
+     * 场内指令，组合资金可用
+     * @param portfolioId
+     * @return
+     */
+    public BigDecimal getPortfolioAvailableCashForChangnei(String portfolioId) {
+        BigDecimal cash = BigDecimal.ZERO;
+        if (null != baseEtrCashPositionCommService) {
+            PtlCashPositionFlowDto dto = new PtlCashPositionFlowDto();
+            Date sysdate = DateUtil.parse(DateUtil.getSysDate());
+            dto.setCdate(sysdate);
+            dto.setPortfolioId(portfolioId);
+            dto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            BigDecimal availableCash = baseEtrCashPositionCommService.qryCommandAvailableCash(dto);
+            if (null != availableCash) {
+                cash = ArithmeticUtil.doAdd(cash, availableCash);
+            }
+        }
+        return cash;
     }
 
 
