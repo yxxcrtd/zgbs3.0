@@ -389,11 +389,11 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                 selectedItem.add(saveRequest);
             }
             dto.setSelectedItem(selectedItem);
-            ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
-            WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
+            ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<>();
+            WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<>();
             params.setPageId("CfetsPrimaryBidManage002");
             params.setElementId(dto.getElementId());
-            params.setBusinessCode(item -> item.getBidId());
+            params.setBusinessCode(CfetsPrimaryBidManageSaveRequest::getBidId);
             params.setBusinessType(item->{
                 if (StringUtil.equals(item.getBidModle(),DictCodeListExt4.投标方式_自主投标.getValue())) {
                     return DictCodeListExt4.共通业务类型_中标结果维护自主投标.getValue();
@@ -401,22 +401,23 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                     return DictCodeListExt4.共通业务类型_中标结果维护代投代缴.getValue();
                 }
             });
+            String str;
+            if (StringUtil.equals(dto.getIsWin(), DictCodeList.是否_是.getValue())) {
+                str = "中标日期" +
+                        GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS
+                        + "资产简称" + GlobalConstant.OPEN_PARENTHESIS + dto.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS
+                        + "中标方式" + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.中标方式, dto.getWinType()) + GlobalConstant.CLOSE_PARENTHESIS
+                        + "中标标位" + GlobalConstant.OPEN_PARENTHESIS + cfetsPrimaryBidManageService.getBidPriceStr(dto) + GlobalConstant.CLOSE_PARENTHESIS
+                        + "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS
+                        + ArithmeticUtil.divide(dto.getWinPrinamt(), BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS;
+            } else {
+                str = "未中标日期" + GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
+                        "资产简称" + GlobalConstant.OPEN_PARENTHESIS + dto.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS + "未中标";
+            }
             // 设置流程业务说明, entity即传入的dto
             //中标日期+资产简称+中标方式+中标标位+中标券面总额 ArithmeticUtil.multiply(entity.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100))+"%"
-            params.setComment(entity -> {
-                if (StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
-                    return WorkFlowUtil.concatComment("中标日期" +
-                            GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
-                            "资产简称" + GlobalConstant.OPEN_PARENTHESIS + entity.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS
-                            + "中标方式" + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType()) + GlobalConstant.CLOSE_PARENTHESIS
-                            + "中标标位" + GlobalConstant.OPEN_PARENTHESIS + cfetsPrimaryBidManageService.getBidPriceStr(entity) + GlobalConstant.CLOSE_PARENTHESIS
-                            + "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(entity.getWinPrinamt(), BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS);
-                }else{
-                    return WorkFlowUtil.concatComment("未中标日期"+
-                            GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
-                            "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS+"未中标");
-                }
-            });
+            String finalStr = str;
+            params.setComment(entity -> finalStr);
             processParameter.setOperationType(OperationType.DELETE);
             processParameter.setWorkFlowParameter(params);
             //债券交易自动加券、上市流通交易自动加券，加的券没有在留痕表存值，导致删除报错特殊处理

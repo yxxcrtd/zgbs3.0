@@ -80,7 +80,7 @@ public interface FinTenderBondAssetMapper {
      * @param finprodId
      * @return
      */
-    Integer countFinprodIdUse(@Param("finprodId") String finprodId, @Param("isCancel") String isCancel,@Param("ps") String ps);
+    Integer countFinprodIdUse(@Param("finprodId") String finprodId, @Param("isCancel") String isCancel, @Param("isClose") String isClose, @Param("ps") String ps);
 
     /**
      * 判断是否存在上市流通交易数据

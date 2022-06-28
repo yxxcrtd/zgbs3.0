@@ -310,6 +310,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
             dto.setTotalWinId(IDGenerator.generate());
         }
         dto.setIsWin(DictCodeList.是否_是.getValue());
+        cfetsPrimaryBidManageService.selectCash(dto);
         WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
