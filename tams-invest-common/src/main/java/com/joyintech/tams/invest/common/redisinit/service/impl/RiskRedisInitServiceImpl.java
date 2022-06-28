@@ -463,17 +463,19 @@ public class RiskRedisInitServiceImpl extends BaseService implements RiskRedisIn
             totalParamValMap.forEach((key, value) -> {
                 if (StringUtil.isNotEmpty(key)) {
                     String[] fieldArray = new String[0];
-                    if (!StringUtil.isEmptyList(cond.getCondList())) {
-                        fieldArray = cond.getCondList().toArray(new String[0]);
-                    }
-                    // 过滤掉其他资产，只保留当前新建或编辑的资产
-                    if(value != null && cond != null && cond.getCondList() != null){
-                        value.entrySet().removeIf(map -> {
-                            if(map == null){
-                                return false;
-                            }
-                            return !cond.getCondList().contains(map.getKey());
-                        });
+                    if(StringUtil.equals("asset",cond.getSource())){
+                        if (!StringUtil.isEmptyList(cond.getCondList())) {
+                            fieldArray = cond.getCondList().toArray(new String[0]);
+                        }
+                        // 过滤掉其他资产，只保留当前新建或编辑的资产
+                        if(value != null && cond != null && cond.getCondList() != null){
+                            value.entrySet().removeIf(map -> {
+                                if(map == null){
+                                    return false;
+                                }
+                                return !cond.getCondList().contains(map.getKey());
+                            });
+                        }
                     }
                     // 只删除当前新建或编辑的资产
                     indicatorParamService.deleteInfoFromRedis(RedisKeyEnum.指标参数值.key() + key, fieldArray);
