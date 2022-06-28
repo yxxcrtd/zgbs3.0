@@ -874,6 +874,11 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrders, stlPayTempOrders);
                 stlPayOrdersMapper.insertSelective(stlPayOrders);
 
+                //覆盖原来的还款指令 ZGCPCN-1779
+                StlPayOrdersDto stlPayOrdersDto1 = new BussTrdTransferOrderDto();
+                BeanUtil.copyPropertiesIgnoreNull(stlPayOrdersDto1, stlPayTempOrders);
+                baseTradeProductDealDto.setStlPayOrdersList(Arrays.asList(stlPayOrdersDto1));
+
                 // 写入金融产品临时汇总交易表
                 TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
                 BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdTempDto.getTrdProductTempDeal());
