@@ -845,7 +845,8 @@
             FP.TRADE_MARKET  tradeMarket,
             BO.BID_ID  bidId,
             decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)   payDate,
-            BO.PAY_TYPE  payType
+            BO.PAY_TYPE  payType,
+            BRT.IS_WIN  isWin
         FROM BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
@@ -878,7 +879,8 @@
             FP.TRADE_MARKET  tradeMarket,
             BO.BID_ID  bidId,
             decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)  payDate,
-            BO.PAY_TYPE  payType
+            BO.PAY_TYPE  payType,
+            BRT.IS_WIN  isWin
         FROM WFL_BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
