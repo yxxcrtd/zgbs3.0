@@ -94,6 +94,11 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
                     }
                     // 金融产品汇总交易DTO
                     TotalTrdProductDealDto resultDealTotal = resultDealTotalMap.get(notifyDealTotal.getTotleTradeId());
+                    // 循环原成交明细列表
+                    for (SettleTransDataDto settleTransDataDetail : stdDetailList) {
+                        // 投管交易关系
+                        settleTransTgMappingList.add(tgTradeInfo(settleTransDataDetail, resultDealTotal));
+                    }
                     // 构造金融交易汇总表数据
                     totalProductDealList.add(resultDealTotal);
                     // 按份额从小到大排序
@@ -102,12 +107,13 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
                             .collect(Collectors.toList());
                     // 处理尾插用
                     Map<String, BigDecimal> amtInfoMap = new HashMap<>();
+                    BigDecimal shareAmtTotal = sortedNotifyDealList.stream().map(TrdProductDeal::getShareAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
                     for(int i = 0; i < sortedNotifyDealList.size(); i++){
                         // 最后一条数据
                         Boolean lastItem = i == sortedNotifyDealList.size() - 1;
                         TrdProductDeal notifyTrdProductDeal = sortedNotifyDealList.get(0);
                         // 生成金融产品交易表
-                        TrdProductDealDto resultTrdProductDeal = createTrdProductDeal(notifyTrdProductDeal, resultDealTotal, amtInfoMap, lastItem);
+                        TrdProductDealDto resultTrdProductDeal = createTrdProductDeal(notifyTrdProductDeal, resultDealTotal, amtInfoMap, lastItem, shareAmtTotal);
                         productDealList.add(resultTrdProductDeal);
                         // 生成金融产品交易附属表
                         TrdProductDealAdd trdProductDealAdd = this.createTrdProductDealAdd(resultTrdProductDeal, notifyTrdProductDeal);
@@ -120,11 +126,6 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
                         PtlTrade ptlTrade = new PtlTrade();
                         ptlTrade.setPortfolioId(trdProductDealAdd.getPortfolioId());
                         ptlTradeList.add(createPtlTrade(ptlTrade, resultTrdProductDeal));
-                        // 循环原成交明细列表
-                        for (SettleTransDataDto settleTransDataDetail : stdDetailList) {
-                            // 投管交易关系
-                            settleTransTgMappingList.add(tgTradeInfo(settleTransDataDetail, resultDealTotal));
-                        }
                     }
                     // TrdBankManualSettleInfo
                     trdBankManualSettleInfoList.add(trdBankManualSettleInfo(settleTransDataTotal, resultDealTotal));
@@ -185,6 +186,7 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
             resultDealTotal.setTotleTradeId(settleCommonService.buildBussinessCodeExt(DictCodeList.共通业务类型_债券买入));
             // 前置交易编号
             resultDealTotal.setbTradeId(notifyDealTotal.getTotleTradeId());
+            resultDealTotal.setSettleDate(settleTransDataTotal.getSettleDate());
             // 尾差分配在最后一个(份额最大)上
             if (i == sortedNotifyDealTotalList.size()-1) {
                 // 交易份额
@@ -524,8 +526,7 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
      * @return
      */
     private TrdProductDealDto createTrdProductDeal(TrdProductDeal notifyTrdProductDeal, TotalTrdProductDealDto resultDealTotal,
-                                                   Map<String, BigDecimal> amtInfoMap, Boolean lastItem) {
-        BigDecimal shareAmtTotal = resultDealTotal.getShareAmt();
+                                                   Map<String, BigDecimal> amtInfoMap, Boolean lastItem, BigDecimal shareAmtTotal) {
         TrdProductDealDto trdProductDeal = new TrdProductDealDto();
         // 交易编号
         trdProductDeal.setTradeId(settleCommonService.buildBussinessCodeExt(DictCodeList.共通业务类型_债券买入));
@@ -566,25 +567,25 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
             // 交易本金
             trdProductDeal.setPrinAmt(ArithmeticUtil.subtract(resultDealTotal.getPrinAmt(), amtInfoMap.get("prinAmt")));
             // 全价总额
-            trdProductDeal.setFpriceAmt(ArithmeticUtil.subtract(resultDealTotal.getPrinAmt(), amtInfoMap.get("fpriceAmt")));
+            trdProductDeal.setFpriceAmt(ArithmeticUtil.subtract(resultDealTotal.getFpriceAmt(), amtInfoMap.get("fpriceAmt")));
             // 交易金额
-            trdProductDeal.setTradeAmt(ArithmeticUtil.subtract(resultDealTotal.getPrinAmt(), amtInfoMap.get("tradeAmt")));
+            trdProductDeal.setTradeAmt(ArithmeticUtil.subtract(resultDealTotal.getTradeAmt(), amtInfoMap.get("tradeAmt")));
             // 不是最后一条数据
         } else {
             // 交易份额
-            trdProductDeal.setShareAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(notifyTrdProductDeal.getShareAmt(), resultDealTotal.getShareAmt()), shareAmtTotal, 2));
+            trdProductDeal.setShareAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(resultDealTotal.getShareAmt(), notifyTrdProductDeal.getShareAmt()), shareAmtTotal, 2));
             amtInfoMap.put("shareAmt", ArithmeticUtil.doAdd(amtInfoMap.get("shareAmt"), trdProductDeal.getShareAmt()));
             // 净价总额
-            trdProductDeal.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(notifyTrdProductDeal.getCpriceAmt(), resultDealTotal.getShareAmt()), shareAmtTotal, 2));
+            trdProductDeal.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(resultDealTotal.getCpriceAmt(), notifyTrdProductDeal.getShareAmt()), shareAmtTotal, 2));
             amtInfoMap.put("cpriceAmt", ArithmeticUtil.doAdd(amtInfoMap.get("cpriceAmt"), trdProductDeal.getCpriceAmt()));
             // 交易本金
-            trdProductDeal.setPrinAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(notifyTrdProductDeal.getPrinAmt(), resultDealTotal.getShareAmt()), shareAmtTotal, 2));
+            trdProductDeal.setPrinAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(resultDealTotal.getPrinAmt(), notifyTrdProductDeal.getShareAmt()), shareAmtTotal, 2));
             amtInfoMap.put("prinAmt", ArithmeticUtil.doAdd(amtInfoMap.get("prinAmt"), trdProductDeal.getPrinAmt()));
             // 全价总额
-            trdProductDeal.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(notifyTrdProductDeal.getPrinAmt(), resultDealTotal.getShareAmt()), shareAmtTotal, 2));
+            trdProductDeal.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(resultDealTotal.getFpriceAmt(), notifyTrdProductDeal.getShareAmt()), shareAmtTotal, 2));
             amtInfoMap.put("fpriceAmt", ArithmeticUtil.doAdd(amtInfoMap.get("fpriceAmt"), trdProductDeal.getFpriceAmt()));
             // 交易金额
-            trdProductDeal.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(notifyTrdProductDeal.getPrinAmt(), resultDealTotal.getShareAmt()), shareAmtTotal, 2));
+            trdProductDeal.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(resultDealTotal.getTradeAmt(), notifyTrdProductDeal.getShareAmt()), shareAmtTotal, 2));
             amtInfoMap.put("tradeAmt", ArithmeticUtil.doAdd(amtInfoMap.get("tradeAmt"), trdProductDeal.getTradeAmt()));
         }
         // 利息总额
