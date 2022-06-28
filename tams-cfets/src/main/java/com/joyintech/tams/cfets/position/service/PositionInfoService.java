@@ -350,7 +350,17 @@ public class PositionInfoService {
         }
         List<String> filtered = acctTypes.stream().filter(string -> !string.isEmpty()).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(filtered)) {
+            acctTypes.clear();
             acctTypes.add("A01");
+        }
+
+        if (CollectionUtils.isEmpty(acctTypeList)) {
+            acctTypeList = new ArrayList<>();
+        }
+        List<String> filteredList = acctTypeList.stream().filter(string -> !string.isEmpty()).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(filteredList)) {
+            acctTypeList.clear();
+            acctTypeList.add("A01");
         }
         if (StringUtil.isEmpty(ccy)) {
             ccy = DictCodeList.币种_人民币_CNY.getValue();
@@ -384,7 +394,7 @@ public class PositionInfoService {
                 positionQueryDto1.setPortfolioId(portfolioId);
                 positionQueryDto1.setCcy(ccy);
                 positionQueryDto1.setCdate(t1Day);
-                positionQueryDto.setAcctType(acctTypeList);
+                positionQueryDto1.setAcctType(acctTypeList);
                 cashT1 = ArithmeticUtil.doAdd(cashT1, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto1));
                 Map<String, String> secIdMap = new HashMap<>();
                 Map<String, String> map = new HashMap<>();
