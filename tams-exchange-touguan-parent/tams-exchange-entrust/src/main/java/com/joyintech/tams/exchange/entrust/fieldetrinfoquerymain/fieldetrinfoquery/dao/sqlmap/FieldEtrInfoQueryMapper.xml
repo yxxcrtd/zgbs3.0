@@ -1743,6 +1743,73 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
     </select>
 
     <select id="getEtrDispatcherBidDealListInfo"  resultType="com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.TradeQueryBean">
+        SELECT
+        T.effectFlag,
+        T.busiTypePosition,
+        T.entrustId,
+        T.pledgeFinprodId,
+        T.chlIdName,
+        T.tradeMarket,
+        T.fCprice,
+        T.fYield,
+        T.vTradeAmt,
+        T.mSettleAmt,
+        T.assetType1,
+        T.assetType10,
+        T.assetType11,
+        T.shareAmt,
+        T.purCfmDate,
+        T.totleTradeId,
+        T.tradeId,
+        T.portfolioId,
+        T.portfolioName,
+        T.finprodId,
+        T.finprodMarketId,
+        T.finprodAbbr,
+        T.ps,
+        T.secAcctId,
+        T.tradeDate,
+        T.settleSpeed,
+        T.settleDate,
+        T.unitPrice,
+        T.matureYield,
+        T.exerYield,
+        T.shareNum,
+        T.unitInt,
+        T.allPrice,
+        T.cpriceAmt,
+        T.intAmt,
+        T.fpriceAmt,
+        T.ccy,
+        T.counterId,
+        T.counterName,
+        T.remark,
+        T.termType,
+        T.repoTerm,
+        T.vpayDate,
+        T.mpayDate,
+        T.actCapDays,
+        T.rebackPrice,
+        T.tradeAmt,
+        T.mIntAmt,
+        T.mTradeAmt,
+        T.mCprice,
+        T.mYield,
+        T.secTotalPrin,
+        T.actPayAmt,
+        T.prinAmt,
+        T.registOrgStr,
+        T.TRADE_TIME,
+        T.TRADING_DAY,
+        T.etrBidPriceTotal,
+        T.price,
+        T.payType,
+        T.biddingMethod,
+        T.payDate,
+        T.accountName,
+        T.winPrice
+        FROM
+        (SELECT T1.* FROM (
         SELECT distinct
         decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
         <include refid="etrDispatcherBidDealListInfo"/>
@@ -1752,7 +1819,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN PTL_PORTFOLIO pp ON tpda.portfolio_id = pp.portfolio_id
         LEFT JOIN FIN_PRODUCT fp ON tpd.finprod_id = fp.finprod_id
         LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
-        left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
+        left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and
+        sdl_registorg.DICT_CODE='REGIST_ORG'
         LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
         LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
@@ -1762,7 +1830,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
         LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
-        LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID  = ee.ENTRUST_ID
+        LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
         SELECT
         brd.ENTRUST_ID,
@@ -1801,7 +1869,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN PTL_PORTFOLIO pp ON tpda.portfolio_id = pp.portfolio_id
         LEFT JOIN FIN_PRODUCT fp ON tpd.finprod_id = fp.finprod_id
         LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
-        left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
+        left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and
+        sdl_registorg.DICT_CODE='REGIST_ORG'
         LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
         LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
@@ -1810,8 +1879,9 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN WFL_BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
-        LEFT JOIN WFL_BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
-        LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID  = ee.ENTRUST_ID
+        LEFT JOIN WFL_BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID =
+        tpdt.P_TOTLE_TRADE_ID
+        LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
         SELECT
         brd.ENTRUST_ID,
@@ -1850,7 +1920,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN PTL_PORTFOLIO pp ON tpda.portfolio_id = pp.portfolio_id
         LEFT JOIN FIN_PRODUCT fp ON tpd.finprod_id = fp.finprod_id
         LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
-        left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and sdl_registorg.DICT_CODE='REGIST_ORG'
+        left join SYS_DATADICT_LIST sdl_registorg on fp.REGIST_ORG=sdl_registorg.ITEM_CODE and
+        sdl_registorg.DICT_CODE='REGIST_ORG'
         LEFT JOIN MST_COUNTER_PARTY mcp ON tpd.counter_id = mcp.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
         LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID = fpt.FINPROD_ID
@@ -1860,7 +1931,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
         LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
-        LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID  = ee.ENTRUST_ID
+        LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
         SELECT
         brd.ENTRUST_ID,
@@ -1889,6 +1960,75 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         ee.ENTRUST_ID = #{entrustId}
         AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
         OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId}))
+        ) T1
+        ORDER BY T1.updateTime DESC
+        )T
+        GROUP BY
+        T.effectFlag,
+        T.busiTypePosition,
+        T.entrustId,
+        T.pledgeFinprodId,
+        T.chlIdName,
+        T.tradeMarket,
+        T.fCprice,
+        T.fYield,
+        T.vTradeAmt,
+        T.mSettleAmt,
+        T.assetType1,
+        T.assetType10,
+        T.assetType11,
+        T.shareAmt,
+        T.purCfmDate,
+        T.totleTradeId,
+        T.tradeId,
+        T.portfolioId,
+        T.portfolioName,
+        T.finprodId,
+        T.finprodMarketId,
+        T.finprodAbbr,
+        T.ps,
+        T.secAcctId,
+        T.tradeDate,
+        T.settleSpeed,
+        T.settleDate,
+        T.unitPrice,
+        T.matureYield,
+        T.exerYield,
+        T.shareNum,
+        T.unitInt,
+        T.allPrice,
+        T.cpriceAmt,
+        T.intAmt,
+        T.fpriceAmt,
+        T.ccy,
+        T.counterId,
+        T.counterName,
+        T.remark,
+        T.termType,
+        T.repoTerm,
+        T.vpayDate,
+        T.mpayDate,
+        T.actCapDays,
+        T.rebackPrice,
+        T.tradeAmt,
+        T.mIntAmt,
+        T.mTradeAmt,
+        T.mCprice,
+        T.mYield,
+        T.secTotalPrin,
+        T.actPayAmt,
+        T.prinAmt,
+        T.registOrgStr,
+        T.TRADE_TIME,
+        T.TRADING_DAY,
+        T.etrBidPriceTotal,
+        T.price,
+        T.payType,
+        T.biddingMethod,
+        T.payDate,
+        T.accountName,
+        T.winPrice
+
     </select>
 
     <sql id="etrDispatcherBidDealListInfo">
@@ -1958,7 +2098,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
            when fpi.TENDER_TARGET = '01' AND brd.WIN_PRICE IS NOT NULL then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
            when fpi.TENDER_TARGET = '02' AND brd.WIN_PRICE IS NOT NULL then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990') || '元'
            when fpi.TENDER_TARGET = '03' AND brd.WIN_PRICE IS NOT NULL then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
-        end          AS    winPrice/*中标标位(成交价格)*/
+        end          AS    winPrice/*中标标位(成交价格)*/,
+        tpd.UPDATE_TIME updateTime
 
     </sql>
 
