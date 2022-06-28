@@ -716,10 +716,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 intAmt= ArithmeticUtil.doAdd(intAmt,detailDto.getIntAmt());
                 settFeeAmt= ArithmeticUtil.doAdd(settFeeAmt,detailDto.getSettFeeAmt());
             }
-            if (StringUtil.equals(dto.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())) {
-                trdFinProductDealTotal.setUnitCprice(unitCprice);
-            }
+            trdFinProductDealTotal.setUnitCprice(unitCprice);
             trdFinProductDealTotal.setUnitInt(unitInt);
+            trdFinProductDealTotal.setUnitFprice(ArithmeticUtil.doAdd(unitCprice,intAmt));
             trdFinProductDealTotal.setParValue(BigDecimal.valueOf(100));
             CfetsBidManageCalcAmountRequest request = new CfetsBidManageCalcAmountRequest();
             request.setWinPrinamt(winPrinamt);
@@ -981,6 +980,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     private void sendPositionMethod(CfetsPrimaryBidManageSaveRequest entity, boolean isSubmit, String confirmOk) {
         List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
         for (CfetsPrimaryBidManageSaveDetailDto productDto : entity.getAllocationDetails()) {
+            if(!StringUtil.isNotEmpty(productDto.getWinCprice())){
+                continue;
+            }
             //调用头寸
             CfetsBondPortfolioCashRequest posport = new CfetsBondPortfolioCashRequest();
             posport.setPortfolioId(productDto.getPortfolioId());
@@ -1009,10 +1011,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     }
                 }
             }
-            posport.setCashAmount(productDto.getTotalBidPrinamt());
-            posport.setSecAmount(productDto.getTotalBidPrinamt());
-            if (StringUtil.isNotEmpty(productDto.getTotalBidPrinamt())) {
-                posport.setOwnSecAmount(productDto.getTotalBidPrinamt().toString());
+            posport.setCashAmount(productDto.getPayAmt());
+            posport.setSecAmount(productDto.getActWinPrinamt());
+            if (StringUtil.isNotEmpty(productDto.getActWinPrinamt())) {
+                posport.setOwnSecAmount(productDto.getActWinPrinamt().toString());
                 posport.setIntegrateSecAmount("0");
             }
             ptlList.add(posport);

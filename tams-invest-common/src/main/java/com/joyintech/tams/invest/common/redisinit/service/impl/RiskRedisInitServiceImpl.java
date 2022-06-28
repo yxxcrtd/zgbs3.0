@@ -467,7 +467,14 @@ public class RiskRedisInitServiceImpl extends BaseService implements RiskRedisIn
                         fieldArray = cond.getCondList().toArray(new String[0]);
                     }
                     // 过滤掉其他资产，只保留当前新建或编辑的资产
-                    value.entrySet().removeIf(map -> !cond.getCondList().contains(map.getKey()));
+                    if(value != null && cond != null && cond.getCondList() != null){
+                        value.entrySet().removeIf(map -> {
+                            if(map == null){
+                                return false;
+                            }
+                            return !cond.getCondList().contains(map.getKey());
+                        });
+                    }
                     // 只删除当前新建或编辑的资产
                     indicatorParamService.deleteInfoFromRedis(RedisKeyEnum.指标参数值.key() + key, fieldArray);
                 }
