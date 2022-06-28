@@ -320,6 +320,9 @@ public class FieldEtrInfoQueryService extends BaseService {
                 if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
                     response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                 }
+                if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_信用保护凭证.getValue())) {
+                    response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
+                }
                 if (StringUtils.equals(response.getEntrustBs(), DictCodeListExt3.交易方向_质押券出库.getValue())
                         || StringUtils.equals(response.getEntrustBs(), DictCodeListExt3.交易方向_质押券入库.getValue())) {
                     response.setTradedPrice(StringUtil.isNotEmpty(response.getTradedPrice()) ? ArithmeticUtil.multiply(response.getTradedPrice(), BigDecimal.valueOf(100)) : null);
