@@ -2449,4 +2449,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             productDto.setSecDesirableCash(cashMap.getBigDecimal("secDesirableCash"));
         }
     }
+
+    public List<String>  selectManualSettleInfo(String totalWinId) {
+        return cfetsPrimaryBidManageMapper.selectManualSettleInfo(totalWinId);
+    }
 }
