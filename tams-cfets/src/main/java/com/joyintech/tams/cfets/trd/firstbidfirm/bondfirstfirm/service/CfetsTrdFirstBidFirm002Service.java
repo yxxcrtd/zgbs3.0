@@ -9,6 +9,7 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
@@ -29,6 +30,7 @@ import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePositionRequest;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRespone;
@@ -42,6 +44,7 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
@@ -67,11 +70,13 @@ import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCash
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -2818,8 +2823,56 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             if (StringUtil.isNotEmpty(settleRemark)) {
                 params.put("revokeReason", "交易撤销:" + settleRemark);
             }
-            restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/common/trdcommonbase/doRevokeComplete?", params,
-                    String.class);
+            if(!isYJFS) {
+                restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/common/trdcommonbase/doRevokeComplete?", params,
+                        String.class);
+            }else {
+                // 金融产品交易汇总
+                TrdFinProductDealTotal trdFinProductDealTotal = entity.getTrdFinProductDealTotal();
+                if (trdFinProductDealTotal != null) {
+                    // 原数据 是否撤销 => 是
+                    trdFinProductDealTotal.setIsCancel(DictCodeList.是否_是.getValue());
+
+                    if (StringUtil.isNotEmpty(settleRemark)) {
+                        trdFinProductDealTotal.setRemark((trdFinProductDealTotal.getRemark() == null ? "" : trdFinProductDealTotal.getRemark()) + settleRemark);
+                    }
+                    trdProductTempDealTotalMapper.updateByPrimaryKeySelective(trdFinProductDealTotal);
+                    TrdFinProductDealTotal trdFinProductDealTotal1 = new TrdFinProductDealTotal();
+                    BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal1, trdFinProductDealTotal);
+                    // 撤销交易状态为撤销
+                    trdFinProductDealTotal1.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                    String newTotalTradeId = trdFinProductDealTotal.getTotleTradeId() + "R";
+                    trdFinProductDealTotal1.setpTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    trdFinProductDealTotal1.setTotleTradeId(newTotalTradeId);
+                    if (StringUtil.isNotEmpty(trdFinProductDealTotal.getpTotleTradeId())) {
+                        trdFinProductDealTotal1.setpTotleTradeId(trdFinProductDealTotal1.getpTotleTradeId() + "R");
+                    }
+                    // 是否撤销入否
+                    trdFinProductDealTotal.setIsCancel(DictCodeList.是否_否.getValue());
+                    trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal1);
+                }
+
+                for (TrdProductDeal trdProductDeal : entity.getTrdProductDeals()) {
+                    TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
+                    BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, trdProductDeal);
+                    trdProductTempDeal.setIsCancel(DictCodeList.是否_是.getValue());  // 原数据 是否撤销 => 是
+                    trdProductTempDealMapper.updateByPrimaryKey(trdProductTempDeal);
+                    String oldTradeId = trdProductDeal.getTradeId();
+                    String newTradeId = trdProductDeal.getTradeId() + "R";
+                    TrdProductTempDeal trdProductTempDeal1 = new TrdProductTempDeal();
+                    BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal1, trdProductTempDeal);
+                    trdProductTempDeal1.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue()); // 调用估值接口时，状态是撤销
+                    trdProductTempDeal1.setpTradeId(oldTradeId);
+                    trdProductTempDeal1.setTradeId(newTradeId);
+                    trdProductDeal.setTotleTradeId(trdProductDeal.getTotleTradeId() + "R");
+                    trdProductDeal.setpTradeId(oldTradeId);
+                    trdProductDeal.setTradeId(newTradeId);
+                    trdProductDeal.setCancelRemark(settleRemark);
+                    trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
+                    trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                    trdProductTempDealMapper.insertSelective(trdProductTempDeal1);
+                }
+            }
         } else {
             // 删除流程中数据
             this.deleteTradeData(entity);
@@ -4165,6 +4218,54 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             return finishEtrList;
         }
         return null;
+    }
+
+    @Override
+    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
+        CfetsTrdFirstBidFirmInfoDto dto = this.getBussinessEntity(entity);
+        CommonBusinessService commonBusinessService = SpringContextUtil.getBean(CommonBusinessService.class);
+        if (taskId != null) {
+            try {
+                if (StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH_IS_TOTAL), "Y")) {
+                    return getEtrLimitSwitch(entity.getWorkflowId(), dto, commonBusinessService);
+                } else {
+//           		BussinessConstant.是否需要上级审批
+                    Map<String, Object> result = new HashMap<>();
+                    for (CfetsTrdFirstBidFirmProductDto productDto : dto.getProductDtos()) {
+                        CfetsTrdFirstBidFirmInfoDto dto1 = new CfetsTrdFirstBidFirmInfoDto();
+                        BeanUtil.copyPropertiesIgnoreNull(dto1,dto);
+                        dto1.setPayableAmount(productDto.getPayAmt());
+                        dto1.setTotalBiddingNum(productDto.getTotalBiddingNum());
+                        result = getEtrLimitSwitch(entity.getWorkflowId(), dto1, commonBusinessService);
+                        if ((boolean) result.get(BussinessConstant.是否需要上级审批) == true) {
+                            return result;
+                        }
+                    }
+                    return result;
+                }
+            } catch (WorkFlowException e) {
+                // 未设置授权或设置成不授权时，抛出异常，当前用户只能退回
+                throw new WorkFlowException(e);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private Map<String, Object> getEtrLimitSwitch(String workflowId, CfetsTrdFirstBidFirmInfoDto dto,
+                                                  CommonBusinessService commonBusinessService) throws WorkFlowException {
+        BigDecimal amount = dto.getPayableAmount();
+        if (amount == null) {
+            amount = dto.getTotalBiddingNum();
+        }
+        Map<String, Object> params = CommonBusinessService.setParams(dto.getCounterId(), amount, LoginUserUtil.getUserName(),
+                BussinessDictCodeList.平安资产类型_债券.getValue(), null, dto.getTradeMarket(), DictCodeList.交易方向_买入.getValue()
+                , dto.getFinprodId(), workflowId
+        );
+        // add by zhangrui1 风险审批修改 start
+        params.put("riskTrialRetDto", dto.getRiskcalResponse().getRiskcalReturnList());
+        // add by zhangrui1 风险审批修改 end
+        return commonBusinessService.是否需要上级审批_委托用(params);
     }
 }
 

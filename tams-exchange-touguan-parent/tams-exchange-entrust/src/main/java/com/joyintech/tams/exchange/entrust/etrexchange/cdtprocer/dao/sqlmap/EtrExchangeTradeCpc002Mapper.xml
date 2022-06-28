@@ -99,7 +99,7 @@
         left join PTL_PORTFOLIO FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
         GROUP BY EED.ENTRUST_ID ) detail ON T1.ENTRUST_ID = detail.ENTRUST_ID
 
-        INNER JOIN PTL_PORTFOLIO_AUTHORITY T6 ON
+        LEFT JOIN PTL_PORTFOLIO_AUTHORITY T6 ON
         T6.PORTFOLIO_ID = T5.PORTFOLIO_ID
         <if test="userId != null and userId != ''">
             AND T6.USER_ID = #{userId}
@@ -241,7 +241,7 @@
         left join PTL_PORTFOLIO FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
         GROUP BY EED.ENTRUST_ID ) detail ON T1.ENTRUST_ID = detail.ENTRUST_ID
 
-        INNER JOIN PTL_PORTFOLIO_AUTHORITY T6 ON
+        LEFT JOIN PTL_PORTFOLIO_AUTHORITY T6 ON
         T6.PORTFOLIO_ID = T5.PORTFOLIO_ID
         <if test="userId != null and userId != ''">
             AND T6.USER_ID = #{userId}

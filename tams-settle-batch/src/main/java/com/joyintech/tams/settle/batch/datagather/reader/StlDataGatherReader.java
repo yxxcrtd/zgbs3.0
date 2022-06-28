@@ -286,7 +286,10 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
                         //变量.汇总成交明细dto.净价总额:				空
                         //变量.汇总成交明细dto.单位面值:				空
                         //变量.汇总成交明细dto.交易日期:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setApplyTradeId(settleTransDataDtoInit.getApplyTradeId());
                         settleTransDataTotal.setTradeDate(settleTransDataDtoInit.getTradeDate());
+                        settleTransDataTotal.setDealDate(settleTransDataDtoInit.getDealDate());
+                        settleTransDataTotal.setIsPayWithTrade(settleTransDataDtoInit.getIsPayWithTrade());
                         //变量.汇总成交明细dto.交割日期:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
                         settleTransDataTotal.setSettleDate(settleTransDataDtoInit.getSettleDate());
                         //变量.汇总成交明细dto.交易份额:				∑temp_当前成交数据明细数据list所有数据的对应字段

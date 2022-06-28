@@ -816,22 +816,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
 
         }
 
-        // TODO 选择的成交编号存在对应的报价，则不影响风险
-        if (!StringUtil.isEmptyList(entity.getDtoList()) && !StringUtil.isNotBlank(entity.getfTradeId())) {
-            try {
-                List<CfetsTrdFirstBondInvestTradeDto> list = new ArrayList<>();
-                for (CfetsTrdFirstBondInvestTradeDto item : entity.getDtoList()) {
-                    CfetsTrdFirstBondInvestTradeDto bondDto = new CfetsTrdFirstBondInvestTradeDto();
-                    BeanUtil.copyPropertiesIgnoreNull(bondDto, item);
-                    list.add(bondDto);
-                }
-                interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
-                        BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue(), DictCodeList.平安资产类型_债券.getValue(),
-                        (en) -> interfRiskRdsService.sendRiskRdsListData(en, list, null));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         //更新操作记录日志
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entity.getTotleTradeId());
