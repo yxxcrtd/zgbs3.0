@@ -2690,12 +2690,18 @@
         left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
                    from ETR_FINISH_STATUS
                    group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
-        left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
-                   from TRD_PRODUCT_DEAL t1
-                            left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
-                            where t1.IS_CANCEL = 'N'
-                              and t1.TRADE_STATUS != '03'
-                            group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
+        left join (
+            select sum(T.SHARE_AMT) SHARE_AMT, T.ENTRUST_ID from (
+                select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+                from TRD_PRODUCT_DEAL t1
+                         left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+                where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03'
+                union all
+                select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+                from TRD_PRODUCT_TEMP_DEAL t1
+                         left join TRD_PRODUCT_TEMP_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+                where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03') T
+            group by T.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         where ee.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
     </select>
 
