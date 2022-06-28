@@ -2453,6 +2453,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
     }
 
+    public List<String>  selectManualSettleInfo(String totalWinId) {
+        return cfetsPrimaryBidManageMapper.selectManualSettleInfo(totalWinId);
+    }
+
     @Override
     public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
         CfetsPrimaryBidManageSaveRequest dto = this.getBussinessEntity(entity);
