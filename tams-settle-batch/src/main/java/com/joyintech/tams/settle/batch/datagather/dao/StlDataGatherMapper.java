@@ -285,6 +285,13 @@ public interface StlDataGatherMapper {
     List<TrdFinProductDealTotal>  selectTotalTradesBytotleTradeId(@Param("tradeIdTgList") List<String> tradeIdTgList);
 
     /**
+     * 根据汇总交易编号查询出所有交易
+     * @param totleTradeId
+     * @return 所有汇总交易
+     */
+    List<TrdProductDeal>  selectTradesByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+
+    /**
      * 根据汇总的成交明细查询出原成交明细列表
      * @param stdMap
      * @return成交明细列表

@@ -1711,7 +1711,7 @@
 			SELECT std.TRADE_ID
 			FROM SETTLE_TRANS_DATA std
 			WHERE std.APPLY_TRADE_ID = #{applyTradeId, jdbcType=VARCHAR}
-			AND  std.SETTLE_DATE = #{settleDate,jdbcType=DATE}
+			AND  std.TRADE_DATE = #{tradeDate,jdbcType=DATE}
 			AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
 			AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
 		)
@@ -1719,12 +1719,20 @@
 	<!--add 查询投管交易编号 by liujs 20220512 end-->
 	<!--add 根据汇总交易编号查询出所有汇总交易 by liujs 20220512 start-->
 	<select id="selectTotalTradesBytotleTradeId" resultType="com.joyintech.tams.common.base.entity.TrdFinProductDealTotal">
-		SELECT *
+		SELECT
+		       DISTINCT *
 		FROM TRD_FIN_PRODUCT_DEAL_TOTAL t
 		where t.TOTLE_TRADE_ID IN
 		<foreach collection="tradeIdTgList" item="item" open="(" close=")" separator=",">
 			#{item,jdbcType=VARCHAR}
 		</foreach>
+	</select>
+
+	<select id="selectTradesByTotleTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+		SELECT
+			 *
+		FROM TRD_PRODUCT_DEAL t
+		where t.TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
 	</select>
 	<!--add 根据汇总交易编号查询出所有汇总交易 by liujs 20220512 end-->
 	<!--add 根据汇总的成交明细查询出原成交明细列表 by liujs 20220512 start-->
@@ -1733,6 +1741,7 @@
 		FROM SETTLE_TRANS_DATA std
 		WHERE std.APPLY_TRADE_ID = #{applyTradeId, jdbcType=VARCHAR}
 		AND  std.DEAL_DATE = #{dealDate,jdbcType=DATE}
+	  	AND  std.TRADE_DATE = #{tradeDate,jdbcType=DATE}
 		AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
 		AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
 	</select>
