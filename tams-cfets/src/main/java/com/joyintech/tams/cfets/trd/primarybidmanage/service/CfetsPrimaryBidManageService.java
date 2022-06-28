@@ -323,10 +323,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBidOrderDtail(param);
             if (StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
                     StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())){
-                details.addAll(detailDtos.stream().sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice)
+                details.addAll(detailDtos.stream().filter(item->item.getTotalBidPrinamt().compareTo(BigDecimal.ZERO)!=0).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice)
                         ).collect(Collectors.toList()));
             }else if (StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())){
-                details.addAll(detailDtos.stream().sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice).reversed()
+                details.addAll(detailDtos.stream().filter(item->item.getTotalBidPrinamt().compareTo(BigDecimal.ZERO)!=0).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice).reversed()
                         ).collect(Collectors.toList()));
             }
             response.setAllocationDetails(details);
