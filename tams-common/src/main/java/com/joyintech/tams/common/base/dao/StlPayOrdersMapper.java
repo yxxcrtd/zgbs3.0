@@ -1,6 +1,8 @@
 package com.joyintech.tams.common.base.dao;
 
+import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import com.joyintech.tams.common.base.entity.StlPayOrders;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,4 +26,12 @@ public interface StlPayOrdersMapper {
     int updateByTradeId(StlPayOrders record);
 
     List<StlPayOrders> selectByTradeId(String orderId);
+
+    /**
+     * 检索交易对手资金账户共通
+     * @param counterId 交易对手ID
+     * @param ccy
+     * @return 交易对手资金账户
+     */
+    List<StlCapacctInfo> selectCounterCapacctInfoList(@Param("counterId") String counterId, @Param("acctType") String acctType, @Param("ccy") String ccy);
 }

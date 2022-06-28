@@ -7,6 +7,7 @@ import com.joyintech.service.trade.bond.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.trade.bond.service.TrdBondCalcService;
 import com.joyintech.service.trade.entrustmsgbymq.dao.EntrustMsgbyMQMapper;
 import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
+import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.service.DateCalService;
@@ -86,6 +87,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
 
     @Autowired
     private TrdCommonBaseService trdCommonBaseService;
+
+    @Autowired
+    private TamsBusinessCommonService tamsBusinessCommonService;
 
     /**
      * BaseGetBusinessId
@@ -847,13 +851,25 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         }
         // 写入临时划款指令表
         if (stlPayOrdersDto != null) {
-            StlPayTempOrders stlPayTempOrders = new StlPayTempOrders();
-            BeanUtil.copyPropertiesIgnoreNull(stlPayTempOrders,
-                    trdTempDto.getBussTrdTransferOrder().get(0));
-            stlPayTempOrdersMapper.insertSelective(stlPayTempOrders);
             if (DictCodeList.交易方向_申购.getValue().equals(infContractDetailfile.getPs())
                     && Objects.nonNull(trdTempDto.getFinProductType())
                     && DictCodeListExt2.平安资产类型_信用保护凭证.getValue().equals(trdTempDto.getFinProductType().getType8())) {
+                //查询托管户资金账号
+                String myAcctNo = tamsBusinessCommonService.selectProdTghCapacctNo(trdTempDto.getPortfolioId());
+                //写入临时划款指令
+                StlPayTempOrders stlPayTempOrders = new StlPayTempOrders();
+                BeanUtil.copyPropertiesIgnoreNull(stlPayTempOrders,
+                        trdTempDto.getBussTrdTransferOrder().get(0));
+                stlPayTempOrders.setMyAcctNo(myAcctNo);
+                stlPayTempOrders.setPayType(DictCodeListExt1.平安划款类型_清算划款.getValue());
+                //查询对手方交易账号
+                List<StlCapacctInfo> stlCapacctInfos = stlPayOrdersMapper.selectCounterCapacctInfoList(trdTempDto.getCounterId(), DictCodeListExt1.资金账户类型_交易对手账户.getValue(), trdTempDto.getCcy());
+                if (!CollectionUtils.isEmpty(stlCapacctInfos)) {
+                    StlCapacctInfo stlCapacctInfo = stlCapacctInfos.get(0);
+                    stlPayTempOrders.setCounterAcctNo(stlCapacctInfo.getAcctNo());
+                }
+                stlPayTempOrdersMapper.insertSelective(stlPayTempOrders);
+                //写入划款指令
                 StlPayOrders stlPayOrders = new StlPayOrders();
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrders, stlPayTempOrders);
                 stlPayOrdersMapper.insertSelective(stlPayOrders);
@@ -871,6 +887,11 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
                 trdFinProductDealTotal.setShareAmt(infContractDetailfileTemp.getShareAmt());
                 trdFinProductDealTotal.setTradeAmt(infContractDetailfileTemp.getTradeAmt());
                 trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
+            } else {
+                StlPayTempOrders stlPayTempOrders = new StlPayTempOrders();
+                BeanUtil.copyPropertiesIgnoreNull(stlPayTempOrders,
+                        trdTempDto.getBussTrdTransferOrder().get(0));
+                stlPayTempOrdersMapper.insertSelective(stlPayTempOrders);
             }
         }
         // 质押式回购
@@ -2568,7 +2589,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
     /**
      * 处理数据
      *
-     * @param infContractDetailfile
+     * @param file
      * @param trdTempDto
      */
     private void saveSettleInfo(InfContractDetailfile file, TrdTempDto trdTempDto) {
