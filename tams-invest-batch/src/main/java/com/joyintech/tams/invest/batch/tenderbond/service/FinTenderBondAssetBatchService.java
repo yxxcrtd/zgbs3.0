@@ -85,13 +85,6 @@ public class FinTenderBondAssetBatchService {
     @Resource
     private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
 
-
-    @Autowired(required = false)
-    private EtrCommonCashPositionDealService etrCommonCashPositionDealService;
-
-    @Autowired(required = false)
-    private EtrCommonCashPositionMapper etrCommonCashPositionMapper;
-
     /**
      * 是否单体服务
      */
@@ -173,6 +166,7 @@ public class FinTenderBondAssetBatchService {
                             dto.setCirculationCode(interList.get(0).getSecid());
                             dto.setCirculationDate(plateDate);
                             save(dto, plateDate, seqNoList);
+                            updateCfetsOprHis(interList.get(0).getSecid(),null);
                         }
                     }
                 }
@@ -412,6 +406,19 @@ public class FinTenderBondAssetBatchService {
         oprHisReq.setBusiDes(remark);
         oprHisReq.setBusiType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+    }
+
+    /**
+     * 处理履历
+     */
+    public void updateCfetsOprHis(String entrustId, String workflowId) {
+        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+        oprHisReq.setEntrustId(entrustId);
+        oprHisReq.setWorkflowId(workflowId);
+        oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
+        oprHisReq.setBusiType(DictCodeList.共通业务类型_债券类资产信息.getValue());
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+
     }
 
 }
