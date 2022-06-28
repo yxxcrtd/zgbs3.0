@@ -159,4 +159,11 @@ public interface FinTenderBondAssetMapper {
      * @return
      */
     Integer  getCount(@Param("finprodMarketId") String finprodMarketId);
+
+    /**
+     * 查询标的表和接口表是否存在待上市的代码
+     * @param finprodMarketId
+     * @return
+     */
+    Integer getCountByFinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
 }

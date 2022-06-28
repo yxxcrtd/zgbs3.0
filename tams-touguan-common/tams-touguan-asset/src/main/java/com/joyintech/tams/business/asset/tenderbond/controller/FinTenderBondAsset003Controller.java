@@ -142,6 +142,9 @@ public class FinTenderBondAsset003Controller extends BaseController {
     @PostMapping("/save")
     @ApiOperation(value = "上市流通/撤销", notes = "上市流通/撤销")
     public Message<AjaxResult> save(@RequestBody FinTenderBondAsset003Dto dto) {
+        if(!finTenderBoundAsset003Service.validAppearMarketId(dto)) {
+            return Message.fail("上市代码不存在");
+        }
         ProcessParameter<FinTenderBondAsset003Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<FinTenderBondAsset003Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());

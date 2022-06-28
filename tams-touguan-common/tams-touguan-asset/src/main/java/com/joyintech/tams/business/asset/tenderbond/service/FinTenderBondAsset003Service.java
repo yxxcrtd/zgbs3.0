@@ -405,9 +405,6 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      */
     public List<ValidMessage> valid(FinTenderBondAsset003Dto dto) {
         List<ValidMessage> validMessages = new ArrayList<>();
-        if(true) {
-            return validMessages;
-        }
         if (StringUtil.isEmpty(dto.getWorkflowId()) && finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003", "FinTenderBondAsset002")) {
             validMessages.add(new ValidMessage("存在流程中的数据"));
         }
@@ -447,8 +444,32 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             if (Objects.nonNull(dto.getIssueDate()) && Objects.nonNull(dto.getListingDate()) && dto.getListingDate().compareTo(dto.getIssueDate()) < 0) {
                 validMessages.add(new ValidMessage("上市日需大于等于发行日"));
             }
+            /*if(StringUtil.isNotEmpty(dto.getAppearMarketId())) {
+                Integer count = finTenderBoundAssetMapper.getCountByFinprodMarketId(dto.getAppearMarketId());
+                if(count == null || count == 0) {
+                    validMessages.add(new ValidMessage("上市代码不存在"));
+                }
+            }*/
+
+
         }
         return validMessages;
+    }
+
+    /**
+     * 校验上市代码是否存在
+     * @param dto
+     * @return
+     */
+    public boolean validAppearMarketId(FinTenderBondAsset003Dto dto) {
+        if(StringUtil.isNotEmpty(dto.getAppearMarketId())) {
+            Integer count = finTenderBoundAssetMapper.getCountByFinprodMarketId(dto.getAppearMarketId());
+            if(count == null || count == 0) {
+                return false;
+            }
+        }
+        return true;
+
     }
 
 }
