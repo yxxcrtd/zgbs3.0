@@ -212,7 +212,7 @@ public class PositionHttpRequest {
                 .put("revokeId", revokeId)
                 .put("modelType", modelType)
                 .put("userId", LoginUserUtil.getUserName());
-        logger.info("发送头寸报文:" + JsonUtils.object2Json(bm));
+        logger.info("发送回滚头寸报文:" + JsonUtils.object2Json(bm));
         try {
             roll(bm);
         } catch (Exception e) {

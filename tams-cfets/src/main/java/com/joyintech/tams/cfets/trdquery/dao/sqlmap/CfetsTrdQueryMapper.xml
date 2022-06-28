@@ -228,12 +228,17 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END
                 AS	faceValue,
-            decode(BO.BID_MODLE,null,
-                    TO_CHAR(ROUND(FPI.REFER_YIELD*100,4),'FM99999990.0000')||'%',
-                    decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},BRBP.BID_PRICE||' %',
-                                            #{TENDER_TARGET_02},BRBP.BID_PRICE||' 元',
-                                            #{TENDER_TARGET_03},BRBP.BID_PRICE||' BP',BRBP.BID_PRICE))
-            AS tradeYield,
+            CASE WHEN  FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN
+                case when FP.COUPON_SPECIES = '01' AND  FPI.INT_TYPE = '02' AND SDLDATA.ITEM_VALUE IS NOT NULL AND FPI.bp IS NOT NULL THEN
+                SDLDATA.ITEM_VALUE || '+' || to_char(FPI.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
+                WHEN FPI.REFER_YIELD IS NOT NULL THEN to_char(FPI.REFER_YIELD * 100 ,'FM999,999,999,999,990.9990') || ' %'
+                END
+            WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03})  THEN
+                CASE  WHEN  FPI.TENDER_TARGET = '01' AND BRBP.BID_PRICE IS NOT NULL THEN BRBP.BID_PRICE || ' %'
+                WHEN  FPI.TENDER_TARGET = '02' AND BRBP.BID_PRICE IS NOT NULL THEN BRBP.BID_PRICE || ' 元'
+                WHEN  FPI.TENDER_TARGET = '03' AND BRBP.BID_PRICE IS NOT NULL THEN BRBP.BID_PRICE || ' BP'
+                END
+            END AS tradeYield,
             null									AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.PAYABLE_AMOUNT END AS	tradeAmt,
@@ -294,6 +299,7 @@
         left join sys_user su on  BO.OUR_TRADER = su.user_name
         LEFT JOIN FIN_PRODUCT_ISSUE FPI
                ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on FPI.INT_RATE_ID = SDLDATA.ITEM_CODE
         LEFT JOIN FIN_PRODUCT_TYPE FPT
                ON FPT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN MST_COUNTER_PARTY MCCI
@@ -391,12 +397,17 @@
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN WBO.WIN_PRIN_AMT/10000
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN WBO.SUBSCRIPTION_AMOUNT/10000
                 END AS	faceValue,
-            decode(WBO.BID_MODLE,null,
-                    TO_CHAR(ROUND(FPI.REFER_YIELD*100,4),'FM99999990.9990')||'%',
-                    decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},WBRBP.BID_PRICE||' %',
-                                            #{TENDER_TARGET_02},WBRBP.BID_PRICE||' 元',
-                                            #{TENDER_TARGET_03},WBRBP.BID_PRICE||' BP',WBRBP.BID_PRICE))
-            AS tradeYield,
+            CASE WHEN  FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN
+            case when FP.COUPON_SPECIES = '01' AND  FPI.INT_TYPE = '02' AND SDLDATA.ITEM_VALUE IS NOT NULL AND FPI.bp IS NOT NULL THEN
+            SDLDATA.ITEM_VALUE || '+' || to_char(FPI.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
+            WHEN FPI.REFER_YIELD IS NOT NULL THEN to_char(FPI.REFER_YIELD * 100 ,'FM999,999,999,999,990.9990') || ' %'
+            END
+            WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03})  THEN
+            CASE  WHEN  FPI.TENDER_TARGET = '01' AND WBRBP.BID_PRICE IS NOT NULL THEN WBRBP.BID_PRICE || ' %'
+            WHEN  FPI.TENDER_TARGET = '02' AND WBRBP.BID_PRICE IS NOT NULL THEN WBRBP.BID_PRICE || ' 元'
+            WHEN  FPI.TENDER_TARGET = '03' AND WBRBP.BID_PRICE IS NOT NULL THEN WBRBP.BID_PRICE || ' BP'
+            END
+            END AS tradeYield,
             null	AS	termDays,
             CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN null
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN WBO.PAYABLE_AMOUNT END  AS	tradeAmt,
@@ -451,6 +462,7 @@
                ON FP.FINPROD_ID = FPA.FINPROD_ID
          LEFT JOIN FIN_PRODUCT_ISSUE FPI
                 ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on FPI.INT_RATE_ID = SDLDATA.ITEM_CODE
         left join sys_user su on  WBO.OUR_TRADER = su.user_name
          LEFT JOIN FIN_PRODUCT_TYPE FPT
                 ON FPT.FINPROD_ID = FP.FINPROD_ID
@@ -986,7 +998,7 @@
         FROM (
         select rp.pledge_finprod_id as finprodId,
         nvl(fp.finprod_market_id, ipo.SECID) AS finprodMarketId,
-        nvl(fp.finprod_abbr, ipo.SECFULLNAME) AS finprodAbbr,
+        nvl(fp.finprod_abbr, ipo.SECNAME) AS finprodAbbr,
         rp.portfolio_id as portfolioId,
         pp.portfolio_name as portfolioName,
         rp.pledge_number/100 as pledgePrin,
@@ -1040,7 +1052,7 @@
         union all
         select rp.pledge_finprod_id as finprodId,
         nvl(fp.finprod_market_id, ipo.SECID) AS finprodMarketId,
-        nvl(fp.finprod_abbr, ipo.SECFULLNAME) AS finprodAbbr,
+        nvl(fp.finprod_abbr, ipo.SECNAME) AS finprodAbbr,
         rp.portfolio_id as portfolioId,
         pp.portfolio_name as portfolioName,
         rp.pledge_number/100 as pledgePrin,
@@ -4753,7 +4765,7 @@
         FROM (
                  select rp.pledge_finprod_id                          as finprodId,
                         nvl(fp.finprod_market_id, ipo.SECID)          AS finprodMarketId,
-                        nvl(fp.finprod_abbr, ipo.SECFULLNAME)         AS finprodAbbr,
+                        nvl(fp.finprod_abbr, ipo.SECNAME)         AS finprodAbbr,
                         tpda.portfolio_id                             as portfolioId,
                         pp.portfolio_name                             as portfolioName,
                         (rp.pledge_number * rp.pledge_ratio) / 100 as pledgePrin,
@@ -4808,19 +4820,30 @@
 
     <select id="findRepoPledgeInfo"
             resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsPledgeInfoResponse">
+        SELECT T.finprodId,
+               T.finprodMarketId,
+               T.finprodAbbr,
+               T.portfolioId,
+               T.portfolioName,
+               SUM(pledgePrin) pledgePrin,
+               T.pledgeRate,
+               T.firstNetPrice,
+               T.repRegistOrg
+        FROM (
         select rp.pledge_finprod_id as finprodId,
-               fp.finprod_market_id as finprodMarketId,
-               fp.finprod_abbr as finprodAbbr,
+               nvl(fp.finprod_market_id, ipo.SECID)          AS finprodMarketId,
+               nvl(fp.finprod_abbr, ipo.SECNAME)         AS finprodAbbr,
                tpda.portfolio_id as portfolioId,
                pp.portfolio_name as portfolioName,
-               sum(rp.pledge_number*rp.pledge_ratio)/100 as pledgePrin,
+               (rp.pledge_number*rp.pledge_ratio)/100 as pledgePrin,
                rp.pledge_ratio*100 as pledgeRate,
                mbvi.NETPRICE as firstNetPrice,
-               fp.REGIST_ORG as repRegistOrg
+               nvl(fp.REGIST_ORG, ipo.INSTITUTION)           AS repRegistOrg
         from FIN_DEAL_PLEDGE rp
                  left join trd_product_deal deal
                            on rp.finprod_id=deal.trade_id
                  left join fin_product fp on fp.finprod_id=rp.pledge_finprod_id
+                 LEFT JOIN INTERF_PAYHSRCSECINFO ipo ON ipo.SECID = rp.pledge_finprod_id
                  left join trd_product_deal_add tpda on tpda.trade_id=rp.finprod_id
                  LEFT JOIN PTL_PORTFOLIO PP ON tpda.PORTFOLIO_ID = PP.PORTFOLIO_ID
                  LEFT JOIN (
@@ -4851,14 +4874,16 @@
         ) mbvi/*以上获取债券小于等于平台日的最新估值行情*/
                            ON fp.FINPROD_MARKET_ID = mbvi.SEC_ID
         where deal.TOTLE_TRADE_ID=#{totleTradeId,jdbcType=VARCHAR}
-        group by rp.pledge_finprod_id,
-                 fp.finprod_market_id,
-                 fp.finprod_abbr,
-                 tpda.portfolio_id,
-                 pp.portfolio_name,
-                 rp.pledge_ratio,
-                 mbvi.NETPRICE,
-                 fp.REGIST_ORG
+             ) T
+        GROUP BY
+            T.finprodId,
+            T.finprodMarketId,
+            T.finprodAbbr,
+            T.portfolioId,
+            T.portfolioName,
+            T.pledgeRate,
+            T.firstNetPrice,
+            T.repRegistOrg
     </select>
 
     <select id="findEtrEntrustIsForcedFinish" resultType="java.lang.String">
@@ -5450,13 +5475,17 @@
                 mcp.COUNTER_NAME AS counterIdStr,
                 FPI.ISSUE_PRICE issuePrice,
                 case
-                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                        then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' and sdl_sd.ITEM_VALUE is not null and fpi.bp is not null
+                        then sdl_sd.ITEM_VALUE|| '+'|| to_char(fpi.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
                     when fpi.REFER_YIELD is not null  then  to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
                     end rateStr,
                 case
-                    when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                        then nvl(fpi.REFER_YIELD,0)*100 end rateYleid,
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' and sdl_sd.ITEM_VALUE is not null and fpi.bp is not null
+                        then sdl_sd.ITEM_VALUE|| '+'|| to_char(fpi.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
+                    when fpi.REFER_YIELD is not null  then  to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
+                    end rateYleid,
+                fp.COUPON_SPECIES couponSpecies,
+                fpi.INT_TYPE intType,
                 bo.SUBSCRIPTION_AMOUNT/10000 subAmt,
                 bo.PAYABLE_AMOUNT  payableAmount,
                 bo.SETT_FEE_AMT  settleFeeAmt,
@@ -5481,13 +5510,17 @@
                 MCCI.COUNTER_NAME AS counterIdStr,
                 FPI.ISSUE_PRICE issuePrice,
                 case
-                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                        then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
-                    when fp.COUPON_SPECIES is not null then  to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' and sdl_sd.ITEM_VALUE is not null and fpi.bp is not null
+                        then sdl_sd.ITEM_VALUE|| '+'|| to_char(fpi.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
+                    when fpi.REFER_YIELD is not null  then  to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
                     end rateStr,
                 case
-                    when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                        then nvl(fpi.REFER_YIELD,0)*100 end rateYleid,
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' and sdl_sd.ITEM_VALUE is not null and fpi.bp is not null
+                        then sdl_sd.ITEM_VALUE|| '+'|| to_char(fpi.bp * 10000 ,'FM999,999,999,999,990.90') || ' BP'
+                    when fpi.REFER_YIELD is not null  then  to_char(fpi.REFER_YIELD * 100 , 'FM9999999999999990.9990') || ' %'
+                    end rateYleid,
+                fp.COUPON_SPECIES couponSpecies,
+                fpi.INT_TYPE intType,
                 wbo.SUBSCRIPTION_AMOUNT subAmt,
                 wbo.PAYABLE_AMOUNT  payableAmount,
                 wbo.SETT_FEE_AMT  settleFeeAmt,
