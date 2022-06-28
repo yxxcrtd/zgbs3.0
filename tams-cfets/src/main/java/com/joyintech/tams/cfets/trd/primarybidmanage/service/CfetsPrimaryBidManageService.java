@@ -323,10 +323,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBidOrderDtail(param);
             if (StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
                     StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())){
-                details.addAll(detailDtos.stream().sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice)
+                details.addAll(detailDtos.stream().filter(item->item.getTotalBidPrinamt().compareTo(BigDecimal.ZERO)!=0).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice)
                         ).collect(Collectors.toList()));
             }else if (StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())){
-                details.addAll(detailDtos.stream().sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice).reversed()
+                details.addAll(detailDtos.stream().filter(item->item.getTotalBidPrinamt().compareTo(BigDecimal.ZERO)!=0).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice).reversed()
                         ).collect(Collectors.toList()));
             }
             response.setAllocationDetails(details);
@@ -1091,7 +1091,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Arrays.asList(entity.getBidId()));
             } else {
                 for (CfetsPrimaryBidManageSaveDetailDto deal : entity.getAllocationDetails()) {
-                    AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
+                    if(!StringUtil.isNotEmpty(deal.getWinCprice())){
+                        continue;
+                    }
                     FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
                     finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
                     finProductTradeDto.setAssetType2("ISSUE_CLASS_01");
