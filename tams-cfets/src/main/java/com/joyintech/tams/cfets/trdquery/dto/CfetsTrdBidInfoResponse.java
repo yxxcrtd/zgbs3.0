@@ -199,7 +199,7 @@ public class CfetsTrdBidInfoResponse {
     private String rateStr;
 
     @ApiModelProperty(name="rateYleid",value="票面利率")
-    private BigDecimal rateYleid;
+    private String rateYleid;
 
     @ApiModelProperty(name="payableAmount",value="应缴款金额")
     private BigDecimal payableAmount;
@@ -664,11 +664,11 @@ public class CfetsTrdBidInfoResponse {
         this.rateStr = rateStr;
     }
 
-    public BigDecimal getRateYleid() {
+    public String getRateYleid() {
         return rateYleid;
     }
 
-    public void setRateYleid(BigDecimal rateYleid) {
+    public void setRateYleid(String rateYleid) {
         this.rateYleid = rateYleid;
     }
 
