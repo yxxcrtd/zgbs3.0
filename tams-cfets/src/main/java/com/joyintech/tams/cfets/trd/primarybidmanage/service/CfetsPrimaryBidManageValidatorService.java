@@ -160,25 +160,20 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator {
                         resultList.add(new ValidMessage(getMessage("中标券面总额/中标标位不满足该资产发行要求！")));
                     }
                 }
-                for (int i = 0; i < list.size(); i++) {
-                    if (StringUtil.isNotEmpty(list.get(i).getActWinPrinamt())) {
-                        BigDecimal[] remainder = list.get(i).getActWinPrinamt().divideAndRemainder(new BigDecimal(bidMinUnit));
+                for (CfetsPrimaryBidManageSaveDetailDto cfetsPrimaryBidManageSaveDetailDto : list) {
+                    if (StringUtil.isNotEmpty(cfetsPrimaryBidManageSaveDetailDto.getActWinPrinamt())) {
+                        BigDecimal[] remainder = cfetsPrimaryBidManageSaveDetailDto.getActWinPrinamt().divideAndRemainder(new BigDecimal(bidMinUnit));
                         if (remainder[1].compareTo(BigDecimal.ZERO) != 0) {
                             resultList.add(new ValidMessage(getMessage("中标券面总额不满足该资产发行要求，请确认")));
                         }
                         if (StringUtil.equals(DictCodeListExt4.中标方式_单标位中标.getValue(), dto.getWinType())
-                                && BigDecimalUtil.ACompareToB(dto.getWinPrice(), list.get(i).getWinPrice(), 4) != 0) {
+                                && BigDecimalUtil.ACompareToB(dto.getWinPrice(), cfetsPrimaryBidManageSaveDetailDto.getWinPrice(), 4) != 0) {
                             resultList.add(new ValidMessage(getMessage("单标位中标的分配明细中中标标位必须等于基本信息中中标标位")));
                             break;
                         } else if (StringUtil.equals(DictCodeListExt4.中标方式_多标位中标.getValue(), dto.getWinType())) {
-                            if ((StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
-                                    StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue()))
-                                    && BigDecimalUtil.ACompareToB(dto.getWinPrice(), list.get(i).getWinPrice(), 4) > 0) {
-                                resultList.add(new ValidMessage(getMessage("单标位中标的分配明细中中标标位必须小于等于基本信息中中标标位")));
-                                break;
-                            } else if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())
-                                    && BigDecimalUtil.ACompareToB(dto.getWinPrice(), list.get(i).getWinPrice(), 4) < 0) {
-                                resultList.add(new ValidMessage(getMessage("单标位中标的分配明细中中标标位必须大于等于基本信息中中标标位")));
+                            if (BigDecimalUtil.ACompareToB(cfetsPrimaryBidManageSaveDetailDto.getWinPrice(),
+                                    cfetsPrimaryBidManageSaveDetailDto.getBidPrice(), 4) == 0) {
+                                resultList.add(new ValidMessage(getMessage("多标位中标的分配明细中中标标位必须等于投标标位")));
                                 break;
                             }
                         }

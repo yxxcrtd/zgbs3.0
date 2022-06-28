@@ -9,6 +9,7 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
@@ -75,6 +76,7 @@ import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -2821,8 +2823,56 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             if (StringUtil.isNotEmpty(settleRemark)) {
                 params.put("revokeReason", "交易撤销:" + settleRemark);
             }
-            restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/common/trdcommonbase/doRevokeComplete?", params,
-                    String.class);
+            if(!isYJFS) {
+                restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/common/trdcommonbase/doRevokeComplete?", params,
+                        String.class);
+            }else {
+                // 金融产品交易汇总
+                TrdFinProductDealTotal trdFinProductDealTotal = entity.getTrdFinProductDealTotal();
+                if (trdFinProductDealTotal != null) {
+                    // 原数据 是否撤销 => 是
+                    trdFinProductDealTotal.setIsCancel(DictCodeList.是否_是.getValue());
+
+                    if (StringUtil.isNotEmpty(settleRemark)) {
+                        trdFinProductDealTotal.setRemark((trdFinProductDealTotal.getRemark() == null ? "" : trdFinProductDealTotal.getRemark()) + settleRemark);
+                    }
+                    trdProductTempDealTotalMapper.updateByPrimaryKeySelective(trdFinProductDealTotal);
+                    TrdFinProductDealTotal trdFinProductDealTotal1 = new TrdFinProductDealTotal();
+                    BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal1, trdFinProductDealTotal);
+                    // 撤销交易状态为撤销
+                    trdFinProductDealTotal1.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                    String newTotalTradeId = trdFinProductDealTotal.getTotleTradeId() + "R";
+                    trdFinProductDealTotal1.setpTradeId(trdFinProductDealTotal.getTotleTradeId());
+                    trdFinProductDealTotal1.setTotleTradeId(newTotalTradeId);
+                    if (StringUtil.isNotEmpty(trdFinProductDealTotal.getpTotleTradeId())) {
+                        trdFinProductDealTotal1.setpTotleTradeId(trdFinProductDealTotal1.getpTotleTradeId() + "R");
+                    }
+                    // 是否撤销入否
+                    trdFinProductDealTotal.setIsCancel(DictCodeList.是否_否.getValue());
+                    trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal1);
+                }
+
+                for (TrdProductDeal trdProductDeal : entity.getTrdProductDeals()) {
+                    TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
+                    BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, trdProductDeal);
+                    trdProductTempDeal.setIsCancel(DictCodeList.是否_是.getValue());  // 原数据 是否撤销 => 是
+                    trdProductTempDealMapper.updateByPrimaryKey(trdProductTempDeal);
+                    String oldTradeId = trdProductDeal.getTradeId();
+                    String newTradeId = trdProductDeal.getTradeId() + "R";
+                    TrdProductTempDeal trdProductTempDeal1 = new TrdProductTempDeal();
+                    BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal1, trdProductTempDeal);
+                    trdProductTempDeal1.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue()); // 调用估值接口时，状态是撤销
+                    trdProductTempDeal1.setpTradeId(oldTradeId);
+                    trdProductTempDeal1.setTradeId(newTradeId);
+                    trdProductDeal.setTotleTradeId(trdProductDeal.getTotleTradeId() + "R");
+                    trdProductDeal.setpTradeId(oldTradeId);
+                    trdProductDeal.setTradeId(newTradeId);
+                    trdProductDeal.setCancelRemark(settleRemark);
+                    trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
+                    trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                    trdProductTempDealMapper.insertSelective(trdProductTempDeal1);
+                }
+            }
         } else {
             // 删除流程中数据
             this.deleteTradeData(entity);
