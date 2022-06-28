@@ -1708,10 +1708,10 @@
 		DISTINCT  sttm.TRADE_ID_TG
 		FROM SETTLE_TRANS_TG_MAPPING sttm
 		WHERE sttm.TRADE_ID in(
-			SELECT std.SEQ_NO
+			SELECT std.TRADE_ID
 			FROM SETTLE_TRANS_DATA std
 			WHERE std.APPLY_TRADE_ID = #{applyTradeId, jdbcType=VARCHAR}
-			AND  std.DEAL_DATE = #{dealDate,jdbcType=DATE}
+			AND  std.SETTLE_DATE = #{settleDate,jdbcType=DATE}
 			AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
 			AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
 		)
