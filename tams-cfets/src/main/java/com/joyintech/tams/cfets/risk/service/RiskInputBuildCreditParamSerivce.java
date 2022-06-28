@@ -106,7 +106,7 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
         BeanUtil.copyPropertiesIgnoreNull(inputDto, dto);
         inputDto.setTradeId(dto.getBidId());
         inputDto.setFinprodId(dto.getFinprodId());
-        inputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+        inputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
         inputDto.setTradeDate(dto.getTradeDate());
         inputDto.setPs(DictCodeList.交易方向_买入.getValue());
         inputDto.setCounterId(dto.getCounterId());
@@ -114,13 +114,13 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
             inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
             inputDto.setTradeAmt(dto.getTotalBiddingNum());
             if (dto.getTotalBiddingNum() != null) {
-                inputDto.setShareAmt(dto.getTotalBiddingNum().divide(new BigDecimal(100), RoundingMode.HALF_UP));
+                inputDto.setShareAmt(dto.getTotalBiddingNum());
             }
         } else if (StringUtil.equals(dto.getBiddingMethod(), DictCodeListExt4.投标方式_分销买入.getValue())) {
             inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
             inputDto.setTradeAmt(dto.getBidPriceTotal());
             if (dto.getBidPriceTotal() != null) {
-                inputDto.setShareAmt(dto.getBidPriceTotal().divide(new BigDecimal(100), RoundingMode.HALF_UP));
+                inputDto.setShareAmt(dto.getBidPriceTotal());
             }
         }
         result.add(inputDto);
@@ -147,13 +147,13 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
         inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
         inputDto.setTradeId(dto.getBidId());
         inputDto.setFinprodId(dto.getFinprodId());
-        inputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+        inputDto.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_债券.getValue());
         inputDto.setTradeDate(dto.getTradeDate());
         inputDto.setPs(DictCodeList.交易方向_买入.getValue());
         inputDto.setCounterId(finProduct.getIssuer()); //发行人?
         inputDto.setTradeAmt(dto.getPayableAmount());
         if (dto.getSubscriptionAmount() != null) {
-            inputDto.setShareAmt(dto.getSubscriptionAmount().divide(new BigDecimal(100), RoundingMode.HALF_UP));
+            inputDto.setShareAmt(dto.getSubscriptionAmount());
         }
         result.add(inputDto);
         return result;
@@ -261,15 +261,15 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
 //            inputDto.setTradeId(dto.getTotalWinId()+"R");
 //        }
         //最新面值
-        BigDecimal newFaceValue = creditLinesDealsMapper.getFaceValue(inputDto);
+/*        BigDecimal newFaceValue = creditLinesDealsMapper.getFaceValue(inputDto);
         if (newFaceValue == null) {
             newFaceValue = new BigDecimal(100);
         }
         if (inputDto.getShareAmt() != null) {
             inputDto.setTradeAmt(newFaceValue.multiply(inputDto.getShareAmt()));
         } else if (inputDto.getTradeAmt() != null) {
-            inputDto.setTradeAmt(newFaceValue.multiply(ArithmeticUtil.divide(inputDto.getTradeAmt(), 100, 2)));
-        }
+            inputDto.setTradeAmt(inputDto.getTradeAmt());
+        }*/
         result.add(inputDto);
         return result;
     }

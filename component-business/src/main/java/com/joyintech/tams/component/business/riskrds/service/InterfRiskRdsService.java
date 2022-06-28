@@ -2607,7 +2607,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             }else{
                 //infRiskRdsDto.setAmount(finDto.getFpriceAmt());//债券为全价总额存款
                 // add by zhangrui1 汇总确认 start
-                String winPrinAmtKey = "bidPrinAmt";
+                String winPrinAmtKey = "bidPriceTotal";
                 Object winPrinAmt = dataMap.get(winPrinAmtKey);
                 if (infRiskRdsDto.getAmount() == null && winPrinAmt != null) {
                     infRiskRdsDto.setAmount(winPrinAmt instanceof BigDecimal ? (BigDecimal) winPrinAmt : new BigDecimal(
