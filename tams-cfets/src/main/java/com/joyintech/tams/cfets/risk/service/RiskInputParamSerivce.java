@@ -467,9 +467,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         //try {
             doOccupy(inputDto);
-        //}catch (Exception e) {
+       // }catch (Exception e) {
         //    e.printStackTrace();
-        //}
+       // }
     }
 
 
@@ -655,7 +655,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
             businessDto.getTrdProductDeals().forEach(item -> {
                 item.setTotleTradeId(null);
-                item.setFinprodId(null);
+                //item.setFinprodId(null);
                 item.setPs(businessDto.getPs());
             });
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, businessDto.getTrdProductDeals(), null);
