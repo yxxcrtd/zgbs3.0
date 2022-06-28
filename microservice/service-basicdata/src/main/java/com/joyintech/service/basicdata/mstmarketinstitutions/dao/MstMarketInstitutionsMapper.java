@@ -150,6 +150,8 @@ public interface MstMarketInstitutionsMapper {
      * @since 1.0
      */
     List<MstMarketInstitutionsDto> customerNameCheck(Map<String, Object> param);
+
+    Integer insitituteCodeCheck(Map<String, Object> param);
     
     /**
      * 

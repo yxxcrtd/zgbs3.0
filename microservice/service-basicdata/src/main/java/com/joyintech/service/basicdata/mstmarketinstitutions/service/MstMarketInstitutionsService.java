@@ -256,6 +256,12 @@ public class MstMarketInstitutionsService extends BaseService<MstMarketInstituti
         param.put("customerType", DictCodeList.客户类型_法人.getValue());
         return  mstMarketInstitutionsMapper.customerNameCheck(param);
     }
+
+    public Integer insitituteCodeCheck(String insitituteCode){
+        Map<String, Object> param = new HashMap<>();
+        param.put("insitituteCode", insitituteCode);
+        return  mstMarketInstitutionsMapper.insitituteCodeCheck(param);
+    }
     
     /**
      * 

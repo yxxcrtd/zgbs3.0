@@ -208,6 +208,11 @@ public class MstMarketInstitutionsController {
     public List<MstMarketInstitutionsDto> customerNameCheck(String customerName){
         return mstMarketInstitutionsService.customerNameCheck(customerName);
     }
+
+    @GetMapping("/insitituteCodeCheck")
+    public Integer insitituteCodeCheck(String insitituteCode){
+        return mstMarketInstitutionsService.insitituteCodeCheck(insitituteCode);
+    }
     
     /**
      * 
