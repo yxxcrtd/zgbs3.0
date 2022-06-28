@@ -71,7 +71,7 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
         inputDto.setPs(dto.getPs());
         inputDto.setCounterId(dto.getCounterId());
         inputDto.setTradeAmt(dto.getEntrustNum());
-        if (dto.getEntrustNum() != null) {
+      /*  if (dto.getEntrustNum() != null) {
             inputDto.setShareAmt(dto.getEntrustNum().divide(new BigDecimal(100), RoundingMode.HALF_UP));
         }
         //最新面值
@@ -83,7 +83,7 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
             inputDto.setTradeAmt(newFaceValue.multiply(inputDto.getShareAmt()));
         } else if (inputDto.getTradeAmt() != null) {
             inputDto.setTradeAmt(newFaceValue.multiply(ArithmeticUtil.divide(inputDto.getTradeAmt(), 100, 2)));
-        }
+        }*/
         result.add(inputDto);
         return result;
     }
@@ -113,15 +113,15 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
         if (StringUtil.equals(dto.getBiddingMethod(), DictCodeListExt4.投标方式_自主投标.getValue())) {
             inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
             inputDto.setTradeAmt(dto.getTotalBiddingNum());
-            if (dto.getTotalBiddingNum() != null) {
+        /*    if (dto.getTotalBiddingNum() != null) {
                 inputDto.setShareAmt(dto.getTotalBiddingNum());
-            }
+            }*/
         } else if (StringUtil.equals(dto.getBiddingMethod(), DictCodeListExt4.投标方式_分销买入.getValue())) {
             inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
             inputDto.setTradeAmt(dto.getBidPriceTotal());
-            if (dto.getBidPriceTotal() != null) {
-                inputDto.setShareAmt(dto.getBidPriceTotal());
-            }
+            /*if (dto.getBidPriceTotal() != null) {
+                inputDto.setShareAmt(dto.getBidPriceTotal().divide(new BigDecimal(100), RoundingMode.HALF_UP));
+            }*/
         }
         result.add(inputDto);
         return result;
@@ -152,9 +152,9 @@ public class RiskInputBuildCreditParamSerivce extends RiskCommonService {
         inputDto.setPs(DictCodeList.交易方向_买入.getValue());
         inputDto.setCounterId(finProduct.getIssuer()); //发行人?
         inputDto.setTradeAmt(dto.getPayableAmount());
-        if (dto.getSubscriptionAmount() != null) {
-            inputDto.setShareAmt(dto.getSubscriptionAmount());
-        }
+       /* if (dto.getSubscriptionAmount() != null) {
+            inputDto.setShareAmt(dto.getSubscriptionAmount().divide(new BigDecimal(100), RoundingMode.HALF_UP));
+        }*/
         result.add(inputDto);
         return result;
     }
