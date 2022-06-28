@@ -1181,4 +1181,14 @@
     <select id="selectEntrustIdByBidId" resultType="java.lang.String">
         SELECT distinct ENTRUST_ID   FROM BID_ORDER_BID_PRICE WHERE BID_ID = #{bidId,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectManualSettleInfo" resultType="java.lang.String">
+        SELECT distinct SETTLE.SETTLE_SEQ_NO
+          FROM TRD_FIN_PRODUCT_DEAL_TOTAL TOTAl
+         INNER JOIN TRD_BANK_MANUAL_SETTLE_INFO SETTLE
+                ON SETTLE.TRADE_ID = TOTAl.TOTLE_TRADE_ID
+               AND SETTLE.SETTLE_STATUS = '02'
+          WHERE TOTAl.B_TRADE_ID = #{totalWinId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>
