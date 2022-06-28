@@ -59,10 +59,32 @@
     });
     
     // 新增按钮点击事件
-    //点击“新增”按钮，在业绩基准信息列表中展示该条信息，并重置上方要素信息	
-	var btnClick = function() {
+    //点击“新增”按钮，在业绩基准信息列表中展示该条信息，并重置上方要素信息
+	getElementById('btn_create').click(function() {
 	    var tableArry = bussBenchMarkInfoTable.getAllRows();
 	    var flag = false;
+	    //TISHKS-1385   多固定期限周期型产品 1：字段不能为空，2：不能重复 start
+        if($('#' + dealModeElement).val() === DISPOSE_PATTERN_10){
+            if($('#' + profitType).val() === PROFIT_TYPE_01 && $('#' + periodElement).val() === TERM_TYPE_02){
+                if((!getElementById('investmentCycle').val() || getElementById('investmentCycle').val() =='')){
+                    Joyin.error(JoyinUtil.getMessage("多固定期限周期型产品, 投资周期不能为空！"));
+                    return;
+                }
+                if(tableArry && tableArry.length > 0){
+                    _.each(tableArry,function (data){
+                        if(getElementById('investmentCycle').val() && getElementById('investmentCycle').val() == data.investmentCycle){
+                            Joyin.error(JoyinUtil.getMessage("列表中存在相同投资周期,不允许保存"));
+                            flag = true;
+                            return;
+                        }
+                    })
+                    if(flag){
+                        return;
+                    }
+                }
+            }
+        }
+        //TISHKS-1385   多固定期限周期型产品 1：字段不能为空，2：不能重复 end
 	    if(tableArry && tableArry.length > 0){
 	    	if($('#' + dealModeElement).val() === DISPOSE_PATTERN_11){
 	    		if((!getElementById('prodStyle').val() || getElementById('prodStyle').val() =='')){
@@ -73,7 +95,7 @@
 		            if(getElementById('prodStyle').val() && getElementById('prodStyle').val() == data.prodStyle){
 		                Joyin.error(JoyinUtil.getMessage("FIN_PROD_M_006"));
 		                flag = true;
-		                return; 
+		                return;
 		            }
 		        })
 	    	}
@@ -84,7 +106,7 @@
 	                return;
 	            }
 		        _.each(tableArry,function (data){
-		            if(getElementById('investmentCycle').val() && getElementById('investmentCycle').val() == data.prodStyle){
+		            if(getElementById('investmentCycle').val() && getElementById('investmentCycle').val() == data.investmentCycle){
 		                Joyin.error(JoyinUtil.getMessage("FIN_PROD_M_003"));
 		                flag = true;
 		                return; 
@@ -215,7 +237,7 @@
 	        getElementById('investmentCycle').val('').trigger('change');
 	    }
 	    
-	}
+	})
 	
 	/**
 	 * 绑定删除事件
@@ -264,7 +286,7 @@
             bussBenchMarkInfoTable.reload({data:[],url:null});
             getElementById('div').hide();
         }
-		getElementById('btn_create').click(function() {btnClick()});
+//		getElementById('btn_create').click(function() {btnClick()});
     }
 	 /**
 	     * 期限联动事件
@@ -337,7 +359,7 @@
                 getElementById('resetType').val('').trigger('change').prop('disabled', false);
             }
         });
- 
+
         //产品处理模式联动事件
         dealModeChange();
         $('#' + dealModeElement).change(dealModeChange);
