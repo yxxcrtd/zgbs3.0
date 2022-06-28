@@ -21,6 +21,7 @@ import com.joyintech.tams.invest.common.dto.position.PositionQueryDto;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -335,6 +337,20 @@ public class PositionInfoService {
         return null;
     }
 
+    public void getNotNullList(List<String> list) {
+        if (CollectionUtils.isNotEmpty(list)) {
+            Iterator<String> iterator = list.iterator();
+            while (iterator.hasNext()) {
+                String next = iterator.next();
+                if (StringUtils.isEmpty(next)) {
+                    iterator.remove();
+                }
+            }
+
+        }
+
+    }
+
     /**
      * 查询交易t0、t1、账户现金
      *
@@ -348,18 +364,16 @@ public class PositionInfoService {
         if (CollectionUtils.isEmpty(acctTypes)) {
             acctTypes = new ArrayList<>();
         }
-        List<String> filtered = acctTypes.stream().filter(string -> !string.isEmpty()).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(filtered)) {
-            acctTypes.clear();
+        getNotNullList(acctTypes);
+        if (CollectionUtils.isEmpty(acctTypes)) {
             acctTypes.add("A01");
         }
 
         if (CollectionUtils.isEmpty(acctTypeList)) {
             acctTypeList = new ArrayList<>();
         }
-        List<String> filteredList = acctTypeList.stream().filter(string -> !string.isEmpty()).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(filteredList)) {
-            acctTypeList.clear();
+        getNotNullList(acctTypeList);
+        if (CollectionUtils.isEmpty(acctTypeList)) {
             acctTypeList.add("A01");
         }
         if (StringUtil.isEmpty(ccy)) {
