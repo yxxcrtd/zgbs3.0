@@ -465,11 +465,11 @@ public class RiskInputParamSerivce extends RiskCommonService {
         if (inputDto == null) {
             return;
         }
-        try {
+        //try {
             doOccupy(inputDto);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
+        //}catch (Exception e) {
+        //    e.printStackTrace();
+        //}
     }
 
 
