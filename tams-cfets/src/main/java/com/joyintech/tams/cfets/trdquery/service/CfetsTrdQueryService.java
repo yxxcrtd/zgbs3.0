@@ -47,6 +47,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -462,9 +463,7 @@ public class CfetsTrdQueryService extends BaseService {
             } else {
                 infoTableP = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCodeTabTemp, EFFERANGE_IS, userId);
             }
-            resultData.put(dtCode + "_formb", infoFormb);
-            resultData.put(dtCode + "_formo", infoFormo);
-            resultData.put(dtCode + "_tablep", infoTableP);
+
             Map<String, Object> pageParam = new HashMap<>();
             pageParam.put("bidId", dto.getBusiCode());
             //判断角色配置
@@ -494,6 +493,21 @@ public class CfetsTrdQueryService extends BaseService {
             }
             resultData.put(dtCode + "_dataform", dataform);
             resultData.put(dtCode + "_datalist", datalist);
+
+            List<CfgReadonlyFormShow> infoFormbNew = new ArrayList<>();
+            if (StringUtil.equals(DictCodeList.息票品种_利随本清.getValue(),dataform.getCouponSpecies()) ||
+                    (StringUtil.equals(DictCodeList.息票品种_附息.getValue(),dataform.getCouponSpecies()) &&
+                            StringUtil.equals(DictCodeList.利率类型_固定利率.getValue(),dataform.getIntType()))) {
+                //移除
+                infoFormbNew =  infoFormb.stream().filter(item -> !StringUtils.equals(item.getColcode(), "rateStr")).collect(Collectors.toList());
+            }else {
+                //移除
+                infoFormbNew =  infoFormb.stream().filter(item -> !StringUtils.equals(item.getColcode(), "rateYleid")).collect(Collectors.toList());
+            }
+
+            resultData.put(dtCode + "_formb", infoFormbNew);
+            resultData.put(dtCode + "_formo", infoFormo);
+            resultData.put(dtCode + "_tablep", infoTableP);
         }
         return resultData;
     }
