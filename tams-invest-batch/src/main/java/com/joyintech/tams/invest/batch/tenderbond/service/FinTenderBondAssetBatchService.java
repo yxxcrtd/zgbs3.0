@@ -5,6 +5,7 @@ import com.joyintech.framework.util.CacheUtil;
 import com.google.common.collect.Lists;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.JoyinRestTemplate;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -283,27 +284,33 @@ public class FinTenderBondAssetBatchService {
      *
      * @param dto
      */
-    private void insertOldPostion(FinTenderBondAssetBatchDto dto,String finproductId) {
-        if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
-            //1.查出新债的流水
-            List<PtlSecPositionFlow> flowList = baseAssetCashPositionCommMapper.selectByFinproductId(dto.getFinprodId());
+    private void insertOldPostion(FinTenderBondAssetBatchDto dto,String finproductId,Date plateDate) {
+        if (com.joyintech.framework.util.StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+            //1.查出二级债对应的金融产品代码
+            Map<String, String> params = new HashMap();
+            params.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
+            params.put("finprodMarketId", dto.getAppearMarketId());
+            //2.查出新债的流水
+            List<PtlSecPosition> flowList = baseAssetCashPositionCommMapper.selectPositionByFinproductId(dto.getFinprodId(), DateUtil.format(plateDate,"yyyy-MM-dd"));
             if (com.joyintech.framework.util.StringUtil.isNotEmpty(finproductId)) {
                 if (CollectionUtils.isNotEmpty(flowList)) {
-                    //2.冲正新债的流水
-                    for (PtlSecPositionFlow flow : flowList) {
+                    //3.冲正新债的流水
+                    for (PtlSecPosition flow : flowList) {
                         PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(flowDto, flow);
                         flowDto.setAmount(flow.getAmount().negate());
+                        flowDto.setTradeId(dto.getTotleTradeId());
                         basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
-                        //3.重新插入二级债的流水
+                        //4.重新插入二级债的流水
                         PtlSecPositionFlowDto twoDto = new PtlSecPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(twoDto, flow);
                         twoDto.setFinprodId(finproductId);
+                        twoDto.setTradeId(dto.getTotleTradeId());
                         basePtlSecPositionInfoService.inertSecPositionFlow(twoDto);
                     }
                 }
-           /*     //4.处理指令流水
-                List<EtrSecPositionFlowDto> etrFlowList = etrCommonCashPositionMapper.selectAllPositionByFinprodId(dto.getFinprodId());
+                //5.处理指令流水
+         /*       List<EtrSecPositionFlowDto> etrFlowList = etrCommonCashPositionMapper.selectAllPositionByFinprodId(dto.getFinprodId());
                 if (CollectionUtils.isNotEmpty(etrFlowList)) {
                     List<EtrSecPositionFlowDto> list = new ArrayList<>();
                     for (EtrSecPositionFlowDto flowDto : list) {
@@ -359,7 +366,7 @@ public class FinTenderBondAssetBatchService {
         seqList.add(seqNo);
         PositionHttpRequest.send(param);
         //处理旧头寸
-        this.insertOldPostion(dto,finproductId);
+        this.insertOldPostion(dto,finproductId,plateDate);
     }
 
 

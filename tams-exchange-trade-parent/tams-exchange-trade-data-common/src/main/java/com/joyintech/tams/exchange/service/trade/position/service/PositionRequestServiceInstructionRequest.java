@@ -622,7 +622,7 @@ public class PositionRequestServiceInstructionRequest {
 //                map.put("secAmount", null);
 //                ptlSubList.add(map);
 //            }
-            resultMap.put("ptlSubList", Lists.newArrayList());
+//            resultMap.put("ptlSubList", Lists.newArrayList());
         }
     }
 

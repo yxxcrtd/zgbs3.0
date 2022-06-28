@@ -1978,17 +1978,12 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         dto.setSettleDate(infContractDetailfile.getTradeDate());
         // 1、根据成交明细DTO.资金账户代码取资金账户信息里的所属券商。2、根据所属券商、成交明细DTO.股东代码，取证券账户信息里的证券账户代码
         // 更改为 根据成交明细DTO.资金账户代码取证券账户信息里的证券账户代码
-        if(DictCodeList.交易方向_申购.getValue().equals(infContractDetailfile.getPs())){
-            //申购是托管户，直接取券商户的证券账户
-            dto.setSecManageAcctId(infContractDetailfile.getBondId());
-        }else {
-            Map<String, Object> secMap = new HashMap<>();
-            secMap.put("acctNo", infContractDetailfile.getAcctNo());
-            secMap.put("portfolioId", infContractDetailfile.getPortfolioId());
-            secMap.put("tradeMarket", infContractDetailfile.getTradeMarket());
-            String secAcctId = entrustMsgbyMQMapper.queryByAcctNo(secMap);
-            dto.setSecManageAcctId(secAcctId);
-        }
+        Map<String, Object> secMap = new HashMap<>();
+        secMap.put("acctNo", infContractDetailfile.getAcctNo());
+        secMap.put("portfolioId", infContractDetailfile.getPortfolioId());
+        secMap.put("tradeMarket", infContractDetailfile.getTradeMarket());
+        String secAcctId = entrustMsgbyMQMapper.queryByAcctNo(secMap);
+        dto.setSecManageAcctId(secAcctId);
         // 随交易支付费用（本次不计算，为0）
         dto.setFeeAmtPay(BigDecimal.ZERO);
         // 总交易费用（本次不计算，为0）
