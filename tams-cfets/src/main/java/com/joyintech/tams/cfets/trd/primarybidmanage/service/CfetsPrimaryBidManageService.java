@@ -1091,7 +1091,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Arrays.asList(entity.getBidId()));
             } else {
                 for (CfetsPrimaryBidManageSaveDetailDto deal : entity.getAllocationDetails()) {
-                    AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
+                    if(!StringUtil.isNotEmpty(deal.getWinCprice())){
+                        continue;
+                    }
                     FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
                     finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
                     finProductTradeDto.setAssetType2("ISSUE_CLASS_01");
