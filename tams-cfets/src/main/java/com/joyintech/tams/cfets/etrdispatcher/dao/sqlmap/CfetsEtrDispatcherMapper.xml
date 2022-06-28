@@ -424,12 +424,6 @@
                 END
                 ) = #{ps}
             </if>
-            <if test="finprodType2 != null and finprodType2!='' ">
-                AND ETR_ENTRUST_ADD.ASSET_TYPE  = #{finprodType2}
-            </if>
-            <if test="TYPE_9 != null and TYPE_9!='' ">
-                AND fpt.TYPE_9  = #{TYPE_9}
-            </if>
             <if test="busiTypePosition != null and busiTypePosition!='' ">
                 AND (btm.busi_type = #{busiTypePosition}
                 or ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = #{busiTypePosition}
@@ -489,6 +483,9 @@
         left join SYS_DATADICT_LIST sdl8 on sdl8.DICT_CODE='FIRST_BID_STATUS' and t.firstBidStatus=sdl8.ITEM_CODE
         left join SYS_DATADICT_LIST sdl9 on sdl9.DICT_CODE='BUSI_TYPE_TG' and t.busiTypePosition=sdl9.ITEM_CODE
         <where>
+            <if test="finprodType2 != null and finprodType2!='' ">
+                AND t.finprodType2  = #{finprodType2}
+            </if>
             <if test="firstBidStatus != null and firstBidStatus!='' ">
                 AND t.firstBidStatus = #{firstBidStatus}
             </if>
