@@ -289,8 +289,8 @@ public class CfetsIbuQuoteBondController extends BaseController {
 			ibuQuoteBondCalService.calOtherForPtlAllocation(autoAllocationRequest.getPtlAllocations(), autoAllocationRequest);
 			return new Message<List<PtlAllocationDto>>().success().setData(autoAllocationRequest.getPtlAllocations());
 		} catch (Exception e) {
-			logger.error("自动分配异常", e);
-			return new Message<List<PtlAllocationDto>>().fail().setMessage("自动分配异常");
+			logger.error("其他分配异常", e);
+			return new Message<List<PtlAllocationDto>>().fail().setMessage("其他分配异常");
 		}
 	}
 

@@ -1529,7 +1529,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         this.handleTailDifferenceOhter(productDtos, feeTailDifference);
         productDtos.addAll(productNullDtos);
         dto.setAllocationDetails(productDtos);
-        return this.productDtoSort(dto);
+        dto.setAllocationDetails(this.productDtoSort(dto));
+        return dto.getAllocationDetails();
     }
 
     /**
