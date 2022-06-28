@@ -363,6 +363,14 @@
         select count(*) from INTERF_WIND_RELEASE_INFO where  SEC_ID=#{finprodMarketId,jdbcType=VARCHAR}
     </select>
 
+    <select id="getCountByFinprodMarketId" resultType="java.lang.Integer">
+        select sum(qty) from (
+            select count(*) as qty from INTERF_WIND_UNRELEASE_SEC_INFO where  SEC_ID=#{finprodMarketId,jdbcType=VARCHAR}
+            union all
+            select count(*) as qty from FIN_PRODUCT where FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
+        ) t
+    </select>
+
     <!--从接口表中获取标的发行信息数据数据-->
     <select id="getProductIssueFromInterface" resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinProductIssueDto">
         SELECT

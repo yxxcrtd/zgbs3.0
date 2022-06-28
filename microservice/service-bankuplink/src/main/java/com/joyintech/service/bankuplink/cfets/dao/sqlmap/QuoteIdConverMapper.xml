@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.service.bankuplink.cfets.dao.QuoteIdConverMapper">
+
+    <select id="selectQuoteIdConver" resultType="com.joyintech.service.bankuplink.cfets.dto.QuoteIdConverDto">
+        select
+             QUOTE_DATE quoteDate,
+             QUOTE_ID  quoteId,
+             CL_ORD_ID clOrdId
+         from QUOTE_ID_CONVER
+         where 1=1
+            <if test="quoteDate != null" >
+                AND QUOTE_DATE = to_date(#{quoteDate},'yyyy-MM-dd')
+            </if>
+            <if test="quoteId != null  and quoteId != ''" >
+                AND QUOTE_ID = #{quoteId}
+            </if>
+            <if test="clOrdId != null and clOrdId != ''" >
+                AND CL_ORD_ID = #{clOrdId}
+            </if>
+    </select>
+
+    <insert id="insertQuoteIdConver" parameterType="com.joyintech.service.bankuplink.cfets.dto.QuoteIdConverDto" >
+        insert into QUOTE_ID_CONVER (QUOTE_DATE, QUOTE_ID, CL_ORD_ID, CREATE_USER,
+            CREATE_TIME, UPDATE_USER, UPDATE_TIME
+            )
+        values (#{quoteDate,jdbcType=DATE}, #{quoteId,jdbcType=VARCHAR}, #{clOrdId,jdbcType=VARCHAR},
+            #{createUser,jdbcType=VARCHAR},  #{createTime,jdbcType=TIMESTAMP},
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+            )
+    </insert>
+
+</mapper>

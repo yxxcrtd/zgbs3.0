@@ -355,6 +355,11 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                         errorList.add(new ValidMessage("投标方式为自主投标的已中标有效数据，仅支持当日撤销"));
                         break;
                     }
+                    List<String> manualList = cfetsPrimaryBidManageService.selectManualSettleInfo(request.getTotalWinId());
+                    if (manualList.size() > 0) {
+                        errorList.add(new ValidMessage("所选中标结果数据已做交收不支持撤销!业务编号:"+StringUtil.join(manualList,",")));
+                        break;
+                    }
                 }
             }
             if (CollectionUtils.isNotEmpty(errorList)){

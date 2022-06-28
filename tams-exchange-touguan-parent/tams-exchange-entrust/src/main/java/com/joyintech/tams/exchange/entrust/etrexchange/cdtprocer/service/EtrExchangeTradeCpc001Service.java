@@ -215,7 +215,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         etrExchangeTrade001Dto.setStockId(dto.getStockId());
         etrExchangeTrade001Dto.setEntrustDate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
         etrExchangeTrade001Dto.setOptType(dto.getOptType());
-        etrExchangeTrade001Dto.setIsMulti(DictCodeList.是否_是.getValue());
+        etrExchangeTrade001Dto.setIsMulti(DictCodeList.是否_否.getValue());
         //风险试算 ZGCPCN-1582 保留单组合信息
         if (dto.getPortfolioList().size() > 1 && !CollectionUtils.isEmpty(dto.getRiskTrialRetDto())) {
             List<RiskTrialRetDto> riskTrialRetDtos1 = new ArrayList<>();
@@ -657,12 +657,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
     public void doInsetOrUpdateForEtrPositionHoldMulti(EtrCreditProtectionCertificateApplyRequest dto) {
         Map<String,List<EtrExchangeTradePortfolioSecRepoRequest>> groupMap= dto.getPortfolioList().stream().collect(
                 Collectors.groupingBy(item->item.getAcctNo()));
-        if(groupMap.keySet().size() > 1 && dto.getPortfolioList().size()>1) {
-            for (EtrExchangeTradePortfolioSecRepoRequest item : dto.getPortfolioList()) {
-                EtrCreditProtectionCertificateApplyRequest etrExchangeTrade001Dto = this.genEtrExchangeTradeSaveSecRepoRequest(dto, item);
-                doInsetOrUpdateForEtrPositionHold(etrExchangeTrade001Dto);
-            }
-        } else {
+        if(groupMap.keySet().size() == 1 && dto.getPortfolioList().size()>1) {
             EtrExchangeTradePortfolioSecRepoRequest item=dto.getPortfolioList().get(0);
             BigDecimal totalEntrustAmt = null;
             if(dto.getPortfolioList().get(0).getEntrustAmt()!=null){
@@ -681,8 +676,13 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
             dto.setCreateDept(LoginUserUtil.getDeptCode());// 用户部门
             dto.setCreateTime(new Date());// 创建时间
             dto.setPortfolioId(item.getPortfolioId()); //让指令分发能查出来
-            dto.setIsMulti(DictCodeList.是否_否.getValue());
+            dto.setIsMulti(DictCodeList.是否_是.getValue());
             doInsetOrUpdateForEtrPositionHold(dto);
+        } else {
+            for (EtrExchangeTradePortfolioSecRepoRequest item : dto.getPortfolioList()) {
+                EtrCreditProtectionCertificateApplyRequest etrExchangeTrade001Dto = this.genEtrExchangeTradeSaveSecRepoRequest(dto, item);
+                doInsetOrUpdateForEtrPositionHold(etrExchangeTrade001Dto);
+            }
         }
 
     }
