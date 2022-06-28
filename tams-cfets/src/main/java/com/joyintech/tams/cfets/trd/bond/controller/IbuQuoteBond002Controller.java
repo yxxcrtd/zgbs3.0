@@ -9,14 +9,15 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
-import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice002Service;
-import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.common.base.dao.StlSecAcctInfoMapper;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -96,7 +97,7 @@ public class IbuQuoteBond002Controller extends BaseController {
     private PositionInfoService positionInfoService;
 
     @Autowired
-    private CfetsIbuQuoteBondMapper cfetsIbuQuoteBondMapper;
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
     @Override
     public String init(Model model) {
@@ -266,6 +267,18 @@ public class IbuQuoteBond002Controller extends BaseController {
 
         if (!StringUtil.isNotEmpty(cfetsBondDealDialogueQuoteDto.getCalculateField())) {
             cfetsBondDealDialogueQuoteDto.setCalculateField(DictCodeListExt3.债券计算模式_单位净价.getValue());
+        }
+        // 特殊债券信息查询
+        List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(cfetsBondDealDialogueQuoteDto.getFinprodId()));
+        if (CollectionUtils.isNotEmpty(list)) {
+            cfetsBondDealDialogueQuoteDto.setIsDefaultBondIndicator(list.get(0).getIsDefaultBondIndicator());
+            cfetsBondDealDialogueQuoteDto.setIsSpecialDebt(list.get(0).getIsSpecialDebt());
+            cfetsBondDealDialogueQuoteDto.setIsAbs(list.get(0).getIsAbs());
+            if (StringUtil.equals(cfetsBondDealDialogueQuoteDto.getIsAbs(), DictCodeListExt1.是否_是.getValue())
+                    || StringUtil.equals(cfetsBondDealDialogueQuoteDto.getIsDefaultBondIndicator(), DictCodeListExt1.是否_是.getValue())
+                    || StringUtil.equals(cfetsBondDealDialogueQuoteDto.getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
+                cfetsBondDealDialogueQuoteDto.setIsSpecial(DictCodeListExt1.是否_是.getValue());
+            }
         }
         model.addAttribute("assetTypeOne",cfetsBondDealDialogueQuoteDto.getAssetTypeOne());
 

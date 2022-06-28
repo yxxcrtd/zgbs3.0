@@ -213,12 +213,12 @@
             select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
             from TRD_PRODUCT_DEAL t1
             left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
-            where t1.IS_CANCEL = #{YN_N} and t1.TRADE_STATUS != #{TRADE_STATUS03}
+            where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03'
             union all
             select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
             from TRD_PRODUCT_TEMP_DEAL t1
             left join TRD_PRODUCT_TEMP_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
-            where t1.IS_CANCEL = #{YN_N} and t1.TRADE_STATUS != #{TRADE_STATUS03}) T
+            where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03') T
             group by T.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
         LEFT JOIN
@@ -395,12 +395,12 @@
             select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
             from TRD_PRODUCT_DEAL t1
             left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
-            where t1.IS_CANCEL = #{YN_N} and t1.TRADE_STATUS = #{TRADE_STATUS01}
+            where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03'
             union all
             select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
             from TRD_PRODUCT_TEMP_DEAL t1
             left join TRD_PRODUCT_TEMP_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
-            where t1.IS_CANCEL = #{YN_N} and t1.TRADE_STATUS = #{TRADE_STATUS01}) T
+            where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03') T
             group by T.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
         LEFT JOIN

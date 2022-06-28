@@ -7,6 +7,15 @@
     var riskFlag = 0;//风险试算标识，提交前需要点击风险试算
     var rskApproval;
 
+    // 是否 abs
+    let isAbs = $('#isAbs').val();
+    // 是否特殊债
+    let isSpecialDebt = $('#isSpecialDebt').val();
+    // 是否到期违约债
+    let isDefaultBondIndicator = $('#isDefaultBondIndicator').val();
+    // 是否锚定净价
+    let isSpecial = $('#isSpecial').val();
+
     var el = function (ele) {
         return $("#IbuQuoteBond004_bodydiv " + ele);
     }
@@ -528,9 +537,11 @@
                 }
                 el("#CfetsBondDealQuotedPrice004_cpriceAmt").val(JoyinMath.doDiv(data.cpriceAmt, 1, 2));
                 el("#CfetsBondDealQuotedPrice004_unitInt").val(JoyinMath.doDiv(data.unitInt, 1, 5));
+                el("#CfetsBondDealQuotedPrice004_unitIntEdit").val(JoyinMath.doDiv(data.unitInt, 1, 5));
                 el("#CfetsBondDealQuotedPrice004_unitFprice").val(JoyinMath.doDiv(data.unitFprice, 1, 4));
                 el("#CfetsBondDealQuotedPrice004_intAmt").val(JoyinMath.doDiv(data.intAmt, 1, 2));
                 el("#CfetsBondDealQuotedPrice004_fpriceAmt").val(JoyinMath.doDiv(data.fpriceAmt, 1, 2));
+                el("#CfetsBondDealQuotedPrice004_fpriceAmtEdit").val(JoyinMath.doDiv(data.fpriceAmt, 1, 2));
                 el("#dealFeeAmt").val(JoyinMath.doDiv(data.dealFeeAmt, 1, 2));
                 el("#settFeeAmt").val(JoyinMath.doDiv(data.settFeeAmt, 1, 2));
 
@@ -636,7 +647,13 @@
      * 画面初始化
      */
     var initPage = function () {
-
+        if ('Y' === isSpecialDebt) {
+            $('#unitIntEditDiv').show();
+            $('#fpriceAmtEditDiv').hide();
+        }else{
+            $('#unitIntEditDiv').hide();
+            $('#fpriceAmtEditDiv').show();
+        }
     }
 
 
@@ -790,6 +807,39 @@
         $('#CfetsBondDealQuotedPrice004_counterId').change(function () {
             counterIdChangeAction();
         });
+
+        /**
+         * 应计利息
+         */
+        $('#CfetsBondDealQuotedPrice004_unitIntEdit').on('change',function(){
+            $('#CfetsBondDealQuotedPrice004_unitInt').val($('#CfetsBondDealQuotedPrice004_unitIntEdit').val()).trigger('blur');
+            if(!entrustIdChangeFlag){
+                calcAmt(null,'Y');
+            }
+        });
+        /**
+         * 结算金额
+         */
+        $('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').on('change', function () {
+            $('#CfetsBondDealQuotedPrice004_fpriceAmt').val($('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').val()).trigger('blur');;
+            // 结算金额
+            var fpriceAmt = $('#CfetsBondDealQuotedPrice004_fpriceAmt').val();
+            // 应计利息
+            var unitInt = $('#CfetsBondDealQuotedPrice004_unitInt').val();
+            // 交易金额
+            var cpriceAmt = $('#CfetsBondDealQuotedPrice004_cpriceAmt').val();
+            // 净价
+            var unitCprice = $('#CfetsBondDealQuotedPrice004_unitCprice').val();
+            //金额面板.应计利息总额=画面.结算金额-画面.交易金额
+            $('#CfetsBondDealQuotedPrice004_intAmt').val(JoyinMath.doMinus(fpriceAmt, cpriceAmt, 2)).trigger('blur');;
+            // 应计利息总额
+            var intAmt = $('#CfetsBondDealQuotedPrice004_intAmt').val();
+            //金额面板.应计利息 金额面板.应计利息总额/(券面总额（万元）*10000)*100
+            $('#CfetsBondDealQuotedPrice004_unitInt').val(JoyinMath.doDiv(intAmt, cpriceAmt, 2)).trigger('blur');;
+            //金额面板.全价=净价+应计利息
+            $('#CfetsBondDealQuotedPrice004_unitFprice').val(JoyinMath.doAdd(unitCprice, unitInt, 2)).trigger('blur');;
+        });
+
         el("#CfetsBondDealQuotedPrice004_unitCprice").change(function () {//净价
             if(el("#CfetsBondDealQuotedPrice004_unitCprice").val()) {
                 el("#CfetsBondDealQuotedPrice004_hidden_price").val(el("#CfetsBondDealQuotedPrice004_unitCprice").val());
