@@ -193,6 +193,10 @@ $(function () {
             };
 
             Joyin.ajaxJson(basePath + '/invest/product/productelement/periodicmanagement/PeriodicManagement001/check', object, function (result) {
+                if (result.joyinMessages) {
+                    return;
+                }
+
                 Joyin.dialog(JoyinUtil.getLabel("期次管理新建（ " + "<span style='color:red'> * </span>" + "必填）"),
                     basePath + "invest/product/productelement/periodicmanagement/PeriodicManagement002/init",
                     "90%", "90%", object, function () {

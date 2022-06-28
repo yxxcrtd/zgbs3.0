@@ -139,7 +139,7 @@ public class PeriodicManagement001Validator implements BeanValidator {
 
             //检查流程中是否已存在：资产代码、开始日、结束日
             if (StringUtil.equals(dto.getSaveOrSubmit(),"submit") && periodicManagement001Service.isInWflProcess(dto)) {
-                errorList.add(new ValidMessage(getMessage("新建期次管理数据在流程中已存在")));
+                errorList.add(new ValidMessage(getMessage("已存在流程中数据，不能重复提交")));
             }
         }
 
