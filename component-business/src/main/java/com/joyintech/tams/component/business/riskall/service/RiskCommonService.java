@@ -381,8 +381,7 @@ public class RiskCommonService {
         List<CreditLinesOutputDto> creditResultList = riskCommonOutputDto.getCreditResultList();
         if (!StringUtil.isEmptyList(creditResultList)){
             for (CreditLinesOutputDto creditLinesOutputDto : creditResultList){
-                if (StringUtil.equals(creditLinesOutputDto.getRskStatus(),DictCodeListRsk.试算结果_不通过.getValue())
-                    && StringUtil.isNotEmpty(creditLinesOutputDto.getErrMessage())){
+                if (StringUtil.equals(creditLinesOutputDto.getRskStatus(),DictCodeListRsk.试算结果_不通过.getValue())){
                     riskCommonOutputDto.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
                     if (StringUtil.equals(riskCommonInputDto.getCreditControl(),DictCodeListRsk.风险控制类别_硬控.getValue())){
                         riskCommonOutputDto.setErrorMsg("授信风险试算不通过，不允许提交！");

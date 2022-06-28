@@ -1939,7 +1939,7 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
                 outputDto.setAfterOccupyAst(ArithmeticUtil.subtract(creditLines.getCreditAmt(),creditLines.getHapCreditAmt()));
             }
             outputDto.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
-            if (StringUtil.isNotEmpty(outputDto.getErrMessage())){
+            if (StringUtil.isNotEmpty(outputDto.getErrMessage()) || !StringUtil.isEmptyList(outputDto.getConfirmMessages())){
                 outputDto.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
             }
         }
