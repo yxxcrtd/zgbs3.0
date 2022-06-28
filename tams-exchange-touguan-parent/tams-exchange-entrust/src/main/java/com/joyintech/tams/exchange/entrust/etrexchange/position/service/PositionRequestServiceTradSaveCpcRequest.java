@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -35,6 +36,9 @@ public class PositionRequestServiceTradSaveCpcRequest {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private CommonPositionEngineService commonPositionEngineService;
+
+    @Autowired
+    private TamsBusinessCommonService tamsBusinessCommonService;
 
     public void sendEtrExchangeTradeSaveRequest(EtrCreditProtectionCertificateApplyRequest entity, String decisionAct, String systemAct) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -136,6 +140,10 @@ public class PositionRequestServiceTradSaveCpcRequest {
 //                bean.setSecAmount(secAmount.setScale(2, RoundingMode.HALF_UP));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
+                if (StringUtil.equals(entity.getPs(), DictCodeList.交易方向_申购.getValue())) {
+                    String acctId = tamsBusinessCommonService.selectProdTghCapacctNo(item.getPortfolioId());
+                    map.put("cashAcctId", acctId);
+                }
 //                map.put("etrSecAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
                 map.put("secAmount", ArithmeticUtil.multiply(item.getEntrustNum(),BigDecimal.valueOf(10000)));
                 map.put("cashAmount", item.getEntrustAmt());

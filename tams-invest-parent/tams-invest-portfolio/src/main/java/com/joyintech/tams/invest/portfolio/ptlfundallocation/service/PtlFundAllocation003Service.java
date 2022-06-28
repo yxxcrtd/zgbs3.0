@@ -325,6 +325,7 @@ public class PtlFundAllocation003Service extends CommonExportService<PtlFundAllo
         else{
             ptlCashPositionFlow.setSeqno(seqno);
         }
+        ptlCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
         result.setOrderId(dto.getBussTrdTransferOrder().get(i).getOrderId());
         result.setPtlCashPositionFlow(ptlCashPositionFlow);
         dto.setOrderId(dto.getBussTrdTransferOrder().get(i).getOrderId());
@@ -456,6 +457,7 @@ public class PtlFundAllocation003Service extends CommonExportService<PtlFundAllo
         else{
             ptlCashPositionFlow.setSeqno(seqno);
         }
+        ptlCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
         dto.setPtlCashPositionFlow(ptlCashPositionFlow);
 
         /**

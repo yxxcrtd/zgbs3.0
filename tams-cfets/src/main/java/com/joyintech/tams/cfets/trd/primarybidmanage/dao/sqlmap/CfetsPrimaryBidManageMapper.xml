@@ -205,7 +205,7 @@
             BOBP.PORTFOLIO_ID   portfolioId,
             pp.PORTFOLIO_NAME portfolioName,
             NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) totalBidPrinamt,
-            NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) winPrinAmt,
+            NVL(EEBP.BID_PRIN_AMT,0)/100 winPrinAmt,
             decode(FPI.TENDER_TARGET,'01',to_char(BOBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BOBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BOBP.BID_PRICE*10000,'fm999999990.90')||'BP')   winPrice,
             BOBP.INV_AIM   invAim,
             BO.DIP_TYPE  dipType
@@ -225,6 +225,8 @@
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO pp on BOBP.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        LEFT JOIN ETR_ENTRUST_BID_PRICE EEBP on BOBP.PORTFOLIO_ID = EEBP.PORTFOLIO_ID
+              AND BOBP.ENTRUST_ID = EEBP.ENTRUST_ID AND BOBP.BID_PRICE = EEBP.BID_PRICE
         WHERE BOBP.BID_ID = #{bidId}
     </select>
 
@@ -845,7 +847,8 @@
             FP.TRADE_MARKET  tradeMarket,
             BO.BID_ID  bidId,
             decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)   payDate,
-            BO.PAY_TYPE  payType
+            BO.PAY_TYPE  payType,
+            BRT.IS_WIN  isWin
         FROM BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
@@ -878,7 +881,8 @@
             FP.TRADE_MARKET  tradeMarket,
             BO.BID_ID  bidId,
             decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)  payDate,
-            BO.PAY_TYPE  payType
+            BO.PAY_TYPE  payType,
+            BRT.IS_WIN  isWin
         FROM WFL_BID_RESULT_TOTAL BRT
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
@@ -1177,4 +1181,14 @@
     <select id="selectEntrustIdByBidId" resultType="java.lang.String">
         SELECT distinct ENTRUST_ID   FROM BID_ORDER_BID_PRICE WHERE BID_ID = #{bidId,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectManualSettleInfo" resultType="java.lang.String">
+        SELECT distinct SETTLE.SETTLE_SEQ_NO
+          FROM TRD_FIN_PRODUCT_DEAL_TOTAL TOTAl
+         INNER JOIN TRD_BANK_MANUAL_SETTLE_INFO SETTLE
+                ON SETTLE.TRADE_ID = TOTAl.TOTLE_TRADE_ID
+               AND SETTLE.SETTLE_STATUS = '02'
+          WHERE TOTAl.B_TRADE_ID = #{totalWinId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

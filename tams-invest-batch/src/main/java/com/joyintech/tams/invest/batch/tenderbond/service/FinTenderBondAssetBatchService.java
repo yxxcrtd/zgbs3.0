@@ -146,6 +146,7 @@ public class FinTenderBondAssetBatchService {
                             dto.setCirculationCode(interList.get(0).getSecid());
                             dto.setCirculationDate(plateDate);
                             save(dto, plateDate, seqNoList);
+                            updateCfetsOprHis(interList.get(0).getSecid(),null);
                         }
                         continue;
                     }
@@ -158,6 +159,7 @@ public class FinTenderBondAssetBatchService {
                             dto.setCirculationCode(interList.get(0).getSecid());
                             dto.setCirculationDate(plateDate);
                             save(dto, plateDate, seqNoList);
+                            updateCfetsOprHis(interList.get(0).getSecid(),null);
                         }
                     }
                 } else {

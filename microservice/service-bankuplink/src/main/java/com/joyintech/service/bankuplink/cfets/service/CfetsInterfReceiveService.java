@@ -117,6 +117,9 @@ public class CfetsInterfReceiveService {
     private CfetsRepoDealQuotedPrice001Mapper cfetsRepoDealQuotedPrice001Mapper;
 
     @Autowired
+    private QuoteIdConverService quoteIdConverService;
+    
+    @Autowired
     private CstpCommonService cstpCommonService;
 
     @Autowired
@@ -139,7 +142,9 @@ public class CfetsInterfReceiveService {
 			return null;
 		}
 		String msgType = (String)param.get("msgType");
-		
+		/* add by lidong 20220628 TISHKS-184同步补充 start */
+        param.put("clOrdID",quoteIdConverService.getQuoteIdByQuoteIdConver(param));
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
 		if(MsgTypeEnum.j.getValue().equals(msgType) && null!=param.get("clOrdID")) {// 35域-报文类型  // 11域-客户参考编号
 			IbuQuoteBondDto ibuQuoteBondDto2 = ibuQuoteMapper.selectQuoteBondByKey((String)param.get("clOrdID"));
 	    	BeanUtil.copyPropertiesIgnoreNull(ibuQuoteBondDto, ibuQuoteBondDto2);
@@ -280,7 +285,9 @@ public class CfetsInterfReceiveService {
      */
 	public IbuQuoteBondDetDto getIbuQuoteBondDetDto(Map<String, Object> param, IbuQuoteBondDto ibuQuoteBondDto) {
 		IbuQuoteBondDetDto ibuQuoteBondDetDto = new IbuQuoteBondDetDto();
-		
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        param.put("clOrdID",quoteIdConverService.getQuoteIdByQuoteIdConver(param));
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
 		if(null!=param.get("msgType") && null!=param.get("clOrdID")) {// 35域-报文类型  // 11域-客户参考编号
     		if(MsgTypeEnum.j.getValue().equals((String)param.get("msgType"))) {
     			IbuQuoteBondDetDto ibuQuoteBondDetDto2 = ibuQuoteMapper.selectByQuoteId((String)param.get("clOrdID"));
@@ -403,7 +410,9 @@ public class CfetsInterfReceiveService {
             return null;
         }
         String msgType = (String)param.get("msgType");
-
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        param.put("clOrdID",quoteIdConverService.getQuoteIdByQuoteIdConver(param));
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         if (MsgTypeEnum.j.getValue().equals(msgType) && null != param.get("clOrdID")) {// 35域-报文类型 // 11域-客户参考编号
             RepoDialogueQuoteDto inputBean = repoDialogueQuoteSubService.getRepoDialogueQuote((String) param.get("clOrdID"));
             IbuQuoteCrep ibuQuoteCrep = inputBean.getIbuQuoteCrepDto();
@@ -800,7 +809,9 @@ public class CfetsInterfReceiveService {
         }
         IbuQuoteBondDto ibuQuoteBondDto = new IbuQuoteBondDto();
         List<IbuQuoteBondDetDto> ibuQuoteBondDetDtoList = new ArrayList<IbuQuoteBondDetDto>();
-        
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        param.put("clOrdID",quoteIdConverService.getQuoteIdByQuoteIdConver(param));
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         if(MsgTypeEnum.j.getValue().equals(msgType) && null!=param.get("clOrdID")) {// 35域-报文类型  // 11域-客户参考编号
             IbuQuoteBondDto ibuQuoteBondDto2 = ibuQuoteMapper.selectQuoteBondByKey((String)param.get("clOrdID"));
             BeanUtil.copyPropertiesIgnoreNull(ibuQuoteBondDto, ibuQuoteBondDto2);
@@ -1321,6 +1332,9 @@ public class CfetsInterfReceiveService {
     		String securityID = (String) param.get("securityID");
     		ibuQuoteBondDto.setFinprodMarketId(securityID+".IB");//市场代码
     	}
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        param.put("clOrdID",quoteIdConverService.getQuoteIdByQuoteIdConver(param));
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
     	if(StringUtil.isBlank(ibuQuoteBondDto.getQuoteId()) && null!=param.get("clOrdID")) {// 11域-客户参考编号
     		ibuQuoteBondDto.setQuoteId((String) param.get("clOrdID"));//报价编号（内部代码）
     	}
@@ -1383,6 +1397,9 @@ public class CfetsInterfReceiveService {
     }
     
     private void converIbuQuoteBondDetDto(IbuQuoteBondDetDto ibuQuoteBondDetDto, IbuQuoteBondDto ibuQuoteBondDto2, Map<String, Object> param) {
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        param.put("clOrdID",quoteIdConverService.getQuoteIdByQuoteIdConver(param));
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
     	if(StringUtil.isBlank(ibuQuoteBondDetDto.getCfetsReqId()) && null!=param.get("quoteID")) {// 117域-报价编号
     		ibuQuoteBondDetDto.setCfetsReqId((String) param.get("quoteID"));//CFETS请求编号
     	}

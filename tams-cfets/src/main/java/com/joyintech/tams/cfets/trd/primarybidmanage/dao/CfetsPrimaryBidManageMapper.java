@@ -94,4 +94,6 @@ public interface CfetsPrimaryBidManageMapper {
 
 
 	List<String> selectEntrustIdByBidId(@Param("bidId") String bidId);
+
+	List<String>  selectManualSettleInfo(@Param("totalWinId") String totalWinId);
 }
