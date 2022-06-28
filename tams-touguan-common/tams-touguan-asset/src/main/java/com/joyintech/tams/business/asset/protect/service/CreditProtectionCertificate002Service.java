@@ -686,4 +686,13 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     private void emptyCheck(CreditProtectionCertificate002Dto dto, List<ValidMessage> validList) {
         ValidUtils.valid(dto, validList);
     }
+
+    /**
+     * 检查资产是否存在成交数据
+     * @param finprodId
+     * @return
+     */
+    public int checkAssertOnDealed(String finprodId) {
+        return creditProtectionCertificateMapper.checkAssertOnDealed(finprodId);
+    }
 }
