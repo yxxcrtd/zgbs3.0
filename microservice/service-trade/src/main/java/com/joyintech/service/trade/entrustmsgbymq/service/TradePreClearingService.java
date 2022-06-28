@@ -2051,7 +2051,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         dto.setTrader(trader);
         // 交易对手
         EtrEntrust etrEntrust = entrustMsgbyMQMapper.queryEtrEntrust(infContractDetailfile.getEntrustId());
-        dto.setCounterId(etrEntrust.getCounterId());
+        if(Objects.nonNull(etrEntrust) && StringUtil.isNotBlank(etrEntrust.getCounterId())){
+            dto.setCounterId(etrEntrust.getCounterId());
+        }
+
         // 投管业务类型
         dto.setTgBusiType(DictCodeListExt2.平安业务类型_股票交易.getValue());
 
