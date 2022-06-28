@@ -15,6 +15,8 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
@@ -25,10 +27,7 @@ import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Serv
 import com.joyintech.tams.cfets.trd.bond.service.CfetsQuotedCommonService;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -52,6 +51,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service.getBussinessCodeParameter;
@@ -75,7 +75,7 @@ public class IbuQuoteBond004Controller extends BaseController {
     private BaseGetBusinessId baseGetBusinessId;
 
     @Autowired
-    private IPlatformDate iPlatformDate;
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
     @Autowired
     private IbuQuoteBondService ibuQuoteBondService;
@@ -138,6 +138,18 @@ public class IbuQuoteBond004Controller extends BaseController {
         //卖空模式
         model.addAttribute("sellPara",CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED"));
         model.addAttribute("tradeDate", cfetsBondDealQuoteCommonDto.getTradeDate() !=null ? cfetsBondDealQuoteCommonDto.getTradeDate().getTime() : null);
+        // 特殊债券信息查询
+        List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(cfetsBondDealQuoteCommonDto.getFinprodId()));
+        if (CollectionUtils.isNotEmpty(list)) {
+            cfetsBondDealQuoteCommonDto.setIsDefaultBondIndicator(list.get(0).getIsDefaultBondIndicator());
+            cfetsBondDealQuoteCommonDto.setIsSpecialDebt(list.get(0).getIsSpecialDebt());
+            cfetsBondDealQuoteCommonDto.setIsAbs(list.get(0).getIsAbs());
+            if (StringUtil.equals(cfetsBondDealQuoteCommonDto.getIsAbs(), DictCodeListExt1.是否_是.getValue())
+                    || StringUtil.equals(cfetsBondDealQuoteCommonDto.getIsDefaultBondIndicator(), DictCodeListExt1.是否_是.getValue())
+                    || StringUtil.equals(cfetsBondDealQuoteCommonDto.getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
+                cfetsBondDealQuoteCommonDto.setIsSpecial(DictCodeListExt1.是否_是.getValue());
+            }
+        }
         model.addAttribute(GlobalConstant.ENTITY, cfetsBondDealQuoteCommonDto);
         return super.init(model);
     }

@@ -153,6 +153,9 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         pageParam.put("ENTRUST_STATUS_08", DictCodeListExt3.委托状态_流程中.getValue());
         pageParam.put("FINPROD_TYPE2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        pageParam.put("TRADE_STATUS01", DictCodeListExt1.交易状态_初始.getValue());
+        pageParam.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
+        pageParam.put("YN_N", DictCodeListExt1.是否_否.getValue());
 
         List<String> statusList = dto.getEntrustStatus();
         if (!StringUtil.isEmptyList(statusList) && statusList.contains("all")) {

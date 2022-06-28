@@ -548,7 +548,7 @@
         INNER JOIN FIN_PRODUCT FPB
                 ON FPA.FINPROD_ID = FPB.FINPROD_ID
                AND FPB.ISSUE_TYPE = '01'
-        WHERE FP.FINPROD_ID = #{finprodId}
+        WHERE FP.FINPROD_ID = #{finprodId} and FPA.ISSUE_STATUS = '01'
     </select>
 
     <select id="getFinCashPayRuleList"
