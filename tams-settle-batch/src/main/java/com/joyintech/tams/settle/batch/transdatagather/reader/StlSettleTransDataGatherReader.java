@@ -386,6 +386,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     dealTotal.setApplyTradeId(settleTransDataDto.getApplyTradeId());
                     dealTotal.setPs(settleTransDataDto.getPs());
                     settleTransDataList.add(dealTotal);
+                    //当笔成交数据明细.附属表流水号 非空
+                    if(StringUtil.isNotEmpty(settleTransDataDto.getTradeIdAdd())){
+                        SettleTransDataTotalAdd settleTransDataTotalAdd = new SettleTransDataTotalAdd();
+                        BeanUtils.copyProperties(settleTransDataDto, settleTransDataTotalAdd);
+                        settleTransDataTotalAdd.setTradeId(dealTotal.getSeqId());
+                        settleTransDataAddList.add(settleTransDataTotalAdd);
+                    }
                 }
         });
         StlSettleTransDataGatherParamDto dataGatherParamDto = new StlSettleTransDataGatherParamDto(settleTransDataList,settleTransDataAddList,null);
