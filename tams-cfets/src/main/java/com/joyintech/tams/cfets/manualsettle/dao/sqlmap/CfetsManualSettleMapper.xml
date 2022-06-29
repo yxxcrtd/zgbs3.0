@@ -493,7 +493,7 @@
             AND t.cleanStatus= #{cleanStatus}
         </if>
         <if test="tradePlat_01 != null and tradePlat_01 != '' and tradePlat_02 != null and tradePlat_02 != ''">
-            AND ( t.tradeMarket in( #{tradePlat_01},#{tradePlat_02} ) or t.tradeMarket is null )
+            AND t.tradeMarket in( #{tradePlat_01},#{tradePlat_02})
         </if>
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>
