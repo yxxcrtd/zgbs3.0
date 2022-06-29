@@ -271,6 +271,7 @@
 										ON msp.SHARES_ID = fp.FINPROD_MARKET_ID AND msp.DEAL_DATE &lt;= to_date(#{cdate},'yyyy-MM-dd')
 										LEFT JOIN MST_CREDIT_MARKET_INFO mcmi
 										ON mcmi.SECID = fp.FINPROD_MARKET_ID AND mcmi.CDATE &lt;= to_date(#{cdate},'yyyy-MM-dd')
+									    and mcmi.VALUE_SOURCE = 'CSD'
 									)gavInfo
 							) WHERE num = 1
 							<!-- ZGZGST-1408:市值要取最近的一次估值 fuyongsheng 20210828 edit end -->

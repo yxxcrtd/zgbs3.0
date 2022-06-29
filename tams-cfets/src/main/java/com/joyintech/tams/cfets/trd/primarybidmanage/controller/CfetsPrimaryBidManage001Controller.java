@@ -10,6 +10,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService;
@@ -464,8 +465,13 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             });
             processParameter.setOperationType(OperationType.NEW);
             processParameter.setWorkFlowParameter(params);
-            String msg = cfetsPrimaryBidManageService.start(processParameter, dto);
-            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+            try {
+                String msg = cfetsPrimaryBidManageService.start(processParameter, dto);
+                return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+            } catch (Exception e) {
+                logger.error("保存中标结果维护失败", e);
+                return PositionUtil.ajaxErrorReturn(e);
+            }
         }
 //    /**
 //     * 未中标

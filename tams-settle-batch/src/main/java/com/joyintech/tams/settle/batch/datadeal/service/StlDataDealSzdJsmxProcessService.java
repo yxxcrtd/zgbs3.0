@@ -590,6 +590,8 @@ public class StlDataDealSzdJsmxProcessService {
 			settleTransData.setSeqNo(szdJsmx.getSeqno());
 			// 申请编号
 			settleTransData.setApplyTradeId(szdJsmx.getSqbh());
+			// 交收结果
+			settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdJsmx.getJgdm()));
 			// 不同交易类型数据单独处理
 			// 竞价回购交易
 			if (StringUtil.equals(StlDataDealProcessConstant.YWLX_023, szdJsmx.getYwlx()) || StringUtil.equals(StlDataDealProcessConstant.YWLX_602, szdJsmx.getYwlx())) {

@@ -352,6 +352,10 @@ public class RiskTrialCommImpl  implements RiskTrialComm {
         riskTrialRetDto.setSupFrequency(SupFrequency);
         if (null != param.get(Const.parAstCode))
             riskTrialRetDto.setAssetCode(param.get(Const.parAstCode).toString());
+        // 无法将 NULL 插入 ("RSK_ISUP_POINT_DET_VAL"."ASSET_CODE")
+        if(!StringUtil.isNotEmpty(param.get(Const.parAstCode))){
+            riskTrialRetDto.setAssetCode(" ");
+        }
         if (null != param.get(Const.parAstName))
             riskTrialRetDto.setAssetName(param.get(Const.parAstName).toString());
         riskTrialRetDto.setSupDate(DateUtil.parse(sysParam.getValDate()));

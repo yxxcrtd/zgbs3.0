@@ -980,9 +980,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     private void sendPositionMethod(CfetsPrimaryBidManageSaveRequest entity, boolean isSubmit, String confirmOk) {
         List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
         for (CfetsPrimaryBidManageSaveDetailDto productDto : entity.getAllocationDetails()) {
-            if(!StringUtil.isNotEmpty(productDto.getWinCprice())){
-                continue;
-            }
+//            if(!StringUtil.isNotEmpty(productDto.getWinCprice())){
+//                continue;
+//            }
             //调用头寸
             CfetsBondPortfolioCashRequest posport = new CfetsBondPortfolioCashRequest();
             posport.setPortfolioId(productDto.getPortfolioId());
