@@ -131,7 +131,7 @@
         left join sys_user su on reg.ou_trader_id=su.user_name
         LEFT JOIN SYS_USER_ADD sua  ON sua.USER_ID = su.USER_ID
         LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps, INPUT_VALUE_3 AS issueClass, OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
-        ON NVL(fpt.TYPE_8,reg.FINPROD_TYPE2) = btm.Finprod_Type_Tg
+        ON NVL(fpt.TYPE_8,decode(reg.FINPROD_TYPE2,'F02','F07','F03','F07')) = btm.Finprod_Type_Tg
         AND reg.Ps = btm.ps
         AND ((fp.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpl.ISSUE_CLASS) or
         (fp.FINPROD_TYPE2 != 'F32' or fp.FINPROD_TYPE2 is null) and btm.issueClass is null)
@@ -603,7 +603,7 @@
         on reg.sec_manage_acct_id=stlinfo.sec_acct_id
         LEFT JOIN MST_COUNTER_PARTY mcci ON reg.counter_id= mcci.counter_id
         LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps, INPUT_VALUE_3 AS issueClass, OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
-        ON NVL(fpt.TYPE_8,reg.FINPROD_TYPE2) = btm.Finprod_Type_Tg
+        ON NVL(fpt.TYPE_8,decode(reg.FINPROD_TYPE2,'F02','F07','F03','F07')) = btm.Finprod_Type_Tg
         AND reg.Ps = btm.ps
         AND ((fp.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpl.ISSUE_CLASS) or
         (fp.FINPROD_TYPE2 != 'F32' or fp.FINPROD_TYPE2 is null) and btm.issueClass is null)
@@ -2487,7 +2487,7 @@
                 (tmi.trd_conf_status is null or tmi.trd_conf_status = '0') then '02'
                 when tmi.trd_conf_status = '1' then '03' end                       as matchStatus,
                ICB.TRD_ID execid,
-               'BOND1'  businesstype,
+               'BID'  businesstype,
       		   FP.FINPROD_ID  finprodId,
                ICB.INSTRUMENT_ID||'.IB'  finprodMarketId,
                ICB.INSTRUMENT_SHORT_NAME finprodAbbr,
