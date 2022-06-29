@@ -99,8 +99,17 @@ public class EntrustStatusService {
             List<EntrustClosePosEtrReqDto> etrReqDtoList = entrustStatusMapper.selectEntrustList(params);
             // List<String> entrustIds = entrustStatusMapper.selectEntrustIds(params);
             List<String> entrustIds = new ArrayList<>();
+            List<String> entrustIdsNotNeedUpdateOldPosition = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(etrReqDtoList)) {
-                entrustIds = etrReqDtoList.stream().map(EntrustClosePosEtrReqDto::getCloseId).collect(Collectors.toList());
+//                entrustIds = etrReqDtoList.stream().map(EntrustClosePosEtrReqDto::getCloseId).collect(Collectors.toList());
+                etrReqDtoList.forEach(etr -> {
+                    entrustIds.add(etr.getCloseId());
+                    //只对非退回、撤回状态的记录更新老头寸 ZGCPCN-1797
+                    if (StringUtil.equals(DictCodeList.委托状态_已退回.getValue(), etr.getEntrustStatus())
+                            || StringUtil.equals(DictCodeList.委托状态_已撤回.getValue(), etr.getEntrustStatus())) {
+                        entrustIdsNotNeedUpdateOldPosition.add(etr.getCloseId());
+                    }
+                });
             }
             List<EntrustClosePosEtrReqDto> entrustIdList = etrReqDtoList.stream().filter(item ->
                             (StringUtil.equals(item.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
@@ -125,9 +134,17 @@ public class EntrustStatusService {
 
             // 处理未对接了头寸引擎的指令关闭 start
             List<String> entrustIdExistNews = entrustIdList.stream().map(item->item.getCloseId()).collect(Collectors.toList());
-            entrustIdExistNews.forEach(s -> baseEtrCashPositionCommService.entrustCloseExecute(s,DictCodeList.是否_是.getValue()));
+            entrustIdExistNews.forEach(s -> {
+                if (!entrustIdsNotNeedUpdateOldPosition.contains(s)) {
+                    baseEtrCashPositionCommService.entrustCloseExecute(s, DictCodeList.是否_是.getValue());
+                }
+            });
             entrustIds.removeAll(entrustIdExistNews);
-            entrustIds.forEach(s -> baseEtrCashPositionCommService.entrustCloseExecute(s));
+            entrustIds.forEach(s -> {
+                if (!entrustIdsNotNeedUpdateOldPosition.contains(s)) {
+                    baseEtrCashPositionCommService.entrustCloseExecute(s);
+                }
+            });
             entrustStatusMapper.updateDistributeStatus(params);//add by yangwenjun 20201211 更新委托指令分发表中的接收状态
             // 日终关闭委托时，同步释放授信预占
 //            closeDelegateDealCredit(cfetsEntrustIds);
