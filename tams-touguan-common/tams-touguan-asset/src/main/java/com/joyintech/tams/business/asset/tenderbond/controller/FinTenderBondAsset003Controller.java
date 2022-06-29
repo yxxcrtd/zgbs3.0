@@ -137,6 +137,18 @@ public class FinTenderBondAsset003Controller extends BaseController {
         }
     }
 
+    @ResponseBody
+    @PostMapping("/autoCoupons")
+    @ApiOperation(value = "自动加券", notes = "自动加券")
+    public Message autoCoupons(@RequestBody FinTenderBondAsset003Dto dto) {
+        AjaxResult ajaxResult = finTenderBoundAsset003Service.addCoupons(dto);
+        if (CollectionUtils.isEmpty(ajaxResult.getErrorList())) {
+            return Message.success("加券成功", null);
+        } else {
+            return Message.fail("加券失败");
+        }
+    }
+
 
     @ResponseBody
     @PostMapping("/save")

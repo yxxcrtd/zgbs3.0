@@ -145,7 +145,6 @@ public class FinTenderBondAssetBatchService {
                             dto.setCirculationCode(interList.get(0).getSecid());
                             dto.setCirculationDate(plateDate);
                             save(dto, plateDate, seqNoList);
-                            updateCfetsOprHis(interList.get(0).getSecid(),null);
                         }
                         continue;
                     }
@@ -158,7 +157,6 @@ public class FinTenderBondAssetBatchService {
                             dto.setCirculationCode(interList.get(0).getSecid());
                             dto.setCirculationDate(plateDate);
                             save(dto, plateDate, seqNoList);
-                            updateCfetsOprHis(interList.get(0).getSecid(),null);
                         }
                     }
                 } else {
@@ -168,7 +166,6 @@ public class FinTenderBondAssetBatchService {
                             dto.setCirculationCode(interList.get(0).getSecid());
                             dto.setCirculationDate(plateDate);
                             save(dto, plateDate, seqNoList);
-                            updateCfetsOprHis(interList.get(0).getSecid(),null);
                         }
                     }
                 }
@@ -386,11 +383,11 @@ public class FinTenderBondAssetBatchService {
             return false;
         }
         if(Objects.nonNull(message) && message.getCode().equals("000") && Objects.isNull(message.getData())) {
-            InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(dto);
-            if (Objects.nonNull(interfPayhsrcsecinfoDto) && CollectionUtils.isNotEmpty(interfPayhsrcsecinfoDto.getErrorBondList())) {
-                return false;
+            message =  simpleRestTemplate.postForObject(tamsSerever + "/asset/tenderBondAsset003/autoCoupons", paramMap, Message.class);
+            if (Objects.nonNull(message) && message.getCode().equals("000")) {
+                return true;
             }
-            return true;
+            return false;
         }
         return false;
     }
@@ -405,7 +402,7 @@ public class FinTenderBondAssetBatchService {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(DictCodeListExt3.操作类型_上市流通.getValue());
-        oprHisReq.setBusiDes(remark);
+        oprHisReq.setBusiDes("上市流通");
         oprHisReq.setBusiType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
@@ -417,7 +414,7 @@ public class FinTenderBondAssetBatchService {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
         oprHisReq.setWorkflowId(workflowId);
-        oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
+        oprHisReq.setOperType(DictCodeListExt3.操作类型_自动加券.getValue());
         oprHisReq.setBusiType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
 

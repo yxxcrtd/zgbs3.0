@@ -728,12 +728,19 @@ public class AutoPeriodCommonService extends BaseService {
      */
     public void updateDealDataCancel(String totalTradeId,String cancel) {
         TrdFinProductDealTotal total = new TrdFinProductDealTotal();
+        TrdProductDeal deal = new TrdProductDeal();
         total.setTotleTradeId(totalTradeId);
         total.setIsCancel(cancel);
+        if(cancel.equals("Y")) {
+            total.setTradeStatus("03");
+            deal.setTradeStatus("03");
+        }else {
+            total.setTradeStatus("01");
+            deal.setTradeStatus("01");
+        }
         total.setUpdateTime(new Date());
         total.setUpdateUser("system");
         trdFinProductDealTotalMapper.updateByPrimaryKeySelective(total);
-        TrdProductDeal deal = new TrdProductDeal();
         deal.setTotleTradeId(totalTradeId);
         deal.setIsCancel(cancel);
         deal.setUpdateTime(new Date());
