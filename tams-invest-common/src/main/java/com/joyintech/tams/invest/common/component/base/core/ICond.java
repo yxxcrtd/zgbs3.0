@@ -47,4 +47,6 @@ public interface ICond {
 
     void setPlateDate(Date plateDate);
 
+    String getSource();
+
 }
