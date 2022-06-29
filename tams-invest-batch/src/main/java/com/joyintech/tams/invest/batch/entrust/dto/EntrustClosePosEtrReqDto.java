@@ -133,4 +133,14 @@ public class EntrustClosePosEtrReqDto {
     public void setFinprodId(String finprodId) {
         this.finprodId = finprodId;
     }
+
+    private String entrustStatus;
+
+    public String getEntrustStatus() {
+        return entrustStatus;
+    }
+
+    public void setEntrustStatus(String entrustStatus) {
+        this.entrustStatus = entrustStatus;
+    }
 }
