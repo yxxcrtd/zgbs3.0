@@ -1509,8 +1509,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             return;
         }
         for (CfetsPrimaryBidManageSaveDetailDto detailDto : list) {
-            // 应计利息置为 0
-            detailDto.setIntAmt(BigDecimal.ZERO);
             // 判断是否中标
             if (tenderTargetFlag) {
                 // 中标指令列表范围：当【招标标的】为利率和利差时，【投标标位】小于等于基本信息中【中标标位】的指令中标。
