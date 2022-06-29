@@ -352,7 +352,7 @@ public class StlDataDealSzdJsmxProcessService {
 					else {
 						// 金融产品代码
 						//将清算数据Entity.证券代码1作为债券代码去债券标的中取对应的股票代码，再取该股对应的金融产品代码
-						List<String> zzgFinprodIdList = stlDownDataDealMapper.getZzgFinprodId(szdJsmx.getZqdm1());
+						List<String> zzgFinprodIdList = stlDownDataDealMapper.getZzgFinprodId("F01_" + szdJsmx.getZqdm1() +".SH");
  						settleTransData.setFinprodId(CollectionUtils.isEmpty(zzgFinprodIdList)?null:zzgFinprodIdList.get(0));
 						// 金融产品类型(投管分类)
 						//settleTransData.setFinprodType2(null);
@@ -493,7 +493,8 @@ public class StlDataDealSzdJsmxProcessService {
 				if (bondFinprodIdList.contains(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm1() + ".SH")
 						|| bondFinprodIdList.contains(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm2() + ".SH")) {
 					// GNS-879:配债不重新计算净价总额和应计利息总额 modify by fuyongsheng 20220217 start
-					if(!DictCodeListExt3.交易方向_配债.getValue().equals(settleTransData.getPs())){
+					if(!(DictCodeListExt3.交易方向_配债.getValue().equals(settleTransData.getPs())
+							|| DictCodeListExt3.交易方向_债转股.getValue().equals(settleTransData.getPs()))){
 						stlDownDataDealService.calc(settleTransData);
 					}
 					// GNS-879:配债不重新计算净价总额和应计利息总额 modify by fuyongsheng 20220217 end

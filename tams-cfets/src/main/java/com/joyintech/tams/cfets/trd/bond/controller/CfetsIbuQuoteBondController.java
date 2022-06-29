@@ -287,6 +287,13 @@ public class CfetsIbuQuoteBondController extends BaseController {
 	public Message<List<PtlAllocationDto>> otherForPtlAllocation(@RequestBody AutoAllocationRequest autoAllocationRequest) {
 		try {
 			ibuQuoteBondCalService.calOtherForPtlAllocation(autoAllocationRequest.getPtlAllocations(), autoAllocationRequest);
+			if (CollectionUtils.isNotEmpty(autoAllocationRequest.getPtlAllocations())){
+				for (PtlAllocationDto ptlAllocationDto : autoAllocationRequest.getPtlAllocations()){
+					ptlAllocationDto.setIntAmt(ArithmeticUtil.divide(ptlAllocationDto.getIntAmt(),BigDecimal.valueOf(10000),4));
+					ptlAllocationDto.setCpriceAmt(ArithmeticUtil.divide(ptlAllocationDto.getCpriceAmt(),BigDecimal.valueOf(10000),4));
+					ptlAllocationDto.setFpriceAmt(ArithmeticUtil.divide(ptlAllocationDto.getFpriceAmt(),BigDecimal.valueOf(10000),4));
+				}
+			}
 			return new Message<List<PtlAllocationDto>>().success().setData(autoAllocationRequest.getPtlAllocations());
 		} catch (Exception e) {
 			logger.error("其他分配异常", e);

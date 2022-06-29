@@ -1806,14 +1806,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             intAmt = request.getAllocationDetails().get(0).getIntAmt();
         }
         if (StringUtil.equals(DictCodeListExt4.中标方式_多标位中标.getValue(), request.getWinType())) {
-            int index = 0;
-            for(CfetsPrimaryBidManageSaveDetailDto item:request.getAllocationDetails()) {
-                if (item.getWinCprice() != null) {
-                    cprice = ArithmeticUtil.doAdd(cprice, item.getWinPrice());
-                    index++;
-                }
+            BigDecimal total = null; // 总净价
+            BigDecimal weightTotal = null; // 权重汇总
+            for (CfetsPrimaryBidManageSaveDetailDto allocationDetail : request.getAllocationDetails()) {
+                total = ArithmeticUtil.doAdd(total, allocationDetail.getActWinPrinamt());
+                weightTotal = ArithmeticUtil.doAdd(weightTotal, ArithmeticUtil.multiply(allocationDetail.getActWinPrinamt(), allocationDetail.getWinCprice()));
             }
-            cprice = ArithmeticUtil.divide(cprice, BigDecimal.valueOf(index), 4);
+            cprice = ArithmeticUtil.divide(weightTotal, total, 4);
         }
         // 中标净价
         amountResponse.setWinCprice(cprice);
@@ -2064,7 +2063,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BigDecimal total = null; // 总净价
             BigDecimal weightTotal = null; // 权重汇总
             for (CfetsPrimaryBidManageSaveDetailDto allocationDetail : dto.getAllocationDetails()) {
-                total = ArithmeticUtil.doAdd(total, allocationDetail.getWinCprice());
+                total = ArithmeticUtil.doAdd(total, allocationDetail.getActWinPrinamt());
                 weightTotal = ArithmeticUtil.doAdd(weightTotal, ArithmeticUtil.multiply(allocationDetail.getActWinPrinamt(), allocationDetail.getWinCprice()));
                 if (StringUtil.isNotEmpty(allocationDetail.getIntAmt())) {
                     intAmt = allocationDetail.getIntAmt();

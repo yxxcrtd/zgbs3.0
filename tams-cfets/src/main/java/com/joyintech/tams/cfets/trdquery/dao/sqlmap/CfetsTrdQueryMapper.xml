@@ -54,7 +54,7 @@
     </select>
     <sql id="onlyRegInfo">
         select  distinct decode(reg.is_cancel,'Y','撤销','N','有效') as effectiveStatusStr,
-        decode(reg.finprod_type2,'F01','01','F02','02','F03','02') as finprodType2,
+        decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') as finprodType2,
         btm.busi_type busiTypePosition,
         reg.finprod_id as finprodId,
         nvl(fp.finprod_market_id,reg.term_type) as finprodMarketId,
@@ -97,6 +97,7 @@
         on reg.finprod_id=fpl.finprod_id
         left join fin_product fp
         on fp.finprod_id=reg.finprod_id
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
         inner join
         (
             select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
@@ -130,9 +131,10 @@
         left join sys_user su on reg.ou_trader_id=su.user_name
         LEFT JOIN SYS_USER_ADD sua  ON sua.USER_ID = su.USER_ID
         LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps, INPUT_VALUE_3 AS issueClass, OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
-        ON reg.finprod_type2 = btm.Finprod_Type_Tg
+        ON NVL(fpt.TYPE_8,reg.FINPROD_TYPE2) = btm.Finprod_Type_Tg
         AND reg.Ps = btm.ps
-        AND (btm.issueClass = fpl.ISSUE_CLASS  OR btm.issueClass IS NULL )
+        AND ((fp.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpl.ISSUE_CLASS) or
+        (fp.FINPROD_TYPE2 != 'F32' or fp.FINPROD_TYPE2 is null) and btm.issueClass is null)
         where 1=1 and reg.ps in ('T01','T02','T03','03','04') and reg.trade_status='01'
         <if test="sysDate != null and !sysDate.equals('')">
             AND  reg.trade_date= #{sysDate,jdbcType=DATE}
@@ -150,7 +152,7 @@
             AND reg.ps=#{ps}
         </if>
         <if test="finprodType2List != null and finprodType2List.size() > 0">
-            AND reg.finprod_type2 in
+            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in
             <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
@@ -329,7 +331,7 @@
                 AND #{PS_T01} =#{ps}
             </if>
             <if test="finprodType2List != null and finprodType2List.size() > 0">
-                AND FPT.TYPE_9 in
+                AND decode(FPT.TYPE_9,'01','04','02','01') in
                 <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -485,7 +487,7 @@
             AND #{PS_T01} =#{ps}
         </if>
         <if test="finprodType2List != null and finprodType2List.size() > 0">
-            AND FPT.TYPE_9 in
+            AND decode(FPT.TYPE_9,'01','04','02','01') in
             <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
@@ -530,7 +532,7 @@
     </sql>
     <sql id="onlyWflRegInfo">
         select distinct '流程中' as effectiveStatusStr,
-        decode(reg.finprod_type2,'F01','01','F02','02','F03','02') as finprodType2,
+        decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') as finprodType2,
         btm.busi_type busiTypePosition,
         reg.finprod_id as finprodId,
         nvl(fp.finprod_market_id,reg.term_type) as finprodMarketId,
@@ -571,6 +573,7 @@
         on reg.finprod_id=fpl.finprod_id
         left join fin_product fp
         on fp.finprod_id=reg.finprod_id
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID=fp.FINPROD_ID
         inner join
         (
         select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
@@ -600,9 +603,10 @@
         on reg.sec_manage_acct_id=stlinfo.sec_acct_id
         LEFT JOIN MST_COUNTER_PARTY mcci ON reg.counter_id= mcci.counter_id
         LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps, INPUT_VALUE_3 AS issueClass, OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm
-        ON reg.finprod_type2 = btm.Finprod_Type_Tg
+        ON NVL(fpt.TYPE_8,reg.FINPROD_TYPE2) = btm.Finprod_Type_Tg
         AND reg.Ps = btm.ps
-        AND (btm.issueClass = fpl.ISSUE_CLASS  OR btm.issueClass IS NULL )
+        AND ((fp.FINPROD_TYPE2 = 'F32' and btm.issueClass = fpl.ISSUE_CLASS) or
+        (fp.FINPROD_TYPE2 != 'F32' or fp.FINPROD_TYPE2 is null) and btm.issueClass is null)
         where reg.ps in ('T01','T02','T03','03','04')
         <if test="sysDate != null and !sysDate.equals('')">
             AND  reg.trade_date= #{sysDate,jdbcType=DATE}
@@ -621,7 +625,7 @@
             AND reg.ps=#{ps}
         </if>
         <if test="finprodType2List != null and finprodType2List.size() > 0">
-            AND reg.finprod_type2 in
+            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in
             <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
@@ -2775,7 +2779,7 @@
             decode(T1.finprod_type2,'F03',null,nvl(T8.SETTLE_STATUS,#{DELIVERY_STATUS_01})) settleStatus,
             T1.TOTLE_TRADE_ID totleTradeId,
             T1.FINPROD_TYPE2 finprodType2,
-            sdl1.item_value finprodType2Str,
+            decode(FIN_PRODUCT_TYPE.TYPE_9,'01','同业存单', sdl1.item_value) finprodType2Str,
             btm.BUSI_TYPE tgBusiType,
             sdl2.item_value tgBusiTypeStr,
             t2.FINPROD_ID AS finprodId,
@@ -2881,6 +2885,9 @@
                     #{item}
                 </foreach>
            </if>
+            <if test="regAssetType != null and (regAssetType =='04' or regAssetType =='01') ">
+                AND  decode(FIN_PRODUCT_TYPE.TYPE_9,'01','04','02','01') = #{regAssetType}
+            </if>
             <if test="tradeMarket != null and tradeMarket!='' ">
                 AND T1.TRADE_MARKET = #{tradeMarket}
             </if>
@@ -2915,7 +2922,7 @@
                 decode(T1.finprod_type2,'F03',null,nvl(T8.SETTLE_STATUS,#{DELIVERY_STATUS_01})) settleStatus,
                 T1.TOTLE_TRADE_ID totleTradeId,
                 T1.FINPROD_TYPE2 finprodType2,
-                sdl1.item_value finprodType2Str,
+                decode(FIN_PRODUCT_TYPE.TYPE_9,'01','同业存单', sdl1.item_value) finprodType2Str,
                 btm.BUSI_TYPE tgBusiType,
                 sdl2.item_value tgBusiTypeStr,
                 t2.FINPROD_ID AS finprodId,
@@ -3022,6 +3029,9 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="regAssetType != null and (regAssetType =='04' or regAssetType =='01') ">
+                AND  decode(FIN_PRODUCT_TYPE.TYPE_9,'01','04','02','01') = #{regAssetType}
+            </if>
             <if test="tradeMarket != null and tradeMarket!='' ">
                 AND T1.TRADE_MARKET = #{tradeMarket}
             </if>
@@ -3056,7 +3066,7 @@
                 decode(T1.finprod_type2,'F03',null,nvl(T8.SETTLE_STATUS,#{DELIVERY_STATUS_01})) settleStatus,
                 T1.TOTLE_TRADE_ID totleTradeId,
                 T1.FINPROD_TYPE2 finprodType2,
-                sdl1.item_value finprodType2Str,
+                decode(FIN_PRODUCT_TYPE.TYPE_9,'01','同业存单', sdl1.item_value) finprodType2Str,
                 btm.BUSI_TYPE tgBusiType,
                 sdl2.item_value tgBusiTypeStr,
                 t2.FINPROD_ID AS finprodId,
@@ -3162,6 +3172,9 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="regAssetType != null and (regAssetType =='04' or regAssetType =='01') ">
+                AND  decode(FIN_PRODUCT_TYPE.TYPE_9,'01','04','02','01') = #{regAssetType}
+            </if>
             <if test="tradeMarket != null and tradeMarket!='' ">
                 AND T1.TRADE_MARKET = #{tradeMarket}
             </if>
@@ -3193,7 +3206,7 @@
                 NVL(TMSI.SETTLE_STATUS,'01')	 settleStatus,
                 TFPDT.TOTLE_TRADE_ID	totleTradeId,
                 TFPDT.FINPROD_TYPE2	 finprodType2,
-                sdl1.item_value finprodType2Str,
+                decode(FPT.TYPE_9,'01','同业存单', sdl1.item_value) finprodType2Str,
                 CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN #{BUSI_TYPE_POSITION_01}
                 WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN #{BUSI_TYPE_POSITION_34}	END tgBusiType,
                 CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN '一级投标'
@@ -3297,6 +3310,9 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="regAssetType != null and (regAssetType =='04' or regAssetType =='01') ">
+                AND  decode(FPT.TYPE_9,'01','04','02','01') = #{regAssetType}
+            </if>
             <if test="tradeMarket != null and tradeMarket!='' ">
                 AND TFPDT.TRADE_MARKET = #{tradeMarket}
             </if>
@@ -3376,7 +3392,7 @@
             t1.trade_id as busiCode,
             t2.entrust_id as entrustId,
             t1.finprod_type2 as finprodType2,
-            sdl1.item_value finprodType2Str,
+            decode(fin_product_type.TYPE_9,'01','同业存单', sdl1.item_value) finprodType2Str,
             btm.BUSI_TYPE tgBusiType,
             sdl2.item_value tgBusiTypeStr,
             t2.portfolio_id as portfolioId,
@@ -3484,6 +3500,9 @@
                 #{item}
             </foreach>
         </if>
+        <if test="regAssetType != null and (regAssetType =='04' or regAssetType =='01') ">
+            AND  decode(fin_product_type.TYPE_9,'01','04','02','01') = #{regAssetType}
+        </if>
         <if test="tradeMarket != null and tradeMarket!='' ">
             AND T1.TRADE_MARKET = #{tradeMarket}
         </if>
@@ -3524,7 +3543,7 @@
             t1.trade_id as busiCode,
             t2.entrust_id as entrustId,
             t1.finprod_type2 as finprodType2,
-            sdl1.item_value finprodType2Str,
+            decode(fin_product_type.TYPE_9,'01','同业存单', sdl1.item_value) finprodType2Str,
             btm.BUSI_TYPE tgBusiType,
             sdl2.item_value tgBusiTypeStr,
             t2.portfolio_id as portfolioId,
@@ -3632,6 +3651,9 @@
                 #{item}
             </foreach>
         </if>
+        <if test="regAssetType != null and (regAssetType =='04' or regAssetType =='01') ">
+            AND  decode(fin_product_type.TYPE_9,'01','04','02','01') = #{regAssetType}
+        </if>
         <if test="tradeMarket != null and tradeMarket!='' ">
             AND T1.TRADE_MARKET = #{tradeMarket}
         </if>
@@ -3671,7 +3693,7 @@
             t1.trade_id as busiCode,
             t2.entrust_id as entrustId,
             t1.finprod_type2 as finprodType2,
-            sdl1.item_value finprodType2Str,
+            decode(fin_product_type.TYPE_9,'01','同业存单', sdl1.item_value) finprodType2Str,
             btm.BUSI_TYPE tgBusiType,
             sdl2.item_value tgBusiTypeStr,
             t2.portfolio_id as portfolioId,
@@ -3778,6 +3800,9 @@
                 #{item}
             </foreach>
         </if>
+        <if test="regAssetType != null and (regAssetType =='04' or regAssetType =='01') ">
+            AND  decode(fin_product_type.TYPE_9,'01','04','02','01') = #{regAssetType}
+        </if>
         <if test="tradeMarket != null and tradeMarket!='' ">
             AND T1.TRADE_MARKET = #{tradeMarket}
         </if>
@@ -3813,7 +3838,7 @@
         TPD.TRADE_ID     busiCode,
         TPDA.ENTRUST_ID  entrustId,
         TPD.FINPROD_TYPE2     finprodType2,
-        sdl1.item_value finprodType2Str,
+        decode(FPT.TYPE_9,'01','同业存单', sdl1.item_value) finprodType2Str,
         CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN '01'
         WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN '34' END tgBusiType,
         CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN '一级投标'
@@ -3932,6 +3957,9 @@
             <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
+        </if>
+        <if test="regAssetType != null and (regAssetType =='04' or regAssetType =='01') ">
+            AND  decode(FPT.TYPE_9,'01','04','02','01') = #{regAssetType}
         </if>
         <if test="tradeMarket != null and tradeMarket!='' ">
             AND TPD.TRADE_MARKET = #{tradeMarket}
@@ -5315,6 +5343,7 @@
             LEFT JOIN SYS_USER su
                       ON su.USER_NAME = BO.OUR_TRADER
             WHERE  BO.TRADE_STATUS = #{TRADE_STATUS_01}
+              and BRT.STATUS = #{TRADE_STATUS_01}
             AND  BO.BID_ID = #{bidId}
             UNION ALL
             SELECT FP.FINPROD_ID as finprodId,

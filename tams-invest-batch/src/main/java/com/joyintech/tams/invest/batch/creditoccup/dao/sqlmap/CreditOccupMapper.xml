@@ -358,4 +358,17 @@
               and tpd.BRANCH='0'
               and tpd.FINPROD_TYPE2 not in ('F02','F04','F08')
     </select>
+
+    <select id="listTotalTempDeal" resultType="com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto">
+        select
+            P_TOTLE_TRADE_ID as tradeId,
+            '03' as  tradeStatus
+        from TRD_PRODUCT_TEMP_DEAL_TOTAL
+        where FINPROD_TYPE2='F32' and IS_CANCEL='N' AND TRADE_STATUS='01'
+        and TRADE_DATE=to_date(#{executeDate},'yyyy-MM-dd')
+    </select>
+
+
+
+
 </mapper>

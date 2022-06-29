@@ -467,16 +467,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         workFlowParameter.setPageId(getPageId());
         workFlowParameter.setElementId(getPageId() + "_btn_revoke");
         workFlowParameter.setBusinessCode(CfetsTrdFirstBidFirmInfoDto::getBidId);
-        if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), biddingMethod)) {
-            //  自主投标
-            workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标.getValue());
-        } else if (StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), biddingMethod)) {
-            //代投代缴
-            workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴.getValue());
-        } else if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), biddingMethod)) {
-            // 分销买入
-            workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
-        }
+        workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标.getValue());
         workFlowParameter.setComment(entity -> "投标编号 (" + entity.getBidId() + ")");
         processParameter.setPageId(workFlowParameter.getPageId());
         processParameter.setWorkFlowParameter(workFlowParameter);

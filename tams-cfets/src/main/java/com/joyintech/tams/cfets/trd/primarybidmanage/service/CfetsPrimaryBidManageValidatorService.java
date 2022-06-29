@@ -172,7 +172,7 @@ public class CfetsPrimaryBidManageValidatorService implements BeanValidator {
                             break;
                         } else if (StringUtil.equals(DictCodeListExt4.中标方式_多标位中标.getValue(), dto.getWinType())) {
                             if (BigDecimalUtil.ACompareToB(cfetsPrimaryBidManageSaveDetailDto.getWinPrice(),
-                                    cfetsPrimaryBidManageSaveDetailDto.getBidPrice(), 6) == 0) {
+                                    cfetsPrimaryBidManageSaveDetailDto.getBidPrice(), 6) != 0) {
                                 resultList.add(new ValidMessage(getMessage("多标位中标的分配明细中中标标位必须等于投标标位")));
                                 break;
                             }
