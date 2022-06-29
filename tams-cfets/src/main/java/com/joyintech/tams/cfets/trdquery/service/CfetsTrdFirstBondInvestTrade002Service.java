@@ -16,6 +16,7 @@ import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
+import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealDbDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInitRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
@@ -37,6 +38,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.component.base.group.impl.dao.BasePtlCashPositionInfoMapper;
 import com.joyintech.tams.invest.common.component.base.trade.BaseTradeProductDealService;
 import com.joyintech.tams.invest.common.component.business.basicdata.BaseTradeFeeCommService;
@@ -45,6 +47,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.cstp.service.CstpCommonService;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
+import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.risk.service.RiskCreditListCommonValidatorService;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.invest.common.service.MapperDelegateService;
@@ -80,28 +83,13 @@ import java.util.*;
 @Service
 public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrdFirstBondInvestTradeDto> implements BaseProcessService<CfetsTrdFirstBondInvestTradeDto> {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private CfetsTrdQueryMapper cfetsTrdQueryMapper;
     @Autowired
     private CfetsTrdConfirmMapper cfetsTrdConfirmMapper;
-    /**
-     * BussTrdTransferOrderService
-     */
-    @Autowired(required = false)
-    private BussTrdTransferOrderService bussTrdTransferOrderService;
-
     @Autowired
-    private BaseTradeProductDealService baseTradeProductDealService;
-
-    @Autowired
-    private TradeCommonService tradeCommonService;
-
-    /**
-     * DateCalService
-     */
-    @Autowired(required = false)
-    private DateCalService dateCalService;
+    private TrdProductDealAddMapper trdProductDealAddMapper;
 
     /**
      * BaseTradeProductDealCommService
@@ -109,196 +97,23 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     @Autowired(required = false)
     private BaseTradeProductDealCommService baseTradeProductDealCommService;
 
-    /**
-     * IPlatformDate
-     */
-    @Autowired(required = false)
-    private IPlatformDate iPlatformDate;
-
-    @Autowired
-    private PaTrdProductDealMapper paTrdProductDealMapper;
-
-    /**
-     * 共通Mapper的通用代理方案
-     */
-    @Autowired
-    private MapperDelegateService mapperDelegateService;
-
-    /**
-     * 共通组件
-     */
-    @Autowired
-    private CommonBusinessService commonBusinessService;
-
-    // 调用投管接口 add by renping 20190205 start
-    /**
-     * 投管接口共通组件
-     */
-    @Autowired
-    private InvestInterfCommService investInterfCommService;
-    // 调用投管接口 add by renping 20190205 end
-
-    /**
-     * BaseGetBusinessId
-     */
-    @Autowired(required = false)
-    private BaseGetBusinessId baseGetBusinessId;
-
-    @Autowired(required = false)
-    private BussTrdAvailableCashQueryService bussTrdAvailableCashQueryService;
-
-    /**
-     * 风险试算组件Service
-     */
-    @Autowired(required = false)
-    private BasRiskMathCommService basRiskMathCommService;
-
-    @Autowired(required = false)
-    private FinProductMapper finProductMapper;
-
-    /**
-     * {@linkplain}
-     */
-    @Autowired(required = false)
-    private InterfComponentService interfComponentService;
-
-    /**
-     * 费用查询
-     */
-    @Autowired(required = false)
-    private BaseTradeFeeCommService baseTradeFeeCommService;
-
-    /**
-     * MultiApproveTradeCheckService
-     */
-    @Autowired(required = false)
-    private MultiApproveTradeCheckService multiApproveTradeCheckService;
-
-    @Autowired(required = false)
-    private SysUploadFileInfoMapper sysUploadFileInfoMapper;
-
-    @Autowired
-    private WflTrdProductDealMapper wflTrdProductDealMapper;
-
-    @Autowired
-    private WflTrdFinProductDealTotalMapper wflTrdFinProductDealTotalMapper;
-
     @Autowired
     private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
 
     @Autowired
-    private WflPaTrdFinDealTotalMapper wflPaTrdFinDealTotalMapper;
-
-    @Autowired
-    private PaTrdFinProductDealTotalMapper paTrdFinProductDealTotalMapper;
-
-    @Autowired
-    private TrdDealTotalAddMapper trdDealTotalAddMapper;
-
-    @Autowired
-    private WflTrdDealTotalAddMapper wflTrdDealTotalAddMapper;
-
-    @Autowired
-    private WflTrdProductDealAddMapper wflTrdProductDealAddMapper;
-
-    @Autowired
-    private TrdProductDealAddMapper trdProductDealAddMapper;
-
-    @Autowired
-    private WflPaTrdProductDealMapper wflPaTrdProductDealMapper;
-
-    @Autowired
-    private WflStlPayOrdersMapper wflStlPayOrdersMapper;
-
-    @Autowired
-    private StlPayOrdersMapper stlPayOrdersMapper;
-
-    @Autowired
-    private TrdProductDealMapper trdProductDealMapper;
-
-    @Autowired
-    private PtlTradeMapper ptlTradeMapper;
-
-    @Autowired
-    private TrdTradeFeeDetailMapper trdTradeFeeDetailMapper;
-
-    @Autowired
-    private TrdTradeFeeTotalMapper trdTradeFeeTotalMapper;
-
-    @Autowired
-    private StlSecAcctInfoMapper stlSecAcctInfoMapper;
-
-    @Autowired
-    private PaPtlPortfolioMapper paPtlPortfolioMapper;
-
-    @Autowired
-    private MstCounterPartyMapper mstCounterPartyMapper;
-
-    @Autowired
-    private InterfTradSecdealMapper interfTradSecdealMapper;
-
-    @Autowired
-    private PtlPortfolioMapper ptlPortfolioMapper;
-
-    @Autowired
-    private TrdProductDealPreMapper trdProductDealPreMapper;
-    @Autowired
-    private TrdProductDealAddPreMapper trdProductDealAddPreMapper;
-    @Autowired
-    private PreTrdCommonBaseService preTrdCommonBaseService;
-
-    @Autowired
-    private RiskCreditListCommonValidatorService riskCreditListCommonValidatorService;
-
-    @Autowired
-    private TrdCommonBaseService trdCommonBaseService;
-
-    @Autowired
-    private CstpCommonService cstpCommonService;
-
-    @Autowired
-    private BaseEtrCashPositionCommService baseEtrCashPositionCommService;
-
-    @Autowired
-    private FinProductTypeMapper finProductTypeMapper;
-
-    @Autowired
-    private BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
-
-    @Autowired
-    private EtrCommonCashPositionDealService etrCommonCashPositionDealService;
-
-    @Autowired
-    private BasePtlCashPositionInfoMapper basePtlCashPositionInfoMapper;
-
-    @Autowired
-    private EtrCashPositionFlowMapper etrCashPositionFlowMapper;
-
-    @Autowired
-    private PtlCashPositionFlowMapper ptlCashPositionFlowMapper;
-
-    @Autowired
-    private FileAttachmentProcess fileAttachmentProcess;
-    @Autowired(required = false)
-    private BaseTradeProductDealCommServiceImpl baseTradeProductDealCommServiceImpl;
-    /**
-     * 流程组件
-     */
-    @Autowired
-    private MstWorkflowCommonService mstWorkflowCommonService;
-    @Autowired
     private CfetsTrdBondFirstSub002Service cfetsTrdBondFirstSub002Service;
 
-    @Autowired
-    private CfetsManualSettleMapper cfetsManualSettleMapper;
-
-    @Autowired
-    private CfetsQuotedCommonService cfetsQuotedCommonService;
     @Autowired(required = false)
     private FinProductAddMapper finProductAddMapper;
 
+    @Autowired
+    private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    @Autowired
+    private BaseEtrInvestInfoService baseEtrInvestInfoServiceImpl;
+
     // 交易份额小数保留位数
-    private int decimalPlaces_4 = 4;
+    private final int decimalPlaces_4 = 4;
 
     /**
      * 一级申购撤销doComplete
@@ -347,6 +162,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
             finProductAdd.setIssueStatus(null);
             finProductAddMapper.updateByPrimaryKey(finProductAdd);
         }
+        this.insertEtrFinishStatus(entity.getTrdProductDeals(),OperationType.REVOKE);
         //发送头寸
         String ps = DictCodeList.交易方向_买入.getValue();
         String busiType = DictCodeListExt3.头寸业务类型_债券一级申购.getValue();
@@ -445,5 +261,37 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         return resultDto;
     }
 
+    /**
+     * 处理指令完成度
+     *
+     * @param operationType
+     */
+    public void insertEtrFinishStatus(List<TrdProductDeal> list, OperationType operationType) {
+        if (CollectionUtils.isNotEmpty(list)) {
+            List<EtrFinishStatusDto> etrFinishStatusDtos = new ArrayList<>();
+            for (TrdProductDeal trdProductDeal : list) {
+                EtrFinishStatusDto status = new EtrFinishStatusDto();
+                TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getTradeId());
+                status.setEntrustId(trdProductDealAdd.getEntrustId());
+                status.setTradeId(trdProductDeal.getTradeId());
+                status.setFinishDate(trdProductDeal.getTradeDate());
+                EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
+                if (etrEntrustAdd != null && StringUtil.isNotEmpty(etrEntrustAdd.getTargetType())
+                        && StringUtil.equals(DictCodeListExt3.目标类型_金额.getValue(), etrEntrustAdd.getTargetType())) {
+                    status.setEntFinishAmt(trdProductDeal.getTradeAmt());
+                } else {
+                    status.setEntFinishAmt(trdProductDeal.getShareAmt());
+                }
+                status.setTrader(trdProductDeal.getTrader());
+                if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
+                    baseEtrInvestInfoServiceImpl.cancelCompleteDelegate(status.getEntrustId(), trdProductDeal.getTradeId());
+                }
+                etrFinishStatusDtos.add(status);
+            }
+            if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
+                baseEtrInvestInfoServiceImpl.completeDelegate(etrFinishStatusDtos);
+            }
+        }
+    }
 
 }

@@ -49,6 +49,21 @@ public class BigDecimalUtil {
     }
 
     /**
+     * 判断输入数是否为0,输入为空时返回true
+     *
+     * @param a 输入
+     * @return boolean 为零返回true,否则返回false
+     * @author jiangpeng
+     * @date 2022/4/24 9:58
+     */
+    public static boolean isZeroOrNull(BigDecimal a) {
+        if (a == null) {
+            return true;
+        }
+        return a.compareTo(BigDecimal.ZERO) == 0;
+    }
+
+    /**
      * n 是否是 m 的整数倍
      *
      * @param n
