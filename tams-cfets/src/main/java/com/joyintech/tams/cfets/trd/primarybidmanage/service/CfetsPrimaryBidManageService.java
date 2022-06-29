@@ -1548,12 +1548,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 isJudgePrice = detailDto.getBidPrice();
             }//else if 分配明细.同标位汇总投标券面 > 剩余中标券面总额 and 剩余中标券面总额>0
             else if (BigDecimalUtil.ACompareToB(detailDto.getSamePriceTotalBidPrinamt(), lastWinPrinamt, 2) > 0
-                    && BigDecimalUtil.ACompareToB(lastWinPrinamt, bidMinUnit, 6) > 0) {
+                    && BigDecimalUtil.ACompareToB(lastWinPrinamt, bidMinUnit, 6) >= 0) {
                 // if 待填补标位 = null
                 if (Objects.isNull(toBeFilledPrice)) {
                     // 待填补标位 = 分配明细.中标标位
                     toBeFilledPrice = detailDto.getBidPrice();
-
                 }
                 // if 分配明细.中标标位 = 待填补标位
                 if (BigDecimalUtil.ACompareToB(toBeFilledPrice, detailDto.getBidPrice(), 6) == 0) {
@@ -1566,7 +1565,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 isJudgePrice = null;
             }
             // if 分配明细.中标标位 != 待填补标位
-            if (Objects.isNull(isJudgePrice)) {
+            if (Objects.isNull(isJudgePrice)
+                    && BigDecimalUtil.ACompareToB(toBeFilledPrice, detailDto.getBidPrice(), 6) != 0) {
                 this.clearDetailAmt(detailDto);
             } else {
                 // 计算净价
@@ -1584,7 +1584,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                         , toDo.getSamePriceTotalBidPrinamt(), 2);
                 BigDecimal[] results = medianBigdecimal.divideAndRemainder(bidMinUnit);
                 toDo.setTheWinPrinamt(ArithmeticUtil.multiply(results[0], bidMinUnit));
-                toDo.setActWinPrinamt(ArithmeticUtil.multiply(results[0], bidMinUnit));
+                toDo.setActWinPrinamt(toDo.getTheWinPrinamt());
                 // 剩余中标券面总额2 值递减
                 lastWinPrinamt2 = ArithmeticUtil.subtract(lastWinPrinamt2, toDo.getActWinPrinamt());
             }
@@ -1592,12 +1592,15 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 // IF 剩余中标券面总额2 > 参数.中标最小单位
                 if (BigDecimalUtil.ACompareToB(lastWinPrinamt2, bidMinUnit, 2) > 0) {
                     //分配明细.中标券面总额 = 中标券面总额 + 参数.中标最小单位
-                    toDo.setActWinPrinamt(ArithmeticUtil.doAdd(toDo.getActWinPrinamt(), bidMinUnit));
+                    toDo.setTheWinPrinamt(ArithmeticUtil.doAdd(toDo.getActWinPrinamt(), bidMinUnit));
+                    toDo.setActWinPrinamt(toDo.getTheWinPrinamt());
                     //剩余中标券面总额2 = 剩余中标券面总额2 - 参数.中标最小单位
                     lastWinPrinamt2 = ArithmeticUtil.subtract(lastWinPrinamt2, toDo.getActWinPrinamt());
                 } else {
                     // 分配明细.中标券面总额 = 中标券面总额 + 剩余中标券面总额2
-                    toDo.setActWinPrinamt(ArithmeticUtil.doAdd(toDo.getActWinPrinamt(), lastWinPrinamt2));
+                    toDo.setTheWinPrinamt(ArithmeticUtil.doAdd(toDo.getActWinPrinamt(), lastWinPrinamt2));
+                    toDo.setActWinPrinamt(toDo.getTheWinPrinamt());
+                    break;
                 }
             }
         }
@@ -2547,15 +2550,15 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     public String getBidPriceStr(CfetsPrimaryBidManageSaveRequest request){
         String bidPriceStr = null;
         if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利率.getValue())){
-            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100));
+            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getWinPrice(), BigDecimal.valueOf(100));
             bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"%";
         }
         if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利差.getValue())){
-            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(10000));
+            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getWinPrice(), BigDecimal.valueOf(10000));
             bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"BP";
         }
         if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())){
-            BigDecimal bidPrice = request.getAllocationDetails().get(0).getBidPrice();
+            BigDecimal bidPrice = request.getWinPrice();
             bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"元";
         }
         return bidPriceStr;

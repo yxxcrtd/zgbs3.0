@@ -8,6 +8,7 @@ import com.joyintech.tams.common.base.entity.SettleTransData;
 import com.joyintech.tams.common.base.entity.SzdAbcsj;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
@@ -133,7 +134,7 @@ public class StlDataDealSzdAbcsjProcessService {
             // 业务场景分类
             settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_股票_股息红利税_补缴.getValue());
             // 交收结果
-            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdAbcsj.getJgdm()));
+            settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_正常交收.getValue());
             // TODO 佣金，佣金是否随交易支付，佣金_原始
 
             StlDownDataDealWriteBaseDto stlDownDataDealWriteBaseDto = new StlDownDataDealWriteBaseDto();
