@@ -195,6 +195,17 @@
         </where>
     </select>
 
+    <select id="getRefNameList" resultType="java.lang.String">
+        SELECT
+        T1.FINPROD_MARKET_ID text
+        FROM FIN_PRODUCT T1
+        <where>
+            AND T1.FINPROD_TYPE2 = #{finprodType2}
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+            AND T1.FINPROD_ABBR like '%' || #{search} || '%'
+        </where>
+    </select>
+
     <select id="getFinprodIdForSelect" resultMap="finprodIdMap">
         SELECT
         T1.FINPROD_MARKET_ID id,

@@ -1424,12 +1424,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             // IF 分配明细i.投标标位 = 临时投标标位
             if (BigDecimalUtil.ACompareToB(tempBidPrice, list.get(i).getBidPrice(), 6) == 0) {
                 // 同标位汇总投标券面 = 同标位汇总投标券面 + 分配明细i.投标券面
-                samePriceTotalBidPrinamt = ArithmeticUtil.doAdd(list.get(i).getSamePriceTotalBidPrinamt(), samePriceTotalBidPrinamt);
+                samePriceTotalBidPrinamt = ArithmeticUtil.doAdd(list.get(i).getTotalBidPrinamt(), samePriceTotalBidPrinamt);
             }
             // ELSE
             else {
                 // FOR (int j=行号，j<=i，j++)
-                for (int j = index; j < i; j++) {
+                for (int j = index; j <= i; j++) {
                     // 配明细j.同标位汇总投标券面 = 同标位汇总投标券面
                     list.get(j).setSamePriceTotalBidPrinamt(samePriceTotalBidPrinamt);
                 }
@@ -1439,6 +1439,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 tempBidPrice = list.get(i).getBidPrice();
                 //		行号 = i
                 index = i;
+            }
+            if (i == list.size() - 1) {
+                for (int j = index; j <= i; j++) {
+                    // 配明细j.同标位汇总投标券面 = 同标位汇总投标券面
+                    list.get(j).setSamePriceTotalBidPrinamt(samePriceTotalBidPrinamt);
+                }
             }
         }
     }
@@ -1462,8 +1468,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         BigDecimal lastWinPrinamt = request.getWinPrinamt();
         // 待填补标位 = null
         BigDecimal toBeFilledPrice = null;
+        // 已判断标位 = null
+        BigDecimal isJudgePrice = null;
         // 最大中标券面
         BigDecimal maxTheWinPrinamt = BigDecimal.ZERO;
+        // 待填补分配LIST
+        List<CfetsPrimaryBidManageSaveDetailDto> toDoList = new ArrayList<>();
         // 记录最大中标券面的投标信息
         CfetsPrimaryBidManageSaveDetailDto saveDetailDto = new CfetsPrimaryBidManageSaveDetailDto();
         if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
@@ -1481,13 +1491,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             // 判断是否中标
             if (tenderTargetFlag) {
                 // 中标指令列表范围：当【招标标的】为利率和利差时，【投标标位】小于等于基本信息中【中标标位】的指令中标。
-                if (BigDecimalUtil.ACompareToB(detailDto.getBidPrice(), request.getWinPrice(), 4) > 0) {
+                if (BigDecimalUtil.ACompareToB(detailDto.getBidPrice(), request.getWinPrice(), 6) > 0) {
                     this.clearDetailAmt(detailDto);
                     continue;
                 }
             } else {
                 // 当【招标标的】为价格时，【投标标位】大于等于基本信息中【中标标位】的指令中标；
-                if (BigDecimalUtil.ACompareToB(detailDto.getBidPrice(), request.getWinPrice(), 4) < 0) {
+                if (BigDecimalUtil.ACompareToB(detailDto.getBidPrice(), request.getWinPrice(), 6) < 0) {
                     this.clearDetailAmt(detailDto);
                     continue;
                 }
@@ -1504,39 +1514,70 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 return;
             }
             // if 分配明细.同标位汇总投标券面 <= 剩余中标券面总额
-            if (BigDecimalUtil.ACompareToB(detailDto.getSamePriceTotalBidPrinamt(), lastWinPrinamt, 2) <= 0) {
+            if ((BigDecimalUtil.ACompareToB(detailDto.getSamePriceTotalBidPrinamt(), lastWinPrinamt, 2) <= 0
+                    || BigDecimalUtil.ACompareToB(isJudgePrice, detailDto.getBidPrice(), 6) == 0)
+                    && Objects.isNull(toBeFilledPrice)) {
                 // 分配明细.中标券面总额 = 投标券面总额
                 detailDto.setTheWinPrinamt(detailDto.getTotalBidPrinamt());
                 detailDto.setActWinPrinamt(detailDto.getTheWinPrinamt());
+                // 剩余中标券面总额 值递减
+                lastWinPrinamt = ArithmeticUtil.subtract(lastWinPrinamt, detailDto.getActWinPrinamt());
+                isJudgePrice = detailDto.getBidPrice();
             }//else if 分配明细.同标位汇总投标券面 > 剩余中标券面总额 and 剩余中标券面总额>0
-            else if (BigDecimalUtil.ACompareToB(detailDto.getTotalBidPrinamt(), lastWinPrinamt, 2) > 0
-                    && BigDecimalUtil.ACompareToB(lastWinPrinamt, BigDecimal.ZERO, 2) > 0) {
+            else if (BigDecimalUtil.ACompareToB(detailDto.getSamePriceTotalBidPrinamt(), lastWinPrinamt, 2) > 0
+                    && BigDecimalUtil.ACompareToB(lastWinPrinamt, bidMinUnit, 6) > 0) {
                 // if 待填补标位 = null
                 if (Objects.isNull(toBeFilledPrice)) {
                     // 待填补标位 = 分配明细.中标标位
                     toBeFilledPrice = detailDto.getBidPrice();
 
-                }// if 剩余中标券面总额 >= 参数.中标最小单位
-                else if (BigDecimalUtil.ACompareToB(lastWinPrinamt, bidMinUnit, 2) >= 0) {
-                    // 分配明细.中标券面总额 = 剩余中标券面总额*投标券面总额/同标位汇总投标券面 - 剩余中标券面总额*投标券面总额/同标位汇总投标券面 取余 参数.中标最小单位
-                    // 中间值 剩余中标券面总额*投标券面总额/同标位汇总投标券面
-                    BigDecimal medianBigdecimal = ArithmeticUtil.divide(
-                            ArithmeticUtil.multiply(lastWinPrinamt, detailDto.getTotalBidPrinamt())
-                            , detailDto.getSamePriceTotalBidPrinamt(), 2);
-                    BigDecimal[] results = medianBigdecimal.divideAndRemainder(bidMinUnit);
-                    detailDto.setTheWinPrinamt(ArithmeticUtil.multiply(results[0], bidMinUnit));
-                    detailDto.setActWinPrinamt(detailDto.getTheWinPrinamt());
-                    tailDifference = results[1];
+                }
+                // if 分配明细.中标标位 = 待填补标位
+                if (BigDecimalUtil.ACompareToB(toBeFilledPrice, detailDto.getBidPrice(), 6) == 0) {
+                    // 待填补分配LIST.ADD(分配明细)
+                    toDoList.add(detailDto);
+                }else {
+                    isJudgePrice = null;
                 }
             } else {
-                this.clearDetailAmt(detailDto);
+                isJudgePrice = null;
             }
-            // 剩余中标券面总额 值递减
-            lastWinPrinamt = ArithmeticUtil.subtract(lastWinPrinamt, detailDto.getActWinPrinamt());
-            // 计算净价
-            detailDto.setWinCprice(this.calPrice(detailDto, request.getTenderTarget(), request.getFinprodMarketId(), request.getPayDate()));
+            // if 分配明细.中标标位 != 待填补标位
+            if (Objects.isNull(isJudgePrice)) {
+                this.clearDetailAmt(detailDto);
+            } else {
+                // 计算净价
+                detailDto.setWinCprice(this.calPrice(detailDto, request.getTenderTarget(), request.getFinprodMarketId(), request.getPayDate()));
+            }
         }
-        saveDetailDto.setActWinPrinamt(ArithmeticUtil.doAdd(saveDetailDto.getActWinPrinamt(), tailDifference));
+        if (CollectionUtils.isNotEmpty(toDoList)) {
+            // 定义 剩余中标券面总额2 = 剩余中标券面总额
+            BigDecimal lastWinPrinamt2 = lastWinPrinamt;
+            for (CfetsPrimaryBidManageSaveDetailDto toDo : toDoList) {
+                // 分配明细.中标券面总额 = 剩余中标券面总额*投标券面总额/同标位汇总投标券面 - 剩余中标券面总额*投标券面总额/同标位汇总投标券面 取余 参数.中标最小单位
+                // 中间值 剩余中标券面总额*投标券面总额/同标位汇总投标券面
+                BigDecimal medianBigdecimal = ArithmeticUtil.divide(
+                        ArithmeticUtil.multiply(lastWinPrinamt, toDo.getTotalBidPrinamt())
+                        , toDo.getSamePriceTotalBidPrinamt(), 2);
+                BigDecimal[] results = medianBigdecimal.divideAndRemainder(bidMinUnit);
+                toDo.setTheWinPrinamt(ArithmeticUtil.multiply(results[0], bidMinUnit));
+                toDo.setActWinPrinamt(ArithmeticUtil.multiply(results[0], bidMinUnit));
+                // 剩余中标券面总额2 值递减
+                lastWinPrinamt2 = ArithmeticUtil.subtract(lastWinPrinamt2, toDo.getActWinPrinamt());
+            }
+            for (CfetsPrimaryBidManageSaveDetailDto toDo : toDoList) {
+                // IF 剩余中标券面总额2 > 参数.中标最小单位
+                if (BigDecimalUtil.ACompareToB(lastWinPrinamt2, bidMinUnit, 2) > 0) {
+                    //分配明细.中标券面总额 = 中标券面总额 + 参数.中标最小单位
+                    toDo.setActWinPrinamt(ArithmeticUtil.doAdd(toDo.getActWinPrinamt(), bidMinUnit));
+                    //剩余中标券面总额2 = 剩余中标券面总额2 - 参数.中标最小单位
+                    lastWinPrinamt2 = ArithmeticUtil.subtract(lastWinPrinamt2, toDo.getActWinPrinamt());
+                } else {
+                    // 分配明细.中标券面总额 = 中标券面总额 + 剩余中标券面总额2
+                    toDo.setActWinPrinamt(ArithmeticUtil.doAdd(toDo.getActWinPrinamt(), lastWinPrinamt2));
+                }
+            }
+        }
     }
 
     /**
@@ -1643,7 +1684,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         BigDecimal settFeeAmt = StringUtil.isNotEmpty(dto.getSettFeeAmt()) ? dto.getSettFeeAmt() : BigDecimal.ZERO;
         List<CfetsPrimaryBidManageSaveDetailDto> productDtos = dto.getAllocationDetails().stream().filter(item -> StringUtil.isNotEmpty(item.getPayAmt())).collect(Collectors.toList());
         List<CfetsPrimaryBidManageSaveDetailDto> productNullDtos = dto.getAllocationDetails().stream().filter(item -> !StringUtil.isNotEmpty(item.getPayAmt())).collect(Collectors.toList());
-        productDtos.sort(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getPayAmt));
+        productDtos.sort(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getPayAmt).reversed());
         // 费用平均值
         BigDecimal avg = ArithmeticUtil.divide(settFeeAmt, new BigDecimal(productDtos.size()), 2, RoundingMode.DOWN);
         // 费用剩余尾差
@@ -1775,6 +1816,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      * @date 2022/6/25 19:51
      */
     public CfetsPrimaryBidManageSaveRequest editList(CfetsPrimaryBidManageSaveRequest request, String type) {
+        if(!StringUtil.equals(request.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                && !StringUtil.equals(request.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())){
+            request.getAllocationDetails().forEach(item->item.setIntAmt(request.getIntAmt()));
+        }
         if("1".equals(type)){
             // 计算分配明细中中标净价
             this.calCprice(request.getAllocationDetails());
