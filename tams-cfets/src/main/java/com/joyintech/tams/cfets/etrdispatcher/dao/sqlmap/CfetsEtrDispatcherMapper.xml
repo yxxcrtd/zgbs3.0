@@ -1165,6 +1165,7 @@
         group by t0.BID_ID) bobp
         ON bobp.BID_ID = bo.BID_ID
         WHERE TFPDT.TRADE_STATUS = '01'
+        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>
@@ -1271,6 +1272,7 @@
         group by t0.BID_ID) bobp
         ON bobp.BID_ID = bo.BID_ID
         WHERE TFPDT.TRADE_STATUS = '01'
+        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>) T
@@ -1355,6 +1357,7 @@
         left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
         WHERE 1=1
+        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>
@@ -1406,6 +1409,7 @@
         left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
         WHERE 1=1
+        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>) T
@@ -1726,6 +1730,7 @@
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         WHERE tpda.entrust_id = #{entrustId}
           AND tfpdt.TRADE_STATUS = '01'
+          AND tpd.TRADE_STATUS = '01'
         union all
         SELECT
             #{TRADE_FLOW_STATUS01} effectFlag,
@@ -1846,7 +1851,8 @@
             on bo.BID_ID = bobp2.BID_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         WHERE tpda.entrust_id = #{entrustId}
-          AND tfpdt.TRADE_STATUS = '01') T
+          AND tfpdt.TRADE_STATUS = '01'
+          AND tpd.TRADE_STATUS = '01') T
         ORDER BY T.updateTime DESC
 
     </select>
